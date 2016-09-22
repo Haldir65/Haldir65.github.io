@@ -4,14 +4,21 @@
   <meta charset="utf-8">
   
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
-  <title>个人随笔</title>
+  <title>replace butterKnife with databinding | 个人随笔</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="个人随笔">
-<meta property="og:url" content="http://haldir65.github.io/index.html">
+  <meta name="description" content="Yigit Boyar 在2015年的android Dev summit上介绍了Databinding，当时好像提到一句:“no binding libraries will be created from now on “，大意如此。本文介绍使用Databinding替代ButterKnife的用法
+本文大部分代码来自这里，仅为个人学习使用。1.在Activity中使用before123456">
+<meta property="og:type" content="article">
+<meta property="og:title" content="replace butterKnife with databinding">
+<meta property="og:url" content="http://haldir65.github.io/2016/09/22/replace-butterKnife-with-databinding/index.html">
 <meta property="og:site_name" content="个人随笔">
+<meta property="og:description" content="Yigit Boyar 在2015年的android Dev summit上介绍了Databinding，当时好像提到一句:“no binding libraries will be created from now on “，大意如此。本文介绍使用Databinding替代ButterKnife的用法
+本文大部分代码来自这里，仅为个人学习使用。1.在Activity中使用before123456">
+<meta property="og:updated_time" content="2016-09-22T08:13:22.078Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="个人随笔">
+<meta name="twitter:title" content="replace butterKnife with databinding">
+<meta name="twitter:description" content="Yigit Boyar 在2015年的android Dev summit上介绍了Databinding，当时好像提到一句:“no binding libraries will be created from now on “，大意如此。本文介绍使用Databinding替代ButterKnife的用法
+本文大部分代码来自这里，仅为个人学习使用。1.在Activity中使用before123456">
   
     <link rel="alternative" href="/atom.xml" title="个人随笔" type="application/atom+xml">
   
@@ -133,9 +140,7 @@
 </nav>
 
       <div class="body-wrap">
-        
-  
-    <article id="post-replace-butterKnife-with-databinding" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-replace-butterKnife-with-databinding" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <input type="hidden" class="isFancy" />
@@ -144,8 +149,8 @@
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/09/22/replace-butterKnife-with-databinding/">replace butterKnife with databinding</a>
+    <h1 class="article-title" itemprop="name">
+      replace butterKnife with databinding
     </h1>
   
 
@@ -199,90 +204,37 @@
   </div>
 </article>
 
-
-
-
-
-
-
-
-
-
   
-    <article id="post-android-inner-class-leak" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
+<nav id="article-nav">
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/09/18/android-inner-class-leak/">android内部类导致leak模板</a>
-    </h1>
   
+    <a href="/2016/09/18/android-inner-class-leak/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">android内部类导致leak模板</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
 
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <hr>
-<p>通常我们在一个class里面写内部类时，不是一定要用static声明为静态类，但是推荐作为内部静态类，因为内部类会隐式持有外部类的引用，有些时候如果代码处理不对容易造成内存泄漏<br>下面就是个内存泄漏的例子<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MainActivity</span> <span class="keyword">extends</span> <span class="title">Activity</span> </span>&#123;</div><div class="line"></div><div class="line">	<span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyHandler</span> <span class="keyword">extends</span> <span class="title">Handler</span></span>&#123;</div><div class="line">	<span class="meta">@Override</span></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</div><div class="line">		<span class="keyword">if</span>(msg.what==<span class="number">1</span>)&#123;</div><div class="line">			<span class="keyword">new</span> Thread()&#123;</div><div class="line">				<span class="meta">@Override</span></div><div class="line">				<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">					<span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</div><div class="line">						<span class="comment">//do something</span></div><div class="line">					&#125;</div><div class="line">				&#125;</div><div class="line">			&#125;.start();</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">public</span> MyHandler handler;</div><div class="line">	<span class="meta">@Override</span></div><div class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</div><div class="line">		<span class="keyword">super</span>.onCreate(savedInstanceState);</div><div class="line">		setContentView(R.layout.activity_main);</div><div class="line">		</div><div class="line">		<span class="comment">//...</span></div><div class="line">		handler.sendEmptyMessage(<span class="number">1</span>);</div><div class="line">		finish();</div><div class="line">	    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>如上面代码所示，在onCreate方法里发送了一条消息给handler处理然后finish方法关闭activity，但是代码并不能如愿，因为在handler收到消息启动了一个线程并且是<strong>死循环</strong>，<br>这时候Thread持有handler的引用，而handler又持有activity的引用，这就导致了handler不能回收和activty也不能回收，所以推荐使用静态内部类，因为静态内部类不持有外部类的引用，可以避免这些不必要的麻烦。</p>
-<p>除此之外，在Activity里面创建一个AsyncTask的子类也容易导致leak<br>例如 <a href="http://stackoverflow.com/questions/24679383/memory-leak-using-asynctask-as-a-inner-class" target="_blank" rel="external">stackoverFlow上的这个问题</a></p>
-<p>对于这类问题的比较常用的方式:<br>WeakReference<br>例如,写这样一个的静态内部类</p>
-<pre><code class="java"><span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">IncomingHandler</span> <span class="keyword">extends</span> <span class="title">Handler</span> </span>{
-    <span class="keyword">private</span> <span class="keyword">final</span> WeakReference&lt;MessagingService&gt; mReference;
 
-    IncomingHandler(MessagingService service) {
-        mReference = <span class="keyword">new</span> WeakReference&lt;&gt;(service);
-    }
 
-    <span class="meta">@Override</span>
-    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>{
-        MessagingService service = mReference.get();
-        <span class="keyword">switch</span> (msg.what) {
-            <span class="keyword">case</span> MSG_SEND_NOTIFICATION:
-                <span class="keyword">int</span> howManyConversations = msg.arg1 &lt;= <span class="number">0</span> ? <span class="number">1</span> : msg.arg1;
-                <span class="keyword">int</span> messagesPerConversation = msg.arg2 &lt;= <span class="number">0</span> ? <span class="number">1</span> : msg.arg2;
-                <span class="keyword">if</span> (service != <span class="keyword">null</span>) {
-                    service.sendNotification(howManyConversations,
-                    messagesPerConversation);
-                }
-                <span class="keyword">break</span>;
-            <span class="keyword">default</span>:
-                <span class="keyword">super</span>.handleMessage(msg);
-        }
-    }
-}
-</code></pre>
-<p>//handler通过弱引用持有service对象，外加static内部类不持有外部类引用，应该不会leak了</p>
 
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      <a href="/2016/09/18/android-inner-class-leak/" class="archive-article-date">
-  	<time datetime="2016-09-18T02:23:42.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-09-18</time>
-</a>
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags"></i>
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/android/">android</a></li></ul>
+<div class="share_jia">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">Share to: &nbsp; </span>
+		<a class="jiathis_button_facebook"></a> 
+	    <a class="jiathis_button_twitter"></a>
+	    <a class="jiathis_button_plus"></a> 
+	    <a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+    <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
 	</div>
-
-      
-	<div class="article-category tagcloud">
-	<i class="icon-price-tags"></i>
-	<a class="article-category-link" href="/categories/blog/">blog</a>
-	</div>
-
-
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
 
 
 
@@ -290,64 +242,6 @@
 
 
 
-
-
-
-  
-    <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/09/18/hello-world/">Hello World</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      <a href="/2016/09/18/hello-world/" class="archive-article-date">
-  	<time datetime="2016-09-18T00:44:19.677Z" itemprop="datePublished"><i class="icon-clock"></i>2016-09-18</time>
-</a>
-      
-      
-
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
-
-
-
-  
-  
 
 
       </div>
@@ -369,8 +263,8 @@
 		fancybox: true,
 		mathjax: true,
 		animate: true,
-		isHome: true,
-		isPost: false,
+		isHome: false,
+		isPost: true,
 		isArchive: false,
 		isTag: false,
 		isCategory: false,
