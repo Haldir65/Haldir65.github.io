@@ -26,7 +26,7 @@ android:background=”?android:attr/selectableItemBackground”
 这个xml属性最早是我学着写recyclerVeiw的item xml的时候接触到的，简单来说就是，在API 21及以上，用户点击这个itemVi">
 <meta property="og:image" content="https://cloud.githubusercontent.com/assets/12274855/18787855/2a6d93f2-81d7-11e6-8026-58cdbd8583d4.JPG">
 <meta property="og:image" content="https://cloud.githubusercontent.com/assets/12274855/18787841/1d0b2d82-81d7-11e6-916e-b4113772c3a2.JPG">
-<meta property="og:updated_time" content="2016-09-23T14:32:04.062Z">
+<meta property="og:updated_time" content="2016-09-23T14:37:16.673Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="android使用selectableItemBackground的一些坑">
 <meta name="twitter:description" content="android:foreground=”?android:attr/selectableItemBackground”
@@ -183,7 +183,7 @@ android:background=”?android:attr/selectableItemBackground”
 <blockquote>
 <p>android:background=”?android:attr/selectableItemBackground”</p>
 </blockquote>
-<p>这个xml属性最早是我学着写recyclerVeiw的item xml的时候接触到的，简单来说就是，在API 21及以上，用户点击这个itemView时候会出现一个Ripple效果<br><br>非常好看，而在API 21以下则会表现为MonoChrome的类似按压色的效果<img src="https://cloud.githubusercontent.com/assets/12274855/18787855/2a6d93f2-81d7-11e6-8026-58cdbd8583d4.JPG" alt=""> <br><br>而这个点击时的水波纹颜色也是可以Customize的<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;item name=&quot;android:colorControlHighlight&quot;&gt;@color/my_ripple_color&lt;/item&gt;</div></pre></td></tr></table></figure></p>
+<p>这个xml属性最早是我学着写recyclerVeiw的item xml的时候接触到的，简单来说就是，在API 21及以上，用户点击这个itemView时候会出现一个Ripple效果<br>非常好看，而在API 21以下则会表现为MonoChrome的类似按压色的效果<img src="https://cloud.githubusercontent.com/assets/12274855/18787855/2a6d93f2-81d7-11e6-8026-58cdbd8583d4.JPG" alt=""> <br><br>而这个点击时的水波纹颜色也是可以Customize的<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;item name=&quot;android:colorControlHighlight&quot;&gt;@color/my_ripple_color&lt;/item&gt;</div></pre></td></tr></table></figure></p>
 <p>//这个要写在自己的Activity的Theme(style-v21)里，注意，当前Activity的Theme必须继承自Appcompat!!<br>于是，我写了这样的xml<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">LinearLayout</span></span></div><div class="line">        <span class="attr">android:id</span>=<span class="string">"@+id/item_root"</span></div><div class="line">        <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></div><div class="line">        <span class="attr">android:layout_height</span>=<span class="string">"?android:attr/listPreferredItemHeight"</span></div><div class="line">        <span class="attr">android:orientation</span>=<span class="string">"vertical"</span></div><div class="line">        <span class="attr">android:gravity</span>=<span class="string">"center"</span></div><div class="line">        <span class="attr">android:onClick</span>=<span class="string">"@&#123;(view) -&gt; callback.onClick(view,data)&#125;"</span></div><div class="line">        <span class="attr">android:elevation</span>=<span class="string">"2dp"</span></div><div class="line">        <span class="attr">android:background</span>=<span class="string">"@color/md_amber_200"</span></div><div class="line">        <span class="attr">android:foreground</span>=<span class="string">"?android:attr/selectableItemBackground"</span></div><div class="line">        /&gt;</div></pre></td></tr></table></figure></p>
 <p>然而，点击之后并没有出现水波纹(模拟器 API 21)，换成CardView或是将foreground改为background之后才有效。查了很多博客，最后得出结论:<br>android:foreground在API 23之前只对FrameLayout有效(CardView继承自FrameLayout当然有效)。<br><a id="more"></a></p>
 <p>##所以正确的做法是</p>
@@ -196,14 +196,14 @@ android:background=”?android:attr/selectableItemBackground”
 </blockquote>
 <p>或者使用FrameLayout。</p>
 <ul>
-<li><p>关于foreground<br>之前看google io2016时，<a href="https://github.com/chrisbanes" target="_blank" rel="external">Chris Banes</a>给了这样的解释 <img src="https://cloud.githubusercontent.com/assets/12274855/18787841/1d0b2d82-81d7-11e6-916e-b4113772c3a2.JPG" alt="">,<br>android:foreground在API 1 的FrameLayout中就有了，但直到API 23才将这个属性添加到View中。<br>所以，换成API 23的手机上面那段代码foreground也是可以出现Ripple的,至于23之前为什么foreground无效，并不清楚为什么</p>
+<li><p>关于foreground<br>之前看google io2016时，<a href="https://github.com/chrisbanes" target="_blank" rel="external">Chris Banes</a>给了这样的解释。<br><img src="https://cloud.githubusercontent.com/assets/12274855/18787841/1d0b2d82-81d7-11e6-916e-b4113772c3a2.JPG" alt="">,<br>android:foreground在API 1 的FrameLayout中就有了，但直到API 23才将这个属性添加到View中。<br>所以，换成API 23的手机上面那段代码foreground也是可以出现Ripple的,至于23之前为什么foreground无效，并不清楚为什么</p>
 </li>
 <li><p>首先是一种简单的模拟这种视觉效果的尝试：<a href="http://effmx.com/articles/ru-he-chuang-jian-jian-rong-de-foreground-drawable-selectorshi-xian-layoutdian-ji-xiao-guo/" target="_blank" rel="external">如何创建兼容的Forefround drawable selector</a> 这篇文章提到了:</p>
 <blockquote>
 <p>简单来讲，Foreground 定义了绘制于当前内容之上的 Drawable，类似一层覆盖物。所以我们可以为设置 Foreground 的值为 drawable或者color， 那如果将 Froeground 设置为 drawable selector，自然就可以为控件实现点击响应效果了。 比较奇怪的是在 sdk 23 以前，foregrond 属性只对 Framelayout 生效，但这个问题现在得到了解决，所以也请确保你的 compileSdkVersion 大于等于23<br>  这篇文章的做法是针对21以下的版本使用slelector Drawable实现类似的效果</p>
 </blockquote>
 </li>
-<li><p>如何真正实现为API23之前的View,ViewGroup添加foreground?<br>随后我找到了<a href="https://dzone.com/articles/adding-foreground-selector" target="_blank" rel="external">这篇博客</a>。<br>具体的逻辑并不太多。<br>这里插一句，任何Drawable对象，在你调用setDrawable之后，该Drawable都会保留一个最后一个调用对象的callback</p>
+<li><p>如何真正实现为API23之前的View,ViewGroup添加foreground?<br>随后我找到了<a href="https://dzone.com/articles/adding-foreground-selector" target="_blank" rel="external">这篇博客</a>，具体的逻辑并不太多。<br>这里插一句，任何Drawable对象，在你调用setDrawable之后，该Drawable都会保留一个最后一个调用对象的callback</p>
 <blockquote>
 <p>Drawable-&gt;View-&gt;Context //leak!<br>//所以Drawable也有可能导致Activity leak</p>
 </blockquote>
@@ -224,7 +224,7 @@ android:background=”?android:attr/selectableItemBackground”
 <li><p>使用方式</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">your.package.ForegroundLinearLayout</span></span></div><div class="line">    <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></div><div class="line">    <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></div><div class="line">    <span class="attr">android:foreground</span>=<span class="string">"?android:selectableItemBackground"</span>&gt;</div><div class="line"></div><div class="line">    <span class="tag">&lt;<span class="name">ImageView</span></span></div><div class="line">        <span class="attr">android:id</span>=<span class="string">”@+id/imageview_opaque”</span></div><div class="line">        <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></div><div class="line">        <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span> /&gt;</div><div class="line"></div><div class="line">    ... other views ...</div><div class="line"></div><div class="line"><span class="tag">&lt;/<span class="name">your.package.ForegroundLinearLayout</span>&gt;</span></div></pre></td></tr></table></figure>
 </li>
-<li><p>接着是<a href="https://github.com/JakeWharton" target="_blank" rel="external">jack Wharton</a>的<a href="https://gist.github.com/JakeWharton/0a251d67649305d84e8a" target="_blank" rel="external">ForegroundImageView</a><br></p>
+<li><p>接着是<a href="https://github.com/JakeWharton" target="_blank" rel="external">Jack Wharton</a>的<a href="https://gist.github.com/JakeWharton/0a251d67649305d84e8a" target="_blank" rel="external">ForegroundImageView</a><br></p>
 </li>
 <li><p>attrs</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</div><div class="line"><span class="tag">&lt;<span class="name">resources</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">declare-styleable</span> <span class="attr">name</span>=<span class="string">"ForegroundImageView"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">attr</span> <span class="attr">name</span>=<span class="string">"android:foreground"</span>/&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">declare-styleable</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">resources</span>&gt;</span></div></pre></td></tr></table></figure>
@@ -236,7 +236,7 @@ android:background=”?android:attr/selectableItemBackground”
 <p>##reference</p>
 <ul>
 <li><a href="https://www.youtube.com/watch?v=TIHXGwRTMWI" target="_blank" rel="external">Android themes and styles demisfied</a> 关于Theme和Style的区别的很好的学习资料</li>
-<li><a href="https://plus.google.com/108967384991768947849/posts/aHPVDtr6mcp" target="_blank" rel="external">Chris Banes</a> 评论很精彩</li>
+<li><a href="https://plus.google.com/108967384991768947849/posts/aHPVDtr6mcp" target="_blank" rel="external">Chris Banes G+ post</a> 评论很精彩</li>
 <li><a href="https://gist.github.com/shakalaca/6199283" target="_blank" rel="external">RelativeLayout with foreGround</a> 没测试过</li>
 <li><a href="https://github.com/traex/RippleEffect" target="_blank" rel="external">Ripple Effect</a> 将Ripple的动画兼容到API 9+ ，很出色的一个库。之前项目中用过，就是一个继承自RelativeLayout的自定义ViewGroup。</li>
 </ul>
