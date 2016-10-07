@@ -6,28 +6,19 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <title>安卓事件分发流程 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="图片来自making sense of the touch system
-
-图
-片来自文章图解安卓事件分发机制">
+  <meta name="description" content="图1来自making sense of the touch system">
 <meta property="og:type" content="article">
 <meta property="og:title" content="安卓事件分发流程">
 <meta property="og:url" content="http://haldir65.github.io/2016/10/06/touch-event-distribution/index.html">
 <meta property="og:site_name" content="Haldir的博客">
-<meta property="og:description" content="图片来自making sense of the touch system
-
-图
-片来自文章图解安卓事件分发机制">
+<meta property="og:description" content="图1来自making sense of the touch system">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/dispatch_touch_event_video.JPG">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/touch_event_1.png">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/touch_event_2.png">
-<meta property="og:updated_time" content="2016-10-07T14:55:26.376Z">
+<meta property="og:updated_time" content="2016-10-07T17:05:19.009Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="安卓事件分发流程">
-<meta name="twitter:description" content="图片来自making sense of the touch system
-
-图
-片来自文章图解安卓事件分发机制">
+<meta name="twitter:description" content="图1来自making sense of the touch system">
 <meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/dispatch_touch_event_video.JPG">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
@@ -173,12 +164,52 @@
     <div class="article-entry" itemprop="articleBody">
       
         <p><img src="http://odzl05jxx.bkt.clouddn.com/dispatch_touch_event_video.JPG" alt=""></p>
-<p>图片来自making sense of the touch system</p>
+<p>图1来自<a href="https://www.youtube.com/watch?v=usBaTHZdXSI" target="_blank" rel="external">making sense of the touch system</a> <a id="more"></a></p>
+<blockquote>
+<p>Touch事件始于ACTION_DOWN, 终止于ACTION_UP, 这其中可能会伴随着ACTION_MOVE,ACTION_CANCEL等等。</p>
+</blockquote>
+<ul>
+<li>首先来关注ACTION_DOWN，用户触摸屏幕，MotionEvent开始传递：</li>
+</ul>
+<blockquote>
+<ol>
+<li><p>Activity.dispatchTouchEvent</p>
+</li>
+<li><p>ViewGroup.dispatchTouchEvent</p>
+</li>
+<li><p>ViewGroup.onInterceptTouchEvent</p>
+<p>…..中间省略n个视图层级 ….&gt;&gt;&gt;</p>
+</li>
+<li><p>View.dispatchTouchEvent</p>
+</li>
+<li><p>View.onTouchEvent</p>
+</li>
+</ol>
+<p>​      ….中间省略n个视图层级….&gt;&gt;&gt;</p>
+<ol>
+<li>ViewGroup.onTouchEvent</li>
+<li>Activity.onTouchEvent</li>
+</ol>
+</blockquote>
+<p>这也就是本文最开始的图1内描述的内容，注意，在默认情况下(各个函数都返回super的情况下)才能将这个从上到下，再从下到上的循环走完整。这里讨论的还只是ACTION_DOWN。</p>
+<ul>
+<li><p>接下来看ACTION_DOWN下发过程中各个函数返回值对于整个传递链走向的影响，我们在override这些函数的时候，返回值无非三种：</p>
+<blockquote>
+<p>true , false ,super</p>
+</blockquote>
+<ul>
+<li>return true：ACTION_DOWN事件分发到此结束(消费掉)，这里有一个要注意的是onInterceptTouchEvent,返回true表示该ViewGroup打算将事件拦截下来，底层View将接收到一个ACTION_CANCEL，事件传递给该ViewGroup的onTouchEvent</li>
+<li>return false: 对于dispatchTouchEvent，返回false表明不再向下分发，ACTION_DOWN发送到上一层ViewGroup(Activity)的OnTouchEvent；对于onInterceptTouchEvent,返回false表明该ViewGroup不打算拦截，继续下发，对于onTouchEvent，返回false，事件继续上传至上一层级ViewGroup的OnTouchEvent 。</li>
+<li>return super : 完成整个传递链，就像图1中展示的一样。</li>
+</ul>
+</li>
+</ul>
 <p><img src="http://odzl05jxx.bkt.clouddn.com/touch_event_1.png" alt=""></p>
-<p>图</p>
-<p>片来自文章<a href="http://www.jianshu.com/p/e99b5e8bd67b" target="_blank" rel="external">图解安卓事件分发机制</a> <a id="more"></a></p>
+<p>图2 来自<a href="http://www.jianshu.com/p/e99b5e8bd67b" target="_blank" rel="external">图解安卓事件分发机制</a>  完美地解释了事件分发各个流程中返回值对于事件传递的影响。</p>
 <p><img src="http://odzl05jxx.bkt.clouddn.com/touch_event_2.png" alt=""></p>
-<p>关于onClick和onLongClick这类事件何时触发[<a href="http://blog.csdn.net/ddna/article/details/5451722" target="_blank" rel="external">Android onTouchEvent, onClick及onLongClick的调用机制</a>]</p>
+<p>图3 来自<a href="http://www.jianshu.com/p/e99b5e8bd67b" target="_blank" rel="external">图解安卓事件分发机制</a> </p>
+<p>关于onClick和onLongClick这类事件何时触发[<a href="http://blog.csdn.net/ddna/article/details/5451722" target="_blank" rel="external">Android onTouchEvent, onClick及onLongClick的调用机制</a>] </p>
+<p>还有onTouchListener什么时候调用</p>
 
       
     </div>
