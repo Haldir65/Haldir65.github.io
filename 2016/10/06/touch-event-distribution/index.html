@@ -15,7 +15,7 @@
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/dispatch_touch_event_video.JPG">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/touch_event_1.png">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/touch_event_2.png">
-<meta property="og:updated_time" content="2016-10-07T17:05:19.009Z">
+<meta property="og:updated_time" content="2016-10-07T17:51:29.023Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="安卓事件分发流程">
 <meta name="twitter:description" content="图1来自making sense of the touch system">
@@ -208,6 +208,17 @@
 <p>图2 来自<a href="http://www.jianshu.com/p/e99b5e8bd67b" target="_blank" rel="external">图解安卓事件分发机制</a>  完美地解释了事件分发各个流程中返回值对于事件传递的影响。</p>
 <p><img src="http://odzl05jxx.bkt.clouddn.com/touch_event_2.png" alt=""></p>
 <p>图3 来自<a href="http://www.jianshu.com/p/e99b5e8bd67b" target="_blank" rel="external">图解安卓事件分发机制</a> </p>
+<p>接下来看ACTION_DOWN时返回值对于后续ACTION_MOVE,ACTION_UP等传递路径的影响：</p>
+<p>首先介绍概念：</p>
+<blockquote>
+<p>gesture = ACTION_DOWN+ a bounch of ACTIONS +ACTION_UP</p>
+</blockquote>
+<p>一个gesture(手势)即从手指按下到手指离开这段过程中所有的事件的集合,swipe,click,fling等等</p>
+<p>ACTION_DWON发生时，android将会在当前touch区域所有的View中确定一个Touch Target,后者将接管此次gesture中的所有ACTION_MOVE,ACTION_UP。（这样做有两点好处：1.一旦确定了Touch Target，系统将会把所有的后续事件全部传递到这个target为止，这就避免了复杂的view traversing，有助于提升性能; 2：传递链中第一个能够成为Touch Target的View将独立处理后续事件，不需要考虑其他View受到影响）。在在一个gesture开始时，OnTouchEvent（ACTION_DOWN）返回true,就意味着成为TouchTarget。借用简书<a href="http://www.jianshu.com/p/e99b5e8bd67b" target="_blank" rel="external">作者</a>的总结:</p>
+<blockquote>
+<p>ACTION_DOWN事件在哪个控件消费了（return true），  那么ACTION_MOVE和ACTION_UP就会从上往下（通过dispatchTouchEvent）做事件分发往下传，就只会传到这个控件，不会继续往下传，如果ACTION_DOWN事件是在dispatchTouchEvent消费，那么事件到此为止停止传递，如果ACTION_DOWN事件是在onTouchEvent消费的，那么会把ACTION_MOVE或ACTION_UP事件传给该控件的onTouchEvent处理并结束传递。</p>
+</blockquote>
+<p>这里可以看到，事件依旧是从上往下一直分发到TouchTarget这一层，只是在TouchTarget这一层被消费了，<strong><em>且不再往上传递</em></strong>(有助于性能提升)。父ViewGroup的dispatchTouchEvent和onInterceptTouchEvent依旧会先于TouchTarget接收到ACTION_MOVE等事件。所以此时如果父ViewGroup在onInterceptTouchEvent中返回true，父ViewGroup将取代原有的子View成为新的ViewTarget,后续事件(ACTION_MOVE等)将传递到该父ViewGroup中，而子View将收到ACTION_CANCEL(可以在这里做一些恢复状态的工作，比如从foucused变成unfocused)。</p>
 <p>关于onClick和onLongClick这类事件何时触发[<a href="http://blog.csdn.net/ddna/article/details/5451722" target="_blank" rel="external">Android onTouchEvent, onClick及onLongClick的调用机制</a>] </p>
 <p>还有onTouchListener什么时候调用</p>
 
