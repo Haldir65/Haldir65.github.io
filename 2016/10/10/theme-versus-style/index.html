@@ -4,21 +4,30 @@
   <meta charset="utf-8">
   
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
-  <title>service和activity的通信方式 | Haldir的博客</title>
+  <title>theme versus style | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="一年以前写过一篇关于service和Activity相互通信的很详细的博客，当时真的是费了很大心思在上面。现在回过头来看，还是有些不完善的地方，比如aidl没有给，demo不够全面。现在补上。">
+  <meta name="description" content="###认识Themes和Styles
+重新看一遍Using Themes and styles without going crazy，大部分属于直接翻译
+1. Styles1.1 首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来1&amp;lt;View android:background= &quot;#ff0000&quot; /&amp;gt;
+变成
+12345&amp;lt;View style=">
 <meta property="og:type" content="article">
-<meta property="og:title" content="service和activity的通信方式">
-<meta property="og:url" content="http://haldir65.github.io/2016/09/30/service-activity-communication/index.html">
+<meta property="og:title" content="theme versus style">
+<meta property="og:url" content="http://haldir65.github.io/2016/10/10/theme-versus-style/index.html">
 <meta property="og:site_name" content="Haldir的博客">
-<meta property="og:description" content="一年以前写过一篇关于service和Activity相互通信的很详细的博客，当时真的是费了很大心思在上面。现在回过头来看，还是有些不完善的地方，比如aidl没有给，demo不够全面。现在补上。">
-<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/service_lifecycle.png">
-<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/service_binding_tree_lifecycle.png">
-<meta property="og:updated_time" content="2016-10-08T14:29:00.554Z">
+<meta property="og:description" content="###认识Themes和Styles
+重新看一遍Using Themes and styles without going crazy，大部分属于直接翻译
+1. Styles1.1 首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来1&amp;lt;View android:background= &quot;#ff0000&quot; /&amp;gt;
+变成
+12345&amp;lt;View style=">
+<meta property="og:updated_time" content="2016-10-10T14:59:56.551Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="service和activity的通信方式">
-<meta name="twitter:description" content="一年以前写过一篇关于service和Activity相互通信的很详细的博客，当时真的是费了很大心思在上面。现在回过头来看，还是有些不完善的地方，比如aidl没有给，demo不够全面。现在补上。">
-<meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/service_lifecycle.png">
+<meta name="twitter:title" content="theme versus style">
+<meta name="twitter:description" content="###认识Themes和Styles
+重新看一遍Using Themes and styles without going crazy，大部分属于直接翻译
+1. Styles1.1 首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来1&amp;lt;View android:background= &quot;#ff0000&quot; /&amp;gt;
+变成
+12345&amp;lt;View style=">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -144,7 +153,7 @@
 </nav>
 
       <div class="body-wrap">
-        <article id="post-service-activity-communication" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-theme-versus-style" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <input type="hidden" class="isFancy" />
@@ -154,7 +163,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      service和activity的通信方式
+      theme versus style
     </h1>
   
 
@@ -162,40 +171,60 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p><img src="http://odzl05jxx.bkt.clouddn.com/service_lifecycle.png" alt=""></p>
-<p>一年以前写过一篇关于service和Activity相互通信的很详细的博客，当时真的是费了很大心思在上面。现在回过头来看，还是有些不完善的地方，比如aidl没有给，demo不够全面。现在补上。</p>
-<a id="more"></a>
-<ol>
-<li>关于Android的Service，<a href="https://developer.android.com/guide/components/services.html" target="_blank" rel="external">官方文档</a>是这样描述的</li>
-</ol>
+        <p>###认识Themes和Styles</p>
+<p>重新看一遍Using Themes and styles without going crazy，大部分属于直接翻译</p>
+<h4 id="1-Styles"><a href="#1-Styles" class="headerlink" title="1. Styles"></a>1. Styles</h4><h5 id="1-1-首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来"><a href="#1-1-首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来" class="headerlink" title="1.1 首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来"></a>1.1 首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来</h5><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">View</span> <span class="attr">android:background</span>= <span class="string">"#ff0000"</span> /&gt;</span></div></pre></td></tr></table></figure>
+<p>变成</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">View</span> <span class="attr">style</span>= <span class="string">"@Style/MyStyle"</span> /&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">Style</span> <span class="attr">name</span> = <span class="string">"MyStyle"</span>&gt;</span><span class="xml"></span></div><div class="line">	<span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span> = <span class="string">"android:background"</span>&gt;</span>#ff0000<span class="tag">&lt;/<span class="name">item</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">Style</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>这种形式，对于大量的具有相同属性的且具有<em>共性</em>的View，可以直接使用对应的Style，这能够让layout文件更加整洁。前提是确信layout文件中使用的View具有相同的属性。</p>
+<h5 id="1-2-Style-Inheritance"><a href="#1-2-Style-Inheritance" class="headerlink" title="1.2 Style Inheritance"></a>1.2 Style Inheritance</h5><p>Style可以继承，两种方式：</p>
+<p>假设有parent style </p>
 <blockquote>
-<p><code>Service</code> 是一个可以在后台执行长时间运行操作而不使用用户界面的应用组件。服务可由其他应用组件启动，而且即使用户切换到其他应用，服务仍将在后台继续运行。 此外，组件可以绑定到服务，以与之进行交互，甚至是执行进程间通信 (IPC)。 例如，服务可以处理网络事务、播放音乐，执行文件 I/O 或与内容提供程序交互，而所有这一切均可在后台进行。</p>
-</blockquote>
-<p>这其中也能看出Android对于Service角色的定位，后台工作，不涉及UI。</p>
-<p>Service本身包含started Service和Binded Service</p>
-<p>对于Binded Service 使用</p>
-<p><img src="http://odzl05jxx.bkt.clouddn.com/service_binding_tree_lifecycle.png" alt=""></p>
-<h2 id="待续"><a href="#待续" class="headerlink" title="待续"></a>待续</h2><h3 id="reference"><a href="#reference" class="headerlink" title="reference"></a>reference</h3><p><a href="http://blog.csdn.net/javazejian/article/details/52709857" target="_blank" rel="external">csdn</a></p>
+<style name="Parent">
 
+</blockquote>
+<ul>
+<li>Explicit child</li>
+</ul>
+<blockquote>
+<style name = "Child" parent = "Parent">
+
+</blockquote>
+<ul>
+<li>Implicit child</li>
+</ul>
+<blockquote>
+<style name= "Parent.Child">
+
+</blockquote>
+<p>同时使用两种方式时，默认使用Explicit Parent  </p>
+<p>为避免混淆，推荐使用Explicit Child且Child name不带前缀  </p>
+<p>View不能拥有两个Style,除了TextView及其子类，例如</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">TextView</span>&gt;</span></div><div class="line">  android:textColor = "#ffffff"</div><div class="line">	style="@style/SomeStyle"</div><div class="line">  android:textAppearance = "@style/MyText"</div><div class="line"><span class="tag">&lt;/<span class="name">TextView</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>如上所示，TextView中可以定义TextAppearance，后者包含了常见的textColor，textSize等attributes，而在一个View中可以同时定义两个Style。如果出现冲突，styles之间相同attributes的应用优先级为：</p>
+<blockquote>
+<p>android:textColor &gt;&gt; SomeStyle中的android:textColor&gt;&gt;MyText中的android:textColor</p>
+<p>使用TextAppearance 时一定要有一个parent</p>
+</blockquote>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">name</span> = <span class="string">"MyText"</span> <span class="attr">parent</span>=<span class="string">"TextAppearance.Appcompat"</span>&gt;</span><span class="xml"></div><div class="line">	<span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span> = <span class="string">"android:TextColor"</span>&gt;</span>#F08<span class="tag">&lt;/<span class="name">item</span>&gt;</span></div><div class="line"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>因为使用style时，系统将把style中定义的attribute和当前View的默认attribute融合起来，而TextView默认attribute 中什么也没有，造成textSize = 0的情况，所以务必选择parent</p>
+<ul>
+<li><p>[ ] 未完成</p>
+</li>
+<li><p>####2.Themes</p>
+<pre><code>​
+</code></pre></li>
+</ul>
+</style></blockquote>
       
     </div>
     <div class="article-info article-info-index">
       
-      <a href="/2016/09/30/service-activity-communication/" class="archive-article-date">
-  	<time datetime="2016-09-30T07:25:28.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-09-30</time>
+      <a href="/2016/10/10/theme-versus-style/" class="archive-article-date">
+  	<time datetime="2016-10-10T11:35:32.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-10-10</time>
 </a>
       
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags"></i>
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/android/">android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/service/">service</a></li></ul>
-	</div>
-
       
-	<div class="article-category tagcloud">
-	<i class="icon-price-tags"></i>
-	<a class="article-category-link" href="/categories/技术/">技术</a>
-	</div>
-
 
       <div class="clearfix"></div>
     </div>
@@ -205,18 +234,9 @@
   
 <nav id="article-nav">
   
-    <a href="/2016/10/06/touch-event-distribution/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          安卓事件分发流程
-        
-      </div>
-    </a>
   
-  
-    <a href="/2016/09/27/git-manual/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">git常用手册</div>
+    <a href="/2016/10/08/android-7-0-new-features/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">android 7.0一些新特性介绍</div>
       <i class="icon-circle-right"></i>
     </a>
   
