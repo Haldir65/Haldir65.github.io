@@ -20,7 +20,7 @@
 1. Styles1.1 首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来1&amp;lt;View android:background= &quot;#ff0000&quot; /&amp;gt;
 变成
 12345&amp;lt;View style=">
-<meta property="og:updated_time" content="2016-10-10T14:59:56.551Z">
+<meta property="og:updated_time" content="2016-10-10T15:07:48.275Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="theme versus style">
 <meta name="twitter:description" content="###认识Themes和Styles
@@ -176,7 +176,7 @@
 <h4 id="1-Styles"><a href="#1-Styles" class="headerlink" title="1. Styles"></a>1. Styles</h4><h5 id="1-1-首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来"><a href="#1-1-首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来" class="headerlink" title="1.1 首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来"></a>1.1 首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来</h5><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">View</span> <span class="attr">android:background</span>= <span class="string">"#ff0000"</span> /&gt;</span></div></pre></td></tr></table></figure>
 <p>变成</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">View</span> <span class="attr">style</span>= <span class="string">"@Style/MyStyle"</span> /&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">Style</span> <span class="attr">name</span> = <span class="string">"MyStyle"</span>&gt;</span><span class="xml"></span></div><div class="line">	<span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span> = <span class="string">"android:background"</span>&gt;</span>#ff0000<span class="tag">&lt;/<span class="name">item</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">Style</span>&gt;</span></div></pre></td></tr></table></figure>
-<p>这种形式，对于大量的具有相同属性的且具有<em>共性</em>的View，可以直接使用对应的Style，这能够让layout文件更加整洁。前提是确信layout文件中使用的View具有相同的属性。</p>
+<p>这种形式，对于大量的具有相同属性的且具有<em>共性</em>的View，可以直接使用对应的Style，这能够让layout文件更加整洁。前提是确信layout文件中使用的View具有相同的属性。  <a id="more"></a></p>
 <h5 id="1-2-Style-Inheritance"><a href="#1-2-Style-Inheritance" class="headerlink" title="1.2 Style Inheritance"></a>1.2 Style Inheritance</h5><p>Style可以继承，两种方式：</p>
 <p>假设有parent style </p>
 <blockquote>
@@ -207,13 +207,19 @@
 <p>使用TextAppearance 时一定要有一个parent</p>
 </blockquote>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">name</span> = <span class="string">"MyText"</span> <span class="attr">parent</span>=<span class="string">"TextAppearance.Appcompat"</span>&gt;</span><span class="xml"></div><div class="line">	<span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span> = <span class="string">"android:TextColor"</span>&gt;</span>#F08<span class="tag">&lt;/<span class="name">item</span>&gt;</span></div><div class="line"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></div></pre></td></tr></table></figure>
-<p>因为使用style时，系统将把style中定义的attribute和当前View的默认attribute融合起来，而TextView默认attribute 中什么也没有，造成textSize = 0的情况，所以务必选择parent</p>
+<p>因为使用style时，系统将把style中定义的attribute和当前View的默认attribute融合起来，而TextView默认attribute 中什么也没有，造成textSize = 0的情况，所以务必选择parent，在parent style已经定义好大多数属性的情况下再去修改小部分属性将简单得多。</p>
 <ul>
-<li><p>[ ] 未完成</p>
+<li><p>####2. Themes<br>Themes比Styles的作用范围更广，themes可以在Application,Activity层面管理Widget外观，Theme还可以实现夜间模式切换</p>
+<p>来看如何定义一个Theme</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">name</span> = <span class="string">"Theme"</span>&gt;</span><span class="xml"></div><div class="line">	<span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span> = <span class="string">android:statusBarColor</span>&gt;</span>#ff0000<span class="tag">&lt;/<span class="name">item</span>&gt;</span></div><div class="line"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>回头看一下Style</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">Style</span> <span class="attr">name</span> = <span class="string">"Style"</span>&gt;</span><span class="xml"></div><div class="line">	<span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span> = <span class="string">"android:background"</span>&gt;</span>#ff0000<span class="tag">&lt;/<span class="name">item</span>&gt;</span></div><div class="line"></span><span class="tag">&lt;/<span class="name">Style</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>看起来完全一样</p>
+<p>​</p>
+<ul>
+<li>[ ] ThemeOverLay是什么</li>
+</ul>
 </li>
-<li><p>####2.Themes</p>
-<pre><code>​
-</code></pre></li>
 </ul>
 </style></blockquote>
       

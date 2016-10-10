@@ -161,47 +161,11 @@
 <p>重新看一遍Using Themes and styles without going crazy，大部分属于直接翻译</p>
 <h4 id="1-Styles"><a href="#1-Styles" class="headerlink" title="1. Styles"></a>1. Styles</h4><h5 id="1-1-首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来"><a href="#1-1-首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来" class="headerlink" title="1.1 首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来"></a>1.1 首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来</h5><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">View</span> <span class="attr">android:background</span>= <span class="string">"#ff0000"</span> /&gt;</span></div></pre></td></tr></table></figure>
 <p>变成</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">View</span> <span class="attr">style</span>= <span class="string">"@Style/MyStyle"</span> /&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">Style</span> <span class="attr">name</span> = <span class="string">"MyStyle"</span>&gt;</span><span class="xml"></span></div><div class="line">	<span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span> = <span class="string">"android:background"</span>&gt;</span>#ff0000<span class="tag">&lt;/<span class="name">item</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">Style</span>&gt;</span></div></pre></td></tr></table></figure>
-<p>这种形式，对于大量的具有相同属性的且具有<em>共性</em>的View，可以直接使用对应的Style，这能够让layout文件更加整洁。前提是确信layout文件中使用的View具有相同的属性。</p>
-<h5 id="1-2-Style-Inheritance"><a href="#1-2-Style-Inheritance" class="headerlink" title="1.2 Style Inheritance"></a>1.2 Style Inheritance</h5><p>Style可以继承，两种方式：</p>
-<p>假设有parent style </p>
-<blockquote>
-<style name="Parent">
-
-</blockquote>
-<ul>
-<li>Explicit child</li>
-</ul>
-<blockquote>
-<style name = "Child" parent = "Parent">
-
-</blockquote>
-<ul>
-<li>Implicit child</li>
-</ul>
-<blockquote>
-<style name= "Parent.Child">
-
-</blockquote>
-<p>同时使用两种方式时，默认使用Explicit Parent  </p>
-<p>为避免混淆，推荐使用Explicit Child且Child name不带前缀  </p>
-<p>View不能拥有两个Style,除了TextView及其子类，例如</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">TextView</span>&gt;</span></div><div class="line">  android:textColor = "#ffffff"</div><div class="line">	style="@style/SomeStyle"</div><div class="line">  android:textAppearance = "@style/MyText"</div><div class="line"><span class="tag">&lt;/<span class="name">TextView</span>&gt;</span></div></pre></td></tr></table></figure>
-<p>如上所示，TextView中可以定义TextAppearance，后者包含了常见的textColor，textSize等attributes，而在一个View中可以同时定义两个Style。如果出现冲突，styles之间相同attributes的应用优先级为：</p>
-<blockquote>
-<p>android:textColor &gt;&gt; SomeStyle中的android:textColor&gt;&gt;MyText中的android:textColor</p>
-<p>使用TextAppearance 时一定要有一个parent</p>
-</blockquote>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">name</span> = <span class="string">"MyText"</span> <span class="attr">parent</span>=<span class="string">"TextAppearance.Appcompat"</span>&gt;</span><span class="xml"></div><div class="line">	<span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span> = <span class="string">"android:TextColor"</span>&gt;</span>#F08<span class="tag">&lt;/<span class="name">item</span>&gt;</span></div><div class="line"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></div></pre></td></tr></table></figure>
-<p>因为使用style时，系统将把style中定义的attribute和当前View的默认attribute融合起来，而TextView默认attribute 中什么也没有，造成textSize = 0的情况，所以务必选择parent</p>
-<ul>
-<li><p>[ ] 未完成</p>
-</li>
-<li><p>####2.Themes</p>
-<pre><code>​
-</code></pre></li>
-</ul>
-</style></blockquote>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">View</span> <span class="attr">style</span>= <span class="string">"@Style/MyStyle"</span> /&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">Style</span> <span class="attr">name</span> = <span class="string">"MyStyle"</span>&gt;</span><span class="xml"></div><div class="line">	<span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span> = <span class="string">"android:background"</span>&gt;</span>#ff0000<span class="tag">&lt;/<span class="name">item</span>&gt;</span></div><div class="line"></span><span class="tag">&lt;/<span class="name">Style</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>这种形式，对于大量的具有相同属性的且具有<em>共性</em>的View，可以直接使用对应的Style，这能够让layout文件更加整洁。前提是确信layout文件中使用的View具有相同的属性。
+        <p class="article-more-link">
+          <a  href="/2016/10/10/theme-versus-style/#more">more >></a>
+        </p>
       
     </div>
     <div class="article-info article-info-index">
