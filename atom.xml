@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://haldir65.github.io/"/>
-  <updated>2016-10-10T19:13:08.316Z</updated>
+  <updated>2016-10-10T19:51:17.483Z</updated>
   <id>http://haldir65.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://haldir65.github.io/2016/10/10/theme-versus-style/"/>
     <id>http://haldir65.github.io/2016/10/10/theme-versus-style/</id>
     <published>2016-10-10T11:35:32.000Z</published>
-    <updated>2016-10-10T19:13:08.316Z</updated>
+    <updated>2016-10-10T19:51:17.483Z</updated>
     
     <content type="html"><![CDATA[<p>认识Theme和Styles</p>
 <p>重新看一遍Using Themes and styles without going crazy，大部分属于直接翻译</p>
@@ -90,6 +90,10 @@
 </ul>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">name</span> = <span class="string">"AttrTheme"</span> <span class="attr">parent</span> =<span class="string">"Theme.AppCompat"</span>&gt;</span><span class="xml"></span></div><div class="line"><span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span> =<span class="string">"selectableItemBackground"</span>&gt;</span>@drawable/bg<span class="tag">&lt;/<span class="name">item</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></div><div class="line"></div><div class="line">使用时</div><div class="line"><span class="tag">&lt;<span class="name">Button</span> <span class="attr">android:background</span>=<span class="string">?attr/selectableItemBackground</span>"/&gt;</span></div></pre></td></tr></table></figure>
 <p>这样就可以自定义点击时的Drawable了。</p>
+<ul>
+<li>支持android:theme: API 7+(只应用于该View)，API 11+(View及其子View) </li>
+</ul>
+<p>View theming原本只是API 21才引入的概念，AppCompat实现了向前兼容</p>
 <h3 id="4-attr的问题"><a href="#4-attr的问题" class="headerlink" title="4 .  ?attr的问题"></a>4 .  ?attr的问题</h3><blockquote>
 <p>?android:attr/selectableItemBackground</p>
 </blockquote>
@@ -117,19 +121,38 @@
 <p>通过这种继承的方式能够在自己的Theme中使用统一的theme，针对不同的运行时版本确定最终运行的Theme。</p>
 <h3 id="7-ThemeOverlay"><a href="#7-ThemeOverlay" class="headerlink" title="7 . ThemeOverlay"></a>7 . ThemeOverlay</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">ThemeOverlay.Material.Light</div><div class="line">ThemeOverlay.Material.Dark</div><div class="line"><span class="comment">//etc ...</span></div></pre></td></tr></table></figure>
 <p>用于添加到现有的Theme上，例如Theme.Material.Light只包含color relevant to a light Theme，不会改变原有Theme的window Attributes。查看源码，只是完整的Theme中的一小部分attribute。</p>
-<h3 id="8-最后，一点好玩的"><a href="#8-最后，一点好玩的" class="headerlink" title="8. 最后，一点好玩的"></a>8. 最后，一点好玩的</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">Context themedContext = </div><div class="line">  <span class="keyword">new</span> ContextThemeWrapper(baseContext,R.style.MyTheme);</div><div class="line"></div><div class="line">View view = LayoutInflator.form(themedContext)</div><div class="line">  		.inflate(R.layout.some_layout,<span class="keyword">null</span>);</div><div class="line"><span class="comment">//或者</span></div><div class="line">View view = <span class="keyword">new</span> View(themedContext);</div><div class="line"><span class="comment">//生成的View就会带有MyTheme中的属性，动态设置。</span></div></pre></td></tr></table></figure>
+<h3 id="8-常见错误"><a href="#8-常见错误" class="headerlink" title="8. 常见错误"></a>8. 常见错误</h3><ol>
+<li>作为Theme中引用的style必须要有一个parent</li>
+</ol>
+<p>例如<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">在AppTheme中</div><div class="line"><span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span> = <span class="string">"android:editTextStyle"</span>&gt;</span>@style/MyEditTextStyle<span class="tag">&lt;/<span class="name">item</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">name</span>= <span class="string">"MyEditTextStyle"</span>&gt;</span><span class="xml"></span></div><div class="line">	<span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>= <span class="string">"android:fontFamily"</span>&gt;</span></div><div class="line">  sans-serif-medium</div><div class="line">  <span class="tag">&lt;/<span class="name">item</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>这样做的结果将是所有的EditText都会失去基本的属性</p>
+<ol>
+<li>defStyleAttr vs defStyleRes</li>
+</ol>
+<p>常见于 </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">ObtainStyledAttributes(AttributeSet set,<span class="keyword">int</span> []attrs,</div><div class="line"> <span class="keyword">int</span> defStyleAttr,<span class="keyword">int</span> defStyleRes)</div></pre></td></tr></table></figure>
+<p>直接解释：</p>
+<blockquote>
+<p> defStyleAttr: The attr in your theme which points to the default style</p>
+<p> eg: R.attr.editTextStyle</p>
+<p> defStyleRes: The resource ID of the default style</p>
+<p> eg:R.style.Widget_Material_EditText</p>
+</blockquote>
+<p>ObtainStyledAttributes查找Value时读取的顺序如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="number">1</span>. Value in the AttributeSet</div><div class="line"><span class="number">2</span>. Value in the explicit style</div><div class="line"><span class="number">3</span>. Default style specified in defStyleRes</div><div class="line"><span class="number">4</span>. Default style specified in defStyleAttr</div><div class="line"><span class="number">5</span>. Base value in <span class="keyword">this</span> theme</div></pre></td></tr></table></figure>
+<p>注意最后一条，万一在Manifest中出现这种东西</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">Style</span> <span class="attr">name</span> = <span class="string">"AppTheme"</span> <span class="attr">parent</span> = <span class="string">"Theme.AppCompat"</span>&gt;</span><span class="xml"></span></div><div class="line">	<span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span> = <span class="string">"android:background"</span>&gt;</span>...<span class="tag">&lt;/<span class="name">item</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">Style</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>这意味着</p>
+<blockquote>
+<p>Any View which doesn’t have a background set ,will use the theme’s value ,  SHIT!</p>
+</blockquote>
+<h3 id="9-最后，一点好玩的"><a href="#9-最后，一点好玩的" class="headerlink" title="9. 最后，一点好玩的"></a>9. 最后，一点好玩的</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">Context themedContext = </div><div class="line">  <span class="keyword">new</span> ContextThemeWrapper(baseContext,R.style.MyTheme);</div><div class="line"></div><div class="line">View view = LayoutInflator.form(themedContext)</div><div class="line">  		.inflate(R.layout.some_layout,<span class="keyword">null</span>);</div><div class="line"><span class="comment">//或者</span></div><div class="line">View view = <span class="keyword">new</span> View(themedContext);</div><div class="line"><span class="comment">//生成的View就会带有MyTheme中的属性，动态设置。</span></div></pre></td></tr></table></figure>
 <p>而这也是AppComPat对于API 21以下版本进行兼容的原理<br>翻了一下文档：<br>ContextThemeWrapper : Added in API level 1</p>
 <p>这一点AppCompat的作者也在2014年的一篇 <a href="https://chris.banes.me/2014/11/12/theme-vs-style/" target="_blank" rel="external">博客</a>中提到了。</p>
 <h2 id="reference"><a href="#reference" class="headerlink" title="reference"></a>reference</h2><ul>
 <li><a href="https://www.youtube.com/watch?v=Jr8hJdVGHAk" target="_blank" rel="external">Daniel Lew</a></li>
 <li><a href="http://blog.danlew.net/2016/07/19/a-deep-dive-into-android-view-constructors/" target="_blank" rel="external">View Constructor</a></li>
 <li><a href="https://www.youtube.com/watch?v=TIHXGwRTMWI" target="_blank" rel="external">IO 2016</a></li>
-</ul>
-<p>to do </p>
-<ul>
-<li>[ ] ThemeOverLay是什么</li>
-<li>[ ] Chris在Google io上的演讲</li>
-<li>[ ] View的四个构造函数</li>
 </ul>
 ]]></content>
     
@@ -423,9 +446,9 @@
       <category term="技术" scheme="http://haldir65.github.io/categories/%E6%8A%80%E6%9C%AF/"/>
     
     
-      <category term="transition" scheme="http://haldir65.github.io/tags/transition/"/>
-    
       <category term="android" scheme="http://haldir65.github.io/tags/android/"/>
+    
+      <category term="transition" scheme="http://haldir65.github.io/tags/transition/"/>
     
   </entry>
   
