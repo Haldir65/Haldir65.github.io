@@ -2,12 +2,12 @@
 title: 主线程的工作原理
 date: 2016-10-12 16:47:42
 tag: 
-    -Handler
-    -Message
+    Handler
+    Message
 categories : Android
 ---
 
-今天突然找到这样一个问题: "Handler的postDelayed会阻塞线程吗？"。基于自己之前对于Handler的线程间通讯机制的理解，还是不能给出明确的答案。正好打算把一篇关于主线程的工作原理的文章写出来，顺带看下能否把这个问题从源码的角度解释清楚。
+今天突然找到这样一个问题: "Handler的postDelayed会阻塞线程吗？"。基于自己之前对于Handler的线程间通讯机制的理解，还是不能给出明确的答案。正好打算把一篇关于主线程的工作原理的文章写出来，顺带看下能否把这个问题从源码的角度解释清楚。<!--more-->
 
 ### 1. 从线程（Thread）开始
 通常，一个Process会有一个主线程, 而在Android中，UI控件相关的方法和一些系统callback都会发生在主线程上(onResume,onCreate,onStartCommand,onDraw, etc)。 如果App中使用了多个Process，则每个Process都会有一个主线程，但这不是今天的重点。
@@ -47,7 +47,7 @@ Android应用是如何启动的?
     }
 ```
 大致意思就是为当前Thread添加一个Looper。
-Looper.java是一个普通的class，其大致作用就是**为当前Thread维持一个message loop**，默认情况下一个Thread并没有一个Looper，要想添加一个，需要在该线程中调用Looper.prepare()，然后调用Looper.loop()方法即可让消息循环一直持续下去。大部分和message Loop都是通过Handler这个类来进行的。例如
+Looper.java是一个普通的class，其大致作用就是**为当前Thread维持一个message loop**，默认情况下一个Thread并没有一个Looper，要想添加一个，需要在该线程中调用Looper.prepare()，然后调用Looper.loop()方法即可让消息循环一直持续下去。大部分和message Loop的交互都是通过Handler这个类来进行的。例如
 ```java
 class LooperThread extends Thread {
   *      public Handler mHandler;
@@ -94,7 +94,7 @@ Looper持有一个MessageQueue(消息队列)成员变量，消息循环时，Loo
     }
 ```
 简单解释一下，也就是从消息队列中取出新的消息(msg)。交给msg.target.dispatchMessage(msg)
-这个trarget是个Hanlder
+这个trarget是个Handler
 来看下Handler里面的dispatchMessage方法
 ```java
  /**
@@ -141,15 +141,15 @@ Handler基本上就做两件事
    一些好用的构造函数
 > Handler (Looper.getMainLooper()) //往主线程的Looper的消息队列里发消息
 > Hanlder(Looper.myLooper()) //往当前线程Looper的消息队列里添加消息
-> *** Choreographer
-> 使用Android studio时，经常会在Logcat里看到这样的 info:
-> Skipped 60 frames! The application may be doing too much work on its main thread
-> 这段log出自Chreographer ，大意就是主线程上做的事太多或者做了太多不该在主线程上做的事。
-> 至于为什么不要在主线程上做太多的事，来看看主线程都有哪些工作:
-> System Events , Input Events ,Application callback ,Services, Alarm ,UI Drawing....
-> 另外，当屏幕内容发生变化，或者在Animation运行中，系统将会尝试每隔16ms来Draw a Frame。而这部分工作是由Choregrapher来完成的，而其内部是通过一个Handler来进行Frame更新的。
-```java
 
+### Choreographer
+使用Android studio时，经常会在Logcat里看到这样的 info:
+> Skipped 60 frames! The application may be doing too much work on its main thread
+
+这段log出自Chreographer ，大意就是主线程上做的事太多或者做了太多不该在主线程上做的事。至于为什么不要在主线程上做太多的事，来看看主线程都有哪些工作:
+System Events , Input Events ,Application callback ,Services, Alarm ,UI Drawing....另外，当屏幕内容发生变化，或者在Animation运行中，系统将会尝试每隔16ms来Draw a Frame。而这部分工作是由Choregrapher来完成的，而其内部是通过一个Handler来进行Frame更新的。
+
+```java
 FrameHandler mHandler = new FrameHandler(Looper.myLooper());
 Message msg = mHandler.obtainMessage(MSG_DO_FRAME);
 msg.setAsynchronous(true);
@@ -205,7 +205,8 @@ if (BuildConfig.DEBUG) {
 答案在[这里](http://www.dss886.com/android/2016/08/17/17-18)找到了
 postDelayed本身就是把一条消息推迟到相对时间多久之后。关键在Looper取出这条消息时，用的是
 > Message msg = queue.next();  // might block
-> 这个注释的意思已经暗示了可能会阻塞，看下next方法做了什么:
+
+注释已经暗示了可能会阻塞，看下next方法做了什么:
 ```java
     Message next() {
     .....省略
@@ -307,10 +308,10 @@ PostDelayed最终会调用到enqueMessage方法，看一下:
 注意nativeWake方法，在满足一定情况下会唤醒线程
 总结一下就是postDelayed确实调用了阻塞线程的方法，但一旦消息队列前面插入了可执行的message，会调用唤醒线程的方法。这些大部分在MessageQueue这个class中，看一下基本都能明白。
 
+#### 回顾一下整个过程:
 
-***回顾一下整个过程:
 主线程作为一个Thread，持有一个Looper对象，Looper持有一个MessageQueue的消息队列，并一个一个地从中取出满足执行时间条件的Message，执行Messgae的callback或者交给Handler的handleMessage去处理。
 
-###Reference
+### Reference
 1. [Handler.postDelayed()是如何精确延迟指定时间的](http://www.dss886.com/android/2016/08/17/17-18)
 2. [How the Main Thread works](https://www.youtube.com/watch?v=aFGbv9Ih9qQ)
