@@ -5,7 +5,7 @@ categories: [技术]
 tags: [service,android]
 ---
 
-![](https://github.com/Haldir65/BlogBackup/blob/master/source/assets/blogImg/service_lifecycle.png)
+![](http://odzl05jxx.bkt.clouddn.com/service_lifecycle.png)
 
 一年以前写过一篇关于service和Activity相互通信的很详细的博客，当时真的是费了很大心思在上面。现在回过头来看，还是有些不完善的地方，比如aidl没有给，demo不够全面。现在补上。
 
@@ -21,13 +21,15 @@ Service本身包含started Service和Binded Service
 
 对于Binded Service 使用
 
-![](https://github.com/Haldir65/BlogBackup/blob/master/source/assets/blogImg/service_binding_tree_lifecycle.png)
+![](http://odzl05jxx.bkt.clouddn.com/service_binding_tree_lifecycle.png)
 
 
 
 ## 待续
 
 ### reference
+
+[csdn](http://blog.csdn.net/javazejian/article/details/52709857)
 
 
 
