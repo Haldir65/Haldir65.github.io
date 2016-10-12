@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://haldir65.github.io/"/>
-  <updated>2016-10-12T13:50:43.555Z</updated>
+  <updated>2016-10-12T13:53:30.701Z</updated>
   <id>http://haldir65.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://haldir65.github.io/2016/10/12/2016-10-12-How-the-mainThread-work/"/>
     <id>http://haldir65.github.io/2016/10/12/2016-10-12-How-the-mainThread-work/</id>
     <published>2016-10-12T08:47:42.000Z</published>
-    <updated>2016-10-12T13:50:43.555Z</updated>
+    <updated>2016-10-12T13:53:30.701Z</updated>
     
     <content type="html"><![CDATA[<p>今天突然找到这样一个问题: “Handler的postDelayed会阻塞线程吗？”。基于自己之前对于Handler的线程间通讯机制的理解，还是不能给出明确的答案。正好打算把一篇关于主线程的工作原理的文章写出来，顺带看下能否把这个问题从源码的角度解释清楚。<a id="more"></a></p>
 <h3 id="1-从线程（Thread）开始"><a href="#1-从线程（Thread）开始" class="headerlink" title="1. 从线程（Thread）开始"></a>1. 从线程（Thread）开始</h3><p>通常，一个Process会有一个主线程, 而在Android中，UI控件相关的方法和一些系统callback都会发生在主线程上(onResume,onCreate,onStartCommand,onDraw, etc)。 如果App中使用了多个Process，则每个Process都会有一个主线程，但这不是今天的重点。<br>Android应用是如何启动的?<br>启动一个应用时，系统会从Zygote Process fork出一个新的Process，最终走到ActivityThread 的main方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line"><span class="comment">//省略部分无关代码</span></div><div class="line">       Looper.prepareMainLooper();</div><div class="line">       ActivityThread thread = <span class="keyword">new</span> ActivityThread();</div><div class="line">       thread.attach(<span class="keyword">false</span>);</div><div class="line">       <span class="keyword">if</span> (sMainThreadHandler == <span class="keyword">null</span>) &#123;</div><div class="line">           sMainThreadHandler = thread.getHandler();</div><div class="line">       &#125;</div><div class="line">       <span class="comment">// End of event ActivityThreadMain.</span></div><div class="line">       Looper.loop();</div><div class="line">       <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"Main thread loop unexpectedly exited"</span>);<span class="comment">//从这里可以猜到Looper.loop方法会一直执行下去</span></div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
@@ -82,7 +82,7 @@
       <category term="Android" scheme="http://haldir65.github.io/categories/Android/"/>
     
     
-      <category term="-Handler -Message" scheme="http://haldir65.github.io/tags/Handler-Message/"/>
+      <category term="Handler Message" scheme="http://haldir65.github.io/tags/Handler-Message/"/>
     
   </entry>
   
