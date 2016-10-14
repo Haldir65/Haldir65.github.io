@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://haldir65.github.io/"/>
-  <updated>2016-10-14T08:22:24.643Z</updated>
+  <updated>2016-10-14T08:25:34.539Z</updated>
   <id>http://haldir65.github.io/</id>
   
   <author>
@@ -20,11 +20,11 @@
     <link href="http://haldir65.github.io/2016/10/13/2016-10-13-Android-coordinate-System/"/>
     <id>http://haldir65.github.io/2016/10/13/2016-10-13-Android-coordinate-System/</id>
     <published>2016-10-13T10:17:02.000Z</published>
-    <updated>2016-10-14T08:22:24.643Z</updated>
+    <updated>2016-10-14T08:25:34.539Z</updated>
     
     <content type="html"><![CDATA[<p>记录一些Android系统坐标系的常用方法，因为日常开发中难免会碰到需要单独计算View系统坐标的情况。</p>
 <p><img src="http://odzl05jxx.bkt.clouddn.com/minion.jpg?imageView2/2/w/400" alt=""><br><a id="more"></a></p>
-<p>ScrollTo，ScrollBy<br>getVisibleRect<br>首先是一张很多人都见过的图<br><img src="http://odzl05jxx.bkt.clouddn.com/android_screen_coordinate_system.png?imageView2/2/w/500" alt=""><br>中间的蓝色的点是TouchEvent发生时，获得的MotionEvent.getX()、getY()。</p>
+<p>ScrollTo，ScrollBy，getVisibleRect这些方法平时想要用的时候总要去往上查找，这里记录下来，方便今后直接参考<br>首先是一张很多人都见过的图<br><img src="http://odzl05jxx.bkt.clouddn.com/android_screen_coordinate_system.png?imageView2/2/w/500" alt=""><br>中间的蓝色的点是TouchEvent发生时，获得的MotionEvent.getX()、getY()。</p>
 <h3 id="1-坐标原点和坐标轴方向"><a href="#1-坐标原点和坐标轴方向" class="headerlink" title="1. 坐标原点和坐标轴方向"></a>1. 坐标原点和坐标轴方向</h3><p>坐标原点有两种，屏幕左上角（statusBar也包含其中）和父控件左上角<br>坐标轴方向：X轴向右，Y轴向下，Z轴(5.0增加)向上。</p>
 <h3 id="2-Left-Top-Right-Bottom"><a href="#2-Left-Top-Right-Bottom" class="headerlink" title="2. Left,Top,Right,Bottom"></a>2. Left,Top,Right,Bottom</h3><p>而Top，left，bottom,down分别对应着其其相对于父控件的距离，由此可以计算得到View的宽度width = getRight()-getLeft() ,View的高度 height = getBottom()-getTop()<br>而实际上view.getHeight()方法的实现也就是mBottom-mTop.</p>
 <h3 id="3-X-Y"><a href="#3-X-Y" class="headerlink" title="3. X , Y"></a>3. X , Y</h3><p>X代表的是当前View的左上角那个点的横坐标，Y代表的是纵坐标。<br>X = left + getTranslationX<br>Y = Top + getTranslationY<br>通常在动画中使用setTranslationX来实现偏移效果，注意，这是不会改变left的。在滑动过程中，x, y会随着改变。</p>
@@ -32,9 +32,9 @@
 <blockquote>
 <p> W/ViewAnimationActivity.java: [32 | onWindowFocusChanged]statusBarHeight = 75<br> W/ViewAnimationActivity.java: [35 | onWindowFocusChanged]getLocationInWindow  x = 0 y = 75<br> W/ViewAnimationActivity.java: [38 | onWindowFocusChanged]getLocationOnScreen x = 0 y = 75<br>可以看到返回的就是View左上角的坐标，一般情况下两者区别不重要，stackoverFlow上有<a href="http://stackoverflow.com/questions/17672891/getlocationonscreen-vs-getlocationinwindow" target="_blank" rel="external">讨论</a></p>
 </blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">View.getLocationInWindow(pos); <span class="comment">//获取在当前window内的绝对坐标</span></div><div class="line">   View.getLocationOnScreen(pos); <span class="comment">//包括statusBar，以屏幕左上角为坐标原点</span></div><div class="line">   View.getLocalVisibleRect()  </div><div class="line">   <span class="comment">//以view自身的左上角为坐标原点，这个很有用，</span></div><div class="line">   <span class="comment">//返回的坐标一定是(0,0,xxx,xxx)这样的，可以判断当前View是否完全可见</span></div><div class="line">   View.getGlobalVisibleRect()  <span class="comment">// 以屏幕左上角为坐标原点</span></div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">View.getLocationInWindow(pos); <span class="comment">//获取在当前window内的绝对坐标</span></div><div class="line">View.getLocationOnScreen(pos); <span class="comment">//包括statusBar，以屏幕左上角为坐标原点</span></div><div class="line">View.getLocalVisibleRect()  </div><div class="line"><span class="comment">//以view自身的左上角为坐标原点，这个很有用，</span></div><div class="line"><span class="comment">//返回的坐标一定是(0,0,xxx,xxx)这样的，可以判断当前View是否完全可见</span></div><div class="line">View.getGlobalVisibleRect()  <span class="comment">// 以屏幕左上角为坐标原点</span></div></pre></td></tr></table></figure>
 <p>以上四个方法在onCreate里面返回的值都是0，需要在Activity的onWindowFocusChanged(true)中去获得<br>这里需要扯一点关于window的问题，根据大部分博客的介绍：DecorView是FrameLayout的子类，是View视图层级树的根节点。<br>一般会有一个LinearLayout的child</p>
-<p>为此，我在setContentView里面放了一个CoordinateLayout,使用Hierarchy View截图的到这样的结果<br><img src="http://odzl05jxx.bkt.clouddn.com/view_hirearchy_1013.png?imageView2/2/w/600" alt=""></p>
+<p>为此，我在setContentView里面放了一个CoordinateLayout,使用Hierarchy View截图的到这样的结果<br><img src="http://odzl05jxx.bkt.clouddn.com/view_hirearchy_1013.png" alt=""></p>
 <p>在ViewHirearchy中可以看到，Activity中View视图层级从上到下依次为：</p>
 <blockquote>
 <p>PhoneWindow$DecorView（有三个child,分别是LinearLayout，View(id/statusBarBackground)和View(id/navigationBarBackground)）<br>LinearLayout<br>FrameLayout<br>FitWindowsLinearLayout<br>ContentFrameLayout(id/android.R.id.content) //这在开发过程中有时会用到<br>setContentView设置的view</p>
