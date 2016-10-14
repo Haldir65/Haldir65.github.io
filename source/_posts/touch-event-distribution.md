@@ -9,8 +9,7 @@ tags: TouchEvent
 图1 默认情况下事件传递的路径 
 
 > Touch事件始于ACTION_DOWN, 终止于ACTION_UP, 这其中可能会伴随着ACTION_MOVE,ACTION_CANCEL等等。
-
- <!--more-->
+<!--more-->
 
 - 首先来关注ACTION_DOWN，用户触摸屏幕，MotionEvent开始传递：
 
@@ -38,7 +37,7 @@ tags: TouchEvent
   > true , false ,super
 
   - return true：ACTION_DOWN事件分发到此结束(消费掉)，这里有一个要注意的是onInterceptTouchEvent,返回true表示该ViewGroup打算将事件拦截下来，底层View将接收到一个ACTION_CANCEL，事件传递给该ViewGroup的onTouchEvent
-  -  return false: 对于dispatchTouchEvent，返回false表明不再向下分发，ACTION_DOWN发送到上一层ViewGroup(Activity)的OnTouchEvent；对于onInterceptTouchEvent,返回false表明该ViewGroup不打算拦截，继续下发，对于onTouchEvent，返回false，事件继续上传至上一层级ViewGroup的OnTouchEvent 。
+  - return false: 对于dispatchTouchEvent，返回false表明不再向下分发，ACTION_DOWN发送到上一层ViewGroup(Activity)的OnTouchEvent；对于onInterceptTouchEvent,返回false表明该ViewGroup不打算拦截，继续下发，对于onTouchEvent，返回false，事件继续上传至上一层级ViewGroup的OnTouchEvent 。
   - return super : 完成整个传递链，就像图1中展示的一样。
 
 ![](http://odzl05jxx.bkt.clouddn.com/touch_event_1.png)
@@ -375,3 +374,6 @@ int getScaledTouchSlop(); (if Math.abs(x*x+y*y)>mTouchSlop 就可以认为是滑
 3. [Android onTouchEvent, onClick及onLongClick的调用机制](http://blog.csdn.net/ddna/article/details/5451722)
 4. [Android触摸事件机制(三)](http://wangkuiwu.github.io/2015/01/03/TouchEvent-View/)
 5. [ViewConfiguration用法](http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2013/0225/907.html)
+6. [触摸事件的分析与总结](http://glblong.blog.51cto.com/3058613/1559320)
+
+   ​
