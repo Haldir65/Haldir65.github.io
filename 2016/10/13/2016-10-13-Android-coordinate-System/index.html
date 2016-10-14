@@ -6,18 +6,19 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <title>安卓坐标系常用方法 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="记录一些Android系统坐标系的常用方法，日常开发中难免会碰到需要单独计算View系统坐标的情况。">
+  <meta name="description" content="记录一些Android系统坐标系的常用方法，因为日常开发中难免会碰到需要单独计算View系统坐标的情况。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="安卓坐标系常用方法">
 <meta property="og:url" content="http://haldir65.github.io/2016/10/13/2016-10-13-Android-coordinate-System/index.html">
 <meta property="og:site_name" content="Haldir的博客">
-<meta property="og:description" content="记录一些Android系统坐标系的常用方法，日常开发中难免会碰到需要单独计算View系统坐标的情况。">
+<meta property="og:description" content="记录一些Android系统坐标系的常用方法，因为日常开发中难免会碰到需要单独计算View系统坐标的情况。">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/minion.jpg?imageView2/2/w/400">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/android_screen_coordinate_system.png">
-<meta property="og:updated_time" content="2016-10-13T10:38:58.193Z">
+<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/view_hirearchy_1013.png">
+<meta property="og:updated_time" content="2016-10-14T08:09:01.196Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="安卓坐标系常用方法">
-<meta name="twitter:description" content="记录一些Android系统坐标系的常用方法，日常开发中难免会碰到需要单独计算View系统坐标的情况。">
+<meta name="twitter:description" content="记录一些Android系统坐标系的常用方法，因为日常开发中难免会碰到需要单独计算View系统坐标的情况。">
 <meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/minion.jpg?imageView2/2/w/400">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
@@ -162,16 +163,37 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>记录一些Android系统坐标系的常用方法，日常开发中难免会碰到需要单独计算View系统坐标的情况。</p>
-<p><img src="http://odzl05jxx.bkt.clouddn.com/minion.jpg?imageView2/2/w/400" alt=""></p>
-<a id="more"></a>
-<p>ScrollTo，ScrollBy</p>
-<p>getVisibleRect</p>
-<p>首先是一张很多人都见过的图</p>
-<p><img src="http://odzl05jxx.bkt.clouddn.com/android_screen_coordinate_system.png" alt=""></p>
-<h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><ol>
+        <p>记录一些Android系统坐标系的常用方法，因为日常开发中难免会碰到需要单独计算View系统坐标的情况。</p>
+<p><img src="http://odzl05jxx.bkt.clouddn.com/minion.jpg?imageView2/2/w/400" alt=""><br><a id="more"></a></p>
+<p>ScrollTo，ScrollBy<br>getVisibleRect<br>首先是一张很多人都见过的图<br><img src="http://odzl05jxx.bkt.clouddn.com/android_screen_coordinate_system.png" alt=""><br>中间的蓝色的点是TouchEvent发生时，获得的MotionEvent.getX()、getY()。</p>
+<h3 id="1-坐标原点和坐标轴方向"><a href="#1-坐标原点和坐标轴方向" class="headerlink" title="1. 坐标原点和坐标轴方向"></a>1. 坐标原点和坐标轴方向</h3><p>坐标原点有两种，屏幕左上角（statusBar也包含其中）和父控件左上角<br>坐标轴方向：X轴向右，Y轴向下，Z轴(5.0增加)向上。</p>
+<h3 id="2-Left-Top-Right-Bottom"><a href="#2-Left-Top-Right-Bottom" class="headerlink" title="2. Left,Top,Right,Bottom"></a>2. Left,Top,Right,Bottom</h3><p>而Top，left，bottom,down分别对应着其其相对于父控件的距离，由此可以计算得到View的宽度width = getRight()-getLeft() ,View的高度 height = getBottom()-getTop()<br>而实际上view.getHeight()方法的实现也就是mBottom-mTop.</p>
+<h3 id="3-X-Y"><a href="#3-X-Y" class="headerlink" title="3. X , Y"></a>3. X , Y</h3><p>X代表的是当前View的左上角那个点的横坐标，Y代表的是纵坐标。<br>X = left + getTranslationX<br>Y = Top + getTranslationY<br>通常在动画中使用setTranslationX来实现偏移效果，注意，这是不会改变left的。在滑动过程中，x, y会随着改变。</p>
+<h3 id="4-几个跟Rect相关的"><a href="#4-几个跟Rect相关的" class="headerlink" title="4. 几个跟Rect相关的"></a>4. 几个跟Rect相关的</h3><p>获得的是当前View左上角距离屏幕左上角的位置，为此我专门测试了一下</p>
+<blockquote>
+<p> W/ViewAnimationActivity.java: [32 | onWindowFocusChanged]statusBarHeight = 75<br> W/ViewAnimationActivity.java: [35 | onWindowFocusChanged]getLocationInWindow  x = 0 y = 75<br> W/ViewAnimationActivity.java: [38 | onWindowFocusChanged]getLocationOnScreen x = 0 y = 75<br>可以看到返回的就是View左上角的坐标，一般情况下两者区别不重要，stackoverFlow上有<a href="http://stackoverflow.com/questions/17672891/getlocationonscreen-vs-getlocationinwindow" target="_blank" rel="external">讨论</a></p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">View.getLocationInWindow(pos); <span class="comment">//获取在当前window内的绝对坐标</span></div><div class="line">   View.getLocationOnScreen(pos); <span class="comment">//包括statusBar，以屏幕左上角为坐标原点</span></div><div class="line">   View.getLocalVisibleRect()  </div><div class="line">   <span class="comment">//以view自身的左上角为坐标原点，这个很有用，</span></div><div class="line">   <span class="comment">//返回的坐标一定是(0,0,xxx,xxx)这样的，可以判断当前View是否完全可见</span></div><div class="line">   View.getGlobalVisibleRect()  <span class="comment">// 以屏幕左上角为坐标原点</span></div></pre></td></tr></table></figure>
+<p>以上四个方法在onCreate里面返回的值都是0，需要在Activity的onWindowFocusChanged(true)中去获得<br>这里需要扯一点关于window的问题，根据大部分博客的介绍：DecorView是FrameLayout的子类，是View视图层级树的根节点。<br>一般会有一个LinearLayout的child</p>
+<p>为此，我在setContentView里面放了一个CoordinateLayout,使用Hierarchy View截图的到这样的结果<br><img src="http://odzl05jxx.bkt.clouddn.com/view_hirearchy_1013.png" alt=""></p>
+<p>在ViewHirearchy中可以看到，Activity中View视图层级从上到下依次为：</p>
+<blockquote>
+<p>PhoneWindow$DecorView（有三个child,分别是LinearLayout，View(id/statusBarBackground)和View(id/navigationBarBackground)）<br>LinearLayout<br>FrameLayout<br>FitWindowsLinearLayout<br>ContentFrameLayout(id/android.R.id.content) //这在开发过程中有时会用到<br>setContentView设置的view</p>
+</blockquote>
+<p>关于window，DecorWindow的文章网上有很多，仔细研究下会对理解View的测量机制有一定好处，<a href="http://blog.csdn.net/qibin0506/article/details/49245601" target="_blank" rel="external">参考</a><br>这对于View的工作原理也能够更彻底的理解。<br>日常开发中，steContentView只是将我们自己写的activiy_main.xml布局文件inflate出来的view添加到<br>android.R.id.content这个ViewGroup中，实践下来发现这是一个ContentFrameLayout的实例，它的child只有一个，就是我们通过setContentView添加的View</p>
+<h3 id="5-让View滑动起来"><a href="#5-让View滑动起来" class="headerlink" title="5. 让View滑动起来"></a>5. 让View滑动起来</h3><blockquote>
+<p>offsetLeftAndRight(int offset) //给left和right加上一个值，改变的是View的位置<br>offsetTopAndBottom(int offset) </p>
+<p>scrollTo(int x,int y)  // 将View中的内容移动，坐标原点为parentView左上角，注意，参数为正，效果为反<br>例如scrollTo(-100,0) 在手机上看效果是往右移动了</p>
+<p>scrollBy(int x, int y)<br>scrollBy的源码如下:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">scrollBy</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</div><div class="line">      scrollTo(mScrollX + x, mScrollY + y);</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
+</blockquote>
+<p>还有一些不常用的：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setScrollX</span><span class="params">(<span class="keyword">int</span> value)</span> </span>&#123;</div><div class="line">        scrollTo(value, mScrollY);</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<h3 id="6-使用Animation让View动起来"><a href="#6-使用Animation让View动起来" class="headerlink" title="6.使用Animation让View动起来"></a>6.使用Animation让View动起来</h3><p>根据官方文档的<a href="https://developer.android.com/guide/topics/resources/animation-resource.html#Property" target="_blank" rel="external">定义</a>Android中一共两种Animation: </p>
+<blockquote>
+<p>Property Animation<br>View Animation(包括Tween animation, Frame animation)<br>首先从package的位置来看<br>java.lang.Objetct<br>  \downarrow \rightarrow android.animation.Reference<br>      \downarrow \rightarrow </p>
+</blockquote>
+<h3 id="Animation"><a href="#Animation" class="headerlink" title="Animation"></a>Animation</h3><ol>
 <li><a href="http://blog.csdn.net/yanbober/article/details/50419117" target="_blank" rel="external">Android应用坐标系统全面详解</a></li>
-<li>​</li>
+<li>​<a href="http://blog.csdn.net/imyfriend/article/details/8564781" target="_blank" rel="external">如何取得View的位置之View.getLocationInWindow()的小秘密</a></li>
 </ol>
 
       
