@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://haldir65.github.io/"/>
-  <updated>2016-10-14T08:25:34.539Z</updated>
+  <updated>2016-10-14T08:30:47.935Z</updated>
   <id>http://haldir65.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://haldir65.github.io/2016/10/13/2016-10-13-Android-coordinate-System/"/>
     <id>http://haldir65.github.io/2016/10/13/2016-10-13-Android-coordinate-System/</id>
     <published>2016-10-13T10:17:02.000Z</published>
-    <updated>2016-10-14T08:25:34.539Z</updated>
+    <updated>2016-10-14T08:30:47.935Z</updated>
     
     <content type="html"><![CDATA[<p>记录一些Android系统坐标系的常用方法，因为日常开发中难免会碰到需要单独计算View系统坐标的情况。</p>
 <p><img src="http://odzl05jxx.bkt.clouddn.com/minion.jpg?imageView2/2/w/400" alt=""><br><a id="more"></a></p>
@@ -34,25 +34,26 @@
 </blockquote>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">View.getLocationInWindow(pos); <span class="comment">//获取在当前window内的绝对坐标</span></div><div class="line">View.getLocationOnScreen(pos); <span class="comment">//包括statusBar，以屏幕左上角为坐标原点</span></div><div class="line">View.getLocalVisibleRect()  </div><div class="line"><span class="comment">//以view自身的左上角为坐标原点，这个很有用，</span></div><div class="line"><span class="comment">//返回的坐标一定是(0,0,xxx,xxx)这样的，可以判断当前View是否完全可见</span></div><div class="line">View.getGlobalVisibleRect()  <span class="comment">// 以屏幕左上角为坐标原点</span></div></pre></td></tr></table></figure>
 <p>以上四个方法在onCreate里面返回的值都是0，需要在Activity的onWindowFocusChanged(true)中去获得<br>这里需要扯一点关于window的问题，根据大部分博客的介绍：DecorView是FrameLayout的子类，是View视图层级树的根节点。<br>一般会有一个LinearLayout的child</p>
-<p>为此，我在setContentView里面放了一个CoordinateLayout,使用Hierarchy View截图的到这样的结果<br><img src="http://odzl05jxx.bkt.clouddn.com/view_hirearchy_1013.png" alt=""></p>
+<p>为此，我在setContentView里面放了一个CoordinateLayout,使用Hierarchy View截图的到这样的结果。<br>图片有点大<br><img src="http://odzl05jxx.bkt.clouddn.com/view_hirearchy_1013.png" alt=""></p>
 <p>在ViewHirearchy中可以看到，Activity中View视图层级从上到下依次为：</p>
 <blockquote>
 <p>PhoneWindow$DecorView（有三个child,分别是LinearLayout，View(id/statusBarBackground)和View(id/navigationBarBackground)）<br>LinearLayout<br>FrameLayout<br>FitWindowsLinearLayout<br>ContentFrameLayout(id/android.R.id.content) //这在开发过程中有时会用到<br>setContentView设置的view</p>
 </blockquote>
-<p>关于window，DecorWindow的文章网上有很多，仔细研究下会对理解View的测量机制有一定好处，<a href="http://blog.csdn.net/qibin0506/article/details/49245601" target="_blank" rel="external">参考</a><br>这对于View的工作原理也能够更彻底的理解。<br>日常开发中，steContentView只是将我们自己写的activiy_main.xml布局文件inflate出来的view添加到<br>android.R.id.content这个ViewGroup中，实践下来发现这是一个ContentFrameLayout的实例，它的child只有一个，就是我们通过setContentView添加的View</p>
+<p>关于window，DecorWindow的文章网上有很多，仔细研究下会对理解View的测量机制有一定好处，这对于View的工作原理也能够更彻底的理解。<br><a href="http://blog.csdn.net/qibin0506/article/details/49245601" target="_blank" rel="external">参考文章</a><br>日常开发中，setContentView这个方法只是将我们自己写的activiy_main.xml布局文件inflate出来的view添加到<br>android.R.id.content这个ViewGroup中，实践下来发现这是一个ContentFrameLayout的实例，它的child只有一个，就是我们通过setContentView添加的View</p>
 <h3 id="5-让View滑动起来"><a href="#5-让View滑动起来" class="headerlink" title="5. 让View滑动起来"></a>5. 让View滑动起来</h3><blockquote>
 <p>offsetLeftAndRight(int offset) //给left和right加上一个值，改变的是View的位置<br>offsetTopAndBottom(int offset) </p>
 <p>scrollTo(int x,int y)  // 将View中的内容移动，坐标原点为parentView左上角，注意，参数为正，效果为反<br>例如scrollTo(-100,0) 在手机上看效果是往右移动了</p>
-<p>scrollBy(int x, int y)<br>scrollBy的源码如下:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">scrollBy</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</div><div class="line">      scrollTo(mScrollX + x, mScrollY + y);</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
+<p>scrollBy(int x, int y)</p>
 </blockquote>
+<p>scrollBy的源码如下:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">scrollBy</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</div><div class="line">      scrollTo(mScrollX + x, mScrollY + y);</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
 <p>还有一些不常用的：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setScrollX</span><span class="params">(<span class="keyword">int</span> value)</span> </span>&#123;</div><div class="line">        scrollTo(value, mScrollY);</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
-<h3 id="6-使用Animation让View动起来"><a href="#6-使用Animation让View动起来" class="headerlink" title="6.使用Animation让View动起来"></a>6.使用Animation让View动起来</h3><p>根据官方文档的<a href="https://developer.android.com/guide/topics/resources/animation-resource.html#Property" target="_blank" rel="external">定义</a>Android中一共两种Animation: </p>
+<h3 id="6-使用Animation让View动起来"><a href="#6-使用Animation让View动起来" class="headerlink" title="6.使用Animation让View动起来"></a>6.使用Animation让View动起来</h3><p>根据官方文档的<a href="https://developer.android.com/guide/topics/graphics/overview.html" target="_blank" rel="external">定义</a>Android中一共两种Animation: </p>
 <blockquote>
 <p>Property Animation<br>View Animation(包括Tween animation, Frame animation)</p>
 </blockquote>
-<p>首先从package的位置来看<br>属性动画都位于android.animation这个package下面，常见的如OnjectAnimator继承自ValueAnimator<br>View动画则位于android.view.animation这个package下，常见的如TranslateA,AlphaAnimation等</p>
+<p>首先从package的位置来看<br>属性动画都位于android.animation这个package下面，常见的如ObjectAnimator继承自ValueAnimator<br>View动画则位于android.view.animation这个package下，常见的如TranslateA,AlphaAnimation等</p>
 <p>View Animation可以代码创建，也可以写在R.anim文件夹下,用法很简单<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">ImageView image = (ImageView) findViewById(R.id.image);</div><div class="line">Animation hyperspaceJump = AnimationUtils.loadAnimation(<span class="keyword">this</span>, R.anim.hyperspace_jump);</div><div class="line">image.startAnimation(hyperspaceJump);</div></pre></td></tr></table></figure></p>
-<p>属性动画可以代码创建，也可以从R.animator文件夹下,用法:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">AnimatorSet set = (AnimatorSet) AnimatorInflater.loadAnimator(myContext,</div><div class="line">    R.anim.property_animator);</div><div class="line">set.setTarget(myObject);</div><div class="line">set.start();</div></pre></td></tr></table></figure></p>
+<p>属性动画可以代码创建，也可以写在R.animator文件夹下,用法:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">AnimatorSet set = (AnimatorSet) AnimatorInflater.loadAnimator(myContext,</div><div class="line">    R.anim.property_animator);</div><div class="line">set.setTarget(myObject);</div><div class="line">set.start();</div></pre></td></tr></table></figure></p>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
 <li>使用getLocalVisibleRect可以判断一个view是否完全可见</li>
 <li>scrollBy,setScrollX等内部都是调用了scrollTo方法，ScrollTo方法传参数与实际效果是相反的</li>
