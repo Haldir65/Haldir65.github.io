@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://haldir65.github.io/"/>
-  <updated>2016-10-14T09:09:39.227Z</updated>
+  <updated>2016-10-14T09:10:28.232Z</updated>
   <id>http://haldir65.github.io/</id>
   
   <author>
@@ -20,11 +20,11 @@
     <link href="http://haldir65.github.io/2016/10/13/2016-10-13-Android-coordinate-System/"/>
     <id>http://haldir65.github.io/2016/10/13/2016-10-13-Android-coordinate-System/</id>
     <published>2016-10-13T10:17:02.000Z</published>
-    <updated>2016-10-14T09:09:39.227Z</updated>
+    <updated>2016-10-14T09:10:28.232Z</updated>
     
     <content type="html"><![CDATA[<p>记录一些Android系统坐标系的常用方法，因为日常开发中难免会碰到需要单独计算View系统坐标的情况。</p>
 <p><img src="http://odzl05jxx.bkt.clouddn.com/minion.jpg?imageView2/2/w/400" alt=""><br><a id="more"></a></p>
-<p>ScrollTo，ScrollBy，getVisibleRect这些方法平时想要用的时候总要去往上查找，这里记录下来，方便今后直接参考<br>首先是一张很多人都见过的图<br><img src="http://odzl05jxx.bkt.clouddn.com/android_screen_coordinate_system.png?imageView2/2/w/500" alt=""><br>中间的蓝色的点是TouchEvent发生时，获得的MotionEvent.getX()、getY()。</p>
+<p>ScrollTo，ScrollBy，getVisibleRect这些方法平时想要用的时候总要去网上查找，这里记录下来，方便今后直接参考<br>首先是一张很多人都见过的图<br><img src="http://odzl05jxx.bkt.clouddn.com/android_screen_coordinate_system.png?imageView2/2/w/500" alt=""><br>中间的蓝色的点是TouchEvent发生时，获得的MotionEvent.getX()、getY()。</p>
 <h3 id="1-坐标原点和坐标轴方向"><a href="#1-坐标原点和坐标轴方向" class="headerlink" title="1. 坐标原点和坐标轴方向"></a>1. 坐标原点和坐标轴方向</h3><p>坐标原点有两种，屏幕左上角（statusBar也包含其中）和父控件左上角<br>坐标轴方向：X轴向右，Y轴向下，Z轴(5.0增加)向上。</p>
 <h3 id="2-Left-Top-Right-Bottom"><a href="#2-Left-Top-Right-Bottom" class="headerlink" title="2. Left,Top,Right,Bottom"></a>2. Left,Top,Right,Bottom</h3><p>而Top，left，bottom,down分别对应着其其相对于父控件的距离，由此可以计算得到View的宽度width = getRight()-getLeft() ,View的高度 height = getBottom()-getTop()<br>而实际上view.getHeight()方法的实现也就是mBottom-mTop.</p>
 <h3 id="3-X-Y"><a href="#3-X-Y" class="headerlink" title="3. X , Y"></a>3. X , Y</h3><p>X代表的是当前View的左上角那个点的横坐标，Y代表的是纵坐标。<br>X = left + getTranslationX<br>Y = Top + getTranslationY<br>通常在动画中使用setTranslationX来实现偏移效果，注意，这是不会改变left的。在滑动过程中，x, y会随着改变。</p>
