@@ -26,7 +26,8 @@ private void setupStatusBarView(Context context, ViewGroup decorViewGroup) {//�
 
 ### 2. 直到碰到了fitSystemWindow = ture
 几个月前曾经在项目里写过一个普通的Coordinatelayout内部CollapingToolbarLayout的沉浸式状态栏实现，当时为了赶进度一直试到夜里2点才尝试出在4.4和5.0以上手机都能满意的效果。现在想想有些事还是能够事先搞清楚的好，被动学习的代价实在太大。当时的方法是给Toolbar添加了一个顶部的padding，具体原理也不大清楚。
-但实际上并不总能一直 ![trying stuff utill it work](http://odzl05jxx.bkt.clouddn.com/Trying%20stuff%20Untill%20it%20work.jpg?imageView2/2/w/600)
+但实际上并不总能一直</br>  
+  ![trying stuff utill it work](http://odzl05jxx.bkt.clouddn.com/Trying%20stuff%20Untill%20it%20work.jpg?imageView2/2/w/600)
 
 ### 3. 使用CollapsingToolbarLayout时的问题
 1. 5.0以上的手机似乎很简单
@@ -111,6 +112,7 @@ private void setupStatusBarView(Context context, ViewGroup decorViewGroup) {//�
 只要分别在CoordinateLayout，AppBarLayout和CollapsingToolbarLayout的xml属性中加上android:fitSystemWindwo = "true"
 java代码里添加一句
 > getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS); //注意下版本判断
+
 或者在当前Activity的values-v19 styles中添加 <item name="android:windowTranslucentStatus">true</item>
 就行了。实际效果就是图片完全展开时可以扩展到statusBar下面，图片收缩起来后可以让Toolbar停在statusBar下面。但同样的代码在4.4的手机上会使得实际绘图区域落到statusBar以下，statusBar位置变成带灰色遮罩的白色背景。
 
@@ -165,16 +167,26 @@ binding.toolbar.setLayoutParams(params);
 ```
 实际操作可能还要判断非空什么的，但大致意思如此
 看起来像这样
-![5.1模拟器，图片展开](http://odzl05jxx.bkt.clouddn.com/statusbar_5.0_expanded.png)
-![5.1模拟器，图片收起](http://odzl05jxx.bkt.clouddn.com/statusbar_5.0_collapsed.png)
-![4.4模拟器，图片展开](http://odzl05jxx.bkt.clouddn.com/statusbar_4.4_expanded.png)
-![4.4模拟器，图片收起](http://odzl05jxx.bkt.clouddn.com/statusbar_4.4_collapsed.png)
+5.1图片展开:  
+  ![5.1模拟器，图片展开](http://odzl05jxx.bkt.clouddn.com/statusbar_5.0_expanded.png?imageView2/2/w/300)  
 
-原理就是让整个布局占据statusBar的位置，但把Toolbar往下挪一点（其实也就是[这篇文章](http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2016/0330/4104.html)中所推荐的给contentView的第一个childView添加marginTop的方法）
+5.1图片收起:  
+  ![5.1模拟器，图片收起](http://odzl05jxx.bkt.clouddn.com/statusbar_5.0_collapsed.png?imageView2/2/w/300)  
+
+4.4图片展开:  
+  ![4.4模拟器，图片展开](http://odzl05jxx.bkt.clouddn.com/statusbar_4.4_expanded.png?imageView2/2/w/300)  
+
+4.4图片收起:
+  ![4.4模拟器，图片收起](http://odzl05jxx.bkt.clouddn.com/statusbar_4.4_collapsed.png?imageView2/2/w/300)  
+  
+
+原理就是让整个布局占据statusBar的位置，但把Toolbar往下挪一点（其实也就是[这篇文章](http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2016/0330/4104.html)中所推荐的给contentView的给第一个childView添加marginTop的方法）
 
 ### 7. 一些不要犯的小错误
 - 在Theme中添加
-> <item name="android:fitsSystemWindows">true</item>
+```xml
+<item name="android:fitsSystemWindows">true</item>
+```
 这会导致Toast的文字往上偏移，所以，如果需要使用fitSystemWinow = true的话，请老老实实去xml中写
 
 - 状态栏那一块如果你不去占据的话，而你又声明了windowTranslucentStatus，v21上默认的颜色应该是colorPrimaryDark(是的，AppCompat帮你照顾好了)v19上就是一片带阴影的白色(AppCompat不会在这个版本上帮你着色statusBar)。
