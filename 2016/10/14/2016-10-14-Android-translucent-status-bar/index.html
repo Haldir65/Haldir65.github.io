@@ -17,7 +17,7 @@
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/statusbar_5.0_collapsed.png?imageView2/2/w/300">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/statusbar_4.4_expanded.png?imageView2/2/w/300">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/statusbar_4.4_collapsed.png?imageView2/2/w/300">
-<meta property="og:updated_time" content="2016-10-15T10:22:36.911Z">
+<meta property="og:updated_time" content="2016-10-15T10:28:07.331Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="fitSystemWindow和沉浸式状态栏的一些总结">
 <meta name="twitter:description" content="沉浸式状态栏是api 19之后引入的，KitKat应该算是一次比较大的更新了，像是Transition，art runtime,storage access FrameWork(这个有空研究下)，另外就是这个被官方称为Full-screen immersive mode的特性了。具体来说，App可以将展示的区域拓展到statusBar的位置了。我觉得直接叫statusBar就好了，大部分人应该也能">
@@ -195,14 +195,17 @@
 </ol>
 <h3 id="6-我最后实现的解决方案（4-4-5-1均通过）"><a href="#6-我最后实现的解决方案（4-4-5-1均通过）" class="headerlink" title="6.我最后实现的解决方案（4.4,5.1均通过）"></a>6.我最后实现的解决方案（4.4,5.1均通过）</h3><p><strong>其实整个问题的关键就是你是否想要在statusBar那一块长条的位置画画。。。。</strong><br>一整张imageView的话，当然希望能够把图片延伸到statusBar以下<br>而Toolbar则不需要延伸到statusBar以下。<br>我尝试了给toolbar加上padding  &gt;&gt;失败<br>我尝试了给toolbar加上margin   &gt;&gt;&gt;&gt; 问题终于解决</p>
 <p>所以最后，我的xml文件中删除了所有的fitSystemWindow，在style-v19中添加了该加的东西<br>最后只在onCreate里面添加几段话<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">setSupportActionBar(binding.toolbar);</div><div class="line">getSupportActionBar().setDisplayHomeAsUpEnabled(<span class="keyword">true</span>);  <span class="comment">//这个用于显示返回的小箭头，还得指明parentActivity</span></div><div class="line">getSupportActionBar().setTitle(<span class="string">""</span>);</div><div class="line">CollapsingToolbarLayout.LayoutParams params = (CollapsingToolbarLayout.LayoutParams) binding.toolbar.getLayoutParams();</div><div class="line">params.setMargins(<span class="number">0</span>, Utils.getStatusBarHeight(), <span class="number">0</span>, <span class="number">0</span>); <span class="comment">//顶部加个margin就好了</span></div><div class="line">binding.toolbar.setLayoutParams(params);</div></pre></td></tr></table></figure></p>
-<p>实际操作可能还要判断非空什么的，但大致意思如此<br>看起来像这样<br>5.1图片展开:<br>  <img src="http://odzl05jxx.bkt.clouddn.com/statusbar_5.0_expanded.png?imageView2/2/w/300" alt="5.1模拟器，图片展开"><br>5.1图片收起:<br>  <img src="http://odzl05jxx.bkt.clouddn.com/statusbar_5.0_collapsed.png?imageView2/2/w/300" alt="5.1模拟器，图片收起"><br>4.4图片展开:<br>  <img src="http://odzl05jxx.bkt.clouddn.com/statusbar_4.4_expanded.png?imageView2/2/w/300" alt="4.4模拟器，图片展开"><br>4.4图片收起:<br>  <img src="http://odzl05jxx.bkt.clouddn.com/statusbar_4.4_collapsed.png?imageView2/2/w/300" alt="4.4模拟器，图片收起"></p>
-<p>原理就是让整个布局占据statusBar的位置，但把Toolbar往下挪一点（其实也就是<a href="http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2016/0330/4104.html" target="_blank" rel="external">这篇文章</a>中所推荐的给contentView的第一个childView添加marginTop的方法）</p>
+<p>实际操作可能还要判断非空什么的，但大致意思如此<br>看起来像这样<br>5.1图片展开:<br>  <img src="http://odzl05jxx.bkt.clouddn.com/statusbar_5.0_expanded.png?imageView2/2/w/300" alt="5.1模拟器，图片展开">  </p>
+<p>5.1图片收起:<br>  <img src="http://odzl05jxx.bkt.clouddn.com/statusbar_5.0_collapsed.png?imageView2/2/w/300" alt="5.1模拟器，图片收起">  </p>
+<p>4.4图片展开:<br>  <img src="http://odzl05jxx.bkt.clouddn.com/statusbar_4.4_expanded.png?imageView2/2/w/300" alt="4.4模拟器，图片展开">  </p>
+<p>4.4图片收起:<br>  <img src="http://odzl05jxx.bkt.clouddn.com/statusbar_4.4_collapsed.png?imageView2/2/w/300" alt="4.4模拟器，图片收起">  </p>
+<p>原理就是让整个布局占据statusBar的位置，但把Toolbar往下挪一点（其实也就是<a href="http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2016/0330/4104.html" target="_blank" rel="external">这篇文章</a>中所推荐的给contentView的给第一个childView添加marginTop的方法）</p>
 <h3 id="7-一些不要犯的小错误"><a href="#7-一些不要犯的小错误" class="headerlink" title="7. 一些不要犯的小错误"></a>7. 一些不要犯的小错误</h3><ul>
-<li><p>在Theme中添加</p>
-<blockquote>
-<p><item name="android:fitsSystemWindows">true</item><br>这会导致Toast的文字往上偏移，所以，如果需要使用fitSystemWinow = true的话，请老老实实去xml中写</p>
-</blockquote>
+<li>在Theme中添加<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">"android:fitsSystemWindows"</span>&gt;</span>true<span class="tag">&lt;/<span class="name">item</span>&gt;</span></div></pre></td></tr></table></figure>
 </li>
+</ul>
+<p>这会导致Toast的文字往上偏移，所以，如果需要使用fitSystemWinow = true的话，请老老实实去xml中写</p>
+<ul>
 <li><p>状态栏那一块如果你不去占据的话，而你又声明了windowTranslucentStatus，v21上默认的颜色应该是colorPrimaryDark(是的，AppCompat帮你照顾好了)v19上就是一片带阴影的白色(AppCompat不会在这个版本上帮你着色statusBar)。</p>
 </li>
 <li><p>6.0以上可以设置statusBar字体的颜色了，这个随便找找就有了</p>
