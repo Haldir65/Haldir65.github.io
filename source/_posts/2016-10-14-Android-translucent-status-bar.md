@@ -127,7 +127,7 @@ Boolean internal attribute to adjust view layout based on system windows such as
 
 但我的问题在于布局文件是
 CoordinateLayout>  AppBarLyout>  CollapsingToolbarLayout>  Toolbar & ImageView
-这种情况下，照理说Toolbar应该顶部留有25dp的padding，也就是fitSystemWindow = true（假设就只是这么简单），而ImageView需要侵入到statusBar下面，也就是fitSystemWindow = false。
+这种情况下，照理说Toolbar应该顶部留有25dp的padding，也就是fitSystemWindow = true（假设就只是这么简单）[然而事实是，fitSystemWindow会让你设置的padding失效](https://medium.com/google-developers/why-would-i-want-to-fitssystemwindows-4e26d9ce1eec#.vx75v2c9p),而ImageView需要侵入到statusBar下面，也就是fitSystemWindow = false。
 那就只要在toolbar的xml中添加fitSystemWindow这个属性好了。编译，运行，5.1手机，Toolbar的小箭头一部分跑到statusBar下面了，感觉就像Toolbar往上移动了25dp(这个目测的哈)，不可取。
 
 ### 5. 查找到的一些解决方案
@@ -178,7 +178,7 @@ binding.toolbar.setLayoutParams(params);
 
 4.4图片收起:
   ![4.4模拟器，图片收起](http://odzl05jxx.bkt.clouddn.com/statusbar_4.4_collapsed.png?imageView2/2/w/300)  
-  
+
 
 原理就是让整个布局占据statusBar的位置，但把Toolbar往下挪一点（其实也就是[这篇文章](http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2016/0330/4104.html)中所推荐的给contentView的给第一个childView添加marginTop的方法）
 
@@ -193,6 +193,8 @@ binding.toolbar.setLayoutParams(params);
 
 - 6.0以上可以设置statusBar字体的颜色了，这个随便找找就有了
 
+- Ian Lake在medium上给出了对于fitSystemWindow的权威解释，非常有价值。
+
 
 ### 8. 下面这段话可能对于理解window有一定帮助
 fitsSystemWindows, 该属性可以设置是否为系统 View 预留出空间, 当设置为 true 时,会预留出状态栏的空间.
@@ -204,3 +206,4 @@ ContentParent, 实质为 FitWindowsLinearLayout, 里面第一个 View 是 ViewSt
 1. [Android-transulcent-status-bar总结](http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2016/0330/4104.html)
 2. [由沉浸式状态栏引发的血案](http://www.jianshu.com/p/140be70b84cd?utm_source=tuicool&utm_medium=referral)
 3. [Android开发：Translucent System Bar 的最佳实践](http://www.jianshu.com/p/0acc12c29c1b)
+4. [Why would I want to fitsSystemWindows](https://medium.com/google-developers/why-would-i-want-to-fitssystemwindows-4e26d9ce1eec)
