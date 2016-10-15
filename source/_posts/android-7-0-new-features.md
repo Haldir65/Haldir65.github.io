@@ -1,5 +1,5 @@
 ---
-title: android 7.0一些新特性介绍
+title: android 7.0一些新特性介绍及适配方案
 date: 2016-10-08 03:02:26
 tags: android 7
 ---
@@ -26,3 +26,4 @@ tags: android 7
 
 1. [Docs](https://developer.android.com/topic/performance/background-optimization.html?utm_campaign=adp_series__100616&utm_source=anddev&utm_medium=yt-desc)
 2. [youtube](https://www.youtube.com/watch?v=vBjTXKpaFj8)
+3. [Andrioid 7.0适配心得](http://gold.xitu.io/entry/57ff7e14a0bb9f005860c805)

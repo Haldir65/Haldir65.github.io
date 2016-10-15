@@ -109,7 +109,7 @@ private void setupStatusBarView(Context context, ViewGroup decorViewGroup) {//�
             />
     </android.support.design.widget.CoordinatorLayout>
 ```
-只要分别在CoordinateLayout，AppBarLayout和CollapsingToolbarLayout的xml属性中加上android:fitSystemWindwo = "true"
+只要分别在CoordinateLayout，AppBarLayout和CollapsingToolbarLayout的xml属性中加上android:fitSystemWindow = "true"
 java代码里添加一句
 > getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS); //注意下版本判断
 
