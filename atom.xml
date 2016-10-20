@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://haldir65.github.io/"/>
-  <updated>2016-10-20T15:12:37.711Z</updated>
+  <updated>2016-10-20T15:23:00.772Z</updated>
   <id>http://haldir65.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://haldir65.github.io/2016/10/20/2016-10-20-android-dirty-code/"/>
     <id>http://haldir65.github.io/2016/10/20/2016-10-20-android-dirty-code/</id>
     <published>2016-10-20T13:35:10.000Z</published>
-    <updated>2016-10-20T15:12:37.711Z</updated>
+    <updated>2016-10-20T15:23:00.772Z</updated>
     
     <content type="html"><![CDATA[<p>今天在V2EX上看到有人提到Notoification有漏洞，好奇也就查了一下，结果发现有人专门针对这个问题进行了<a href="http://zhoujianghua.com/2015/07/28/black_technology_in_alipay/" target="_blank" rel="external">分析</a>。本身的技术分析并不多，写在这里只是为了作为今后的一个参考。<a id="more"></a></p>
 <h3 id="1-问题的由来"><a href="#1-问题的由来" class="headerlink" title="1. 问题的由来"></a>1. 问题的由来</h3><p>Android对后台应用是有一个权重区分的，最直观的就是查看最近使用的应用，这里每一个应用可能有一个或者多个Process，而系统在资源紧张时会干掉一些Process，而决定后台应用生死的是一个Lru List，也就是least recently used 会被干掉。显然大家都不希望自己被干掉，DAU对于很多应用来说是优先于系统资源和用户体验的。<br>根据<a href="https://developer.android.com/guide/components/processes-and-threads.html" target="_blank" rel="external">官方文档</a>,Android Process有五种，根据优先级从高到低为:</p>
@@ -129,7 +129,8 @@
 <p>单单是看注释大概能看出来Android团队对于这种做法的不满。所以如果不提供有效Notification，则显示你的App的Icon。所以Api 18以上一定会显示一个Notification。</p>
 <p>然而套路还是太深。。。。又有人给出了API 18以上的解决办法:</p>
 <p>我在<a href="http://blog.csdn.net/wxx614817/article/details/50669420" target="_blank" rel="external">这里</a>找到了新的方法，简单来说就是起两个Service，两个Service都在一个进程里。<br>先Start A Service ，onCreate里面 bind B Service，<br>在onServiceConnected的时候A service startForeground(processId,notification)<br>B service startForeground(processId,notification)<br>随后立即调用B service stopForeGround(true)<br>由于两个Notification具有相同的id，所以A service最终成为Foreground Service，Notification也被清除掉了。</p>
-<h3 id="3-综述"><a href="#3-综述" class="headerlink" title="3.综述"></a>3.综述</h3><p>整个过程看下来，API 18以下，给一个不完整的Notification(比如new Notification())，就不会出现在通知栏；API 18以上，起两个Service，B Service负责取消Notification就可以了。<br>目前看来，国内很多App为了保活，都采取了类似的方式。<br>而整体技术层面的实现并不难，只是利用了一个又一个小漏洞罢了。所以，从开发者的角度来说，这种应用与系统的博弈并不是什么好事。<br><img src="http://odzl05jxx.bkt.clouddn.com/blamingtheuser-big.png?imageView2/2/w/600" alt=""></p>
+<h3 id="3-综述"><a href="#3-综述" class="headerlink" title="3.综述"></a>3.综述</h3><p>整个过程看下来，API 18以下，给一个不完整的Notification(比如new Notification())，就不会出现在通知栏；API 18以上，起两个Service，B Service负责取消Notification就可以了。<br>目前看来，国内很多App为了保活，都采取了类似的方式。<br>而整体技术层面的实现并不难，只是利用了一个又一个小漏洞罢了。<br>所谓脏代码不过是技术上做的一些欺骗系统的手段，作为开发者，理应明白谷歌设计这一套系统是为了更好的提升用户体验（占据市场）。然而在当前国内应用开发环境下，我们真的能够为用户考虑考虑吗，或者说，我们提交的代码能吗？</p>
+<p><img src="http://odzl05jxx.bkt.clouddn.com/blamingtheuser-big.png?imageView2/2/w/600" alt=""></p>
 <h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><ul>
 <li><a href="http://zhoujianghua.com/2015/07/28/black_technology_in_alipay/" target="_blank" rel="external">支付宝后台不死的黑科技</a></li>
 <li><a href="http://blog.csdn.net/wxx614817/article/details/50669420" target="_blank" rel="external">Android的startForeground前台Service如何去掉通知显示</a></li>
