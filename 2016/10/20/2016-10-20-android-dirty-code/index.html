@@ -6,20 +6,17 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <title>一些脏代码 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="今天在V2EX上看到有人提到Notoification有漏洞，好奇也就查了一下，结果发现有人专门针对这个问题进行了分析。本身的技术分析并不多，写在这里只是为了作为今后的一个参考。
-1. 问题的由来Android对后台应用是有一个权重区分的，最直观的就是查看最近使用的应用，这里每一个应用可能有一个或者多个Process，而系统在资源紧张时会干掉一些Process，而决定后台应用生死的是一个Lru L">
+  <meta name="description" content="今天在V2EX上看到有人提到Notoification有漏洞，好奇也就查了一下，结果发现有人专门针对这个问题进行了分析。本身的技术分析并不多，写在这里只是为了作为今后的一个参考。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="一些脏代码">
 <meta property="og:url" content="http://haldir65.github.io/2016/10/20/2016-10-20-android-dirty-code/index.html">
 <meta property="og:site_name" content="Haldir的博客">
-<meta property="og:description" content="今天在V2EX上看到有人提到Notoification有漏洞，好奇也就查了一下，结果发现有人专门针对这个问题进行了分析。本身的技术分析并不多，写在这里只是为了作为今后的一个参考。
-1. 问题的由来Android对后台应用是有一个权重区分的，最直观的就是查看最近使用的应用，这里每一个应用可能有一个或者多个Process，而系统在资源紧张时会干掉一些Process，而决定后台应用生死的是一个Lru L">
+<meta property="og:description" content="今天在V2EX上看到有人提到Notoification有漏洞，好奇也就查了一下，结果发现有人专门针对这个问题进行了分析。本身的技术分析并不多，写在这里只是为了作为今后的一个参考。">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/blamingtheuser-big.png?imageView2/2/w/600">
-<meta property="og:updated_time" content="2016-10-20T15:04:10.115Z">
+<meta property="og:updated_time" content="2016-10-20T15:09:35.343Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="一些脏代码">
-<meta name="twitter:description" content="今天在V2EX上看到有人提到Notoification有漏洞，好奇也就查了一下，结果发现有人专门针对这个问题进行了分析。本身的技术分析并不多，写在这里只是为了作为今后的一个参考。
-1. 问题的由来Android对后台应用是有一个权重区分的，最直观的就是查看最近使用的应用，这里每一个应用可能有一个或者多个Process，而系统在资源紧张时会干掉一些Process，而决定后台应用生死的是一个Lru L">
+<meta name="twitter:description" content="今天在V2EX上看到有人提到Notoification有漏洞，好奇也就查了一下，结果发现有人专门针对这个问题进行了分析。本身的技术分析并不多，写在这里只是为了作为今后的一个参考。">
 <meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/blamingtheuser-big.png?imageView2/2/w/600">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
@@ -164,7 +161,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>今天在V2EX上看到有人提到Notoification有漏洞，好奇也就查了一下，结果发现有人专门针对这个问题进行了<a href="http://zhoujianghua.com/2015/07/28/black_technology_in_alipay/" target="_blank" rel="external">分析</a>。本身的技术分析并不多，写在这里只是为了作为今后的一个参考。</p>
+        <p>今天在V2EX上看到有人提到Notoification有漏洞，好奇也就查了一下，结果发现有人专门针对这个问题进行了<a href="http://zhoujianghua.com/2015/07/28/black_technology_in_alipay/" target="_blank" rel="external">分析</a>。本身的技术分析并不多，写在这里只是为了作为今后的一个参考。<a id="more"></a></p>
 <h3 id="1-问题的由来"><a href="#1-问题的由来" class="headerlink" title="1. 问题的由来"></a>1. 问题的由来</h3><p>Android对后台应用是有一个权重区分的，最直观的就是查看最近使用的应用，这里每一个应用可能有一个或者多个Process，而系统在资源紧张时会干掉一些Process，而决定后台应用生死的是一个Lru List，也就是least recently used 会被干掉。显然大家都不希望自己被干掉，DAU对于很多应用来说是优先于系统资源和用户体验的。<br>根据<a href="https://developer.android.com/guide/components/processes-and-threads.html" target="_blank" rel="external">官方文档</a>,Android Process有五种，根据优先级从高到低为:</p>
 <ul>
 <li>前台进程</li>
