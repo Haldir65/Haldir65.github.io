@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://haldir65.github.io/"/>
-  <updated>2016-10-20T08:28:57.846Z</updated>
+  <updated>2016-10-20T08:33:54.999Z</updated>
   <id>http://haldir65.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://haldir65.github.io/2016/10/20/2016-10-20-RecyclerViewAnimationStuff/"/>
     <id>http://haldir65.github.io/2016/10/20/2016-10-20-RecyclerViewAnimationStuff/</id>
     <published>2016-10-20T08:16:49.000Z</published>
-    <updated>2016-10-20T08:28:57.846Z</updated>
+    <updated>2016-10-20T08:33:54.999Z</updated>
     
     <content type="html"><![CDATA[<p>From the talk<br>RecyclerView Animations and Behind the Scenes<br>Yigit Biyar &amp; Chet Haase<br>on Anroid Dev Summit 2015</p>
 <h3 id="1-RecyclerView架构"><a href="#1-RecyclerView架构" class="headerlink" title="1. RecyclerView架构"></a>1. RecyclerView架构</h3><p>RecyclerView is Flexible , Pluggable and Customizeable<br>内部很多功能都交给了各个组件去完成<br><img src="http://odzl05jxx.bkt.clouddn.com/snapshot20161020135353.jpg?imageView2/2/w/600" alt=""><br>ChildHelper 、AdapterHelper 、Recycler对于开发者来说并不常用，但它们在内部负责了许多针对Child View的管理。<a id="more"></a></p>
@@ -64,7 +64,7 @@
 <li>另一种可能导致ViewHolder被销毁的方式<br><img src="http://odzl05jxx.bkt.clouddn.com/snapshot20161020143554.jpg?imageView2/2/w/600" alt=""><br>RecyclerView将View添加到Pool中(实际调用的是addViewHolderToRecycledViewPool(ViewHolder))，Pool会检查这种type的ViewHolder是否还放得下（例如type x的ViewHolder已经有5个了，实在太多了），这种情况下就会Kill这种View,这种情况是我们希望避免的。开发者可以调用pool.setMaxRecycledViews(type,count)来让Pool放更多的Holder per type。</li>
 </ul>
 <p>一些需要注意的，Pool是基于一个Activity Context的。</p>
-<h3 id="2-使用LayoutManager和ItemAnimator自定义ItemView的动画的步骤"><a href="#2-使用LayoutManager和ItemAnimator自定义ItemView的动画的步骤" class="headerlink" title="2. 使用LayoutManager和ItemAnimator自定义ItemView的动画的步骤"></a>2. 使用LayoutManager和ItemAnimator自定义ItemView的动画的步骤</h3><p>perdictiveItemAnimation的关键在于RecyclerView的list并不局限于屏幕。<br>在LayoutManager中复写</p>
+<h3 id="2-使用LayoutManager配合ItemAnimator自定义ItemView的动画的步骤"><a href="#2-使用LayoutManager配合ItemAnimator自定义ItemView的动画的步骤" class="headerlink" title="2. 使用LayoutManager配合ItemAnimator自定义ItemView的动画的步骤"></a>2. 使用LayoutManager配合ItemAnimator自定义ItemView的动画的步骤</h3><p>perdictiveItemAnimation的关键在于RecyclerView的list并不局限于屏幕。<br>在LayoutManager中复写</p>
 <blockquote>
 <p>supportPredictiveItemAnimations()，返回true。</p>
 </blockquote>
@@ -72,17 +72,19 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">supportsPredictiveItemAnimations</span><span class="params">()</span> </span>&#123;</div><div class="line">       <span class="keyword">return</span> mPendingSavedState == <span class="keyword">null</span> &amp;&amp; mLastStackFromEnd == mStackFromEnd;</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
 <p>可以认为返回值就是true</p>
 <p>onLayoutChildern在这种情况下会被调用两次，(之前提到本该被移除的View需要重新添加到ViewGroup中，实现就在这里)<br>参考LinearLayoutManager的实现，源代码实在太长，只复制一些注释<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onLayoutChildren</span><span class="params">(RecyclerView.Recycler recycler, RecyclerView.State state)</span> </span>&#123;</div><div class="line">       <span class="comment">// layout algorithm:</span></div><div class="line">       <span class="comment">// 1) by checking children and other variables, find an anchor coordinate and an anchor</span></div><div class="line">       <span class="comment">//  item position.</span></div><div class="line">       <span class="comment">// 2) fill towards start, stacking from bottom</span></div><div class="line">       <span class="comment">// 3) fill towards end, stacking from top</span></div><div class="line">       <span class="comment">// 4) scroll to fulfill requirements like stack from bottom.</span></div><div class="line">       <span class="comment">// create layout state</span></div><div class="line">       <span class="comment">//omitted....</span></div><div class="line">       &#125;</div></pre></td></tr></table></figure></p>
+<p>简单来说一共三步:</p>
 <ol>
 <li>detach and Scrap Views</li>
 <li>layout那些需要出现在list中的View(包括将要消失的View)</li>
 <li>接下来进入第二步layout，在这里确定那些将出现在屏幕外的View的实际位置。</li>
 </ol>
+<p>这样LayoutManager就能将必要的信息传递给ItemAnimator</p>
 <ul>
-<li>进入ItemAnimator</li>
+<li>进入ItemAnimator<br>大部分的需要实现的函数在SimpleItemAnimator或者DefaultItemAnimator里面都已经实现好了，所以大部分人的选择就是：</li>
 </ul>
 <ol>
-<li>使用DefaultItemAnimator</li>
-<li>Implement SimpleItemAnimator(ItemAnimator)</li>
+<li>使用DefaultItemAnimator(默认已经设置好了)</li>
+<li>Implement SimpleItemAnimator(或者DeafaultItemAnimator)，复写一些必要的方法</li>
 </ol>
 <p>Animator需要做的一些事<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">record[Pre|Post]LayoutInformation<span class="comment">//记录动画开始和结束的layout信息</span></div><div class="line">animate[Appearance|Disappearance]</div><div class="line">animatePersistence()<span class="comment">//不会改变位置</span></div><div class="line">animateChange()<span class="comment">//实际的动画添加位置</span></div></pre></td></tr></table></figure></p>
 <p>这些在DefaultItemAnimator中都有默认的实现<br>动画完成后一定要调用</p>
