@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://haldir65.github.io/"/>
-  <updated>2016-10-20T08:33:54.999Z</updated>
+  <updated>2016-10-20T13:28:00.090Z</updated>
   <id>http://haldir65.github.io/</id>
   
   <author>
@@ -14,6 +14,65 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>自定义LayoutManager</title>
+    <link href="http://haldir65.github.io/2016/10/20/2016-10-20-write-your-own-layoutmanager/"/>
+    <id>http://haldir65.github.io/2016/10/20/2016-10-20-write-your-own-layoutmanager/</id>
+    <published>2016-10-20T08:37:42.000Z</published>
+    <updated>2016-10-20T13:28:00.090Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="1-系统为我们提供了LinearLayoutManager、GridLayoutManager和StaggeredGridLayoutManager。"><a href="#1-系统为我们提供了LinearLayoutManager、GridLayoutManager和StaggeredGridLayoutManager。" class="headerlink" title="1. 系统为我们提供了LinearLayoutManager、GridLayoutManager和StaggeredGridLayoutManager。"></a>1. 系统为我们提供了LinearLayoutManager、GridLayoutManager和StaggeredGridLayoutManager。</h3><p>基本用法都很简单，这里记录一些重要的用法</p>
+<p><img src="http://odzl05jxx.bkt.clouddn.com/Googling%20the%20Error%20Message.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
+<ul>
+<li>GridLayoutManager可以设置某个Item在某一行占据的Column num（VERTICAL的情况下）<br>代码如下:<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">GridLayoutManager manager = <span class="keyword">new</span> GridLayoutManager(</div><div class="line">   <span class="keyword">this</span>,<span class="number">2</span> ,GridLayoutManager.VERTICAL,<span class="keyword">false</span>)</div><div class="line">   </div><div class="line">manager.setSpanSizeLookup()&#123;</div><div class="line">        <span class="keyword">new</span> GridLayoutManager.SpanSizeLookup()&#123;</div><div class="line">        <span class="meta">@override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getSpanSize</span><span class="params">(<span class="keyword">int</span> position)</span></span>&#123;</div><div class="line">                <span class="keyword">return</span> (position % <span class="number">3</span> == <span class="number">0</span> ? <span class="number">2</span> : <span class="number">1</span>)</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>所以，一开始可以把这个2设置大一点，后面可以动态设置，看上去就会造成一种多种格子的错觉。</p>
+<ul>
+<li>GridLayoutManger的同一行的ItemView的itemHeight必须一致，否则同一行的ItemView底部会出现空隙。这种情况请使用StaggeredGridLayoutManager</li>
+</ul>
+<h4 id="2-LayoutManager-lt-——-gt-Recycler-lt-——–-gt-Adapter"><a href="#2-LayoutManager-lt-——-gt-Recycler-lt-——–-gt-Adapter" class="headerlink" title="2. LayoutManager &lt;——-&gt; Recycler &lt;——–&gt; Adapter"></a>2. LayoutManager &lt;——-&gt; Recycler &lt;——–&gt; Adapter</h4><p>LayoutManager永远永远永远不要碰Adapter!!!</p>
+<h3 id="3-Recycler构造"><a href="#3-Recycler构造" class="headerlink" title="3.Recycler构造"></a>3.Recycler构造</h3><p>Recycler内部有两个集合:</p>
+<ol>
+<li>Scrap Heap ： detachAndScrapView() 暂时不用的View丢到这里，随时取回使用</li>
+<li>Recycle Pool: removeAndRecycleView() 确定不需要的View丢到这里，拿回来时position或者data变了</li>
+</ol>
+<h3 id="4-FillGaps-最重要的方法"><a href="#4-FillGaps-最重要的方法" class="headerlink" title="4.FillGaps,最重要的方法"></a>4.FillGaps,最重要的方法</h3><ol>
+<li>Discover firstVisible position/location</li>
+<li><p>找到layout Gaps</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">findFirstVisiblePosition</div></pre></td></tr></table></figure>
+</li>
+<li><p>Scrap everything(丢到ScrapHeap)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line">        * Temporarily detach and scrap all currently attached child views. Views will be scrapped</div><div class="line">        * into the given Recycler. The Recycler may prefer to reuse scrap views before</div><div class="line">        * other views that were previously recycled.</div><div class="line">        *</div><div class="line">        * <span class="doctag">@param</span> recycler Recycler to scrap views into</div><div class="line">        */</div><div class="line">       <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">detachAndScrapAttachedViews</span><span class="params">(Recycler recycler)</span> </span>&#123;</div><div class="line">           <span class="keyword">final</span> <span class="keyword">int</span> childCount = getChildCount();</div><div class="line">           <span class="keyword">for</span> (<span class="keyword">int</span> i = childCount - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</div><div class="line">               <span class="keyword">final</span> View v = getChildAt(i);</div><div class="line">               scrapOrRecycleView(recycler, i, v);</div><div class="line">           &#125;</div><div class="line">       &#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>Lay out all visible positions</p>
+</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span>(...)&#123;</div><div class="line">    <span class="keyword">int</span> nextPosition = ...;</div><div class="line">    View view = recycler.getViewForPosition(nextPosition);</div><div class="line">    addView(view);</div><div class="line">    </div><div class="line">    <span class="comment">//注意这里的Measure和Layout不是平时使用的measureChild和layout方法，原因是ItemDecoration</span></div><div class="line">    measureChildWithMargin(view,...) </div><div class="line">    layoutDecorated(view,....)</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<ol>
+<li>Recycle remaining views<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">final</span> List&lt;RecyclerView.ViewHolder&gt; scrapList =</div><div class="line">    recycler.getScrapList();</div><div class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;scrapList.size;i++)&#123;</div><div class="line">    <span class="keyword">final</span> View removingView = scrapList.get(i);</div><div class="line">    recycler.recycleView(removingView);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>注意: 丢到RecyclerPool的View的viewHolder、LayoutParams都被清除掉</p>
+<h3 id="4-Scroll事件"><a href="#4-Scroll事件" class="headerlink" title="4. Scroll事件"></a>4. Scroll事件</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">scrollHorizontallyBy</span><span class="params">(<span class="keyword">int</span> dx, RecyclerView.Recycler recycler, RecyclerView.State state)</span> </span>&#123;</div><div class="line"></div><div class="line"><span class="comment">//dx 表示系统根据传入的TouchEvent告诉你应该滑动多少</span></div><div class="line">dx &lt;<span class="number">0</span> 内容向右滑动</div><div class="line">dx &gt; <span class="number">0</span>内容向左滑动</div><div class="line"><span class="comment">//这个正负号和ScrollBy那个是一样的邪门</span></div><div class="line"><span class="comment">//返回值是你告诉系统你实际滑动了多少</span></div><div class="line">offsetChildrenHorizontal(delta);<span class="comment">//调用该方法会帮助你移动所有的ChildView，比一个个Iterate方便多了</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="5-notifyDataSetChanged-调用了什么函数"><a href="#5-notifyDataSetChanged-调用了什么函数" class="headerlink" title="5.notifyDataSetChanged()调用了什么函数"></a>5.notifyDataSetChanged()调用了什么函数</h3><p>最终会走到onLayoutChildren这里面，就跟重新走一遍layout就可以了</p>
+<h3 id="6-ScrollToPosition-和SmoothScrollToPosition"><a href="#6-ScrollToPosition-和SmoothScrollToPosition" class="headerlink" title="6.ScrollToPosition()和SmoothScrollToPosition()"></a>6.ScrollToPosition()和SmoothScrollToPosition()</h3><p>两者的实现的不同:<br>scrollToPosition:Track Requested Position、Trigger requestLayout<br>SmoothscrollToPosition: Create a SmoothScroller instance、Set the Target Position、invoke startSmoothScroll<br>SmoothScroller是一个接口，在里面实现computeScrollVectorForPosition返回需要到达的位置</p>
+<h3 id="7-supportPredictiveItemAnimation主要用于ItemChange-Animation"><a href="#7-supportPredictiveItemAnimation主要用于ItemChange-Animation" class="headerlink" title="7. supportPredictiveItemAnimation主要用于ItemChange Animation"></a>7. supportPredictiveItemAnimation主要用于ItemChange Animation</h3><p>主要在发生变化时展示动画。如果想要在滑动过程中展示动画的话，可以考虑在onViewAttachedToWindow或者onBindViewHolder里面给View添加TranslationX（从左边出来），Alpha(透明度从0变成1)，或者ScaleX等等</p>
+<h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><ol>
+<li><a href="https://github.com/devunwired/recyclerview-playground" target="_blank" rel="external">Dave Smith</a></li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;1-系统为我们提供了LinearLayoutManager、GridLayoutManager和StaggeredGridLayoutManager。&quot;&gt;&lt;a href=&quot;#1-系统为我们提供了LinearLayoutManager、GridLayoutManager和StaggeredGridLayoutManager。&quot; class=&quot;headerlink&quot; title=&quot;1. 系统为我们提供了LinearLayoutManager、GridLayoutManager和StaggeredGridLayoutManager。&quot;&gt;&lt;/a&gt;1. 系统为我们提供了LinearLayoutManager、GridLayoutManager和StaggeredGridLayoutManager。&lt;/h3&gt;&lt;p&gt;基本用法都很简单，这里记录一些重要的用法&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://odzl05jxx.bkt.clouddn.com/Googling%20the%20Error%20Message.jpg?imageView2/2/w/600&quot; alt=&quot;&quot;&gt;&lt;br&gt;
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title>使用RecyclerView的Animation</title>
