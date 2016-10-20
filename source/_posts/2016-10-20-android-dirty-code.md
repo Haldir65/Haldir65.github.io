@@ -4,7 +4,7 @@ date: 2016-10-20 21:35:10
 tags:
 ---
 
-今天在V2EX上看到有人提到Notoification有漏洞，好奇也就查了一下，结果发现有人专门针对这个问题进行了[分析](http://zhoujianghua.com/2015/07/28/black_technology_in_alipay/)。本身的技术分析并不多，写在这里只是为了作为今后的一个参考。
+今天在V2EX上看到有人提到Notification有漏洞，好奇也就查了一下，结果发现有人专门针对这个问题进行了[分析](http://zhoujianghua.com/2015/07/28/black_technology_in_alipay/)。本身的技术分析并不多，写在这里只是为了作为今后的一个参考。<!--more-->
 
 ### 1. 问题的由来
 Android对后台应用是有一个权重区分的，最直观的就是查看最近使用的应用，这里每一个应用可能有一个或者多个Process，而系统在资源紧张时会干掉一些Process，而决定后台应用生死的是一个Lru List，也就是least recently used 会被干掉。显然大家都不希望自己被干掉，DAU对于很多应用来说是优先于系统资源和用户体验的。
@@ -25,10 +25,10 @@ Android对后台应用是有一个权重区分的，最直观的就是查看最�
 托管正执行其 onReceive() 方法的 BroadcastReceiver
 通常，在任意给定时间前台进程都为数不多。只有在内在不足以支持它们同时继续运行这一万不得已的情况下，系统才会终止它们。 此时，设备往往已达到内存分页状态，因此需要终止一些前台进程来确保用户界面正常响应。
 ```
-以上条件只有startForeGround满足条件了，但大家都知道startForeGround会在通知栏常驻一个Notification，且用户取消不了。对于我这种强迫症来说实在是太丑。
+以上条件只有startForeground满足条件了，但大家都知道startForeground会在通知栏常驻一个Notification，且用户取消不了。对于我这种强迫症来说实在是太丑。
 
 
-### 2. startForeGround一定会在系统状态栏，真的吗?
+### 2. startForeground一定会在系统状态栏显示一个通知，真的吗?
 ```java
 void startForeground (int id, 
                 Notification notification)
@@ -125,7 +125,6 @@ public void postNotification() {
 单单是看注释大概能看出来Android团队对于这种做法的不满。所以如果不提供有效Notification，则显示你的App的Icon。所以Api 18以上一定会显示一个Notification。
 
 然而套路还是太深。。。。又有人给出了API 18以上的解决办法:
-
 我在[这里](http://blog.csdn.net/wxx614817/article/details/50669420)找到了新的方法，简单来说就是起两个Service，两个Service都在一个进程里。
 先Start A Service ，onCreate里面 bind B Service，
 在onServiceConnected的时候A service startForeground(processId,notification)
@@ -134,11 +133,14 @@ B service startForeground(processId,notification)
 由于两个Notification具有相同的id，所以A service最终成为Foreground Service，Notification也被清除掉了。
 
 
-### 3.综述
+### 3.最后
 整个过程看下来，API 18以下，给一个不完整的Notification(比如new Notification())，就不会出现在通知栏；API 18以上，起两个Service，B Service负责取消Notification就可以了。
 目前看来，国内很多App为了保活，都采取了类似的方式。
-而整体技术层面的实现并不难，只是利用了一个又一个小漏洞罢了。所以，从开发者的角度来说，这种应用与系统的博弈并不是什么好事。
+而整体技术层面的实现并不难，只是利用了一个又一个小漏洞罢了。
+所谓脏代码不过是技术上做的一些欺骗系统的手段，作为开发者，理应明白谷歌设计这一套系统是为了更好的提升用户体验（占据市场）。然而在当前国内应用开发环境下，我们真的能够为用户考虑考虑吗，或者说，我们提交的代码能吗？
+
 ![](http://odzl05jxx.bkt.clouddn.com/blamingtheuser-big.png?imageView2/2/w/600)
+
 
 
 ### Reference
