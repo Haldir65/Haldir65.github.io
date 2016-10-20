@@ -187,8 +187,21 @@ android:background=”?android:attr/selectableItemBackground”
 <blockquote>
 <p>android:background=”?android:attr/selectableItemBackground”</p>
 </blockquote>
-<p>这个xml属性最早是我学着写recyclerVeiw的item xml的时候接触到的，简单来说就是，在API 21及以上，用户点击这个itemView时候会出现一个Ripple效果<br>非常好看，而在API 21以下则会表现为MonoChrome的类似按压色的效果<img src="https://cloud.githubusercontent.com/assets/12274855/18787855/2a6d93f2-81d7-11e6-8026-58cdbd8583d4.JPG" alt=""> <br><br>而这个点击时的水波纹颜色也是可以Customize的<br><figure class="highlight applescript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="built_in">item</span> <span class="built_in">name</span>=<span class="string">"android:colorControlHighlight"</span>&gt;@color/my_ripple_color&lt;/<span class="built_in">item</span>&gt;</div></pre></td></tr></table></figure></p>
-<p>//这个要写在自己的Activity的Theme(style-v21)里，注意，当前Activity的Theme必须继承自Appcompat!!<br>于是，我写了这样的xml<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">LinearLayout</span></span></div><div class="line">        <span class="attr">android:id</span>=<span class="string">"@+id/item_root"</span></div><div class="line">        <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></div><div class="line">        <span class="attr">android:layout_height</span>=<span class="string">"?android:attr/listPreferredItemHeight"</span></div><div class="line">        <span class="attr">android:orientation</span>=<span class="string">"vertical"</span></div><div class="line">        <span class="attr">android:gravity</span>=<span class="string">"center"</span></div><div class="line">        <span class="attr">android:onClick</span>=<span class="string">"@&#123;(view) -&gt; callback.onClick(view,data)&#125;"</span></div><div class="line">        <span class="attr">android:elevation</span>=<span class="string">"2dp"</span></div><div class="line">        <span class="attr">android:background</span>=<span class="string">"@color/md_amber_200"</span></div><div class="line">        <span class="attr">android:foreground</span>=<span class="string">"?android:attr/selectableItemBackground"</span></div><div class="line">        /&gt;</div></pre></td></tr></table></figure></p>
+<p>这个xml属性最早是我学着写recyclerVeiw的item xml的时候接触到的，简单来说就是，在API 21及以上，用户点击这个itemView时候会出现一个Ripple效果<br>非常好看，而在API 21以下则会表现为MonoChrome的类似按压色的效果<img src="https://cloud.githubusercontent.com/assets/12274855/18787855/2a6d93f2-81d7-11e6-8026-58cdbd8583d4.JPG" alt=""> <br><br>而这个点击时的水波纹颜色也是可以Customize的</p>
+<pre><code>&lt;item name=&quot;android:colorControlHighlight&quot;&gt;@color/my_ripple_color&lt;/item&gt;
+</code></pre><p>//这个要写在自己的Activity的Theme(style-v21)里，注意，当前Activity的Theme必须继承自Appcompat!!<br>于是，我写了这样的xml</p>
+<pre><code class="xml">&lt;LinearLayout
+        android:id=&quot;@+id/item_root&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;?android:attr/listPreferredItemHeight&quot;
+        android:orientation=&quot;vertical&quot;
+        android:gravity=&quot;center&quot;
+        android:onClick=&quot;@{(view) -&gt; callback.onClick(view,data)}&quot;
+        android:elevation=&quot;2dp&quot;
+        android:background=&quot;@color/md_amber_200&quot;
+        android:foreground=&quot;?android:attr/selectableItemBackground&quot;
+        /&gt;
+</code></pre>
 <p>然而，点击之后并没有出现水波纹(模拟器 API 21)，换成CardView或是将foreground改为background之后才有效。查了很多博客，最后得出结论:<br>android:foreground在API 23之前只对FrameLayout有效(CardView继承自FrameLayout当然有效)。<br><a id="more"></a></p>
 <p>##所以正确的做法是</p>
 <blockquote>
@@ -220,21 +233,360 @@ android:background=”?android:attr/selectableItemBackground”
 <li>自己动手写一个实现foreground的Viewgroup , <a href="https://gist.github.com/chrisbanes/9091754" target="_blank" rel="external">代码</a></li>
 </ol>
 <ul>
-<li>attrs:<figure class="highlight plain"><figcaption><span>version="1.0" encoding="utf-8"?></span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&lt;resources&gt;</div><div class="line">    &lt;declare-styleable name=&quot;ForegroundLinearLayout&quot;&gt;</div><div class="line">        &lt;attr name=&quot;android:foreground&quot; /&gt;</div><div class="line">        &lt;attr name=&quot;android:foregroundInsidePadding&quot; /&gt;</div><div class="line">        &lt;attr name=&quot;android:foregroundGravity&quot; /&gt;</div><div class="line">    &lt;/declare-styleable&gt;</div><div class="line">&lt;/resources&gt;</div></pre></td></tr></table></figure>
-</li>
+<li>attrs:<br>```&lt;?xml version=”1.0” encoding=”utf-8”?&gt;<br><resources><br>  <declare-styleable name="ForegroundLinearLayout"><pre><code>  &lt;attr name=&quot;android:foreground&quot; /&gt;
+  &lt;attr name=&quot;android:foregroundInsidePadding&quot; /&gt;
+  &lt;attr name=&quot;android:foregroundGravity&quot; /&gt;
+</code></pre>  </declare-styleable><br></resources>```</li>
 </ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div><div class="line">184</div><div class="line">185</div><div class="line">186</div><div class="line">187</div><div class="line">188</div><div class="line">189</div><div class="line">190</div><div class="line">191</div><div class="line">192</div><div class="line">193</div><div class="line">194</div><div class="line">195</div><div class="line">196</div><div class="line">197</div><div class="line">198</div><div class="line">199</div><div class="line">200</div><div class="line">201</div><div class="line">202</div><div class="line">203</div><div class="line">204</div><div class="line">205</div><div class="line">206</div><div class="line">207</div><div class="line">208</div><div class="line">209</div><div class="line">210</div><div class="line">211</div><div class="line">212</div><div class="line">213</div><div class="line">214</div><div class="line">215</div><div class="line">216</div><div class="line">217</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/* </span></div><div class="line"> * Copyright (C) 2006 The Android Open Source Project </div><div class="line"> * </div><div class="line"> * Licensed under the Apache License, Version 2.0 (the "License"); </div><div class="line"> * you may not use this file except in compliance with the License. </div><div class="line"> * You may obtain a copy of the License at </div><div class="line"> * </div><div class="line"> *      http://www.apache.org/licenses/LICENSE-2.0 </div><div class="line"> * </div><div class="line"> * Unless required by applicable law or agreed to in writing, software </div><div class="line"> * distributed under the License is distributed on an "AS IS" BASIS, </div><div class="line"> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. </div><div class="line"> * See the License for the specific language governing permissions and </div><div class="line"> * limitations under the License. </div><div class="line"> */ </div><div class="line"> </div><div class="line"><span class="keyword">package</span> your.<span class="keyword">package</span>; </div><div class="line"> </div><div class="line"><span class="keyword">import</span> android.content.Context;</div><div class="line"><span class="keyword">import</span> android.content.res.TypedArray;</div><div class="line"><span class="keyword">import</span> android.graphics.Canvas;</div><div class="line"><span class="keyword">import</span> android.graphics.Rect;</div><div class="line"><span class="keyword">import</span> android.graphics.drawable.Drawable;</div><div class="line"><span class="keyword">import</span> android.util.AttributeSet;</div><div class="line"><span class="keyword">import</span> android.view.Gravity;</div><div class="line"><span class="keyword">import</span> android.widget.LinearLayout;</div><div class="line"> </div><div class="line"><span class="keyword">import</span> your.<span class="keyword">package</span>.R; </div><div class="line"> </div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ForegroundLinearLayout</span> <span class="keyword">extends</span> <span class="title">LinearLayout</span> </span>&#123;</div><div class="line"> </div><div class="line">    <span class="keyword">private</span> Drawable mForeground;</div><div class="line"> </div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Rect mSelfBounds = <span class="keyword">new</span> Rect();</div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Rect mOverlayBounds = <span class="keyword">new</span> Rect();</div><div class="line"> </div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> mForegroundGravity = Gravity.FILL;</div><div class="line"> </div><div class="line">    <span class="keyword">protected</span> <span class="keyword">boolean</span> mForegroundInPadding = <span class="keyword">true</span>;</div><div class="line"> </div><div class="line">    <span class="keyword">boolean</span> mForegroundBoundsChanged = <span class="keyword">false</span>;</div><div class="line"> </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ForegroundLinearLayout</span><span class="params">(Context context)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>(context);</div><div class="line">    &#125; </div><div class="line"> </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ForegroundLinearLayout</span><span class="params">(Context context, AttributeSet attrs)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>(context, attrs, <span class="number">0</span>);</div><div class="line">    &#125; </div><div class="line"> </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ForegroundLinearLayout</span><span class="params">(Context context, AttributeSet attrs, <span class="keyword">int</span> defStyle)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>(context, attrs, defStyle);</div><div class="line"> </div><div class="line">        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ForegroundLinearLayout,</div><div class="line">                defStyle, <span class="number">0</span>);</div><div class="line"> </div><div class="line">        mForegroundGravity = a.getInt(</div><div class="line">                R.styleable.ForegroundLinearLayout_android_foregroundGravity, mForegroundGravity);</div><div class="line"> </div><div class="line">        <span class="keyword">final</span> Drawable d = a.getDrawable(R.styleable.ForegroundLinearLayout_android_foreground);</div><div class="line">        <span class="keyword">if</span> (d != <span class="keyword">null</span>) &#123;</div><div class="line">            setForeground(d);</div><div class="line">        &#125; </div><div class="line"> </div><div class="line">        mForegroundInPadding = a.getBoolean(</div><div class="line">                R.styleable.ForegroundLinearLayout_android_foregroundInsidePadding, <span class="keyword">true</span>);</div><div class="line"> </div><div class="line">        a.recycle();</div><div class="line">    &#125; </div><div class="line"> </div><div class="line">    <span class="comment">/** </span></div><div class="line">     * Describes how the foreground is positioned. </div><div class="line">     * </div><div class="line">     * <span class="doctag">@return</span> foreground gravity. </div><div class="line">     * </div><div class="line">     * <span class="doctag">@see</span> #setForegroundGravity(int) </div><div class="line">     */ </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getForegroundGravity</span><span class="params">()</span> </span>&#123; </div><div class="line">        <span class="keyword">return</span> mForegroundGravity;</div><div class="line">    &#125; </div><div class="line"> </div><div class="line">    <span class="comment">/** </span></div><div class="line">     * Describes how the foreground is positioned. Defaults to START and TOP. </div><div class="line">     * </div><div class="line">     * <span class="doctag">@param</span> foregroundGravity See &#123;<span class="doctag">@link</span> android.view.Gravity&#125; </div><div class="line">     * </div><div class="line">     * <span class="doctag">@see</span> #getForegroundGravity() </div><div class="line">     */ </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setForegroundGravity</span><span class="params">(<span class="keyword">int</span> foregroundGravity)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (mForegroundGravity != foregroundGravity) &#123;</div><div class="line">            <span class="keyword">if</span> ((foregroundGravity &amp; Gravity.RELATIVE_HORIZONTAL_GRAVITY_MASK) == <span class="number">0</span>) &#123;</div><div class="line">                foregroundGravity |= Gravity.START;</div><div class="line">            &#125; </div><div class="line"> </div><div class="line">            <span class="keyword">if</span> ((foregroundGravity &amp; Gravity.VERTICAL_GRAVITY_MASK) == <span class="number">0</span>) &#123;</div><div class="line">                foregroundGravity |= Gravity.TOP;</div><div class="line">            &#125; </div><div class="line"> </div><div class="line">            mForegroundGravity = foregroundGravity;</div><div class="line"> </div><div class="line"> </div><div class="line">            <span class="keyword">if</span> (mForegroundGravity == Gravity.FILL &amp;&amp; mForeground != <span class="keyword">null</span>) &#123;</div><div class="line">                Rect padding = <span class="keyword">new</span> Rect();</div><div class="line">                mForeground.getPadding(padding);</div><div class="line">            &#125; </div><div class="line"> </div><div class="line">            requestLayout();</div><div class="line">        &#125; </div><div class="line">    &#125; </div><div class="line"> </div><div class="line">    <span class="meta">@Override</span> </div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">boolean</span> <span class="title">verifyDrawable</span><span class="params">(Drawable who)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">super</span>.verifyDrawable(who) || (who == mForeground);</div><div class="line">    &#125; </div><div class="line"> </div><div class="line">    <span class="meta">@Override</span> </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">jumpDrawablesToCurrentState</span><span class="params">()</span> </span>&#123; </div><div class="line">        <span class="keyword">super</span>.jumpDrawablesToCurrentState(); </div><div class="line">        <span class="keyword">if</span> (mForeground != <span class="keyword">null</span>) mForeground.jumpToCurrentState();</div><div class="line">    &#125; </div><div class="line"> </div><div class="line">    <span class="meta">@Override</span> </div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">drawableStateChanged</span><span class="params">()</span> </span>&#123; </div><div class="line">        <span class="keyword">super</span>.drawableStateChanged(); </div><div class="line">        <span class="keyword">if</span> (mForeground != <span class="keyword">null</span> &amp;&amp; mForeground.isStateful()) &#123;</div><div class="line">            mForeground.setState(getDrawableState());</div><div class="line">        &#125; </div><div class="line">    &#125; </div><div class="line"> </div><div class="line">    <span class="comment">/** </span></div><div class="line">     * Supply a Drawable that is to be rendered on top of all of the child </div><div class="line">     * views in the frame layout.  Any padding in the Drawable will be taken </div><div class="line">     * into account by ensuring that the children are inset to be placed </div><div class="line">     * inside of the padding area. </div><div class="line">     * </div><div class="line">     * <span class="doctag">@param</span> drawable The Drawable to be drawn on top of the children. </div><div class="line">     */ </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setForeground</span><span class="params">(Drawable drawable)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (mForeground != drawable) &#123;</div><div class="line">            <span class="keyword">if</span> (mForeground != <span class="keyword">null</span>) &#123;</div><div class="line">                mForeground.setCallback(<span class="keyword">null</span>);</div><div class="line">                unscheduleDrawable(mForeground);</div><div class="line">            &#125; </div><div class="line"> </div><div class="line">            mForeground = drawable;</div><div class="line"> </div><div class="line">            <span class="keyword">if</span> (drawable != <span class="keyword">null</span>) &#123;</div><div class="line">                setWillNotDraw(<span class="keyword">false</span>);</div><div class="line">                drawable.setCallback(<span class="keyword">this</span>);</div><div class="line">                <span class="keyword">if</span> (drawable.isStateful()) &#123;</div><div class="line">                    drawable.setState(getDrawableState());</div><div class="line">                &#125; </div><div class="line">                <span class="keyword">if</span> (mForegroundGravity == Gravity.FILL) &#123;</div><div class="line">                    Rect padding = <span class="keyword">new</span> Rect();</div><div class="line">                    drawable.getPadding(padding);</div><div class="line">                &#125; </div><div class="line">            &#125;  <span class="keyword">else</span> &#123; </div><div class="line">                setWillNotDraw(<span class="keyword">true</span>);</div><div class="line">            &#125; </div><div class="line">            requestLayout();</div><div class="line">            invalidate();</div><div class="line">        &#125; </div><div class="line">    &#125; </div><div class="line"> </div><div class="line">    <span class="comment">/** </span></div><div class="line">     * Returns the drawable used as the foreground of this FrameLayout. The </div><div class="line">     * foreground drawable, if non-null, is always drawn on top of the children. </div><div class="line">     * </div><div class="line">     * <span class="doctag">@return</span> A Drawable or null if no foreground was set. </div><div class="line">     */ </div><div class="line">    <span class="function"><span class="keyword">public</span> Drawable <span class="title">getForeground</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> mForeground;</div><div class="line">    &#125; </div><div class="line"> </div><div class="line">    <span class="meta">@Override</span> </div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onLayout</span><span class="params">(<span class="keyword">boolean</span> changed, <span class="keyword">int</span> left, <span class="keyword">int</span> top, <span class="keyword">int</span> right, <span class="keyword">int</span> bottom)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.onLayout(changed, left, top, right, bottom);</div><div class="line">        mForegroundBoundsChanged = changed;</div><div class="line">    &#125; </div><div class="line"> </div><div class="line">    <span class="meta">@Override</span> </div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onSizeChanged</span><span class="params">(<span class="keyword">int</span> w, <span class="keyword">int</span> h, <span class="keyword">int</span> oldw, <span class="keyword">int</span> oldh)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.onSizeChanged(w, h, oldw, oldh);</div><div class="line">        mForegroundBoundsChanged = <span class="keyword">true</span>;</div><div class="line">    &#125; </div><div class="line"> </div><div class="line">    <span class="meta">@Override</span> </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">draw</span><span class="params">(Canvas canvas)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.draw(canvas);</div><div class="line"> </div><div class="line">        <span class="keyword">if</span> (mForeground != <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">final</span> Drawable foreground = mForeground;</div><div class="line"> </div><div class="line">            <span class="keyword">if</span> (mForegroundBoundsChanged) &#123;</div><div class="line">                mForegroundBoundsChanged = <span class="keyword">false</span>;</div><div class="line">                <span class="keyword">final</span> Rect selfBounds = mSelfBounds;</div><div class="line">                <span class="keyword">final</span> Rect overlayBounds = mOverlayBounds;</div><div class="line"> </div><div class="line">                <span class="keyword">final</span> <span class="keyword">int</span> w = getRight() - getLeft();</div><div class="line">                <span class="keyword">final</span> <span class="keyword">int</span> h = getBottom() - getTop();</div><div class="line"> </div><div class="line">                <span class="keyword">if</span> (mForegroundInPadding) &#123;</div><div class="line">                    selfBounds.set(<span class="number">0</span>, <span class="number">0</span>, w, h);</div><div class="line">                &#125; <span class="keyword">else</span> &#123; </div><div class="line">                    selfBounds.set(getPaddingLeft(), getPaddingTop(),</div><div class="line">                            w - getPaddingRight(), h - getPaddingBottom());</div><div class="line">                &#125; </div><div class="line"> </div><div class="line">                Gravity.apply(mForegroundGravity, foreground.getIntrinsicWidth(),</div><div class="line">                        foreground.getIntrinsicHeight(), selfBounds, overlayBounds);</div><div class="line">                foreground.setBounds(overlayBounds);</div><div class="line">            &#125; </div><div class="line"> </div><div class="line">            foreground.draw(canvas);</div><div class="line">        &#125; </div><div class="line">    &#125; </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code class="java">/* 
+ * Copyright (C) 2006 The Android Open Source Project 
+ * 
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;); 
+ * you may not use this file except in compliance with the License. 
+ * You may obtain a copy of the License at 
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0 
+ * 
+ * Unless required by applicable law or agreed to in writing, software 
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+ * See the License for the specific language governing permissions and 
+ * limitations under the License. 
+ */ 
+
+package your.package; 
+
+import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.Canvas;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.util.AttributeSet;
+import android.view.Gravity;
+import android.widget.LinearLayout;
+
+import your.package.R; 
+
+public class ForegroundLinearLayout extends LinearLayout {
+
+    private Drawable mForeground;
+
+    private final Rect mSelfBounds = new Rect();
+    private final Rect mOverlayBounds = new Rect();
+
+    private int mForegroundGravity = Gravity.FILL;
+
+    protected boolean mForegroundInPadding = true;
+
+    boolean mForegroundBoundsChanged = false;
+
+    public ForegroundLinearLayout(Context context) {
+        super(context);
+    } 
+
+    public ForegroundLinearLayout(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    } 
+
+    public ForegroundLinearLayout(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ForegroundLinearLayout,
+                defStyle, 0);
+
+        mForegroundGravity = a.getInt(
+                R.styleable.ForegroundLinearLayout_android_foregroundGravity, mForegroundGravity);
+
+        final Drawable d = a.getDrawable(R.styleable.ForegroundLinearLayout_android_foreground);
+        if (d != null) {
+            setForeground(d);
+        } 
+
+        mForegroundInPadding = a.getBoolean(
+                R.styleable.ForegroundLinearLayout_android_foregroundInsidePadding, true);
+
+        a.recycle();
+    } 
+
+    /** 
+     * Describes how the foreground is positioned. 
+     * 
+     * @return foreground gravity. 
+     * 
+     * @see #setForegroundGravity(int) 
+     */ 
+    public int getForegroundGravity() { 
+        return mForegroundGravity;
+    } 
+
+    /** 
+     * Describes how the foreground is positioned. Defaults to START and TOP. 
+     * 
+     * @param foregroundGravity See {@link android.view.Gravity} 
+     * 
+     * @see #getForegroundGravity() 
+     */ 
+    public void setForegroundGravity(int foregroundGravity) {
+        if (mForegroundGravity != foregroundGravity) {
+            if ((foregroundGravity &amp; Gravity.RELATIVE_HORIZONTAL_GRAVITY_MASK) == 0) {
+                foregroundGravity |= Gravity.START;
+            } 
+
+            if ((foregroundGravity &amp; Gravity.VERTICAL_GRAVITY_MASK) == 0) {
+                foregroundGravity |= Gravity.TOP;
+            } 
+
+            mForegroundGravity = foregroundGravity;
+
+
+            if (mForegroundGravity == Gravity.FILL &amp;&amp; mForeground != null) {
+                Rect padding = new Rect();
+                mForeground.getPadding(padding);
+            } 
+
+            requestLayout();
+        } 
+    } 
+
+    @Override 
+    protected boolean verifyDrawable(Drawable who) {
+        return super.verifyDrawable(who) || (who == mForeground);
+    } 
+
+    @Override 
+    public void jumpDrawablesToCurrentState() { 
+        super.jumpDrawablesToCurrentState(); 
+        if (mForeground != null) mForeground.jumpToCurrentState();
+    } 
+
+    @Override 
+    protected void drawableStateChanged() { 
+        super.drawableStateChanged(); 
+        if (mForeground != null &amp;&amp; mForeground.isStateful()) {
+            mForeground.setState(getDrawableState());
+        } 
+    } 
+
+    /** 
+     * Supply a Drawable that is to be rendered on top of all of the child 
+     * views in the frame layout.  Any padding in the Drawable will be taken 
+     * into account by ensuring that the children are inset to be placed 
+     * inside of the padding area. 
+     * 
+     * @param drawable The Drawable to be drawn on top of the children. 
+     */ 
+    public void setForeground(Drawable drawable) {
+        if (mForeground != drawable) {
+            if (mForeground != null) {
+                mForeground.setCallback(null);
+                unscheduleDrawable(mForeground);
+            } 
+
+            mForeground = drawable;
+
+            if (drawable != null) {
+                setWillNotDraw(false);
+                drawable.setCallback(this);
+                if (drawable.isStateful()) {
+                    drawable.setState(getDrawableState());
+                } 
+                if (mForegroundGravity == Gravity.FILL) {
+                    Rect padding = new Rect();
+                    drawable.getPadding(padding);
+                } 
+            }  else { 
+                setWillNotDraw(true);
+            } 
+            requestLayout();
+            invalidate();
+        } 
+    } 
+
+    /** 
+     * Returns the drawable used as the foreground of this FrameLayout. The 
+     * foreground drawable, if non-null, is always drawn on top of the children. 
+     * 
+     * @return A Drawable or null if no foreground was set. 
+     */ 
+    public Drawable getForeground() {
+        return mForeground;
+    } 
+
+    @Override 
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+        mForegroundBoundsChanged = changed;
+    } 
+
+    @Override 
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        mForegroundBoundsChanged = true;
+    } 
+
+    @Override 
+    public void draw(Canvas canvas) {
+        super.draw(canvas);
+
+        if (mForeground != null) {
+            final Drawable foreground = mForeground;
+
+            if (mForegroundBoundsChanged) {
+                mForegroundBoundsChanged = false;
+                final Rect selfBounds = mSelfBounds;
+                final Rect overlayBounds = mOverlayBounds;
+
+                final int w = getRight() - getLeft();
+                final int h = getBottom() - getTop();
+
+                if (mForegroundInPadding) {
+                    selfBounds.set(0, 0, w, h);
+                } else { 
+                    selfBounds.set(getPaddingLeft(), getPaddingTop(),
+                            w - getPaddingRight(), h - getPaddingBottom());
+                } 
+
+                Gravity.apply(mForegroundGravity, foreground.getIntrinsicWidth(),
+                        foreground.getIntrinsicHeight(), selfBounds, overlayBounds);
+                foreground.setBounds(overlayBounds);
+            } 
+
+            foreground.draw(canvas);
+        } 
+    } 
+}
+</code></pre>
 <ul>
 <li><p>使用方式</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">your.package.ForegroundLinearLayout</span></span></div><div class="line">    <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></div><div class="line">    <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></div><div class="line">    <span class="attr">android:foreground</span>=<span class="string">"?android:selectableItemBackground"</span>&gt;</div><div class="line"></div><div class="line">    <span class="tag">&lt;<span class="name">ImageView</span></span></div><div class="line">        <span class="attr">android:id</span>=<span class="string">”@+id/imageview_opaque”</span></div><div class="line">        <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></div><div class="line">        <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span> /&gt;</div><div class="line"></div><div class="line">    ... other views ...</div><div class="line">/&gt;</div></pre></td></tr></table></figure>
+<pre><code class="xml">&lt;your.package.ForegroundLinearLayout
+  android:layout_width=&quot;match_parent&quot;
+  android:layout_height=&quot;wrap_content&quot;
+  android:foreground=&quot;?android:selectableItemBackground&quot;&gt;
+
+  &lt;ImageView
+      android:id=”@+id/imageview_opaque”
+      android:layout_width=&quot;match_parent&quot;
+      android:layout_height=&quot;wrap_content&quot; /&gt;
+
+  ... other views ...
+/&gt;
+</code></pre>
 </li>
 <li><p>接着是<a href="https://github.com/JakeWharton" target="_blank" rel="external">Jack Wharton</a>的<a href="https://gist.github.com/JakeWharton/0a251d67649305d84e8a" target="_blank" rel="external">ForegroundImageView</a><br></p>
 </li>
 <li><p>attrs</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="php"><span class="meta">&lt;?</span>xml version=<span class="string">"1.0"</span> encoding=<span class="string">"utf-8"</span><span class="meta">?&gt;</span></span></div><div class="line"><span class="tag">&lt;<span class="name">resources</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">declare-styleable</span> <span class="attr">name</span>=<span class="string">"ForegroundImageView"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">attr</span> <span class="attr">name</span>=<span class="string">"android:foreground"</span>/&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">declare-styleable</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">resources</span>&gt;</span></div></pre></td></tr></table></figure>
+<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;resources&gt;
+&lt;declare-styleable name=&quot;ForegroundImageView&quot;&gt;
+  &lt;attr name=&quot;android:foreground&quot;/&gt;
+&lt;/declare-styleable&gt;
+&lt;/resources&gt;
+</code></pre>
 </li>
 </ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> android.content.Context;</div><div class="line"><span class="keyword">import</span> android.content.res.TypedArray;</div><div class="line"><span class="keyword">import</span> android.graphics.Canvas;</div><div class="line"><span class="keyword">import</span> android.graphics.drawable.Drawable;</div><div class="line"><span class="keyword">import</span> android.util.AttributeSet;</div><div class="line"><span class="keyword">import</span> android.widget.ImageView;</div><div class="line"> </div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ForegroundImageView</span> <span class="keyword">extends</span> <span class="title">ImageView</span> </span>&#123;</div><div class="line">  <span class="keyword">private</span> Drawable foreground;</div><div class="line"> </div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="title">ForegroundImageView</span><span class="params">(Context context)</span> </span>&#123;</div><div class="line">    <span class="keyword">this</span>(context, <span class="keyword">null</span>);</div><div class="line">  &#125; </div><div class="line"> </div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="title">ForegroundImageView</span><span class="params">(Context context, AttributeSet attrs)</span> </span>&#123;</div><div class="line">    <span class="keyword">super</span>(context, attrs);</div><div class="line"> </div><div class="line">    TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ForegroundImageView);</div><div class="line">    Drawable foreground = a.getDrawable(R.styleable.ForegroundImageView_android_foreground);</div><div class="line">    <span class="keyword">if</span> (foreground != <span class="keyword">null</span>) &#123;</div><div class="line">      setForeground(foreground);</div><div class="line">    &#125; </div><div class="line">    a.recycle();</div><div class="line">  &#125; </div><div class="line"> </div><div class="line">  <span class="comment">/** </span></div><div class="line">   * Supply a drawable resource that is to be rendered on top of all of the child </div><div class="line">   * views in the frame layout. </div><div class="line">   * </div><div class="line">   * <span class="doctag">@param</span> drawableResId The drawable resource to be drawn on top of the children. </div><div class="line">   */ </div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setForegroundResource</span><span class="params">(<span class="keyword">int</span> drawableResId)</span> </span>&#123;</div><div class="line">    setForeground(getContext().getResources().getDrawable(drawableResId));</div><div class="line">  &#125; </div><div class="line"> </div><div class="line">  <span class="comment">/** </span></div><div class="line">   * Supply a Drawable that is to be rendered on top of all of the child </div><div class="line">   * views in the frame layout. </div><div class="line">   * </div><div class="line">   * <span class="doctag">@param</span> drawable The Drawable to be drawn on top of the children. </div><div class="line">   */ </div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setForeground</span><span class="params">(Drawable drawable)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (foreground == drawable) &#123;</div><div class="line">      <span class="keyword">return</span>; </div><div class="line">    &#125; </div><div class="line">    <span class="keyword">if</span> (foreground != <span class="keyword">null</span>) &#123;</div><div class="line">      foreground.setCallback(<span class="keyword">null</span>);</div><div class="line">      unscheduleDrawable(foreground);</div><div class="line">    &#125; </div><div class="line"> </div><div class="line">    foreground = drawable;</div><div class="line"> </div><div class="line">    <span class="keyword">if</span> (drawable != <span class="keyword">null</span>) &#123;</div><div class="line">      drawable.setCallback(<span class="keyword">this</span>);</div><div class="line">      <span class="keyword">if</span> (drawable.isStateful()) &#123;</div><div class="line">        drawable.setState(getDrawableState());</div><div class="line">      &#125; </div><div class="line">    &#125; </div><div class="line">    requestLayout();</div><div class="line">    invalidate();</div><div class="line">  &#125; </div><div class="line"> </div><div class="line">  <span class="meta">@Override</span> <span class="function"><span class="keyword">protected</span> <span class="keyword">boolean</span> <span class="title">verifyDrawable</span><span class="params">(Drawable who)</span> </span>&#123;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">super</span>.verifyDrawable(who) || who == foreground;</div><div class="line">  &#125; </div><div class="line"> </div><div class="line">  <span class="meta">@Override</span> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">jumpDrawablesToCurrentState</span><span class="params">()</span> </span>&#123; </div><div class="line">    <span class="keyword">super</span>.jumpDrawablesToCurrentState(); </div><div class="line">    <span class="keyword">if</span> (foreground != <span class="keyword">null</span>) foreground.jumpToCurrentState();</div><div class="line">  &#125; </div><div class="line"> </div><div class="line">  <span class="meta">@Override</span> <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">drawableStateChanged</span><span class="params">()</span> </span>&#123; </div><div class="line">    <span class="keyword">super</span>.drawableStateChanged(); </div><div class="line">    <span class="keyword">if</span> (foreground != <span class="keyword">null</span> &amp;&amp; foreground.isStateful()) &#123;</div><div class="line">      foreground.setState(getDrawableState());</div><div class="line">    &#125; </div><div class="line">  &#125; </div><div class="line"> </div><div class="line">  <span class="meta">@Override</span> <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onMeasure</span><span class="params">(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</span> </span>&#123;</div><div class="line">    <span class="keyword">super</span>.onMeasure(widthMeasureSpec, heightMeasureSpec);</div><div class="line">    <span class="keyword">if</span> (foreground != <span class="keyword">null</span>) &#123;</div><div class="line">      foreground.setBounds(<span class="number">0</span>, <span class="number">0</span>, getMeasuredWidth(), getMeasuredHeight());</div><div class="line">      invalidate();</div><div class="line">    &#125; </div><div class="line">  &#125; </div><div class="line"> </div><div class="line">  <span class="meta">@Override</span> <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onSizeChanged</span><span class="params">(<span class="keyword">int</span> w, <span class="keyword">int</span> h, <span class="keyword">int</span> oldw, <span class="keyword">int</span> oldh)</span> </span>&#123;</div><div class="line">    <span class="keyword">super</span>.onSizeChanged(w, h, oldw, oldh);</div><div class="line">    <span class="keyword">if</span> (foreground != <span class="keyword">null</span>) &#123;</div><div class="line">      foreground.setBounds(<span class="number">0</span>, <span class="number">0</span>, w, h);</div><div class="line">      invalidate();</div><div class="line">    &#125; </div><div class="line">  &#125; </div><div class="line"> </div><div class="line">  <span class="meta">@Override</span> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">draw</span><span class="params">(Canvas canvas)</span> </span>&#123;</div><div class="line">    <span class="keyword">super</span>.draw(canvas);</div><div class="line"> </div><div class="line">    <span class="keyword">if</span> (foreground != <span class="keyword">null</span>) &#123;</div><div class="line">      foreground.draw(canvas);</div><div class="line">    &#125; </div><div class="line">  &#125; </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code class="java">    import android.content.Context;
+    import android.content.res.TypedArray;
+    import android.graphics.Canvas;
+    import android.graphics.drawable.Drawable;
+    import android.util.AttributeSet;
+    import android.widget.ImageView;
+
+    public class ForegroundImageView extends ImageView {
+      private Drawable foreground;
+
+      public ForegroundImageView(Context context) {
+        this(context, null);
+      } 
+
+      public ForegroundImageView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ForegroundImageView);
+        Drawable foreground = a.getDrawable(R.styleable.ForegroundImageView_android_foreground);
+        if (foreground != null) {
+          setForeground(foreground);
+        } 
+        a.recycle();
+      } 
+
+      /** 
+       * Supply a drawable resource that is to be rendered on top of all of the child 
+       * views in the frame layout. 
+       * 
+       * @param drawableResId The drawable resource to be drawn on top of the children. 
+       */ 
+      public void setForegroundResource(int drawableResId) {
+        setForeground(getContext().getResources().getDrawable(drawableResId));
+      } 
+
+      /** 
+       * Supply a Drawable that is to be rendered on top of all of the child 
+       * views in the frame layout. 
+       * 
+       * @param drawable The Drawable to be drawn on top of the children. 
+       */ 
+      public void setForeground(Drawable drawable) {
+        if (foreground == drawable) {
+          return; 
+        } 
+        if (foreground != null) {
+          foreground.setCallback(null);
+          unscheduleDrawable(foreground);
+        } 
+
+        foreground = drawable;
+
+        if (drawable != null) {
+          drawable.setCallback(this);
+          if (drawable.isStateful()) {
+            drawable.setState(getDrawableState());
+          } 
+        } 
+        requestLayout();
+        invalidate();
+      } 
+
+      @Override protected boolean verifyDrawable(Drawable who) {
+        return super.verifyDrawable(who) || who == foreground;
+      } 
+
+      @Override public void jumpDrawablesToCurrentState() { 
+        super.jumpDrawablesToCurrentState(); 
+        if (foreground != null) foreground.jumpToCurrentState();
+      } 
+
+      @Override protected void drawableStateChanged() { 
+        super.drawableStateChanged(); 
+        if (foreground != null &amp;&amp; foreground.isStateful()) {
+          foreground.setState(getDrawableState());
+        } 
+      } 
+
+      @Override protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        if (foreground != null) {
+          foreground.setBounds(0, 0, getMeasuredWidth(), getMeasuredHeight());
+          invalidate();
+        } 
+      } 
+
+      @Override protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        if (foreground != null) {
+          foreground.setBounds(0, 0, w, h);
+          invalidate();
+        } 
+      } 
+
+      @Override public void draw(Canvas canvas) {
+        super.draw(canvas);
+
+        if (foreground != null) {
+          foreground.draw(canvas);
+        } 
+      } 
+    }
+</code></pre>
 <hr>
 <p>最后，还有人给出据说更好的<a href="https://github.com/cesards/ForegroundViews" target="_blank" rel="external">解决方案</a><br>没有测试过，不了解</p>
 <p>##reference</p>

@@ -227,25 +227,269 @@ Touch事件始于ACTION_DOWN, 终止于ACTION_UP, 这其中可能会伴随着ACT
 <p>这里可以看到，事件依旧是从上往下一直分发到TouchTarget这一层，只是在TouchTarget这一层被消费了，<strong><em>且不再往上传递</em></strong>(有助于性能提升)。父ViewGroup的dispatchTouchEvent和onInterceptTouchEvent依旧会先于TouchTarget接收到ACTION_MOVE等事件。所以此时如果父ViewGroup在onInterceptTouchEvent中返回true，父ViewGroup将取代原有的子View成为新的ViewTarget,后续事件(ACTION_MOVE等)将传递到该父ViewGroup中，而子View将收到ACTION_CANCEL(可以在这里做一些恢复状态的工作，比如从foucused变成unfocused)。举一个例子：在ScrollView(不是Android自带的那个)中放一个Button，ACTION_DOWN时，BUTTON表示可以处理ACTION_DOWN,因为这可能会是一次click，于是Button就成了TouchTarget，后续事件将不会传递到ScrollView中，ScrollView也就无法滑动。为解决这个问题，在ScrollView的onInterceptTouchEvent中，如果看到ACTION_DWON，返回false(点击事件对于滑动毫无意义)，但如果看到ACTION_MOVE(滑动事件),返回true并成为新的TouchTarget。注意是在OnInterceptTouchEvent中拦截而不是dispatchTouchEvent中拦截，后者会将事件传递到上层ViewGroup的onTouchEvent中。想想看，不去dispatch了、、、android这种Api起名还是可以的。</p>
 <h3 id="onClick事件"><a href="#onClick事件" class="headerlink" title="#onClick事件"></a>#onClick事件</h3><p>接下来看onClick和onLongClick，onTouchListener这类事件何时触发</p>
 <p>首先是View的dispatchTouchEvent源码部分</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">case</span> MotionEvent.ACTION_UP:</div><div class="line">                    <span class="keyword">boolean</span> prepressed = (mPrivateFlags &amp; PFLAG_PREPRESSED) != <span class="number">0</span>;</div><div class="line">                    <span class="keyword">if</span> ((mPrivateFlags &amp; PFLAG_PRESSED) != <span class="number">0</span> || prepressed) &#123;</div><div class="line">                        <span class="comment">// take focus if we don't have it already and we should in</span></div><div class="line">                        <span class="comment">// touch mode.</span></div><div class="line">                        <span class="keyword">boolean</span> focusTaken = <span class="keyword">false</span>;</div><div class="line">                        <span class="keyword">if</span> (isFocusable() &amp;&amp; isFocusableInTouchMode() &amp;&amp; !isFocused()) &#123;</div><div class="line">                            focusTaken = requestFocus();</div><div class="line">                        &#125;</div><div class="line"></div><div class="line">                        <span class="keyword">if</span> (prepressed) &#123;</div><div class="line">                            <span class="comment">// The button is being released before we actually</span></div><div class="line">                            <span class="comment">// showed it as pressed.  Make it show the pressed</span></div><div class="line">                            <span class="comment">// state now (before scheduling the click) to ensure</span></div><div class="line">                            <span class="comment">// the user sees it.</span></div><div class="line">                            setPressed(<span class="keyword">true</span>, x, y);</div><div class="line">                       &#125;</div><div class="line"></div><div class="line">                        <span class="keyword">if</span> (!mHasPerformedLongPress &amp;&amp; !mIgnoreNextUpEvent) &#123;</div><div class="line">                            <span class="comment">// This is a tap, so remove the longpress check</span></div><div class="line">                            removeLongPressCallback();</div><div class="line"></div><div class="line">                            <span class="comment">// Only perform take click actions if we were in the pressed state</span></div><div class="line">                            <span class="keyword">if</span> (!focusTaken) &#123;</div><div class="line">                                <span class="comment">// Use a Runnable and post this rather than calling</span></div><div class="line">                                <span class="comment">// performClick directly. This lets other visual state</span></div><div class="line">                                <span class="comment">// of the view update before click actions start.</span></div><div class="line">                                <span class="keyword">if</span> (mPerformClick == <span class="keyword">null</span>) &#123;</div><div class="line">                                    mPerformClick = <span class="keyword">new</span> PerformClick();</div><div class="line">                                &#125;</div><div class="line">                                <span class="keyword">if</span> (!post(mPerformClick)) &#123;</div><div class="line">                                    performClick();</div><div class="line">                                &#125;</div><div class="line">                            &#125;</div><div class="line">                        &#125;</div><div class="line"></div><div class="line">                        <span class="keyword">if</span> (mUnsetPressedState == <span class="keyword">null</span>) &#123;</div><div class="line">                            mUnsetPressedState = <span class="keyword">new</span> UnsetPressedState();</div><div class="line">                        &#125;</div><div class="line"></div><div class="line">                        <span class="keyword">if</span> (prepressed) &#123;</div><div class="line">                            postDelayed(mUnsetPressedState,</div><div class="line">                                    ViewConfiguration.getPressedStateDuration());</div><div class="line">                        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (!post(mUnsetPressedState)) &#123;</div><div class="line">                            <span class="comment">// If the post failed, unpress right now</span></div><div class="line">                            mUnsetPressedState.run();</div><div class="line">                        &#125;</div><div class="line"></div><div class="line">                        removeTapCallback();</div><div class="line">                    &#125;</div><div class="line">                    mIgnoreNextUpEvent = <span class="keyword">false</span>;</div><div class="line">                    <span class="keyword">break</span>;</div></pre></td></tr></table></figure>
+<pre><code class="java">case MotionEvent.ACTION_UP:
+                    boolean prepressed = (mPrivateFlags &amp; PFLAG_PREPRESSED) != 0;
+                    if ((mPrivateFlags &amp; PFLAG_PRESSED) != 0 || prepressed) {
+                        // take focus if we don&#39;t have it already and we should in
+                        // touch mode.
+                        boolean focusTaken = false;
+                        if (isFocusable() &amp;&amp; isFocusableInTouchMode() &amp;&amp; !isFocused()) {
+                            focusTaken = requestFocus();
+                        }
+
+                        if (prepressed) {
+                            // The button is being released before we actually
+                            // showed it as pressed.  Make it show the pressed
+                            // state now (before scheduling the click) to ensure
+                            // the user sees it.
+                            setPressed(true, x, y);
+                       }
+
+                        if (!mHasPerformedLongPress &amp;&amp; !mIgnoreNextUpEvent) {
+                            // This is a tap, so remove the longpress check
+                            removeLongPressCallback();
+
+                            // Only perform take click actions if we were in the pressed state
+                            if (!focusTaken) {
+                                // Use a Runnable and post this rather than calling
+                                // performClick directly. This lets other visual state
+                                // of the view update before click actions start.
+                                if (mPerformClick == null) {
+                                    mPerformClick = new PerformClick();
+                                }
+                                if (!post(mPerformClick)) {
+                                    performClick();
+                                }
+                            }
+                        }
+
+                        if (mUnsetPressedState == null) {
+                            mUnsetPressedState = new UnsetPressedState();
+                        }
+
+                        if (prepressed) {
+                            postDelayed(mUnsetPressedState,
+                                    ViewConfiguration.getPressedStateDuration());
+                        } else if (!post(mUnsetPressedState)) {
+                            // If the post failed, unpress right now
+                            mUnsetPressedState.run();
+                        }
+
+                        removeTapCallback();
+                    }
+                    mIgnoreNextUpEvent = false;
+                    break;
+</code></pre>
 <p>所以onClick事件是在ACTION_UP中执行的</p>
 <p>而LongClick事件要看ACTION_DOWN了</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">case</span> MotionEvent.ACTION_DOWN:</div><div class="line">                  mHasPerformedLongPress = <span class="keyword">false</span>;</div><div class="line"></div><div class="line">                  <span class="keyword">if</span> (performButtonActionOnTouchDown(event)) &#123;</div><div class="line">                      <span class="keyword">break</span>;</div><div class="line">                  &#125;</div><div class="line"></div><div class="line">                  <span class="comment">// Walk up the hierarchy to determine if we're inside a scrolling container.</span></div><div class="line">                  <span class="keyword">boolean</span> isInScrollingContainer = isInScrollingContainer();</div><div class="line"></div><div class="line">                  <span class="comment">// For views inside a scrolling container, delay the pressed feedback for</span></div><div class="line">                  <span class="comment">// a short period in case this is a scroll.</span></div><div class="line">                  <span class="keyword">if</span> (isInScrollingContainer) &#123;</div><div class="line">                      mPrivateFlags |= PFLAG_PREPRESSED;</div><div class="line">                      <span class="keyword">if</span> (mPendingCheckForTap == <span class="keyword">null</span>) &#123;</div><div class="line">                          mPendingCheckForTap = <span class="keyword">new</span> CheckForTap();</div><div class="line">                      &#125;</div><div class="line">                      mPendingCheckForTap.x = event.getX();</div><div class="line">                      mPendingCheckForTap.y = event.getY();</div><div class="line">                      postDelayed(mPendingCheckForTap, ViewConfiguration.getTapTimeout());</div><div class="line">                  &#125; <span class="keyword">else</span> &#123;</div><div class="line">                      <span class="comment">// Not inside a scrolling container, so show the feedback right away</span></div><div class="line">                      setPressed(<span class="keyword">true</span>, x, y);</div><div class="line">                      checkForLongClick(<span class="number">0</span>, x, y);</div><div class="line">                  &#125;</div><div class="line">                  <span class="keyword">break</span>;</div></pre></td></tr></table></figure>
+<pre><code class="java">  case MotionEvent.ACTION_DOWN:
+                    mHasPerformedLongPress = false;
+
+                    if (performButtonActionOnTouchDown(event)) {
+                        break;
+                    }
+
+                    // Walk up the hierarchy to determine if we&#39;re inside a scrolling container.
+                    boolean isInScrollingContainer = isInScrollingContainer();
+
+                    // For views inside a scrolling container, delay the pressed feedback for
+                    // a short period in case this is a scroll.
+                    if (isInScrollingContainer) {
+                        mPrivateFlags |= PFLAG_PREPRESSED;
+                        if (mPendingCheckForTap == null) {
+                            mPendingCheckForTap = new CheckForTap();
+                        }
+                        mPendingCheckForTap.x = event.getX();
+                        mPendingCheckForTap.y = event.getY();
+                        postDelayed(mPendingCheckForTap, ViewConfiguration.getTapTimeout());
+                    } else {
+                        // Not inside a scrolling container, so show the feedback right away
+                        setPressed(true, x, y);
+                        checkForLongClick(0, x, y);
+                    }
+                    break;
+</code></pre>
 <p>关键看checkForLongClick, 不贴代码了，结论是：在ACTION_DOWN事件被捕捉后，系统会开始触发一个postDelayed操作，delay的时间为</p>
 <blockquote>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt; <span class="selector-tag">ViewConfiguration</span><span class="selector-class">.getLongPressTimeout</span>() <span class="selector-tag">-</span> <span class="selector-tag">delayOffset</span></div><div class="line">&gt;</div></pre></td></tr></table></figure>
-</blockquote>
+<pre><code>ViewConfiguration.getLongPressTimeout() - delayOffset
+</code></pre></blockquote>
 <p>（这个值在Eclair2.1上为500ms），500ms后会触发CheckForLongPress线程的执行：</p>
 <p>想想看，LongClick事件是在DOWN时开始计时，500ms假设，OnClick是在UP是发生，所以完全有可能同时发生OnClick和OnLongClick。这里看到当onLongClick的返回值为true时， <em>mHasPerformedLongPress</em> = true ,仔细看ACTION_UP中，如果HasPerformLongPress==true，就不会走到onClick事件里。所以在onLongClickListener里需要返回一个boolean值的原因就这么简单。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (!mHasPerformedLongPress &amp;&amp; !mIgnoreNextUpEvent) &#123;</div><div class="line">                           <span class="comment">// This is a tap, so remove the longpress check</span></div><div class="line">                           removeLongPressCallback();</div><div class="line"></div><div class="line">                           <span class="comment">// Only perform take click actions if we were in the pressed state</span></div><div class="line">                           <span class="keyword">if</span> (!focusTaken) &#123;</div><div class="line">                               <span class="comment">// Use a Runnable and post this rather than calling</span></div><div class="line">                               <span class="comment">// performClick directly. This lets other visual state</span></div><div class="line">                               <span class="comment">// of the view update before click actions start.</span></div><div class="line">                               <span class="keyword">if</span> (mPerformClick == <span class="keyword">null</span>) &#123;</div><div class="line">                                   mPerformClick = <span class="keyword">new</span> PerformClick();</div><div class="line">                               &#125;</div><div class="line">                               <span class="keyword">if</span> (!post(mPerformClick)) &#123;</div><div class="line">                                   performClick();</div><div class="line">                               &#125;</div><div class="line">                           &#125;</div><div class="line">                       &#125;</div></pre></td></tr></table></figure>
+<pre><code class="java"> if (!mHasPerformedLongPress &amp;&amp; !mIgnoreNextUpEvent) {
+                            // This is a tap, so remove the longpress check
+                            removeLongPressCallback();
+
+                            // Only perform take click actions if we were in the pressed state
+                            if (!focusTaken) {
+                                // Use a Runnable and post this rather than calling
+                                // performClick directly. This lets other visual state
+                                // of the view update before click actions start.
+                                if (mPerformClick == null) {
+                                    mPerformClick = new PerformClick();
+                                }
+                                if (!post(mPerformClick)) {
+                                    performClick();
+                                }
+                            }
+                        }
+</code></pre>
 <p>接下来是OnTouchListener，直接上结论: onTouchListener里面的方法是在dispatchTouchEvent里面调用的，并且如果listener里面的onTouch返回true，事件将不会发送给onTouchEvent，因此OnTouchListener势必会优先级高于onClick和onLongClick。</p>
-<h2 id="VelocityTracker"><a href="#VelocityTracker" class="headerlink" title="VelocityTracker"></a>VelocityTracker</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">velocityTracker = VelocityTracker.obtain()；</div><div class="line">velocityTracker.addMovement(event);</div><div class="line">velocityTracker.computeCurrentVelocity(<span class="number">1</span>);  </div><div class="line">velocityTracker.getXVelocity();</div><div class="line">velocityTracker.recycle();</div></pre></td></tr></table></figure>
+<h2 id="VelocityTracker"><a href="#VelocityTracker" class="headerlink" title="VelocityTracker"></a>VelocityTracker</h2><pre><code class="java">velocityTracker = VelocityTracker.obtain()；
+velocityTracker.addMovement(event);
+velocityTracker.computeCurrentVelocity(1);  
+velocityTracker.getXVelocity();
+velocityTracker.recycle();
+</code></pre>
 <p>值得注意的是，VelocityTracker内部使用了大量的native方法，所以执行速度比java要快很多。</p>
-<h3 id="实现Fling效果"><a href="#实现Fling效果" class="headerlink" title="实现Fling效果"></a>实现Fling效果</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">onFling</span><span class="params">(<span class="keyword">float</span> velocityX,<span class="keyword">float</span> velocityY)</span></span>&#123;</div><div class="line">  scroller.fling(getScrollX(),getScrollY(),(<span class="keyword">int</span>)-velocityX</div><div class="line">                (<span class="keyword">int</span>)-velocityY,minScrollX,maxScrollX,</div><div class="line">                minScrollY,maxScrollY);</div><div class="line">  invalidate();</div><div class="line">&#125;</div><div class="line"><span class="meta">@overdide</span><span class="comment">// 这是每个View都有的方法</span></div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">computeScroll</span><span class="params">()</span></span>&#123;</div><div class="line">  <span class="keyword">if</span>(scroller.isFinished())&#123;</div><div class="line">    scroller.computeScrollOffset();</div><div class="line">    scrollTo(scroller.getCurrX(),scroller.getCurrY());</div><div class="line">    postInvalidateOnAnimation();</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="捕获双击事件"><a href="#捕获双击事件" class="headerlink" title="捕获双击事件"></a>捕获双击事件</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyView</span> <span class="keyword">extends</span> <span class="title">View</span> </span>&#123;</div><div class="line"> </div><div class="line">GestureDetector gestureDetector;</div><div class="line"> </div><div class="line"><span class="function"><span class="keyword">public</span> <span class="title">MyView</span><span class="params">(Context context, AttributeSet attrs)</span> </span>&#123;</div><div class="line">    <span class="keyword">super</span>(context, attrs);</div><div class="line">            <span class="comment">// creating new gesture detector </span></div><div class="line">    gestureDetector = <span class="keyword">new</span> GestureDetector(context, <span class="keyword">new</span> GestureListener());</div><div class="line">&#125; </div><div class="line"> </div><div class="line"><span class="comment">// skipping measure calculation and drawing </span></div><div class="line"> </div><div class="line">    <span class="comment">// delegate the event to the gesture detector </span></div><div class="line"><span class="meta">@Override</span> </div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onTouchEvent</span><span class="params">(MotionEvent e)</span> </span>&#123;</div><div class="line">    <span class="keyword">return</span> gestureDetector.onTouchEvent(e);</div><div class="line">&#125; </div><div class="line"> </div><div class="line"> </div><div class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">GestureListener</span> <span class="keyword">extends</span> <span class="title">GestureDetector</span>.<span class="title">SimpleOnGestureListener</span> </span>&#123;</div><div class="line"> </div><div class="line">    <span class="meta">@Override</span> </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onDown</span><span class="params">(MotionEvent e)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">true</span>; </div><div class="line">    &#125; </div><div class="line">    <span class="comment">// event when double tap occurs </span></div><div class="line">    <span class="meta">@Override</span> </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onDoubleTap</span><span class="params">(MotionEvent e)</span> </span>&#123;</div><div class="line">        <span class="keyword">float</span> x = e.getX();</div><div class="line">        <span class="keyword">float</span> y = e.getY();</div><div class="line"> </div><div class="line">        Log.d(<span class="string">"Double Tap"</span>, <span class="string">"Tapped at: ("</span> + x + <span class="string">","</span> + y + <span class="string">")"</span>);</div><div class="line"> </div><div class="line">        <span class="keyword">return</span> <span class="keyword">true</span>; </div><div class="line">    &#125; </div><div class="line">&#125; </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="实现Fling效果"><a href="#实现Fling效果" class="headerlink" title="实现Fling效果"></a>实现Fling效果</h3><pre><code class="java">private void onFling(float velocityX,float velocityY){
+  scroller.fling(getScrollX(),getScrollY(),(int)-velocityX
+                (int)-velocityY,minScrollX,maxScrollX,
+                minScrollY,maxScrollY);
+  invalidate();
+}
+@overdide// 这是每个View都有的方法
+private void computeScroll(){
+  if(scroller.isFinished()){
+    scroller.computeScrollOffset();
+    scrollTo(scroller.getCurrX(),scroller.getCurrY());
+    postInvalidateOnAnimation();
+  }
+}
+</code></pre>
+<h3 id="捕获双击事件"><a href="#捕获双击事件" class="headerlink" title="捕获双击事件"></a>捕获双击事件</h3><pre><code class="java">public class MyView extends View {
+
+GestureDetector gestureDetector;
+
+public MyView(Context context, AttributeSet attrs) {
+    super(context, attrs);
+            // creating new gesture detector 
+    gestureDetector = new GestureDetector(context, new GestureListener());
+} 
+
+// skipping measure calculation and drawing 
+
+    // delegate the event to the gesture detector 
+@Override 
+public boolean onTouchEvent(MotionEvent e) {
+    return gestureDetector.onTouchEvent(e);
+} 
+
+
+private class GestureListener extends GestureDetector.SimpleOnGestureListener {
+
+    @Override 
+    public boolean onDown(MotionEvent e) {
+        return true; 
+    } 
+    // event when double tap occurs 
+    @Override 
+    public boolean onDoubleTap(MotionEvent e) {
+        float x = e.getX();
+        float y = e.getY();
+
+        Log.d(&quot;Double Tap&quot;, &quot;Tapped at: (&quot; + x + &quot;,&quot; + y + &quot;)&quot;);
+
+        return true; 
+    } 
+} 
+}
+</code></pre>
 <p> 最后是关于ViewConfiguration的一些常量获取的静态方法：</p>
 <p>int getScaledTouchSlop(); (if Math.abs(x<em>x+y</em>y)&gt;mTouchSlop 就可以认为是滑动事件了)</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**    </span></div><div class="line">  * 包含了方法和标准的常量用来设置UI的超时、大小和距离    </div><div class="line">  */ </div><div class="line"> <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ViewConfiguration</span> </span>&#123;     </div><div class="line">     <span class="comment">// 设定水平滚动条的宽度和垂直滚动条的高度，单位是像素px     </span></div><div class="line">     <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> SCROLL_BAR_SIZE = <span class="number">10</span>;     </div><div class="line">          </div><div class="line">     <span class="comment">//定义滚动条逐渐消失的时间，单位是毫秒     </span></div><div class="line">     <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> SCROLL_BAR_FADE_DURATION = <span class="number">250</span>;     </div><div class="line">          </div><div class="line">     <span class="comment">// 默认的滚动条多少秒之后消失，单位是毫秒     </span></div><div class="line">     <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> SCROLL_BAR_DEFAULT_DELAY = <span class="number">300</span>;     </div><div class="line">          </div><div class="line">     <span class="comment">// 定义边缘地方褪色的长度     </span></div><div class="line">     <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FADING_EDGE_LENGTH = <span class="number">12</span>;     </div><div class="line">          </div><div class="line">     <span class="comment">//定义子控件按下状态的持续事件     </span></div><div class="line">     <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> PRESSED_STATE_DURATION = <span class="number">125</span>;     </div><div class="line">              </div><div class="line">     <span class="comment">//定义一个按下状态转变成长按状态的转变时间     </span></div><div class="line">     <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> LONG_PRESS_TIMEOUT = <span class="number">500</span>;     </div><div class="line">              </div><div class="line">     <span class="comment">//定义用户在按住适当按钮，弹出全局的对话框的持续时间     </span></div><div class="line">     <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> GLOBAL_ACTIONS_KEY_TIMEOUT = <span class="number">500</span>;     </div><div class="line">              </div><div class="line">     <span class="comment">//定义一个touch事件中是点击事件还是一个滑动事件所需的时间，如果用户在这个时间之内滑动，那么就认为是一个点击事件     </span></div><div class="line">     <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> TAP_TIMEOUT = <span class="number">115</span>;     </div><div class="line">              </div><div class="line">     <span class="comment">/**    </span></div><div class="line">      * Defines the duration in milliseconds we will wait to see if a touch event     </div><div class="line">      * is a jump tap. If the user does not complete the jump tap within this interval, it is    </div><div class="line">      * considered to be a tap.     </div><div class="line">      */ </div><div class="line">     <span class="comment">//定义一个touch事件时候是一个点击事件。如果用户在这个时间内没有完成这个点击，那么就认为是一个点击事件     </span></div><div class="line">     <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> JUMP_TAP_TIMEOUT = <span class="number">500</span>;     </div><div class="line">          </div><div class="line">     <span class="comment">//定义双击事件的间隔时间     </span></div><div class="line">     <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> DOUBLE_TAP_TIMEOUT = <span class="number">300</span>;     </div><div class="line">              </div><div class="line">     <span class="comment">//定义一个缩放控制反馈到用户界面的时间     </span></div><div class="line">     <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> ZOOM_CONTROLS_TIMEOUT = <span class="number">3000</span>;     </div><div class="line">          </div><div class="line">     <span class="comment">/**    </span></div><div class="line">      * Inset in pixels to look for touchable content when the user touches the edge of the screen    </div><div class="line">      */ </div><div class="line">     <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> EDGE_SLOP = <span class="number">12</span>;     </div><div class="line">              </div><div class="line">     <span class="comment">/**    </span></div><div class="line">      * Distance a touch can wander before we think the user is scrolling in pixels    </div><div class="line">      */ </div><div class="line">     <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> TOUCH_SLOP = <span class="number">16</span>;     </div><div class="line">              </div><div class="line">     <span class="comment">/**    </span></div><div class="line">      * Distance a touch can wander before we think the user is attempting a paged scroll    </div><div class="line">      * (in dips)    </div><div class="line">      */ </div><div class="line">     <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> PAGING_TOUCH_SLOP = TOUCH_SLOP * <span class="number">2</span>;     </div><div class="line">              </div><div class="line">     <span class="comment">/**    </span></div><div class="line">      * Distance between the first touch and second touch to still be considered a double tap    </div><div class="line">      */ </div><div class="line">     <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> DOUBLE_TAP_SLOP = <span class="number">100</span>;     </div><div class="line">              </div><div class="line">     <span class="comment">/**    </span></div><div class="line">      * Distance a touch needs to be outside of a window's bounds for it to    </div><div class="line">      * count as outside for purposes of dismissing the window.    </div><div class="line">      */ </div><div class="line">     <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> WINDOW_TOUCH_SLOP = <span class="number">16</span>;     </div><div class="line">          </div><div class="line">    <span class="comment">//用来初始化fling的最小速度，单位是每秒多少像素     </span></div><div class="line">     <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MINIMUM_FLING_VELOCITY = <span class="number">50</span>;     </div><div class="line">              </div><div class="line">     <span class="comment">//用来初始化fling的最大速度，单位是每秒多少像素     </span></div><div class="line">     <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MAXIMUM_FLING_VELOCITY = <span class="number">4000</span>;     </div><div class="line">          </div><div class="line">     <span class="comment">//视图绘图缓存的最大尺寸，以字节表示。在ARGB888格式下，这个尺寸应至少等于屏幕的大小     </span></div><div class="line">     <span class="meta">@Deprecated</span>     </div><div class="line">     <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MAXIMUM_DRAWING_CACHE_SIZE = <span class="number">320</span> * <span class="number">480</span> * <span class="number">4</span>; <span class="comment">// HVGA screen, ARGB8888     </span></div><div class="line">          </div><div class="line">     <span class="comment">//flings和scrolls摩擦力度大小的系数     </span></div><div class="line">     <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">float</span> SCROLL_FRICTION = <span class="number">0.015f</span>;     </div><div class="line">          </div><div class="line">     <span class="comment">/**    </span></div><div class="line">      * Max distance to over scroll for edge effects    </div><div class="line">      */ </div><div class="line">     <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> OVERSCROLL_DISTANCE = <span class="number">0</span>;     </div><div class="line">          </div><div class="line">     <span class="comment">/**    </span></div><div class="line">      * Max distance to over fling for edge effects    </div><div class="line">      */ </div><div class="line">     <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> OVERFLING_DISTANCE = <span class="number">4</span>;     </div><div class="line">          </div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<pre><code class="java">/**    
+  * 包含了方法和标准的常量用来设置UI的超时、大小和距离    
+  */ 
+ public class ViewConfiguration {     
+     // 设定水平滚动条的宽度和垂直滚动条的高度，单位是像素px     
+     private static final int SCROLL_BAR_SIZE = 10;     
+
+     //定义滚动条逐渐消失的时间，单位是毫秒     
+     private static final int SCROLL_BAR_FADE_DURATION = 250;     
+
+     // 默认的滚动条多少秒之后消失，单位是毫秒     
+     private static final int SCROLL_BAR_DEFAULT_DELAY = 300;     
+
+     // 定义边缘地方褪色的长度     
+     private static final int FADING_EDGE_LENGTH = 12;     
+
+     //定义子控件按下状态的持续事件     
+     private static final int PRESSED_STATE_DURATION = 125;     
+
+     //定义一个按下状态转变成长按状态的转变时间     
+     private static final int LONG_PRESS_TIMEOUT = 500;     
+
+     //定义用户在按住适当按钮，弹出全局的对话框的持续时间     
+     private static final int GLOBAL_ACTIONS_KEY_TIMEOUT = 500;     
+
+     //定义一个touch事件中是点击事件还是一个滑动事件所需的时间，如果用户在这个时间之内滑动，那么就认为是一个点击事件     
+     private static final int TAP_TIMEOUT = 115;     
+
+     /**    
+      * Defines the duration in milliseconds we will wait to see if a touch event     
+      * is a jump tap. If the user does not complete the jump tap within this interval, it is    
+      * considered to be a tap.     
+      */ 
+     //定义一个touch事件时候是一个点击事件。如果用户在这个时间内没有完成这个点击，那么就认为是一个点击事件     
+     private static final int JUMP_TAP_TIMEOUT = 500;     
+
+     //定义双击事件的间隔时间     
+     private static final int DOUBLE_TAP_TIMEOUT = 300;     
+
+     //定义一个缩放控制反馈到用户界面的时间     
+     private static final int ZOOM_CONTROLS_TIMEOUT = 3000;     
+
+     /**    
+      * Inset in pixels to look for touchable content when the user touches the edge of the screen    
+      */ 
+     private static final int EDGE_SLOP = 12;     
+
+     /**    
+      * Distance a touch can wander before we think the user is scrolling in pixels    
+      */ 
+     private static final int TOUCH_SLOP = 16;     
+
+     /**    
+      * Distance a touch can wander before we think the user is attempting a paged scroll    
+      * (in dips)    
+      */ 
+     private static final int PAGING_TOUCH_SLOP = TOUCH_SLOP * 2;     
+
+     /**    
+      * Distance between the first touch and second touch to still be considered a double tap    
+      */ 
+     private static final int DOUBLE_TAP_SLOP = 100;     
+
+     /**    
+      * Distance a touch needs to be outside of a window&#39;s bounds for it to    
+      * count as outside for purposes of dismissing the window.    
+      */ 
+     private static final int WINDOW_TOUCH_SLOP = 16;     
+
+    //用来初始化fling的最小速度，单位是每秒多少像素     
+     private static final int MINIMUM_FLING_VELOCITY = 50;     
+
+     //用来初始化fling的最大速度，单位是每秒多少像素     
+     private static final int MAXIMUM_FLING_VELOCITY = 4000;     
+
+     //视图绘图缓存的最大尺寸，以字节表示。在ARGB888格式下，这个尺寸应至少等于屏幕的大小     
+     @Deprecated     
+     private static final int MAXIMUM_DRAWING_CACHE_SIZE = 320 * 480 * 4; // HVGA screen, ARGB8888     
+
+     //flings和scrolls摩擦力度大小的系数     
+     private static float SCROLL_FRICTION = 0.015f;     
+
+     /**    
+      * Max distance to over scroll for edge effects    
+      */ 
+     private static final int OVERSCROLL_DISTANCE = 0;     
+
+     /**    
+      * Max distance to over fling for edge effects    
+      */ 
+     private static final int OVERFLING_DISTANCE = 4;     
+
+ }
+</code></pre>
 <ul>
 <li><h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2></li>
 </ul>

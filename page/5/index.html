@@ -4,18 +4,14 @@
   <meta charset="utf-8">
   
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
-  <title>android内部类导致leak模板 | Haldir的博客</title>
+  <title>Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="通常我们在一个class里面写内部类时，不是一定要用static声明为静态类，但是推荐作为内部静态类，因为内部类会隐式持有外部类的引用，有些时候如果代码处理不对容易造成内存泄漏下面就是个内存泄漏的例子">
-<meta property="og:type" content="article">
-<meta property="og:title" content="android内部类导致leak模板">
-<meta property="og:url" content="http://haldir65.github.io/2016/09/18/android-inner-class-leak/index.html">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Haldir的博客">
+<meta property="og:url" content="http://haldir65.github.io/page/5/index.html">
 <meta property="og:site_name" content="Haldir的博客">
-<meta property="og:description" content="通常我们在一个class里面写内部类时，不是一定要用static声明为静态类，但是推荐作为内部静态类，因为内部类会隐式持有外部类的引用，有些时候如果代码处理不对容易造成内存泄漏下面就是个内存泄漏的例子">
-<meta property="og:updated_time" content="2016-10-06T09:04:53.716Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="android内部类导致leak模板">
-<meta name="twitter:description" content="通常我们在一个class里面写内部类时，不是一定要用static声明为静态类，但是推荐作为内部静态类，因为内部类会隐式持有外部类的引用，有些时候如果代码处理不对容易造成内存泄漏下面就是个内存泄漏的例子">
+<meta name="twitter:title" content="Haldir的博客">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -141,7 +137,9 @@
 </nav>
 
       <div class="body-wrap">
-        <article id="post-android-inner-class-leak" class="article article-type-post" itemscope itemprop="blogPost">
+        
+  
+    <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <input type="hidden" class="isFancy" />
@@ -150,8 +148,8 @@
       <header class="article-header">
         
   
-    <h1 class="article-title" itemprop="name">
-      android内部类导致leak模板
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/09/18/hello-world/">Hello World</a>
     </h1>
   
 
@@ -159,139 +157,40 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <hr>
-<p>通常我们在一个class里面写内部类时，不是一定要用static声明为静态类，但是推荐作为内部静态类，因为内部类会隐式持有外部类的引用，有些时候如果代码处理不对容易造成内存泄漏<br>下面就是个内存泄漏的例子<br><a id="more"></a></p>
-<pre><code class="java">public class MainActivity extends Activity {
-
-    public class MyHandler extends Handler{
-    @Override
-    public void handleMessage(Message msg) {
-        if(msg.what==1){
-            new Thread(){
-                @Override
-                public void run() {
-                    while(true){
-                        //do something
-                    }
-                }
-            }.start();
-        }
-    }
-    }
-    public MyHandler handler;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        //...
-        handler.sendEmptyMessage(1);
-        finish();
-        }
-}
-</code></pre>
-<p>如上面代码所示，在onCreate方法里发送了一条消息给handler处理然后finish方法关闭activity，但是代码并不能如愿，因为在handler收到消息启动了一个线程并且是<strong>死循环</strong>，<br>这时候Thread持有handler的引用，而handler又持有activity的引用，这就导致了handler不能回收和activty也不能回收，所以推荐使用静态内部类，因为静态内部类不持有外部类的引用，可以避免这些不必要的麻烦。</p>
-<p>除此之外，在Activity里面创建一个AsyncTask的子类也容易导致leak<br>例如 <a href="http://stackoverflow.com/questions/24679383/memory-leak-using-asynctask-as-a-inner-class" target="_blank" rel="external">stackoverFlow上的这个问题</a></p>
-<p>对于这类问题的比较常用的方式:<br>WeakReference<br>例如,写这样一个的静态内部类</p>
-<pre><code class="java">private static class IncomingHandler extends Handler {
-    private final WeakReference&lt;MessagingService&gt; mReference;
-
-    IncomingHandler(MessagingService service) {
-        mReference = new WeakReference&lt;&gt;(service);
-    }
-
-    @Override
-    public void handleMessage(Message msg) {
-        MessagingService service = mReference.get();
-        switch (msg.what) {
-            case MSG_SEND_NOTIFICATION:
-                int howManyConversations = msg.arg1 &lt;= 0 ? 1 : msg.arg1;
-                int messagesPerConversation = msg.arg2 &lt;= 0 ? 1 : msg.arg2;
-                if (service != null) {
-                    service.sendNotification(howManyConversations,
-                    messagesPerConversation);
-                }
-                break;
-            default:
-                super.handleMessage(msg);
-        }
-    }
-}
-</code></pre>
-<p>//handler通过弱引用持有service对象，外加static内部类不持有外部类引用，应该不会leak了</p>
-
+        <p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+        <p class="article-more-link">
+          <a  href="/2016/09/18/hello-world/#more">more >></a>
+        </p>
       
     </div>
     <div class="article-info article-info-index">
       
-      <a href="/2016/09/18/android-inner-class-leak/" class="archive-article-date">
-  	<time datetime="2016-09-18T02:23:42.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-09-18</time>
+      <a href="/2016/09/18/hello-world/" class="archive-article-date">
+  	<time datetime="2016-09-18T00:44:19.677Z" itemprop="datePublished"><i class="icon-clock"></i>2016-09-18</time>
 </a>
       
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags"></i>
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/android/">android</a></li></ul>
-	</div>
-
       
-	<div class="article-category tagcloud">
-	<i class="icon-price-tags"></i>
-	<a class="article-category-link" href="/categories/blog/">blog</a>
-	</div>
-
 
       <div class="clearfix"></div>
     </div>
   </div>
 </article>
 
-  
-<nav id="article-nav">
-  
-    <a href="/2016/09/22/replace-butterKnife-with-databinding/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          replace butterKnife with databinding
-        
-      </div>
-    </a>
+
+
+
+
+
+
+
+
+
   
   
-    <a href="/2016/09/18/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">Hello World</div>
-      <i class="icon-circle-right"></i>
-    </a>
+    <nav id="page-nav">
+      <a class="extend prev" rel="prev" href="/page/4/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span>
+    </nav>
   
-</nav>
-
-
-
-
-<div class="share_jia">
-	<!-- JiaThis Button BEGIN -->
-	<div class="jiathis_style">
-		<span class="jiathis_txt">Share to: &nbsp; </span>
-		<a class="jiathis_button_facebook"></a> 
-	    <a class="jiathis_button_twitter"></a>
-	    <a class="jiathis_button_plus"></a> 
-	    <a class="jiathis_button_tsina"></a>
-		<a class="jiathis_button_cqq"></a>
-		<a class="jiathis_button_douban"></a>
-		<a class="jiathis_button_weixin"></a>
-		<a class="jiathis_button_tumblr"></a>
-    <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
-	</div>
-	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
-	<!-- JiaThis Button END -->
-</div>
-
-
-
-
-
-
-
 
 
       </div>
@@ -313,8 +212,8 @@
 		fancybox: true,
 		mathjax: false,
 		animate: false,
-		isHome: false,
-		isPost: true,
+		isHome: true,
+		isPost: false,
 		isArchive: false,
 		isTag: false,
 		isCategory: false,

@@ -163,12 +163,106 @@
       
         <p><img src="http://odzl05jxx.bkt.clouddn.com/writing%20code%20that%20nobody%20else%20can%20read.jpg" alt=""></p>
 <p>​    今天突然找到这样一个问题: “Handler的postDelayed会阻塞线程吗？”。基于自己之前对于Handler的线程间通讯机制的理解，还是不能给出明确的答案。正好打算把一篇关于主线程的工作原理的文章写出来，顺带看下能否把这个问题从源码的角度解释清楚。<a id="more"></a></p>
-<h3 id="1-从线程（Thread）开始"><a href="#1-从线程（Thread）开始" class="headerlink" title="1. 从线程（Thread）开始"></a>1. 从线程（Thread）开始</h3><p>通常，一个Process会有一个主线程, 而在Android中，UI控件相关的方法和一些系统callback都会发生在主线程上(onResume,onCreate,onStartCommand,onDraw, etc)。 如果App中使用了多个Process，则每个Process都会有一个主线程，但这不是今天的重点。<br>Android应用是如何启动的?<br>启动一个应用时，系统会从Zygote Process fork出一个新的Process，最终走到ActivityThread 的main方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line"><span class="comment">//省略部分无关代码</span></div><div class="line">       Looper.prepareMainLooper();</div><div class="line">       ActivityThread thread = <span class="keyword">new</span> ActivityThread();</div><div class="line">       thread.attach(<span class="keyword">false</span>);</div><div class="line">       <span class="keyword">if</span> (sMainThreadHandler == <span class="keyword">null</span>) &#123;</div><div class="line">           sMainThreadHandler = thread.getHandler();</div><div class="line">       &#125;</div><div class="line">       <span class="comment">// End of event ActivityThreadMain.</span></div><div class="line">       Looper.loop();</div><div class="line">       <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"Main thread loop unexpectedly exited"</span>);<span class="comment">//从这里可以猜到Looper.loop方法会一直执行下去</span></div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
-<p>看一下Looper.prepareMainLooper()方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="comment">/**</span></div><div class="line"> * Initialize the current thread as a looper, marking it as an</div><div class="line"> * application's main looper. The main looper for your application</div><div class="line"> * is created by the Android environment, so you should never need</div><div class="line"> * to call this function yourself.  See also: &#123;<span class="doctag">@link</span> #prepare()&#125;</div><div class="line"> */</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">prepareMainLooper</span><span class="params">()</span> </span>&#123;</div><div class="line">    prepare(<span class="keyword">false</span>);</div><div class="line">    <span class="keyword">synchronized</span> (Looper.class) &#123;</div><div class="line">        <span class="keyword">if</span> (sMainLooper != <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"The main Looper has already been prepared."</span>);</div><div class="line">        &#125;</div><div class="line">        sMainLooper = myLooper();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>大致意思就是为当前Thread添加一个Looper。<br>Looper.java是一个普通的class，其大致作用就是<strong>为当前Thread维持一个message loop</strong>，默认情况下一个Thread并没有一个Looper，要想添加一个，需要在该线程中调用Looper.prepare()，然后调用Looper.loop()方法即可让消息循环一直持续下去。大部分和message Loop的交互都是通过Handler这个类来进行的。例如<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">LooperThread</span> <span class="keyword">extends</span> <span class="title">Thread</span> </span>&#123;</div><div class="line">  *      <span class="keyword">public</span> Handler mHandler;</div><div class="line">  *</div><div class="line">  *      <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">  *          Looper.prepare();</div><div class="line">  *</div><div class="line">  *          mHandler = <span class="keyword">new</span> Handler() &#123;</div><div class="line">  *              <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</div><div class="line">  *                  <span class="comment">// 在这里处理消息</span></div><div class="line">  *              &#125;</div><div class="line">  *          &#125;;</div><div class="line">  *	</div><div class="line">  *          Looper.loop();</div><div class="line">    		<span class="comment">//这里面发送消息</span></div><div class="line">  *      &#125;</div><div class="line">  *  &#125;</div></pre></td></tr></table></figure></p>
-<p>Looper持有一个MessageQueue(消息队列)成员变量，消息循环时，Looper就不断地从消息队列中拿出消息进行处理。<br>下面来看Looper.loop()方法里所做的事：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/** 删除了部分不相关的代码</span></div><div class="line">   * Run the message queue in this thread. Be sure to call</div><div class="line">   * &#123;<span class="doctag">@link</span> #quit()&#125; to end the loop.</div><div class="line">   */</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">loop</span><span class="params">()</span> </span>&#123;</div><div class="line">      <span class="keyword">final</span> Looper me = myLooper();<span class="comment">//返回当前线程中对应的Looper，看看下面的Exception就知道了</span></div><div class="line">      <span class="keyword">if</span> (me == <span class="keyword">null</span>) &#123;</div><div class="line">          <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"No Looper; Looper.prepare() wasn't called on this thread."</span>);</div><div class="line">      &#125;</div><div class="line">      <span class="keyword">final</span> MessageQueue queue = me.mQueue;</div><div class="line">      <span class="keyword">for</span> (;;) &#123;</div><div class="line">          Message msg = queue.next(); <span class="comment">// might block</span></div><div class="line">          <span class="keyword">if</span> (msg == <span class="keyword">null</span>) &#123;</div><div class="line">              <span class="comment">// No message indicates that the message queue is quitting.</span></div><div class="line">              <span class="keyword">return</span>;</div><div class="line">          &#125;</div><div class="line">          <span class="keyword">try</span> &#123;</div><div class="line">              msg.target.dispatchMessage(msg);</div><div class="line">          &#125; <span class="keyword">finally</span> &#123;</div><div class="line">             ....省略</div><div class="line">          &#125;</div><div class="line">      &#125;</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
-<p>简单解释一下，也就是从消息队列中取出新的消息(msg)。交给msg.target.dispatchMessage(msg)<br>这个trarget是个Handler<br>来看下Handler里面的dispatchMessage方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line">    * Handle system messages here.</div><div class="line">    */</div><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">dispatchMessage</span><span class="params">(Message msg)</span> </span>&#123;</div><div class="line">       <span class="keyword">if</span> (msg.callback != <span class="keyword">null</span>) &#123;</div><div class="line">           handleCallback(msg);</div><div class="line">       &#125; <span class="keyword">else</span> &#123;</div><div class="line">           <span class="keyword">if</span> (mCallback != <span class="keyword">null</span>) &#123;</div><div class="line">               <span class="keyword">if</span> (mCallback.handleMessage(msg)) &#123;</div><div class="line">                   <span class="keyword">return</span>;</div><div class="line">               &#125;</div><div class="line">           &#125;</div><div class="line">           handleMessage(msg);</div><div class="line">       &#125;</div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
-<p>很明显是一个either or 的过程：<br>Message这个类里面有个Runnable callback，如果这个message有callback的话，就执行这个runnable，否则执行handler.callBack.handleMessage。也就是我们经常用的<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Handler handler = <span class="keyword">new</span> Handler()&#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</div><div class="line">                <span class="keyword">super</span>.handleMessage(msg);</div><div class="line">            &#125;</div><div class="line">        &#125;;</div></pre></td></tr></table></figure></p>
+<h3 id="1-从线程（Thread）开始"><a href="#1-从线程（Thread）开始" class="headerlink" title="1. 从线程（Thread）开始"></a>1. 从线程（Thread）开始</h3><p>通常，一个Process会有一个主线程, 而在Android中，UI控件相关的方法和一些系统callback都会发生在主线程上(onResume,onCreate,onStartCommand,onDraw, etc)。 如果App中使用了多个Process，则每个Process都会有一个主线程，但这不是今天的重点。<br>Android应用是如何启动的?<br>启动一个应用时，系统会从Zygote Process fork出一个新的Process，最终走到ActivityThread 的main方法</p>
+<pre><code class="java"> public static void main(String[] args) {
+ //省略部分无关代码
+        Looper.prepareMainLooper();
+        ActivityThread thread = new ActivityThread();
+        thread.attach(false);
+        if (sMainThreadHandler == null) {
+            sMainThreadHandler = thread.getHandler();
+        }
+        // End of event ActivityThreadMain.
+        Looper.loop();
+        throw new RuntimeException(&quot;Main thread loop unexpectedly exited&quot;);//从这里可以猜到Looper.loop方法会一直执行下去
+    }
+</code></pre>
+<p>看一下Looper.prepareMainLooper()方法：</p>
+<pre><code class="java">
+    /**
+     * Initialize the current thread as a looper, marking it as an
+     * application&#39;s main looper. The main looper for your application
+     * is created by the Android environment, so you should never need
+     * to call this function yourself.  See also: {@link #prepare()}
+     */
+    public static void prepareMainLooper() {
+        prepare(false);
+        synchronized (Looper.class) {
+            if (sMainLooper != null) {
+                throw new IllegalStateException(&quot;The main Looper has already been prepared.&quot;);
+            }
+            sMainLooper = myLooper();
+        }
+    }
+</code></pre>
+<p>大致意思就是为当前Thread添加一个Looper。<br>Looper.java是一个普通的class，其大致作用就是<strong>为当前Thread维持一个message loop</strong>，默认情况下一个Thread并没有一个Looper，要想添加一个，需要在该线程中调用Looper.prepare()，然后调用Looper.loop()方法即可让消息循环一直持续下去。大部分和message Loop的交互都是通过Handler这个类来进行的。例如</p>
+<pre><code class="java">class LooperThread extends Thread {
+  *      public Handler mHandler;
+  *
+  *      public void run() {
+  *          Looper.prepare();
+  *
+  *          mHandler = new Handler() {
+  *              public void handleMessage(Message msg) {
+  *                  // 在这里处理消息
+  *              }
+  *          };
+  *    
+  *          Looper.loop();
+            //这里面发送消息
+  *      }
+  *  }
+</code></pre>
+<p>Looper持有一个MessageQueue(消息队列)成员变量，消息循环时，Looper就不断地从消息队列中拿出消息进行处理。<br>下面来看Looper.loop()方法里所做的事：</p>
+<pre><code class="java">  /** 删除了部分不相关的代码
+     * Run the message queue in this thread. Be sure to call
+     * {@link #quit()} to end the loop.
+     */
+    public static void loop() {
+        final Looper me = myLooper();//返回当前线程中对应的Looper，看看下面的Exception就知道了
+        if (me == null) {
+            throw new RuntimeException(&quot;No Looper; Looper.prepare() wasn&#39;t called on this thread.&quot;);
+        }
+        final MessageQueue queue = me.mQueue;
+        for (;;) {
+            Message msg = queue.next(); // might block
+            if (msg == null) {
+                // No message indicates that the message queue is quitting.
+                return;
+            }
+            try {
+                msg.target.dispatchMessage(msg);
+            } finally {
+               ....省略
+            }
+        }
+    }
+</code></pre>
+<p>简单解释一下，也就是从消息队列中取出新的消息(msg)。交给msg.target.dispatchMessage(msg)<br>这个trarget是个Handler<br>来看下Handler里面的dispatchMessage方法</p>
+<pre><code class="java"> /**
+     * Handle system messages here.
+     */
+    public void dispatchMessage(Message msg) {
+        if (msg.callback != null) {
+            handleCallback(msg);
+        } else {
+            if (mCallback != null) {
+                if (mCallback.handleMessage(msg)) {
+                    return;
+                }
+            }
+            handleMessage(msg);
+        }
+    }
+</code></pre>
+<p>很明显是一个either or 的过程：<br>Message这个类里面有个Runnable callback，如果这个message有callback的话，就执行这个runnable，否则执行handler.callBack.handleMessage。也就是我们经常用的</p>
+<pre><code class="java">Handler handler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+            }
+        };
+</code></pre>
 <p>这种内部类的形式了<br>需要注意的是，Message最好不要用new，使用obtain方法获得，使用release方法释放，这里面有一个消息池的概念，我也不太理解。<br>MessageQueue中没有太多的公共方法，其中next()方法会返回</p>
 <blockquote>
 <p>message that should be processed. Will not return message that will be processed at future times.<br>Message有一个long类型的变量Message.when，指的是这条消息最早可以被执行的时间，这个时间是基于SystemClock.uptimeMills()的。所以如果消息队列中没有一条message到达自己的可执行时间, 这个next()方法就会一直block。值得注意的是SystemClock.uptimeMills是基于CPU活动时间的，如果cpu处于sleep状态，这个sleep时间是不算的。所以如果你postDelayed了10s，假设cpu5s后开始休眠，10s后醒来，睡眠的这段时间是不算的。所以真正执行的时间可能还会往后延迟。</p>
@@ -193,9 +287,48 @@
 <p>Skipped 60 frames! The application may be doing too much work on its main thread</p>
 </blockquote>
 <p>这段log出自Chreographer ，大意就是主线程上做的事太多或者做了太多不该在主线程上做的事。至于为什么不要在主线程上做太多的事，来看看主线程都有哪些工作:<br>System Events , Input Events ,Application callback ,Services, Alarm ,UI Drawing….另外，当屏幕内容发生变化，或者在Animation运行中，系统将会尝试每隔16ms来Draw a Frame。而这部分工作是由Choregrapher来完成的，而其内部是通过一个Handler来进行Frame更新的。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">FrameHandler mHandler = <span class="keyword">new</span> FrameHandler(Looper.myLooper());</div><div class="line">Message msg = mHandler.obtainMessage(MSG_DO_FRAME);</div><div class="line">msg.setAsynchronous(<span class="keyword">true</span>);</div><div class="line">mHandler.sendMessageAtTime(msg,nextFrameTime)</div><div class="line"></div><div class="line"> <span class="keyword">private</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">FrameHandler</span> <span class="keyword">extends</span> <span class="title">Handler</span> </span>&#123;</div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="title">FrameHandler</span><span class="params">(Looper looper)</span> </span>&#123;</div><div class="line">            <span class="keyword">super</span>(looper);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</div><div class="line">            <span class="keyword">switch</span> (msg.what) &#123;</div><div class="line">                <span class="keyword">case</span> MSG_DO_FRAME:</div><div class="line">                    doFrame(System.nanoTime(), <span class="number">0</span>);</div><div class="line">                    <span class="keyword">break</span>;</div><div class="line">                <span class="keyword">case</span> MSG_DO_SCHEDULE_VSYNC:</div><div class="line">                    doScheduleVsync();</div><div class="line">                    <span class="keyword">break</span>;</div><div class="line">                <span class="keyword">case</span> MSG_DO_SCHEDULE_CALLBACK:</div><div class="line">                    doScheduleCallback(msg.arg1);</div><div class="line">                    <span class="keyword">break</span>;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<pre><code class="java">FrameHandler mHandler = new FrameHandler(Looper.myLooper());
+Message msg = mHandler.obtainMessage(MSG_DO_FRAME);
+msg.setAsynchronous(true);
+mHandler.sendMessageAtTime(msg,nextFrameTime)
+
+ private final class FrameHandler extends Handler {
+        public FrameHandler(Looper looper) {
+            super(looper);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MSG_DO_FRAME:
+                    doFrame(System.nanoTime(), 0);
+                    break;
+                case MSG_DO_SCHEDULE_VSYNC:
+                    doScheduleVsync();
+                    break;
+                case MSG_DO_SCHEDULE_CALLBACK:
+                    doScheduleCallback(msg.arg1);
+                    break;
+            }
+        }
+    }
+</code></pre>
 <p>假设你在onMeasure,onLayout,onDraw这些方法中耽误主线程太多时间，Choregrapher将不能及时的更新Frame，哪怕你只耽误了1ms，系统也只能在16ms(大约)之后才能更新下一Frame。</p>
-<h3 id="3-为了在开发中发现不应该在主线程中进行的操作-IO，网络-，可以使用StrictMode："><a href="#3-为了在开发中发现不应该在主线程中进行的操作-IO，网络-，可以使用StrictMode：" class="headerlink" title="3. 为了在开发中发现不应该在主线程中进行的操作(IO，网络)，可以使用StrictMode："></a>3. 为了在开发中发现不应该在主线程中进行的操作(IO，网络)，可以使用StrictMode：</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (BuildConfig.DEBUG) &#123;</div><div class="line">            StrictMode.setThreadPolicy(<span class="keyword">new</span> StrictMode.ThreadPolicy.Builder()</div><div class="line">                    .detectDiskReads()</div><div class="line">                    .detectDiskWrites()</div><div class="line">                    .detectNetwork()   <span class="comment">// or .detectAll() for all detectable problems</span></div><div class="line">                    .penaltyLog()</div><div class="line">                    .build());</div><div class="line">            StrictMode.setVmPolicy(<span class="keyword">new</span> StrictMode.VmPolicy.Builder()</div><div class="line">                    .detectLeakedSqlLiteObjects()</div><div class="line">                    .detectLeakedClosableObjects()</div><div class="line">                    .penaltyLog()</div><div class="line">                    .penaltyDeath()</div><div class="line">                    .build());</div><div class="line">        &#125;</div></pre></td></tr></table></figure>
+<h3 id="3-为了在开发中发现不应该在主线程中进行的操作-IO，网络-，可以使用StrictMode："><a href="#3-为了在开发中发现不应该在主线程中进行的操作-IO，网络-，可以使用StrictMode：" class="headerlink" title="3. 为了在开发中发现不应该在主线程中进行的操作(IO，网络)，可以使用StrictMode："></a>3. 为了在开发中发现不应该在主线程中进行的操作(IO，网络)，可以使用StrictMode：</h3><pre><code class="java">if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .detectDiskReads()
+                    .detectDiskWrites()
+                    .detectNetwork()   // or .detectAll() for all detectable problems
+                    .penaltyLog()
+                    .build());
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                    .detectLeakedSqlLiteObjects()
+                    .detectLeakedClosableObjects()
+                    .penaltyLog()
+                    .penaltyDeath()
+                    .build());
+        }
+</code></pre>
 <h3 id="4-Activity-LifeCycle-Events"><a href="#4-Activity-LifeCycle-Events" class="headerlink" title="4 .Activity LifeCycle Events"></a>4 .Activity LifeCycle Events</h3><ul>
 <li>Activity LifeCycle Events(startActivity(), finishi()) go out of your process through Binder IPC to the ActivityManager //有时候startActivity启动的Activity不是自己Process的,比如调用系统相机这种</li>
 <li>Then back on to your main queue in the form of lifeCycle callbacks(onCreate(),onDestory() et_al) // 异步，异步！</li>
@@ -204,12 +337,100 @@
 <blockquote>
 <p>Message msg = queue.next();  // might block</p>
 </blockquote>
-<p>注释已经暗示了可能会阻塞，看下next方法做了什么:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line">   <span class="function">Message <span class="title">next</span><span class="params">()</span> </span>&#123;</div><div class="line">   .....省略</div><div class="line">       <span class="keyword">for</span> (;;) &#123;</div><div class="line">           <span class="keyword">if</span> (nextPollTimeoutMillis != <span class="number">0</span>) &#123;</div><div class="line">               Binder.flushPendingCommands();</div><div class="line">           &#125;</div><div class="line"></div><div class="line">           nativePollOnce(ptr, nextPollTimeoutMillis);</div><div class="line"></div><div class="line">           <span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;</div><div class="line">               <span class="comment">// Try to retrieve the next message.  Return if found.</span></div><div class="line">               <span class="keyword">final</span> <span class="keyword">long</span> now = SystemClock.uptimeMillis();</div><div class="line">               Message prevMsg = <span class="keyword">null</span>;</div><div class="line">               Message msg = mMessages;</div><div class="line">               <span class="keyword">if</span> (msg != <span class="keyword">null</span> &amp;&amp; msg.target == <span class="keyword">null</span>) &#123;</div><div class="line">                   <span class="comment">// Stalled by a barrier.  Find the next asynchronous message in the queue.</span></div><div class="line">                   do &#123;</div><div class="line">                       prevMsg = msg;</div><div class="line">                       msg = msg.next;</div><div class="line">                   &#125; <span class="keyword">while</span> (msg != <span class="keyword">null</span> &amp;&amp; !msg.isAsynchronous());</div><div class="line">               &#125;</div><div class="line">               <span class="keyword">if</span> (msg != <span class="keyword">null</span>) &#123;</div><div class="line">                   <span class="keyword">if</span> (now &lt; msg.when) &#123;</div><div class="line">                       <span class="comment">// Next message is not ready.  Set a timeout to wake up when it is ready.</span></div><div class="line">                       nextPollTimeoutMillis = (<span class="keyword">int</span>) Math.min(msg.when - now, Integer.MAX_VALUE);</div><div class="line">                   &#125; <span class="keyword">else</span> &#123;</div><div class="line">                       <span class="comment">// Got a message.</span></div><div class="line">                       mBlocked = <span class="keyword">false</span>;</div><div class="line">                       <span class="keyword">if</span> (prevMsg != <span class="keyword">null</span>) &#123;</div><div class="line">                           prevMsg.next = msg.next;</div><div class="line">                       &#125; <span class="keyword">else</span> &#123;</div><div class="line">                           mMessages = msg.next;</div><div class="line">                       &#125;</div><div class="line">                       msg.next = <span class="keyword">null</span>;</div><div class="line">                       msg.markInUse();</div><div class="line">                       <span class="keyword">return</span> msg;</div><div class="line">                   &#125;</div><div class="line">               &#125; <span class="keyword">else</span> &#123;</div><div class="line">                   <span class="comment">// No more messages.</span></div><div class="line">                   nextPollTimeoutMillis = -<span class="number">1</span>;</div><div class="line">               &#125;</div><div class="line">....省略部分</div></pre></td></tr></table></figure></p>
+<p>注释已经暗示了可能会阻塞，看下next方法做了什么:</p>
+<pre><code class="java">    Message next() {
+    .....省略
+        for (;;) {
+            if (nextPollTimeoutMillis != 0) {
+                Binder.flushPendingCommands();
+            }
+
+            nativePollOnce(ptr, nextPollTimeoutMillis);
+
+            synchronized (this) {
+                // Try to retrieve the next message.  Return if found.
+                final long now = SystemClock.uptimeMillis();
+                Message prevMsg = null;
+                Message msg = mMessages;
+                if (msg != null &amp;&amp; msg.target == null) {
+                    // Stalled by a barrier.  Find the next asynchronous message in the queue.
+                    do {
+                        prevMsg = msg;
+                        msg = msg.next;
+                    } while (msg != null &amp;&amp; !msg.isAsynchronous());
+                }
+                if (msg != null) {
+                    if (now &lt; msg.when) {
+                        // Next message is not ready.  Set a timeout to wake up when it is ready.
+                        nextPollTimeoutMillis = (int) Math.min(msg.when - now, Integer.MAX_VALUE);
+                    } else {
+                        // Got a message.
+                        mBlocked = false;
+                        if (prevMsg != null) {
+                            prevMsg.next = msg.next;
+                        } else {
+                            mMessages = msg.next;
+                        }
+                        msg.next = null;
+                        msg.markInUse();
+                        return msg;
+                    }
+                } else {
+                    // No more messages.
+                    nextPollTimeoutMillis = -1;
+                }
+    ....省略部分
+</code></pre>
 <p>首先进来 调用了nativePollOnce(ptr,nextPollTimeoutMillis);<br>这是个native方法，类似于线程的wait方法，不过使用了Native的方法会更加精准。可以认为是用native方法让这个queue.next的方法耗时延长了，所以return时返回的Message也就满足合适的时间。<br>往下看</p>
 <blockquote>
 <p> // Next message is not ready.  Set a timeout to wake up when it is ready.<br> nextPollTimeoutMillis = (int) Math.min(msg.when - now, Integer.MAX_VALUE);</p>
 </blockquote>
-<p>所以确实是blocked了。但这并不意味着从postDelayed(r,10)开始，接下来的10ms就真的完全堵塞了(queue.next阻塞)<br>PostDelayed最终会调用到enqueMessage方法，看一下:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;</div><div class="line">    <span class="keyword">if</span> (mQuitting) &#123;</div><div class="line">        IllegalStateException e = <span class="keyword">new</span> IllegalStateException(</div><div class="line">                msg.target + <span class="string">" sending message to a Handler on a dead thread"</span>);</div><div class="line">        Log.w(TAG, e.getMessage(), e);</div><div class="line">        msg.recycle();</div><div class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    msg.markInUse();</div><div class="line">    msg.when = when;</div><div class="line">    Message p = mMessages;</div><div class="line">    <span class="keyword">boolean</span> needWake;</div><div class="line">    <span class="keyword">if</span> (p == <span class="keyword">null</span> || when == <span class="number">0</span> || when &lt; p.when) &#123;</div><div class="line">        <span class="comment">// New head, wake up the event queue if blocked.</span></div><div class="line">        msg.next = p;</div><div class="line">        mMessages = msg;</div><div class="line">        needWake = mBlocked;</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        <span class="comment">// Inserted within the middle of the queue.  Usually we don't have to wake</span></div><div class="line">        <span class="comment">// up the event queue unless there is a barrier at the head of the queue</span></div><div class="line">        <span class="comment">// and the message is the earliest asynchronous message in the queue.</span></div><div class="line">        needWake = mBlocked &amp;&amp; p.target == <span class="keyword">null</span> &amp;&amp; msg.isAsynchronous();</div><div class="line">        Message prev;</div><div class="line">        <span class="keyword">for</span> (;;) &#123;</div><div class="line">            prev = p;</div><div class="line">            p = p.next;</div><div class="line">            <span class="keyword">if</span> (p == <span class="keyword">null</span> || when &lt; p.when) &#123;</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">if</span> (needWake &amp;&amp; p.isAsynchronous()) &#123;</div><div class="line">                needWake = <span class="keyword">false</span>;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        msg.next = p; <span class="comment">// invariant: p == prev.next</span></div><div class="line">        prev.next = msg;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// We can assume mPtr != 0 because mQuitting is false.</span></div><div class="line">    <span class="keyword">if</span> (needWake) &#123;</div><div class="line">        nativeWake(mPtr);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>所以确实是blocked了。但这并不意味着从postDelayed(r,10)开始，接下来的10ms就真的完全堵塞了(queue.next阻塞)<br>PostDelayed最终会调用到enqueMessage方法，看一下:</p>
+<pre><code class="java">
+        synchronized (this) {
+            if (mQuitting) {
+                IllegalStateException e = new IllegalStateException(
+                        msg.target + &quot; sending message to a Handler on a dead thread&quot;);
+                Log.w(TAG, e.getMessage(), e);
+                msg.recycle();
+                return false;
+            }
+
+            msg.markInUse();
+            msg.when = when;
+            Message p = mMessages;
+            boolean needWake;
+            if (p == null || when == 0 || when &lt; p.when) {
+                // New head, wake up the event queue if blocked.
+                msg.next = p;
+                mMessages = msg;
+                needWake = mBlocked;
+            } else {
+                // Inserted within the middle of the queue.  Usually we don&#39;t have to wake
+                // up the event queue unless there is a barrier at the head of the queue
+                // and the message is the earliest asynchronous message in the queue.
+                needWake = mBlocked &amp;&amp; p.target == null &amp;&amp; msg.isAsynchronous();
+                Message prev;
+                for (;;) {
+                    prev = p;
+                    p = p.next;
+                    if (p == null || when &lt; p.when) {
+                        break;
+                    }
+                    if (needWake &amp;&amp; p.isAsynchronous()) {
+                        needWake = false;
+                    }
+                }
+                msg.next = p; // invariant: p == prev.next
+                prev.next = msg;
+            }
+
+            // We can assume mPtr != 0 because mQuitting is false.
+            if (needWake) {
+                nativeWake(mPtr);
+            }
+        }
+</code></pre>
 <p>注意nativeWake方法，在满足一定情况下会唤醒线程<br>总结一下就是postDelayed确实调用了阻塞线程的方法，但一旦消息队列前面插入了可执行的message，会调用唤醒线程的方法。这些大部分在MessageQueue这个class中，看一下基本都能明白。</p>
 <h4 id="回顾一下整个过程"><a href="#回顾一下整个过程" class="headerlink" title="回顾一下整个过程:"></a>回顾一下整个过程:</h4><p>主线程作为一个Thread，持有一个Looper对象，Looper持有一个MessageQueue的消息队列，并一个一个地从中取出满足执行时间条件的Message，执行Messgae的callback或者交给Handler的handleMessage去处理。</p>
 <h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><ol>

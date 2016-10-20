@@ -217,9 +217,25 @@
 <p>supportPredictiveItemAnimations()，返回true。</p>
 </blockquote>
 <p>LinearLayoutManger的实现</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">supportsPredictiveItemAnimations</span><span class="params">()</span> </span>&#123;</div><div class="line">       <span class="keyword">return</span> mPendingSavedState == <span class="keyword">null</span> &amp;&amp; mLastStackFromEnd == mStackFromEnd;</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<pre><code class="java"> @Override
+    public boolean supportsPredictiveItemAnimations() {
+        return mPendingSavedState == null &amp;&amp; mLastStackFromEnd == mStackFromEnd;
+    }
+</code></pre>
 <p>可以认为返回值就是true</p>
-<p>onLayoutChildern在这种情况下会被调用两次，(之前提到本该被移除的View需要重新添加到ViewGroup中，实现就在这里)<br>参考LinearLayoutManager的实现，源代码实在太长，只复制一些注释<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onLayoutChildren</span><span class="params">(RecyclerView.Recycler recycler, RecyclerView.State state)</span> </span>&#123;</div><div class="line">       <span class="comment">// layout algorithm:</span></div><div class="line">       <span class="comment">// 1) by checking children and other variables, find an anchor coordinate and an anchor</span></div><div class="line">       <span class="comment">//  item position.</span></div><div class="line">       <span class="comment">// 2) fill towards start, stacking from bottom</span></div><div class="line">       <span class="comment">// 3) fill towards end, stacking from top</span></div><div class="line">       <span class="comment">// 4) scroll to fulfill requirements like stack from bottom.</span></div><div class="line">       <span class="comment">// create layout state</span></div><div class="line">       <span class="comment">//omitted....</span></div><div class="line">       &#125;</div></pre></td></tr></table></figure></p>
+<p>onLayoutChildern在这种情况下会被调用两次，(之前提到本该被移除的View需要重新添加到ViewGroup中，实现就在这里)<br>参考LinearLayoutManager的实现，源代码实在太长，只复制一些注释</p>
+<pre><code class="java"> @Override
+    public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+        // layout algorithm:
+        // 1) by checking children and other variables, find an anchor coordinate and an anchor
+        //  item position.
+        // 2) fill towards start, stacking from bottom
+        // 3) fill towards end, stacking from top
+        // 4) scroll to fulfill requirements like stack from bottom.
+        // create layout state
+        //omitted....
+        }
+</code></pre>
 <p>简单来说一共三步:</p>
 <ol>
 <li>detach and Scrap Views</li>
@@ -234,12 +250,39 @@
 <li>使用DefaultItemAnimator(默认已经设置好了)</li>
 <li>Implement SimpleItemAnimator(或者DeafaultItemAnimator)，复写一些必要的方法</li>
 </ol>
-<p>Animator需要做的一些事<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">record[Pre|Post]LayoutInformation<span class="comment">//记录动画开始和结束的layout信息</span></div><div class="line">animate[Appearance|Disappearance]</div><div class="line">animatePersistence()<span class="comment">//不会改变位置</span></div><div class="line">animateChange()<span class="comment">//实际的动画添加位置</span></div></pre></td></tr></table></figure></p>
+<p>Animator需要做的一些事</p>
+<pre><code class="java">record[Pre|Post]LayoutInformation//记录动画开始和结束的layout信息
+animate[Appearance|Disappearance]
+animatePersistence()//不会改变位置
+animateChange()//实际的动画添加位置
+</code></pre>
 <p>这些在DefaultItemAnimator中都有默认的实现<br>动画完成后一定要调用</p>
 <blockquote>
 <p>DispatchAnimationFinished(ViewHolder)</p>
 </blockquote>
-<p>记录动画开始前和结束后的信息，实例代码:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@NonNull</span></div><div class="line">      <span class="meta">@Override</span></div><div class="line">      <span class="function"><span class="keyword">public</span> ItemHolderInfo <span class="title">recordPreLayoutInformation</span><span class="params">(RecyclerView.State state,</span></span></div><div class="line">              RecyclerView.ViewHolder viewHolder, <span class="keyword">int</span> changeFlags, List&lt;Object&gt; payloads) &#123;</div><div class="line">          ColorTextInfo info = (ColorTextInfo) <span class="keyword">super</span>.recordPreLayoutInformation(state, viewHolder,</div><div class="line">                  changeFlags, payloads);</div><div class="line">          <span class="keyword">return</span> getItemHolderInfo((MyViewHolder) viewHolder, info);</div><div class="line">      &#125;</div><div class="line"></div><div class="line">      <span class="meta">@NonNull</span></div><div class="line">      <span class="meta">@Override</span></div><div class="line">      <span class="function"><span class="keyword">public</span> ItemHolderInfo <span class="title">recordPostLayoutInformation</span><span class="params">(@NonNull RecyclerView.State state,</span></span></div><div class="line">              @NonNull RecyclerView.ViewHolder viewHolder) &#123;</div><div class="line">          ColorTextInfo info = (ColorTextInfo) <span class="keyword">super</span>.recordPostLayoutInformation(state, viewHolder);</div><div class="line">          <span class="keyword">return</span> getItemHolderInfo((MyViewHolder) viewHolder, info);</div><div class="line">      &#125;</div><div class="line"></div><div class="line">      <span class="meta">@Override</span></div><div class="line">      <span class="function"><span class="keyword">public</span> ItemHolderInfo <span class="title">obtainHolderInfo</span><span class="params">()</span> </span>&#123;</div><div class="line">          <span class="keyword">return</span> <span class="keyword">new</span> ColorTextInfo();</div><div class="line">      &#125;</div></pre></td></tr></table></figure></p>
+<p>记录动画开始前和结束后的信息，实例代码:</p>
+<pre><code class="java">  @NonNull
+        @Override
+        public ItemHolderInfo recordPreLayoutInformation(RecyclerView.State state,
+                RecyclerView.ViewHolder viewHolder, int changeFlags, List&lt;Object&gt; payloads) {
+            ColorTextInfo info = (ColorTextInfo) super.recordPreLayoutInformation(state, viewHolder,
+                    changeFlags, payloads);
+            return getItemHolderInfo((MyViewHolder) viewHolder, info);
+        }
+
+        @NonNull
+        @Override
+        public ItemHolderInfo recordPostLayoutInformation(@NonNull RecyclerView.State state,
+                @NonNull RecyclerView.ViewHolder viewHolder) {
+            ColorTextInfo info = (ColorTextInfo) super.recordPostLayoutInformation(state, viewHolder);
+            return getItemHolderInfo((MyViewHolder) viewHolder, info);
+        }
+
+        @Override
+        public ItemHolderInfo obtainHolderInfo() {
+            return new ColorTextInfo();
+        }
+</code></pre>
 <ul>
 <li>canReuseViewHolder的作用:<br>例如notifyItemChanged(position)后，只是某个位置的viewHolder发生了信息改变，那就没有必要创建一个新的ViewHolder，直接提供原有的ViewHolder，提升性能。</li>
 </ul>
