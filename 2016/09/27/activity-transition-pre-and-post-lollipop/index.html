@@ -170,23 +170,10 @@
 </ul>
 <p>A activity &gt;&gt;&gt;&gt; B activity</p>
 <p>A activity中:</p>
-<pre><code class="java"> intent = new Intent(getActivity(), PictureDetailSubActivity2.class);
-                intent.putExtra(EXTRA_IMAGE_URL, R.drawable.b2);
-                intent.putExtra(EXTRA_IMAGE_TITLE, &quot;使用ActivityCompat动画&quot;);
-                ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.
-                        makeSceneTransitionAnimation(getActivity(), view, TRANSIT_PIC);
-                try {
-                    ActivityCompat.startActivity(getActivity(), intent, optionsCompat.toBundle()); //据说部分三星手机上会失效
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    ToastUtils.showTextShort(getActivity(), &quot;ActivityCompat出错！！&quot;);
-                    startActivity(intent);
-                }
-</code></pre>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">intent = <span class="keyword">new</span> Intent(getActivity(), PictureDetailSubActivity2.class);</div><div class="line">               intent.putExtra(EXTRA_IMAGE_URL, R.drawable.b2);</div><div class="line">               intent.putExtra(EXTRA_IMAGE_TITLE, <span class="string">"使用ActivityCompat动画"</span>);</div><div class="line">               ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.</div><div class="line">                       makeSceneTransitionAnimation(getActivity(), view, TRANSIT_PIC);</div><div class="line">               <span class="keyword">try</span> &#123;</div><div class="line">                   ActivityCompat.startActivity(getActivity(), intent, optionsCompat.toBundle()); <span class="comment">//据说部分三星手机上会失效</span></div><div class="line">               &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">                   e.printStackTrace();</div><div class="line">                   ToastUtils.showTextShort(getActivity(), <span class="string">"ActivityCompat出错！！"</span>);</div><div class="line">                   startActivity(intent);</div><div class="line">               &#125;</div></pre></td></tr></table></figure>
 <p>Pair这个class是v4包里的一个Util类，用来装载一组(pair)对象，支持泛型，很好用。由于都是v4包里的方法，省去了做API版本判断，在API 16以下，就只会调用普通的startActivity方法。上面加了try catch是避免部分手机上出现问题</p>
 <p>B activity中onCreate调用</p>
-<pre><code class="java"> ViewCompat.setTransitionName(binding.imageDetail, TRANSIT_PIC);
-</code></pre>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ViewCompat.setTransitionName(binding.imageDetail, TRANSIT_PIC);</div></pre></td></tr></table></figure>
 <p>就可实现普通的转场动画。</p>
 <ul>
 <li><p>兼容方式(将连续的Transition带到API16以下)</p>
@@ -197,11 +184,7 @@
 <li><p>最后是这几天遇到的天坑</p>
 </li>
 </ul>
-<pre><code class="java">@Override
-public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
-    super.onCreate(savedInstanceState, persistentState);
-}
-</code></pre>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState, PersistableBundle persistentState)</span> </span>&#123;</div><div class="line">    <span class="keyword">super</span>.onCreate(savedInstanceState, persistentState);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>这样的Activity绝对会出ClassNotFoundException , 而且并不会主动出现在logcat中</p>
 <ul>
 <li>overridePendingTransaction要在startActivity以及finish之后才能调用</li>

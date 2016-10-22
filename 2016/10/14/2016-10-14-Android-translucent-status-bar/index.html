@@ -166,117 +166,26 @@
     <div class="article-entry" itemprop="articleBody">
       
         <p>沉浸式状态栏是api 19之后引入的，KitKat应该算是一次比较大的更新了，像是Transition，art runtime,storage access FrameWork(这个有空研究下)，另外就是这个被官方称为Full-screen immersive mode的特性了。具体来说，App可以将展示的区域拓展到statusBar的位置了。我觉得直接叫statusBar就好了，大部分人应该也能理解这就是手机上显示”中国移动”还有显示手机电量那一块的长条，宽度是match_parent。高度的话，据说是25dp，然后6.0上给改成了24dp。不过这不是重点<a id="more"></a></p>
-<h3 id="1-最初的做法"><a href="#1-最初的做法" class="headerlink" title="1.最初的做法"></a>1.最初的做法</h3><p>看到有人推荐使用<a href="https://github.com/jgilfelt/SystemBarTint" target="_blank" rel="external">SystemBarTint</a>这个class,刚上来觉得也挺好用的，就是一个java class，直接复制粘贴到项目里，改一下package name，无脑使用即可。原理的话，看过源码后，大致明白是在statusBar的位置添加一个new View，然后持有这个view的引用，接下来就可以做常规的setBackground或者setBackgroundColor了。初始化时的关键代码如下</p>
-<pre><code class="java">private void setupStatusBarView(Context context, ViewGroup decorViewGroup) {//这个decorViewGroup指的是activity.getWindow()
-        mStatusBarTintView = new View(context);
-        LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, mConfig.getStatusBarHeight());
-        params.gravity = Gravity.TOP;
-        if (mNavBarAvailable &amp;&amp; !mConfig.isNavigationAtBottom()) {
-            params.rightMargin = mConfig.getNavigationBarWidth();
-        }
-        mStatusBarTintView.setLayoutParams(params);
-        mStatusBarTintView.setBackgroundColor(DEFAULT_TINT_COLOR);
-        mStatusBarTintView.setVisibility(View.GONE);
-        decorViewGroup.addView(mStatusBarTintView);
-    }
-</code></pre>
+<h3 id="1-最初的做法"><a href="#1-最初的做法" class="headerlink" title="1.最初的做法"></a>1.最初的做法</h3><p>看到有人推荐使用<a href="https://github.com/jgilfelt/SystemBarTint" target="_blank" rel="external">SystemBarTint</a>这个class,刚上来觉得也挺好用的，就是一个java class，直接复制粘贴到项目里，改一下package name，无脑使用即可。原理的话，看过源码后，大致明白是在statusBar的位置添加一个new View，然后持有这个view的引用，接下来就可以做常规的setBackground或者setBackgroundColor了。初始化时的关键代码如下<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">setupStatusBarView</span><span class="params">(Context context, ViewGroup decorViewGroup)</span> </span>&#123;<span class="comment">//这个decorViewGroup指的是activity.getWindow()</span></div><div class="line">        mStatusBarTintView = <span class="keyword">new</span> View(context);</div><div class="line">        LayoutParams params = <span class="keyword">new</span> LayoutParams(LayoutParams.MATCH_PARENT, mConfig.getStatusBarHeight());</div><div class="line">        params.gravity = Gravity.TOP;</div><div class="line">        <span class="keyword">if</span> (mNavBarAvailable &amp;&amp; !mConfig.isNavigationAtBottom()) &#123;</div><div class="line">            params.rightMargin = mConfig.getNavigationBarWidth();</div><div class="line">        &#125;</div><div class="line">        mStatusBarTintView.setLayoutParams(params);</div><div class="line">        mStatusBarTintView.setBackgroundColor(DEFAULT_TINT_COLOR);</div><div class="line">        mStatusBarTintView.setVisibility(View.GONE);</div><div class="line">        decorViewGroup.addView(mStatusBarTintView);</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
 <p>一切看起来都很美好</p>
 <h3 id="2-直到碰到了fitSystemWindow-ture"><a href="#2-直到碰到了fitSystemWindow-ture" class="headerlink" title="2. 直到碰到了fitSystemWindow = ture"></a>2. 直到碰到了fitSystemWindow = ture</h3><p>几个月前曾经在项目里写过一个普通的Coordinatelayout内部CollapingToolbarLayout的沉浸式状态栏实现，当时为了赶进度一直试到夜里2点才尝试出在4.4和5.0以上手机都能满意的效果。现在想想有些事还是能够事先搞清楚的好，被动学习的代价实在太大。当时的方法是给Toolbar添加了一个顶部的padding，具体原理也不大清楚。<br>但实际上并不总能一直<br><br>  <img src="http://odzl05jxx.bkt.clouddn.com/Trying%20stuff%20Untill%20it%20work.jpg?imageView2/2/w/600" alt="trying stuff utill it work"></p>
 <h3 id="3-使用CollapsingToolbarLayout时的问题"><a href="#3-使用CollapsingToolbarLayout时的问题" class="headerlink" title="3. 使用CollapsingToolbarLayout时的问题"></a>3. 使用CollapsingToolbarLayout时的问题</h3><ol>
-<li><p>5.0以上的手机似乎很简单</p>
-<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
- &lt;android.support.design.widget.CoordinatorLayout
-     xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
-     xmlns:app=&quot;http://schemas.android.com/apk/res-auto&quot;
-     android:id=&quot;@+id/coordinateLayout&quot;
-     android:layout_width=&quot;match_parent&quot;
-     android:layout_height=&quot;match_parent&quot;
-     android:background=&quot;@android:color/background_light&quot;
-     android:fitsSystemWindows=&quot;true&quot;
-     &gt;
-
-     &lt;android.support.design.widget.AppBarLayout
-         android:id=&quot;@+id/appbarLayout&quot;
-         android:layout_width=&quot;match_parent&quot;
-         android:layout_height=&quot;300dp&quot;
-         android:theme=&quot;@style/ThemeOverlay.AppCompat.Dark.ActionBar&quot;
-         android:fitsSystemWindows=&quot;true&quot;
-         &gt;
-
-         &lt;android.support.design.widget.CollapsingToolbarLayout
-             android:id=&quot;@+id/collapsingToolbarLayout&quot;
-             android:layout_width=&quot;match_parent&quot;
-             android:layout_height=&quot;match_parent&quot;
-             app:contentScrim=&quot;?attr/colorPrimary&quot;
-             app:expandedTitleMarginEnd=&quot;64dp&quot;
-             app:expandedTitleMarginStart=&quot;48dp&quot;
-             app:layout_scrollFlags=&quot;scroll|exitUntilCollapsed&quot;
-             &gt;
-
-             &lt;ImageView
-                 android:id=&quot;@+id/backdrop&quot;
-                 android:layout_width=&quot;match_parent&quot;
-                 android:layout_height=&quot;match_parent&quot;
-                 android:scaleType=&quot;centerCrop&quot;
-                 android:src=&quot;@drawable/image_19&quot;
-                 app:layout_collapseMode=&quot;parallax&quot;
-                 android:fitsSystemWindows=&quot;true&quot;
-                 /&gt;
-
-             &lt;android.support.v7.widget.Toolbar
-                 android:id=&quot;@+id/toolbar&quot;
-                 android:layout_width=&quot;match_parent&quot;
-                 android:layout_height=&quot;?attr/actionBarSize&quot;
-                 app:layout_collapseMode=&quot;pin&quot;
-                 app:popupTheme=&quot;@style/ThemeOverlay.AppCompat.Light&quot;
-                 /&gt;
-         &lt;/android.support.design.widget.CollapsingToolbarLayout&gt;
-     &lt;/android.support.design.widget.AppBarLayout&gt;
-
-     &lt;android.support.v4.widget.NestedScrollView
-         android:id=&quot;@+id/nestedScrollView&quot;
-         android:layout_width=&quot;match_parent&quot;
-         android:layout_height=&quot;match_parent&quot;
-         app:layout_behavior=&quot;@string/appbar_scrolling_view_behavior&quot;
-         &gt;
-
-         &lt;TextView
-             android:layout_width=&quot;match_parent&quot;
-             android:layout_height=&quot;wrap_content&quot;
-             android:lineSpacingExtra=&quot;8dp&quot;
-             android:padding=&quot;@dimen/activity_horizontal_margin&quot;
-             android:text=&quot;@string/newsBody&quot;
-             android:textSize=&quot;20sp&quot;
-             /&gt;
-     &lt;/android.support.v4.widget.NestedScrollView&gt;
-
-     &lt;android.support.design.widget.FloatingActionButton
-         android:id=&quot;@+id/fab&quot;
-         android:layout_width=&quot;wrap_content&quot;
-         android:layout_height=&quot;wrap_content&quot;
-         android:layout_margin=&quot;@dimen/activity_horizontal_margin&quot;
-         android:src=&quot;@android:drawable/ic_menu_slideshow&quot;
-         app:layout_anchor=&quot;@id/appbarLayout&quot;
-         app:layout_anchorGravity=&quot;bottom|right|end&quot;
-         /&gt;
- &lt;/android.support.design.widget.CoordinatorLayout&gt;
-</code></pre>
+<li>5.0以上的手机似乎很简单<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</div><div class="line">    <span class="tag">&lt;<span class="name">android.support.design.widget.CoordinatorLayout</span></span></div><div class="line">        <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></div><div class="line">        <span class="attr">xmlns:app</span>=<span class="string">"http://schemas.android.com/apk/res-auto"</span></div><div class="line">        <span class="attr">android:id</span>=<span class="string">"@+id/coordinateLayout"</span></div><div class="line">        <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></div><div class="line">        <span class="attr">android:layout_height</span>=<span class="string">"match_parent"</span></div><div class="line">        <span class="attr">android:background</span>=<span class="string">"@android:color/background_light"</span></div><div class="line">        <span class="attr">android:fitsSystemWindows</span>=<span class="string">"true"</span></div><div class="line">        &gt;</div><div class="line"></div><div class="line">        <span class="tag">&lt;<span class="name">android.support.design.widget.AppBarLayout</span></span></div><div class="line">            <span class="attr">android:id</span>=<span class="string">"@+id/appbarLayout"</span></div><div class="line">            <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></div><div class="line">            <span class="attr">android:layout_height</span>=<span class="string">"300dp"</span></div><div class="line">            <span class="attr">android:theme</span>=<span class="string">"@style/ThemeOverlay.AppCompat.Dark.ActionBar"</span></div><div class="line">            <span class="attr">android:fitsSystemWindows</span>=<span class="string">"true"</span></div><div class="line">            &gt;</div><div class="line"></div><div class="line">            <span class="tag">&lt;<span class="name">android.support.design.widget.CollapsingToolbarLayout</span></span></div><div class="line">                <span class="attr">android:id</span>=<span class="string">"@+id/collapsingToolbarLayout"</span></div><div class="line">                <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></div><div class="line">                <span class="attr">android:layout_height</span>=<span class="string">"match_parent"</span></div><div class="line">                <span class="attr">app:contentScrim</span>=<span class="string">"?attr/colorPrimary"</span></div><div class="line">                <span class="attr">app:expandedTitleMarginEnd</span>=<span class="string">"64dp"</span></div><div class="line">                <span class="attr">app:expandedTitleMarginStart</span>=<span class="string">"48dp"</span></div><div class="line">                <span class="attr">app:layout_scrollFlags</span>=<span class="string">"scroll|exitUntilCollapsed"</span></div><div class="line">                &gt;</div><div class="line"></div><div class="line">                <span class="tag">&lt;<span class="name">ImageView</span></span></div><div class="line">                    <span class="attr">android:id</span>=<span class="string">"@+id/backdrop"</span></div><div class="line">                    <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></div><div class="line">                    <span class="attr">android:layout_height</span>=<span class="string">"match_parent"</span></div><div class="line">                    <span class="attr">android:scaleType</span>=<span class="string">"centerCrop"</span></div><div class="line">                    <span class="attr">android:src</span>=<span class="string">"@drawable/image_19"</span></div><div class="line">                    <span class="attr">app:layout_collapseMode</span>=<span class="string">"parallax"</span></div><div class="line">                    <span class="attr">android:fitsSystemWindows</span>=<span class="string">"true"</span></div><div class="line">                    /&gt;</div><div class="line"></div><div class="line">                <span class="tag">&lt;<span class="name">android.support.v7.widget.Toolbar</span></span></div><div class="line">                    <span class="attr">android:id</span>=<span class="string">"@+id/toolbar"</span></div><div class="line">                    <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></div><div class="line">                    <span class="attr">android:layout_height</span>=<span class="string">"?attr/actionBarSize"</span></div><div class="line">                    <span class="attr">app:layout_collapseMode</span>=<span class="string">"pin"</span></div><div class="line">                    <span class="attr">app:popupTheme</span>=<span class="string">"@style/ThemeOverlay.AppCompat.Light"</span></div><div class="line">                    /&gt;</div><div class="line">            <span class="tag">&lt;/<span class="name">android.support.design.widget.CollapsingToolbarLayout</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">android.support.design.widget.AppBarLayout</span>&gt;</span></div><div class="line"></div><div class="line">        <span class="tag">&lt;<span class="name">android.support.v4.widget.NestedScrollView</span></span></div><div class="line">            <span class="attr">android:id</span>=<span class="string">"@+id/nestedScrollView"</span></div><div class="line">            <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></div><div class="line">            <span class="attr">android:layout_height</span>=<span class="string">"match_parent"</span></div><div class="line">            <span class="attr">app:layout_behavior</span>=<span class="string">"@string/appbar_scrolling_view_behavior"</span></div><div class="line">            &gt;</div><div class="line"></div><div class="line">            <span class="tag">&lt;<span class="name">TextView</span></span></div><div class="line">                <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></div><div class="line">                <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></div><div class="line">                <span class="attr">android:lineSpacingExtra</span>=<span class="string">"8dp"</span></div><div class="line">                <span class="attr">android:padding</span>=<span class="string">"@dimen/activity_horizontal_margin"</span></div><div class="line">                <span class="attr">android:text</span>=<span class="string">"@string/newsBody"</span></div><div class="line">                <span class="attr">android:textSize</span>=<span class="string">"20sp"</span></div><div class="line">                /&gt;</div><div class="line">        <span class="tag">&lt;/<span class="name">android.support.v4.widget.NestedScrollView</span>&gt;</span></div><div class="line"></div><div class="line">        <span class="tag">&lt;<span class="name">android.support.design.widget.FloatingActionButton</span></span></div><div class="line">            <span class="attr">android:id</span>=<span class="string">"@+id/fab"</span></div><div class="line">            <span class="attr">android:layout_width</span>=<span class="string">"wrap_content"</span></div><div class="line">            <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></div><div class="line">            <span class="attr">android:layout_margin</span>=<span class="string">"@dimen/activity_horizontal_margin"</span></div><div class="line">            <span class="attr">android:src</span>=<span class="string">"@android:drawable/ic_menu_slideshow"</span></div><div class="line">            <span class="attr">app:layout_anchor</span>=<span class="string">"@id/appbarLayout"</span></div><div class="line">            <span class="attr">app:layout_anchorGravity</span>=<span class="string">"bottom|right|end"</span></div><div class="line">            /&gt;</div><div class="line">    <span class="tag">&lt;/<span class="name">android.support.design.widget.CoordinatorLayout</span>&gt;</span></div></pre></td></tr></table></figure>
+</li>
+</ol>
 <p>只要分别在CoordinateLayout，AppBarLayout和CollapsingToolbarLayout的xml属性中加上android:fitSystemWindow = “true”<br>java代码里添加一句</p>
 <blockquote>
 <p>getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS); //注意下版本判断</p>
 </blockquote>
-</li>
-</ol>
 <p>或者在当前Activity的values-v19 styles中添加 <item name="android:windowTranslucentStatus">true</item><br>就行了。实际效果就是图片完全展开时可以扩展到statusBar下面，图片收缩起来后可以让Toolbar停在statusBar下面。但同样的代码在4.4的手机上会使得实际绘图区域落到statusBar以下，statusBar位置变成带灰色遮罩的白色背景。</p>
 <h3 id="4-fitSystemWindow是什么意思"><a href="#4-fitSystemWindow是什么意思" class="headerlink" title="4. fitSystemWindow是什么意思"></a>4. fitSystemWindow是什么意思</h3><p>fitSystemWindows属性：<br>官方描述:<br>Boolean internal attribute to adjust view layout based on system windows such as the status bar. If true, adjusts the padding of this view to leave space for the system windows. Will only take effect if this view is in a non-embedded activity.<br>简单来说就是如果设置为true,机会根据statusbar来添加一个padding.<br>假定:<br>布局文件只是一个普通的LinearLayout(fitSystemWindow = false（默认情况）),顶部include一个toolbar(fitSystemWindow = true )<br>就已经可以实现4.4以下，4.4-5.0，5.0以上的各种场景了,(前提，使用Appcompat 的Theme，因为它会使用colorPrimaryDark为statusBar着色)</p>
 <p>但我的问题在于布局文件是<br>CoordinateLayout&gt;  AppBarLyout&gt;  CollapsingToolbarLayout&gt;  Toolbar &amp; ImageView<br>这种情况下，照理说Toolbar应该顶部留有25dp的padding，也就是fitSystemWindow = true（假设就只是这么简单）<a href="https://medium.com/google-developers/why-would-i-want-to-fitssystemwindows-4e26d9ce1eec#.vx75v2c9p" target="_blank" rel="external">然而事实是，fitSystemWindow会让你设置的padding失效</a>,而ImageView需要侵入到statusBar下面，也就是fitSystemWindow = false。<br>那就只要在toolbar的xml中添加fitSystemWindow这个属性好了。编译，运行，5.1手机，Toolbar的小箭头一部分跑到statusBar下面了，感觉就像Toolbar往上移动了25dp(这个目测的哈)，不可取。</p>
 <h3 id="5-查找到的一些解决方案"><a href="#5-查找到的一些解决方案" class="headerlink" title="5. 查找到的一些解决方案"></a>5. 查找到的一些解决方案</h3><p> 主要介绍原理了:</p>
 <ol>
-<li>类似于SystemBarTint，在android.R.id.content的View中添加一个 View<pre><code class="java">ViewGroup.LayoutParams statusViewLp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                getStatusBarHeight());
-contentView.addView(statusBarView,layoutParams)
-</code></pre>
-Activity持有一个PhoneWindow，PhoneWindow持有一个根View，叫DecorView（是一个FrameLayout），DecorView持有一个LinearLayout，在LinearLayout下分配两个FrameLayout，一个给ActionBar（当设置主题为NoActionBar是为ViewStub），一个给ContentView。不管如何，只要我们在LinearLayout的第一个位置插入一个View就可以让ContentView下移了。<a href="http://www.jianshu.com/p/140be70b84cd?utm_source=tuicool&amp;utm_medium=referral" target="_blank" rel="external">简书作者</a><br>这种方式其实已经无所谓是否需要在xml中fitSystemWindow了，因为都会通过添加最后一个View的方式把状态栏那块给遮住了。用来着色其实挺好的。</li>
+<li><p>类似于SystemBarTint，在android.R.id.content的View中添加一个 View</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"> ViewGroup.LayoutParams statusViewLp = <span class="keyword">new</span> ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,</div><div class="line">                    getStatusBarHeight());</div><div class="line">contentView.addView(statusBarView,layoutParams)</div></pre></td></tr></table></figure>
+<p>Activity持有一个PhoneWindow，PhoneWindow持有一个根View，叫DecorView（是一个FrameLayout），DecorView持有一个LinearLayout，在LinearLayout下分配两个FrameLayout，一个给ActionBar（当设置主题为NoActionBar是为ViewStub），一个给ContentView。不管如何，只要我们在LinearLayout的第一个位置插入一个View就可以让ContentView下移了。<a href="http://www.jianshu.com/p/140be70b84cd?utm_source=tuicool&amp;utm_medium=referral" target="_blank" rel="external">简书作者</a><br>这种方式其实已经无所谓是否需要在xml中fitSystemWindow了，因为都会通过添加最后一个View的方式把状态栏那块给遮住了。用来着色其实挺好的。</p>
+</li>
 </ol>
 <ol>
 <li><p>往android.R.id.content这个View里面添加一个假View,xml中fitSystemWindows</p>
@@ -285,25 +194,18 @@ Activity持有一个PhoneWindow，PhoneWindow持有一个根View，叫DecorView�
 </li>
 </ol>
 <h3 id="6-我最后实现的解决方案（4-4-5-1均通过）"><a href="#6-我最后实现的解决方案（4-4-5-1均通过）" class="headerlink" title="6.我最后实现的解决方案（4.4,5.1均通过）"></a>6.我最后实现的解决方案（4.4,5.1均通过）</h3><p><strong>其实整个问题的关键就是你是否想要在statusBar那一块长条的位置画画。。。。</strong><br>一整张imageView的话，当然希望能够把图片延伸到statusBar以下<br>而Toolbar则不需要延伸到statusBar以下。<br>我尝试了给toolbar加上padding  &gt;&gt;失败<br>我尝试了给toolbar加上margin   &gt;&gt;&gt;&gt; 问题终于解决</p>
-<p>所以最后，我的xml文件中删除了所有的fitSystemWindow，在style-v19中添加了该加的东西<br>最后只在onCreate里面添加几段话</p>
-<pre><code class="java">setSupportActionBar(binding.toolbar);
-getSupportActionBar().setDisplayHomeAsUpEnabled(true);  //这个用于显示返回的小箭头，还得指明parentActivity
-getSupportActionBar().setTitle(&quot;&quot;);
-CollapsingToolbarLayout.LayoutParams params = (CollapsingToolbarLayout.LayoutParams) binding.toolbar.getLayoutParams();
-params.setMargins(0, Utils.getStatusBarHeight(), 0, 0); //顶部加个margin就好了
-binding.toolbar.setLayoutParams(params);
-</code></pre>
+<p>所以最后，我的xml文件中删除了所有的fitSystemWindow，在style-v19中添加了该加的东西<br>最后只在onCreate里面添加几段话<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">setSupportActionBar(binding.toolbar);</div><div class="line">getSupportActionBar().setDisplayHomeAsUpEnabled(<span class="keyword">true</span>);  <span class="comment">//这个用于显示返回的小箭头，还得指明parentActivity</span></div><div class="line">getSupportActionBar().setTitle(<span class="string">""</span>);</div><div class="line">CollapsingToolbarLayout.LayoutParams params = (CollapsingToolbarLayout.LayoutParams) binding.toolbar.getLayoutParams();</div><div class="line">params.setMargins(<span class="number">0</span>, Utils.getStatusBarHeight(), <span class="number">0</span>, <span class="number">0</span>); <span class="comment">//顶部加个margin就好了</span></div><div class="line">binding.toolbar.setLayoutParams(params);</div></pre></td></tr></table></figure></p>
 <p>实际操作可能还要判断非空什么的，但大致意思如此<br>看起来像这样<br>5.1图片展开:<br>  <img src="http://odzl05jxx.bkt.clouddn.com/statusbar_5.0_expanded.png?imageView2/2/w/300" alt="5.1模拟器，图片展开">  </p>
 <p>5.1图片收起:<br>  <img src="http://odzl05jxx.bkt.clouddn.com/statusbar_5.0_collapsed.png?imageView2/2/w/300" alt="5.1模拟器，图片收起">  </p>
 <p>4.4图片展开:<br>  <img src="http://odzl05jxx.bkt.clouddn.com/statusbar_4.4_expanded.png?imageView2/2/w/300" alt="4.4模拟器，图片展开">  </p>
 <p>4.4图片收起:<br>  <img src="http://odzl05jxx.bkt.clouddn.com/statusbar_4.4_collapsed.png?imageView2/2/w/300" alt="4.4模拟器，图片收起">  </p>
 <p>原理就是让整个布局占据statusBar的位置，但把Toolbar往下挪一点（其实也就是<a href="http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2016/0330/4104.html" target="_blank" rel="external">这篇文章</a>中所推荐的给contentView的给第一个childView添加marginTop的方法）</p>
 <h3 id="7-一些不要犯的小错误"><a href="#7-一些不要犯的小错误" class="headerlink" title="7. 一些不要犯的小错误"></a>7. 一些不要犯的小错误</h3><ul>
-<li><p>在Theme中添加</p>
-<pre><code class="xml">&lt;item name=&quot;android:fitsSystemWindows&quot;&gt;true&lt;/item&gt;
-</code></pre>
-<p>这会导致Toast的文字往上偏移，所以，如果需要使用fitSystemWinow = true的话，请老老实实去xml中写</p>
+<li>在Theme中添加<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">"android:fitsSystemWindows"</span>&gt;</span>true<span class="tag">&lt;/<span class="name">item</span>&gt;</span></div></pre></td></tr></table></figure>
 </li>
+</ul>
+<p>这会导致Toast的文字往上偏移，所以，如果需要使用fitSystemWinow = true的话，请老老实实去xml中写</p>
+<ul>
 <li><p>状态栏那一块如果你不去占据的话，而你又声明了windowTranslucentStatus，v21上默认的颜色应该是colorPrimaryDark(是的，AppCompat帮你照顾好了)v19上就是一片带阴影的白色(AppCompat不会在这个版本上帮你着色statusBar)。</p>
 </li>
 <li><p>6.0以上可以设置statusBar字体的颜色了，这个随便找找就有了</p>
