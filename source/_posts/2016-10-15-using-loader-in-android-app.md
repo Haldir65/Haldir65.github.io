@@ -14,12 +14,17 @@ App中经常有这样的需求:
 ### 1. 自定义一个Loader(加载数据类型，Cache处理等)
 Loader的使用就像一个AsyncTask一样，可以提前指定需要在异步线程中做的事情、数据类型以及完成加载后将数据推送到主线程。谷歌给出了一个使用Loader来查询手机上安装的App并显示在一个ListView中的DemoApp，虽然是好几年前的东西了，并且使用的是V4包里的Loader,但还是值得学习。
 首先来看自定义的AppListLoader
+
 ```java
-public class AppListLoader extends AsyncTaskLoader<List<AppEntry>>{//AsynTaskLoader支持泛型，AppEntry是已安装App信息的包装类。
-    private List<AppEntry> mApps; 查询的App列表保存为成员变量
- 
- //构造函数
- public AppListLoader(Context ctx) {
+public class AppListLoader extends AsyncTaskLoader<List<AppEntry>> { //AsynTaskLoader支持泛型，AppEntry是已安装App信息的包装类。
+    private List<AppEntry> mApps;
+    //查询的App列表保存为成员变量
+    final PackageManager mPm;
+    private boolean DEBUG = true;
+    public static final String TAG = AppListLoader.class.getSimpleName();
+
+    //构造函数
+    public AppListLoader(Context ctx) {
         // Loaders may be used across multiple Activitys (assuming they aren't
         // bound to the LoaderManager), so NEVER hold a reference to the context
         // directly. Doing so will cause you to leak an entire Activity's context.
@@ -27,22 +32,19 @@ public class AppListLoader extends AsyncTaskLoader<List<AppEntry>>{//AsynTaskLoa
         // Context instead, and can be retrieved with a call to getContext().
         super(ctx);
         //第一，这里运行在主线程上；
-		//第二，传进来的context(一般是Activity只是为了获取ApplicationContext)
+        //第二，传进来的context(一般是Activity只是为了获取ApplicationContext)
         mPm = getContext().getPackageManager();//getContext()返回的是Application的Context。
     }
-	
-	
-	  @Override
+
+    @Override
     public List<AppEntry> loadInBackground() {
         if (DEBUG) Log.i(TAG, "+++ loadInBackground() called! +++");
         LogUtil.p("");// 子线程,耗时的工作放到这里
         // Retrieve all installed applications.
         List<ApplicationInfo> apps = mPm.getInstalledApplications(0);//PackageManager的方法
-
         if (apps == null) {
             apps = new ArrayList<ApplicationInfo>();
         }
-
         // Create corresponding array of entries and load their labels.
         List<AppEntry> entries = new ArrayList<AppEntry>(apps.size());
         for (int i = 0; i < apps.size(); i++) {
@@ -50,19 +52,17 @@ public class AppListLoader extends AsyncTaskLoader<List<AppEntry>>{//AsynTaskLoa
             entry.loadLabel(getContext());
             entries.add(entry);
         }
-
         // Sort the list.
         Collections.sort(entries, ALPHA_COMPARATOR);
-
         return entries;
     }
 
-	
-	 @Override
+    @Override
     public void deliverResult(List<AppEntry> apps) {
         //运行在主线程上
         if (isReset()) {//这里就类似于AsyncTask的onPostExecute了，把子线程处理好的数据推送到主线程
-            if (DEBUG) Log.w(TAG, "+++ Warning! An async query came in while the Loader was reset! +++");
+            if (DEBUG)
+                Log.w(TAG, "+++ Warning! An async query came in while the Loader was reset! +++");
             // The Loader has been reset; ignore the result and invalidate the data.
             // This can happen when the Loader is reset while an asynchronous query
             // is working in the background. That is, when the background thread
@@ -74,12 +74,10 @@ public class AppListLoader extends AsyncTaskLoader<List<AppEntry>>{//AsynTaskLoa
                 return;
             }
         }//如果调用了reset()方法，说明子线程加载的数据是无效的，释放资源，处理无效数据
-
         // Hold a reference to the old data so it doesn't get garbage collected.
         // We must protect it until the new data has been delivered.
         List<AppEntry> oldApps = mApps;
         mApps = apps;
-
         if (isStarted()) {// 如果一切正常，即调用了startLoading且stopLoading和reset均为被调用
             if (DEBUG) Log.i(TAG, "+++ Delivering results to the LoaderManager for" +
                     " the ListFragment to display! +++");
@@ -87,7 +85,6 @@ public class AppListLoader extends AsyncTaskLoader<List<AppEntry>>{//AsynTaskLoa
             // results to the client.
             super.deliverResult(apps);
         }
-
         // Invalidate the old data as we don't need it any more.
         if (oldApps != null && oldApps != apps) {
             if (DEBUG) Log.i(TAG, "+++ Releasing any old data associated with this Loader. +++");
@@ -162,61 +159,50 @@ Demo中使用的是Fragment：
 回到server端(Loader),AsyncTaskLoader是一个abstract class，loadInBackground方法已经实现了，但还有几个方法强调必须要复写或者与生命周期相关
 ```java
  @Override
-protected void onStartLoading() {
-	/**
-     * Subclasses must implement this to take care of loading their data,
-     * as per {@link #startLoading()}.  This is not called by clients directly,
-     * but as a result of a call to {@link #startLoading()}.
-     */
-	 在这里检查一下成员变量中的数据是否不为空，有数据的话，deliverResults
-}
+    protected void onStartLoading() {
+        /* Subclasses must implement this to take care of loading their data,
+          as per {@link #startLoading()}.  This is not called by clients directly,
+          but as a result of a call to {@link #startLoading()}.*/
+        //在这里检查一下成员变量中的数据是否不为空，有数据的话，deliverResults
+    }
 
-@Override
-protected void onStopLoading() {
- /**
-     * Subclasses must implement this to take care of stopping their loader,
-     * as per {@link #stopLoading()}.  This is not called by clients directly,
-     * but as a result of a call to {@link #stopLoading()}.
-     * This will always be called from the process's main thread.
-     */
-}
+    @Override
+    protected void onStopLoading() {
+          /*Subclasses must implement this to take care of stopping their loader,
+          as per {@link #stopLoading()}.  This is not called by clients directly,
+          but as a result of a call to {@link #stopLoading()}.
+          This will always be called from the process's main thread.*/
+    }
 
-@Override
-protected void onReset() {
-/**
-     * Subclasses must implement this to take care of resetting their loader,
-     * as per {@link #reset()}.  This is not called by clients directly,
-     * but as a result of a call to {@link #reset()}.
-     * This will always be called from the process's main thread.
-	如果调用了destoryLoader或者Loader相关联的Activity/Fragment被destory了
-	所以在Demo中可以看到onReset里面调用了onStopLoading去取消当前任务，同时释放资源，取消广播注册
-     */
-}
+    @Override
+    protected void onReset() {
+        /* Subclasses must implement this to take care of resetting their loader,
+         as per {@link #reset()}.  This is not called by clients directly,
+         but as a result of a call to {@link #reset()}.
+         This will always be called from the process's main thread.
+         如果调用了destoryLoader或者Loader相关联的Activity/Fragment被destory了
+         所以在Demo中可以看到onReset里面调用了onStopLoading去取消当前任务，同时释放资源，取消广播注册*/
+    }
 
-@Override
-public void onCanceled(List<AppEntry> apps) {
- /**
-     * Called if the task was canceled before it was completed.  Gives the class a chance
-     * to clean up post-cancellation and to properly dispose of the result.
-     *
-     * @param data The value that was returned by {@link #loadInBackground}, or null
-     * if the task threw {@link OperationCanceledException}.
-     */
-	 在这里释放资源
-}
+    @Override
+    public void onCanceled(List<AppEntry> apps) {
+         /* Called if the task was canceled before it was completed.  Gives the class a chance
+          to clean up post-cancellation and to properly dispose of the result.
+         
+          @param data The value that was returned by {@link #loadInBackground}, or null
+          if the task threw {@link OperationCanceledException}.*/
+        //在这里释放资源
+    }
 
-@Override
-public void forceLoad() {
-/**
-     * Force an asynchronous load. Unlike {@link #startLoading()} this will ignore a previously
-     * loaded data set and load a new one.  This simply calls through to the
-     * implementation's {@link #onForceLoad()}.  You generally should only call this
-     * when the loader is started -- that is, {@link #isStarted()} returns true.
-     *
-     * <p>Must be called from the process's main thread.
-     */
-	 startLoading会直接使用onConfigurationchange之前的Activity中Loader加载的数据，但这里则放弃旧的数据，重新加载，所以isStarted会在这时返回true（）
-}
+    @Override
+    public void forceLoad() {
+        /*Force an asynchronous load. Unlike {@link #startLoading()} this will ignore a previously
+        loaded data set and load a new one.  This simply calls through to the
+        implementation's {@link #onForceLoad()}.  You generally should only call this
+        when the loader is started -- that is, {@link #isStarted()} returns true.
+        Must be called from the process's main thread.*/
+        //startLoading会直接使用onConfigurationchange之前的Activity中Loader加载的数据，但这里则放弃旧的数据，重新加载，所以isStarted会在这时返回true
+    }
 ```
 考虑一下，如果在加载数据过程中数据源发生了变化，比如在扫描已安装App过程中又安装了新的App怎么办？所以这里又注册了两个广播，在onReceive的时候调用
 >     mLoader.onContentChanged();

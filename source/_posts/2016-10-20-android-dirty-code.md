@@ -40,6 +40,7 @@ Unfortunately there are a number of applications on Google Play which are using 
 也就是说，API 18以前，只需要提供一个无效的Notification就可以让Notification不显示了。所以，判断下API<18的时候，直接new Notification()就可以得到一个不完整的Notification.
 文章也指出了这是一个Loophole（已经是个贬义词了）。
 Api 18之后的修复措施，看[ServiceRecord的源码](https://android.googlesource.com/platform/frameworks/base.git/+/android-4.3_r2.1/services/java/com/android/server/am/ServiceRecord.java):
+
 ```java
 public void postNotification() {
         final int appUid = appInfo.uid;
@@ -120,7 +121,6 @@ public void postNotification() {
             });
         }
     }
-
 ```
 单单是看注释大概能看出来Android团队对于这种做法的不满。所以如果不提供有效Notification，则显示你的App的Icon。所以Api 18以上一定会显示一个Notification。
 
