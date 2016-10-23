@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+  <title>replace butterKnife with databinding | Haldir的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Yigit Boyar 在2015年的android Dev summit上介绍了Databinding，当时好像提到一句:“no binding libraries will be created from now on “，大意如此。本文介绍使用Databinding替代ButterKnife的用法
+本文大部分代码来自网络，我只是觉得简单的代码直接复制粘贴可能会比较好。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="replace butterKnife with databinding">
+<meta property="og:url" content="http://haldir65.github.io/2016/09/22/replace-butterKnife-with-databinding/index.html">
+<meta property="og:site_name" content="Haldir的博客">
+<meta property="og:description" content="Yigit Boyar 在2015年的android Dev summit上介绍了Databinding，当时好像提到一句:“no binding libraries will be created from now on “，大意如此。本文介绍使用Databinding替代ButterKnife的用法
+本文大部分代码来自网络，我只是觉得简单的代码直接复制粘贴可能会比较好。">
+<meta property="og:updated_time" content="2016-10-06T09:04:53.739Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="replace butterKnife with databinding">
+<meta name="twitter:description" content="Yigit Boyar 在2015年的android Dev summit上介绍了Databinding，当时好像提到一句:“no binding libraries will be created from now on “，大意如此。本文介绍使用Databinding替代ButterKnife的用法
+本文大部分代码来自网络，我只是觉得简单的代码直接复制粘贴可能会比较好。">
+  
+    <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="//favicon.png">
+  
+  <script src="/style.js"></script>
+</head>
+
+<body>
+  <div id="container">
+    <div class="left-col">
+      <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			
+			<img src="http://odzl05jxx.bkt.clouddn.com/bolg_avatar.jpg" class="js-avatar show" style="width: 100%;height: 100%;opacity: 1;">
+			
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">Haldir</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">Android狗，python学习中</p>
+		
+
+		<nav class="header-menu">
+			<ul>
+			
+				<li><a href="/">主页</a></li>
+	        
+				<li><a href="/tags/android">文章</a></li>
+	        
+			</ul>
+		</nav>
+		<nav class="header-smart-menu">
+	        
+    		
+    			
+    			<a class="js-smart-menu" data-idx="0" href="javascript:void(0)">主页</a>
+    			
+    			
+            
+    			
+    			<a class="js-smart-menu" data-idx="1" href="javascript:void(0)">标签</a>
+    			
+    			
+            
+    			
+    			<a class="js-smart-menu" data-idx="2" href="javascript:void(0)">友链</a>
+    			
+    			
+            
+    			
+    			<a class="js-smart-menu" data-idx="3" href="javascript:void(0)">关于我</a>
+    			
+    			
+            
+		</nav>
+		<nav class="header-nav">
+			<div class="social">
+				
+					<a class="github" target="_blank" href="https://github.com/Haldir65" title="github">github</a>
+		        
+					<a class="weibo" target="_blank" href="#" title="weibo">weibo</a>
+		        
+					<a class="rss" target="_blank" href="#" title="rss">rss</a>
+		        
+					<a class="zhihu" target="_blank" href="#" title="zhihu">zhihu</a>
+		        
+			</div>
+		</nav>
+	</header>		
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"><i class="icon-list"></i></div>
+  		<h1 class="header-author js-mobile-header hide">Haldir</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				
+					<img src="nullhttp://odzl05jxx.bkt.clouddn.com/bolg_avatar.jpg" class="js-avatar" style="width: 100%;height: 100%;opacity: 1;">
+				
+			</div>
+			<hgroup>
+			  <h1 class="header-author">Haldir</h1>
+			</hgroup>
+			
+			<p class="header-subtitle">Android狗，python学习中</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/tags/android">文章</a></li>
+		        
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/Haldir65" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="#" title="weibo">weibo</a>
+			        
+						<a class="rss" target="_blank" href="#" title="rss">rss</a>
+			        
+						<a class="zhihu" target="_blank" href="#" title="zhihu">zhihu</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+
+      <div class="body-wrap">
+        <article id="post-replace-butterKnife-with-databinding" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      replace butterKnife with databinding
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Yigit Boyar 在2015年的android Dev summit上介绍了Databinding，当时好像提到一句:<br>“no binding libraries will be created from now on “，大意如此。<br>本文介绍使用Databinding替代ButterKnife的用法</p>
+<h2 id="本文大部分代码来自网络，我只是觉得简单的代码直接复制粘贴可能会比较好。"><a href="#本文大部分代码来自网络，我只是觉得简单的代码直接复制粘贴可能会比较好。" class="headerlink" title="本文大部分代码来自网络，我只是觉得简单的代码直接复制粘贴可能会比较好。"></a>本文大部分代码来自网络，我只是觉得简单的代码直接复制粘贴可能会比较好。</h2><a id="more"></a>
+<h1 id="1-在Activity中使用"><a href="#1-在Activity中使用" class="headerlink" title="1.在Activity中使用"></a>1.在Activity中使用</h1><p><em>before</em><br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ExampleActivity</span> <span class="keyword">extends</span> <span class="title">Activity</span> </span>&#123;</div><div class="line">  <span class="meta">@Bind</span>(R.id.title) TextView title;</div><div class="line">  <span class="meta">@Bind</span>(R.id.subtitle) TextView subtitle;</div><div class="line">  <span class="meta">@Bind</span>(R.id.footer) TextView footer;</div><div class="line"></div><div class="line">  <span class="meta">@Override</span></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</div><div class="line">    <span class="keyword">super</span>.onCreate(savedInstanceState);</div><div class="line">    setContentView(R.layout.simple_activity);</div><div class="line">    ButterKnife.bind(<span class="keyword">this</span>);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><em>after</em><br>首先需要将xml文件添加 <strong>Layout</strong> tag<br><code>R.layout.smple_activity</code><br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">layout</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">LinearLayout</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">TextView</span> <span class="attr">android:id</span>=<span class="string">"@+id/title"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">TextView</span> <span class="attr">android:id</span>=<span class="string">"@+id/subtitle"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">TextView</span> <span class="attr">android:id</span>=<span class="string">"@+id/footer"</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">LinearLayout</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">layout</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ExampleActivity</span> <span class="keyword">extends</span> <span class="title">Activity</span> </span>&#123;</div><div class="line">  <span class="keyword">private</span> ActivitySampleBinding binding;</div><div class="line"></div><div class="line">  <span class="meta">@Override</span></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</div><div class="line">    <span class="keyword">super</span>.onCreate(savedInstanceState);</div><div class="line">    binding = DataBindingUtils.setContentView(<span class="keyword">this</span>, R.layout.simple_activity);</div><div class="line">    binding.title.setText(<span class="string">"I am Title"</span>);</div><div class="line">    <span class="comment">//no more findViewById!!!</span></div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="2-在Fragment中使用"><a href="#2-在Fragment中使用" class="headerlink" title="2.在Fragment中使用"></a>2.在Fragment中使用</h1><p><em>before</em><br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FancyFragment</span> <span class="keyword">extends</span> <span class="title">Fragment</span> </span>&#123;</div><div class="line">  <span class="meta">@Bind</span>(R.id.button1) Button button1;</div><div class="line">  <span class="meta">@Bind</span>(R.id.button2) Button button2;</div><div class="line">  <span class="meta">@Override</span></div><div class="line">  <span class="function"><span class="keyword">public</span> View <span class="title">onCreateView</span><span class="params">(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)</span> </span>&#123;</div><div class="line">    View view = inflater.inflate(R.layout.fancy_fragment, container, <span class="keyword">false</span>);</div><div class="line">    ButterKnife.bind(<span class="keyword">this</span>, view);</div><div class="line">    <span class="comment">// TODO Use fields...</span></div><div class="line">    <span class="keyword">return</span> view;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><em>after</em><br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FancyFragment</span> <span class="keyword">extends</span> <span class="title">Fragment</span> </span>&#123;</div><div class="line">  <span class="keyword">private</span> FragmentFancyBinding binding;</div><div class="line"></div><div class="line">  <span class="meta">@Override</span></div><div class="line">  <span class="function"><span class="keyword">public</span> View <span class="title">onCreateView</span><span class="params">(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)</span> </span>&#123;</div><div class="line">    binding = DataBindingUtil.inflate(inflater,R.layout.fragment_fancy, container, <span class="keyword">false</span>);</div><div class="line">true  <span class="keyword">return</span> binding.getRoot();</div><div class="line">  &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h1 id="3-在ViewHolder中使用"><a href="#3-在ViewHolder中使用" class="headerlink" title="3.在ViewHolder中使用"></a>3.在ViewHolder中使用</h1><p><em>before</em><br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyAdapter</span> <span class="keyword">extends</span> <span class="title">BaseAdapter</span> </span>&#123;</div><div class="line">  <span class="meta">@Override</span></div><div class="line">  <span class="function"><span class="keyword">public</span> View <span class="title">getView</span><span class="params">(<span class="keyword">int</span> position, View view, ViewGroup parent)</span> </span>&#123;</div><div class="line">    ViewHolder holder;</div><div class="line">    <span class="keyword">if</span> (view != <span class="keyword">null</span>) &#123;</div><div class="line">      holder = (ViewHolder) view.getTag();</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">      view = inflater.inflate(R.layout.list_item_sample, parent, <span class="keyword">false</span>);</div><div class="line">      holder = <span class="keyword">new</span> ViewHolder(view);</div><div class="line">      view.setTag(holder);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    holder.name.setText(<span class="string">"John Doe"</span>);</div><div class="line">    <span class="comment">// etc...</span></div><div class="line"></div><div class="line">    <span class="keyword">return</span> view;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ViewHolder</span> </span>&#123;</div><div class="line">    <span class="meta">@Bind</span>(R.id.title) TextView name;</div><div class="line">    <span class="meta">@Bind</span>(R.id.job_title) TextView jobTitle;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ViewHolder</span><span class="params">(View view)</span> </span>&#123;</div><div class="line">      ButterKnife.bind(<span class="keyword">this</span>, view);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><em>after</em></p>
+<h3 id="ListView"><a href="#ListView" class="headerlink" title="ListView"></a>ListView</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyAdapter</span> <span class="keyword">extends</span> <span class="title">BaseAdapter</span> </span>&#123;</div><div class="line">  <span class="meta">@Override</span></div><div class="line">  <span class="function"><span class="keyword">public</span> View <span class="title">getView</span><span class="params">(<span class="keyword">int</span> position, View convertView, ViewGroup parent)</span> </span>&#123;</div><div class="line">      ListItemSampleBinding binding;</div><div class="line">      <span class="keyword">if</span> (convertView == <span class="keyword">null</span>) &#123;</div><div class="line">          binding = DataBindingUtil.inflate(inflater, R.layout.list_item_sample, parent, <span class="keyword">false</span>);</div><div class="line">          convertView = binding.getRoot();</div><div class="line">          convertView.setTag(binding);</div><div class="line">      &#125; <span class="keyword">else</span> &#123;</div><div class="line">          binding = (ListItemSampleBinding) convertView.getTag();</div><div class="line">      &#125;</div><div class="line">      binding.setUser(getItem(position));</div><div class="line">      <span class="comment">// binding.name.setText("John Doe");</span></div><div class="line"></div><div class="line">      <span class="keyword">return</span> convertView;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="recyclerView"><a href="#recyclerView" class="headerlink" title="recyclerView"></a>recyclerView</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SampleRecyclerAdapter</span> <span class="keyword">extends</span> <span class="title">RecyclerView</span>.<span class="title">Adapter</span>&lt;<span class="title">SampleRecyclerAdapter</span>.<span class="title">BindingHolder</span>&gt; </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="keyword">public</span> RegisterableDeviceListAdapter.<span class="function">ViewHolder <span class="title">onCreateViewHolder</span><span class="params">(ViewGroup parent, <span class="keyword">int</span> viewType)</span> </span>&#123;</div><div class="line">      <span class="keyword">final</span> View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_sample, parent, <span class="keyword">false</span>);</div><div class="line">      <span class="keyword">return</span> <span class="keyword">new</span> BindingHolder(v);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">  <span class="meta">@Override</span></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onBindViewHolder</span><span class="params">(BindingHolder holder, <span class="keyword">int</span> position)</span> </span>&#123;</div><div class="line">    holder.getBinding().setVariable(BR.user, getItem(position));</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">BindingHolder</span> <span class="keyword">extends</span> <span class="title">RecyclerView</span>.<span class="title">ViewHolder</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ViewDataBinding binding;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">BindingHolder</span><span class="params">(View itemView)</span> </span>&#123;</div><div class="line">      <span class="keyword">super</span>(itemView);</div><div class="line">      binding = DataBindingUtil.bind(itemView)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> ViewDataBinding <span class="title">getBinding</span><span class="params">()</span> </span>&#123;</div><div class="line">      <span class="keyword">return</span> binding;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="4-在CustomView中使用"><a href="#4-在CustomView中使用" class="headerlink" title="4.在CustomView中使用"></a>4.在CustomView中使用</h1><p>在自定义View(ViewGroup)的时候，可以用ButterKnife减少自定义ViewGroup中的findViewById,使用Databinding之后是这样的。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Pagination</span> <span class="keyword">extends</span> <span class="title">RelativeLayout</span> </span>&#123;</div><div class="line">  <span class="keyword">private</span> ViewPaginationBinding binding;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="title">Pagination</span><span class="params">(Context context)</span> </span>&#123;</div><div class="line">    <span class="keyword">this</span>(context, <span class="keyword">null</span>);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="title">Pagination</span><span class="params">(Context context, AttributeSet attrs)</span> </span>&#123;</div><div class="line">    <span class="keyword">super</span>(context, attrs);</div><div class="line">    binding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.view_pagination, <span class="keyword">this</span>, <span class="keyword">true</span>);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">setListener</span><span class="params">(Pagination paginate, View target, OnPaginationClickListener listener)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (listener != <span class="keyword">null</span>) &#123;</div><div class="line">      target.setOnClickListener(_v -&gt; listener.onClick(paginate));</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="meta">@BindingAdapter</span>(&#123;<span class="string">"android:onPrevButtonClicked"</span>&#125;)</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">setPrevClickListener</span><span class="params">(Pagination view, OnPaginationClickListener listener)</span> </span>&#123;</div><div class="line">    setListener(view, view.binding.btnPrevPage, listener);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="meta">@BindingAdapter</span>(&#123;<span class="string">"android:onNextButtonClicked"</span>&#125;)</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">setNextClickListener</span><span class="params">(Pagination view, OnPaginationClickListener listener)</span> </span>&#123;</div><div class="line">    setListener(view, view.binding.btnNextPage, listener);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">OnPaginationClickListener</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">onClick</span><span class="params">(Pagination pagination)</span></span>;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h1 id="5-EventHandler-setDefaultComponent…"><a href="#5-EventHandler-setDefaultComponent…" class="headerlink" title="5.EventHandler, setDefaultComponent…"></a>5.EventHandler, setDefaultComponent…<br></h1><p>Databinding还有很多高级用法，目前给我带来的好处就是明显减少了boilerplate code <br><br>So ,感谢ButterKnife给我们带来的便利，Googbye ButterKnife，Hello DataBinding!</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ol>
+<li><a href="https://developer.android.com/topic/libraries/data-binding/index.html" target="_blank" rel="external">Data Binding Library</a></li>
+<li><a href="https://realm.io/cn/news/data-binding-android-boyar-mount/" target="_blank" rel="external">data-binding-android-boyar-mount</a> </li>
+<li><a href="https://www.youtube.com/watch?v=DAmMN7m3wLU" target="_blank" rel="external">Advanced Data Bindinding</a> Two-Way Data Binding at google io 2016</li>
+<li><a href="https://www.youtube.com/watch?v=NBbeQMOcnZ0" target="_blank" rel="external">Android Dev Summit 2015</a></li>
+<li><a href="http://qiita.com/izumin5210/items/2784576d86ce6b9b51e6" target="_blank" rel="external">Goodbye Butter Knife</a></li>
+<li><a href="https://github.com/google/android-ui-toolkit-demos" target="_blank" rel="external">Google Sample</a></li>
+</ol>
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      <a href="/2016/09/22/replace-butterKnife-with-databinding/" class="archive-article-date">
+  	<time datetime="2016-09-22T07:17:39.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-09-22</time>
+</a>
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags"></i>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Butterknife/">Butterknife</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/android/">android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/databinding/">databinding</a></li></ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+	<i class="icon-price-tags"></i>
+	<a class="article-category-link" href="/categories/blog/">blog</a>
+	</div>
+
+
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+  
+<nav id="article-nav">
+  
+    <a href="/2016/09/23/selectableItemBackground-foreground/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          android使用selectableItemBackground的一些坑
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/09/18/android-inner-class-leak/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">android内部类导致leak模板</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+
+
+<div class="share_jia">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">Share to: &nbsp; </span>
+		<a class="jiathis_button_facebook"></a> 
+	    <a class="jiathis_button_twitter"></a>
+	    <a class="jiathis_button_plus"></a> 
+	    <a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+    <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+
+
+
+
+
+
+      </div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2016 Haldir
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    <script>
+	var yiliaConfig = {
+		fancybox: true,
+		mathjax: false,
+		animate: false,
+		isHome: false,
+		isPost: true,
+		isArchive: false,
+		isTag: false,
+		isCategory: false,
+		open_in_new: true,
+		root: "/"
+	}
+</script>
+
+<script src="/./main.js"></script>
+
+
+
+
+
+    
+<div class="tools-col">
+  <ul class="btn-wrap">
+    
+      <li class="chose" data-hook="tools-section-all"><span class="text">全部</span><i class="icon-book"></i></li>
+    
+    
+      <li data-hook="tools-section-tag"><span class="text">标签</span><i class="icon-price-tags"></i></li>
+    
+    
+      <li data-hook="tools-section-friends"><span class="text">友链</span><i class="icon-link"></i></li>
+    
+    
+      <li data-hook="tools-section-me"><span class="text">我</span><i class="icon-smile"></i></li>
+    
+  </ul>
+  <div class="tools-wrap">
+    
+    	<section class="tools-section tools-section-all chose">
+    	</section>
+    
+
+    
+    	<section class="tools-section tools-section-tag">
+    			<div class="widget tagcloud" id="js-tagcloud">
+    				<a href="/tags/Android/" style="font-size: 10px;">Android</a> <a href="/tags/Butterknife/" style="font-size: 10px;">Butterknife</a> <a href="/tags/Handler-Message/" style="font-size: 10px;">Handler Message</a> <a href="/tags/RecyclerView/" style="font-size: 10px;">RecyclerView</a> <a href="/tags/TouchEvent/" style="font-size: 15px;">TouchEvent</a> <a href="/tags/Window/" style="font-size: 10px;">Window</a> <a href="/tags/android/" style="font-size: 20px;">android</a> <a href="/tags/android-7/" style="font-size: 10px;">android 7</a> <a href="/tags/databinding/" style="font-size: 10px;">databinding</a> <a href="/tags/foreground/" style="font-size: 10px;">foreground</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/service/" style="font-size: 10px;">service</a> <a href="/tags/statusBar/" style="font-size: 10px;">statusBar</a> <a href="/tags/transition/" style="font-size: 10px;">transition</a> <a href="/tags/坐标/" style="font-size: 10px;">坐标</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
+    			</div>
+    	</section>
+    
+
+    
+    	<section class="tools-section tools-section-friends">
+  		
+  			<div class="friends-wrap" id="js-friends">
+  			
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接1</a>
+  	        
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接2</a>
+  	        
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接3</a>
+  	        
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接4</a>
+  	        
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接5</a>
+  	        
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接6</a>
+  	        
+  	        </div>
+  		
+    	</section>
+    
+
+    
+    	<section class="tools-section tools-section-me">
+  	  	
+  	  		<div class="aboutme-wrap" id="js-aboutme">很惭愧&lt;br&gt;&lt;br&gt;只做了一点微小的工作&lt;br&gt;谢谢大家</div>
+  	  	
+    	</section>
+    
+  </div>
+  
+</div>
+    <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+  </div>
+</body>
+</html>

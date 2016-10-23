@@ -149,6 +149,31 @@ Scroller scroller = new Scroller(mContext);
  }
 ```
 
+### 9. 补充几个好玩的函数
+View.canScrollVertically(int)
+```java
+ public static boolean canChildScrollUp(View view) {
+        if (android.os.Build.VERSION.SDK_INT < 14) {
+            if (view instanceof AbsListView) {
+                final AbsListView absListView = (AbsListView) view;
+                return absListView.getChildCount() > 0
+                        && (absListView.getFirstVisiblePosition() > 0 || absListView.getChildAt(0)
+                        .getTop() < absListView.getPaddingTop());
+            } else {
+                return view.getScrollY() > 0;
+            }
+        } else {
+            return view.canScrollVertically(-1);
+        }
+    }
+```
+这段是我在秋百万的android-ultra-pulltorefresh里面找到的，想当初为了自己写下拉刷新，一遍一遍的打Log，最后甚至用上getVisibleRect才算搞定。
+其实很多东西前人已经帮我们整理好了。
+对了这东西在v4包里有ViewCompat.canScrollVertically，v4包除了方法数有点多(10k+好像)这点不好以外，一直都很好用
+附上supportLibrary各个包的方法数，如果对65536这个数字熟悉的话，还是会注意点的。
+![pic](http://odzl05jxx.bkt.clouddn.com/support_lib_methods_summary.jpg)
+
+
 
 ### 总结
 - 使用getLocalVisibleRect可以判断一个view是否完全可见

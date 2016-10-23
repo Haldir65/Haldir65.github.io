@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+  <title>activity transition pre and post lollipop | Haldir的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Lollipop开始引入了新的Activity Transition动画效果，比起常用的overridePendingTransaction() 效果要强大许多
+测试环境supportLibVersion = “24.2.1”gradle plugin version : “classpath ‘com.android.tools.build:gradle:2.2.0’”gradle versio">
+<meta property="og:type" content="article">
+<meta property="og:title" content="activity transition pre and post lollipop">
+<meta property="og:url" content="http://haldir65.github.io/2016/09/27/activity-transition-pre-and-post-lollipop/index.html">
+<meta property="og:site_name" content="Haldir的博客">
+<meta property="og:description" content="Lollipop开始引入了新的Activity Transition动画效果，比起常用的overridePendingTransaction() 效果要强大许多
+测试环境supportLibVersion = “24.2.1”gradle plugin version : “classpath ‘com.android.tools.build:gradle:2.2.0’”gradle versio">
+<meta property="og:updated_time" content="2016-10-06T09:04:53.709Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="activity transition pre and post lollipop">
+<meta name="twitter:description" content="Lollipop开始引入了新的Activity Transition动画效果，比起常用的overridePendingTransaction() 效果要强大许多
+测试环境supportLibVersion = “24.2.1”gradle plugin version : “classpath ‘com.android.tools.build:gradle:2.2.0’”gradle versio">
+  
+    <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="//favicon.png">
+  
+  <script src="/style.js"></script>
+</head>
+
+<body>
+  <div id="container">
+    <div class="left-col">
+      <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			
+			<img src="http://odzl05jxx.bkt.clouddn.com/bolg_avatar.jpg" class="js-avatar show" style="width: 100%;height: 100%;opacity: 1;">
+			
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">Haldir</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">Android狗，python学习中</p>
+		
+
+		<nav class="header-menu">
+			<ul>
+			
+				<li><a href="/">主页</a></li>
+	        
+				<li><a href="/tags/android">文章</a></li>
+	        
+			</ul>
+		</nav>
+		<nav class="header-smart-menu">
+	        
+    		
+    			
+    			<a class="js-smart-menu" data-idx="0" href="javascript:void(0)">主页</a>
+    			
+    			
+            
+    			
+    			<a class="js-smart-menu" data-idx="1" href="javascript:void(0)">标签</a>
+    			
+    			
+            
+    			
+    			<a class="js-smart-menu" data-idx="2" href="javascript:void(0)">友链</a>
+    			
+    			
+            
+    			
+    			<a class="js-smart-menu" data-idx="3" href="javascript:void(0)">关于我</a>
+    			
+    			
+            
+		</nav>
+		<nav class="header-nav">
+			<div class="social">
+				
+					<a class="github" target="_blank" href="https://github.com/Haldir65" title="github">github</a>
+		        
+					<a class="weibo" target="_blank" href="#" title="weibo">weibo</a>
+		        
+					<a class="rss" target="_blank" href="#" title="rss">rss</a>
+		        
+					<a class="zhihu" target="_blank" href="#" title="zhihu">zhihu</a>
+		        
+			</div>
+		</nav>
+	</header>		
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"><i class="icon-list"></i></div>
+  		<h1 class="header-author js-mobile-header hide">Haldir</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				
+					<img src="nullhttp://odzl05jxx.bkt.clouddn.com/bolg_avatar.jpg" class="js-avatar" style="width: 100%;height: 100%;opacity: 1;">
+				
+			</div>
+			<hgroup>
+			  <h1 class="header-author">Haldir</h1>
+			</hgroup>
+			
+			<p class="header-subtitle">Android狗，python学习中</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/tags/android">文章</a></li>
+		        
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/Haldir65" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="#" title="weibo">weibo</a>
+			        
+						<a class="rss" target="_blank" href="#" title="rss">rss</a>
+			        
+						<a class="zhihu" target="_blank" href="#" title="zhihu">zhihu</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+
+      <div class="body-wrap">
+        <article id="post-activity-transition-pre-and-post-lollipop" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      activity transition pre and post lollipop
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Lollipop开始引入了新的Activity Transition动画效果，比起常用的overridePendingTransaction() 效果要强大许多</p>
+<p>测试环境<br>supportLibVersion = “24.2.1”<br>gradle plugin version : “classpath ‘com.android.tools.build:gradle:2.2.0’”<br>gradle version : 3.1<br>compileSdkVersion 24<br>buildToolsVersion “24.0.2”</p>
+<a id="more"></a>
+<ul>
+<li>常规用法:</li>
+</ul>
+<p>A activity &gt;&gt;&gt;&gt; B activity</p>
+<p>A activity中:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">intent = <span class="keyword">new</span> Intent(getActivity(), PictureDetailSubActivity2.class);</div><div class="line">               intent.putExtra(EXTRA_IMAGE_URL, R.drawable.b2);</div><div class="line">               intent.putExtra(EXTRA_IMAGE_TITLE, <span class="string">"使用ActivityCompat动画"</span>);</div><div class="line">               ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.</div><div class="line">                       makeSceneTransitionAnimation(getActivity(), view, TRANSIT_PIC);</div><div class="line">               <span class="keyword">try</span> &#123;</div><div class="line">                   ActivityCompat.startActivity(getActivity(), intent, optionsCompat.toBundle()); <span class="comment">//据说部分三星手机上会失效</span></div><div class="line">               &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">                   e.printStackTrace();</div><div class="line">                   ToastUtils.showTextShort(getActivity(), <span class="string">"ActivityCompat出错！！"</span>);</div><div class="line">                   startActivity(intent);</div><div class="line">               &#125;</div></pre></td></tr></table></figure>
+<p>Pair这个class是v4包里的一个Util类，用来装载一组(pair)对象，支持泛型，很好用。由于都是v4包里的方法，省去了做API版本判断，在API 16以下，就只会调用普通的startActivity方法。上面加了try catch是避免部分手机上出现问题</p>
+<p>B activity中onCreate调用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ViewCompat.setTransitionName(binding.imageDetail, TRANSIT_PIC);</div></pre></td></tr></table></figure>
+<p>就可实现普通的转场动画。</p>
+<ul>
+<li><p>兼容方式(将连续的Transition带到API16以下)</p>
+<p>主要的原理: 在A activity中记录要带到B activity中的View的当前位置，在B activity中添加onPredrawListener(measure完毕，layout完毕，即将开始Draw的时候)，此时开始进行动画，将SharedView从原位置animate到B Activty中的位置</p>
+<p>原理及详细代码在这里:</p>
+<p> <a href="https://www.youtube.com/watch?v=CPxkoe2MraA" target="_blank" rel="external">Dev Bytes Activity Animations Youtube</a> 我照着写了一些关于Activity Transition的模板，<a href="https://github.com/Haldir65/CustomActivityTransition" target="_blank" rel="external">gitHub</a> 基本能实现兼容到API 16以下的效果</p>
+</li>
+<li><p>最后是这几天遇到的天坑</p>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState, PersistableBundle persistentState)</span> </span>&#123;</div><div class="line">    <span class="keyword">super</span>.onCreate(savedInstanceState, persistentState);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这样的Activity绝对会出ClassNotFoundException , 而且并不会主动出现在logcat中</p>
+<ul>
+<li>overridePendingTransaction要在startActivity以及finish之后才能调用</li>
+</ul>
+<p>gitHub上有一个比较好的<a href="https://github.com/takahirom/PreLollipopTransition" target="_blank" rel="external">兼容库</a>，大致原理也是使用onPreDrawListener</p>
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      <a href="/2016/09/27/activity-transition-pre-and-post-lollipop/" class="archive-article-date">
+  	<time datetime="2016-09-27T06:53:25.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-09-27</time>
+</a>
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags"></i>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/android/">android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/transition/">transition</a></li></ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+	<i class="icon-price-tags"></i>
+	<a class="article-category-link" href="/categories/技术/">技术</a>
+	</div>
+
+
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+  
+<nav id="article-nav">
+  
+    <a href="/2016/09/27/git-manual/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          git常用手册
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/09/23/selectableItemBackground-foreground/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">android使用selectableItemBackground的一些坑</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+
+
+<div class="share_jia">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">Share to: &nbsp; </span>
+		<a class="jiathis_button_facebook"></a> 
+	    <a class="jiathis_button_twitter"></a>
+	    <a class="jiathis_button_plus"></a> 
+	    <a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+    <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+
+
+
+
+
+
+      </div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2016 Haldir
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    <script>
+	var yiliaConfig = {
+		fancybox: true,
+		mathjax: false,
+		animate: false,
+		isHome: false,
+		isPost: true,
+		isArchive: false,
+		isTag: false,
+		isCategory: false,
+		open_in_new: true,
+		root: "/"
+	}
+</script>
+
+<script src="/./main.js"></script>
+
+
+
+
+
+    
+<div class="tools-col">
+  <ul class="btn-wrap">
+    
+      <li class="chose" data-hook="tools-section-all"><span class="text">全部</span><i class="icon-book"></i></li>
+    
+    
+      <li data-hook="tools-section-tag"><span class="text">标签</span><i class="icon-price-tags"></i></li>
+    
+    
+      <li data-hook="tools-section-friends"><span class="text">友链</span><i class="icon-link"></i></li>
+    
+    
+      <li data-hook="tools-section-me"><span class="text">我</span><i class="icon-smile"></i></li>
+    
+  </ul>
+  <div class="tools-wrap">
+    
+    	<section class="tools-section tools-section-all chose">
+    	</section>
+    
+
+    
+    	<section class="tools-section tools-section-tag">
+    			<div class="widget tagcloud" id="js-tagcloud">
+    				<a href="/tags/Android/" style="font-size: 10px;">Android</a> <a href="/tags/Butterknife/" style="font-size: 10px;">Butterknife</a> <a href="/tags/Handler-Message/" style="font-size: 10px;">Handler Message</a> <a href="/tags/RecyclerView/" style="font-size: 10px;">RecyclerView</a> <a href="/tags/TouchEvent/" style="font-size: 15px;">TouchEvent</a> <a href="/tags/Window/" style="font-size: 10px;">Window</a> <a href="/tags/android/" style="font-size: 20px;">android</a> <a href="/tags/android-7/" style="font-size: 10px;">android 7</a> <a href="/tags/databinding/" style="font-size: 10px;">databinding</a> <a href="/tags/foreground/" style="font-size: 10px;">foreground</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/service/" style="font-size: 10px;">service</a> <a href="/tags/statusBar/" style="font-size: 10px;">statusBar</a> <a href="/tags/transition/" style="font-size: 10px;">transition</a> <a href="/tags/坐标/" style="font-size: 10px;">坐标</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
+    			</div>
+    	</section>
+    
+
+    
+    	<section class="tools-section tools-section-friends">
+  		
+  			<div class="friends-wrap" id="js-friends">
+  			
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接1</a>
+  	        
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接2</a>
+  	        
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接3</a>
+  	        
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接4</a>
+  	        
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接5</a>
+  	        
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接6</a>
+  	        
+  	        </div>
+  		
+    	</section>
+    
+
+    
+    	<section class="tools-section tools-section-me">
+  	  	
+  	  		<div class="aboutme-wrap" id="js-aboutme">很惭愧&lt;br&gt;&lt;br&gt;只做了一点微小的工作&lt;br&gt;谢谢大家</div>
+  	  	
+    	</section>
+    
+  </div>
+  
+</div>
+    <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+  </div>
+</body>
+</html>

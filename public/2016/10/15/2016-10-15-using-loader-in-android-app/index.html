@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+  <title>使用Loader进行异步数据操作 | Haldir的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="App中经常有这样的需求:进入一个页面，首先查询数据库，如果数据库数据有效，直接使用数据库数据。否则去网络查询数据，网络数据返回后重新加载数据。很显然，这里的查询数据库和网络请求都需要放到子线程去操作，异步了。android推荐使用Loader进行数据查询，最大的好处就是Laoder会处理好与生命周期相关的事情，Android Developers推出过关于Loaders的介绍视频，Loader就">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Loader进行异步数据操作">
+<meta property="og:url" content="http://haldir65.github.io/2016/10/15/2016-10-15-using-loader-in-android-app/index.html">
+<meta property="og:site_name" content="Haldir的博客">
+<meta property="og:description" content="App中经常有这样的需求:进入一个页面，首先查询数据库，如果数据库数据有效，直接使用数据库数据。否则去网络查询数据，网络数据返回后重新加载数据。很显然，这里的查询数据库和网络请求都需要放到子线程去操作，异步了。android推荐使用Loader进行数据查询，最大的好处就是Laoder会处理好与生命周期相关的事情，Android Developers推出过关于Loaders的介绍视频，Loader就">
+<meta property="og:updated_time" content="2016-10-23T10:39:34.619Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用Loader进行异步数据操作">
+<meta name="twitter:description" content="App中经常有这样的需求:进入一个页面，首先查询数据库，如果数据库数据有效，直接使用数据库数据。否则去网络查询数据，网络数据返回后重新加载数据。很显然，这里的查询数据库和网络请求都需要放到子线程去操作，异步了。android推荐使用Loader进行数据查询，最大的好处就是Laoder会处理好与生命周期相关的事情，Android Developers推出过关于Loaders的介绍视频，Loader就">
+  
+    <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="//favicon.png">
+  
+  <script src="/style.js"></script>
+</head>
+
+<body>
+  <div id="container">
+    <div class="left-col">
+      <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			
+			<img src="http://odzl05jxx.bkt.clouddn.com/bolg_avatar.jpg" class="js-avatar show" style="width: 100%;height: 100%;opacity: 1;">
+			
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">Haldir</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">Android狗，python学习中</p>
+		
+
+		<nav class="header-menu">
+			<ul>
+			
+				<li><a href="/">主页</a></li>
+	        
+				<li><a href="/tags/android">文章</a></li>
+	        
+			</ul>
+		</nav>
+		<nav class="header-smart-menu">
+	        
+    		
+    			
+    			<a class="js-smart-menu" data-idx="0" href="javascript:void(0)">主页</a>
+    			
+    			
+            
+    			
+    			<a class="js-smart-menu" data-idx="1" href="javascript:void(0)">标签</a>
+    			
+    			
+            
+    			
+    			<a class="js-smart-menu" data-idx="2" href="javascript:void(0)">友链</a>
+    			
+    			
+            
+    			
+    			<a class="js-smart-menu" data-idx="3" href="javascript:void(0)">关于我</a>
+    			
+    			
+            
+		</nav>
+		<nav class="header-nav">
+			<div class="social">
+				
+					<a class="github" target="_blank" href="https://github.com/Haldir65" title="github">github</a>
+		        
+					<a class="weibo" target="_blank" href="#" title="weibo">weibo</a>
+		        
+					<a class="rss" target="_blank" href="#" title="rss">rss</a>
+		        
+					<a class="zhihu" target="_blank" href="#" title="zhihu">zhihu</a>
+		        
+			</div>
+		</nav>
+	</header>		
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"><i class="icon-list"></i></div>
+  		<h1 class="header-author js-mobile-header hide">Haldir</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				
+					<img src="nullhttp://odzl05jxx.bkt.clouddn.com/bolg_avatar.jpg" class="js-avatar" style="width: 100%;height: 100%;opacity: 1;">
+				
+			</div>
+			<hgroup>
+			  <h1 class="header-author">Haldir</h1>
+			</hgroup>
+			
+			<p class="header-subtitle">Android狗，python学习中</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/tags/android">文章</a></li>
+		        
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/Haldir65" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="#" title="weibo">weibo</a>
+			        
+						<a class="rss" target="_blank" href="#" title="rss">rss</a>
+			        
+						<a class="zhihu" target="_blank" href="#" title="zhihu">zhihu</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+
+      <div class="body-wrap">
+        <article id="post-2016-10-15-using-loader-in-android-app" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      使用Loader进行异步数据操作
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>App中经常有这样的需求:<br>进入一个页面，首先查询数据库，如果数据库数据有效，直接使用数据库数据。否则去网络查询数据，网络数据返回后重新加载数据。<br>很显然，这里的查询数据库和网络请求都需要放到子线程去操作，异步了。android推荐使用Loader进行数据查询，最大的好处就是Laoder会处理好与生命周期相关的事情，Android Developers推出过关于Loaders的<a href="https://www.youtube.com/watch?v=s4eAtMHU5gI&amp;index=8&amp;list=PLWz5rJ2EKKc9CBxr3BVjPTPoDPLdPIFCE" target="_blank" rel="external">介绍视频</a>，Loader就是为了解决这种问题而推出的，Loader具有几点好处</p>
+<ol>
+<li>如果Activity挂掉了，Activity中启动了的线程怎么办，如果不处理好有可能导致leak。</li>
+<li>activity挂了，而子线程中持有View的强引用，此时再去更新View已经没有意义，View已经不可见了</li>
+<li>这条线程所做的工作，加载的资源都白白浪费了，下次还需要重新加载一遍。<a id="more"></a>
+</li>
+</ol>
+<h3 id="1-自定义一个Loader-加载数据类型，Cache处理等"><a href="#1-自定义一个Loader-加载数据类型，Cache处理等" class="headerlink" title="1. 自定义一个Loader(加载数据类型，Cache处理等)"></a>1. 自定义一个Loader(加载数据类型，Cache处理等)</h3><p>Loader的使用就像一个AsyncTask一样，可以提前指定需要在异步线程中做的事情、数据类型以及完成加载后将数据推送到主线程。谷歌给出了一个使用Loader来查询手机上安装的App并显示在一个ListView中的DemoApp，虽然是好几年前的东西了，并且使用的是V4包里的Loader,但还是值得学习。<br>首先来看自定义的AppListLoader</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AppListLoader</span> <span class="keyword">extends</span> <span class="title">AsyncTaskLoader</span>&lt;<span class="title">List</span>&lt;<span class="title">AppEntry</span>&gt;&gt; </span>&#123; <span class="comment">//AsynTaskLoader支持泛型，AppEntry是已安装App信息的包装类。</span></div><div class="line">    <span class="keyword">private</span> List&lt;AppEntry&gt; mApps;</div><div class="line">    <span class="comment">//查询的App列表保存为成员变量</span></div><div class="line">    <span class="keyword">final</span> PackageManager mPm;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> DEBUG = <span class="keyword">true</span>;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String TAG = AppListLoader.class.getSimpleName();</div><div class="line"></div><div class="line">    <span class="comment">//构造函数</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">AppListLoader</span><span class="params">(Context ctx)</span> </span>&#123;</div><div class="line">        <span class="comment">// Loaders may be used across multiple Activitys (assuming they aren't</span></div><div class="line">        <span class="comment">// bound to the LoaderManager), so NEVER hold a reference to the context</span></div><div class="line">        <span class="comment">// directly. Doing so will cause you to leak an entire Activity's context.</span></div><div class="line">        <span class="comment">// The superclass constructor will store a reference to the Application</span></div><div class="line">        <span class="comment">// Context instead, and can be retrieved with a call to getContext().</span></div><div class="line">        <span class="keyword">super</span>(ctx);</div><div class="line">        <span class="comment">//第一，这里运行在主线程上；</span></div><div class="line">        <span class="comment">//第二，传进来的context(一般是Activity只是为了获取ApplicationContext)</span></div><div class="line">        mPm = getContext().getPackageManager();<span class="comment">//getContext()返回的是Application的Context。</span></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> List&lt;AppEntry&gt; <span class="title">loadInBackground</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (DEBUG) Log.i(TAG, <span class="string">"+++ loadInBackground() called! +++"</span>);</div><div class="line">        LogUtil.p(<span class="string">""</span>);<span class="comment">// 子线程,耗时的工作放到这里</span></div><div class="line">        <span class="comment">// Retrieve all installed applications.</span></div><div class="line">        List&lt;ApplicationInfo&gt; apps = mPm.getInstalledApplications(<span class="number">0</span>);<span class="comment">//PackageManager的方法</span></div><div class="line">        <span class="keyword">if</span> (apps == <span class="keyword">null</span>) &#123;</div><div class="line">            apps = <span class="keyword">new</span> ArrayList&lt;ApplicationInfo&gt;();</div><div class="line">        &#125;</div><div class="line">        <span class="comment">// Create corresponding array of entries and load their labels.</span></div><div class="line">        List&lt;AppEntry&gt; entries = <span class="keyword">new</span> ArrayList&lt;AppEntry&gt;(apps.size());</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; apps.size(); i++) &#123;</div><div class="line">            AppEntry entry = <span class="keyword">new</span> AppEntry(<span class="keyword">this</span>, apps.get(i));</div><div class="line">            entry.loadLabel(getContext());</div><div class="line">            entries.add(entry);</div><div class="line">        &#125;</div><div class="line">        <span class="comment">// Sort the list.</span></div><div class="line">        Collections.sort(entries, ALPHA_COMPARATOR);</div><div class="line">        <span class="keyword">return</span> entries;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">deliverResult</span><span class="params">(List&lt;AppEntry&gt; apps)</span> </span>&#123;</div><div class="line">        <span class="comment">//运行在主线程上</span></div><div class="line">        <span class="keyword">if</span> (isReset()) &#123;<span class="comment">//这里就类似于AsyncTask的onPostExecute了，把子线程处理好的数据推送到主线程</span></div><div class="line">            <span class="keyword">if</span> (DEBUG)</div><div class="line">                Log.w(TAG, <span class="string">"+++ Warning! An async query came in while the Loader was reset! +++"</span>);</div><div class="line">            <span class="comment">// The Loader has been reset; ignore the result and invalidate the data.</span></div><div class="line">            <span class="comment">// This can happen when the Loader is reset while an asynchronous query</span></div><div class="line">            <span class="comment">// is working in the background. That is, when the background thread</span></div><div class="line">            <span class="comment">// finishes its work and attempts to deliver the results to the client,</span></div><div class="line">            <span class="comment">// it will see here that the Loader has been reset and discard any</span></div><div class="line">            <span class="comment">// resources associated with the new data as necessary.</span></div><div class="line">            <span class="keyword">if</span> (apps != <span class="keyword">null</span>) &#123;</div><div class="line">                releaseResources(apps);</div><div class="line">                <span class="keyword">return</span>;</div><div class="line">            &#125;</div><div class="line">        &#125;<span class="comment">//如果调用了reset()方法，说明子线程加载的数据是无效的，释放资源，处理无效数据</span></div><div class="line">        <span class="comment">// Hold a reference to the old data so it doesn't get garbage collected.</span></div><div class="line">        <span class="comment">// We must protect it until the new data has been delivered.</span></div><div class="line">        List&lt;AppEntry&gt; oldApps = mApps;</div><div class="line">        mApps = apps;</div><div class="line">        <span class="keyword">if</span> (isStarted()) &#123;<span class="comment">// 如果一切正常，即调用了startLoading且stopLoading和reset均为被调用</span></div><div class="line">            <span class="keyword">if</span> (DEBUG) Log.i(TAG, <span class="string">"+++ Delivering results to the LoaderManager for"</span> +</div><div class="line">                    <span class="string">" the ListFragment to display! +++"</span>);</div><div class="line">            <span class="comment">// If the Loader is in a started state, have the superclass deliver the</span></div><div class="line">            <span class="comment">// results to the client.</span></div><div class="line">            <span class="keyword">super</span>.deliverResult(apps);</div><div class="line">        &#125;</div><div class="line">        <span class="comment">// Invalidate the old data as we don't need it any more.</span></div><div class="line">        <span class="keyword">if</span> (oldApps != <span class="keyword">null</span> &amp;&amp; oldApps != apps) &#123;</div><div class="line">            <span class="keyword">if</span> (DEBUG) Log.i(TAG, <span class="string">"+++ Releasing any old data associated with this Loader. +++"</span>);</div><div class="line">            releaseResources(oldApps);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>到此，数据加载的Server端算是完成，这里注意调用到了isReset()、isStarted()等方法，这些就是Server端在在处理Client端生命周期是需要注意的，这个后面再说。</p>
+<h3 id="2-使用LoaderManager管理Loader"><a href="#2-使用LoaderManager管理Loader" class="headerlink" title="2. 使用LoaderManager管理Loader"></a>2. 使用LoaderManager管理Loader</h3><p>我们使用LoaderManager在Activity或Fragment中与Loader交互。通常在onCreate或者onActivityCreated中:</p>
+<blockquote>
+<p>getSupportedLoaderManager.initLoader()//Activity中<br>getLoaderManager() //Fragment中</p>
+</blockquote>
+<p>这里介绍在Fragment中的使用，因为Loader处理好了与Activity,Fragment甚至Child Fragment的生命周期。<br>推荐使用v4包里的Loader，Loader是在Android3.0引入FrameWork中的，但v4包让Loadder在更早的版本上也有相应的API。更重要的是，v4 包中的Loader是伴随着v4包新的release step，也就是说v4包会与时俱进修复其中的bug。<br>这一点在medium上有<a href="https://medium.com/google-developers/making-loading-data-on-android-lifecycle-aware-897e12760832#.wrh1ciyts" target="_blank" rel="external">介绍</a> 。<br>再看一下这个方法</p>
+<blockquote>
+<p> public abstract <d> Loader<d> initLoader(int id, Bundle args,<br>            LoaderManager.LoaderCallbacks<d> callback);</d></d></d></p>
+</blockquote>
+<p>Demo中使用的是Fragment：</p>
+<blockquote>
+<p> // Initialize a Loader with id ‘1’. If the Loader with this id already<br>            // exists, then the LoaderManager will reuse the existing Loader.<br>            getLoaderManager().initLoader(LOADER_ID, null, this);            </p>
+</blockquote>
+<p>相对应的Fragment需要implements  LoaderManager.LoaderCallbacks<list<appentry>&gt; //注意泛型<br>这个接口有三个方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"> <span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">LoaderCallbacks</span>&lt;<span class="title">D</span>&gt; </span>&#123;</div><div class="line">       </div><div class="line">        <span class="function"><span class="keyword">public</span> Loader&lt;D&gt; <span class="title">onCreateLoader</span><span class="params">(<span class="keyword">int</span> id, Bundle args)</span></span>;</div><div class="line"></div><div class="line">       </div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onLoadFinished</span><span class="params">(Loader&lt;D&gt; loader, D data)</span></span>;</div><div class="line"></div><div class="line">       </div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onLoaderReset</span><span class="params">(Loader&lt;D&gt; loader)</span></span>;</div><div class="line">    &#125;</div><div class="line">```			</div><div class="line">看一下Demo中是如何实现的</div><div class="line">```java</div><div class="line">   <span class="meta">@Override</span></div><div class="line">        <span class="keyword">public</span> android.support.v4.content.Loader&lt;List&lt;AppEntry&gt;&gt; onCreateLoader(<span class="keyword">int</span> id, Bundle args) &#123;</div><div class="line">            <span class="keyword">if</span> (DEBUG) Log.i(TAG, <span class="string">"+++ onCreateLoader() called! +++"</span>);</div><div class="line">            <span class="keyword">return</span> <span class="keyword">new</span> AppListLoader(getActivity());</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onLoadFinished</span><span class="params">(android.support.v4.content.Loader&lt;List&lt;AppEntry&gt;&gt; loader, List&lt;AppEntry&gt; data)</span> </span>&#123;</div><div class="line">            <span class="keyword">if</span> (DEBUG) Log.i(TAG, <span class="string">"+++ onLoadFinished() called! +++"</span>);</div><div class="line">            mAdapter.setData(data);<span class="comment">//加载数据到UI</span></div><div class="line"></div><div class="line">            <span class="keyword">if</span> (isResumed()) &#123;</div><div class="line">                setListShown(<span class="keyword">true</span>);</div><div class="line">            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                setListShownNoAnimation(<span class="keyword">true</span>);</div><div class="line">            &#125; </div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onLoaderReset</span><span class="params">(android.support.v4.content.Loader&lt;List&lt;AppEntry&gt;&gt; loader)</span> </span>&#123;</div><div class="line">            <span class="keyword">if</span> (DEBUG) Log.i(TAG, <span class="string">"+++ onLoadReset() called! +++"</span>);</div><div class="line">            mAdapter.setData(<span class="keyword">null</span>);<span class="comment">//loader被reset，UI这边需要清除所有与Loader数据相关的引用，但清除数据的任务会由Loader处理好</span></div><div class="line">        &#125;</div></pre></td></tr></table></figure></list<appentry></p>
+<p>在三个明显的回调中处理好数据绑定到UI及过期数据的清理即可。</p>
+<h3 id="3-处理Activity生命周期的问题"><a href="#3-处理Activity生命周期的问题" class="headerlink" title="3. 处理Activity生命周期的问题"></a>3. 处理Activity生命周期的问题</h3><p>回到server端(Loader),AsyncTaskLoader是一个abstract class，loadInBackground方法已经实现了，但还有几个方法强调必须要复写或者与生命周期相关<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line">   <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onStartLoading</span><span class="params">()</span> </span>&#123;</div><div class="line">       <span class="comment">/* Subclasses must implement this to take care of loading their data,</span></div><div class="line">         as per &#123;@link #startLoading()&#125;.  This is not called by clients directly,</div><div class="line">         but as a result of a call to &#123;@link #startLoading()&#125;.*/</div><div class="line">       <span class="comment">//在这里检查一下成员变量中的数据是否不为空，有数据的话，deliverResults</span></div><div class="line">   &#125;</div><div class="line"></div><div class="line">   <span class="meta">@Override</span></div><div class="line">   <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onStopLoading</span><span class="params">()</span> </span>&#123;</div><div class="line">         <span class="comment">/*Subclasses must implement this to take care of stopping their loader,</span></div><div class="line">         as per &#123;@link #stopLoading()&#125;.  This is not called by clients directly,</div><div class="line">         but as a result of a call to &#123;@link #stopLoading()&#125;.</div><div class="line">         This will always be called from the process's main thread.*/</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   <span class="meta">@Override</span></div><div class="line">   <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onReset</span><span class="params">()</span> </span>&#123;</div><div class="line">       <span class="comment">/* Subclasses must implement this to take care of resetting their loader,</span></div><div class="line">        as per &#123;@link #reset()&#125;.  This is not called by clients directly,</div><div class="line">        but as a result of a call to &#123;@link #reset()&#125;.</div><div class="line">        This will always be called from the process's main thread.</div><div class="line">        如果调用了destoryLoader或者Loader相关联的Activity/Fragment被destory了</div><div class="line">        所以在Demo中可以看到onReset里面调用了onStopLoading去取消当前任务，同时释放资源，取消广播注册*/</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   <span class="meta">@Override</span></div><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCanceled</span><span class="params">(List&lt;AppEntry&gt; apps)</span> </span>&#123;</div><div class="line">        <span class="comment">/* Called if the task was canceled before it was completed.  Gives the class a chance</span></div><div class="line">         to clean up post-cancellation and to properly dispose of the result.</div><div class="line">        </div><div class="line">         @param data The value that was returned by &#123;@link #loadInBackground&#125;, or null</div><div class="line">         if the task threw &#123;@link OperationCanceledException&#125;.*/</div><div class="line">       <span class="comment">//在这里释放资源</span></div><div class="line">   &#125;</div><div class="line"></div><div class="line">   <span class="meta">@Override</span></div><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">forceLoad</span><span class="params">()</span> </span>&#123;</div><div class="line">       <span class="comment">/*Force an asynchronous load. Unlike &#123;@link #startLoading()&#125; this will ignore a previously</span></div><div class="line">       loaded data set and load a new one.  This simply calls through to the</div><div class="line">       implementation's &#123;@link #onForceLoad()&#125;.  You generally should only call this</div><div class="line">       when the loader is started -- that is, &#123;@link #isStarted()&#125; returns true.</div><div class="line">       Must be called from the process's main thread.*/</div><div class="line">       <span class="comment">//startLoading会直接使用onConfigurationchange之前的Activity中Loader加载的数据，但这里则放弃旧的数据，重新加载，所以isStarted会在这时返回true</span></div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
+<p>考虑一下，如果在加载数据过程中数据源发生了变化，比如在扫描已安装App过程中又安装了新的App怎么办？所以这里又注册了两个广播，在onReceive的时候调用</p>
+<blockquote>
+<pre><code>mLoader.onContentChanged();
+</code></pre><p>//这会直接调用forceLoad（Loader已经started）或者设置一个标志位，让takeContentChanged（）返回true<br>在onStartLoading中发现这个为true，直接forceLoad<br>//接下来进入loadInBackground,完成后进入deliverResult<br>deliverResult首先检查Activity是否destoryed(挂了直接释放资源),没挂的话判断下isStarted(是否一切正常，未调用过stopLoading或reset)，符合条件的话通过super.deliverResult把数据传递出去。接下来判断下之前的旧数据和新数据是否一致，否则释放掉旧数据</p>
+</blockquote>
+<p>整个过程考虑到了数据的有效性，资源的释放，在Loader这一端，通过isReset,isStarted等方法确保了不确定的数据加载过程能够和不确定的生命周期和谐共处。<br>网上看到的关于Loader的文章大部分是关于CursorLoader的，也就是和数据库打交道的那一块，这里不细说。主要是目前没有看到太多App中使用这种加载模式，可能确实有点麻烦。在Medium上看到这篇文章，觉得还是有必要做一些记录的。</p>
+<h3 id="4-关于性能"><a href="#4-关于性能" class="headerlink" title="4. 关于性能"></a>4. 关于性能</h3><p>最后我想说的是，AsyncTaskLoader内部使用的还是AsyncTask那一套，关于AsyncTask的串行和并行的讨论网上有很多。于是我看了下AsyncTaskLoader中最终调用AsyncTask的execute方法:</p>
+<blockquote>
+<p> mTask.executeOnExecutor(mExecutor, (Void[]) null);</p>
+</blockquote>
+<p>至于这个mExecutor的本质:</p>
+<blockquote>
+<p>public static final Executor THREAD_POOL_EXECUTOR<br>            = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE,<br>                    TimeUnit.SECONDS, sPoolWorkQueue, sThreadFactory);<br>CORE_POOL_SIZE = 5<br>嗯，并行的线程池，性能应该还不错。<br>学过rxjava，是否rxjava会是一种比loader更好的加载数据的方式呢</p>
+</blockquote>
+<h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><ol>
+<li><a href="http://huxian99.github.io/2015/10/28/RxJava%E7%9A%84Android%E5%BC%80%E5%8F%91%E4%B9%8B%E8%B7%AF-RxJava%E5%AE%9E%E6%88%98-%E4%BA%8C/" target="_blank" rel="external">rxLoader</a></li>
+<li><a href="https://medium.com/google-developers/making-loading-data-on-android-lifecycle-aware-897e12760832#.btjs9ady6" target="_blank" rel="external">making loading data on android lifecycle aware</a></li>
+<li><a href="https://github.com/alexjlockwood/adp-applistloader" target="_blank" rel="external">AppListLoader</a></li>
+</ol>
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      <a href="/2016/10/15/2016-10-15-using-loader-in-android-app/" class="archive-article-date">
+  	<time datetime="2016-10-15T11:12:22.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-10-15</time>
+</a>
+      
+      
+
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+  
+<nav id="article-nav">
+  
+    <a href="/2016/10/20/2016-10-20-RecyclerViewAnimationStuff/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          使用RecyclerView的Animation
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/10/14/2016-10-14-Android-translucent-status-bar/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">fitSystemWindow和沉浸式状态栏的一些总结</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+
+
+<div class="share_jia">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">Share to: &nbsp; </span>
+		<a class="jiathis_button_facebook"></a> 
+	    <a class="jiathis_button_twitter"></a>
+	    <a class="jiathis_button_plus"></a> 
+	    <a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+    <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+
+
+
+
+
+
+      </div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2016 Haldir
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    <script>
+	var yiliaConfig = {
+		fancybox: true,
+		mathjax: false,
+		animate: false,
+		isHome: false,
+		isPost: true,
+		isArchive: false,
+		isTag: false,
+		isCategory: false,
+		open_in_new: true,
+		root: "/"
+	}
+</script>
+
+<script src="/./main.js"></script>
+
+
+
+
+
+    
+<div class="tools-col">
+  <ul class="btn-wrap">
+    
+      <li class="chose" data-hook="tools-section-all"><span class="text">全部</span><i class="icon-book"></i></li>
+    
+    
+      <li data-hook="tools-section-tag"><span class="text">标签</span><i class="icon-price-tags"></i></li>
+    
+    
+      <li data-hook="tools-section-friends"><span class="text">友链</span><i class="icon-link"></i></li>
+    
+    
+      <li data-hook="tools-section-me"><span class="text">我</span><i class="icon-smile"></i></li>
+    
+  </ul>
+  <div class="tools-wrap">
+    
+    	<section class="tools-section tools-section-all chose">
+    	</section>
+    
+
+    
+    	<section class="tools-section tools-section-tag">
+    			<div class="widget tagcloud" id="js-tagcloud">
+    				<a href="/tags/Android/" style="font-size: 10px;">Android</a> <a href="/tags/Butterknife/" style="font-size: 10px;">Butterknife</a> <a href="/tags/Handler-Message/" style="font-size: 10px;">Handler Message</a> <a href="/tags/RecyclerView/" style="font-size: 10px;">RecyclerView</a> <a href="/tags/TouchEvent/" style="font-size: 15px;">TouchEvent</a> <a href="/tags/Window/" style="font-size: 10px;">Window</a> <a href="/tags/android/" style="font-size: 20px;">android</a> <a href="/tags/android-7/" style="font-size: 10px;">android 7</a> <a href="/tags/databinding/" style="font-size: 10px;">databinding</a> <a href="/tags/foreground/" style="font-size: 10px;">foreground</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/service/" style="font-size: 10px;">service</a> <a href="/tags/statusBar/" style="font-size: 10px;">statusBar</a> <a href="/tags/transition/" style="font-size: 10px;">transition</a> <a href="/tags/坐标/" style="font-size: 10px;">坐标</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
+    			</div>
+    	</section>
+    
+
+    
+    	<section class="tools-section tools-section-friends">
+  		
+  			<div class="friends-wrap" id="js-friends">
+  			
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接1</a>
+  	        
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接2</a>
+  	        
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接3</a>
+  	        
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接4</a>
+  	        
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接5</a>
+  	        
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接6</a>
+  	        
+  	        </div>
+  		
+    	</section>
+    
+
+    
+    	<section class="tools-section tools-section-me">
+  	  	
+  	  		<div class="aboutme-wrap" id="js-aboutme">很惭愧&lt;br&gt;&lt;br&gt;只做了一点微小的工作&lt;br&gt;谢谢大家</div>
+  	  	
+    	</section>
+    
+  </div>
+  
+</div>
+    <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+  </div>
+</body>
+</html>

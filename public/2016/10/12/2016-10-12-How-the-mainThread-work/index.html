@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+  <title>主线程的工作原理 | Haldir的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="​    今天突然找到这样一个问题: “Handler的postDelayed会阻塞线程吗？”。基于自己之前对于Handler的线程间通讯机制的理解，还是不能给出明确的答案。正好打算把一篇关于主线程的工作原理的文章写出来，顺带看下能否把这个问题从源码的角度解释清楚。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="主线程的工作原理">
+<meta property="og:url" content="http://haldir65.github.io/2016/10/12/2016-10-12-How-the-mainThread-work/index.html">
+<meta property="og:site_name" content="Haldir的博客">
+<meta property="og:description" content="​    今天突然找到这样一个问题: “Handler的postDelayed会阻塞线程吗？”。基于自己之前对于Handler的线程间通讯机制的理解，还是不能给出明确的答案。正好打算把一篇关于主线程的工作原理的文章写出来，顺带看下能否把这个问题从源码的角度解释清楚。">
+<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/writing%20code%20that%20nobody%20else%20can%20read.jpg">
+<meta property="og:updated_time" content="2016-10-13T07:44:51.771Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="主线程的工作原理">
+<meta name="twitter:description" content="​    今天突然找到这样一个问题: “Handler的postDelayed会阻塞线程吗？”。基于自己之前对于Handler的线程间通讯机制的理解，还是不能给出明确的答案。正好打算把一篇关于主线程的工作原理的文章写出来，顺带看下能否把这个问题从源码的角度解释清楚。">
+<meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/writing%20code%20that%20nobody%20else%20can%20read.jpg">
+  
+    <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="//favicon.png">
+  
+  <script src="/style.js"></script>
+</head>
+
+<body>
+  <div id="container">
+    <div class="left-col">
+      <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			
+			<img src="http://odzl05jxx.bkt.clouddn.com/bolg_avatar.jpg" class="js-avatar show" style="width: 100%;height: 100%;opacity: 1;">
+			
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">Haldir</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">Android狗，python学习中</p>
+		
+
+		<nav class="header-menu">
+			<ul>
+			
+				<li><a href="/">主页</a></li>
+	        
+				<li><a href="/tags/android">文章</a></li>
+	        
+			</ul>
+		</nav>
+		<nav class="header-smart-menu">
+	        
+    		
+    			
+    			<a class="js-smart-menu" data-idx="0" href="javascript:void(0)">主页</a>
+    			
+    			
+            
+    			
+    			<a class="js-smart-menu" data-idx="1" href="javascript:void(0)">标签</a>
+    			
+    			
+            
+    			
+    			<a class="js-smart-menu" data-idx="2" href="javascript:void(0)">友链</a>
+    			
+    			
+            
+    			
+    			<a class="js-smart-menu" data-idx="3" href="javascript:void(0)">关于我</a>
+    			
+    			
+            
+		</nav>
+		<nav class="header-nav">
+			<div class="social">
+				
+					<a class="github" target="_blank" href="https://github.com/Haldir65" title="github">github</a>
+		        
+					<a class="weibo" target="_blank" href="#" title="weibo">weibo</a>
+		        
+					<a class="rss" target="_blank" href="#" title="rss">rss</a>
+		        
+					<a class="zhihu" target="_blank" href="#" title="zhihu">zhihu</a>
+		        
+			</div>
+		</nav>
+	</header>		
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"><i class="icon-list"></i></div>
+  		<h1 class="header-author js-mobile-header hide">Haldir</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				
+					<img src="nullhttp://odzl05jxx.bkt.clouddn.com/bolg_avatar.jpg" class="js-avatar" style="width: 100%;height: 100%;opacity: 1;">
+				
+			</div>
+			<hgroup>
+			  <h1 class="header-author">Haldir</h1>
+			</hgroup>
+			
+			<p class="header-subtitle">Android狗，python学习中</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/tags/android">文章</a></li>
+		        
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/Haldir65" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="#" title="weibo">weibo</a>
+			        
+						<a class="rss" target="_blank" href="#" title="rss">rss</a>
+			        
+						<a class="zhihu" target="_blank" href="#" title="zhihu">zhihu</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+
+      <div class="body-wrap">
+        <article id="post-2016-10-12-How-the-mainThread-work" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      主线程的工作原理
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="http://odzl05jxx.bkt.clouddn.com/writing%20code%20that%20nobody%20else%20can%20read.jpg" alt=""></p>
+<p>​    今天突然找到这样一个问题: “Handler的postDelayed会阻塞线程吗？”。基于自己之前对于Handler的线程间通讯机制的理解，还是不能给出明确的答案。正好打算把一篇关于主线程的工作原理的文章写出来，顺带看下能否把这个问题从源码的角度解释清楚。<a id="more"></a></p>
+<h3 id="1-从线程（Thread）开始"><a href="#1-从线程（Thread）开始" class="headerlink" title="1. 从线程（Thread）开始"></a>1. 从线程（Thread）开始</h3><p>通常，一个Process会有一个主线程, 而在Android中，UI控件相关的方法和一些系统callback都会发生在主线程上(onResume,onCreate,onStartCommand,onDraw, etc)。 如果App中使用了多个Process，则每个Process都会有一个主线程，但这不是今天的重点。<br>Android应用是如何启动的?<br>启动一个应用时，系统会从Zygote Process fork出一个新的Process，最终走到ActivityThread 的main方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line"><span class="comment">//省略部分无关代码</span></div><div class="line">       Looper.prepareMainLooper();</div><div class="line">       ActivityThread thread = <span class="keyword">new</span> ActivityThread();</div><div class="line">       thread.attach(<span class="keyword">false</span>);</div><div class="line">       <span class="keyword">if</span> (sMainThreadHandler == <span class="keyword">null</span>) &#123;</div><div class="line">           sMainThreadHandler = thread.getHandler();</div><div class="line">       &#125;</div><div class="line">       <span class="comment">// End of event ActivityThreadMain.</span></div><div class="line">       Looper.loop();</div><div class="line">       <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"Main thread loop unexpectedly exited"</span>);<span class="comment">//从这里可以猜到Looper.loop方法会一直执行下去</span></div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
+<p>看一下Looper.prepareMainLooper()方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="comment">/**</span></div><div class="line"> * Initialize the current thread as a looper, marking it as an</div><div class="line"> * application's main looper. The main looper for your application</div><div class="line"> * is created by the Android environment, so you should never need</div><div class="line"> * to call this function yourself.  See also: &#123;<span class="doctag">@link</span> #prepare()&#125;</div><div class="line"> */</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">prepareMainLooper</span><span class="params">()</span> </span>&#123;</div><div class="line">    prepare(<span class="keyword">false</span>);</div><div class="line">    <span class="keyword">synchronized</span> (Looper.class) &#123;</div><div class="line">        <span class="keyword">if</span> (sMainLooper != <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"The main Looper has already been prepared."</span>);</div><div class="line">        &#125;</div><div class="line">        sMainLooper = myLooper();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>大致意思就是为当前Thread添加一个Looper。<br>Looper.java是一个普通的class，其大致作用就是<strong>为当前Thread维持一个message loop</strong>，默认情况下一个Thread并没有一个Looper，要想添加一个，需要在该线程中调用Looper.prepare()，然后调用Looper.loop()方法即可让消息循环一直持续下去。大部分和message Loop的交互都是通过Handler这个类来进行的。例如<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">LooperThread</span> <span class="keyword">extends</span> <span class="title">Thread</span> </span>&#123;</div><div class="line">  *      <span class="keyword">public</span> Handler mHandler;</div><div class="line">  *</div><div class="line">  *      <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">  *          Looper.prepare();</div><div class="line">  *</div><div class="line">  *          mHandler = <span class="keyword">new</span> Handler() &#123;</div><div class="line">  *              <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</div><div class="line">  *                  <span class="comment">// 在这里处理消息</span></div><div class="line">  *              &#125;</div><div class="line">  *          &#125;;</div><div class="line">  *	</div><div class="line">  *          Looper.loop();</div><div class="line">    		<span class="comment">//这里面发送消息</span></div><div class="line">  *      &#125;</div><div class="line">  *  &#125;</div></pre></td></tr></table></figure></p>
+<p>Looper持有一个MessageQueue(消息队列)成员变量，消息循环时，Looper就不断地从消息队列中拿出消息进行处理。<br>下面来看Looper.loop()方法里所做的事：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/** 删除了部分不相关的代码</span></div><div class="line">   * Run the message queue in this thread. Be sure to call</div><div class="line">   * &#123;<span class="doctag">@link</span> #quit()&#125; to end the loop.</div><div class="line">   */</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">loop</span><span class="params">()</span> </span>&#123;</div><div class="line">      <span class="keyword">final</span> Looper me = myLooper();<span class="comment">//返回当前线程中对应的Looper，看看下面的Exception就知道了</span></div><div class="line">      <span class="keyword">if</span> (me == <span class="keyword">null</span>) &#123;</div><div class="line">          <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"No Looper; Looper.prepare() wasn't called on this thread."</span>);</div><div class="line">      &#125;</div><div class="line">      <span class="keyword">final</span> MessageQueue queue = me.mQueue;</div><div class="line">      <span class="keyword">for</span> (;;) &#123;</div><div class="line">          Message msg = queue.next(); <span class="comment">// might block</span></div><div class="line">          <span class="keyword">if</span> (msg == <span class="keyword">null</span>) &#123;</div><div class="line">              <span class="comment">// No message indicates that the message queue is quitting.</span></div><div class="line">              <span class="keyword">return</span>;</div><div class="line">          &#125;</div><div class="line">          <span class="keyword">try</span> &#123;</div><div class="line">              msg.target.dispatchMessage(msg);</div><div class="line">          &#125; <span class="keyword">finally</span> &#123;</div><div class="line">             ....省略</div><div class="line">          &#125;</div><div class="line">      &#125;</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
+<p>简单解释一下，也就是从消息队列中取出新的消息(msg)。交给msg.target.dispatchMessage(msg)<br>这个trarget是个Handler<br>来看下Handler里面的dispatchMessage方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line">    * Handle system messages here.</div><div class="line">    */</div><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">dispatchMessage</span><span class="params">(Message msg)</span> </span>&#123;</div><div class="line">       <span class="keyword">if</span> (msg.callback != <span class="keyword">null</span>) &#123;</div><div class="line">           handleCallback(msg);</div><div class="line">       &#125; <span class="keyword">else</span> &#123;</div><div class="line">           <span class="keyword">if</span> (mCallback != <span class="keyword">null</span>) &#123;</div><div class="line">               <span class="keyword">if</span> (mCallback.handleMessage(msg)) &#123;</div><div class="line">                   <span class="keyword">return</span>;</div><div class="line">               &#125;</div><div class="line">           &#125;</div><div class="line">           handleMessage(msg);</div><div class="line">       &#125;</div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
+<p>很明显是一个either or 的过程：<br>Message这个类里面有个Runnable callback，如果这个message有callback的话，就执行这个runnable，否则执行handler.callBack.handleMessage。也就是我们经常用的<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Handler handler = <span class="keyword">new</span> Handler()&#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</div><div class="line">                <span class="keyword">super</span>.handleMessage(msg);</div><div class="line">            &#125;</div><div class="line">        &#125;;</div></pre></td></tr></table></figure></p>
+<p>这种内部类的形式了<br>需要注意的是，Message最好不要用new，使用obtain方法获得，使用release方法释放，这里面有一个消息池的概念，我也不太理解。<br>MessageQueue中没有太多的公共方法，其中next()方法会返回</p>
+<blockquote>
+<p>message that should be processed. Will not return message that will be processed at future times.<br>Message有一个long类型的变量Message.when，指的是这条消息最早可以被执行的时间，这个时间是基于SystemClock.uptimeMills()的。所以如果消息队列中没有一条message到达自己的可执行时间, 这个next()方法就会一直block。值得注意的是SystemClock.uptimeMills是基于CPU活动时间的，如果cpu处于sleep状态，这个sleep时间是不算的。所以如果你postDelayed了10s，假设cpu5s后开始休眠，10s后醒来，睡眠的这段时间是不算的。所以真正执行的时间可能还会往后延迟。</p>
+</blockquote>
+<h3 id="2-Handler"><a href="#2-Handler" class="headerlink" title="2. Handler"></a>2. Handler</h3><p>Handler基本上就做两件事</p>
+<ol>
+<li>add message to the messageQueue of the Looper it’s associated with</li>
+</ol>
+<ul>
+<li>post()  //把一条消息添加到所有可以被执行的消息的最后面，但在还没到时间的消息的前面</li>
+<li>postDelayed()/postAtTime() //一个相对时间，一个绝对时间</li>
+<li>postAtFrontOfQueue() // @piwai 插队行为，不要用</li>
+</ul>
+<ol>
+<li>Handle message when this message doesn’t have callback<br>Handler的构造方法有7个,初始化时需要获得一个Looper<br>常用的Handler handler = new Handler() 会创建一个基于当前线程的Looper的Handler,如果当前线程没有调用Looper.Prepare，会抛出一个异常，这些在源代码里都能看到。<br>一些好用的构造函数<blockquote>
+<p>Handler (Looper.getMainLooper()) //往主线程的Looper的消息队列里发消息<br>Hanlder(Looper.myLooper()) //往当前线程Looper的消息队列里添加消息</p>
+</blockquote>
+</li>
+</ol>
+<h3 id="Choreographer"><a href="#Choreographer" class="headerlink" title="Choreographer"></a>Choreographer</h3><p>使用Android studio时，经常会在Logcat里看到这样的 info:</p>
+<blockquote>
+<p>Skipped 60 frames! The application may be doing too much work on its main thread</p>
+</blockquote>
+<p>这段log出自Chreographer ，大意就是主线程上做的事太多或者做了太多不该在主线程上做的事。至于为什么不要在主线程上做太多的事，来看看主线程都有哪些工作:<br>System Events , Input Events ,Application callback ,Services, Alarm ,UI Drawing….另外，当屏幕内容发生变化，或者在Animation运行中，系统将会尝试每隔16ms来Draw a Frame。而这部分工作是由Choregrapher来完成的，而其内部是通过一个Handler来进行Frame更新的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">FrameHandler mHandler = <span class="keyword">new</span> FrameHandler(Looper.myLooper());</div><div class="line">Message msg = mHandler.obtainMessage(MSG_DO_FRAME);</div><div class="line">msg.setAsynchronous(<span class="keyword">true</span>);</div><div class="line">mHandler.sendMessageAtTime(msg,nextFrameTime)</div><div class="line"></div><div class="line"> <span class="keyword">private</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">FrameHandler</span> <span class="keyword">extends</span> <span class="title">Handler</span> </span>&#123;</div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="title">FrameHandler</span><span class="params">(Looper looper)</span> </span>&#123;</div><div class="line">            <span class="keyword">super</span>(looper);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</div><div class="line">            <span class="keyword">switch</span> (msg.what) &#123;</div><div class="line">                <span class="keyword">case</span> MSG_DO_FRAME:</div><div class="line">                    doFrame(System.nanoTime(), <span class="number">0</span>);</div><div class="line">                    <span class="keyword">break</span>;</div><div class="line">                <span class="keyword">case</span> MSG_DO_SCHEDULE_VSYNC:</div><div class="line">                    doScheduleVsync();</div><div class="line">                    <span class="keyword">break</span>;</div><div class="line">                <span class="keyword">case</span> MSG_DO_SCHEDULE_CALLBACK:</div><div class="line">                    doScheduleCallback(msg.arg1);</div><div class="line">                    <span class="keyword">break</span>;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>假设你在onMeasure,onLayout,onDraw这些方法中耽误主线程太多时间，Choregrapher将不能及时的更新Frame，哪怕你只耽误了1ms，系统也只能在16ms(大约)之后才能更新下一Frame。</p>
+<h3 id="3-为了在开发中发现不应该在主线程中进行的操作-IO，网络-，可以使用StrictMode："><a href="#3-为了在开发中发现不应该在主线程中进行的操作-IO，网络-，可以使用StrictMode：" class="headerlink" title="3. 为了在开发中发现不应该在主线程中进行的操作(IO，网络)，可以使用StrictMode："></a>3. 为了在开发中发现不应该在主线程中进行的操作(IO，网络)，可以使用StrictMode：</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (BuildConfig.DEBUG) &#123;</div><div class="line">            StrictMode.setThreadPolicy(<span class="keyword">new</span> StrictMode.ThreadPolicy.Builder()</div><div class="line">                    .detectDiskReads()</div><div class="line">                    .detectDiskWrites()</div><div class="line">                    .detectNetwork()   <span class="comment">// or .detectAll() for all detectable problems</span></div><div class="line">                    .penaltyLog()</div><div class="line">                    .build());</div><div class="line">            StrictMode.setVmPolicy(<span class="keyword">new</span> StrictMode.VmPolicy.Builder()</div><div class="line">                    .detectLeakedSqlLiteObjects()</div><div class="line">                    .detectLeakedClosableObjects()</div><div class="line">                    .penaltyLog()</div><div class="line">                    .penaltyDeath()</div><div class="line">                    .build());</div><div class="line">        &#125;</div></pre></td></tr></table></figure>
+<h3 id="4-Activity-LifeCycle-Events"><a href="#4-Activity-LifeCycle-Events" class="headerlink" title="4 .Activity LifeCycle Events"></a>4 .Activity LifeCycle Events</h3><ul>
+<li>Activity LifeCycle Events(startActivity(), finishi()) go out of your process through Binder IPC to the ActivityManager //有时候startActivity启动的Activity不是自己Process的,比如调用系统相机这种</li>
+<li>Then back on to your main queue in the form of lifeCycle callbacks(onCreate(),onDestory() et_al) // 异步，异步！</li>
+</ul>
+<p>最后回到文章开头的那个问题：Handler.postDelay会阻塞线程吗？<br>答案在<a href="http://www.dss886.com/android/2016/08/17/17-18" target="_blank" rel="external">这里</a>找到了<br>postDelayed本身就是把一条消息推迟到相对时间多久之后。关键在Looper取出这条消息时，用的是</p>
+<blockquote>
+<p>Message msg = queue.next();  // might block</p>
+</blockquote>
+<p>注释已经暗示了可能会阻塞，看下next方法做了什么:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line">   <span class="function">Message <span class="title">next</span><span class="params">()</span> </span>&#123;</div><div class="line">   .....省略</div><div class="line">       <span class="keyword">for</span> (;;) &#123;</div><div class="line">           <span class="keyword">if</span> (nextPollTimeoutMillis != <span class="number">0</span>) &#123;</div><div class="line">               Binder.flushPendingCommands();</div><div class="line">           &#125;</div><div class="line"></div><div class="line">           nativePollOnce(ptr, nextPollTimeoutMillis);</div><div class="line"></div><div class="line">           <span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;</div><div class="line">               <span class="comment">// Try to retrieve the next message.  Return if found.</span></div><div class="line">               <span class="keyword">final</span> <span class="keyword">long</span> now = SystemClock.uptimeMillis();</div><div class="line">               Message prevMsg = <span class="keyword">null</span>;</div><div class="line">               Message msg = mMessages;</div><div class="line">               <span class="keyword">if</span> (msg != <span class="keyword">null</span> &amp;&amp; msg.target == <span class="keyword">null</span>) &#123;</div><div class="line">                   <span class="comment">// Stalled by a barrier.  Find the next asynchronous message in the queue.</span></div><div class="line">                   do &#123;</div><div class="line">                       prevMsg = msg;</div><div class="line">                       msg = msg.next;</div><div class="line">                   &#125; <span class="keyword">while</span> (msg != <span class="keyword">null</span> &amp;&amp; !msg.isAsynchronous());</div><div class="line">               &#125;</div><div class="line">               <span class="keyword">if</span> (msg != <span class="keyword">null</span>) &#123;</div><div class="line">                   <span class="keyword">if</span> (now &lt; msg.when) &#123;</div><div class="line">                       <span class="comment">// Next message is not ready.  Set a timeout to wake up when it is ready.</span></div><div class="line">                       nextPollTimeoutMillis = (<span class="keyword">int</span>) Math.min(msg.when - now, Integer.MAX_VALUE);</div><div class="line">                   &#125; <span class="keyword">else</span> &#123;</div><div class="line">                       <span class="comment">// Got a message.</span></div><div class="line">                       mBlocked = <span class="keyword">false</span>;</div><div class="line">                       <span class="keyword">if</span> (prevMsg != <span class="keyword">null</span>) &#123;</div><div class="line">                           prevMsg.next = msg.next;</div><div class="line">                       &#125; <span class="keyword">else</span> &#123;</div><div class="line">                           mMessages = msg.next;</div><div class="line">                       &#125;</div><div class="line">                       msg.next = <span class="keyword">null</span>;</div><div class="line">                       msg.markInUse();</div><div class="line">                       <span class="keyword">return</span> msg;</div><div class="line">                   &#125;</div><div class="line">               &#125; <span class="keyword">else</span> &#123;</div><div class="line">                   <span class="comment">// No more messages.</span></div><div class="line">                   nextPollTimeoutMillis = -<span class="number">1</span>;</div><div class="line">               &#125;</div><div class="line">....省略部分</div></pre></td></tr></table></figure></p>
+<p>首先进来 调用了nativePollOnce(ptr,nextPollTimeoutMillis);<br>这是个native方法，类似于线程的wait方法，不过使用了Native的方法会更加精准。可以认为是用native方法让这个queue.next的方法耗时延长了，所以return时返回的Message也就满足合适的时间。<br>往下看</p>
+<blockquote>
+<p> // Next message is not ready.  Set a timeout to wake up when it is ready.<br> nextPollTimeoutMillis = (int) Math.min(msg.when - now, Integer.MAX_VALUE);</p>
+</blockquote>
+<p>所以确实是blocked了。但这并不意味着从postDelayed(r,10)开始，接下来的10ms就真的完全堵塞了(queue.next阻塞)<br>PostDelayed最终会调用到enqueMessage方法，看一下:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;</div><div class="line">    <span class="keyword">if</span> (mQuitting) &#123;</div><div class="line">        IllegalStateException e = <span class="keyword">new</span> IllegalStateException(</div><div class="line">                msg.target + <span class="string">" sending message to a Handler on a dead thread"</span>);</div><div class="line">        Log.w(TAG, e.getMessage(), e);</div><div class="line">        msg.recycle();</div><div class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    msg.markInUse();</div><div class="line">    msg.when = when;</div><div class="line">    Message p = mMessages;</div><div class="line">    <span class="keyword">boolean</span> needWake;</div><div class="line">    <span class="keyword">if</span> (p == <span class="keyword">null</span> || when == <span class="number">0</span> || when &lt; p.when) &#123;</div><div class="line">        <span class="comment">// New head, wake up the event queue if blocked.</span></div><div class="line">        msg.next = p;</div><div class="line">        mMessages = msg;</div><div class="line">        needWake = mBlocked;</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        <span class="comment">// Inserted within the middle of the queue.  Usually we don't have to wake</span></div><div class="line">        <span class="comment">// up the event queue unless there is a barrier at the head of the queue</span></div><div class="line">        <span class="comment">// and the message is the earliest asynchronous message in the queue.</span></div><div class="line">        needWake = mBlocked &amp;&amp; p.target == <span class="keyword">null</span> &amp;&amp; msg.isAsynchronous();</div><div class="line">        Message prev;</div><div class="line">        <span class="keyword">for</span> (;;) &#123;</div><div class="line">            prev = p;</div><div class="line">            p = p.next;</div><div class="line">            <span class="keyword">if</span> (p == <span class="keyword">null</span> || when &lt; p.when) &#123;</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">if</span> (needWake &amp;&amp; p.isAsynchronous()) &#123;</div><div class="line">                needWake = <span class="keyword">false</span>;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        msg.next = p; <span class="comment">// invariant: p == prev.next</span></div><div class="line">        prev.next = msg;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// We can assume mPtr != 0 because mQuitting is false.</span></div><div class="line">    <span class="keyword">if</span> (needWake) &#123;</div><div class="line">        nativeWake(mPtr);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>注意nativeWake方法，在满足一定情况下会唤醒线程<br>总结一下就是postDelayed确实调用了阻塞线程的方法，但一旦消息队列前面插入了可执行的message，会调用唤醒线程的方法。这些大部分在MessageQueue这个class中，看一下基本都能明白。</p>
+<h4 id="回顾一下整个过程"><a href="#回顾一下整个过程" class="headerlink" title="回顾一下整个过程:"></a>回顾一下整个过程:</h4><p>主线程作为一个Thread，持有一个Looper对象，Looper持有一个MessageQueue的消息队列，并一个一个地从中取出满足执行时间条件的Message，执行Messgae的callback或者交给Handler的handleMessage去处理。</p>
+<h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><ol>
+<li><a href="http://www.dss886.com/android/2016/08/17/17-18" target="_blank" rel="external">Handler.postDelayed()是如何精确延迟指定时间的</a></li>
+<li><a href="https://www.youtube.com/watch?v=aFGbv9Ih9qQ" target="_blank" rel="external">How the Main Thread works</a></li>
+</ol>
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      <a href="/2016/10/12/2016-10-12-How-the-mainThread-work/" class="archive-article-date">
+  	<time datetime="2016-10-12T08:47:42.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-10-12</time>
+</a>
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags"></i>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Handler-Message/">Handler Message</a></li></ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+	<i class="icon-price-tags"></i>
+	<a class="article-category-link" href="/categories/Android/">Android</a>
+	</div>
+
+
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+  
+<nav id="article-nav">
+  
+    <a href="/2016/10/13/2016-10-13-Android-coordinate-System/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          安卓坐标系常用方法
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/10/10/theme-versus-style/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Theme和Style的区别</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+
+
+<div class="share_jia">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">Share to: &nbsp; </span>
+		<a class="jiathis_button_facebook"></a> 
+	    <a class="jiathis_button_twitter"></a>
+	    <a class="jiathis_button_plus"></a> 
+	    <a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+    <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+
+
+
+
+
+
+      </div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2016 Haldir
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    <script>
+	var yiliaConfig = {
+		fancybox: true,
+		mathjax: false,
+		animate: false,
+		isHome: false,
+		isPost: true,
+		isArchive: false,
+		isTag: false,
+		isCategory: false,
+		open_in_new: true,
+		root: "/"
+	}
+</script>
+
+<script src="/./main.js"></script>
+
+
+
+
+
+    
+<div class="tools-col">
+  <ul class="btn-wrap">
+    
+      <li class="chose" data-hook="tools-section-all"><span class="text">全部</span><i class="icon-book"></i></li>
+    
+    
+      <li data-hook="tools-section-tag"><span class="text">标签</span><i class="icon-price-tags"></i></li>
+    
+    
+      <li data-hook="tools-section-friends"><span class="text">友链</span><i class="icon-link"></i></li>
+    
+    
+      <li data-hook="tools-section-me"><span class="text">我</span><i class="icon-smile"></i></li>
+    
+  </ul>
+  <div class="tools-wrap">
+    
+    	<section class="tools-section tools-section-all chose">
+    	</section>
+    
+
+    
+    	<section class="tools-section tools-section-tag">
+    			<div class="widget tagcloud" id="js-tagcloud">
+    				<a href="/tags/Android/" style="font-size: 10px;">Android</a> <a href="/tags/Butterknife/" style="font-size: 10px;">Butterknife</a> <a href="/tags/Handler-Message/" style="font-size: 10px;">Handler Message</a> <a href="/tags/RecyclerView/" style="font-size: 10px;">RecyclerView</a> <a href="/tags/TouchEvent/" style="font-size: 15px;">TouchEvent</a> <a href="/tags/Window/" style="font-size: 10px;">Window</a> <a href="/tags/android/" style="font-size: 20px;">android</a> <a href="/tags/android-7/" style="font-size: 10px;">android 7</a> <a href="/tags/databinding/" style="font-size: 10px;">databinding</a> <a href="/tags/foreground/" style="font-size: 10px;">foreground</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/service/" style="font-size: 10px;">service</a> <a href="/tags/statusBar/" style="font-size: 10px;">statusBar</a> <a href="/tags/transition/" style="font-size: 10px;">transition</a> <a href="/tags/坐标/" style="font-size: 10px;">坐标</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
+    			</div>
+    	</section>
+    
+
+    
+    	<section class="tools-section tools-section-friends">
+  		
+  			<div class="friends-wrap" id="js-friends">
+  			
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接1</a>
+  	        
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接2</a>
+  	        
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接3</a>
+  	        
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接4</a>
+  	        
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接5</a>
+  	        
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接6</a>
+  	        
+  	        </div>
+  		
+    	</section>
+    
+
+    
+    	<section class="tools-section tools-section-me">
+  	  	
+  	  		<div class="aboutme-wrap" id="js-aboutme">很惭愧&lt;br&gt;&lt;br&gt;只做了一点微小的工作&lt;br&gt;谢谢大家</div>
+  	  	
+    	</section>
+    
+  </div>
+  
+</div>
+    <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+  </div>
+</body>
+</html>
