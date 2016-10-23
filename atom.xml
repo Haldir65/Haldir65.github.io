@@ -681,9 +681,9 @@
     <link href="http://haldir65.github.io/2016/10/08/android-7-0-new-features/"/>
     <id>http://haldir65.github.io/2016/10/08/android-7-0-new-features/</id>
     <published>2016-10-07T19:02:26.000Z</published>
-    <updated>2016-10-23T10:11:24.199Z</updated>
+    <updated>2016-10-23T10:13:55.236Z</updated>
     
-    <content type="html"><![CDATA[<p>Google I/O 2016上的<a href="https://www.youtube.com/watch?v=B08iLAtS3AQ" target="_blank" rel="external">What’s new in Android</a>介绍的比较全面，MultiWindow、Notification、ConstraintLayout等都比较简单。这里拎出来开发者不得不注意的几点来介绍。</p>
+    <content type="html"><![CDATA[<p>Google I/O 2016上的<a href="https://www.youtube.com/watch?v=B08iLAtS3AQ" target="_blank" rel="external">What’s new in Android</a>介绍的比较全面，MultiWindow、Notification、ConstraintLayout等都比较简单。这里拎出来开发者不得不注意的几点来介绍。<br><a id="more"></a></p>
 <h3 id="1-BackGround-Optimization"><a href="#1-BackGround-Optimization" class="headerlink" title="1. BackGround Optimization"></a>1. BackGround Optimization</h3><p><del>CONNECTIVITY_CHANGE</del>(很多应用喜欢在Manifest里注册这个BroadCasetReceiver，导致网络变化时，一大堆应用都被唤醒，而ram中无法同时存在这么多process，系统不得不kill old process，由此导致memory thrashing)</p>
 <p>同时被移除的还有<del>NEW_PICTURE</del>,<del>NEW_VIDEO</del>.</p>
 <p>具体来说: 对于<strong>targeting N</strong>的应用，在manifest文件中声明 static broadcastReceiver，监听<del>CONNECTIVITY_CHANGE</del>将不会唤醒应用。如果应用正在运行，使用context.registerReceiver，将仍能够接受到broadcast。但不会被唤醒。</p>
@@ -693,7 +693,6 @@
 <p>解决方案：使用JobScheduler(可以监听contentProvider change)<br><strong>NEW_PICTURE</strong>的处理(这段代码只在API24以上存在，记得判断下版本)<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">pubilc <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MY_BACKGROUND_JOB = <span class="number">0</span>;</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">scheduleJob</span><span class="params">(Context context)</span></span>&#123;</div><div class="line">trueJobScheduler js =</div><div class="line">true context.getSystemService(JobScheduler.class);</div><div class="line">trueJobInfo.Builder builder = <span class="keyword">new</span> JobInfo.Builder(</div><div class="line">trueR.id.schedule_photo_jobs,</div><div class="line">true<span class="keyword">new</span> ComponentName(context,PhotoContentJob.class));</div><div class="line"></div><div class="line">truebuilder.addTriggerContentUri(</div><div class="line">truetrue<span class="keyword">new</span> JobInfo.TriggerContentUri(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,</div><div class="line">truetruetrueJobInfo.TriggerContentUri.FLAG_NOTIFY_FOR_DESCENDANTS)</div><div class="line">truetrue);</div><div class="line">true</div><div class="line">truejs.schedule(builder.build()); </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>参考<a href="https://www.youtube.com/watch?v=3ZX0CfVfVP8" target="_blank" rel="external">youtube上谷歌员工的演讲</a></p>
 <h3 id="2-文件系统的权限更改-FileProvider"><a href="#2-文件系统的权限更改-FileProvider" class="headerlink" title="2. 文件系统的权限更改(FileProvider)"></a>2. 文件系统的权限更改(FileProvider)</h3><p> File storage permission change<br> 简单来说就是Uri.fromFile(file://URI)不能再用了，需要使用FileProvider，这主要是为了6.0开始引进的permission model 考虑的，storage permission例如WRITE_EXTERNAL_STORAGE这种都已经属于Dangerous permission了。<br> 一个常见的场景就是调用系统相机拍照，给Intent设置一个uri，在7.0上直接用Uri.FromFile会崩<br> 需要通过FileProvider提供Uri,写了一个<a href="https://github.com/Haldir65/FileProviderDmo" target="_blank" rel="external">Demo</a>，使用FileProvider传递文件给另一个App。<br> 另一个需要注意的就是DownloadManager访问COLUMN_LOCAL_FILENAME会报错，这个不常见。</p>
-<p> ###</p>
 <h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ol>
 <li><a href="https://developer.android.com/topic/performance/background-optimization.html?utm_campaign=adp_series__100616&amp;utm_source=anddev&amp;utm_medium=yt-desc" target="_blank" rel="external">Docs</a></li>
 <li><a href="https://www.youtube.com/watch?v=vBjTXKpaFj8" target="_blank" rel="external">youtube</a></li>
@@ -704,7 +703,7 @@
     
     <summary type="html">
     
-      &lt;p&gt;Google I/O 2016上的&lt;a href=&quot;https://www.youtube.com/watch?v=B08iLAtS3AQ&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;What’s new in Android&lt;/a&gt;介绍的比较全面，Mu
+      &lt;p&gt;Google I/O 2016上的&lt;a href=&quot;https://www.youtube.com/watch?v=B08iLAtS3AQ&quot;&gt;What’s new in Android&lt;/a&gt;介绍的比较全面，MultiWindow、Notification、ConstraintLayout等都比较简单。这里拎出来开发者不得不注意的几点来介绍。&lt;br&gt;
     
     </summary>
     
