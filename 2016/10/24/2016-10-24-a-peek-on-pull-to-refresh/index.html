@@ -4,14 +4,20 @@
   <meta charset="utf-8">
   
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
-  <title>Archives: 2016 | Haldir的博客</title>
+  <title>android-Ultra-pull-to-refresh分析 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Haldir的博客">
-<meta property="og:url" content="http://haldir65.github.io/archives/2016/page/4/index.html">
+  <meta name="description" content="最早开始接触安卓的时候就知道有Chris Banes的Pull-To-Refresh，当时这个库已经被标记被Deprecated了，后来出于寻找替代品的目的找到了秋百万的android-Ultra-pull-toRefresh，直接fork，当时甚至没有能力把一个Demo跑起来。之后的项目中，直接使用swipeRefreshLayout了。现在回头看，终于觉得可以尝试着分析一遍整个下拉刷新的过程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="android-Ultra-pull-to-refresh分析">
+<meta property="og:url" content="http://haldir65.github.io/2016/10/24/2016-10-24-a-peek-on-pull-to-refresh/index.html">
 <meta property="og:site_name" content="Haldir的博客">
+<meta property="og:description" content="最早开始接触安卓的时候就知道有Chris Banes的Pull-To-Refresh，当时这个库已经被标记被Deprecated了，后来出于寻找替代品的目的找到了秋百万的android-Ultra-pull-toRefresh，直接fork，当时甚至没有能力把一个Demo跑起来。之后的项目中，直接使用swipeRefreshLayout了。现在回头看，终于觉得可以尝试着分析一遍整个下拉刷新的过程">
+<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/687474703a2f2f692e696d6775722e636f6d2f4766746846417a2e706e67.png">
+<meta property="og:updated_time" content="2016-10-24T09:03:47.202Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Haldir的博客">
+<meta name="twitter:title" content="android-Ultra-pull-to-refresh分析">
+<meta name="twitter:description" content="最早开始接触安卓的时候就知道有Chris Banes的Pull-To-Refresh，当时这个库已经被标记被Deprecated了，后来出于寻找替代品的目的找到了秋百万的android-Ultra-pull-toRefresh，直接fork，当时甚至没有能力把一个Demo跑起来。之后的项目中，直接使用swipeRefreshLayout了。现在回头看，终于觉得可以尝试着分析一遍整个下拉刷新的过程">
+<meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/687474703a2f2f692e696d6775722e636f6d2f4766746846417a2e706e67.png">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -137,174 +143,89 @@
 </nav>
 
       <div class="body-wrap">
+        <article id="post-2016-10-24-a-peek-on-pull-to-refresh" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
         
   
+    <h1 class="article-title" itemprop="name">
+      android-Ultra-pull-to-refresh分析
+    </h1>
   
+
+      </header>
     
-    
+    <div class="article-entry" itemprop="articleBody">
       
+        <p> 最早开始接触安卓的时候就知道有Chris Banes的<a href="https://github.com/chrisbanes/Android-PullToRefresh" target="_blank" rel="external">Pull-To-Refresh</a>，当时这个库已经被标记被Deprecated了，后来出于寻找替代品的目的找到了秋百万的<a href="https://github.com/liaohuqiu/android-Ultra-Pull-To-Refresh" target="_blank" rel="external">android-Ultra-pull-toRefresh</a>，直接fork<img src="http://odzl05jxx.bkt.clouddn.com/687474703a2f2f692e696d6775722e636f6d2f4766746846417a2e706e67.png" alt="">，当时甚至没有能力把一个Demo跑起来。之后的项目中，直接使用swipeRefreshLayout了。现在回头看，终于觉得可以尝试着分析一遍整个下拉刷新的过程。本文只针对<a href="https://github.com/liaohuqiu/android-Ultra-Pull-To-Refresh" target="_blank" rel="external">android-ultra-pulltoRefresh</a>部分源码进行分析，向为开源社区贡献优秀代码的秋百万致敬。<br> <a id="more"></a></p>
+<h3 id="1"><a href="#1" class="headerlink" title="1."></a>1.</h3>
       
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2016" class="archive-year">2016</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2016/09/27/git-manual/" class="archive-article-date">
-  	<time datetime="2016-09-27T09:24:51.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-09-27</time>
+    </div>
+    <div class="article-info article-info-index">
+      
+      <a href="/2016/10/24/2016-10-24-a-peek-on-pull-to-refresh/" class="archive-article-date">
+  	<time datetime="2016-10-24T02:25:35.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-10-24</time>
 </a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/09/27/git-manual/">git常用手册</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags"></i>
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git/">git</a></li></ul>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/android/">android</a></li></ul>
 	</div>
 
-          
-	<div class="article-category tagcloud">
-	<i class="icon-price-tags"></i>
-	<a class="article-category-link" href="/categories/技术/">技术</a>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2016/09/27/activity-transition-pre-and-post-lollipop/" class="archive-article-date">
-  	<time datetime="2016-09-27T06:53:25.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-09-27</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/09/27/activity-transition-pre-and-post-lollipop/">activity transition pre and post lollipop</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags"></i>
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/android/">android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/transition/">transition</a></li></ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-	<i class="icon-price-tags"></i>
-	<a class="article-category-link" href="/categories/技术/">技术</a>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2016/09/23/selectableItemBackground-foreground/" class="archive-article-date">
-  	<time datetime="2016-09-23T11:56:39.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-09-23</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/09/23/selectableItemBackground-foreground/">android使用selectableItemBackground的一些坑</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags"></i>
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/android/">android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/foreground/">foreground</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/随笔/">随笔</a></li></ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-	<i class="icon-price-tags"></i>
-	<a class="article-category-link" href="/categories/技术/">技术</a>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2016/09/22/replace-butterKnife-with-databinding/" class="archive-article-date">
-  	<time datetime="2016-09-22T07:17:39.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-09-22</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/09/22/replace-butterKnife-with-databinding/">replace butterKnife with databinding</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags"></i>
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Butterknife/">Butterknife</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/android/">android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/databinding/">databinding</a></li></ul>
-	</div>
-
-          
+      
 	<div class="article-category tagcloud">
 	<i class="icon-price-tags"></i>
 	<a class="article-category-link" href="/categories/blog/">blog</a>
 	</div>
 
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
-  
-  
-    </div></section>
-  
 
-    
-    <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/archives/2016/page/3/">&laquo; Prev</a><a class="page-number" href="/archives/2016/">1</a><a class="page-number" href="/archives/2016/page/2/">2</a><a class="page-number" href="/archives/2016/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/archives/2016/page/5/">5</a><a class="extend next" rel="next" href="/archives/2016/page/5/">Next &raquo;</a>
-    </nav>
   
+<nav id="article-nav">
+  
+  
+    <a href="/2016/10/20/2016-10-20-android-dirty-code/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">一些脏代码</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+
+
+<div class="share_jia">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">Share to: &nbsp; </span>
+		<a class="jiathis_button_facebook"></a> 
+	    <a class="jiathis_button_twitter"></a>
+	    <a class="jiathis_button_plus"></a> 
+	    <a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+    <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+
+
+
+
 
 
       </div>
@@ -327,8 +248,8 @@
 		mathjax: false,
 		animate: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: true,
