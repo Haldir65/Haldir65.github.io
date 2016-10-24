@@ -4,14 +4,16 @@ date: 2016-10-24 10:25:35
 categories: blog  
 tags: [android]
 ---
- 最早开始接触安卓的时候就知道有Chris Banes的[Pull-To-Refresh](https://github.com/chrisbanes/Android-PullToRefresh)，当时这个库已经被标记被Deprecated了，后来出于寻找替代品的目的找到了秋百万的[android-Ultra-pull-toRefresh](https://github.com/liaohuqiu/android-Ultra-Pull-To-Refresh)，直接![fork](http://odzl05jxx.bkt.clouddn.com/687474703a2f2f692e696d6775722e636f6d2f4766746846417a2e706e67.png)
+ 最早开始接触安卓的时候就知道有Chris Banes的[Pull-To-Refresh](https://github.com/chrisbanes/Android-PullToRefresh)，当时这个库已经被标记被Deprecated了，后来出于寻找替代品的目的找到了秋百万的[android-Ultra-pull-toRefresh](https://github.com/liaohuqiu/android-Ultra-Pull-To-Refresh)，直接
 
- 当时甚至没有能力把一个Demo跑起来。之后的项目中，直接使用swipeRefreshLayout了。现在回头看，终于觉得可以尝试着分析一遍整个下拉刷新的过程。本文只针对[android-Ultra-pulltoRefresh](https://github.com/liaohuqiu/android-Ultra-Pull-To-Refresh)部分源码进行分析。拆一个轮子可能只需要花一天时间，但能够从无到有构思出这个框架并将项目搭建起来，长期维护真的是一件需要很强毅力的事情，向为开源社区贡献优秀代码的秋百万致敬。
+ ![fork](http://odzl05jxx.bkt.clouddn.com/687474703a2f2f692e696d6775722e636f6d2f4766746846417a2e706e67.png)
+
+ 当时甚至没有能力把一个Demo跑起来。之后的项目中，直接使用swipeRefreshLayout了。现在回头看，终于觉得可以尝试着分析一遍整个下拉刷新的过程。本文只针对[android-Ultra-pulltoRefresh](https://github.com/liaohuqiu/android-Ultra-Pull-To-Refresh)部分源码进行分析。拆一个轮子可能只需要花一天时间，但能够从无到有构思出这个框架，将项目搭建起来并且坚持长期维护真的是一件需要很强毅力的事情，向为开源社区贡献优秀代码的秋百万和众多做出贡献的开发者致敬。
  <!--more-->
 
  ### 1. 从Demo开始吧
 从github clone下来之后，改一下gradle版本，compile sdk version什么的就可以运行项目自带的Demo了.
-MainActivity 添加了一个PtrDemoHomeFragment,onCreateVie里面返回的View对应的xml文件为
+MainActivity 添加了一个PtrDemoHomeFragment,onCreateView里面返回的View对应的xml文件为
 fragment_ptr_home.xml
 ```xml
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -30,7 +32,6 @@ fragment_ptr_home.xml
         cube_ptr:ptr_pull_to_fresh="false"
         cube_ptr:ptr_ratio_of_header_height_to_refresh="1.2"
         cube_ptr:ptr_resistance="1.7">
-
         <ScrollView
             android:id="@+id/fragment_block_menu_scroll_view"
             android:layout_width="match_parent"
@@ -43,7 +44,6 @@ fragment_ptr_home.xml
                 android:layout_height="wrap_content"
                 android:padding="@dimen/cube_mints_content_view_padding" />
         </ScrollView>
-
     </in.srain.cube.views.ptr.PtrFrameLayout>
 </LinearLayout>
 ```
@@ -264,13 +264,13 @@ public interface PtrUIHandler {
 
             mStatus = PTR_STATUS_PREPARE;
             mPtrUIHandlerHolder.onUIRefreshPrepare(this);//刚开始往下移一点点或者刚刚从下面回到0的位置，可以认为是下拉刷新刚开始和刚结束的时候。这个Holder的结构类似于一个链表，一个Holder里面有UIHandler，以及下一个Holder(next)。作用类似于一个集合，等于作者自己实现了这样一个不断循环的消息列表(看起来挺像Message的)。这个Holder的作用在于可以动态添加UIHanlder，相对应的方法都做好了(addHandler)。
-            //再次强调，这里表示**刚开始往下移一点点或者刚刚从下面回到0的位置，可以认为是下拉刷新刚开始和刚结束的时候。**
+            //再次强调，这里表示**刚开始往下移一点点或者刚刚从下面回到0的位置，可以认为是下拉刷新刚开始和刚结束的时候。此时的状态为STATUS_PREPARED**
         }
 
         // back to initiated position
         if (mPtrIndicator.hasJustBackToStartPosition()) {
             tryToNotifyReset();
-            //**刚刚从下面回到0的位置，通知UIHandler的onUIReset()方法**
+            //**刚刚从下面回到0的位置，通知UIHandler的onUIReset()方法,此时的状态为STATUS_INIT**
             //将整个过程划分的真详细
             // recover event to children，虽然手指还在屏幕上，处于ACTION_MOVE，但这里由于已经复位，需要把ACTION_DOWN传递下去，这一段比较复杂。
             if (isUnderTouch) {
@@ -290,30 +290,61 @@ public interface PtrUIHandler {
                 tryToPerformRefresh();
             }
         }
+        //tryToPerformRefresh()方法判断mPtrIndicator.isOverOffsetToRefresh()，满足条件的话进入STATUS_LOADING，这个时候就要开始让动画run了。所以这里调用的是 mPtrUIHandlerHolder.onUIRefreshBegin(this);和mPtrHandler.onRefreshBegin(this);前者是后来手动添加的UIHandler，后者则是在onInFlateFinish中自行判断的，这两个都会被执行。这里扯一句，这个Holder就像一个中间层，持有了UIHandler,所有方法都调用的是后者HanldleUI的方法。facade模式？
 
 
-        // 让一个View滑动的方式有很多种，这里采用的是改变X,Y的方式(X = left+translationX;Y = top+translationY) 
+        // 终于看到实际调用View滑动的代码了，让一个View滑动的方式有很多种，这里采用的是改变X,Y的方式(X = left+translationX;Y = top+translationY) 
         mHeaderView.offsetTopAndBottom(change);
         if (!isPinContent()) {
             mContent.offsetTopAndBottom(change);
         }
-        invalidate();
+        invalidate();??我觉得这里好像没有必要这么频繁的调这一句话
 
+        //移动完成之后通知UIHandlerHolder位置改变了，没有通知mUIHandler是因为后者就是mContent和mHeaderView。
         if (mPtrUIHandlerHolder.hasHandler()) {
             mPtrUIHandlerHolder.onUIPositionChange(this, isUnderTouch, mStatus, mPtrIndicator);
         }
-        onPositionChange(isUnderTouch, mStatus, mPtrIndicator);
+        onPositionChange(isUnderTouch, mStatus, mPtrIndicator);//最后还预留了一个onPositionChange的空方法，子类可能会有点用吧
+    }
+```
+到这里，ACTION_MOVE已经研究完毕，大部分的分析都在注释里面，只要分清楚滑动过程中的各种STATUS，我觉得还是比较好理解的。MOVE过程中伴随着距离的变化，ptr也进入不同的status，ptr本身其实只做了移动headrView和childView的工作，实际的动画效果等等都是由UIHanlder拿着ptr的实例去做的。关于能够滑动多少距离的问题，由于这里并没有判断，所以，这个contentView的下滑是没有下限的，不过在xml里面有一个自定义的resistance，相当于阻力系数了，设置大一点的话就不会出事。**目前手指还在屏幕上，status等于STATUS_PREPARED或者STATUS_LOADING。借用手机评测那帮人的话来说，跟手**
+
+
+**ACTION_UP**： mPtrIndicator中的mPressed设置为false，标示下当前手指已经不按在屏幕上了。如果这时候的位置>0，就是contentView还没有复位，需要想办法让它"弹回来"，这部分工作交给了onRelease(false)，这个false我猜肯定是后面加上去的(查了下git log果然。。。)。来看OnRelease:
+```java
+  private void onRelease(boolean stayForLoading) {
+
+        tryToPerformRefresh();//会检查下当前status!=STATUS_PREPARED的话直接return false，就是不是在刚开始或刚复位的情况下不做；否则继续执行performRefresh操作，其实这样想也符合常理，手指离开了屏幕，ptr应该能够自我判断是否还需要执行动画
+
+        if (mStatus == PTR_STATUS_LOADING) {
+            // keep header for fresh
+            if (mKeepHeaderWhenRefresh) {
+                // scroll header back
+                if (mPtrIndicator.isOverOffsetToKeepHeaderWhileLoading() && !stayForLoading) {//已经过了需要加载动画的位置，statyForLoading这里传进来的是false
+                    mScrollChecker.tryToScrollTo(mPtrIndicator.getOffsetToKeepHeaderWhileLoading(), mDurationToClose);//滑动到加载动画的位置，这里面是不断地post一个runnable，在run方法里面调用之前和ACTION_MOVE里面一样的那个movePos方法，所以重用性还好。也会通知相应的UIHandler或者UIHandlerHolder
+                } else {
+                    // do nothing
+                }
+            } else {
+                tryScrollBackToTopWhileLoading();//这里会一直滑动到0的位置，其实也是不断调用updatPos方法，会将STATUS重置为STATUS_INIT或者STATUS_PREPARED
+            }
+        } else {
+            if (mStatus == PTR_STATUS_COMPLETE) {//STATUS_COMPLETE通常由外部调用者调用refreshComplete public 方法设置，相当于SwipeRefreshLayout的setRefreshing()，否则将一直停留在加载状态。也就是说需要调用者手动设置关闭，这也符合常理，因为加载本身是需要时间的，把这个设置的时机交给开发者来手动设置几乎是唯一的选择。
+                notifyUIRefreshComplete(false);
+            } else {
+                tryScrollBackToTopAbortRefresh();
+            }
+        }
     }
 ```
 
-注意，在offset之前先调用了performRefresh方法
-这里会调用
-> mPtrUIHandlerHolder.onUIRefreshBegin(this);
-> mPtrHandler.onRefreshBegin(this);
+到此，ptr内部只剩下一些getter和setter了，不再解释，结合Demo使用就会有所体会。
 
-这里由于ChildView和ContentView即将开始滑动(offset),从手机上看的话就是ptr进入Loading状态，比如加载动画开始执行了。
 
-**ACTION_UP**
+### 3. 总结
+ptr的本质就是通过ViewGroup的dispatchTouchEvent将事件拦截在内部进行处理，并将事件过程分发给几个自定义的接口。而内部又添加了一些自定义的变量，并给出getter和setter，使得外部调用者使用起来十分轻松。只要掌握好事件分发处理和View的绘制流程，拆起来还算简单。当然，如果在实际项目中碰到了类似的需求，我倾向于定制一个简单一点的小工具。
+
+
 
 
 
