@@ -115,3 +115,4 @@ SmoothScroller是一个接口，在里面实现computeScrollVectorForPosition返
 
 ### Reference
 1. [Dave Smith](https://github.com/devunwired/recyclerview-playground)
+2. [500px](https://github.com/500px/greedo-layout-for-android.git)

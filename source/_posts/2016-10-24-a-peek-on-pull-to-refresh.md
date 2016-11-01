@@ -1,8 +1,8 @@
 ---
 title: android-Ultra-pull-to-refresh分析
 date: 2016-10-24 10:25:35
-categories: blog  
-tags: [android]
+categories: android  
+
 ---
  最早开始接触安卓的时候就知道有Chris Banes的[Pull-To-Refresh](https://github.com/chrisbanes/Android-PullToRefresh)，当时这个库已经被标记被Deprecated了，后来出于寻找替代品的目的找到了秋百万的[android-Ultra-pull-toRefresh](https://github.com/liaohuqiu/android-Ultra-Pull-To-Refresh)，直接
 
