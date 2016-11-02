@@ -9,7 +9,7 @@ Google I/O 2016上的[What's new in Android](https://www.youtube.com/watch?v=B08
 
 ### 1. BackGround Optimization
 
-~~CONNECTIVITY_CHANGE~~(很多应用喜欢在Manifest里注册这个BroadCasetReceiver，导致网络变化时，一大堆应用都被唤醒，而ram中无法同时存在这么多process，系统不得不kill old process，由此导致memory thrashing)
+~~CONNECTIVITY_CHANGE~~(很多应用喜欢在Manifest里注册这个BroadcastReceiver，导致网络变化时，一大堆应用都被唤醒，而ram中无法同时存在这么多process，系统不得不kill old process，由此导致memory thrashing)
 
 同时被移除的还有~~NEW_PICTURE~~,~~NEW_VIDEO~~.
 
