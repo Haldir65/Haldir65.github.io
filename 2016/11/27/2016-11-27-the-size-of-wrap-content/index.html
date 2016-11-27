@@ -4,14 +4,38 @@
   <meta charset="utf-8">
   
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
-  <title>Archives: 2016 | Haldir的博客</title>
+  <title>wrap_content到底多大 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Haldir的博客">
-<meta property="og:url" content="http://haldir65.github.io/archives/2016/page/2/index.html">
+  <meta name="description" content="转眼就十一月了，java的分析越来越少，虽然常常在业务上碰到不少坑。。。
+问题的由来这周碰到一个需要画时间轴样式的自定义View的需求，大概像这样：
+想想也就是自定义ViewGroup的那一套老样子。抄起键盘就开始研(Copy)究(Paste)，写着写着发现不对劲，主要的问题包括:
+
+
+在onMeasure里面拿到的height == 0 , 具体一点就是
+123456protected void">
+<meta property="og:type" content="article">
+<meta property="og:title" content="wrap_content到底多大">
+<meta property="og:url" content="http://haldir65.github.io/2016/11/27/2016-11-27-the-size-of-wrap-content/index.html">
 <meta property="og:site_name" content="Haldir的博客">
+<meta property="og:description" content="转眼就十一月了，java的分析越来越少，虽然常常在业务上碰到不少坑。。。
+问题的由来这周碰到一个需要画时间轴样式的自定义View的需求，大概像这样：
+想想也就是自定义ViewGroup的那一套老样子。抄起键盘就开始研(Copy)究(Paste)，写着写着发现不对劲，主要的问题包括:
+
+
+在onMeasure里面拿到的height == 0 , 具体一点就是
+123456protected void">
+<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/timelineView.png">
+<meta property="og:updated_time" content="2016-11-27T09:04:09.670Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Haldir的博客">
+<meta name="twitter:title" content="wrap_content到底多大">
+<meta name="twitter:description" content="转眼就十一月了，java的分析越来越少，虽然常常在业务上碰到不少坑。。。
+问题的由来这周碰到一个需要画时间轴样式的自定义View的需求，大概像这样：
+想想也就是自定义ViewGroup的那一套老样子。抄起键盘就开始研(Copy)究(Paste)，写着写着发现不对劲，主要的问题包括:
+
+
+在onMeasure里面拿到的height == 0 , 具体一点就是
+123456protected void">
+<meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/timelineView.png">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -129,149 +153,98 @@
 </nav>
 
       <div class="body-wrap">
+        <article id="post-2016-11-27-the-size-of-wrap-content" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
         
   
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2016" class="archive-year">2016</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2016/10/20/2016-10-20-write-your-own-layoutmanager/" class="archive-article-date">
-  	<time datetime="2016-10-20T08:37:42.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-10-20</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/10/20/2016-10-20-write-your-own-layoutmanager/">自定义LayoutManager</a>
+    <h1 class="article-title" itemprop="name">
+      wrap_content到底多大
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>转眼就十一月了，java的分析越来越少，虽然常常在业务上碰到不少坑。。。</p>
+<h4 id="问题的由来"><a href="#问题的由来" class="headerlink" title="问题的由来"></a>问题的由来</h4><p>这周碰到一个需要画时间轴样式的自定义View的需求，大概像这样：<br><img src="http://odzl05jxx.bkt.clouddn.com/timelineView.png" alt=""></p>
+<p>想想也就是自定义ViewGroup的那一套老样子。抄起键盘就开始研(Copy)究(Paste)，写着写着发现不对劲，主要的问题包括:</p>
+<blockquote>
+<ol>
+<li><p>在onMeasure里面拿到的height == 0 , 具体一点就是</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onMeasure</span><span class="params">(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</span> </span>&#123;</div><div class="line">       <span class="keyword">final</span> <span class="keyword">int</span> widthMode = MeasureSpec.getMode(widthMeasureSpec);</div><div class="line">       <span class="keyword">final</span> <span class="keyword">int</span> heightMode = MeasureSpec.getMode(heightMeasureSpec);</div><div class="line">       <span class="keyword">final</span> <span class="keyword">int</span> widthSize = MeasureSpec.getSize(widthMeasureSpec);</div><div class="line">       <span class="keyword">final</span> <span class="keyword">int</span> heightSize = MeasureSpec.getSize(heightMeasureSpec); <span class="comment">// 居然等于0</span></div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>左侧的</p>
+</li>
+</ol>
+</blockquote>
+<h4 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h4><h3 id="ref"><a href="#ref" class="headerlink" title="ref"></a>ref</h3><ul>
+<li><a href="https://www.liaohuqiu.net/posts/how-does-android-caculate-the-size-of-child-view/" target="_blank" rel="external">秋百万</a></li>
+</ul>
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2016/10/20/2016-10-20-RecyclerViewAnimationStuff/" class="archive-article-date">
-  	<time datetime="2016-10-20T08:16:49.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-10-20</time>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      <a href="/2016/11/27/2016-11-27-the-size-of-wrap-content/" class="archive-article-date">
+  	<time datetime="2016-11-27T08:46:44.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-11-27</time>
 </a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/10/20/2016-10-20-RecyclerViewAnimationStuff/">使用RecyclerView的Animation</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags"></i>
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RecyclerView/">RecyclerView</a></li></ul>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/android/">android</a></li></ul>
 	</div>
 
-          
+      
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2016/10/15/2016-10-15-using-loader-in-android-app/" class="archive-article-date">
-  	<time datetime="2016-10-15T11:12:22.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-10-15</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/10/15/2016-10-15-using-loader-in-android-app/">使用Loader进行异步数据操作</a>
-    </h1>
-  
 
-        <div class="article-info info-on-right">
-          
-          
+  
+<nav id="article-nav">
+  
+  
+    <a href="/2016/10/31/2016-10-31-install-lxml-on-windows/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Windows10平台安装lxml记录</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2016/10/14/2016-10-14-Android-translucent-status-bar/" class="archive-article-date">
-  	<time datetime="2016-10-14T09:15:47.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-10-14</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/10/14/2016-10-14-Android-translucent-status-bar/">fitSystemWindow和沉浸式状态栏的一些总结</a>
-    </h1>
-  
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags"></i>
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Window/">Window</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/statusBar/">statusBar</a></li></ul>
+
+
+<div class="share_jia">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">Share to: &nbsp; </span>
+		<a class="jiathis_button_facebook"></a> 
+	    <a class="jiathis_button_twitter"></a>
+	    <a class="jiathis_button_plus"></a> 
+	    <a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+    <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
 	</div>
-
-          
-	<div class="article-category tagcloud">
-	<i class="icon-price-tags"></i>
-	<a class="article-category-link" href="/categories/技术/">技术</a>
-	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
 
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
 
-    
-    <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/archives/2016/">&laquo; Prev</a><a class="page-number" href="/archives/2016/">1</a><span class="page-number current">2</span><a class="page-number" href="/archives/2016/page/3/">3</a><a class="page-number" href="/archives/2016/page/4/">4</a><a class="page-number" href="/archives/2016/page/5/">5</a><a class="extend next" rel="next" href="/archives/2016/page/3/">Next &raquo;</a>
-    </nav>
-  
+
+
+
+
 
 
       </div>
@@ -294,8 +267,8 @@
 		mathjax: false,
 		animate: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: true,
