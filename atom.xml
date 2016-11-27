@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://haldir65.github.io/"/>
-  <updated>2016-11-27T09:36:46.551Z</updated>
+  <updated>2016-11-27T09:39:06.296Z</updated>
   <id>http://haldir65.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://haldir65.github.io/2016/11/27/2016-11-27-the-size-of-wrap-content/"/>
     <id>http://haldir65.github.io/2016/11/27/2016-11-27-the-size-of-wrap-content/</id>
     <published>2016-11-27T08:46:44.000Z</published>
-    <updated>2016-11-27T09:36:46.551Z</updated>
+    <updated>2016-11-27T09:39:06.296Z</updated>
     
     <content type="html"><![CDATA[<p>转眼就十一月了，java的分析越来越少，虽然常常在业务上碰到不少坑。。。</p>
 <h4 id="问题的由来"><a href="#问题的由来" class="headerlink" title="问题的由来"></a>问题的由来</h4><p>这周碰到一个需要画时间轴样式的自定义View的需求，大概像这样(图片来自网络)：<br><img src="http://odzl05jxx.bkt.clouddn.com/timelineView.png" alt=""></p>
@@ -35,14 +35,14 @@
 <p>回顾这个Item的实现，Item继承自RelativeLayout，左边的View是调用addView(view,RelativeLayout.Layoutparams)加进去的,params设置了一些rules，像是AlignParentLeft这种，记得给左边的View和右边的TextView都设置一个id就好。TextView也是这样addView进去的。后来查到了秋百万对于MeasureSpec的介绍，我想到RelativeLayout的onMeasure会调用两次，在第一次测量的时候，左边的View和右边的TextView都把高度设置为wrap_content了。要命的是这个Item本身添加到UI的方式也是类似的addView(view,RelativeLayout.Layoutparams)方式，这里的height也是wrap_content。即Item本身高度需要由其child决定，左边的child决定不了，只有右边的TextView才能决定。所以第一轮测量下来，左边的View的高度只能是0，右边的TextView高度倒是确定了。这时候Item本身的高度也就能确定了。在第二遍测量的时候，就能顺利拿到高度了。</p>
 <blockquote>
 <ol>
-<li>左侧的每个节点上的drawable不画出来<br>后来查了下，原因在于我对传进来的drawable检查了大小，太大的话用一个ScaleDrawable转一下。但是，scaleDrawable需要调用setLevel方法才会draw，我这里偷懒直接设置为1了。<br></li>
+<li>左侧的每个节点上的drawable不画出来<br>后来查了下，原因在于我对传进来的drawable检查了大小，太大的话用一个ScaleDrawable转一下。但是，scaleDrawable需要调用setLevel方法才会draw，我这里偷懒直接设置为1了。</li>
 </ol>
 <ol>
 <li>Item本身是继承自RelativeLayout，想要使onDraw方法被调用需要在构造函数里设置<br>setWillNotDraw(false)<br>这个boolean值默认是true，主要是顾及到性能的原因。</li>
 </ol>
 </blockquote>
 <h3 id="ref"><a href="#ref" class="headerlink" title="ref"></a>ref</h3><ul>
-<li><a href="https://www.liaohuqiu.net/posts/how-does-android-caculate-the-size-of-child-view/" target="_blank" rel="external">秋百万</a></li>
+<li><a href="https://www.liaohuqiu.net/posts/how-does-android-caculate-the-size-of-child-view/" target="_blank" rel="external">How Android caculates view size</a></li>
 </ul>
 ]]></content>
     
