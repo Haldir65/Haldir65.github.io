@@ -1,7 +1,7 @@
 ---
-title: [转载]abd command收藏
-date: 2016-12-10 21:14:14
-tags:
+title: adb常用命令手册
+date：2016-12-10 21:14:14
+tags：[Android,adb]
 ---
 
 ## ADB 常用命令手册
