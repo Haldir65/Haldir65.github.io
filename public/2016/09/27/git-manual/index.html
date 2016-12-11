@@ -12,7 +12,7 @@
 <meta property="og:url" content="http://haldir65.github.io/2016/09/27/git-manual/index.html">
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="记录一下常用git的命令，作为日常使用的参考手册1. 在本地创建一个项目并同步到github的过程12345678$ mkdir ~/hello-world    //创建一个项目hello-world$ cd ~/hello-world       //打开这个项目$ git init             //初始化 $ touch README   		//创建文件$ git add RE">
-<meta property="og:updated_time" content="2016-12-10T14:49:41.368Z">
+<meta property="og:updated_time" content="2016-12-11T10:10:46.693Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="git常用操作手册">
 <meta name="twitter:description" content="记录一下常用git的命令，作为日常使用的参考手册1. 在本地创建一个项目并同步到github的过程12345678$ mkdir ~/hello-world    //创建一个项目hello-world$ cd ~/hello-world       //打开这个项目$ git init             //初始化 $ touch README   		//创建文件$ git add RE">
@@ -165,7 +165,14 @@
 <h3 id="5-设置代理"><a href="#5-设置代理" class="headerlink" title="5. 设置代理"></a>5. 设置代理</h3><p>设置全局代理<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git config --global http.proxy socks5:<span class="comment">//127.0.0.1:1080</span></div></pre></td></tr></table></figure></p>
 <p>对指定url设置代理<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">git config --global http.&lt;要设置代理的URL&gt;.proxy socks5:<span class="comment">//127.0.0.1:1080</span></div><div class="line"> </div><div class="line">git config --global http.https:<span class="comment">//github.com.proxy socks5://127.0.0.1:1080</span></div></pre></td></tr></table></figure></p>
 <h3 id="6-对上一次commit进行修改-在不添加新的commit的基础上"><a href="#6-对上一次commit进行修改-在不添加新的commit的基础上" class="headerlink" title="6. 对上一次commit进行修改(在不添加新的commit的基础上)"></a>6. 对上一次commit进行修改(在不添加新的commit的基础上)</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git commit --amend</div></pre></td></tr></table></figure>
-<h3 id="7-git-revert和reset的区别"><a href="#7-git-revert和reset的区别" class="headerlink" title="7. git revert和reset的区别"></a>7. git revert和reset的区别</h3><h3 id="8-切分支-删除分支"><a href="#8-切分支-删除分支" class="headerlink" title="8. 切分支, 删除分支"></a>8. 切分支, 删除分支</h3><h3 id="9-pull"><a href="#9-pull" class="headerlink" title="9. pull"></a>9. pull</h3><h3 id="10-rebase和cherry-pick"><a href="#10-rebase和cherry-pick" class="headerlink" title="10. rebase和cherry-pick"></a>10. rebase和cherry-pick</h3>
+<h3 id="7-git-revert和reset的区别"><a href="#7-git-revert和reset的区别" class="headerlink" title="7. git revert和reset的区别"></a>7. git revert和reset的区别</h3><blockquote>
+<p>reset 是在正常的commit历史中,删除了指定的commit,这时 HEAD 是向后移动了,而 revert 是在正常的commit历史中再commit一次,只不过是反向提交,他的 HEAD 是一直向前的. 即reset是通过一次反向的commit操作撤销之前的commit，而reset则会直接从提交历史里删除commit。如果还没有push，用reset可以在本地解决问题，之后重新commit再push。如果已经push，可以考虑通过一次revert来实现“撤销”的效果。</p>
+</blockquote>
+<p>语法：</p>
+<h4 id="reset"><a href="#reset" class="headerlink" title="reset"></a>reset</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">git reset --hard HEAD <span class="comment">//本地仓库文件修改也会消失</span></div><div class="line">git reset --soft HEAD <span class="comment">//本地文件修改不会消失，类似于回到git add 之前的状态</span></div><div class="line">git reset --hard HEAD~<span class="number">3</span> <span class="comment">//最近的三次提交全部撤销</span></div></pre></td></tr></table></figure>
+<h4 id="revert"><a href="#revert" class="headerlink" title="revert"></a>revert</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git revert c011eb3c20ba6fb38cc94fe <span class="comment">//之后在分支图上就能看到一个新的反向的commit，push即可。</span></div></pre></td></tr></table></figure>
+<h3 id="8-切分支-删除分支"><a href="#8-切分支-删除分支" class="headerlink" title="8. 切分支, 删除分支"></a>8. 切分支, 删除分支</h3><h3 id="9-pull"><a href="#9-pull" class="headerlink" title="9. pull"></a>9. pull</h3><h3 id="10-rebase和cherry-pick"><a href="#10-rebase和cherry-pick" class="headerlink" title="10. rebase和cherry-pick"></a>10. rebase和cherry-pick</h3><h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p>-<a href="http://yijiebuyi.com/blog/8f985d539566d0bf3b804df6be4e0c90.html" target="_blank" rel="external">git reset和revert</a> </p>
+
       
     </div>
     <div class="article-info article-info-index">

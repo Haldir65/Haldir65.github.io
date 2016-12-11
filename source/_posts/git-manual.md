@@ -72,9 +72,29 @@ git commit --amend
 ```
 
 ### 7. git revert和reset的区别
+> reset 是在正常的commit历史中,删除了指定的commit,这时 HEAD 是向后移动了,而 revert 是在正常的commit历史中再commit一次,只不过是反向提交,他的 HEAD 是一直向前的. 即reset是通过一次反向的commit操作撤销之前的commit，而reset则会直接从提交历史里删除commit。如果还没有push，用reset可以在本地解决问题，之后重新commit再push。如果已经push，可以考虑通过一次revert来实现“撤销”的效果。
+
+
+语法：
+#### reset
+```java
+git reset --hard HEAD //本地仓库文件修改也会消失
+git reset --soft HEAD //本地文件修改不会消失，类似于回到git add 之前的状态
+git reset --hard HEAD~3 //最近的三次提交全部撤销
+```
+
+#### revert
+```java
+git revert c011eb3c20ba6fb38cc94fe //之后在分支图上就能看到一个新的反向的commit，push即可。
+```
 
 ### 8. 切分支, 删除分支
+
 
 ### 9. pull
 
 ### 10. rebase和cherry-pick
+
+
+## Reference
+-[git reset和revert](http://yijiebuyi.com/blog/8f985d539566d0bf3b804df6be4e0c90.html) 
