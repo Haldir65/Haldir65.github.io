@@ -98,8 +98,9 @@ git checkout -b <branchName>
 git branch --set-upstream <laocalBranchName> origin/<RemoteBranchName>
 ```
 直接从远程仓库切一个分支出来并保持同步的方式
+```java
 git checkout -b <branchName> origin/<branchName>
-
+```
 
 删除远程分支:
 ```java
