@@ -89,6 +89,26 @@ git revert c011eb3c20ba6fb38cc94fe //之后在分支图上就能看到一个新�
 ```
 
 ### 8. 切分支, 删除分支
+本地新建分支
+```java
+git checkout -b <branchName>
+```
+将这条分支与远程同步的方式
+```java
+git branch --set-upstream <laocalBranchName> origin/<RemoteBranchName>
+```
+直接从远程仓库切一个分支出来并保持同步的方式
+git checkout -b <branchName> origin/<branchName>
+
+
+删除远程分支:
+```java
+git push origin --delete <branchName>
+```
+删除远程tag
+```java
+git push origin --delete tag <tagName>
+```
 
 
 ### 9. pull
