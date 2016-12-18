@@ -182,7 +182,16 @@ binding.toolbar.setLayoutParams(params);
 
 原理就是让整个布局占据statusBar的位置，但把Toolbar往下挪一点（其实也就是[这篇文章](http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2016/0330/4104.html)中所推荐的给contentView的给第一个childView添加marginTop的方法）
 
-### 7. 一些不要犯的小错误
+
+### 7.在onCreate之后设置fitSystemWindows并不会把ContentView往上挪或往下挪.
+自己测试了一下，在根布局里添加fitSystemWindows = true之后，在Activity的onCreate里面是可以使用ViewCompat.setfitSystems(rootView,false)设置起作用的。但也只限于onCreate的时候。例如添加一个点击事件，在onClick里面setFitSystemWindows，是不会把RootView往下挪的。这种情况就需要一开始就确保fitSystem = false，然后需要往下挪的时候，给设置一个FrameLayout.LayoutParams的TopMargin就可以了。注意来回切换(全屏模式和着色模式之间切换)的时候要看下rootView的getTop,因为MarginTop设置了之后会导致Top!=0。
+其实fitSystemWindows是在FitSystemWindowLinearLayout中添加Padding起效的，后期操作的Margin只是对其Child ContentFrameLayout进行操作。
+所以，这种情况下我觉得直接全部弄成fitSystemWindows = false，先把statusBar后面的空间占据了再说，后面再通过手动设置Margin上下挪动。
+
+
+
+
+### 8. 一些不要犯的小错误
 - 在Theme中添加
 ```xml
 <item name="android:fitsSystemWindows">true</item>
@@ -196,7 +205,7 @@ binding.toolbar.setLayoutParams(params);
 - Ian Lake在medium上给出了对于fitSystemWindow的权威解释，非常有价值。
 
 
-### 8. 下面这段话可能对于理解window有一定帮助
+### 9. 下面这段话可能对于理解window有一定帮助
 fitsSystemWindows, 该属性可以设置是否为系统 View 预留出空间, 当设置为 true 时,会预留出状态栏的空间.
 ContentView, 实质为 ContentFrameLayout, 但是重写了 dispatchFitSystemWindows 方法, 所以对其设置 fitsSystemWindows 无效.
 ContentParent, 实质为 FitWindowsLinearLayout, 里面第一个 View 是 ViewStubCompat, 如果主题没有设置 title ,它就不会 inflate .第二个 View 就是 ContentView.
