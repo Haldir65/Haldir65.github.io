@@ -17,7 +17,7 @@
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/statusbar_5.0_collapsed.png?imageView2/2/w/300">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/statusbar_4.4_expanded.png?imageView2/2/w/300">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/statusbar_4.4_collapsed.png?imageView2/2/w/300">
-<meta property="og:updated_time" content="2016-10-15T14:52:02.885Z">
+<meta property="og:updated_time" content="2016-12-18T08:37:43.152Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="fitSystemWindow和沉浸式状态栏的一些总结">
 <meta name="twitter:description" content="沉浸式状态栏是api 19之后引入的，KitKat应该算是一次比较大的更新了，像是Transition，art runtime,storage access FrameWork(这个有空研究下)，另外就是这个被官方称为Full-screen immersive mode的特性了。具体来说，App可以将展示的区域拓展到statusBar的位置了。我觉得直接叫statusBar就好了，大部分人应该也能">
@@ -192,7 +192,8 @@
 <p>4.4图片展开:<br>  <img src="http://odzl05jxx.bkt.clouddn.com/statusbar_4.4_expanded.png?imageView2/2/w/300" alt="4.4模拟器，图片展开">  </p>
 <p>4.4图片收起:<br>  <img src="http://odzl05jxx.bkt.clouddn.com/statusbar_4.4_collapsed.png?imageView2/2/w/300" alt="4.4模拟器，图片收起">  </p>
 <p>原理就是让整个布局占据statusBar的位置，但把Toolbar往下挪一点（其实也就是<a href="http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2016/0330/4104.html" target="_blank" rel="external">这篇文章</a>中所推荐的给contentView的给第一个childView添加marginTop的方法）</p>
-<h3 id="7-一些不要犯的小错误"><a href="#7-一些不要犯的小错误" class="headerlink" title="7. 一些不要犯的小错误"></a>7. 一些不要犯的小错误</h3><ul>
+<h3 id="7-在onCreate之后设置fitSystemWindows并不会把ContentView往上挪或往下挪"><a href="#7-在onCreate之后设置fitSystemWindows并不会把ContentView往上挪或往下挪" class="headerlink" title="7.在onCreate之后设置fitSystemWindows并不会把ContentView往上挪或往下挪."></a>7.在onCreate之后设置fitSystemWindows并不会把ContentView往上挪或往下挪.</h3><p>自己测试了一下，在根布局里添加fitSystemWindows = true之后，在Activity的onCreate里面是可以使用ViewCompat.setfitSystems(rootView,false)设置起作用的。但也只限于onCreate的时候。例如添加一个点击事件，在onClick里面setFitSystemWindows，是不会把RootView往下挪的。这种情况就需要一开始就确保fitSystem = false，然后需要往下挪的时候，给设置一个FrameLayout.LayoutParams的TopMargin就可以了。注意来回切换(全屏模式和着色模式之间切换)的时候要看下rootView的getTop,因为MarginTop设置了之后会导致Top!=0。</p>
+<h3 id="8-一些不要犯的小错误"><a href="#8-一些不要犯的小错误" class="headerlink" title="8. 一些不要犯的小错误"></a>8. 一些不要犯的小错误</h3><ul>
 <li>在Theme中添加<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">"android:fitsSystemWindows"</span>&gt;</span>true<span class="tag">&lt;/<span class="name">item</span>&gt;</span></div></pre></td></tr></table></figure>
 </li>
 </ul>
@@ -205,7 +206,7 @@
 <li><p>Ian Lake在medium上给出了对于fitSystemWindow的权威解释，非常有价值。</p>
 </li>
 </ul>
-<h3 id="8-下面这段话可能对于理解window有一定帮助"><a href="#8-下面这段话可能对于理解window有一定帮助" class="headerlink" title="8. 下面这段话可能对于理解window有一定帮助"></a>8. 下面这段话可能对于理解window有一定帮助</h3><p>fitsSystemWindows, 该属性可以设置是否为系统 View 预留出空间, 当设置为 true 时,会预留出状态栏的空间.<br>ContentView, 实质为 ContentFrameLayout, 但是重写了 dispatchFitSystemWindows 方法, 所以对其设置 fitsSystemWindows 无效.<br>ContentParent, 实质为 FitWindowsLinearLayout, 里面第一个 View 是 ViewStubCompat, 如果主题没有设置 title ,它就不会 inflate .第二个 View 就是 ContentView.<br>最后感谢网上各位博主不辞辛苦写出来的干货，让我能够比较简单的复制粘贴他们的代码来检验，写博客真的很累。</p>
+<h3 id="9-下面这段话可能对于理解window有一定帮助"><a href="#9-下面这段话可能对于理解window有一定帮助" class="headerlink" title="9. 下面这段话可能对于理解window有一定帮助"></a>9. 下面这段话可能对于理解window有一定帮助</h3><p>fitsSystemWindows, 该属性可以设置是否为系统 View 预留出空间, 当设置为 true 时,会预留出状态栏的空间.<br>ContentView, 实质为 ContentFrameLayout, 但是重写了 dispatchFitSystemWindows 方法, 所以对其设置 fitsSystemWindows 无效.<br>ContentParent, 实质为 FitWindowsLinearLayout, 里面第一个 View 是 ViewStubCompat, 如果主题没有设置 title ,它就不会 inflate .第二个 View 就是 ContentView.<br>最后感谢网上各位博主不辞辛苦写出来的干货，让我能够比较简单的复制粘贴他们的代码来检验，写博客真的很累。</p>
 <h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><ol>
 <li><a href="http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2016/0330/4104.html" target="_blank" rel="external">Android-transulcent-status-bar总结</a></li>
 <li><a href="http://www.jianshu.com/p/140be70b84cd?utm_source=tuicool&amp;utm_medium=referral" target="_blank" rel="external">由沉浸式状态栏引发的血案</a></li>
