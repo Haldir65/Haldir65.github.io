@@ -96,11 +96,16 @@ git checkout -b <branchName>
 将这条分支与远程同步的方式
 ```java
 git branch --set-upstream <laocalBranchName> origin/<RemoteBranchName>
+// 或者
+git branch -u origin/dev
 ```
 直接从远程仓库切一个分支出来并保持同步的方式
 ```java
 git checkout -b <branchName> origin/<branchName>
+
+git checkout --track origin/dev
 ```
+
 
 删除远程分支:
 ```java
@@ -112,10 +117,45 @@ git push origin --delete tag <tagName>
 ```
 
 
-### 9. pull
+### 9. pull和rebase的区别
+pull = fetch +merge ，会生成新的提交
 
-### 10. rebase和cherry-pick
+> Merge好在它是一个安全的操作。现有的分支不会被更改，避免了rebase潜在的缺点
 
+### 10. rebase和cherry-pick 
+rebase不会生成新的提交，而且会使得项目提交历史呈现出完美的线性。但注意[不要在公共的分支上使用](https://github.com/geeeeeeeeek/git-recipes/wiki/5.1-%E4%BB%A3%E7%A0%81%E5%90%88%E5%B9%B6%EF%BC%9AMerge%E3%80%81Rebase%E7%9A%84%E9%80%89%E6%8B%A9)
+
+
+
+### 11. gitignore文件写法
+参考[repo](https://github.com/suzeyu1992/repo/tree/master/project/git)
+```java
+# 忽略所有以 .c结尾的文件
+*.c
+
+# 但是 stream.c 会被git追踪
+!stream.c
+
+# 只忽略当前文件夹下的TODO文件, 不包括其他文件夹下的TODO例如: subdir/TODO
+/TODO
+
+# 忽略所有在build文件夹下的文件
+build/
+
+# 忽略 doc/notes.txt, 但不包括多层下.txt例如: doc/server/arch.txt
+doc/*.txt
+
+# 忽略所有在doc目录下的.pdf文件
+doc/**/*.pdf
+```
+
+### 12. 强推
+谨慎使用
+```java
+# Be very careful with this command!
+git push --force
+```
 
 ## Reference
 -[git reset和revert](http://yijiebuyi.com/blog/8f985d539566d0bf3b804df6be4e0c90.html) 
+-[git recipes](https://github.com/geeeeeeeeek/git-recipes)
