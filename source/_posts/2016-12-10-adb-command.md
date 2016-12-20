@@ -183,6 +183,13 @@ tags：[Android,adb]
 
 > adb shell monkey -v -p your.package.name 500
 
+录制视频
+
+> adb shell screenrecord /sdcard/demo.mp4  生成的Demo.mp4文件在根目录下面，默认录制时长180s
+按下ctrl+c 停止录制
+注意，最好在开发者选项里面，把显示触摸操作打开，这样视频中能显示用户点击操作位置
+
+
 
 ### Ref: 
 
