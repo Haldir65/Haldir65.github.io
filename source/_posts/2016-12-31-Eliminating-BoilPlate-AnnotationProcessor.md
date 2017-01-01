@@ -1,5 +1,5 @@
 ---
-title: 使用AnnotationProcessor自动生成代码(在编译期)
+title: 使用AnnotationProcessor自动生成代码
 date: 2016-12-31 22:42:15
 tags:
 ---
@@ -8,7 +8,7 @@ tags:
 ![](http://odzl05jxx.bkt.clouddn.com/apt_01.JPG)
 记得Romain Guy在一次DroidCon上曾说过:
 
-> As I understand, modern java application are all about wrting annaotation Processors and not wrting code anymore...
+> As I understand, modern java development are all about wrting annaotation Processors and not wrting code anymore...
 
 全场观众大笑。。。
 
