@@ -149,7 +149,17 @@ doc/*.txt
 doc/**/*.pdf
 ```
 
-### 12. 强推
+### 12. git stash 
+常用命令
+```java
+git stash  //保存下来，压进一个栈
+git stash pop //出栈
+git stash list 
+git stash delete
+git stash apply
+```
+
+### 13. 强推
 谨慎使用
 ```java
 # Be very careful with this command!
