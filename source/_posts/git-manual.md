@@ -152,11 +152,17 @@ doc/**/*.pdf
 ### 12. git stash 
 常用命令
 ```java
-git stash  //保存下来，压进一个栈
-git stash pop //出栈
-git stash list 
-git stash delete
-git stash apply
+git stash  //保存下来，压进一个栈，基本上就是先进后出了
+git stash pop //推出一个栈
+
+git stash save -a "message to add" // 添加一次stash，打上标记
+
+git stash list  //展示当前仓库所有的被stash的变更以及对应的id，记得这个不是跟着branch走的
+git stash drop stah@{id} // 从stash的List中删除指定的某一次stash
+git stash apply <stash@{id}> //应用某一次的stash
+
+git stash clear// 一次性删除stash List中所有的item
+
 ```
 
 ### 13. 强推
