@@ -1,11 +1,14 @@
 ---
 title: linux基本命令介绍
 date: 2017-01-07 15:38:43
-categories: [技术]
-tags: [linux]
+categories: [linux]
+tags: [置顶]
+top : 1
 ---
 
-把经常会用到的一些linux基本命令罗列在这里，这其中配上一些自己的图，希望作为今后工作中的参考。 <!--more-->
+把经常会用到的一些linux基本命令罗列在这里，这其中配上一些自己的图，希望作为今后工作中的参考。</br>
+![](http://odzl05jxx.bkt.clouddn.com/fork_you_git.jpg)
+ <!--more-->
 
 
 ### 1. 文件操作常用命令

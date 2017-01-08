@@ -6,14 +6,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://haldir65.github.io">
-  <title>Haldir的博客</title>
+  <title>Hexo部署个人博客记录 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Haldir的博客">
-<meta property="og:url" content="http://haldir65.github.io/page/2/index.html">
+  <meta name="description" content="去年九月份之前还觉得写个人blog是一件很奢侈的事情，现在几个月过去了，很多问题都能够自己在网上找到答案。记录下来的问题也越来越多，如果想要给自己的blog一个值得置顶的文章的话，我觉得一篇记录使用hexo过程中的一些解决问题的方法的文章是再合适不过的了。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo部署个人博客记录">
+<meta property="og:url" content="http://haldir65.github.io/2017/01/08/2017-01-08-trouble-shooting-with-my-blog/index.html">
 <meta property="og:site_name" content="Haldir的博客">
+<meta property="og:description" content="去年九月份之前还觉得写个人blog是一件很奢侈的事情，现在几个月过去了，很多问题都能够自己在网上找到答案。记录下来的问题也越来越多，如果想要给自己的blog一个值得置顶的文章的话，我觉得一篇记录使用hexo过程中的一些解决问题的方法的文章是再合适不过的了。">
+<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/163216sn1ziyyaef4zaeps.jpg?imageView2/2/w/600">
+<meta property="og:updated_time" content="2017-01-08T13:37:46.784Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Haldir的博客">
+<meta name="twitter:title" content="Hexo部署个人博客记录">
+<meta name="twitter:description" content="去年九月份之前还觉得写个人blog是一件很奢侈的事情，现在几个月过去了，很多问题都能够自己在网上找到答案。记录下来的问题也越来越多，如果想要给自己的blog一个值得置顶的文章的话，我觉得一篇记录使用hexo过程中的一些解决问题的方法的文章是再合适不过的了。">
+<meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/163216sn1ziyyaef4zaeps.jpg?imageView2/2/w/600">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -164,56 +170,80 @@ ga('send', 'pageview');
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-    <article id="post-2016-11-27-the-size-of-wrap-content" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+            <article id="post-2017-01-08-trouble-shooting-with-my-blog" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/11/27/2016-11-27-the-size-of-wrap-content/">wrap_content到底多大</a>
+    <h1 class="article-title" itemprop="name">
+      Hexo部署个人博客记录
     </h1>
   
 
         
-        <a href="/2016/11/27/2016-11-27-the-size-of-wrap-content/" class="archive-article-date">
-  	<time datetime="2016-11-27T08:46:44.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-11-27</time>
+        <a href="/2017/01/08/2017-01-08-trouble-shooting-with-my-blog/" class="archive-article-date">
+  	<time datetime="2017-01-08T10:01:01.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-01-08</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>转眼就十一月了，java的分析越来越少，虽然常常在业务上碰到不少坑。。。</p>
-<h4 id="问题的由来"><a href="#问题的由来" class="headerlink" title="问题的由来"></a>问题的由来</h4><p>这周碰到一个需要画时间轴样式的自定义View的需求，大概像这样(图片来自网络)：<br><img src="http://odzl05jxx.bkt.clouddn.com/timelineView.png" alt=""></p>
-<p>要求，左侧的圆形节点可以自定义Drawable，右侧的文字高度随文字数量变化自适应。</p>
-<p>想想也就是自定义ViewGroup的那一套老样子。抄起键盘就开始研(Copy)究(Paste)，写着写着发现不对劲，主要的问题包括: </p>
-<blockquote>
-<ol>
-<li>在onMeasure里面拿到的height == 0 , 具体一点就是:<br>整个ViewGroup包含多个Item，每个Item包括左侧的自定义View(CustomView)，高度是wrap_content，右边的TextView高度是wrap_content(自适应嘛)。可是debug时发现左侧的自定义View拿到的高度是0，简直日了哈士奇了。随后拿着关键词去Google搜索，还是没有什么收获。</li>
-</ol>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onMeasure</span><span class="params">(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</span> </span>&#123;</div><div class="line">       <span class="keyword">final</span> <span class="keyword">int</span> widthMode = MeasureSpec.getMode(widthMeasureSpec);</div><div class="line">       <span class="keyword">final</span> <span class="keyword">int</span> heightMode = MeasureSpec.getMode(heightMeasureSpec);<span class="comment">// 这里是UNSPECIFIED, 常规概念里wrap_content对应的应该是AT_MOST</span></div><div class="line">       <span class="keyword">final</span> <span class="keyword">int</span> widthSize = MeasureSpec.getSize(widthMeasureSpec);</div><div class="line">       <span class="keyword">final</span> <span class="keyword">int</span> heightSize = MeasureSpec.getSize(heightMeasureSpec); <span class="comment">// 居然等于0</span></div><div class="line">   &#125;</div></pre></td></tr></table></figure>
-<p>回顾这个Item的实现，Item继承自RelativeLayout，左边的View是调用addView(view,RelativeLayout.Layoutparams)加进去的,params设置了一些rules，像是AlignParentLeft这种，记得给左边的View和右边的TextView都设置一个id就好。TextView也是这样addView进去的。后来查到了秋百万对于MeasureSpec的介绍，我想到RelativeLayout的onMeasure会调用两次，在第一次测量的时候，左边的View和右边的TextView都把高度设置为wrap_content了。要命的是这个Item本身添加到UI的方式也是类似的addView(view,RelativeLayout.Layoutparams)方式，这里的height也是wrap_content。即Item本身高度需要由其child决定，左边的child决定不了，只有右边的TextView才能决定。所以第一轮测量下来，左边的View的高度只能是0，右边的TextView高度倒是确定了。这时候Item本身的高度也就能确定了。在第二遍测量的时候，就能顺利拿到高度了。</p>
-<blockquote>
-<ol>
-<li>左侧的每个节点上的drawable不画出来<br>后来查了下，原因在于我对传进来的drawable检查了大小，太大的话用一个ScaleDrawable转一下。但是，scaleDrawable需要调用setLevel方法才会draw，我这里偷懒直接设置为1了。</li>
-</ol>
-<ol>
-<li>Item本身是继承自RelativeLayout，想要使onDraw方法被调用需要在构造函数里设置<br>setWillNotDraw(false)<br>这个boolean值默认是true，主要是顾及到性能的原因。</li>
-</ol>
-</blockquote>
-<h3 id="ref"><a href="#ref" class="headerlink" title="ref"></a>ref</h3><ul>
-<li><a href="https://www.liaohuqiu.net/posts/how-does-android-caculate-the-size-of-child-view/" target="_blank" rel="external">How Android caculates view size</a></li>
+        <p>去年九月份之前还觉得写个人blog是一件很奢侈的事情，现在几个月过去了，很多问题都能够自己在网上找到答案。记录下来的问题也越来越多，如果想要给自己的blog一个值得置顶的文章的话，我觉得一篇记录使用hexo过程中的一些解决问题的方法的文章是再合适不过的了。<br><br><img src="http://odzl05jxx.bkt.clouddn.com/163216sn1ziyyaef4zaeps.jpg?imageView2/2/w/600" alt=""></p>
+<a id="more"></a>
+<h3 id="1-经常更新yilia的theme"><a href="#1-经常更新yilia的theme" class="headerlink" title="1. 经常更新yilia的theme"></a>1. 经常更新yilia的theme</h3><p><a href="https://github.com/litten/hexo-theme-yilia" target="_blank" rel="external">yilia</a>主题经常会更新，及时更新theme会发现很多新的特性及bug fix</p>
+<h3 id="2-部署相关"><a href="#2-部署相关" class="headerlink" title="2. 部署相关"></a>2. 部署相关</h3><ul>
+<li><p>部署到github</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">hexo clean <span class="comment">//清除缓存</span></div><div class="line">hexo g -d <span class="comment">//一步到位 = hexo g + hexo d</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>部署过程中出现的一些错误</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div></pre></td><td class="code"><pre><div class="line">$ hexo g -d</div><div class="line">INFO  Start processing</div><div class="line">ERROR Process failed: _posts/<span class="number">2016</span>-<span class="number">12</span>-<span class="number">10</span>-adb-command.md</div><div class="line">YAMLException: can not read a block mapping entry; a multiline key may not be an implicit key at line <span class="number">3</span>, column <span class="number">11</span>:</div><div class="line">    categories:  [技术]</div><div class="line">              ^</div><div class="line">    <span class="function">at <span class="title">generateError</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\js-yaml\lib\js-yaml\loader.js:<span class="number">162</span>:<span class="number">10</span>)</span></span></div><div class="line">    at <span class="title">throwError</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\js-yaml\lib\js-yaml\loader.js:<span class="number">168</span>:<span class="number">9</span>)</span></div><div class="line">    at <span class="title">readBlockMapping</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\js-yaml\lib\js-yaml\loader.js:<span class="number">1040</span>:<span class="number">9</span>)</span></div><div class="line">    at <span class="title">composeNode</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\js-yaml\lib\js-yaml\loader.js:<span class="number">1326</span>:<span class="number">12</span>)</span></div><div class="line">    at <span class="title">readDocument</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\js-yaml\lib\js-yaml\loader.js:<span class="number">1488</span>:<span class="number">3</span>)</span></div><div class="line">    at <span class="title">loadDocuments</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\js-yaml\lib\js-yaml\loader.js:<span class="number">1544</span>:<span class="number">5</span>)</span></div><div class="line">    at Object.<span class="title">load</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\js-yaml\lib\js-yaml\loader.js:<span class="number">1561</span>:<span class="number">19</span>)</span></div><div class="line">    at <span class="title">parseYAML</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\hexo-front-matter\lib\front_matter.js:<span class="number">80</span>:<span class="number">21</span>)</span></div><div class="line">    at <span class="title">parse</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\hexo-front-matter\lib\front_matter.js:<span class="number">56</span>:<span class="number">12</span>)</span></div><div class="line">    at D:\Blog\github\node_modules\hexo\lib\plugins\processor\post.js:52:18</div><div class="line">    at <span class="title">tryCatcher</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\util.js:<span class="number">16</span>:<span class="number">23</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromiseFromHandler</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">507</span>:<span class="number">35</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromise</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">567</span>:<span class="number">18</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromise0</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">612</span>:<span class="number">10</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromises</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">691</span>:<span class="number">18</span>)</span></div><div class="line">    at Promise.<span class="title">_fulfill</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">636</span>:<span class="number">18</span>)</span></div><div class="line">    at PromiseArray.<span class="title">_resolve</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise_array.js:<span class="number">125</span>:<span class="number">19</span>)</span></div><div class="line">    at PromiseArray.<span class="title">_promiseFulfilled</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise_array.js:<span class="number">143</span>:<span class="number">14</span>)</span></div><div class="line">    at PromiseArray.<span class="title">_iterate</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise_array.js:<span class="number">113</span>:<span class="number">31</span>)</span></div><div class="line">    at PromiseArray.init [as _init] <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise_array.js:<span class="number">77</span>:<span class="number">10</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromise</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">564</span>:<span class="number">21</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromise0</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">612</span>:<span class="number">10</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromises</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">691</span>:<span class="number">18</span>)</span></div><div class="line">    at Promise.<span class="title">_fulfill</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">636</span>:<span class="number">18</span>)</span></div><div class="line">    at PromiseArray.<span class="title">_resolve</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise_array.js:<span class="number">125</span>:<span class="number">19</span>)</span></div><div class="line">    at PromiseArray.<span class="title">_promiseFulfilled</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise_array.js:<span class="number">143</span>:<span class="number">14</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromise</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">572</span>:<span class="number">26</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromise0</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">612</span>:<span class="number">10</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromises</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">691</span>:<span class="number">18</span>)</span></div><div class="line">    at Promise.<span class="title">_fulfill</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">636</span>:<span class="number">18</span>)</span></div><div class="line">    at Promise.<span class="title">_resolveCallback</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">431</span>:<span class="number">57</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromiseFromHandler</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">522</span>:<span class="number">17</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromise</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">567</span>:<span class="number">18</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromise0</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">612</span>:<span class="number">10</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromises</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">691</span>:<span class="number">18</span>)</span></div><div class="line">    at Promise.<span class="title">_fulfill</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">636</span>:<span class="number">18</span>)</span></div><div class="line">    at D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\nodeback.js:42:21</div><div class="line">    at D:\Blog\github\node_modules\hexo\node_modules\hexo-fs\node_modules\graceful-fs\graceful-fs.js:78:16</div><div class="line">    at <span class="title">tryToString</span> <span class="params">(fs.js:<span class="number">455</span>:<span class="number">3</span>)</span></div><div class="line">    at FSReqWrap.readFileAfterClose [as oncomplete] <span class="params">(fs.js:<span class="number">442</span>:<span class="number">12</span>)</span></div><div class="line">INFO  Files loaded in 1.48 s</div><div class="line">INFO  Generated: sitemap.xml</div><div class="line">INFO  Generated: atom.xml</div><div class="line">INFO  Generated: 2017/01/08/2017-01-08-trouble-shooting-with-my-blog/index.html</div><div class="line">INFO  Generated: index.html</div><div class="line">INFO  4 files generated in 2.26 s</div><div class="line">INFO  Deploying: git</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="3-一些功能的实现"><a href="#3-一些功能的实现" class="headerlink" title="3. 一些功能的实现"></a>3. 一些功能的实现</h3><ul>
+<li>置顶功能<br>  将node_modules/hexo-generator-index/lib/generator.js的文件内容替换成一下内容</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="meta">'use strict'</span>;</div><div class="line"><span class="keyword">var</span> pagination = <span class="built_in">require</span>(<span class="string">'hexo-pagination'</span>);</div><div class="line"><span class="built_in">module</span>.exports = <span class="function"><span class="keyword">function</span>(<span class="params">locals</span>)</span>&#123;</div><div class="line">  <span class="keyword">var</span> config = <span class="keyword">this</span>.config;</div><div class="line">  <span class="keyword">var</span> posts = locals.posts;</div><div class="line">    posts.data = posts.data.sort(<span class="function"><span class="keyword">function</span>(<span class="params">a, b</span>) </span>&#123;</div><div class="line">        <span class="keyword">if</span>(a.top &amp;&amp; b.top) &#123; <span class="comment">// 两篇文章top都有定义</span></div><div class="line">            <span class="keyword">if</span>(a.top == b.top) <span class="keyword">return</span> b.date - a.date; <span class="comment">// 若top值一样则按照文章日期降序排</span></div><div class="line">            <span class="keyword">else</span> <span class="keyword">return</span> b.top - a.top; <span class="comment">// 否则按照top值降序排</span></div><div class="line">        &#125;</div><div class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(a.top &amp;&amp; !b.top) &#123; <span class="comment">// 以下是只有一篇文章top有定义，那么将有top的排在前面（这里用异或操作居然不行233）</span></div><div class="line">            <span class="keyword">return</span> <span class="number">-1</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(!a.top &amp;&amp; b.top) &#123;</div><div class="line">            <span class="keyword">return</span> <span class="number">1</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">else</span> <span class="keyword">return</span> b.date - a.date; <span class="comment">// 都没定义按照文章日期降序排</span></div><div class="line">    &#125;);</div><div class="line">  <span class="keyword">var</span> paginationDir = config.pagination_dir || <span class="string">'page'</span>;</div><div class="line">  <span class="keyword">return</span> pagination(<span class="string">''</span>, posts, &#123;</div><div class="line">    perPage: config.index_generator.per_page,</div><div class="line">    layout: [<span class="string">'index'</span>, <span class="string">'archive'</span>],</div><div class="line">    format: paginationDir + <span class="string">'/%d/'</span>,</div><div class="line">    data: &#123;</div><div class="line">    __index: <span class="literal">true</span></div><div class="line">    &#125;</div><div class="line">  &#125;);</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<ul>
+<li>同时在文章开头添加top : 1即可 ，实际排序按照这个数字从大到小排序<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"> title: Hexo置顶文章</div><div class="line">date: 2016-11-11 23:26:22</div><div class="line">tags:[置顶]</div><div class="line">categories: Hexo</div><div class="line">top: 0 # 0或者1</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="4-markdown语法"><a href="#4-markdown语法" class="headerlink" title="4. markdown语法"></a>4. markdown语法</h3><h3 id="ref"><a href="#ref" class="headerlink" title="ref"></a>ref</h3><ul>
+<li><a href="http://yanhuili.github.io/2016/11/21/hexo%E5%8D%9A%E6%96%87%E7%BD%AE%E9%A1%B6%E6%8A%80%E5%B7%A7/" target="_blank" rel="external">Hexo博文置顶技巧</a></li>
 </ul>
 
       
 
       
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
     </div>
     <div class="article-info article-info-index">
+      
+        <div class="article-pop-out tagcloud">
+          <i class="icon-tuding"></i>
+          <a>置顶</a>
+        </div>
       
       
 	<div class="article-tag tagcloud">
@@ -221,7 +251,7 @@ ga('send', 'pageview');
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">android</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">hexo</a>
         		</li>
       		
 		</ul>
@@ -230,18 +260,74 @@ ga('send', 'pageview');
       
 
       
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2016/11/27/2016-11-27-the-size-of-wrap-content/">展开全文 >></a>
-        </p>
-      
 
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
+        </div>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://haldir65.github.io/2017/01/08/2017-01-08-trouble-shooting-with-my-blog/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
       
       <div class="clearfix"></div>
     </div>
   </div>
 </article>
 
-
+  
+<nav id="article-nav">
+  
+  
+    <a href="/2017/01/07/2017-01-07-Linux-Basic-Commands/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">linux基本命令介绍</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
 
 
 
@@ -249,208 +335,10 @@ ga('send', 'pageview');
 
 
   
-    <article id="post-2016-10-31-install-lxml-on-windows" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/10/31/2016-10-31-install-lxml-on-windows/">Windows10平台安装lxml记录</a>
-    </h1>
+    <div class="duoshuo"></div>
   
 
-        
-        <a href="/2016/10/31/2016-10-31-install-lxml-on-windows/" class="archive-article-date">
-  	<time datetime="2016-10-31T07:49:38.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-10-31</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>前几天尝试使用一个简单的微博爬虫进行操作，导包的时候遇到lxml缺失的问题，找了好久最终在百度知道上找到个能用的，(⊙﹏⊙)b。</p>
-<h3 id="1-环境"><a href="#1-环境" class="headerlink" title="1. 环境"></a>1. 环境</h3><ol>
-<li>python2.7, win10 64位</li>
-<li>pip 环境变量配置
-        
-          <a class="article-more-a" href="/2016/10/31/2016-10-31-install-lxml-on-windows/#more">more >></a>
-        
-      
 
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">Python</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2016/10/31/2016-10-31-install-lxml-on-windows/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
-
-  
-    <article id="post-2016-10-24-a-peek-on-pull-to-refresh" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/10/24/2016-10-24-a-peek-on-pull-to-refresh/">android-Ultra-pull-to-refresh分析</a>
-    </h1>
-  
-
-        
-        <a href="/2016/10/24/2016-10-24-a-peek-on-pull-to-refresh/" class="archive-article-date">
-  	<time datetime="2016-10-24T02:25:35.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-10-24</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p> 最早开始接触安卓的时候就知道有Chris Banes的<a href="https://github.com/chrisbanes/Android-PullToRefresh">Pull-To-Refresh</a>，当时这个库已经被标记被Deprecated了，后来出于寻找替代品的目的找到了秋百万的<a href="https://github.com/liaohuqiu/android-Ultra-Pull-To-Refresh">android-Ultra-pull-toRefresh</a>，直接</p>
-<p> <img src="http://odzl05jxx.bkt.clouddn.com/687474703a2f2f692e696d6775722e636f6d2f4766746846417a2e706e67.png" alt="fork"></p>
-<p> 当时甚至没有能力把一个Demo跑起来。之后的项目中，直接使用swipeRefreshLayout了。现在回头看，终于觉得可以尝试着分析一遍整个下拉刷新的过程。本文只针对<a href="https://github.com/liaohuqiu/android-Ultra-Pull-To-Refresh">android-Ultra-pulltoRefresh</a>部分源码进行分析。拆一个轮子可能只需要花一天时间，但能够从无到有构思出这个框架，将项目搭建起来并且坚持长期维护真的是一件需要很强毅力的事情，向为开源社区贡献优秀代码的秋百万和众多做出贡献的开发者致敬。<br>
-        
-          <a class="article-more-a" href="/2016/10/24/2016-10-24-a-peek-on-pull-to-refresh/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">置顶</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2016/10/24/2016-10-24-a-peek-on-pull-to-refresh/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
-
-  
-    <article id="post-2016-10-20-android-dirty-code" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/10/20/2016-10-20-android-dirty-code/">一些脏代码</a>
-    </h1>
-  
-
-        
-        <a href="/2016/10/20/2016-10-20-android-dirty-code/" class="archive-article-date">
-  	<time datetime="2016-10-20T13:35:10.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-10-20</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>今天在V2EX上看到有人提到Notification有漏洞，好奇也就查了一下，结果发现有人专门针对这个问题进行了<a href="http://zhoujianghua.com/2015/07/28/black_technology_in_alipay/">分析</a>。本身的技术分析并不多，写在这里只是为了作为今后的一个参考。
-        
-          <a class="article-more-a" href="/2016/10/20/2016-10-20-android-dirty-code/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2016/10/20/2016-10-20-android-dirty-code/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
-
-  
-  
-    <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/3/">Next &raquo;</a>
-    </nav>
-  
 
 
           </div>
@@ -472,8 +360,8 @@ ga('send', 'pageview');
     <script>
 	var yiliaConfig = {
 		mathjax: false,
-		isHome: true,
-		isPost: false,
+		isHome: false,
+		isPost: true,
 		isArchive: false,
 		isTag: false,
 		isCategory: false,
