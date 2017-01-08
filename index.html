@@ -166,6 +166,88 @@ ga('send', 'pageview');
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-2016-10-24-a-peek-on-pull-to-refresh" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/10/24/2016-10-24-a-peek-on-pull-to-refresh/">android-Ultra-pull-to-refresh分析</a>
+    </h1>
+  
+
+        
+        <a href="/2016/10/24/2016-10-24-a-peek-on-pull-to-refresh/" class="archive-article-date">
+  	<time datetime="2016-10-24T02:25:35.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-10-24</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p> 最早开始接触安卓的时候就知道有Chris Banes的<a href="https://github.com/chrisbanes/Android-PullToRefresh">Pull-To-Refresh</a>，当时这个库已经被标记被Deprecated了，后来出于寻找替代品的目的找到了秋百万的<a href="https://github.com/liaohuqiu/android-Ultra-Pull-To-Refresh">android-Ultra-pull-toRefresh</a>，直接</p>
+<p> <img src="http://odzl05jxx.bkt.clouddn.com/687474703a2f2f692e696d6775722e636f6d2f4766746846417a2e706e67.png" alt="fork"></p>
+<p> 当时甚至没有能力把一个Demo跑起来。之后的项目中，直接使用swipeRefreshLayout了。现在回头看，终于觉得可以尝试着分析一遍整个下拉刷新的过程。本文只针对<a href="https://github.com/liaohuqiu/android-Ultra-Pull-To-Refresh">android-Ultra-pulltoRefresh</a>部分源码进行分析。拆一个轮子可能只需要花一天时间，但能够从无到有构思出这个框架，将项目搭建起来并且坚持长期维护真的是一件需要很强毅力的事情，向为开源社区贡献优秀代码的秋百万和众多做出贡献的开发者致敬。<br>
+        
+          <a class="article-more-a" href="/2016/10/24/2016-10-24-a-peek-on-pull-to-refresh/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+        <div class="article-pop-out tagcloud">
+          <i class="icon-tuding"></i>
+          <a>置顶</a>
+        </div>
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">置顶</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/android/" class="article-tag-list-link color3">android</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2016/10/24/2016-10-24-a-peek-on-pull-to-refresh/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+  
     <article id="post-2017-01-07-Linux-Basic-Commands" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -355,89 +437,6 @@ ga('send', 'pageview');
 
 
   
-    <article id="post-2016-11-27-the-size-of-wrap-content" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/11/27/2016-11-27-the-size-of-wrap-content/">wrap_content到底多大</a>
-    </h1>
-  
-
-        
-        <a href="/2016/11/27/2016-11-27-the-size-of-wrap-content/" class="archive-article-date">
-  	<time datetime="2016-11-27T08:46:44.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-11-27</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>转眼就十一月了，java的分析越来越少，虽然常常在业务上碰到不少坑。。。</p>
-<h4 id="问题的由来"><a href="#问题的由来" class="headerlink" title="问题的由来"></a>问题的由来</h4><p>这周碰到一个需要画时间轴样式的自定义View的需求，大概像这样(图片来自网络)：<br><img src="http://odzl05jxx.bkt.clouddn.com/timelineView.png" alt=""></p>
-<p>要求，左侧的圆形节点可以自定义Drawable，右侧的文字高度随文字数量变化自适应。</p>
-<p>想想也就是自定义ViewGroup的那一套老样子。抄起键盘就开始研(Copy)究(Paste)，写着写着发现不对劲，主要的问题包括: </p>
-<blockquote>
-<ol>
-<li>在onMeasure里面拿到的height == 0 , 具体一点就是:<br>整个ViewGroup包含多个Item，每个Item包括左侧的自定义View(CustomView)，高度是wrap_content，右边的TextView高度是wrap_content(自适应嘛)。可是debug时发现左侧的自定义View拿到的高度是0，简直日了哈士奇了。随后拿着关键词去Google搜索，还是没有什么收获。</li>
-</ol>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onMeasure</span><span class="params">(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</span> </span>&#123;</div><div class="line">       <span class="keyword">final</span> <span class="keyword">int</span> widthMode = MeasureSpec.getMode(widthMeasureSpec);</div><div class="line">       <span class="keyword">final</span> <span class="keyword">int</span> heightMode = MeasureSpec.getMode(heightMeasureSpec);<span class="comment">// 这里是UNSPECIFIED, 常规概念里wrap_content对应的应该是AT_MOST</span></div><div class="line">       <span class="keyword">final</span> <span class="keyword">int</span> widthSize = MeasureSpec.getSize(widthMeasureSpec);</div><div class="line">       <span class="keyword">final</span> <span class="keyword">int</span> heightSize = MeasureSpec.getSize(heightMeasureSpec); <span class="comment">// 居然等于0</span></div><div class="line">   &#125;</div></pre></td></tr></table></figure>
-<p>回顾这个Item的实现，Item继承自RelativeLayout，左边的View是调用addView(view,RelativeLayout.Layoutparams)加进去的,params设置了一些rules，像是AlignParentLeft这种，记得给左边的View和右边的TextView都设置一个id就好。TextView也是这样addView进去的。后来查到了秋百万对于MeasureSpec的介绍，我想到RelativeLayout的onMeasure会调用两次，在第一次测量的时候，左边的View和右边的TextView都把高度设置为wrap_content了。要命的是这个Item本身添加到UI的方式也是类似的addView(view,RelativeLayout.Layoutparams)方式，这里的height也是wrap_content。即Item本身高度需要由其child决定，左边的child决定不了，只有右边的TextView才能决定。所以第一轮测量下来，左边的View的高度只能是0，右边的TextView高度倒是确定了。这时候Item本身的高度也就能确定了。在第二遍测量的时候，就能顺利拿到高度了。</p>
-<blockquote>
-<ol>
-<li>左侧的每个节点上的drawable不画出来<br>后来查了下，原因在于我对传进来的drawable检查了大小，太大的话用一个ScaleDrawable转一下。但是，scaleDrawable需要调用setLevel方法才会draw，我这里偷懒直接设置为1了。</li>
-</ol>
-<ol>
-<li>Item本身是继承自RelativeLayout，想要使onDraw方法被调用需要在构造函数里设置<br>setWillNotDraw(false)<br>这个boolean值默认是true，主要是顾及到性能的原因。</li>
-</ol>
-</blockquote>
-<h3 id="ref"><a href="#ref" class="headerlink" title="ref"></a>ref</h3><ul>
-<li><a href="https://www.liaohuqiu.net/posts/how-does-android-caculate-the-size-of-child-view/" target="_blank" rel="external">How Android caculates view size</a></li>
-</ul>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2016/11/27/2016-11-27-the-size-of-wrap-content/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
@@ -554,6 +553,18 @@ ga('send', 'pageview');
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">坐标</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">Android</a>
               </li>
              
@@ -566,23 +577,7 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">坐标</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">android</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Python</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -590,7 +585,11 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+                <a href="javascript:void(0)" class="js-tag color2">Python</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">android</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -598,19 +597,11 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">android 7</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">随笔</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -619,6 +610,14 @@ ga('send', 'pageview');
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">随笔</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
              
               <li class="article-tag-list-item">
