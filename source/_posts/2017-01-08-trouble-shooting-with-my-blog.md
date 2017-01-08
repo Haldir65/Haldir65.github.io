@@ -6,7 +6,7 @@ top : 2
 ---
 
 去年九月份之前还觉得写个人blog是一件很奢侈的事情，现在几个月过去了，很多问题都能够自己在网上找到答案。记录下来的问题也越来越多，如果想要给自己的blog一个值得置顶的文章的话，我觉得一篇记录使用hexo过程中的一些解决问题的方法的文章是再合适不过的了。</br>
-![](http://odzl05jxx.bkt.clouddn.com/163216sn1ziyyaef4zaeps.jpg?imageView2/2/w/600)
+![](http://odzl05jxx.bkt.clouddn.com/163216sn1ziyyaef4zaeps.jpg?imageView2/2/w/500)
 
 <!--more-->
 

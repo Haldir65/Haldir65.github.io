@@ -5,7 +5,7 @@ tags:
 ---
 
 
-![](http://odzl05jxx.bkt.clouddn.com/apt_01.JPG)
+![](http://odzl05jxx.bkt.clouddn.com/apt_01.JPG?imageView2/2/w/500)
 记得Romain Guy在一次DroidCon上曾说过:
 
 > As I understand, modern java development are all about wrting annaotation Processors and not wrting code anymore...
