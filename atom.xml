@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://haldir65.github.io/"/>
-  <updated>2017-01-08T13:45:30.975Z</updated>
+  <updated>2017-01-13T15:09:32.572Z</updated>
   <id>http://haldir65.github.io/</id>
   
   <author>
@@ -16,11 +16,31 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>使用Kotlin进行java开发</title>
+    <link href="http://haldir65.github.io/2017/01/13/2017-01-13-embracing-kotlin/"/>
+    <id>http://haldir65.github.io/2017/01/13/2017-01-13-embracing-kotlin/</id>
+    <published>2017-01-13T15:06:13.000Z</published>
+    <updated>2017-01-13T15:09:32.572Z</updated>
+    
+    <content type="html"><![CDATA[<p>Kotlin是Jetbrain公司推出的面向jvm的语言，编译后的bytecode和java编写的代码并没有什么区别。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Kotlin是Jetbrain公司推出的面向jvm的语言，编译后的bytecode和java编写的代码并没有什么区别。&lt;/p&gt;
+
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
     <title>Hexo部署个人博客记录</title>
     <link href="http://haldir65.github.io/2017/01/08/2017-01-08-trouble-shooting-with-my-blog/"/>
     <id>http://haldir65.github.io/2017/01/08/2017-01-08-trouble-shooting-with-my-blog/</id>
     <published>2017-01-08T10:01:01.000Z</published>
-    <updated>2017-01-08T13:45:30.975Z</updated>
+    <updated>2017-01-08T13:47:34.587Z</updated>
     
     <content type="html"><![CDATA[<p>去年九月份之前还觉得写个人blog是一件很奢侈的事情，现在几个月过去了，很多问题都能够自己在网上找到答案。记录下来的问题也越来越多，如果想要给自己的blog一个值得置顶的文章的话，我觉得一篇记录使用hexo过程中的一些解决问题的方法的文章是再合适不过的了。<br><br><img src="http://odzl05jxx.bkt.clouddn.com/163216sn1ziyyaef4zaeps.jpg?imageView2/2/w/500" alt=""></p>
 <a id="more"></a>
@@ -1291,59 +1311,6 @@
     
     
       <category term="git" scheme="http://haldir65.github.io/tags/git/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>activity transition pre and post lollipop</title>
-    <link href="http://haldir65.github.io/2016/09/27/activity-transition-pre-and-post-lollipop/"/>
-    <id>http://haldir65.github.io/2016/09/27/activity-transition-pre-and-post-lollipop/</id>
-    <published>2016-09-27T06:53:25.000Z</published>
-    <updated>2016-10-06T09:04:53.709Z</updated>
-    
-    <content type="html"><![CDATA[<p>Lollipop开始引入了新的Activity Transition动画效果，比起常用的overridePendingTransaction() 效果要强大许多</p>
-<p>测试环境<br>supportLibVersion = “24.2.1”<br>gradle plugin version : “classpath ‘com.android.tools.build:gradle:2.2.0’”<br>gradle version : 3.1<br>compileSdkVersion 24<br>buildToolsVersion “24.0.2”</p>
-<a id="more"></a>
-<ul>
-<li>常规用法:</li>
-</ul>
-<p>A activity &gt;&gt;&gt;&gt; B activity</p>
-<p>A activity中:</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">intent = <span class="keyword">new</span> Intent(getActivity(), PictureDetailSubActivity2.class);</div><div class="line">               intent.putExtra(EXTRA_IMAGE_URL, R.drawable.b2);</div><div class="line">               intent.putExtra(EXTRA_IMAGE_TITLE, <span class="string">"使用ActivityCompat动画"</span>);</div><div class="line">               ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.</div><div class="line">                       makeSceneTransitionAnimation(getActivity(), view, TRANSIT_PIC);</div><div class="line">               <span class="keyword">try</span> &#123;</div><div class="line">                   ActivityCompat.startActivity(getActivity(), intent, optionsCompat.toBundle()); <span class="comment">//据说部分三星手机上会失效</span></div><div class="line">               &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">                   e.printStackTrace();</div><div class="line">                   ToastUtils.showTextShort(getActivity(), <span class="string">"ActivityCompat出错！！"</span>);</div><div class="line">                   startActivity(intent);</div><div class="line">               &#125;</div></pre></td></tr></table></figure>
-<p>Pair这个class是v4包里的一个Util类，用来装载一组(pair)对象，支持泛型，很好用。由于都是v4包里的方法，省去了做API版本判断，在API 16以下，就只会调用普通的startActivity方法。上面加了try catch是避免部分手机上出现问题</p>
-<p>B activity中onCreate调用</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ViewCompat.setTransitionName(binding.imageDetail, TRANSIT_PIC);</div></pre></td></tr></table></figure>
-<p>就可实现普通的转场动画。</p>
-<ul>
-<li><p>兼容方式(将连续的Transition带到API16以下)</p>
-<p>主要的原理: 在A activity中记录要带到B activity中的View的当前位置，在B activity中添加onPredrawListener(measure完毕，layout完毕，即将开始Draw的时候)，此时开始进行动画，将SharedView从原位置animate到B Activty中的位置</p>
-<p>原理及详细代码在这里:</p>
-<p> <a href="https://www.youtube.com/watch?v=CPxkoe2MraA" target="_blank" rel="external">Dev Bytes Activity Animations Youtube</a> 我照着写了一些关于Activity Transition的模板，<a href="https://github.com/Haldir65/CustomActivityTransition" target="_blank" rel="external">gitHub</a> 基本能实现兼容到API 16以下的效果</p>
-</li>
-<li><p>最后是这几天遇到的天坑</p>
-</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState, PersistableBundle persistentState)</span> </span>&#123;</div><div class="line">    <span class="keyword">super</span>.onCreate(savedInstanceState, persistentState);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>这样的Activity绝对会出ClassNotFoundException , 而且并不会主动出现在logcat中</p>
-<ul>
-<li>overridePendingTransaction要在startActivity以及finish之后才能调用</li>
-</ul>
-<p>gitHub上有一个比较好的<a href="https://github.com/takahirom/PreLollipopTransition" target="_blank" rel="external">兼容库</a>，大致原理也是使用onPreDrawListener</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;Lollipop开始引入了新的Activity Transition动画效果，比起常用的overridePendingTransaction() 效果要强大许多&lt;/p&gt;
-&lt;p&gt;测试环境&lt;br&gt;supportLibVersion = “24.2.1”&lt;br&gt;gradle plugin version : “classpath ‘com.android.tools.build:gradle:2.2.0’”&lt;br&gt;gradle version : 3.1&lt;br&gt;compileSdkVersion 24&lt;br&gt;buildToolsVersion “24.0.2”&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="技术" scheme="http://haldir65.github.io/categories/%E6%8A%80%E6%9C%AF/"/>
-    
-    
-      <category term="android" scheme="http://haldir65.github.io/tags/android/"/>
-    
-      <category term="transition" scheme="http://haldir65.github.io/tags/transition/"/>
     
   </entry>
   
