@@ -82,7 +82,7 @@ INFO  Deploying: git
 ### 3. 一些功能的实现
 
 - 置顶功能
-    将node_modules/hexo-generator-index/lib/generator.js的文件内容替换成一下内容
+    将node_modules/hexo-generator-index/lib/generator.js的文件内容替换成以下内容
 
 ```javascript
 'use strict';
