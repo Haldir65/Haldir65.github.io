@@ -159,6 +159,133 @@ animateChange()//实际的动画添加位置
 7. Pro RecyclerView
 最近看到yigit在relam作的关于recyclerView的演讲，记录下来一些比较重要的点
 
+- view:: requestLayout的效果，requestLayout会一直地向上请求直到根视图，next Frame开始时，所有的子View都将调用自身的measure(onMeasure)和layout(onLayout)方法
+如果子View不曾requestLayout,之前的measure结果会被cache下来，节省measure和layout的时间。
+
+- 在RecyclerView中，在itemView的onBIndView方法中调用ImageLoader的加载图片方法，由于图片加载是异步操作，最终会调用ImageView的setImageBitmap方法。而在ImageView的实现中，setImageBitmap方法最终会调用requestLayout方法，最终会一层层向上传递到recyclerView中，就像这样
+```java
+imageView setImageBitmap
+
+imageView requestLayout
+
+itemView requestLayout
+
+recyclerView requestLayout 
+```
+而recyclerView的requestLayout方法会在next Frame重新position所有的child(very expensive!)为此，recyclerView提供了一个setHasFixedSize方法，设置为true表明recyclerView自身不会因为childView的变化而resize，这样recyclerVeiw就不会调用requestLayout方法(如果去看RecyclerView的源码，可以看到mEatRequestLayout这个变量，也就是避免重复调用requestLayout造成性能损耗。)，不会造成所有的childView都被重新测量一遍。在ImageView(2011年之后的版本)中，setImageDrawable方法大致长这样：
+```java
+void setImageDrawable(Drawable drawable){
+    if(mDrawable != drawable){
+    int oldWidth = mDrawableWidth;
+    int oldHeight = mDrawableHeight;
+    updateDrawable(drawable)
+        if(oldWidth!=mDrawableWidth||oldHeight!=mDrawableHeight){
+            requestLayout();
+        }
+        invalidate();
+    }
+}
+
+```
+简单来说就是判断下前后图像的宽度或高度是否发生了变化，如果无变化则不需调用requestLayout方法，只需要reDraw。也就避免了这种性能的损耗。但是，TextView的implementation则复杂的多，并没有这种优化。实际操作中，API应该能够告诉客户端图片的width和Height,使用AspectRationImageView加载图片。在图片加载完成之前优先使用PlaceHolder，并设定好加载完成应有的尺寸，这样就避免了后期图片加载完成后的requestLayout。
+
+- 使用SortedList用于进行List变更
+```java
+SortedList<Item> mSortedList = new SortedList<Item>(Item.class,
+    new SortedListAdapterCallback<Item>(mAdapter)){
+    //override三个方法，懒得抄了
+
+}
+使用方式十分简单，后面的数据更新操作包括notifyDataChange都被处理好了。
+onNetwokCallback(List<News> news){
+    mSortedList.addAll(news);
+} 
+```
+对于未发生变化的Item，将直接跳过，实现了最优化的列表数据更新。
+
+- DiffUtil(added in 24.2.0)用于对比数据变更前后的两个List
+```java
+DiffResult result = DiffUtil.calculateDiff(
+    new MyCallback(oldList,newList));
+mAdapter.setItems(newList);
+result.dispatchTo(mAdapter);
+```
+只需调用上述方法即可实现列表Item更新及Adapter的notify。DiffUtil的callback有四个方法需要复写，另外有一个方法用于单个Item的部分payload更新。在[medium](https://medium.com/@iammert/using-diffutil-in-android-recyclerview-bdca8e4fbb00#.rbtzmmtbg)上找到一个现成的，直接借用了。
+```java
+public class MyDiffCallback extends DiffUtil.Callback{
+
+    List<Person> oldPersons;
+    List<Person> newPersons;
+
+    public MyDiffCallback(List<Person> newPersons, List<Person> oldPersons) {
+        this.newPersons = newPersons;
+        this.oldPersons = oldPersons;
+    }
+
+    @Override
+    public int getOldListSize() {
+        return oldPersons.size();
+    }
+
+    @Override
+    public int getNewListSize() {
+        return newPersons.size();
+    }
+
+    @Override
+    public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+        return oldPersons.get(oldItemPosition).id == newPersons.get(newItemPosition).id;
+    }
+
+    @Override
+    public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+        return oldPersons.get(oldItemPosition).equals(newPersons.get(newItemPosition));
+    }
+
+    @Nullable
+    @Override
+    public Object getChangePayload(int oldItemPosition, int newItemPosition) {
+        //you can return particular field for changed item.//这里的object会被带到onBindViewHolder中
+        return super.getChangePayload(oldItemPosition, newItemPosition);
+    }
+}
+```
+这些方法会帮助完成remove和add等方法。
+
+- viewHolder的生命周期
+```java
+onCreate
+onBindViewHolder(获取video资源)
+onViewAttachedToWindow(可以在这里开始播放视频)
+onViewDetachedFromWindow(可以在这里停止播放视频，随时有可能重新被直接attach，这过程中不会调用onBind方法)
+onRecycled(可以在这里释放Video资源或者释放Bitmap引用，这之后再使用该ViewHolder需要调用onBind方法)
+```
+
+- recyclerView的一些defer操作对于日常开发的帮助
+recyclerView会将一些pending操作defer到next frame。eg:
+```java
+recyclerView.scrollToPosition(15);
+int x = layoutManager.getFirstVisiblePosition()//此时x并不等于15，因为下一帧并未开始。真正的执行scroll操作需要等到nextFrame执行后才能生效，具体一点的话，就是下一个执行layout的message的callback还未被执行。
+又例如，在onCreate中调用
+```java
+recyclerView.scrollToPosition(15)
+//在netWorkCallback中调用setAdapter，这时recyclerView会利用pending的15 position。原因在于recyclerView会判断如果layoutManager和adapter是否为null，如果都为null。skip layout。
+
+- 在getItemViewType中返回R.layout.itemLayout的好处。
+在onCreateViewHolder(ViewGroup viewParent,int ViewType){
+    View itemView = inflate.inflate(ViewType,parent,false);
+    return XXXHolder(itemView);//aapt可以确保R.layout.xxxx是unique的。
+}
+```
+
+- ClickListener的实现
+在onCreateViewHolder中传一个callback，不要在onBindViewHolder中传，不要把onBindViewHolder中的position变为final的。getAdapterPositon可能为NO_POSITION(-1)，因为RecyclerView的UI更新会被defer到next Frame，在下一帧更新被执行前，用户可能已经点击了item，这时的position就有可能是-1(这种情况发生在点击后删除了所有的item数据，这时获得的position就类似于list的indexAt，当然是-1。).
+
+- LayoutManager只知道LayoutPosition，并不知道AdapterPosition
+Items在Adapter的数据集中的顺序可能会随时变更，但recyclerView可能并不会调用onBindViewHolder方法，这也就是onBindViewHolder中的position并不可靠的原因。因为viewHolder本身是backed by Item的，而viewHolder的getAdapterPosition能够正确地反应Item在数据集中的顺序。
+
+
+
 
 
 ### 4 . 一些参考资料
