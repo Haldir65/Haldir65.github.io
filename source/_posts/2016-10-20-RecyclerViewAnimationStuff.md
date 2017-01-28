@@ -156,9 +156,13 @@ animateChange()//实际的动画添加位置
 6. RecyclerView.setRecycledViewPool(pool)
 一个pool只能为为同一个context(Activity)中的RecyclerView使用，因为这些View是与Context相关的，而不同的Activity可能有不同的Theme，Style。
 
+7. Pro RecyclerView
+最近看到yigit在relam作的关于recyclerView的演讲，记录下来一些比较重要的点
+
 
 
 ### 4 . 一些参考资料
 - [RecyclerView Animations and Behind the Scenes (Android Dev Summit 2015)](https://www.youtube.com/watch?v=imsr8NrIAMs)
 - [ItemAnimator模板](https://github.com/wasabeef/recyclerview-animators)
 - [UI ToolKit Demo](https://github.com/google/android-ui-toolkit-demos)
+- [Yigit Boyar: Pro RecyclerView](https://www.youtube.com/watch?v=KhLVD6iiZQs)
