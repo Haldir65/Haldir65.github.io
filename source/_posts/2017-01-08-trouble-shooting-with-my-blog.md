@@ -125,12 +125,56 @@ categories: Hexo
 top: 0 # 0或者1
 ```
 
+### 4. SublimeText的一些快捷键
+由于文章大部分都是使用SublimeText写的，Typroa这种所见即所得的编辑器也不错，但对于掌握MardkDown语法没有帮助。这里摘录一些SubLimeText的快捷键。
+
+> Ctrl+Shift+P：打开命令面板
 
 
+```java
+
+Ctrl+P：搜索项目中的文件
+Ctrl+G：跳转到第几行
+Ctrl+W：关闭当前打开文件
+Ctrl+Shift+W：关闭所有打开文件
+Ctrl+Shift+V：粘贴并格式化
+Ctrl+D：选择单词，重复可增加选择下一个相同的单词
+Ctrl+L：选择行，重复可依次增加选择下一行
+Ctrl+Shift+L：选择多行
+Ctrl+Shift+Enter：在当前行前插入新行
+Ctrl+X：删除当前行
+Ctrl+M：跳转到对应括号
+Ctrl+U：软撤销，撤销光标位置
+Ctrl+J：选择标签内容
+Ctrl+F：查找内容
+Ctrl+Shift+F：查找并替换
+Ctrl+H：替换
+Ctrl+R：前往 method
+Ctrl+N：新建窗口
+Ctrl+K+B：开关侧栏
+Ctrl+Shift+M：选中当前括号内容，重复可选着括号本身
+Ctrl+F2：设置/删除标记
+Ctrl+/：注释当前行
+Ctrl+Shift+/：当前位置插入注释
+Ctrl+Alt+/：块注释，并Focus到首行，写注释说明用的
+Ctrl+Shift+A：选择当前标签前后，修改标签用的
+F11：全屏
+Shift+F11：全屏免打扰模式，只编辑当前文件
+Alt+F3：选择所有相同的词
+Alt+.：闭合标签
+Alt+Shift+数字：分屏显示
+Alt+数字：切换打开第N个文件
+Shift+右键拖动：光标多不，用来更改或插入列内容
+鼠标的前进后退键可切换Tab文件
+按Ctrl，依次点击或选取，可需要编辑的多个位置
+按Ctrl+Shift+上下键，可替换行
+```
 
 
-### 4. markdown语法
+### 5. markdown语法
+
 
 
 ### ref
 - [Hexo博文置顶技巧](http://yanhuili.github.io/2016/11/21/hexo%E5%8D%9A%E6%96%87%E7%BD%AE%E9%A1%B6%E6%8A%80%E5%B7%A7/)
+- [SublimeText快捷键](http://www.daqianduan.com/4820.html)
