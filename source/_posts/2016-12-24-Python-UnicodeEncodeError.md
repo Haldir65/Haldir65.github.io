@@ -1,7 +1,17 @@
 ---
-title: Python编码遇到的UnicodeEncodeError解决方案
+title: Python 3 学习记录
 date: 2016-12-24 22:06:37
-tags:
+tags: Python
 ---
 
-先占坑，明日在写
+todo 
+
+install mongoDb(better performance than sql)
+install pip
+grep log in command console
+basic grammars
+network, disk ,database, io , dic, list ,etc
+class object orientated
+
+
+
