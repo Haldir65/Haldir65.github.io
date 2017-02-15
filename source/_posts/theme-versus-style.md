@@ -332,7 +332,7 @@ ObtainStyledAttributes查找Value时读取的顺序如下
 4. Default style specified in defStyleAttr
 5. Base value in this theme     
 ```
-注意最后一条，万一在Manifest中出现这种东西
+注意最后一条，万一在manifests文件中出现这种东西
 
 ```xml
 <Style name = "AppTheme" parent = "Theme.AppCompat">
@@ -344,7 +344,19 @@ ObtainStyledAttributes查找Value时读取的顺序如下
 
 > Any View which doesn't have a background set ,will use the theme's value ,  SHIT!
 
-### 9. 最后，一点好玩的
+
+
+
+### 9. 容易遇到的错误
+编译不通过的情况
+```java
+Error retrieving parent for item: No resource found that matches the given name
+ '@android:style/TextAppearance.Holo.Widget.ActionBar.Title'
+```
+
+
+
+### 10. 最后，一点好玩的
 
 ```java
 Context themedContext = 
