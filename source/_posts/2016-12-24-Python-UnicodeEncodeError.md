@@ -26,6 +26,17 @@ class object orientated
 > 第一个缺点就是运行速度慢，和C程序相比非常慢，因为Python是解释型语言，你的代码在执行时会一行一行地翻译成CPU能理解的机器码，这个翻译过程非常耗时，所以很慢。而C程序是运行前直接编译成CPU能执行的机器码，所以非常快。
 第二个缺点就是代码不能加密
 
+2. python 2.7 intepreter
+
+```python
+   import urllib2
+   req = urllib2.Request(url,headers=header)
+   html = urllib2.urlopen(req)
+   html_data = html.read
+   html_path = etree.HTML(html_data)	
+```   
+
+
 
 ### Reference
 - [廖雪峰的官方网站](http://www.liaoxuefeng.com/)

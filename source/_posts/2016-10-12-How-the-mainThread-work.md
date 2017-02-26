@@ -317,3 +317,4 @@ PostDelayed最终会调用到enqueMessage方法，看一下:
 ### Reference
 1. [Handler.postDelayed()是如何精确延迟指定时间的](http://www.dss886.com/android/2016/08/17/17-18)
 2. [How the Main Thread works](https://www.youtube.com/watch?v=aFGbv9Ih9qQ)
+3. [安卓中为什么主线程不会因为Looper中的死循环而卡死？](http://www.cnblogs.com/linguanh/p/6412042.html)

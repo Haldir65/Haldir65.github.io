@@ -6,8 +6,8 @@ tags: [置顶]
 top : 1
 ---
 
-把经常会用到的一些linux基本命令罗列在这里，这其中配上一些自己的图，希望作为今后工作中的参考。</br>
-![](http://odzl05jxx.bkt.clouddn.com/fork_you_git.jpg)
+一些常用的linux基本命令,仅作为参考。</br>
+![](http://odzl05jxx.bkt.clouddn.com/rationalizingyourhoriiblehack-big.png?imageView2/2/w/500)
  <!--more-->
 
 
@@ -221,3 +221,5 @@ $ ls -l | grep "^d" //只列出目录
 
 ## ref 
 鸟哥
+
+![](http://odzl05jxx.bkt.clouddn.com/fork_you_git.jpg)
