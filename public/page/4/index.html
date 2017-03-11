@@ -166,6 +166,63 @@ ga('send', 'pageview');
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-2016-10-15-using-loader-in-android-app" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/10/15/2016-10-15-using-loader-in-android-app/">使用Loader进行异步数据操作</a>
+    </h1>
+  
+
+        
+        <a href="/2016/10/15/2016-10-15-using-loader-in-android-app/" class="archive-article-date">
+  	<time datetime="2016-10-15T11:12:22.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-10-15</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>App中经常有这样的需求:<br>进入一个页面，首先查询数据库，如果数据库数据有效，直接使用数据库数据。否则去网络查询数据，网络数据返回后重新加载数据。<br>很显然，这里的查询数据库和网络请求都需要放到子线程去操作，异步了。android推荐使用Loader进行数据查询，最大的好处就是Laoder会处理好与生命周期相关的事情，Android Developers推出过关于Loaders的<a href="https://www.youtube.com/watch?v=s4eAtMHU5gI&amp;index=8&amp;list=PLWz5rJ2EKKc9CBxr3BVjPTPoDPLdPIFCE">介绍视频</a>，Loader就是为了解决这种问题而推出的，Loader具有几点好处</p>
+<ol>
+<li>如果Activity挂掉了，Activity中启动了的线程怎么办，如果不处理好有可能导致leak。</li>
+<li>activity挂了，而子线程中持有View的强引用，此时再去更新View已经没有意义，View已经不可见了</li>
+<li>这条线程所做的工作，加载的资源都白白浪费了，下次还需要重新加载一遍。
+        
+          <a class="article-more-a" href="/2016/10/15/2016-10-15-using-loader-in-android-app/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2016/10/15/2016-10-15-using-loader-in-android-app/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+  
     <article id="post-2016-10-14-Android-translucent-status-bar" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -405,64 +462,6 @@ ga('send', 'pageview');
 
 
   
-    <article id="post-theme-versus-style" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/10/10/theme-versus-style/">Theme和Style的区别</a>
-    </h1>
-  
-
-        
-        <a href="/2016/10/10/theme-versus-style/" class="archive-article-date">
-  	<time datetime="2016-10-10T11:35:32.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-10-10</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>认识Theme和Styles</p>
-<p>重新看一遍Using Themes and styles without going crazy，大部分属于直接翻译</p>
-<h4 id="1-Styles"><a href="#1-Styles" class="headerlink" title="1. Styles"></a>1. Styles</h4><h5 id="1-1-首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来"><a href="#1-1-首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来" class="headerlink" title="1.1 首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来"></a>1.1 首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来</h5><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">View</span> <span class="attr">android:background</span>= <span class="string">"#ff0000"</span> /&gt;</span></div></pre></td></tr></table></figure>
-<p>变成</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">View</span> <span class="attr">style</span>= <span class="string">"@Style/MyStyle"</span> /&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">Style</span> <span class="attr">name</span> = <span class="string">"MyStyle"</span>&gt;</span><span class="xml"></div><div class="line">true<span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span> = <span class="string">"android:background"</span>&gt;</span>#ff0000<span class="tag">&lt;/<span class="name">item</span>&gt;</span></div><div class="line"></span><span class="tag">&lt;/<span class="name">Style</span>&gt;</span></div></pre></td></tr></table></figure>
-<p>这种形式，对于大量的具有相同属性的且具有<em>共性</em>的View，可以直接使用对应的Style，这能够让layout文件更加整洁。前提是确信layout文件中使用的View具有相同的属性。</p>
-        
-          <a class="article-more-a" href="/2016/10/10/theme-versus-style/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2016/10/10/theme-versus-style/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
-
-  
   
     <nav id="page-nav">
       <a class="extend prev" rel="prev" href="/page/3/">&laquo; Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/5/">Next &raquo;</a>
@@ -564,6 +563,18 @@ ga('send', 'pageview');
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">坐标</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">Android</a>
               </li>
              
@@ -576,11 +587,7 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">坐标</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -588,7 +595,7 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+                <a href="javascript:void(0)" class="js-tag color2">Python</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -596,19 +603,15 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Python</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+                <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">transition</a>
+                <a href="javascript:void(0)" class="js-tag color5">android 7</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -633,10 +636,6 @@ ga('send', 'pageview');
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">service</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">android 7</a>
               </li>
             
             <div class="clearfix"></div>
