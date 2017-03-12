@@ -4,15 +4,8 @@ date: 2016-12-24 22:06:37
 tags: Python
 ---
 
-todo 
 
-<!-- install mongoDb(better performance than sql) -->
-<!-- install pip -->
-grep log in command console
-basic grammars
-network, disk ,database, io , dic, list ,etc
-class object orientated  
-
+#### 人生苦短，Python是岸
 
 ![implementing dumb features](http://odzl05jxx.bkt.clouddn.com/implementingdumbfeatures-big.png?imageView2/2/w/500)
 
@@ -50,18 +43,55 @@ GIL的全称是Global Interpreter Lock(全局解释器锁)，来源是python设�
 而每次释放GIL锁，线程进行锁竞争、切换线程，会消耗资源。并且由于GIL锁存在，python里一个进程永远只能同时执行一个线程(拿到GIL的线程才能执行)，这就是为什么在多核CPU上，python的多线程效率并不高。
 ```
 
-### 2. python 2.7 intepreter
+### 2. 安装package各种can't resolve XXX
+[no module named urllib2](http://stackoverflow.com/questions/2792650/python3-error-import-error-no-module-name-urllib2)
+
+> The urllib2 module has been split across several modules in Python 3 named urllib.request and urllib.error. The 2to3 tool will automatically adapt imports when converting your sources to Python 3.
+
+This is what look like on py 2.7
 
 ```python
-   import urllib2
-   req = urllib2.Request(url,headers=header)
-   html = urllib2.urlopen(req)
-   html_data = html.read
-   html_path = etree.HTML(html_data)	
+import urllib2
+req = urllib2.Request(url,headers=header)
+html = urllib2.urlopen(req)
+html_data = html.read
+html_path = etree.HTML(html_data)	
 ```   
 
-### 3. 爬虫相关
+on Python 3.X 
+```python
+from urllib.request import urlopen
+from urllib.request import Request
+
+req = Request(img_url, headers=headers)
+urlhtml = urlopen(req)
+```
+
+
+### 3. pip install XXXX 
+安装package的方式 pip install xxxx....
+#### if not working
+![](http://odzl05jxx.bkt.clouddn.com/Googling%20the%20Error%20Message.jpg?imageView2/2/w/500)
+
+
+### 4. Dic、List、Tuple、set以及基本的数据类型
+
+
+
+
+### 5. 爬虫相关
 Chrome自带开发者工具，可以查看每一个request的header，cookies等信息。模拟浏览器行为比较有效。
+
+
+
+todo 
+
+<!-- install mongoDb(better performance than sql) -->
+<!-- install pip -->
+grep log in command console
+basic grammars
+network, disk ,database, io , dic, list ,etc
+class object orientated  
 
 
 
