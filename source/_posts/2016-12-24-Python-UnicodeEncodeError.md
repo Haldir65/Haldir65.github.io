@@ -20,13 +20,13 @@ class object orientated
 <!-- more -->
 
 
-1. Python的一些缺点
+###1. Python的一些缺点
 引用[廖雪峰的官方网站](http://www.liaoxuefeng.com/)上的话，Python一个是慢，一个是代码不能加密
 
 > 第一个缺点就是运行速度慢，和C程序相比非常慢，因为Python是解释型语言，你的代码在执行时会一行一行地翻译成CPU能理解的机器码，这个翻译过程非常耗时，所以很慢。而C程序是运行前直接编译成CPU能执行的机器码，所以非常快。
 第二个缺点就是代码不能加密
 
-2. python 2.7 intepreter
+###2. python 2.7 intepreter
 
 ```python
    import urllib2
@@ -35,6 +35,9 @@ class object orientated
    html_data = html.read
    html_path = etree.HTML(html_data)	
 ```   
+
+### 3. 爬虫相关
+Chrome自带开发者工具，可以查看每一个request的header，cookies等信息。模拟浏览器行为比较有效。
 
 
 
