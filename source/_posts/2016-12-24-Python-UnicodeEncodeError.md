@@ -74,7 +74,27 @@ urlhtml = urlopen(req)
 ![](http://odzl05jxx.bkt.clouddn.com/Googling%20the%20Error%20Message.jpg?imageView2/2/w/500)
 
 
-### 4. Dic、List、Tuple、set以及基本的数据类型
+### 4. List、tuple、dict、set以及基本的数据类型
+
+list >  mylist = ['Tom','Jerry','Henry']
+		mylist[0] = 'Tom'
+
+tuple>	 mytuple = ('rock','pop','jazz')
+		 mytuple[0] = 'rock' 
+
+tuple在初始化时就已经确定，不能修改
+
+dict: > d={'name':'tom','job':'doctor','age',99}
+		d['name'] = 'tom'
+
+set: > s = set([1,2,3]) # 需要传入一个list作为参数
+	>> s
+	{1,2,3}
+	set无序，不可有重复元素
+	set和dict的区别在于前者没有存储value，两者内部都不能有重复元素(key)
+
+
+
 
 
 
