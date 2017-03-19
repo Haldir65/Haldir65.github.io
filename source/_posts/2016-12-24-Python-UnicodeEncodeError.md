@@ -94,6 +94,15 @@ set: > s = set([1,2,3]) # 需要传入一个list作为参数
 	set和dict的区别在于前者没有存储value，两者内部都不能有重复元素(key)
 
 
+class name should be cammelCase, Arguments,variable name should be lowercase
+
+循环
+```python
+ for i in range(2, 5):
+        print(i)
+>>> result: 2 3 4 左闭右开
+
+```
 
 
 
