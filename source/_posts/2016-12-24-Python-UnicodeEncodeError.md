@@ -102,6 +102,51 @@ class name should be cammelCase, Arguments,variable name should be lowercase
         print(i)
 >>> result: 2 3 4 左闭右开
 
+条件判断
+```python
+def add_end(L=None):
+    if L is None:
+        L = []
+    L.append('END')
+    return L
+```
+
+函数组合（一共五种）
+
+默认参数函数
+```python
+def power(x, n=2): #这里的n=2就是默认参数，注意，默认参数应该是不可变对象,例如str、None这种
+    s = 1
+    while n > 0:
+        n = n - 1
+        s = s * x
+    return s
+
+power(5) >> 25
+power(5,2) >>>25    
+```
+
+可变参数函数
+```python
+def calc(*numbers): #函数内部接收到的是一个tuple
+    sum = 0
+    for n in numbers:
+        sum = sum + n * n
+    return sum
+
+calc(1,2)
+
+calc(2,3,5)    
+```
+关键字参数
+```python
+def person(name, age, **kw):
+    print('name:', name, 'age:', age, 'other:', kw)
+
+>>> person('Michael', 30)
+name: Michael age: 30 other: {}
+
+内部自动将关键字参数转换成一个dict    
 ```
 
 
