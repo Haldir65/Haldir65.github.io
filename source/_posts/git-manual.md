@@ -42,14 +42,16 @@ git config core.ignorecase false
 $ git config --global user.name "name"
 $ git config --global user.email xxx@163.com
 ```
-这样可以为git所有的仓库设置用户名，如果想为指定仓库设置用户名:
+这样可以为git所有的仓库设置用户名，如果想为指定仓库设置用户名或email:
 
 ```java
 $ git config user.name "name"
+$ git config user.email "myEmail.awesome.com"
 ```
-查看当前用户名
+查看当前用户名或email
 ```
 $ git config user.name 
+$ git config user.email 
 ```
 
 ### 5. 设置代理
