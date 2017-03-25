@@ -76,24 +76,27 @@ urlhtml = urlopen(req)
 
 ### 4. List、tuple、dict、set以及基本的数据类型
 
-list >  mylist = ['Tom','Jerry','Henry']
-		mylist[0] = 'Tom'
+```python
+ list   mylist = ['Tom','Jerry','Henry']
+        mylist[0] = 'Tom'
 
-tuple>	 mytuple = ('rock','pop','jazz')
-		 mytuple[0] = 'rock' 
+ tuple  mytuple = ('rock','pop','jazz')
+         mytuple[0] = 'rock' 
 
-tuple在初始化时就已经确定，不能修改
+ tuple在初始化时就已经确定，不能修改
 
-dict: > d={'name':'tom','job':'doctor','age',99}
-		d['name'] = 'tom'
+ dict: d={'name':'tom','job':'doctor','age',99}
+        d['name'] = 'tom'
 
-set: > s = set([1,2,3]) # 需要传入一个list作为参数
-	>> s
-	{1,2,3}
-	set无序，不可有重复元素
-	set和dict的区别在于前者没有存储value，两者内部都不能有重复元素(key)
+ set:  s = set([1,2,3]) # 需要传入一个list作为参数
+    >> s
+    {1,2,3}
+    set无序，不可有重复元素
+    set和dict的区别在于前者没有存储value，两者内部都不能有重复元素(key)
+```
+tuple用的比较多，例如有多个返回值的函数，Python其实返回了一个Tuple。
 
-
+#### 类名应该写成驼峰样式，变量名应该小写
 class name should be cammelCase, Arguments,variable name should be lowercase
 
 循环
@@ -103,7 +106,7 @@ class name should be cammelCase, Arguments,variable name should be lowercase
 >>> result: 2 3 4 左闭右开
 
 条件判断
-```python
+
 def add_end(L=None):
     if L is None:
         L = []
@@ -111,7 +114,20 @@ def add_end(L=None):
     return L
 ```
 
-函数组合（一共五种）
+##### 函数参数相关，函数组合（一共五种）
+位置参数，默认参数，可变参数，关键字参数，命名关键字参数
+
+定义一个函数可以带上默认值，默认值是一个固定的对象，上次操作的值会保留到下一次调用
+```python
+def sell(name,price,amount=1):
+    print(price*amount)
+
+sell('product',26)
+sell('product',26,2)
+
+>>> 26    
+>>> 52    
+```
 
 默认参数函数
 ```python
@@ -126,7 +142,7 @@ power(5) >> 25
 power(5,2) >>>25    
 ```
 
-可变参数函数
+可变参数函数# 定义的时候在参数前面加一个*号就可以了，内部会默认组装成一个tuple
 ```python
 def calc(*numbers): #函数内部接收到的是一个tuple
     sum = 0
@@ -137,6 +153,9 @@ def calc(*numbers): #函数内部接收到的是一个tuple
 calc(1,2)
 
 calc(2,3,5)    
+
+nums = [1,2,3]
+cal(*nums)#把tuple内的元素作为参数传进去
 ```
 关键字参数
 ```python
@@ -148,6 +167,15 @@ name: Michael age: 30 other: {}
 
 内部自动将关键字参数转换成一个dict    
 ```
+命名关键字函数
+```python
+def shoppping(name,time,*,price,count)# price可以有默认值
+    print(price*count)
+
+>> shopping(john,0325,price=39,count=5)
+>> 195
+```
+
 
 
 
