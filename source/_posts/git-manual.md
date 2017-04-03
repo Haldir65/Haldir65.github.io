@@ -22,8 +22,16 @@ $ git push -u origin master     //将本地项目更新到github项目上去
 
 ### 2.  将本地git branch和远程github repository同步
 
+可行的方式
 ```python
 git branch --set-upstream local_branch origin/remote_branch
+```
+这样做可行，但出现下面的错误提示，照着操作就行了。
+
+```
+$ git branch --set-upstream master origin/master
+The --set-upstream flag is deprecated and will be removed. Consider using --track or --set-upstream-to
+Branch master set up to track remote branch master from origin.
 ```
 
 <!--more-->
