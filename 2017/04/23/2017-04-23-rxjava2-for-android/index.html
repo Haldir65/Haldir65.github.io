@@ -15,12 +15,12 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="本文多数内容来自Jake Wharton的演讲，配合一些个人的感受，作为今后使用Rxjava2的一些参考。">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/stream_compose.jpg?imageView2/2/w/600">
-<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/creating_source_from_iterable.jpg">
-<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/creating_source_from_just.jpg">
+<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/creating_source_from_iterable.jpg?imageView2/2/w/600">
+<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/creating_source_from_just.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/shinynewthings-big.png?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/reading%20network%20response%20on%20main%20thread.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/observing%20on%20ui%20thred.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-04-23T10:34:55.185Z">
+<meta property="og:updated_time" content="2017-04-23T10:38:26.544Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Rxjava2 的一些点">
 <meta name="twitter:description" content="本文多数内容来自Jake Wharton的演讲，配合一些个人的感受，作为今后使用Rxjava2的一些参考。">
@@ -216,8 +216,8 @@ ga('send', 'pageview');
 <li>Maybe(有可能返回值，有可能不返回，也有可能异常，即optional)<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Maybe</span>&lt;<span class="title">T</span>&gt; <span class="keyword">implements</span> <span class="title">MaybeSource</span>&lt;<span class="title">T</span>&gt; </span>&#123;&#125;</div></pre></td></tr></table></figure>
 </li>
 </ol>
-<p>以上三种数据源都有static方法生成：<br>例如<br><img src="http://odzl05jxx.bkt.clouddn.com/creating_source_from_iterable.jpg" alt="from iterable"></p>
-<p><img src="http://odzl05jxx.bkt.clouddn.com/creating_source_from_just.jpg" alt="fromjust"></p>
+<p>以上三种数据源都有static方法生成：<br>例如<br><img src="http://odzl05jxx.bkt.clouddn.com/creating_source_from_iterable.jpg?imageView2/2/w/600" alt="from iterable"></p>
+<p><img src="http://odzl05jxx.bkt.clouddn.com/creating_source_from_just.jpg?imageView2/2/w/600" alt="fromjust"></p>
 <p>比较推荐的方法有两种</p>
 <h4 id="1-fromCallable"><a href="#1-fromCallable" class="headerlink" title="1. fromCallable"></a>1. fromCallable</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">Observable.fromCallable(<span class="keyword">new</span> Callable&lt;String&gt;()&#123;</div><div class="line"></div><div class="line">true<span class="meta">@override</span> </div><div class="line">true<span class="function"><span class="keyword">public</span> String <span class="title">call</span><span class="params">()</span> throw Exception</span>&#123;</div><div class="line">true<span class="keyword">return</span> getName() <span class="comment">//  之前是synchronious的get，现在这一步可以asynchnous执行,比如放一个OkHttpClient.newCall(request).execute(); //因为是异步执行的，也不存在性能问题</span></div><div class="line">&#125;</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
 <p>上面这段中的call方法会在被订阅后执行，成功的话会走到observer的onNext，失败的话会走到onError。<br>fromCallable可用于各种数据源，包括Flowable<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Flowable.fromCallable(() -&gt; <span class="string">"Hello Flowable"</span>);</div><div class="line">Observable.fromCallable(() -&gt; <span class="string">"Hello Observable"</span>);</div><div class="line">Maybe.fromCallable(() -&gt; <span class="string">"Hello Maybe"</span>);</div><div class="line">Single.fromCallable(() -&gt; <span class="string">"Hello Single"</span>);</div><div class="line">Completeable.fromCallable(() -&gt; <span class="string">"Hello Completeable"</span>);</div></pre></td></tr></table></figure></p>
