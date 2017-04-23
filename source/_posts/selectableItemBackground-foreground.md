@@ -1,8 +1,8 @@
 ---
 title: android使用selectableItemBackground的一些坑
 date: 2016-09-23 19:56:39
-categories: [技术]
-tags: [随笔,foreground,android]
+categories: blog
+tags: [foreground,android]
 ---
 
 > android:foreground="?android:attr/selectableItemBackground"

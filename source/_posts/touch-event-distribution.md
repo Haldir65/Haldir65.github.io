@@ -1,7 +1,8 @@
 ---
 title: 安卓事件分发流程
 date: 2016-10-06 23:32:30
-tags: TouchEvent
+categories: blog 
+tags: [android]
 ---
 
 ![](http://odzl05jxx.bkt.clouddn.com/dispatch_touch_event_video.JPG)

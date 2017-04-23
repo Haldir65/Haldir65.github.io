@@ -1,7 +1,8 @@
 ---
 title: Python 3 学习记录
 date: 2016-12-24 22:06:37
-tags: Python
+categories: blog 
+tags: [python]
 ---
 
 

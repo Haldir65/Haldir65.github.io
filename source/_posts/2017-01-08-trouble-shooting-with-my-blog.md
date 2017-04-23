@@ -1,7 +1,8 @@
 ---
 title: Hexo部署个人博客记录
 date: 2017-01-08 18:01:01
-tags: hexo 
+categories: blog
+tags: [hexo,置顶]
 top : 2
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: android-Ultra-pull-to-refresh分析
 date: 2016-10-24 10:25:35
-categories: Android  
+categories: blog
 tags: [置顶]
 
 

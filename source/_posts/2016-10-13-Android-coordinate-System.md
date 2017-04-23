@@ -1,8 +1,8 @@
 ---
 title: 安卓坐标系常用方法
 date: 2016-10-13 18:17:02
-categories: [技术]
-tags: [坐标,TouchEvent]
+categories: blog
+tags: [android,TouchEvent]
 ---
 记录一些Android系统坐标系的常用方法，因为日常开发中难免会碰到需要单独计算View系统坐标的情况。
 

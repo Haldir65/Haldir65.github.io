@@ -1,7 +1,8 @@
 ---
-title: 一些脏代码
+title: 让service常驻后台的方法
 date: 2016-10-20 21:35:10
-tags:
+categories: blog
+tags: [android]
 ---
 
 今天在V2EX上看到有人提到Notification有漏洞，好奇也就查了一下，结果发现有人专门针对这个问题进行了[分析](http://zhoujianghua.com/2015/07/28/black_technology_in_alipay/)。本身的技术分析并不多，写在这里只是为了作为今后的一个参考。<!--more-->

@@ -1,7 +1,8 @@
 ---
 title: Rxjava2 的一些点
 date: 2017-04-23 13:56:07
-tags:
+categories: blog
+tags: [rxjava2,android]
 ---
 
 本文多数内容来自Jake Wharton的演讲，配合一些个人的感受，作为今后使用Rxjava2的一些参考。
@@ -80,10 +81,10 @@ public abstract class Maybe<T> implements MaybeSource<T> {}
 ```
 以上三种数据源都有static方法生成：
 例如
-![from iterable](http://odzl05jxx.bkt.clouddn.com/creating_source_from_iterable.jpg)
+![from iterable](http://odzl05jxx.bkt.clouddn.com/creating_source_from_iterable.jpg?imageView2/2/w/600)
 
 
-![fromjust](http://odzl05jxx.bkt.clouddn.com/creating_source_from_just.jpg)
+![fromjust](http://odzl05jxx.bkt.clouddn.com/creating_source_from_just.jpg?imageView2/2/w/600)
 
 比较推荐的方法有两种
 

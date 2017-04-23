@@ -1,7 +1,8 @@
 ---
 title: Theme和Style的区别
 date: 2016-10-10 19:35:32
-tags:
+categories: blog
+tags: [android]
 ---
 
 

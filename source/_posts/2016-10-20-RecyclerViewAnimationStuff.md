@@ -1,7 +1,8 @@
 ---
 title: 使用RecyclerView的Animation
 date: 2016-10-20 16:16:49
-tags: RecyclerView
+categories: blog  
+tags: [android,RecyclerView]
 ---
 
 From the talk 

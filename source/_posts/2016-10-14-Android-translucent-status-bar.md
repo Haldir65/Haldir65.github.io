@@ -1,8 +1,8 @@
 ---
 title: fitSystemWindow和沉浸式状态栏的一些总结
 date: 2016-10-14 17:15:47
-categories: [技术]
-tags: [Android,Window,statusBar]
+categories: blog
+tags: [android,Window,statusBar]
 ---
 沉浸式状态栏是api 19之后引入的，KitKat应该算是一次比较大的更新了，像是Transition，art runtime,storage access FrameWork(这个有空研究下)，另外就是这个被官方称为Full-screen immersive mode的特性了。具体来说，App可以将展示的区域拓展到statusBar的位置了。我觉得直接叫statusBar就好了，大部分人应该也能理解这就是手机上显示"中国移动"还有显示手机电量那一块的长条，宽度是match_parent。高度的话，据说是25dp，然后6.0上给改成了24dp。不过这不是重点<!--more-->
 

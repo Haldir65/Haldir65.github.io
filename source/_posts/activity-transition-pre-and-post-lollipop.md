@@ -1,7 +1,7 @@
 ---
 title: activity transition pre and post lollipop
 date: 2016-09-27 14:53:25
-categories: [技术]
+categories: blog
 tags: [transition,android]
 ---
 

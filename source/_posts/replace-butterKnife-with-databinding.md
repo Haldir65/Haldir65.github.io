@@ -1,7 +1,7 @@
 ---
 title: replace butterKnife with databinding
 date: 2016-09-22 15:17:39
-categories: blog  
+categories: blog 
 tags: [databinding, Butterknife,android]
 ---
 

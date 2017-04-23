@@ -1,7 +1,8 @@
 ---
 title: android 7.0一些新特性介绍及适配方案
 date: 2016-10-08 03:02:26
-tags: android 7
+categories: blog  
+tags: [android]
 ---
 
 Google I/O 2016上的[What's new in Android](https://www.youtube.com/watch?v=B08iLAtS3AQ)介绍的比较全面，MultiWindow、Notification、ConstraintLayout等都比较简单。这里拎出来开发者不得不注意的几点来介绍。

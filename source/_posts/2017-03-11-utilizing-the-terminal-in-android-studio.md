@@ -1,7 +1,8 @@
 ---
 title: 使用IDE内置的Terminal
 date: 2017-03-11 22:28:51
-tags:
+categories: blog 
+tags: [android]
 ---
 
 ![io](http://odzl05jxx.bkt.clouddn.com/device-2017-03-11-222239.png?imageView2/2/w/600)

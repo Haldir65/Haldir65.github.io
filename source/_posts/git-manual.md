@@ -1,7 +1,7 @@
 ---
 title: git常用操作手册
 date: 2016-09-27 17:24:51
-categories: [技术]
+categories: blog
 tags: [git]
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: Windows10平台安装lxml记录
 date: 2016-10-31 15:49:38
+categories: blog
 tags: Python
 ---
 

@@ -1,7 +1,8 @@
 ---
 title: 使用AnnotationProcessor自动生成代码
 date: 2016-12-31 22:42:15
-tags:
+categories: blog 
+tags: [android,annotation]
 ---
 
 

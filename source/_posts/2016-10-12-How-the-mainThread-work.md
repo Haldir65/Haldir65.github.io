@@ -4,7 +4,7 @@ date: 2016-10-12 16:47:42
 tag: 
     Handler
     Message
-categories : Android
+categories: blog
 ---
 
 ![](http://odzl05jxx.bkt.clouddn.com/writing%20code%20that%20nobody%20else%20can%20read.jpg)

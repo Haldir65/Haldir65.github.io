@@ -1,7 +1,8 @@
 ---
 title: 自定义LayoutManager
 date: 2016-10-20 16:37:42
-tags:
+categories: blog  
+tags: [android]
 ---
 
 ### 1. 系统为我们提供了LinearLayoutManager、GridLayoutManager和StaggeredGridLayoutManager。

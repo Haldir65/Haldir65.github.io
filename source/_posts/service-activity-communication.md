@@ -1,7 +1,7 @@
 ---
 title: service和activity的通信方式
 date: 2016-09-30 15:25:28
-categories: [技术]
+categories: blog
 tags: [service,android]
 ---
 

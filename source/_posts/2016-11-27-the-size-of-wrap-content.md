@@ -1,7 +1,8 @@
 ---
 title: wrap_content到底多大
 date: 2016-11-27 16:46:44
-tags: android
+categories: blog
+tags: [android]
 ---
 
 转眼就十一月了，java的分析越来越少，虽然常常在业务上碰到不少坑。。。
