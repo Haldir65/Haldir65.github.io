@@ -6,24 +6,24 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://haldir65.github.io">
-  <title>Rxjava2 的一些点 | Haldir的博客</title>
+  <title>Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="本文多数内容来自Jake Wharton的演讲，配合一些个人的感受，作为今后使用Rxjava2的一些参考。">
+  <meta name="description" content="title: Rxjava2 的一些点date: 2017-04-23 13:56:07categories: [技术]tags: [rxjava2,android]本文多数内容来自Jake Wharton的演讲，配合一些个人的感受，作为今后使用Rxjava2的一些参考。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Rxjava2 的一些点">
+<meta property="og:title" content="Haldir的博客">
 <meta property="og:url" content="http://haldir65.github.io/2017/04/23/2017-04-23-rxjava2-for-android/index.html">
 <meta property="og:site_name" content="Haldir的博客">
-<meta property="og:description" content="本文多数内容来自Jake Wharton的演讲，配合一些个人的感受，作为今后使用Rxjava2的一些参考。">
+<meta property="og:description" content="title: Rxjava2 的一些点date: 2017-04-23 13:56:07categories: [技术]tags: [rxjava2,android]本文多数内容来自Jake Wharton的演讲，配合一些个人的感受，作为今后使用Rxjava2的一些参考。">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/stream_compose.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/creating_source_from_iterable.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/creating_source_from_just.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/shinynewthings-big.png?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/reading%20network%20response%20on%20main%20thread.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/observing%20on%20ui%20thred.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-04-23T10:38:26.544Z">
+<meta property="og:updated_time" content="2017-04-23T10:40:02.219Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Rxjava2 的一些点">
-<meta name="twitter:description" content="本文多数内容来自Jake Wharton的演讲，配合一些个人的感受，作为今后使用Rxjava2的一些参考。">
+<meta name="twitter:title" content="Haldir的博客">
+<meta name="twitter:description" content="title: Rxjava2 的一些点date: 2017-04-23 13:56:07categories: [技术]tags: [rxjava2,android]本文多数内容来自Jake Wharton的演讲，配合一些个人的感受，作为今后使用Rxjava2的一些参考。">
 <meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/stream_compose.jpg?imageView2/2/w/600">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
@@ -178,24 +178,10 @@ ga('send', 'pageview');
             <article id="post-2017-04-23-rxjava2-for-android" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
-      <header class="article-header">
-        
-  
-    <h1 class="article-title" itemprop="name">
-      Rxjava2 的一些点
-    </h1>
-  
-
-        
-        <a href="/2017/04/23/2017-04-23-rxjava2-for-android/" class="archive-article-date">
-  	<time datetime="2017-04-23T05:56:07.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-04-23</time>
-</a>
-        
-      </header>
-    
     <div class="article-entry" itemprop="articleBody">
       
-        <p>本文多数内容来自Jake Wharton的演讲，配合一些个人的感受，作为今后使用Rxjava2的一些参考。</p>
+        <hr>
+<p>title: Rxjava2 的一些点<br>date: 2017-04-23 13:56:07<br>categories: [技术]<br>tags: [rxjava2,android]<br>本文多数内容来自Jake Wharton的演讲，配合一些个人的感受，作为今后使用Rxjava2的一些参考。</p>
 <a id="more"></a>
 <h3 id="1-Why-Reactive"><a href="#1-Why-Reactive" class="headerlink" title="1. Why Reactive?"></a>1. Why Reactive?</h3><p>最早使用Rxjava的初衷在于方便地实现线程切换，使用链式语法轻松地将异步任务分发到子线程并省去了主动实现回调的麻烦。<br>我们生活在一个事件异步分发的环境中，网络，文件、甚至用户输入本身也是异步事件，除此之外，安卓系统本身的许多操作也是异步的，例如startActivity，Fragment的transaction，这就要求开发者不得不考虑各种事件状态，并在各种事件之间进行协调。Rxjava将各种事件的处理、完成以及异常在事件定义之初定义好处理方式。事件的开始，进行，完成以及异常，都被抽象到Observable的载体中。值得注意的是，这种链式调用很像Builder Pattern，但本质上每一步都生成了一个新的对象。这个在Rxjava的Wiki上有所说明，即每一步都生成一个新的immutable objec（GC表示压力大）。</p>
 <h3 id="2-数据源"><a href="#2-数据源" class="headerlink" title="2. 数据源"></a>2. 数据源</h3><p>Stream基本包括这三部分<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">source of data</div><div class="line">listener of data</div><div class="line">methods for modifying data</div></pre></td></tr></table></figure></p>
@@ -523,6 +509,18 @@ ga('send', 'pageview');
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">service</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
             
             <div class="clearfix"></div>
