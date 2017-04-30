@@ -6,14 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://haldir65.github.io">
-  <title>Archives: 2016 | Haldir的博客</title>
+  <title>2017-04-30-concurrency and beyond | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Haldir的博客">
-<meta property="og:url" content="http://haldir65.github.io/archives/2016/page/6/index.html">
+  <meta name="description" content="原本只打算写一点关于线程池的实现原理，后来发现坑越挖越大，五一决定要死磕线程池">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2017-04-30-concurrency and beyond">
+<meta property="og:url" content="http://haldir65.github.io/2017/04/30/2017-04-30-concurrency-and-beyond/index.html">
 <meta property="og:site_name" content="Haldir的博客">
+<meta property="og:description" content="原本只打算写一点关于线程池的实现原理，后来发现坑越挖越大，五一决定要死磕线程池">
+<meta property="og:updated_time" content="2017-04-30T12:16:09.709Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Haldir的博客">
+<meta name="twitter:title" content="2017-04-30-concurrency and beyond">
+<meta name="twitter:description" content="原本只打算写一点关于线程池的实现原理，后来发现坑越挖越大，五一决定要死磕线程池">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -164,102 +168,152 @@ ga('send', 'pageview');
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-2017-04-30-concurrency-and-beyond" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2016" class="archive-year">2016</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2016/09/18/android-inner-class-leak/" class="archive-article-date">
-  	<time datetime="2016-09-18T02:23:42.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-09-18</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/09/18/android-inner-class-leak/">android内部类导致leak模板</a>
+    <h1 class="article-title" itemprop="name">
+      2017-04-30-concurrency and beyond
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/blog/" class="article-tag-list-link color5">blog</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2016/09/18/hello-world/" class="archive-article-date">
-  	<time datetime="2016-09-18T00:44:19.677Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-09-18</time>
+        
+        <a href="/2017/04/30/2017-04-30-concurrency-and-beyond/" class="archive-article-date">
+  	<time datetime="2017-04-30T11:17:45.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-04-30</time>
 </a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/09/18/hello-world/">Hello World</a>
-    </h1>
-  
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>原本只打算写一点关于线程池的实现原理，后来发现坑越挖越大，五一决定要死磕线程池<br><a id="more"></a></p>
+<ol>
+<li>线程池的常规使用方式<br>通常说的线程池对外表现为具有一系列操作功能的接口，Executor提供了execute一个runnable的功能，而其子类ExecutorService则对外提供了更多的实用功能，所以平时用的都是ExecutorService的实现类。<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Executor</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * Executes the given command at some time in the future.  The command</div><div class="line">     * may execute in a new thread, in a pooled thread, or in the calling</div><div class="line">     * thread, at the discretion of the &#123;<span class="doctag">@code</span> Executor&#125; implementation.</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> command the runnable task</div><div class="line">     * <span class="doctag">@throws</span> RejectedExecutionException if this task cannot be</div><div class="line">     * accepted for execution</div><div class="line">     * <span class="doctag">@throws</span> NullPointerException if command is null</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">execute</span><span class="params">(Runnable command)</span></span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ExecutorService</span> <span class="keyword">extends</span> <span class="title">Executor</span></span>&#123;</div><div class="line">true<span class="comment">/// ....</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AbstractExecutorService</span> <span class="keyword">implements</span> <span class="title">ExecutorService</span> </span>&#123;</div><div class="line">true<span class="comment">//....</span></div><div class="line">&#125;</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ThreadPoolExecutor</span> <span class="keyword">extends</span> <span class="title">AbstractExecutorService</span> </span>&#123;</div><div class="line">true<span class="comment">//...</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>更具体一点来说，java.util.concurrent.ThreadPoolExecutor这个类提供了上述接口的具体实现，同时对外提供了一些hook(beforeExecute、afterExecute等)，当然开发者也可以继承这个方法，实现更多自定义功能。<br>它的构造函数如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">public ThreadPoolExecutor(int corePoolSize,</div><div class="line">                              int maximumPoolSize,</div><div class="line">                              long keepAliveTime,</div><div class="line">                              TimeUnit unit,</div><div class="line">                              BlockingQueue&lt;Runnable&gt; workQueue) &#123;</div><div class="line">        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue,</div><div class="line">             Executors.defaultThreadFactory(), defaultHandler);</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>但实际上，java不建议这样直接弄一个线程池出来，而是使用java.util.concurrent.Executors中的一些现成的工厂方法来创建一个线程池实例，具体的方法名很好理解，newFixedThreadPool，newSingleThreadExecutor，newCachedThreadPool等等。关于线程池构造函数各个参数的意义以及Executors提供的各种线程方法的适用场合，网上有很多详尽的文章。<br>这里针对execute方法具体的实现来展开，即，如何做到自动扩容，如何做到线程缓存，如何实现终止，以及资源同步问题。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(Runnable command)</span> </span>&#123;</div><div class="line">       <span class="keyword">if</span> (command == <span class="keyword">null</span>)</div><div class="line">           <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException();</div><div class="line">       <span class="comment">/*</span></div><div class="line">        * Proceed in 3 steps:</div><div class="line">        *</div><div class="line">        * 1. If fewer than corePoolSize threads are running, try to</div><div class="line">        * start a new thread with the given command as its first</div><div class="line">        * task.  The call to addWorker atomically checks runState and</div><div class="line">        * workerCount, and so prevents false alarms that would add</div><div class="line">        * threads when it shouldn't, by returning false.</div><div class="line">        *</div><div class="line">        * 2. If a task can be successfully queued, then we still need</div><div class="line">        * to double-check whether we should have added a thread</div><div class="line">        * (because existing ones died since last checking，上一次检查之后可能有线程挂掉了) or that</div><div class="line">        * the pool shut down since entry into this method. So we</div><div class="line">        * recheck state and if necessary roll back the enqueuing if</div><div class="line">        * stopped, or start a new thread if there are none.</div><div class="line">        *</div><div class="line">        * 3. If we cannot queue task, then we try to add a new</div><div class="line">        * thread.  If it fails, we know we are shut down or saturated</div><div class="line">        * and so reject the task.</div><div class="line">        */</div><div class="line">       <span class="keyword">int</span> c = ctl.get();</div><div class="line">       <span class="keyword">if</span> (workerCountOf(c) &lt; corePoolSize) &#123; <span class="comment">//</span></div><div class="line">      <span class="comment">// Core pool size is the minimum number of workers to keep alive (and not allow to time out etc)</span></div><div class="line">       unless allowCoreThreadTimeOut is set, in which <span class="keyword">case</span> the minimum is zero.</div><div class="line">           <span class="keyword">if</span> (addWorker(command, <span class="keyword">true</span>))<span class="comment">//true表示创建新的Worker时的上限是coolPoolSize,false表示上限是maximunPoolSize</span></div><div class="line">           一般前者都小于等于后者，成功创建新的Worker并执行任务的话,直接在这里就<span class="keyword">return</span>掉了</div><div class="line">               <span class="keyword">return</span>;</div><div class="line">           c = ctl.get(); <span class="comment">//当前pool的state,ctl是一个AtomicInteger</span></div><div class="line">       &#125;</div><div class="line">       <span class="keyword">if</span> (isRunning(c) &amp;&amp; workQueue.offer(command)) &#123;<span class="comment">//addworker就是创建一个新的Worker并立即执行command，没能成功就得暂时放进queue了。offer就是往这里面加一个runnable</span></div><div class="line">           <span class="keyword">int</span> recheck = ctl.get();<span class="comment">//recheck的原因源码中也说明了</span></div><div class="line">          <span class="comment">//走到这一步，说明已经成功加入到队列中了。</span></div><div class="line">           <span class="keyword">if</span> (! isRunning(recheck) &amp;&amp; remove(command))</div><div class="line">               reject(command);<span class="comment">//pool随时可能会被关掉</span></div><div class="line">           <span class="keyword">else</span> <span class="keyword">if</span> (workerCountOf(recheck) == <span class="number">0</span>)</div><div class="line">               addWorker(<span class="keyword">null</span>, <span class="keyword">false</span>);</div><div class="line"></div><div class="line">       &#125;</div><div class="line">       <span class="keyword">else</span> <span class="keyword">if</span> (!addWorker(command, <span class="keyword">false</span>))</div><div class="line">           reject(command);</div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
+<p>来看addWorker的实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">addWorker</span><span class="params">(Runnable firstTask, <span class="keyword">boolean</span> core)</span> </span>&#123;</div><div class="line">        retry:</div><div class="line">        、、、省略代码</div><div class="line">        </div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            w = <span class="keyword">new</span> Worker(firstTask);</div><div class="line">            <span class="comment">//每一个不为null的command都会创建一个新的worker</span></div><div class="line">            <span class="keyword">final</span> Thread t = w.thread;</div><div class="line">            <span class="keyword">if</span> (t != <span class="keyword">null</span>) &#123;</div><div class="line">                <span class="keyword">final</span> ReentrantLock mainLock = <span class="keyword">this</span>.mainLock;</div><div class="line">                mainLock.lock();</div><div class="line">                <span class="keyword">try</span> &#123;</div><div class="line">                        workers.add(w); <span class="comment">//workers就是一个普通的HashSet,同步的问题通过ReentrantLock解决</span></div><div class="line">                        <span class="keyword">int</span> s = workers.size();</div><div class="line">                        <span class="keyword">if</span> (s &gt; largestPoolSize)</div><div class="line">                            largestPoolSize = s;</div><div class="line">                        workerAdded = <span class="keyword">true</span>;</div><div class="line">                    &#125;</div><div class="line">                &#125; <span class="keyword">finally</span> &#123;</div><div class="line">                    mainLock.unlock();</div><div class="line">                &#125;</div><div class="line">                <span class="keyword">if</span> (workerAdded) &#123;</div><div class="line">                    t.start(); <span class="comment">//这里就是真正执行command的方法了</span></div><div class="line">                    workerStarted = <span class="keyword">true</span>;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125; <span class="keyword">finally</span> &#123;</div><div class="line">            <span class="keyword">if</span> (! workerStarted)</div><div class="line">                addWorkerFailed(w);</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> workerStarted; <span class="comment">//这里可以看出来,addWorker返回值表示这个command有没有被执行</span></div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"> <span class="function"><span class="keyword">final</span> <span class="keyword">void</span> <span class="title">runWorker</span><span class="params">(Worker w)</span> </span>&#123; <span class="comment">//每一条线程运行起来的时候都会走这个方法</span></div><div class="line">        Thread wt = Thread.currentThread();</div><div class="line">        Runnable task = w.firstTask;</div><div class="line">        w.firstTask = <span class="keyword">null</span>;</div><div class="line">        w.unlock(); <span class="comment">// allow interrupts</span></div><div class="line">        <span class="keyword">boolean</span> completedAbruptly = <span class="keyword">true</span>;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="keyword">while</span> (task != <span class="keyword">null</span> || (task = getTask()) != <span class="keyword">null</span>) &#123;</div><div class="line">                w.lock();</div><div class="line">                <span class="comment">//getTask方法就是不断的从队列中获取任务。注意之前addTask的方法入参说明,command是该worker执行的第一个任务。也就是说，一个worker之后还有可能从queue中获取新的任务。线程能够一直有任务执行，就不会进入死亡状态(Thread有几个状态)</span></div><div class="line">                <span class="comment">// If pool is stopping, ensure thread is interrupted;</span></div><div class="line">                <span class="comment">// if not, ensure thread is not interrupted.  This</span></div><div class="line">                <span class="comment">// requires a recheck in second case to deal with</span></div><div class="line">                <span class="comment">// shutdownNow race while clearing interrupt</span></div><div class="line">                <span class="keyword">if</span> ((runStateAtLeast(ctl.get(), STOP) ||</div><div class="line">                     (Thread.interrupted() &amp;&amp;</div><div class="line">                      runStateAtLeast(ctl.get(), STOP))) &amp;&amp;</div><div class="line">                    !wt.isInterrupted())</div><div class="line">                    wt.interrupt();</div><div class="line">                <span class="keyword">try</span> &#123;</div><div class="line">                    beforeExecute(wt, task);</div><div class="line">                    Throwable thrown = <span class="keyword">null</span>;</div><div class="line">                    <span class="keyword">try</span> &#123;</div><div class="line">                        task.run();</div><div class="line">                    &#125; <span class="keyword">catch</span> (RuntimeException x) &#123;</div><div class="line">                        thrown = x; <span class="keyword">throw</span> x;</div><div class="line">                    &#125; <span class="keyword">catch</span> (Error x) &#123;</div><div class="line">                        thrown = x; <span class="keyword">throw</span> x;</div><div class="line">                    &#125; <span class="keyword">catch</span> (Throwable x) &#123;</div><div class="line">                        thrown = x; <span class="keyword">throw</span> <span class="keyword">new</span> Error(x);</div><div class="line">                    &#125; <span class="keyword">finally</span> &#123;</div><div class="line">                        afterExecute(task, thrown);<span class="comment">//钩子</span></div><div class="line">                    &#125;</div><div class="line">                &#125; <span class="keyword">finally</span> &#123;</div><div class="line">                    task = <span class="keyword">null</span>;</div><div class="line">                    w.completedTasks++;</div><div class="line">                    w.unlock();</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            completedAbruptly = <span class="keyword">false</span>;</div><div class="line">        &#125; <span class="keyword">finally</span> &#123;</div><div class="line">            processWorkerExit(w, completedAbruptly);</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>addWorker会创建一个新的Worker(线程)，而Worker的run方法是线程跑起来执行的方法，这其中有<br>注意上面使用了重入锁 ReentrantLock，后来发现ThreadPoolExecutor中多处使用了这个类。</p>
+<p>今天下午看到很多jdk里源码的注释，作者都是 Doug Lea ，佩服。</p>
+<p>Reference </p>
+<ol>
+<li><a href="https://github.com/pzxwhc/MineKnowContainer/issues/9" target="_blank" rel="external">Java 多线程：线程池实现原理</a></li>
+</ol>
 
-        <div class="article-info info-on-right">
-          
-          
+      
 
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
+        </div>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://haldir65.github.io/2017/04/30/2017-04-30-concurrency-and-beyond/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
   
   
-    </div></section>
+    <a href="/2017/04/23/2017-04-23-rxjava2-for-android/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Rxjava2 的一些点</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+
+
+
+
+  
+    <div class="duoshuo"></div>
   
 
-    
-    <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/archives/2016/page/5/">&laquo; Prev</a><a class="page-number" href="/archives/2016/">1</a><span class="space">&hellip;</span><a class="page-number" href="/archives/2016/page/4/">4</a><a class="page-number" href="/archives/2016/page/5/">5</a><span class="page-number current">6</span>
-    </nav>
-  
+
 
 
           </div>
@@ -282,8 +336,8 @@ ga('send', 'pageview');
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: true,
