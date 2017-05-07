@@ -10,6 +10,8 @@ top : 1
 ![](http://odzl05jxx.bkt.clouddn.com/rationalizingyourhoriiblehack-big.png?imageView2/2/w/500)
  <!--more-->
 
+首先是连接vps的ssh(Secure Shell)工具，putty或者xshell都可以。
+
 
 ### 1. 文件操作常用命令
 
@@ -23,6 +25,15 @@ top : 1
 - > rmdir //删除目录,如果目录不为空，
 - >使用 rm -r //递归删除
 - > rm -rf //强制删除
+
+文件名一般不支持空格，如果真有的话得用单引号括起来，像这样:
+-> rm -f 'my file'
+重命名
+
+-> mv a.mp4 b.mp4 //mv虽然是移动（Windows中的剪切）操作，但这种情况下就等同于重命名了，亲测有效
+ rename是实际意义上的重命名命令，但rename接受三个参数
+
+
 
 - > touch filename //创建文件，后缀在linux下没意义
 
@@ -43,6 +54,10 @@ top : 1
 - > mv d1 /  把d1移动到相对路径，也就是根目录下
 - > mv d1 ../把d1往上移动一层
 - > mv d1 ../../
+
+
+文件传输（linux ->windows）： 一般使用putty ssh到Linux主机，想要把Linux上的文件弄到Windows中，需要使用pscp工具。下载好pscp.exe后，放到c:/windows/system32下面。打开cmd。输入命令
+pscp -r root@202.123.123.123:"/root/fileonServer.mp4" d:/whateveriwantonmyPc.mp4  ，确认后输入root密码就好了。我主要是用来下载视频的。
 
 ```
 
