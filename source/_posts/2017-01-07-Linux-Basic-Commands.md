@@ -58,7 +58,11 @@ top : 1
 
 文件传输（linux ->windows）： 一般使用putty ssh到Linux主机，想要把Linux上的文件弄到Windows中，需要使用pscp工具。下载好pscp.exe后，放到c:/windows/system32下面。打开cmd。输入命令
 pscp -r root@202.123.123.123:"/root/fileonServer.mp4" d:/whateveriwantonmyPc.mp4  ，确认后输入root密码就好了。我主要是用来下载视频的。
-
+有时候会出现Connection Refused Error。
+netstat -anp | grep sshd
+看下跑在哪个端口
+然后
+pscp -P 12345-r root@202.123.123.123:"/root/fileonServer.mp4" d:/whateveriwantonmyPc.mp4 # -p要大写
 ```
 
 
