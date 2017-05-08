@@ -63,6 +63,13 @@ netstat -anp | grep sshd
 看下跑在哪个端口
 然后
 pscp -P 12345-r root@202.123.123.123:"/root/fileonServer.mp4" d:/whateveriwantonmyPc.mp4 # -p要大写
+
+查看硬盘存储空间:
+df -h //h的意思是human-readable
+du -sh //查看当前directory的大小
+du -h //查看当前目录下各个子目录分别的大小
+dh -h img// 查看img目录下文件及文件夹的大小
+dh -h img/1.jpg //查看指定文件的大小
 ```
 
 
@@ -242,3 +249,4 @@ $ ls -l | grep "^d" //只列出目录
 鸟哥
 
 ![](http://odzl05jxx.bkt.clouddn.com/fork_you_git.jpg)
+[文件大小查看命令](https://my.oschina.net/liting/blog/392051)
