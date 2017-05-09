@@ -70,6 +70,13 @@ du -sh //查看当前directory的大小
 du -h //查看当前目录下各个子目录分别的大小
 dh -h img// 查看img目录下文件及文件夹的大小
 dh -h img/1.jpg //查看指定文件的大小
+
+
+压缩文件命令
+将/home/video/ 这个目录下所有文件和文件夹打包为当前目录下的video.zip
+
+zip –q –r video.zip /home/video/video.zip
+
 ```
 
 
@@ -250,3 +257,4 @@ $ ls -l | grep "^d" //只列出目录
 
 ![](http://odzl05jxx.bkt.clouddn.com/fork_you_git.jpg)
 [文件大小查看命令](https://my.oschina.net/liting/blog/392051)
+[文件压缩命令](http://blog.sina.com.cn/s/blog_7479f7990100zwkp.html)
