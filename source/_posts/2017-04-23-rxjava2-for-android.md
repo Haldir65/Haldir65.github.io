@@ -130,10 +130,12 @@ Observable.create(new ObservableOnSubscribe<String>()){
 	e.onComplete();
 	}
 }
+```
 
 //一个Observable可以有多个subscriber。一个被观察者可以有多个观察者，被观察者的onNext调用，观察者的onNext也会被调用
 
 lambda更简洁
+```java
 Observable.create(e ->{
 	e.onNext("Hello");
 	e.onNext("Hello");
@@ -179,7 +181,6 @@ Observable.create(e ->{
 // 点击按钮发送事件，取消订阅时避免leak View
 
 和fromCallable一样，create方法也适用于所有五种data source
-
 
 ```
 
