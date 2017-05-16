@@ -105,6 +105,40 @@ Vi分为命令模式和编辑模式，一进来是命令模式，输入'a'进入
 
 - > head - 3 filename //只查看文件前面三行
 - > tail - 3 filename //只查看倒数后三行 
+
+ss 命令 
+ssserver -c /etc/shadowsocks/config.json # 前台运行
+
+#后台运行和停止
+ssserver -c /etc/shadowsocks.json -d start
+ssserver -c /etc/shadowsocks.json -d stop
+
+#加入开机启动
+在/etc/rc.local中加入
+sudo ssserver -c /etc/shadowsocks.json --user username -d start #不要总是用root用户做事，adduser来做，给sudo权限即可
+
+[ShadowsocksR](https://github.com/breakwa11/shadowsocks-rss/wiki)启动后台运行命令
+> python server.py -p 443 -k password -m aes-256-cfb -O auth_sha1_v4 -o http_simple -d start
+
+[net-speeder](https://zhgcao.github.io/2016/05/26/ubuntu-install-net-speeder/)
+venetX，OpenVZ架构
+```
+cd net-speeder-master/
+sh build.sh -DCOOKED
+
+Xen，KVM，物理机
+cd net-speeder-master/
+sh build.sh
+```
+
+加速所有ip协议数据
+./net_speeder venet0 "ip"
+
+只加速指定端口，例如只加速TCP协议的 8989端口
+#前提是切换到net-speeder的目录下
+# ./net_speeder venet0:0 "tcp src port 8989"
+
+
 ```
 
 
@@ -258,3 +292,4 @@ $ ls -l | grep "^d" //只列出目录
 ![](http://odzl05jxx.bkt.clouddn.com/fork_you_git.jpg)
 [文件大小查看命令](https://my.oschina.net/liting/blog/392051)
 [文件压缩命令](http://blog.sina.com.cn/s/blog_7479f7990100zwkp.html)
+[硬件查询](https://my.oschina.net/hunterli/blog/140783)
