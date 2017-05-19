@@ -188,6 +188,14 @@ Chrome自带开发者工具，可以查看每一个request的header，cookies等
 
 
 todo 
+### 6.一些细节
+文件读写的各种模式以及解码问题
+```python
+ with open(filepath, 'r', encoding="utf8") as f:
+    f.write('最好用utf8读和写文件')
+    #已经自动做好close文件的工作
+```
+
 
 <!-- install mongoDb(better performance than sql) -->
 <!-- install pip -->
