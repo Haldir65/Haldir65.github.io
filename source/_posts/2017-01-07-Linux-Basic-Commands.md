@@ -56,26 +56,20 @@ top : 1
 - > mv d1 ../../
 
 
-文件传输（linux ->windows）： 一般使用putty ssh到Linux主机，想要把Linux上的文件弄到Windows中，需要使用pscp工具。下载好pscp.exe后，放到c:/windows/system32下面。打开cmd。输入命令
-pscp -r root@202.123.123.123:"/root/fileonServer.mp4" d:/whateveriwantonmyPc.mp4  ，确认后输入root密码就好了。我主要是用来下载视频的。
-有时候会出现Connection Refused Error。
-netstat -anp | grep sshd
-看下跑在哪个端口
-然后
-pscp -P 12345-r root@202.123.123.123:"/root/fileonServer.mp4" d:/whateveriwantonmyPc.mp4 # -p要大写
-
-查看硬盘存储空间:
-df -h //h的意思是human-readable
-du -sh //查看当前directory的大小
-du -h //查看当前目录下各个子目录分别的大小
-dh -h img// 查看img目录下文件及文件夹的大小
-dh -h img/1.jpg //查看指定文件的大小
 
 
-压缩文件命令
-将/home/video/ 这个目录下所有文件和文件夹打包为当前目录下的video.zip
+###重定向
+重定向输出 >
+ls  > lsoutput.txt #用于将输出的结果写入一个新的文本文件中
+echo 'hey man' # 类似于print
+echo 'hello' > log.txt #把这句话写入到文本中 ，覆盖其原有内容
 
-zip –q –r video.zip /home/video/video.zip
+重定向输入 <
+wall < aa.txt # wall是向所有用户发广播， 即从aa.txt中读取内容，然后广播发出去
+
+
+#service命令
+service XXX start/stop/status #原理是将这些程序注册成为系统服务，这样调用这些程序的时候就不需要写一大堆绝对路径了，具体用法help已经很详细了。
 
 ```
 
@@ -250,7 +244,7 @@ d代表目录
 后面九位划分为三块，可能的权限有这么几种
 r(read权限)w(写权限)-(无权限)x(执行权限)
 
-第一组代表所有者权限，第二组代表与所有者一个用户组的用户的权限，第三组代表其他用户的权限
+第一组代表所有者(u)权限，第二组代表与所有者一个用户组的用户(g)的权限，第三组代表其他用户(0)的权限
 
 更改文件权限命令: chmod
 ```shell
@@ -258,7 +252,26 @@ chmod +x filename //加上可执行权限，所有用户都加上了
 chmod u+x filename //给当前用户加上可执行权限
 //其他命令不一一列举
 
+> u ：目录或者文件的当前的用户
+  g ：目录或者文件的当前的群组
+  o ：除了目录或者文件的当前用户或群组之外的用户或者群组
+  a ：所有的用户及群组
+
+
+> r ：读权限，用数字4表示
+  w ：写权限，用数字2表示
+  x ：执行权限，用数字1表示
+  - ：删除权限，用数字0表示
+
+所以给所有用户增加a.txt文件的可执行权限就像这样
+chmod a+x a.txt 
+#其余自行发挥
+chmod a-x a.txt  #删除所有用户的可执行权限
+
+
 chmod 755 filename  
+751应该是读/写/执行
+chomod 444 filename# 为所有用户分配读权限
 chmod 777 filename //全部权限都有了，其实上面的9位就是这三位数每一位的二进制拼起来的
 755 就是 111101101,也就对应上面的权限九位字母
 
@@ -283,13 +296,37 @@ $ ls -l | grep "^d" //只列出目录
 
 ### 7. 磁盘分区的问题
 
-### 8. 配置sql,Tomcat
+
+查看硬盘存储空间:
+df -h //h的意思是human-readable
+du -sh //查看当前directory的大小
+du -h //查看当前目录下各个子目录分别的大小
+dh -h img// 查看img目录下文件及文件夹的大小
+dh -h img/1.jpg //查看指定文件的大小
 
 
-## ref 
-鸟哥
+压缩文件命令
+将/home/video/ 这个目录下所有文件和文件夹打包为当前目录下的video.zip
 
-![](http://odzl05jxx.bkt.clouddn.com/fork_you_git.jpg)
-[文件大小查看命令](https://my.oschina.net/liting/blog/392051)
-[文件压缩命令](http://blog.sina.com.cn/s/blog_7479f7990100zwkp.html)
-[硬件查询](https://my.oschina.net/hunterli/blog/140783)
+zip –q –r video.zip /home/video/video.zip
+
+
+文件传输（linux ->windows）： 一般使用putty ssh到Linux主机，想要把Linux上的文件弄到Windows中，需要使用pscp工具。下载好pscp.exe后，放到c:/windows/system32下面。打开cmd。输入命令
+pscp -r root@202.123.123.123:"/root/fileonServer.mp4" d:/whateveriwantonmyPc.mp4  ，确认后输入root密码就好了。我主要是用来下载视频的。
+有时候会出现Connection Refused Error。
+netstat -anp | grep sshd
+看下跑在哪个端口
+然后
+pscp -P 12345-r root@202.123.123.123:"/root/fileonServer.mp4" d:/whateveriwantonmyPc.mp4 # -p要大写
+
+
+
+
+
+### 参考
+
+
+- ![](http://odzl05jxx.bkt.clouddn.com/fork_you_git.jpg)
+- [文件大小查看命令](https://my.oschina.net/liting/blog/392051)
+- [文件压缩命令](http://blog.sina.com.cn/s/blog_7479f7990100zwkp.html)
+- [硬件查询](https://my.oschina.net/hunterli/blog/140783)
