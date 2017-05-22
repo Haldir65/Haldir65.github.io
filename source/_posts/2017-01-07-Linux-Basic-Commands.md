@@ -68,8 +68,22 @@ echo 'hello' > log.txt #把这句话写入到文本中 ，覆盖其原有内容
 wall < aa.txt # wall是向所有用户发广播， 即从aa.txt中读取内容，然后广播发出去
 
 
+
 #service命令
 service XXX start/stop/status #原理是将这些程序注册成为系统服务，这样调用这些程序的时候就不需要写一大堆绝对路径了，具体用法help已经很详细了。
+
+zip –q –r video.zip /home/video 
+zip –q –r video.zip .  # .代表当前目录
+
+查看ip命令  
+
+ifconfig
+
+进程命令
+#实时监控，1秒刷新一次
+watch -n 1 ps -aux --sort=-pmem,-pcpu
+
+
 
 ```
 
@@ -83,13 +97,19 @@ Vi分为命令模式和编辑模式，一进来是命令模式，输入'a'进入
 切换回命令模式按'esc' 
 命令模式下 :w 表示存盘
 - :q 退出
-- :!q 不保存退出
+
 - :wq 保存并退出
+- :q! 不保存退出（无内容变化）
 ```
 
 
 在编辑模式下,输入 'dd'删除一行 ，输入'dw'删除一个词
 输入'o'插入一行。。。。。。
+
+
+
+
+
 ```shell
 - > more filename//查看文件内容
 
