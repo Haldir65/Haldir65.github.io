@@ -331,14 +331,15 @@ pscp -P 12345-r root@202.123.123.123:"/root/fileonServer.mp4" d:/whateveriwanton
 
 ### 8.Shadowsocks
 
+```
 ss 命令 
 ssserver -c /etc/shadowsocks/config.json # 前台运行
 
-#后台运行和停止
+# 后台运行和停止
 ssserver -c /etc/shadowsocks.json -d start
 ssserver -c /etc/shadowsocks.json -d stop
 
-#加入开机启动
+# 加入开机启动
 在/etc/rc.local中加入
 sudo ssserver -c /etc/shadowsocks.json --user username -d start #不要总是用root用户做事，adduser来做，给sudo权限即可
 
@@ -357,11 +358,12 @@ sh build.sh
 ```
 
 加速所有ip协议数据
-./net_speeder venet0 "ip"
+> ./net_speeder venet0 "ip"
 
 只加速指定端口，例如只加速TCP协议的 8989端口
 #前提是切换到net-speeder的目录下
-# ./net_speeder venet0:0 "tcp src port 8989"
+> ./net_speeder venet0:0 "tcp src port 8989"
+```
 
 
 
