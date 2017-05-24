@@ -6,23 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://haldir65.github.io">
-  <title>安卓坐标系常用方法 | Haldir的博客</title>
+  <title>jvm架构概述 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="记录一些Android系统坐标系的常用方法，因为日常开发中难免会碰到需要单独计算View系统坐标的情况。">
+  <meta name="description" content="关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下">
 <meta property="og:type" content="article">
-<meta property="og:title" content="安卓坐标系常用方法">
-<meta property="og:url" content="http://haldir65.github.io/2016/10/13/2016-10-13-Android-coordinate-System/index.html">
+<meta property="og:title" content="jvm架构概述">
+<meta property="og:url" content="http://haldir65.github.io/2017/05/24/2017-05-24-jvm-architecture/index.html">
 <meta property="og:site_name" content="Haldir的博客">
-<meta property="og:description" content="记录一些Android系统坐标系的常用方法，因为日常开发中难免会碰到需要单独计算View系统坐标的情况。">
-<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/minion.jpg?imageView2/2/w/400">
-<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/android_screen_coordinate_system.png?imageView2/2/w/500">
-<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/view_hirearchy_1013.png">
-<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/support_lib_methods_summary.jpg">
-<meta property="og:updated_time" content="2017-04-23T10:50:09.399Z">
+<meta property="og:description" content="关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下">
+<meta property="og:updated_time" content="2017-05-24T15:41:07.120Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="安卓坐标系常用方法">
-<meta name="twitter:description" content="记录一些Android系统坐标系的常用方法，因为日常开发中难免会碰到需要单独计算View系统坐标的情况。">
-<meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/minion.jpg?imageView2/2/w/400">
+<meta name="twitter:title" content="jvm架构概述">
+<meta name="twitter:description" content="关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -173,73 +168,51 @@ ga('send', 'pageview');
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-2016-10-13-Android-coordinate-System" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-2017-05-24-jvm-architecture" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      安卓坐标系常用方法
+      jvm架构概述
     </h1>
   
 
         
-        <a href="/2016/10/13/2016-10-13-Android-coordinate-System/" class="archive-article-date">
-  	<time datetime="2016-10-13T10:17:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-10-13</time>
+        <a href="/2017/05/24/2017-05-24-jvm-architecture/" class="archive-article-date">
+  	<time datetime="2017-05-24T14:48:58.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-05-24</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>记录一些Android系统坐标系的常用方法，因为日常开发中难免会碰到需要单独计算View系统坐标的情况。</p>
-<p><img src="http://odzl05jxx.bkt.clouddn.com/minion.jpg?imageView2/2/w/400" alt=""><br><a id="more"></a></p>
-<p>ScrollTo，ScrollBy，getVisibleRect这些方法平时想要用的时候总要去网上查找，这里记录下来，方便今后直接参考<br>首先是一张很多人都见过的图<br><img src="http://odzl05jxx.bkt.clouddn.com/android_screen_coordinate_system.png?imageView2/2/w/500" alt=""><br>中间的蓝色的点是TouchEvent发生时，获得的MotionEvent.getX()、getY()。</p>
-<h3 id="1-坐标原点和坐标轴方向"><a href="#1-坐标原点和坐标轴方向" class="headerlink" title="1. 坐标原点和坐标轴方向"></a>1. 坐标原点和坐标轴方向</h3><p>坐标原点有两种，屏幕左上角（statusBar也包含其中）和父控件左上角<br>坐标轴方向：X轴向右，Y轴向下，Z轴(5.0增加)向上。</p>
-<h3 id="2-Left-Top-Right-Bottom"><a href="#2-Left-Top-Right-Bottom" class="headerlink" title="2. Left,Top,Right,Bottom"></a>2. Left,Top,Right,Bottom</h3><p>而Top，left，bottom,down分别对应着其其相对于父控件的距离，由此可以计算得到View的宽度width = getRight()-getLeft() ,View的高度 height = getBottom()-getTop()<br>而实际上view.getHeight()方法的实现也就是mBottom-mTop.</p>
-<h3 id="3-X-Y"><a href="#3-X-Y" class="headerlink" title="3. X , Y"></a>3. X , Y</h3><p>X代表的是当前View的左上角那个点的横坐标，Y代表的是纵坐标。<br>X = left + getTranslationX<br>Y = Top + getTranslationY<br>通常在动画中使用setTranslationX来实现偏移效果，注意，这是不会改变left的。在滑动过程中，x, y会随着改变。</p>
-<h3 id="4-几个跟Rect相关的"><a href="#4-几个跟Rect相关的" class="headerlink" title="4. 几个跟Rect相关的"></a>4. 几个跟Rect相关的</h3><p>获得的是当前View左上角距离屏幕左上角的位置，为此我专门测试了一下</p>
-<blockquote>
-<p> W/ViewAnimationActivity.java: [32 | onWindowFocusChanged]statusBarHeight = 75<br> W/ViewAnimationActivity.java: [35 | onWindowFocusChanged]getLocationInWindow  x = 0 y = 75<br> W/ViewAnimationActivity.java: [38 | onWindowFocusChanged]getLocationOnScreen x = 0 y = 75<br>可以看到返回的就是View左上角的坐标，一般情况下两者区别不重要，stackoverFlow上有<a href="http://stackoverflow.com/questions/17672891/getlocationonscreen-vs-getlocationinwindow" target="_blank" rel="external">讨论</a></p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">View.getLocationInWindow(pos); <span class="comment">//获取在当前window内的绝对坐标</span></div><div class="line">View.getLocationOnScreen(pos); <span class="comment">//包括statusBar，以屏幕左上角为坐标原点</span></div><div class="line">View.getLocalVisibleRect()  </div><div class="line"><span class="comment">//以view自身的左上角为坐标原点，这个很有用，</span></div><div class="line"><span class="comment">//返回的坐标一定是(0,0,xxx,xxx)这样的，可以判断当前View是否完全可见</span></div><div class="line">View.getGlobalVisibleRect()  <span class="comment">// 以屏幕左上角为坐标原点</span></div></pre></td></tr></table></figure>
-<p>以上四个方法在onCreate里面返回的值都是0，需要在Activity的onWindowFocusChanged(true)中去获得<br>这里需要扯一点关于window的问题，根据大部分博客的介绍：DecorView是FrameLayout的子类，是View视图层级树的根节点。<br>一般会有一个LinearLayout的child</p>
-<p>为此，我在setContentView里面放了一个CoordinateLayout,使用Hierarchy View截图的到这样的结果。<br>图片有点大<br><img src="http://odzl05jxx.bkt.clouddn.com/view_hirearchy_1013.png" alt=""></p>
-<p>在ViewHirearchy中可以看到，Activity中View视图层级从上到下依次为：</p>
-<blockquote>
-<p>PhoneWindow$DecorView（有三个child,分别是LinearLayout，View(id/statusBarBackground)和View(id/navigationBarBackground)）<br>LinearLayout<br>FrameLayout<br>FitWindowsLinearLayout<br>ContentFrameLayout(id/android.R.id.content) //这在开发过程中有时会用到<br>setContentView设置的view</p>
-</blockquote>
-<p>关于window，DecorWindow的文章网上有很多，仔细研究下会对理解View的测量机制有一定好处，这对于View的工作原理也能够更彻底的理解。<br><a href="http://blog.csdn.net/qibin0506/article/details/49245601" target="_blank" rel="external">参考文章</a><br>日常开发中，setContentView这个方法只是将我们自己写的activiy_main.xml布局文件inflate出来的view添加到<br>android.R.id.content这个ViewGroup中，实践下来发现这是一个ContentFrameLayout的实例，它的child只有一个，就是我们通过setContentView添加的View</p>
-<h3 id="5-让View滑动起来"><a href="#5-让View滑动起来" class="headerlink" title="5. 让View滑动起来"></a>5. 让View滑动起来</h3><blockquote>
-<p>offsetLeftAndRight(int offset) //给left和right加上一个值，改变的是View的位置<br>offsetTopAndBottom(int offset) </p>
-<p>scrollTo(int x,int y)  // 将View中的内容移动，坐标原点为parentView左上角，注意，参数为正，效果为反<br>例如scrollTo(-100,0) 在手机上看效果是往右移动了</p>
-<p>scrollBy(int x, int y)</p>
-</blockquote>
-<p>scrollBy的源码如下:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">scrollBy</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</div><div class="line">      scrollTo(mScrollX + x, mScrollY + y);</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
-<p>还有一些不常用的：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setScrollX</span><span class="params">(<span class="keyword">int</span> value)</span> </span>&#123;</div><div class="line">        scrollTo(value, mScrollY);</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
-<h3 id="6-改变LayoutParams的margin让View移动"><a href="#6-改变LayoutParams的margin让View移动" class="headerlink" title="6. 改变LayoutParams的margin让View移动"></a>6. 改变LayoutParams的margin让View移动</h3><p>这是一种很生硬的方式，不常用<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">MarginLayoutParams params = (MarginLayoutParams)mTextView.getLayoutParams(); <span class="comment">//可能为null</span></div><div class="line">params.leftMargin + = <span class="number">100</span>;</div><div class="line">mTextView.setLayoutParams();<span class="comment">// 这里面调用了requestLayout</span></div></pre></td></tr></table></figure></p>
-<h3 id="7-使用Animation让View动起来"><a href="#7-使用Animation让View动起来" class="headerlink" title="7.使用Animation让View动起来"></a>7.使用Animation让View动起来</h3><p>根据官方文档的<a href="https://developer.android.com/guide/topics/graphics/overview.html" target="_blank" rel="external">定义</a>Android中一共两种Animation: </p>
-<blockquote>
-<p>Property Animation<br>View Animation(包括Tween animation, Frame animation)</p>
-</blockquote>
-<p>首先从package的位置来看<br>属性动画都位于android.animation这个package下面，常见的如ObjectAnimator继承自ValueAnimator<br>View动画则位于android.view.animation这个package下，常见的如TranslateA,AlphaAnimation等</p>
-<p>View Animation可以代码创建，也可以写在R.anim文件夹下,用法很简单<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">ImageView image = (ImageView) findViewById(R.id.image);</div><div class="line">Animation hyperspaceJump = AnimationUtils.loadAnimation(<span class="keyword">this</span>, R.anim.hyperspace_jump);</div><div class="line">image.startAnimation(hyperspaceJump);</div></pre></td></tr></table></figure></p>
-<p>属性动画可以代码创建，也可以写在R.animator文件夹下,用法:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">AnimatorSet set = (AnimatorSet) AnimatorInflater.loadAnimator(myContext,</div><div class="line">    R.anim.property_animator);</div><div class="line">set.setTarget(myObject);</div><div class="line">set.start();</div></pre></td></tr></table></figure></p>
-<p>推荐使用ViewPropertyAnimator，这是一个位于android.view下面的class，感觉更像是一个Util,大部分的方法都是在API 12 ,API 14引入的，<br>实际开发中推荐使用ViewCompat.animate() 返回一个ViewPropertyAnimator对象，省去了开发者版本判断的麻烦<br>语法更为简单：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ViewCompat.animate(view).x(<span class="number">500</span>).y(<span class="number">500</span>).setDuration(<span class="number">5000</span>).setInterpolator(<span class="keyword">new</span> DecelaratorInterpolator());  <span class="comment">//不需要调用start()</span></div></pre></td></tr></table></figure></p>
-<p>据说这种方式性能最好，Google官方强烈推荐,参考DevByte。<br>另外，据说大部分Google的App使用的都是DecelaratorInterpolator，当然这跟设计有关。</p>
-<h3 id="8-使用Scroller实现smoothScroll"><a href="#8-使用Scroller实现smoothScroll" class="headerlink" title="8.使用Scroller实现smoothScroll"></a>8.使用Scroller实现smoothScroll</h3><p>View有一个方法computeScroll(),复写，像这样就可以了<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">Scroller scroller = <span class="keyword">new</span> Scroller(mContext);</div><div class="line"> </div><div class="line"> <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">smoothScrollTo</span><span class="params">(<span class="keyword">int</span> dstX, <span class="keyword">int</span> dstY)</span> </span>&#123;</div><div class="line">      <span class="keyword">int</span> scrollX = getScrollX();</div><div class="line">      <span class="keyword">int</span> delta = dstX - scrollX;</div><div class="line">      scroller.startScroll(scrollX, <span class="number">0</span>, delta, <span class="number">0</span>, <span class="number">1000</span>);</div><div class="line">      invalidate();</div><div class="line"> &#125;</div><div class="line">  </div><div class="line"> <span class="meta">@Override</span></div><div class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">computeScroll</span><span class="params">()</span> </span>&#123;</div><div class="line">     <span class="keyword">if</span> (scroller.computeScrollOffset()) &#123;</div><div class="line">         scrollTo(scroller.getCurrX(), scroller.getCurY());</div><div class="line">         postInvalidate();</div><div class="line">     &#125;</div><div class="line"> &#125;</div></pre></td></tr></table></figure></p>
-<h3 id="9-补充几个好玩的函数"><a href="#9-补充几个好玩的函数" class="headerlink" title="9. 补充几个好玩的函数"></a>9. 补充几个好玩的函数</h3><p>View.canScrollVertically(int)<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">canChildScrollUp</span><span class="params">(View view)</span> </span>&#123;</div><div class="line">       <span class="keyword">if</span> (android.os.Build.VERSION.SDK_INT &lt; <span class="number">14</span>) &#123;</div><div class="line">           <span class="keyword">if</span> (view <span class="keyword">instanceof</span> AbsListView) &#123;</div><div class="line">               <span class="keyword">final</span> AbsListView absListView = (AbsListView) view;</div><div class="line">               <span class="keyword">return</span> absListView.getChildCount() &gt; <span class="number">0</span></div><div class="line">                       &amp;&amp; (absListView.getFirstVisiblePosition() &gt; <span class="number">0</span> || absListView.getChildAt(<span class="number">0</span>)</div><div class="line">                       .getTop() &lt; absListView.getPaddingTop());</div><div class="line">           &#125; <span class="keyword">else</span> &#123;</div><div class="line">               <span class="keyword">return</span> view.getScrollY() &gt; <span class="number">0</span>;</div><div class="line">           &#125;</div><div class="line">       &#125; <span class="keyword">else</span> &#123;</div><div class="line">           <span class="keyword">return</span> view.canScrollVertically(-<span class="number">1</span>);</div><div class="line">       &#125;</div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
-<p>这段是我在秋百万的android-ultra-pulltorefresh里面找到的，想当初为了自己写下拉刷新，一遍一遍的打Log，最后甚至用上getVisibleRect才算搞定。<br>其实很多东西前人已经帮我们整理好了。<br>对了这东西在v4包里有ViewCompat.canScrollVertically，v4包除了方法数有点多(10k+好像)这点不好以外，一直都很好用<br>附上supportLibrary各个包的方法数，如果对65536这个数字熟悉的话，还是会注意点的。<br><img src="http://odzl05jxx.bkt.clouddn.com/support_lib_methods_summary.jpg" alt="pic"></p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
-<li>使用getLocalVisibleRect可以判断一个view是否完全可见</li>
-<li>scrollBy,setScrollX等内部都是调用了scrollTo方法，ScrollTo方法传参数与实际效果是相反的</li>
-</ul>
-<h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><ol>
-<li><a href="http://blog.csdn.net/yanbober/article/details/50419117" target="_blank" rel="external">Android应用坐标系统全面详解</a></li>
-<li>​[如何取得View的位置之View.getLocationInWindow()的小秘密](<a href="http://blog.csdn.net/imyfriend/article/details/8564781" target="_blank" rel="external">http://blog.csdn.net/imyfriend/article/details/8564781</a></li>
-<li><a href="http://www.cnblogs.com/absfree/p/5352258.html" target="_blank" rel="external">详解实现Android中实现View滑动的几种方式</a></li>
-</ol>
+        <p>关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下<br><a id="more"></a></p>
+<h3 id="1-从MyApp-java文件开始"><a href="#1-从MyApp-java文件开始" class="headerlink" title="1.从MyApp.java文件开始"></a>1.从MyApp.java文件开始</h3><p>大家都知道最开始学习Java的时候，要用javac 来编译MyApp.java来生成一个class文件。<br>在命令行里，大致是这样的执行顺序:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">javac MyApp.java</div><div class="line">java MyApp</div></pre></td></tr></table></figure></p>
+<h4 id="实际上后一句话就创建了一个jvm-instance"><a href="#实际上后一句话就创建了一个jvm-instance" class="headerlink" title="实际上后一句话就创建了一个jvm instance."></a>实际上后一句话就创建了一个jvm instance.</h4><h3 id="2-从classLoader进入Execution-Engine-再到Host-Operating-System"><a href="#2-从classLoader进入Execution-Engine-再到Host-Operating-System" class="headerlink" title="2. 从classLoader进入Execution Engine 再到Host Operating System"></a>2. 从classLoader进入Execution Engine 再到Host Operating System</h3><p>java MyApp会调用class loader，后者不仅要负责加载MyApp.class文件，还需要加载java API中的class文件（String,Object,Collection….）。加载的class文件（byte code）被传递给Execution Engine,后者则负责执行byte code（其实也是调用宿主操作系统的方法执行操作）</p>
+<h3 id="3-where-did-classLoader-load-class-into"><a href="#3-where-did-classLoader-load-class-into" class="headerlink" title="3. where did classLoader load class into ?"></a>3. where did classLoader load class into ?</h3><p>classloader将class 文件加载进内存中的一部分（Runtime data areas）。到此，jvm architecture的三个主要组件：class loader subsystem,Runtime data areas 以及execution Enigne的主要功能都说清楚了。<br>所以，这篇文章主要就按照class loader subsystem -&gt; Runtime data areas -&gt; Execution Engine的顺序来讲。</p>
+<h3 id="4-从classloader开始执行（class-loading-subsystem）"><a href="#4-从classloader开始执行（class-loading-subsystem）" class="headerlink" title="4.从classloader开始执行（class loading subsystem）"></a>4.从classloader开始执行（class loading subsystem）</h3><pre><code>- load 将byte code 加载进内存，来源可以是.java文件，可以是.jar文件，甚至可以是network Socket（这要看具体class loader的implementation）。load阶段包含三种不同的class loader，这也是面试时的重点。
+
+&gt; 1. Bootstrap class loader (jre文件夹中有一个rt.jar文件，里面装的就是java的internal class) // 
+
+&gt; 2. extension class loader (jre/lib/ext) //负责加载这个文件夹中的class文件
+
+&gt; 3. Application class loader (CLASSPATH, -cp)//加载CLASSPATH变量中描述的位置
+
+- load完成后是link
+verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的static variable分配内存，variable被赋默认值) -&gt; Resolve(when all the symbolic reference inside currentclass are resolved，例如引用了其他的class，例如引用了常量池里面的东西，classDefNotFoundException也是在这个时候抛出的)
+
+注意，以上步骤都是java specification所规定的，但不同的jvm实现可能有微小的差异
+</code></pre><p>class loading subsystem的最后一步是initialize<br>class vars to initiazed Value in code(比如静态代码块就是在这时执行的)</p>
+<h3 id="5-Runtime-data-area五个部分的划分"><a href="#5-Runtime-data-area五个部分的划分" class="headerlink" title="5. Runtime data area五个部分的划分"></a>5. Runtime data area五个部分的划分</h3><p>Runtime data area 即java virtural machine的内存，可以划分成五部分</p>
+<pre><code>- Method Area
+- Heap
+- java stack 
+- pc Registers
+- Native method stacks
+</code></pre><p>Method Area(方法区，用于存储class的数据，static variable,byte code,class level constant pool都放在这里)    ，Method Area也称为Perm gen space(永生代)，默认大小是64MB ，可以通过-XX:MaxPermSize 调节</p>
+<h3 id="6-Execution-Engine的任务"><a href="#6-Execution-Engine的任务" class="headerlink" title="6. Execution Engine的任务"></a>6. Execution Engine的任务</h3><h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="https://www.youtube.com/watch?v=ZBJ0u9MaKtM" target="_blank" rel="external">JVM ( java virtual machine) architecture - tutorial</a></p>
 
       
 
@@ -274,28 +247,13 @@ ga('send', 'pageview');
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">android</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">TouchEvent</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">jvm</a>
         		</li>
       		
 		</ul>
 	</div>
 
       
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/blog/" class="article-tag-list-link color5">blog</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
 
       
 
@@ -345,7 +303,7 @@ ga('send', 'pageview');
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="http://s.jiathis.com/qrcode.php?url=http://haldir65.github.io/2016/10/13/2016-10-13-Android-coordinate-System/" alt="微信分享二维码">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://haldir65.github.io/2017/05/24/2017-05-24-jvm-architecture/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -359,18 +317,9 @@ ga('send', 'pageview');
   
 <nav id="article-nav">
   
-    <a href="/2016/10/14/2016-10-14-Android-translucent-status-bar/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          fitSystemWindow和沉浸式状态栏的一些总结
-        
-      </div>
-    </a>
   
-  
-    <a href="/2016/10/12/2016-10-12-How-the-mainThread-work/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">主线程的工作原理</div>
+    <a href="/2017/05/07/2017-05-07-download-video-from-vps/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">VPS下载Youtube视频并同步到本地</div>
       <i class="icon-circle-right"></i>
     </a>
   
