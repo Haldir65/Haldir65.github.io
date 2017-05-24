@@ -7,7 +7,7 @@ top : 1
 ---
 
 一些常用的linux基本命令,仅作为参考。</br>
-![](http://odzl05jxx.bkt.clouddn.com/rationalizingyourhoriiblehack-big.png?imageView2/2/w/500)
+![](http://odzl05jxx.bkt.clouddn.com/b3.jpg?imageView2/2/w/500)
  <!--more-->
 
 首先是连接vps的ssh(Secure Shell)工具，putty或者xshell都可以。
@@ -120,37 +120,6 @@ Vi分为命令模式和编辑模式，一进来是命令模式，输入'a'进入
 - > head - 3 filename //只查看文件前面三行
 - > tail - 3 filename //只查看倒数后三行 
 
-ss 命令 
-ssserver -c /etc/shadowsocks/config.json # 前台运行
-
-#后台运行和停止
-ssserver -c /etc/shadowsocks.json -d start
-ssserver -c /etc/shadowsocks.json -d stop
-
-#加入开机启动
-在/etc/rc.local中加入
-sudo ssserver -c /etc/shadowsocks.json --user username -d start #不要总是用root用户做事，adduser来做，给sudo权限即可
-
-[ShadowsocksR](https://github.com/breakwa11/shadowsocks-rss/wiki)启动后台运行命令
-> python server.py -p 443 -k password -m aes-256-cfb -O auth_sha1_v4 -o http_simple -d start
-
-[net-speeder](https://zhgcao.github.io/2016/05/26/ubuntu-install-net-speeder/)
-venetX，OpenVZ架构
-```
-cd net-speeder-master/
-sh build.sh -DCOOKED
-
-Xen，KVM，物理机
-cd net-speeder-master/
-sh build.sh
-```
-
-加速所有ip协议数据
-./net_speeder venet0 "ip"
-
-只加速指定端口，例如只加速TCP协议的 8989端口
-#前提是切换到net-speeder的目录下
-# ./net_speeder venet0:0 "tcp src port 8989"
 
 
 ```
@@ -359,6 +328,40 @@ netstat -anp | grep sshd
 看下跑在哪个端口
 然后
 pscp -P 12345-r root@202.123.123.123:"/root/fileonServer.mp4" d:/whateveriwantonmyPc.mp4 # -p要大写
+
+### 8.Shadowsocks
+
+ss 命令 
+ssserver -c /etc/shadowsocks/config.json # 前台运行
+
+#后台运行和停止
+ssserver -c /etc/shadowsocks.json -d start
+ssserver -c /etc/shadowsocks.json -d stop
+
+#加入开机启动
+在/etc/rc.local中加入
+sudo ssserver -c /etc/shadowsocks.json --user username -d start #不要总是用root用户做事，adduser来做，给sudo权限即可
+
+[ShadowsocksR](https://github.com/breakwa11/shadowsocks-rss/wiki)启动后台运行命令
+> python server.py -p 443 -k password -m aes-256-cfb -O auth_sha1_v4 -o http_simple -d start
+
+[net-speeder](https://zhgcao.github.io/2016/05/26/ubuntu-install-net-speeder/)
+venetX，OpenVZ架构
+```
+cd net-speeder-master/
+sh build.sh -DCOOKED
+
+Xen，KVM，物理机
+cd net-speeder-master/
+sh build.sh
+```
+
+加速所有ip协议数据
+./net_speeder venet0 "ip"
+
+只加速指定端口，例如只加速TCP协议的 8989端口
+#前提是切换到net-speeder的目录下
+# ./net_speeder venet0:0 "tcp src port 8989"
 
 
 
