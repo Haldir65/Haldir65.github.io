@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://haldir65.github.io/"/>
-  <updated>2017-05-24T15:41:07.120Z</updated>
+  <updated>2017-05-24T15:45:34.564Z</updated>
   <id>http://haldir65.github.io/</id>
   
   <author>
@@ -20,12 +20,12 @@
     <link href="http://haldir65.github.io/2017/05/24/2017-05-24-jvm-architecture/"/>
     <id>http://haldir65.github.io/2017/05/24/2017-05-24-jvm-architecture/</id>
     <published>2017-05-24T14:48:58.000Z</published>
-    <updated>2017-05-24T15:41:07.120Z</updated>
+    <updated>2017-05-24T15:45:34.564Z</updated>
     
-    <content type="html"><![CDATA[<p>关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下<br><a id="more"></a></p>
+    <content type="html"><![CDATA[<p>关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下<br><img src="http://odzl05jxx.bkt.clouddn.com/high_way_scene.jpg?imageView2/2/w/500" alt=""><br><a id="more"></a></p>
 <h3 id="1-从MyApp-java文件开始"><a href="#1-从MyApp-java文件开始" class="headerlink" title="1.从MyApp.java文件开始"></a>1.从MyApp.java文件开始</h3><p>大家都知道最开始学习Java的时候，要用javac 来编译MyApp.java来生成一个class文件。<br>在命令行里，大致是这样的执行顺序:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">javac MyApp.java</div><div class="line">java MyApp</div></pre></td></tr></table></figure></p>
-<h4 id="实际上后一句话就创建了一个jvm-instance"><a href="#实际上后一句话就创建了一个jvm-instance" class="headerlink" title="实际上后一句话就创建了一个jvm instance."></a>实际上后一句话就创建了一个jvm instance.</h4><h3 id="2-从classLoader进入Execution-Engine-再到Host-Operating-System"><a href="#2-从classLoader进入Execution-Engine-再到Host-Operating-System" class="headerlink" title="2. 从classLoader进入Execution Engine 再到Host Operating System"></a>2. 从classLoader进入Execution Engine 再到Host Operating System</h3><p>java MyApp会调用class loader，后者不仅要负责加载MyApp.class文件，还需要加载java API中的class文件（String,Object,Collection….）。加载的class文件（byte code）被传递给Execution Engine,后者则负责执行byte code（其实也是调用宿主操作系统的方法执行操作）</p>
-<h3 id="3-where-did-classLoader-load-class-into"><a href="#3-where-did-classLoader-load-class-into" class="headerlink" title="3. where did classLoader load class into ?"></a>3. where did classLoader load class into ?</h3><p>classloader将class 文件加载进内存中的一部分（Runtime data areas）。到此，jvm architecture的三个主要组件：class loader subsystem,Runtime data areas 以及execution Enigne的主要功能都说清楚了。<br>所以，这篇文章主要就按照class loader subsystem -&gt; Runtime data areas -&gt; Execution Engine的顺序来讲。</p>
+<h4 id="实际上后一句话就创建了一个jvm-instance"><a href="#实际上后一句话就创建了一个jvm-instance" class="headerlink" title="实际上后一句话就创建了一个jvm instance."></a>实际上后一句话就创建了一个jvm instance.</h4><h3 id="2-从class-loader进入Execution-Engine-再到Host-Operating-System"><a href="#2-从class-loader进入Execution-Engine-再到Host-Operating-System" class="headerlink" title="2. 从class loader进入Execution Engine 再到Host Operating System"></a>2. 从class loader进入Execution Engine 再到Host Operating System</h3><p>java MyApp会调用class loader，后者不仅要负责加载MyApp.class文件，还需要加载java API中的class文件（String,Object,Collection….）。加载的class文件（byte code）被传递给Execution Engine,后者则负责执行byte code（其实也是调用宿主操作系统的方法执行操作）</p>
+<h3 id="3-where-did-class-loader-load-class-into"><a href="#3-where-did-class-loader-load-class-into" class="headerlink" title="3. where did class loader load class into ?"></a>3. where did class loader load class into ?</h3><p>classloader将class 文件加载进内存中的一部分（Runtime data areas）。到此，jvm architecture的三个主要组件：class loader subsystem,Runtime data areas 以及execution Enigne的主要功能都说清楚了。<br>所以，这篇文章主要就按照class loader subsystem -&gt; Runtime data areas -&gt; Execution Engine的顺序来讲。</p>
 <h3 id="4-从classloader开始执行（class-loading-subsystem）"><a href="#4-从classloader开始执行（class-loading-subsystem）" class="headerlink" title="4.从classloader开始执行（class loading subsystem）"></a>4.从classloader开始执行（class loading subsystem）</h3><pre><code>- load 将byte code 加载进内存，来源可以是.java文件，可以是.jar文件，甚至可以是network Socket（这要看具体class loader的implementation）。load阶段包含三种不同的class loader，这也是面试时的重点。
 
 &gt; 1. Bootstrap class loader (jre文件夹中有一个rt.jar文件，里面装的就是java的internal class) // 
@@ -46,12 +46,13 @@ verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的s
 - pc Registers
 - Native method stacks
 </code></pre><p>Method Area(方法区，用于存储class的数据，static variable,byte code,class level constant pool都放在这里)    ，Method Area也称为Perm gen space(永生代)，默认大小是64MB ，可以通过-XX:MaxPermSize 调节</p>
-<h3 id="6-Execution-Engine的任务"><a href="#6-Execution-Engine的任务" class="headerlink" title="6. Execution Engine的任务"></a>6. Execution Engine的任务</h3><h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="https://www.youtube.com/watch?v=ZBJ0u9MaKtM" target="_blank" rel="external">JVM ( java virtual machine) architecture - tutorial</a></p>
+<h3 id="6-Execution-Engine的任务"><a href="#6-Execution-Engine的任务" class="headerlink" title="6. Execution Engine的任务"></a>6. Execution Engine的任务</h3><p><img src="http://odzl05jxx.bkt.clouddn.com/starry_sky.jpg?imageView2/2/w/500" alt=""></p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="https://www.youtube.com/watch?v=ZBJ0u9MaKtM" target="_blank" rel="external">JVM ( java virtual machine) architecture - tutorial</a></p>
 ]]></content>
     
     <summary type="html">
     
-      &lt;p&gt;关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下&lt;br&gt;
+      &lt;p&gt;关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下&lt;br&gt;&lt;img src=&quot;http://odzl05jxx.bkt.clouddn.com/high_way_scene.jpg?imageView2/2/w/500&quot; alt=&quot;&quot;&gt;&lt;br&gt;
     
     </summary>
     
