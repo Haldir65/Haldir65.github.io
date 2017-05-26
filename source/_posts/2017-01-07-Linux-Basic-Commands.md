@@ -28,14 +28,16 @@ top : 1
 
 文件名一般不支持空格，如果真有的话得用单引号括起来，像这样:
 -> rm -f 'my file'
+-> mv a.mp4 b.mp4 //mv虽然是移动（Windows中的剪切）操作，但这种情况下就等同于重命名了，亲测有效
+
 重命名
 
--> mv a.mp4 b.mp4 //mv虽然是移动（Windows中的剪切）操作，但这种情况下就等同于重命名了，亲测有效
- rename是实际意义上的重命名命令，但rename接受三个参数
+rename是实际意义上的重命名命令，但rename接受三个参数
 
 
 
 - > touch filename //创建文件，后缀在linux下没意义
+
 
 
 ```
@@ -382,6 +384,76 @@ Softlayer, Singapore, SG        119.81.28.170           3.26MB/s
 Softlayer, HongKong, CN         119.81.130.170          3.72MB/s
 ----------------------------------------------------------------------
 
+
+DigitalOcean Los Angeles
+
+----------------------------------------------------------------------
+CPU model            : Intel(R) Xeon(R) CPU E5-2650L v3 @ 1.80GHz
+Number of cores      : 1
+CPU frequency        : 1799.998 MHz
+Total size of Disk   : 20.2 GB (1.0 GB Used)
+Total amount of Mem  : 488 MB (33 MB Used)
+Total amount of Swap : 0 MB (0 MB Used)
+System uptime        : 0 days, 0 hour 3 min
+Load average         : 0.16, 0.10, 0.03
+OS                   : Ubuntu 16.04.2 LTS
+Arch                 : x86_64 (64 Bit)
+Kernel               : 4.4.0-78-generic
+----------------------------------------------------------------------
+I/O speed(1st run)   : 581 MB/s
+I/O speed(2nd run)   : 711 MB/s
+I/O speed(3rd run)   : 777 MB/s
+Average I/O speed    : 689.7 MB/s
+----------------------------------------------------------------------
+Node Name                       IPv4 address            Download Speed
+CacheFly                        205.234.175.175         161MB/s
+Linode, Tokyo, JP               106.187.96.148          15.7MB/s
+Linode, Singapore, SG           139.162.23.4            5.96MB/s
+Linode, London, UK              176.58.107.39           5.71MB/s
+Linode, Frankfurt, DE           139.162.130.8           6.45MB/s
+Linode, Fremont, CA             50.116.14.9             30.4MB/s
+Softlayer, Dallas, TX           173.192.68.18           29.9MB/s
+Softlayer, Seattle, WA          67.228.112.250          57.7MB/s
+Softlayer, Frankfurt, DE        159.122.69.4            3.64MB/s
+Softlayer, Singapore, SG        119.81.28.170           7.59MB/s
+Softlayer, HongKong, CN         119.81.130.170          8.84MB/s
+----------------------------------------------------------------------
+
+DigitalOcean Sinapore (ip adress lokks like Russian)
+
+----------------------------------------------------------------------
+CPU model            : Intel(R) Xeon(R) CPU E5-2630L 0 @ 2.00GHz
+Number of cores      : 1
+CPU frequency        : 1999.999 MHz
+Total size of Disk   : 20.2 GB (1.0 GB Used)
+Total amount of Mem  : 488 MB (36 MB Used)
+Total amount of Swap : 0 MB (0 MB Used)
+System uptime        : 0 days, 0 hour 2 min
+Load average         : 0.17, 0.20, 0.09
+OS                   : Ubuntu 16.04.2 LTS
+Arch                 : x86_64 (64 Bit)
+Kernel               : 4.4.0-78-generic
+----------------------------------------------------------------------
+I/O speed(1st run)   : 662 MB/s
+I/O speed(2nd run)   : 741 MB/s
+I/O speed(3rd run)   : 728 MB/s
+Average I/O speed    : 710.3 MB/s
+----------------------------------------------------------------------
+Node Name                       IPv4 address            Download Speed
+CacheFly                        205.234.175.175         20.8MB/s
+Linode, Tokyo, JP               106.187.96.148          18.6MB/s
+Linode, Singapore, SG           139.162.23.4            83.8MB/s
+Linode, London, UK              176.58.107.39           5.71MB/s
+Linode, Frankfurt, DE           139.162.130.8           8.13MB/s
+Linode, Fremont, CA             50.116.14.9             2.82MB/s
+Softlayer, Dallas, TX           173.192.68.18           6.18MB/s
+Softlayer, Seattle, WA          67.228.112.250          8.47MB/s
+Softlayer, Frankfurt, DE        159.122.69.4            6.77MB/s
+Softlayer, Singapore, SG        119.81.28.170           97.9MB/s
+Softlayer, HongKong, CN         119.81.130.170          35.2MB/s
+----------------------------------------------------------------------
+
+
 ```
 
 
@@ -406,7 +478,7 @@ free -h # human readable
 压缩文件命令
 将/home/video/ 这个目录下所有文件和文件夹打包为当前目录下的video.zip
 
-zip –q –r video.zip /home/video/video.zip
+zip –q –r -v video.zip . #机上一个-v主要是为了能够实时查看输出
 
 
 文件传输（linux ->windows）： 一般使用putty ssh到Linux主机，想要把Linux上的文件弄到Windows中，需要使用pscp工具。下载好pscp.exe后，放到c:/windows/system32下面。打开cmd。输入命令
@@ -475,7 +547,7 @@ ssserver -c /etc/shadowsocks.json -d stop
 
 
 #加入开机启动
->>>>>>> Stashed changes
+
 在/etc/rc.local中加入
 sudo ssserver -c /etc/shadowsocks.json --user username -d start #不要总是用root用户做事，adduser来做，给sudo权限即可
 
@@ -508,7 +580,7 @@ sh build.sh
 只加速指定端口，例如只加速TCP协议的 8989端口
 #前提是切换到net-speeder的目录下
 # ./net_speeder venet0:0 "tcp src port 8989"
->>>>>>> Stashed changes
+
 
 ### 9. 网络监控
 ```

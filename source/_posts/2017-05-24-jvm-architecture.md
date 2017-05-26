@@ -44,13 +44,40 @@ class vars to initiazed Value in code(比如静态代码块就是在这时执行
 
 ### 5. Runtime data area五个部分的划分
 Runtime data area 即java virtural machine的内存，可以划分成五部分
+	//per jvm ,shared by all threads
 	- Method Area
 	- Heap
+
+	// per thread 
 	- java stack 
 	- pc Registers
 	- Native method stacks
 
-Method Area(方法区，用于存储class的数据，static variable,byte code,class level constant pool都放在这里)	，Method Area也称为Perm gen space(永生代)，默认大小是64MB ，可以通过-XX:MaxPermSize 调节
+#### 1. Method Area(方法区，用于存储class的数据，static variable,byte code,class level constant pool都放在这里)	，Method Area也称为Perm gen space(永生代)，默认大小是64MB ，可以通过-XX:MaxPermSize 调节 。这里有可能抛出out of memory error。
+
+### java8将method Area移除，改为 metaspace (就是将method area移到了Native Memory，这样就不会有限制了，也可以人为设置上限)
+
+#### 2. Heap
+日常开发中new出来的东西都放在这里
+
+-Xms , minimun size
+-Xmx , maximum size
+
+#### 3. Java Stack
+java stacks contains stack frames of the current execution per thread. 
+eg : method a -> 调用 method b -> 调用method c
+当前线程的方法栈中就会push三个stack frame(每个Frame对应一个方法的执行环境)
+stack Frame包含当前方法中的变量，以及返回值，etc
+这里定义了stackoverFlowError
+
+
+
+#### 4. pc Registers
+这里面装的是程序计数器，后者是指向下一个将要被执行的指令的指针（每条线程都有）。
+
+#### 5. Native method stacks
+Native method stacks 是由java stack中的方法调用native方法创建的，例如windows上的dll库
+
 
 
 
@@ -60,6 +87,14 @@ Method Area(方法区，用于存储class的数据，static variable,byte code,c
 
 ### 6. Execution Engine的任务
 ![](http://odzl05jxx.bkt.clouddn.com/starry_sky.jpg?imageView2/2/w/500)
+	- Interpreter 将byte code 翻译成机器指令并执行(根据指令去调用Native方法，在windows上jre/bin/文件夹中一大堆的dll就是windows平台提供的Native库，在linux上是.so文件)
+
+	- JIT Compiler  just in time compiler（如果有某项byte code instruction被多次调用，这些byte code不会每次都被inteprete，JIT will hold on to that system level target machine code for future usage,which is fast）
+	- Hotspot profiler(it helps the JIT Compiler analysise the frequently used byte codess)
+	- GC (a lengthy talk)
+
+调用Native Method Interface(JNI) -> Native method libraries（.dll,.so etc）
+
 
 
 
