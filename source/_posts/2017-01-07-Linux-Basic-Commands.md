@@ -474,7 +474,15 @@ cat /proc/cpuinfo
 free -m 
 free -h # human readable
 
+修改默认安全设置
+vi /etc/ssh/ssd_config
+添加或修改
 
+```
+Port 22 (ssh默认端口修改)
+PermitRootLogin without-Password no
+AllowUsers userName
+```
 压缩文件命令
 将/home/video/ 这个目录下所有文件和文件夹打包为当前目录下的video.zip
 
@@ -488,6 +496,8 @@ netstat -anp | grep sshd
 看下跑在哪个端口
 然后
 pscp -P 12345-r root@202.123.123.123:"/root/fileonServer.mp4" d:/whateveriwantonmyPc.mp4 # -p要大写
+
+
 
 
 ### 8.Shadowsocks
@@ -584,7 +594,33 @@ sh build.sh
 
 ### 9. 网络监控
 ```
-tcpdump -i "venet0:0"  
+tcpdump -i "venet0:0"  //抓包的
+tcpdump -c 10 //count
+tcpdump -c -A  //Asicii码形式展示出来每个package
+tcpdump -c 5 -i wlo1 // 监听某一个网卡
+tcpdump -c 5 -i wlo1 port 22// 监听某一个网卡某一个端口
+```
+tcpdump version 4.5.1
+libpcap version 1.5.3
+Usage: tcpdump [-aAbdDefhHIJKlLnNOpqRStuUvxX] [ -B size ] [ -c count ]
+                [ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]
+                [ -i interface ] [ -j tstamptype ] [ -M secret ]
+                [ -P in|out|inout ]
+                [ -r file ] [ -s snaplen ] [ -T type ] [ -V file ] [ -w file ]
+                [ -W filecount ] [ -y datalinktype ] [ -z command ]
+                [ -Z user ] [ expression ]
+
+```
+
+
+netstat
+netstat -i // 查看某个网络接口发出和接收了多少byte的数据
+netstat -ta //当前active的网络连接
+netstat -tan //以ip地址的方式展示出来
+
+ifconfig // 查看机器上的网卡
+en01 //Ethernet 
+注意 RX bytes(接收到的数据)和TX bytes(发送出去的数据)后面的数字
 ```
 
 
