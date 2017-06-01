@@ -12,6 +12,18 @@ top : 1
 
 首先是连接vps的ssh(Secure Shell)工具，putty或者xshell都可以。
 
+## 速查手册
+1. [文件操作](#1)
+2. [Vi文本编辑器](#2)
+3. [bash脚本怎么写](#3)
+4. [用户和用户组的问题](#4)
+5. [文件权限](#5)
+6. [管道](#6)
+7. [硬件相关的命令](#7)
+8. [SS相关的命令](#8)
+9. [网络监控](#9)
+10. [查看进程](#10)
+
 
 ### 1. 文件操作常用命令
 
@@ -30,15 +42,10 @@ top : 1
 -> rm -f 'my file'
 -> mv a.mp4 b.mp4 //mv虽然是移动（Windows中的剪切）操作，但这种情况下就等同于重命名了，亲测有效
 
-重命名
-
+# 重命名
 rename是实际意义上的重命名命令，但rename接受三个参数
 
-
-
 - > touch filename //创建文件，后缀在linux下没意义
-
-
 
 ```
 
@@ -56,11 +63,13 @@ rename是实际意义上的重命名命令，但rename接受三个参数
 - > mv d1 /  把d1移动到相对路径，也就是根目录下
 - > mv d1 ../把d1往上移动一层
 - > mv d1 ../../
-
+```
 
 
 
 ###重定向
+
+```
 重定向输出 >
 ls  > lsoutput.txt #用于将输出的结果写入一个新的文本文件中
 echo 'hey man' # 类似于print
@@ -70,22 +79,11 @@ echo 'hello' > log.txt #把这句话写入到文本中 ，覆盖其原有内容
 wall < aa.txt # wall是向所有用户发广播， 即从aa.txt中读取内容，然后广播发出去
 
 
-
 #service命令
 service XXX start/stop/status #原理是将这些程序注册成为系统服务，这样调用这些程序的时候就不需要写一大堆绝对路径了，具体用法help已经很详细了。
 
 zip –q –r video.zip /home/video 
 zip –q –r video.zip .  # .代表当前目录
-
-查看ip命令  
-
-ifconfig
-
-进程命令
-#实时监控，1秒刷新一次
-watch -n 1 ps -aux --sort=-pmem,-pcpu
-
-
 
 ```
 
@@ -224,26 +222,7 @@ exit就回到root用户的身份
 新用户登录时，默认的pwd是该用户的主目录
 ```
 
-### 查看进程命令
-```
-top 动态显示
-PID：进程的ID[参数解释](http://www.cnblogs.com/gaojun/p/3406096.html)
-　　USER：进程所有者
-　　PR：进程的优先级别，越小越优先被执行
-　　NInice：值
-　　VIRT：进程占用的虚拟内存
-　　RES：进程占用的物理内存
-　　SHR：进程使用的共享内存
-　　S：进程的状态。S表示休眠，R表示正在运行，Z表示僵死状态，N表示该进程优先值为负数
-　　%CPU：进程占用CPU的使用率
-　　%MEM：进程使用的物理内存和总内存的百分比
-　　TIME+：该进程启动后占用的总的CPU时间，即占用CPU使用时间的累加值。
-　　COMMAND：进程启动命令名称
 
-ps a 显示现行终端机下的所有程序，包括其他用户的程序。
-
-
-```
 
 
 ### 5. 文件权限的问题
@@ -308,14 +287,16 @@ $ ls -l | grep "^d" //只列出目录
 
 ### 7. 硬件相关的命令
 
-[跑分](https://github.com/Teddysun/across)
-git clone下来
-cd across
-命令
-> wget -qO- bench.sh | bash （亲测可用）
-或者 > curl -Lso- bench.sh | bash 
-BandWagon
+[VPS跑分软件](https://github.com/Teddysun/across)
 
+
+> git clone下来
+cd across
+wget -qO- bench.sh | bash （亲测可用，也可以自己看Readme）
+或者 > curl -Lso- bench.sh | bash 
+
+
+#### BandWagon
 ```
 ----------------------------------------------------------------------
 CPU model            : Intel(R) Xeon(R) CPU E3-1275 v5 @ 3.60GHz
@@ -350,8 +331,7 @@ Softlayer, HongKong, CN         119.81.130.170          13.2MB/s
 ----------------------------------------------------------------------
 
 ```
-
-BuyVm
+#### BuyVm 
 ```
 CPU model            : Intel(R) Xeon(R) CPU           L5639  @ 2.13GHz
 Number of cores      : 1
@@ -383,10 +363,11 @@ Softlayer, Frankfurt, DE        159.122.69.4            1.89MB/s
 Softlayer, Singapore, SG        119.81.28.170           3.26MB/s
 Softlayer, HongKong, CN         119.81.130.170          3.72MB/s
 ----------------------------------------------------------------------
+```
 
+#### DigitalOcean Los Angeles
 
-DigitalOcean Los Angeles
-
+```
 ----------------------------------------------------------------------
 CPU model            : Intel(R) Xeon(R) CPU E5-2650L v3 @ 1.80GHz
 Number of cores      : 1
@@ -418,9 +399,10 @@ Softlayer, Frankfurt, DE        159.122.69.4            3.64MB/s
 Softlayer, Singapore, SG        119.81.28.170           7.59MB/s
 Softlayer, HongKong, CN         119.81.130.170          8.84MB/s
 ----------------------------------------------------------------------
+```
 
-DigitalOcean Sinapore (ip adress lokks like Russian)
-
+#### DigitalOcean Sinapore (ip adress lokks like Russian)
+```
 ----------------------------------------------------------------------
 CPU model            : Intel(R) Xeon(R) CPU E5-2630L 0 @ 2.00GHz
 Number of cores      : 1
@@ -453,29 +435,29 @@ Softlayer, Singapore, SG        119.81.28.170           97.9MB/s
 Softlayer, HongKong, CN         119.81.130.170          35.2MB/s
 ----------------------------------------------------------------------
 
-
 ```
 
 
-
-
-
 查看硬盘存储空间:
+````
 df -h //h的意思是human-readable
 du -sh //查看当前directory的大小
 du -h //查看当前目录下各个子目录分别的大小
 dh -h img// 查看img目录下文件及文件夹的大小
 dh -h img/1.jpg //查看指定文件的大小
+````
 
 查看cpu信息
-cat /proc/cpuinfo
+> cat /proc/cpuinfo
 
 查看内存
-free -m 
+>free -m 
 free -h # human readable
 
 修改默认安全设置
-vi /etc/ssh/ssd_config
+> vi /etc/ssh/ssd_config
+
+
 添加或修改
 
 ```
@@ -486,31 +468,21 @@ AllowUsers userName
 压缩文件命令
 将/home/video/ 这个目录下所有文件和文件夹打包为当前目录下的video.zip
 
-zip –q –r -v video.zip . #机上一个-v主要是为了能够实时查看输出
+zip –q –r -v video.zip . #加上一个-v主要是为了能够实时查看输出
 
 
 文件传输（linux ->windows）： 一般使用putty ssh到Linux主机，想要把Linux上的文件弄到Windows中，需要使用pscp工具。下载好pscp.exe后，放到c:/windows/system32下面。打开cmd。输入命令
 pscp -r root@202.123.123.123:"/root/fileonServer.mp4" d:/whateveriwantonmyPc.mp4  ，确认后输入root密码就好了。我主要是用来下载视频的。
 有时候会出现Connection Refused Error。
-netstat -anp | grep sshd
+> netstat -anp | grep sshd
+
+
 看下跑在哪个端口
 然后
-pscp -P 12345-r root@202.123.123.123:"/root/fileonServer.mp4" d:/whateveriwantonmyPc.mp4 # -p要大写
+> pscp -P 12345-r root@202.123.123.123:"/root/fileonServer.mp4" d:/whateveriwantonmyPc.mp4  -p要大写
 
 
 
-
-### 8.Shadowsocks
-
-```
-ss 命令 
-ssserver -c /etc/shadowsocks/config.json # 前台运行
-
-# 后台运行和停止
-ssserver -c /etc/shadowsocks.json -d start
-ssserver -c /etc/shadowsocks.json -d stop
-
-# 加入开机启动
 
 ### 8. SS相关的命令
   1. 刚装好的ubuntu需要执行以下步骤
@@ -542,24 +514,23 @@ ssserver -c /etc/shadowsocks.json -d stop
    "method":"aes-256-cfb",
    "fast_open": false
 }
-  ```
-  > ssserver -c config.json -d start #启动完成
-
+  
+ssserver -c config.json -d start #启动完成
+```
 检查下是否启动了
 ps -ef |grep sss
 
 ss 命令 
 ssserver -c /etc/shadowsocks/config.json # 前台运行
 
-#后台运行和停止
+- 后台运行和停止
 ssserver -c /etc/shadowsocks.json -d start
 ssserver -c /etc/shadowsocks.json -d stop
 
-
-#加入开机启动
+- 加入开机启动
 
 在/etc/rc.local中加入
-sudo ssserver -c /etc/shadowsocks.json --user username -d start #不要总是用root用户做事，adduser来做，给sudo权限即可
+sudo ssserver -c /etc/shadowsocks.json --user username -d start - 不要总是用root用户做事，adduser来做，给sudo权限即可
 
 [ShadowsocksR](https://github.com/breakwa11/shadowsocks-rss/wiki)启动后台运行命令
 > python server.py -p 443 -k password -m aes-256-cfb -O auth_sha1_v4 -o http_simple -d start
@@ -580,17 +551,17 @@ sh build.sh
 > ./net_speeder venet0 "ip"
 
 只加速指定端口，例如只加速TCP协议的 8989端口
-#前提是切换到net-speeder的目录下
+前提是切换到net-speeder的目录下
 > ./net_speeder venet0:0 "tcp src port 8989"
-```
+
 
 
 ./net_speeder venet0 "ip"
 
 只加速指定端口，例如只加速TCP协议的 8989端口
-#前提是切换到net-speeder的目录下
-# ./net_speeder venet0:0 "tcp src port 8989"
-
+前提是切换到net-speeder的目录下
+ ./net_speeder venet0:0 "tcp src port 8989"
+```
 
 ### 9. 网络监控
 ```
@@ -599,7 +570,7 @@ tcpdump -c 10 //count
 tcpdump -c -A  //Asicii码形式展示出来每个package
 tcpdump -c 5 -i wlo1 // 监听某一个网卡
 tcpdump -c 5 -i wlo1 port 22// 监听某一个网卡某一个端口
-```
+
 tcpdump version 4.5.1
 libpcap version 1.5.3
 Usage: tcpdump [-aAbdDefhHIJKlLnNOpqRStuUvxX] [ -B size ] [ -c count ]
@@ -609,21 +580,54 @@ Usage: tcpdump [-aAbdDefhHIJKlLnNOpqRStuUvxX] [ -B size ] [ -c count ]
                 [ -r file ] [ -s snaplen ] [ -T type ] [ -V file ] [ -w file ]
                 [ -W filecount ] [ -y datalinktype ] [ -z command ]
                 [ -Z user ] [ expression ]
-
 ```
 
+tcpdump结合wireshark可实现完整的网络抓包
 
+```
 netstat
 netstat -i // 查看某个网络接口发出和接收了多少byte的数据
 netstat -ta //当前active的网络连接
 netstat -tan //以ip地址的方式展示出来
+```
 
+```
 ifconfig // 查看机器上的网卡
 en01 //Ethernet 
 注意 RX bytes(接收到的数据)和TX bytes(发送出去的数据)后面的数字
 ```
 
 
+
+
+### 10.查看进程
+
+```
+top 动态显示
+PID：进程的ID[参数解释](http://www.cnblogs.com/gaojun/p/3406096.html)
+　　USER：进程所有者
+　　PR：进程的优先级别，越小越优先被执行
+　　NInice：值
+　　VIRT：进程占用的虚拟内存
+　　RES：进程占用的物理内存
+　　SHR：进程使用的共享内存
+　　S：进程的状态。S表示休眠，R表示正在运行，Z表示僵死状态，N表示该进程优先值为负数
+　　%CPU：进程占用CPU的使用率
+　　%MEM：进程使用的物理内存和总内存的百分比
+　　TIME+：该进程启动后占用的总的CPU时间，即占用CPU使用时间的累加值。
+　　COMMAND：进程启动命令名称
+
+ps a 显示现行终端机下的所有程序，包括其他用户的程序。
+
+看下某个进程跑在哪个端口
+ netstat -anp | grep sshd
+
+
+进程命令
+实时监控，1秒刷新一次
+watch -n 1 ps -aux --sort=-pmem,-pcpu
+
+```
 
 ### 参考
 
