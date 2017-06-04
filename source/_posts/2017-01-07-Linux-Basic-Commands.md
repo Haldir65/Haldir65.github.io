@@ -560,6 +560,9 @@ sh build.sh
 只加速指定端口，例如只加速TCP协议的 8989端口
 前提是切换到net-speeder的目录下
  ./net_speeder venet0:0 "tcp src port 8989"
+
+
+ [KVM架构升级内核开启BBR](https://qiujunya.com/linodebbr.html)
 ```
 
 ### 9. 网络监控
