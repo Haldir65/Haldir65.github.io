@@ -19,6 +19,7 @@ top : 2
 ```javascript
 hexo clean //清除缓存
 hexo g -d //一步到位 = hexo g + hexo d
+hexo s //localost:4000本地预览
 ```
 
 - 部署过程中出现的一些错误
@@ -132,20 +133,18 @@ top: 0 # 0或者1
 由于文章大部分都是使用SublimeText写的，Typroa这种所见即所得的编辑器也不错，但对于掌握MardkDown语法没有帮助。这里摘录一些SubLimeText的快捷键。
 
 > Ctrl+Shift+P：打开命令面板
-
-
-```java
-
 Ctrl+P：搜索项目中的文件
 Ctrl+G：跳转到第几行
 Ctrl+W：关闭当前打开文件
 Ctrl+Shift+W：关闭所有打开文件
 Ctrl+Shift+V：粘贴并格式化
 Ctrl+D：选择单词，重复可增加选择下一个相同的单词
-Ctrl+L：选择行，重复可依次增加选择下一行
-Ctrl+Shift+L：选择多行
+**Ctrl+L：选择行，重复可依次增加选择下一行**
+**Ctrl+Shift+L：选择多行**
+**Ctrl+Shift+D：复制粘贴当前行**
+**Ctrl+X：删除当前行**
+Ctrl+Shift+D：复制粘贴当前行
 Ctrl+Shift+Enter：在当前行前插入新行
-Ctrl+X：删除当前行
 Ctrl+M：跳转到对应括号
 Ctrl+U：软撤销，撤销光标位置
 Ctrl+J：选择标签内容
@@ -177,6 +176,8 @@ Shift+右键拖动：光标多不，用来更改或插入列内容
 
 
 ### 6. markdown语法
+MarkDown页面内部跳转
+[MarkDown技巧：两种方式实现页内跳转](http://www.cnblogs.com/JohnTsai/p/4027229.html)
 
 
 

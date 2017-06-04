@@ -13,16 +13,18 @@ top : 1
 首先是连接vps的ssh(Secure Shell)工具，putty或者xshell都可以。
 
 ## 速查手册
-1. [文件操作](#1)
-2. [Vi文本编辑器](#2)
-3. [bash脚本怎么写](#3)
-4. [用户和用户组的问题](#4)
-5. [文件权限](#5)
-6. [管道](#6)
-7. [硬件相关的命令](#7)
-8. [SS相关的命令](#8)
-9. [网络监控](#9)
-10. [查看进程](#10)
+1. [文件操作](#1-文件操作常用命令)
+2. [Vi文本编辑器](#2-Vi文本编辑器)
+3. [bash脚本怎么写](#3-linux下shell脚本语句的语法)
+4. [用户和用户组的问题](#4-用户和用户组的问题)
+5. [文件权限](#5-文件权限的问题)
+6. [管道](#6-管道)
+7. [硬件相关的命令](#7-硬件相关的命令)
+8. [SS相关的命令](#8-SS相关的命令)
+9. [网络监控](#9-网络监控)
+10. [查看进程](#10-查看进程)
+
+[参考](#参考)
 
 
 ### 1. 文件操作常用命令
@@ -485,12 +487,12 @@ pscp -r root@202.123.123.123:"/root/fileonServer.mp4" d:/whateveriwantonmyPc.mp4
 
 
 ### 8. SS相关的命令
+```
   1. 刚装好的ubuntu需要执行以下步骤
   安装git > apt-get install git
   安装python > apt-get install python-2.7
   安装python-setuptools > apt-get install python-setuptools
   检查是否安装好： python --version
-
 
 
   2. 下载shadowsocks源码编译
@@ -503,7 +505,6 @@ pscp -r root@202.123.123.123:"/root/fileonServer.mp4" d:/whateveriwantonmyPc.mp4
 
   3. 编辑配置文件
   vim config.json
-  ```
   {
    "server":"my_server_ip",
    "server_port":8388,
@@ -516,7 +517,7 @@ pscp -r root@202.123.123.123:"/root/fileonServer.mp4" d:/whateveriwantonmyPc.mp4
 }
   
 ssserver -c config.json -d start #启动完成
-```
+
 检查下是否启动了
 ps -ef |grep sss
 
@@ -537,14 +538,14 @@ sudo ssserver -c /etc/shadowsocks.json --user username -d start - 不要总是�
 
 [net-speeder](https://zhgcao.github.io/2016/05/26/ubuntu-install-net-speeder/)
 venetX，OpenVZ架构
-```
+
 cd net-speeder-master/
 sh build.sh -DCOOKED
 
 Xen，KVM，物理机
 cd net-speeder-master/
 sh build.sh
-```
+
 
 加速所有ip协议数据
 
@@ -554,8 +555,6 @@ sh build.sh
 前提是切换到net-speeder的目录下
 > ./net_speeder venet0:0 "tcp src port 8989"
 
-
-
 ./net_speeder venet0 "ip"
 
 只加速指定端口，例如只加速TCP协议的 8989端口
@@ -564,6 +563,8 @@ sh build.sh
 ```
 
 ### 9. 网络监控
+
+
 ```
 tcpdump -i "venet0:0"  //抓包的
 tcpdump -c 10 //count
@@ -619,12 +620,12 @@ PID：进程的ID[参数解释](http://www.cnblogs.com/gaojun/p/3406096.html)
 
 ps a 显示现行终端机下的所有程序，包括其他用户的程序。
 
-看下某个进程跑在哪个端口
+**看下某个进程跑在哪个端口**
  netstat -anp | grep sshd
 
 
 进程命令
-实时监控，1秒刷新一次
+*实时监控，1秒刷新一次*
 watch -n 1 ps -aux --sort=-pmem,-pcpu
 
 ```
