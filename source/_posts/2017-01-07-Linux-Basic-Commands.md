@@ -633,6 +633,19 @@ watch -n 1 ps -aux --sort=-pmem,-pcpu
 
 ```
 
+更改locale为utf-8(ubuntu)
+> 
+vi ~/.bashrc 
+
+# add these lines
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+export LANGUAGE=en_US.UTF-8
+
+sudo locale-gen "en_US.UTF-8"
+sudo dpkg-reconfigure locales
+
+
 ### 参考
 
 
@@ -642,3 +655,4 @@ watch -n 1 ps -aux --sort=-pmem,-pcpu
 - [硬件查询](https://my.oschina.net/hunterli/blog/140783)
 - [Python源码编译安装ss](http://www.jianshu.com/p/3d80c7cb7b17)
 - [源码编译安装ss](http://blog.csdn.net/program_thinker/article/details/45787395)
+- [修改系统编码为utf-8](https://askubuntu.com/questions/162391/how-do-i-fix-my-locale-issue)
