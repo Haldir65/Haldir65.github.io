@@ -23,6 +23,7 @@ top : 1
 8. [SS相关的命令](#8-SS相关的命令)
 9. [网络监控](#9-网络监控)
 10. [查看进程](#10-查看进程)
+11.[通用配置](#11-常用配置)
 
 [参考](#参考)
 
@@ -633,6 +634,22 @@ watch -n 1 ps -aux --sort=-pmem,-pcpu
 
 ```
 
+
+### 11 .常用配置
+> 查看登陆失败日志
+grep "Failed password for root" /var/log/auth.log | awk '{print $11}' | sort | uniq -c | sort -nr | more
+
+防范措施
+修改登陆端口号
+sudo vi /etc/ssh/sshd_config
+Port 4484
+PermitRootLogin no
+
+修改完成后重启ssh
+/etc/init.d/ssh restart
+
+
+编码的修改
 更改locale为utf-8(ubuntu)
 > 
 vi ~/.bashrc 
@@ -645,6 +662,8 @@ export LANGUAGE=en_US.UTF-8
 sudo locale-gen "en_US.UTF-8"
 sudo dpkg-reconfigure locales
 
+添加XXX到环境变量
+todo
 
 ### 参考
 

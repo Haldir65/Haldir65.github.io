@@ -51,7 +51,9 @@ VPS下载视频的速度很快，但从vps到国内的速度就很慢了。
 
 
 ### 3.后话
-除了youtube-dl之外，[you-get](https://github.com/soimort/you-get)也是很有名的下载工具，不过由于它是基于Python3的，目前还没弄清楚怎么给vps装python3 ，所以暂时不论。
+[you-get](https://github.com/soimort/you-get)也是基于python3的下载工具，使用简单。在windows上安装还有点麻烦，
+在ubuntu上只需 pip3 install you-get 就安装好了
+使用方式更简单 > you-get "url"
 
 
 
