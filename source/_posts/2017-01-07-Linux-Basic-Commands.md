@@ -607,6 +607,8 @@ en01 //Ethernet
 
 ### 10.查看进程
 
+[起一个进程，后台运行，关掉终端照样跑的那种](https://stackoverflow.com/questions/4797050/how-to-run-process-as-background-and-never-die)
+
 ```
 top 动态显示
 PID：进程的ID[参数解释](http://www.cnblogs.com/gaojun/p/3406096.html)
@@ -627,10 +629,19 @@ ps a 显示现行终端机下的所有程序，包括其他用户的程序。
 **看下某个进程跑在哪个端口**
  netstat -anp | grep sshd
 
+ps | grep 类似于 pgrep XXX //查找某个进程
 
 进程命令
 *实时监控，1秒刷新一次*
 watch -n 1 ps -aux --sort=-pmem,-pcpu
+
+
+nohup node server.js > /dev/null 2>&1 &
+
+1. nohup means: Do not terminate this process even when the stty is cut off.
+2. > /dev/null means: stdout goes to /dev/null (which is a dummy device that does not record any output).
+3. 2>&1 means: stderr also goes to the stdout (which is already redirected to /dev/null). You may replace &1 with a file path to keep a log of errors, e.g.: 2>/tmp/myLog
+4. & at the end means: run this command as a background task.
 
 ```
 
