@@ -30,27 +30,27 @@ Observable<T> 和Flowable<T>，区别在于后者支持BackPressure，后者不�
 
 ```java
 interface Observer<T>{
-	void onNext(T t);
-	void onComplete();
-	void onError(Throwable t);
-	void onSubscribe(Disposable d);
+  void onNext(T t);
+  void onComplete();
+  void onError(Throwable t);
+  void onSubscribe(Disposable d);
 }
 
 interface Disposable{
-	void dispose();
+  void dispose();
 }
 
 
 interface Subscriber<T>{
-	void onNext(T t)
-	void onComplete();;
-	void onError(Throwable t);
-	void onSubscribe(Subscription s);
+  void onNext(T t)
+  void onComplete();;
+  void onError(Throwable t);
+  void onSubscribe(Subscription s);
 }
 
 interface Subscription{
-	void cancel() //用于取消订阅，释放资源
-	void request(long r) //请求更多的数据，即BackPressure开始体现的地方
+  void cancel() //用于取消订阅，释放资源
+  void request(long r) //请求更多的数据，即BackPressure开始体现的地方
 }
 ```
 两者的区别在于最后一个方法，以Disposable为例，当你开始subscribe一个数据源的时，就类似于创建了一个Resurce，而Resource是往往需要在用完之后及时释放。无论是Observable还是Flowable,这个onSubscribe方法会在订阅后立即被调用，这个方法里的Disposable可以保留下来，在必要时候用于释放资源。如Activity的onDestroy中cancel network request.
@@ -194,27 +194,27 @@ Observable.create(e ->{
 
 ```java
 interface Observer<T>{
-	void onNext(T t);
-	void onComplete();
-	void onError(Throwable t);
-	void onSubscribe(Disposable d);
+  void onNext(T t);
+  void onComplete();
+  void onError(Throwable t);
+  void onSubscribe(Disposable d);
 }
 
 interface Disposable{
-	void dispose();
+  void dispose();
 }
 
 
 interface Subscriber<T>{
-	void onNext(T t);
-	void onComplete();
-	void onError(Throwable t);
-	void onSubscribe(Subscription s);
+  void onNext(T t);
+  void onComplete();
+  void onError(Throwable t);
+  void onSubscribe(Subscription s);
 }
 
 interface Subscription{
-	void cancel(); //用于取消订阅，释放资源
-	void request(long r) ;//请求更多的数据，即BackPressure开始体现的地方
+  void cancel(); //用于取消订阅，释放资源
+  void request(long r) ;//请求更多的数据，即BackPressure开始体现的地方
 }
 ```
 ## 所以整体来看，数据的流向就这么两种，左边发送数据(可能只有一个，可能间歇性的，可能一直不停)，事件通过数据流传输到右边，右边根据协议作出相应(Reactive)
