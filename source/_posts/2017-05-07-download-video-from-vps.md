@@ -54,6 +54,8 @@ VPS下载视频的速度很快，但从vps到国内的速度就很慢了。
 [you-get](https://github.com/soimort/you-get)也是基于python3的下载工具，使用简单。在windows上安装还有点麻烦，
 在ubuntu上只需 pip3 install you-get 就安装好了
 使用方式更简单 > you-get "url"
+you-get还提供了windows版本 下载youtube视频只需要
+> you-get -x 127.0.0.1:1080 -o "D:\Porn" 'https://www.youtube.com/watch?v=jNQXAC9IVRw'
 
 
 

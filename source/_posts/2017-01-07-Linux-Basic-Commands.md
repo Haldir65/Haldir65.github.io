@@ -647,6 +647,7 @@ nohup node server.js > /dev/null 2>&1 &
 
 
 ### 11 .常用配置
+
 > 查看登陆失败日志
 grep "Failed password for root" /var/log/auth.log | awk '{print $11}' | sort | uniq -c | sort -nr | more
 
@@ -658,6 +659,7 @@ PermitRootLogin no
 
 修改完成后重启ssh
 /etc/init.d/ssh restart
+
 
 
 编码的修改
@@ -675,6 +677,7 @@ sudo dpkg-reconfigure locales
 
 添加XXX到环境变量
 todo
+
 
 ### 参考
 
