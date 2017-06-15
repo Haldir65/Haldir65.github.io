@@ -92,9 +92,9 @@ public abstract class Maybe<T> implements MaybeSource<T> {}
 ```java
 Observable.fromCallable(new Callable<String>(){
 
-	@override 
-	public String call() throw Exception{
-	return getName() //  之前是synchronious的get，现在这一步可以asynchnous执行,比如放一个OkHttpClient.newCall(request).execute(); //因为是异步执行的，也不存在性能问题
+  @override 
+  public String call() throw Exception{
+      return getName() //  之前是synchronious的get，现在这一步可以asynchnous执行,比如放一个OkHttpClient.newCall(request).execute(); //因为是异步执行的，也不存在性能问题
 }
 })
 ```
@@ -123,12 +123,12 @@ Completeable.fromRunnable(() -> "ignore")
 #### 2. create(Rxjava 1中不推荐使用该方法，Rxjava2中建议使用)
 ```java
 Observable.create(new ObservableOnSubscribe<String>()){
-	@override
-	public void subscribe (ObservableEmitter<String> e) throws Exception{ //subscribe get called whenever there's a new subscriber, emitter is the person that's listening.
-	//
-	e.onNext("Hello");
-	e.onComplete();
-	}
+      @override
+      public void subscribe (ObservableEmitter<String> e) throws Exception{ //subscribe get called whenever there's a new subscriber, emitter is the person that's listening.
+      //
+         e.onNext("Hello");
+         e.onComplete();
+      }
 }
 ```
 
@@ -137,33 +137,33 @@ Observable.create(new ObservableOnSubscribe<String>()){
 lambda更简洁
 ```java
 Observable.create(e ->{
-	e.onNext("Hello");
-	e.onNext("Hello");
-	e.onComplete();
+    e.onNext("Hello");
+    e.onNext("Hello");
+    e.onComplete();
 })
 
 Okhttp的异步网络请求也可以model成一种被观察的流
 Observable.create(e ->{
-	Call call = client.newCall(request);
-	call.enqueue(new Callback()){
+   Call call = client.newCall(request);
+   call.enqueue(new Callback()){
 
-		@Override
-		public void	onResponse(Response r) throws IOException{
-			e.onNext(r.body().toString());
-			e.onComplete();
-		}
+    @Override
+    public void   onResponse(Response r) throws IOException{
+      e.onNext(r.body().toString());
+      e.onComplete();
+    }
 
-		@Override
-		public void onFailure(IOException e){
-			e.onError(e);
-		}
+    @Override
+    public void onFailure(IOException e){
+      e.onError(e);
+    }
 
-	}
+  }
 })
 
 //重点了来了， 
 public interface ObservableEmitter<T> extends Emitter<T> {
-	  /**
+    /**
      * Sets a Cancellable on this emitter; any previous Disposable
      * or Cancellation will be unsubscribed/cancelled.
      * @param c the cancellable resource, null is allowed
@@ -174,8 +174,8 @@ public interface ObservableEmitter<T> extends Emitter<T> {
 // emitter可以设置cancel的动作
 
 Observable.create(e ->{
-	e.setCacelation(() -view.setOnClickListener(null));
-	view.setOnClickListener(v -> e.onNext());
+    e.setCacelation(() -view.setOnClickListener(null));
+    view.setOnClickListener(v -> e.onNext());
 })
 
 // 点击按钮发送事件，取消订阅时避免leak View
@@ -224,7 +224,7 @@ Flowable -> subscribe -> Subscription
 
 #### 3.2 onSubscribe怎么用
 通常不直接用这两种base class，因为第四个方法不知道怎么用嘛。
-![](http://odzl05jxx.bkt.clouddn.com/shinynewthings-big.png?imageView2/2/w/600)
+![](http://odzl05jxx.bkt.clouddn.com/4dab298b9f7ce29c43f9d8eaf686e02f.jpg?imageView2/2/w/600)
 ```java
 Observable.just("Hello").subscribe(new DisposableObserver<String>() {
                     @Override

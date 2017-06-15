@@ -2,7 +2,7 @@
 title: View的属性大全[转载]
 date: 2017-04-03 11:38:10
 categories: blog 
-tags: [android]
+tags: [android,notes]
 ---
 
 转自[Android属性大全](http://www.codexiu.cn/android/blog/40141/)

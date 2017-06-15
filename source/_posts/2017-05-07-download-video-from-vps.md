@@ -1,7 +1,7 @@
 ---
 title: VPS下载Youtube视频并同步到本地
 date: 2017-05-07 16:48:01
-tags: [linux]
+tags: [linux,python]
 ---
 
 几天前花几块钱买了个新的vps，试了下，速度不错。后来看到网上有关于如何使用vps下载视频并拖到Windows的，试了一下，确实酸爽。

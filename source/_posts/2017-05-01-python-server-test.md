@@ -1,7 +1,7 @@
 ---
 title: Python localHost部署命令
 date: 2017-05-01 08:57:27
-tags:
+tags: [python]
 ---
 
 一行命令即可

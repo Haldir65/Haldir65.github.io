@@ -2,7 +2,7 @@
 title: git常用操作手册
 date: 2016-09-27 17:24:51
 categories: blog
-tags: [git]
+tags: [git,notes]
 ---
 
 ## 记录一下常用git的命令，作为日常使用的参考手册
