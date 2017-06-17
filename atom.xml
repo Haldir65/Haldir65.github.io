@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://haldir65.github.io/"/>
-  <updated>2017-06-17T14:53:44.486Z</updated>
+  <updated>2017-06-17T15:55:25.335Z</updated>
   <id>https://haldir65.github.io/</id>
   
   <author>
@@ -20,9 +20,14 @@
     <link href="https://haldir65.github.io/2017/06/17/2017-06-17-tiny-details-in-java/"/>
     <id>https://haldir65.github.io/2017/06/17/2017-06-17-tiny-details-in-java/</id>
     <published>2017-06-17T13:24:48.000Z</published>
-    <updated>2017-06-17T14:53:44.486Z</updated>
+    <updated>2017-06-17T15:55:25.335Z</updated>
     
-    <content type="html"><![CDATA[<ol>
+    <content type="html"><![CDATA[<blockquote>
+<p>interesting stuff in java that don’t seem to get enough pubilicity</p>
+</blockquote>
+<p><img src="http://odzl05jxx.bkt.clouddn.com/34a7d57ccabb18c69d085247cf009b22.jpg?imageView2/2/w/600" alt="landscape"></p>
+<a id="more"></a>
+<ol>
 <li>getting the concreate class from generic types <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">        <span class="comment">/**</div><div class="line">     * Make a GET request and return a parsed object from JSON.</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> url     URL of the request to make</div><div class="line">     * <span class="doctag">@param</span> clazz   Relevant class object, for Gson's reflection</div><div class="line">     * <span class="doctag">@param</span> headers Map of request headers</div><div class="line">     */</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">GenericMoshiRequest</span><span class="params">(String url, @Nullable Class&lt;T&gt; clazz, Map&lt;String, String&gt; headers,</div><div class="line">                               Response.Listener&lt;T&gt; listener, Response.ErrorListener errorListener)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>(Method.GET, url, errorListener);</div><div class="line"><span class="comment">//        this.clazz = clazz;</span></div><div class="line">        Class&lt;T&gt; entityClass = (Class&lt;T&gt;) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[<span class="number">0</span>];<span class="comment">//使用反射获得泛型对应class</span></div><div class="line">        <span class="keyword">this</span>.clazz = entityClass;</div><div class="line">        <span class="keyword">this</span>.headers = headers;</div><div class="line">        <span class="keyword">this</span>.listener = listener;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
 </li>
 </ol>
@@ -30,8 +35,10 @@
     
     <summary type="html">
     
-      &lt;ol&gt;
-&lt;li&gt;getting the concreate class from generic types &lt;figure class=&quot;highlight java&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;
+      &lt;blockquote&gt;
+&lt;p&gt;interesting stuff in java that don’t seem to get enough pubilicity&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src=&quot;http://odzl05jxx.bkt.clouddn.com/34a7d57ccabb18c69d085247cf009b22.jpg?imageView2/2/w/600&quot; alt=&quot;landscape&quot;&gt;&lt;/p&gt;
     
     </summary>
     
@@ -45,17 +52,20 @@
     <link href="https://haldir65.github.io/2017/06/15/2017-06-15-python-networks/"/>
     <id>https://haldir65.github.io/2017/06/15/2017-06-15-python-networks/</id>
     <published>2017-06-15T15:56:26.000Z</published>
-    <updated>2017-06-17T14:54:49.956Z</updated>
+    <updated>2017-06-17T15:55:09.098Z</updated>
     
-    <content type="html"><![CDATA[<p><img src="http://odzl05jxx.bkt.clouddn.com/DSCN2952.JPG?imageView2/2/w/600" alt="Kitty"><br>关于如何使用Python搭建后台的方法很多，这里列举出一些实例。</p>
-<h3 id="1-The-Flask-Way"><a href="#1-The-Flask-Way" class="headerlink" title="1. The Flask Way"></a>1. The Flask Way</h3><p>Flask官方的快速入门很详细，做一个接口也很简单。Flask的方式是使用Decorator对请求进行处理<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/python3</span></div><div class="line"><span class="comment"># -*- coding:utf8 -*-</span></div><div class="line"></div><div class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask</div><div class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> request</div><div class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> jsonify</div><div class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> send_file</div><div class="line"></div><div class="line"><span class="comment"># create the flask object</span></div><div class="line">app = Flask(__name__)</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"><span class="comment"># 处理GET请求像这样就可以了</span></div><div class="line"></div><div class="line"><span class="meta">@app.route('/', methods=['GET'])</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">handle_get</span><span class="params">()</span>:</span></div><div class="line">    <span class="keyword">return</span> <span class="string">'haha ,this is http status code 200'</span></div><div class="line"></div><div class="line"><span class="comment">#处理POST请求大概这样，前端和后台商量好字段就可以了</span></div><div class="line"><span class="meta">@app.route('/', methods=['POST'])</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">handle_post</span><span class="params">()</span>:</span></div><div class="line">    uid = request.form[<span class="string">'uid'</span>]</div><div class="line">    name = request.form[<span class="string">'name'</span>]</div><div class="line">    print(<span class="string">'uid is %s ,name is %s '</span> % (uid, name))</div><div class="line">    <span class="keyword">return</span> <span class="string">'200 Ok, or whatever you like'</span>  </div><div class="line"></div><div class="line"><span class="comment"># hosting static file，image,css,etc</span></div></pre></td></tr></table></figure></p>
-<p>我觉得Flask的官方Doc对初学者的友好度几乎是满分 :sunglasses:</p>
+    <content type="html"><![CDATA[<p><img src="http://odzl05jxx.bkt.clouddn.com/c6dd030bf8cc75628fce3aec8216ba52.jpg?imageView2/2/w/600" alt="Kitty"><br>关于如何使用Python搭建后台的方法很多，这里列举出一些实例。<a id="more"></a></p>
+<h3 id="1-The-Flask-Way"><a href="#1-The-Flask-Way" class="headerlink" title="1. The Flask Way"></a>1. The Flask Way</h3><p>Flask官方的快速入门很详细，做一个接口也很简单。Flask的方式是使用Decorator对请求进行处理<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/python3</span></div><div class="line"><span class="comment"># -*- coding:utf8 -*-</span></div><div class="line"></div><div class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask</div><div class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> request</div><div class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> jsonify</div><div class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> send_file</div><div class="line"></div><div class="line"><span class="comment"># create the flask object</span></div><div class="line">app = Flask(__name__)</div><div class="line"></div><div class="line"><span class="comment"># 处理GET请求像这样就可以了</span></div><div class="line"></div><div class="line"><span class="meta">@app.route('/', methods=['GET'])</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">handle_get</span><span class="params">()</span>:</span></div><div class="line">    <span class="keyword">return</span> <span class="string">'haha ,this is http status code 200'</span></div><div class="line"></div><div class="line"><span class="comment">#处理POST请求，从request中拿东西，返回response</span></div><div class="line"><span class="meta">@app.route('/', methods=['POST'])</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">handle_post</span><span class="params">()</span>:</span></div><div class="line">    uid = request.form[<span class="string">'uid'</span>]</div><div class="line">    name = request.form[<span class="string">'name'</span>]</div><div class="line">    print(<span class="string">'uid is %s ,name is %s '</span> % (uid, name))</div><div class="line">    <span class="keyword">return</span> <span class="string">'200 Ok, or whatever you like'</span>  </div><div class="line"></div><div class="line"></div><div class="line"> <span class="comment">#返回json，作为API</span></div><div class="line"><span class="meta">@app.route('/_get_current_user', methods=['GET'])</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_current_user</span><span class="params">()</span>:</span></div><div class="line">    <span class="keyword">return</span> jsonify(</div><div class="line">        username=<span class="string">'Admin'</span>,</div><div class="line">        email=<span class="string">'Bob@gmail.com'</span>,</div><div class="line">        age=<span class="number">18</span></div><div class="line">    )    </div><div class="line"></div><div class="line">&#123;</div><div class="line">    username: <span class="string">'Admin'</span>;</div><div class="line">    email: <span class="string">'Bob@gamil.com'</span>;</div><div class="line">    age: <span class="number">18</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">#返回复杂一点的json，或者json数组 </span></div><div class="line"><span class="meta">@app.route('/_get_user_list', methods=['GET'])</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_user_list</span><span class="params">()</span>:</span></div><div class="line">    user_list = create_user_list()</div><div class="line">    <span class="keyword">return</span> Response(json.dumps(user_list), mimetype=<span class="string">'application/json'</span>)</div><div class="line"></div><div class="line"></div><div class="line"><span class="comment">#生成数据</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">create_user_list</span><span class="params">()</span>:</span></div><div class="line">    alice = &#123;<span class="string">'name'</span>: <span class="string">'alice'</span>, <span class="string">'age'</span>: <span class="number">16</span>, <span class="string">'sex'</span>: <span class="string">'female'</span>&#125;</div><div class="line">    tom = &#123;<span class="string">'name'</span>: <span class="string">'tom'</span>, <span class="string">'age'</span>: <span class="number">23</span>, <span class="string">'sex'</span>: <span class="string">'male'</span>&#125;</div><div class="line">    josh = &#123;<span class="string">'name'</span>: <span class="string">'josh'</span>, <span class="string">'age'</span>: <span class="number">20</span>, <span class="string">'sex'</span>: <span class="string">'male'</span>&#125;</div><div class="line">    bill = &#123;<span class="string">'name'</span>: <span class="string">'bill'</span>, <span class="string">'age'</span>: <span class="number">19</span>, <span class="string">'sex'</span>: <span class="string">'male'</span>&#125;</div><div class="line">    li = [alice, tom, josh, bill]</div><div class="line">    <span class="keyword">return</span> li</div><div class="line"></div><div class="line"></div><div class="line"><span class="comment"># 在Postman中就能获得这样的result</span></div><div class="line">[</div><div class="line">    &#123;</div><div class="line">        <span class="string">"name"</span>: <span class="string">"alice"</span>,</div><div class="line">        <span class="string">"age"</span>: <span class="number">16</span>,</div><div class="line">        <span class="string">"sex"</span>: <span class="string">"female"</span></div><div class="line">    &#125;,</div><div class="line">    &#123;</div><div class="line">        <span class="string">"name"</span>: <span class="string">"tom"</span>,</div><div class="line">        <span class="string">"age"</span>: <span class="number">23</span>,</div><div class="line">        <span class="string">"sex"</span>: <span class="string">"male"</span></div><div class="line">    &#125;,</div><div class="line">    &#123;</div><div class="line">        <span class="string">"name"</span>: <span class="string">"josh"</span>,</div><div class="line">        <span class="string">"age"</span>: <span class="number">20</span>,</div><div class="line">        <span class="string">"sex"</span>: <span class="string">"male"</span></div><div class="line">    &#125;,</div><div class="line">    &#123;</div><div class="line">        <span class="string">"name"</span>: <span class="string">"bill"</span>,</div><div class="line">        <span class="string">"age"</span>: <span class="number">19</span>,</div><div class="line">        <span class="string">"sex"</span>: <span class="string">"male"</span></div><div class="line">    &#125;</div><div class="line">]</div><div class="line"></div><div class="line"><span class="comment"># hosting static file，image,css,etc</span></div><div class="line"><span class="comment"># 提供图片什么的</span></div><div class="line"></div><div class="line"><span class="meta">@app.route('/_get_image', methods=['GET'])</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_image</span><span class="params">()</span>:</span></div><div class="line">    filename = <span class="string">'static/image/b1.jpg'</span></div><div class="line">    fullpath = os.path.join(os.path.curdir, filename)</div><div class="line">    print(filename, fullpath)</div><div class="line">    <span class="keyword">return</span> send_file(fullpath, mimetype=<span class="string">'image/jpeg'</span>)</div></pre></td></tr></table></figure></p>
+<p>我觉得Flask的官方Doc对初学者的友好度几乎是满分 </p>
 <ul>
 <li><a href="http://flask.pocoo.org/docs/0.12/quickstart/#accessing-request-data">accessing-request-data</a></li>
 <li><a href="http://flask.pocoo.org/docs/0.12/quickstart/#cookies">cookies</a></li>
 <li><a href="http://flask.pocoo.org/docs/0.12/quickstart/#sessions">sessions</a></li>
-<li><a href="http://flask.pocoo.org/docs/0.12/quickstart/#static-files">static files</a></li>
+<li><a href="http://flask.pocoo.org/docs/0.12/quickstart/#static-files">static files</a><br>所有的静态文件必须放在当前目录下的static目录中，里面可以再创建image，css,404.html等文件<br>另外，如果要调试接口的话，用Postman吧，比Fiddler简单点<br>返回response的时候一定要指明mime-type，或者content-type<br>text/html、text/css、application/json什么的，<a href="http://www.runoob.com/http/http-content-type.html">详细的http-content-type表格</a><br>关于content-type,找到一篇<a href="http://homeway.me/2015/07/19/understand-http-about-content-type/">介绍</a></li>
 </ul>
+<blockquote>
+<p>下面是几个常见的Content-Type:<br>1.text/html<br>2.text/plain<br>3.text/css<br>4.text/javascript<br>5.application/x-www-form-urlencoded<br>6.multipart/form-data<br>7.application/json<br>8.application/xml<br>…<br>前面几个都很好理解，都是html，css，javascript的文件类型，后面四个是POST的发包方式。</p>
+</blockquote>
 <h3 id="2-The-Django-Way"><a href="#2-The-Django-Way" class="headerlink" title="2. The Django Way"></a>2. The Django Way</h3><h3 id="3-Using-Tornado"><a href="#3-Using-Tornado" class="headerlink" title="3. Using Tornado"></a>3. Using Tornado</h3><h3 id="4-其他的点"><a href="#4-其他的点" class="headerlink" title="4. 其他的点"></a>4. 其他的点</h3><p>UrlLib，Socket</p>
 <h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><ol>
 <li>xxxx</li>
@@ -65,8 +75,7 @@
     
     <summary type="html">
     
-      &lt;p&gt;&lt;img src=&quot;http://odzl05jxx.bkt.clouddn.com/DSCN2952.JPG?imageView2/2/w/600&quot; alt=&quot;Kitty&quot;&gt;&lt;br&gt;关于如何使用Python搭建后台的方法很多，这里列举出一些实例。&lt;/p&gt;
-&lt;h3 id=&quot;
+      &lt;p&gt;&lt;img src=&quot;http://odzl05jxx.bkt.clouddn.com/c6dd030bf8cc75628fce3aec8216ba52.jpg?imageView2/2/w/600&quot; alt=&quot;Kitty&quot;&gt;&lt;br&gt;关于如何使用Python搭建后台的方法很多，这里列举出一些实例。
     
     </summary>
     
@@ -80,7 +89,7 @@
     <link href="https://haldir65.github.io/2017/05/24/2017-05-24-jvm-architecture/"/>
     <id>https://haldir65.github.io/2017/05/24/2017-05-24-jvm-architecture/</id>
     <published>2017-05-24T14:48:58.000Z</published>
-    <updated>2017-05-27T19:39:54.223Z</updated>
+    <updated>2017-06-17T15:48:57.305Z</updated>
     
     <content type="html"><![CDATA[<p>关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下<br><img src="http://odzl05jxx.bkt.clouddn.com/high_way_scene.jpg?imageView2/2/w/500" alt=""><br><a id="more"></a></p>
 <h3 id="1-从MyApp-java文件开始"><a href="#1-从MyApp-java文件开始" class="headerlink" title="1.从MyApp.java文件开始"></a>1.从MyApp.java文件开始</h3><p>大家都知道最开始学习Java的时候，要用javac 来编译MyApp.java来生成一个class文件。<br>在命令行里，大致是这样的执行顺序:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">javac MyApp.java</div><div class="line">java MyApp</div></pre></td></tr></table></figure></p>
@@ -138,9 +147,10 @@ verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的s
     <link href="https://haldir65.github.io/2017/05/07/2017-05-07-download-video-from-vps/"/>
     <id>https://haldir65.github.io/2017/05/07/2017-05-07-download-video-from-vps/</id>
     <published>2017-05-07T08:48:01.000Z</published>
-    <updated>2017-06-15T15:35:11.856Z</updated>
+    <updated>2017-06-17T15:51:14.594Z</updated>
     
-    <content type="html"><![CDATA[<p>几天前花几块钱买了个新的vps，试了下，速度不错。后来看到网上有关于如何使用vps下载视频并拖到Windows的，试了一下，确实酸爽。<br><a id="more"></a></p>
+    <content type="html"><![CDATA[<p>几天前花几块钱买了个新的vps，试了下，速度不错。后来看到网上有关于如何使用vps下载视频并拖到Windows的，试了一下，确实酸爽。<br><img src="http://odzl05jxx.bkt.clouddn.com/4667305cbdace582c667f218e38fe70a.jpg?imageView2/2/w/500" alt=""></p>
+<a id="more"></a>
 <h3 id="1-youtube下载视频到vps的硬盘上"><a href="#1-youtube下载视频到vps的硬盘上" class="headerlink" title="1. youtube下载视频到vps的硬盘上"></a>1. youtube下载视频到vps的硬盘上</h3><p>首先是安装一些必要的环境，我安装的系统是Ubuntu 14.0.4 ，这个版本默认的python是2.7。配置好pip,python等环境后，首先安装youtube-dl,基本上就是两行命令搞定的事情，参考<a href="http://rg3.github.io/youtube-dl/download.html">官网</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">sudo curl -L https://yt-dl.org/downloads/latest/youtube-dl -o /usr/local/bin/youtube-dl</div><div class="line"></div><div class="line">sudo chmod a+rx /usr/local/bin/youtube-dl</div></pre></td></tr></table></figure></p>
 <p>为了方便管理，首先在/根目录下面创建一个文件夹并切换到该目录下</p>
 <blockquote>
@@ -177,7 +187,7 @@ verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的s
     
     <summary type="html">
     
-      &lt;p&gt;几天前花几块钱买了个新的vps，试了下，速度不错。后来看到网上有关于如何使用vps下载视频并拖到Windows的，试了一下，确实酸爽。&lt;br&gt;
+      &lt;p&gt;几天前花几块钱买了个新的vps，试了下，速度不错。后来看到网上有关于如何使用vps下载视频并拖到Windows的，试了一下，确实酸爽。&lt;br&gt;&lt;img src=&quot;http://odzl05jxx.bkt.clouddn.com/4667305cbdace582c667f218e38fe70a.jpg?imageView2/2/w/500&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
     
     </summary>
     
@@ -628,9 +638,9 @@ verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的s
     
       <category term="置顶" scheme="https://haldir65.github.io/tags/%E7%BD%AE%E9%A1%B6/"/>
     
-      <category term="notes" scheme="https://haldir65.github.io/tags/notes/"/>
-    
       <category term="Linux" scheme="https://haldir65.github.io/tags/Linux/"/>
+    
+      <category term="notes" scheme="https://haldir65.github.io/tags/notes/"/>
     
   </entry>
   
