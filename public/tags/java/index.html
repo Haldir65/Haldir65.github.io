@@ -6,21 +6,14 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://haldir65.github.io">
-  <title>jvm架构概述 | Haldir的博客</title>
+  <title>Tag: java | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下">
-<meta property="og:type" content="article">
-<meta property="og:title" content="jvm架构概述">
-<meta property="og:url" content="https://haldir65.github.io/2017/05/24/2017-05-24-jvm-architecture/index.html">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Haldir的博客">
+<meta property="og:url" content="https://haldir65.github.io/tags/java/index.html">
 <meta property="og:site_name" content="Haldir的博客">
-<meta property="og:description" content="关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下">
-<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/high_way_scene.jpg?imageView2/2/w/500">
-<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/starry_sky.jpg?imageView2/2/w/500">
-<meta property="og:updated_time" content="2017-06-17T15:48:57.305Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="jvm架构概述">
-<meta name="twitter:description" content="关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下">
-<meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/high_way_scene.jpg?imageView2/2/w/500">
+<meta name="twitter:title" content="Haldir的博客">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -177,196 +170,60 @@ ga('send', 'pageview');
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-2017-05-24-jvm-architecture" class="article article-type-post " itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
+            
   
-    <h1 class="article-title" itemprop="name">
-      jvm架构概述
+  
+    
+    
+      
+      
+      <section class="archives-wrap">
+        <div class="archive-year-wrap">
+          <a href="/archives/2017" class="archive-year">2017</a>
+        </div>
+        <div class="archives">
+    
+    <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      	<div class="article-meta">
+	      	<a href="/2017/06/17/2017-06-17-tiny-details-in-java/" class="archive-article-date">
+  	<time datetime="2017-06-17T13:24:48.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-06-17</time>
+</a>
+        </div>
+    	 
+  
+    <h1 itemprop="name">
+      <a class="archive-article-title" href="/2017/06/17/2017-06-17-tiny-details-in-java/">For those tiny details in Java</a>
     </h1>
   
 
-        
-        <a href="/2017/05/24/2017-05-24-jvm-architecture/" class="archive-article-date">
-  	<time datetime="2017-05-24T14:48:58.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-05-24</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下<br><img src="http://odzl05jxx.bkt.clouddn.com/high_way_scene.jpg?imageView2/2/w/500" alt=""><br><a id="more"></a></p>
-<h3 id="1-从MyApp-java文件开始"><a href="#1-从MyApp-java文件开始" class="headerlink" title="1.从MyApp.java文件开始"></a>1.从MyApp.java文件开始</h3><p>大家都知道最开始学习Java的时候，要用javac 来编译MyApp.java来生成一个class文件。<br>在命令行里，大致是这样的执行顺序:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">javac MyApp.java</div><div class="line">java MyApp</div></pre></td></tr></table></figure></p>
-<h4 id="实际上后一句话就创建了一个jvm-instance"><a href="#实际上后一句话就创建了一个jvm-instance" class="headerlink" title="实际上后一句话就创建了一个jvm instance."></a>实际上后一句话就创建了一个jvm instance.</h4><h3 id="2-从class-loader进入Execution-Engine-再到Host-Operating-System"><a href="#2-从class-loader进入Execution-Engine-再到Host-Operating-System" class="headerlink" title="2. 从class loader进入Execution Engine 再到Host Operating System"></a>2. 从class loader进入Execution Engine 再到Host Operating System</h3><p>java MyApp会调用class loader，后者不仅要负责加载MyApp.class文件，还需要加载java API中的class文件（String,Object,Collection….）。加载的class文件（byte code）被传递给Execution Engine,后者则负责执行byte code（其实也是调用宿主操作系统的方法执行操作）</p>
-<h3 id="3-where-did-class-loader-load-class-into"><a href="#3-where-did-class-loader-load-class-into" class="headerlink" title="3. where did class loader load class into ?"></a>3. where did class loader load class into ?</h3><p>classloader将class 文件加载进内存中的一部分（Runtime data areas）。到此，jvm architecture的三个主要组件：class loader subsystem,Runtime data areas 以及execution Enigne的主要功能都说清楚了。<br>所以，这篇文章主要就按照class loader subsystem -&gt; Runtime data areas -&gt; Execution Engine的顺序来讲。</p>
-<h3 id="4-从classloader开始执行（class-loading-subsystem）"><a href="#4-从classloader开始执行（class-loading-subsystem）" class="headerlink" title="4.从classloader开始执行（class loading subsystem）"></a>4.从classloader开始执行（class loading subsystem）</h3><pre><code>- load 将byte code 加载进内存，来源可以是.java文件，可以是.jar文件，甚至可以是network Socket（这要看具体class loader的implementation）。load阶段包含三种不同的class loader，这也是面试时的重点。
-
-&gt; 1. Bootstrap class loader (jre文件夹中有一个rt.jar文件，里面装的就是java的internal class) // 
-
-&gt; 2. extension class loader (jre/lib/ext) //负责加载这个文件夹中的class文件
-
-&gt; 3. Application class loader (CLASSPATH, -cp)//加载CLASSPATH变量中描述的位置
-
-- load完成后是link
-verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的static variable分配内存，variable被赋默认值) -&gt; Resolve(when all the symbolic reference inside currentclass are resolved，例如引用了其他的class，例如引用了常量池里面的东西，classDefNotFoundException也是在这个时候抛出的)
-
-注意，以上步骤都是java specification所规定的，但不同的jvm实现可能有微小的差异
-</code></pre><p>class loading subsystem的最后一步是initialize<br>class vars to initiazed Value in code(比如静态代码块就是在这时执行的)</p>
-<h3 id="5-Runtime-data-area五个部分的划分"><a href="#5-Runtime-data-area五个部分的划分" class="headerlink" title="5. Runtime data area五个部分的划分"></a>5. Runtime data area五个部分的划分</h3><p>Runtime data area 即java virtural machine的内存，可以划分成五部分<br>    //per jvm ,shared by all threads</p>
-<pre><code>- Method Area
-- Heap
-
-// per thread 
-- java stack 
-- pc Registers
-- Native method stacks
-</code></pre><h4 id="1-Method-Area-方法区，用于存储class的数据，static-variable-byte-code-class-level-constant-pool都放在这里-，Method-Area也称为Perm-gen-space-永生代-，默认大小是64MB-，可以通过-XX-MaxPermSize-调节-。这里有可能抛出out-of-memory-error。"><a href="#1-Method-Area-方法区，用于存储class的数据，static-variable-byte-code-class-level-constant-pool都放在这里-，Method-Area也称为Perm-gen-space-永生代-，默认大小是64MB-，可以通过-XX-MaxPermSize-调节-。这里有可能抛出out-of-memory-error。" class="headerlink" title="1. Method Area(方法区，用于存储class的数据，static variable,byte code,class level constant pool都放在这里)    ，Method Area也称为Perm gen space(永生代)，默认大小是64MB ，可以通过-XX:MaxPermSize 调节 。这里有可能抛出out of memory error。"></a>1. Method Area(方法区，用于存储class的数据，static variable,byte code,class level constant pool都放在这里)    ，Method Area也称为Perm gen space(永生代)，默认大小是64MB ，可以通过-XX:MaxPermSize 调节 。这里有可能抛出out of memory error。</h4><h3 id="java8将method-Area移除，改为-metaspace-就是将method-area移到了Native-Memory，这样就不会有限制了，也可以人为设置上限"><a href="#java8将method-Area移除，改为-metaspace-就是将method-area移到了Native-Memory，这样就不会有限制了，也可以人为设置上限" class="headerlink" title="java8将method Area移除，改为 metaspace (就是将method area移到了Native Memory，这样就不会有限制了，也可以人为设置上限)"></a>java8将method Area移除，改为 metaspace (就是将method area移到了Native Memory，这样就不会有限制了，也可以人为设置上限)</h3><h4 id="2-Heap"><a href="#2-Heap" class="headerlink" title="2. Heap"></a>2. Heap</h4><p>日常开发中new出来的东西都放在这里</p>
-<p>-Xms , minimun size<br>-Xmx , maximum size</p>
-<h4 id="3-Java-Stack"><a href="#3-Java-Stack" class="headerlink" title="3. Java Stack"></a>3. Java Stack</h4><p>java stacks contains stack frames of the current execution per thread.<br>eg : method a -&gt; 调用 method b -&gt; 调用method c<br>当前线程的方法栈中就会push三个stack frame(每个Frame对应一个方法的执行环境)<br>stack Frame包含当前方法中的变量，以及返回值，etc<br>这里定义了stackoverFlowError</p>
-<h4 id="4-pc-Registers"><a href="#4-pc-Registers" class="headerlink" title="4. pc Registers"></a>4. pc Registers</h4><p>这里面装的是程序计数器，后者是指向下一个将要被执行的指令的指针（每条线程都有）。</p>
-<h4 id="5-Native-method-stacks"><a href="#5-Native-method-stacks" class="headerlink" title="5. Native method stacks"></a>5. Native method stacks</h4><p>Native method stacks 是由java stack中的方法调用native方法创建的，例如windows上的dll库</p>
-<h3 id="6-Execution-Engine的任务"><a href="#6-Execution-Engine的任务" class="headerlink" title="6. Execution Engine的任务"></a>6. Execution Engine的任务</h3><p><img src="http://odzl05jxx.bkt.clouddn.com/starry_sky.jpg?imageView2/2/w/500" alt=""></p>
-<pre><code>- Interpreter 将byte code 翻译成机器指令并执行(根据指令去调用Native方法，在windows上jre/bin/文件夹中一大堆的dll就是windows平台提供的Native库，在linux上是.so文件)
-
-- JIT Compiler  just in time compiler（如果有某项byte code instruction被多次调用，这些byte code不会每次都被inteprete，JIT will hold on to that system level target machine code for future usage,which is fast）
-- Hotspot profiler(it helps the JIT Compiler analysise the frequently used byte codess)
-- GC (a lengthy talk)
-</code></pre><p>调用Native Method Interface(JNI) -&gt; Native method libraries（.dll,.so etc）</p>
-<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="https://www.youtube.com/watch?v=ZBJ0u9MaKtM">JVM ( java virtual machine) architecture - tutorial</a></p>
-
-      
-
-      
-        <div class="page-reward">
-          <a href="javascript:;" class="page-reward-btn tooltip-top">
-            <div class="tooltip tooltip-east">
-            <span class="tooltip-item">
-              赏
-            </span>
-            <span class="tooltip-content">
-              <span class="tooltip-text">
-                <span class="tooltip-inner">
-                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
-                  <div class="reward-box">
-                    
-                    
-                  </div>
-                </span>
-              </span>
-            </span>
-          </div>
-          </a>
-        </div>
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
+        <div class="article-info info-on-right">
+          
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">jvm</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">java</a>
         		</li>
       		
 		</ul>
 	</div>
 
-      
+          
 
-      
-
-      
-        
-<div class="share-btn share-icons tooltip-left">
-  <div class="tooltip tooltip-east">
-    <span class="tooltip-item">
-      <a href="javascript:;" class="share-sns share-outer">
-        <i class="icon icon-share"></i>
-      </a>
-    </span>
-    <span class="tooltip-content">
-      <div class="share-wrap">
-        <div class="share-icons">
-          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
-            <i class="icon icon-weibo"></i>
-          </a>
-          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
-            <i class="icon icon-weixin"></i>
-          </a>
-          <a class="qq share-sns" href="javascript:;" data-type="qq">
-            <i class="icon icon-qq"></i>
-          </a>
-          <a class="douban share-sns" href="javascript:;" data-type="douban">
-            <i class="icon icon-douban"></i>
-          </a>
-          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
-            <i class="icon icon-qzone"></i>
-          </a>
-          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
-            <i class="icon icon-facebook"></i>
-          </a>
-          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
-            <i class="icon icon-twitter"></i>
-          </a>
-          <a class="google share-sns" href="javascript:;" data-type="google">
-            <i class="icon icon-google"></i>
-          </a>
         </div>
-      </div>
-    </span>
-  </div>
-</div>
-
-<div class="page-modal wx-share js-wx-box">
-    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
-    <p>扫一扫，分享到微信</p>
-    <div class="wx-qrcode">
-      <img src="http://s.jiathis.com/qrcode.php?url=https://haldir65.github.io/2017/05/24/2017-05-24-jvm-architecture/" alt="微信分享二维码">
-    </div>
-</div>
-
-<div class="mask js-mask"></div>
-      
-      <div class="clearfix"></div>
-    </div>
+        <div class="clearfix"></div>
+    </header>
   </div>
 </article>
-
-  
-<nav id="article-nav">
-  
-    <a href="/2017/06/15/2017-06-15-python-networks/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          使用Python搭建本地服务器
-        
-      </div>
-    </a>
   
   
-    <a href="/2017/05/07/2017-05-07-download-video-from-vps/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">VPS下载Youtube视频并同步到本地</div>
-      <i class="icon-circle-right"></i>
-    </a>
-  
-</nav>
-
-
-
-
-
-  
-  
+    </div></section>
   
 
-  
-
-  
+    
 
 
           </div>
@@ -389,9 +246,9 @@ verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的s
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: true,
+		isPost: false,
 		isArchive: false,
-		isTag: false,
+		isTag: true,
 		isCategory: false,
 		open_in_new: false,
 		root: "/",
