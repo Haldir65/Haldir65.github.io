@@ -1,6 +1,7 @@
 ---
 title: jvm架构概述
 date: 2017-05-24 22:48:58
+categories: blog
 tags: [jvm]
 ---
 

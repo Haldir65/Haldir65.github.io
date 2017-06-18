@@ -2,7 +2,7 @@
 title: linux基本命令介绍
 date: 2017-01-07 15:38:43
 categories: blog
-tags: [置顶,Linux,notes]
+tags: [置顶,linux,notes]
 top : 1
 ---
 

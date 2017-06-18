@@ -23,9 +23,8 @@ hexo s //localost:4000本地预览
 ```
 
 - 部署过程中出现的一些错误
-> to be fixed
 
-```java
+```javascript
 $ hexo g -d
 INFO  Start processing
 ERROR Process failed: _posts/2016-12-10-adb-command.md
@@ -80,6 +79,26 @@ INFO  Generated: index.html
 INFO  4 files generated in 2.26 s
 INFO  Deploying: git
 
+```
+找了好久，有说 _config.xml有空格的，有说title被乱改的，试了好长时间，改成这样就不再报错了。所以，**冒号后面一定要加空格，英文半角的**
+```
+---
+title: adb常用命令手册
+date: 2016-12-10 21:14:14
+tags:
+ - android
+ - adb
+---
+```
+tags有两种写法，一种是上面这样前面加横杠
+另一种长这样，写成数组形式
+```
+---
+title: my awesometitle
+date: 2017-05-07 16:48:01
+categories: blog
+tags: [linux,python]
+---
 ```
 
 

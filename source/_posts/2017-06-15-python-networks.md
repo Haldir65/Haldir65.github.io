@@ -1,6 +1,7 @@
 ---
 title: 使用Python搭建本地服务器
 date: 2017-06-15 23:56:26
+categories: blog
 tags: [python]
 ---
 

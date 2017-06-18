@@ -1,6 +1,7 @@
 ---
 title: Python localHost部署命令
 date: 2017-05-01 08:57:27
+categories: blog
 tags: [python]
 ---
 

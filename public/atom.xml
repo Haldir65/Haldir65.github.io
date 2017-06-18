@@ -52,7 +52,7 @@
     <link href="https://haldir65.github.io/2017/06/15/2017-06-15-python-networks/"/>
     <id>https://haldir65.github.io/2017/06/15/2017-06-15-python-networks/</id>
     <published>2017-06-15T15:56:26.000Z</published>
-    <updated>2017-06-17T15:55:09.098Z</updated>
+    <updated>2017-06-17T16:06:57.828Z</updated>
     
     <content type="html"><![CDATA[<p><img src="http://odzl05jxx.bkt.clouddn.com/c6dd030bf8cc75628fce3aec8216ba52.jpg?imageView2/2/w/600" alt="Kitty"><br>关于如何使用Python搭建后台的方法很多，这里列举出一些实例。<a id="more"></a></p>
 <h3 id="1-The-Flask-Way"><a href="#1-The-Flask-Way" class="headerlink" title="1. The Flask Way"></a>1. The Flask Way</h3><p>Flask官方的快速入门很详细，做一个接口也很简单。Flask的方式是使用Decorator对请求进行处理<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/python3</span></div><div class="line"><span class="comment"># -*- coding:utf8 -*-</span></div><div class="line"></div><div class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask</div><div class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> request</div><div class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> jsonify</div><div class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> send_file</div><div class="line"></div><div class="line"><span class="comment"># create the flask object</span></div><div class="line">app = Flask(__name__)</div><div class="line"></div><div class="line"><span class="comment"># 处理GET请求像这样就可以了</span></div><div class="line"></div><div class="line"><span class="meta">@app.route('/', methods=['GET'])</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">handle_get</span><span class="params">()</span>:</span></div><div class="line">    <span class="keyword">return</span> <span class="string">'haha ,this is http status code 200'</span></div><div class="line"></div><div class="line"><span class="comment">#处理POST请求，从request中拿东西，返回response</span></div><div class="line"><span class="meta">@app.route('/', methods=['POST'])</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">handle_post</span><span class="params">()</span>:</span></div><div class="line">    uid = request.form[<span class="string">'uid'</span>]</div><div class="line">    name = request.form[<span class="string">'name'</span>]</div><div class="line">    print(<span class="string">'uid is %s ,name is %s '</span> % (uid, name))</div><div class="line">    <span class="keyword">return</span> <span class="string">'200 Ok, or whatever you like'</span>  </div><div class="line"></div><div class="line"></div><div class="line"> <span class="comment">#返回json，作为API</span></div><div class="line"><span class="meta">@app.route('/_get_current_user', methods=['GET'])</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_current_user</span><span class="params">()</span>:</span></div><div class="line">    <span class="keyword">return</span> jsonify(</div><div class="line">        username=<span class="string">'Admin'</span>,</div><div class="line">        email=<span class="string">'Bob@gmail.com'</span>,</div><div class="line">        age=<span class="number">18</span></div><div class="line">    )    </div><div class="line"></div><div class="line">&#123;</div><div class="line">    username: <span class="string">'Admin'</span>;</div><div class="line">    email: <span class="string">'Bob@gamil.com'</span>;</div><div class="line">    age: <span class="number">18</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">#返回复杂一点的json，或者json数组 </span></div><div class="line"><span class="meta">@app.route('/_get_user_list', methods=['GET'])</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_user_list</span><span class="params">()</span>:</span></div><div class="line">    user_list = create_user_list()</div><div class="line">    <span class="keyword">return</span> Response(json.dumps(user_list), mimetype=<span class="string">'application/json'</span>)</div><div class="line"></div><div class="line"></div><div class="line"><span class="comment">#生成数据</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">create_user_list</span><span class="params">()</span>:</span></div><div class="line">    alice = &#123;<span class="string">'name'</span>: <span class="string">'alice'</span>, <span class="string">'age'</span>: <span class="number">16</span>, <span class="string">'sex'</span>: <span class="string">'female'</span>&#125;</div><div class="line">    tom = &#123;<span class="string">'name'</span>: <span class="string">'tom'</span>, <span class="string">'age'</span>: <span class="number">23</span>, <span class="string">'sex'</span>: <span class="string">'male'</span>&#125;</div><div class="line">    josh = &#123;<span class="string">'name'</span>: <span class="string">'josh'</span>, <span class="string">'age'</span>: <span class="number">20</span>, <span class="string">'sex'</span>: <span class="string">'male'</span>&#125;</div><div class="line">    bill = &#123;<span class="string">'name'</span>: <span class="string">'bill'</span>, <span class="string">'age'</span>: <span class="number">19</span>, <span class="string">'sex'</span>: <span class="string">'male'</span>&#125;</div><div class="line">    li = [alice, tom, josh, bill]</div><div class="line">    <span class="keyword">return</span> li</div><div class="line"></div><div class="line"></div><div class="line"><span class="comment"># 在Postman中就能获得这样的result</span></div><div class="line">[</div><div class="line">    &#123;</div><div class="line">        <span class="string">"name"</span>: <span class="string">"alice"</span>,</div><div class="line">        <span class="string">"age"</span>: <span class="number">16</span>,</div><div class="line">        <span class="string">"sex"</span>: <span class="string">"female"</span></div><div class="line">    &#125;,</div><div class="line">    &#123;</div><div class="line">        <span class="string">"name"</span>: <span class="string">"tom"</span>,</div><div class="line">        <span class="string">"age"</span>: <span class="number">23</span>,</div><div class="line">        <span class="string">"sex"</span>: <span class="string">"male"</span></div><div class="line">    &#125;,</div><div class="line">    &#123;</div><div class="line">        <span class="string">"name"</span>: <span class="string">"josh"</span>,</div><div class="line">        <span class="string">"age"</span>: <span class="number">20</span>,</div><div class="line">        <span class="string">"sex"</span>: <span class="string">"male"</span></div><div class="line">    &#125;,</div><div class="line">    &#123;</div><div class="line">        <span class="string">"name"</span>: <span class="string">"bill"</span>,</div><div class="line">        <span class="string">"age"</span>: <span class="number">19</span>,</div><div class="line">        <span class="string">"sex"</span>: <span class="string">"male"</span></div><div class="line">    &#125;</div><div class="line">]</div><div class="line"></div><div class="line"><span class="comment"># hosting static file，image,css,etc</span></div><div class="line"><span class="comment"># 提供图片什么的</span></div><div class="line"></div><div class="line"><span class="meta">@app.route('/_get_image', methods=['GET'])</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_image</span><span class="params">()</span>:</span></div><div class="line">    filename = <span class="string">'static/image/b1.jpg'</span></div><div class="line">    fullpath = os.path.join(os.path.curdir, filename)</div><div class="line">    print(filename, fullpath)</div><div class="line">    <span class="keyword">return</span> send_file(fullpath, mimetype=<span class="string">'image/jpeg'</span>)</div></pre></td></tr></table></figure></p>
@@ -79,6 +79,8 @@
     
     </summary>
     
+      <category term="blog" scheme="https://haldir65.github.io/categories/blog/"/>
+    
     
       <category term="python" scheme="https://haldir65.github.io/tags/python/"/>
     
@@ -89,7 +91,7 @@
     <link href="https://haldir65.github.io/2017/05/24/2017-05-24-jvm-architecture/"/>
     <id>https://haldir65.github.io/2017/05/24/2017-05-24-jvm-architecture/</id>
     <published>2017-05-24T14:48:58.000Z</published>
-    <updated>2017-06-17T15:48:57.305Z</updated>
+    <updated>2017-06-17T16:06:28.786Z</updated>
     
     <content type="html"><![CDATA[<p>关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下<br><img src="http://odzl05jxx.bkt.clouddn.com/high_way_scene.jpg?imageView2/2/w/500" alt=""><br><a id="more"></a></p>
 <h3 id="1-从MyApp-java文件开始"><a href="#1-从MyApp-java文件开始" class="headerlink" title="1.从MyApp.java文件开始"></a>1.从MyApp.java文件开始</h3><p>大家都知道最开始学习Java的时候，要用javac 来编译MyApp.java来生成一个class文件。<br>在命令行里，大致是这样的执行顺序:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">javac MyApp.java</div><div class="line">java MyApp</div></pre></td></tr></table></figure></p>
@@ -137,6 +139,8 @@ verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的s
     
     </summary>
     
+      <category term="blog" scheme="https://haldir65.github.io/categories/blog/"/>
+    
     
       <category term="jvm" scheme="https://haldir65.github.io/tags/jvm/"/>
     
@@ -147,7 +151,7 @@ verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的s
     <link href="https://haldir65.github.io/2017/05/07/2017-05-07-download-video-from-vps/"/>
     <id>https://haldir65.github.io/2017/05/07/2017-05-07-download-video-from-vps/</id>
     <published>2017-05-07T08:48:01.000Z</published>
-    <updated>2017-06-17T15:51:14.594Z</updated>
+    <updated>2017-06-17T16:06:32.270Z</updated>
     
     <content type="html"><![CDATA[<p>几天前花几块钱买了个新的vps，试了下，速度不错。后来看到网上有关于如何使用vps下载视频并拖到Windows的，试了一下，确实酸爽。<br><img src="http://odzl05jxx.bkt.clouddn.com/4667305cbdace582c667f218e38fe70a.jpg?imageView2/2/w/500" alt=""></p>
 <a id="more"></a>
@@ -191,6 +195,8 @@ verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的s
     
     </summary>
     
+      <category term="blog" scheme="https://haldir65.github.io/categories/blog/"/>
+    
     
       <category term="python" scheme="https://haldir65.github.io/tags/python/"/>
     
@@ -203,7 +209,7 @@ verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的s
     <link href="https://haldir65.github.io/2017/05/01/2017-05-01-python-server-test/"/>
     <id>https://haldir65.github.io/2017/05/01/2017-05-01-python-server-test/</id>
     <published>2017-05-01T00:57:27.000Z</published>
-    <updated>2017-06-15T15:39:27.536Z</updated>
+    <updated>2017-06-17T16:07:06.675Z</updated>
     
     <content type="html"><![CDATA[<p>一行命令即可</p>
 <blockquote>
@@ -236,6 +242,8 @@ verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的s
 &lt;p&gt;打开浏览器，输入127.0.0.1 ， 即可浏览当前目录下的文件，以GET的方式进行，命令行窗口会出现浏览记录。&lt;br&gt;
     
     </summary>
+    
+      <category term="blog" scheme="https://haldir65.github.io/categories/blog/"/>
     
     
       <category term="python" scheme="https://haldir65.github.io/tags/python/"/>
@@ -466,7 +474,7 @@ verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的s
     <link href="https://haldir65.github.io/2017/01/08/2017-01-08-trouble-shooting-with-my-blog/"/>
     <id>https://haldir65.github.io/2017/01/08/2017-01-08-trouble-shooting-with-my-blog/</id>
     <published>2017-01-08T10:01:01.000Z</published>
-    <updated>2017-06-04T11:59:46.229Z</updated>
+    <updated>2017-06-18T02:40:25.053Z</updated>
     
     <content type="html"><![CDATA[<p>使用hexo写博客以来，记录下来的问题越来越多。只希望下次再碰到同样的问题时，不要再去浪费时间去查找。如果想要给自己的blog一个值得置顶的文章的话，我觉得一篇记录使用hexo过程中的一些解决问题的方法的文章是再合适不过的了。</br><br><img src="http://odzl05jxx.bkt.clouddn.com/163216sn1ziyyaef4zaeps.jpg?imageView2/2/w/500" alt=""></p>
 <a id="more"></a>
@@ -476,12 +484,11 @@ verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的s
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">hexo clean <span class="comment">//清除缓存</span></div><div class="line">hexo g -d <span class="comment">//一步到位 = hexo g + hexo d</span></div><div class="line">hexo s <span class="comment">//localost:4000本地预览</span></div></pre></td></tr></table></figure>
 </li>
 <li><p>部署过程中出现的一些错误</p>
-<blockquote>
-<p>to be fixed</p>
-</blockquote>
 </li>
 </ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div></pre></td><td class="code"><pre><div class="line">$ hexo g -d</div><div class="line">INFO  Start processing</div><div class="line">ERROR Process failed: _posts/<span class="number">2016</span>-<span class="number">12</span>-<span class="number">10</span>-adb-command.md</div><div class="line">YAMLException: can not read a block mapping entry; a multiline key may not be an implicit key at line <span class="number">3</span>, column <span class="number">11</span>:</div><div class="line">    categories:  [技术]</div><div class="line">              ^</div><div class="line">    <span class="function">at <span class="title">generateError</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\js-yaml\lib\js-yaml\loader.js:<span class="number">162</span>:<span class="number">10</span>)</span></div><div class="line">    at <span class="title">throwError</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\js-yaml\lib\js-yaml\loader.js:<span class="number">168</span>:<span class="number">9</span>)</span></div><div class="line">    at <span class="title">readBlockMapping</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\js-yaml\lib\js-yaml\loader.js:<span class="number">1040</span>:<span class="number">9</span>)</span></div><div class="line">    at <span class="title">composeNode</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\js-yaml\lib\js-yaml\loader.js:<span class="number">1326</span>:<span class="number">12</span>)</span></div><div class="line">    at <span class="title">readDocument</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\js-yaml\lib\js-yaml\loader.js:<span class="number">1488</span>:<span class="number">3</span>)</span></div><div class="line">    at <span class="title">loadDocuments</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\js-yaml\lib\js-yaml\loader.js:<span class="number">1544</span>:<span class="number">5</span>)</span></div><div class="line">    at Object.<span class="title">load</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\js-yaml\lib\js-yaml\loader.js:<span class="number">1561</span>:<span class="number">19</span>)</span></div><div class="line">    at <span class="title">parseYAML</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\hexo-front-matter\lib\front_matter.js:<span class="number">80</span>:<span class="number">21</span>)</span></div><div class="line">    at <span class="title">parse</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\hexo-front-matter\lib\front_matter.js:<span class="number">56</span>:<span class="number">12</span>)</span></div><div class="line">    at D:\Blog\github\node_modules\hexo\lib\plugins\processor\post.js:52:18</div><div class="line">    at <span class="title">tryCatcher</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\util.js:<span class="number">16</span>:<span class="number">23</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromiseFromHandler</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">507</span>:<span class="number">35</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromise</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">567</span>:<span class="number">18</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromise0</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">612</span>:<span class="number">10</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromises</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">691</span>:<span class="number">18</span>)</span></div><div class="line">    at Promise.<span class="title">_fulfill</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">636</span>:<span class="number">18</span>)</span></div><div class="line">    at PromiseArray.<span class="title">_resolve</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise_array.js:<span class="number">125</span>:<span class="number">19</span>)</span></div><div class="line">    at PromiseArray.<span class="title">_promiseFulfilled</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise_array.js:<span class="number">143</span>:<span class="number">14</span>)</span></div><div class="line">    at PromiseArray.<span class="title">_iterate</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise_array.js:<span class="number">113</span>:<span class="number">31</span>)</span></div><div class="line">    at PromiseArray.init [as _init] <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise_array.js:<span class="number">77</span>:<span class="number">10</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromise</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">564</span>:<span class="number">21</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromise0</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">612</span>:<span class="number">10</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromises</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">691</span>:<span class="number">18</span>)</span></div><div class="line">    at Promise.<span class="title">_fulfill</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">636</span>:<span class="number">18</span>)</span></div><div class="line">    at PromiseArray.<span class="title">_resolve</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise_array.js:<span class="number">125</span>:<span class="number">19</span>)</span></div><div class="line">    at PromiseArray.<span class="title">_promiseFulfilled</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise_array.js:<span class="number">143</span>:<span class="number">14</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromise</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">572</span>:<span class="number">26</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromise0</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">612</span>:<span class="number">10</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromises</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">691</span>:<span class="number">18</span>)</span></div><div class="line">    at Promise.<span class="title">_fulfill</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">636</span>:<span class="number">18</span>)</span></div><div class="line">    at Promise.<span class="title">_resolveCallback</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">431</span>:<span class="number">57</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromiseFromHandler</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">522</span>:<span class="number">17</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromise</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">567</span>:<span class="number">18</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromise0</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">612</span>:<span class="number">10</span>)</span></div><div class="line">    at Promise.<span class="title">_settlePromises</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">691</span>:<span class="number">18</span>)</span></div><div class="line">    at Promise.<span class="title">_fulfill</span> <span class="params">(D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">636</span>:<span class="number">18</span>)</span></div><div class="line">    at D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\nodeback.js:42:21</div><div class="line">    at D:\Blog\github\node_modules\hexo\node_modules\hexo-fs\node_modules\graceful-fs\graceful-fs.js:78:16</div><div class="line">    at <span class="title">tryToString</span> <span class="params">(fs.js:<span class="number">455</span>:<span class="number">3</span>)</span></div><div class="line">    at FSReqWrap.readFileAfterClose [as oncomplete] <span class="params">(fs.js:<span class="number">442</span>:<span class="number">12</span>)</span></div><div class="line">INFO  Files loaded in 1.48 s</div><div class="line">INFO  Generated: sitemap.xml</div><div class="line">INFO  Generated: atom.xml</div><div class="line">INFO  Generated: 2017/01/08/2017-01-08-trouble-shooting-with-my-blog/index.html</div><div class="line">INFO  Generated: index.html</div><div class="line">INFO  4 files generated in 2.26 s</div><div class="line">INFO  Deploying: git</span></div></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div></pre></td><td class="code"><pre><div class="line">$ hexo g -d</div><div class="line">INFO  Start processing</div><div class="line">ERROR Process failed: _posts/<span class="number">2016</span><span class="number">-12</span><span class="number">-10</span>-adb-command.md</div><div class="line">YAMLException: can not read a block mapping entry; a multiline key may not be an implicit key at line <span class="number">3</span>, column <span class="number">11</span>:</div><div class="line">    categories:  [技术]</div><div class="line">              ^</div><div class="line">    at generateError (D:\Blog\github\node_modules\hexo\node_modules\js-yaml\lib\js-yaml\loader.js:<span class="number">162</span>:<span class="number">10</span>)</div><div class="line">    at throwError (D:\Blog\github\node_modules\hexo\node_modules\js-yaml\lib\js-yaml\loader.js:<span class="number">168</span>:<span class="number">9</span>)</div><div class="line">    at readBlockMapping (D:\Blog\github\node_modules\hexo\node_modules\js-yaml\lib\js-yaml\loader.js:<span class="number">1040</span>:<span class="number">9</span>)</div><div class="line">    at composeNode (D:\Blog\github\node_modules\hexo\node_modules\js-yaml\lib\js-yaml\loader.js:<span class="number">1326</span>:<span class="number">12</span>)</div><div class="line">    at readDocument (D:\Blog\github\node_modules\hexo\node_modules\js-yaml\lib\js-yaml\loader.js:<span class="number">1488</span>:<span class="number">3</span>)</div><div class="line">    at loadDocuments (D:\Blog\github\node_modules\hexo\node_modules\js-yaml\lib\js-yaml\loader.js:<span class="number">1544</span>:<span class="number">5</span>)</div><div class="line">    at <span class="built_in">Object</span>.load (D:\Blog\github\node_modules\hexo\node_modules\js-yaml\lib\js-yaml\loader.js:<span class="number">1561</span>:<span class="number">19</span>)</div><div class="line">    at parseYAML (D:\Blog\github\node_modules\hexo\node_modules\hexo-front-matter\lib\front_matter.js:<span class="number">80</span>:<span class="number">21</span>)</div><div class="line">    at parse (D:\Blog\github\node_modules\hexo\node_modules\hexo-front-matter\lib\front_matter.js:<span class="number">56</span>:<span class="number">12</span>)</div><div class="line">    at D:\Blog\github\node_modules\hexo\lib\plugins\processor\post.js:<span class="number">52</span>:<span class="number">18</span></div><div class="line">    at tryCatcher (D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\util.js:<span class="number">16</span>:<span class="number">23</span>)</div><div class="line">    at <span class="built_in">Promise</span>._settlePromiseFromHandler (D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">507</span>:<span class="number">35</span>)</div><div class="line">    at <span class="built_in">Promise</span>._settlePromise (D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">567</span>:<span class="number">18</span>)</div><div class="line">    at <span class="built_in">Promise</span>._settlePromise0 (D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">612</span>:<span class="number">10</span>)</div><div class="line">    at <span class="built_in">Promise</span>._settlePromises (D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">691</span>:<span class="number">18</span>)</div><div class="line">    at <span class="built_in">Promise</span>._fulfill (D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">636</span>:<span class="number">18</span>)</div><div class="line">    at PromiseArray._resolve (D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise_array.js:<span class="number">125</span>:<span class="number">19</span>)</div><div class="line">    at PromiseArray._promiseFulfilled (D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise_array.js:<span class="number">143</span>:<span class="number">14</span>)</div><div class="line">    at PromiseArray._iterate (D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise_array.js:<span class="number">113</span>:<span class="number">31</span>)</div><div class="line">    at PromiseArray.init [<span class="keyword">as</span> _init] (D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise_array.js:<span class="number">77</span>:<span class="number">10</span>)</div><div class="line">    at <span class="built_in">Promise</span>._settlePromise (D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">564</span>:<span class="number">21</span>)</div><div class="line">    at <span class="built_in">Promise</span>._settlePromise0 (D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">612</span>:<span class="number">10</span>)</div><div class="line">    at <span class="built_in">Promise</span>._settlePromises (D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">691</span>:<span class="number">18</span>)</div><div class="line">    at <span class="built_in">Promise</span>._fulfill (D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">636</span>:<span class="number">18</span>)</div><div class="line">    at PromiseArray._resolve (D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise_array.js:<span class="number">125</span>:<span class="number">19</span>)</div><div class="line">    at PromiseArray._promiseFulfilled (D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise_array.js:<span class="number">143</span>:<span class="number">14</span>)</div><div class="line">    at <span class="built_in">Promise</span>._settlePromise (D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">572</span>:<span class="number">26</span>)</div><div class="line">    at <span class="built_in">Promise</span>._settlePromise0 (D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">612</span>:<span class="number">10</span>)</div><div class="line">    at <span class="built_in">Promise</span>._settlePromises (D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">691</span>:<span class="number">18</span>)</div><div class="line">    at <span class="built_in">Promise</span>._fulfill (D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">636</span>:<span class="number">18</span>)</div><div class="line">    at <span class="built_in">Promise</span>._resolveCallback (D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">431</span>:<span class="number">57</span>)</div><div class="line">    at <span class="built_in">Promise</span>._settlePromiseFromHandler (D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">522</span>:<span class="number">17</span>)</div><div class="line">    at <span class="built_in">Promise</span>._settlePromise (D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">567</span>:<span class="number">18</span>)</div><div class="line">    at <span class="built_in">Promise</span>._settlePromise0 (D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">612</span>:<span class="number">10</span>)</div><div class="line">    at <span class="built_in">Promise</span>._settlePromises (D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">691</span>:<span class="number">18</span>)</div><div class="line">    at <span class="built_in">Promise</span>._fulfill (D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\promise.js:<span class="number">636</span>:<span class="number">18</span>)</div><div class="line">    at D:\Blog\github\node_modules\hexo\node_modules\bluebird\js\release\nodeback.js:<span class="number">42</span>:<span class="number">21</span></div><div class="line">    at D:\Blog\github\node_modules\hexo\node_modules\hexo-fs\node_modules\graceful-fs\graceful-fs.js:<span class="number">78</span>:<span class="number">16</span></div><div class="line">    at tryToString (fs.js:<span class="number">455</span>:<span class="number">3</span>)</div><div class="line">    at FSReqWrap.readFileAfterClose [<span class="keyword">as</span> oncomplete] (fs.js:<span class="number">442</span>:<span class="number">12</span>)</div><div class="line">INFO  Files loaded <span class="keyword">in</span> <span class="number">1.48</span> s</div><div class="line">INFO  Generated: sitemap.xml</div><div class="line">INFO  Generated: atom.xml</div><div class="line">INFO  Generated: <span class="number">2017</span>/<span class="number">01</span>/<span class="number">08</span>/<span class="number">2017</span><span class="number">-01</span><span class="number">-08</span>-trouble-shooting-<span class="keyword">with</span>-my-blog/index.html</div><div class="line">INFO  Generated: index.html</div><div class="line">INFO  <span class="number">4</span> files generated <span class="keyword">in</span> <span class="number">2.26</span> s</div><div class="line">INFO  Deploying: git</div></pre></td></tr></table></figure>
+<p>找了好久，有说 _config.xml有空格的，有说title被乱改的，试了好长时间，改成这样就不再报错了。所以，<strong>冒号后面一定要加空格，英文半角的</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">---</div><div class="line">title: adb常用命令手册</div><div class="line">date: 2016-12-10 21:14:14</div><div class="line">tags:</div><div class="line"> - android</div><div class="line"> - adb</div><div class="line">---</div></pre></td></tr></table></figure></p>
+<p>tags有两种写法，一种是上面这样前面加横杠<br>另一种长这样，写成数组形式<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">---</div><div class="line">title: my awesometitle</div><div class="line">date: 2017-05-07 16:48:01</div><div class="line">categories: blog</div><div class="line">tags: [linux,python]</div><div class="line">---</div></pre></td></tr></table></figure></p>
 <h3 id="3-一些功能的实现"><a href="#3-一些功能的实现" class="headerlink" title="3. 一些功能的实现"></a>3. 一些功能的实现</h3><ul>
 <li>置顶功能<br>  将node_modules/hexo-generator-index/lib/generator.js的文件内容替换成以下内容</li>
 </ul>
@@ -521,7 +528,7 @@ verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的s
     <link href="https://haldir65.github.io/2017/01/07/2017-01-07-Linux-Basic-Commands/"/>
     <id>https://haldir65.github.io/2017/01/07/2017-01-07-Linux-Basic-Commands/</id>
     <published>2017-01-07T07:38:43.000Z</published>
-    <updated>2017-06-15T15:21:23.509Z</updated>
+    <updated>2017-06-18T02:52:57.694Z</updated>
     
     <content type="html"><![CDATA[<p>一些常用的linux基本命令,仅作为参考。</br><br><img src="http://odzl05jxx.bkt.clouddn.com/b3.jpg?imageView2/2/w/500" alt=""><br> <a id="more"></a></p>
 <p>首先是连接vps的ssh(Secure Shell)工具，putty或者xshell都可以。</p>
@@ -638,9 +645,9 @@ verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的s
     
       <category term="置顶" scheme="https://haldir65.github.io/tags/%E7%BD%AE%E9%A1%B6/"/>
     
-      <category term="Linux" scheme="https://haldir65.github.io/tags/Linux/"/>
-    
       <category term="notes" scheme="https://haldir65.github.io/tags/notes/"/>
+    
+      <category term="linux" scheme="https://haldir65.github.io/tags/linux/"/>
     
   </entry>
   
@@ -788,6 +795,212 @@ verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的s
     
     
       <category term="python" scheme="https://haldir65.github.io/tags/python/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>adb常用命令手册</title>
+    <link href="https://haldir65.github.io/2016/12/10/2016-12-10-adb-command/"/>
+    <id>https://haldir65.github.io/2016/12/10/2016-12-10-adb-command/</id>
+    <published>2016-12-10T13:14:14.000Z</published>
+    <updated>2017-06-18T02:32:52.366Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="ADB-常用命令手册"><a href="#ADB-常用命令手册" class="headerlink" title="ADB 常用命令手册"></a>ADB 常用命令手册</h2><p>平时在android studio中用command的时候还有点不熟悉，找到一篇博客，记录下来，作为日常参考。希望后期能够有时间把Google IO上添加的一些命令加上来<br><a id="more"></a></p>
+<p>获取序列号：</p>
+<blockquote>
+<p>adb get-serialno</p>
+</blockquote>
+<p>查看连接计算机的设备：</p>
+<blockquote>
+<p>adb devices</p>
+</blockquote>
+<p>重启机器：</p>
+<blockquote>
+<p>adb reboot</p>
+</blockquote>
+<p>重启到bootloader，即刷机模式：</p>
+<blockquote>
+<p>adb reboot bootloader</p>
+</blockquote>
+<p>重启到recovery，即恢复模式：</p>
+<blockquote>
+<p>adb reboot recovery</p>
+</blockquote>
+<p>查看log：</p>
+<blockquote>
+<p>adb logcat</p>
+</blockquote>
+<p>终止adb服务进程：</p>
+<blockquote>
+<p>adb kill-server</p>
+</blockquote>
+<p>重启adb服务进程：</p>
+<blockquote>
+<p>adb start-server</p>
+</blockquote>
+<p>获取机器MAC地址：</p>
+<blockquote>
+<p>adb shell  cat /sys/class/net/wlan0/address</p>
+</blockquote>
+<p>获取CPU序列号：</p>
+<blockquote>
+<p>adb shell cat /proc/cpuinfo</p>
+</blockquote>
+<p>安装APK：</p>
+<blockquote>
+<p>adb install <apkfile> //比如：adb install baidu.apk</p>
+</blockquote>
+<p>保留数据和缓存文件，重新安装apk：</p>
+<blockquote>
+<p>adb install -r <apkfile> //比如：adb install -r baidu.apk</p>
+</blockquote>
+<p>安装apk到sd卡：</p>
+<blockquote>
+<p>adb install -s <apkfile> // 比如：adb install -s baidu.apk</p>
+</blockquote>
+<p>卸载APK：</p>
+<blockquote>
+<p>adb uninstall <package> //比如：adb uninstall com.baidu.search</p>
+</blockquote>
+<p>卸载app但保留数据和缓存文件：</p>
+<blockquote>
+<p>adb uninstall -k <package> //比如：adb uninstall -k com.baidu.search</p>
+</blockquote>
+<p>启动应用：</p>
+<blockquote>
+<p>adb shell am start -n <package_name>/.<activity_class_name></p>
+</blockquote>
+<p>查看设备cpu和内存占用情况：</p>
+<blockquote>
+<p>adb shell top</p>
+</blockquote>
+<p>查看占用内存前6的app：</p>
+<blockquote>
+<p>adb shell top -m 6</p>
+</blockquote>
+<p>刷新一次内存信息，然后返回：</p>
+<blockquote>
+<p>adb shell top -n 1</p>
+</blockquote>
+<p>查询各进程内存使用情况：</p>
+<blockquote>
+<p>adb shell procrank</p>
+</blockquote>
+<p>杀死一个进程：</p>
+<blockquote>
+<p>adb shell kill [pid]</p>
+</blockquote>
+<p>查看进程列表：</p>
+<blockquote>
+<p>adb shell ps</p>
+</blockquote>
+<p>查看指定进程状态：</p>
+<blockquote>
+<p>adb shell ps -x [PID]</p>
+</blockquote>
+<p>查看后台services信息：</p>
+<blockquote>
+<p>adb shell service list</p>
+</blockquote>
+<p>查看当前内存占用：</p>
+<blockquote>
+<p>adb shell cat /proc/meminfo</p>
+</blockquote>
+<p>查看IO内存分区：</p>
+<blockquote>
+<p>adb shell cat /proc/iomem</p>
+</blockquote>
+<p>将system分区重新挂载为可读写分区：</p>
+<blockquote>
+<p>adb remount</p>
+</blockquote>
+<p>从本地复制文件到设备：</p>
+<blockquote>
+<p>adb push <local> <remote></p>
+</blockquote>
+<p>从设备复制文件到本地：</p>
+<blockquote>
+<p>adb pull <remote>  <local></p>
+</blockquote>
+<p>列出目录下的文件和文件夹，等同于dos中的dir命令：</p>
+<blockquote>
+<p>adb shell ls</p>
+</blockquote>
+<p>进入文件夹，等同于dos中的cd 命令：</p>
+<blockquote>
+<p>adb shell cd <folder></p>
+</blockquote>
+<p>重命名文件：</p>
+<blockquote>
+<p>adb shell rename path/oldfilename path/newfilename</p>
+</blockquote>
+<p>删除system/avi.apk：</p>
+<blockquote>
+<p>adb shell rm /system/avi.apk</p>
+</blockquote>
+<p>删除文件夹及其下面所有文件：</p>
+<blockquote>
+<p>adb shell rm -r <folder></p>
+</blockquote>
+<p>移动文件：</p>
+<blockquote>
+<p>adb shell mv path/file newpath/file</p>
+</blockquote>
+<p>设置文件权限：</p>
+<blockquote>
+<p>adb shell chmod 777 /system/fonts/DroidSansFallback.ttf</p>
+</blockquote>
+<p>新建文件夹：</p>
+<blockquote>
+<p>adb shell mkdir path/foldelname</p>
+</blockquote>
+<p>查看文件内容：</p>
+<blockquote>
+<p>adb shell cat <file></p>
+</blockquote>
+<p>查看wifi密码：</p>
+<blockquote>
+<p>adb shell cat /data/misc/wifi/*.conf</p>
+</blockquote>
+<p>清除log缓存：</p>
+<blockquote>
+<p>adb logcat -c</p>
+</blockquote>
+<p>查看bug报告：</p>
+<blockquote>
+<p>adb bugreport</p>
+</blockquote>
+<p>获取设备名称：</p>
+<blockquote>
+<p>adb shell cat /system/build.prop</p>
+</blockquote>
+<p>查看ADB帮助：</p>
+<blockquote>
+<p>adb help</p>
+</blockquote>
+<p>跑monkey：</p>
+<blockquote>
+<p>adb shell monkey -v -p your.package.name 500</p>
+</blockquote>
+<p>录制视频</p>
+<blockquote>
+<p>adb shell screenrecord /sdcard/demo.mp4  生成的Demo.mp4文件在根目录下面，默认录制时长180s<br>按下ctrl+c 停止录制<br>注意，最好在开发者选项里面，把显示触摸操作打开，这样视频中能显示用户点击操作位置</p>
+</blockquote>
+<h3 id="Ref"><a href="#Ref" class="headerlink" title="Ref:"></a>Ref:</h3><ul>
+<li><a href="http://zmywly8866.github.io/2015/01/24/all-adb-command.html">张明云的博客</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;ADB-常用命令手册&quot;&gt;&lt;a href=&quot;#ADB-常用命令手册&quot; class=&quot;headerlink&quot; title=&quot;ADB 常用命令手册&quot;&gt;&lt;/a&gt;ADB 常用命令手册&lt;/h2&gt;&lt;p&gt;平时在android studio中用command的时候还有点不熟悉，找到一篇博客，记录下来，作为日常参考。希望后期能够有时间把Google IO上添加的一些命令加上来&lt;br&gt;
+    
+    </summary>
+    
+    
+      <category term="android" scheme="https://haldir65.github.io/tags/android/"/>
+    
+      <category term="adb" scheme="https://haldir65.github.io/tags/adb/"/>
     
   </entry>
   
@@ -1078,158 +1291,6 @@ verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的s
     
     
       <category term="android" scheme="https://haldir65.github.io/tags/android/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>使用RecyclerView的Animation</title>
-    <link href="https://haldir65.github.io/2016/10/20/2016-10-20-RecyclerViewAnimationStuff/"/>
-    <id>https://haldir65.github.io/2016/10/20/2016-10-20-RecyclerViewAnimationStuff/</id>
-    <published>2016-10-20T08:16:49.000Z</published>
-    <updated>2017-04-23T10:50:29.288Z</updated>
-    
-    <content type="html"><![CDATA[<p>From the talk<br>RecyclerView Animations and Behind the Scenes<br>Yigit Biyar &amp; Chet Haase<br>on Anroid Dev Summit 2015</p>
-<h3 id="1-RecyclerView架构"><a href="#1-RecyclerView架构" class="headerlink" title="1. RecyclerView架构"></a>1. RecyclerView架构</h3><p>RecyclerView is Flexible , Pluggable and Customizeable<br>内部很多功能都交给了各个组件去完成<br><img src="http://odzl05jxx.bkt.clouddn.com/snapshot20161020135353.jpg?imageView2/2/w/600" alt=""><br>ChildHelper 、AdapterHelper 、Recycler对于开发者来说并不常用，但它们在内部负责了许多针对Child View的管理。<a id="more"></a></p>
-<ul>
-<li>ViewHolder的创建<br><img src="http://odzl05jxx.bkt.clouddn.com/viewHolder_step_1.jpg?imageView2/2/w/600" alt=""><br>1 .LayoutManager首先检查getViewForPosition，RecyclerView查找Cache(getViewForPosition)，如果找到了。直接交给LayoutManager,这一过程甚至不需要与Adapter接触。</li>
-</ul>
-<ol>
-<li>如果Cache中未找到，RecyclerView调用Adpter的getViewType，并去Recycled Pool中getViewHolderByType。</li>
-<li>如果在Pool中未找到，RecyclerView将调用Adapter的createViewHolder。</li>
-<li>如果在Pool中这种Type的ViewHolder已经有了，或者步骤3中创建了一个新的viewHolder，bindViewHolder并交给LayoutManager。<br><img src="http://odzl05jxx.bkt.clouddn.com/viewHolder_step_2.jpg?imageView2/2/w/600" alt=""></li>
-<li>最终LayoutManager将把这个View添加到UI，这时会调用RecyclerView的onViewAttachedToWindow回调（生命周期）。</li>
-</ol>
-<ul>
-<li>ViewHolder的回收(Reserves)<br><img src="http://odzl05jxx.bkt.clouddn.com/viewHolder_step_3.jpg?imageView2/2/w/600" alt=""></li>
-</ul>
-<ol>
-<li>LayoutManager调用removeAndRecycleView，RecyclerView会在这里收到回调onViewDetachedFromWindow</li>
-<li>检查这个View.isValid。这一点很重要，在scroll过程中，如果一个View是Valid的话，可以将View添加到Cache中，随后可以简单将其复用。Cache将会invalidate oldest one，并告诉Adapter(onViewRecycled)。</li>
-<li>如果不是Valid的View，将会被添加到Pool中，Adapter会收到onViewRecycled回调。</li>
-</ol>
-<ul>
-<li>ViewHolder的另一种更好的回收方式(Fancy Reserves!)<br><img src="http://odzl05jxx.bkt.clouddn.com/snapshot20161020124442.jpg?imageView2/2/w/600" alt=""></li>
-</ul>
-<ol>
-<li>LayoutManager调用onLayoutChildren</li>
-<li>Layout完成后，RecyclerView检查那些之前已经被layout了的但不再存在于屏幕上了。RecyclerView将这些View重新添加到ViewGroup中，这些View此时对LayoutManager不可见。重新添加的目的在于动画。</li>
-<li>RecyclerView这时候把这些本不该add的View交给ItemAnimator，后者调用动画效果，300ms(安卓中大部分默认动画时间是300ms)之后，调用onAnimationFinished，告诉RecyclerView.</li>
-<li>接着RecyclerView通知Adapter(onViewDetachedFromWindow)</li>
-<li>最后将这些View添加到Cache或者Recycled Pool。</li>
-</ol>
-<ul>
-<li>ViewHolder的销毁<br><img src="http://odzl05jxx.bkt.clouddn.com/snapshot20161020124836.jpg?imageView2/2/w/600" alt=""></li>
-</ul>
-<ol>
-<li>LayoutManager调用removeAndRecycleView，RecyclerView检查View是否valid</li>
-<li>如果不是Valid，添加到RecycledPool中，但在这之前先检查是否 hasTransientState（例如正在运行动画）</li>
-<li>如果这个View正好处在Animation中，一些属性被Animating， Pool会调用Adapter的onFailedToRecycle(Adapter中应该复写这个方法，取消动画)</li>
-<li>onFailedToRecycle(ViewHolder)返回true的话，Pool将无视View的TransientState并回收这个View(可能处在动画中)</li>
-</ol>
-<ul>
-<li>另一种可能导致ViewHolder被销毁的方式<br><img src="http://odzl05jxx.bkt.clouddn.com/snapshot20161020143554.jpg?imageView2/2/w/600" alt=""><br>RecyclerView将View添加到Pool中(实际调用的是addViewHolderToRecycledViewPool(ViewHolder))，Pool会检查这种type的ViewHolder是否还放得下（例如type x的ViewHolder已经有5个了，实在太多了），这种情况下就会Kill这种View,这种情况是我们希望避免的。开发者可以调用pool.setMaxRecycledViews(type,count)来让Pool放更多的Holder per type。</li>
-</ul>
-<p>一些需要注意的，Pool是基于一个Activity Context的。</p>
-<h3 id="2-使用LayoutManager配合ItemAnimator自定义ItemView的动画的步骤"><a href="#2-使用LayoutManager配合ItemAnimator自定义ItemView的动画的步骤" class="headerlink" title="2. 使用LayoutManager配合ItemAnimator自定义ItemView的动画的步骤"></a>2. 使用LayoutManager配合ItemAnimator自定义ItemView的动画的步骤</h3><p>perdictiveItemAnimation的关键在于RecyclerView的list并不局限于屏幕。<br>在LayoutManager中复写</p>
-<blockquote>
-<p>supportPredictiveItemAnimations()，返回true。</p>
-</blockquote>
-<p>LinearLayoutManger的实现</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">supportsPredictiveItemAnimations</span><span class="params">()</span> </span>&#123;</div><div class="line">       <span class="keyword">return</span> mPendingSavedState == <span class="keyword">null</span> &amp;&amp; mLastStackFromEnd == mStackFromEnd;</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
-<p>可以认为返回值就是true</p>
-<p>onLayoutChildern在这种情况下会被调用两次，(之前提到本该被移除的View需要重新添加到ViewGroup中，实现就在这里)<br>参考LinearLayoutManager的实现，源代码实在太长，只复制一些注释<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onLayoutChildren</span><span class="params">(RecyclerView.Recycler recycler, RecyclerView.State state)</span> </span>&#123;</div><div class="line">       <span class="comment">// layout algorithm:</span></div><div class="line">       <span class="comment">// 1) by checking children and other variables, find an anchor coordinate and an anchor</span></div><div class="line">       <span class="comment">//  item position.</span></div><div class="line">       <span class="comment">// 2) fill towards start, stacking from bottom</span></div><div class="line">       <span class="comment">// 3) fill towards end, stacking from top</span></div><div class="line">       <span class="comment">// 4) scroll to fulfill requirements like stack from bottom.</span></div><div class="line">       <span class="comment">// create layout state</span></div><div class="line">       <span class="comment">//omitted....</span></div><div class="line">       &#125;</div></pre></td></tr></table></figure></p>
-<p>简单来说一共三步:</p>
-<ol>
-<li>detach and Scrap Views</li>
-<li>layout那些需要出现在list中的View(包括将要消失的View)</li>
-<li>接下来进入第二步layout，在这里确定那些将出现在屏幕外的View的实际位置。</li>
-</ol>
-<p>这样LayoutManager就能将必要的信息传递给ItemAnimator</p>
-<ul>
-<li>进入ItemAnimator<br>大部分的需要实现的函数在SimpleItemAnimator或者DefaultItemAnimator里面都已经实现好了，所以大部分人的选择就是：</li>
-</ul>
-<ol>
-<li>使用DefaultItemAnimator(默认已经设置好了)</li>
-<li>Implement SimpleItemAnimator(或者DeafaultItemAnimator)，复写一些必要的方法</li>
-</ol>
-<p>Animator需要做的一些事<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">record[Pre|Post]LayoutInformation<span class="comment">//记录动画开始和结束的layout信息</span></div><div class="line">animate[Appearance|Disappearance]</div><div class="line">animatePersistence()<span class="comment">//不会改变位置</span></div><div class="line">animateChange()<span class="comment">//实际的动画添加位置</span></div></pre></td></tr></table></figure></p>
-<p>这些在DefaultItemAnimator中都有默认的实现<br>动画完成后一定要调用</p>
-<blockquote>
-<p>DispatchAnimationFinished(ViewHolder)</p>
-</blockquote>
-<p>记录动画开始前和结束后的信息，实例代码:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@NonNull</span></div><div class="line">      <span class="meta">@Override</span></div><div class="line">      <span class="function"><span class="keyword">public</span> ItemHolderInfo <span class="title">recordPreLayoutInformation</span><span class="params">(RecyclerView.State state,</div><div class="line">              RecyclerView.ViewHolder viewHolder, <span class="keyword">int</span> changeFlags, List&lt;Object&gt; payloads)</span> </span>&#123;</div><div class="line">          ColorTextInfo info = (ColorTextInfo) <span class="keyword">super</span>.recordPreLayoutInformation(state, viewHolder,</div><div class="line">                  changeFlags, payloads);</div><div class="line">          <span class="keyword">return</span> getItemHolderInfo((MyViewHolder) viewHolder, info);</div><div class="line">      &#125;</div><div class="line"></div><div class="line">      <span class="meta">@NonNull</span></div><div class="line">      <span class="meta">@Override</span></div><div class="line">      <span class="function"><span class="keyword">public</span> ItemHolderInfo <span class="title">recordPostLayoutInformation</span><span class="params">(@NonNull RecyclerView.State state,</div><div class="line">              @NonNull RecyclerView.ViewHolder viewHolder)</span> </span>&#123;</div><div class="line">          ColorTextInfo info = (ColorTextInfo) <span class="keyword">super</span>.recordPostLayoutInformation(state, viewHolder);</div><div class="line">          <span class="keyword">return</span> getItemHolderInfo((MyViewHolder) viewHolder, info);</div><div class="line">      &#125;</div><div class="line"></div><div class="line">      <span class="meta">@Override</span></div><div class="line">      <span class="function"><span class="keyword">public</span> ItemHolderInfo <span class="title">obtainHolderInfo</span><span class="params">()</span> </span>&#123;</div><div class="line">          <span class="keyword">return</span> <span class="keyword">new</span> ColorTextInfo();</div><div class="line">      &#125;</div></pre></td></tr></table></figure></p>
-<ul>
-<li>canReuseViewHolder的作用:<br>例如notifyItemChanged(position)后，只是某个位置的viewHolder发生了信息改变，那就没有必要创建一个新的ViewHolder，直接提供原有的ViewHolder，提升性能。</li>
-</ul>
-<h3 id="3-常见错误"><a href="#3-常见错误" class="headerlink" title="3. 常见错误"></a>3. 常见错误</h3><ol>
-<li><p>mAdapter.notifyItemMoved(1,5)<br>不会调用onBindViewHolder，不会invalidate </p>
-</li>
-<li><p>不要在onBindViewHolder中添加onClickListener(以匿名内部类的方式,这会使得position变成final),想象一下，mAdapter.notifyItemMoved(1,5)调用后不会调用onBindViewHolder，这使得点击pos 1时实际传递给listener的是pos 5。</p>
-</li>
-<li><p>检查RecyclerView.NO_POSITION<br>这个Int值为-1，其实就是itemView被removed，但用户手够快，在View被移除前点击了这个View，那这个onClickListener还是会被调用。</p>
-</li>
-<li><p>mAdapter.notifyItemChanged(position,payload)<br>如果某个ViewHolder中只是一部分信息改变，将更新内容丢到payload中，最终会调用到onBindViewHolder(ViewHolder,position,List Payloads)，在这里只需要把ViewHolder中的一小部分改变就可以了，这有助于优化新能。</p>
-</li>
-<li><p>onCreateViewHolder<em>必须</em>返回一个new ViewHolder，不能在本地作为成员变量返回。</p>
-</li>
-<li><p>RecyclerView.setRecycledViewPool(pool)<br>一个pool只能为为同一个context(Activity)中的RecyclerView使用，因为这些View是与Context相关的，而不同的Activity可能有不同的Theme，Style。</p>
-</li>
-<li><p>Pro RecyclerView<br>最近看到yigit在relam作的关于recyclerView的演讲，记录下来一些比较重要的点</p>
-</li>
-</ol>
-<ul>
-<li><p>view:: requestLayout的效果，requestLayout会一直地向上请求直到根视图，next Frame开始时，所有的子View都将调用自身的measure(onMeasure)和layout(onLayout)方法<br>如果子View不曾requestLayout,之前的measure结果会被cache下来，节省measure和layout的时间。</p>
-</li>
-<li><p>在RecyclerView中，在itemView的onBIndView方法中调用ImageLoader的加载图片方法，由于图片加载是异步操作，最终会调用ImageView的setImageBitmap方法。而在ImageView的实现中，setImageBitmap方法最终会调用requestLayout方法，最终会一层层向上传递到recyclerView中，就像这样</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">imageView setImageBitmap</div><div class="line"></div><div class="line">imageView requestLayout</div><div class="line"></div><div class="line">itemView requestLayout</div><div class="line"></div><div class="line">recyclerView requestLayout</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>而recyclerView的requestLayout方法会在next Frame重新position所有的child(very expensive!)为此，recyclerView提供了一个setHasFixedSize方法，设置为true表明recyclerView自身不会因为childView的变化而resize，这样recyclerVeiw就不会调用requestLayout方法(如果去看RecyclerView的源码，可以看到mEatRequestLayout这个变量，也就是避免重复调用requestLayout造成性能损耗。)，不会造成所有的childView都被重新测量一遍。在ImageView(2011年之后的版本)中，setImageDrawable方法大致长这样：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">setImageDrawable</span><span class="params">(Drawable drawable)</span></span>&#123;</div><div class="line">    <span class="keyword">if</span>(mDrawable != drawable)&#123;</div><div class="line">    <span class="keyword">int</span> oldWidth = mDrawableWidth;</div><div class="line">    <span class="keyword">int</span> oldHeight = mDrawableHeight;</div><div class="line">    updateDrawable(drawable)</div><div class="line">        <span class="keyword">if</span>(oldWidth!=mDrawableWidth||oldHeight!=mDrawableHeight)&#123;</div><div class="line">            requestLayout();</div><div class="line">        &#125;</div><div class="line">        invalidate();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>简单来说就是判断下前后图像的宽度或高度是否发生了变化，如果无变化则不需调用requestLayout方法，只需要reDraw。也就避免了这种性能的损耗。但是，TextView的implementation则复杂的多，并没有这种优化。实际操作中，API应该能够告诉客户端图片的width和Height,使用AspectRationImageView加载图片。在图片加载完成之前优先使用PlaceHolder，并设定好加载完成应有的尺寸，这样就避免了后期图片加载完成后的requestLayout。</p>
-<ul>
-<li>使用SortedList用于进行List变更<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">SortedList&lt;Item&gt; mSortedList = <span class="keyword">new</span> SortedList&lt;Item&gt;(Item.class,</div><div class="line">    <span class="keyword">new</span> SortedListAdapterCallback&lt;Item&gt;(mAdapter))&#123;</div><div class="line">    <span class="comment">//override三个方法，懒得抄了</span></div><div class="line"></div><div class="line">&#125;</div><div class="line">使用方式十分简单，后面的数据更新操作包括notifyDataChange都被处理好了。</div><div class="line">onNetwokCallback(List&lt;News&gt; news)&#123;</div><div class="line">    mSortedList.addAll(news);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>对于未发生变化的Item，将直接跳过，实现了最优化的列表数据更新。</p>
-<ul>
-<li>DiffUtil(added in 24.2.0)用于对比数据变更前后的两个List<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">DiffResult result = DiffUtil.calculateDiff(</div><div class="line">    <span class="keyword">new</span> MyCallback(oldList,newList));</div><div class="line">mAdapter.setItems(newList);</div><div class="line">result.dispatchTo(mAdapter);</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>只需调用上述方法即可实现列表Item更新及Adapter的notify。DiffUtil的callback有四个方法需要复写，另外有一个方法用于单个Item的部分payload更新。在<a href="https://medium.com/@iammert/using-diffutil-in-android-recyclerview-bdca8e4fbb00#.rbtzmmtbg">medium</a>上找到一个现成的，直接借用了。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyDiffCallback</span> <span class="keyword">extends</span> <span class="title">DiffUtil</span>.<span class="title">Callback</span></span>&#123;</div><div class="line"></div><div class="line">    List&lt;Person&gt; oldPersons;</div><div class="line">    List&lt;Person&gt; newPersons;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyDiffCallback</span><span class="params">(List&lt;Person&gt; newPersons, List&lt;Person&gt; oldPersons)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.newPersons = newPersons;</div><div class="line">        <span class="keyword">this</span>.oldPersons = oldPersons;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getOldListSize</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> oldPersons.size();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getNewListSize</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> newPersons.size();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">areItemsTheSame</span><span class="params">(<span class="keyword">int</span> oldItemPosition, <span class="keyword">int</span> newItemPosition)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> oldPersons.get(oldItemPosition).id == newPersons.get(newItemPosition).id;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">areContentsTheSame</span><span class="params">(<span class="keyword">int</span> oldItemPosition, <span class="keyword">int</span> newItemPosition)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> oldPersons.get(oldItemPosition).equals(newPersons.get(newItemPosition));</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Nullable</span></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">getChangePayload</span><span class="params">(<span class="keyword">int</span> oldItemPosition, <span class="keyword">int</span> newItemPosition)</span> </span>&#123;</div><div class="line">        <span class="comment">//you can return particular field for changed item.//这里的object会被带到onBindViewHolder中</span></div><div class="line">        <span class="keyword">return</span> <span class="keyword">super</span>.getChangePayload(oldItemPosition, newItemPosition);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>这些方法会帮助完成remove和add等方法。</p>
-<ul>
-<li><p>viewHolder的生命周期</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function">onCreate</div><div class="line"><span class="title">onBindViewHolder</span><span class="params">(获取video资源)</span></div><div class="line"><span class="title">onViewAttachedToWindow</span><span class="params">(可以在这里开始播放视频)</span></div><div class="line"><span class="title">onViewDetachedFromWindow</span><span class="params">(可以在这里停止播放视频，随时有可能重新被直接attach，这过程中不会调用onBind方法)</span></div><div class="line"><span class="title">onRecycled</span><span class="params">(可以在这里释放Video资源或者释放Bitmap引用，这之后再使用该ViewHolder需要调用onBind方法)</span></span></div></pre></td></tr></table></figure>
-</li>
-<li><p>recyclerView的一些defer操作对于日常开发的帮助<br>recyclerView会将一些pending操作defer到next frame。eg:</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">recyclerView.scrollToPosition(<span class="number">15</span>);</div><div class="line"><span class="keyword">int</span> x = layoutManager.getFirstVisiblePosition()<span class="comment">//此时x并不等于15，因为下一帧并未开始。真正的执行scroll操作需要等到nextFrame执行后才能生效，具体一点的话，就是下一个执行layout的message的callback还未被执行。</span></div><div class="line">又例如，在onCreate中调用</div><div class="line">```java</div><div class="line">recyclerView.scrollToPosition(<span class="number">15</span>)</div><div class="line"><span class="comment">//在netWorkCallback中调用setAdapter，这时recyclerView会利用pending的15 position。原因在于recyclerView会判断如果layoutManager和adapter是否为null，如果都为null。skip layout。</span></div><div class="line"></div><div class="line">- 在getItemViewType中返回R.layout.itemLayout的好处。</div><div class="line">在onCreateViewHolder(ViewGroup viewParent,<span class="keyword">int</span> ViewType)&#123;</div><div class="line">    View itemView = inflate.inflate(ViewType,parent,<span class="keyword">false</span>);</div><div class="line">    <span class="keyword">return</span> XXXHolder(itemView);<span class="comment">//aapt可以确保R.layout.xxxx是unique的。</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</li>
-<li><p>ClickListener的实现<br>在onCreateViewHolder中传一个callback，不要在onBindViewHolder中传，不要把onBindViewHolder中的position变为final的。getAdapterPositon可能为NO_POSITION(-1)，因为RecyclerView的UI更新会被defer到next Frame，在下一帧更新被执行前，用户可能已经点击了item，这时的position就有可能是-1(这种情况发生在点击后删除了所有的item数据，这时获得的position就类似于list的indexAt，当然是-1。).</p>
-</li>
-<li><p>LayoutManager只知道LayoutPosition，并不知道AdapterPosition<br>Items在Adapter的数据集中的顺序可能会随时变更，但recyclerView可能并不会调用onBindViewHolder方法，这也就是onBindViewHolder中的position并不可靠的原因。因为viewHolder本身是backed by Item的，而viewHolder的getAdapterPosition能够正确地反应Item在数据集中的顺序。</p>
-</li>
-</ul>
-<h3 id="4-一些参考资料"><a href="#4-一些参考资料" class="headerlink" title="4 . 一些参考资料"></a>4 . 一些参考资料</h3><ul>
-<li><a href="https://www.youtube.com/watch?v=imsr8NrIAMs">RecyclerView Animations and Behind the Scenes (Android Dev Summit 2015)</a></li>
-<li><a href="https://github.com/wasabeef/recyclerview-animators">ItemAnimator模板</a></li>
-<li><a href="https://github.com/google/android-ui-toolkit-demos">UI ToolKit Demo</a></li>
-<li><a href="https://www.youtube.com/watch?v=KhLVD6iiZQs">Yigit Boyar: Pro RecyclerView</a></li>
-</ul>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;From the talk&lt;br&gt;RecyclerView Animations and Behind the Scenes&lt;br&gt;Yigit Biyar &amp;amp; Chet Haase&lt;br&gt;on Anroid Dev Summit 2015&lt;/p&gt;
-&lt;h3 id=&quot;1-RecyclerView架构&quot;&gt;&lt;a href=&quot;#1-RecyclerView架构&quot; class=&quot;headerlink&quot; title=&quot;1. RecyclerView架构&quot;&gt;&lt;/a&gt;1. RecyclerView架构&lt;/h3&gt;&lt;p&gt;RecyclerView is Flexible , Pluggable and Customizeable&lt;br&gt;内部很多功能都交给了各个组件去完成&lt;br&gt;&lt;img src=&quot;http://odzl05jxx.bkt.clouddn.com/snapshot20161020135353.jpg?imageView2/2/w/600&quot; alt=&quot;&quot;&gt;&lt;br&gt;ChildHelper 、AdapterHelper 、Recycler对于开发者来说并不常用，但它们在内部负责了许多针对Child View的管理。
-    
-    </summary>
-    
-      <category term="blog" scheme="https://haldir65.github.io/categories/blog/"/>
-    
-    
-      <category term="android" scheme="https://haldir65.github.io/tags/android/"/>
-    
-      <category term="RecyclerView" scheme="https://haldir65.github.io/tags/RecyclerView/"/>
     
   </entry>
   

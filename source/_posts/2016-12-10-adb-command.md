@@ -1,8 +1,9 @@
 ---
 title: adb常用命令手册
-date：2016-12-10 21:14:14
-categories: blog
-tags: [adb,android]
+date: 2016-12-10 21:14:14
+tags:
+ - android
+ - adb
 ---
 
 ## ADB 常用命令手册

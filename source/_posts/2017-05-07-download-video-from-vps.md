@@ -1,6 +1,7 @@
 ---
 title: VPS下载Youtube视频并同步到本地
 date: 2017-05-07 16:48:01
+categories: blog
 tags: [linux,python]
 ---
 
