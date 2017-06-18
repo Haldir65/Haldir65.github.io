@@ -6,7 +6,7 @@ tags: [rxjava2,android]
 ---
 
 本文多数内容来自Jake Wharton的演讲，配合一些个人的感受，作为今后使用Rxjava2的一些参考。
-
+![](http://odzl05jxx.bkt.clouddn.com/f21a6a245edfe0b19804be5b3df24a3d.jpg?imageView2/2/w/600)
 <!--more-->
 
 

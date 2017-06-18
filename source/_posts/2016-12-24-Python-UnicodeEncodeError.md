@@ -8,7 +8,7 @@ tags: [python]
 
 #### 人生苦短，Python是岸
 
-![implementing dumb features](http://odzl05jxx.bkt.clouddn.com/implementingdumbfeatures-big.png?imageView2/2/w/500)
+![implementing dumb features](http://odzl05jxx.bkt.clouddn.com/46ee54dd915d71da90e435703d4568fb.jpg?imageView2/2/w/600)
 
 
 <!-- more -->

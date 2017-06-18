@@ -9,8 +9,10 @@ tags: [python]
 关于如何使用Python搭建后台的方法很多，这里列举出一些实例。<!--more-->
 
 ### 1. The Flask Way
+
+#### 1.1 Basics
 Flask官方的快速入门很详细，做一个接口也很简单。Flask的方式是使用Decorator对请求进行处理
-```python
+```Python
 #!/usr/bin/python3
 # -*- coding:utf8 -*-
 
@@ -31,11 +33,28 @@ def handle_get():
 #处理POST请求，从request中拿东西，返回response
 @app.route('/', methods=['POST'])
 def handle_post():
-    uid = request.form['uid']
+    uid = request.form['uid'] # requets.form是一个list，从里面获取想表单的参数
     name = request.form['name']
     print('uid is %s ,name is %s ' % (uid, name))
     return '200 Ok, or whatever you like'  
 
+if __name__ == '__main__':
+    app.run(port=12345, debug=True) #设置为True后，会自动检测到服务端代码更改并reload，出错了也会给client返回实际的错误堆栈， 生产环境不要打开Debug 。
+
+# 对于GET请求，获得query参数的方式
+http://127.0.0.1:12345/_search_user?user=111&date=190
+
+@app.route('/_search_user', methods=['GET'])
+def query_user_profile():
+    user = request.args.get('user')
+    date = request.args.get('date')
+    print(user)
+    print(date)
+    return 'every Thing Ok'
+
+ 输出
+ 111
+ 190   
 
  #返回json，作为API
 @app.route('/_get_current_user', methods=['GET'])
@@ -128,16 +147,39 @@ text/html、text/css、application/json什么的，[详细的http-content-type�
 …
 前面几个都很好理解，都是html，css，javascript的文件类型，后面四个是POST的发包方式。
 
+#### 1.2 Flask BluePrints
 
+#### 1.3 Flask + gevent 提高web 框架的性能
+[docs](http://flask.pocoo.org/docs/0.12/deploying/wsgi-standalone/)
 
 ### 2. The Django Way 
+
 
 
 ### 3. Using Tornado
 
 ### 4. 其他的点
-UrlLib，Socket
+#### 4.1 Web架构
+网络库上手比较快，很重要的一点是理解其在通讯中的层级，Nigix属于代理转发，Flask处理业务逻辑，Tornado处理Http底层实现，Django负责用于高效网络应用开发
+ - [Django和Flask这两个框架在设计上各方面有什么优缺点？
+](https://www.zhihu.com/question/41564604)
 
+
+UrlLib，Socket这些属于Python底层的基础性的network库，属于基础的东西。
+
+#### 4.2不服跑个分
+引用一篇[测评](http://www.vimer.cn/archives/2926.html)
+>可见纯框架自身的性能为:
+
+    bottle > flask > tornado > django 
+
+结合实际使用:
+
+    tornado 使用了异步驱动，所以在写业务代码时如果稍有同步耗时性能就会急剧下降；
+    bottle需要自己实现的东西太多，加上之后不知道性能会怎样；
+    flask性能稍微差点，但周边的支持已经很丰富了；
+    django就不说了，性能已经没法看了，唯一的好处就是开发的架子都已经搭好，开发速度快很多
+当然这些框架不是纯粹一个功能层面上的东西，可能有所偏差。
 
 
 

@@ -6,7 +6,7 @@ tags: [jvm]
 ---
 
 关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下
-![](http://odzl05jxx.bkt.clouddn.com/high_way_scene.jpg?imageView2/2/w/500)
+![](http://odzl05jxx.bkt.clouddn.com/high_way_scene.jpg?imageView2/2/w/600)
 <!--more-->
 
 ### 1.从MyApp.java文件开始

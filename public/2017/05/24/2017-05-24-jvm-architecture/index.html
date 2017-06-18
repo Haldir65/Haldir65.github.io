@@ -14,13 +14,13 @@
 <meta property="og:url" content="https://haldir65.github.io/2017/05/24/2017-05-24-jvm-architecture/index.html">
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下">
-<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/high_way_scene.jpg?imageView2/2/w/500">
+<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/high_way_scene.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/starry_sky.jpg?imageView2/2/w/500">
-<meta property="og:updated_time" content="2017-06-17T16:06:28.786Z">
+<meta property="og:updated_time" content="2017-06-18T05:10:51.560Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="jvm架构概述">
 <meta name="twitter:description" content="关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下">
-<meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/high_way_scene.jpg?imageView2/2/w/500">
+<meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/high_way_scene.jpg?imageView2/2/w/600">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -197,7 +197,7 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下<br><img src="http://odzl05jxx.bkt.clouddn.com/high_way_scene.jpg?imageView2/2/w/500" alt=""><br><a id="more"></a></p>
+        <p>关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下<br><img src="http://odzl05jxx.bkt.clouddn.com/high_way_scene.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
 <h3 id="1-从MyApp-java文件开始"><a href="#1-从MyApp-java文件开始" class="headerlink" title="1.从MyApp.java文件开始"></a>1.从MyApp.java文件开始</h3><p>大家都知道最开始学习Java的时候，要用javac 来编译MyApp.java来生成一个class文件。<br>在命令行里，大致是这样的执行顺序:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">javac MyApp.java</div><div class="line">java MyApp</div></pre></td></tr></table></figure></p>
 <h4 id="实际上后一句话就创建了一个jvm-instance"><a href="#实际上后一句话就创建了一个jvm-instance" class="headerlink" title="实际上后一句话就创建了一个jvm instance."></a>实际上后一句话就创建了一个jvm instance.</h4><h3 id="2-从class-loader进入Execution-Engine-再到Host-Operating-System"><a href="#2-从class-loader进入Execution-Engine-再到Host-Operating-System" class="headerlink" title="2. 从class loader进入Execution Engine 再到Host Operating System"></a>2. 从class loader进入Execution Engine 再到Host Operating System</h3><p>java MyApp会调用class loader，后者不仅要负责加载MyApp.class文件，还需要加载java API中的class文件（String,Object,Collection….）。加载的class文件（byte code）被传递给Execution Engine,后者则负责执行byte code（其实也是调用宿主操作系统的方法执行操作）</p>
 <h3 id="3-where-did-class-loader-load-class-into"><a href="#3-where-did-class-loader-load-class-into" class="headerlink" title="3. where did class loader load class into ?"></a>3. where did class loader load class into ?</h3><p>classloader将class 文件加载进内存中的一部分（Runtime data areas）。到此，jvm architecture的三个主要组件：class loader subsystem,Runtime data areas 以及execution Enigne的主要功能都说清楚了。<br>所以，这篇文章主要就按照class loader subsystem -&gt; Runtime data areas -&gt; Execution Engine的顺序来讲。</p>

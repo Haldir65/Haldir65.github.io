@@ -7,7 +7,7 @@ top : 2
 ---
 
 使用hexo写博客以来，记录下来的问题越来越多。只希望下次再碰到同样的问题时，不要再去浪费时间去查找。如果想要给自己的blog一个值得置顶的文章的话，我觉得一篇记录使用hexo过程中的一些解决问题的方法的文章是再合适不过的了。</br>
-![](http://odzl05jxx.bkt.clouddn.com/163216sn1ziyyaef4zaeps.jpg?imageView2/2/w/500)
+![](http://odzl05jxx.bkt.clouddn.com/79a65f1911c81d736be0704904de8ea1.jpg?imageView2/2/w/600)
 
 <!--more-->
 

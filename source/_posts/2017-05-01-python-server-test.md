@@ -9,6 +9,7 @@ tags: [python]
 >  python -m http.server 8000 --bind 127.0.0.1 
 
 打开浏览器，输入127.0.0.1 ， 即可浏览当前目录下的文件，以GET的方式进行，命令行窗口会出现浏览记录。
+![](http://odzl05jxx.bkt.clouddn.com/ChMkJ1fAMmKIIFpWAA_5Us41gQkAAUv1QE2Pp8AD_lq599.jpg?imageView2/2/w/600)
 <!--more-->
 
 据说SimpleHttpServer也可以，

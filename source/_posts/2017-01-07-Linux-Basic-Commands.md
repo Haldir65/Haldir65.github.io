@@ -7,7 +7,7 @@ top : 1
 ---
 
 一些常用的linux基本命令,仅作为参考。</br>
-![](http://odzl05jxx.bkt.clouddn.com/b3.jpg?imageView2/2/w/500)
+![](http://odzl05jxx.bkt.clouddn.com/849c18412f8e7a0b18df09f6f87e6516.jpg?imageView2/2/w/600)
  <!--more-->
 
 首先是连接vps的ssh(Secure Shell)工具，putty或者xshell都可以。
