@@ -11,7 +11,9 @@ tags: [python]
 ### 1. The Flask Way
 
 #### 1.1 Basics
-Flask官方的快速入门很详细，做一个接口也很简单。Flask的方式是使用Decorator对请求进行处理
+> Flask is a very simple, but extremely flexible framework Flask使用Decorator对请求进行处理
+ 
+
 ```Python
 #!/usr/bin/python3
 # -*- coding:utf8 -*-
@@ -153,6 +155,7 @@ text/html、text/css、application/json什么的，[详细的http-content-type�
 [docs](http://flask.pocoo.org/docs/0.12/deploying/wsgi-standalone/)
 
 ### 2. The Django Way 
+Django是**web framework**，不是**WebServer**
 
 
 

@@ -11,3 +11,6 @@ tags:
 ![](http://odzl05jxx.bkt.clouddn.com/ChMkJ1gq00WIXw_GAA47r_8gjqgAAXxJAH8qOMADjvH566.jpg?imageView2/2/w/600)
 
 <!--more-->
+
+1. 常用软件安装
+[utorrent](http://blog.topspeedsnail.com/archives/5752)
