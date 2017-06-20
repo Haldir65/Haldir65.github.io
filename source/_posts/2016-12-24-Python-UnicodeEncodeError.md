@@ -187,6 +187,7 @@ Chrome自带开发者工具，可以查看每一个request的header，cookies等
 
 
 
+
 todo 
 ### 6.一些细节
 文件读写的各种模式以及解码问题
