@@ -7,7 +7,6 @@ tags: [kotlin]
 
 Kotlin是Jetbrain公司推出的面向jvm的语言，编译后的bytecode和java编写的代码并没有什么区别。
 
-
 <!--more-->
 
 ### 1. 基本语法
@@ -35,14 +34,25 @@ Kotlin是Jetbrain公司推出的面向jvm的语言，编译后的bytecode和java
  ```
 
  支持lambda
- ```
-
-fun maps(list: List<String>) {
+ fun maps(list: List<String>) {
     list.filter { it.startsWith("a") }
             .sortedBy { it }
             .map(String::toUpperCase)
             .forEach(::print)
 }
+ ```
+
+
+ 
+
+### 2. 集合迭代
+
+ ```
+//带index的方式
+  val quoteParts = " YOU JUST TALKED TO MUCH !".split(" ")
+            for ((index, value) in quoteParts.withIndex()) {
+                print("reading index $index: $value ")
+            }
  ```
 
 
@@ -52,4 +62,5 @@ fun maps(list: List<String>) {
 
 1. [Kotlin in production](https://www.youtube.com/watch?v=mDpnc45WwlI&index=10&list=PLnVy79PaFHMXJha06t6pWfkYcATV4oPvC)
 2. [10 Kotlin Tricks in 10 ish minutes by Jake Wharton](https://www.youtube.com/watch?v=YKzUbeUtTak)​
+3. [Try Kotlin](https://try.kotlinlang.org/#/Examples/Basic%20syntax%20walk-through/Null-checks/Null-checks.kt)
 

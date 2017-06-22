@@ -10,15 +10,11 @@ tags: [python]
 
 ![implementing dumb features](http://odzl05jxx.bkt.clouddn.com/46ee54dd915d71da90e435703d4568fb.jpg?imageView2/2/w/600)
 
-
 <!-- more -->
-
-
 ### 1. Python的一些缺点
 引用[廖雪峰的官方网站](http://www.liaoxuefeng.com/)上的话，Python一个是慢，一个是代码不能加密
 
 > 第一个缺点就是运行速度慢，和C程序相比非常慢，因为Python是解释型语言，你的代码在执行时会一行一行地翻译成CPU能理解的机器码，这个翻译过程非常耗时，所以很慢。而C程序是运行前直接编译成CPU能执行的机器码，所以非常快。
-
 
 > 第二个缺点就是代码不能加密
 
@@ -178,16 +174,72 @@ def shoppping(name,time,*,price,count)# price可以有默认值
 ```
 
 
-
-
-
-
 ### 5. 爬虫相关
-Chrome自带开发者工具，可以查看每一个request的header，cookies等信息。模拟浏览器行为比较有效。
+Chrome自带开发者工具，可以查看每一个request的header，cookies等信息。模拟浏览器行为比较有效。ctrl+shift+R神器
+#### 5.1 Request, Urllib2 
+
+#### 5.2 UnicodeEncodeError: 'ascii' codec can't encode characters in position
+
+
+```
+# how to invoke this error
+b = "this is english within ascii range".encode('ascii')  # totally fine
+
+s = "你好".encode('ascii') 
+# this will raise an error ,UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-1: ordinal not in range(128)>
 
 
 
-todo 
+ print((b"totally cool binary representation of english words within ascii range").decode('ascii'))
+ print((b"totally cool binary cause utf-8 include ascii").decode('utf-8'))
+ # 完全正常
+
+
+ # eg.
+string = "你好啊"
+binary_string = b'\xe4\xbd\xa0\xe5\xa5\xbd\xe5\x95\x8a'
+binary_string_2_string = bstring.decode('utf-8')
+
+
+code :
+print(string)  
+print(string.encode('utf-8'))
+print(bstring2string)
+print(bstring2string)
+    
+print(which_instance_is_this(string))
+print(which_instance_is_this(bstring))
+print(which_instance_is_this(bstring2string))
+
+
+outputs:
+你好啊
+b'\xe4\xbd\xa0\xe5\xa5\xbd\xe5\x95\x8a'
+你好啊 
+你好啊
+
+is str
+is byte 
+is str
+
+**Since Python 3.0, the language features a str type that contain Unicode characters, meaning any string created using "unicode rocks!", 'unicode rocks!', or the triple-quoted string syntax is stored as Unicode.**
+
+冒号里面的都是str，都是unicode的集合。生成unicode可以用chr(12345) ，该方法接受一个integer返回一个长度为1的Unicode String。
+反过来可以用ord(你) 生成“你”这个字在unicode中的编号
+
+
+print(chr(20320))   >>>> 你
+print(ord('你'))    >>>> 20320 #这里只能用长度为1的string
+
+binary to string is called decode ,string to binary is encode
+bytes.decode('utf-8')   <----> str.encode('utf-8')
+
+回到UnicodeEncodeError: 'ascii' codec can't encode characters in position
+str.encode('ascii')，unicode字符超出了ascii的范围，无法decode成binary
+```
+
+
+
 ### 6.一些细节
 文件读写的各种模式以及解码问题
 ```python
@@ -196,6 +248,9 @@ todo
     #已经自动做好close文件的工作
 ```
 
+ how to upgrade installed packages?
+
+> pip install --upgrade setuptools
 
 <!-- install mongoDb(better performance than sql) -->
 <!-- install pip -->
@@ -210,5 +265,10 @@ class object orientated
 - [廖雪峰的官方网站](http://www.liaoxuefeng.com/)
 - [use python and mongoDb as backend](https://zhuanlan.zhihu.com/p/20488077?columnSlug=kotandroid)
 - [静觅](http://cuiqingcai.com/category/technique/python) 
+- [unicodeencodeerror-ascii-codec-cant-encode-character](https://stackoverflow.com/questions/9942594/unicodeencodeerror-ascii-codec-cant-encode-character-u-xa0-in-position-20?rq=1)
+- [Droidcon NYC 2016 - Decoding the Secrets of Binary Data](https://www.youtube.com/watch?v=T_p22jMZSrk)
+- [Jake Wharton and Jesse Wilson - Death, Taxes, and HTTP](https://www.youtube.com/watch?v=6uroXz5l7Gk)
+- [Droidcon Montreal Jake Wharton - A Few Ok Libraries](https://www.youtube.com/watch?v=WvyScM_S88c)
+- [Jesse Wilson - Coordinating Space and Time](https://www.youtube.com/watch?v=yS0Nc-L1Uuk)
 
 

@@ -269,6 +269,7 @@ chomod 444 filename# 为所有用户分配读权限
 chmod 777 filename //全部权限都有了，其实上面的9位就是这三位数每一位的二进制拼起来的
 755 就是 111101101,也就对应上面的权限九位字母
 
+chown -R Jane /foldername # 把flodername文件夹的所有者改为Jane， -R 表示递归，会保证所有子文件夹的所有者也被更改
 
 ```
 
@@ -608,6 +609,9 @@ en01 //Ethernet
 ### 10.查看进程
 
 [起一个进程，后台运行，关掉终端照样跑的那种](https://stackoverflow.com/questions/4797050/how-to-run-process-as-background-and-never-die)
+
+> nohup node server.js > /dev/null 2>&1 &
+
 
 ```
 top 动态显示

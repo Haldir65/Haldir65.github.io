@@ -360,6 +360,11 @@ Observable -> ignoreElements() ->Completable
 Flowable -> firsetElement -> Maybe
 Flowable -> ignoreElements() ->Completable
 
+- [Combining Observables](https://github.com/ReactiveX/RxJava/wiki/Combining-Observables) 多个数据来源的加工
+
+
+
+
 
 ## 链式调用每一步都生成了新的object，Rxjava2和Rxjava1相比，对GC更加友好。
 ## quote: 
