@@ -238,8 +238,6 @@ bytes.decode('utf-8')   <----> str.encode('utf-8')
 str.encode('ascii')，unicode字符超出了ascii的范围，无法decode成binary
 ```
 
-
-
 ### 6.一些细节
 文件读写的各种模式以及解码问题
 ```python

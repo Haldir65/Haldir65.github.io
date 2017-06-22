@@ -135,7 +135,8 @@ def get_image():
 返回response的时候一定要指明mime-type，或者content-type
 text/html、text/css、application/json什么的，[详细的http-content-type表格](http://www.runoob.com/http/http-content-type.html)
 关于content-type,找到一篇[介绍](http://homeway.me/2015/07/19/understand-http-about-content-type/)
-
+关于Http header常用字段[理解Http Header](http://zq210wl.github.io/2014/12/30/html-http-header-analysis/)
+Http底层TCP ,ACK 等等需要tcpcump结合wireShark抓包
 
 >下面是几个常见的Content-Type:
 1.text/html
