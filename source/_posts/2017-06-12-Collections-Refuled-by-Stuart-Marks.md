@@ -1,9 +1,10 @@
 ---
 title: Collections Refuled by Stuart Marks
-date: 2016-10-12 16:47:42
-tag: Java
+date: 2017-06-25 22:56:33
 categories: blog
+tags: [java]
 ---
+
 
 
 list.replaceAll(String::toUpperCase) // can not change the elemeet type, for that you need an stream

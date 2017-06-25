@@ -679,8 +679,7 @@ export LANGUAGE=en_US.UTF-8
 sudo locale-gen "en_US.UTF-8"
 sudo dpkg-reconfigure locales
 
-添加XXX到环境变量
-todo
+
 
 
 ### 参考
