@@ -610,7 +610,16 @@ en01 //Ethernet
 
 [起一个进程，后台运行，关掉终端照样跑的那种](https://stackoverflow.com/questions/4797050/how-to-run-process-as-background-and-never-die)
 
-> nohup node server.js > /dev/null 2>&1 &
+>  nohup node server.js > /dev/null 2>&1 &
+
+```
+nohup node server.js > /dev/null 2>&1 &
+
+1. nohup means: Do not terminate this process even when the stty is cut off.
+2. > /dev/null means: stdout goes to /dev/null (which is a dummy device that does not record any output).
+3. 2>&1 means: stderr also goes to the stdout (which is already redirected to /dev/null). You may replace &1 with a file path to keep a log of errors, e.g.: 2>/tmp/myLog
+4. & at the end means: run this command as a background task.
+```
 
 
 ```
@@ -638,16 +647,20 @@ ps | grep 类似于 pgrep XXX //查找某个进程
 进程命令
 *实时监控，1秒刷新一次*
 watch -n 1 ps -aux --sort=-pmem,-pcpu
-
-
-nohup node server.js > /dev/null 2>&1 &
-
-1. nohup means: Do not terminate this process even when the stty is cut off.
-2. > /dev/null means: stdout goes to /dev/null (which is a dummy device that does not record any output).
-3. 2>&1 means: stderr also goes to the stdout (which is already redirected to /dev/null). You may replace &1 with a file path to keep a log of errors, e.g.: 2>/tmp/myLog
-4. & at the end means: run this command as a background task.
-
 ```
+查看端口占用
+```
+#列出所有端口的占用情况
+netstat -anp
+lsof -i # 这个也行
+#查看哪个进程占了http端口(其实就是80了)
+lsof -i:80
+#查看某个进程占了哪些端口
+netstat -anp|grep pid
+```
+
+> 杀进程，慎用
+kill -9 进程id  
 
 
 ### 11 .常用配置
