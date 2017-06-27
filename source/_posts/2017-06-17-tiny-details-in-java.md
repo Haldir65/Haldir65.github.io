@@ -87,4 +87,7 @@ OkHttp 3.3.0 - ChangLog
 
 另外，GET方法本身是人畜无害的，Retry请求多次发起不会造成数据错误；但对于POST，涉及到写服务端写操作，最好带上GUID作为单次请求unique标示。（这是server和client之间需要协商好的protocol）
 
-3. 
+3. From Java Code To Java Heap 
+   A talk from IBM Engineer, talking about optimizing the memery usage for your java application.[youtube](https://www.youtube.com/watch?v=FLcXf9pO27w)
+   [ibm](https://www.ibm.com/developerworks/java/library/j-codetoheap/index.html)
+4. 
