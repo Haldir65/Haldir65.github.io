@@ -90,4 +90,25 @@ OkHttp 3.3.0 - ChangLog
 3. From Java Code To Java Heap 
    A talk from IBM Engineer, talking about optimizing the memery usage for your java application.[youtube](https://www.youtube.com/watch?v=FLcXf9pO27w)
    [ibm](https://www.ibm.com/developerworks/java/library/j-codetoheap/index.html)
-4. 
+
+4. 强行更改String的内容
+  String这种东西是放在常量池里面的，所以
+  ```java
+  String a = "hello"
+  String b = "hello"
+  String c = new String("Hello")
+  
+  显然ab都指向了常量池，c指向了放在堆上的对象，后者也指向常量池
+  a==b!=c  
+
+  //更改这个String里面的东西
+  Field a_ = String.class.getDeclaredField("value");
+        a_.setAccessible(true);
+        char[] value=(char[])a_.get(a);
+        value[3]='_';   //修改a所指向的值
+
+  这样a,b,c 的值都改掉了      
+
+  ```
+
+5. 
