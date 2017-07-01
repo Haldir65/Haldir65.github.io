@@ -209,6 +209,9 @@ public class Pagination extends RelativeLayout {
 Databinding还有很多高级用法，目前给我带来的好处就是明显减少了boilerplate code </br>
 So ,感谢ButterKnife给我们带来的便利，Googbye ButterKnife，Hello DataBinding!
 
+＊todo＊ 
+###　how did ButterKnife work?
+
 # Reference
 
  1. [Data Binding Library](https://developer.android.com/topic/libraries/data-binding/index.html)

@@ -80,7 +80,7 @@ OkHttp默认会对请求进行重试，具体是在RetryAndFollowUpInterceptor�
   }
     ```
 客户端当然可以使用retryOnConnectionFailure禁止这种自动重试策略，但不建议这么做。另外，为避免减少不必要的重试请求，
-OkHttp 3.3.0 - ChangLog
+OkHttp 3.3.0 [issue](https://github.com/square/okhttp/issues/2394)
 
 > Don’t recover if we encounter a read timeout after sending the request, but do recover if we encounter a timeout building a connection
 建立连接超时可以重试(客户端到服务器的通道不可靠，当然可以重试)，连接上之后读取超时则不去重试(服务器出了问题，没有必要重试)。
