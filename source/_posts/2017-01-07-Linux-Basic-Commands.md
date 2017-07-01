@@ -659,8 +659,32 @@ lsof -i:80
 netstat -anp|grep pid
 ```
 
-> 杀进程，慎用
-kill -9 进程id  
+//杀进程（如果进程不属于当前用户，要sudo）
+> 杀进程，慎用。
+kill -9 进程id // 9直接干掉进程，慎用。。。
+kill pid // 这个和kill 15是一样的 //15表示terminate,请求进程停下来  
+
+kill -l //列出进程及id
+
+killall nginx ->> 干掉nginx的所有进程
+
+pkill -u username //干掉所有属于某一个用户的ps
+
+Signal (信号)  man signal
+
+进程状态
+runnable、sleeping、zombie、stop
+
+//更改友善度,数字越小越不友好
+nice -n 15 /.....   命令path。启动的时候确定nice
+renice -s pid //更改友善度
+
+df -ah  // 查看mounted文件系统
+proc
+
+
+
+
 
 
 ### 11 .常用配置
