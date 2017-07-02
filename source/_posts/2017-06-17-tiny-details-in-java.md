@@ -111,4 +111,15 @@ OkHttp 3.3.0 [issue](https://github.com/square/okhttp/issues/2394)
 
   ```
 
-5. 
+5. 注解
+```java
+ Builder(Retrofit retrofit, Method method) {
+      this.retrofit = retrofit;
+      this.method = method;
+      this.methodAnnotations = method.getAnnotations();
+      this.parameterTypes = method.getGenericParameterTypes();
+      this.parameterAnnotationsArray = method.getParameterAnnotations();
+    }
+```
+
+如果不是看到Retrofit的源码，一般还真没机会了解到这几个方法。。
