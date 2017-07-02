@@ -14,7 +14,11 @@ ArrayList
 LinkedList(not recommended)
 HashSet
 
-
+<!--more-->
+1. ArrayList源码解析
+2. HashMap源码解析
+3. HashSet原理
+4. 
 
 
 HashMap的实现原理，LinkedHashMap的实现
@@ -32,3 +36,4 @@ public static void dodtuff(){
 ### ref 
 1. Collections Refuled by Stuart Marks
 2. IBM from java code to java heap
+3. [Java集合干货系列](http://www.jianshu.com/p/2cd7be850540)
