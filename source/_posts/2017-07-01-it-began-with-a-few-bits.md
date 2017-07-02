@@ -8,6 +8,7 @@ tags:
 ---
 
 ### This is gonna be nasty......
+![](http://odzl05jxx.bkt.clouddn.com/d653491fb55bec754b8471aa6a3f6eed.jpg?imageView2/2/w/600)
 
 <!--more-->
 
@@ -257,8 +258,11 @@ execute是同步方法，enqueue是异步请求的方法，底层其实就调用
 
 1.4 第三个方法和AdapterFactory
 return serviceMethod.callAdapter.adapt(okHttpCall); //这个return需要的是Object,涉及到动态代理，可以无视。
+
 回头看一下serviceMethod的createCallAdapter方法，就是从retrofit对象的adapterFactories中一个个遍历：
-      CallAdapter<?, ?> adapter = adapterFactories.get(i).get(returnType, annotations, this);
+
+CallAdapter<?, ?> adapter = adapterFactories.get(i).get(returnType, annotations, this)；
+
 找到之后就返回，默认的实现有DefaultCallAdapterFactory和ExecutorCallAdapterFactory以及RxjavaCallAdapterFactory。
 
 
@@ -274,6 +278,8 @@ DefaultCallAdapterFactory的处理方式是
     };
 
 ExecutorCallAdapterFactory的处理方式是
+
+```java
  return new CallAdapter<Object, Call<?>>() {
       @Override public Type responseType() {
         return responseType;
@@ -283,9 +289,13 @@ ExecutorCallAdapterFactory的处理方式是
         return new ExecutorCallbackCall<>(callbackExecutor, call);
       }
     };
+```
+
+
 其实就是将callback丢到一个线程池callbackExecutor中，这个线程池可以通过Retrofit创建的时候配置，简单来说就是response会在这个线程池中回调。
 
-RxjavaCallAdapterFactory的做法是
+ RxjavaCallAdapterFactory的做法是
+```java
  @Override
   public CallAdapter<?> get(Type returnType, Annotation[] annotations, Retrofit retrofit) {
     Class<?> rawType = getRawType(returnType);
@@ -316,13 +326,21 @@ RxjavaCallAdapterFactory的做法是
       return SingleHelper.makeSingle(callAdapter);
     }
     return callAdapter;
-  }
+}
+```
 
-1.5 使用Retrofit的best practices[making retrofit work for you](https://www.youtube.com/watch?v=t34AQlblSeE)
-到这里，retrofit的工作流程就通过三个方法讲完了，接下来根据jake wharton的talk来讲几个best practice。
+
+1.5 使用Retrofit的best practices
+
+到这里，retrofit的工作流程就通过三个方法讲完了，接下来根据jake wharton的talk [making retrofit work for you](https://www.youtube.com/watch?v=t34AQlblSeE)来讲几个best practice。
 
 1.5.1 end point 不一样怎么办
-默认情况下，如果不指定client,每一次都会创建一个新的OkHttpClient，这样做就丧失了disk caching,connection pooling等优势。![endpoint](http://odzl05jxx.bkt.clouddn.com/different_end_point.JPG)    所以需要提取出一个OkHttpClient,解决方式很简单![](http://odzl05jxx.bkt.clouddn.com/different_end_point_teh_right_way.JPG)
+默认情况下，如果不指定client,每一次都会创建一个新的OkHttpClient，这样做就丧失了disk caching,connection pooling等优势。
+
+![endpoint](http://odzl05jxx.bkt.clouddn.com/different_end_point.JPG)    
+
+所以需要提取出一个OkHttpClient,解决方式很简单
+![](http://odzl05jxx.bkt.clouddn.com/different_end_point_teh_right_way.JPG)
 
 1.5.2 不要创建多个HttpClient
 
@@ -352,7 +370,9 @@ Call<User> login(@Body LoginRequest request)
     ![](http://odzl05jxx.bkt.clouddn.com/creating%20two%20convertors.JPG)和之前的创建两个httpclient一样，人们也很容易创建两个解析器。解决方法也很实在，提取出来公用即可。
 
 1.5.5 addConverterFactory可以调用多次
-假如一个接口返回json，一个接口返回proto。不要试图创建多个retrofit实例。这样就可以了![](http://odzl05jxx.bkt.clouddn.com/different_response.JPG)
+假如一个接口返回json，一个接口返回proto。不要试图创建多个retrofit实例。这样就可以了
+![](http://odzl05jxx.bkt.clouddn.com/different_response.JPG)
+
 底层的原理是这样的。
 User是Proto,Friend是Json。 Proto都extends一个protoType class，所以只要看下是否 instanceof proto就可以了。这一切都是在serviceMethod创建过程中判断的。这里顺序很重要。由于gson基本能够序列化一切，所以gson总是会认为自己可以成功。所以要把protoConverter放在前面。
  GsonConverterFactory, SimpleXmlConverterFactory converters , they say yes to everyThing. 所以如果出现这种情况怎么办？
@@ -397,6 +417,7 @@ class XmlOrJsonConverterFactroy extend Converter.Factory{
 
 1.5.7 和Rxjava配合使用
 CallAdapterFactory和ConverterFactory类似，也可以自定义，所以这样可以直接将所有的Observable返回到主线程
+
 ![](http://odzl05jxx.bkt.clouddn.com/always_observe_on_mian_thread.JPG)
 
 
