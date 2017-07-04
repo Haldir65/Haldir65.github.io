@@ -32,4 +32,12 @@ which XXX
 PATH=$PATH:/etc/apache/bin  #只对本次回话有效
 或者  PATH=$PATH:/etc/apache/bin #在~./bashrc或者~./profile里面添加这句话
 
-3. 
+3. alias设置
+vi 中输入 /XXX 可以搜索
+vi ~/.bashrc 
+添加 alias yourcommand='ls -alr' 
+重开session即可生效
+
+4. 
+
+
