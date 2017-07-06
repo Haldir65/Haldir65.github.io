@@ -9,18 +9,21 @@
   <title>Java集合类的一些整理 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="集合的实现原理
-HashMapLinkedHashMapArrayListLinkedList(not recommended)HashSet">
+HashMapLinkedHashMapArrayListLinkedList(not recommended)HashSet
+类型擦除原理">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Java集合类的一些整理">
 <meta property="og:url" content="https://haldir65.github.io/2017/06/25/2017-06-12-Collections-Refuled-by-Stuart-Marks/index.html">
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="集合的实现原理
-HashMapLinkedHashMapArrayListLinkedList(not recommended)HashSet">
-<meta property="og:updated_time" content="2017-07-03T00:07:42.201Z">
+HashMapLinkedHashMapArrayListLinkedList(not recommended)HashSet
+类型擦除原理">
+<meta property="og:updated_time" content="2017-07-06T13:02:07.643Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java集合类的一些整理">
 <meta name="twitter:description" content="集合的实现原理
-HashMapLinkedHashMapArrayListLinkedList(not recommended)HashSet">
+HashMapLinkedHashMapArrayListLinkedList(not recommended)HashSet
+类型擦除原理">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -199,9 +202,30 @@ ga('send', 'pageview');
       
         <p>集合的实现原理</p>
 <p>HashMap<br>LinkedHashMap<br>ArrayList<br>LinkedList(not recommended)<br>HashSet</p>
+<p>类型擦除原理</p>
 <a id="more"></a>
 <ol>
 <li>ArrayList源码解析</li>
+</ol>
+<ul>
+<li>崩溃代码<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">    String[] array = <span class="keyword">new</span> String[]&#123;<span class="string">"a"</span>, <span class="string">"b"</span>, <span class="string">"c"</span>, <span class="string">"d"</span>&#125;;</div><div class="line">    List&lt;String&gt; l = Arrays.asList(array);</div><div class="line">    l.add(<span class="string">"d"</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>Exception in thread “main” java.lang.UnsupportedOperationException<br>    at java.util.AbstractList.add(AbstractList.java:148)<br>    at java.util.AbstractList.add(AbstractList.java:108)<br>    at com.example.demo.main(ConcurrentModificationListDemo.java:13)</p>
+<p>问题出在Arrays.asList返回了一个<strong>java.util.Arrays.ArrayList</strong>，而不是<strong>java.util.ArrayList</strong>。前者只实现了List接口的有限的几个方法，并且是Arrays内部的一个private class。<br>正确的用法是new 一个ArrayList，把这个有限的list的元素(的指针)copy进去，即addAll()方法<br>ArrayList.toArray(T[] a)是把所有的elements通过System.arraycopy(elementData, 0, a, 0, size);复制到a数组中。</p>
+<ul>
+<li>System.arraycopy可以从自己的数组复制到自己的数组<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(<span class="keyword">int</span> index, E element)</span> </span>&#123;</div><div class="line">      rangeCheckForAdd(index);</div><div class="line">      ensureCapacityInternal(size + <span class="number">1</span>);  <span class="comment">// Increments modCount!!</span></div><div class="line">      System.arraycopy(elementData, index, elementData, index + <span class="number">1</span>,</div><div class="line">                       size - index);  </div><div class="line">      elementData[index] = element;</div><div class="line">      size++;</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>添加到指定位置，System.arrayCopy可以从同一个数组复制到同一个数组，几乎就是挪动指针了。</p>
+<ul>
+<li>不常见的方法</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//下面这两个是因为ArrayList implements java.io.Serializable，是序列化时会调用的</span></div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">writeObject</span><span class="params">(java.io.ObjectOutputStream s)</span></div><div class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">readObject</span><span class="params">(java.io.ObjectInputStream s)</span></div><div class="line"></div><div class="line"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">removeRange</span><span class="params">(<span class="keyword">int</span> fromIndex, <span class="keyword">int</span> toIndex)</span> </div><div class="line"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">removeAll</span><span class="params">(Collection&lt;?&gt; c)</span> <span class="comment">//给一个集合，删除list与之的交集</span></span></div></pre></td></tr></table></figure>
+<ul>
+<li></li>
+</ul>
+<ol>
 <li>HashMap源码解析</li>
 <li>HashSet原理</li>
 <li></li>
@@ -213,6 +237,7 @@ ga('send', 'pageview');
 <li>Collections Refuled by Stuart Marks</li>
 <li>IBM from java code to java heap</li>
 <li><a href="http://www.jianshu.com/p/2cd7be850540">Java集合干货系列</a></li>
+<li><a href="http://www.programcreek.com/2014/01/java%E7%A8%8B%E5%BA%8F%E5%91%98%E5%B8%B8%E7%8A%AF%E7%9A%8410%E4%B8%AA%E9%94%99%E8%AF%AF/">Arrays.asList()返回的List</a></li>
 </ol>
 
       
