@@ -6,20 +6,14 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://haldir65.github.io">
-  <title>For those tiny details in Java | Haldir的博客</title>
+  <title>Tag: Okio | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="interesting stuff in java that don’t seem to get enough pubilicity">
-<meta property="og:type" content="article">
-<meta property="og:title" content="For those tiny details in Java">
-<meta property="og:url" content="https://haldir65.github.io/2017/06/17/2017-06-17-tiny-details-in-java/index.html">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Haldir的博客">
+<meta property="og:url" content="https://haldir65.github.io/tags/Okio/index.html">
 <meta property="og:site_name" content="Haldir的博客">
-<meta property="og:description" content="interesting stuff in java that don’t seem to get enough pubilicity">
-<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/34a7d57ccabb18c69d085247cf009b22.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-07-03T00:07:42.213Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="For those tiny details in Java">
-<meta name="twitter:description" content="interesting stuff in java that don’t seem to get enough pubilicity">
-<meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/34a7d57ccabb18c69d085247cf009b22.jpg?imageView2/2/w/600">
+<meta name="twitter:title" content="Haldir的博客">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -176,187 +170,68 @@ ga('send', 'pageview');
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-2017-06-17-tiny-details-in-java" class="article article-type-post " itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
+            
   
-    <h1 class="article-title" itemprop="name">
-      For those tiny details in Java
+  
+    
+    
+      
+      
+      <section class="archives-wrap">
+        <div class="archive-year-wrap">
+          <a href="/archives/2017" class="archive-year">2017</a>
+        </div>
+        <div class="archives">
+    
+    <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      	<div class="article-meta">
+	      	<a href="/2017/07/01/2017-07-01-it-began-with-a-few-bits/" class="archive-article-date">
+  	<time datetime="2017-07-01T15:03:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-07-01</time>
+</a>
+        </div>
+    	 
+  
+    <h1 itemprop="name">
+      <a class="archive-article-title" href="/2017/07/01/2017-07-01-it-began-with-a-few-bits/">2017-07-01-it-began-with-a-few-bits</a>
     </h1>
   
 
-        
-        <a href="/2017/06/17/2017-06-17-tiny-details-in-java/" class="archive-article-date">
-  	<time datetime="2017-06-17T13:24:48.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-06-17</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <blockquote>
-<p>interesting stuff in java that don’t seem to get enough pubilicity</p>
-</blockquote>
-<p><img src="http://odzl05jxx.bkt.clouddn.com/34a7d57ccabb18c69d085247cf009b22.jpg?imageView2/2/w/600" alt="landscape"></p>
-<a id="more"></a>
-<ol>
-<li><p>getting the concreate class from generic types</p>
- <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">        <span class="comment">/**</div><div class="line">     * Make a GET request and return a parsed object from JSON.</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> url     URL of the request to make</div><div class="line">     * <span class="doctag">@param</span> clazz   Relevant class object, for Gson's reflection</div><div class="line">     * <span class="doctag">@param</span> headers Map of request headers</div><div class="line">     */</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">GenericMoshiRequest</span><span class="params">(String url, @Nullable Class&lt;T&gt; clazz, Map&lt;String, String&gt; headers,</div><div class="line">                               Response.Listener&lt;T&gt; listener, Response.ErrorListener errorListener)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>(Method.GET, url, errorListener);</div><div class="line"><span class="comment">//        this.clazz = clazz;</span></div><div class="line">        Class&lt;T&gt; entityClass = (Class&lt;T&gt;) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[<span class="number">0</span>];<span class="comment">//使用反射获得泛型对应class</span></div><div class="line">        <span class="keyword">this</span>.clazz = entityClass;</div><div class="line">        <span class="keyword">this</span>.headers = headers;</div><div class="line">        <span class="keyword">this</span>.listener = listener;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-</li>
-<li><p>OkHttp 默认会自动重试失败的请求<br><a href="https://medium.com/inloop/okhttp-is-quietly-retrying-requests-is-your-api-ready-19489ef35ace">okhttp-is-quietly-retrying-requests-is-your-api-ready</a><br>OkHttp默认会对请求进行重试，具体是在RetryAndFollowUpInterceptor中进行的。</p>
- <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"> RetryAndFollowUpInterceptor.java</div><div class="line"></div><div class="line">@Override public Response intercept(Chain chain) throws IOException &#123;</div><div class="line">  Request request = chain.request();</div><div class="line"></div><div class="line">  streamAllocation = new StreamAllocation(</div><div class="line">      client.connectionPool(), createAddress(request.url()), callStackTrace);</div><div class="line"></div><div class="line">  int followUpCount = 0;</div><div class="line">  Response priorResponse = null;</div><div class="line">  while (true) &#123; # 不停的尝试</div><div class="line">    if (canceled) &#123;</div><div class="line">      streamAllocation.release();</div><div class="line">      throw new IOException("Canceled");</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    Response response = null;</div><div class="line">    boolean releaseConnection = true;</div><div class="line">    try &#123;</div><div class="line">      response = ((RealInterceptorChain) chain).proceed(request, streamAllocation, null, null);</div><div class="line">      releaseConnection = false; //默认不认可response成功</div><div class="line">    &#125; catch (RouteException e) &#123;</div><div class="line">      // The attempt to connect via a route failed. The request will not have been sent.</div><div class="line">      if (!recover(e.getLastConnectException(), false, request)) &#123;</div><div class="line">        throw e.getLastConnectException();</div><div class="line">      &#125;</div><div class="line">      releaseConnection = false;</div><div class="line">      continue;  //继续尝试</div><div class="line">    &#125; catch (IOException e) &#123;</div><div class="line">      // An attempt to communicate with a server failed. The request may have been sent.</div><div class="line">      boolean requestSendStarted = !(e instanceof ConnectionShutdownException);</div><div class="line">      if (!recover(e, requestSendStarted, request)) throw e;</div><div class="line">      releaseConnection = false;</div><div class="line">      continue; //继续尝试</div><div class="line">    &#125; finally &#123;</div><div class="line">      // We're throwing an unchecked exception. Release any resources.</div><div class="line">      if (releaseConnection) &#123; //出现不可预料的错误，释放硬件资源，端口什么的</div><div class="line">        streamAllocation.streamFailed(null);</div><div class="line">        streamAllocation.release();</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<p>客户端当然可以使用retryOnConnectionFailure禁止这种自动重试策略，但不建议这么做。另外，为避免减少不必要的重试请求，<br>OkHttp 3.3.0 <a href="https://github.com/square/okhttp/issues/2394">issue</a></p>
-<blockquote>
-<p>Don’t recover if we encounter a read timeout after sending the request, but do recover if we encounter a timeout building a connection<br>建立连接超时可以重试(客户端到服务器的通道不可靠，当然可以重试)，连接上之后读取超时则不去重试(服务器出了问题，没有必要重试)。</p>
-</blockquote>
-<p>另外，GET方法本身是人畜无害的，Retry请求多次发起不会造成数据错误；但对于POST，涉及到写服务端写操作，最好带上GUID作为单次请求unique标示。（这是server和client之间需要协商好的protocol）</p>
-<ol>
-<li><p>From Java Code To Java Heap<br>A talk from IBM Engineer, talking about optimizing the memery usage for your java application.<a href="https://www.youtube.com/watch?v=FLcXf9pO27w">youtube</a><br><a href="https://www.ibm.com/developerworks/java/library/j-codetoheap/index.html">ibm</a></p>
-</li>
-<li><p>强行更改String的内容<br>String这种东西是放在常量池里面的，所以</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">String a = <span class="string">"hello"</span></div><div class="line">String b = <span class="string">"hello"</span></div><div class="line">String c = <span class="keyword">new</span> String(<span class="string">"Hello"</span>)</div><div class="line"></div><div class="line">显然ab都指向了常量池，c指向了放在堆上的对象，后者也指向常量池</div><div class="line">a==b!=c  </div><div class="line"></div><div class="line"><span class="comment">//更改这个String里面的东西</span></div><div class="line">Field a_ = String.class.getDeclaredField(<span class="string">"value"</span>);</div><div class="line">      a_.setAccessible(<span class="keyword">true</span>);</div><div class="line">      <span class="keyword">char</span>[] value=(<span class="keyword">char</span>[])a_.get(a);</div><div class="line">      value[<span class="number">3</span>]=<span class="string">'_'</span>;   <span class="comment">//修改a所指向的值</span></div><div class="line"></div><div class="line">这样a,b,c 的值都改掉了</div></pre></td></tr></table></figure>
-</li>
-<li><p>注解</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">Builder(Retrofit retrofit, Method method) &#123;</div><div class="line">     <span class="keyword">this</span>.retrofit = retrofit;</div><div class="line">     <span class="keyword">this</span>.method = method;</div><div class="line">     <span class="keyword">this</span>.methodAnnotations = method.getAnnotations();</div><div class="line">     <span class="keyword">this</span>.parameterTypes = method.getGenericParameterTypes();</div><div class="line">     <span class="keyword">this</span>.parameterAnnotationsArray = method.getParameterAnnotations();</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<p>如果不是看到Retrofit的源码，一般还真没机会了解到这几个方法。。</p>
-
-      
-
-      
-        <div class="page-reward">
-          <a href="javascript:;" class="page-reward-btn tooltip-top">
-            <div class="tooltip tooltip-east">
-            <span class="tooltip-item">
-              赏
-            </span>
-            <span class="tooltip-content">
-              <span class="tooltip-text">
-                <span class="tooltip-inner">
-                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
-                  <div class="reward-box">
-                    
-                    
-                  </div>
-                </span>
-              </span>
-            </span>
-          </div>
-          </a>
-        </div>
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
+        <div class="article-info info-on-right">
+          
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">java</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Retrofit</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">OkHttp</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Okio</a>
         		</li>
       		
 		</ul>
 	</div>
 
-      
+          
 
-      
-
-      
-        
-<div class="share-btn share-icons tooltip-left">
-  <div class="tooltip tooltip-east">
-    <span class="tooltip-item">
-      <a href="javascript:;" class="share-sns share-outer">
-        <i class="icon icon-share"></i>
-      </a>
-    </span>
-    <span class="tooltip-content">
-      <div class="share-wrap">
-        <div class="share-icons">
-          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
-            <i class="icon icon-weibo"></i>
-          </a>
-          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
-            <i class="icon icon-weixin"></i>
-          </a>
-          <a class="qq share-sns" href="javascript:;" data-type="qq">
-            <i class="icon icon-qq"></i>
-          </a>
-          <a class="douban share-sns" href="javascript:;" data-type="douban">
-            <i class="icon icon-douban"></i>
-          </a>
-          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
-            <i class="icon icon-qzone"></i>
-          </a>
-          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
-            <i class="icon icon-facebook"></i>
-          </a>
-          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
-            <i class="icon icon-twitter"></i>
-          </a>
-          <a class="google share-sns" href="javascript:;" data-type="google">
-            <i class="icon icon-google"></i>
-          </a>
         </div>
-      </div>
-    </span>
-  </div>
-</div>
-
-<div class="page-modal wx-share js-wx-box">
-    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
-    <p>扫一扫，分享到微信</p>
-    <div class="wx-qrcode">
-      <img src="http://s.jiathis.com/qrcode.php?url=https://haldir65.github.io/2017/06/17/2017-06-17-tiny-details-in-java/" alt="微信分享二维码">
-    </div>
-</div>
-
-<div class="mask js-mask"></div>
-      
-      <div class="clearfix"></div>
-    </div>
+        <div class="clearfix"></div>
+    </header>
   </div>
 </article>
-
-  
-<nav id="article-nav">
-  
-    <a href="/2017/06/18/2017-06-18-linux-commands-extended/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          linux常用命令扩展
-        
-      </div>
-    </a>
   
   
-    <a href="/2017/06/15/2017-06-15-python-networks/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">使用Python搭建本地服务器</div>
-      <i class="icon-circle-right"></i>
-    </a>
-  
-</nav>
-
-
-
-
-
-  
-  
+    </div></section>
   
 
-  
-
-  
+    
 
 
           </div>
@@ -379,9 +254,9 @@ ga('send', 'pageview');
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: true,
+		isPost: false,
 		isArchive: false,
-		isTag: false,
+		isTag: true,
 		isCategory: false,
 		open_in_new: false,
 		root: "/",

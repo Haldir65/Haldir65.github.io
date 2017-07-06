@@ -7,14 +7,14 @@ tags:
    - Okio
 ---
 
-### This is gonna be nasty......
+### This is gonna be nasty...... TL;DR
 ![](http://odzl05jxx.bkt.clouddn.com/d653491fb55bec754b8471aa6a3f6eed.jpg?imageView2/2/w/600)
 
 <!--more-->
 
-1. Retrofit
+### 1. Retrofit
 
-1.1 使用方法
+#### 1.1 使用方法
 Retrofit本身并不局限于Andriod平台，java应用也可以用来和服务器沟通。
 Retrofit一般的用法看上去很简单
 ```java
@@ -45,13 +45,12 @@ Retrofit retrofit = new Retrofit.Builder()
 ```
 关键来看这段 retroft.create ,重点都在这里面。关键的代码就在这三行里面了
 
-```java
-ServiceMethod serviceMethod = loadServiceMethod(method);
+
+>ServiceMethod serviceMethod = loadServiceMethod(method);
 OkHttpCall okHttpCall = new OkHttpCall<>(serviceMethod, args);
 return serviceMethod.callAdapter.adapt(okHttpCall);
-```
 
-1.2 第一个方法以及ServiceMethod的创建
+### 1.2 第一个方法以及ServiceMethod的创建
 loadServiceMethod(Method)会查找invoke的时候会查找methodCache中有没有这个方法，没有的话调用Builder方法创建一个ServiceMethod实例并放入cahce。看一看这个Builder的构造函数 ，基本上就是把Builder中的参数引用赋值给ServiceMethod实例。
 
 result = new ServiceMethod.Builder(this, method).build();
@@ -175,7 +174,7 @@ ServiceMethod(Builder<T> builder) {
 ```
 
 
-1.3 第二个方法和OkHttpCall
+### 1.3 第二个方法和OkHttpCall
 第二个方法:
  OkHttpCall<Object> okHttpCall = new OkHttpCall<>(serviceMethod, args);
 
@@ -183,6 +182,7 @@ OkHttpCall的成员变量：
 okhttp3.Call rawCall //用于发起请求
 ServiceMethod<T, ?> serviceMethod;  //这就是刚才实例化的serviceMethod对象
 这个类相对简单，主要看execute方法
+
 ```java
  @Override public Response<T> execute() throws IOException {
     okhttp3.Call call;
@@ -256,17 +256,18 @@ parseRespnse的实现
 
 execute是同步方法，enqueue是异步请求的方法，底层其实就调用了OkHttp.Call.enqueue()，所以说Retrofit本身并不负责创建网络请求，线程调度。只做了parseRespnse的方法，另外，OkHttp和Retrofit本身并不负责把Response推到主线程上，Android 平台可能要注意。
 
-1.4 第三个方法和AdapterFactory
+### 1.4 第三个方法和AdapterFactory
 return serviceMethod.callAdapter.adapt(okHttpCall); //这个return需要的是Object,涉及到动态代理，可以无视。
 
 回头看一下serviceMethod的createCallAdapter方法，就是从retrofit对象的adapterFactories中一个个遍历：
 
-CallAdapter<?, ?> adapter = adapterFactories.get(i).get(returnType, annotations, this)；
+> CallAdapter<?, ?> adapter = adapterFactories.get(i).get(returnType, annotations, this)；
 
 找到之后就返回，默认的实现有DefaultCallAdapterFactory和ExecutorCallAdapterFactory以及RxjavaCallAdapterFactory。
 
+```java
+在DefaultCallAdapterFactory中的处理方式是
 
-DefaultCallAdapterFactory的处理方式是
  return new CallAdapter<Call<?>>() {
       @Override public Type responseType() {
         return responseType;
@@ -277,9 +278,10 @@ DefaultCallAdapterFactory的处理方式是
       }
     };
 
+
 ExecutorCallAdapterFactory的处理方式是
 
-```java
+
  return new CallAdapter<Object, Call<?>>() {
       @Override public Type responseType() {
         return responseType;
@@ -330,11 +332,11 @@ ExecutorCallAdapterFactory的处理方式是
 ```
 
 
-1.5 使用Retrofit的best practices
+### 1.5 使用Retrofit的best practices
 
 到这里，retrofit的工作流程就通过三个方法讲完了，接下来根据jake wharton的talk [making retrofit work for you](https://www.youtube.com/watch?v=t34AQlblSeE)来讲几个best practice。
 
-1.5.1 end point 不一样怎么办
+#### 1.5.1 end point 不一样怎么办
 默认情况下，如果不指定client,每一次都会创建一个新的OkHttpClient，这样做就丧失了disk caching,connection pooling等优势。
 
 ![endpoint](http://odzl05jxx.bkt.clouddn.com/different_end_point.JPG)    
@@ -342,7 +344,7 @@ ExecutorCallAdapterFactory的处理方式是
 所以需要提取出一个OkHttpClient,解决方式很简单
 ![](http://odzl05jxx.bkt.clouddn.com/different_end_point_teh_right_way.JPG)
 
-1.5.2 不要创建多个HttpClient
+#### 1.5.2 不要创建多个HttpClient
 
 shallow copy
 ```java
@@ -354,7 +356,7 @@ OkHttpClient clientBar = client.newBuilder().readTimeOut(20,SECONDS)
 .writeTimeOut(20,SECONDS).build()
 ```
 
-1.5.3 有的接口需要认证（加Header），有的不需要（比如登录，忘记密码）
+#### 1.5.3 有的接口需要认证（加Header），有的不需要（比如登录，忘记密码）
 一般可能会想到在OkHttp的Interceptor中去判断url然后手动加上header，一种更好的解决方式是，假定所有的API都需要加Header，对于登录和忘记密码的Api,这样写
 ```java
 @POST("/login")
@@ -365,11 +367,13 @@ Call<User> login(@Body LoginRequest request)
 只要判断request.header("No-Authentication")==null 即表示该接口需要加上header。
 所以，对于特定接口的筛选可以，采用这种方式。
 
-1.5.4 Converters将byte变成java对象，底层的解析器不要创建多个
-    addConverterFactory
-    ![](http://odzl05jxx.bkt.clouddn.com/creating%20two%20convertors.JPG)和之前的创建两个httpclient一样，人们也很容易创建两个解析器。解决方法也很实在，提取出来公用即可。
+#### 1.5.4 Converters将byte变成java对象，底层的解析器不要创建多个
 
-1.5.5 addConverterFactory可以调用多次
+addConverterFactory，和之前的创建两个httpclient一样，人们也很容易创建两个解析器。解决方法也很实在，提取出来公用即可。
+![](http://odzl05jxx.bkt.clouddn.com/creating%20two%20convertors.JPG)
+
+
+#### 1.5.5 addConverterFactory可以调用多次
 假如一个接口返回json，一个接口返回proto。不要试图创建多个retrofit实例。这样就可以了
 ![](http://odzl05jxx.bkt.clouddn.com/different_response.JPG)
 
@@ -409,13 +413,13 @@ class XmlOrJsonConverterFactroy extend Converter.Factory{
 [AnnotatedConverterFactory用于自定义类型](https://github.com/square/retrofit/blob/master/samples/src/main/java/com/example/retrofit/AnnotatedConverters.java)
 ```
 
-1.5.6 服务器返回的数据中包括一些metaData
+#### 1.5.6 服务器返回的数据中包括一些metaData
 使用delegate的方式去除这些metadata，只获取想要的response实体对象
 ![](http://odzl05jxx.bkt.clouddn.com/delegaet_converters.JPG)
 但这些metaData是有用的。。怎么处理
 可以在convert中集中处理自定义错误码。
 
-1.5.7 和Rxjava配合使用
+#### 1.5.7 和Rxjava配合使用
 CallAdapterFactory和ConverterFactory类似，也可以自定义，所以这样可以直接将所有的Observable返回到主线程
 
 ![](http://odzl05jxx.bkt.clouddn.com/always_observe_on_mian_thread.JPG)
@@ -425,25 +429,19 @@ CallAdapterFactory和ConverterFactory类似，也可以自定义，所以这样�
 
 
 
-
-
-
-
-
-
-
-
  
 
-2. OkHttp
-3. A few 'ok' libraries
+### 2. OkHttp
+
+
+### 3. A few 'ok' libraries
 why moshi ? why Retrofit call can be clone cheap？
 why SinkedSource?
 why protolBuffer cost less ?
 
 
 
-### ref
-1. [Paisy](https://blog.piasy.com/2016/06/25/Understand-Retrofit/)
-2. [open-sourse-projetc](https://github.com/android-cn/android-open-project-analysis/tree/master/tool-lib/network/retrofit)
-3. [making retrofit work for you]
+### Ref
+1. [Paisy解析Retrofit](https://blog.piasy.com/2016/06/25/Understand-Retrofit/)
+2. [open-sourse-projetc解析Retrofit](https://github.com/android-cn/android-open-project-analysis/tree/master/tool-lib/network/retrofit)
+3. [Making Retrofit Work For You by Jake Wharton](https://www.youtube.com/watch?v=t34AQlblSeE)
