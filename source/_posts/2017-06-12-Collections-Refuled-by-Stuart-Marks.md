@@ -59,11 +59,18 @@ protected void removeRange(int fromIndex, int toIndex)
 public boolean removeAll(Collection<?> c) //给一个集合，删除list与之的交集
 ```
 
+
+多线程场景下要注意的问题
+
+> 和Vector不同，ArrayList中的操作不是线程安全的！所以，建议在单线程中才使用ArrayList，而在多线程中可以选择Vector或者CopyOnWriteArrayList。
 - 
 
-2. HashMap源码解析
+2. HashMap源码解析 LinkedMap
 3. HashSet原理
-4. 
+4. 一些不常用的类
+    Vetor，Stack，ArrayDeque,queue
+5. concurrentHashMap等
+6. WeakHaskMap
 
 
 HashMap的实现原理，LinkedHashMap的实现
