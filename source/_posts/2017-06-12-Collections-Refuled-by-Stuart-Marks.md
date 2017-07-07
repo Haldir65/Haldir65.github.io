@@ -13,6 +13,7 @@ LinkedHashMap
 ArrayList 
 LinkedList(not recommended)
 HashSet
+SparseArray
 
 [类型擦除原理](http://blog.csdn.net/lonelyroamer/article/details/7868820)
 
@@ -56,7 +57,9 @@ private void writeObject(java.io.ObjectOutputStream s)
 private void readObject(java.io.ObjectInputStream s)
 
 protected void removeRange(int fromIndex, int toIndex) 
+
 public boolean removeAll(Collection<?> c) //给一个集合，删除list与之的交集
+public boolean retainAll(Collection<?> c) //  给定一个集合，从list中删除所有不在这个集合里面的元素
 ```
 
 
@@ -66,6 +69,9 @@ public boolean removeAll(Collection<?> c) //给一个集合，删除list与之�
 - 
 
 2. HashMap源码解析 LinkedMap
+
+
+
 3. HashSet原理
 4. 一些不常用的类
     Vetor，Stack，ArrayDeque,queue
@@ -85,8 +91,8 @@ public static void dodtuff(){
 ```
  
 
-### ref 
-1. Collections Refuled by Stuart Marks
-2. IBM from java code to java heap
+### Reference 
+1. [Collections Refuled by Stuart Marks](https://www.youtube.com/watch?v=q6zF3vf114M)
+2. [From Java Code to Java Heap: Understanding the Memory Usage of Your Application](https://www.youtube.com/watch?v=FLcXf9pO27w)
 3. [Java集合干货系列](http://www.jianshu.com/p/2cd7be850540)
-4. [Arrays.asList()返回的List](http://www.programcreek.com/2014/01/java%E7%A8%8B%E5%BA%8F%E5%91%98%E5%B8%B8%E7%8A%AF%E7%9A%8410%E4%B8%AA%E9%94%99%E8%AF%AF/)
+4. [Arrays.asList()返回的List不是jva.util.ArrayList](http://www.programcreek.com/2014/01/java%E7%A8%8B%E5%BA%8F%E5%91%98%E5%B8%B8%E7%8A%AF%E7%9A%8410%E4%B8%AA%E9%94%99%E8%AF%AF/)

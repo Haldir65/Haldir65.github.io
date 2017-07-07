@@ -22,7 +22,7 @@ apache,mysql
 查看PATH : echo $PATH
 /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games (注意，系统是按照这个顺序找的，如果在第一个目录下找到一个叫sudo的东西，就会直接执行了，所以这里是有潜在的危险的)
 看下哪个命令对应的位置在哪里
-which XXX
+which XXXk
 比如sudo 就放在 /usr/bin/sudo
 ```
 
