@@ -14,7 +14,7 @@ ArrayList
 LinkedList(not recommended)
 HashSet
 
-类型擦除原理
+[类型擦除原理](http://blog.csdn.net/lonelyroamer/article/details/7868820)
 
 <!--more-->
 1. ArrayList源码解析
