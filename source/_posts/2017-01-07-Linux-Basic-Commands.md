@@ -703,7 +703,7 @@ PermitRootLogin no
 
 
 
-编码的修改
+[编码的修改](https://perlgeek.de/en/article/set-up-a-clean-utf8-environment)
 更改locale为utf-8(ubuntu)
 > 
 vi ~/.bashrc 

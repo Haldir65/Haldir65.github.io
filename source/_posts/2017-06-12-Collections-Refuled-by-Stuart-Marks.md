@@ -5,8 +5,12 @@ categories: blog
 tags: [java]
 ---
 
-根据网上的大部分博客的分类，集合框架分为Collections(具有类似数组的功能)和Map(存储键值对)这两大部分。
+根据网上的大部分博客的分类，集合框架分为Collections(具有类似数组的功能)和Map(存储键值对)这两大部分。针对jdk1.8的java.util里面的一些常用的或者不常用的集合做一些分析。写这篇文章的过程中，我慢慢发现不同版本jdk的同一个class的实现是有一些差异的(LinkedList)，由于对照的是java1.8的代码，里面会多一些since 1.8的代码，这个暂时不管。
+![](http://odzl05jxx.bkt.clouddn.com/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg?imageView2/2/w/600)
  
+<!--more-->
+
+
 ## List
 ArrayList (建议new出来的时候给定一个适当的size，不然每次扩容很慢的)
 LinkedList(not recommended，增删元素的时候快一点)
@@ -31,8 +35,7 @@ SparseArray
 
 [类型擦除原理](http://blog.csdn.net/lonelyroamer/article/details/7868820)
 
-针对jdk1.8的java.util里面的一些常用的或者不常用的集合做一些分析。写这篇文章的过程中，我慢慢发现不同版本jdk的同一个class的实现是有一些差异的(LinkedList)，由于对照的是java1.8的代码，里面会多一些since 1.8的代码，这个暂时不管。
-<!--more-->
+
 1. ArrayList源码解析
 - 崩溃代码
 ```java
