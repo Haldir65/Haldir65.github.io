@@ -8,22 +8,18 @@
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>Java集合类的一些整理 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="集合的实现原理
-HashMapLinkedHashMapArrayListLinkedList(not recommended)HashSet
-类型擦除原理">
+  <meta name="description" content="根据网上的大部分博客的分类，集合框架分为Collections(具有类似数组的功能)和Map(存储键值对)这两大部分。针对jdk1.8的java.util里面的一些常用的或者不常用的集合做一些分析。写这篇文章的过程中，我慢慢发现不同版本jdk的同一个class的实现是有一些差异的(LinkedList)，由于对照的是java1.8的代码，里面会多一些since 1.8的代码，这个暂时不管。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Java集合类的一些整理">
 <meta property="og:url" content="https://haldir65.github.io/2017/06/25/2017-06-12-Collections-Refuled-by-Stuart-Marks/index.html">
 <meta property="og:site_name" content="Haldir的博客">
-<meta property="og:description" content="集合的实现原理
-HashMapLinkedHashMapArrayListLinkedList(not recommended)HashSet
-类型擦除原理">
-<meta property="og:updated_time" content="2017-07-06T13:02:07.643Z">
+<meta property="og:description" content="根据网上的大部分博客的分类，集合框架分为Collections(具有类似数组的功能)和Map(存储键值对)这两大部分。针对jdk1.8的java.util里面的一些常用的或者不常用的集合做一些分析。写这篇文章的过程中，我慢慢发现不同版本jdk的同一个class的实现是有一些差异的(LinkedList)，由于对照的是java1.8的代码，里面会多一些since 1.8的代码，这个暂时不管。">
+<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg?imageView2/2/w/600">
+<meta property="og:updated_time" content="2017-07-08T15:01:38.629Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java集合类的一些整理">
-<meta name="twitter:description" content="集合的实现原理
-HashMapLinkedHashMapArrayListLinkedList(not recommended)HashSet
-类型擦除原理">
+<meta name="twitter:description" content="根据网上的大部分博客的分类，集合框架分为Collections(具有类似数组的功能)和Map(存储键值对)这两大部分。针对jdk1.8的java.util里面的一些常用的或者不常用的集合做一些分析。写这篇文章的过程中，我慢慢发现不同版本jdk的同一个class的实现是有一些差异的(LinkedList)，由于对照的是java1.8的代码，里面会多一些since 1.8的代码，这个暂时不管。">
+<meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg?imageView2/2/w/600">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -200,10 +196,14 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>集合的实现原理</p>
-<p>HashMap<br>LinkedHashMap<br>ArrayList<br>LinkedList(not recommended)<br>HashSet</p>
-<p>类型擦除原理</p>
+        <p>根据网上的大部分博客的分类，集合框架分为Collections(具有类似数组的功能)和Map(存储键值对)这两大部分。针对jdk1.8的java.util里面的一些常用的或者不常用的集合做一些分析。写这篇文章的过程中，我慢慢发现不同版本jdk的同一个class的实现是有一些差异的(LinkedList)，由于对照的是java1.8的代码，里面会多一些since 1.8的代码，这个暂时不管。<br><img src="http://odzl05jxx.bkt.clouddn.com/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg?imageView2/2/w/600" alt=""></p>
 <a id="more"></a>
+<h2 id="List"><a href="#List" class="headerlink" title="List"></a>List</h2><p>ArrayList (建议new出来的时候给定一个适当的size，不然每次扩容很慢的)<br>LinkedList(not recommended，增删元素的时候快一点)<br>Vector（线程安全,重同步，不推荐）</p>
+<h2 id="Set"><a href="#Set" class="headerlink" title="Set"></a>Set</h2><p>HashSet<br>TreeSet<br>LinekedHashSet</p>
+<h2 id="Queue"><a href="#Queue" class="headerlink" title="Queue"></a>Queue</h2><p>Stack ArrayDeque</p>
+<p>———————————Map————————-</p>
+<h2 id="HashMap-（LinkedHashMap-）"><a href="#HashMap-（LinkedHashMap-）" class="headerlink" title="HashMap （LinkedHashMap ）"></a>HashMap （LinkedHashMap ）</h2><h2 id="TreeMap"><a href="#TreeMap" class="headerlink" title="TreeMap"></a>TreeMap</h2><h2 id="HashTable"><a href="#HashTable" class="headerlink" title="HashTable"></a>HashTable</h2><p>SparseArray</p>
+<p><a href="http://blog.csdn.net/lonelyroamer/article/details/7868820">类型擦除原理</a></p>
 <ol>
 <li>ArrayList源码解析</li>
 </ol>
@@ -221,23 +221,58 @@ ga('send', 'pageview');
 <ul>
 <li>不常见的方法</li>
 </ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//下面这两个是因为ArrayList implements java.io.Serializable，是序列化时会调用的</span></div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">writeObject</span><span class="params">(java.io.ObjectOutputStream s)</span></div><div class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">readObject</span><span class="params">(java.io.ObjectInputStream s)</span></div><div class="line"></div><div class="line"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">removeRange</span><span class="params">(<span class="keyword">int</span> fromIndex, <span class="keyword">int</span> toIndex)</span> </div><div class="line"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">removeAll</span><span class="params">(Collection&lt;?&gt; c)</span> <span class="comment">//给一个集合，删除list与之的交集</span></span></div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//下面这两个是因为ArrayList implements java.io.Serializable，是序列化时会调用的</span></div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">writeObject</span><span class="params">(java.io.ObjectOutputStream s)</span></div><div class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">readObject</span><span class="params">(java.io.ObjectInputStream s)</span></div><div class="line"></div><div class="line"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">removeRange</span><span class="params">(<span class="keyword">int</span> fromIndex, <span class="keyword">int</span> toIndex)</span> </div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">removeAll</span><span class="params">(Collection&lt;?&gt; c)</span> <span class="comment">//给一个集合，删除list与之的交集</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">retainAll</span><span class="params">(Collection&lt;?&gt; c)</span> <span class="comment">//  给定一个集合，从list中删除所有不在这个集合里面的元素</span></div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">trimToSize</span><span class="params">()</span> <span class="comment">// 内存压力大的时候可以释放掉一部分内存，记得那个1.5倍的默认扩容嘛，释放的就是这0.5的内存</span></span></div></pre></td></tr></table></figure>
+<p>多线程场景下要注意的问题</p>
+<blockquote>
+<p>和Vector不同，ArrayList中的操作不是线程安全的！所以，建议在单线程中才使用ArrayList，而在多线程中可以选择Vector或者CopyOnWriteArrayList。</p>
+</blockquote>
+<p>1.2 LinkedList的一些点<br>LinkedList是双向链表实现的，可以想象成一帮小孩左手拉右手绕成一个圈，只不过这里面的每一个小孩并不是你放进去的 T 类型数据，而是一个Node<T> 。所以LinkedList是可以放进去一个Null的。<br>LinkedList往往被人诟病的就是除了添加和删除快之外，get和set很慢。<br>来看下add的实现（jdk 1.8）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">add</span><span class="params">(E e)</span> </span>&#123;</div><div class="line">        linkLast(e);</div><div class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line"><span class="comment">/**</div><div class="line">     * Links e as last element.</div><div class="line">     */</span></div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">linkLast</span><span class="params">(E e)</span> </span>&#123;</div><div class="line">        <span class="keyword">final</span> Node&lt;E&gt; l = last;  <span class="comment">//先把链表的尾巴找出来</span></div><div class="line">        <span class="keyword">final</span> Node&lt;E&gt; newNode = <span class="keyword">new</span> Node&lt;&gt;(l, e, <span class="keyword">null</span>); <span class="comment">// 可以想象每次add都有new的操作，并将原来的尾巴作为这个新的Entry的头部</span></div><div class="line">        last = newNode; <span class="comment">//新的Node将成为新的尾巴</span></div><div class="line">        <span class="keyword">if</span> (l == <span class="keyword">null</span>) <span class="comment">//这种情况是原来没有尾巴，也就是说size = 0</span></div><div class="line">            first = newNode; <span class="comment">//这时候就只有一个Node，头和尾都是Null</span></div><div class="line">        <span class="keyword">else</span></div><div class="line">            l.next = newNode; <span class="comment">//不然的话，旧的尾巴变成了倒数第二个，它的next指向了新的Entry.</span></div><div class="line"></div><div class="line">        size++;</div><div class="line">        modCount++;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>add的过程看起来很快，new一个entery，确定下前后的指针就可以了。remove也差不多，取消指针引用即可。</p>
+<p>来看比较慢的get</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> E <span class="title">get</span><span class="params">(<span class="keyword">int</span> index)</span> </span>&#123;</div><div class="line">       checkElementIndex(index);</div><div class="line">       <span class="keyword">return</span> node(index).item;</div><div class="line">   &#125;</div><div class="line"></div><div class="line"> <span class="comment">/**</div><div class="line">    * Returns the (non-null) Node at the specified element index.</div><div class="line">    */</span></div><div class="line">   <span class="function">Node&lt;E&gt; <span class="title">node</span><span class="params">(<span class="keyword">int</span> index)</span> </span>&#123;</div><div class="line">       <span class="comment">// assert isElementIndex(index);</span></div><div class="line"></div><div class="line">       <span class="keyword">if</span> (index &lt; (size &gt;&gt; <span class="number">1</span>)) &#123;</div><div class="line">           Node&lt;E&gt; x = first;</div><div class="line">           <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; index; i++)</div><div class="line">               x = x.next; <span class="comment">//一直遍历到这个index才返回，慢</span></div><div class="line">           <span class="keyword">return</span> x;</div><div class="line">       &#125; <span class="keyword">else</span> &#123;</div><div class="line">           Node&lt;E&gt; x = last;</div><div class="line">           <span class="keyword">for</span> (<span class="keyword">int</span> i = size - <span class="number">1</span>; i &gt; index; i--)</div><div class="line">               x = x.prev;</div><div class="line">           <span class="keyword">return</span> x;</div><div class="line">       &#125;</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<p>值得注意的一点小事：<br>ArrayList implement RandomAccess接口，而LinkedList并没有。RandomAccess接口的定义如下</p>
+<blockquote>
 <ul>
-<li></li>
+<li>Marker interface used by <tt>List</tt> implementations to indicate that<ul>
+<li>they support fast (generally constant time) random access.  The primary</li>
+<li>purpose of this interface is to allow generic algorithms to alter their</li>
+<li>behavior to provide good performance when applied to either random or</li>
+<li>sequential access lists.<br>*</li>
+<li><p>The best algorithms for manipulating random access lists (such as</li>
+<li><tt>ArrayList</tt>) can produce quadratic behavior when applied to</li>
+<li>sequential access lists (such as <tt>LinkedList</tt>).  Generic list</li>
+<li>algorithms are encouraged to check whether the given list is an</li>
+<li><tt>instanceof</tt> this interface before applying an algorithm that would</li>
+<li>provide poor performance if it were applied to a sequential access list,</li>
+<li>and to alter their behavior if necessary to guarantee acceptable</li>
+<li>performance.<br>*</li>
+<li><p>It is recognized that the distinction between random and sequential</li>
+<li>access is often fuzzy.  For example, some <tt>List</tt> implementations</li>
+<li>provide asymptotically linear access times if they get huge, but constant</li>
+<li>access times in practice.  Such a <tt>List</tt> implementation</li>
+<li>should generally implement this interface.  As a rule of thumb, a</li>
+<li><tt>List</tt> implementation should implement this interface if,</li>
+<li>for typical instances of the class, this loop:</li>
+<li><pre></li>
+<li>for (int i=0, n=list.size(); i &lt; n; i++)</li>
+<li>list.get(i); //get的速度应该是恒定的</li>
+<li></pre></li>
+<li>runs faster than this loop:</li>
+<li><pre></li>
+<li>for (Iterator i=list.iterator(); i.hasNext(); )</li>
+<li>i.next(); </li>
+<li></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">这种接口就是给外界使用者看的，用来说明该集合支持这种通过下标查找（速度不变）的快速操作</div><div class="line"></div><div class="line">实践表明，对于linkedList，采用for loop的方式要很慢，但使用ListIterator&lt;T&gt;的方式，速度并不慢，简单来想，沿着链表的一个方向一致往下走就是了嘛。</div><div class="line">一些经验表明(摘自简书作者嘟爷MD的文章)</div><div class="line">&gt; [ArryList和LinkedList的对比结论](http://www.jianshu.com/p/d5ec2ff72b33) </div><div class="line">&gt; 1、顺序插入速度ArrayList会比较快</div><div class="line">&gt; 2、LinkedList将比ArrayList更耗费一些内存</div><div class="line">&gt; 3、ArrayList的遍历效率会比LinkedList的遍历效率高一些</div><div class="line">&gt; 4、有些说法认为LinkedList做插入和删除更快，这种说法其实是不准确的：如果增加或者删除的元素在前半部分的时候，ArrayList会频繁调用System.arrayCopy方法，虽然native方法快，但高频率调用肯定慢，至少比不上移动指针。</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">2. HashMap源码解析 LinkedMap</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">3. HashSet原理</div><div class="line">4. 一些不常用的类</div><div class="line">    Vetor，Stack，ArrayDeque,queue</div><div class="line">5. concurrentHashMap等</div><div class="line">6. WeakHaskMap</div><div class="line"></div><div class="line"></div><div class="line">HashMap的实现原理，LinkedHashMap的实现</div><div class="line"></div><div class="line">list.replaceAll(String::toUpperCase) // can not change the elemeet type, for that you need an stream</div><div class="line"></div><div class="line">```java</div><div class="line">public static void dodtuff()&#123;</div><div class="line">    print()</div><div class="line">    // show case awesome </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
 </ul>
-<ol>
-<li>HashMap源码解析</li>
-<li>HashSet原理</li>
-<li></li>
-</ol>
-<p>HashMap的实现原理，LinkedHashMap的实现</p>
-<p>list.replaceAll(String::toUpperCase) // can not change the elemeet type, for that you need an stream</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">dodtuff</span><span class="params">()</span></span>&#123;</div><div class="line">    print()</div><div class="line">    <span class="comment">// show case awesome </span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="ref"><a href="#ref" class="headerlink" title="ref"></a>ref</h3><ol>
-<li>Collections Refuled by Stuart Marks</li>
-<li>IBM from java code to java heap</li>
+</li>
+</ul>
+</blockquote>
+<h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><ol>
+<li><a href="https://www.youtube.com/watch?v=q6zF3vf114M">Collections Refuled by Stuart Marks</a></li>
+<li><a href="https://www.youtube.com/watch?v=FLcXf9pO27w">From Java Code to Java Heap: Understanding the Memory Usage of Your Application</a></li>
 <li><a href="http://www.jianshu.com/p/2cd7be850540">Java集合干货系列</a></li>
-<li><a href="http://www.programcreek.com/2014/01/java%E7%A8%8B%E5%BA%8F%E5%91%98%E5%B8%B8%E7%8A%AF%E7%9A%8410%E4%B8%AA%E9%94%99%E8%AF%AF/">Arrays.asList()返回的List</a></li>
+<li><a href="http://www.programcreek.com/2014/01/java%E7%A8%8B%E5%BA%8F%E5%91%98%E5%B8%B8%E7%8A%AF%E7%9A%8410%E4%B8%AA%E9%94%99%E8%AF%AF/">Arrays.asList()返回的List不是jva.util.ArrayList</a></li>
 </ol>
 
       
