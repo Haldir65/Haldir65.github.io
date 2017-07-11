@@ -250,12 +250,18 @@ str.encode('ascii')，unicode字符超出了ascii的范围，无法decode成bina
 
 > pip install --upgrade setuptools
 
+
+
 <!-- install mongoDb(better performance than sql) -->
 <!-- install pip -->
+
+
+
 grep log in command console
 basic grammars
 network, disk ,database, io , dic, list ,etc
 class object orientated  
+
 
 
 

@@ -70,7 +70,7 @@ class QuotesSpider(scrapy.Spider):
         self.log('Saved file %s' % filename)
 ```
 
-> scrapy crawl quotes #开始爬quotes.toscrape.com的内容
+> scrapy crawl quotes #开始爬quotes.toscrape.com的内容,需要切换到tutorial文件夹下
 
 >scrapy shell 'http://quotes.toscrape.com/page/1/' #从Response中提取所需的值  
 
