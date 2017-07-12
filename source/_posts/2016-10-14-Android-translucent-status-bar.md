@@ -209,6 +209,7 @@ binding.toolbar.setLayoutParams(params);
 fitsSystemWindows, 该属性可以设置是否为系统 View 预留出空间, 当设置为 true 时,会预留出状态栏的空间.
 ContentView, 实质为 ContentFrameLayout, 但是重写了 dispatchFitSystemWindows 方法, 所以对其设置 fitsSystemWindows 无效.
 ContentParent, 实质为 FitWindowsLinearLayout, 里面第一个 View 是 ViewStubCompat, 如果主题没有设置 title ,它就不会 inflate .第二个 View 就是 ContentView.
+另外，如果使用AppCompat，在api21以上，会自动将状态栏颜色设置为colorPrimaryDark。
 最后感谢网上各位博主不辞辛苦写出来的干货，让我能够比较简单的复制粘贴他们的代码来检验，写博客真的很累。
 
 ### Reference

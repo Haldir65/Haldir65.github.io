@@ -503,8 +503,22 @@ for access-order, false for insertion-order.
 
 LinkedHashMap常用的属性就是它支持有序，这个有序是指迭代的时候有序
 
+### 2.3 SparseArray
+先来看一段崩溃日志
+```
+Fatal Exception: java.lang.ArrayIndexOutOfBoundsException: src.length=509 srcPos=60 dst.length=509 dstPos=61 length=-60
+       at java.lang.System.arraycopy(System.java:388)
+       at com.android.internal.util.GrowingArrayUtils.insert(GrowingArrayUtils.java:135)
+       at android.util.SparseIntArray.put(SparseIntArray.java:144)
+```
 
-### 3. Set的介绍
+使用SparseArray的初衷还是在android这种内存比cpu金贵的平台中，使用SparseArry相比HashMap能够减轻内存压力，获得更好的性能。
+
+
+
+
+
+## 3. Set的介绍
 Set用比较少，HashSet、TreeSet和LinkedHashSet是jdk的实现类
 
 public class HashSet<E>

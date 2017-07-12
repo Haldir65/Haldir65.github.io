@@ -67,3 +67,54 @@ A Cookbook shall look like a collection of Recipes, or an index page from where 
 ## 杂乱的点
 [java中的任何细碎的点](http://haldir65.github.io/2017/06/17/2017-06-17-tiny-details-in-java/)
 
+
+## ToDo List
+- [ ] Fragment源码解析
+- [ ] AppCompat源码解析
+- [X] Glide源码解析（写出来）
+- [ ] Binder的原理，Binder里面引用计数的原理，Binder底层为什么用红黑树
+- [ ] 垃圾回收器的分类及优缺点
+- [ ] LruCache的原理
+- [ ] 如何维持一个长连接
+- [ ] TCP UDP的不同 TCP三次握手
+- [ ] Realm的优点
+- [ ] ContentProvider的启动过程
+- [ ] View的绘制原理
+- [ ] 点击一个网址底层经历哪些过程
+- [ ] String StringBuffer StringBuilder区别
+- [ ] HashMap和conrrentHashmap区别(分段锁)
+- [ ] 多线程异步断点续传框架原理,利用该原理在图片加载框架中的应用
+- [ ] 单例模式需要考虑到jvm优化的问题（为什么要写两个synchronized）
+- [ ] java类加载机制(classLoader相关的)
+- [ ] Java四种引用
+- [ ] java堆和栈的区别，如何判断堆栈上的对象死没死
+- [ ] linux进程间通信方式有哪些（信号量这种）
+- [ ] 多线程断点续传原理，大文件下载oom问题
+- [ ] 数组跟链表区别,数组跟链表排序时区别,数组跟链表排序时区别
+- [ ] 自己写一个一部图片加载框架，并发图像滤镜框架
+- [ ] 数据结构，操作系统
+- [ ] WebView JS交互
+- [ ] try catch finally到底会不会执行
+- [ ] 二分法查找，排序，冒泡，复杂度
+- [ ] gson的原理，cache什么的，常规json解析器的原理，moshi为什么和Okio更配？
+- [ ] 画一下java的集合框架
+- [ ] UI Toolkit源码解析
+    - [ ] ViewPager的原理
+    - [ ] ViewGroup，View的源码
+    - [ ] ListView,RecyclerView原理,加载优化(prefetcher什么的，滑动过程中不去加载图片,我记得Glide是没有做这件事的)
+
+
+
+## 一些需要看的演讲
+[Droidcon Montreal Jake Wharton - A Few Ok Libraries](https://www.youtube.com/watch?v=WvyScM_S88c)
+[Advanced Scrolling Techniques on Android](https://www.youtube.com/watch?v=N3J4ZFiR_3Q)
+
+## 一些有名的人
+[GDE](https://developers.google.com/experts/all/technology/android) 
+Dianne Hackborn
+[Jesse Wilson](https://github.com/swankjesse)
+
+
+
+
+
