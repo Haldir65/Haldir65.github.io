@@ -21,7 +21,7 @@
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/4dab298b9f7ce29c43f9d8eaf686e02f.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/reading%20network%20response%20on%20main%20thread.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/observing%20on%20ui%20thred.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-06-22T14:27:51.568Z">
+<meta property="og:updated_time" content="2017-07-12T00:36:03.172Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Rxjava2 的一些点">
 <meta name="twitter:description" content="本文多数内容来自Jake Wharton的演讲，配合一些个人的感受，作为今后使用Rxjava2的一些参考。">
@@ -203,7 +203,7 @@ ga('send', 'pageview');
     <div class="article-entry" itemprop="articleBody">
       
         <p>本文多数内容来自Jake Wharton的演讲，配合一些个人的感受，作为今后使用Rxjava2的一些参考。<br><img src="http://odzl05jxx.bkt.clouddn.com/f21a6a245edfe0b19804be5b3df24a3d.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
-<h3 id="1-Why-Reactive"><a href="#1-Why-Reactive" class="headerlink" title="1. Why Reactive?"></a>1. Why Reactive?</h3><p>最早使用Rxjava的初衷在于方便地实现线程切换，使用链式语法轻松地将异步任务分发到子线程并省去了主动实现回调的麻烦。<br>我们生活在一个事件异步分发的环境中，网络，文件、甚至用户输入本身也是异步事件，除此之外，安卓系统本身的许多操作也是异步的，例如startActivity，Fragment的transaction，这就要求开发者不得不考虑各种事件状态，并在各种事件之间进行协调。Rxjava将各种事件的处理、完成以及异常在事件定义之初定义好处理方式。事件的开始，进行，完成以及异常，都被抽象到Observable的载体中。值得注意的是，这种链式调用很像Builder Pattern，但本质上每一步都生成了一个新的对象。这个在Rxjava的Wiki上有所说明，即每一步都生成一个新的immutable objec（GC表示压力大）。</p>
+<h3 id="1-Why-Reactive"><a href="#1-Why-Reactive" class="headerlink" title="1. Why Reactive?"></a>1. Why Reactive?</h3><p>最早使用Rxjava的初衷在于方便地实现线程切换，使用链式语法轻松地将异步任务分发到子线程并省去了主动实现回调的麻烦。<br>我们生活在一个事件异步分发的环境中，网络，文件、甚至用户输入本身也是异步事件，除此之外，安卓系统本身的许多操作也是异步的，例如startActivity，Fragment的transaction，这就要求开发者不得不考虑各种事件状态，并在各种事件之间进行协调。Rxjava将各种事件的处理、完成以及异常在事件定义之初定义好处理方式。事件的开始，进行，完成以及异常，都被抽象到Observable的载体中。值得注意的是，这种链式调用很像Builder Pattern，但本质上每一步都生成了一个新的对象。这个在Rxjava的Wiki上有所说明，即每一步都生成一个新的immutable object（GC表示压力大）。</p>
 <h3 id="2-数据源"><a href="#2-数据源" class="headerlink" title="2. 数据源"></a>2. 数据源</h3><p>Stream基本包括这三部分<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">source of data</div><div class="line">listener of data</div><div class="line">methods for modifying data</div></pre></td></tr></table></figure></p>
 <p><img src="http://odzl05jxx.bkt.clouddn.com/stream_compose.jpg?imageView2/2/w/600" alt=""></p>
 <h4 id="2-1-数据源的种类"><a href="#2-1-数据源的种类" class="headerlink" title="2.1 数据源的种类"></a>2.1 数据源的种类</h4><p>Observable<T> 和Flowable<T>，区别在于后者支持BackPressure，后者不支持BackPressure.<br>接收Observable和Flowable的类型分别为Observer和Subscriber</p>
