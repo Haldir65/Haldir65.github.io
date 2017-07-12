@@ -433,7 +433,7 @@ public class ForegroundLinearLayout extends LinearLayout {
 最后，还有人给出据说更好的[解决方案](https://github.com/cesards/ForegroundViews)
 没有测试过，不了解
 
-##reference
+## reference
  - [Android themes and styles demisfied](https://www.youtube.com/watch?v=TIHXGwRTMWI) 关于Theme和Style的区别的很好的学习资料
  - [Chris Banes G+ post](https://plus.google.com/108967384991768947849/posts/aHPVDtr6mcp) 评论很精彩
  - [RelativeLayout with foreGround](https://gist.github.com/shakalaca/6199283) 没测试过
