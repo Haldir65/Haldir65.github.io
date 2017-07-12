@@ -74,6 +74,7 @@ A Cookbook shall look like a collection of Recipes, or an index page from where 
 - [X] Glide源码解析（写出来）
 - [ ] Binder的原理，Binder里面引用计数的原理，Binder底层为什么用红黑树
 - [ ] 垃圾回收器的分类及优缺点
+- [ ] ThreadLocal原理及可能的内存泄漏
 - [ ] LruCache的原理
 - [ ] 如何维持一个长连接
 - [ ] TCP UDP的不同 TCP三次握手

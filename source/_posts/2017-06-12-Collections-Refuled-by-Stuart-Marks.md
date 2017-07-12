@@ -514,6 +514,9 @@ Fatal Exception: java.lang.ArrayIndexOutOfBoundsException: src.length=509 srcPos
 
 使用SparseArray的初衷还是在android这种内存比cpu金贵的平台中，使用SparseArry相比HashMap能够减轻内存压力，获得更好的性能。
 
+### 2.4 ArrayMap
+
+
 
 
 

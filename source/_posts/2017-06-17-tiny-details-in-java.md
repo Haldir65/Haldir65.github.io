@@ -123,3 +123,32 @@ OkHttp 3.3.0 [issue](https://github.com/square/okhttp/issues/2394)
 ```
 
 如果不是看到Retrofit的源码，一般还真没机会了解到这几个方法。。
+
+6. java如何把char类型数据转成int类型数据
+String a = "123"
+Stirng本质上就是一个char[]的包装类，1对应Asicii码的49,2对应50,3对应51.所以实质上就类似于char[] = new char{49,50,51} ;
+
+想把1,2,3分别拿出来得这么写：
+```java
+char[] array = a.tocharArray();
+for(i=0;i<=array.length();i++){
+  int a = Integer.parseInt(String.valueof(array.charAt(i)));//这样就能分别把1,2,3拿出来了。
+}
+```
+
+
+根据stackoverFlow的[解释](https://stackoverflow.com/questions/14342988/why-are-we-allowed-to-assign-char-to-a-int-in-java), char只是16bit的数字，也就是int（4个字节,32位）的子集。
+
+```java
+char word = 'A' +1234 ;//编译通过
+
+char word2 = 'A';
+word2 = word2 +1 ;//编译失败
+```
+
+[char的转换问题](https://stackoverflow.com/questions/21317631/java-char-int-conversions)
+
+
+
+
+
