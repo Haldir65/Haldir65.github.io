@@ -72,6 +72,7 @@ A Cookbook shall look like a collection of Recipes, or an index page from where 
 - [ ] Fragment源码解析
 - [ ] AppCompat源码解析
 - [X] Glide源码解析（写出来）
+- [ ] onSaveInstance,不仅仅是Activity,Fragment，View中也有，具体实现原理
 - [ ] Binder的原理，Binder里面引用计数的原理，Binder底层为什么用红黑树
 - [ ] 垃圾回收器的分类及优缺点
 - [ ] java位运算，Collection框架中多次用到了

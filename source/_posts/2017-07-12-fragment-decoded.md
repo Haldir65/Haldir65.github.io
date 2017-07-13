@@ -173,50 +173,60 @@ FragmentFransaction只是将所有操作保留到一次Transaction的一个任�
      *                    in unoptimized transactions
      */
     void executePopOps(boolean moveToState) {
-        for (int opNum = mOps.size() - 1; opNum >= 0; opNum--) { //倒序执行
+        for (int opNum = mOps.size() - 1; opNum >= 0; opNum--) { //倒序执行,每一个ops包含了对一个Fragment的指令，遍历所有的ops
             final Op op = mOps.get(opNum);
             Fragment f = op.fragment;
             f.setNextTransition(FragmentManagerImpl.reverseTransit(mTransition), mTransitionStyle);
             switch (op.cmd) {
+                //这些操作全部只是设置一些变量的值，暂时还没到UI更改，具体的UI操作在moveToState里面
                 case OP_ADD:
                     f.setNextAnim(op.popExitAnim);
-                    mManager.removeFragment(f);
+                    mManager.removeFragment(f);  //从FragmentManager的mAdded中移除该fragment，fragment的mAdded = false,mRemoving = true;
                     break;
                 case OP_REMOVE:
                     f.setNextAnim(op.popEnterAnim);
                     mManager.addFragment(f, false);
+                    /** addFragment里面有这么一段  
+       if (mAdded.contains(fragment)) {
+                throw new IllegalStateException("Fragment already added: " + fragment); //就是简单的判断下List中是否存在，如果在一个Fragment已经added的情况下再去add，就会出现这种错误
+            }**/
                     break;
                 case OP_HIDE:
                     f.setNextAnim(op.popEnterAnim);
                     mManager.showFragment(f);
+                    // 只是将fragment的mHidden设置为false了
                     break;
                 case OP_SHOW:
                     f.setNextAnim(op.popExitAnim);
                     mManager.hideFragment(f);
+                    // 只是将fragment的mHidden设置为true了
                     break;
                 case OP_DETACH:
                     f.setNextAnim(op.popEnterAnim);
                     mManager.attachFragment(f);
+                    //和attach差不多，也是设定了一些标志位
                     break;
                 case OP_ATTACH:
                     f.setNextAnim(op.popExitAnim);
                     mManager.detachFragment(f);
+                    // mFragment.mDetached = false,这里判断了manager.mAdded.contains(mFragment)，会抛出异常Fragment already added!如果正常的话把mFragment添加到mAdded里面
                     break;
                 default:
                     throw new IllegalArgumentException("Unknown cmd: " + op.cmd);
             }
-            if (!mAllowOptimization && op.cmd != OP_REMOVE) {
+           if (!mAllowOptimization && op.cmd != OP_ADD) {
                 mManager.moveFragmentToExpectedState(f);
             }
         }
-        if (!mAllowOptimization && moveToState) {
+         if (!mAllowOptimization) {
+            // Added fragments are added at the end to comply with prior behavior.
             mManager.moveToState(mManager.mCurState, true);
         }
     }        
 
 ```
 通常我们都是在主线程往Manager添加Transaction，不过从这里看来，添加Transaction只是添加了一份BackStackRecord，最终执行还是在主线程上做的。
-很直观的看到这里 调用了manager的removeFragment、showFragmentdeng 等方法.随便挑两个
+很直观的看到这里 调用了manager的removeFragment、showFragment等方法.随便挑两个
 ```java
 // FragmentManagerImpl.java
  public void addFragment(Fragment fragment, boolean moveToStateNow) {
@@ -272,7 +282,7 @@ FragmentFransaction只是将所有操作保留到一次Transaction的一个任�
 
 
 ```java
-
+// FragmentImpl.java
     void moveToState(Fragment f, int newState, int transit, int transitionStyle,
             boolean keepActive) {
         // Fragments that are not currently added will sit in the onCreate() state.
@@ -288,7 +298,7 @@ FragmentFransaction只是将所有操作保留到一次Transaction的一个任�
         if (f.mDeferStart && f.mState < Fragment.STARTED && newState > Fragment.STOPPED) {
             newState = Fragment.STOPPED;
         }
-        if (f.mState < newState) {
+        if (f.mState < newState) { //Fragment的state将提高，例如从ACTIVITY_CREATED到ACTIVITYCREATED
             // For fragments that are created from a layout, when restoring from
             // state we don't want to allow them to be created until they are
             // being reloaded from the layout.
@@ -337,9 +347,9 @@ FragmentFransaction只是将所有操作保留到一次Transaction的一个任�
                                 + " did not call through to super.onAttach()");
                     }
                     if (f.mParentFragment == null) {
-                        mHost.onAttachFragment(f);
+                        mHost.onAttachFragment(f);//mHost其实就是Activity
                     } else {
-                        f.mParentFragment.onAttachFragment(f);
+                        f.mParentFragment.onAttachFragment(f); //这个是ChildFragment的情况
                     }
                     dispatchOnFragmentAttached(f, mHost.getContext(), false);
 
@@ -351,7 +361,7 @@ FragmentFransaction只是将所有操作保留到一次Transaction的一个任�
                         f.mState = Fragment.CREATED;
                     }
                     f.mRetaining = false;
-                    if (f.mFromLayout) {
+                    if (f.mFromLayout) {//写在XML里面的，直接在从INITIALIZING到CREATED的过程中把performCreateView和onViewCreated走一遍
                         // For fragments that are part of the content view
                         // layout, we need to instantiate the view immediately
                         // and the inflater will take care of adding it.
@@ -414,7 +424,7 @@ FragmentFransaction只是将所有操作保留到一次Transaction的一个任�
                                 if (f.mHidden) { //hide就只是设置Visibility这么简单，这mHdidden是在上面的showFragment里面设置的
                                     f.mView.setVisibility(View.GONE);
                                 }
-                                f.onViewCreated(f.mView, f.mSavedFragmentState);// 又是回调
+                                f.onViewCreated(f.mView, f.mSavedFragmentState);// 又是回调,onViewCreated确实是在onCreatedView之后立马添加的
                                 dispatchOnFragmentViewCreated(f, f.mView, f.mSavedFragmentState,
                                         false);
                                 // Only animate the view if it is visible. This is done after
@@ -425,7 +435,7 @@ FragmentFransaction只是将所有操作保留到一次Transaction的一个任�
                                 f.mInnerView = null;
                             }
                         }
-
+                        //随后马上就调用到了onActivityCreated了，同一个Message中
                         f.performActivityCreated(f.mSavedFragmentState);
                         dispatchOnFragmentActivityCreated(f, f.mSavedFragmentState, false);
                         if (f.mView != null) {
@@ -440,36 +450,36 @@ FragmentFransaction只是将所有操作保留到一次Transaction的一个任�
                 case Fragment.STOPPED:
                     if (newState > Fragment.STOPPED) {
                         if (DEBUG) Log.v(TAG, "moveto STARTED: " + f);
-                        f.performStart();
+                        f.performStart(); //随后开始onStart
                         dispatchOnFragmentStarted(f, false);
                     }
                 case Fragment.STARTED:
                     if (newState > Fragment.STARTED) {
                         if (DEBUG) Log.v(TAG, "moveto RESUMED: " + f);
-                        f.performResume();
+                        f.performResume(); //onResume
                         dispatchOnFragmentResumed(f, false);
                         f.mSavedFragmentState = null;
                         f.mSavedViewState = null;
                     }
             }
-        } else if (f.mState > newState) {
+        } else if (f.mState > newState) { //Fragment的STATE降低
             switch (f.mState) {
                 case Fragment.RESUMED:
                     if (newState < Fragment.RESUMED) {
                         if (DEBUG) Log.v(TAG, "movefrom RESUMED: " + f);
-                        f.performPause();
+                        f.performPause(); //onPause
                         dispatchOnFragmentPaused(f, false);
                     }
                 case Fragment.STARTED:
                     if (newState < Fragment.STARTED) {
                         if (DEBUG) Log.v(TAG, "movefrom STARTED: " + f);
-                        f.performStop();
+                        f.performStop();//调用onStop,state变成STOPPED
                         dispatchOnFragmentStopped(f, false);
                     }
                 case Fragment.STOPPED:
                     if (newState < Fragment.STOPPED) {
                         if (DEBUG) Log.v(TAG, "movefrom STOPPED: " + f);
-                        f.performReallyStop();
+                        f.performReallyStop();//不调用回调，状态变成ACTIVITY_CREATED
                     }
                 case Fragment.ACTIVITY_CREATED:
                     if (newState < Fragment.ACTIVITY_CREATED) {
@@ -481,7 +491,7 @@ FragmentFransaction只是将所有操作保留到一次Transaction的一个任�
                                 saveFragmentViewState(f);
                             }
                         }
-                        f.performDestroyView();
+                        f.performDestroyView(); //状态变成CREATED，调用onDestoryView。最后收尾调用                            f.mContainer.removeView(f.mView);//引用置空
                         dispatchOnFragmentViewDestroyed(f, false);
                         if (f.mView != null && f.mContainer != null) {
                             Animation anim = null;
@@ -583,6 +593,14 @@ FragmentFransaction只是将所有操作保留到一次Transaction的一个任�
         mManager.execSingleAction(this, false);
     }
 ```
+
+
+## 4. 现在再来看FragmentPagerAdapter和FragmentStatePagerAdapter
+这两个类行数都不超过300行，非常简单，只是通过调用FragmentManager的相应方法实现展示View的功能。
+
+## 5. Fragment的一些不常用的API
+attach,detach,FragmentLifecycleCallbacks,commitNow，setAllowOptimization(26.0.0又被deprecated了)
+
 
 
 ## Reference
