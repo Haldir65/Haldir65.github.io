@@ -1,5 +1,5 @@
 ---
-title: Java集合类的一些整理 
+title: Java集合类的一些整理
 date: 2017-06-25 22:56:33
 categories: blog
 tags: [java]
@@ -7,7 +7,7 @@ tags: [java]
 
 根据网上的大部分博客的分类，集合框架分为Collections(具有类似数组的功能)和Map(存储键值对)这两大部分。针对jdk1.8的java.util里面的一些常用的或者不常用的集合做一些分析。写这篇文章的过程中，我慢慢发现不同版本jdk的同一个class的实现是有一些差异的(LinkedList)，由于对照的是java1.8的代码，里面会多一些since 1.8的代码，这里不作论述。
 ![](http://odzl05jxx.bkt.clouddn.com/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg?imageView2/2/w/600)
- 
+
 <!--more-->
 
 java集合的大致框架建议参考网上博客的总结，[Java集合干货系列](http://www.jianshu.com/p/2cd7be850540)写的比较好，图画的也不错，针对jdk 1.6源码讲的。我这里只是自己学习过程中的一些笔记。
@@ -77,7 +77,7 @@ ArrayList.toArray(T[] a)是把所有的elements通过System.arraycopy(elementDat
 private void writeObject(java.io.ObjectOutputStream s)
 private void readObject(java.io.ObjectInputStream s)
 
-protected void removeRange(int fromIndex, int toIndex) 
+protected void removeRange(int fromIndex, int toIndex)
 
 public boolean removeAll(Collection<?> c) //给一个集合，删除list与之的交集
 public boolean retainAll(Collection<?> c) //  给定一个集合，从list中删除所有不在这个集合里面的元素
@@ -180,7 +180,7 @@ ArrayList implement RandomAccess接口，而LinkedList并没有。RandomAccess�
  *         list.get(i); //get的速度应该是恒定的
  * runs faster than this loop:
  *     for (Iterator i=list.iterator(); i.hasNext(); )
- *         i.next(); 
+ *         i.next();
 
 
 这种接口就是给外界使用者看的，用来说明该集合支持这种通过下标查找（速度不变）的快速操作
@@ -188,7 +188,7 @@ ArrayList implement RandomAccess接口，而LinkedList并没有。RandomAccess�
 实践表明，对于linkedList，采用for loop的方式要很慢，但使用ListIterator<T>的方式，速度并不慢，简单来想，沿着链表的一个方向一致往下走就是了嘛。
 一些经验表明(摘自简书作者嘟爷MD的文章)
 
-[ArryList和LinkedList的对比结论](http://www.jianshu.com/p/d5ec2ff72b33) 
+[ArryList和LinkedList的对比结论](http://www.jianshu.com/p/d5ec2ff72b33)
 
 > 1、顺序插入速度ArrayList会比较快
 > 2、LinkedList将比ArrayList更耗费一些内存
@@ -197,17 +197,17 @@ ArrayList implement RandomAccess接口，而LinkedList并没有。RandomAccess�
 
 
 ## 2. Map的几个实现类
-### 2.1 HashMap源码解析 
+### 2.1 HashMap源码解析
 
 >public class HashMap<K,V> extends AbstractMap<K,V>
-    implements Map<K,V>, Cloneable, Serializable 
-   
+    implements Map<K,V>, Cloneable, Serializable
+
 HashMap不是线程安全的，Key和Value都有可能为null，存储数据不是有序的(get的顺序不是put的顺序)
 
 HashMap中有几个默认值常量
 
     默认初始容量是16
-    static final int DEFAULT_INITIAL_CAPACITY = 1 << 4; // aka 16 
+    static final int DEFAULT_INITIAL_CAPACITY = 1 << 4; // aka 16
 
     默认加载因子是0.75f ，加载因子是指Hashmap在自动扩容之前可以达到多满
     static final float DEFAULT_LOAD_FACTOR = 0.75f; //一般不需要改
@@ -284,7 +284,7 @@ HashMap中有几个默认值常量
 ```
 
 get方法
-```java 
+```java
   public V get(Object key) {
         Node<K,V> e;
         return (e = getNode(hash(key), key)) == null ? null : e.value;//根据key来找value
@@ -340,7 +340,7 @@ get方法
                 if (first instanceof TreeNode)
                     return ((TreeNode<K,V>)first).getTreeNode(hash, key);
                 do {
-                    if (e.hash == hash && 
+                    if (e.hash == hash &&
                         ((k = e.key) == key || (key != null && key.equals(k))))
                         return e;
     //可以看出比较的方式就是hash（int）相等且key(指针相等)  或者key equals(所以经常说重写equals需要确保hashcode一致，这里至少反应了这一点)
@@ -380,7 +380,7 @@ Set<Map.Entry<K, V>> entrySet();
      *
      * @return a set view of the mappings contained in this map
 ```
-   
+
 大致意思是： 返回一个能够反映该map元素组合的一个Set，对这个Set的操作都将反映到原map上，反之亦然。在通过entrySet迭代这个map的时候，除了remove和操作操作都是不被支持的。返回的Set支持删除对应的mapping组合。但不支持add操作
 
 HashMap内部保留了一个这样的成员变量：
@@ -484,7 +484,7 @@ transient Set<Map.Entry<K,V>> entrySet; //成员变量
             }
         }
         return false;
-    } 
+    }
 ```
 
 和ArrayList、LinkedList比起来，HashMap的源码要麻烦许多，这里面涉及到hashCode，链表，红黑树。需要一点数据结构的知识。另外，HashMap还针对hashCode冲突（hash Collision，不同的Object居然有相同的hashCode）的情况作了[预处理](https://stackoverflow.com/questions/6493605/how-does-a-java-hashmap-handle-different-objects-with-the-same-hash-code)
@@ -511,8 +511,61 @@ Fatal Exception: java.lang.ArrayIndexOutOfBoundsException: src.length=509 srcPos
        at com.android.internal.util.GrowingArrayUtils.insert(GrowingArrayUtils.java:135)
        at android.util.SparseIntArray.put(SparseIntArray.java:144)
 ```
+SparseArry提供了类似于HashMap的调用接口，
 
 使用SparseArray的初衷还是在android这种内存比cpu金贵的平台中，使用SparseArry相比HashMap能够减轻内存压力，获得更好的性能。
+[liaohuqiu指出SparseArry并不是任何时候都更快](https://www.liaohuqiu.net/cn/posts/sparse-array-in-android/)，主要是节省内存，避免autoBoxing，二分法查找对于cpu的消耗需要权衡。尤其是存储的量很大的时候，二分法查找的速度会很慢。
+
+SparseArry类似的class有好几个，据说有八个，以SparseIntArry为例
+SparseIntArry的几个常用方法,值得注意的是 clear方法只不过是把计数清零了。
+```java
+public int indexOfKey(int key)
+public int indexOfValue(int value)
+public int get(int key)
+public void put(int key, int value)
+
+public void clear() {
+       mSize = 0;
+   }
+//迭代一个SparseArry的方法
+for(int i = 0; i < sparseArray.size(); i++) {
+   int key = sparseArray.keyAt(i);
+   // get the object by the key.
+   Object obj = sparseArray.get(key);
+}
+
+// 从源码来看变量结构
+public class SparseIntArray implements Cloneable{
+    private int[] mKeys;
+    private int[] mValues;
+    private int mSize;
+}
+
+
+
+public void put(int key, int value) {
+     int i = ContainerHelpers.binarySearch(mKeys, mSize, key); //二分法查找
+
+     if (i >= 0) {
+         mValues[i] = value; //找到了在Value数组中的index,直接替换掉
+     } else {
+         i = ~i;
+         mKeys = GrowingArrayUtils.insert(mKeys, mSize, i, key);
+         mValues = GrowingArrayUtils.insert(mValues, mSize, i, value);
+         mSize++;
+     }
+ }
+
+```
+
+廖祜秋 特地强调
+1. SparseArray 是针对HashMap做的优化。
+    1.HashMap 内部的存储结构，导致一些内存的浪费。
+    2.在刚扩容完，SparseArray 和 HashMap 都会存在一些没被利用的内存。
+2. SparseArray 并不是任何时候都会更快，有时反而会更慢
+
+
+
 
 ### 2.4 ArrayMap
 
@@ -571,7 +624,7 @@ WeakHashMap的value不要持有key的强引用，否则，key永远不会被清�
 
 
 ## 7. java 8的一些新的方法
-list.replaceAll(String::toUpperCase) //method reference 
+list.replaceAll(String::toUpperCase) //method reference
 can not change the elemeet type, for that you need an stream
 [Collections Refuled by Stuart Marks](https://www.youtube.com/watch?v=q6zF3vf114M)
 
@@ -584,7 +637,7 @@ can not change the elemeet type, for that you need an stream
 
 
 
-### Reference 
+### Reference
 1. [Collections Refuled by Stuart Marks](https://www.youtube.com/watch?v=q6zF3vf114M)
 2. [From Java Code to Java Heap: Understanding the Memory Usage of Your Application](https://www.youtube.com/watch?v=FLcXf9pO27w)
 3. [Java集合干货系列](http://www.jianshu.com/p/2cd7be850540)
