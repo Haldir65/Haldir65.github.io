@@ -4,7 +4,7 @@ date: 2017-07-12 08:37:23
 tags: [android]
 ---
 
-We been told Fragment itself should only trust official docs, the implementation detail are prone to any change any time. 
+We been told Fragment itself should only trust official docs, the implementation detail are prone to any change any time.
 ![](http://odzl05jxx.bkt.clouddn.com/2009528111321773591934.jpg?imageView2/2/w/600)
 ![](http://odzl05jxx.bkt.clouddn.com/Cg-4zFVJ0xGITwm_AA688WRj8n8AAXZ9wGMpd0ADr0J195.jpg?imageView2/2/w/600)
 ![](http://odzl05jxx.bkt.clouddn.com/u=3180342558,2746910171&fm=214&gp=0.jpg?imageView2/2/w/600)
@@ -254,7 +254,7 @@ FragmentFransaction只是将所有操作保留到一次Transaction的一个任�
     }
 
         // show的方法异常简单
-       /** 
+       /**
      * Marks a fragment as shown to be later animated in with
      * {@link #completeShowHideFragment(Fragment)}.
      *
@@ -586,7 +586,7 @@ FragmentFransaction只是将所有操作保留到一次Transaction的一个任�
 
 
 ```java
-注意24.2之后Google添加了一个单独的commitNow方法，这一点Adam Powell在2016年的IO上特别提到过。
+注意24.2 之后Google添加了一个单独的commitNow方法，这一点Adam Powell在2016年的IO上特别提到过。
  @Override
     public void commitNow() {
         disallowAddToBackStack();
@@ -601,7 +601,22 @@ FragmentFransaction只是将所有操作保留到一次Transaction的一个任�
 ## 5. Fragment的一些不常用的API
 attach,detach,FragmentLifecycleCallbacks,commitNow，setAllowOptimization(26.0.0又被deprecated了)
 
+## 6. 关于Glide是如何实现生命周期绑定的
+Fragment本身提供了生命周期监听回调
+```java
+registerFragmentLifecycleCallbacks 25.1.0
+unregisterFragmentLifecycleCallbacks 25.1.0
 
+addOnBackStackChangedListener 22.2.0
+removeOnBackStackChangedListener 22.2.0
+```
+Glide的做法是写了一个**SupportRequestManagerFragment** 在这个Fragment的构造函数里放了一个ActivityFragmentLifecycle
+ [参考](http://blog.leanote.com/post/qq-tank/Glide%E4%B8%AD)
+ 在这个Fragment的onStart，OnStop等方法里面调用该lifeCycle的onStart,onStop等回调(lifeCycle是接口，由RequestManager实现)
+
+
+## 7. 总结
+Fragemnt的一些生命周期还是需要跟Activity的生命周期一起看，毕竟是异步操作，所有任务都是在
 
 ## Reference
-1. [Fragment的onAttach和onDetach什么时候会调用](http://stackoverflow.com/questions/9156406/whats-the-difference-between-detaching-a-fragment-and-removing-it) 
+1. [Fragment的onAttach和onDetach什么时候会调用](http://stackoverflow.com/questions/9156406/whats-the-difference-between-detaching-a-fragment-and-removing-it)

@@ -79,7 +79,7 @@ A Cookbook shall look like a collection of Recipes, or an index page from where 
 - [ ] ThreadLocal原理及可能的内存泄漏
 - [ ] LruCache的原理
 - [ ] 如何维持一个长连接
-- [ ] TCP UDP的不同 TCP三次握手
+- [ ] TCP UDP的不同 TCP三次握手，wireShark抓包
 - [ ] Realm的优点
 - [ ] ContentProvider的启动过程
 - [ ] View的绘制原理
@@ -96,7 +96,6 @@ A Cookbook shall look like a collection of Recipes, or an index page from where 
 - [ ] 多线程断点续传原理，大文件下载oom问题
 - [ ] 数组跟链表区别,数组跟链表排序时区别,数组跟链表排序时区别
 - [ ] 自己写一个一部图片加载框架，并发图像滤镜框架
-- [ ] 数据结构，操作系统
 - [ ] WebView JS交互
 - [ ] try catch finally到底会不会执行
 - [ ] 二分法查找，排序，冒泡，复杂度
@@ -106,6 +105,12 @@ A Cookbook shall look like a collection of Recipes, or an index page from where 
     - [ ] ViewPager的原理
     - [ ] ViewGroup，View的源码
     - [ ] ListView,RecyclerView原理,加载优化(prefetcher什么的，滑动过程中不去加载图片,我记得Glide是没有做这件事的)
+- [ ] MySql从入门到删库跑路
+- [ ] Linux command extended
+- [ ] 数据结构，操作系统
+
+
+
 
 
 
@@ -114,11 +119,6 @@ A Cookbook shall look like a collection of Recipes, or an index page from where 
 [Advanced Scrolling Techniques on Android](https://www.youtube.com/watch?v=N3J4ZFiR_3Q)
 
 ## 一些有名的人
-[GDE](https://developers.google.com/experts/all/technology/android) 
+[GDE](https://developers.google.com/experts/all/technology/android)
 Dianne Hackborn
 [Jesse Wilson](https://github.com/swankjesse)
-
-
-
-
-

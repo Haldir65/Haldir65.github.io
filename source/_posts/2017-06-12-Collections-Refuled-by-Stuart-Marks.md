@@ -225,8 +225,18 @@ HashMap中有几个默认值常量
 来看常见的CURD操作(jdk 1.8源码，和我在网上找到的jdk1.6源码有一些变化了)
 ```java
  public V put(K key, V value) {
-        return putVal(hash(key), key, value, false, true);
+        return putVal(hash(key), key, value, false, true); //HashMap允许key为null,key为null的话，直接放到数组的0的位置（hash方法返回的是0）
     }
+
+    static final int hash(Object key) {
+           int h;
+           return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16); //如果是null，放到数组的第一个
+// 这里面就是HashMap算法的高明之处  ，
+//  1. 首先算出object的hashcode，
+//2.然后根据上述公式将二进制的1尽量分散的均匀一点         
+// 3. 在putVal的时候将这个值跟数组的长度length-1进行位运算，得到一个比length小的正数，作为这个新元素在数组中的index.但这样仍不免会产生冲突(hash Collision)
+       }
+
 
  /**
      * Implements Map.put and related methods
