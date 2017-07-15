@@ -37,7 +37,7 @@ A Cookbook shall look like a collection of Recipes, or an index page from where 
 
 ### 底层原理
 [主线程的工作原理](http://haldir65.github.io/2016/10/12/2016-10-12-How-the-mainThread-work/) **Michael Bailey American Express, 他2016年还讲了LayoutInflater的工作原理**
-[Fragment源码解析](http://haldir65.github.io/2017/07/12/2017-07-12-fragment-decoded/)   // tbd
+[Fragment源码解析](http://haldir65.github.io/2017/07/12/2017-07-12-fragment-decoded/)  
 [让service常驻后台的方法](http://haldir65.github.io/2016/10/20/2016-10-20-android-dirty-code/)
 
 ### 新版本适配，新特性
@@ -69,45 +69,66 @@ A Cookbook shall look like a collection of Recipes, or an index page from where 
 
 
 ## ToDo List
-- [ ] Fragment源码解析
-- [ ] AppCompat源码解析
-- [X] Glide源码解析（写出来）
-- [ ] onSaveInstance,不仅仅是Activity,Fragment，View中也有，具体实现原理
-- [ ] Binder的原理，Binder里面引用计数的原理，Binder底层为什么用红黑树
-- [ ] 垃圾回收器的分类及优缺点
+Java相关
+- [X] 画一下java的集合框架
 - [ ] java位运算，Collection框架中多次用到了
+- [ ] gson的原理，cache什么的，常规json解析器的原理
+- [ ] 基于Okio展开到OkHttp,Retrofit。
+- [ ] String StringBuffer StringBuilder区别
+- [ ] 垃圾回收器的分类及优缺点
 - [ ] ThreadLocal原理及可能的内存泄漏
 - [ ] LruCache的原理
-- [ ] 如何维持一个长连接
-- [ ] TCP UDP的不同 TCP三次握手，wireShark抓包
-- [ ] Realm的优点
-- [ ] ContentProvider的启动过程
-- [ ] View的绘制原理
-- [ ] 点击一个网址底层经历哪些过程
-- [ ] String StringBuffer StringBuilder区别
 - [ ] Understanding Dagger2's generated code
 - [ ] HashMap和conrrentHashmap区别(分段锁)
-- [ ] 多线程异步断点续传框架原理,利用该原理在图片加载框架中的应用
 - [ ] 单例模式需要考虑到jvm优化的问题（为什么要写两个synchronized）
 - [ ] java类加载机制(classLoader相关的)
 - [ ] Java四种引用
 - [ ] java堆和栈的区别，如何判断堆栈上的对象死没死
-- [ ] linux进程间通信方式有哪些（信号量这种）
-- [ ] 多线程断点续传原理，大文件下载oom问题
-- [ ] 数组跟链表区别,数组跟链表排序时区别,数组跟链表排序时区别
 - [ ] 自己写一个一部图片加载框架，并发图像滤镜框架
-- [ ] WebView JS交互
+- [ ] 多线程异步断点续传框架原理,利用该原理在图片加载框架中的应用
 - [ ] try catch finally到底会不会执行
-- [ ] 二分法查找，排序，冒泡，复杂度
-- [ ] gson的原理，cache什么的，常规json解析器的原理，moshi为什么和Okio更配？
-- [ ] 画一下java的集合框架
+- [ ] 一个Java Object到底占用多少内存
+- [ ] 并发编程，java.util.concurrent里面的类熟练掌握，粗略了解原理
+
+
+Android相关
+- [X] Fragment源码解析
+- [X] Glide源码解析（写出来）
+- [ ] AppCompat源码解析
+- [ ] ContentProvider的启动过程
+- [ ] IPC，Binder原理
+- [ ] Binder的原理，Binder里面引用计数的原理，Binder底层为什么用红黑树
+- [ ] onSaveInstance,不仅仅是Activity,Fragment，View中也有，具体实现原理。View一定要有id
+- [ ] WebView JS交互
 - [ ] UI Toolkit源码解析
     - [ ] ViewPager的原理
     - [ ] ViewGroup，View的源码
+    - [ ] View的绘制原理
     - [ ] ListView,RecyclerView原理,加载优化(prefetcher什么的，滑动过程中不去加载图片,我记得Glide是没有做这件事的)
-- [ ] MySql从入门到删库跑路
+
+
+Linux相关
+- [ ] linux进程间通信方式有哪些（信号量这种）
 - [ ] Linux command extended
+
+网络通信
+- [ ] TCP UDP的不同 TCP三次握手，wireShark抓包,抓一个App的包，模拟请求
+- [ ] 如何维持一个长连接
+- [ ] 多线程断点续传原理，大文件下载oom问题
+- [ ] 点击一个网址底层经历哪些过程
+
+
+
+数据库相关
+- [ ] MySql从入门到删库跑路
+- [ ] Realm的优点
+
+
+数据结构，算法
 - [ ] 数据结构，操作系统
+- [ ] 编码，底层二进制
+- [ ] 二分法查找，排序，冒泡，复杂度
+- [ ] 数组跟链表区别,数组跟链表排序时区别,数组跟链表排序时区别
 
 
 
