@@ -37,6 +37,7 @@ A Cookbook shall look like a collection of Recipes, or an index page from where 
 
 ### 底层原理
 [主线程的工作原理](http://haldir65.github.io/2016/10/12/2016-10-12-How-the-mainThread-work/) **Michael Bailey American Express, 他2016年还讲了LayoutInflater的工作原理**
+[vsync原理解释](http://djt.qq.com/article/view/987)
 [Fragment源码解析](http://haldir65.github.io/2017/07/12/2017-07-12-fragment-decoded/)  
 [让service常驻后台的方法](http://haldir65.github.io/2016/10/20/2016-10-20-android-dirty-code/)
 
@@ -74,7 +75,7 @@ Java相关
 - [ ] java位运算，Collection框架中多次用到了
 - [ ] gson的原理，cache什么的，常规json解析器的原理
 - [ ] 基于Okio展开到OkHttp,Retrofit。
-- [ ] String StringBuffer StringBuilder区别
+- [X] String StringBuffer StringBuilder区别(StringBuffer很多方法都加了synchronized)
 - [ ] 垃圾回收器的分类及优缺点
 - [ ] ThreadLocal原理及可能的内存泄漏
 - [ ] LruCache的原理
@@ -85,7 +86,7 @@ Java相关
 - [ ] Java四种引用
 - [ ] java堆和栈的区别，如何判断堆栈上的对象死没死
 - [ ] 自己写一个一部图片加载框架，并发图像滤镜框架
-- [ ] 多线程异步断点续传框架原理,利用该原理在图片加载框架中的应用
+- [ ] 多线程异步断点续传框架原理,利用该原理在图片加载框架中的应用(MappedByteBuffer或者RandomAccessFile)
 - [ ] try catch finally到底会不会执行
 - [ ] 一个Java Object到底占用多少内存
 - [ ] 并发编程，java.util.concurrent里面的类熟练掌握，粗略了解原理
