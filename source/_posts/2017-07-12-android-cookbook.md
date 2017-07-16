@@ -98,9 +98,10 @@ Android相关
 - [ ] AppCompat源码解析
 - [ ] ContentProvider的启动过程
 - [ ] IPC，Binder原理
+- [ ] cookie存储位置(/webviewCookiesChromium.db),db存储位置
 - [ ] Binder的原理，Binder里面引用计数的原理，Binder底层为什么用红黑树
 - [ ] onSaveInstance,不仅仅是Activity,Fragment，View中也有，具体实现原理。View一定要有id
-- [ ] WebView JS交互
+- [ ] WebView JS交互，WebView存在的[漏洞](http://www.jianshu.com/p/9f7e9ab8d2fa),通过反射可看可能存在的[安全问题](https://my.oschina.net/fengheju/blog/673629)以及[C代码](http://blog.csdn.net/xueerfei008/article/details/26750659)
 - [ ] UI Toolkit源码解析
     - [ ] ViewPager的原理
     - [ ] ViewGroup，View的源码
