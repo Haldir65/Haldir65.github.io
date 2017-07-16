@@ -485,6 +485,8 @@ private void checkStateLoss() {
 
 ## 5. Fragment的一些不常用的API
 attach,detach,FragmentLifecycleCallbacks,commitNow，setAllowOptimization(26.0.0又被deprecated了)
+onCreateView这个名字是怎么来的，其实是在dispatchFragmentsOnCreateView里面调用的。Activity实现了onCreateView(LayoutInflater定义的，会在getSytemService返回LayoutInflater时调用，获取系统服务毕竟是一个异步过程)。
+
 
 ## 6. 关于Glide是如何实现生命周期绑定的
 Fragment本身提供了生命周期监听回调
