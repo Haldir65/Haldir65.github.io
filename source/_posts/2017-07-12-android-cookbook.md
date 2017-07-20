@@ -5,10 +5,10 @@ tags: [android]
 ---
 
 A Cookbook shall look like a collection of Recipes, or an index page from where dinner are made. And it keeps you sane.
-
+![](http://odzl05jxx.bkt.clouddn.com/Cg-4zFVJ0xGITwm_AA688WRj8n8AAXZ9wGMpd0ADr0J195.jpg?imageView2/2/w/600)
 <!--more-->
 
-## Android平台特定的一些记录
+## 各个平台相关的特定的一些记录
 
 ### 布局相关的点
 [theme和Style](http://haldir65.github.io/2016/10/10/theme-versus-style/)  **Dan lew**
@@ -101,6 +101,7 @@ Android相关
 - [ ] cookie存储位置(/webviewCookiesChromium.db),db存储位置
 - [ ] Binder的原理，Binder里面引用计数的原理，Binder底层为什么用红黑树
 - [ ] onSaveInstance,不仅仅是Activity,Fragment，View中也有，具体实现原理。View一定要有id
+- [ ] 热修复框架原理
 - [ ] WebView JS交互，WebView存在的[漏洞](http://www.jianshu.com/p/9f7e9ab8d2fa),通过反射可看可能存在的[安全问题](https://my.oschina.net/fengheju/blog/673629)以及[C代码](http://blog.csdn.net/xueerfei008/article/details/26750659)
 - [ ] UI Toolkit源码解析
     - [ ] ViewPager的原理
@@ -118,6 +119,7 @@ Linux相关
 - [ ] 如何维持一个长连接
 - [ ] 多线程断点续传原理，大文件下载oom问题
 - [ ] 点击一个网址底层经历哪些过程
+- [ ] 一个url分为哪些组成部分,host,segment,fragment,etc
 
 
 

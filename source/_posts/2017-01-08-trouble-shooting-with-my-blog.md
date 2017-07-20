@@ -211,6 +211,9 @@ Alt+数字：切换打开第N个文件
 MarkDown页面内部跳转
 [MarkDown技巧：两种方式实现页内跳转](http://www.cnblogs.com/JohnTsai/p/4027229.html)
 
+### 7.github提交commit的时候显示Emoji
+链接[在此](https://www.webpagefx.com/tools/emoji-cheat-sheet/)
+
 
 
 ### ref

@@ -6,9 +6,6 @@ tags: [android]
 
 We been told Fragment itself should only trust official docs, the implementation detail are prone to any change any time, don't count on it!
 ![](http://odzl05jxx.bkt.clouddn.com/2009528111321773591934.jpg?imageView2/2/w/600)
-![](http://odzl05jxx.bkt.clouddn.com/Cg-4zFVJ0xGITwm_AA688WRj8n8AAXZ9wGMpd0ADr0J195.jpg?imageView2/2/w/600)
-![](http://odzl05jxx.bkt.clouddn.com/u=3180342558,2746910171&fm=214&gp=0.jpg?imageView2/2/w/600)
-
 <!--more-->
 
 Fragment源码解析（support Library 25.3.0），不要以为看了源码就可以不鸟官方文档了，源码的内容经常变，只有官方的文档才是可靠的，谷歌保证会实现的效果。
