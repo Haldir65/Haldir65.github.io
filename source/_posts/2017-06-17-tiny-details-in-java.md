@@ -34,7 +34,7 @@ tags: [java]
 2. OkHttp 默认会自动重试失败的请求
 [okhttp-is-quietly-retrying-requests-is-your-api-ready](https://medium.com/inloop/okhttp-is-quietly-retrying-requests-is-your-api-ready-19489ef35ace)
 OkHttp默认会对请求进行重试，具体是在RetryAndFollowUpInterceptor中进行的。
-    ```java
+ ```java
    RetryAndFollowUpInterceptor.java
 
   @Override public Response intercept(Chain chain) throws IOException {
