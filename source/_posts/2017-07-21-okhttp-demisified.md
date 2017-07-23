@@ -1,7 +1,7 @@
 ---
 title: OkHttp和Okio阅读笔记
 date: 2017-07-21 00:02:56
-tags:
+tags: [android,java]
 ---
 
 很早的时候就知道，OkHttp在io层面上的操作是由Okio代为完成的，所以实际意义上和Socket打交道的应该是Okio。而Okio又比传统的java io要高效。所以，在分析OkHttp之前，有必要针对Okio的一些方法进行展开，作为后面读写操作的铺垫。

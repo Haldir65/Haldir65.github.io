@@ -1,5 +1,5 @@
 ---
-title: Android Cookbook
+title: Android手册
 date: 2017-07-12 08:40:08
 tags: [android]
 ---
@@ -41,6 +41,14 @@ A Cookbook shall look like a collection of Recipes, or an index page from where 
 [主线程的工作原理](http://haldir65.github.io/2016/10/12/2016-10-12-How-the-mainThread-work/) **Michael Bailey American Express, 他2016年还讲了LayoutInflater的工作原理**
 [vsync原理解释](http://djt.qq.com/article/view/987)
 [让service常驻后台的方法](http://haldir65.github.io/2016/10/20/2016-10-20-android-dirty-code/)
+//下面这些已经有人写的很好了，直接看就可以了
+[应用进程启动流程](http://blog.csdn.net/qq_23547831/article/details/51119333)
+[Launcher启动流程](http://blog.csdn.net/qq_23547831/article/details/51112031)
+[SystemServer进程启动流程](http://blog.csdn.net/qq_23547831/article/details/51105171)
+[Zygote进程启动流程](http://blog.csdn.net/qq_23547831/article/details/51104873)
+[Apk安装流程](http://blog.csdn.net/qq_23547831/article/details/51210682)
+[Activity启动流程](http://blog.csdn.net/qq_23547831/article/details/51224992)
+//这个博主写的一系列底层分析都比较清楚
 
 ### 新版本适配，新特性
 [Android 7.0的适配](http://haldir65.github.io/2016/10/08/android-7-0-new-features/)
@@ -111,6 +119,9 @@ Android相关
     - [ ] ViewGroup，View的源码
     - [ ] View的绘制原理
     - [ ] ListView,RecyclerView原理,加载优化(prefetcher什么的，滑动过程中不去加载图片,我记得Glide是没有做这件事的)
+- [ ] Zygote进程启动流程
+- [ ] SystemServer进程启动流程
+- [ ] Launcher启动流程
 
 
 Linux相关
@@ -122,7 +133,7 @@ Linux相关
 - [ ] 如何维持一个长连接
 - [ ] 多线程断点续传原理，大文件下载oom问题
 - [ ] 点击一个网址底层经历哪些过程
-- [ ] 一个url分为哪些组成部分,host,segment,fragment,etc
+- [X] 一个url分为哪些组成部分,host,segment,fragment,etc
 
 
 

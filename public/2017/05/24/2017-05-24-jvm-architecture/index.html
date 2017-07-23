@@ -16,7 +16,7 @@
 <meta property="og:description" content="关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/high_way_scene.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/starry_sky.jpg?imageView2/2/w/500">
-<meta property="og:updated_time" content="2017-06-18T05:10:51.560Z">
+<meta property="og:updated_time" content="2017-07-23T10:43:10.477Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="jvm架构概述">
 <meta name="twitter:description" content="关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下">
@@ -82,7 +82,7 @@ ga('send', 'pageview');
 	        
 				<li><a href="/tags/linux/">系统</a></li>
 	        
-				<li><a href="/tags/notes/">工具</a></li>
+				<li><a href="/tags/tools/">工具</a></li>
 	        
 			</ul>
 		</nav>
@@ -162,7 +162,7 @@ ga('send', 'pageview');
 		        
 					<li style="width: 25%"><a href="/tags/linux/">系统</a></li>
 		        
-					<li style="width: 25%"><a href="/tags/notes/">工具</a></li>
+					<li style="width: 25%"><a href="/tags/tools/">工具</a></li>
 		        
 				</ul>
 			</nav>
@@ -198,12 +198,13 @@ ga('send', 'pageview');
     <div class="article-entry" itemprop="articleBody">
       
         <p>关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下<br><img src="http://odzl05jxx.bkt.clouddn.com/high_way_scene.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
-<h3 id="1-从MyApp-java文件开始"><a href="#1-从MyApp-java文件开始" class="headerlink" title="1.从MyApp.java文件开始"></a>1.从MyApp.java文件开始</h3><p>大家都知道最开始学习Java的时候，要用javac 来编译MyApp.java来生成一个class文件。<br>在命令行里，大致是这样的执行顺序:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">javac MyApp.java</div><div class="line">java MyApp</div></pre></td></tr></table></figure></p>
-<h4 id="实际上后一句话就创建了一个jvm-instance"><a href="#实际上后一句话就创建了一个jvm-instance" class="headerlink" title="实际上后一句话就创建了一个jvm instance."></a>实际上后一句话就创建了一个jvm instance.</h4><h3 id="2-从class-loader进入Execution-Engine-再到Host-Operating-System"><a href="#2-从class-loader进入Execution-Engine-再到Host-Operating-System" class="headerlink" title="2. 从class loader进入Execution Engine 再到Host Operating System"></a>2. 从class loader进入Execution Engine 再到Host Operating System</h3><p>java MyApp会调用class loader，后者不仅要负责加载MyApp.class文件，还需要加载java API中的class文件（String,Object,Collection….）。加载的class文件（byte code）被传递给Execution Engine,后者则负责执行byte code（其实也是调用宿主操作系统的方法执行操作）</p>
-<h3 id="3-where-did-class-loader-load-class-into"><a href="#3-where-did-class-loader-load-class-into" class="headerlink" title="3. where did class loader load class into ?"></a>3. where did class loader load class into ?</h3><p>classloader将class 文件加载进内存中的一部分（Runtime data areas）。到此，jvm architecture的三个主要组件：class loader subsystem,Runtime data areas 以及execution Enigne的主要功能都说清楚了。<br>所以，这篇文章主要就按照class loader subsystem -&gt; Runtime data areas -&gt; Execution Engine的顺序来讲。</p>
-<h3 id="4-从classloader开始执行（class-loading-subsystem）"><a href="#4-从classloader开始执行（class-loading-subsystem）" class="headerlink" title="4.从classloader开始执行（class loading subsystem）"></a>4.从classloader开始执行（class loading subsystem）</h3><pre><code>- load 将byte code 加载进内存，来源可以是.java文件，可以是.jar文件，甚至可以是network Socket（这要看具体class loader的implementation）。load阶段包含三种不同的class loader，这也是面试时的重点。
+<h2 id="1-从MyApp-java文件开始"><a href="#1-从MyApp-java文件开始" class="headerlink" title="1.从MyApp.java文件开始"></a>1.从MyApp.java文件开始</h2><p>大家都知道最开始学习Java的时候，要用javac 来编译MyApp.java来生成一个class文件。<br>在命令行里，大致是这样的执行顺序:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">javac MyApp.java</div><div class="line">java MyApp</div></pre></td></tr></table></figure></p>
+<p><strong> 实际上后一句话就创建了一个jvm instance.</strong></p>
+<h2 id="2-从class-loader进入Execution-Engine-再到Host-Operating-System"><a href="#2-从class-loader进入Execution-Engine-再到Host-Operating-System" class="headerlink" title="2. 从class loader进入Execution Engine 再到Host Operating System"></a>2. 从class loader进入Execution Engine 再到Host Operating System</h2><p>java MyApp会调用class loader，后者不仅要负责加载MyApp.class文件，还需要加载java API中的class文件（String,Object,Collection….）。加载的class文件（byte code）被传递给Execution Engine,后者则负责执行byte code（其实也是调用宿主操作系统的方法执行操作）</p>
+<h2 id="3-where-did-class-loader-load-class-into"><a href="#3-where-did-class-loader-load-class-into" class="headerlink" title="3. where did class loader load class into ?"></a>3. where did class loader load class into ?</h2><p>classloader将class 文件加载进内存中的一部分（Runtime data areas）。到此，jvm architecture的三个主要组件：class loader subsystem,Runtime data areas 以及execution Enigne的主要功能都说清楚了。<br>所以，这篇文章主要就按照class loader subsystem -&gt; Runtime data areas -&gt; Execution Engine的顺序来讲。</p>
+<h2 id="4-从classloader开始执行（class-loading-subsystem）"><a href="#4-从classloader开始执行（class-loading-subsystem）" class="headerlink" title="4.从classloader开始执行（class loading subsystem）"></a>4.从classloader开始执行（class loading subsystem）</h2><pre><code>- load 将byte code 加载进内存，来源可以是.java文件，可以是.jar文件，甚至可以是network Socket（这要看具体class loader的implementation）。load阶段包含三种不同的class loader，这也是面试时的重点。
 
-&gt; 1. Bootstrap class loader (jre文件夹中有一个rt.jar文件，里面装的就是java的internal class) // 
+&gt; 1. Bootstrap class loader (jre文件夹中有一个rt.jar文件，里面装的就是java的internal class) //
 
 &gt; 2. extension class loader (jre/lib/ext) //负责加载这个文件夹中的class文件
 
@@ -214,20 +215,20 @@ verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的s
 
 注意，以上步骤都是java specification所规定的，但不同的jvm实现可能有微小的差异
 </code></pre><p>class loading subsystem的最后一步是initialize<br>class vars to initiazed Value in code(比如静态代码块就是在这时执行的)</p>
-<h3 id="5-Runtime-data-area五个部分的划分"><a href="#5-Runtime-data-area五个部分的划分" class="headerlink" title="5. Runtime data area五个部分的划分"></a>5. Runtime data area五个部分的划分</h3><p>Runtime data area 即java virtural machine的内存，可以划分成五部分<br>    //per jvm ,shared by all threads</p>
+<h2 id="5-Runtime-data-area五个部分的划分"><a href="#5-Runtime-data-area五个部分的划分" class="headerlink" title="5. Runtime data area五个部分的划分"></a>5. Runtime data area五个部分的划分</h2><p>Runtime data area 即java virtural machine的内存，可以划分成五部分<br>    //per jvm ,shared by all threads</p>
 <pre><code>- Method Area
 - Heap
 
-// per thread 
-- java stack 
+// per thread
+- java stack
 - pc Registers
 - Native method stacks
-</code></pre><h4 id="1-Method-Area-方法区，用于存储class的数据，static-variable-byte-code-class-level-constant-pool都放在这里-，Method-Area也称为Perm-gen-space-永生代-，默认大小是64MB-，可以通过-XX-MaxPermSize-调节-。这里有可能抛出out-of-memory-error。"><a href="#1-Method-Area-方法区，用于存储class的数据，static-variable-byte-code-class-level-constant-pool都放在这里-，Method-Area也称为Perm-gen-space-永生代-，默认大小是64MB-，可以通过-XX-MaxPermSize-调节-。这里有可能抛出out-of-memory-error。" class="headerlink" title="1. Method Area(方法区，用于存储class的数据，static variable,byte code,class level constant pool都放在这里)    ，Method Area也称为Perm gen space(永生代)，默认大小是64MB ，可以通过-XX:MaxPermSize 调节 。这里有可能抛出out of memory error。"></a>1. Method Area(方法区，用于存储class的数据，static variable,byte code,class level constant pool都放在这里)    ，Method Area也称为Perm gen space(永生代)，默认大小是64MB ，可以通过-XX:MaxPermSize 调节 。这里有可能抛出out of memory error。</h4><h3 id="java8将method-Area移除，改为-metaspace-就是将method-area移到了Native-Memory，这样就不会有限制了，也可以人为设置上限"><a href="#java8将method-Area移除，改为-metaspace-就是将method-area移到了Native-Memory，这样就不会有限制了，也可以人为设置上限" class="headerlink" title="java8将method Area移除，改为 metaspace (就是将method area移到了Native Memory，这样就不会有限制了，也可以人为设置上限)"></a>java8将method Area移除，改为 metaspace (就是将method area移到了Native Memory，这样就不会有限制了，也可以人为设置上限)</h3><h4 id="2-Heap"><a href="#2-Heap" class="headerlink" title="2. Heap"></a>2. Heap</h4><p>日常开发中new出来的东西都放在这里</p>
+</code></pre><h3 id="1-Method-Area-方法区，用于存储class的数据，static-variable-byte-code-class-level-constant-pool都放在这里-，Method-Area也称为Perm-gen-space-永生代-，默认大小是64MB-，可以通过-XX-MaxPermSize-调节-。这里有可能抛出out-of-memory-error。"><a href="#1-Method-Area-方法区，用于存储class的数据，static-variable-byte-code-class-level-constant-pool都放在这里-，Method-Area也称为Perm-gen-space-永生代-，默认大小是64MB-，可以通过-XX-MaxPermSize-调节-。这里有可能抛出out-of-memory-error。" class="headerlink" title="1. Method Area(方法区，用于存储class的数据，static variable,byte code,class level constant pool都放在这里)    ，Method Area也称为Perm gen space(永生代)，默认大小是64MB ，可以通过-XX:MaxPermSize 调节 。这里有可能抛出out of memory error。"></a>1. Method Area(方法区，用于存储class的数据，static variable,byte code,class level constant pool都放在这里)    ，Method Area也称为Perm gen space(永生代)，默认大小是64MB ，可以通过-XX:MaxPermSize 调节 。这里有可能抛出out of memory error。</h3><h3 id="java8将method-Area移除，改为-metaspace-就是将method-area移到了Native-Memory，这样就不会有限制了，也可以人为设置上限"><a href="#java8将method-Area移除，改为-metaspace-就是将method-area移到了Native-Memory，这样就不会有限制了，也可以人为设置上限" class="headerlink" title="java8将method Area移除，改为 metaspace (就是将method area移到了Native Memory，这样就不会有限制了，也可以人为设置上限)"></a>java8将method Area移除，改为 metaspace (就是将method area移到了Native Memory，这样就不会有限制了，也可以人为设置上限)</h3><h3 id="2-Heap"><a href="#2-Heap" class="headerlink" title="2. Heap"></a>2. Heap</h3><p>日常开发中new出来的东西都放在这里</p>
 <p>-Xms , minimun size<br>-Xmx , maximum size</p>
-<h4 id="3-Java-Stack"><a href="#3-Java-Stack" class="headerlink" title="3. Java Stack"></a>3. Java Stack</h4><p>java stacks contains stack frames of the current execution per thread.<br>eg : method a -&gt; 调用 method b -&gt; 调用method c<br>当前线程的方法栈中就会push三个stack frame(每个Frame对应一个方法的执行环境)<br>stack Frame包含当前方法中的变量，以及返回值，etc<br>这里定义了stackoverFlowError</p>
-<h4 id="4-pc-Registers"><a href="#4-pc-Registers" class="headerlink" title="4. pc Registers"></a>4. pc Registers</h4><p>这里面装的是程序计数器，后者是指向下一个将要被执行的指令的指针（每条线程都有）。</p>
-<h4 id="5-Native-method-stacks"><a href="#5-Native-method-stacks" class="headerlink" title="5. Native method stacks"></a>5. Native method stacks</h4><p>Native method stacks 是由java stack中的方法调用native方法创建的，例如windows上的dll库</p>
-<h3 id="6-Execution-Engine的任务"><a href="#6-Execution-Engine的任务" class="headerlink" title="6. Execution Engine的任务"></a>6. Execution Engine的任务</h3><p><img src="http://odzl05jxx.bkt.clouddn.com/starry_sky.jpg?imageView2/2/w/500" alt=""></p>
+<h3 id="3-Java-Stack"><a href="#3-Java-Stack" class="headerlink" title="3. Java Stack"></a>3. Java Stack</h3><p>java stacks contains stack frames of the current execution per thread.<br>eg : method a -&gt; 调用 method b -&gt; 调用method c<br>当前线程的方法栈中就会push三个stack frame(每个Frame对应一个方法的执行环境)<br>stack Frame包含当前方法中的变量，以及返回值，etc<br>这里定义了stackoverFlowError</p>
+<h3 id="4-pc-Registers"><a href="#4-pc-Registers" class="headerlink" title="4. pc Registers"></a>4. pc Registers</h3><p>这里面装的是程序计数器，后者是指向下一个将要被执行的指令的指针（每条线程都有）。</p>
+<h3 id="5-Native-method-stacks"><a href="#5-Native-method-stacks" class="headerlink" title="5. Native method stacks"></a>5. Native method stacks</h3><p>Native method stacks 是由java stack中的方法调用native方法创建的，例如windows上的dll库</p>
+<h2 id="6-Execution-Engine的任务"><a href="#6-Execution-Engine的任务" class="headerlink" title="6. Execution Engine的任务"></a>6. Execution Engine的任务</h2><p><img src="http://odzl05jxx.bkt.clouddn.com/starry_sky.jpg?imageView2/2/w/500" alt=""></p>
 <pre><code>- Interpreter 将byte code 翻译成机器指令并执行(根据指令去调用Native方法，在windows上jre/bin/文件夹中一大堆的dll就是windows平台提供的Native库，在linux上是.so文件)
 
 - JIT Compiler  just in time compiler（如果有某项byte code instruction被多次调用，这些byte code不会每次都被inteprete，JIT will hold on to that system level target machine code for future usage,which is fast）
@@ -238,27 +239,6 @@ verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的s
 
       
 
-      
-        <div class="page-reward">
-          <a href="javascript:;" class="page-reward-btn tooltip-top">
-            <div class="tooltip tooltip-east">
-            <span class="tooltip-item">
-              赏
-            </span>
-            <span class="tooltip-content">
-              <span class="tooltip-text">
-                <span class="tooltip-inner">
-                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
-                  <div class="reward-box">
-                    
-                    
-                  </div>
-                </span>
-              </span>
-            </span>
-          </div>
-          </a>
-        </div>
       
     </div>
     <div class="article-info article-info-index">

@@ -1,10 +1,12 @@
 ---
 title: 网络通信手册
 date: 2017-07-21 00:05:32
-tags:
+tags: 
+  - linux
+  - tools
 ---
 
-网络相关的全部丢到这里
+网络相关的查找手册
 ![](http://odzl05jxx.bkt.clouddn.com/b9ae1189145b4a4d9dfe4d0b89a21b47.jpg?imageView2/2/w/600)
 <!--more-->
 
@@ -216,15 +218,25 @@ Session就是维护会话的。
 [HTTP长连接和短连接](http://blog.csdn.net/mr_liabill/article/details/50705130)
 
 
-## 5.1长连接的实现原理
+### 5.1长连接的实现原理
 - 轮询
 - 心跳
 - Tcp长连接
 
-## 5.2 keep-Alive和WebSocket的区别
+### 5.2 keep-Alive和WebSocket的区别
 
 
 ![](http://odzl05jxx.bkt.clouddn.com/ed541bc1ed61ead0bf6ea8233ef01c0a.jpg?imageView2/2/w/600)
+
+
+### 5.3 http2可以实现推送了
+
+
+## 6. WebSocket、SPDY、Http2
+WebSocket一种在单个TCP 连接上进行全双工通讯的协议。
+HTTP/2（超文本传输协议第2版，最初命名为HTTP 2.0），简称为h2（基于TLS/1.2或以上版本的加密连接）或h2c（非加密连接），是HTTP协议的的第二个主要版本
+SPDY也就是HTTP/2的前身，一种开放的网络传输协议，由Google开发，用来发送网页内容。基于传输控制协议（TCP）的应用层协议
+
 
 
 
