@@ -11,9 +11,9 @@ tags: [android]
 
 重新看一遍Using Themes and styles without going crazy，大部分属于直接翻译
 
-#### 1. Styles
+## 1. Styles
 
-##### 1.1 首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来
+### 1.1 首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来
 
 ```xml
 <View android:background= "#ff0000" />
@@ -33,7 +33,7 @@ tags: [android]
 
 <!--more-->
 
-##### 1.2 Style Inheritance
+### 1.2 Style Inheritance
 
 Style可以继承，两种方式：
 
@@ -83,7 +83,7 @@ View不能拥有两个Style,除了TextView及其子类，例如
 
 因为使用style时，系统将把style中定义的attribute和当前View的默认attribute融合起来，而TextView默认attribute 中什么也没有，造成textSize = 0的情况，所以务必选择parent，在parent style已经定义好大多数属性的情况下再去修改小部分属性将简单得多。TextAppearance可以在Theme中定义，也可以写在单一的TextView上。
 
-- ####2. Themes
+## 2. Themes
   在Android中，Theme名字以"Theme."开头，查看源码会发现只是定义了一大堆color attributes 和Window attributes。Themes比Styles的作用范围更广，themes可以在Application,Activity层面管理Widget外观，Theme还可以实现夜间模式切换
 
   来看如何定义一个Theme
@@ -119,7 +119,7 @@ View不能拥有两个Style,除了TextView及其子类，例如
   所以，只要在AppTheme中点进去，找一下这个键对应的值就可以了
 
 
-  2.1 使用Theme
+### 2.1 使用Theme
 
   两种方式:
 
@@ -150,39 +150,38 @@ View不能拥有两个Style,除了TextView及其子类，例如
 
   例如在Holo中有Holo.Light.DarkActionBar，为了专门适配ActionBar需要一个专门的Theme。目前看来主要应用在Toolbar上。
 
-  ### 3 .墙裂推荐使用AppCompat
+## 3 .墙裂推荐使用AppCompat
 
-  好处: 
+  好处:
 
 - Material on all devices ,记得以前听说AppCompat在21以上继承自Theme.Material。
 - Baseline themes/styles AppCompat 预设了一系列样式标准，只需要继承AppCompat，改动一小部分样式就能完成设计
-    - Enable View theming pre-Lollipop 
+    - Enable View theming pre-Lollipop
     - 使用ColorPrimary , ColorAccent等attributes(backPorted by AppCompat)设置Widget样式
     - 在Theme中可以定义默认的Widget样式，例如
+
 ```xml
 <style name="AppTheme" parent = "Theme.AppCompat">
 <item name="android:spinnerItemStyle">@sytle/MySpinnerStyle</item>
 </style>
 ```
 
-- 还可以更改默认样式：
+还可以更改默认样式：
 
 ```xml
 <style name = "AttrTheme" parent ="Theme.AppCompat">
 <item name ="selectableItemBackground">@drawable/bg</item>
 </style>
-
-使用时
 <Button android:background=?attr/selectableItemBackground"/>
 ```
-
 这样就可以自定义点击时的Drawable了。
 
-- 支持android:theme: API 7+(只应用于该View)，API 11+(View及其子View) 
+- 支持android:theme: API 7+(只应用于该View)，API 11+(View及其子View)
 
 View theming原本只是API 21才引入的概念，AppCompat实现了向前兼容
 
-### 4 .  ?attr的问题
+
+## 4 .  ?attr的问题
 
 > ?android:attr/selectableItemBackground
 
@@ -244,14 +243,14 @@ Style可以通过?attr的方式引用Theme中的资源
 
 
 
-### 5 .获取Theme
+## 5 .获取Theme
 
 ```java
 context.getTheme().resolveAttribute(R.attr.dialogTheme,outValue,true)
-  
+
 在View中
   TypedArray a = context.obtainStyledAttributes(attrs,com.android.internal.R.styleable.ImageView,defStyleAttr,defStyleRes)
-  
+
 int alpha = a.getInt(
   com.android.internal.R.styleable.ImageView_drawableAlpha,255)   
 ```
@@ -260,7 +259,7 @@ Activity有一个setTheme(int themeResId)方法，注意，这个方法并不是
 
 
 
-### 6. v21的问题
+## 6. v21的问题
 
 ```xml
 在values/styles.xml中
@@ -278,7 +277,7 @@ lint就不会飙黄了，直接引用Toolbar即可
 
 通过这种继承的方式能够在自己的Theme中使用统一的theme，针对不同的运行时版本确定最终运行的Theme。
 
-### 7 . ThemeOverlay
+## 7 . ThemeOverlay
 
 ```JAVA
 ThemeOverlay.Material.Light
@@ -288,7 +287,7 @@ ThemeOverlay.Material.Dark
 
 用于添加到现有的Theme上，例如Theme.Material.Light只包含color relevant to a light Theme，不会改变原有Theme的window Attributes。查看源码，只是完整的Theme中的一小部分attribute。
 
-### 8. 常见错误
+## 8. 常见错误
 
 1. 作为Theme中引用的style必须要有一个parent
 
@@ -307,7 +306,7 @@ ThemeOverlay.Material.Dark
 
 2. defStyleAttr vs defStyleRes
 
-常见于 
+常见于
 
 ```java
 ObtainStyledAttributes(AttributeSet set,int []attrs,
@@ -348,7 +347,7 @@ ObtainStyledAttributes查找Value时读取的顺序如下
 
 
 
-### 9. 容易遇到的错误
+## 9. 容易遇到的错误
 编译不通过的情况
 ```java
 Error retrieving parent for item: No resource found that matches the given name
@@ -357,10 +356,10 @@ Error retrieving parent for item: No resource found that matches the given name
 
 
 
-### 10. 最后，一点好玩的
+## 10. 最后，一点好玩的
 
 ```java
-Context themedContext = 
+Context themedContext =
   new ContextThemeWrapper(baseContext,R.style.MyTheme);
 
 View view = LayoutInflator.form(themedContext)
@@ -370,7 +369,7 @@ View view = new View(themedContext);
 //生成的View就会带有MyTheme中的属性，动态设置。
 ```
 
-而这也是AppComPat对于API 21以下版本进行兼容的原理 
+而这也是AppComPat对于API 21以下版本进行兼容的原理
 翻了一下文档：
 ContextThemeWrapper : Added in API level 1
 
@@ -381,9 +380,3 @@ ContextThemeWrapper : Added in API level 1
 - [Daniel Lew](https://www.youtube.com/watch?v=Jr8hJdVGHAk)
 - [View Constructor](http://blog.danlew.net/2016/07/19/a-deep-dive-into-android-view-constructors/)
 - [IO 2016](https://www.youtube.com/watch?v=TIHXGwRTMWI)
-
-
-
-
-
-

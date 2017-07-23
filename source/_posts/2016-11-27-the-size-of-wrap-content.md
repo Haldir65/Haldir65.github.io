@@ -7,13 +7,13 @@ tags: [android]
 
 转眼就十一月了，java的分析越来越少，虽然常常在业务上碰到不少坑。。。
 
-#### 问题的由来
+### 问题的由来
 这周碰到一个需要画时间轴样式的自定义View的需求，大概像这样(图片来自网络)：
 ![](http://odzl05jxx.bkt.clouddn.com/timelineView.png)
 
 要求，左侧的圆形节点可以自定义Drawable，右侧的文字高度随文字数量变化自适应。
 
-想想也就是自定义ViewGroup的那一套老样子。抄起键盘就开始研(Copy)究(Paste)，写着写着发现不对劲，主要的问题包括: 
+想想也就是自定义ViewGroup的那一套老样子。抄起键盘就开始研(Copy)究(Paste)，写着写着发现不对劲，主要的问题包括:
 
 > 1. 在onMeasure里面拿到的height == 0 , 具体一点就是:
 整个ViewGroup包含多个Item，每个Item包括左侧的自定义View(CustomView)，高度是wrap_content，右边的TextView高度是wrap_content(自适应嘛)。可是debug时发现左侧的自定义View拿到的高度是0，简直日了哈士奇了。随后拿着关键词去Google搜索，还是没有什么收获。
@@ -35,10 +35,10 @@ tags: [android]
 
 
 > 3. Item本身是继承自RelativeLayout，想要使onDraw方法被调用需要在构造函数里设置
-setWillNotDraw(false) 
+setWillNotDraw(false)
 这个boolean值默认是true，主要是顾及到性能的原因。
 
 
 
-### ref 
+### ref
 - [How Android caculates view size](https://www.liaohuqiu.net/posts/how-does-android-caculate-the-size-of-child-view/)

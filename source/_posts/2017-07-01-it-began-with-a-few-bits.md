@@ -1,5 +1,5 @@
 ---
-title: 2017-07-01-it-began-with-a-few-bits
+title: Retrofit源码阅读笔记
 date: 2017-07-01 23:03:00
 tags:
    - Retrofit
@@ -57,7 +57,7 @@ result = new ServiceMethod.Builder(this, method).build();
 ```java
  public Builder(Retrofit retrofit, Method method) {
       this.retrofit = retrofit; //client创建retrofit时可以设定一些属性
-      this.method = method; 
+      this.method = method;
       this.methodAnnotations = method.getAnnotations();
       this.parameterTypes = method.getGenericParameterTypes();
       this.parameterAnnotationsArray = method.getParameterAnnotations();
@@ -107,7 +107,7 @@ contentType（MimeType）
 1. createCallAdapter  --->  retrofit.callAdapter(returnType, annotations); 从adapterFactories(显然可以有多个)中遍历，找到了一个就返回。已经实现的的有三种**策略**，DefaultCallAdapterFactory、ExecutorCallAdapterFactory和RxjavaCallAdapterFactory。显然用户可以在创建retrofit实例的过程中install自己的callAdapter实现。
 再次强调这个CallAdater的作用，就是将Retrofit的Call adpt成对应的Response class的实例。
 
-2. createResponseConverter --->  retrofit.responseBodyConverter(responseType, annotations); 
+2. createResponseConverter --->  retrofit.responseBodyConverter(responseType, annotations);
 Retrofit2.Converter<F, T> (from和To，我猜的)
 
 Convert objects to and from their representation in HTTP. Instances are created by {@linkplain
@@ -160,11 +160,11 @@ ServiceMethod(Builder<T> builder) {
     this.callAdapter = builder.callAdapter; //
     this.baseUrl = builder.retrofit.baseUrl(); //这个就是
     this.responseConverter = builder.responseConverter; // GsonConverter
-    this.httpMethod = builder.httpMethod; //@GET 
+    this.httpMethod = builder.httpMethod; //@GET
     this.relativeUrl = builder.relativeUrl; //@Path
     this.headers = builder.headers; //@Header
     this.contentType = builder.contentType;  //application/json这种
-    this.hasBody = builder.hasBody; 
+    this.hasBody = builder.hasBody;
     this.isFormEncoded = builder.isFormEncoded;
     this.isMultipart = builder.isMultipart;
     this.parameterHandlers = builder.parameterHandlers;
@@ -390,7 +390,7 @@ User是Proto,Friend是Json。 Proto都extends一个protoType class，所以只�
     Call<User> user(); // User是XML
 
     @GET("/Friends") @Json
-    Call<Friends> friends();  //Friends是Json 
+    Call<Friends> friends();  //Friends是Json
  }
 
 class XmlOrJsonConverterFactroy extend Converter.Factory{
@@ -404,7 +404,7 @@ class XmlOrJsonConverterFactroy extend Converter.Factory{
             if(annotation.getClass == Xml.class){
                 return xml.reponseBodyConverter(type,annotations,retrofit);
             }else if(annotation.getClass == Json.class){
-                // json 
+                // json
             }
             return null; 都不是。 会去找下一个Converter..
         }
@@ -429,7 +429,7 @@ CallAdapterFactory和ConverterFactory类似，也可以自定义，所以这样�
 
 
 
- 
+
 
 ### 2. OkHttp
 

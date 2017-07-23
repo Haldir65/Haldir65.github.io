@@ -1,7 +1,7 @@
 ---
 title: 主线程的工作原理
 date: 2016-10-12 16:47:42
-tag: 
+tag:
     Handler
     Message
 categories: blog
@@ -62,7 +62,7 @@ class LooperThread extends Thread {
   *                  // 在这里处理消息
   *              }
   *          };
-  *	
+  *
   *          Looper.loop();
     		//这里面发送消息
   *      }
@@ -310,7 +310,7 @@ PostDelayed最终会调用到enqueMessage方法，看一下:
 注意nativeWake方法，在满足一定情况下会唤醒线程
 总结一下就是postDelayed确实调用了阻塞线程的方法，但一旦消息队列前面插入了可执行的message，会调用唤醒线程的方法。这些大部分在MessageQueue这个class中，看一下基本都能明白。
 
-#### 回顾一下整个过程:
+### 回顾一下整个过程:
 
 主线程作为一个Thread，持有一个Looper对象，Looper持有一个MessageQueue的消息队列，并一个一个地从中取出满足执行时间条件的Message，执行Messgae的callback或者交给Handler的handleMessage去处理。
 

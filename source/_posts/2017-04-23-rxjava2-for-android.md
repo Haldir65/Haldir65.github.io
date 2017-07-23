@@ -10,12 +10,12 @@ tags: [rxjava2,android]
 <!--more-->
 
 
-### 1. Why Reactive? 
+## 1. Why Reactive?
 最早使用Rxjava的初衷在于方便地实现线程切换，使用链式语法轻松地将异步任务分发到子线程并省去了主动实现回调的麻烦。
 我们生活在一个事件异步分发的环境中，网络，文件、甚至用户输入本身也是异步事件，除此之外，安卓系统本身的许多操作也是异步的，例如startActivity，Fragment的transaction，这就要求开发者不得不考虑各种事件状态，并在各种事件之间进行协调。Rxjava将各种事件的处理、完成以及异常在事件定义之初定义好处理方式。事件的开始，进行，完成以及异常，都被抽象到Observable的载体中。值得注意的是，这种链式调用很像Builder Pattern，但本质上每一步都生成了一个新的对象。这个在Rxjava的Wiki上有所说明，即每一步都生成一个新的immutable object（GC表示压力大）。
 
 
-### 2. 数据源
+## 2. 数据源
 Stream基本包括这三部分
 ```
 source of data
@@ -24,8 +24,8 @@ methods for modifying data
 ```
 ![](http://odzl05jxx.bkt.clouddn.com/stream_compose.jpg?imageView2/2/w/600)
 
-#### 2.1 数据源的种类
-Observable<T> 和Flowable<T>，区别在于后者支持BackPressure，后者不支持BackPressure. 
+### 2.1 数据源的种类
+Observable<T> 和Flowable<T>，区别在于后者支持BackPressure，后者不支持BackPressure.
 接收Observable和Flowable的类型分别为Observer和Subscriber
 
 ```java
@@ -56,7 +56,7 @@ interface Subscription{
 两者的区别在于最后一个方法，以Disposable为例，当你开始subscribe一个数据源的时，就类似于创建了一个Resurce，而Resource是往往需要在用完之后及时释放。无论是Observable还是Flowable,这个onSubscribe方法会在订阅后立即被调用，这个方法里的Disposable可以保留下来，在必要时候用于释放资源。如Activity的onDestroy中cancel network request.
 
 
-#### 2.2 数据源的对应类
+### 2.2 数据源的对应类
 1. Single(订阅一个Single，要么获得仅一个返回值，要么出现异常返回Error)
 ```java
 public abstract class Single<T> implements SingleSource<T> {}
@@ -69,9 +69,9 @@ public abstract class Completable implements CompletableSource {}
 ```
 例如，异步写一个文件，要么成功，要么出现error，并不需要返回什么。
 ```java
-public void writeFile(Stirng data){} 
+public void writeFile(Stirng data){}
 // 就可以model成
-Completeable writeFile(Stirng data){} 
+Completeable writeFile(Stirng data){}
 ```
 
 
@@ -88,11 +88,11 @@ public abstract class Maybe<T> implements MaybeSource<T> {}
 
 比较推荐的方法有两种
 
-#### 1. fromCallable
+### 1. fromCallable
 ```java
 Observable.fromCallable(new Callable<String>(){
 
-  @override 
+  @override
   public String call() throw Exception{
       return getName() //  之前是synchronious的get，现在这一步可以asynchnous执行,比如放一个OkHttpClient.newCall(request).execute(); //因为是异步执行的，也不存在性能问题
 }
@@ -107,7 +107,7 @@ Maybe.fromCallable(() -> "Hello Maybe");
 Single.fromCallable(() -> "Hello Single");
 Completeable.fromCallable(() -> "Hello Completeable");
 ```
-> fromCallable are for modeling synchronous sourse of a single source of data. 
+> fromCallable are for modeling synchronous sourse of a single source of data.
 
 很多需要返回值的方法都可以抽象成这种方法。
 Maybe和Completeable还有两个方法,用于表示不返回数据的方法
@@ -120,7 +120,7 @@ Completeable.fromRunnable(() -> "ignore")
 
 ```
 
-#### 2. create(Rxjava 1中不推荐使用该方法，Rxjava2中建议使用)
+### 2. create(Rxjava 1中不推荐使用该方法，Rxjava2中建议使用)
 ```java
 Observable.create(new ObservableOnSubscribe<String>()){
       @override
@@ -161,7 +161,7 @@ Observable.create(e ->{
   }
 })
 
-//重点了来了， 
+//重点了来了，
 public interface ObservableEmitter<T> extends Emitter<T> {
     /**
      * Sets a Cancellable on this emitter; any previous Disposable
@@ -186,9 +186,9 @@ Observable.create(e ->{
 
 
 
-### 3. 如何订阅（接收）这些数据
+## 3. 如何订阅（接收）这些数据
 
-#### 3.1 observer<T>和Subscriber<T>
+### 3.1 observer<T>和Subscriber<T>
 
 接收Observable和Flowable的类型分别为Observer和Subscriber
 
@@ -218,11 +218,11 @@ interface Subscription{
 }
 ```
 ## 所以整体来看，数据的流向就这么两种，左边发送数据(可能只有一个，可能间歇性的，可能一直不停)，事件通过数据流传输到右边，右边根据协议作出相应(Reactive)
-Observable -> subscribe -> Observer 
+Observable -> subscribe -> Observer
 
 Flowable -> subscribe -> Subscription
 
-#### 3.2 onSubscribe怎么用
+### 3.2 onSubscribe怎么用
 通常不直接用这两种base class，因为第四个方法不知道怎么用嘛。
 ![](http://odzl05jxx.bkt.clouddn.com/4dab298b9f7ce29c43f9d8eaf686e02f.jpg?imageView2/2/w/600)
 ```java
@@ -269,7 +269,7 @@ Observable.just("Hello").subscribe(new DisposableObserver<String>() {
 
 
 
-### 4. 数据源和接受者建立联系
+## 4. 数据源和接受者建立联系
 
 > Observable.subscribe  
 或者
@@ -328,7 +328,7 @@ Observable.fromCallable(new Callable<List<String>>() {
             }
         });
 
-执行顺序：（括号内数字表示线程id） 
+执行顺序：（括号内数字表示线程id）
 doOnsubscribe(1) -> onSubscribe(1) -> call(276) ->doOnNext(1)->onNext(1) -> doAfterNext(1) ->doOnComplete(1)->onComplete(1)
 所以基本上可以认为doOnXXX= doBeforeXXX,线程都是一样的。估计是为了打日志用的，或者说用于切片。
 像极了OkHttp的interecpter或是gradle的task。
@@ -338,12 +338,12 @@ doOnsubscribe(1) -> onSubscribe(1) -> call(276) ->doOnNext(1)->onNext(1) -> doAf
 
 
 
-### 5. Operator and Threading
+## 5. Operator and Threading
 ```java
 Observable<String> greeting  = Observable.just("Hello");
 Observable<String> yelling = greeting.map(s ->s.toUppercase())
 
-Observable.subscribeOn(Schedulers.io()) // 
+Observable.subscribeOn(Schedulers.io()) //
 ```
 subscribeOn决定了task在哪条线程上运行，操作符的顺序很重要
 ![Wrong](http://odzl05jxx.bkt.clouddn.com/reading%20network%20response%20on%20main%20thread.jpg?imageView2/2/w/600)
@@ -367,7 +367,7 @@ Flowable -> ignoreElements() ->Completable
 
 
 ## 链式调用每一步都生成了新的object，Rxjava2和Rxjava1相比，对GC更加友好。
-## quote: 
+## quote:
 ### RxJava 2 is not something new. Reactive programming is not new by any stretch, but Android itself is a highly reactive world that we’ve been taught to model in a very imperative, stateful fashion.
 Reactive programming allow us to model it in the proper way: asynchronously. Embrace the asynchronicity of the sources, and instead of trying to manage all the state ourselves, compose them together such that our apps become truly reactive.
 

@@ -1,12 +1,12 @@
 ---
 title: Python 3 学习记录
 date: 2016-12-24 22:06:37
-categories: blog 
+categories: blog
 tags: [python]
 ---
 
 
-#### 人生苦短，Python是岸
+### 人生苦短，Python是岸
 
 ![implementing dumb features](http://odzl05jxx.bkt.clouddn.com/46ee54dd915d71da90e435703d4568fb.jpg?imageView2/2/w/600)
 
@@ -52,10 +52,10 @@ import urllib2
 req = urllib2.Request(url,headers=header)
 html = urllib2.urlopen(req)
 html_data = html.read
-html_path = etree.HTML(html_data)	
+html_path = etree.HTML(html_data)
 ```   
 
-on Python 3.X 
+on Python 3.X
 ```python
 from urllib.request import urlopen
 from urllib.request import Request
@@ -65,9 +65,9 @@ urlhtml = urlopen(req)
 ```
 
 
-### 3. pip install XXXX 
+### 3. pip install XXXX
 安装package的方式 pip install xxxx....
-#### if not working
+** if not working**
 ![](http://odzl05jxx.bkt.clouddn.com/Googling%20the%20Error%20Message.jpg?imageView2/2/w/500)
 
 
@@ -78,7 +78,7 @@ urlhtml = urlopen(req)
         mylist[0] = 'Tom'
 
  tuple  mytuple = ('rock','pop','jazz')
-         mytuple[0] = 'rock' 
+         mytuple[0] = 'rock'
 
  tuple在初始化时就已经确定，不能修改
 
@@ -93,7 +93,7 @@ urlhtml = urlopen(req)
 ```
 tuple用的比较多，例如有多个返回值的函数，Python其实返回了一个Tuple。
 
-#### 类名应该写成驼峰样式，变量名应该小写
+### 类名应该写成驼峰样式，变量名应该小写
 class name should be cammelCase, Arguments,variable name should be lowercase
 
 循环
@@ -111,7 +111,7 @@ def add_end(L=None):
     return L
 ```
 
-##### 函数参数相关，函数组合（一共五种）
+### 函数参数相关，函数组合（一共五种）
 位置参数，默认参数，可变参数，关键字参数，命名关键字参数
 
 定义一个函数可以带上默认值，默认值是一个固定的对象，上次操作的值会保留到下一次调用
@@ -176,16 +176,16 @@ def shoppping(name,time,*,price,count)# price可以有默认值
 
 ### 5. 爬虫相关
 Chrome自带开发者工具，可以查看每一个request的header，cookies等信息。模拟浏览器行为比较有效。ctrl+shift+R神器
-#### 5.1 Request, Urllib2 
+### 5.1 Request, Urllib2
 
-#### 5.2 UnicodeEncodeError: 'ascii' codec can't encode characters in position
+### 5.2 UnicodeEncodeError: 'ascii' codec can't encode characters in position
 
 
 ```
 # how to invoke this error
 b = "this is english within ascii range".encode('ascii')  # totally fine
 
-s = "你好".encode('ascii') 
+s = "你好".encode('ascii')
 # this will raise an error ,UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-1: ordinal not in range(128)>
 
 
@@ -206,7 +206,7 @@ print(string)
 print(string.encode('utf-8'))
 print(bstring2string)
 print(bstring2string)
-    
+
 print(which_instance_is_this(string))
 print(which_instance_is_this(bstring))
 print(which_instance_is_this(bstring2string))
@@ -215,11 +215,11 @@ print(which_instance_is_this(bstring2string))
 outputs:
 你好啊
 b'\xe4\xbd\xa0\xe5\xa5\xbd\xe5\x95\x8a'
-你好啊 
+你好啊
 你好啊
 
 is str
-is byte 
+is byte
 is str
 
 **Since Python 3.0, the language features a str type that contain Unicode characters, meaning any string created using "unicode rocks!", 'unicode rocks!', or the triple-quoted string syntax is stored as Unicode.**
@@ -268,11 +268,9 @@ class object orientated
 ### Reference
 - [廖雪峰的官方网站](http://www.liaoxuefeng.com/)
 - [use python and mongoDb as backend](https://zhuanlan.zhihu.com/p/20488077?columnSlug=kotandroid)
-- [静觅](http://cuiqingcai.com/category/technique/python) 
+- [静觅](http://cuiqingcai.com/category/technique/python)
 - [unicodeencodeerror-ascii-codec-cant-encode-character](https://stackoverflow.com/questions/9942594/unicodeencodeerror-ascii-codec-cant-encode-character-u-xa0-in-position-20?rq=1)
 - [Droidcon NYC 2016 - Decoding the Secrets of Binary Data](https://www.youtube.com/watch?v=T_p22jMZSrk)
 - [Jake Wharton and Jesse Wilson - Death, Taxes, and HTTP](https://www.youtube.com/watch?v=6uroXz5l7Gk)
 - [Droidcon Montreal Jake Wharton - A Few Ok Libraries](https://www.youtube.com/watch?v=WvyScM_S88c)
 - [Jesse Wilson - Coordinating Space and Time](https://www.youtube.com/watch?v=yS0Nc-L1Uuk)
-
-

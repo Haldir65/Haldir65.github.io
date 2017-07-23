@@ -1,10 +1,10 @@
 ---
-title: For those tiny details in Java 
+title: For those tiny details in Java
 date: 2017-06-17 21:24:48
 tags: [java]
 ---
 > interesting stuff in java that don't seem to get enough pubilicity
-> 
+>
 >
 
 ![landscape](http://odzl05jxx.bkt.clouddn.com/34a7d57ccabb18c69d085247cf009b22.jpg?imageView2/2/w/600)
@@ -87,7 +87,7 @@ OkHttp 3.3.0 [issue](https://github.com/square/okhttp/issues/2394)
 
 另外，GET方法本身是人畜无害的，Retry请求多次发起不会造成数据错误；但对于POST，涉及到写服务端写操作，最好带上GUID作为单次请求unique标示。（这是server和client之间需要协商好的protocol）
 
-3. From Java Code To Java Heap 
+3. From Java Code To Java Heap
    A talk from IBM Engineer, talking about optimizing the memery usage for your java application.[youtube](https://www.youtube.com/watch?v=FLcXf9pO27w)
    [ibm](https://www.ibm.com/developerworks/java/library/j-codetoheap/index.html)
 
@@ -97,7 +97,7 @@ OkHttp 3.3.0 [issue](https://github.com/square/okhttp/issues/2394)
   String a = "hello"
   String b = "hello"
   String c = new String("Hello")
-  
+
   显然ab都指向了常量池，c指向了放在堆上的对象，后者也指向常量池
   a==b!=c  
 
@@ -148,7 +148,4 @@ word2 = word2 +1 ;//编译失败
 
 [char的转换问题](https://stackoverflow.com/questions/21317631/java-char-int-conversions)
 
-
-
-
-
+7. Guava就是个Util

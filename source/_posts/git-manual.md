@@ -11,12 +11,12 @@ tags: [git,notes]
 
 <!--more-->
 
-### 1. 在本地创建一个项目并同步到github的过程
+## 1. 在本地创建一个项目并同步到github的过程
 
-```java
+```git
 $ mkdir ~/hello-world    //创建一个项目hello-world
 $ cd ~/hello-world       //打开这个项目
-$ git init             //初始化 
+$ git init             //初始化
 $ touch README   		//创建文件
 $ git add README        //更新README文件
 $ git commit -m 'first commit'     //提交更新，并注释信息“first commit”
@@ -24,15 +24,15 @@ $ git remote add origin git@github.test/hellotest.git     //连接远程github�
 $ git push -u origin master     //将本地项目更新到github项目上去
 ```
 
-### 2.  将本地git branch和远程github repository同步
+## 2.  将本地git branch和远程github repository同步
 
 可行的方式
-```python
+```git
 git branch --set-upstream local_branch origin/remote_branch
 ```
 这样做可行，但出现下面的错误提示，照着操作就行了。
 
-```
+```git
 $ git branch --set-upstream master origin/master
 The --set-upstream flag is deprecated and will be removed. Consider using --track or --set-upstream-to
 Branch master set up to track remote branch master from origin.
@@ -40,81 +40,81 @@ Branch master set up to track remote branch master from origin.
 
 <!--more-->
 
-### 3. git处理大小写字母的问题
+## 3. git处理大小写字母的问题
 
 > git默认对大小写不敏感，所以，新建一个文件adapter.java，上传到github之后说不定就给变成了Adapter.java。在windows下面将已经push到远端的文件，改变其文件名的大小写时，git默认会认为文件没有发生任何改动，从而拒绝提交和推送，原因是其默认配置为大小写不敏感，故须在bash下修改配置：
 
-```java
-git config core.ignorecase false 
+```git
+git config core.ignorecase false
 ```
 
-### 4. git设置用户名
+## 4. git设置用户名
 
-```java
+```git
 $ git config --global user.name "name"
 $ git config --global user.email xxx@163.com
 ```
 这样可以为git所有的仓库设置用户名，如果想为指定仓库设置用户名或email:
 
-```java
+```git
 $ git config user.name "name"
 $ git config user.email "myEmail.awesome.com"
 ```
 查看当前用户名或email
-```
-$ git config user.name 
-$ git config user.email 
+```git
+$ git config user.name
+$ git config user.email
 ```
 
-### 5. 设置代理
+## 5. 设置代理
 
 设置全局代理
-```java
+```git
 git config --global http.proxy socks5://127.0.0.1:1080
 ```
 
 对指定url设置代理
-```java
+###
 git config --global http.<要设置代理的URL>.proxy socks5://127.0.0.1:1080
- 
+
 git config --global http.https://github.com.proxy socks5://127.0.0.1:1080
 ```
 
-### 6. 对上一次commit进行修改(在不添加新的commit的基础上)
-```java
+## 6. 对上一次commit进行修改(在不添加新的commit的基础上)
+```git
 git commit --amend
 ```
 
-### 7. git revert和reset的区别
+## 7. git revert和reset的区别
 > reset 是在正常的commit历史中,删除了指定的commit,这时 HEAD 是向后移动了,而 revert 是在正常的commit历史中再commit一次,只不过是反向提交,他的 HEAD 是一直向前的. 即reset是通过一次反向的commit操作撤销之前的commit，而reset则会直接从提交历史里删除commit。如果还没有push，用reset可以在本地解决问题，之后重新commit再push。如果已经push，可以考虑通过一次revert来实现“撤销”的效果。
 
 
 语法：
-#### reset
-```java
+### reset
+```git
 git reset --hard HEAD //本地仓库文件修改也会消失
 git reset --soft HEAD //本地文件修改不会消失，类似于回到git add 之前的状态
 git reset --hard HEAD~3 //最近的三次提交全部撤销
 ```
 
-#### revert
-```java
+### revert
+```git
 git revert c011eb3c20ba6fb38cc94fe //之后在分支图上就能看到一个新的反向的commit，push即可。
 ```
 
-### 8. 切分支, 删除分支
+## 8. 切分支, 删除分支
 本地新建分支
-```java
+```git
 git checkout -b <branchName>
 ```
 将这条分支与远程同步的方式
-```java
+```git
 git branch --set-upstream <laocalBranchName> origin/<RemoteBranchName>
 // 或者
 git branch -u origin/dev
 ```
 直接从远程仓库切一个分支出来并保持同步的方式
-```java
+```git
 git checkout -b <branchName> origin/<branchName>
 
 git checkout --track origin/dev
@@ -122,28 +122,28 @@ git checkout --track origin/dev
 
 
 删除远程分支:
-```java
+```git
 git push origin --delete <branchName>
 ```
 删除远程tag
-```java
+```git
 git push origin --delete tag <tagName>
 ```
 
 
-### 9. pull和rebase的区别
+## 9. pull和rebase的区别
 pull = fetch +merge ，会生成新的提交
 
 > Merge好在它是一个安全的操作。现有的分支不会被更改，避免了rebase潜在的缺点
 
-### 10. rebase和cherry-pick 
+## 10. rebase和cherry-pick
 rebase不会生成新的提交，而且会使得项目提交历史呈现出完美的线性。但注意[不要在公共的分支上使用](https://github.com/geeeeeeeeek/git-recipes/wiki/5.1-%E4%BB%A3%E7%A0%81%E5%90%88%E5%B9%B6%EF%BC%9AMerge%E3%80%81Rebase%E7%9A%84%E9%80%89%E6%8B%A9)
 
 
 
-### 11. gitignore文件写法
+## 11. gitignore文件写法
 参考[repo](https://github.com/suzeyu1992/repo/tree/master/project/git)
-```java
+```git
 # 忽略所有以 .c结尾的文件
 *.c
 
@@ -163,9 +163,9 @@ doc/*.txt
 doc/**/*.pdf
 ```
 
-### 12. git stash 
+## 12. git stash
 常用命令
-```java
+```git
 git stash  //保存下来，压进一个栈，基本上就是先进后出了
 git stash pop //推出一个栈
 
@@ -179,13 +179,13 @@ git stash clear// 一次性删除stash List中所有的item
 
 ```
 
-### 13. 强推
+## 13. 强推
 谨慎使用
-```java
+```git
 # Be very careful with this command!
 git push --force
 ```
 
 ## Reference
--[git reset和revert](http://yijiebuyi.com/blog/8f985d539566d0bf3b804df6be4e0c90.html) 
+-[git reset和revert](http://yijiebuyi.com/blog/8f985d539566d0bf3b804df6be4e0c90.html)
 -[git recipes](https://github.com/geeeeeeeeek/git-recipes)

@@ -8,11 +8,11 @@ tags: [python]
 ![Kitty](http://odzl05jxx.bkt.clouddn.com/c6dd030bf8cc75628fce3aec8216ba52.jpg?imageView2/2/w/600)
 关于如何使用Python搭建后台的方法很多，这里列举出一些实例。<!--more-->
 
-### 1. The Flask Way
+## 1. The Flask Way
 
-#### 1.1 Basics
+### 1.1 Basics
 > Flask is a very simple, but extremely flexible framework Flask使用Decorator对请求进行处理
- 
+
 
 ```Python
 #!/usr/bin/python3
@@ -73,7 +73,7 @@ def get_current_user():
     age: 18
 }
 
-#返回复杂一点的json，或者json数组 
+#返回复杂一点的json，或者json数组
 @app.route('/_get_user_list', methods=['GET'])
 def get_user_list():
     user_list = create_user_list()
@@ -125,7 +125,7 @@ def get_image():
     return send_file(fullpath, mimetype='image/jpeg')
 ```
 
-我觉得Flask的官方Doc对初学者的友好度几乎是满分 
+我觉得Flask的官方Doc对初学者的友好度几乎是满分
 - [accessing-request-data](http://flask.pocoo.org/docs/0.12/quickstart/#accessing-request-data)
 - [cookies](http://flask.pocoo.org/docs/0.12/quickstart/#cookies)
 - [sessions](http://flask.pocoo.org/docs/0.12/quickstart/#sessions)
@@ -150,20 +150,20 @@ Http底层TCP ,ACK 等等需要tcpcump结合wireShark抓包
 …
 前面几个都很好理解，都是html，css，javascript的文件类型，后面四个是POST的发包方式。
 
-#### 1.2 Flask BluePrints
+### 1.2 Flask BluePrints
 
-#### 1.3 Flask + gevent 提高web 框架的性能
+### 1.3 Flask + gevent 提高web 框架的性能
 [docs](http://flask.pocoo.org/docs/0.12/deploying/wsgi-standalone/)
 
-### 2. The Django Way 
+### 2. The Django Way
 Django是**web framework**，不是**WebServer**
 
 
 
-### 3. Using Tornado
+## 3. Using Tornado
 
-### 4. 其他的点
-#### 4.1 Web架构
+## 4. 其他的点
+### 4.1 Web架构
 网络库上手比较快，很重要的一点是理解其在通讯中的层级，Nigix属于代理转发，Flask处理业务逻辑，Tornado处理Http底层实现，Django负责用于高效网络应用开发
  - [Django和Flask这两个框架在设计上各方面有什么优缺点？
 ](https://www.zhihu.com/question/41564604)
@@ -171,11 +171,11 @@ Django是**web framework**，不是**WebServer**
 
 UrlLib，Socket这些属于Python底层的基础性的network库，属于基础的东西。
 
-#### 4.2不服跑个分
+### 4.2不服跑个分
 引用一篇[测评](http://www.vimer.cn/archives/2926.html)
 >可见纯框架自身的性能为:
 
-    bottle > flask > tornado > django 
+    bottle > flask > tornado > django
 
 结合实际使用:
 

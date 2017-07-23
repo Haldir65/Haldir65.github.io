@@ -16,7 +16,7 @@ tags: [android]
 ```java
 GridLayoutManager manager = new GridLayoutManager(
    this,2 ,GridLayoutManager.VERTICAL,false)
-   
+
 manager.setSpanSizeLookup(){
         new GridLayoutManager.SpanSizeLookup(){
         @override
@@ -30,7 +30,7 @@ manager.setSpanSizeLookup(){
 
 - GridLayoutManger的同一行的ItemView的itemHeight必须一致，否则同一行的ItemView底部会出现空隙。这种情况请使用StaggeredGridLayoutManager
 
-#### 2. LayoutManager <-------> Recycler <--------> Adapter
+### 2. LayoutManager <-------> Recycler <--------> Adapter
 LayoutManager永远永远永远不要碰Adapter!!!
 
 ### 3.Recycler构造
@@ -69,9 +69,9 @@ for(...){
     int nextPosition = ...;
     View view = recycler.getViewForPosition(nextPosition);
     addView(view);
-    
+
     //注意这里的Measure和Layout不是平时使用的measureChild和layout方法，原因是ItemDecoration
-    measureChildWithMargin(view,...) 
+    measureChildWithMargin(view,...)
     layoutDecorated(view,....)
     }
 ```
@@ -91,7 +91,7 @@ for(int i=0;i<scrapList.size;i++){
 ### 4. Scroll事件
 ```java
    public int scrollHorizontallyBy(int dx, RecyclerView.Recycler recycler, RecyclerView.State state) {
-   
+
    //dx 表示系统根据传入的TouchEvent告诉你应该滑动多少
    dx <0 内容向右滑动
    dx > 0内容向左滑动

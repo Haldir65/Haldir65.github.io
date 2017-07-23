@@ -33,12 +33,13 @@ A Cookbook shall look like a collection of Recipes, or an index page from where 
 ### V4包里面的东西
 [使用RecyclerView的Animation Android Dev Summit 2015](http://haldir65.github.io/2016/10/20/2016-10-20-RecyclerViewAnimationStuff/)   **yigit boyar和Chet Haase**
 [自定义LayoutManager](http://haldir65.github.io/2016/10/20/2016-10-20-write-your-own-layoutmanager/)  **Dave Smith**
+[Fragment源码解析](http://haldir65.github.io/2017/07/12/2017-07-12-fragment-decoded/)  
+
 
 
 ### 底层原理
 [主线程的工作原理](http://haldir65.github.io/2016/10/12/2016-10-12-How-the-mainThread-work/) **Michael Bailey American Express, 他2016年还讲了LayoutInflater的工作原理**
 [vsync原理解释](http://djt.qq.com/article/view/987)
-[Fragment源码解析](http://haldir65.github.io/2017/07/12/2017-07-12-fragment-decoded/)  
 [让service常驻后台的方法](http://haldir65.github.io/2016/10/20/2016-10-20-android-dirty-code/)
 
 ### 新版本适配，新特性
@@ -56,6 +57,7 @@ A Cookbook shall look like a collection of Recipes, or an index page from where 
 [Rxjava2的一些点](http://haldir65.github.io/2017/04/23/2017-04-23-rxjava2-for-android/) **Jake Wharton**
 [Java线程池的一些点](http://haldir65.github.io/2017/04/30/2017-04-30-concurrency-and-beyond/)
 [Retrofit源码解析](http://haldir65.github.io/2017/07/01/2017-07-01-it-began-with-a-few-bits/)
+[OkHttp和Okio源码解析](http://haldir65.github.io/2017/07/21/2017-07-21-okhttp-demisified/)
 [使用AnnotationProcessor自动生成代码](http://haldir65.github.io/2016/12/31/2016-12-31-Eliminating-BoilPlate-AnnotationProcessor/)
 [翻译了一个印度口音的关于jvm架构的视频](http://haldir65.github.io/2017/05/24/2017-05-24-jvm-architecture/)
 
@@ -72,23 +74,23 @@ A Cookbook shall look like a collection of Recipes, or an index page from where 
 ## ToDo List
 Java相关
 - [X] 画一下java的集合框架
+- [X] 基于Okio展开到OkHttp,Retrofit。
+- [X] String StringBuffer StringBuilder区别(StringBuffer很多方法都加了synchronized)
+- [ ] 一个Java Object到底占用多少内存(from java code to java heap)
 - [ ] java位运算，Collection框架中多次用到了
 - [ ] gson的原理，cache什么的，常规json解析器的原理
-- [ ] 基于Okio展开到OkHttp,Retrofit。
-- [X] String StringBuffer StringBuilder区别(StringBuffer很多方法都加了synchronized)
 - [ ] 垃圾回收器的分类及优缺点
 - [ ] ThreadLocal原理及可能的内存泄漏
 - [ ] LruCache的原理
 - [ ] Understanding Dagger2's generated code
 - [ ] HashMap和conrrentHashmap区别(分段锁)
 - [ ] 单例模式需要考虑到jvm优化的问题（为什么要写两个synchronized）
-- [ ] java类加载机制(classLoader相关的)
+- [ ] java类加载机制(classLoader相关的，类的加载顺序)
 - [ ] Java四种引用
 - [ ] java堆和栈的区别，如何判断堆栈上的对象死没死
 - [ ] 自己写一个一部图片加载框架，并发图像滤镜框架
 - [ ] 多线程异步断点续传框架原理,利用该原理在图片加载框架中的应用(MappedByteBuffer或者RandomAccessFile)
 - [ ] try catch finally到底会不会执行
-- [ ] 一个Java Object到底占用多少内存
 - [ ] 并发编程，java.util.concurrent里面的类熟练掌握，粗略了解原理
 
 
