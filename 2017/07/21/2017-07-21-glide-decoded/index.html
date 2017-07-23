@@ -6,19 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://haldir65.github.io">
-  <title>2017-07-21-glide-decoded | Haldir的博客</title>
+  <title>从glide源码到图片加载框架设计思路 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="Glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&amp;gt;  CacheDispatch  —&amp;gt; NetworkDispatcher  —-&amp;gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是">
+  <meta name="description" content="glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&amp;gt;  CacheDispatch  —&amp;gt; NetworkDispatcher  —-&amp;gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是">
 <meta property="og:type" content="article">
-<meta property="og:title" content="2017-07-21-glide-decoded">
+<meta property="og:title" content="从glide源码到图片加载框架设计思路">
 <meta property="og:url" content="https://haldir65.github.io/2017/07/21/2017-07-21-glide-decoded/index.html">
 <meta property="og:site_name" content="Haldir的博客">
-<meta property="og:description" content="Glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&amp;gt;  CacheDispatch  —&amp;gt; NetworkDispatcher  —-&amp;gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是">
+<meta property="og:description" content="glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&amp;gt;  CacheDispatch  —&amp;gt; NetworkDispatcher  —-&amp;gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/a11f41e0b1df95212c71920b3959cd72.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-07-20T16:22:43.195Z">
+<meta property="og:updated_time" content="2017-07-23T11:10:26.996Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="2017-07-21-glide-decoded">
-<meta name="twitter:description" content="Glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&amp;gt;  CacheDispatch  —&amp;gt; NetworkDispatcher  —-&amp;gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是">
+<meta name="twitter:title" content="从glide源码到图片加载框架设计思路">
+<meta name="twitter:description" content="glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&amp;gt;  CacheDispatch  —&amp;gt; NetworkDispatcher  —-&amp;gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是">
 <meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/a11f41e0b1df95212c71920b3959cd72.jpg?imageView2/2/w/600">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
@@ -81,7 +81,7 @@ ga('send', 'pageview');
 	        
 				<li><a href="/tags/linux/">系统</a></li>
 	        
-				<li><a href="/tags/notes/">工具</a></li>
+				<li><a href="/tags/tools/">工具</a></li>
 	        
 			</ul>
 		</nav>
@@ -161,7 +161,7 @@ ga('send', 'pageview');
 		        
 					<li style="width: 25%"><a href="/tags/linux/">系统</a></li>
 		        
-					<li style="width: 25%"><a href="/tags/notes/">工具</a></li>
+					<li style="width: 25%"><a href="/tags/tools/">工具</a></li>
 		        
 				</ul>
 			</nav>
@@ -183,7 +183,7 @@ ga('send', 'pageview');
         
   
     <h1 class="article-title" itemprop="name">
-      2017-07-21-glide-decoded
+      从glide源码到图片加载框架设计思路
     </h1>
   
 
@@ -196,37 +196,27 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>Glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&gt;  CacheDispatch  —&gt; NetworkDispatcher  —-&gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是能够独立设计出一套类似的框架了。</p>
+        <p>glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&gt;  CacheDispatch  —&gt; NetworkDispatcher  —-&gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是能够独立设计出一套类似的框架了。</p>
 <p><img src="http://odzl05jxx.bkt.clouddn.com/a11f41e0b1df95212c71920b3959cd72.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
-
+<h2 id="tdb"><a href="#tdb" class="headerlink" title="tdb"></a>tdb</h2><h2 id="1-使用入门"><a href="#1-使用入门" class="headerlink" title="1. 使用入门"></a>1. 使用入门</h2><h2 id="2-RequestManager"><a href="#2-RequestManager" class="headerlink" title="2. RequestManager"></a>2. RequestManager</h2><h3 id="2-1-和Context的生命周期挂钩以及如何在生命周期中获取和释放资源"><a href="#2-1-和Context的生命周期挂钩以及如何在生命周期中获取和释放资源" class="headerlink" title="2.1 和Context的生命周期挂钩以及如何在生命周期中获取和释放资源"></a>2.1 和Context的生命周期挂钩以及如何在生命周期中获取和释放资源</h3><h2 id="3-Engine及任务描述"><a href="#3-Engine及任务描述" class="headerlink" title="3. Engine及任务描述"></a>3. Engine及任务描述</h2><h3 id="3-1-解码任务"><a href="#3-1-解码任务" class="headerlink" title="3.1 解码任务"></a>3.1 解码任务</h3><h2 id="4-缓存机制，BitmapPool以及MemoryCache（算上DiskCache的话至少三层Cache）"><a href="#4-缓存机制，BitmapPool以及MemoryCache（算上DiskCache的话至少三层Cache）" class="headerlink" title="4. 缓存机制，BitmapPool以及MemoryCache（算上DiskCache的话至少三层Cache）"></a>4. 缓存机制，BitmapPool以及MemoryCache（算上DiskCache的话至少三层Cache）</h2>
       
 
-      
-        <div class="page-reward">
-          <a href="javascript:;" class="page-reward-btn tooltip-top">
-            <div class="tooltip tooltip-east">
-            <span class="tooltip-item">
-              赏
-            </span>
-            <span class="tooltip-content">
-              <span class="tooltip-text">
-                <span class="tooltip-inner">
-                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
-                  <div class="reward-box">
-                    
-                    
-                  </div>
-                </span>
-              </span>
-            </span>
-          </div>
-          </a>
-        </div>
       
     </div>
     <div class="article-info article-info-index">
       
       
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">android</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
       
 
       
@@ -291,9 +281,18 @@ ga('send', 'pageview');
   
 <nav id="article-nav">
   
+    <a href="/2017/07/23/2017-07-23-lru-cache-and-more/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          LruCache阅读笔记
+        
+      </div>
+    </a>
+  
   
     <a href="/2017/07/21/2017-07-21-network-manual/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">2017-07-21-network-manual</div>
+      <div class="article-nav-title">网络通信手册</div>
       <i class="icon-circle-right"></i>
     </a>
   

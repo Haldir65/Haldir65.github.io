@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="1. 系统为我们提供了LinearLayoutManager、GridLayoutManager和StaggeredGridLayoutManager。基本用法都很简单，这里记录一些重要的用法">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/Googling%20the%20Error%20Message.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-04-23T10:50:40.959Z">
+<meta property="og:updated_time" content="2017-07-23T10:43:10.446Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="自定义LayoutManager">
 <meta name="twitter:description" content="1. 系统为我们提供了LinearLayoutManager、GridLayoutManager和StaggeredGridLayoutManager。基本用法都很简单，这里记录一些重要的用法">
@@ -81,7 +81,7 @@ ga('send', 'pageview');
 	        
 				<li><a href="/tags/linux/">系统</a></li>
 	        
-				<li><a href="/tags/notes/">工具</a></li>
+				<li><a href="/tags/tools/">工具</a></li>
 	        
 			</ul>
 		</nav>
@@ -161,7 +161,7 @@ ga('send', 'pageview');
 		        
 					<li style="width: 25%"><a href="/tags/linux/">系统</a></li>
 		        
-					<li style="width: 25%"><a href="/tags/notes/">工具</a></li>
+					<li style="width: 25%"><a href="/tags/tools/">工具</a></li>
 		        
 				</ul>
 			</nav>
@@ -199,14 +199,14 @@ ga('send', 'pageview');
         <h3 id="1-系统为我们提供了LinearLayoutManager、GridLayoutManager和StaggeredGridLayoutManager。"><a href="#1-系统为我们提供了LinearLayoutManager、GridLayoutManager和StaggeredGridLayoutManager。" class="headerlink" title="1. 系统为我们提供了LinearLayoutManager、GridLayoutManager和StaggeredGridLayoutManager。"></a>1. 系统为我们提供了LinearLayoutManager、GridLayoutManager和StaggeredGridLayoutManager。</h3><p>基本用法都很简单，这里记录一些重要的用法</p>
 <p><img src="http://odzl05jxx.bkt.clouddn.com/Googling%20the%20Error%20Message.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
 <ul>
-<li>GridLayoutManager可以设置某个Item在某一行占据的Column num（VERTICAL的情况下）<br>代码如下:<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">GridLayoutManager manager = <span class="keyword">new</span> GridLayoutManager(</div><div class="line">   <span class="keyword">this</span>,<span class="number">2</span> ,GridLayoutManager.VERTICAL,<span class="keyword">false</span>)</div><div class="line">   </div><div class="line">manager.setSpanSizeLookup()&#123;</div><div class="line">        <span class="keyword">new</span> GridLayoutManager.SpanSizeLookup()&#123;</div><div class="line">        <span class="meta">@override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getSpanSize</span><span class="params">(<span class="keyword">int</span> position)</span></span>&#123;</div><div class="line">                <span class="keyword">return</span> (position % <span class="number">3</span> == <span class="number">0</span> ? <span class="number">2</span> : <span class="number">1</span>)</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<li>GridLayoutManager可以设置某个Item在某一行占据的Column num（VERTICAL的情况下）<br>代码如下:<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">GridLayoutManager manager = <span class="keyword">new</span> GridLayoutManager(</div><div class="line">   <span class="keyword">this</span>,<span class="number">2</span> ,GridLayoutManager.VERTICAL,<span class="keyword">false</span>)</div><div class="line"></div><div class="line">manager.setSpanSizeLookup()&#123;</div><div class="line">        <span class="keyword">new</span> GridLayoutManager.SpanSizeLookup()&#123;</div><div class="line">        <span class="meta">@override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getSpanSize</span><span class="params">(<span class="keyword">int</span> position)</span></span>&#123;</div><div class="line">                <span class="keyword">return</span> (position % <span class="number">3</span> == <span class="number">0</span> ? <span class="number">2</span> : <span class="number">1</span>)</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
 </li>
 </ul>
 <p>所以，一开始可以把这个2设置大一点，后面可以动态设置，看上去就会造成一种多种格子的错觉。</p>
 <ul>
 <li>GridLayoutManger的同一行的ItemView的itemHeight必须一致，否则同一行的ItemView底部会出现空隙。这种情况请使用StaggeredGridLayoutManager</li>
 </ul>
-<h4 id="2-LayoutManager-lt-——-gt-Recycler-lt-——–-gt-Adapter"><a href="#2-LayoutManager-lt-——-gt-Recycler-lt-——–-gt-Adapter" class="headerlink" title="2. LayoutManager &lt;——-&gt; Recycler &lt;——–&gt; Adapter"></a>2. LayoutManager &lt;——-&gt; Recycler &lt;——–&gt; Adapter</h4><p>LayoutManager永远永远永远不要碰Adapter!!!</p>
+<h3 id="2-LayoutManager-lt-——-gt-Recycler-lt-——–-gt-Adapter"><a href="#2-LayoutManager-lt-——-gt-Recycler-lt-——–-gt-Adapter" class="headerlink" title="2. LayoutManager &lt;——-&gt; Recycler &lt;——–&gt; Adapter"></a>2. LayoutManager &lt;——-&gt; Recycler &lt;——–&gt; Adapter</h3><p>LayoutManager永远永远永远不要碰Adapter!!!</p>
 <h3 id="3-Recycler构造"><a href="#3-Recycler构造" class="headerlink" title="3.Recycler构造"></a>3.Recycler构造</h3><p>Recycler内部有两个集合:</p>
 <ol>
 <li>Scrap Heap ： detachAndScrapView() 暂时不用的View丢到这里，随时取回使用</li>
@@ -223,7 +223,7 @@ ga('send', 'pageview');
 <li><p>Lay out all visible positions</p>
 </li>
 </ol>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span>(...)&#123;</div><div class="line">    <span class="keyword">int</span> nextPosition = ...;</div><div class="line">    View view = recycler.getViewForPosition(nextPosition);</div><div class="line">    addView(view);</div><div class="line">    </div><div class="line">    <span class="comment">//注意这里的Measure和Layout不是平时使用的measureChild和layout方法，原因是ItemDecoration</span></div><div class="line">    measureChildWithMargin(view,...) </div><div class="line">    layoutDecorated(view,....)</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span>(...)&#123;</div><div class="line">    <span class="keyword">int</span> nextPosition = ...;</div><div class="line">    View view = recycler.getViewForPosition(nextPosition);</div><div class="line">    addView(view);</div><div class="line"></div><div class="line">    <span class="comment">//注意这里的Measure和Layout不是平时使用的measureChild和layout方法，原因是ItemDecoration</span></div><div class="line">    measureChildWithMargin(view,...)</div><div class="line">    layoutDecorated(view,....)</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
 <ol>
 <li>Recycle remaining views<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">final</span> List&lt;RecyclerView.ViewHolder&gt; scrapList =</div><div class="line">    recycler.getScrapList();</div><div class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;scrapList.size;i++)&#123;</div><div class="line">    <span class="keyword">final</span> View removingView = scrapList.get(i);</div><div class="line">    recycler.recycleView(removingView);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
 </li>
@@ -240,27 +240,6 @@ ga('send', 'pageview');
 
       
 
-      
-        <div class="page-reward">
-          <a href="javascript:;" class="page-reward-btn tooltip-top">
-            <div class="tooltip tooltip-east">
-            <span class="tooltip-item">
-              赏
-            </span>
-            <span class="tooltip-content">
-              <span class="tooltip-text">
-                <span class="tooltip-inner">
-                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
-                  <div class="reward-box">
-                    
-                    
-                  </div>
-                </span>
-              </span>
-            </span>
-          </div>
-          </a>
-        </div>
       
     </div>
     <div class="article-info article-info-index">
