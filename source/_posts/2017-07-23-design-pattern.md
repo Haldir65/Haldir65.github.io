@@ -5,3 +5,4 @@ tags: [java,designpattern,tools]
 ---
 
 TBD
+<!--more-->

@@ -105,3 +105,4 @@ Native method stacks 是由java stack中的方法调用native方法创建的，�
 
 ### 参考
 [JVM ( java virtual machine) architecture - tutorial](https://www.youtube.com/watch?v=ZBJ0u9MaKtM)
+[Java系列笔记(3) - Java 内存区域和GC机制](http://www.cnblogs.com/zhguang/p/3257367.html)
