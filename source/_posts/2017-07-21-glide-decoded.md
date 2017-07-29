@@ -213,7 +213,7 @@ T和Y的一一对应其实是在Glide的构造函数里面写好的：
  public class DrawableTypeRequest<ModelType> extends DrawableRequestBuilder<ModelType> implements DownloadOptions
  public class DrawableRequestBuilder<ModelType>
         extends GenericRequestBuilder<ModelType, ImageVideoWrapper, GifBitmapWrapper, GlideDrawable>
-        implements BitmapOptions, DrawableOptions 
+        implements BitmapOptions, DrawableOptions
  public class GenericRequestBuilder<ModelType, DataType, ResourceType, TranscodeType> implements Cloneable        
 ```
 
@@ -262,7 +262,7 @@ DrawableRequestBuilder
         return into(glide.buildImageViewTarget(view, transcodeClass));
         //这个into接收一个Target的子类的实例，而Target又继承自LifeCycleListener
         //这个TranscodeClass是每一个Request创建的时候从构造函数传进来的。
-       
+
     }
 
 
@@ -291,7 +291,7 @@ GlideDrawableImageViewTarget、BitmapImageViewTarget以及DrawableImageViewTarge
 public class GlideDrawableImageViewTarget extends ImageViewTarget<GlideDrawable> {
     private static final float SQUARE_RATIO_MARGIN = 0.05f;
     private int maxLoopCount;
-    private GlideDrawable resource; 
+    private GlideDrawable resource;
     }
 ```
 GlideDrawable是一个继承自Drawable的抽象类，添加了isAnimated(),setLoopCount以及由于实现了isAnimated所需要的三个方法(start,stop,isRunning)。子类必须实现这五个抽象方法。
@@ -396,10 +396,10 @@ GenericRequest.java
 ```java
    /**
      * A callback method that should never be invoked directly.
-     */ 
+     */
     @Override
     public void onSizeReady(int width, int height) {
-        
+
         if (status != Status.WAITING_FOR_SIZE) {
             return;
         }
@@ -410,7 +410,7 @@ GenericRequest.java
 
         ModelLoader<A, T> modelLoader = loadProvider.getModelLoader();
         final DataFetcher<T> dataFetcher = modelLoader.getResourceFetcher(model, width, height);
-            
+
         ResourceTranscoder<Z, R> transcoder = loadProvider.getTranscoder();
         loadedFromMemoryCache = true;
         loadStatus = engine.load(signature, width, height, dataFetcher, loadProvider, transformation, transcoder,
@@ -539,7 +539,7 @@ Engine先去Cache里面查找，找到了直接调用ResourceCallback(GenericReq
 - ViewTarget里面有一个 T extends View，可见Glide不只适用于ImageView。
 - BaseTarget里带了一个private Request，其子类可以通过getRequest获得。
 - 对于ListView等可以快速滑动的View，如果某一个View被滑出屏幕外，自动取消请求(通过setTagId实现)
-- "You must not call setTag() on a view Glide is targeting" setTag可能会崩，原因
+- "You must not call setTag() on a view Glide is targeting" setTag会崩，原因是GenericRequestBuilder的into方法会通过ViewTarget去查找previous，看看这一个ViewTarget是否已经有了request。这一点常见于循环利用View的场景，快速滑动的ViewGroup会复用View。对于同一个View，可能ViewGroup会需要它展示不同的(图片、Url)，所以Glide必须要检查previous，同时清除掉旧的请求。
 - GenericRequestBuilder的obtainRequest内部使用了一个ArrayDeque来obtain Request。这样Request实例不会多次创建，回收是在request.recycle里面做的。
 
 
@@ -602,12 +602,13 @@ if (sourceService == null) {
         }
 ```
 在外部没有提供线程池的情况下，DiskCache一个线程池就好了，SourceService的大小为当前cpu可用核心数，还是比较高效的。
+debug的时候可能会看见“fifo-pool-thread-1”这样的线程，就是Glide的。
 上面是往DiskCacheService提交了一个EngineRunable，这个Runnable的run里面主要是decodeFromCache和DecodeFroSource，分别代表从**磁盘缓存**获取和从数据源获取。
 首先会调用decodeFromCache，一层层往下找，如果没找到的话会调用onLoadFailed方法，并将任务提交给SourceService，去获取资源。
 
 
 ### 4.1 CacheService这个线程池的工作以及第三层缓存的出现
-**注意这里出现了第三层缓存** 
+**注意这里出现了第三层缓存**
 ```
  File cacheFile = diskCacheProvider.getDiskCache().get(key);
 ```
@@ -663,7 +664,7 @@ Resource<Z> result = transcode(transformed); ///把一种资源转成另一种�
     }
 ```
 
-**第四层缓存出现。。。**
+**第四层缓存出现。。。LruBitmapPool**
 DecodeFromSource也是类似，判断是否允许Cache，通过DataFetcher获取数据这个数据可能是InputStream，也可能是ImageVideoWrapper。。。总之是一个可以提供数据的来源。如果可以Cache的话，先把数据写到lru里面，然后从lru里面取出来，从Source decode成想要的数据类型。
 例如从Stream转成Bitmap是这么干的
 StreamBitmapDecoder.java
@@ -697,11 +698,83 @@ onResourceReady最终会走到GenericRequest的onResourceReady方法里
 
 ### 5. Glide除了普通的加载方法，还能用什么比较有意思的玩法
 
+- 1.Glide加载Gif的原理在GifDecoder的 public synchronized Bitmap getNextFrame()方法里，Gif本质上是一帧帧的Frame数据，Glide将这些数据包装到GifFrame这个类中，每次想要获得下一帧的时候，就从bitmapPool中obtain Bitmap,同时从Frame中提取必要信息填充bitmap.
+Gif的显示是在GifDrawable的draw方法里面通过frameLoader.getCurrentFrame()获得当前帧的bitmap。
 
-## 来一些不拘一格的加载图片的方法
-### 使用Application的Context,不跟生命周期走
 
-## 小结
+- 2.GlideDrawableImageViewTarget中有这么一段注释：
+```java
+@Override
+   public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
+       if (!resource.isAnimated()) {
+           //TODO: Try to generalize this to other sizes/shapes.
+           // This is a dirty hack that tries to make loading square thumbnails and then square full images less costly
+           // by forcing both the smaller thumb and the larger version to have exactly the same intrinsic dimensions.
+           // If a drawable is replaced in an ImageView by another drawable with different intrinsic dimensions,
+           // the ImageView requests a layout. Scrolling rapidly while replacing thumbs with larger images triggers
+           // lots of these calls and causes significant amounts of jank.
+           float viewRatio = view.getWidth() / (float) view.getHeight();
+           float drawableRatio = resource.getIntrinsicWidth() / (float) resource.getIntrinsicHeight();
+           if (Math.abs(viewRatio - 1f) <= SQUARE_RATIO_MARGIN
+                   && Math.abs(drawableRatio - 1f) <= SQUARE_RATIO_MARGIN) {
+               resource = new SquaringDrawable(resource, view.getWidth());
+           }
+       }
+       super.onResourceReady(resource, animation);
+       this.resource = resource;
+       resource.setLoopCount(maxLoopCount);
+       resource.start();
+   }
+```
+
+- 3. Glide还可以用来纯粹的解码获得Bitmap.
+```java
+Glide.with(itemView.getContext()) //不用担心leak,RequestManager只是通过这个context获得了ApplicationContext，保留下来的是Application的context
+               .load(R.drawable.image_41)
+               .asBitmap()
+               .centerCrop().into(new SimpleTarget<Bitmap>() {
+           @Override
+           public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+
+           }
+
+           @Override
+           public void onDestroy() {
+               super.onDestroy(); //其实这里面是空方法。
+           }
+       });
+```
+
+- 4.缓存路径获取
+```java
+Glide.with(itemView.getContext())
+            .load("")
+            .downloadOnly(new BaseTarget<File>() {
+                @Override
+                public void onResourceReady(File resource, GlideAnimation<? super File> glideAnimation) {
+                  Log.d(TAG, resource.getAbsoluteFile());
+              //放心，都在主线程
+                }
+
+                @Override
+                public void getSize(SizeReadyCallback cb) {
+                }
+            });
+```
+根据之前的分析，打印出来的应该是context.getCacheDir+"image_manager_disk_cache"+"/xxxxxx.xxx" ，我没研究过后缀，不过这个后缀没意义吧。
+
+
+
+## 总结
+- 4层缓存（MemoryCache是内存层面的一层，activeResources是一层（HashMap）,cacheService和SourceService这俩线程池干活需要一个DiskLruCache，另外decode还有一个bitmapPool，其实这不算缓存吧）。
+- 默认的缓存大小考虑了屏幕尺寸和可用内存大小，科学合理。线程池的keepAlive数量上，一个是可用cpu核心数，所以快吧，一个是1。
+- 全局只有一个Glide,一个页面只有一个RequestManager
+- Target是一个接口，将资源的受众抽象成一个接口。
+- setTag会崩，ListView,RecyclerView原理,加载优化(prefetcher什么的，滑动过程中不去加载图片，Glide只是取消了之前的请求，并未去prefetch,其实可以啊，网络差的时候，downloadOnly就好了嘛，下次会快一点点)
+- 传进去的是context，但它只是借用context.getApplicationContext，保留下来的是ApplicationContext，哪有那么容易leak。
+- 生命周期挂钩什么，创建一个没有View的SupportFragment，还是做的很巧妙的。
+- 泛型写的各种绕。。。
 
 
 ## 参考
+- [Android Glide源码解析](http://frodoking.github.io/2015/10/10/android-glide/)

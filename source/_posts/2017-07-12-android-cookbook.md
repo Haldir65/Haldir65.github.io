@@ -118,7 +118,7 @@ Android相关
     - [ ] ViewPager的原理
     - [ ] ViewGroup，View的源码
     - [ ] View的绘制原理
-    - [ ] ListView,RecyclerView原理,加载优化(prefetcher什么的，滑动过程中不去加载图片,我记得Glide是没有做这件事的)
+    - [ ] ListView,RecyclerView原理,加载优化(prefetcher什么的，滑动过程中不去加载图片，参考我写的Glide笔记)
 - [ ] Zygote进程启动流程
 - [ ] SystemServer进程启动流程
 - [ ] Launcher启动流程
