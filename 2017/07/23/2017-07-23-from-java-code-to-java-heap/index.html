@@ -8,16 +8,19 @@
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>java对象内存占用分析 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="TBD">
+  <meta name="description" content="面向对象语言就意味着对象要占用内存空间，那么，java中随便new 出来的东西到底多大？还有，new出来的东西全都都放在heap上吗(有些真不是)？">
 <meta property="og:type" content="article">
 <meta property="og:title" content="java对象内存占用分析">
 <meta property="og:url" content="https://haldir65.github.io/2017/07/23/2017-07-23-from-java-code-to-java-heap/index.html">
 <meta property="og:site_name" content="Haldir的博客">
-<meta property="og:description" content="TBD">
-<meta property="og:updated_time" content="2017-07-23T11:25:12.380Z">
+<meta property="og:description" content="面向对象语言就意味着对象要占用内存空间，那么，java中随便new 出来的东西到底多大？还有，new出来的东西全都都放在heap上吗(有些真不是)？">
+<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/9b157a7acab582078ac1fabada5c8009.jpg?imageView2/2/w/600">
+<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/official_java_primitive_type_size_table.JPG">
+<meta property="og:updated_time" content="2017-07-28T23:49:48.698Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java对象内存占用分析">
-<meta name="twitter:description" content="TBD">
+<meta name="twitter:description" content="面向对象语言就意味着对象要占用内存空间，那么，java中随便new 出来的东西到底多大？还有，new出来的东西全都都放在heap上吗(有些真不是)？">
+<meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/9b157a7acab582078ac1fabada5c8009.jpg?imageView2/2/w/600">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -194,7 +197,80 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>TBD</p>
+        <p><img src="http://odzl05jxx.bkt.clouddn.com/9b157a7acab582078ac1fabada5c8009.jpg?imageView2/2/w/600" alt=""><br>面向对象语言就意味着对象要占用内存空间，那么，java中随便new 出来的东西到底多大？还有，new出来的东西全都都放在heap上吗(有些真不是)？<br><a id="more"></a></p>
+<h2 id="1-首先给出精确判断Object大小的一种方法"><a href="#1-首先给出精确判断Object大小的一种方法" class="headerlink" title="1.首先给出精确判断Object大小的一种方法"></a>1.首先给出精确判断Object大小的一种方法</h2><p>一个判断Java Object大小的方法<br>比较精准的确定一个对象的大小的<a href="https://github.com/liaohuqiu/java-object-size">方法</a>:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ObjectSizeFetcher</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Instrumentation instrumentation;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">premain</span><span class="params">(String args, Instrumentation inst)</span> </span>&#123;</div><div class="line">        instrumentation = inst;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">long</span> <span class="title">getObjectSize</span><span class="params">(Object o)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> instrumentation.getObjectSize(o);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这样通常在IDE里面跑不起来。</p>
+<p>据说dump memory也行，没试过。</p>
+<h2 id="2-内存对齐"><a href="#2-内存对齐" class="headerlink" title="2. 内存对齐"></a>2. 内存对齐</h2><p>JVM为了malloc与gc方便，指定分配的每个对象都需要是8字节的整数倍<a href="http://github.thinkingbar.com/alignment/">参考</a><br>简单来说，一个Object占用的内存大小是8 Byte的倍数</p>
+<h2 id="3-java进程的内存占用情况"><a href="#3-java进程的内存占用情况" class="headerlink" title="3. java进程的内存占用情况"></a>3. java进程的内存占用情况</h2><h3 id="3-1-操作系统和runtime占用的内存"><a href="#3-1-操作系统和runtime占用的内存" class="headerlink" title="3.1 操作系统和runtime占用的内存"></a>3.1 操作系统和runtime占用的内存</h3><p>操作系统的内存中，一部分被操作系统和kernel所占用。对于用c或者c++写的jvm，还需要分配一部分给c runtime。操作系统和c<br>runtime占用的内存比较大，不同的操作系统上不一样，windows上默认是2GB。剩下的内存(即user space)，就是进程可以使用的内存。</p>
+<h3 id="3-2-剩下的内存-user-space"><a href="#3-2-剩下的内存-user-space" class="headerlink" title="3.2 剩下的内存(user space)"></a>3.2 剩下的内存(user space)</h3><p>对于Java进程来讲，这剩下的部分分为两块:</p>
+<ul>
+<li>Java Heap(s)</li>
+<li>Native (non-java) Heap</li>
+</ul>
+<p>Java Heap可以通过-Xms 和 -Xmx 来设置最小值和最大值<br>Native Heap是在分配了java maximum Heap大小之后剩下的大小(jvm占用的内存也算在这里面)</p>
+<h3 id="3-3-数据类型大小"><a href="#3-3-数据类型大小" class="headerlink" title="3.3 数据类型大小"></a>3.3 数据类型大小</h3><p>基本数据类型大小很简单，其实也不简单。这张图是从ibm网站上截下来的<br><img src="http://odzl05jxx.bkt.clouddn.com/official_java_primitive_type_size_table.JPG" alt=""><br>注意一个boolean在数组中只占用一个字节，单独使用占用4个字节。<br>原理<a href="http://www.jianshu.com/p/2f663dc820d0">参考</a></p>
+<p>引用的大小：<br>在 32 位的 JVM 上，一个对象引用占用 4 个字节；在 64 位上，占用 8 个字节。通过 java -d64 -version 可确定是否是 64 位的 JVM。<br>处理器能够处理的bit范围决定了操作系统能够使用的内存范围：<br>32位的cpu(2^32 = 4,294,967,296 bits = 4GB)<br>64位cpu (2^64 = 18,446,744,073,709,551,616 = 16 exabytes)<br>多数jvm是用c或者c++写的:</p>
+<ul>
+<li>the Java runtime creates an operating-system process — just as if you were running a C-based program. In fact, most JVMs are written largely in C or C++</li>
+</ul>
+<p>查看jvm是否64位的方法:</p>
+<ul>
+<li>java -d64 -version<br>64位上引用占用大小变大的原因是，需要管理4g以上的内存，指针(内存地址不够用了)</li>
+</ul>
+<h2 id="4-java对象内存布局，从一个Integer说起"><a href="#4-java对象内存布局，从一个Integer说起" class="headerlink" title="4. java对象内存布局，从一个Integer说起"></a>4. java对象内存布局，从一个Integer说起</h2><p>一个class实例占据的大小包括:</p>
+<ol>
+<li>自身的大小（对象头+基本数据类型数据大小） - Shadow heap size<br>Object自身的大小在不同的jvm版本和厂商之间有一些变化，但大体上包括三个部分:</li>
+</ol>
+<ul>
+<li>Class ： 一个指针，指向对应的class，用于表明其类型。比如一个Integer就指向java.lang.Integer这个类(32位上4字节，64位上8字节)</li>
+<li>Flags : A collection of flags that describe the state of the object, including the hash code for the object if it has one, and the shape of the object (that is, whether or not the object is an array).（就是存hash值和用于表示是不是数组的，32位上4字节，64位上8字节）</li>
+<li>Lock 所有的Object都能lock，这部分内存用于表示当前Object是否是被synchronized(32位上4字节，64位上8字节)</li>
+</ul>
+<p>所以，对于java.lang.Integer来说，一个Integer的大小就是：<br>32(class信息)+32(Flags)+32(Lock))+32(int是基本数据类型，4字节) = 128bits（16字节）<br>事实上，一个Interger的大小是int（4个字节）的四倍，简单来说一个对象的头信息就占用了3个字节。</p>
+<ol>
+<li><p>数组的大小<br>数组和普通的object差不多，多了一个size(32字节)。也就是说。为了存储一个int值。使用一个大小为1的int[]数组的内存消耗比一个Integer还要大。（同样，32位4字节，64位8字节）。数组因为多一个size，所以4个字节起步。</p>
+</li>
+<li><p>8个字节变成4个字节<br>IBM和Oracle的jvm都能够提供ompressed References (-Xcompressedrefs) 和Compressed OOPs (-XX:+UseCompressedOops) 选项。这样一来，原本在64位机器上要占用8个字节的指针就只要占用4个字节了。但这只对java Heap上的内存有效，对于Native Heap这部分，64位占用内存还是要比32位多。所以同样的一份代码，在64位上占用的内存一定比32位上多。jdk 1.6.x之后好像默认是打开了的。</p>
+</li>
+<li><p>引用的对象的大小(递归即可) - Retained heap size(Shallow Heap大小加上引用的对象的)<br>java.lang.Integer还算比较简单的，里面除了一个int值表示value以外，没有其它的成员变量，所以并没有引用到其他对象的实例。对于复杂一点的数据类型，比如jav.lang.String呢？</p>
+</li>
+</ol>
+<p>String本身是一个很简单的类(如果不算常量池的话)，几乎可以看成一个char数组的wrapper。除了一个普通对象的class、Flag和Locks等信息外，String内部还有一个 private int hash（用于Cache hash值），还有offset和count（这俩好像没找到），此外就是一个char数组了。<br>所以，为了存储8个字符(16个字节,128bits)。首先这个char数组对象占用了16个字节(2*8)+（对象头+数组大小）16个字节 = 256bits。<br>算到String头上，String本身的文件头是12个字节，算上hash,count,offset各自4个字节，就24个字节了。再加上数组的引用4个字节，再加上数组的大小32个字节。<br>合计60个字节（480bits）。而这里面实际有用的数据只有16个字节。73.3%的内存都是存储其他东西的。</p>
+<p>说的比较乱了，这里直接照搬一段计算,<a href="http://www.yunweipai.com/archives/1092.html">参考</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">- 一般而言，Java 对象在虚拟机的结构如下：</div><div class="line">•对象头（object header）：8 个字节（保存对象的 class 信息、ID、在虚拟机中的状态）</div><div class="line">•Java 原始类型数据：如 int, float, char 等类型的数据</div><div class="line">•引用（reference）：4 个字节</div><div class="line">•填充符（padding）</div><div class="line"></div><div class="line">String定义：</div><div class="line"></div><div class="line">JDK6:</div><div class="line">private final char value[];</div><div class="line">private final int offset;</div><div class="line">private final int count;</div><div class="line">private int hash;</div><div class="line"></div><div class="line">JDK6的空字符串所占的空间为40字节</div><div class="line"></div><div class="line">JDK7:</div><div class="line">private final char value[];</div><div class="line">private int hash;</div><div class="line">private transient int hash32;</div><div class="line"></div><div class="line">JDK7的空字符串所占的空间也是40字节</div><div class="line"></div><div class="line">JDK6字符串内存占用的计算方式：</div><div class="line">首先计算一个空的 char 数组所占空间，在 Java 里数组也是对象，因而数组也有对象头，故一个数组所占的空间为对象头所占的空间加上数组长度，即 8 + 4 = 12 字节 , 经过填充后为 16 字节。</div><div class="line"></div><div class="line">那么一个空 String 所占空间为：</div><div class="line"></div><div class="line">对象头（8 字节）+ char 数组（16 字节）+ 3 个 int（3 × 4 = 12 字节）+1 个 char 数组的引用 (4 字节 ) = 40 字节。</div><div class="line"></div><div class="line">因此一个实际的 String 所占空间的计算公式如下：</div><div class="line"></div><div class="line">8*( ( 8+12+2*n+4+12)+7 ) / 8 = 8*(int) ( ( ( (n) *2 )+43) /8 )</div><div class="line"></div><div class="line">其中，n 为字符串长度。</div></pre></td></tr></table></figure></p>
+<ol>
+<li>小结<br>随便new一个Object就意味着12个Byte没了，数组的话16个字节没了。每添加一个成员变量（指针），4个字节没了。这些都还没算上实际存储的数据。</li>
+</ol>
+<h2 id="5-java-util框架中使用的那些集合类"><a href="#5-java-util框架中使用的那些集合类" class="headerlink" title="5. java.util框架中使用的那些集合类"></a>5. java.util框架中使用的那些集合类</h2><h3 id="5-1-HashSet"><a href="#5-1-HashSet" class="headerlink" title="5.1 HashSet"></a>5.1 HashSet</h3><p>A HashSet is an implementation of the Set interface。无重复元素，不保证迭代顺序，常规的add,contains等方法速度不会随着内部元素的增加而变慢。HashSet内部最多有一个null，底层实现是HashMap，这意味着其占用内存要比HashMap大。<br>默认容量 16个Entries<br>内部元素为空时的大小 144bytes<br>查找，添加，删除的时间复杂度为 O(1)，在没有Hash collisions发生的前提下 </p>
+<h3 id="5-2-HashMap"><a href="#5-2-HashMap" class="headerlink" title="5.2 HashMap"></a>5.2 HashMap</h3><p>A HashMap is an implementation of the Map interface.<br>HashMap是一种存储Key-Value型数据的集合，一个key最多map到一个value，key和value都可以为null，可以存储重复元素。（所以）——HashMap是HashSet的一种功能上的简化。<br>底层是Entries(Entries元素是链表)，长这样。</p>
+<ul>
+<li>transient HashMapEntry<K,V>[] table = (HashMapEntry<K,V>[]) EMPTY_TABLE;<br>HashMap的成员变量包括：</li>
+</ul>
+<p>transient HashMapEntry<K,V>[] table（HashMapEntry的数组）<br>int size<br>int threshold<br>final float loadFactor<br>transient int modCount;</p>
+<p>一个HashMap刚创建时(完全为空时)的大小为128bytes，jdk 1.8在初始化时没有加载Entries，在put操作时才去分配。可能会好一点。<br>内部结构一般是这样的，一个HashMapEntry的大小为32byte。<br>int KeyHash<br>Object next<br>Object key<br>Object value<br>HashMap每次put键值对时，都使用了一个HashMap$Entry这样的包装类，这意味着整个HashMap的overhead包括：<br>This means that the total overhead of a HashMap consists of the HashMap object, a HashMap$Entry array entry, and a HashMap$Entry object for each entry.<br>直接照搬结论：对于HashMap<br>Default capacities为16个 entries</p>
+<p>对于一个有10000个Entries的HashMap，光是由于HashMap，Entry数组以及每个Entry对象带来的overhead就达到了360K左右，这里还不算存储的键值对本身的大小。</p>
+<h3 id="5-3-Hashtable"><a href="#5-3-Hashtable" class="headerlink" title="5.3 Hashtable"></a>5.3 Hashtable</h3><p>HashTable和HashMap的主要区别是HashTable是线程安全的，HashTable中很多方法都加上了synchronized修饰。一般来讲，jdk1.5以上如果想要线程安全，直接用synchronizedHashMap。Hashtable继承自Dictionary，后者已经被废弃了，推荐使用map接口的实现类。<br>照搬结论：要存储10k个Entries，overhead达到360k。</p>
+<h3 id="5-4-LinkedList"><a href="#5-4-LinkedList" class="headerlink" title="5.4 LinkedList"></a>5.4 LinkedList</h3><p>Linkedist是典型的双向链表，除非增删操作特别频繁，否则没必要使用。<br>查找的时间复杂度为 o(n)。添加的元素被包装在一个Node节点中。<br>存储10K个元素的overhead为240K。</p>
+<h3 id="5-5-ArrayList"><a href="#5-5-ArrayList" class="headerlink" title="5.5 ArrayList"></a>5.5 ArrayList</h3><p>ArrayList要好很多，value直接存在一个数组内部，查找的时间复杂度为o(1)<br>存储10K个元素的overhead为40K左右。</p>
+<h3 id="5-6-StringBuffer，StringBuilder"><a href="#5-6-StringBuffer，StringBuilder" class="headerlink" title="5.6 StringBuffer，StringBuilder"></a>5.6 StringBuffer，StringBuilder</h3><p>StringBuffer直接强加synchronized，StringBuilder和StringBuffer都继承自AbstractStringBuilder。成员变量就两个一个char[] value和一个int count。</p>
+<h2 id="6-集合的默认初始容量和扩系数"><a href="#6-集合的默认初始容量和扩系数" class="headerlink" title="6.集合的默认初始容量和扩系数"></a>6.集合的默认初始容量和扩系数</h2><p>以StirngBuffer为例（也算一种char的集合吧），默认容量是16，即创建了一个char[16]，空的，算上对象头，一共72bytes。这还只是StringBuffer里什么都没存储的情况。<br>StringBuffer sb = new StringBuffer(“My String”)。//算下用了多少内存<br>首先算数组，文件头12bytes，加上size 16bytes。算上数组，（数组长度为str.length+16）一共116bytes，算上内存对齐，一共120bytes。StringBuffer对象的大小：对象头+count+数组指针 = 20 bytes。<br>合计140bytes，内存对齐后144bytes，只为存储”My String”这9个字符（36bytes）。<br>上面提到的这些集合类都对外提供了可以设置初始容量的构造函数以避免内存浪费，但要注意HashMap只接受2的指数幂。</p>
+<h3 id="7-high-level抽象带来的便利性及所需付出的代价"><a href="#7-high-level抽象带来的便利性及所需付出的代价" class="headerlink" title="7.high level抽象带来的便利性及所需付出的代价"></a>7.high level抽象带来的便利性及所需付出的代价</h3><p>面向对象语言推荐开发者使用一些高层抽象化的类，但更加复杂的功能意味着内存占用的增加。而内存意味着一切，所以，权衡好开发便利与内存占用对于程序的高效运行就十分重要，而这一切的前提就在于了解这些Wrapper对象工作的原理。</p>
+<h2 id="一些很有意思的事情"><a href="#一些很有意思的事情" class="headerlink" title="一些很有意思的事情"></a>一些很有意思的事情</h2><ul>
+<li>Integer内部缓存了一个Integer[] ，最大值可以通过(java.lang.Integer.IntegerCache.high)配置</li>
+<li>不同版本jdk上String的优化很有意思，又是那个一个String占用多少字节的问题</li>
+<li>关于ConcurrentModificationException，对一个集合的更改分为结构性更改和集合元素值的更改，前者会抛出ConcurrentModificationException，后者不会。</li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://www.liaohuqiu.net/cn/posts/caculate-object-size-in-java/">JAVA 对象大小</a></li>
+<li><a href="http://www.cnblogs.com/zhanjindong/p/3757767.html">一个Java对象到底占用多大内存</a></li>
+<li><a href="http://github.thinkingbar.com/lookup-objsize/">查看 Java 对象大小</a></li>
+<li><a href="https://www.ibm.com/developerworks/library/j-codetoheap/index.html">From Java code to Java heap</a></li>
+<li><a href="https://www.youtube.com/watch?v=FLcXf9pO27w">Understanding the Memory Usage of Your Application</a></li>
+<li><a href="https://www.ibm.com/developerworks/library/j-nativememory-linux/index.html">Thanks for the memory, Linux</a></li>
+<li><a href="http://www.jianshu.com/p/2f663dc820d0">boolean数组中一个值占用1bit</a></li>
+<li><a href="http://www.yunweipai.com/archives/1092.html">不同jdk版本String做的优化</a> </li>
+</ul>
 
       
 
