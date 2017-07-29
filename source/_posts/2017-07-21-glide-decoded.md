@@ -209,22 +209,493 @@ T和Y的一一对应其实是在Glide的构造函数里面写好的：
 
 ### 2.2 Request的继承关系
 
-- public class DrawableTypeRequest<ModelType> extends DrawableRequestBuilder<ModelType> implements DownloadOptions
-- public class DrawableRequestBuilder<ModelType>
+```
+ public class DrawableTypeRequest<ModelType> extends DrawableRequestBuilder<ModelType> implements DownloadOptions
+ public class DrawableRequestBuilder<ModelType>
         extends GenericRequestBuilder<ModelType, ImageVideoWrapper, GifBitmapWrapper, GlideDrawable>
         implements BitmapOptions, DrawableOptions 
-- public class GenericRequestBuilder<ModelType, DataType, ResourceType, TranscodeType> implements Cloneable        
+ public class GenericRequestBuilder<ModelType, DataType, ResourceType, TranscodeType> implements Cloneable        
+```
+
+记住这个ModelType就是Glide.with(context).load(XXX) 里面传进去的Object的Class，例如File.class，那么
+上面其实就是创建了一个DrawableTypeRequest，泛型是File ，构造函数一层层往上调用，DrawableRequestBuilder这一层调用了crossFade方法，即默认会有一个crossFade的效果，默认用的是DrawableCrossFadeFactory。注意这里把属于RequestManager的RequestTracker也传进来了。
+- Glide.with(context).load(XX)到目前为止只是返回了一个DrawableTypeRequest<ModelType> 的实例。(还在主线程)
+
+## 2.3 小节
+Glide.with返回一个RequestManger，每个Activity只会有一个RequestManager
+load方法返回了一个DrawableTypeRequest<T>，这个T可能是File,String,Interger等。
+到目前为止还只是构建一个Request。
+
+## 3. DrawableRequestBuilder的into方法
+Glide的最后一个调用方法是into()，也是最终分发请求的方法
+
+DrawableRequestBuilder
+```java
+ @Override
+    public Target<GlideDrawable> into(ImageView view) {
+        return super.into(view);
+    }
 
 
-记住这个ModelType就是Glide.with(context).load(XXX) 里面传进去的Object的Class，例如File.class
+    public Target<TranscodeType> into(ImageView view) {
+        Util.assertMainThread();//还是在主线程对不对
+        if (view == null) {
+            throw new IllegalArgumentException("You must pass in a non null View");
+        }
+
+        if (!isTransformationSet && view.getScaleType() != null) {
+            switch (view.getScaleType()) {
+                case CENTER_CROP:
+                    applyCenterCrop();
+                    break;
+                case FIT_CENTER:
+                case FIT_START:
+                case FIT_END:
+                    applyFitCenter();
+                    break;
+                //$CASES-OMITTED$
+                default:
+                    // Do nothing.
+            }
+        }
+
+        return into(glide.buildImageViewTarget(view, transcodeClass));
+        //这个into接收一个Target的子类的实例，而Target又继承自LifeCycleListener
+        //这个TranscodeClass是每一个Request创建的时候从构造函数传进来的。
+       
+    }
+
+
+ //transcodeclass可能是GlideDrawable.class，也可能是Bitmap.class也可能是Drawable.class
+     @SuppressWarnings("unchecked")
+    public <Z> Target<Z> buildTarget(ImageView view, Class<Z> clazz) {
+        if (GlideDrawable.class.isAssignableFrom(clazz)) { //isAssignableFrom表示左边的class是否是右边class一个类或者父类，应该和instaceof倒过来。
+            return (Target<Z>) new GlideDrawableImageViewTarget(view);
+        } else if (Bitmap.class.equals(clazz)) {
+            return (Target<Z>) new BitmapImageViewTarget(view);
+        } else if (Drawable.class.isAssignableFrom(clazz)) {
+            return (Target<Z>) new DrawableImageViewTarget(view);
+        } else {
+            throw new IllegalArgumentException("Unhandled class: " + clazz
+                    + ", try .as*(Class).transcode(ResourceTranscoder)");
+        }
+    }
+
+```
+GlideDrawableImageViewTarget、BitmapImageViewTarget以及DrawableImageViewTarget全部继承自ImageViewTarget，后者继承自ViewTarget,再继承自BaseTarget，再 implements Target。一层层继承下来，GlideDrawableImageViewTarget等三个子类中都有一个Request，一个T extents View(看来不一定是ImageView)
 
 
 
+### 3.1 以GlideDrawableImageViewTarget为例
+```java
+public class GlideDrawableImageViewTarget extends ImageViewTarget<GlideDrawable> {
+    private static final float SQUARE_RATIO_MARGIN = 0.05f;
+    private int maxLoopCount;
+    private GlideDrawable resource; 
+    }
+```
+GlideDrawable是一个继承自Drawable的抽象类，添加了isAnimated(),setLoopCount以及由于实现了isAnimated所需要的三个方法(start,stop,isRunning)。子类必须实现这五个抽象方法。
 
-## 3. Engine及任务描述
-### 3.1 解码任务
+GlideDrawableImageViewTarget往上走
+```java
+public abstract class ImageViewTarget<Z> extends ViewTarget<ImageView, Z> implements GlideAnimation.ViewAdapter{
 
-## 4. 缓存机制，BitmapPool以及MemoryCache（算上DiskCache的话至少三层Cache）
+}
+```
+
+接着往上找父类
+
+```java
+public abstract class ViewTarget<T extends View, Z> extends BaseTarget<Z> {
+    private static final String TAG = "ViewTarget";
+    private static boolean isTagUsedAtLeastOnce = false;
+    private static Integer tagId = null;
+
+    protected final T view;
+    private final SizeDeterminer sizeDeterminer;
+
+}
+```
+
+看下文档：A base Target for loading android.graphics.Bitmaps into Views that provides default implementations for most most methods and can determine the size of views using a android.view.ViewTreeObserver.OnDrawListener
+To detect View} reuse in android.widget.ListView or any android.view.ViewGroup that reuses views, this class uses the View setTag(Object) method to store some metadata so that if a view is reused, any previous loads or resources from previous loads can be cancelled or reused.
+ Any calls to View setTag(Object)on a View given to this class will result in excessive allocations and
+ and/or IllegalArgumentExceptions. If you must call View#setTag(Object)on a view, consider  using BaseTarget or SimpleTarget instead.
+
+- 翻译一下，ViewTarget提供了将Bitmap 加载进View的大部分方法的基本实现，并且添加了onPreDrawListener以获得View的尺寸，对于Resuse View的场景，通过setTag来取消被滑出屏幕的View的request的加载。
+
+既然提供了大部分方法的默认实现，那么一定有方法没实现，其实就是
+protected void setResource(Z resource)啦。
+这个Z可能是Bitmap,GlideDrawable或者Drawable。直接拿来setImageBitmap或者setImageDrawable就可以了，这个方法其实在是解码完成之后了。
+
+关键是default implementation是怎么实现的以及这些方法在父类中的调用时机。
+ViewTarget的构造函数传进来一个View的子类，同时创建一个SizeDeterminer（只是通过onPreDrawListener获得View的宽和高）。
+
+再往上找父类
+```java
+public abstract class BaseTarget<Z> implements Target<Z> { //添加了一个Request成员变量，为Target中的一些方法提供了空实现，比如onLoadStarted，onLoadXXX等
+
+    private Request request;
+
+    }
+```
+
+到这里，还只是配置资源要加载进的对象，我倾向于把Target看成一个资源加载完毕的中转者，它管理了View（也可以没有View）和Request，在外部调用Target.onLoadStarted等方法是，调用View(如果有的话)的xxx方法。
+
+### 3.2任务分发
+```java
+    public <Y extends Target<TranscodeType>> Y into(Y target) {
+        Util.assertMainThread(); //还在主线程上
+        Request previous = target.getRequest();
+
+        if (previous != null) { //每一个Target都只有一个Request，用于清除之前的请求
+            previous.clear();
+            requestTracker.removeRequest(previous);
+            previous.recycle();
+        }
+
+        Request request = buildRequest(target);
+        target.setRequest(request);
+        lifecycle.addListener(target);
+        requestTracker.runRequest(request);
+
+        return target; //这里返回Target的好处在于可以接着链式调用，上面只是添加到任务队列，真正被处理还得等到下一帧(onPreDraw调用时)，所以这里还可以接着对这个Target进行配置
+    }
+```
+注意 requestTracker.runRequest(request)方法
+GenericRequest.java
+```java
+  /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void begin() {
+        startTime = LogTime.getLogTime();
+        if (model == null) {
+            onException(null);
+            return;
+        }
+
+        status = Status.WAITING_FOR_SIZE;
+        if (Util.isValidDimensions(overrideWidth, overrideHeight)) {
+            onSizeReady(overrideWidth, overrideHeight);
+        } else {
+            target.getSize(this); //这个方法其实就等于挂了个钩子在onPreDraw中调用，onPreDraw时会调用onSizeReady。
+        }
+
+        if (!isComplete() && !isFailed() && canNotifyStatusChanged()) {
+            target.onLoadStarted(getPlaceholderDrawable());
+        }
+        if (Log.isLoggable(TAG, Log.VERBOSE)) {
+            logV("finished run method in " + LogTime.getElapsedMillis(startTime));
+        }
+    }
+```
+onSizeReady才是真正开始干活的时机，理由也很充分。解码Bitmap必须要知道需要多大的尺寸，否则也是白搭。
+GenericRequest.java
+```java
+   /**
+     * A callback method that should never be invoked directly.
+     */ 
+    @Override
+    public void onSizeReady(int width, int height) {
+        
+        if (status != Status.WAITING_FOR_SIZE) {
+            return;
+        }
+        status = Status.RUNNING;
+
+        width = Math.round(sizeMultiplier * width); //这个sizeMultiplier可以通过链式调用配置
+        height = Math.round(sizeMultiplier * height);
+
+        ModelLoader<A, T> modelLoader = loadProvider.getModelLoader();
+        final DataFetcher<T> dataFetcher = modelLoader.getResourceFetcher(model, width, height);
+            
+        ResourceTranscoder<Z, R> transcoder = loadProvider.getTranscoder();
+        loadedFromMemoryCache = true;
+        loadStatus = engine.load(signature, width, height, dataFetcher, loadProvider, transformation, transcoder,
+                priority, isMemoryCacheable, diskCacheStrategy, this);
+        loadedFromMemoryCache = resource != null;
+        if (Log.isLoggable(TAG, Log.VERBOSE)) {
+            logV("finished onSizeReady in " + LogTime.getElapsedMillis(startTime));
+        }
+    }
+```
+
+
+### 3.3 缓存查找
+开始查找缓存是engine.load开始的，找到了就调用Callback的onResourceReady
+Engine.java
+```java
+    public <T, Z, R> LoadStatus load(Key signature, int width, int height, DataFetcher<T> fetcher,
+            DataLoadProvider<T, Z> loadProvider, Transformation<Z> transformation, ResourceTranscoder<Z, R> transcoder,
+            Priority priority, boolean isMemoryCacheable, DiskCacheStrategy diskCacheStrategy, ResourceCallback cb) {
+        Util.assertMainThread(); //还是在主线程上
+        long startTime = LogTime.getLogTime();
+
+        final String id = fetcher.getId();//如果是个网络图片，返回网络url，类似这种
+        EngineKey key = keyFactory.buildKey(id, signature, width, height, loadProvider.getCacheDecoder(),
+                loadProvider.getSourceDecoder(), transformation, loadProvider.getEncoder(),
+                transcoder, loadProvider.getSourceEncoder());
+
+        EngineResource<?> cached = loadFromCache(key, isMemoryCacheable);
+        //EngineResource内部wrap了真正的Resource，并使用一个int acquire表示当前正在占用资源的使用者数。当这个数为0的时候可以release。
+        if (cached != null) {
+            cb.onResourceReady(cached);
+            if (Log.isLoggable(TAG, Log.VERBOSE)) {
+                logWithTimeAndKey("Loaded resource from cache", startTime, key);
+            }
+            return null;
+        }
+
+        EngineResource<?> active = loadFromActiveResources(key, isMemoryCacheable);
+        if (active != null) {
+            cb.onResourceReady(active);
+            if (Log.isLoggable(TAG, Log.VERBOSE)) {
+                logWithTimeAndKey("Loaded resource from active resources", startTime, key);
+            }
+            return null;
+        }
+
+        EngineJob current = jobs.get(key);
+        if (current != null) {
+            current.addCallback(cb);
+            if (Log.isLoggable(TAG, Log.VERBOSE)) {
+                logWithTimeAndKey("Added to existing load", startTime, key);
+            }
+            return new LoadStatus(cb, current);
+        }
+
+        EngineJob engineJob = engineJobFactory.build(key, isMemoryCacheable);
+        DecodeJob<T, Z, R> decodeJob = new DecodeJob<T, Z, R>(key, width, height, fetcher, loadProvider, transformation,
+                transcoder, diskCacheProvider, diskCacheStrategy, priority);
+        EngineRunnable runnable = new EngineRunnable(engineJob, decodeJob, priority);
+        jobs.put(key, engineJob);
+        engineJob.addCallback(cb);
+        engineJob.start(runnable);
+
+        if (Log.isLoggable(TAG, Log.VERBOSE)) {
+            logWithTimeAndKey("Started new load", startTime, key);
+        }
+        return new LoadStatus(cb, engineJob);
+    }
+```
+
+Engine先去Cache里面查找，找到了直接调用ResourceCallback(GenericRequest)的onResourceReady(EngineResource<?> resource)，注意这个EngineResource里面包装了一个Resource，主要是为了引用计数。
+
+ Engine的loadFromCache(key, isMemoryCacheable)是第一步，从成员变量cache中获取。找到了就挪到activeResources里面。
+ Engine.java
+ ```java
+ public class Engine implements EngineJobListener,
+        MemoryCache.ResourceRemovedListener,
+        EngineResource.ResourceListener {
+    private static final String TAG = "Engine";
+    private final Map<Key, EngineJob> jobs;
+    private final EngineKeyFactory keyFactory;
+    private final MemoryCache cache;
+    private final EngineJobFactory engineJobFactory;
+    private final Map<Key, WeakReference<EngineResource<?>>> activeResources;
+    private final ResourceRecycler resourceRecycler;
+    private final LazyDiskCacheProvider diskCacheProvider;
+
+}
+ ```
+
+如果在MemoryCache这个Lru里面没找到，就调用loadFromActiveResources，从activeResources里面找到。
+
+**所以这里已经出现两层缓存了，先去Lru(内存)找，再去activeResources(HashMap)里面找。缓存都是放在Enginel里面的，全局只有一份**
+
+缓存里面的Value都是EngineResource。
+
+
+这个MemoryCache是一个LruCache，大小是在MemorySizeCalculator中获得的，
+对于一般的设备，activityManager.getMemoryClass() * 1024 * 1024获得每个App能够使用的Size,乘以0.4。
+```java
+ MemorySizeCalculator(Context context, ActivityManager activityManager, ScreenDimensions screenDimensions) {
+        this.context = context;
+        final int maxSize = getMaxSize(activityManager);
+
+        final int screenSize = screenDimensions.getWidthPixels() * screenDimensions.getHeightPixels()
+                * BYTES_PER_ARGB_8888_PIXEL; //算出占满整个屏幕的一张图的大小
+
+        int targetPoolSize = screenSize * BITMAP_POOL_TARGET_SCREENS; //乘以4就是bitmappool的大小
+        int targetMemoryCacheSize = screenSize * MEMORY_CACHE_TARGET_SCREENS;
+        //乘以2就是MemoryCache的大小
+
+        if (targetMemoryCacheSize + targetPoolSize <= maxSize) {
+            memoryCacheSize = targetMemoryCacheSize;
+            bitmapPoolSize = targetPoolSize;
+        } else { //这里判断了BitmapPool和MemoryCache的大小之和不能超出应用可以使用的内存大小的0.4倍。
+            int part = Math.round((float) maxSize / (BITMAP_POOL_TARGET_SCREENS + MEMORY_CACHE_TARGET_SCREENS));
+            memoryCacheSize = part * MEMORY_CACHE_TARGET_SCREENS;
+            bitmapPoolSize = part * BITMAP_POOL_TARGET_SCREENS;
+        }
+    }
+```
+所以缓存的大小综合考虑了屏幕分辨率和内存大小。只要屏幕像素不是特别高，一般都会走到第一步。
+
+
+### 小结
+- ViewTarget里面有一个 T extends View，可见Glide不只适用于ImageView。
+- BaseTarget里带了一个private Request，其子类可以通过getRequest获得。
+- 对于ListView等可以快速滑动的View，如果某一个View被滑出屏幕外，自动取消请求(通过setTagId实现)
+- "You must not call setTag() on a view Glide is targeting" setTag可能会崩，原因
+- GenericRequestBuilder的obtainRequest内部使用了一个ArrayDeque来obtain Request。这样Request实例不会多次创建，回收是在request.recycle里面做的。
+
+
+
+### 4. 离开主线程，提交任务到线程池
+如果上面两层缓存都没找到，去jobs里找看下有没有已经加入队列的EngineJob
+记住上面有两层缓存
+
+
+来看后面提交任务这几段
+```java
+ EngineJob engineJob = engineJobFactory.build(key, isMemoryCacheable);
+        DecodeJob<T, Z, R> decodeJob = new DecodeJob<T, Z, R>(key, width, height, fetcher, loadProvider, transformation,
+                transcoder, diskCacheProvider, diskCacheStrategy, priority);
+        EngineRunnable runnable = new EngineRunnable(engineJob, decodeJob, priority);
+        jobs.put(key, engineJob);
+        engineJob.addCallback(cb);
+        engineJob.start(runnable); //往diskCacheService提交了一个Runnable
+
+class EngineJob implements EngineRunnable.EngineRunnableManager {
+    private static final EngineResourceFactory DEFAULT_FACTORY = new EngineResourceFactory();
+    private static final Handler MAIN_THREAD_HANDLER = new Handler(Looper.getMainLooper(), new MainThreadCallback());
+
+    private static final int MSG_COMPLETE = 1;
+    private static final int MSG_EXCEPTION = 2;
+
+    private final List<ResourceCallback> cbs = new ArrayList<ResourceCallback>();
+    private final EngineResourceFactory engineResourceFactory;
+    private final EngineJobListener listener;
+    private final Key key;
+    private final ExecutorService diskCacheService; //线程池
+    private final ExecutorService sourceService; //线程池
+    private final boolean isCacheable;
+
+    private boolean isCancelled;
+    // Either resource or exception (particularly exception) may be returned to us null, so use booleans to track if
+    // we've received them instead of relying on them to be non-null. See issue #180.
+    private Resource<?> resource;
+    private boolean hasResource;
+    private Exception exception;
+    private boolean hasException;
+    // A set of callbacks that are removed while we're notifying other callbacks of a change in status.
+    private Set<ResourceCallback> ignoredCallbacks;
+    private EngineRunnable engineRunnable;
+    private EngineResource<?> engineResource;
+
+    private volatile Future<?> future;
+}
+
+
+```
+EngineJob是通过Factory创建的，创建时会传两个线程池进来。一个管DiskCache,一个管Source获取。初始化是在Glide.createGlide里面做的：
+```java
+if (sourceService == null) {
+            final int cores = Math.max(1, Runtime.getRuntime().availableProcessors());
+            sourceService = new FifoPriorityThreadPoolExecutor(cores);
+        }
+        if (diskCacheService == null) {
+            diskCacheService = new FifoPriorityThreadPoolExecutor(1);
+        }
+```
+在外部没有提供线程池的情况下，DiskCache一个线程池就好了，SourceService的大小为当前cpu可用核心数，还是比较高效的。
+上面是往DiskCacheService提交了一个EngineRunable，这个Runnable的run里面主要是decodeFromCache和DecodeFroSource，分别代表从**磁盘缓存**获取和从数据源获取。
+首先会调用decodeFromCache，一层层往下找，如果没找到的话会调用onLoadFailed方法，并将任务提交给SourceService，去获取资源。
+
+
+### 4.1 CacheService这个线程池的工作以及第三层缓存的出现
+**注意这里出现了第三层缓存** 
+```
+ File cacheFile = diskCacheProvider.getDiskCache().get(key);
+```
+
+这一层缓存是给DiskCache的线程池查找用的，查找的时候分为从Result中查找和从Source中查找，其实查找的目的地都是那个DiskCache，Resul是用ResultKey去找的，Source是用ResultKey.getOriginalKey去查找的。物理位置都放在那个磁盘目录下。
+
+另外在DecodeJob的cacheAndDecodeSourceData方法里，存的只是origin(因为用的是origin Key)，然后再拿着originKey去磁盘找，找出来decode。
+
+DecodeFromCache又包括两步decodeResultFromCache和decodeSourceFromCache，这就让人想到Glide的DiskCacheStrategy分为Result和Source，即可以缓存decode结果也可以缓存decode之前的source。前提是在上面的diskCacheProvider.getDiskCache().get(key)方法里面找到了CachedFile。这个路径在InternalCacheDiskCacheFactory里面写了具体的路径
+
+```java
+ public InternalCacheDiskCacheFactory(final Context context, final String diskCacheName, int diskCacheSize) {
+        super(new CacheDirectoryGetter() {
+            @Override
+            public File getCacheDirectory() {
+                File cacheDirectory = context.getCacheDir();
+                if (cacheDirectory == null) {
+                    return null;
+                }
+                if (diskCacheName != null) {
+                    return new File(cacheDirectory, diskCacheName);
+                    //就是context.getCacheDir+"image_manager_disk_cache"
+                    //默认上限是250MB
+                    //由于这个Cache放在CacheDir里面，其他应用拿不到
+                }
+                return cacheDirectory;
+            }
+        }, diskCacheSize);
+    }
+```
+注意无论是decodeResultFromCache还是decodeSourceFromCache里都有类似的一段：
+```java
+Resource<T> transformed = loadFromCache(resultKey);
+Resource<Z> result = transcode(transformed); ///把一种资源转成另一种资源，比如把Bitmap的Resource转成一个ByteResource
+```
+
+
+
+### 4.2 SourceService这个线程池以及BitmapPool这一层缓存的出现
+```java
+   private Resource<T> decodeFromSourceData(A data) throws IOException {
+        final Resource<T> decoded;
+        if (diskCacheStrategy.cacheSource()) {
+            decoded = cacheAndDecodeSourceData(data);
+        } else {
+            long startTime = LogTime.getLogTime();
+            decoded = loadProvider.getSourceDecoder().decode(data, width, height); // 这里面放进BitmapPool了
+            if (Log.isLoggable(TAG, Log.VERBOSE)) {
+                logWithTimeAndKey("Decoded from source", startTime);
+            }
+        }
+        return decoded;
+    }
+```
+
+**第四层缓存出现。。。**
+DecodeFromSource也是类似，判断是否允许Cache，通过DataFetcher获取数据这个数据可能是InputStream，也可能是ImageVideoWrapper。。。总之是一个可以提供数据的来源。如果可以Cache的话，先把数据写到lru里面，然后从lru里面取出来，从Source decode成想要的数据类型。
+例如从Stream转成Bitmap是这么干的
+StreamBitmapDecoder.java
+```java
+ @Override
+    public Resource<Bitmap> decode(InputStream source, int width, int height) {
+        Bitmap bitmap = downsampler.decode(source, bitmapPool, width, height, decodeFormat);
+        return BitmapResource.obtain(bitmap, bitmapPool);
+    }
+```
+顺便还放进了LruBitmapPool（又一个实现了lru算法的缓存），Bitmap存在一个LruPoolStrategy接口实例的GroupedLinkedMap中。
+
+
+### 4.3 回到主线程
+EngineRunnable的run方法跑在子线程，在run的最后就是用一个handler推到主线程了。有可能是从CacheService这个线程池里面的线程推过去的，也可能是SourceSevice这个线程池里面推过去的。
+
+onResourceReady最终会走到GenericRequest的onResourceReady方法里
+```
+  private void onResourceReady(Resource<?> resource, R result) {
+
+        if (requestListener == null || !requestListener.onResourceReady(result, model, target, loadedFromMemoryCache,
+                isFirstResource)) {
+            GlideAnimation<R> animation = animationFactory.build(loadedFromMemoryCache, isFirstResource);
+            target.onResourceReady(result, animation); //注意这句话就可以了
+        }
+    }
+
+```
+最终会调到ImageViewTarget,AppWidgetTarget等Target（持有Request和View,View可能没有），这时候，直接调用ImageView.setImagBitmap等方法就可以了。
+图片设置完毕。
+
+### 5. Glide除了普通的加载方法，还能用什么比较有意思的玩法
 
 
 ## 来一些不拘一格的加载图片的方法
