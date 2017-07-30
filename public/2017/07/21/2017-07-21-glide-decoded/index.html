@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&amp;gt;  CacheDispatch  —&amp;gt; NetworkDispatcher  —-&amp;gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/a11f41e0b1df95212c71920b3959cd72.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-07-29T13:17:08.244Z">
+<meta property="og:updated_time" content="2017-07-30T10:43:56.324Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从glide源码到图片加载框架设计思路">
 <meta name="twitter:description" content="glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&amp;gt;  CacheDispatch  —&amp;gt; NetworkDispatcher  —-&amp;gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是">
@@ -296,7 +296,7 @@ ga('send', 'pageview');
 </ul>
 <p>根据之前的分析，打印出来的应该是context.getCacheDir+”image_manager_disk_cache”+”/xxxxxx.xxx” ，我没研究过后缀，不过这个后缀没意义吧。</p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
-<li>4层缓存（MemoryCache是内存层面的一层，activeResources是一层（HashMap）,cacheService和SourceService这俩线程池干活需要一个DiskLruCache，另外decode还有一个bitmapPool，其实这不算缓存吧）。</li>
+<li>4层缓存（MemoryCache是内存中的一层，activeResources是一层（HashMap）,cacheService和SourceService这俩线程池干活需要一个DiskLruCache，另外decode还有一个bitmapPool，其实这不算缓存吧）。</li>
 <li>默认的缓存大小考虑了屏幕尺寸和可用内存大小，科学合理。线程池的keepAlive数量上，一个是可用cpu核心数，所以快吧，一个是1。</li>
 <li>全局只有一个Glide,一个页面只有一个RequestManager</li>
 <li>Target是一个接口，将资源的受众抽象成一个接口。</li>
@@ -305,6 +305,17 @@ ga('send', 'pageview');
 <li>生命周期挂钩什么，创建一个没有View的SupportFragment，还是做的很巧妙的。</li>
 <li>泛型写的各种绕。。。</li>
 </ul>
+<p><strong>现在来回答那个问题：“如果你来设计一个图片加载框架，你会怎么设计？”</strong></p>
+<p>一个ImagerLoader应该具有的几个特性包括：</p>
+<ol>
+<li>内存缓存和磁盘缓存,lru</li>
+<li>做好图片压缩和bitmap重用(不可见图片及时回收)，避免oom (bitmap的宽高要根据View的大小确定)</li>
+<li>对于不同资源来源能够提供对应的DataFetcher</li>
+<li>对外提供start,stop,pause,resume等功能，必要时自动跟踪应用生命周期</li>
+<li>耗时操作(io，解码)挪到后台</li>
+<li>内存缓存可以设计两层bitmap缓存，一层是直接拿来用的(active)，一层是lru的。根据<a href="https://dev.qq.com/topic/591d61f56793d26660901b4e">经验</a>，一张bitmap占几个MB(高分辨屏幕)，而一个App能够使用的最大heap大小（ActivityManage.getMemoryClass）一般在100多MB，取其中的40%。完全能够做到内存中cache十几张bitmap。</li>
+</ol>
+<p>外部调用者需要传入资源(url,File,res，etc)，及ImageView实例(我们也就有了Context)。在onPreDraw之后获得View的尺寸（这一点至关重要）。根据资源地址生成唯一的key，在bitmap pool中查找，然后在内存缓存(lru)中查找。如果还未找到的话提交DiskCache查找请求请求到DiskCache查找线程池，如果未找到提交请求到资源获取线程池(网络，文件，或者Res)，数据获取完成后cahe到disk并提交到主线程。多线程同步和生命周期追踪是难点。</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="http://frodoking.github.io/2015/10/10/android-glide/">Android Glide源码解析</a></li>
 </ul>

@@ -766,7 +766,7 @@ Glide.with(itemView.getContext())
 
 
 ## 总结
-- 4层缓存（MemoryCache是内存层面的一层，activeResources是一层（HashMap）,cacheService和SourceService这俩线程池干活需要一个DiskLruCache，另外decode还有一个bitmapPool，其实这不算缓存吧）。
+- 4层缓存（MemoryCache是内存中的一层，activeResources是一层（HashMap）,cacheService和SourceService这俩线程池干活需要一个DiskLruCache，另外decode还有一个bitmapPool，其实这不算缓存吧）。
 - 默认的缓存大小考虑了屏幕尺寸和可用内存大小，科学合理。线程池的keepAlive数量上，一个是可用cpu核心数，所以快吧，一个是1。
 - 全局只有一个Glide,一个页面只有一个RequestManager
 - Target是一个接口，将资源的受众抽象成一个接口。
@@ -774,6 +774,25 @@ Glide.with(itemView.getContext())
 - 传进去的是context，但它只是借用context.getApplicationContext，保留下来的是ApplicationContext，哪有那么容易leak。
 - 生命周期挂钩什么，创建一个没有View的SupportFragment，还是做的很巧妙的。
 - 泛型写的各种绕。。。
+
+
+
+**现在来回答那个问题：“如果你来设计一个图片加载框架，你会怎么设计？”**
+
+一个ImagerLoader应该具有的几个特性包括：
+1. 内存缓存和磁盘缓存,lru
+2. 做好图片压缩和bitmap重用(不可见图片及时回收)，避免oom (bitmap的宽高要根据View的大小确定)
+3. 对于不同资源来源能够提供对应的DataFetcher
+4. 对外提供start,stop,pause,resume等功能，必要时自动跟踪应用生命周期
+5. 耗时操作(io，解码)挪到后台
+6. 内存缓存可以设计两层bitmap缓存，一层是直接拿来用的(active)，一层是lru的。根据[经验](https://dev.qq.com/topic/591d61f56793d26660901b4e)，一张bitmap占几个MB(高分辨屏幕)，而一个App能够使用的最大heap大小（ActivityManage.getMemoryClass）一般在100多MB，取其中的40%。完全能够做到内存中cache十几张bitmap。
+
+外部调用者需要传入资源(url,File,res，etc)，及ImageView实例(我们也就有了Context)。在onPreDraw之后获得View的尺寸（这一点至关重要）。根据资源地址生成唯一的key，在bitmap pool中查找，然后在内存缓存(lru)中查找。如果还未找到的话提交DiskCache查找请求请求到DiskCache查找线程池，如果未找到提交请求到资源获取线程池(网络，文件，或者Res)，数据获取完成后cahe到disk并提交到主线程。多线程同步和生命周期追踪是难点。
+
+
+
+
+
 
 
 ## 参考
