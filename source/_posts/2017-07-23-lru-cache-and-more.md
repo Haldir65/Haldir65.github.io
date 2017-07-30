@@ -23,10 +23,17 @@ int maxMemory = (int) (Runtime.getRuntime().totalMemory()/1024);
 ```
 这个sizeOf函数必须复写，用于计算单个元素大小，主要为了确保缓存不超出最大容量。
 
+## 2.简单介绍
+LruCache是线程安全的，在内部的 get、put、remove 包括 trimToSize 都是安全的（因为都上锁了）
+
+## 简书作者写的比较好
 
 
 
 
 
-## 参考 
+
+## 参考
 - [彻底解析Android缓存机制——LruCache](http://www.jianshu.com/p/b49a111147ee)
+- [Android源码解析——LruCache](http://www.jianshu.com/p/bdbfdfd0641b)
+- [LruCache 源码解析](https://github.com/LittleFriendsGroup/AndroidSdkSourceAnalysis/blob/master/article/LruCache%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90.md)

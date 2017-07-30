@@ -84,12 +84,12 @@ Java相关
 - [X] 画一下java的集合框架
 - [X] 基于Okio展开到OkHttp,Retrofit。
 - [X] String StringBuffer StringBuilder区别(StringBuffer很多方法都加了synchronized)
-- [ ] 一个Java Object到底占用多少内存(from java code to java heap)
+- [X] 一个Java Object到底占用多少内存(from java code to java heap)
 - [ ] java位运算，Collection框架中多次用到了
 - [ ] gson的原理，cache什么的，常规json解析器的原理
 - [ ] 垃圾回收器的分类及优缺点
 - [ ] ThreadLocal原理及可能的内存泄漏
-- [ ] LruCache的原理
+- [X] LruCache的原理
 - [ ] Understanding Dagger2's generated code
 - [ ] HashMap和conrrentHashmap区别(分段锁)
 - [ ] 单例模式需要考虑到jvm优化的问题（为什么要写两个synchronized）
@@ -104,7 +104,7 @@ Java相关
 
 Android相关
 - [X] Fragment源码解析
-- [X] Glide源码解析（写出来）
+- [X] Glide源码解析
 - [ ] AppCompat源码解析
 - [ ] ContentProvider的启动过程
 - [ ] IPC，Binder原理
