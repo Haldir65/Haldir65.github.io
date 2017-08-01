@@ -13,3 +13,6 @@ tags: [java,designpattern,tools]
 ![](http://odzl05jxx.bkt.clouddn.com/77a5260f0e038392414105c5bf8fdecc.jpg?imageView2/2/w/600)
 
 
+
+## 参考
+- [设计模式大全](http://zz563143188.iteye.com/blog/1847029)

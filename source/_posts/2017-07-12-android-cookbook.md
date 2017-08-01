@@ -92,14 +92,18 @@ Java相关
 - [X] LruCache的原理
 - [ ] Understanding Dagger2's generated code
 - [ ] HashMap和conrrentHashmap区别(分段锁)
+- [ ] volatile硬件层面的实现原理[一级缓存，时钟周期](http://www.cnblogs.com/xrq730/p/7048693.html)
 - [ ] 单例模式需要考虑到jvm优化的问题（为什么要写两个synchronized）
 - [ ] java类加载机制(classLoader相关的，类的加载顺序)
 - [ ] Java四种引用
+- [ ] Future和FutureTask这些怎么用
+- [ ][反射](http://blog.csdn.net/briblue/article/details/76223206)
 - [ ] java堆和栈的区别，如何判断堆栈上的对象死没死
 - [ ] 自己写一个一部图片加载框架，并发图像滤镜框架
 - [ ] 多线程异步断点续传框架原理,利用该原理在图片加载框架中的应用(MappedByteBuffer或者RandomAccessFile)
 - [ ] try catch finally到底会不会执行
 - [ ] 并发编程，java.util.concurrent里面的类熟练掌握，粗略了解原理
+- [ ]写一个[生产者消费者](https://github.com/Mr-YangCheng/ForAndroidInterview/blob/master/java/%5BJava%5D%20%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E7%94%9F%E4%BA%A7%E8%80%85%E6%B6%88%E8%B4%B9%E8%80%85%E9%97%AE%E9%A2%98%E7%9A%84%E4%BA%94%E7%A7%8D%E5%90%8C%E6%AD%A5%E6%96%B9%E6%B3%95%E5%AE%9E%E7%8E%B0.md)模型
 
 
 Android相关

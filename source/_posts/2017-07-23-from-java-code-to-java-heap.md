@@ -42,7 +42,7 @@ JVM为了malloc与gc方便，指定分配的每个对象都需要是8字节的�
 ## 3. java进程的内存占用情况
 
 ### 3.1 操作系统和runtime占用的内存
-操作系统的内存中，一部分被操作系统和kernel所占用。对于用c或者c++写的jvm，还需要分配一部分给c runtime。操作系统和c 
+操作系统的内存中，一部分被操作系统和kernel所占用。对于用c或者c++写的jvm，还需要分配一部分给c runtime。操作系统和c
 runtime占用的内存比较大，不同的操作系统上不一样，windows上默认是2GB。剩下的内存(即user space)，就是进程可以使用的内存。
 
 ### 3.2 剩下的内存(user space)
@@ -151,7 +151,7 @@ JDK6字符串内存占用的计算方式：
 A HashSet is an implementation of the Set interface。无重复元素，不保证迭代顺序，常规的add,contains等方法速度不会随着内部元素的增加而变慢。HashSet内部最多有一个null，底层实现是HashMap，这意味着其占用内存要比HashMap大。
 默认容量 16个Entries
 内部元素为空时的大小 144bytes
-查找，添加，删除的时间复杂度为 O(1)，在没有Hash collisions发生的前提下 
+查找，添加，删除的时间复杂度为 O(1)，在没有Hash collisions发生的前提下
 
 ### 5.2 HashMap
 A HashMap is an implementation of the Map interface.
@@ -163,7 +163,7 @@ HashMap的成员变量包括：
 transient HashMapEntry<K,V>[] table（HashMapEntry的数组）
 int size
 int threshold
-final float loadFactor 
+final float loadFactor
 transient int modCount;
 
 一个HashMap刚创建时(完全为空时)的大小为128bytes，jdk 1.8在初始化时没有加载Entries，在put操作时才去分配。可能会好一点。
@@ -173,7 +173,7 @@ Object next
 Object key
 Object value
 HashMap每次put键值对时，都使用了一个HashMap$Entry这样的包装类，这意味着整个HashMap的overhead包括：
-This means that the total overhead of a HashMap consists of the HashMap object, a HashMap$Entry array entry, and a HashMap$Entry object for each entry. 
+This means that the total overhead of a HashMap consists of the HashMap object, a HashMap$Entry array entry, and a HashMap$Entry object for each entry.
 直接照搬结论：对于HashMap
 Default capacities为16个 entries
 
@@ -223,5 +223,5 @@ StringBuffer sb = new StringBuffer("My String")。//算下用了多少内存
 - [Understanding the Memory Usage of Your Application](https://www.youtube.com/watch?v=FLcXf9pO27w)
 - [Thanks for the memory, Linux](https://www.ibm.com/developerworks/library/j-nativememory-linux/index.html)
 - [boolean数组中一个值占用1bit](http://www.jianshu.com/p/2f663dc820d0)
-- [不同jdk版本String做的优化](http://www.yunweipai.com/archives/1092.html) 
-
+- [不同jdk版本String做的优化](http://www.yunweipai.com/archives/1092.html)
+- [对象头里面的lock是怎么用的](http://www.cnblogs.com/xrq730/p/6928133.html)
