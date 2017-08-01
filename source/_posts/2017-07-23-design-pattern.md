@@ -4,11 +4,46 @@ tags: [java,designpattern,tools]
 ---
 
 ![](http://odzl05jxx.bkt.clouddn.com/509bdb071f9e7040823049e3db56e7c1.jpeg?imageView2/2/w/600)
-
+一般来讲设计模式有23种，这里根据菜鸟教程上的关于设计模式的总结看下来的一些读书笔记，估计要写很久。
 <!--more-->
 
+设计模式分四大类：
+- 创建型模式
+- 结构型模式
+- 行为型模式
+- J2EE模式
 
-![](http://odzl05jxx.bkt.clouddn.com/4b52d8db2e9d86b95c730af1db127a81.jpg?imageView2/2/w/600)
+
+## 1. 面向对象的六大原则
+这个就当背书好了。
+- 单一职责原则
+- 开闭原则
+- 里氏替换原则
+- 依赖倒置原则
+- 接口隔离原则
+- 迪米特原则
+
+
+## 2. 23中设计模式简单介绍
+1. 工厂模式
+意图：定义一个创建对象的接口，让其子类自己决定实例化哪一个工厂类，工厂模式使其创建过程延迟到子类进行。
+
+做法： 定义一个完成某项功能的接口，功能的具体实现由子类决定，让子类实现工厂接口，返回的也是一个抽象产品。
+
+实例：
+getSystemService根据传入的参数决定返回什么样的SystemService实例。
+
+
+
+2. 抽象工厂模式
+3. 单例模式
+4. 
+
+
+
+
+
+
 
 ![](http://odzl05jxx.bkt.clouddn.com/77a5260f0e038392414105c5bf8fdecc.jpg?imageView2/2/w/600)
 
@@ -16,3 +51,4 @@ tags: [java,designpattern,tools]
 
 ## 参考
 - [设计模式大全](http://zz563143188.iteye.com/blog/1847029)
+- [从Android代码中来记忆23种设计模式](http://www.jianshu.com/p/1a9f571ad7c0从Android代码中来记忆23种设计模式)

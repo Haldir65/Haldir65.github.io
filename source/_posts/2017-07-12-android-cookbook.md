@@ -1,12 +1,16 @@
 ---
-title: Android手册
+title: 日常开发手册
 date: 2017-07-12 08:40:08
-tags: [android]
+tags: [android,java,tools]
 ---
 
 A Cookbook shall look like a collection of Recipes, or an index page from where dinner are made. And it keeps you sane.
 ![](http://odzl05jxx.bkt.clouddn.com/Cg-4zFVJ0xGITwm_AA688WRj8n8AAXZ9wGMpd0ADr0J195.jpg?imageView2/2/w/600)
 <!--more-->
+
+
+github上已经star了四百多个项目，应该复习下了。
+
 
 ## 各个平台相关的特定的一些记录
 
@@ -58,16 +62,21 @@ A Cookbook shall look like a collection of Recipes, or an index page from where 
 [replace butterKnife with databinding](http://haldir65.github.io/2016/09/22/replace-butterKnife-with-databinding/)
 
 
-
+### 拆轮子
+[Glide源码解析](http://haldir65.github.io/2017/07/21/2017-07-21-glide-decoded/)
+[Rxjava2的一些点](http://haldir65.github.io/2017/04/23/2017-04-23-rxjava2-for-android/) **Jake Wharton**
+[Retrofit源码解析](http://haldir65.github.io/2017/07/01/2017-07-01-it-began-with-a-few-bits/)
+[OkHttp和Okio源码解析](http://haldir65.github.io/2017/07/21/2017-07-21-okhttp-demisified/)
 
 ## 跟java相关的
 [java集合类的实现原理](http://haldir65.github.io/2017/06/25/2017-06-12-Collections-Refuled-by-Stuart-Marks/)
-[Rxjava2的一些点](http://haldir65.github.io/2017/04/23/2017-04-23-rxjava2-for-android/) **Jake Wharton**
 [Java线程池的一些点](http://haldir65.github.io/2017/04/30/2017-04-30-concurrency-and-beyond/)
-[Retrofit源码解析](http://haldir65.github.io/2017/07/01/2017-07-01-it-began-with-a-few-bits/)
-[OkHttp和Okio源码解析](http://haldir65.github.io/2017/07/21/2017-07-21-okhttp-demisified/)
 [使用AnnotationProcessor自动生成代码](http://haldir65.github.io/2016/12/31/2016-12-31-Eliminating-BoilPlate-AnnotationProcessor/)
 [翻译了一个印度口音的关于jvm架构的视频](http://haldir65.github.io/2017/05/24/2017-05-24-jvm-architecture/)
+- [一个Java Object到底占用多少内存(from java code to java heap)](http://haldir65.github.io/2017/07/23/2017-07-23-from-java-code-to-java-heap/)
+- [LruCache的原理](http://haldir65.github.io/2017/07/23/2017-07-23-lru-cache-and-more/)
+- 
+
 
 
 
@@ -81,17 +90,16 @@ A Cookbook shall look like a collection of Recipes, or an index page from where 
 
 ## ToDo List
 Java相关
+
 - [X] 画一下java的集合框架
-- [X] 基于Okio展开到OkHttp,Retrofit。
 - [X] String StringBuffer StringBuilder区别(StringBuffer很多方法都加了synchronized)
-- [X] 一个Java Object到底占用多少内存(from java code to java heap)
+- [ ] 多线程异步断点续传框架原理,利用该原理在图片加载框架中的应用(MappedByteBuffer或者RandomAccessFile)
+- [ ] 多线程断点续传原理，大文件下载oom问题
 - [ ] java位运算，Collection框架中多次用到了
 - [ ] gson的原理，cache什么的，常规json解析器的原理
 - [ ] 垃圾回收器的分类及优缺点
 - [ ] ThreadLocal原理及可能的内存泄漏
-- [X] LruCache的原理
 - [ ] Understanding Dagger2's generated code
-- [ ] HashMap和conrrentHashmap区别(分段锁)
 - [ ] volatile硬件层面的实现原理[一级缓存，时钟周期](http://www.cnblogs.com/xrq730/p/7048693.html)
 - [ ] 单例模式需要考虑到jvm优化的问题（为什么要写两个synchronized）
 - [ ] java类加载机制(classLoader相关的，类的加载顺序)
@@ -100,15 +108,13 @@ Java相关
 - [ ][反射](http://blog.csdn.net/briblue/article/details/76223206)
 - [ ] java堆和栈的区别，如何判断堆栈上的对象死没死
 - [ ] 自己写一个一部图片加载框架，并发图像滤镜框架
-- [ ] 多线程异步断点续传框架原理,利用该原理在图片加载框架中的应用(MappedByteBuffer或者RandomAccessFile)
 - [ ] try catch finally到底会不会执行
 - [ ] 并发编程，java.util.concurrent里面的类熟练掌握，粗略了解原理
 - [ ]写一个[生产者消费者](https://github.com/Mr-YangCheng/ForAndroidInterview/blob/master/java/%5BJava%5D%20%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E7%94%9F%E4%BA%A7%E8%80%85%E6%B6%88%E8%B4%B9%E8%80%85%E9%97%AE%E9%A2%98%E7%9A%84%E4%BA%94%E7%A7%8D%E5%90%8C%E6%AD%A5%E6%96%B9%E6%B3%95%E5%AE%9E%E7%8E%B0.md)模型
+- [ ] HashMap和conrrentHashmap区别(分段锁比较难)
 
 
 Android相关
-- [X] Fragment源码解析
-- [X] Glide源码解析
 - [ ] AppCompat源码解析
 - [ ] ContentProvider的启动过程
 - [ ] IPC，Binder原理
@@ -135,10 +141,10 @@ Linux相关
 网络通信
 - [ ] TCP UDP的不同 TCP三次握手，wireShark抓包,抓一个App的包，模拟请求
 - [ ] 如何维持一个长连接
-- [ ] 多线程断点续传原理，大文件下载oom问题
 - [ ] 点击一个网址底层经历哪些过程
-- [X] 一个url分为哪些组成部分,host,segment,fragment,etc
 
+Gradle相关
+- [ ]写一些DSL吧
 
 
 数据库相关
@@ -157,6 +163,7 @@ Linux相关
 
 
 
+
 ## 一些需要看的演讲
 [Droidcon Montreal Jake Wharton - A Few Ok Libraries](https://www.youtube.com/watch?v=WvyScM_S88c)
 [Advanced Scrolling Techniques on Android](https://www.youtube.com/watch?v=N3J4ZFiR_3Q)
@@ -165,3 +172,10 @@ Linux相关
 [GDE](https://developers.google.com/experts/all/technology/android)
 Dianne Hackborn
 [Jesse Wilson](https://github.com/swankjesse)
+
+## 一些列入的规划的想法
+- 多线程下载实例
+- 自己写一个ImageLoader(主要是多线程同步的问题,queue)
+
+
+
