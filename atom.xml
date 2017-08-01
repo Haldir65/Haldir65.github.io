@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://haldir65.github.io/"/>
-  <updated>2017-07-30T09:48:38.640Z</updated>
+  <updated>2017-08-01T15:44:08.573Z</updated>
   <id>https://haldir65.github.io/</id>
   
   <author>
@@ -16,11 +16,44 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>多线程断点续传原理及实现</title>
+    <link href="https://haldir65.github.io/2017/08/01/2017-08-01-mutithread-downloader/"/>
+    <id>https://haldir65.github.io/2017/08/01/2017-08-01-mutithread-downloader/</id>
+    <published>2017-08-01T14:19:31.000Z</published>
+    <updated>2017-08-01T15:44:08.573Z</updated>
+    
+    <content type="html"><![CDATA[<p>主要讲一下在java中实现多线程断点续传的原理,主要讲断点下载的原理。<br><img src="http://odzl05jxx.bkt.clouddn.com/4b52d8db2e9d86b95c730af1db127a81.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
+<p>其实就是在Http请求里面加上一个”range”的header，HttpUrlConnection可以这么干：</p>
+<ul>
+<li>conn.setRequestProperty(“Range”, “bytes=” + 500 + “-“ + 1000);</li>
+</ul>
+<p>也就是告诉服务器上次下载到的位置，本地写文件可以使用RandomAccessFile。本地需要记录下上次中断后停下来的位置。可以用db记录，也可以用sp记录。</p>
+<p>这里面的难点在于多线程同步问题，高效率锁。还得要使用ArrayBlockingQueue。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="http://www.jianshu.com/p/2b82db0a5181">简书</a></li>
+<li><a href="https://github.com/AriaLyy/Aria">Demo</a></li>
+<li><a href="https://github.com/Aspsine/MultiThreadDownload">MultiThreadDownload for Android</a></li>
+<li><a href="http://blog.csdn.net/zhaokaiqiang1992/article/details/43939279">csdn</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;主要讲一下在java中实现多线程断点续传的原理,主要讲断点下载的原理。&lt;br&gt;&lt;img src=&quot;http://odzl05jxx.bkt.clouddn.com/4b52d8db2e9d86b95c730af1db127a81.jpg?imageView2/2/w/600&quot; alt=&quot;&quot;&gt;&lt;br&gt;
+    
+    </summary>
+    
+    
+      <category term="java" scheme="https://haldir65.github.io/tags/java/"/>
+    
+  </entry>
+  
+  <entry>
     <title>二进制编码总结</title>
     <link href="https://haldir65.github.io/2017/07/30/2017-07-30-decoding-the-secret-of-binary/"/>
     <id>https://haldir65.github.io/2017/07/30/2017-07-30-decoding-the-secret-of-binary/</id>
     <published>2017-07-30T09:45:51.000Z</published>
-    <updated>2017-07-30T09:48:38.640Z</updated>
+    <updated>2017-07-30T09:50:49.043Z</updated>
     
     <content type="html"><![CDATA[<p><img src="http://odzl05jxx.bkt.clouddn.com/01f691dea62d22e138481a353fbb6228.jpg?imageView2/2/w/600" alt=""></p>
 <a id="more"></a>
@@ -108,20 +141,45 @@
     <link href="https://haldir65.github.io/2017/07/23/2017-07-23-design-pattern/"/>
     <id>https://haldir65.github.io/2017/07/23/2017-07-23-design-pattern/</id>
     <published>2017-07-23T11:03:51.000Z</published>
-    <updated>2017-08-01T13:41:18.461Z</updated>
+    <updated>2017-08-01T14:32:19.198Z</updated>
     
-    <content type="html"><![CDATA[<p><img src="http://odzl05jxx.bkt.clouddn.com/509bdb071f9e7040823049e3db56e7c1.jpeg?imageView2/2/w/600" alt=""></p>
-<a id="more"></a>
-<p><img src="http://odzl05jxx.bkt.clouddn.com/4b52d8db2e9d86b95c730af1db127a81.jpg?imageView2/2/w/600" alt=""></p>
+    <content type="html"><![CDATA[<p><img src="http://odzl05jxx.bkt.clouddn.com/509bdb071f9e7040823049e3db56e7c1.jpeg?imageView2/2/w/600" alt=""><br>一般来讲设计模式有23种，这里根据菜鸟教程上的关于设计模式的总结看下来的一些读书笔记，估计要写很久。<br><a id="more"></a></p>
+<p>设计模式分四大类：</p>
+<ul>
+<li>创建型模式</li>
+<li>结构型模式</li>
+<li>行为型模式</li>
+<li>J2EE模式</li>
+</ul>
+<h2 id="1-面向对象的六大原则"><a href="#1-面向对象的六大原则" class="headerlink" title="1. 面向对象的六大原则"></a>1. 面向对象的六大原则</h2><p>这个就当背书好了。</p>
+<ul>
+<li>单一职责原则</li>
+<li>开闭原则</li>
+<li>里氏替换原则</li>
+<li>依赖倒置原则</li>
+<li>接口隔离原则</li>
+<li>迪米特原则</li>
+</ul>
+<h2 id="2-23中设计模式简单介绍"><a href="#2-23中设计模式简单介绍" class="headerlink" title="2. 23中设计模式简单介绍"></a>2. 23中设计模式简单介绍</h2><ol>
+<li>工厂模式<br>意图：定义一个创建对象的接口，让其子类自己决定实例化哪一个工厂类，工厂模式使其创建过程延迟到子类进行。</li>
+</ol>
+<p>做法： 定义一个完成某项功能的接口，功能的具体实现由子类决定，让子类实现工厂接口，返回的也是一个抽象产品。</p>
+<p>实例：<br>getSystemService根据传入的参数决定返回什么样的SystemService实例。</p>
+<ol>
+<li>抽象工厂模式</li>
+<li>单例模式</li>
+<li></li>
+</ol>
 <p><img src="http://odzl05jxx.bkt.clouddn.com/77a5260f0e038392414105c5bf8fdecc.jpg?imageView2/2/w/600" alt=""></p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="http://zz563143188.iteye.com/blog/1847029">设计模式大全</a></li>
+<li><a href="http://www.jianshu.com/p/1a9f571ad7c0从Android代码中来记忆23种设计模式">从Android代码中来记忆23种设计模式</a></li>
 </ul>
 ]]></content>
     
     <summary type="html">
     
-      &lt;p&gt;&lt;img src=&quot;http://odzl05jxx.bkt.clouddn.com/509bdb071f9e7040823049e3db56e7c1.jpeg?imageView2/2/w/600&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+      &lt;p&gt;&lt;img src=&quot;http://odzl05jxx.bkt.clouddn.com/509bdb071f9e7040823049e3db56e7c1.jpeg?imageView2/2/w/600&quot; alt=&quot;&quot;&gt;&lt;br&gt;一般来讲设计模式有23种，这里根据菜鸟教程上的关于设计模式的总结看下来的一些读书笔记，估计要写很久。&lt;br&gt;
     
     </summary>
     
@@ -630,13 +688,14 @@
   </entry>
   
   <entry>
-    <title>Android手册</title>
+    <title>日常开发手册</title>
     <link href="https://haldir65.github.io/2017/07/12/2017-07-12-android-cookbook/"/>
     <id>https://haldir65.github.io/2017/07/12/2017-07-12-android-cookbook/</id>
     <published>2017-07-12T00:40:08.000Z</published>
-    <updated>2017-08-01T13:41:18.455Z</updated>
+    <updated>2017-08-01T15:45:39.753Z</updated>
     
     <content type="html"><![CDATA[<p>A Cookbook shall look like a collection of Recipes, or an index page from where dinner are made. And it keeps you sane.<br><img src="http://odzl05jxx.bkt.clouddn.com/Cg-4zFVJ0xGITwm_AA688WRj8n8AAXZ9wGMpd0ADr0J195.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
+<p>github上已经star了四百多个项目，应该复习下了。</p>
 <h2 id="各个平台相关的特定的一些记录"><a href="#各个平台相关的特定的一些记录" class="headerlink" title="各个平台相关的特定的一些记录"></a>各个平台相关的特定的一些记录</h2><h3 id="布局相关的点"><a href="#布局相关的点" class="headerlink" title="布局相关的点"></a>布局相关的点</h3><p><a href="http://haldir65.github.io/2016/10/10/theme-versus-style/">theme和Style</a>  <strong>Dan lew</strong></p>
 <h3 id="事件分发，动画，自定义View"><a href="#事件分发，动画，自定义View" class="headerlink" title="事件分发，动画，自定义View"></a>事件分发，动画，自定义View</h3><p><a href="http://haldir65.github.io/2016/09/23/selectableItemBackground-foreground/">android使用selectableItemBackground的一些坑</a><br><a href="http://haldir65.github.io/2016/09/27/activity-transition-pre-and-post-lollipop/">activity transition pre and post lollipop</a><br><a href="http://haldir65.github.io/2016/10/06/touch-event-distribution/">事件分发流程</a><br><a href="http://haldir65.github.io/2016/10/13/2016-10-13-Android-coordinate-System/">安卓坐标系常用方法</a><br><a href="http://haldir65.github.io/2016/10/24/2016-10-24-a-peek-on-pull-to-refresh/">android-Ultra-pull-to-refresh分析</a></p>
 <h3 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h3><p><a href="http://haldir65.github.io/2016/09/18/android-inner-class-leak/">内存泄漏</a></p>
@@ -645,22 +704,26 @@
 <h3 id="底层原理"><a href="#底层原理" class="headerlink" title="底层原理"></a>底层原理</h3><p><a href="http://haldir65.github.io/2016/10/12/2016-10-12-How-the-mainThread-work/">主线程的工作原理</a> <strong>Michael Bailey American Express, 他2016年还讲了LayoutInflater的工作原理</strong><br><a href="http://djt.qq.com/article/view/987">vsync原理解释</a><br><a href="http://haldir65.github.io/2016/10/20/2016-10-20-android-dirty-code/">让service常驻后台的方法</a><br>//下面这些已经有人写的很好了，直接看就可以了<br><a href="http://blog.csdn.net/qq_23547831/article/details/51119333">应用进程启动流程</a><br><a href="http://blog.csdn.net/qq_23547831/article/details/51112031">Launcher启动流程</a><br><a href="http://blog.csdn.net/qq_23547831/article/details/51105171">SystemServer进程启动流程</a><br><a href="http://blog.csdn.net/qq_23547831/article/details/51104873">Zygote进程启动流程</a><br><a href="http://blog.csdn.net/qq_23547831/article/details/51210682">Apk安装流程</a><br><a href="http://blog.csdn.net/qq_23547831/article/details/51224992">Activity启动流程</a><br>//这个博主写的一系列底层分析都比较清楚</p>
 <h3 id="新版本适配，新特性"><a href="#新版本适配，新特性" class="headerlink" title="新版本适配，新特性"></a>新版本适配，新特性</h3><p><a href="http://haldir65.github.io/2016/10/08/android-7-0-new-features/">Android 7.0的适配</a></p>
 <h3 id="工具方法"><a href="#工具方法" class="headerlink" title="工具方法"></a>工具方法</h3><p><a href="http://haldir65.github.io/2016/10/14/2016-10-14-Android-translucent-status-bar/">沉浸式状态栏</a><br><a href="http://haldir65.github.io/2016/09/22/replace-butterKnife-with-databinding/">replace butterKnife with databinding</a></p>
-<h2 id="跟java相关的"><a href="#跟java相关的" class="headerlink" title="跟java相关的"></a>跟java相关的</h2><p><a href="http://haldir65.github.io/2017/06/25/2017-06-12-Collections-Refuled-by-Stuart-Marks/">java集合类的实现原理</a><br><a href="http://haldir65.github.io/2017/04/23/2017-04-23-rxjava2-for-android/">Rxjava2的一些点</a> <strong>Jake Wharton</strong><br><a href="http://haldir65.github.io/2017/04/30/2017-04-30-concurrency-and-beyond/">Java线程池的一些点</a><br><a href="http://haldir65.github.io/2017/07/01/2017-07-01-it-began-with-a-few-bits/">Retrofit源码解析</a><br><a href="http://haldir65.github.io/2017/07/21/2017-07-21-okhttp-demisified/">OkHttp和Okio源码解析</a><br><a href="http://haldir65.github.io/2016/12/31/2016-12-31-Eliminating-BoilPlate-AnnotationProcessor/">使用AnnotationProcessor自动生成代码</a><br><a href="http://haldir65.github.io/2017/05/24/2017-05-24-jvm-architecture/">翻译了一个印度口音的关于jvm架构的视频</a></p>
+<h3 id="拆轮子"><a href="#拆轮子" class="headerlink" title="拆轮子"></a>拆轮子</h3><p><a href="http://haldir65.github.io/2017/07/21/2017-07-21-glide-decoded/">Glide源码解析</a><br><a href="http://haldir65.github.io/2017/04/23/2017-04-23-rxjava2-for-android/">Rxjava2的一些点</a> <strong>Jake Wharton</strong><br><a href="http://haldir65.github.io/2017/07/01/2017-07-01-it-began-with-a-few-bits/">Retrofit源码解析</a><br><a href="http://haldir65.github.io/2017/07/21/2017-07-21-okhttp-demisified/">OkHttp和Okio源码解析</a></p>
+<h2 id="跟java相关的"><a href="#跟java相关的" class="headerlink" title="跟java相关的"></a>跟java相关的</h2><p><a href="http://haldir65.github.io/2017/06/25/2017-06-12-Collections-Refuled-by-Stuart-Marks/">java集合类的实现原理</a><br><a href="http://haldir65.github.io/2017/04/30/2017-04-30-concurrency-and-beyond/">Java线程池的一些点</a><br><a href="http://haldir65.github.io/2016/12/31/2016-12-31-Eliminating-BoilPlate-AnnotationProcessor/">使用AnnotationProcessor自动生成代码</a><br><a href="http://haldir65.github.io/2017/05/24/2017-05-24-jvm-architecture/">翻译了一个印度口音的关于jvm架构的视频</a></p>
+<ul>
+<li><a href="http://haldir65.github.io/2017/07/23/2017-07-23-from-java-code-to-java-heap/">一个Java Object到底占用多少内存(from java code to java heap)</a></li>
+<li><a href="http://haldir65.github.io/2017/07/23/2017-07-23-lru-cache-and-more/">LruCache的原理</a></li>
+<li></li>
+</ul>
 <h2 id="工具书"><a href="#工具书" class="headerlink" title="工具书"></a>工具书</h2><p><a href="http://haldir65.github.io/2016/09/27/git-manual/">git常用操作手册</a><br><a href="http://haldir65.github.io/2016/12/10/2016-12-10-adb-command/">adb常用命令手册</a></p>
 <h2 id="杂乱的点"><a href="#杂乱的点" class="headerlink" title="杂乱的点"></a>杂乱的点</h2><p><a href="http://haldir65.github.io/2017/06/17/2017-06-17-tiny-details-in-java/">java中的任何细碎的点</a></p>
 <h2 id="ToDo-List"><a href="#ToDo-List" class="headerlink" title="ToDo List"></a>ToDo List</h2><p>Java相关</p>
 <ul>
 <li>[X] 画一下java的集合框架</li>
-<li>[X] 基于Okio展开到OkHttp,Retrofit。</li>
 <li>[X] String StringBuffer StringBuilder区别(StringBuffer很多方法都加了synchronized)</li>
-<li>[X] 一个Java Object到底占用多少内存(from java code to java heap)</li>
+<li>[ ] 多线程异步断点续传框架原理,利用该原理在图片加载框架中的应用(MappedByteBuffer或者RandomAccessFile)</li>
+<li>[ ] 多线程断点续传原理，大文件下载oom问题</li>
 <li>[ ] java位运算，Collection框架中多次用到了</li>
 <li>[ ] gson的原理，cache什么的，常规json解析器的原理</li>
 <li>[ ] 垃圾回收器的分类及优缺点</li>
 <li>[ ] ThreadLocal原理及可能的内存泄漏</li>
-<li>[X] LruCache的原理</li>
 <li>[ ] Understanding Dagger2’s generated code</li>
-<li>[ ] HashMap和conrrentHashmap区别(分段锁)</li>
 <li>[ ] volatile硬件层面的实现原理<a href="http://www.cnblogs.com/xrq730/p/7048693.html">一级缓存，时钟周期</a></li>
 <li>[ ] 单例模式需要考虑到jvm优化的问题（为什么要写两个synchronized）</li>
 <li>[ ] java类加载机制(classLoader相关的，类的加载顺序)</li>
@@ -669,15 +732,13 @@
 <li>[ ]<a href="http://blog.csdn.net/briblue/article/details/76223206">反射</a></li>
 <li>[ ] java堆和栈的区别，如何判断堆栈上的对象死没死</li>
 <li>[ ] 自己写一个一部图片加载框架，并发图像滤镜框架</li>
-<li>[ ] 多线程异步断点续传框架原理,利用该原理在图片加载框架中的应用(MappedByteBuffer或者RandomAccessFile)</li>
 <li>[ ] try catch finally到底会不会执行</li>
 <li>[ ] 并发编程，java.util.concurrent里面的类熟练掌握，粗略了解原理</li>
 <li>[ ]写一个<a href="https://github.com/Mr-YangCheng/ForAndroidInterview/blob/master/java/%5BJava%5D%20%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E7%94%9F%E4%BA%A7%E8%80%85%E6%B6%88%E8%B4%B9%E8%80%85%E9%97%AE%E9%A2%98%E7%9A%84%E4%BA%94%E7%A7%8D%E5%90%8C%E6%AD%A5%E6%96%B9%E6%B3%95%E5%AE%9E%E7%8E%B0.md">生产者消费者</a>模型</li>
+<li>[ ] HashMap和conrrentHashmap区别(分段锁比较难)</li>
 </ul>
 <p>Android相关</p>
 <ul>
-<li>[X] Fragment源码解析</li>
-<li>[X] Glide源码解析</li>
 <li>[ ] AppCompat源码解析</li>
 <li>[ ] ContentProvider的启动过程</li>
 <li>[ ] IPC，Binder原理</li>
@@ -707,9 +768,11 @@
 <ul>
 <li>[ ] TCP UDP的不同 TCP三次握手，wireShark抓包,抓一个App的包，模拟请求</li>
 <li>[ ] 如何维持一个长连接</li>
-<li>[ ] 多线程断点续传原理，大文件下载oom问题</li>
 <li>[ ] 点击一个网址底层经历哪些过程</li>
-<li>[X] 一个url分为哪些组成部分,host,segment,fragment,etc</li>
+</ul>
+<p>Gradle相关</p>
+<ul>
+<li>[ ]写一些DSL吧</li>
 </ul>
 <p>数据库相关</p>
 <ul>
@@ -725,6 +788,10 @@
 </ul>
 <h2 id="一些需要看的演讲"><a href="#一些需要看的演讲" class="headerlink" title="一些需要看的演讲"></a>一些需要看的演讲</h2><p><a href="https://www.youtube.com/watch?v=WvyScM_S88c">Droidcon Montreal Jake Wharton - A Few Ok Libraries</a><br><a href="https://www.youtube.com/watch?v=N3J4ZFiR_3Q">Advanced Scrolling Techniques on Android</a></p>
 <h2 id="一些有名的人"><a href="#一些有名的人" class="headerlink" title="一些有名的人"></a>一些有名的人</h2><p><a href="https://developers.google.com/experts/all/technology/android">GDE</a><br>Dianne Hackborn<br><a href="https://github.com/swankjesse">Jesse Wilson</a></p>
+<h2 id="一些列入的规划的想法"><a href="#一些列入的规划的想法" class="headerlink" title="一些列入的规划的想法"></a>一些列入的规划的想法</h2><ul>
+<li>多线程下载实例</li>
+<li>自己写一个ImageLoader(主要是多线程同步的问题,queue)</li>
+</ul>
 ]]></content>
     
     <summary type="html">
@@ -735,6 +802,10 @@
     
     
       <category term="android" scheme="https://haldir65.github.io/tags/android/"/>
+    
+      <category term="tools" scheme="https://haldir65.github.io/tags/tools/"/>
+    
+      <category term="java" scheme="https://haldir65.github.io/tags/java/"/>
     
   </entry>
   
@@ -1393,52 +1464,6 @@ verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的s
       <category term="python" scheme="https://haldir65.github.io/tags/python/"/>
     
       <category term="linux" scheme="https://haldir65.github.io/tags/linux/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Python localHost部署命令</title>
-    <link href="https://haldir65.github.io/2017/05/01/2017-05-01-python-server-test/"/>
-    <id>https://haldir65.github.io/2017/05/01/2017-05-01-python-server-test/</id>
-    <published>2017-05-01T00:57:27.000Z</published>
-    <updated>2017-06-25T14:44:59.886Z</updated>
-    
-    <content type="html"><![CDATA[<p>一行命令即可</p>
-<blockquote>
-<p> python -m http.server 8000 –bind 127.0.0.1 </p>
-</blockquote>
-<p>打开浏览器，输入127.0.0.1 ， 即可浏览当前目录下的文件，以GET的方式进行，命令行窗口会出现浏览记录。<br><img src="http://odzl05jxx.bkt.clouddn.com/ChMkJ1fAMmKIIFpWAA_5Us41gQkAAUv1QE2Pp8AD_lq599.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
-<p>据说SimpleHttpServer也可以，<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/python</span></div><div class="line"><span class="comment"># -*- coding: UTF-8 -*-</span></div><div class="line"><span class="keyword">import</span> sys</div><div class="line"><span class="keyword">from</span> http.server <span class="keyword">import</span> SimpleHTTPRequestHandler</div><div class="line"><span class="keyword">from</span> http.server <span class="keyword">import</span> BaseHTTPRequestHandler, HTTPServer</div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">(HandlerClass=SimpleHTTPRequestHandler,</div><div class="line">         ServerClass=HTTPServer)</span>:</span></div><div class="line">    protocol = <span class="string">"HTTP/1.0"</span></div><div class="line">    host = <span class="string">''</span></div><div class="line">    port = <span class="number">8000</span></div><div class="line">    <span class="keyword">if</span> len(sys.argv) &gt; <span class="number">1</span>:</div><div class="line">        arg = sys.argv[<span class="number">1</span>]</div><div class="line">        <span class="keyword">if</span> <span class="string">':'</span> <span class="keyword">in</span> arg:</div><div class="line">            host, port = arg.split(<span class="string">':'</span>)</div><div class="line">            port = int(port)</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            <span class="keyword">try</span>:</div><div class="line">                port = int(sys.argv[<span class="number">1</span>])</div><div class="line">            <span class="keyword">except</span>:</div><div class="line">                host = sys.argv[<span class="number">1</span>]</div><div class="line"></div><div class="line">    server_address = (host, port)</div><div class="line"></div><div class="line">    HandlerClass.protocol_version = protocol</div><div class="line">    httpd = ServerClass(server_address, HandlerClass)</div><div class="line"></div><div class="line">    sa = httpd.socket.getsockname()</div><div class="line">    print(<span class="string">"Serving HTTP on"</span>, sa[<span class="number">0</span>], <span class="string">"port"</span>, sa[<span class="number">1</span>], <span class="string">"..."</span>)</div><div class="line">    httpd.serve_forever()</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</div><div class="line">    test()</div></pre></td></tr></table></figure></p>
-<h3 id="2-sys-args-的使用"><a href="#2-sys-args-的使用" class="headerlink" title="2 .sys.args[]的使用"></a>2 .sys.args[]的使用</h3><p>cmd中</p>
-<blockquote>
-<p>python</p>
-</blockquote>
-<p>Python 3.6.1 (v3.6.1:69c0db5, Mar 21 2017, 17:54:52) [MSC v.1900 32 bit (Intel)] on win32<br>Type “help”, “copyright”, “credits” or “license” for more information.</p>
-<blockquote>
-<blockquote>
-<p>&gt;</p>
-</blockquote>
-</blockquote>
-<p>退出方式 ctrl+Z</p>
-<p>切换到脚本所在目录 ,例如test.py</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">#!/usr/bin/env python3</div><div class="line"># -*- coding: utf-8 -*-</div><div class="line">import sys</div><div class="line"></div><div class="line"># sys.argv接收参数，第一个参数是文件名，第二个参数开始是用户输入的参数，以空格隔开</div><div class="line"># cmd到该文件位置</div><div class="line"></div><div class="line">def run1():</div><div class="line">    print('I\'m action1')</div><div class="line"></div><div class="line"></div><div class="line">def run2():</div><div class="line">    print('I\'m action2')</div><div class="line"></div><div class="line"></div><div class="line">if 2 &gt; len(sys.argv):</div><div class="line">    print('none')</div><div class="line">else:</div><div class="line">    action1 = sys.argv[0]</div><div class="line">    action2 = sys.argv[1]</div><div class="line">    &lt;!-- if 'run1' == action1:</div><div class="line">        run1()</div><div class="line">    if 'run2' == action2:</div><div class="line">        run2() --&gt;</div><div class="line"></div><div class="line">    print(action1)</div><div class="line">    print(action2)</div></pre></td></tr></table></figure>
-<p>输入 python test.py run1<br>输出 test.py ‘run1’</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;一行命令即可&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt; python -m http.server 8000 –bind 127.0.0.1 &lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;打开浏览器，输入127.0.0.1 ， 即可浏览当前目录下的文件，以GET的方式进行，命令行窗口会出现浏览记录。&lt;br&gt;&lt;img src=&quot;http://odzl05jxx.bkt.clouddn.com/ChMkJ1fAMmKIIFpWAA_5Us41gQkAAUv1QE2Pp8AD_lq599.jpg?imageView2/2/w/600&quot; alt=&quot;&quot;&gt;&lt;br&gt;
-    
-    </summary>
-    
-      <category term="blog" scheme="https://haldir65.github.io/categories/blog/"/>
-    
-    
-      <category term="python" scheme="https://haldir65.github.io/tags/python/"/>
     
   </entry>
   
