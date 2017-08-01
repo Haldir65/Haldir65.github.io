@@ -1,7 +1,7 @@
 ---
 title: 网络通信手册
 date: 2017-07-21 00:05:32
-tags: 
+tags:
   - linux
   - tools
 ---
@@ -49,7 +49,7 @@ Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/a
 DNT: 1
 Accept-Encoding: gzip, deflate, br
 Accept-Language: zh-CN,zh;q=0.8,en-US;q=0.6,en;q=0.4
-Cookie: BAIDUID=B41D39A8836273546754tC7F0C5DE315B64E2:FG=1; MCITY=-289%3A; 
+Cookie: BAIDUID=B41D39A8836273546754tC7F0C5DE315B64E2:FG=1; MCITY=-289%3A;
 ```
 
 Response(同样，无线电传输的时候是没有换行的概念的，每一行末尾都有一个\r\n)
@@ -102,11 +102,11 @@ request中常见的请求头包括：
 
 - Accept-Charset ：浏览器可以接受的字符编码集
 
-- Accept-Encoding:gzip, deflate, br 
+- Accept-Encoding:gzip, deflate, br
 客户端浏览器可以支持的压缩编码类型。比如gzip，用于压缩数据，节省带宽。
 
 - Accept-Language 指定Http客户端浏览器用来优先展示的语言
-示例: Accept-Language:zh-CN,zh;q=0.8,en-US;q=0.6,en;q=0.4 
+示例: Accept-Language:zh-CN,zh;q=0.8,en-US;q=0.6,en;q=0.4
 
 - Cache-Control： [参考](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=zh-cn)
 具体操作[百度百科](https://baike.baidu.com/item/Cache-Control)写的很清楚
@@ -125,7 +125,7 @@ Cache-Control:private, no-cache, no-cache=Set-Cookie, no-store, proxy-revalidate
 http 1.0需要手动设置。原理就是服务器保持客户端到服务器的连接持续有效，避免了重新建立连接的开销(tcp三次握手)。这种情况下，客户端不能根据读取到EOF(-1)来判断传输完毕。有两种解决方案：对于静态文件，客户端和服务器能够知道其大小，使用content-length，根据这个判断数据是否已经接收完成；对于动态页面，不可能预先知道内容大小。可以使用Transfer-Encoding:chunked的模式进行传输。基本上就是服务器把文件分成几块，一块一块的发送过去。[参考](https://www.byvoid.com/zhs/blog/http-keep-alive-header)
 
 - Content-Type  代表文件类型。request只有POST请求中会有，Response中也会有。
-POST里面的Content-type有两种: 
+POST里面的Content-type有两种:
 Content-type: application/x-www-form-urlencoded;charset:UTF-8 //缺省值，表示提交表单
 multipart/form-data //上传文件时用这种，既可以发送文本数据，也支持二进制上传。上面那个CharSet只是为了告诉服务器用的是哪种编码
 响应头中的Content-Type示例： Content-Type:image/gif或者Content-Type: text/html;charset=utf-8 [参考](http://www.runoob.com/http/http-content-type.html)
@@ -241,7 +241,7 @@ SPDY也就是HTTP/2的前身，一种开放的网络传输协议，由Google开�
 
 
 网络协议，架构，规范，spdy,http2,url规范.
-OSI七层网络体系结构 ： 物理层、数据链路层、网络层、传输层、表示层、会话层、应用层 
+OSI七层网络体系结构 ： 物理层、数据链路层、网络层、传输层、表示层、会话层、应用层
 
 应用层面的Http，SMTP,FTP,POP,TLS/SSL,IMAP
 
@@ -255,3 +255,5 @@ tls,https加密过程，sha1和sha256加密算法
 ping ,traceRouter
 
 [Restfull架构详解](http://www.runoob.com/w3cnote/restful-architecture.html)
+[文件断点续传原理](http://blog.csdn.net/zhuhuiby/article/details/6725951)
+[断点续传实现](http://lcodecorex.github.io/2016/08/01/%E6%96%87%E4%BB%B6%E5%88%86%E7%89%87%E4%B8%8E%E6%96%AD%E7%82%B9%E7%BB%AD%E4%BC%A0%E5%8E%9F%E7%90%86%E4%B8%8E%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0/)

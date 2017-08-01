@@ -11,7 +11,7 @@ tags: [java]
 
 <!--more-->
 
-1. getting the concreate class from generic types
+## 1. getting the concreate class from generic types
     ```java
         /**
      * Make a GET request and return a parsed object from JSON.
@@ -31,7 +31,7 @@ tags: [java]
     }
     ```
 
-2. OkHttp 默认会自动重试失败的请求
+## 2. OkHttp 默认会自动重试失败的请求
 [okhttp-is-quietly-retrying-requests-is-your-api-ready](https://medium.com/inloop/okhttp-is-quietly-retrying-requests-is-your-api-ready-19489ef35ace)
 OkHttp默认会对请求进行重试，具体是在RetryAndFollowUpInterceptor中进行的。
  ```java
@@ -87,11 +87,11 @@ OkHttp 3.3.0 [issue](https://github.com/square/okhttp/issues/2394)
 
 另外，GET方法本身是人畜无害的，Retry请求多次发起不会造成数据错误；但对于POST，涉及到写服务端写操作，最好带上GUID作为单次请求unique标示。（这是server和client之间需要协商好的protocol）
 
-3. From Java Code To Java Heap
+## 3. From Java Code To Java Heap
    A talk from IBM Engineer, talking about optimizing the memery usage for your java application.[youtube](https://www.youtube.com/watch?v=FLcXf9pO27w)
    [ibm](https://www.ibm.com/developerworks/java/library/j-codetoheap/index.html)
 
-4. 强行更改String的内容
+## 4. 强行更改String的内容
   String这种东西是放在常量池里面的，所以
   ```java
   String a = "hello"
@@ -111,7 +111,7 @@ OkHttp 3.3.0 [issue](https://github.com/square/okhttp/issues/2394)
 
   ```
 
-5. 注解
+## 5. 注解
 ```java
  Builder(Retrofit retrofit, Method method) {
       this.retrofit = retrofit;
@@ -125,7 +125,7 @@ OkHttp 3.3.0 [issue](https://github.com/square/okhttp/issues/2394)
 如果不是看到Retrofit的源码，一般还真没机会了解到这几个方法。。
 
 
-6. java如何把char类型数据转成int类型数据
+## 6. java如何把char类型数据转成int类型数据
 String a = "123"
 Stirng本质上就是一个char[]的包装类，1对应Asicii码的49,2对应50,3对应51.所以实质上就类似于char[] = new char{49,50,51} ;
 
@@ -149,11 +149,9 @@ word2 = word2 +1 ;//编译失败
 
 [char的转换问题](https://stackoverflow.com/questions/21317631/java-char-int-conversions)
 
-7. Guava就是个Util
+## 7. Guava就是个Util
 
-
-
-8. 从ArrayList的ConcurrentModificationException说起
+## 8. 从ArrayList的ConcurrentModificationException说起
 ArrayList的ConcurrentModificationException一般在使用Iterator的时候会抛出，普通的get，set不会。
 
 ```java
@@ -222,7 +220,7 @@ CopyOnWriteArrayList内部ListIterator直接保存了一份final的之前Array�
 
 
 
-9. 同时对共享资源进行操作好一点的加锁的方式
+## 9. 同时对共享资源进行操作好一点的加锁的方式
 
 ```java
 @Override
