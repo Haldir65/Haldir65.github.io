@@ -8,14 +8,17 @@
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>位运算总结 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="article">
+  <meta name="description" content="位运算的好处至少有两点，由于是直接操作bit,没有任何包装类，速度快。另外一个就是节省内存了。">
+<meta property="og:type" content="article">
 <meta property="og:title" content="位运算总结">
 <meta property="og:url" content="https://haldir65.github.io/2017/07/23/2017-07-23-manipulating-bits/index.html">
 <meta property="og:site_name" content="Haldir的博客">
+<meta property="og:description" content="位运算的好处至少有两点，由于是直接操作bit,没有任何包装类，速度快。另外一个就是节省内存了。">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/8af185ed137a586be732d63425d8bcb8.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-07-30T09:46:48.746Z">
+<meta property="og:updated_time" content="2017-08-01T13:46:02.357Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="位运算总结">
+<meta name="twitter:description" content="位运算的好处至少有两点，由于是直接操作bit,没有任何包装类，速度快。另外一个就是节省内存了。">
 <meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/8af185ed137a586be732d63425d8bcb8.jpg?imageView2/2/w/600">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
@@ -193,9 +196,46 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p><img src="http://odzl05jxx.bkt.clouddn.com/8af185ed137a586be732d63425d8bcb8.jpg?imageView2/2/w/600" alt=""></p>
-<a id="more"></a>
-<p>TBD</p>
+        <p>位运算的好处至少有两点，由于是直接操作bit,没有任何包装类，速度快。另外一个就是节省内存了。</p>
+<p><img src="http://odzl05jxx.bkt.clouddn.com/8af185ed137a586be732d63425d8bcb8.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
+<h2 id="1-左移（-lt-lt-）"><a href="#1-左移（-lt-lt-）" class="headerlink" title="1.左移（&lt;&lt;）"></a>1.左移（&lt;&lt;）</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;  </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;  </div><div class="line">        System.out.println(<span class="number">5</span>&lt;&lt;<span class="number">2</span>);<span class="comment">//运行结果是20  </span></div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>原理：<br>5的二进制表示方式是：<br>0000 0000 0000 0000 0000 0000 0000 0101<br>向左挪两位就变成了<br>0000 0000 0000 0000 0000 0000 0001 0100 //末位补零 ，也就是20</p>
+<p>可以认为 5&lt;&lt;n就代表乘以2的n次方<br>所以10KB可以这么写 ： 10&lt;&lt;10</p>
+<h2 id="2-右移-gt-gt"><a href="#2-右移-gt-gt" class="headerlink" title="2.右移(&gt;&gt;)"></a>2.右移(&gt;&gt;)</h2><p>和左移反过来，前面补0。一样的道理，不再赘述。</p>
+<h2 id="3-无符号右移-gt-gt-gt"><a href="#3-无符号右移-gt-gt-gt" class="headerlink" title="3. 无符号右移(&gt;&gt;&gt;)"></a>3. 无符号右移(&gt;&gt;&gt;)</h2><p>在java中一个int占32位，正数的首位是0，负数位-1。<br>-5 就是<br>1111 1111 1111 1111 1111 1111 1111 1011</p>
+<p>正数右移，高位用0补；负数右移，高位用1补；负数无符号右移，用0补高位。</p>
+<p>所以-5&gt;&gt;&gt;3 也就变成了<br>0001 1111 1111 1111 1111 1111 1111 1111 //十进制536870911</p>
+<p>注意，正数或者负数左移，低位都是用0补</p>
+<h2 id="4-位与-amp"><a href="#4-位与-amp" class="headerlink" title="4. 位与(&amp;)"></a>4. 位与(&amp;)</h2><p>看实例:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;  </div><div class="line">       System.out.println(<span class="number">5</span> &amp; <span class="number">3</span>);<span class="comment">//结果为1  </span></div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
+<p>原因： 5的二进制是： 0000 0000 0000 0000 0000 0000 0000 0101<br>      3的二进制是：  0000 0000 0000 0000 0000 0000 0000 0011<br>同一位上必须都为1，结果才为1，否则为0；于是结果就得到：<br>      0000 0000 0000 0000 0000 0000 0000 0001 = 1</p>
+<h2 id="5-位或（-）"><a href="#5-位或（-）" class="headerlink" title="5. 位或（|）"></a>5. 位或（|）</h2><p>和位与相反<br>同一位上只要有一个为1，就为1.只有两个都为0，才为0.<br>所以 (5|3) = 7(这让人想到linux文件权限的777)<br>其实就是 111 111 111 （owner,creater,others）</p>
+<h2 id="6-位异或"><a href="#6-位异或" class="headerlink" title="6. 位异或(^)"></a>6. 位异或(^)</h2><p>// 1. 获得int型最大值<br>System.out.println((1 &lt;&lt; 31) - 1);// 2147483647， 由于优先级关系，括号不可省略<br>System.out.println(~(1 &lt;&lt; 31));// 2147483647</p>
+<p>// 2. 获得int型最小值<br>System.out.println(1 &lt;&lt; 31);<br>System.out.println(1 &lt;&lt; -1);</p>
+<p>// 3. 获得long类型的最大值<br>System.out.println(((long)1 &lt;&lt; 127) - 1);</p>
+<p>// 4. 乘以2运算<br>System.out.println(10&lt;&lt;1);</p>
+<p>// 5. 除以2运算(负奇数的运算不可用)<br>System.out.println(10&gt;&gt;1);</p>
+<p>// 6. 乘以2的m次方<br>System.out.println(10&lt;&lt;2);</p>
+<p>// 7. 除以2的m次方<br>System.out.println(16&gt;&gt;2);</p>
+<p>// 8. 判断一个数的奇偶性<br>System.out.println((10 &amp; 1) == 1);<br>System.out.println((9 &amp; 1) == 1);</p>
+<p>// 9. 不用临时变量交换两个数（面试常考）<br>a ^= b;<br>b ^= a;<br>a ^= b;</p>
+<p>// 10. 取绝对值（某些机器上，效率比n&gt;0 ? n:-n 高）<br>int n = -1;<br>System.out.println((n ^ (n &gt;&gt; 31)) - (n &gt;&gt; 31));<br>/<em> n&gt;&gt;31 取得n的符号，若n为正数，n&gt;&gt;31等于0，若n为负数，n&gt;&gt;31等于-1<br>若n为正数 n^0-0数不变，若n为负数n^-1 需要计算n和-1的补码，异或后再取补码，<br>结果n变号并且绝对值减1，再减去-1就是绝对值 </em>/</p>
+<p>// 11. 取两个数的最大值（某些机器上，效率比a&gt;b ? a:b高）<br>System.out.println(b&amp;((a-b)&gt;&gt;31) | a&amp;(~(a-b)&gt;&gt;31));</p>
+<p>// 12. 取两个数的最小值（某些机器上，效率比a&gt;b ? b:a高）<br>System.out.println(a&amp;((a-b)&gt;&gt;31) | b&amp;(~(a-b)&gt;&gt;31));</p>
+<p>// 13. 判断符号是否相同(true 表示 x和y有相同的符号， false表示x，y有相反的符号。)<br>System.out.println((a ^ b) &gt; 0);</p>
+<p>// 14. 计算2的n次方 n &gt; 0<br>System.out.println(2&lt;&lt;(n-1));</p>
+<p>// 15. 判断一个数n是不是2的幂<br>System.out.println((n &amp; (n - 1)) == 0);<br>/<em>如果是2的幂，n一定是100… n-1就是1111….<br>所以做与运算结果为0</em>/</p>
+<p>// 16. 求两个整数的平均值<br>System.out.println((a+b) &gt;&gt; 1);</p>
+<p>// 17. 从低位到高位,取n的第m位<br>int m = 2;<br>System.out.println((n &gt;&gt; (m-1)) &amp; 1);</p>
+<p>// 18. 从低位到高位.将n的第m位置为1<br>System.out.println(n | (1&lt;&lt;(m-1)));<br>/<em>将1左移m-1位找到第m位，得到000…1…000<br>n在和这个数做或运算</em>/</p>
+<p>// 19. 从低位到高位,将n的第m位置为0<br>System.out.println(n &amp; ~(0&lt;&lt;(m-1)));<br>/<em> 将1左移m-1位找到第m位，取反后变成111…0…1111<br>n再和这个数做与运算</em>/</p>
+<h2 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h2><ol>
+<li>记得Chet Haase和Romain Guy曾经在2013年的一次<a href="https://www.youtube.com/watch?v=Ho-anLsWvJo">演讲</a>中提到,Android中View内部使用了3个byte来表示70多个Flags。如果换做boolean(4byte大小)的话，就需要接近300bytes。由于View在Application中被广泛（成百上千）使用，framework这样做事实上为开发者节约了相当多的内存。、</li>
+<li>不要迷信位运算，对于一些简单的操作，现代编译器还是能够帮助开发者自动做好优化的。</li>
+</ol>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://my.oschina.net/xianggao/blog/412967">Java位运算操作全面总结</a></li>
+<li><a href="http://blog.csdn.net/xiaochunyong/article/details/7748713">Java 位运算(移位、位与、或、异或、非）</a></li>
+</ul>
 
       
 
