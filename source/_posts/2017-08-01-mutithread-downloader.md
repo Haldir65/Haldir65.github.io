@@ -18,14 +18,36 @@ tags: [java]
 
 这里面的难点在于多线程同步问题，高效率锁。还得要使用ArrayBlockingQueue。
 
+## 1. 获取要下载的内容的contentLength
+HttpUrlConnection有一个connection.getContentLength()方法，用于获取内容大小(bytes)
 
 
+## 2. 大文件上传避免oom
+```java
+Caused by java.lang.OutOfMemoryError: Failed to allocate a 65548 byte allocation with 32012 free bytes and 31KB until OOM
+at com.android.okio.Segment.<init>(Segment.java:37)
+at com.android.okio.SegmentPool.take(SegmentPool.java:48)
+at com.android.okio.OkBuffer.writableSegment(OkBuffer.java:511)
+at com.android.okio.OkBuffer.write(OkBuffer.java:424)
+at com.android.okio.OkBuffer.clone(OkBuffer.java:740)
+at com.android.okhttp.internal.http.RetryableSink.writeToSocket(RetryableSink.java:77)
+at com.android.okhttp.internal.http.HttpConnection.writeRequestBody(HttpConnection.java:263)
+at com.android.okhttp.internal.http.HttpTransport.writeRequestBody(HttpTransport.java:84)
+at com.android.okhttp.internal.http.HttpEngine.readResponse(HttpEngine.java:790)
+at com.android.okhttp.internal.http.HttpURLConnectionImpl.execute(HttpURLConnectionImpl.java:405)
+at com.android.okhttp.internal.http.HttpURLConnectionImpl.getResponse(HttpURLConnectionImpl.java:349)
+at com.android.okhttp.internal.http.HttpURLConnectionImpl.getResponseCode(HttpURLConnectionImpl.java:517)
+at com.android.okhttp.internal.http.DelegatingHttpsURLConnection.getResponseCode(DelegatingHttpsURLConnection.java:105)
+```
+
+[参考](http://blog.sina.com.cn/s/blog_bfdb961b0101mkbo.html) con.setChunkedStreamingMode(1024);//内部缓冲区---分段上传防止oom
+[解决方案](https://github.com/square/retrofit/issues/2270),RequestBody的contentLength设置为-1就好了
+[HttpURLConnection教程](http://www.cnblogs.com/begin1949/p/5060802.html)
 
 
-
-
-## 参考 
+## 参考
 - [简书](http://www.jianshu.com/p/2b82db0a5181)
 - [Demo](https://github.com/AriaLyy/Aria)
 - [MultiThreadDownload for Android](https://github.com/Aspsine/MultiThreadDownload)
 - [csdn](http://blog.csdn.net/zhaokaiqiang1992/article/details/43939279)
+- [断点上传麻烦点，要自己搭server](http://blog.csdn.net/chenrunhua/article/details/50113993)
