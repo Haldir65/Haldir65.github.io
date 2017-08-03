@@ -75,7 +75,7 @@ github上已经star了四百多个项目，应该复习下了。
 [翻译了一个印度口音的关于jvm架构的视频](http://haldir65.github.io/2017/05/24/2017-05-24-jvm-architecture/)
 - [一个Java Object到底占用多少内存(from java code to java heap)](http://haldir65.github.io/2017/07/23/2017-07-23-from-java-code-to-java-heap/)
 - [LruCache的原理](http://haldir65.github.io/2017/07/23/2017-07-23-lru-cache-and-more/)
-- 
+-
 
 
 
@@ -144,7 +144,7 @@ Linux相关
 - [ ] 点击一个网址底层经历哪些过程
 
 Gradle相关
-- [ ]写一些DSL吧
+- [ ]写一些DSL吧[Old Driver](https://github.com/Ccixyj/JBusDriver)
 
 
 数据库相关
@@ -176,6 +176,3 @@ Dianne Hackborn
 ## 一些列入的规划的想法
 - 多线程下载实例
 - 自己写一个ImageLoader(主要是多线程同步的问题,queue)
-
-
-

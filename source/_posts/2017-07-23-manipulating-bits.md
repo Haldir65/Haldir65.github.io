@@ -64,7 +64,7 @@ public static void main(String[] args) {
 其实就是 111 111 111 （owner,creater,others）
 
 ## 6. 位异或(^)
-      
+
 
 
 
@@ -169,7 +169,17 @@ n再和这个数做与运算*/
 
 
 ## 结束
-1. 记得Chet Haase和Romain Guy曾经在2013年的一次[演讲](https://www.youtube.com/watch?v=Ho-anLsWvJo)中提到,Android中View内部使用了3个byte来表示70多个Flags。如果换做boolean(4byte大小)的话，就需要接近300bytes。由于View在Application中被广泛（成百上千）使用，framework这样做事实上为开发者节约了相当多的内存。、
+1. 记得Chet Haase和Romain Guy曾经在2013年的一次[演讲](https://www.youtube.com/watch?v=Ho-anLsWvJo)中提到,Android中View内部使用了3个int来表示70多个Flags。如果换做boolean(4byte大小)的话，就需要接近300bytes。由于View在Application中被广泛（成百上千）使用，framework这样做事实上为开发者节约了相当多的内存。
+android.view.View.java
+```
+int mPrivateFlags;
+int mPrivateFlags2;
+int mPrivateFlags3;
+```
+int中的每一个bit都成为一个boolean，一共只用了12bytes(96bits)的内存.和300bytes相比，节省的内存总量还是相当可观的。
+一个onClickListener大概500bytes
+
+
 2. 不要迷信位运算，对于一些简单的操作，现代编译器还是能够帮助开发者自动做好优化的。
 
 

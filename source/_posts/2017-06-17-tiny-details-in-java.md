@@ -237,5 +237,18 @@ CopyOnWriteArrayList内部ListIterator直接保存了一份final的之前Array�
 ```
 ThreadLocal当做一个HashMap来用就好了
 
+**volatile并不是Atomic操作，例如，A线程对volatile变量进行写操作(实际上是读和写操作)，B线程可能在这两个操作之间进行了写操作；**
+
 ## 10.float和long这些相互除法，会出现精确度损失
 6.8040496E7*100/68040488f 会出现1.000001这种东西
+
+
+[ ] high concurrency model needs blog and code .
+
+
+
+## 参考
+- [Jesse Wilson - Coordinating Space and Time](https://www.youtube.com/watch?v=yS0Nc-L1Uuk)
+- [Jake Wharton and Jesse Wilson - Death, Taxes, and HTTP](https://www.youtube.com/watch?v=6uroXz5l7Gk)
+- [Android Tech Talk: HTTP In A Hostile World](https://www.youtube.com/watch?v=tfD2uYjzXFo)
+- [看起来 ReentrantLock 无论在哪方面都比 synchronized 好](http://blog.csdn.net/fw0124/article/details/6672522)
