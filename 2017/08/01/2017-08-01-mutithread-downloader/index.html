@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="主要讲一下在java中实现多线程断点续传的原理,主要讲断点下载的原理。">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/4b52d8db2e9d86b95c730af1db127a81.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-08-01T15:44:08.573Z">
+<meta property="og:updated_time" content="2017-08-03T13:00:08.817Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="多线程断点续传原理及实现">
 <meta name="twitter:description" content="主要讲一下在java中实现多线程断点续传的原理,主要讲断点下载的原理。">
@@ -205,11 +205,15 @@ ga('send', 'pageview');
 </ul>
 <p>也就是告诉服务器上次下载到的位置，本地写文件可以使用RandomAccessFile。本地需要记录下上次中断后停下来的位置。可以用db记录，也可以用sp记录。</p>
 <p>这里面的难点在于多线程同步问题，高效率锁。还得要使用ArrayBlockingQueue。</p>
+<h2 id="1-获取要下载的内容的contentLength"><a href="#1-获取要下载的内容的contentLength" class="headerlink" title="1. 获取要下载的内容的contentLength"></a>1. 获取要下载的内容的contentLength</h2><p>HttpUrlConnection有一个connection.getContentLength()方法，用于获取内容大小(bytes)</p>
+<h2 id="2-大文件上传避免oom"><a href="#2-大文件上传避免oom" class="headerlink" title="2. 大文件上传避免oom"></a>2. 大文件上传避免oom</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">Caused by java.lang.OutOfMemoryError: Failed to allocate a <span class="number">65548</span> <span class="keyword">byte</span> allocation with <span class="number">32012</span> free bytes and <span class="number">31</span>KB until OOM</div><div class="line">at com.android.okio.Segment.&lt;init&gt;(Segment.java:<span class="number">37</span>)</div><div class="line">at com.android.okio.SegmentPool.take(SegmentPool.java:<span class="number">48</span>)</div><div class="line">at com.android.okio.OkBuffer.writableSegment(OkBuffer.java:<span class="number">511</span>)</div><div class="line">at com.android.okio.OkBuffer.write(OkBuffer.java:<span class="number">424</span>)</div><div class="line">at com.android.okio.OkBuffer.clone(OkBuffer.java:<span class="number">740</span>)</div><div class="line">at com.android.okhttp.internal.http.RetryableSink.writeToSocket(RetryableSink.java:<span class="number">77</span>)</div><div class="line">at com.android.okhttp.internal.http.HttpConnection.writeRequestBody(HttpConnection.java:<span class="number">263</span>)</div><div class="line">at com.android.okhttp.internal.http.HttpTransport.writeRequestBody(HttpTransport.java:<span class="number">84</span>)</div><div class="line">at com.android.okhttp.internal.http.HttpEngine.readResponse(HttpEngine.java:<span class="number">790</span>)</div><div class="line">at com.android.okhttp.internal.http.HttpURLConnectionImpl.execute(HttpURLConnectionImpl.java:<span class="number">405</span>)</div><div class="line">at com.android.okhttp.internal.http.HttpURLConnectionImpl.getResponse(HttpURLConnectionImpl.java:<span class="number">349</span>)</div><div class="line">at com.android.okhttp.internal.http.HttpURLConnectionImpl.getResponseCode(HttpURLConnectionImpl.java:<span class="number">517</span>)</div><div class="line">at com.android.okhttp.internal.http.DelegatingHttpsURLConnection.getResponseCode(DelegatingHttpsURLConnection.java:<span class="number">105</span>)</div></pre></td></tr></table></figure>
+<p><a href="http://blog.sina.com.cn/s/blog_bfdb961b0101mkbo.html">参考</a> con.setChunkedStreamingMode(1024);//内部缓冲区—分段上传防止oom<br><a href="https://github.com/square/retrofit/issues/2270">解决方案</a>,RequestBody的contentLength设置为-1就好了<br><a href="http://www.cnblogs.com/begin1949/p/5060802.html">HttpURLConnection教程</a></p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="http://www.jianshu.com/p/2b82db0a5181">简书</a></li>
 <li><a href="https://github.com/AriaLyy/Aria">Demo</a></li>
 <li><a href="https://github.com/Aspsine/MultiThreadDownload">MultiThreadDownload for Android</a></li>
 <li><a href="http://blog.csdn.net/zhaokaiqiang1992/article/details/43939279">csdn</a></li>
+<li><a href="http://blog.csdn.net/chenrunhua/article/details/50113993">断点上传麻烦点，要自己搭server</a></li>
 </ul>
 
       
@@ -293,6 +297,15 @@ ga('send', 'pageview');
 
   
 <nav id="article-nav">
+  
+    <a href="/2017/08/03/2017-08-03-high-concurrency-recipes/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          高并发实践手册
+        
+      </div>
+    </a>
   
   
     <a href="/2017/07/30/2017-07-30-decoding-the-secret-of-binary/" id="article-nav-older" class="article-nav-link-wrap">
@@ -420,15 +433,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -440,23 +453,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">linux</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">tools</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -468,7 +473,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">linux</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -496,10 +509,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">databinding</a>
               </li>
              
@@ -513,6 +522,10 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">service</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
             
             <div class="clearfix"></div>

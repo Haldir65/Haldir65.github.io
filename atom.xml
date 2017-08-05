@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://haldir65.github.io/"/>
-  <updated>2017-08-01T15:44:08.573Z</updated>
+  <updated>2017-08-03T15:24:18.870Z</updated>
   <id>https://haldir65.github.io/</id>
   
   <author>
@@ -16,11 +16,42 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>高并发实践手册</title>
+    <link href="https://haldir65.github.io/2017/08/03/2017-08-03-high-concurrency-recipes/"/>
+    <id>https://haldir65.github.io/2017/08/03/2017-08-03-high-concurrency-recipes/</id>
+    <published>2017-08-03T13:04:28.000Z</published>
+    <updated>2017-08-03T15:24:18.870Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="http://odzl05jxx.bkt.clouddn.com/image/blog/be3c80a11edfd0fdb75d098550ed2c8e.jpg" alt=""><br><a id="more"></a></p>
+<h2 id="1-同时对共享资源进行操作好一点的加锁的方式"><a href="#1-同时对共享资源进行操作好一点的加锁的方式" class="headerlink" title="1. 同时对共享资源进行操作好一点的加锁的方式"></a>1. 同时对共享资源进行操作好一点的加锁的方式</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line">       <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">           <span class="keyword">final</span> ReentrantLock lock = <span class="keyword">this</span>.lock;</div><div class="line">           lock.lock(); <span class="comment">//拿不到lock的Thread会挂起</span></div><div class="line">           <span class="keyword">try</span> &#123;</div><div class="line">               <span class="keyword">this</span>.mList.add(<span class="string">"new elements added by"</span> + mIndex + <span class="string">""</span>); <span class="comment">//对共享资源的操作放这里</span></div><div class="line">           &#125;</div><div class="line">           <span class="keyword">finally</span> &#123;</div><div class="line">               lock.unlock(); <span class="comment">//记得解锁</span></div><div class="line">           &#125;</div><div class="line">       &#125;</div></pre></td></tr></table></figure>
+<h2 id="2-ThreadLocal当做一个HashMap来用就好了"><a href="#2-ThreadLocal当做一个HashMap来用就好了" class="headerlink" title="2. ThreadLocal当做一个HashMap来用就好了"></a>2. ThreadLocal当做一个HashMap来用就好了</h2><p><strong>volatile并不是Atomic操作，例如，A线程对volatile变量进行写操作(实际上是读和写操作)，B线程可能在这两个操作之间进行了写操作；</strong></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="http://blog.csdn.net/fw0124/article/details/6672522">看起来 ReentrantLock 无论在哪方面都比 synchronized 好</a></li>
+<li><a href="https://www.youtube.com/watch?v=yS0Nc-L1Uuk">Jesse Wilson - Coordinating Space and Time</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;img src=&quot;http://odzl05jxx.bkt.clouddn.com/image/blog/be3c80a11edfd0fdb75d098550ed2c8e.jpg&quot; alt=&quot;&quot;&gt;&lt;br&gt;
+    
+    </summary>
+    
+    
+      <category term="tools" scheme="https://haldir65.github.io/tags/tools/"/>
+    
+      <category term="concurrency" scheme="https://haldir65.github.io/tags/concurrency/"/>
+    
+      <category term="java" scheme="https://haldir65.github.io/tags/java/"/>
+    
+  </entry>
+  
+  <entry>
     <title>多线程断点续传原理及实现</title>
     <link href="https://haldir65.github.io/2017/08/01/2017-08-01-mutithread-downloader/"/>
     <id>https://haldir65.github.io/2017/08/01/2017-08-01-mutithread-downloader/</id>
     <published>2017-08-01T14:19:31.000Z</published>
-    <updated>2017-08-01T15:44:08.573Z</updated>
+    <updated>2017-08-03T13:00:08.817Z</updated>
     
     <content type="html"><![CDATA[<p>主要讲一下在java中实现多线程断点续传的原理,主要讲断点下载的原理。<br><img src="http://odzl05jxx.bkt.clouddn.com/4b52d8db2e9d86b95c730af1db127a81.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
 <p>其实就是在Http请求里面加上一个”range”的header，HttpUrlConnection可以这么干：</p>
@@ -29,11 +60,15 @@
 </ul>
 <p>也就是告诉服务器上次下载到的位置，本地写文件可以使用RandomAccessFile。本地需要记录下上次中断后停下来的位置。可以用db记录，也可以用sp记录。</p>
 <p>这里面的难点在于多线程同步问题，高效率锁。还得要使用ArrayBlockingQueue。</p>
+<h2 id="1-获取要下载的内容的contentLength"><a href="#1-获取要下载的内容的contentLength" class="headerlink" title="1. 获取要下载的内容的contentLength"></a>1. 获取要下载的内容的contentLength</h2><p>HttpUrlConnection有一个connection.getContentLength()方法，用于获取内容大小(bytes)</p>
+<h2 id="2-大文件上传避免oom"><a href="#2-大文件上传避免oom" class="headerlink" title="2. 大文件上传避免oom"></a>2. 大文件上传避免oom</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">Caused by java.lang.OutOfMemoryError: Failed to allocate a <span class="number">65548</span> <span class="keyword">byte</span> allocation with <span class="number">32012</span> free bytes and <span class="number">31</span>KB until OOM</div><div class="line">at com.android.okio.Segment.&lt;init&gt;(Segment.java:<span class="number">37</span>)</div><div class="line">at com.android.okio.SegmentPool.take(SegmentPool.java:<span class="number">48</span>)</div><div class="line">at com.android.okio.OkBuffer.writableSegment(OkBuffer.java:<span class="number">511</span>)</div><div class="line">at com.android.okio.OkBuffer.write(OkBuffer.java:<span class="number">424</span>)</div><div class="line">at com.android.okio.OkBuffer.clone(OkBuffer.java:<span class="number">740</span>)</div><div class="line">at com.android.okhttp.internal.http.RetryableSink.writeToSocket(RetryableSink.java:<span class="number">77</span>)</div><div class="line">at com.android.okhttp.internal.http.HttpConnection.writeRequestBody(HttpConnection.java:<span class="number">263</span>)</div><div class="line">at com.android.okhttp.internal.http.HttpTransport.writeRequestBody(HttpTransport.java:<span class="number">84</span>)</div><div class="line">at com.android.okhttp.internal.http.HttpEngine.readResponse(HttpEngine.java:<span class="number">790</span>)</div><div class="line">at com.android.okhttp.internal.http.HttpURLConnectionImpl.execute(HttpURLConnectionImpl.java:<span class="number">405</span>)</div><div class="line">at com.android.okhttp.internal.http.HttpURLConnectionImpl.getResponse(HttpURLConnectionImpl.java:<span class="number">349</span>)</div><div class="line">at com.android.okhttp.internal.http.HttpURLConnectionImpl.getResponseCode(HttpURLConnectionImpl.java:<span class="number">517</span>)</div><div class="line">at com.android.okhttp.internal.http.DelegatingHttpsURLConnection.getResponseCode(DelegatingHttpsURLConnection.java:<span class="number">105</span>)</div></pre></td></tr></table></figure>
+<p><a href="http://blog.sina.com.cn/s/blog_bfdb961b0101mkbo.html">参考</a> con.setChunkedStreamingMode(1024);//内部缓冲区—分段上传防止oom<br><a href="https://github.com/square/retrofit/issues/2270">解决方案</a>,RequestBody的contentLength设置为-1就好了<br><a href="http://www.cnblogs.com/begin1949/p/5060802.html">HttpURLConnection教程</a></p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="http://www.jianshu.com/p/2b82db0a5181">简书</a></li>
 <li><a href="https://github.com/AriaLyy/Aria">Demo</a></li>
 <li><a href="https://github.com/Aspsine/MultiThreadDownload">MultiThreadDownload for Android</a></li>
 <li><a href="http://blog.csdn.net/zhaokaiqiang1992/article/details/43939279">csdn</a></li>
+<li><a href="http://blog.csdn.net/chenrunhua/article/details/50113993">断点上传麻烦点，要自己搭server</a></li>
 </ul>
 ]]></content>
     
@@ -78,7 +113,7 @@
     <link href="https://haldir65.github.io/2017/07/23/2017-07-23-manipulating-bits/"/>
     <id>https://haldir65.github.io/2017/07/23/2017-07-23-manipulating-bits/</id>
     <published>2017-07-23T11:06:46.000Z</published>
-    <updated>2017-08-01T13:46:02.357Z</updated>
+    <updated>2017-08-03T13:00:08.806Z</updated>
     
     <content type="html"><![CDATA[<p>位运算的好处至少有两点，由于是直接操作bit,没有任何包装类，速度快。另外一个就是节省内存了。</p>
 <p><img src="http://odzl05jxx.bkt.clouddn.com/8af185ed137a586be732d63425d8bcb8.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
@@ -113,7 +148,11 @@
 <p>// 18. 从低位到高位.将n的第m位置为1<br>System.out.println(n | (1&lt;&lt;(m-1)));<br>/<em>将1左移m-1位找到第m位，得到000…1…000<br>n在和这个数做或运算</em>/</p>
 <p>// 19. 从低位到高位,将n的第m位置为0<br>System.out.println(n &amp; ~(0&lt;&lt;(m-1)));<br>/<em> 将1左移m-1位找到第m位，取反后变成111…0…1111<br>n再和这个数做与运算</em>/</p>
 <h2 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h2><ol>
-<li>记得Chet Haase和Romain Guy曾经在2013年的一次<a href="https://www.youtube.com/watch?v=Ho-anLsWvJo">演讲</a>中提到,Android中View内部使用了3个byte来表示70多个Flags。如果换做boolean(4byte大小)的话，就需要接近300bytes。由于View在Application中被广泛（成百上千）使用，framework这样做事实上为开发者节约了相当多的内存。、</li>
+<li>记得Chet Haase和Romain Guy曾经在2013年的一次<a href="https://www.youtube.com/watch?v=Ho-anLsWvJo">演讲</a>中提到,Android中View内部使用了3个int来表示70多个Flags。如果换做boolean(4byte大小)的话，就需要接近300bytes。由于View在Application中被广泛（成百上千）使用，framework这样做事实上为开发者节约了相当多的内存。<br>android.view.View.java<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">int mPrivateFlags;</div><div class="line">int mPrivateFlags2;</div><div class="line">int mPrivateFlags3;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>int中的每一个bit都成为一个boolean，一共只用了12bytes(96bits)的内存.和300bytes相比，节省的内存总量还是相当可观的。<br>一个onClickListener大概500bytes</p>
+<ol>
 <li>不要迷信位运算，对于一些简单的操作，现代编译器还是能够帮助开发者自动做好优化的。</li>
 </ol>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
@@ -574,9 +613,9 @@
     </summary>
     
     
-      <category term="linux" scheme="https://haldir65.github.io/tags/linux/"/>
-    
       <category term="tools" scheme="https://haldir65.github.io/tags/tools/"/>
+    
+      <category term="linux" scheme="https://haldir65.github.io/tags/linux/"/>
     
   </entry>
   
@@ -692,7 +731,7 @@
     <link href="https://haldir65.github.io/2017/07/12/2017-07-12-android-cookbook/"/>
     <id>https://haldir65.github.io/2017/07/12/2017-07-12-android-cookbook/</id>
     <published>2017-07-12T00:40:08.000Z</published>
-    <updated>2017-08-01T15:45:39.753Z</updated>
+    <updated>2017-08-03T13:00:08.797Z</updated>
     
     <content type="html"><![CDATA[<p>A Cookbook shall look like a collection of Recipes, or an index page from where dinner are made. And it keeps you sane.<br><img src="http://odzl05jxx.bkt.clouddn.com/Cg-4zFVJ0xGITwm_AA688WRj8n8AAXZ9wGMpd0ADr0J195.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
 <p>github上已经star了四百多个项目，应该复习下了。</p>
@@ -708,8 +747,7 @@
 <h2 id="跟java相关的"><a href="#跟java相关的" class="headerlink" title="跟java相关的"></a>跟java相关的</h2><p><a href="http://haldir65.github.io/2017/06/25/2017-06-12-Collections-Refuled-by-Stuart-Marks/">java集合类的实现原理</a><br><a href="http://haldir65.github.io/2017/04/30/2017-04-30-concurrency-and-beyond/">Java线程池的一些点</a><br><a href="http://haldir65.github.io/2016/12/31/2016-12-31-Eliminating-BoilPlate-AnnotationProcessor/">使用AnnotationProcessor自动生成代码</a><br><a href="http://haldir65.github.io/2017/05/24/2017-05-24-jvm-architecture/">翻译了一个印度口音的关于jvm架构的视频</a></p>
 <ul>
 <li><a href="http://haldir65.github.io/2017/07/23/2017-07-23-from-java-code-to-java-heap/">一个Java Object到底占用多少内存(from java code to java heap)</a></li>
-<li><a href="http://haldir65.github.io/2017/07/23/2017-07-23-lru-cache-and-more/">LruCache的原理</a></li>
-<li></li>
+<li><a href="http://haldir65.github.io/2017/07/23/2017-07-23-lru-cache-and-more/">LruCache的原理</a><br>-</li>
 </ul>
 <h2 id="工具书"><a href="#工具书" class="headerlink" title="工具书"></a>工具书</h2><p><a href="http://haldir65.github.io/2016/09/27/git-manual/">git常用操作手册</a><br><a href="http://haldir65.github.io/2016/12/10/2016-12-10-adb-command/">adb常用命令手册</a></p>
 <h2 id="杂乱的点"><a href="#杂乱的点" class="headerlink" title="杂乱的点"></a>杂乱的点</h2><p><a href="http://haldir65.github.io/2017/06/17/2017-06-17-tiny-details-in-java/">java中的任何细碎的点</a></p>
@@ -772,7 +810,7 @@
 </ul>
 <p>Gradle相关</p>
 <ul>
-<li>[ ]写一些DSL吧</li>
+<li>[ ]写一些DSL吧<a href="https://github.com/Ccixyj/JBusDriver">Old Driver</a></li>
 </ul>
 <p>数据库相关</p>
 <ul>
@@ -1240,7 +1278,7 @@ Deque(双端队列)
     <link href="https://haldir65.github.io/2017/06/17/2017-06-17-tiny-details-in-java/"/>
     <id>https://haldir65.github.io/2017/06/17/2017-06-17-tiny-details-in-java/</id>
     <published>2017-06-17T13:24:48.000Z</published>
-    <updated>2017-08-01T13:46:02.341Z</updated>
+    <updated>2017-08-03T15:24:31.068Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p>interesting stuff in java that don’t seem to get enough pubilicity</p>
@@ -1271,7 +1309,11 @@ Deque(双端队列)
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">COWIterator</span>&lt;<span class="title">E</span>&gt; <span class="keyword">implements</span> <span class="title">ListIterator</span>&lt;<span class="title">E</span>&gt; </span>&#123;</div><div class="line">     <span class="comment">/** Snapshot of the array */</span></div><div class="line">     <span class="keyword">private</span> <span class="keyword">final</span> Object[] snapshot;</div><div class="line">     <span class="comment">/** Index of element to be returned by subsequent call to next.  */</span></div><div class="line">     <span class="keyword">private</span> <span class="keyword">int</span> cursor;  </div><div class="line"></div><div class="line">   &#125;</div></pre></td></tr></table></figure>
 <p>没有了expectedModCount，成员变量就这俩。<br>CopyOnWriteArrayList直接实现List，写操作都用ReentrantLock锁上了，即同时只能有一条线程进行写操作，get没有加锁。<br>private transient volatile Object[] array;<br>注意保存数据的array是volatile的，任何一条线程写的操作都会被所有的读取线程看到(skip了cpu缓存)，set的时候，以set为例：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> E <span class="title">set</span><span class="params">(<span class="keyword">int</span> index, E element)</span> </span>&#123;</div><div class="line">      <span class="keyword">final</span> ReentrantLock lock = <span class="keyword">this</span>.lock;</div><div class="line">      lock.lock();</div><div class="line">      <span class="keyword">try</span> &#123;</div><div class="line">          Object[] elements = getArray();</div><div class="line">          E oldValue = get(elements, index);</div><div class="line"></div><div class="line">          <span class="keyword">if</span> (oldValue != element) &#123;</div><div class="line">              <span class="keyword">int</span> len = elements.length;</div><div class="line">              Object[] newElements = Arrays.copyOf(elements, len); <span class="comment">//即CopyOnWrite</span></div><div class="line">              newElements[index] = element;</div><div class="line">              setArray(newElements);</div><div class="line">          &#125; <span class="keyword">else</span> &#123;</div><div class="line">              <span class="comment">// Not quite a no-op; ensures volatile write semantics</span></div><div class="line">              setArray(elements);</div><div class="line">          &#125;</div><div class="line">          <span class="keyword">return</span> oldValue;</div><div class="line">      &#125; <span class="keyword">finally</span> &#123;</div><div class="line">          lock.unlock();</div><div class="line">      &#125;</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
 <p>CopyOnWriteArrayList内部ListIterator直接保存了一份final的之前Array的snapShot，由于是volatile，任何读操作都能读取到实时的array数据。所谓读取是安全的是指读的时候始终读到的是最实时的信息，这个通过volatile 就能保证。读取由于加锁了，所以也是线程安全的。</p>
-<h2 id="9-同时对共享资源进行操作好一点的加锁的方式"><a href="#9-同时对共享资源进行操作好一点的加锁的方式" class="headerlink" title="9. 同时对共享资源进行操作好一点的加锁的方式"></a>9. 同时对共享资源进行操作好一点的加锁的方式</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line">       <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">           <span class="keyword">final</span> ReentrantLock lock = <span class="keyword">this</span>.lock;</div><div class="line">           lock.lock(); <span class="comment">//拿不到lock的Thread会挂起</span></div><div class="line">           <span class="keyword">try</span> &#123;</div><div class="line">               <span class="keyword">this</span>.mList.add(<span class="string">"new elements added by"</span> + mIndex + <span class="string">""</span>); <span class="comment">//对共享资源的操作放这里</span></div><div class="line">           &#125;</div><div class="line">           <span class="keyword">finally</span> &#123;</div><div class="line">               lock.unlock(); <span class="comment">//记得解锁</span></div><div class="line">           &#125;</div><div class="line">       &#125;</div></pre></td></tr></table></figure>
+<h2 id="9-float和long这些相互除法，会出现精确度损失"><a href="#9-float和long这些相互除法，会出现精确度损失" class="headerlink" title="9.float和long这些相互除法，会出现精确度损失"></a>9.float和long这些相互除法，会出现精确度损失</h2><p>6.8040496E7*100/68040488f 会出现1.000001这种东西</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://www.youtube.com/watch?v=6uroXz5l7Gk">Jake Wharton and Jesse Wilson - Death, Taxes, and HTTP</a></li>
+<li><a href="https://www.youtube.com/watch?v=tfD2uYjzXFo">Android Tech Talk: HTTP In A Hostile World</a></li>
+</ul>
 ]]></content>
     
     <summary type="html">
@@ -1406,64 +1448,6 @@ verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的s
     
     
       <category term="jvm" scheme="https://haldir65.github.io/tags/jvm/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>VPS下载Youtube视频并同步到本地</title>
-    <link href="https://haldir65.github.io/2017/05/07/2017-05-07-download-video-from-vps/"/>
-    <id>https://haldir65.github.io/2017/05/07/2017-05-07-download-video-from-vps/</id>
-    <published>2017-05-07T08:48:01.000Z</published>
-    <updated>2017-06-18T05:10:56.769Z</updated>
-    
-    <content type="html"><![CDATA[<p>几天前花几块钱买了个新的vps，试了下，速度不错。后来看到网上有关于如何使用vps下载视频并拖到Windows的，试了一下，确实酸爽。<br><img src="http://odzl05jxx.bkt.clouddn.com/4667305cbdace582c667f218e38fe70a.jpg?imageView2/2/w/600" alt=""></p>
-<a id="more"></a>
-<h3 id="1-youtube下载视频到vps的硬盘上"><a href="#1-youtube下载视频到vps的硬盘上" class="headerlink" title="1. youtube下载视频到vps的硬盘上"></a>1. youtube下载视频到vps的硬盘上</h3><p>首先是安装一些必要的环境，我安装的系统是Ubuntu 14.0.4 ，这个版本默认的python是2.7。配置好pip,python等环境后，首先安装youtube-dl,基本上就是两行命令搞定的事情，参考<a href="http://rg3.github.io/youtube-dl/download.html">官网</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">sudo curl -L https://yt-dl.org/downloads/latest/youtube-dl -o /usr/local/bin/youtube-dl</div><div class="line"></div><div class="line">sudo chmod a+rx /usr/local/bin/youtube-dl</div></pre></td></tr></table></figure></p>
-<p>为了方便管理，首先在/根目录下面创建一个文件夹并切换到该目录下</p>
-<blockquote>
-<p>mkdir youtube   </p>
-</blockquote>
-<p>以一个普通的<a href="https://www.youtube.com/watch?v=7PtDrv5AUmA">视频链接</a>为例<br>直接使用 </p>
-<blockquote>
-<p>youtube-dl <a href="https://www.youtube.com/watch?v=7PtDrv5AUmA">https://www.youtube.com/watch?v=7PtDrv5AUmA</a></p>
-</blockquote>
-<p>就能自动选择合适的格式，下载到当前目录。比较好的一点是，由于vps在美国，下载速度非常快，维持在20MB/ms的样子。下载好的文件会放在当前目录下，后面使用pscp工具从vps拖下来就好了，不过我实践下来，这一步往往是最慢的。关键要看vps到你的ip的速度。有些时候还会突然断掉，所以很麻烦。这个看后面能不能搞定百度云盘中转。<br>还有一个要注意的，生成的文件名是随机的，比如</p>
-<blockquote>
-<p>-yj74P_BY1zI.mp4</p>
-</blockquote>
-<p>由于前面带了一个横杠，很多命令是不认这种名字的，需要手动重命名一下 </p>
-<blockquote>
-<p>mv -yj74P_BY1zI.mp4 porn.video<br>mv ./-yj74P_BY1zI.mp4 porn.video #. 表示当前目录</p>
-</blockquote>
-<p>有时候下载的文件带有空格，有时候带有中文，用单引号包起来就好了。</p>
-<p>youtube-dl还有一些命令行参数可以设置</p>
-<blockquote>
-<p>youtube-dl –all-formats <a href="https://www.youtube.com/watch?v=7PtDrv5AUmA">https://www.youtube.com/watch?v=7PtDrv5AUmA</a></p>
-</blockquote>
-<p>这样会列出所有的可供下载的分辨率选项，每个选项前面带有一个序号，选择特定分辨率的选项下载只需要</p>
-<blockquote>
-<p>youtube-dl -f 13 <a href="https://www.youtube.com/watch?v=7PtDrv5AUmA">https://www.youtube.com/watch?v=7PtDrv5AUmA</a> </p>
-</blockquote>
-<h3 id="2-从vps的硬盘上把下载好的视频拖下来"><a href="#2-从vps的硬盘上把下载好的视频拖下来" class="headerlink" title="2.从vps的硬盘上把下载好的视频拖下来"></a>2.从vps的硬盘上把下载好的视频拖下来</h3><p>VPS下载视频的速度很快，但从vps到国内的速度就很慢了。<br>目前可能的方案有从百度网盘或dropBox中转，测试了一下百度网盘的方案bypy，vps上传到网盘速度太慢，shell出现假死，据说是百度方面限速的原因，所以这条路基本也是堵上了的。</p>
-<h3 id="3-后话"><a href="#3-后话" class="headerlink" title="3.后话"></a>3.后话</h3><p><a href="https://github.com/soimort/you-get">you-get</a>也是基于python3的下载工具，使用简单。在windows上安装还有点麻烦，<br>在ubuntu上只需 pip3 install you-get 就安装好了<br>使用方式更简单 &gt; you-get “url”<br>you-get还提供了windows版本 下载youtube视频只需要</p>
-<blockquote>
-<p>you-get -x 127.0.0.1:1080 -o “D:\Porn” ‘<a href="https://www.youtube.com/watch?v=jNQXAC9IVRw">https://www.youtube.com/watch?v=jNQXAC9IVRw</a>‘</p>
-</blockquote>
-<p><a href="https://doub.io/dbrj-1/">参考</a><br><a href="http://www.typemylife.com/use-vps-download-videos-from-youtube-upload-to-baidu-cloud/">百度云盘同步的方法</a><br><a href="https://www.v2ex.com/t/189034">讨论</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;几天前花几块钱买了个新的vps，试了下，速度不错。后来看到网上有关于如何使用vps下载视频并拖到Windows的，试了一下，确实酸爽。&lt;br&gt;&lt;img src=&quot;http://odzl05jxx.bkt.clouddn.com/4667305cbdace582c667f218e38fe70a.jpg?imageView2/2/w/600&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="blog" scheme="https://haldir65.github.io/categories/blog/"/>
-    
-    
-      <category term="python" scheme="https://haldir65.github.io/tags/python/"/>
-    
-      <category term="linux" scheme="https://haldir65.github.io/tags/linux/"/>
     
   </entry>
   
