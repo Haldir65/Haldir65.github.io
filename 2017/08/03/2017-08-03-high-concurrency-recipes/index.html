@@ -12,11 +12,11 @@
 <meta property="og:title" content="高并发实践手册">
 <meta property="og:url" content="https://haldir65.github.io/2017/08/03/2017-08-03-high-concurrency-recipes/index.html">
 <meta property="og:site_name" content="Haldir的博客">
-<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/blog/be3c80a11edfd0fdb75d098550ed2c8e.jpg">
-<meta property="og:updated_time" content="2017-08-03T15:24:18.870Z">
+<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/blog/be3c80a11edfd0fdb75d098550ed2c8e.jpg?imageView2/2/w/600">
+<meta property="og:updated_time" content="2017-08-05T14:33:47.443Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="高并发实践手册">
-<meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/image/blog/be3c80a11edfd0fdb75d098550ed2c8e.jpg">
+<meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/image/blog/be3c80a11edfd0fdb75d098550ed2c8e.jpg?imageView2/2/w/600">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -195,7 +195,7 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p><img src="http://odzl05jxx.bkt.clouddn.com/image/blog/be3c80a11edfd0fdb75d098550ed2c8e.jpg" alt=""><br><a id="more"></a></p>
+        <p><img src="http://odzl05jxx.bkt.clouddn.com/image/blog/be3c80a11edfd0fdb75d098550ed2c8e.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
 <h2 id="1-同时对共享资源进行操作好一点的加锁的方式"><a href="#1-同时对共享资源进行操作好一点的加锁的方式" class="headerlink" title="1. 同时对共享资源进行操作好一点的加锁的方式"></a>1. 同时对共享资源进行操作好一点的加锁的方式</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line">       <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">           <span class="keyword">final</span> ReentrantLock lock = <span class="keyword">this</span>.lock;</div><div class="line">           lock.lock(); <span class="comment">//拿不到lock的Thread会挂起</span></div><div class="line">           <span class="keyword">try</span> &#123;</div><div class="line">               <span class="keyword">this</span>.mList.add(<span class="string">"new elements added by"</span> + mIndex + <span class="string">""</span>); <span class="comment">//对共享资源的操作放这里</span></div><div class="line">           &#125;</div><div class="line">           <span class="keyword">finally</span> &#123;</div><div class="line">               lock.unlock(); <span class="comment">//记得解锁</span></div><div class="line">           &#125;</div><div class="line">       &#125;</div></pre></td></tr></table></figure>
 <h2 id="2-ThreadLocal当做一个HashMap来用就好了"><a href="#2-ThreadLocal当做一个HashMap来用就好了" class="headerlink" title="2. ThreadLocal当做一个HashMap来用就好了"></a>2. ThreadLocal当做一个HashMap来用就好了</h2><p><strong>volatile并不是Atomic操作，例如，A线程对volatile变量进行写操作(实际上是读和写操作)，B线程可能在这两个操作之间进行了写操作；</strong></p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
