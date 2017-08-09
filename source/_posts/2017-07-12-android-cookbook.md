@@ -100,7 +100,6 @@ Java相关
 - [ ] 垃圾回收器的分类及优缺点
 - [ ] ThreadLocal原理及可能的内存泄漏
 - [ ] Understanding Dagger2's generated code
-- [ ] volatile硬件层面的实现原理[一级缓存，时钟周期](http://www.cnblogs.com/xrq730/p/7048693.html)
 - [ ] 单例模式需要考虑到jvm优化的问题（为什么要写两个synchronized）
 - [ ] java类加载机制(classLoader相关的，类的加载顺序)
 - [ ] Java四种引用
