@@ -2,7 +2,7 @@
 title: linux常用命令扩展
 date: 2017-06-18 16:51:49
 categories: blog
-tags: 
+tags:
   - linux
 ---
 > 一些linux的常用命令，linux环境下运行server ,bash的语法
@@ -34,10 +34,8 @@ PATH=$PATH:/etc/apache/bin  #只对本次回话有效
 
 3. alias设置
 vi 中输入 /XXX 可以搜索
-vi ~/.bashrc 
-添加 alias yourcommand='ls -alr' 
+vi ~/.bashrc
+添加 alias yourcommand='ls -alr'
 重开session即可生效
 
-4. 
-
-
+4. pushd和popd（类似于文件夹stack）

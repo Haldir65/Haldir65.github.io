@@ -111,6 +111,7 @@ Java相关
 - [ ] 并发编程，java.util.concurrent里面的类熟练掌握，粗略了解原理
 - [ ]写一个[生产者消费者](https://github.com/Mr-YangCheng/ForAndroidInterview/blob/master/java/%5BJava%5D%20%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E7%94%9F%E4%BA%A7%E8%80%85%E6%B6%88%E8%B4%B9%E8%80%85%E9%97%AE%E9%A2%98%E7%9A%84%E4%BA%94%E7%A7%8D%E5%90%8C%E6%AD%A5%E6%96%B9%E6%B3%95%E5%AE%9E%E7%8E%B0.md)模型
 - [ ] HashMap和conrrentHashmap区别(分段锁比较难)
+- [ ] java的包结构：java.lang(Language核心类);java.io(I/O相关);java.util(包含collection和concurrent);java.nio(另一种I/O);java.net(网络操作)
 
 
 Android相关
@@ -156,6 +157,7 @@ Gradle相关
 - [ ] 编码，底层二进制
 - [ ] 二分法查找，排序，冒泡，复杂度
 - [ ] 数组跟链表区别,数组跟链表排序时区别,数组跟链表排序时区别
+- [ ] 八大排序[算法](http://www.cnblogs.com/123hll/p/6903454.html)
 
 
 

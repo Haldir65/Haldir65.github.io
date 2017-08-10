@@ -216,13 +216,16 @@ public E set(int index, E element) {
   }
 ```
 
-CopyOnWriteArrayList内部ListIterator直接保存了一份final的之前Array的snapShot，由于是volatile，任何读操作都能读取到实时的array数据。所谓读取是安全的是指读的时候始终读到的是最实时的信息，这个通过volatile 就能保证。读取由于加锁了，所以也是线程安全的。
+CopyOnWriteArrayList内部ListIterator直接保存了一份final的之前Array的snapShot，由于是volatile，任何读操作都能读取到实时的array数据。所谓读取是安全的是指读的时候始终读到的是最实时的信息，这个通过volatile 就能保证。写入由于加锁了，所以也是线程安全的。
 
 
 
 
 ## 9.float和long这些相互除法，会出现精确度损失
 6.8040496E7*100/68040488f 会出现1.000001这种东西
+
+## 10. int居然还可以这么写
+- int a = 5_372_4323; 下划线只是为了具有更好的可读性，added in java 7
 
 
 

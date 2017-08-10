@@ -449,12 +449,15 @@ du -sh //查看当前directory的大小
 du -h //查看当前目录下各个子目录分别的大小
 dh -h img// 查看img目录下文件及文件夹的大小
 dh -h img/1.jpg //查看指定文件的大小
+du -hsBM //查看当前目录的大小(s表示summary)，以MB为单位
+du -hsBM /var/* | sort -n //该目录下全部文件，从小到大排列
 ````
 
 查看cpu信息
 > cat /proc/cpuinfo
 
 查看内存
+> cat /proc/meminfo | grep Mem
 >free -m
 free -h # human readable
 
@@ -595,6 +598,7 @@ netstat
 netstat -i // 查看某个网络接口发出和接收了多少byte的数据
 netstat -ta //当前active的网络连接
 netstat -tan //以ip地址的方式展示出来
+netstat -tupln //tcp+udp+program name+监听的端口+numerically
 ```
 
 ```
@@ -657,6 +661,7 @@ lsof -i # 这个也行
 lsof -i:80
 #查看某个进程占了哪些端口
 netstat -anp|grep pid
+lsof //list opened files
 ```
 
 //杀进程（如果进程不属于当前用户，要sudo）
@@ -700,6 +705,11 @@ PermitRootLogin no
 
 修改完成后重启ssh
 /etc/init.d/ssh restart
+
+查看系统release版本
+```
+more /etc/*release
+```
 
 
 

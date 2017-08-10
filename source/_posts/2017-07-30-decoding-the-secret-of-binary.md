@@ -47,10 +47,22 @@ char c = 12 //正确
 所以(byte、short、char) -> int -> long -> float -> double这么从小往大转是没有问题的。编译器自动转，所以经常不会被察觉。
 byte、short、char这三个是平级的，相互转换也行。
 试了下,
-byte->short 自动转，short -> byte 要加强转
-char和short之间互相不能转
-byte和char之间互相不能转
+```java
+byte b = 3;
+char c = '2';
+short s = 23;
 
+s = b; //只有byte往上转short是自动的
+b = (byte) s;
+
+
+s = (short) c;
+c = (char) s;
+
+b = (byte) c;
+c = (char) b;
+```
+强转就意味着可能的精度损失。
 
 所以除去boolean以外:
 - char
@@ -59,10 +71,17 @@ byte和char之间互相不能转
 可以分成这三类，从小往大转没问题，同一类从小到大转没问题。
 
 具体到实际操作上：
-1. byte,short,char类型自动提升为int
+1. char->byte->short->int->long->float->double
 2. 有一个操作数是long，结果是long
 3. 有一个操作数是float,结果是float
 4. 有一个操作数是double，结果是double
+5. long l = 424323L ,后面的L要大写。
+6. 这些整数都是没办法表示一个小数的，要用float或者double，后面加上f（F）或者L。
+7. char(16位)，能表示的范围大小和short一样，是用单引号括起来的一个字符(可以是中文字符)，两个字符不行。
+8. char的原理就是转成int，根据unicode编码找到对应的符号并显示出来。
+9. 两个char相加，就是转成int之后两个int相加
+10. double类型后面可以不写D
+11. float后面写f或者F都一样
 
 
 
