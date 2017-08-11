@@ -60,29 +60,48 @@ public static void main(String[] args) {
 ## 5. 位或（|）
 和位与相反
 同一位上只要有一个为1，就为1.只有两个都为0，才为0.
+二进制下：
+      5的二进制是： 0000 0000 0000 0000 0000 0000 0000 0101
+      3的二进制是： 0000 0000 0000 0000 0000 0000 0000 0011
+所以结果是 7        0000 0000 0000 0000 0000 0000 0000 0111
 所以 (5|3) = 7(这让人想到linux文件权限的777)
+
+
 其实就是 111 111 111 （owner,creater,others）
 
 ## 6. 位异或(^)
+还是拿5和3一起算
+第一个操作数的的第n位于第二个操作数的第n位 相反，那么结果的第n为也为1，否则为0
+二进制下：
+      5的二进制是： 0000 0000 0000 0000 0000 0000 0000 0101
+      3的二进制是： 0000 0000 0000 0000 0000 0000 0000 0011
+所以结果是 6        0000 0000 0000 0000 0000 0000 0000 0110
+所以a^b可以用来判断两个Flag前后有没有发生变化，有时候如果发现前后flag没有变化，即不操作。
 
 
+## 7.位非(~)
+位非是一元操作符，对一个数进行操作
+位非：操作数的第n位为1，那么结果的第n位为0，反之为1，就是所有的1变成0,0变成1。
+ 5的二进制是： 0000 0000 0000 0000 0000 0000 0000 0101
+ 倒过来就是：  1111 1111 1111 1111 1111 1111 1111 1010
+负整数转二进制的标准方法：先是将对应的正整数转换成二进制后，对二进制取反，然后对结果再加一。
+
+## 8.一些衍生的操作符
+从上面的一些基本操作符衍生来的有
+
+```
+&= 按位与赋值
+|=  按位或赋值
+^= 按位非赋值
+>>= 右移赋值
+>>>= 无符号右移赋值
+<<= 赋值左移
+```
+
+和+=一个意思。至于那个运算符优先级，算了吧。
 
 
-
-
-
-
-
-
-
-
-
-
-## 跟位运算无关
- 后厂村
-
-
-
+## 9.一些常用的小技巧
 
 // 1. 获得int型最大值
 System.out.println((1 << 31) - 1);// 2147483647， 由于优先级关系，括号不可省略
@@ -159,16 +178,6 @@ n再和这个数做与运算*/
 
 
 
-
-
-
-
-
-
-
-
-
-
 ## 结束
 1. 记得Chet Haase和Romain Guy曾经在2013年的一次[演讲](https://www.youtube.com/watch?v=Ho-anLsWvJo)中提到,Android中View内部使用了3个int来表示70多个Flags。如果换做boolean(4byte大小)的话，就需要接近300bytes。由于View在Application中被广泛（成百上千）使用，framework这样做事实上为开发者节约了相当多的内存。
 android.view.View.java
@@ -179,11 +188,73 @@ int mPrivateFlags3;
 ```
 int中的每一个bit都成为一个boolean，一共只用了12bytes(96bits)的内存.和300bytes相比，节省的内存总量还是相当可观的。
 一个onClickListener大概500bytes
+所以View.java中到处是这样的奇怪的Flags
+```java
+  public void setDrawingCacheEnabled(boolean enabled) {
+        mCachingFailed = false;
+        setFlags(enabled ? 0x00008000 : 0, 0x00008000);
+    }
+
+    @ViewDebug.ExportedProperty(category = "drawing")
+    public boolean isDrawingCacheEnabled() {
+        return (mViewFlags & 0x00008000) == 0x00008000;
+    }
+```
+除了省内存，位运算速度快也有一定的好处。
 
 
 2. 不要迷信位运算，对于一些简单的操作，现代编译器还是能够帮助开发者自动做好优化的。
 
+3. 从java7开始，可以在java代码里[直接写二进制，八进制，十六进制的数字了](https://www.bbsmax.com/A/xl569bA1Jr/)
+```java
+//16进制
+jdk6写法：
+public static void main(String[] args) {
+ 
+         int res = Integer.parseInt("A", 16);
+         System.out.println(res);
+     }
+jdk7写法：
+public static void main(String[] args) {
+ 
+         int res = 0xA;
+         System.out.println(res);
+     }
+
+// 8进制
+jdk6写法:
+ public static void main(String[] args) {
+ 
+         int res = Integer.parseInt("11",8);
+         System.out.println(res);
+     }
+jdk7写法:
+public static void main(String[] args) {
+ 
+         int res = 011;
+         System.out.println(res);
+     }
+
+//二进制
+jdk6写法:
+public static void main(String[] args) {
+ 
+         int res = Integer.parseInt("1100110", 2);
+         System.out.println(res);
+     }
+jdk7写法:
+public static void main(String[] args) {
+ 
+         int res = 0b1100110;
+         System.out.println(res);
+     }
+```
+即：
+二进制： int res = 0b110; 六（0B也行，0b01_10010_0这种加下划线也行）
+八进制： int res = 0110; 七十二
+十六进制： int res = 0xA;  十
 
 ## 参考
 - [Java位运算操作全面总结](https://my.oschina.net/xianggao/blog/412967)
 - [Java 位运算(移位、位与、或、异或、非）](http://blog.csdn.net/xiaochunyong/article/details/7748713)
+

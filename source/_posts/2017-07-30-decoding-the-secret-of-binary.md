@@ -85,7 +85,7 @@ c = (char) b;
 
 
 
-
+## 2. Encoding解析
 
 java编译器将源代码编译位字节码时，会用int来表示boolean(非零表示真)
 byte,short,int,long这些都是有符号的整数，八进制数以0开头，十六进制数字以0x开头

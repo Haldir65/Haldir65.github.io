@@ -103,7 +103,7 @@ Java相关
 - [ ] 单例模式需要考虑到jvm优化的问题（为什么要写两个synchronized）
 - [ ] java类加载机制(classLoader相关的，类的加载顺序)
 - [ ] Java四种引用
-- [ ] Future和FutureTask这些怎么用
+- [ ] Future和FutureTask,CompletableFuture这些怎么用
 - [ ][反射](http://blog.csdn.net/briblue/article/details/76223206)
 - [ ] java堆和栈的区别，如何判断堆栈上的对象死没死
 - [ ] 自己写一个一部图片加载框架，并发图像滤镜框架
@@ -137,6 +137,7 @@ Android相关
 Linux相关
 - [ ] linux进程间通信方式有哪些（信号量这种）
 - [ ] Linux command extended
+- [ ] 搭建mail服务
 
 网络通信
 - [ ] TCP UDP的不同 TCP三次握手，wireShark抓包,抓一个App的包，模拟请求
@@ -150,6 +151,9 @@ Gradle相关
 数据库相关
 - [ ] MySql从入门到删库跑路
 - [ ] Realm的优点
+
+C语言从入门到放弃
+- [ ] 加载ffmpeg需要，不得不学[ffmpeg教程](http://blog.csdn.net/leixiaohua1020/article/details/47008825)
 
 
 数据结构，算法
