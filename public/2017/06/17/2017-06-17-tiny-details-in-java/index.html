@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="interesting stuff in java that don’t seem to get enough pubilicity">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/34a7d57ccabb18c69d085247cf009b22.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-08-01T13:46:02.341Z">
+<meta property="og:updated_time" content="2017-08-12T03:09:58.590Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="For those tiny details in Java">
 <meta name="twitter:description" content="interesting stuff in java that don’t seem to get enough pubilicity">
@@ -226,8 +226,15 @@ ga('send', 'pageview');
 <p>改成CopyOnWriteArrayList为什么就不会崩了：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">COWIterator</span>&lt;<span class="title">E</span>&gt; <span class="keyword">implements</span> <span class="title">ListIterator</span>&lt;<span class="title">E</span>&gt; </span>&#123;</div><div class="line">     <span class="comment">/** Snapshot of the array */</span></div><div class="line">     <span class="keyword">private</span> <span class="keyword">final</span> Object[] snapshot;</div><div class="line">     <span class="comment">/** Index of element to be returned by subsequent call to next.  */</span></div><div class="line">     <span class="keyword">private</span> <span class="keyword">int</span> cursor;  </div><div class="line"></div><div class="line">   &#125;</div></pre></td></tr></table></figure>
 <p>没有了expectedModCount，成员变量就这俩。<br>CopyOnWriteArrayList直接实现List，写操作都用ReentrantLock锁上了，即同时只能有一条线程进行写操作，get没有加锁。<br>private transient volatile Object[] array;<br>注意保存数据的array是volatile的，任何一条线程写的操作都会被所有的读取线程看到(skip了cpu缓存)，set的时候，以set为例：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> E <span class="title">set</span><span class="params">(<span class="keyword">int</span> index, E element)</span> </span>&#123;</div><div class="line">      <span class="keyword">final</span> ReentrantLock lock = <span class="keyword">this</span>.lock;</div><div class="line">      lock.lock();</div><div class="line">      <span class="keyword">try</span> &#123;</div><div class="line">          Object[] elements = getArray();</div><div class="line">          E oldValue = get(elements, index);</div><div class="line"></div><div class="line">          <span class="keyword">if</span> (oldValue != element) &#123;</div><div class="line">              <span class="keyword">int</span> len = elements.length;</div><div class="line">              Object[] newElements = Arrays.copyOf(elements, len); <span class="comment">//即CopyOnWrite</span></div><div class="line">              newElements[index] = element;</div><div class="line">              setArray(newElements);</div><div class="line">          &#125; <span class="keyword">else</span> &#123;</div><div class="line">              <span class="comment">// Not quite a no-op; ensures volatile write semantics</span></div><div class="line">              setArray(elements);</div><div class="line">          &#125;</div><div class="line">          <span class="keyword">return</span> oldValue;</div><div class="line">      &#125; <span class="keyword">finally</span> &#123;</div><div class="line">          lock.unlock();</div><div class="line">      &#125;</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
-<p>CopyOnWriteArrayList内部ListIterator直接保存了一份final的之前Array的snapShot，由于是volatile，任何读操作都能读取到实时的array数据。所谓读取是安全的是指读的时候始终读到的是最实时的信息，这个通过volatile 就能保证。读取由于加锁了，所以也是线程安全的。</p>
-<h2 id="9-同时对共享资源进行操作好一点的加锁的方式"><a href="#9-同时对共享资源进行操作好一点的加锁的方式" class="headerlink" title="9. 同时对共享资源进行操作好一点的加锁的方式"></a>9. 同时对共享资源进行操作好一点的加锁的方式</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line">       <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">           <span class="keyword">final</span> ReentrantLock lock = <span class="keyword">this</span>.lock;</div><div class="line">           lock.lock(); <span class="comment">//拿不到lock的Thread会挂起</span></div><div class="line">           <span class="keyword">try</span> &#123;</div><div class="line">               <span class="keyword">this</span>.mList.add(<span class="string">"new elements added by"</span> + mIndex + <span class="string">""</span>); <span class="comment">//对共享资源的操作放这里</span></div><div class="line">           &#125;</div><div class="line">           <span class="keyword">finally</span> &#123;</div><div class="line">               lock.unlock(); <span class="comment">//记得解锁</span></div><div class="line">           &#125;</div><div class="line">       &#125;</div></pre></td></tr></table></figure>
+<p>CopyOnWriteArrayList内部ListIterator直接保存了一份final的之前Array的snapShot，由于是volatile，任何读操作都能读取到实时的array数据。所谓读取是安全的是指读的时候始终读到的是最实时的信息，这个通过volatile 就能保证。写入由于加锁了，所以也是线程安全的。</p>
+<h2 id="9-float和long这些相互除法，会出现精确度损失"><a href="#9-float和long这些相互除法，会出现精确度损失" class="headerlink" title="9.float和long这些相互除法，会出现精确度损失"></a>9.float和long这些相互除法，会出现精确度损失</h2><p>6.8040496E7*100/68040488f 会出现1.000001这种东西</p>
+<h2 id="10-int居然还可以这么写"><a href="#10-int居然还可以这么写" class="headerlink" title="10. int居然还可以这么写"></a>10. int居然还可以这么写</h2><ul>
+<li>int a = 5_372_4323; 下划线只是为了具有更好的可读性，added in java 7</li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://www.youtube.com/watch?v=6uroXz5l7Gk">Jake Wharton and Jesse Wilson - Death, Taxes, and HTTP</a></li>
+<li><a href="https://www.youtube.com/watch?v=tfD2uYjzXFo">Android Tech Talk: HTTP In A Hostile World</a></li>
+</ul>
 
       
 
@@ -438,6 +445,18 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Window</a>
               </li>
              
@@ -446,27 +465,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">adb</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -478,11 +477,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+                <a href="javascript:void(0)" class="js-tag color4">adb</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -494,7 +497,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -514,6 +517,10 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
@@ -526,11 +533,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">databinding</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
+                <a href="javascript:void(0)" class="js-tag color3">service</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -538,7 +541,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">service</a>
+                <a href="javascript:void(0)" class="js-tag color2">databinding</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
               </li>
             
             <div class="clearfix"></div>
