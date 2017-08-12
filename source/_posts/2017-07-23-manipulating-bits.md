@@ -89,6 +89,7 @@ public static void main(String[] args) {
 ## 8.一些衍生的操作符
 从上面的一些基本操作符衍生来的有
 
+
 ```
 &= 按位与赋值
 |=  按位或赋值
@@ -97,6 +98,7 @@ public static void main(String[] args) {
 >>>= 无符号右移赋值
 <<= 赋值左移
 ```
+
 
 和+=一个意思。至于那个运算符优先级，算了吧。
 
