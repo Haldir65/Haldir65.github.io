@@ -94,8 +94,8 @@ Java相关
 - [X] 画一下java的集合框架
 - [X] String StringBuffer StringBuilder区别(StringBuffer很多方法都加了synchronized)
 - [ ] 多线程异步断点续传框架原理,利用该原理在图片加载框架中的应用(MappedByteBuffer或者RandomAccessFile)
-- [ ] 多线程断点续传原理，大文件下载oom问题
-- [ ] java位运算，Collection框架中多次用到了
+- [X] 多线程断点续传原理，大文件下载oom问题
+- [X] java位运算，Collection框架中多次用到了
 - [ ] gson的原理，cache什么的，常规json解析器的原理
 - [ ] 垃圾回收器的分类及优缺点
 - [ ] ThreadLocal原理及可能的内存泄漏

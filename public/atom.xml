@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://haldir65.github.io/"/>
-  <updated>2017-08-01T15:44:08.573Z</updated>
+  <updated>2017-08-12T03:10:15.324Z</updated>
   <id>https://haldir65.github.io/</id>
   
   <author>
@@ -16,11 +16,43 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>高并发实践手册</title>
+    <link href="https://haldir65.github.io/2017/08/03/2017-08-03-high-concurrency-recipes/"/>
+    <id>https://haldir65.github.io/2017/08/03/2017-08-03-high-concurrency-recipes/</id>
+    <published>2017-08-03T13:04:28.000Z</published>
+    <updated>2017-08-12T03:10:15.324Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="http://odzl05jxx.bkt.clouddn.com/image/blog/be3c80a11edfd0fdb75d098550ed2c8e.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
+<h2 id="1-同时对共享资源进行操作好一点的加锁的方式"><a href="#1-同时对共享资源进行操作好一点的加锁的方式" class="headerlink" title="1. 同时对共享资源进行操作好一点的加锁的方式"></a>1. 同时对共享资源进行操作好一点的加锁的方式</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line">       <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">           <span class="keyword">final</span> ReentrantLock lock = <span class="keyword">this</span>.lock;</div><div class="line">           lock.lock(); <span class="comment">//拿不到lock的Thread会挂起</span></div><div class="line">           <span class="keyword">try</span> &#123;</div><div class="line">               <span class="keyword">this</span>.mList.add(<span class="string">"new elements added by"</span> + mIndex + <span class="string">""</span>); <span class="comment">//对共享资源的操作放这里</span></div><div class="line">           &#125;</div><div class="line">           <span class="keyword">finally</span> &#123;</div><div class="line">               lock.unlock(); <span class="comment">//记得解锁</span></div><div class="line">           &#125;</div><div class="line">       &#125;</div></pre></td></tr></table></figure>
+<h2 id="2-ThreadLocal当做一个HashMap来用就好了"><a href="#2-ThreadLocal当做一个HashMap来用就好了" class="headerlink" title="2. ThreadLocal当做一个HashMap来用就好了"></a>2. ThreadLocal当做一个HashMap来用就好了</h2><p><strong>volatile并不是Atomic操作，例如，A线程对volatile变量进行写操作(实际上是读和写操作)，B线程可能在这两个操作之间进行了写操作；</strong></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="http://blog.csdn.net/fw0124/article/details/6672522">看起来 ReentrantLock 无论在哪方面都比 synchronized 好</a></li>
+<li><a href="https://www.youtube.com/watch?v=yS0Nc-L1Uuk">Jesse Wilson - Coordinating Space and Time</a></li>
+<li><a href="http://www.cnblogs.com/xrq730/p/7048693.html">一级缓存，时钟周期</a>volatile硬件层面的实现原理<br>-</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;img src=&quot;http://odzl05jxx.bkt.clouddn.com/image/blog/be3c80a11edfd0fdb75d098550ed2c8e.jpg?imageView2/2/w/600&quot; alt=&quot;&quot;&gt;&lt;br&gt;
+    
+    </summary>
+    
+    
+      <category term="tools" scheme="https://haldir65.github.io/tags/tools/"/>
+    
+      <category term="concurrency" scheme="https://haldir65.github.io/tags/concurrency/"/>
+    
+      <category term="java" scheme="https://haldir65.github.io/tags/java/"/>
+    
+  </entry>
+  
+  <entry>
     <title>多线程断点续传原理及实现</title>
     <link href="https://haldir65.github.io/2017/08/01/2017-08-01-mutithread-downloader/"/>
     <id>https://haldir65.github.io/2017/08/01/2017-08-01-mutithread-downloader/</id>
     <published>2017-08-01T14:19:31.000Z</published>
-    <updated>2017-08-01T15:44:08.573Z</updated>
+    <updated>2017-08-05T14:33:32.968Z</updated>
     
     <content type="html"><![CDATA[<p>主要讲一下在java中实现多线程断点续传的原理,主要讲断点下载的原理。<br><img src="http://odzl05jxx.bkt.clouddn.com/4b52d8db2e9d86b95c730af1db127a81.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
 <p>其实就是在Http请求里面加上一个”range”的header，HttpUrlConnection可以这么干：</p>
@@ -29,11 +61,15 @@
 </ul>
 <p>也就是告诉服务器上次下载到的位置，本地写文件可以使用RandomAccessFile。本地需要记录下上次中断后停下来的位置。可以用db记录，也可以用sp记录。</p>
 <p>这里面的难点在于多线程同步问题，高效率锁。还得要使用ArrayBlockingQueue。</p>
+<h2 id="1-获取要下载的内容的contentLength"><a href="#1-获取要下载的内容的contentLength" class="headerlink" title="1. 获取要下载的内容的contentLength"></a>1. 获取要下载的内容的contentLength</h2><p>HttpUrlConnection有一个connection.getContentLength()方法，用于获取内容大小(bytes)</p>
+<h2 id="2-大文件上传避免oom"><a href="#2-大文件上传避免oom" class="headerlink" title="2. 大文件上传避免oom"></a>2. 大文件上传避免oom</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">Caused by java.lang.OutOfMemoryError: Failed to allocate a <span class="number">65548</span> <span class="keyword">byte</span> allocation with <span class="number">32012</span> free bytes and <span class="number">31</span>KB until OOM</div><div class="line">at com.android.okio.Segment.&lt;init&gt;(Segment.java:<span class="number">37</span>)</div><div class="line">at com.android.okio.SegmentPool.take(SegmentPool.java:<span class="number">48</span>)</div><div class="line">at com.android.okio.OkBuffer.writableSegment(OkBuffer.java:<span class="number">511</span>)</div><div class="line">at com.android.okio.OkBuffer.write(OkBuffer.java:<span class="number">424</span>)</div><div class="line">at com.android.okio.OkBuffer.clone(OkBuffer.java:<span class="number">740</span>)</div><div class="line">at com.android.okhttp.internal.http.RetryableSink.writeToSocket(RetryableSink.java:<span class="number">77</span>)</div><div class="line">at com.android.okhttp.internal.http.HttpConnection.writeRequestBody(HttpConnection.java:<span class="number">263</span>)</div><div class="line">at com.android.okhttp.internal.http.HttpTransport.writeRequestBody(HttpTransport.java:<span class="number">84</span>)</div><div class="line">at com.android.okhttp.internal.http.HttpEngine.readResponse(HttpEngine.java:<span class="number">790</span>)</div><div class="line">at com.android.okhttp.internal.http.HttpURLConnectionImpl.execute(HttpURLConnectionImpl.java:<span class="number">405</span>)</div><div class="line">at com.android.okhttp.internal.http.HttpURLConnectionImpl.getResponse(HttpURLConnectionImpl.java:<span class="number">349</span>)</div><div class="line">at com.android.okhttp.internal.http.HttpURLConnectionImpl.getResponseCode(HttpURLConnectionImpl.java:<span class="number">517</span>)</div><div class="line">at com.android.okhttp.internal.http.DelegatingHttpsURLConnection.getResponseCode(DelegatingHttpsURLConnection.java:<span class="number">105</span>)</div></pre></td></tr></table></figure>
+<p><a href="http://blog.sina.com.cn/s/blog_bfdb961b0101mkbo.html">参考</a> con.setChunkedStreamingMode(1024);//内部缓冲区—分段上传防止oom<br><a href="https://github.com/square/retrofit/issues/2270">解决方案</a>,RequestBody的contentLength设置为-1就好了<br><a href="http://www.cnblogs.com/begin1949/p/5060802.html">HttpURLConnection教程</a></p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="http://www.jianshu.com/p/2b82db0a5181">简书</a></li>
 <li><a href="https://github.com/AriaLyy/Aria">Demo</a></li>
 <li><a href="https://github.com/Aspsine/MultiThreadDownload">MultiThreadDownload for Android</a></li>
 <li><a href="http://blog.csdn.net/zhaokaiqiang1992/article/details/43939279">csdn</a></li>
+<li><a href="http://blog.csdn.net/chenrunhua/article/details/50113993">断点上传麻烦点，要自己搭server</a></li>
 </ul>
 ]]></content>
     
@@ -53,16 +89,103 @@
     <link href="https://haldir65.github.io/2017/07/30/2017-07-30-decoding-the-secret-of-binary/"/>
     <id>https://haldir65.github.io/2017/07/30/2017-07-30-decoding-the-secret-of-binary/</id>
     <published>2017-07-30T09:45:51.000Z</published>
-    <updated>2017-07-30T09:50:49.043Z</updated>
+    <updated>2017-08-12T10:54:49.670Z</updated>
     
-    <content type="html"><![CDATA[<p><img src="http://odzl05jxx.bkt.clouddn.com/01f691dea62d22e138481a353fbb6228.jpg?imageView2/2/w/600" alt=""></p>
+    <content type="html"><![CDATA[<p>OkHttp作者Jesse Wilson在2016 Droidcon NYC上作了一篇关于编码的演讲，十分有趣。对于了解计算机基础非常有用，结合着写一些关于这方面的笔记。<br><img src="http://odzl05jxx.bkt.clouddn.com/01f691dea62d22e138481a353fbb6228.jpg?imageView2/2/w/600" alt=""></p>
 <a id="more"></a>
+<h2 id="1-重新学习Java基本数据类型"><a href="#1-重新学习Java基本数据类型" class="headerlink" title="1.重新学习Java基本数据类型"></a>1.重新学习Java基本数据类型</h2><h3 id="基本数据类型之间的转换"><a href="#基本数据类型之间的转换" class="headerlink" title="基本数据类型之间的转换"></a>基本数据类型之间的转换</h3><p>初学java的时候都说没必要记住各种基本数据类型的大小范围。这里补上一些：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">byte：8位，最大存储数据量是255，存放的数据范围是-128~127之间。</div><div class="line"></div><div class="line">short：16位，最大数据存储量是65536，数据范围是-32768~32767之间。</div><div class="line"></div><div class="line">int：32位，最大数据存储容量是2的32次方减1，数据范围是负的2的31次方到正的2的31次方减1。</div><div class="line"></div><div class="line">long：64位，最大数据存储容量是2的64次方减1，数据范围为负的2的63次方到正的2的63次方减1。</div><div class="line"></div><div class="line">float：32位，数据范围在3.4e-45~1.4e38，直接赋值时必须在数字后加上f或F。</div><div class="line"></div><div class="line">double：64位，数据范围在4.9e-324~1.8e308，赋值时可以加d或D也可以不加。</div><div class="line"></div><div class="line">boolean：只有true和false两个取值。</div><div class="line"></div><div class="line">char：16位，存储Unicode码，用单引号赋值。</div></pre></td></tr></table></figure>
+<p>这个表的顺序是有道理的，byte-&gt;short-&gt;int-&gt;long这类表示的都是整数（不带小数点的）;<br>float-&gt;double这类表示的都是浮点数(计算机里没有小数点，都是用类似科学计数法来表示的);</p>
+<p>后面这俩比较特殊：<br>boolean只有两个值;<br>char专门用来表示Unicode码，最小值是0，最大值是65535(2^16-1);</p>
+<ul>
+<li>(这个范围是严格限定的，比如byte a = 127都没问题，byte a = 128 立马编译有问题。)<br>另外，char是为数不多的可以在java IDE里面像python一样写单引号的机会：<br>char c = ‘1’ // ok<br>char c = ‘12’//错误<br>char c = 12 //正确</li>
+</ul>
+<p>当一个较大的数和一个较小的数在一块运算的时候，系统会自动将较小的数转换成较大的数，再进行运算。<a href="http://www.cnblogs.com/doit8791/archive/2012/05/25/2517448.html">这里的大小指的是基本类型范围的大小</a><br>所以(byte、short、char) -&gt; int -&gt; long -&gt; float -&gt; double这么从小往大转是没有问题的。编译器自动转，所以经常不会被察觉。<br>byte、short、char这三个是平级的，相互转换也行。<br>试了下,<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">byte</span> b = <span class="number">3</span>;</div><div class="line"><span class="keyword">char</span> c = <span class="string">'2'</span>;</div><div class="line"><span class="keyword">short</span> s = <span class="number">23</span>;</div><div class="line"></div><div class="line">s = b; <span class="comment">//只有byte往上转short是自动的</span></div><div class="line">b = (<span class="keyword">byte</span>) s;</div><div class="line"></div><div class="line"></div><div class="line">s = (<span class="keyword">short</span>) c;</div><div class="line">c = (<span class="keyword">char</span>) s;</div><div class="line"></div><div class="line">b = (<span class="keyword">byte</span>) c;</div><div class="line">c = (<span class="keyword">char</span>) b;</div></pre></td></tr></table></figure></p>
+<p>强转就意味着可能的精度损失。</p>
+<p>所以除去boolean以外:</p>
+<ul>
+<li>char</li>
+<li>byte,short,int,long</li>
+<li>float,double<br>可以分成这三类，从小往大转没问题，同一类从小到大转没问题。</li>
+</ul>
+<p>具体到实际操作上：</p>
+<ol>
+<li>char-&gt;byte-&gt;short-&gt;int-&gt;long-&gt;float-&gt;double</li>
+<li>有一个操作数是long，结果是long</li>
+<li>有一个操作数是float,结果是float</li>
+<li>有一个操作数是double，结果是double</li>
+<li>long l = 424323L ,后面的L要大写。</li>
+<li>这些整数都是没办法表示一个小数的，要用float或者double，后面加上f（F）或者L。</li>
+<li>char(16位)，能表示的范围大小和short一样，是用单引号括起来的一个字符(可以是中文字符)，两个字符不行。</li>
+<li>char的原理就是转成int，根据unicode编码找到对应的符号并显示出来。</li>
+<li>两个char相加，就是转成int之后两个int相加</li>
+<li>double类型后面可以不写D</li>
+<li>float后面写f或者F都一样</li>
+</ol>
+<h2 id="2-Java中注意的点"><a href="#2-Java中注意的点" class="headerlink" title="2. Java中注意的点"></a>2. Java中注意的点</h2><p>java编译器将源代码编译位字节码时，会用int来表示boolean(非零表示真)<br>byte,short,int,long这些都是有符号的整数，八进制数以0开头，十六进制数字以0x开头<br>java7 开始 ，可以直接在代码里写二进制数，例如：<br>205 = 0b110_1101</p>
+<h2 id="3-Encoding解释"><a href="#3-Encoding解释" class="headerlink" title="3. Encoding解释"></a>3. Encoding解释</h2><ul>
+<li>hexadecimal 十六进制</li>
+<li>Decimal   十进制</li>
+<li>Octal     八进制</li>
+</ul>
+<h3 id="3-1-用二进制表示-0-1-任何文字的能力"><a href="#3-1-用二进制表示-0-1-任何文字的能力" class="headerlink" title="3.1 用二进制表示(0,1)任何文字的能力"></a>3.1 用二进制表示(0,1)任何文字的能力</h3><p>数据的发送方和接收方对传输数据的结构类型达成一致，即(Encoding)。</p>
+<p>8 bit = 1 Byte (为什么是8，据说60年代是6)，8bit能够表达的范围也就是2^8 = 0-256.<br>1967年，ASCII码诞生，即American Standard Code for Information Interchange，即将Byte转成文字的一张表。ASCII只用了7个bits，原因是当时硬件很贵。所以就能够表示128个字符。随便找了下这张表<br><img src="http://odzl05jxx.bkt.clouddn.com/ascii-Table.jpg" alt=""></p>
+<p>例如0表示NULL, 65表示A(大写),93表示标点符号”]”。<br>举例：单词Donut的每一个字母对应的ASCII分别是：<br>十进制 ：68  111 110 117 116<br>二进制: 01000100 01101111 01101110 01110101 01110100<br>所以这么发送出去，接收者就知道是Donut了</p>
+<h3 id="3-2-可是128个字符不足以表示世界上所有的文字"><a href="#3-2-可是128个字符不足以表示世界上所有的文字" class="headerlink" title="3.2 可是128个字符不足以表示世界上所有的文字"></a>3.2 可是128个字符不足以表示世界上所有的文字</h3><ul>
+<li><p>Charset  字符集<br>1991年出现Unicode，用于表示所有的字符，所有语言的每一个字符都能有一个唯一的id（数字）。为了能够表达这么大的一个范围，所以得多用点内存，于是UTF-16(16-bit Unicode Transformation Format)出现了，每一个字符都得用2bytes来表示。至于这张表的范围,2^16 = 65536(好熟悉的数字)，这也就是java的char类型的来源，char的定义就是<strong>16位Unicode字符</strong>。<br>这样做有一个显然的缺陷。<br>Unicode是ASCII的超集，D在ASCII中只要 01000100，在Unicode中却要在前面补上毫无意义的8个0，浪费了空间。</p>
+</li>
+<li><p>UTF-16最大范围65536</p>
+</li>
+<li>但还是没法表示一些特殊字符，例如Emoji,Dount Emoji的id是127,849。原因是90年代的设计者没有想到今天会出这么多emoji。解决办法是”surrogate pairs”。下面解释：<br>java的String其实不过是一个char Array的wrapper，如果在ide里面看的话，String里面的char[]每个数字都代表这个位置的Unicode id。所以经常在IDE里debu看到String里面有char[],1=”67”；2=“79”。。。这种东西，其实也就是这个String（字符串）中对应位置的字符的unicode码。对于Emoji，会用两个char来表示。如何确定相邻的两个字符应该用来表示一个Emoji而是两个独立的字符？<br>去看Emoji的Unicode表的话，这四个byte连在一起一般长这样：</li>
+<li>\xF0\x9F\x98\x81</li>
+<li>\xF0\x9F\x98\x82</li>
+<li>\xF0\x9F\x98\x83</li>
+<li>\xF0\x9F\x98\x84</li>
+</ul>
+<p>中间那个\x9F\x98就是surrogate pairs的标志<br>所以，要认识到char本身还是不足以表示所有的字符<br>这样的代码要是拿来打印Emoji，只会讲原本4byte的Emoji拆成2个char，所以就在console里面看到一些乱码。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">String s = &quot;一些包含Emoji的文字&quot;</div><div class="line">for(int i =0 ,size = s.length();i&lt;size;i++)&#123;</div><div class="line">    char c = s.charAt(i);</div><div class="line">    System.out.println(&quot;The Caharacter at %d is &apos;%c&apos;%n&quot;,i,c);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>正确的做法是:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">String s = &quot;一些包含Emoji的文字&quot;</div><div class="line">for(int i =0 ,size = s.length();i&lt;size;)&#123;</div><div class="line">    int c = s.codePointAt(i);</div><div class="line">    System.out.println(&quot;The Caharacter at %d is &apos;%c&apos;%n&quot;,i,c);</div><div class="line">    i+=Cahracter.charCount(c);//正确识别char数量</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="3-3-UTF-8出现"><a href="#3-3-UTF-8出现" class="headerlink" title="3.3 UTF-8出现"></a>3.3 UTF-8出现</h3><p>8-bit Unicode Transformation Format于1998年出现，之前提到了2个byte表示一个字符实在太浪费了，utf-8的做法是将每个字符所需要的长度变成可变的。</p>
+<ul>
+<li>多数字符只用1byte，有些用到2,3个byte，Donut的Emoji用4bytes.</li>
+</ul>
+<p>&lt;=7个bit的（ASCII）： 0XXXXXX (我用X表示可以被填充的空间)<br>&lt;=11个bit  ：110XXXXX 10XXXXXX (第一个byte以110开头，后面以10开头)<br>&lt;=16个bit :  1110XXXX 10XXXXXX 10XXXXXX (第一个byte以1110开头，后面跟两个10开头的bytes)<br>&lt;=21个bit :  11110XXX 10XXXXXX 10XXXXXX 10XXXXXX (第一个byte以11110开头，后面跟三个10开头的bytes)</p>
+<p>现在来看看网上那些常用的中文转UTF-8工具怎么用，随便找一个找一个站长之家<br>输入“美” ，对应的utf-8编码是”&amp;#x7F8E”，转Unicode是”\u7f8e”<br>查了下“美”这个字还真是“7F8E”。这里有张比较好的<a href="http://www.chi2ko.com/tool/CJK.htm">表格</a>。<br>二进制转unicode直接粘贴到<a href="http://tool.oschina.net/hexconvert">这里</a>的转16进制就可以了。转utf-8的话，来看这个其实是15个bit。所以这样写<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">7F8E显然是16进制，转成十进制是32654。</div><div class="line">转成二进制是11111111 0001110(注意只有15个bit,前面8个1)。</div><div class="line">转utf-8的时候，从后往前往上面的XXXX里面填充</div><div class="line"></div><div class="line">1110XXXX 10XXXXXX 10XXXXXX就变成了</div><div class="line">1110X111 10111110 10001110（注意有一个位置还空着）</div><div class="line">X用0补上，最终得到汉字&quot;美&quot;的utf-8二进制编码</div><div class="line">11100111 10111110 10001110</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">读取的时候</div><div class="line">1111 111100 01110(7f8e)</div></pre></td></tr></table></figure></p>
+<p>，这三个byte就代表汉字”美”。</p>
+<h2 id="4-接下来讲颜色"><a href="#4-接下来讲颜色" class="headerlink" title="4.接下来讲颜色"></a>4.接下来讲颜色</h2><p>颜色就是RGB的组合,屏幕中每一个像素都是由三个subPixel组成的(分别是红绿蓝)，所以在ps里面经常会碰到255,XXX,XXX这种东西。<br>0,0,0代表全黑，255,255,255(0-256也就是一个byte能够表达的范围)代表纯白。其他的颜色都是这三种颜色的组合，所以用三个byte就能表达一种颜色。<br>所以经常在java代码里看到：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">view.setBackgroundColor(Color.parseColor(&quot;#87CEFA&quot;));//三个bytes</div><div class="line">//或者</div><div class="line">Color.RED</div><div class="line">//还有更好玩的</div><div class="line">tv.setTextColor(Color.rgb(255, 255, 255));</div><div class="line">//&quot;#XX XX XX&quot; 十六进制，256的范围，只需要2位数字就好了，所以总是看到00,01,10,...ff这样</div></pre></td></tr></table></figure></p>
+<p>在xml里面是这样的<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</div><div class="line"><span class="tag">&lt;<span class="name">resources</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">color</span> <span class="attr">name</span>=<span class="string">"wl_blue"</span>&gt;</span>#2878ff<span class="tag">&lt;/<span class="name">color</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">color</span> <span class="attr">name</span>=<span class="string">"wl_gray"</span>&gt;</span>#c1c1c1<span class="tag">&lt;/<span class="name">color</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">color</span> <span class="attr">name</span>=<span class="string">"text_color"</span>&gt;</span>#434343<span class="tag">&lt;/<span class="name">color</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">resources</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>只不过少写了0x而已<br>关于十六进制，多说一点</p>
+<ul>
+<li>Colors: #ffffff</li>
+<li>URL escaping:<a href="http://example.com/?q=hello%20world">http://example.com/?q=hello%20world</a></li>
+<li>Unicode code points: U+2020</li>
+<li>ipv6地址： 2001∶0d02∶0000∶0000∶0014∶0000∶0000∶0095</li>
+</ul>
+<p>都是十六进制(Dexadecimal)的应用</p>
+<h2 id="5-有了颜色就有了图片"><a href="#5-有了颜色就有了图片" class="headerlink" title="5.有了颜色就有了图片"></a>5.有了颜色就有了图片</h2><p>3个小像素组成一个像素，屏幕上无数个像素(颜色的点,每个像素大小为3bytes)组成了图片，图片只是一个颜色的2维数组(数组的每个元素是一个颜色)。<br>那么一张64<em>64pixel的图标大小为，64</em>64<em>3 = 12 288bytes，现在的屏幕动辄百万像素，1980</em>1080的图片，大小是1980<em>1080</em>3 = 6.4MB。现在明白Android上图片为什么这么容易oom了吧。这还只是rgb，其实正规图片应该还有一个Alpha，即ARGB,好了，这下占用了1920<em>1080</em>4 = 8MB。所以Android在Bitmap里面提供了一些<a href="https://developer.android.com/reference/android/graphics/Bitmap.Config.html#ARGB_8888">选项</a>：</p>
+<p>BitMap.config.ALPAH_8 ：只存储透明度，不存储颜色信息</p>
+<p>BitMap.config.ARGB_4444(Deprecated) ：Each pixel is stored on 2 bytes. (节省了一般)</p>
+<p>BitMap.config.ARGB_8888 : Each pixel is stored on 4 bytes. Each channel (RGB and alpha for translucency) is stored with 8 bits of precision (256 possible values.) This configuration is very flexible and offers the best quality. It should be used whenever possible.这也就是上面提到的一个像素三个小像素外加一个透明度的算法。</p>
+<p>Bitmap.Config RGB_565： Each pixel is stored on 2 bytes and only the RGB channels are encoded。(能这么省是因为这里面用5bit表示red，6bit表示green，5bit表示blue，这个划分似乎是UI行业的标准，用了一些近似算法。所以经常看到有人拿着两张ARGB_8888和RGB_565的图片来比较，然后批判RGB_565颜色不准)。RBG_565本来就不是冲着颜色准确去的。其实还有RBG_232这种更加不准确的。</p>
+<p>日常开发都是用的ARGB_8888,一个像素要用4bytes内存，所以bitmap真的非常耗内存。</p>
+<h2 id="6-来看一张图片是怎么写出来的-在文件系统中"><a href="#6-来看一张图片是怎么写出来的-在文件系统中" class="headerlink" title="6.来看一张图片是怎么写出来的(在文件系统中)"></a>6.来看一张图片是怎么写出来的(在文件系统中)</h2><p>我这里直接把Jesse Wilson的<a href="https://github.com/swankjesse/encoding/blob/master/encoding/src/main/java/com/publicobject/encoding/Bitmap.java">代码</a>复制过来，大意就是写一个bmp文件的方法，先写文件头，然后从那个int[][]中读取数组，写进一个文件，也就得到一个.bmp文件了。文件就是这么写的。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Bitmap</span> </span>&#123;</div><div class="line">  <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span>[][] pixels;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="title">Bitmap</span><span class="params">(<span class="keyword">int</span>[][] pixels)</span> </span>&#123;</div><div class="line">    <span class="keyword">this</span>.pixels = pixels;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="comment">/** https://en.wikipedia.org/wiki/BMP_file_format */</span></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">encode</span><span class="params">(BufferedSink sink)</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">    <span class="keyword">int</span> height = pixels.length;</div><div class="line">    <span class="keyword">int</span> width = pixels[<span class="number">0</span>].length;</div><div class="line"></div><div class="line">    <span class="keyword">int</span> bytesPerPixel = <span class="number">3</span>;</div><div class="line">    <span class="keyword">int</span> rowByteCountWithoutPadding = (bytesPerPixel * width);</div><div class="line">    <span class="keyword">int</span> rowByteCount = ((rowByteCountWithoutPadding + <span class="number">3</span>) / <span class="number">4</span>) * <span class="number">4</span>;</div><div class="line">    <span class="keyword">int</span> pixelDataSize = rowByteCount * height;</div><div class="line">    <span class="keyword">int</span> bmpHeaderSize = <span class="number">14</span>;</div><div class="line">    <span class="keyword">int</span> dibHeaderSize = <span class="number">40</span>;</div><div class="line"></div><div class="line">    <span class="comment">// BMP Header</span></div><div class="line">    sink.writeUtf8(<span class="string">"BM"</span>); <span class="comment">// ID.</span></div><div class="line">    sink.writeIntLe(bmpHeaderSize + dibHeaderSize + pixelDataSize); <span class="comment">// File size.</span></div><div class="line">    sink.writeShortLe(<span class="number">0</span>); <span class="comment">// Unused.</span></div><div class="line">    sink.writeShortLe(<span class="number">0</span>); <span class="comment">// Unused.</span></div><div class="line">    sink.writeIntLe(bmpHeaderSize + dibHeaderSize); <span class="comment">// Offset of pixel data.</span></div><div class="line"></div><div class="line">    <span class="comment">// DIB Header</span></div><div class="line">    sink.writeIntLe(dibHeaderSize);</div><div class="line">    sink.writeIntLe(width);</div><div class="line">    sink.writeIntLe(height);</div><div class="line">    sink.writeShortLe(<span class="number">1</span>);  <span class="comment">// Color plane count.</span></div><div class="line">    sink.writeShortLe(bytesPerPixel * Byte.SIZE);</div><div class="line">    sink.writeIntLe(<span class="number">0</span>);    <span class="comment">// No compression.</span></div><div class="line">    sink.writeIntLe(<span class="number">16</span>);   <span class="comment">// Size of bitmap data including padding.</span></div><div class="line">    sink.writeIntLe(<span class="number">2835</span>); <span class="comment">// Horizontal print resolution in pixels/meter. (72 dpi).</span></div><div class="line">    sink.writeIntLe(<span class="number">2835</span>); <span class="comment">// Vertical print resolution in pixels/meter. (72  dpi).</span></div><div class="line">    sink.writeIntLe(<span class="number">0</span>);    <span class="comment">// Palette color count.</span></div><div class="line">    sink.writeIntLe(<span class="number">0</span>);    <span class="comment">// 0 important colors.</span></div><div class="line"></div><div class="line">    <span class="comment">// Pixel data.</span></div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> y = height - <span class="number">1</span>; y &gt;= <span class="number">0</span>; y--) &#123;</div><div class="line">      <span class="keyword">int</span>[] row = pixels[y];</div><div class="line">      <span class="keyword">for</span> (<span class="keyword">int</span> x = <span class="number">0</span>; x &lt; width; x++) &#123;</div><div class="line">        <span class="keyword">int</span> pixel = row[x];</div><div class="line">        sink.writeByte((pixel &amp; <span class="number">0x0000ff</span>));       <span class="comment">// Blue.</span></div><div class="line">        sink.writeByte((pixel &amp; <span class="number">0x00ff00</span>) &gt;&gt; <span class="number">8</span>);  <span class="comment">// Green.</span></div><div class="line">        sink.writeByte((pixel &amp; <span class="number">0xff0000</span>) &gt;&gt; <span class="number">16</span>); <span class="comment">// Red.</span></div><div class="line">      &#125;</div><div class="line"></div><div class="line">      <span class="comment">// Padding for 4-byte alignment.</span></div><div class="line">      <span class="keyword">for</span> (<span class="keyword">int</span> p = rowByteCountWithoutPadding; p &lt; rowByteCount; p++) &#123;</div><div class="line">        sink.writeByte(<span class="number">0</span>);</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">encodeToFile</span><span class="params">(File file)</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">    <span class="keyword">try</span> (BufferedSink sink = Okio.buffer(Okio.sink(file))) &#123;</div><div class="line">      encode(sink);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里没有考虑压缩算法。这里面还有Big Ending和Small Ending的处理。<br>Big Ending： 拿32bit ，一次读8bit，从左到右<br>Little Ending: 拿32bit ,一次读8bit，从右到左读</p>
+<h2 id="7-从json到protoBuffer以及http2"><a href="#7-从json到protoBuffer以及http2" class="headerlink" title="7.从json到protoBuffer以及http2"></a>7.从json到protoBuffer以及http2</h2><p>一般我们看到的json是这样的<br><figure class="highlight json"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  <span class="attr">"price"</span>: <span class="number">14</span>,</div><div class="line">  <span class="attr">"gender"</span>: <span class="literal">true</span>,</div><div class="line">  <span class="attr">"height"</span>: <span class="number">1.65</span>,</div><div class="line">  <span class="attr">"grade"</span>: <span class="literal">null</span>,</div><div class="line">  <span class="attr">"time"</span>: ,<span class="attr">"2016-09-30T18:30:00Z"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>注意那个事件戳，时间戳本可以用long(8bytes)表示，这上面的String的每个字符都在英文或者阿拉伯数字，所以在ASCII内，所以一个字符按照utf-8编码的话也就1byte，一个个数下来也有二十多个bytes。从8bytes到二十多个bytes，浪费了一半多的bits。数据量越大，编码越慢，传输越慢，解码越慢。</p>
+<p>来看protocolBuffer，protocolBuffer一般长这样，每一个field都有一个独一无二的tag.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">message Person &#123;</div><div class="line">  required string name = 1;</div><div class="line">  required int32 id = 2;</div><div class="line">  optional string email = 3;</div><div class="line"></div><div class="line">  enum PhoneType &#123;</div><div class="line">    MOBILE = 0;</div><div class="line">    HOME = 1;</div><div class="line">    WORK = 2;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  message PhoneNumber &#123;</div><div class="line">    required string number = 1;</div><div class="line">    optional PhoneType type = 2 [default = HOME];</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  repeated PhoneNumber phone = 4;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>以 optional string email = 3 为例，ProtocolBuffer定义了一个length mode（enum,int32,int64是000,fixed64是001，String,message是010），拿一个byte出来，先把后面三位填上010，即XXXXX010，然后把3在前面，即00011010，一共只用了一个byte就把String email这句话表示出来了。即protobuffer只需一个byte就能表示key,同样的key，json要12byte（utf-8下一个字母一个byte）。value也是一样，转成hex的形式。<br>印象中http2也是用数字来表示header key的，类似的节省数据的道理。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
+<li>软件开发能够接触到的最小单位byte就是8个排在一起的可以盛放0或者1的小槽子。从60年代的ASCII到后来的utf-8再到今天的utf-8，成熟的业界标准使得计算机行业能够跨语言形成信息处理，传输，消费的统一化，同时兼顾了效率。</li>
+<li>图片只是无数颜色的组合，用byte表示RGB的方式使得电子产品显示图片变为可能。</li>
+<li>在数据传输中，数据传输双方可以协商采取合理的传输协议，让通信量变得小，通信速度变快。</li>
+<li>hexadecimal简化了写无数个01的过程，日常开发尽量写0xffffff这种形式。两个十六进制数字的组合通常代表一个byte的范围。</li>
+</ol>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.youtube.com/watch?v=T_p22jMZSrk">Jesse Wilson | Decoding the Secrets of Binary Data </a></p>
 ]]></content>
     
     <summary type="html">
     
-      &lt;p&gt;&lt;img src=&quot;http://odzl05jxx.bkt.clouddn.com/01f691dea62d22e138481a353fbb6228.jpg?imageView2/2/w/600&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+      &lt;p&gt;OkHttp作者Jesse Wilson在2016 Droidcon NYC上作了一篇关于编码的演讲，十分有趣。对于了解计算机基础非常有用，结合着写一些关于这方面的笔记。&lt;br&gt;&lt;img src=&quot;http://odzl05jxx.bkt.clouddn.com/01f691dea62d22e138481a353fbb6228.jpg?imageView2/2/w/600&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
     
     </summary>
     
@@ -78,7 +201,7 @@
     <link href="https://haldir65.github.io/2017/07/23/2017-07-23-manipulating-bits/"/>
     <id>https://haldir65.github.io/2017/07/23/2017-07-23-manipulating-bits/</id>
     <published>2017-07-23T11:06:46.000Z</published>
-    <updated>2017-08-01T13:46:02.357Z</updated>
+    <updated>2017-08-12T03:09:58.641Z</updated>
     
     <content type="html"><![CDATA[<p>位运算的好处至少有两点，由于是直接操作bit,没有任何包装类，速度快。另外一个就是节省内存了。</p>
 <p><img src="http://odzl05jxx.bkt.clouddn.com/8af185ed137a586be732d63425d8bcb8.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
@@ -92,8 +215,14 @@
 <p>注意，正数或者负数左移，低位都是用0补</p>
 <h2 id="4-位与-amp"><a href="#4-位与-amp" class="headerlink" title="4. 位与(&amp;)"></a>4. 位与(&amp;)</h2><p>看实例:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;  </div><div class="line">       System.out.println(<span class="number">5</span> &amp; <span class="number">3</span>);<span class="comment">//结果为1  </span></div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
 <p>原因： 5的二进制是： 0000 0000 0000 0000 0000 0000 0000 0101<br>      3的二进制是：  0000 0000 0000 0000 0000 0000 0000 0011<br>同一位上必须都为1，结果才为1，否则为0；于是结果就得到：<br>      0000 0000 0000 0000 0000 0000 0000 0001 = 1</p>
-<h2 id="5-位或（-）"><a href="#5-位或（-）" class="headerlink" title="5. 位或（|）"></a>5. 位或（|）</h2><p>和位与相反<br>同一位上只要有一个为1，就为1.只有两个都为0，才为0.<br>所以 (5|3) = 7(这让人想到linux文件权限的777)<br>其实就是 111 111 111 （owner,creater,others）</p>
-<h2 id="6-位异或"><a href="#6-位异或" class="headerlink" title="6. 位异或(^)"></a>6. 位异或(^)</h2><p>// 1. 获得int型最大值<br>System.out.println((1 &lt;&lt; 31) - 1);// 2147483647， 由于优先级关系，括号不可省略<br>System.out.println(~(1 &lt;&lt; 31));// 2147483647</p>
+<h2 id="5-位或（-）"><a href="#5-位或（-）" class="headerlink" title="5. 位或（|）"></a>5. 位或（|）</h2><p>和位与相反<br>同一位上只要有一个为1，就为1.只有两个都为0，才为0.<br>二进制下：<br>      5的二进制是： 0000 0000 0000 0000 0000 0000 0000 0101<br>      3的二进制是： 0000 0000 0000 0000 0000 0000 0000 0011<br>所以结果是 7        0000 0000 0000 0000 0000 0000 0000 0111<br>所以 (5|3) = 7(这让人想到linux文件权限的777)</p>
+<p>其实就是 111 111 111 （owner,creater,others）</p>
+<h2 id="6-位异或"><a href="#6-位异或" class="headerlink" title="6. 位异或(^)"></a>6. 位异或(^)</h2><p>还是拿5和3一起算<br>第一个操作数的的第n位于第二个操作数的第n位 相反，那么结果的第n为也为1，否则为0<br>二进制下：<br>      5的二进制是： 0000 0000 0000 0000 0000 0000 0000 0101<br>      3的二进制是： 0000 0000 0000 0000 0000 0000 0000 0011<br>所以结果是 6        0000 0000 0000 0000 0000 0000 0000 0110<br>所以a^b可以用来判断两个Flag前后有没有发生变化，有时候如果发现前后flag没有变化，即不操作。</p>
+<h2 id="7-位非"><a href="#7-位非" class="headerlink" title="7.位非(~)"></a>7.位非(~)</h2><p>位非是一元操作符，对一个数进行操作<br>位非：操作数的第n位为1，那么结果的第n位为0，反之为1，就是所有的1变成0,0变成1。<br> 5的二进制是： 0000 0000 0000 0000 0000 0000 0000 0101<br> 倒过来就是：  1111 1111 1111 1111 1111 1111 1111 1010<br>负整数转二进制的标准方法：先是将对应的正整数转换成二进制后，对二进制取反，然后对结果再加一。</p>
+<h2 id="8-一些衍生的操作符"><a href="#8-一些衍生的操作符" class="headerlink" title="8.一些衍生的操作符"></a>8.一些衍生的操作符</h2><p>从上面的一些基本操作符衍生来的有</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&amp;= 按位与赋值</div><div class="line">|=  按位或赋值</div><div class="line">^= 按位非赋值</div><div class="line">&gt;&gt;= 右移赋值</div><div class="line">&gt;&gt;&gt;= 无符号右移赋值</div><div class="line">&lt;&lt;= 赋值左移</div></pre></td></tr></table></figure>
+<p>和+=一个意思。至于那个运算符优先级，算了吧。</p>
+<h2 id="9-一些常用的小技巧"><a href="#9-一些常用的小技巧" class="headerlink" title="9.一些常用的小技巧"></a>9.一些常用的小技巧</h2><p>// 1. 获得int型最大值<br>System.out.println((1 &lt;&lt; 31) - 1);// 2147483647， 由于优先级关系，括号不可省略<br>System.out.println(~(1 &lt;&lt; 31));// 2147483647</p>
 <p>// 2. 获得int型最小值<br>System.out.println(1 &lt;&lt; 31);<br>System.out.println(1 &lt;&lt; -1);</p>
 <p>// 3. 获得long类型的最大值<br>System.out.println(((long)1 &lt;&lt; 127) - 1);</p>
 <p>// 4. 乘以2运算<br>System.out.println(10&lt;&lt;1);</p>
@@ -113,9 +242,19 @@
 <p>// 18. 从低位到高位.将n的第m位置为1<br>System.out.println(n | (1&lt;&lt;(m-1)));<br>/<em>将1左移m-1位找到第m位，得到000…1…000<br>n在和这个数做或运算</em>/</p>
 <p>// 19. 从低位到高位,将n的第m位置为0<br>System.out.println(n &amp; ~(0&lt;&lt;(m-1)));<br>/<em> 将1左移m-1位找到第m位，取反后变成111…0…1111<br>n再和这个数做与运算</em>/</p>
 <h2 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h2><ol>
-<li>记得Chet Haase和Romain Guy曾经在2013年的一次<a href="https://www.youtube.com/watch?v=Ho-anLsWvJo">演讲</a>中提到,Android中View内部使用了3个byte来表示70多个Flags。如果换做boolean(4byte大小)的话，就需要接近300bytes。由于View在Application中被广泛（成百上千）使用，framework这样做事实上为开发者节约了相当多的内存。、</li>
-<li>不要迷信位运算，对于一些简单的操作，现代编译器还是能够帮助开发者自动做好优化的。</li>
+<li>记得Chet Haase和Romain Guy曾经在2013年的一次<a href="https://www.youtube.com/watch?v=Ho-anLsWvJo">演讲</a>中提到,Android中View内部使用了3个int来表示70多个Flags。如果换做boolean(4byte大小)的话，就需要接近300bytes。由于View在Application中被广泛（成百上千）使用，framework这样做事实上为开发者节约了相当多的内存。<br>android.view.View.java<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">int mPrivateFlags;</div><div class="line">int mPrivateFlags2;</div><div class="line">int mPrivateFlags3;</div></pre></td></tr></table></figure>
+</li>
 </ol>
+<p>int中的每一个bit都成为一个boolean，一共只用了12bytes(96bits)的内存.和300bytes相比，节省的内存总量还是相当可观的。<br>一个onClickListener大概500bytes<br>所以View.java中到处是这样的奇怪的Flags<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setDrawingCacheEnabled</span><span class="params">(<span class="keyword">boolean</span> enabled)</span> </span>&#123;</div><div class="line">      mCachingFailed = <span class="keyword">false</span>;</div><div class="line">      setFlags(enabled ? <span class="number">0x00008000</span> : <span class="number">0</span>, <span class="number">0x00008000</span>);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="meta">@ViewDebug</span>.ExportedProperty(category = <span class="string">"drawing"</span>)</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isDrawingCacheEnabled</span><span class="params">()</span> </span>&#123;</div><div class="line">      <span class="keyword">return</span> (mViewFlags &amp; <span class="number">0x00008000</span>) == <span class="number">0x00008000</span>;</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
+<p>除了省内存，位运算速度快也有一定的好处。</p>
+<ol>
+<li><p>不要迷信位运算，对于一些简单的操作，现代编译器还是能够帮助开发者自动做好优化的。</p>
+</li>
+<li><p>从java7开始，可以在java代码里<a href="https://www.bbsmax.com/A/xl569bA1Jr/">直接写二进制，八进制，十六进制的数字了</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//16进制</span></div><div class="line">jdk6写法：</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line"> </div><div class="line">         <span class="keyword">int</span> res = Integer.parseInt(<span class="string">"A"</span>, <span class="number">16</span>);</div><div class="line">         System.out.println(res);</div><div class="line">     &#125;</div><div class="line">jdk7写法：</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line"> </div><div class="line">         <span class="keyword">int</span> res = <span class="number">0xA</span>;</div><div class="line">         System.out.println(res);</div><div class="line">     &#125;</div><div class="line"></div><div class="line"><span class="comment">// 8进制</span></div><div class="line">jdk6写法:</div><div class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line"> </div><div class="line">         <span class="keyword">int</span> res = Integer.parseInt(<span class="string">"11"</span>,<span class="number">8</span>);</div><div class="line">         System.out.println(res);</div><div class="line">     &#125;</div><div class="line">jdk7写法:</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line"> </div><div class="line">         <span class="keyword">int</span> res = <span class="number">011</span>;</div><div class="line">         System.out.println(res);</div><div class="line">     &#125;</div><div class="line"></div><div class="line"><span class="comment">//二进制</span></div><div class="line">jdk6写法:</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line"> </div><div class="line">         <span class="keyword">int</span> res = Integer.parseInt(<span class="string">"1100110"</span>, <span class="number">2</span>);</div><div class="line">         System.out.println(res);</div><div class="line">     &#125;</div><div class="line">jdk7写法:</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line"> </div><div class="line">         <span class="keyword">int</span> res = <span class="number">0b1100110</span>;</div><div class="line">         System.out.println(res);</div><div class="line">     &#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>即：<br>二进制： int res = 0b110; 六（0B也行，0b01_10010_0这种加下划线也行）<br>八进制： int res = 0110; 七十二<br>十六进制： int res = 0xA;  十</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="https://my.oschina.net/xianggao/blog/412967">Java位运算操作全面总结</a></li>
 <li><a href="http://blog.csdn.net/xiaochunyong/article/details/7748713">Java 位运算(移位、位与、或、异或、非）</a></li>
@@ -197,7 +336,7 @@
     <link href="https://haldir65.github.io/2017/07/23/2017-07-23-from-java-code-to-java-heap/"/>
     <id>https://haldir65.github.io/2017/07/23/2017-07-23-from-java-code-to-java-heap/</id>
     <published>2017-07-23T11:02:52.000Z</published>
-    <updated>2017-08-01T13:41:18.468Z</updated>
+    <updated>2017-08-12T03:09:58.632Z</updated>
     
     <content type="html"><![CDATA[<p><img src="http://odzl05jxx.bkt.clouddn.com/9b157a7acab582078ac1fabada5c8009.jpg?imageView2/2/w/600" alt=""><br>面向对象语言就意味着对象要占用内存空间，那么，java中随便new 出来的东西到底多大？还有，new出来的东西全都都放在heap上吗(有些真不是)？<br><a id="more"></a></p>
 <h2 id="1-首先给出精确判断Object大小的一种方法"><a href="#1-首先给出精确判断Object大小的一种方法" class="headerlink" title="1.首先给出精确判断Object大小的一种方法"></a>1.首先给出精确判断Object大小的一种方法</h2><p>一个判断Java Object大小的方法<br>比较精准的确定一个对象的大小的<a href="https://github.com/liaohuqiu/java-object-size">方法</a>:</p>
@@ -273,6 +412,7 @@
 <li><a href="http://www.jianshu.com/p/2f663dc820d0">boolean数组中一个值占用1bit</a></li>
 <li><a href="http://www.yunweipai.com/archives/1092.html">不同jdk版本String做的优化</a></li>
 <li><a href="http://www.cnblogs.com/xrq730/p/6928133.html">对象头里面的lock是怎么用的</a></li>
+<li><a href="https://academy.realm.io/posts/360-andev-2017-romain-guy-chet-haase-android-performance/">Android里面的一个View大概0.5kb</a></li>
 </ul>
 ]]></content>
     
@@ -692,7 +832,7 @@
     <link href="https://haldir65.github.io/2017/07/12/2017-07-12-android-cookbook/"/>
     <id>https://haldir65.github.io/2017/07/12/2017-07-12-android-cookbook/</id>
     <published>2017-07-12T00:40:08.000Z</published>
-    <updated>2017-08-01T15:45:39.753Z</updated>
+    <updated>2017-08-12T03:09:58.613Z</updated>
     
     <content type="html"><![CDATA[<p>A Cookbook shall look like a collection of Recipes, or an index page from where dinner are made. And it keeps you sane.<br><img src="http://odzl05jxx.bkt.clouddn.com/Cg-4zFVJ0xGITwm_AA688WRj8n8AAXZ9wGMpd0ADr0J195.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
 <p>github上已经star了四百多个项目，应该复习下了。</p>
@@ -708,8 +848,7 @@
 <h2 id="跟java相关的"><a href="#跟java相关的" class="headerlink" title="跟java相关的"></a>跟java相关的</h2><p><a href="http://haldir65.github.io/2017/06/25/2017-06-12-Collections-Refuled-by-Stuart-Marks/">java集合类的实现原理</a><br><a href="http://haldir65.github.io/2017/04/30/2017-04-30-concurrency-and-beyond/">Java线程池的一些点</a><br><a href="http://haldir65.github.io/2016/12/31/2016-12-31-Eliminating-BoilPlate-AnnotationProcessor/">使用AnnotationProcessor自动生成代码</a><br><a href="http://haldir65.github.io/2017/05/24/2017-05-24-jvm-architecture/">翻译了一个印度口音的关于jvm架构的视频</a></p>
 <ul>
 <li><a href="http://haldir65.github.io/2017/07/23/2017-07-23-from-java-code-to-java-heap/">一个Java Object到底占用多少内存(from java code to java heap)</a></li>
-<li><a href="http://haldir65.github.io/2017/07/23/2017-07-23-lru-cache-and-more/">LruCache的原理</a></li>
-<li></li>
+<li><a href="http://haldir65.github.io/2017/07/23/2017-07-23-lru-cache-and-more/">LruCache的原理</a><br>-</li>
 </ul>
 <h2 id="工具书"><a href="#工具书" class="headerlink" title="工具书"></a>工具书</h2><p><a href="http://haldir65.github.io/2016/09/27/git-manual/">git常用操作手册</a><br><a href="http://haldir65.github.io/2016/12/10/2016-12-10-adb-command/">adb常用命令手册</a></p>
 <h2 id="杂乱的点"><a href="#杂乱的点" class="headerlink" title="杂乱的点"></a>杂乱的点</h2><p><a href="http://haldir65.github.io/2017/06/17/2017-06-17-tiny-details-in-java/">java中的任何细碎的点</a></p>
@@ -724,11 +863,10 @@
 <li>[ ] 垃圾回收器的分类及优缺点</li>
 <li>[ ] ThreadLocal原理及可能的内存泄漏</li>
 <li>[ ] Understanding Dagger2’s generated code</li>
-<li>[ ] volatile硬件层面的实现原理<a href="http://www.cnblogs.com/xrq730/p/7048693.html">一级缓存，时钟周期</a></li>
 <li>[ ] 单例模式需要考虑到jvm优化的问题（为什么要写两个synchronized）</li>
 <li>[ ] java类加载机制(classLoader相关的，类的加载顺序)</li>
 <li>[ ] Java四种引用</li>
-<li>[ ] Future和FutureTask这些怎么用</li>
+<li>[ ] Future和FutureTask,CompletableFuture这些怎么用</li>
 <li>[ ]<a href="http://blog.csdn.net/briblue/article/details/76223206">反射</a></li>
 <li>[ ] java堆和栈的区别，如何判断堆栈上的对象死没死</li>
 <li>[ ] 自己写一个一部图片加载框架，并发图像滤镜框架</li>
@@ -736,6 +874,7 @@
 <li>[ ] 并发编程，java.util.concurrent里面的类熟练掌握，粗略了解原理</li>
 <li>[ ]写一个<a href="https://github.com/Mr-YangCheng/ForAndroidInterview/blob/master/java/%5BJava%5D%20%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E7%94%9F%E4%BA%A7%E8%80%85%E6%B6%88%E8%B4%B9%E8%80%85%E9%97%AE%E9%A2%98%E7%9A%84%E4%BA%94%E7%A7%8D%E5%90%8C%E6%AD%A5%E6%96%B9%E6%B3%95%E5%AE%9E%E7%8E%B0.md">生产者消费者</a>模型</li>
 <li>[ ] HashMap和conrrentHashmap区别(分段锁比较难)</li>
+<li>[ ] java的包结构：java.lang(Language核心类);java.io(I/O相关);java.util(包含collection和concurrent);java.nio(另一种I/O);java.net(网络操作)</li>
 </ul>
 <p>Android相关</p>
 <ul>
@@ -763,6 +902,7 @@
 <ul>
 <li>[ ] linux进程间通信方式有哪些（信号量这种）</li>
 <li>[ ] Linux command extended</li>
+<li>[ ] 搭建mail服务</li>
 </ul>
 <p>网络通信</p>
 <ul>
@@ -772,12 +912,16 @@
 </ul>
 <p>Gradle相关</p>
 <ul>
-<li>[ ]写一些DSL吧</li>
+<li>[ ]写一些DSL吧<a href="https://github.com/Ccixyj/JBusDriver">Old Driver</a></li>
 </ul>
 <p>数据库相关</p>
 <ul>
 <li>[ ] MySql从入门到删库跑路</li>
 <li>[ ] Realm的优点</li>
+</ul>
+<p>C语言从入门到放弃</p>
+<ul>
+<li>[ ] 加载ffmpeg需要，不得不学<a href="http://blog.csdn.net/leixiaohua1020/article/details/47008825">ffmpeg教程</a></li>
 </ul>
 <p>数据结构，算法</p>
 <ul>
@@ -785,6 +929,7 @@
 <li>[ ] 编码，底层二进制</li>
 <li>[ ] 二分法查找，排序，冒泡，复杂度</li>
 <li>[ ] 数组跟链表区别,数组跟链表排序时区别,数组跟链表排序时区别</li>
+<li>[ ] 八大排序<a href="http://www.cnblogs.com/123hll/p/6903454.html">算法</a></li>
 </ul>
 <h2 id="一些需要看的演讲"><a href="#一些需要看的演讲" class="headerlink" title="一些需要看的演讲"></a>一些需要看的演讲</h2><p><a href="https://www.youtube.com/watch?v=WvyScM_S88c">Droidcon Montreal Jake Wharton - A Few Ok Libraries</a><br><a href="https://www.youtube.com/watch?v=N3J4ZFiR_3Q">Advanced Scrolling Techniques on Android</a></p>
 <h2 id="一些有名的人"><a href="#一些有名的人" class="headerlink" title="一些有名的人"></a>一些有名的人</h2><p><a href="https://developers.google.com/experts/all/technology/android">GDE</a><br>Dianne Hackborn<br><a href="https://github.com/swankjesse">Jesse Wilson</a></p>
@@ -1195,7 +1340,7 @@ Deque(双端队列)
     <link href="https://haldir65.github.io/2017/06/18/2017-06-18-linux-commands-extended/"/>
     <id>https://haldir65.github.io/2017/06/18/2017-06-18-linux-commands-extended/</id>
     <published>2017-06-18T08:51:49.000Z</published>
-    <updated>2017-07-08T15:01:38.640Z</updated>
+    <updated>2017-08-12T03:09:58.599Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p>一些linux的常用命令，linux环境下运行server ,bash的语法</p>
@@ -1215,7 +1360,8 @@ Deque(双端队列)
 <ol>
 <li><p>alias设置<br>vi 中输入 /XXX 可以搜索<br>vi ~/.bashrc<br>添加 alias yourcommand=’ls -alr’<br>重开session即可生效</p>
 </li>
-<li></li>
+<li><p>pushd和popd（类似于文件夹stack）</p>
+</li>
 </ol>
 ]]></content>
     
@@ -1240,7 +1386,7 @@ Deque(双端队列)
     <link href="https://haldir65.github.io/2017/06/17/2017-06-17-tiny-details-in-java/"/>
     <id>https://haldir65.github.io/2017/06/17/2017-06-17-tiny-details-in-java/</id>
     <published>2017-06-17T13:24:48.000Z</published>
-    <updated>2017-08-01T13:46:02.341Z</updated>
+    <updated>2017-08-12T03:09:58.590Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p>interesting stuff in java that don’t seem to get enough pubilicity</p>
@@ -1270,8 +1416,15 @@ Deque(双端队列)
 <p>改成CopyOnWriteArrayList为什么就不会崩了：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">COWIterator</span>&lt;<span class="title">E</span>&gt; <span class="keyword">implements</span> <span class="title">ListIterator</span>&lt;<span class="title">E</span>&gt; </span>&#123;</div><div class="line">     <span class="comment">/** Snapshot of the array */</span></div><div class="line">     <span class="keyword">private</span> <span class="keyword">final</span> Object[] snapshot;</div><div class="line">     <span class="comment">/** Index of element to be returned by subsequent call to next.  */</span></div><div class="line">     <span class="keyword">private</span> <span class="keyword">int</span> cursor;  </div><div class="line"></div><div class="line">   &#125;</div></pre></td></tr></table></figure>
 <p>没有了expectedModCount，成员变量就这俩。<br>CopyOnWriteArrayList直接实现List，写操作都用ReentrantLock锁上了，即同时只能有一条线程进行写操作，get没有加锁。<br>private transient volatile Object[] array;<br>注意保存数据的array是volatile的，任何一条线程写的操作都会被所有的读取线程看到(skip了cpu缓存)，set的时候，以set为例：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> E <span class="title">set</span><span class="params">(<span class="keyword">int</span> index, E element)</span> </span>&#123;</div><div class="line">      <span class="keyword">final</span> ReentrantLock lock = <span class="keyword">this</span>.lock;</div><div class="line">      lock.lock();</div><div class="line">      <span class="keyword">try</span> &#123;</div><div class="line">          Object[] elements = getArray();</div><div class="line">          E oldValue = get(elements, index);</div><div class="line"></div><div class="line">          <span class="keyword">if</span> (oldValue != element) &#123;</div><div class="line">              <span class="keyword">int</span> len = elements.length;</div><div class="line">              Object[] newElements = Arrays.copyOf(elements, len); <span class="comment">//即CopyOnWrite</span></div><div class="line">              newElements[index] = element;</div><div class="line">              setArray(newElements);</div><div class="line">          &#125; <span class="keyword">else</span> &#123;</div><div class="line">              <span class="comment">// Not quite a no-op; ensures volatile write semantics</span></div><div class="line">              setArray(elements);</div><div class="line">          &#125;</div><div class="line">          <span class="keyword">return</span> oldValue;</div><div class="line">      &#125; <span class="keyword">finally</span> &#123;</div><div class="line">          lock.unlock();</div><div class="line">      &#125;</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
-<p>CopyOnWriteArrayList内部ListIterator直接保存了一份final的之前Array的snapShot，由于是volatile，任何读操作都能读取到实时的array数据。所谓读取是安全的是指读的时候始终读到的是最实时的信息，这个通过volatile 就能保证。读取由于加锁了，所以也是线程安全的。</p>
-<h2 id="9-同时对共享资源进行操作好一点的加锁的方式"><a href="#9-同时对共享资源进行操作好一点的加锁的方式" class="headerlink" title="9. 同时对共享资源进行操作好一点的加锁的方式"></a>9. 同时对共享资源进行操作好一点的加锁的方式</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line">       <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">           <span class="keyword">final</span> ReentrantLock lock = <span class="keyword">this</span>.lock;</div><div class="line">           lock.lock(); <span class="comment">//拿不到lock的Thread会挂起</span></div><div class="line">           <span class="keyword">try</span> &#123;</div><div class="line">               <span class="keyword">this</span>.mList.add(<span class="string">"new elements added by"</span> + mIndex + <span class="string">""</span>); <span class="comment">//对共享资源的操作放这里</span></div><div class="line">           &#125;</div><div class="line">           <span class="keyword">finally</span> &#123;</div><div class="line">               lock.unlock(); <span class="comment">//记得解锁</span></div><div class="line">           &#125;</div><div class="line">       &#125;</div></pre></td></tr></table></figure>
+<p>CopyOnWriteArrayList内部ListIterator直接保存了一份final的之前Array的snapShot，由于是volatile，任何读操作都能读取到实时的array数据。所谓读取是安全的是指读的时候始终读到的是最实时的信息，这个通过volatile 就能保证。写入由于加锁了，所以也是线程安全的。</p>
+<h2 id="9-float和long这些相互除法，会出现精确度损失"><a href="#9-float和long这些相互除法，会出现精确度损失" class="headerlink" title="9.float和long这些相互除法，会出现精确度损失"></a>9.float和long这些相互除法，会出现精确度损失</h2><p>6.8040496E7*100/68040488f 会出现1.000001这种东西</p>
+<h2 id="10-int居然还可以这么写"><a href="#10-int居然还可以这么写" class="headerlink" title="10. int居然还可以这么写"></a>10. int居然还可以这么写</h2><ul>
+<li>int a = 5_372_4323; 下划线只是为了具有更好的可读性，added in java 7</li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://www.youtube.com/watch?v=6uroXz5l7Gk">Jake Wharton and Jesse Wilson - Death, Taxes, and HTTP</a></li>
+<li><a href="https://www.youtube.com/watch?v=tfD2uYjzXFo">Android Tech Talk: HTTP In A Hostile World</a></li>
+</ul>
 ]]></content>
     
     <summary type="html">
@@ -1406,64 +1559,6 @@ verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的s
     
     
       <category term="jvm" scheme="https://haldir65.github.io/tags/jvm/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>VPS下载Youtube视频并同步到本地</title>
-    <link href="https://haldir65.github.io/2017/05/07/2017-05-07-download-video-from-vps/"/>
-    <id>https://haldir65.github.io/2017/05/07/2017-05-07-download-video-from-vps/</id>
-    <published>2017-05-07T08:48:01.000Z</published>
-    <updated>2017-06-18T05:10:56.769Z</updated>
-    
-    <content type="html"><![CDATA[<p>几天前花几块钱买了个新的vps，试了下，速度不错。后来看到网上有关于如何使用vps下载视频并拖到Windows的，试了一下，确实酸爽。<br><img src="http://odzl05jxx.bkt.clouddn.com/4667305cbdace582c667f218e38fe70a.jpg?imageView2/2/w/600" alt=""></p>
-<a id="more"></a>
-<h3 id="1-youtube下载视频到vps的硬盘上"><a href="#1-youtube下载视频到vps的硬盘上" class="headerlink" title="1. youtube下载视频到vps的硬盘上"></a>1. youtube下载视频到vps的硬盘上</h3><p>首先是安装一些必要的环境，我安装的系统是Ubuntu 14.0.4 ，这个版本默认的python是2.7。配置好pip,python等环境后，首先安装youtube-dl,基本上就是两行命令搞定的事情，参考<a href="http://rg3.github.io/youtube-dl/download.html">官网</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">sudo curl -L https://yt-dl.org/downloads/latest/youtube-dl -o /usr/local/bin/youtube-dl</div><div class="line"></div><div class="line">sudo chmod a+rx /usr/local/bin/youtube-dl</div></pre></td></tr></table></figure></p>
-<p>为了方便管理，首先在/根目录下面创建一个文件夹并切换到该目录下</p>
-<blockquote>
-<p>mkdir youtube   </p>
-</blockquote>
-<p>以一个普通的<a href="https://www.youtube.com/watch?v=7PtDrv5AUmA">视频链接</a>为例<br>直接使用 </p>
-<blockquote>
-<p>youtube-dl <a href="https://www.youtube.com/watch?v=7PtDrv5AUmA">https://www.youtube.com/watch?v=7PtDrv5AUmA</a></p>
-</blockquote>
-<p>就能自动选择合适的格式，下载到当前目录。比较好的一点是，由于vps在美国，下载速度非常快，维持在20MB/ms的样子。下载好的文件会放在当前目录下，后面使用pscp工具从vps拖下来就好了，不过我实践下来，这一步往往是最慢的。关键要看vps到你的ip的速度。有些时候还会突然断掉，所以很麻烦。这个看后面能不能搞定百度云盘中转。<br>还有一个要注意的，生成的文件名是随机的，比如</p>
-<blockquote>
-<p>-yj74P_BY1zI.mp4</p>
-</blockquote>
-<p>由于前面带了一个横杠，很多命令是不认这种名字的，需要手动重命名一下 </p>
-<blockquote>
-<p>mv -yj74P_BY1zI.mp4 porn.video<br>mv ./-yj74P_BY1zI.mp4 porn.video #. 表示当前目录</p>
-</blockquote>
-<p>有时候下载的文件带有空格，有时候带有中文，用单引号包起来就好了。</p>
-<p>youtube-dl还有一些命令行参数可以设置</p>
-<blockquote>
-<p>youtube-dl –all-formats <a href="https://www.youtube.com/watch?v=7PtDrv5AUmA">https://www.youtube.com/watch?v=7PtDrv5AUmA</a></p>
-</blockquote>
-<p>这样会列出所有的可供下载的分辨率选项，每个选项前面带有一个序号，选择特定分辨率的选项下载只需要</p>
-<blockquote>
-<p>youtube-dl -f 13 <a href="https://www.youtube.com/watch?v=7PtDrv5AUmA">https://www.youtube.com/watch?v=7PtDrv5AUmA</a> </p>
-</blockquote>
-<h3 id="2-从vps的硬盘上把下载好的视频拖下来"><a href="#2-从vps的硬盘上把下载好的视频拖下来" class="headerlink" title="2.从vps的硬盘上把下载好的视频拖下来"></a>2.从vps的硬盘上把下载好的视频拖下来</h3><p>VPS下载视频的速度很快，但从vps到国内的速度就很慢了。<br>目前可能的方案有从百度网盘或dropBox中转，测试了一下百度网盘的方案bypy，vps上传到网盘速度太慢，shell出现假死，据说是百度方面限速的原因，所以这条路基本也是堵上了的。</p>
-<h3 id="3-后话"><a href="#3-后话" class="headerlink" title="3.后话"></a>3.后话</h3><p><a href="https://github.com/soimort/you-get">you-get</a>也是基于python3的下载工具，使用简单。在windows上安装还有点麻烦，<br>在ubuntu上只需 pip3 install you-get 就安装好了<br>使用方式更简单 &gt; you-get “url”<br>you-get还提供了windows版本 下载youtube视频只需要</p>
-<blockquote>
-<p>you-get -x 127.0.0.1:1080 -o “D:\Porn” ‘<a href="https://www.youtube.com/watch?v=jNQXAC9IVRw">https://www.youtube.com/watch?v=jNQXAC9IVRw</a>‘</p>
-</blockquote>
-<p><a href="https://doub.io/dbrj-1/">参考</a><br><a href="http://www.typemylife.com/use-vps-download-videos-from-youtube-upload-to-baidu-cloud/">百度云盘同步的方法</a><br><a href="https://www.v2ex.com/t/189034">讨论</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;几天前花几块钱买了个新的vps，试了下，速度不错。后来看到网上有关于如何使用vps下载视频并拖到Windows的，试了一下，确实酸爽。&lt;br&gt;&lt;img src=&quot;http://odzl05jxx.bkt.clouddn.com/4667305cbdace582c667f218e38fe70a.jpg?imageView2/2/w/600&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="blog" scheme="https://haldir65.github.io/categories/blog/"/>
-    
-    
-      <category term="python" scheme="https://haldir65.github.io/tags/python/"/>
-    
-      <category term="linux" scheme="https://haldir65.github.io/tags/linux/"/>
     
   </entry>
   
