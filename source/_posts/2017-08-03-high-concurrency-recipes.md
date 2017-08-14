@@ -7,6 +7,10 @@ tags: [java,tools,concurrency]
 ![](http://odzl05jxx.bkt.clouddn.com/image/blog/be3c80a11edfd0fdb75d098550ed2c8e.jpg?imageView2/2/w/600)
 <!--more-->
 
+![](http://odzl05jxx.bkt.clouddn.com/Cg-4V1Kg7NCIMLH-AAwW6gNGe9cAAOB4AFTanwADBcC664.jpg?imageView2/2/w/600)
+![](http://odzl05jxx.bkt.clouddn.com/40164340_40164340_1414330224938_mthumb.jpg?imageView2/2/w/600)
+![](http://odzl05jxx.bkt.clouddn.com/image/jpg/a13262133_01000.jpg?imageView2/2/w/600)
+
 
 ## 1. 同时对共享资源进行操作好一点的加锁的方式
 
@@ -29,6 +33,8 @@ tags: [java,tools,concurrency]
 
 **volatile并不是Atomic操作，例如，A线程对volatile变量进行写操作(实际上是读和写操作)，B线程可能在这两个操作之间进行了写操作；**
 
+## 3. Fork/join since java 7
+有些任务是可以分块的。
 
 
 

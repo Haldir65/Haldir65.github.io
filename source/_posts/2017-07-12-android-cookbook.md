@@ -129,6 +129,7 @@ Android相关
     - [ ] ViewGroup，View的源码
     - [ ] View的绘制原理
     - [ ] ListView,RecyclerView原理,加载优化(prefetcher什么的，滑动过程中不去加载图片，参考我写的Glide笔记)
+    - [ ] SurfaceView，TextureView从入门到解析
 - [ ] Zygote进程启动流程
 - [ ] SystemServer进程启动流程
 - [ ] Launcher启动流程
@@ -140,7 +141,7 @@ Linux相关
 - [ ] 搭建mail服务
 
 网络通信
-- [ ] TCP UDP的不同 TCP三次握手，wireShark抓包,抓一个App的包，模拟请求
+- [ ] TCP UDP的不同 TCP三次握手，wireShark[抓包](https://www.youtube.com/watch?v=r0l_54thSYU),抓一个App的包，模拟请求
 - [ ] 如何维持一个长连接
 - [ ] 点击一个网址底层经历哪些过程
 
@@ -158,7 +159,7 @@ C语言从入门到放弃
 
 数据结构，算法
 - [ ] 数据结构，操作系统
-- [ ] 编码，底层二进制
+- [X] 编码，底层二进制
 - [ ] 二分法查找，排序，冒泡，复杂度
 - [ ] 数组跟链表区别,数组跟链表排序时区别,数组跟链表排序时区别
 - [ ] 八大排序[算法](http://www.cnblogs.com/123hll/p/6903454.html)

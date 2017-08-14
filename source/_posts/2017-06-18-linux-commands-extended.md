@@ -12,11 +12,11 @@ tags:
 
 <!--more-->
 
-1. 常用软件安装
+### 1. 常用软件安装
 [utorrent](http://blog.topspeedsnail.com/archives/5752)
 apache,mysql
 
-2. 环境变量怎么改
+### 2. 环境变量怎么改
 平时在shell中输入sudo XXX ,系统是如何知道怎么执行这条指令的呢。首先，可以查看which XXX ，用于查找某项指令对应的文件的位置。而像sudo这种都放在PATH位置，系统会在几个关键位置查找sudo命令。用户本身完全可以创建一个叫做sudo的文件chmod+X ，然后运行这个sudo。
 ```
 查看PATH : echo $PATH
@@ -32,10 +32,19 @@ which XXXk
 PATH=$PATH:/etc/apache/bin  #只对本次回话有效
 或者  PATH=$PATH:/etc/apache/bin #在~./bashrc或者~./profile里面添加这句话
 
-3. alias设置
+### 3. alias设置
 vi 中输入 /XXX 可以搜索
 vi ~/.bashrc
 添加 alias yourcommand='ls -alr'
 重开session即可生效
 
-4. pushd和popd（类似于文件夹stack）
+### 4. pushd和popd（类似于文件夹stack）
+
+### 5. 小硬盘linux磁盘要经常清理需要的命令
+- du --max-depth=1 -h # 查看当前路径下所有文件/文件夹的大小
+- du -k --max-depth=2 | sort -rn # 加上排序
+
+
+
+## 参考
+- [每天一个Linux命令](http://www.cnblogs.com/peida/archive/2012/12/05/2803591.html)
