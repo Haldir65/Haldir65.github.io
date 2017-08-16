@@ -204,21 +204,60 @@ int中的每一个bit都成为一个boolean，一共只用了12bytes(96bits)的�
 ```
 除了省内存，位运算速度快也有一定的好处。
 
+2. 来看看Android中的ViewGroup是怎么干的
+```java
+   // Set by default
+   static final int FLAG_CLIP_CHILDREN = 0x1;   //二进制的1
 
-2. 不要迷信位运算，对于一些简单的操作，现代编译器还是能够帮助开发者自动做好优化的。
+   private static final int FLAG_CLIP_TO_PADDING = 0x2; //二进制的10
 
-3. 从java7开始，可以在java代码里[直接写二进制，八进制，十六进制的数字了](https://www.bbsmax.com/A/xl569bA1Jr/)
+   static final int FLAG_INVALIDATE_REQUIRED  = 0x4; //二进制 100
+
+   private static final int FLAG_RUN_ANIMATION = 0x8; //二进制1000
+
+   static final int FLAG_ANIMATION_DONE = 0x10; //二进制 10000
+
+
+   private static final int FLAG_PADDING_NOT_NULL = 0x20;//二进制 100000
+
+   /** @deprecated - functionality removed */
+   private static final int FLAG_ANIMATION_CACHE = 0x40;//二进制 1000000
+
+   static final int FLAG_OPTIMIZE_INVALIDATE = 0x80;//二进制 10000000
+
+   static final int FLAG_CLEAR_TRANSFORMATION = 0x100;//二进制 100000000
+
+   private static final int FLAG_NOTIFY_ANIMATION_LISTENER = 0x200;//二进制 1000000000
+
+
+   protected static final int FLAG_USE_CHILD_DRAWING_ORDER = 0x400;//二进制 10000000000
+
+   //还有更多。
+
+   if ((flags & FLAG_INVALIDATE_REQUIRED) == FLAG_INVALIDATE_REQUIRED) {
+     //按为与 两个都为1才为1，所以只有当前flag小于FLAG_INVALIDATE_REQUIRED的时候这个表达式才成立
+             invalidate(true);
+         }
+
+```
+
+
+
+
+3. 不要迷信位运算，对于一些简单的操作，现代编译器还是能够帮助开发者自动做好优化的。
+
+4. 从java7开始，可以在java代码里[直接写二进制，八进制，十六进制的数字了](https://www.bbsmax.com/A/xl569bA1Jr/)
 ```java
 //16进制
 jdk6写法：
 public static void main(String[] args) {
- 
+
          int res = Integer.parseInt("A", 16);
          System.out.println(res);
      }
 jdk7写法：
 public static void main(String[] args) {
- 
+
          int res = 0xA;
          System.out.println(res);
      }
@@ -226,13 +265,13 @@ public static void main(String[] args) {
 // 8进制
 jdk6写法:
  public static void main(String[] args) {
- 
+
          int res = Integer.parseInt("11",8);
          System.out.println(res);
      }
 jdk7写法:
 public static void main(String[] args) {
- 
+
          int res = 011;
          System.out.println(res);
      }
@@ -240,13 +279,13 @@ public static void main(String[] args) {
 //二进制
 jdk6写法:
 public static void main(String[] args) {
- 
+
          int res = Integer.parseInt("1100110", 2);
          System.out.println(res);
      }
 jdk7写法:
 public static void main(String[] args) {
- 
+
          int res = 0b1100110;
          System.out.println(res);
      }
@@ -259,4 +298,3 @@ public static void main(String[] args) {
 ## 参考
 - [Java位运算操作全面总结](https://my.oschina.net/xianggao/blog/412967)
 - [Java 位运算(移位、位与、或、异或、非）](http://blog.csdn.net/xiaochunyong/article/details/7748713)
-

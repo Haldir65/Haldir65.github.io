@@ -227,6 +227,11 @@ CopyOnWriteArrayList内部ListIterator直接保存了一份final的之前Array�
 ## 10. int居然还可以这么写
 - int a = 5_372_4323; 下划线只是为了具有更好的可读性，added in java 7
 
+## 11.java nio是java1.4引入的
+适合连接数高的并发处理
+1.nio做了内存映射，少了一次用户空间和系统空间之间的拷贝
+2.nio是异步，触发式的响应，非阻塞式的响应，充分利用了系统资源，主要是cpu
+
 
 
 

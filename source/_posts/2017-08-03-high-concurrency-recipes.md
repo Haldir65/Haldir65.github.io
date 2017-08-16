@@ -34,8 +34,12 @@ tags: [java,tools,concurrency]
 **volatile并不是Atomic操作，例如，A线程对volatile变量进行写操作(实际上是读和写操作)，B线程可能在这两个操作之间进行了写操作；**
 
 ## 3. Fork/join since java 7
-有些任务是可以分块的。
+有些任务是可以分块的。[work-stealing的实现](http://ifeve.com/java7-fork-join-and-closure/)
 
+## 4. ArrayBlockingQueue<E> Thread Safe
+
+## 5.ReentrantLock 不公平锁
+在jdk1.5里面，ReentrantLock的性能是明显优于synchronized的，但是在jdk1.6里面，synchronized做了优化，他们之间的性能差别已经不明显了。
 
 
 
