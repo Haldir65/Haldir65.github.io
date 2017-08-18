@@ -223,6 +223,10 @@ Session就是维护会话的。
 - 心跳
 - Tcp长连接
 
+Http长连接不如说tcp长连接,Tcp是可以不断开的，http连接服务器给到response之后就断开了。[TCP连接](http://www.cnblogs.com/zuoxiaolong/p/life49.html)Http不过是做了tcp连接复用,http通道是一次性的，tcp不是的，这样做也是为了节省tcp通道。
+长连接就是Connection  keep-Alive那玩意，客户端和服务器都得设置才有效。
+长短轮询的间隔是服务器通过代码控制的。
+
 ### 5.2 keep-Alive和WebSocket的区别
 
 
@@ -250,10 +254,14 @@ udp使用
 
 tls,https加密过程，sha1和sha256加密算法
 
-[http请求的TCP瓶颈](https://bhsc881114.github.io/2015/06/23/HTTP%E8%AF%B7%E6%B1%82%E7%9A%84TCP%E7%93%B6%E9%A2%88%E5%88%86%E6%9E%90/)
+
+
+## 参考
+- [谈谈HTTP协议中的短轮询、长轮询、长连接和短连接](http://www.cnblogs.com/zuoxiaolong/p/life49.html)
+- [http请求的TCP瓶颈](https://bhsc881114.github.io/2015/06/23/HTTP%E8%AF%B7%E6%B1%82%E7%9A%84TCP%E7%93%B6%E9%A2%88%E5%88%86%E6%9E%90/)
 
 ping ,traceRouter
 
-[Restfull架构详解](http://www.runoob.com/w3cnote/restful-architecture.html)
-[文件断点续传原理](http://blog.csdn.net/zhuhuiby/article/details/6725951)
-[断点续传实现](http://lcodecorex.github.io/2016/08/01/%E6%96%87%E4%BB%B6%E5%88%86%E7%89%87%E4%B8%8E%E6%96%AD%E7%82%B9%E7%BB%AD%E4%BC%A0%E5%8E%9F%E7%90%86%E4%B8%8E%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0/)
+- [Restfull架构详解](http://www.runoob.com/w3cnote/restful-architecture.html)
+- [文件断点续传原理,CountdownLatch](http://blog.csdn.net/zhuhuiby/article/details/6725951)
+- [断点续传实现](http://lcodecorex.github.io/2016/08/01/%E6%96%87%E4%BB%B6%E5%88%86%E7%89%87%E4%B8%8E%E6%96%AD%E7%82%B9%E7%BB%AD%E4%BC%A0%E5%8E%9F%E7%90%86%E4%B8%8E%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0/)

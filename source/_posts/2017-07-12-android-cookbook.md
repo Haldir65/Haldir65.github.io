@@ -112,12 +112,15 @@ Java相关
 - [ ]写一个[生产者消费者](https://github.com/Mr-YangCheng/ForAndroidInterview/blob/master/java/%5BJava%5D%20%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E7%94%9F%E4%BA%A7%E8%80%85%E6%B6%88%E8%B4%B9%E8%80%85%E9%97%AE%E9%A2%98%E7%9A%84%E4%BA%94%E7%A7%8D%E5%90%8C%E6%AD%A5%E6%96%B9%E6%B3%95%E5%AE%9E%E7%8E%B0.md)模型
 - [ ] HashMap和conrrentHashmap区别(分段锁比较难)
 - [ ] java的包结构：java.lang(Language核心类);java.io(I/O相关);java.util(包含collection和concurrent);java.nio(另一种I/O);java.net(网络操作)
+- [ ] 面试长谈[问题](http://www.cnblogs.com/zuoxiaolong/p/life51.html)
+- [ ] jvm字节码看函数调用[链接](https://mp.weixin.qq.com/s/jv7avKM3Z3zK8sJNdtii_g)
 
 
 Android相关
 - [ ] AppCompat源码解析
 - [ ] ContentProvider的启动过程
 - [ ] IPC，Binder原理
+- [ ] [Android Internals](https://academy.realm.io/posts/360-andev-2017-effie-barak-android-internals/)
 - [ ] cookie存储位置(/webviewCookiesChromium.db),db存储位置
 - [ ] Binder的原理，Binder里面引用计数的原理，Binder底层为什么用红黑树
 - [ ] onSaveInstance,不仅仅是Activity,Fragment，View中也有，具体实现原理。View一定要有id

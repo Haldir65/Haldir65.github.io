@@ -44,7 +44,12 @@ vi ~/.bashrc
 - du --max-depth=1 -h # 查看当前路径下所有文件/文件夹的大小
 - du -k --max-depth=2 | sort -rn # 加上排序
 
+### 6. AWK文本分析工具
+- awk '{print $0}' /etc/passwd # 和cat差不多，显示文本内容
+
+
 
 
 ## 参考
 - [每天一个Linux命令](http://www.cnblogs.com/peida/archive/2012/12/05/2803591.html)
+- [awk是三个人的名字](https://mp.weixin.qq.com/s/L0oViwqjIgudY-SrV0paRA)
