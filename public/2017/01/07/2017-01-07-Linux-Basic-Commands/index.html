@@ -16,7 +16,7 @@
 <meta property="og:description" content="一些常用的linux基本命令,仅作为参考。">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/849c18412f8e7a0b18df09f6f87e6516.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/fork_you_git.jpg">
-<meta property="og:updated_time" content="2017-08-12T03:09:58.566Z">
+<meta property="og:updated_time" content="2017-08-18T13:58:02.796Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="linux基本命令介绍">
 <meta name="twitter:description" content="一些常用的linux基本命令,仅作为参考。">
@@ -273,7 +273,7 @@ ga('send', 'pageview');
 <blockquote>
 <p>pscp -P 12345-r root@202.123.123.123:”/root/fileonServer.mp4” d:/whateveriwantonmyPc.mp4  -p要大写</p>
 </blockquote>
-<h3 id="8-SS相关的命令"><a href="#8-SS相关的命令" class="headerlink" title="8. SS相关的命令"></a>8. SS相关的命令</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div></pre></td><td class="code"><pre><div class="line">  1. 刚装好的ubuntu需要执行以下步骤</div><div class="line">  安装git &gt; apt-get install git</div><div class="line">  安装python &gt; apt-get install python-2.7</div><div class="line">  安装python-setuptools &gt; apt-get install python-setuptools</div><div class="line">  检查是否安装好： python --version</div><div class="line"></div><div class="line"></div><div class="line">  2. 下载shadowsocks源码编译</div><div class="line"> &gt; git clone https://github.com/shadowsocks/shadowsocks</div><div class="line">  # 记得切换到master分支</div><div class="line">  python setup.py build</div><div class="line">  python setup.py install</div><div class="line"></div><div class="line">  检查下版本 ssserver --version</div><div class="line"></div><div class="line">  3. 编辑配置文件</div><div class="line">  vim config.json</div><div class="line">  &#123;</div><div class="line">   &quot;server&quot;:&quot;my_server_ip&quot;,</div><div class="line">   &quot;server_port&quot;:8388,</div><div class="line">   &quot;local_address&quot;: &quot;127.0.0.1&quot;,</div><div class="line">   &quot;local_port&quot;:1080,</div><div class="line">   &quot;password&quot;:&quot;mypassword&quot;,</div><div class="line">   &quot;timeout&quot;:300,</div><div class="line">   &quot;method&quot;:&quot;aes-256-cfb&quot;,</div><div class="line">   &quot;fast_open&quot;: false</div><div class="line">&#125;</div><div class="line"></div><div class="line">ssserver -c config.json -d start #启动完成</div><div class="line"></div><div class="line">检查下是否启动了</div><div class="line">ps -ef |grep sss</div><div class="line"></div><div class="line">ss 命令</div><div class="line">ssserver -c /etc/shadowsocks/config.json # 前台运行</div><div class="line"></div><div class="line">- 后台运行和停止</div><div class="line">ssserver -c /etc/shadowsocks.json -d start</div><div class="line">ssserver -c /etc/shadowsocks.json -d stop</div><div class="line"></div><div class="line">- 加入开机启动</div><div class="line"></div><div class="line">在/etc/rc.local中加入</div><div class="line">sudo ssserver -c /etc/shadowsocks.json --user username -d start - 不要总是用root用户做事，adduser来做，给sudo权限即可</div><div class="line"></div><div class="line">[ShadowsocksR](https://github.com/breakwa11/shadowsocks-rss/wiki)启动后台运行命令</div><div class="line">&gt; python server.py -p 443 -k password -m aes-256-cfb -O auth_sha1_v4 -o http_simple -d start</div><div class="line"></div><div class="line">[net-speeder](https://zhgcao.github.io/2016/05/26/ubuntu-install-net-speeder/)</div><div class="line">venetX，OpenVZ架构</div><div class="line"></div><div class="line">cd net-speeder-master/</div><div class="line">sh build.sh -DCOOKED</div><div class="line"></div><div class="line">Xen，KVM，物理机</div><div class="line">cd net-speeder-master/</div><div class="line">sh build.sh</div><div class="line"></div><div class="line"></div><div class="line">加速所有ip协议数据</div><div class="line"></div><div class="line">&gt; ./net_speeder venet0 &quot;ip&quot;</div><div class="line"></div><div class="line">只加速指定端口，例如只加速TCP协议的 8989端口</div><div class="line">前提是切换到net-speeder的目录下</div><div class="line">&gt; ./net_speeder venet0:0 &quot;tcp src port 8989&quot;</div><div class="line"></div><div class="line">./net_speeder venet0 &quot;ip&quot;</div><div class="line"></div><div class="line">只加速指定端口，例如只加速TCP协议的 8989端口</div><div class="line">前提是切换到net-speeder的目录下</div><div class="line"> ./net_speeder venet0:0 &quot;tcp src port 8989&quot;</div><div class="line"></div><div class="line"></div><div class="line"> [KVM架构升级内核开启BBR](https://qiujunya.com/linodebbr.html)</div></pre></td></tr></table></figure>
+<h3 id="8-SS相关的命令"><a href="#8-SS相关的命令" class="headerlink" title="8. SS相关的命令"></a>8. SS相关的命令</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div></pre></td><td class="code"><pre><div class="line">  1. 刚装好的ubuntu需要执行以下步骤</div><div class="line">  安装git &gt; apt-get install git</div><div class="line">  安装python &gt; apt-get install python-2.7</div><div class="line">  安装python-setuptools &gt; apt-get install python-setuptools</div><div class="line">  检查是否安装好： python --version</div><div class="line"></div><div class="line"></div><div class="line">  2. 下载shadowsocks源码编译</div><div class="line"> &gt; git clone https://github.com/shadowsocks/shadowsocks</div><div class="line">  # 记得切换到master分支</div><div class="line">  python setup.py build</div><div class="line">  python setup.py install</div><div class="line"></div><div class="line">  检查下版本 ssserver --version</div><div class="line"></div><div class="line">  3. 编辑配置文件</div><div class="line">  vim config.json</div><div class="line">  &#123;</div><div class="line">   &quot;server&quot;:&quot;my_server_ip&quot;,</div><div class="line">   &quot;server_port&quot;:8388,</div><div class="line">   &quot;local_address&quot;: &quot;127.0.0.1&quot;,</div><div class="line">   &quot;local_port&quot;:1080,</div><div class="line">   &quot;password&quot;:&quot;mypassword&quot;,</div><div class="line">   &quot;timeout&quot;:300,</div><div class="line">   &quot;method&quot;:&quot;aes-256-cfb&quot;,</div><div class="line">   &quot;fast_open&quot;: false</div><div class="line">&#125;</div><div class="line"></div><div class="line">ssserver -c config.json -d start #启动完成</div><div class="line"></div><div class="line">检查下是否启动了</div><div class="line">ps -ef |grep sss</div><div class="line"></div><div class="line">ss 命令</div><div class="line">ssserver -c /etc/shadowsocks/config.json # 前台运行</div><div class="line"></div><div class="line">- 后台运行和停止</div><div class="line">ssserver -c /etc/shadowsocks.json -d start</div><div class="line">ssserver -c /etc/shadowsocks.json -d stop</div><div class="line"></div><div class="line">- 加入开机启动</div><div class="line"></div><div class="line">在/etc/rc.local中加入</div><div class="line">sudo ssserver -c /etc/shadowsocks.json --user username -d start - 不要总是用root用户做事，adduser来做，给sudo权限即可</div><div class="line"></div><div class="line">[ShadowsocksR](https://github.com/breakwa11/shadowsocks-rss/wiki)启动后台运行命令</div><div class="line">&gt; python server.py -p 443 -k password -m aes-256-cfb -O auth_sha1_v4 -o http_simple -d start</div><div class="line"></div><div class="line">[net-speeder](https://zhgcao.github.io/2016/05/26/ubuntu-install-net-speeder/)</div><div class="line">venetX，OpenVZ架构</div><div class="line"></div><div class="line">cd net-speeder-master/</div><div class="line">sh build.sh -DCOOKED</div><div class="line"></div><div class="line">Xen，KVM，物理机</div><div class="line">cd net-speeder-master/</div><div class="line">sh build.sh</div><div class="line"></div><div class="line"></div><div class="line">加速所有ip协议数据</div><div class="line"></div><div class="line">&gt; ./net_speeder venet0 &quot;ip&quot;</div><div class="line"></div><div class="line">只加速指定端口，例如只加速TCP协议的 8989端口</div><div class="line">前提是切换到net-speeder的目录下</div><div class="line">&gt; ./net_speeder venet0:0 &quot;tcp src port 8989&quot;</div><div class="line"></div><div class="line">./net_speeder venet0 &quot;ip&quot;</div><div class="line"></div><div class="line">只加速指定端口，例如只加速TCP协议的 8989端口</div><div class="line">前提是切换到net-speeder的目录下</div><div class="line"> ./net_speeder venet0:0 &quot;tcp src port 8989&quot;</div><div class="line"></div><div class="line"></div><div class="line"> </div><div class="line"></div><div class="line"></div><div class="line"> [KVM架构升级内核开启BBR](https://qiujunya.com/linodebbr.html)</div></pre></td></tr></table></figure>
 <h3 id="9-网络监控"><a href="#9-网络监控" class="headerlink" title="9. 网络监控"></a>9. 网络监控</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">tcpdump -i &quot;venet0:0&quot;  //抓包的</div><div class="line">tcpdump -c 10 //count</div><div class="line">tcpdump -c -A  //Asicii码形式展示出来每个package</div><div class="line">tcpdump -c 5 -i wlo1 // 监听某一个网卡</div><div class="line">tcpdump -c 5 -i wlo1 port 22// 监听某一个网卡某一个端口</div><div class="line"></div><div class="line">tcpdump version 4.5.1</div><div class="line">libpcap version 1.5.3</div><div class="line">Usage: tcpdump [-aAbdDefhHIJKlLnNOpqRStuUvxX] [ -B size ] [ -c count ]</div><div class="line">                [ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]</div><div class="line">                [ -i interface ] [ -j tstamptype ] [ -M secret ]</div><div class="line">                [ -P in|out|inout ]</div><div class="line">                [ -r file ] [ -s snaplen ] [ -T type ] [ -V file ] [ -w file ]</div><div class="line">                [ -W filecount ] [ -y datalinktype ] [ -z command ]</div><div class="line">                [ -Z user ] [ expression ]</div></pre></td></tr></table></figure>
 <p>tcpdump结合wireshark可实现完整的网络抓包</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">netstat</div><div class="line">netstat -i // 查看某个网络接口发出和接收了多少byte的数据</div><div class="line">netstat -ta //当前active的网络连接</div><div class="line">netstat -tan //以ip地址的方式展示出来</div><div class="line">netstat -tupln //tcp+udp+program name+监听的端口+numerically</div></pre></td></tr></table></figure>
@@ -540,15 +540,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">android</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -556,7 +548,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -565,6 +557,10 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -584,11 +580,23 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">annotation</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -600,11 +608,19 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -620,26 +636,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">transition</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">service</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
              
@@ -649,6 +645,14 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">service</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
             
             <div class="clearfix"></div>

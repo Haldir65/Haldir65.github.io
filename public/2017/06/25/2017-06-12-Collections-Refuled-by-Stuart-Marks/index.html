@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="根据网上的大部分博客的分类，集合框架分为Collections(具有类似数组的功能)和Map(存储键值对)这两大部分。针对jdk1.8的java.util里面的一些常用的或者不常用的集合做一些分析。写这篇文章的过程中，我慢慢发现不同版本jdk的同一个class的实现是有一些差异的(LinkedList)，由于对照的是java1.8的代码，里面会多一些since 1.8的代码，这里不作论述。">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-07-15T08:56:34.194Z">
+<meta property="og:updated_time" content="2017-08-19T09:12:26.771Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java集合类的一些整理">
 <meta name="twitter:description" content="根据网上的大部分博客的分类，集合框架分为Collections(具有类似数组的功能)和Map(存储键值对)这两大部分。针对jdk1.8的java.util里面的一些常用的或者不常用的集合做一些分析。写这篇文章的过程中，我慢慢发现不同版本jdk的同一个class的实现是有一些差异的(LinkedList)，由于对照的是java1.8的代码，里面会多一些since 1.8的代码，这里不作论述。">
@@ -299,13 +299,15 @@ static final float DEFAULT_LOAD_FACTOR = 0.75f; //一般不需要改
 </blockquote>
 <p>LinkedHashMap常用的属性就是它支持有序，这个有序是指迭代的时候有序</p>
 <h3 id="2-3-SparseArray"><a href="#2-3-SparseArray" class="headerlink" title="2.3 SparseArray"></a>2.3 SparseArray</h3><p>先来看一段崩溃日志<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Fatal Exception: java.lang.ArrayIndexOutOfBoundsException: src.length=509 srcPos=60 dst.length=509 dstPos=61 length=-60</div><div class="line">       at java.lang.System.arraycopy(System.java:388)</div><div class="line">       at com.android.internal.util.GrowingArrayUtils.insert(GrowingArrayUtils.java:135)</div><div class="line">       at android.util.SparseIntArray.put(SparseIntArray.java:144)</div></pre></td></tr></table></figure></p>
+<p>简单分析一下，<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line">GrowingArrayUtils.java</div><div class="line">  /**</div><div class="line">     * Primitive int version of &#123;@link #insert(Object[], int, int, Object)&#125;.</div><div class="line">     */</div><div class="line">    public static int[] insert(int[] array, int currentSize, int index, int element) &#123;</div><div class="line">        assert currentSize &lt;= array.length;</div><div class="line"></div><div class="line">        if (currentSize + 1 &lt;= array.length) &#123;</div><div class="line">          System.arraycopy(array, index, array, index + 1, currentSize -index);</div><div class="line">          array[index] = element;</div><div class="line">            return array;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        int[] newArray = new int[growSize(currentSize)];</div><div class="line">        System.arraycopy(array, 0, newArray, 0, index);</div><div class="line">        newArray[index] = element;</div><div class="line">        System.arraycopy(array, index, newArray, index + 1, array.length - index);</div><div class="line">        return newArray;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">public static void arraycopy(int[] src, int srcPos, int[] dst, int dstPos, int length) &#123;</div><div class="line">        if (src == null) &#123;</div><div class="line">            throw new NullPointerException(&quot;src == null&quot;);</div><div class="line">        &#125;</div><div class="line">        if (dst == null) &#123;</div><div class="line">            throw new NullPointerException(&quot;dst == null&quot;);</div><div class="line">        &#125;</div><div class="line">        if (srcPos &lt; 0 || dstPos &lt; 0 || length &lt; 0 ||</div><div class="line">            srcPos &gt; src.length - length || dstPos &gt; dst.length - length) &#123;</div><div class="line">            throw new ArrayIndexOutOfBoundsException(</div><div class="line">                &quot;src.length=&quot; + src.length + &quot; srcPos=&quot; + srcPos +</div><div class="line">                &quot; dst.length=&quot; + dst.length + &quot; dstPos=&quot; + dstPos + &quot; length=&quot; + length); </div><div class="line">//对照着崩溃日志，length传了个-60进来，而srcPos = 60。显然是有其他线程在SparseArray.put调用后，在GrowingArrayUtils.insert调用前做了一次clear操作。怎么办，加锁呗。</div><div class="line"></div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>很显然这段话是因为length= -60导致崩溃，应该是mSize被设置为0(其他线程调用了clear方法，clear只是设置mSize = 0)</p>
 <p>SparseArry提供了类似于HashMap的调用接口，</p>
 <p>使用SparseArray的初衷还是在android这种内存比cpu金贵的平台中，使用SparseArry相比HashMap能够减轻内存压力，获得更好的性能。<br><a href="https://www.liaohuqiu.net/cn/posts/sparse-array-in-android/">liaohuqiu指出SparseArry并不是任何时候都更快</a>，主要是节省内存，避免autoBoxing，二分法查找对于cpu的消耗需要权衡。尤其是存储的量很大的时候，二分法查找的速度会很慢。</p>
-<p>SparseArry类似的class有好几个，据说有八个，以SparseIntArry为例<br>SparseIntArry的几个常用方法,值得注意的是 clear方法只不过是把计数清零了。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">indexOfKey</span><span class="params">(<span class="keyword">int</span> key)</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">indexOfValue</span><span class="params">(<span class="keyword">int</span> value)</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">get</span><span class="params">(<span class="keyword">int</span> key)</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span><span class="params">(<span class="keyword">int</span> key, <span class="keyword">int</span> value)</span></div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">clear</span><span class="params">()</span> </span>&#123;</div><div class="line">       mSize = <span class="number">0</span>;</div><div class="line">   &#125;</div><div class="line"><span class="comment">//迭代一个SparseArry的方法</span></div><div class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; sparseArray.size(); i++) &#123;</div><div class="line">   <span class="keyword">int</span> key = sparseArray.keyAt(i);</div><div class="line">   <span class="comment">// get the object by the key.</span></div><div class="line">   Object obj = sparseArray.get(key);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 从源码来看变量结构</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SparseIntArray</span> <span class="keyword">implements</span> <span class="title">Cloneable</span></span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span>[] mKeys;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span>[] mValues;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> mSize;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span><span class="params">(<span class="keyword">int</span> key, <span class="keyword">int</span> value)</span> </span>&#123;</div><div class="line">     <span class="keyword">int</span> i = ContainerHelpers.binarySearch(mKeys, mSize, key); <span class="comment">//二分法查找</span></div><div class="line"></div><div class="line">     <span class="keyword">if</span> (i &gt;= <span class="number">0</span>) &#123;</div><div class="line">         mValues[i] = value; <span class="comment">//找到了在Value数组中的index,直接替换掉</span></div><div class="line">     &#125; <span class="keyword">else</span> &#123;</div><div class="line">         i = ~i;</div><div class="line">         mKeys = GrowingArrayUtils.insert(mKeys, mSize, i, key);</div><div class="line">         mValues = GrowingArrayUtils.insert(mValues, mSize, i, value);</div><div class="line">         mSize++;</div><div class="line">     &#125;</div><div class="line"> &#125;</div></pre></td></tr></table></figure></p>
-<p>廖祜秋 特地强调</p>
+<p>SparseArry类似的class有好几个，据说有八个，以SparseIntArry为例<br>SparseIntArry的几个常用方法,值得注意的是 clear方法只不过是把mSize设置为0。<br>remove(key)只是把这个key对应位置value设置为DELETED.<br>内部的mKeys是有序的int[],long[]。这样才能实现二分法查找。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">indexOfKey</span><span class="params">(<span class="keyword">int</span> key)</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">indexOfValue</span><span class="params">(<span class="keyword">int</span> value)</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">get</span><span class="params">(<span class="keyword">int</span> key)</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span><span class="params">(<span class="keyword">int</span> key, <span class="keyword">int</span> value)</span></div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">clear</span><span class="params">()</span> </span>&#123;</div><div class="line">       mSize = <span class="number">0</span>;</div><div class="line">   &#125;</div><div class="line"><span class="comment">//迭代一个SparseArry的方法</span></div><div class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; sparseArray.size(); i++) &#123;</div><div class="line">   <span class="keyword">int</span> key = sparseArray.keyAt(i);</div><div class="line">   <span class="comment">// get the object by the key.</span></div><div class="line">   Object obj = sparseArray.get(key);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 从源码来看变量结构</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SparseIntArray</span> <span class="keyword">implements</span> <span class="title">Cloneable</span></span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span>[] mKeys;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span>[] mValues;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> mSize;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span><span class="params">(<span class="keyword">int</span> key, <span class="keyword">int</span> value)</span> </span>&#123;</div><div class="line">     <span class="keyword">int</span> i = ContainerHelpers.binarySearch(mKeys, mSize, key); <span class="comment">//二分法查找</span></div><div class="line"></div><div class="line">     <span class="keyword">if</span> (i &gt;= <span class="number">0</span>) &#123;</div><div class="line">         mValues[i] = value; <span class="comment">//找到了在Value数组中的index,直接替换掉</span></div><div class="line">     &#125; <span class="keyword">else</span> &#123;</div><div class="line">         i = ~i;</div><div class="line">         mKeys = GrowingArrayUtils.insert(mKeys, mSize, i, key);</div><div class="line">         mValues = GrowingArrayUtils.insert(mValues, mSize, i, value);</div><div class="line">         mSize++;</div><div class="line">     &#125;</div><div class="line"> &#125;</div><div class="line"></div><div class="line">  <span class="comment">//  GrowwingArrayUtils.java</span></div><div class="line">     <span class="comment">/**</div><div class="line">     * Primitive int version of &#123;<span class="doctag">@link</span> #insert(Object[], int, int, Object)&#125;.</div><div class="line">     */</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span>[] insert(<span class="keyword">int</span>[] array, <span class="keyword">int</span> currentSize, <span class="keyword">int</span> index, <span class="keyword">int</span> element) &#123;</div><div class="line">        <span class="keyword">assert</span> currentSize &lt;= array.length;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (currentSize + <span class="number">1</span> &lt;= array.length) &#123;</div><div class="line">            System.arraycopy(array, index, array, index + <span class="number">1</span>, currentSize - index);</div><div class="line">            array[index] = element;</div><div class="line">            <span class="keyword">return</span> array;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">int</span>[] newArray = <span class="keyword">new</span> <span class="keyword">int</span>[growSize(currentSize)];</div><div class="line">        System.arraycopy(array, <span class="number">0</span>, newArray, <span class="number">0</span>, index);</div><div class="line">        newArray[index] = element;</div><div class="line">        System.arraycopy(array, index, newArray, index + <span class="number">1</span>, array.length - index);</div><div class="line">        <span class="keyword">return</span> newArray;</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>SparseArray<br>廖祜秋 特地强调</p>
 <ol>
 <li>SparseArray 是针对HashMap做的优化。<br> 1.HashMap 内部的存储结构，导致一些内存的浪费。<br> 2.在刚扩容完，SparseArray 和 HashMap 都会存在一些没被利用的内存。</li>
-<li>SparseArray 并不是任何时候都会更快，有时反而会更慢</li>
+<li>SparseArray 并不是任何时候都会更快，有时反而会更慢<br>vauleAt和keyAt接收一个index参数(数组下标)，这个参数应该是key对应的BinarySearch得到的值。</li>
 </ol>
 <h3 id="2-4-ArrayMap"><a href="#2-4-ArrayMap" class="headerlink" title="2.4 ArrayMap"></a>2.4 ArrayMap</h3><h2 id="3-Set的介绍"><a href="#3-Set的介绍" class="headerlink" title="3. Set的介绍"></a>3. Set的介绍</h2><p>Set用比较少，HashSet、TreeSet和LinkedHashSet是jdk的实现类</p>
 <p>public class HashSet<E><br>    extends AbstractSet<E><br>    implements Set<E>, Cloneable, java.io.Serializable<br>Set的重要特点就是<strong>不能放进去重复</strong>的元素，Set中不会存在e1和e2，e1.equals(e2)的情况<br>HashSet的源码只有三百多行，内部有一个map（HashMap）相对来说是比较简单的。其实Set平时用的也不是那么多。。。</p>
@@ -554,15 +556,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">android</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -570,7 +564,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -579,6 +573,10 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -598,11 +596,23 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">annotation</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -614,11 +624,19 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -634,26 +652,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">transition</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">service</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
              
@@ -663,6 +661,14 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">service</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
             
             <div class="clearfix"></div>

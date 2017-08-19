@@ -521,13 +521,60 @@ Fatal Exception: java.lang.ArrayIndexOutOfBoundsException: src.length=509 srcPos
        at com.android.internal.util.GrowingArrayUtils.insert(GrowingArrayUtils.java:135)
        at android.util.SparseIntArray.put(SparseIntArray.java:144)
 ```
+
+简单分析一下，
+```
+GrowingArrayUtils.java
+  /**
+     * Primitive int version of {@link #insert(Object[], int, int, Object)}.
+     */
+    public static int[] insert(int[] array, int currentSize, int index, int element) {
+        assert currentSize <= array.length;
+
+        if (currentSize + 1 <= array.length) {
+          System.arraycopy(array, index, array, index + 1, currentSize -index);
+          array[index] = element;
+            return array;
+        }
+
+        int[] newArray = new int[growSize(currentSize)];
+        System.arraycopy(array, 0, newArray, 0, index);
+        newArray[index] = element;
+        System.arraycopy(array, index, newArray, index + 1, array.length - index);
+        return newArray;
+    }
+
+public static void arraycopy(int[] src, int srcPos, int[] dst, int dstPos, int length) {
+        if (src == null) {
+            throw new NullPointerException("src == null");
+        }
+        if (dst == null) {
+            throw new NullPointerException("dst == null");
+        }
+        if (srcPos < 0 || dstPos < 0 || length < 0 ||
+            srcPos > src.length - length || dstPos > dst.length - length) {
+            throw new ArrayIndexOutOfBoundsException(
+                "src.length=" + src.length + " srcPos=" + srcPos +
+                " dst.length=" + dst.length + " dstPos=" + dstPos + " length=" + length); 
+//对照着崩溃日志，length传了个-60进来，而srcPos = 60。显然是有其他线程在SparseArray.put调用后，在GrowingArrayUtils.insert调用前做了一次clear操作。怎么办，加锁呗。
+
+        }
+    }
+
+
+```
+
+很显然这段话是因为length= -60导致崩溃，应该是mSize被设置为0(其他线程调用了clear方法，clear只是设置mSize = 0)
+
 SparseArry提供了类似于HashMap的调用接口，
 
 使用SparseArray的初衷还是在android这种内存比cpu金贵的平台中，使用SparseArry相比HashMap能够减轻内存压力，获得更好的性能。
 [liaohuqiu指出SparseArry并不是任何时候都更快](https://www.liaohuqiu.net/cn/posts/sparse-array-in-android/)，主要是节省内存，避免autoBoxing，二分法查找对于cpu的消耗需要权衡。尤其是存储的量很大的时候，二分法查找的速度会很慢。
 
 SparseArry类似的class有好几个，据说有八个，以SparseIntArry为例
-SparseIntArry的几个常用方法,值得注意的是 clear方法只不过是把计数清零了。
+SparseIntArry的几个常用方法,值得注意的是 clear方法只不过是把mSize设置为0。
+remove(key)只是把这个key对应位置value设置为DELETED.
+内部的mKeys是有序的int[],long[]。这样才能实现二分法查找。
 ```java
 public int indexOfKey(int key)
 public int indexOfValue(int value)
@@ -566,13 +613,35 @@ public void put(int key, int value) {
      }
  }
 
+  //  GrowwingArrayUtils.java
+     /**
+     * Primitive int version of {@link #insert(Object[], int, int, Object)}.
+     */
+    public static int[] insert(int[] array, int currentSize, int index, int element) {
+        assert currentSize <= array.length;
+
+        if (currentSize + 1 <= array.length) {
+            System.arraycopy(array, index, array, index + 1, currentSize - index);
+            array[index] = element;
+            return array;
+        }
+
+        int[] newArray = new int[growSize(currentSize)];
+        System.arraycopy(array, 0, newArray, 0, index);
+        newArray[index] = element;
+        System.arraycopy(array, index, newArray, index + 1, array.length - index);
+        return newArray;
+    }
+
 ```
 
+SparseArray
 廖祜秋 特地强调
 1. SparseArray 是针对HashMap做的优化。
     1.HashMap 内部的存储结构，导致一些内存的浪费。
     2.在刚扩容完，SparseArray 和 HashMap 都会存在一些没被利用的内存。
 2. SparseArray 并不是任何时候都会更快，有时反而会更慢
+vauleAt和keyAt接收一个index参数(数组下标)，这个参数应该是key对应的BinarySearch得到的值。
 
 
 
