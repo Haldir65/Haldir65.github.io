@@ -544,7 +544,7 @@ GrowingArrayUtils.java
         return newArray;
     }
 
-public static void arraycopy(int[] src, int srcPos, int[] dst, int dstPos, int length) {
+    public static void arraycopy(int[] src, int srcPos, int[] dst, int dstPos, int length) {
         if (src == null) {
             throw new NullPointerException("src == null");
         }
@@ -555,7 +555,7 @@ public static void arraycopy(int[] src, int srcPos, int[] dst, int dstPos, int l
             srcPos > src.length - length || dstPos > dst.length - length) {
             throw new ArrayIndexOutOfBoundsException(
                 "src.length=" + src.length + " srcPos=" + srcPos +
-                " dst.length=" + dst.length + " dstPos=" + dstPos + " length=" + length); 
+                " dst.length=" + dst.length + " dstPos=" + dstPos + " length=" + length);
 //对照着崩溃日志，length传了个-60进来，而srcPos = 60。显然是有其他线程在SparseArray.put调用后，在GrowingArrayUtils.insert调用前做了一次clear操作。怎么办，加锁呗。
 
         }
@@ -565,6 +565,71 @@ public static void arraycopy(int[] src, int srcPos, int[] dst, int dstPos, int l
 ```
 
 很显然这段话是因为length= -60导致崩溃，应该是mSize被设置为0(其他线程调用了clear方法，clear只是设置mSize = 0)
+
+重现了一下：
+```java
+ @Override
+    public void onClick(View v) {
+        executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        for (int i = 0; i < 1000; i++) {
+            if (i %2==0) {
+                executor.execute(new closer(sparseIntArray));
+                continue;
+            }
+            executor.execute(new writer(sparseIntArray, i));
+        }
+    }
+
+    static class writer implements Runnable {
+
+        SparseIntArray array;
+
+        int index;
+
+        public writer(SparseIntArray array, int index) {
+            this.array = array;
+            this.index = index;
+        }
+
+
+        @Override
+        public void run() {
+            array.put(index, (int) Thread.currentThread().getId());
+            LogUtil.p("write to "+index);
+        }
+    }
+
+    static class closer implements Runnable {
+
+        SparseIntArray array;
+
+        public closer(SparseIntArray array) {
+            this.array = array;
+        }
+
+        @Override
+        public void run() {
+            array.clear();
+            LogUtil.e("clear array");
+        }
+    }
+```
+
+果然:
+```
+08-21 15:26:27.600 23165-23207/com.harris.simplezhihu E/AndroidRuntime: FATAL EXCEPTION: pool-1-thread-4
+        Process: com.harris.simplezhihu, PID: 23165
+        java.lang.ArrayIndexOutOfBoundsException: src.length=21 srcPos=1 dst.length=21 dstPos=2 length=-1
+        at java.lang.System.arraycopy(System.java:388)
+        at com.android.internal.util.GrowingArrayUtils.insert(GrowingArrayUtils.java:135)
+        at android.util.SparseIntArray.put(SparseIntArray.java:143)
+        at com.harris.simplezhihu._07_sparsearry_concurrent.SpareArrayCrashActivity$writer.run(SpareArrayCrashActivity.java:61)
+        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1113)
+        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:588)
+        at java.lang.Thread.run(Thread.java:818)
+```
+
+
 
 SparseArry提供了类似于HashMap的调用接口，
 

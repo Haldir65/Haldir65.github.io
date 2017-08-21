@@ -142,11 +142,13 @@ Linux相关
 - [ ] linux进程间通信方式有哪些（信号量这种）
 - [ ] Linux command extended
 - [ ] 搭建mail服务
+- [ ] win10加ubuntu[双系统](http://www.jianshu.com/p/2eebd6ad284d)安装[如果不需要了直接删分区，删除引导即可]
 
 网络通信
 - [ ] TCP UDP的不同 TCP三次握手，wireShark[抓包](https://www.youtube.com/watch?v=r0l_54thSYU),抓一个App的包，模拟请求
 - [ ] 如何维持一个长连接
 - [ ] 点击一个网址底层经历哪些过程
+- [ ] nginx搭建rmtp推流后台[搭建nginx-rtmp直播服务器，ffmpeg模拟推流](http://cxuef.github.io/linux/%E3%80%90%E7%BD%AE%E9%A1%B6%E3%80%91%E6%90%AD%E5%BB%BAnginx-rtmp%E7%9B%B4%E6%92%AD%E6%9C%8D%E5%8A%A1%E5%99%A8%EF%BC%8Cffmpeg%E6%A8%A1%E6%8B%9F%E6%8E%A8%E6%B5%81/)
 
 Gradle相关
 - [ ]写一些DSL吧[Old Driver](https://github.com/Ccixyj/JBusDriver)

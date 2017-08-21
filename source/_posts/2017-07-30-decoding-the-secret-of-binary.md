@@ -178,6 +178,48 @@ X用0补上，最终得到汉字"美"的utf-8二进制编码
 ```
 ，这三个byte就代表汉字"美"。
 
+Integer.toBinaryString提供了将一个int(十进制)转成二进制字符的方法,即给一个十进制数字，转成"01010101110101"这样的String，方便看懂。
+
+即转成一大堆"0101010110"
+来试一下，看怎么获得这些"01010101110101".
+```java
+public static void main(String[] args) {
+    String s = "美";
+    char[] array = s.toCharArray();
+    for (int i = 0,size = array.length; i < size; i++) {
+        System.out.println(array[i]);
+        System.out.println(Integer.toBinaryString(array[i]));
+    }
+}
+           //输出   111111110001110 
+```
+古人诚不我欺也
+反过来，用一大堆"0101010111010"也能在java代码里写一个汉字出来
+
+```java
+char c = 0b111111110001110;
+String ns = new String(new char[]{c});
+System.out.println(ns);
+```
+0b是java 1.7开始可以使用的用来直接在代码里写二进制的方式。
+so if you want improve the cooleness of your code...
+当然java早就准备好了相应的方法(二进制-八进制-十进制-十六进制)之间的互相转化
+```java
+十进制转成十六进制：
+String Integer.toHexString(int i)
+十进制转成八进制
+String Integer.toOctalString(int i)
+十进制转成二进制
+ String Integer.toBinaryString(int i)
+十六进制转成十进制
+Integer.valueOf("FFFF",16).toString()   //不能处理带前缀的情况 0x
+八进制转成十进制
+Integer.valueOf("76",8).toString()  //前缀0可以被处理
+二进制转十进制
+Integer.valueOf("0101",2).toString()  
+```
+
+
 
 ## 4.接下来讲颜色
 颜色就是RGB的组合,屏幕中每一个像素都是由三个subPixel组成的(分别是红绿蓝)，所以在ps里面经常会碰到255,XXX,XXX这种东西。

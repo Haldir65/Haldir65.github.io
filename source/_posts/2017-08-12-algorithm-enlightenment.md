@@ -40,3 +40,30 @@ android.support.v4.util.ContainerHelpers
 ```
 
 最后一个用的是位非操作，就是把int(4 bytes)转成2进制所有的0变成1，所有的1变成0.
+
+### 1.2 BubbleSort
+把较大的元素挪到右边，较小的元素挪到左边。
+每次从左到右边，两个两个的比较，大的往右挪，第一次完成后，最大的一个一定已经挪到最后了。接下里对n-1个元素进行同样的操作。
+java代码
+```java
+public static void bubbleSort(int[] numArray) {
+
+    int n = numArray.length;
+    int temp = 0;
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 1; j < (n - i); j++) {
+
+            if (numArray[j - 1] > numArray[j]) {
+                temp = numArray[j - 1];
+                numArray[j - 1] = numArray[j];
+                numArray[j] = temp;
+            }
+
+        }
+    }
+}
+```
+
+the worst case scenario ：array完全倒序 o(n^2)
+the best case scenario : array已经排序好 Ω（n）

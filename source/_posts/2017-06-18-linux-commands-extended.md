@@ -47,7 +47,19 @@ vi ~/.bashrc
 ### 6. AWK文本分析工具
 - awk '{print $0}' /etc/passwd # 和cat差不多，显示文本内容
 
+### 7.tar命令
+主要是跟压缩和解压文件有关的,[参考](http://man.linuxde.net/tar)
+```
+tar -cvf log.tar log2012.log 仅打包，不压缩！ 
+tar -zcvf log.tar.gz log2012.log 打包后，以 gzip 压缩 
+tar -jcvf log.tar.bz2 log2012.log 打包后，以 bzip2 压缩 
+```
 
+对照手册来看：
+-c //小写的c，--create，表示创建新的备份文件
+-v //verbose,显示进度什么的
+-f 指定备份文件
+-z --gzip，通过gzip压缩或者解压文件
 
 
 ## 参考
