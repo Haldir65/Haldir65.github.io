@@ -154,6 +154,12 @@ Gradle相关
 - [ ]写一些DSL吧[Old Driver](https://github.com/Ccixyj/JBusDriver)
 
 
+Python
+- [ ] sending  mail via Flask
+- [ ] bootstrap integration
+
+
+
 数据库相关
 - [ ] MySql从入门到删库跑路
 - [ ] Realm的优点

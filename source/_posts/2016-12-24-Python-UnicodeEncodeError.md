@@ -252,8 +252,14 @@ str.encode('ascii')，unicode字符超出了ascii的范围，无法decode成bina
 
 
 
+### 7. 在PyCharm中使用virtualenv
+virtualenv一般都是在命令行里面创建，PyCharm里面，setting-project-project Interpreter 那个选择的箭头右边有一个齿轮，直接创建一个新的就好了。
+virtualenv的好处是不会干扰机器上已安装的package，有些包现在还只能在2.7下运行，如flask_mail。用完之后，ide cmd输入 deactivate即可退出virtualenv。
+
 <!-- install mongoDb(better performance than sql) -->
 <!-- install pip -->
+
+
 
 
 

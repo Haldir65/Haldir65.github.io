@@ -236,7 +236,7 @@ CopyOnWriteArrayList内部ListIterator直接保存了一份final的之前Array�
 ```java
    List<String> list = new ArrayList<>();
   for (int i = 0; i < list.size(); i++) {
-      //do stuff 
+      //do stuff
   }
 
 //下面这种才是正确的方法
@@ -247,10 +247,11 @@ CopyOnWriteArrayList内部ListIterator直接保存了一份final的之前Array�
 ```
 在字节码层面，list.size是通过invokeInterface实现的，这个过程实际上需要根据"size（）"这个方法名称计算出对应的hash值，然后去方法区缓存里面查找这个方法的对应实现。hash计算一次无所谓，计算多次总归比计算一次要浪费时间。
 
-
-
+## 13. inline Function
+编译器层面做的优化[inline](https://www.quora.com/How-can-you-perform-an-inline-function-in-Java)。主要是省去不必要的一次函数调用
 
 ## 参考
 
 - [Jake Wharton and Jesse Wilson - Death, Taxes, and HTTP](https://www.youtube.com/watch?v=6uroXz5l7Gk)
 - [Android Tech Talk: HTTP In A Hostile World](https://www.youtube.com/watch?v=tfD2uYjzXFo)
+

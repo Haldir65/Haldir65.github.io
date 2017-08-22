@@ -219,6 +219,7 @@ Integer.valueOf("76",8).toString()  //前缀0可以被处理
 Integer.valueOf("0101",2).toString()  
 ```
 
+String还有一个getByte(Charset)方法，可以传各种charset进去，i/o强调的是读写使用的都是相同的编码，否则就会出现乱码。
 
 
 ## 4.接下来讲颜色
@@ -384,5 +385,5 @@ message Person {
 
 
 ## 参考
-
-[Jesse Wilson | Decoding the Secrets of Binary Data ](https://www.youtube.com/watch?v=T_p22jMZSrk)
+- [Jesse Wilson | Decoding the Secrets of Binary Data ](https://www.youtube.com/watch?v=T_p22jMZSrk)
+- [深入分析 Java 中的中文编码问题](https://www.ibm.com/developerworks/cn/java/j-lo-chinesecoding/index.html)IBM出品

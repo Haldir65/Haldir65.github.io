@@ -50,9 +50,9 @@ vi ~/.bashrc
 ### 7.tar命令
 主要是跟压缩和解压文件有关的,[参考](http://man.linuxde.net/tar)
 ```
-tar -cvf log.tar log2012.log 仅打包，不压缩！ 
-tar -zcvf log.tar.gz log2012.log 打包后，以 gzip 压缩 
-tar -jcvf log.tar.bz2 log2012.log 打包后，以 bzip2 压缩 
+tar -cvf log.tar log2012.log 仅打包，不压缩！
+tar -zcvf log.tar.gz log2012.log 打包后，以 gzip 压缩
+tar -jcvf log.tar.bz2 log2012.log 打包后，以 bzip2 压缩
 ```
 
 对照手册来看：
@@ -60,6 +60,36 @@ tar -jcvf log.tar.bz2 log2012.log 打包后，以 bzip2 压缩
 -v //verbose,显示进度什么的
 -f 指定备份文件
 -z --gzip，通过gzip压缩或者解压文件
+
+### 8.定时任务怎么写
+已经有网站把各种常用的[example](https://crontab.guru/every-6-hours)写出来了，直接照抄就是
+后面跟上需要的命令，例如重启就是 /sbin/reboot
+
+### 9. 查找相关(grep,find)
+在文件中查找字符串，不区分大小写
+- grep -i "sometext" filenname
+在一个文件夹里面的所有文件中递归查找含有特定字符串的文件
+- grep -r "sometext" *
+
+find
+根据文件名查找文件
+- find -name *.config  #在当前目录下查找
+- find / -name finename # 在根目录下查找filename的文件("filename"用双引号包起来)
+- 
+
+### 10.已安装的软件
+- sudo dpkg -l
+
+### 11.Ping一个主机
+- ping -c 5 gmail.com #只发送5次
+
+### 12.Wget 
+下载文件 
+- wget url
+下载文件并以指定的文件名保存下来
+- wget -0 filename url
+
+
 
 
 ## 参考
