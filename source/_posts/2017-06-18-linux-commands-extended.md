@@ -89,8 +89,17 @@ find
 下载文件并以指定的文件名保存下来
 - wget -0 filename url
 
+### 13.查看文件的时候显示行号
+cat -n rsyslog.conf # 显示行号，报错的时候方便处理
+-n   显示行号（包括空行）
+-b   显示行号（不包括空行）
 
-
+### 14.统计文件夹下特定文件类型的数目
+- ls -l |grep "^-"|wc -l  ##统计某文件夹下文件的个数
+- ls -l |grep "^ｄ"|wc -l ##统计当前目录中文件夹的数量
+- ls -lR|grep "^-"|wc -l ##递归一层层往下找的话，加上一个R就可以了
+统计某个目录下的所有js文件：
+- ls -lR /home/user|grep js|wc -l
 
 ## 参考
 - [每天一个Linux命令](http://www.cnblogs.com/peida/archive/2012/12/05/2803591.html)

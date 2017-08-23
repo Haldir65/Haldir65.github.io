@@ -260,7 +260,9 @@ virtualenv的好处是不会干扰机器上已安装的package，有些包现在
 <!-- install pip -->
 
 
-
+### 8.在linux环境中运行Python及调用系统API
+[计算当前系统磁盘空间占用率](http://dragonball.blog.51cto.com/1459915/1413369)
+[推荐使用os.subprocess模块调用shell](http://blog.csdn.net/pipisorry/article/details/46972171)
 
 
 grep log in command console

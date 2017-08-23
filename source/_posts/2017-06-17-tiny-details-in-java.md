@@ -250,8 +250,12 @@ CopyOnWriteArrayList内部ListIterator直接保存了一份final的之前Array�
 ## 13. inline Function
 编译器层面做的优化[inline](https://www.quora.com/How-can-you-perform-an-inline-function-in-Java)。主要是省去不必要的一次函数调用
 
+## 14.json解析器推荐报出的错误稍微看下还是能懂的
+例如：[gson-throwing-expected-begin-object-but-was-begin-array](https://stackoverflow.com/questions/9598707/gson-throwing-expected-begin-object-but-was-begin-array) 问题就在于，String形式的json没问题，自己这边写的对应映射class结构写错了，一个变量其实是object，自己在class里面写成了array(list).
+一般的解析器会allocate一大堆String然后丢掉，moshi会根据binary data做好cache，每一个key只会创建一次。所以速度很快。这一点jake Wharton和Jesse Wilson在一次[会议](https://www.youtube.com/watch?v=6uroXz5l7Gk)上提到过.
+另外，jsonArray的String长这样"[{},{}]",jsonObject的String长这样"{key1:value1,key2:value2}". 经常会不确定。
+
 ## 参考
 
 - [Jake Wharton and Jesse Wilson - Death, Taxes, and HTTP](https://www.youtube.com/watch?v=6uroXz5l7Gk)
 - [Android Tech Talk: HTTP In A Hostile World](https://www.youtube.com/watch?v=tfD2uYjzXFo)
-
