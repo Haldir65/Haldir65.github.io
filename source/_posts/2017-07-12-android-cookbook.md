@@ -127,6 +127,7 @@ Android相关
 - [ ] 热修复框架原理
 - [ ] WebView JS交互，WebView存在的[漏洞](http://www.jianshu.com/p/9f7e9ab8d2fa),通过反射可看可能存在的[安全问题](https://my.oschina.net/fengheju/blog/673629)以及[C代码](http://blog.csdn.net/xueerfei008/article/details/26750659)
 - [ ] Media相关，视频播放etc，相机，滤镜等.[Demo](https://github.com/w1123440793/VideoListDemo)
+- [ ] FFMpeg，[IjkPlayer](http://www.jianshu.com/p/a4eea7ea4664)，[弹幕](https://github.com/Bilibili/DanmakuFlameMaster)
 - [ ] UI Toolkit源码解析
     - [ ] ViewPager的原理
     - [ ] ViewGroup，View的源码
@@ -168,12 +169,14 @@ C语言从入门到放弃
 - [ ] 加载ffmpeg需要，不得不学[ffmpeg教程](http://blog.csdn.net/leixiaohua1020/article/details/47008825)
 
 
-数据结构，算法
+数据结构，算法(注意，不值得深究)
 - [ ] 数据结构，操作系统
 - [X] 编码，底层二进制
 - [ ] 二分法查找，排序，冒泡，复杂度
 - [ ] 数组跟链表区别,数组跟链表排序时区别,数组跟链表排序时区别
 - [ ] 八大排序[算法](http://www.cnblogs.com/123hll/p/6903454.html)
+- [ ] 算法刷题网站[剑指offer](https://www.nowcoder.com/ta/coding-interviews),[leetcode](https://www.nowcoder.com/ta/leetcode)
+
 
 
 

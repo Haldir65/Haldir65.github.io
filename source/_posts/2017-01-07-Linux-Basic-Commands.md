@@ -718,8 +718,11 @@ sudo vi /etc/ssh/sshd_config
 Port 4484
 PermitRootLogin no
 
-修改完成后重启ssh
+改了sshd_config之后千万记得重启ssh服务，不然会出现connection refused.
 /etc/init.d/ssh restart
+
+CentOS 重启SSH ：service sshd restart
+DeBian重启SSH：service ssh restart
 
 查看系统release版本
 ```
