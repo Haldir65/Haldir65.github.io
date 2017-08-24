@@ -16,7 +16,7 @@
 <meta property="og:description" content="OkHttp作者Jesse Wilson在2016 Droidcon NYC上作了一篇关于编码的演讲，十分有趣。对于了解计算机基础非常有用，结合着写一些关于这方面的笔记。">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/01f691dea62d22e138481a353fbb6228.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/ascii-Table.jpg">
-<meta property="og:updated_time" content="2017-08-12T10:54:49.670Z">
+<meta property="og:updated_time" content="2017-08-24T20:40:33.448Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="二进制编码总结">
 <meta name="twitter:description" content="OkHttp作者Jesse Wilson在2016 Droidcon NYC上作了一篇关于编码的演讲，十分有趣。对于了解计算机基础非常有用，结合着写一些关于这方面的笔记。">
@@ -260,6 +260,12 @@ ga('send', 'pageview');
 <p>&lt;=7个bit的（ASCII）： 0XXXXXX (我用X表示可以被填充的空间)<br>&lt;=11个bit  ：110XXXXX 10XXXXXX (第一个byte以110开头，后面以10开头)<br>&lt;=16个bit :  1110XXXX 10XXXXXX 10XXXXXX (第一个byte以1110开头，后面跟两个10开头的bytes)<br>&lt;=21个bit :  11110XXX 10XXXXXX 10XXXXXX 10XXXXXX (第一个byte以11110开头，后面跟三个10开头的bytes)</p>
 <p>现在来看看网上那些常用的中文转UTF-8工具怎么用，随便找一个找一个站长之家<br>输入“美” ，对应的utf-8编码是”&amp;#x7F8E”，转Unicode是”\u7f8e”<br>查了下“美”这个字还真是“7F8E”。这里有张比较好的<a href="http://www.chi2ko.com/tool/CJK.htm">表格</a>。<br>二进制转unicode直接粘贴到<a href="http://tool.oschina.net/hexconvert">这里</a>的转16进制就可以了。转utf-8的话，来看这个其实是15个bit。所以这样写<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">7F8E显然是16进制，转成十进制是32654。</div><div class="line">转成二进制是11111111 0001110(注意只有15个bit,前面8个1)。</div><div class="line">转utf-8的时候，从后往前往上面的XXXX里面填充</div><div class="line"></div><div class="line">1110XXXX 10XXXXXX 10XXXXXX就变成了</div><div class="line">1110X111 10111110 10001110（注意有一个位置还空着）</div><div class="line">X用0补上，最终得到汉字&quot;美&quot;的utf-8二进制编码</div><div class="line">11100111 10111110 10001110</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">读取的时候</div><div class="line">1111 111100 01110(7f8e)</div></pre></td></tr></table></figure></p>
 <p>，这三个byte就代表汉字”美”。</p>
+<p>Integer.toBinaryString提供了将一个int(十进制)转成二进制字符的方法,即给一个十进制数字，转成”01010101110101”这样的String，方便看懂。</p>
+<p>即转成一大堆”0101010110”<br>来试一下，看怎么获得这些”01010101110101”.<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">    String s = <span class="string">"美"</span>;</div><div class="line">    <span class="keyword">char</span>[] array = s.toCharArray();</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>,size = array.length; i &lt; size; i++) &#123;</div><div class="line">        System.out.println(array[i]);</div><div class="line">        System.out.println(Integer.toBinaryString(array[i]));</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">           <span class="comment">//输出   111111110001110</span></div></pre></td></tr></table></figure></p>
+<p>古人诚不我欺也<br>反过来，用一大堆”0101010111010”也能在java代码里写一个汉字出来</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">char</span> c = <span class="number">0b111111110001110</span>;</div><div class="line">String ns = <span class="keyword">new</span> String(<span class="keyword">new</span> <span class="keyword">char</span>[]&#123;c&#125;);</div><div class="line">System.out.println(ns);</div></pre></td></tr></table></figure>
+<p>0b是java 1.7开始可以使用的用来直接在代码里写二进制的方式。<br>so if you want improve the cooleness of your code…<br>当然java早就准备好了相应的方法(二进制-八进制-十进制-十六进制)之间的互相转化<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">十进制转成十六进制：</div><div class="line">String Integer.toHexString(<span class="keyword">int</span> i)</div><div class="line">十进制转成八进制</div><div class="line">String Integer.toOctalString(<span class="keyword">int</span> i)</div><div class="line">十进制转成二进制</div><div class="line"> String Integer.toBinaryString(<span class="keyword">int</span> i)</div><div class="line">十六进制转成十进制</div><div class="line">Integer.valueOf(<span class="string">"FFFF"</span>,<span class="number">16</span>).toString()   <span class="comment">//不能处理带前缀的情况 0x</span></div><div class="line">八进制转成十进制</div><div class="line">Integer.valueOf(<span class="string">"76"</span>,<span class="number">8</span>).toString()  <span class="comment">//前缀0可以被处理</span></div><div class="line">二进制转十进制</div><div class="line">Integer.valueOf(<span class="string">"0101"</span>,<span class="number">2</span>).toString()</div></pre></td></tr></table></figure></p>
+<p>String还有一个getByte(Charset)方法，可以传各种charset进去，i/o强调的是读写使用的都是相同的编码，否则就会出现乱码。</p>
 <h2 id="4-接下来讲颜色"><a href="#4-接下来讲颜色" class="headerlink" title="4.接下来讲颜色"></a>4.接下来讲颜色</h2><p>颜色就是RGB的组合,屏幕中每一个像素都是由三个subPixel组成的(分别是红绿蓝)，所以在ps里面经常会碰到255,XXX,XXX这种东西。<br>0,0,0代表全黑，255,255,255(0-256也就是一个byte能够表达的范围)代表纯白。其他的颜色都是这三种颜色的组合，所以用三个byte就能表达一种颜色。<br>所以经常在java代码里看到：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">view.setBackgroundColor(Color.parseColor(&quot;#87CEFA&quot;));//三个bytes</div><div class="line">//或者</div><div class="line">Color.RED</div><div class="line">//还有更好玩的</div><div class="line">tv.setTextColor(Color.rgb(255, 255, 255));</div><div class="line">//&quot;#XX XX XX&quot; 十六进制，256的范围，只需要2位数字就好了，所以总是看到00,01,10,...ff这样</div></pre></td></tr></table></figure></p>
 <p>在xml里面是这样的<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</div><div class="line"><span class="tag">&lt;<span class="name">resources</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">color</span> <span class="attr">name</span>=<span class="string">"wl_blue"</span>&gt;</span>#2878ff<span class="tag">&lt;/<span class="name">color</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">color</span> <span class="attr">name</span>=<span class="string">"wl_gray"</span>&gt;</span>#c1c1c1<span class="tag">&lt;/<span class="name">color</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">color</span> <span class="attr">name</span>=<span class="string">"text_color"</span>&gt;</span>#434343<span class="tag">&lt;/<span class="name">color</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">resources</span>&gt;</span></div></pre></td></tr></table></figure></p>
 <p>只不过少写了0x而已<br>关于十六进制，多说一点</p>
@@ -280,15 +286,38 @@ ga('send', 'pageview');
 <p>这里没有考虑压缩算法。这里面还有Big Ending和Small Ending的处理。<br>Big Ending： 拿32bit ，一次读8bit，从左到右<br>Little Ending: 拿32bit ,一次读8bit，从右到左读</p>
 <h2 id="7-从json到protoBuffer以及http2"><a href="#7-从json到protoBuffer以及http2" class="headerlink" title="7.从json到protoBuffer以及http2"></a>7.从json到protoBuffer以及http2</h2><p>一般我们看到的json是这样的<br><figure class="highlight json"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  <span class="attr">"price"</span>: <span class="number">14</span>,</div><div class="line">  <span class="attr">"gender"</span>: <span class="literal">true</span>,</div><div class="line">  <span class="attr">"height"</span>: <span class="number">1.65</span>,</div><div class="line">  <span class="attr">"grade"</span>: <span class="literal">null</span>,</div><div class="line">  <span class="attr">"time"</span>: ,<span class="attr">"2016-09-30T18:30:00Z"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>注意那个事件戳，时间戳本可以用long(8bytes)表示，这上面的String的每个字符都在英文或者阿拉伯数字，所以在ASCII内，所以一个字符按照utf-8编码的话也就1byte，一个个数下来也有二十多个bytes。从8bytes到二十多个bytes，浪费了一半多的bits。数据量越大，编码越慢，传输越慢，解码越慢。</p>
-<p>来看protocolBuffer，protocolBuffer一般长这样，每一个field都有一个独一无二的tag.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">message Person &#123;</div><div class="line">  required string name = 1;</div><div class="line">  required int32 id = 2;</div><div class="line">  optional string email = 3;</div><div class="line"></div><div class="line">  enum PhoneType &#123;</div><div class="line">    MOBILE = 0;</div><div class="line">    HOME = 1;</div><div class="line">    WORK = 2;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  message PhoneNumber &#123;</div><div class="line">    required string number = 1;</div><div class="line">    optional PhoneType type = 2 [default = HOME];</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  repeated PhoneNumber phone = 4;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>来看protocolBuffer，protocolBuffer一般长这样，每一个field都有一个独一无二的tag.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">message Person &#123;</div><div class="line">  required string name = 1;</div><div class="line">  required int32 id = 2;</div><div class="line">  optional string email = 3;</div><div class="line"></div><div class="line">  enum PhoneType &#123;</div><div class="line">    MOBILE = 0;</div><div class="line">    HOME = 1;</div><div class="line">    WORK = 2;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  message PhoneNumber &#123;</div><div class="line">    required string number = 1;</div><div class="line">    optional PhoneType type = 2 [default = HOME];</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  repeated PhoneNumber phone = 4;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>以 optional string email = 3 为例，ProtocolBuffer定义了一个length mode（enum,int32,int64是000,fixed64是001，String,message是010），拿一个byte出来，先把后面三位填上010，即XXXXX010，然后把3在前面，即00011010，一共只用了一个byte就把String email这句话表示出来了。即protobuffer只需一个byte就能表示key,同样的key，json要12byte（utf-8下一个字母一个byte）。value也是一样，转成hex的形式。<br>印象中http2也是用数字来表示header key的，类似的节省数据的道理。</p>
+<h2 id="8-补充"><a href="#8-补充" class="headerlink" title="8. 补充"></a>8. 补充</h2><h3 id="8-1-Big-ending和Little-endian这名字其实跟文学作品有关"><a href="#8-1-Big-ending和Little-endian这名字其实跟文学作品有关" class="headerlink" title="8.1 Big-ending和Little-endian这名字其实跟文学作品有关"></a>8.1 Big-ending和Little-endian这名字其实跟文学作品有关</h3><ol>
+<li>Notepad++可以右下角可以看到当前文件的编码方式，utf-8 dom跟微软有关，<a href="http://www.cnblogs.com/findumars/p/3620078.html">最好不要用</a>.</li>
+<li>Python前面写的”# -<em>- coding: utf-8 -</em>-“跟这事有关,”#!/usr/bin/python”是用来说明脚本语言是python的</li>
+<li>unicode是字符集，utf-8是一种编码形式。</li>
+<li>《格列夫游记》里面，吃鸡蛋先打打头还是小头<a href="http://blog.csdn.net/ce123_zhouwei/article/details/6971544">详解</a></li>
+<li>文档头部放一个BOM (用来表示该文件的字节序，BOM是FFFE或者FEFF，操作系统也就能判断是大端还是小端了)<a href="http://www.freebuf.com/articles/others-articles/25623.html">大小端的介绍</a></li>
+<li>全角和半角跟GB2312把一些ASCII里面已有的拉丁字母又编码了一遍有关。</li>
+</ol>
+<ul>
+<li>GB2312 是对 ASCII 的中文扩展.在这些编码里，我们还把数学符号、罗马希腊的字母、日文的假名们都编进去了，连在 ASCII 里本来就有的数字、标点、字母都统统重新编了两个字节长的编码，这就是常说的”全角”字符，而原来在127号以下的那些就叫”半角”字符了。</li>
+</ul>
+<ol>
+<li>大端小端没有谁优谁劣，各自优势便是对方劣势</li>
+<li>大小端的<a href="http://blog.csdn.net/ce123_zhouwei/article/details/6971544">应用</a></li>
+<li>windows记事本会强行给utf-8加上bom，主要是为了兼容旧版本系统。BOM就是（“FE FF”）这么几个二进制，notepad++需要装插件才能看二进制，比较好的解释看<a href="http://blog.csdn.net/u010999240/article/details/71836108">这篇</a>.直接用InputStream往文件里写byte数组，接着读出来，编码不对就报错。</li>
+<li>很多人都有用记事本编辑代码出错的经历，所以尽量不要用windows下的记事本编辑代码。notepad++默认保存为utf-8不带bom格式，所以编辑文件没什么问题。</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"> 一般操作系统都是小端，而通讯协议是大端的。</div><div class="line">4.1 常见CPU的字节序</div><div class="line">Big Endian : PowerPC、IBM、Sun</div><div class="line">Little Endian : x86、DEC</div><div class="line">ARM既可以工作在大端模式，也可以工作在小端模式。</div><div class="line"></div><div class="line">4.2 常见文件的字节序</div><div class="line">Adobe PS – Big Endian</div><div class="line">BMP – Little Endian</div><div class="line">DXF(AutoCAD) – Variable</div><div class="line">GIF – Little Endian</div><div class="line">JPEG – Big Endian</div><div class="line">MacPaint – Big Endian</div><div class="line">RTF – Little Endian</div><div class="line">另外，Java和所有的网络通讯协议都是使用Big-Endian的编码。</div></pre></td></tr></table></figure>
+<h3 id="8-2-读取一个json文件"><a href="#8-2-读取一个json文件" class="headerlink" title="8.2 读取一个json文件"></a>8.2 读取一个json文件</h3><p>先用BufferedSource将文件变成一个Source，再用Moshi从这个Source里面读数据</p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
 <li>软件开发能够接触到的最小单位byte就是8个排在一起的可以盛放0或者1的小槽子。从60年代的ASCII到后来的utf-8再到今天的utf-8，成熟的业界标准使得计算机行业能够跨语言形成信息处理，传输，消费的统一化，同时兼顾了效率。</li>
 <li>图片只是无数颜色的组合，用byte表示RGB的方式使得电子产品显示图片变为可能。</li>
 <li>在数据传输中，数据传输双方可以协商采取合理的传输协议，让通信量变得小，通信速度变快。</li>
 <li>hexadecimal简化了写无数个01的过程，日常开发尽量写0xffffff这种形式。两个十六进制数字的组合通常代表一个byte的范围。</li>
 </ol>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.youtube.com/watch?v=T_p22jMZSrk">Jesse Wilson | Decoding the Secrets of Binary Data </a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://www.youtube.com/watch?v=T_p22jMZSrk">Jesse Wilson | Decoding the Secrets of Binary Data </a></li>
+<li><a href="https://www.ibm.com/developerworks/cn/java/j-lo-chinesecoding/index.html">深入分析 Java 中的中文编码问题</a>IBM出品</li>
+</ul>
 
       
 
@@ -495,15 +524,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">android</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">android</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -516,6 +541,14 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -539,15 +572,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -559,23 +584,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -588,6 +601,22 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">Okio</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">

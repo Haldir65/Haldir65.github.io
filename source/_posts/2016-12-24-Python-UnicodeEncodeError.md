@@ -64,6 +64,8 @@ req = Request(img_url, headers=headers)
 urlhtml = urlopen(req)
 ```
 
+如果是自己写了一个.py文件，调用里面的函数,import的时候要把包路径写完整
+
 
 ### 3. pip install XXXX
 安装package的方式 pip install xxxx....

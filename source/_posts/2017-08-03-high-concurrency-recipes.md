@@ -8,7 +8,6 @@ tags: [java,tools,concurrency]
 <!--more-->
 
 ![](http://odzl05jxx.bkt.clouddn.com/Cg-4V1Kg7NCIMLH-AAwW6gNGe9cAAOB4AFTanwADBcC664.jpg?imageView2/2/w/600)
-![](http://odzl05jxx.bkt.clouddn.com/40164340_40164340_1414330224938_mthumb.jpg?imageView2/2/w/600)
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/a13262133_01000.jpg?imageView2/2/w/600)
 
 
