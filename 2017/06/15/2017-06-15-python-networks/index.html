@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="关于如何使用Python搭建后台的方法很多，这里列举出一些实例。">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/c6dd030bf8cc75628fce3aec8216ba52.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-07-23T10:43:10.493Z">
+<meta property="og:updated_time" content="2017-08-24T20:40:33.417Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用Python搭建本地服务器">
 <meta name="twitter:description" content="关于如何使用Python搭建后台的方法很多，这里列举出一些实例。">
@@ -199,7 +199,8 @@ ga('send', 'pageview');
     <div class="article-entry" itemprop="articleBody">
       
         <p><img src="http://odzl05jxx.bkt.clouddn.com/c6dd030bf8cc75628fce3aec8216ba52.jpg?imageView2/2/w/600" alt="Kitty"><br>关于如何使用Python搭建后台的方法很多，这里列举出一些实例。<a id="more"></a></p>
-<h2 id="1-The-Flask-Way"><a href="#1-The-Flask-Way" class="headerlink" title="1. The Flask Way"></a>1. The Flask Way</h2><h3 id="1-1-Basics"><a href="#1-1-Basics" class="headerlink" title="1.1 Basics"></a>1.1 Basics</h3><blockquote>
+<h2 id="1-The-Flask-Way"><a href="#1-The-Flask-Way" class="headerlink" title="1. The Flask Way"></a>1. The Flask Way</h2><p>PyCharm最好装Professional的，方便很多，可以ssh到linux远程服务器,直接<a href="http://blog.csdn.net/zhaihaifei/article/details/53691873">远程开发</a>，调试。除了连接有点慢，别的都好。windows环境下很多库都跑不起来。</p>
+<h3 id="1-1-Basics"><a href="#1-1-Basics" class="headerlink" title="1.1 Basics"></a>1.1 Basics</h3><blockquote>
 <p>Flask is a very simple, but extremely flexible framework Flask使用Decorator对请求进行处理</p>
 </blockquote>
 <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div></pre></td><td class="code"><pre><div class="line">#!/usr/bin/python3</div><div class="line"># -*- coding:utf8 -*-</div><div class="line"></div><div class="line">from flask import Flask</div><div class="line">from flask import request</div><div class="line">from flask import jsonify</div><div class="line">from flask import send_file</div><div class="line"></div><div class="line"># create the flask object</div><div class="line">app = Flask(__name__)</div><div class="line"></div><div class="line"># 处理GET请求像这样就可以了</div><div class="line"></div><div class="line">@app.route('/', methods=['GET'])</div><div class="line">def handle_get():</div><div class="line">    return 'haha ,this is http status code 200'</div><div class="line"></div><div class="line">#处理POST请求，从request中拿东西，返回response</div><div class="line">@app.route('/', methods=['POST'])</div><div class="line">def handle_post():</div><div class="line">    uid = request.form['uid'] # requets.form是一个list，从里面获取想表单的参数</div><div class="line">    name = request.form['name']</div><div class="line">    print('uid is %s ,name is %s ' % (uid, name))</div><div class="line">    return '200 Ok, or whatever you like'  </div><div class="line"></div><div class="line">if __name__ == '__main__':</div><div class="line">    app.run(port=12345, debug=True) #设置为True后，会自动检测到服务端代码更改并reload，出错了也会给client返回实际的错误堆栈， 生产环境不要打开Debug 。</div><div class="line"></div><div class="line"># 对于GET请求，获得query参数的方式</div><div class="line">http://127.0.0.1:12345/_search_user?user=111&amp;date=190</div><div class="line"></div><div class="line">@app.route('/_search_user', methods=['GET'])</div><div class="line">def query_user_profile():</div><div class="line">    user = request.args.get('user')</div><div class="line">    date = request.args.get('date')</div><div class="line">    print(user)</div><div class="line">    print(date)</div><div class="line">    return 'every Thing Ok'</div><div class="line"></div><div class="line"> 输出</div><div class="line"> 111</div><div class="line"> 190   </div><div class="line"></div><div class="line"> #返回json，作为API</div><div class="line">@app.route('/_get_current_user', methods=['GET'])</div><div class="line">def get_current_user():</div><div class="line">    return jsonify(</div><div class="line">        username='Admin',</div><div class="line">        email='Bob@gmail.com',</div><div class="line">        age=18</div><div class="line">    )    </div><div class="line"></div><div class="line">&#123;</div><div class="line">    username: 'Admin';</div><div class="line">    email: 'Bob@gamil.com';</div><div class="line">    age: 18</div><div class="line">&#125;</div><div class="line"></div><div class="line">#返回复杂一点的json，或者json数组</div><div class="line">@app.route('/_get_user_list', methods=['GET'])</div><div class="line">def get_user_list():</div><div class="line">    user_list = create_user_list()</div><div class="line">    return Response(json.dumps(user_list), mimetype='application/json')</div><div class="line"></div><div class="line"></div><div class="line">#生成数据</div><div class="line">def create_user_list():</div><div class="line">    alice = &#123;'name': 'alice', 'age': 16, 'sex': 'female'&#125;</div><div class="line">    tom = &#123;'name': 'tom', 'age': 23, 'sex': 'male'&#125;</div><div class="line">    josh = &#123;'name': 'josh', 'age': 20, 'sex': 'male'&#125;</div><div class="line">    bill = &#123;'name': 'bill', 'age': 19, 'sex': 'male'&#125;</div><div class="line">    li = [alice, tom, josh, bill]</div><div class="line">    return li</div><div class="line"></div><div class="line"></div><div class="line"># 在Postman中就能获得这样的result</div><div class="line">[</div><div class="line">    &#123;</div><div class="line">        "name": "alice",</div><div class="line">        "age": 16,</div><div class="line">        "sex": "female"</div><div class="line">    &#125;,</div><div class="line">    &#123;</div><div class="line">        "name": "tom",</div><div class="line">        "age": 23,</div><div class="line">        "sex": "male"</div><div class="line">    &#125;,</div><div class="line">    &#123;</div><div class="line">        "name": "josh",</div><div class="line">        "age": 20,</div><div class="line">        "sex": "male"</div><div class="line">    &#125;,</div><div class="line">    &#123;</div><div class="line">        "name": "bill",</div><div class="line">        "age": 19,</div><div class="line">        "sex": "male"</div><div class="line">    &#125;</div><div class="line">]</div><div class="line"></div><div class="line"># hosting static file，image,css,etc</div><div class="line"># 提供图片什么的</div><div class="line"></div><div class="line">@app.route('/_get_image', methods=['GET'])</div><div class="line">def get_image():</div><div class="line">    filename = 'static/image/b1.jpg'</div><div class="line">    fullpath = os.path.join(os.path.curdir, filename)</div><div class="line">    print(filename, fullpath)</div><div class="line">    return send_file(fullpath, mimetype='image/jpeg')</div></pre></td></tr></table></figure>
@@ -449,15 +450,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">android</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">android</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -470,6 +467,14 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -493,15 +498,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -513,23 +510,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -542,6 +527,22 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">Okio</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">

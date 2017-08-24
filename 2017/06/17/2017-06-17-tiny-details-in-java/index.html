@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="interesting stuff in java that don’t seem to get enough pubilicity">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/34a7d57ccabb18c69d085247cf009b22.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-08-18T13:58:02.827Z">
+<meta property="og:updated_time" content="2017-08-24T20:40:33.417Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="For those tiny details in Java">
 <meta name="twitter:description" content="interesting stuff in java that don’t seem to get enough pubilicity">
@@ -232,6 +232,11 @@ ga('send', 'pageview');
 <li>int a = 5_372_4323; 下划线只是为了具有更好的可读性，added in java 7</li>
 </ul>
 <h2 id="11-java-nio是java1-4引入的"><a href="#11-java-nio是java1-4引入的" class="headerlink" title="11.java nio是java1.4引入的"></a>11.java nio是java1.4引入的</h2><p>适合连接数高的并发处理<br>1.nio做了内存映射，少了一次用户空间和系统空间之间的拷贝<br>2.nio是异步，触发式的响应，非阻塞式的响应，充分利用了系统资源，主要是cpu</p>
+<h2 id="12-微观-macro-层面的性能要点"><a href="#12-微观-macro-层面的性能要点" class="headerlink" title="12.微观(macro)层面的性能要点"></a>12.微观(macro)层面的性能要点</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">   List&lt;String&gt; list = <span class="keyword">new</span> ArrayList&lt;&gt;();</div><div class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; list.size(); i++) &#123;</div><div class="line">      <span class="comment">//do stuff</span></div><div class="line">  &#125;</div><div class="line"></div><div class="line"><span class="comment">//下面这种才是正确的方法</span></div><div class="line"> List&lt;String&gt; list = <span class="keyword">new</span> ArrayList&lt;&gt;();</div><div class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>,size = list.size(); i&lt;size; i++) &#123;</div><div class="line">      <span class="comment">//do stuff</span></div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<p>在字节码层面，list.size是通过invokeInterface实现的，这个过程实际上需要根据”size（）”这个方法名称计算出对应的hash值，然后去方法区缓存里面查找这个方法的对应实现。hash计算一次无所谓，计算多次总归比计算一次要浪费时间。</p>
+<h2 id="13-inline-Function"><a href="#13-inline-Function" class="headerlink" title="13. inline Function"></a>13. inline Function</h2><p>编译器层面做的优化<a href="https://www.quora.com/How-can-you-perform-an-inline-function-in-Java">inline</a>。主要是省去不必要的一次函数调用</p>
+<h2 id="14-json解析器推荐报出的错误稍微看下还是能懂的"><a href="#14-json解析器推荐报出的错误稍微看下还是能懂的" class="headerlink" title="14.json解析器推荐报出的错误稍微看下还是能懂的"></a>14.json解析器推荐报出的错误稍微看下还是能懂的</h2><p>例如：<a href="https://stackoverflow.com/questions/9598707/gson-throwing-expected-begin-object-but-was-begin-array">gson-throwing-expected-begin-object-but-was-begin-array</a> 问题就在于，String形式的json没问题，自己这边写的对应映射class结构写错了，一个变量其实是object，自己在class里面写成了array(list).<br>一般的解析器会allocate一大堆String然后丢掉，moshi会根据binary data做好cache，每一个key只会创建一次。所以速度很快。这一点jake Wharton和Jesse Wilson在一次<a href="https://www.youtube.com/watch?v=6uroXz5l7Gk">会议</a>上提到过.<br>另外，jsonArray的String长这样”[{},{}]”,jsonObject的String长这样”{key1:value1,key2:value2}”. 经常会不确定。</p>
+<h2 id="15-Collections-unmodifiableList是有用的"><a href="#15-Collections-unmodifiableList是有用的" class="headerlink" title="15. Collections.unmodifiableList是有用的"></a>15. Collections.unmodifiableList是有用的</h2><p>还记得Arrays.asList返回的并不是java.util.ArrayList。并不支持add,remove(丢unSupportedOperationException).<strong>但支持set,get</strong>。为了把List变成彻底只读的，就得用Collections的这个方法。原理上就是在get和set里面也丢异常出来。</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="https://www.youtube.com/watch?v=6uroXz5l7Gk">Jake Wharton and Jesse Wilson - Death, Taxes, and HTTP</a></li>
 <li><a href="https://www.youtube.com/watch?v=tfD2uYjzXFo">Android Tech Talk: HTTP In A Hostile World</a></li>
@@ -438,15 +443,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">android</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">android</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -459,6 +460,14 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -482,15 +491,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -502,23 +503,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -531,6 +520,22 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">Okio</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
