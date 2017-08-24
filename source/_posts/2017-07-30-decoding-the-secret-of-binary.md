@@ -104,7 +104,7 @@ java7 开始 ，可以直接在代码里写二进制数，例如：
 ![](http://odzl05jxx.bkt.clouddn.com/ascii-Table.jpg)
 
 例如0表示NULL, 65表示A(大写),93表示标点符号"]"。
-举例：单词Donut的每一个字母对应的ASCII分别是： 
+举例：单词Donut的每一个字母对应的ASCII分别是：
 十进制 ：68  111 110 117 116
 二进制: 01000100 01101111 01101110 01110101 01110100
 所以这么发送出去，接收者就知道是Donut了
@@ -191,7 +191,7 @@ public static void main(String[] args) {
         System.out.println(Integer.toBinaryString(array[i]));
     }
 }
-           //输出   111111110001110 
+           //输出   111111110001110
 ```
 古人诚不我欺也
 反过来，用一大堆"0101010111010"也能在java代码里写一个汉字出来
@@ -352,6 +352,7 @@ Little Ending: 拿32bit ,一次读8bit，从右到左读
 注意那个事件戳，时间戳本可以用long(8bytes)表示，这上面的String的每个字符都在英文或者阿拉伯数字，所以在ASCII内，所以一个字符按照utf-8编码的话也就1byte，一个个数下来也有二十多个bytes。从8bytes到二十多个bytes，浪费了一半多的bits。数据量越大，编码越慢，传输越慢，解码越慢。
 
 来看protocolBuffer，protocolBuffer一般长这样，每一个field都有一个独一无二的tag.
+
 ```
 message Person {
   required string name = 1;
@@ -374,6 +375,43 @@ message Person {
 ```
 以 optional string email = 3 为例，ProtocolBuffer定义了一个length mode（enum,int32,int64是000,fixed64是001，String,message是010），拿一个byte出来，先把后面三位填上010，即XXXXX010，然后把3在前面，即00011010，一共只用了一个byte就把String email这句话表示出来了。即protobuffer只需一个byte就能表示key,同样的key，json要12byte（utf-8下一个字母一个byte）。value也是一样，转成hex的形式。
 印象中http2也是用数字来表示header key的，类似的节省数据的道理。
+
+
+## 8. 补充
+### 8.1 Big-ending和Little-endian这名字其实跟文学作品有关
+1. Notepad++可以右下角可以看到当前文件的编码方式，utf-8 dom跟微软有关，[最好不要用](http://www.cnblogs.com/findumars/p/3620078.html).
+2. Python前面写的"# -*- coding: utf-8 -*-"跟这事有关,"#!/usr/bin/python"是用来说明脚本语言是python的
+3. unicode是字符集，utf-8是一种编码形式。
+4. 《格列夫游记》里面，吃鸡蛋先打打头还是小头[详解](http://blog.csdn.net/ce123_zhouwei/article/details/6971544)
+5. 文档头部放一个BOM (用来表示该文件的字节序，BOM是FFFE或者FEFF，操作系统也就能判断是大端还是小端了)[大小端的介绍](http://www.freebuf.com/articles/others-articles/25623.html)
+6. 全角和半角跟GB2312把一些ASCII里面已有的拉丁字母又编码了一遍有关。
+- GB2312 是对 ASCII 的中文扩展.在这些编码里，我们还把数学符号、罗马希腊的字母、日文的假名们都编进去了，连在 ASCII 里本来就有的数字、标点、字母都统统重新编了两个字节长的编码，这就是常说的”全角”字符，而原来在127号以下的那些就叫”半角”字符了。
+7. 大端小端没有谁优谁劣，各自优势便是对方劣势
+8. 大小端的[应用](http://blog.csdn.net/ce123_zhouwei/article/details/6971544)
+9. windows记事本会强行给utf-8加上bom，主要是为了兼容旧版本系统。BOM就是（“FE FF”）这么几个二进制，notepad++需要装插件才能看二进制，比较好的解释看[这篇](http://blog.csdn.net/u010999240/article/details/71836108).直接用InputStream往文件里写byte数组，接着读出来，编码不对就报错。
+10. 很多人都有用记事本编辑代码出错的经历，所以尽量不要用windows下的记事本编辑代码。notepad++默认保存为utf-8不带bom格式，所以编辑文件没什么问题。
+
+```
+ 一般操作系统都是小端，而通讯协议是大端的。
+4.1 常见CPU的字节序
+Big Endian : PowerPC、IBM、Sun
+Little Endian : x86、DEC
+ARM既可以工作在大端模式，也可以工作在小端模式。
+
+4.2 常见文件的字节序
+Adobe PS – Big Endian
+BMP – Little Endian
+DXF(AutoCAD) – Variable
+GIF – Little Endian
+JPEG – Big Endian
+MacPaint – Big Endian
+RTF – Little Endian
+另外，Java和所有的网络通讯协议都是使用Big-Endian的编码。
+```
+
+### 8.2 读取一个json文件
+先用BufferedSource将文件变成一个Source，再用Moshi从这个Source里面读数据
+
 
 
 ## 总结

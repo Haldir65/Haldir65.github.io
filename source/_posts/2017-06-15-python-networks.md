@@ -9,6 +9,7 @@ tags: [python]
 关于如何使用Python搭建后台的方法很多，这里列举出一些实例。<!--more-->
 
 ## 1. The Flask Way
+PyCharm最好装Professional的，方便很多，可以ssh到linux远程服务器,直接[远程开发](http://blog.csdn.net/zhaihaifei/article/details/53691873)，调试。除了连接有点慢，别的都好。windows环境下很多库都跑不起来。
 
 ### 1.1 Basics
 > Flask is a very simple, but extremely flexible framework Flask使用Decorator对请求进行处理

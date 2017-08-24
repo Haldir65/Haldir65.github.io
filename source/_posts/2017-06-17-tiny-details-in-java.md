@@ -255,6 +255,9 @@ CopyOnWriteArrayList内部ListIterator直接保存了一份final的之前Array�
 一般的解析器会allocate一大堆String然后丢掉，moshi会根据binary data做好cache，每一个key只会创建一次。所以速度很快。这一点jake Wharton和Jesse Wilson在一次[会议](https://www.youtube.com/watch?v=6uroXz5l7Gk)上提到过.
 另外，jsonArray的String长这样"[{},{}]",jsonObject的String长这样"{key1:value1,key2:value2}". 经常会不确定。
 
+## 15. Collections.unmodifiableList是有用的
+还记得Arrays.asList返回的并不是java.util.ArrayList。并不支持add,remove(丢unSupportedOperationException).**但支持set,get**。为了把List变成彻底只读的，就得用Collections的这个方法。原理上就是在get和set里面也丢异常出来。
+
 ## 参考
 
 - [Jake Wharton and Jesse Wilson - Death, Taxes, and HTTP](https://www.youtube.com/watch?v=6uroXz5l7Gk)
