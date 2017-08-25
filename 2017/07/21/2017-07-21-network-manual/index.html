@@ -16,7 +16,7 @@
 <meta property="og:description" content="网络相关的查找手册">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/b9ae1189145b4a4d9dfe4d0b89a21b47.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/ed541bc1ed61ead0bf6ea8233ef01c0a.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-08-18T13:58:02.986Z">
+<meta property="og:updated_time" content="2017-08-25T13:03:25.480Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="网络通信手册">
 <meta name="twitter:description" content="网络相关的查找手册">
@@ -204,6 +204,17 @@ ga('send', 'pageview');
 <ul>
 <li>protocol 指使用的传输协议(http、file、https、mailto、ed2k、thunder等)<br>hostname 是指存放资源的服务器的域名系统(DNS) 主机名或 IP 地址。有时，在主机名前也可以包含连接到服务器所需的用户名和密码（格式：username:password@hostname）。有时候是ip,有时候前面还带账号密码<br>port http默认是80，https是443 ,ssh默认端口号是20<br>path(路径) 由零或多个“/”符号隔开的字符串，一般用来表示主机上的一个目录或文件地址。<br>parameters（参数）这是用于指定特殊参数的可选项。<br>query(查询) 一般GET请求可以在这里面查找。可选，用于给动态网页（如使用CGI、ISAPI、PHP/JSP/ASP/ASP。NET等技术制作的网页）传递参数，可有多个参数，用“&amp;”符号隔开，每个参数的名和值用“=”符号隔开。<br>fragment（信息片断）字符串，用于指定网络资源中的片断。例如一个网页中有多个名词解释，可使用fragment直接定位到某一名词解释。</li>
 </ul>
+<h3 id="1-1-Http的GET请求的url长度是有限制的"><a href="#1-1-Http的GET请求的url长度是有限制的" class="headerlink" title="1.1 Http的GET请求的url长度是有限制的"></a>1.1 Http的GET请求的url长度是有限制的</h3><p>Http1.1协议中并没有做这个限制，但通信的两端，服务器(Nginx和Tomcat)和客户端(浏览器长厂商)都做了限制。<a href="https://cnbin.github.io/blog/2016/02/20/httpxie-yi-zhong-de-ge-chong-chang-du-xian-zhi-zong-jie/">参考</a><br>一些浏览器的url长度限制，即url长度不能超过这么多个字符</p>
+<ul>
+<li>IE : 2803</li>
+<li>Firefox:65536</li>
+<li>Chrome:8182</li>
+<li>Safari:80000</li>
+<li>Opera:190000<br>再具体一点的话，就是下面这个我在百度里搜索zhihu这个词的时候<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">GET /s?ie=utf-8&amp;f=8&amp;rsv_bp=0&amp;rsv_idx=1&amp;tn=baidu&amp;wd=zhihu&amp;rsv_pq=d66519eb000157d4&amp;rsv_t=4ce0B%2B8rfGgWxu9SAjGi7H5n5vylTydZebyyJXgD0JrPUSfBwp5zKxK9uKQ&amp;rqlang=cn&amp;rsv_enter=1&amp;rsv_sug3=6&amp;rsv_sug1=4&amp;rsv_sug7=100&amp;rsv_sug2=0&amp;inputT=3737&amp;rsv_sug4=4444 HTTP/1.1  （从GET到这里不能超过8182个字）</div><div class="line">Host: www.baidu.com</div><div class="line">Connection: keep-alive</div><div class="line">Cache-Control: max-age=0</div><div class="line">Upgrade-Insecure-Requests: 1</div><div class="line">User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36</div><div class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8</div><div class="line">DNT: 1</div><div class="line">Accept-Encoding: gzip, deflate, br</div><div class="line">Accept-Language: zh-CN,zh;q=0.8</div><div class="line">Cookie: BAIDUID=325243543:FG=1; PSTM=543534543; BIDUPSID=54353; pgv_pvi=5435; MCITY=-%3A; BD_HOME=0; BD_UPN=5435; H_PS_645EC=453453453; BDORZ=5435; BD_CK_SAM=1; PSINO=5; BDSVRTM=54; H_PS_PSSID=543; ispeed_lsm=2</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>另外，Cookie就是一个键值对，放在header里面，所以如果服务器对于Http请求头长度做了限制，Cookie也会受限制。</p>
+<p>###1.2 GET和POST的一些小区别<br>GET只会发一个TCP包，POST发两个(一个是Header,一个是Body)。所以GET快一点，POST要求服务器长时间处于连接状态，可能造成服务器负载升高。</p>
 <h2 id="2-http请求本质上是发送了一堆字符给服务器"><a href="#2-http请求本质上是发送了一堆字符给服务器" class="headerlink" title="2. http请求本质上是发送了一堆字符给服务器"></a>2. http请求本质上是发送了一堆字符给服务器</h2><p>另外,domain(域名)是指www.wikipedia.org这种，DNS会把它转成一个ip地址<br>而在http请求的header中经常或看到<br>Host: www.baidu.com\r\n 这样的一行，其实这是<a href="https://zh.wikipedia.org/wiki/HTTP%E5%A4%B4%E5%AD%97%E6%AE%B5">Http头字段</a>的标准请求字段，总之就是标准。这个Host指的是服务器的域名，就是domian。<br>wiki上的<a href="https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6%9C%AC%E4%BC%A0%E8%BE%93%E5%8D%8F%E8%AE%AE">http名词解释</a></p>
 <h2 id="3-Header相关的"><a href="#3-Header相关的" class="headerlink" title="3. Header相关的"></a>3. Header相关的</h2><p>首先看下请求百度首页的request和response</p>
 <p>Request（其实发送的时候每一行后面都跟了一个\r\n用于换行）</p>
