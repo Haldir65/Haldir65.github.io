@@ -113,7 +113,7 @@ Java相关
 - [ ] HashMap和conrrentHashmap区别(分段锁比较难)
 - [ ] java的包结构：java.lang(Language核心类);java.io(I/O相关);java.util(包含collection和concurrent);java.nio(另一种I/O);java.net(网络操作)
 - [ ] 面试长谈[问题](http://www.cnblogs.com/zuoxiaolong/p/life51.html)
-- [ ] jvm字节码看函数调用[链接](https://mp.weixin.qq.com/s/jv7avKM3Z3zK8sJNdtii_g)
+- [ ] jvm字节码看函数调用[链接](https://mp.weixin.qq.com/s/jv7avKM3Z3zK8sJNdtii_g)，Jit for dummies
 
 
 Android相关
@@ -144,12 +144,14 @@ Linux相关
 - [ ] Linux command extended
 - [ ] 搭建mail服务
 - [ ] win10加ubuntu[双系统](http://www.jianshu.com/p/2eebd6ad284d)安装[如果不需要了直接删分区，删除引导即可]
+- [ ]win10 装ubuntu有时候失败是因为删除了C盘的一个文件夹[参考](http://blog.csdn.net/fesdgasdgasdg/article/details/54183577)
 
 网络通信
 - [ ] TCP UDP的不同 TCP三次握手，wireShark[抓包](https://www.youtube.com/watch?v=r0l_54thSYU),抓一个App的包，模拟请求
 - [ ] 如何维持一个长连接
 - [ ] 点击一个网址底层经历哪些过程
 - [ ] nginx搭建rmtp推流后台[搭建nginx-rtmp直播服务器，ffmpeg模拟推流](http://cxuef.github.io/linux/%E3%80%90%E7%BD%AE%E9%A1%B6%E3%80%91%E6%90%AD%E5%BB%BAnginx-rtmp%E7%9B%B4%E6%92%AD%E6%9C%8D%E5%8A%A1%E5%99%A8%EF%BC%8Cffmpeg%E6%A8%A1%E6%8B%9F%E6%8E%A8%E6%B5%81/)
+- [ ] ffmpeg[参考教程](http://blog.csdn.net/leixiaohua1020/article/details/15811977)
 
 Gradle相关
 - [ ]写一些DSL吧[Old Driver](https://github.com/Ccixyj/JBusDriver)

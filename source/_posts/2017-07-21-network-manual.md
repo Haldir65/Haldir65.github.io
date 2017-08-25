@@ -27,6 +27,34 @@ query(查询) 一般GET请求可以在这里面查找。可选，用于给动态
 fragment（信息片断）字符串，用于指定网络资源中的片断。例如一个网页中有多个名词解释，可使用fragment直接定位到某一名词解释。
 
 
+### 1.1 Http的GET请求的url长度是有限制的
+Http1.1协议中并没有做这个限制，但通信的两端，服务器(Nginx和Tomcat)和客户端(浏览器长厂商)都做了限制。[参考](https://cnbin.github.io/blog/2016/02/20/httpxie-yi-zhong-de-ge-chong-chang-du-xian-zhi-zong-jie/)
+一些浏览器的url长度限制，即url长度不能超过这么多个字符
+- IE : 2803
+- Firefox:65536
+- Chrome:8182
+- Safari:80000
+- Opera:190000
+再具体一点的话，就是下面这个我在百度里搜索zhihu这个词的时候
+```
+GET /s?ie=utf-8&f=8&rsv_bp=0&rsv_idx=1&tn=baidu&wd=zhihu&rsv_pq=d66519eb000157d4&rsv_t=4ce0B%2B8rfGgWxu9SAjGi7H5n5vylTydZebyyJXgD0JrPUSfBwp5zKxK9uKQ&rqlang=cn&rsv_enter=1&rsv_sug3=6&rsv_sug1=4&rsv_sug7=100&rsv_sug2=0&inputT=3737&rsv_sug4=4444 HTTP/1.1  （从GET到这里不能超过8182个字）
+Host: www.baidu.com
+Connection: keep-alive
+Cache-Control: max-age=0
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+DNT: 1
+Accept-Encoding: gzip, deflate, br
+Accept-Language: zh-CN,zh;q=0.8
+Cookie: BAIDUID=325243543:FG=1; PSTM=543534543; BIDUPSID=54353; pgv_pvi=5435; MCITY=-%3A; BD_HOME=0; BD_UPN=5435; H_PS_645EC=453453453; BDORZ=5435; BD_CK_SAM=1; PSINO=5; BDSVRTM=54; H_PS_PSSID=543; ispeed_lsm=2
+```
+另外，Cookie就是一个键值对，放在header里面，所以如果服务器对于Http请求头长度做了限制，Cookie也会受限制。
+
+###1.2 GET和POST的一些小区别
+GET只会发一个TCP包，POST发两个(一个是Header,一个是Body)。所以GET快一点，POST要求服务器长时间处于连接状态，可能造成服务器负载升高。
+
+
 ## 2. http请求本质上是发送了一堆字符给服务器
 另外,domain(域名)是指www.wikipedia.org这种，DNS会把它转成一个ip地址
 而在http请求的header中经常或看到
