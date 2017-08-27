@@ -81,6 +81,7 @@ INFO  Deploying: git
 
 ```
 找了好久，有说 _config.xml有空格的，有说title被乱改的，试了好长时间，改成这样就不再报错了。所以，**冒号后面一定要加空格，英文半角的**
+
 ```
 ---
 title: adb常用命令手册
@@ -214,7 +215,8 @@ MarkDown页面内部跳转
 ### 7.github提交commit的时候显示Emoji
 链接[在此](https://www.webpagefx.com/tools/emoji-cheat-sheet/)
 
-
+### 8.换电脑了怎么办
+亲测，把整个目录下所有文件全部复制粘贴到新电脑上，装上node，然后装上hexo，记得勾选添加到PATH,然后就可以了。需要注意的是小文件比较多，所以复制粘贴可能要十几分钟。
 
 ### ref
 - [Hexo博文置顶技巧](http://yanhuili.github.io/2016/11/21/hexo%E5%8D%9A%E6%96%87%E7%BD%AE%E9%A1%B6%E6%8A%80%E5%B7%A7/)

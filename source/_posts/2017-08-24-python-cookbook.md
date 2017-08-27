@@ -1,7 +1,7 @@
 ---
-title: 2017-08-24-python-cookbook
+title: Python工具手册
 date: 2017-08-24 22:25:18
-tags:
+tags: [python,tools]
 ---
 
 ## 苦海无涯，Python是岸
@@ -9,7 +9,7 @@ tags:
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/essay-with-programming-lang.jpg)
 
 
-
+<!--more-->
 
 ## 1. 基本数据操作，及语法
 
