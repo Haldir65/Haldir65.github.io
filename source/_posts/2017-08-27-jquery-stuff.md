@@ -67,6 +67,17 @@ var jq=jQuery.noConflict()，
 所以
 - <a id="2.2">文字</a> 这种id是不会有响应的
 
+### 1.4 还可以加事件回调
+可以在事件后面加回调，例如
+```javascript
+jq('.click_btn').slideUp(300)
+//可以认为第二个参数是一个function
+ jq('.click_btn').slideUp(300,function {
+    alert('this will invoke after slideup finished')
+ })
+```
+可以自己写函数，可以引用之前定义的函数。当然函数回调里面还可以加回调，当然会有callback hell。简单的解决方式，把作为第二个参数的函数提取成一个函数，引用函数名作为参数传进去就好了。
+另外，在js里面var myFunction = function(){//stuff }是完全成立的，函数也是var。
 
 ## Todo
 - 去复制一大堆文字，button，img的css样式，修改，继承，引用。手写实在太慢

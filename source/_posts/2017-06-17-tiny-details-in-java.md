@@ -255,8 +255,34 @@ CopyOnWriteArrayList内部ListIterator直接保存了一份final的之前Array�
 一般的解析器会allocate一大堆String然后丢掉，moshi会根据binary data做好cache，每一个key只会创建一次。所以速度很快。这一点jake Wharton和Jesse Wilson在一次[会议](https://www.youtube.com/watch?v=6uroXz5l7Gk)上提到过.
 另外，jsonArray的String长这样"[{},{}]",jsonObject的String长这样"{key1:value1,key2:value2}". 经常会不确定。
 
-## 15. Collections.unmodifiableList是有用的
+## 15. Collections.unmodifiableList的出现是有道理的
 还记得Arrays.asList返回的并不是java.util.ArrayList。并不支持add,remove(丢unSupportedOperationException).**但支持set,get**。为了把List变成彻底只读的，就得用Collections的这个方法。原理上就是在get和set里面也丢异常出来。
+
+
+### 16. 单例模式，双重锁检查
+单例模式怎么写，一般的答案就是双重检查
+```
+class Foo {
+    private Helper helper;
+    public Helper getHelper() {
+        if (helper == null) {
+            synchronized(this) {
+                if (helper == null) { //可能指针不为空，但指向的对象还未实例化完成
+                    helper = new Helper();
+                }
+            }
+        }
+        return helper;
+    }
+}
+```
+除非在单例前面加上volatile，否则上述单例模式并不安全。
+infoQ也有[解释](http://www.infoq.com/cn/articles/double-checked-locking-with-delay-initialization)
+正确答案参考知乎答案:
+[知乎用户](https://www.zhihu.com/question/35268028/answer/62016374)
+
+- 是因为**指令重排**造成的。直接原因也就是 初始化一个对象并使一个引用指向他 这个过程不是原子的。导致了可能会出现引用指向了对象并未初始化好的那块堆内存，使用volatile修饰对象引用，防止重排序即可解决。推荐使用**内部静态类**做延时初始化，更合适，更可靠。这个同步过程由JVM实现了。
+
 
 ## 参考
 

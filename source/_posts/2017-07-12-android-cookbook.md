@@ -137,6 +137,7 @@ Android相关
 - [ ] Zygote进程启动流程
 - [ ] SystemServer进程启动流程
 - [ ] Launcher启动流程
+- [ ] Android生命周期在不同版本的表现形式[有些onXXX在高版本不会调](http://blog.csdn.net/liuweiballack/article/details/47026263)
 
 
 Linux相关
