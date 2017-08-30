@@ -263,6 +263,8 @@ Http长连接不如说tcp长连接,Tcp是可以不断开的，http连接服务�
 
 ### 5.3 http2可以实现推送了
 
+### 5.4 Http这玩意就不是为了视频流设计的
+[HTTP wasn't really designed for streaming](https://stackoverflow.com/questions/14352599/how-to-send-chunks-of-video-for-streaming-using-http-protocol)
 
 ## 6. WebSocket、SPDY、Http2
 WebSocket一种在单个TCP 连接上进行全双工通讯的协议。

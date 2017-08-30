@@ -101,6 +101,26 @@ cat -n rsyslog.conf # 显示行号，报错的时候方便处理
 统计某个目录下的所有js文件：
 - ls -lR /home/user|grep js|wc -l
 
+### 15. curl命令
+写shell脚本可能会用到网络交互，curl可以发起网络请求，下载文件，上传文件，cookie处理，断点续传，分段下载,ftp下载文件
+随便写两个：
+- curl -o home.html http://www.baidu.com  #把百度首页抓下来，写到home.html中
+- curl -d "user=nick&password=12345" http://www.xxx.com/login.jsp # 提交表单，发起POST请求
+
+### 16. 搭建samba服务器
+这个主要是用来从windows上访问linux主机上的文件的
+- sudo apt-get install samba
+剩下的就是设定要分享的目录，给权限，设定访问密码，启动服务这些了[教程](http://www.cnblogs.com/gzdaijie/p/5194033.html)
+
+### 17.删除/boot分区不需要的内核
+先df -h看/boot分区使用情况；
+然后 dpkg --get-selections|grep linux-image ;
+查看当前使用的内核 uname -a ;
+清理不用的内核 sudo apt-get purge linux-image-3.13.0-24-generic （注意，不要删正在使用的内核）
+
+
 ## 参考
 - [每天一个Linux命令](http://www.cnblogs.com/peida/archive/2012/12/05/2803591.html)
 - [awk是三个人的名字](https://mp.weixin.qq.com/s/L0oViwqjIgudY-SrV0paRA)
+- [树莓派搭建局域网媒体服务器，下载机](http://www.cnblogs.com/xiaowuyi/p/4051238.html)
+- [Linux中国](https://linux.cn/tech/sa/index.php?page=4)

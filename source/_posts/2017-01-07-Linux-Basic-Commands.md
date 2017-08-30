@@ -12,6 +12,10 @@ top : 1
 
 首先是连接vps的ssh(Secure Shell)工具，putty或者xshell都可以,putty改颜色[教程](http://www.cnblogs.com/nayitian/archive/2013/01/18/2866690.html)。
 
+重启 reboot
+关机 shutdown -h now # 
+或者 halt
+
 ## 速查手册
 1. [文件操作](#1-文件操作常用命令)
 2. [Vi文本编辑器](#2-Vi文本编辑器)
@@ -49,6 +53,8 @@ top : 1
 rename是实际意义上的重命名命令，但rename接受三个参数
 
 - > touch filename //创建文件，后缀在linux下没意义
+另外,touch 命令主要是用来改文件的时间戳的
+- > touch -t 201707081238.34 file.txt //把这个文件的时间戳改成2017年XXX。。。
 
 ```
 

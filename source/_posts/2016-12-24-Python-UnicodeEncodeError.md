@@ -251,7 +251,15 @@ str.encode('ascii')，unicode字符超出了ascii的范围，无法decode成bina
  how to upgrade installed packages?
 
 > pip install --upgrade setuptools
+> 
 
+迭代一个字典，并打印出key,vaule
+``` python
+for key,value in d.items(): # 这个items函数其实是字典自带的函数
+        print('%s key has the value %s'%(key,value)) #第三个百分号是用来把key填到第一个百分号后，把value填到第二个百分号后面的
+# 用普通的for i 方式迭代一个字典，迭代出来的是一个个的key，可以用dict[key]把value搞出来
+
+```
 
 
 ### 7. 在PyCharm中使用virtualenv

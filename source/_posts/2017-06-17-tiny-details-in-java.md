@@ -283,6 +283,23 @@ infoQ也有[解释](http://www.infoq.com/cn/articles/double-checked-locking-with
 
 - 是因为**指令重排**造成的。直接原因也就是 初始化一个对象并使一个引用指向他 这个过程不是原子的。导致了可能会出现引用指向了对象并未初始化好的那块堆内存，使用volatile修饰对象引用，防止重排序即可解决。推荐使用**内部静态类**做延时初始化，更合适，更可靠。这个同步过程由JVM实现了。
 
+### 17.函数的执行顺序，由此带来的性能影响
+```java
+Log.Debug("list is "+list) //传一个list进去，list的长度未知
+其实应该改为
+Log.debug(() -> "list is"+list) //这个方法接受一个Supplier<String>
+```
+区别在于，前者无论是否DEBUG都会去创建一个String，后者只是提供了如何创建String的思路，并没有真的创建。
+
+### 18.inline的解释
+这种说辞更多见于C或者C++,java里面，例如
+```
+String s = "someThing";
+System.out.println(s.length())
+
+//可以改成 
+System.out.println("something".length()) // 这就叫inline，没必要多创建一根指针出来
+```
 
 ## 参考
 
