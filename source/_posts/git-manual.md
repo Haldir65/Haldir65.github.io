@@ -186,6 +186,11 @@ git stash clear// 一次性删除stash List中所有的item
 git push --force
 ```
 
+## 14.既然是shell环境，那当然可以写bash 脚本
+- git add . && git commit -m "stuff" && git push
+一部搞定，前提是每一步都得成功，原理就是bash脚本的&&和||操作符。
+
+
 ## Reference
 -[git reset和revert](http://yijiebuyi.com/blog/8f985d539566d0bf3b804df6be4e0c90.html)
 -[git recipes](https://github.com/geeeeeeeeek/git-recipes)

@@ -114,6 +114,7 @@ Java相关
 - [ ] java的包结构：java.lang(Language核心类);java.io(I/O相关);java.util(包含collection和concurrent);java.nio(另一种I/O);java.net(网络操作)
 - [ ] 面试长谈[问题](http://www.cnblogs.com/zuoxiaolong/p/life51.html)
 - [ ] jvm字节码看函数调用[链接](https://mp.weixin.qq.com/s/jv7avKM3Z3zK8sJNdtii_g)，Jit for dummies
+- [ ] OkHttp跑分[github](https://github.com/square/okhttp/blob/master/benchmarks/src/main/java/okhttp3/benchmarks/Benchmark.java)以及作者的[Gplus](https://plus.google.com/+JesseWilson/posts/EJCDEiPrN42)，以及外国人做的[High-Concurrency HTTP Clients on the JVM](https://dzone.com/articles/high-concurrency-http-clients-on-the-jvm)，纯属好玩。
 
 
 Android相关
@@ -144,8 +145,8 @@ Linux相关
 - [ ] linux进程间通信方式有哪些（信号量这种）
 - [ ] Linux command extended
 - [ ] 搭建mail服务
-- [ ] win10加ubuntu[双系统](http://www.jianshu.com/p/2eebd6ad284d)安装[如果不需要了直接删分区，删除引导即可]
-- [ ]win10 装ubuntu有时候失败是因为删除了C盘的一个文件夹[参考](http://blog.csdn.net/fesdgasdgasdg/article/details/54183577)
+- [x] win10加ubuntu[双系统](http://www.jianshu.com/p/2eebd6ad284d)安装[如果不需要了直接删分区，删除引导即可]
+- [x]win10 装ubuntu有时候失败是因为删除了C盘的一个文件夹[参考](http://blog.csdn.net/fesdgasdgasdg/article/details/54183577)
 
 网络通信
 - [ ] TCP UDP的不同 TCP三次握手，wireShark[抓包](https://www.youtube.com/watch?v=r0l_54thSYU),抓一个App的包，模拟请求
