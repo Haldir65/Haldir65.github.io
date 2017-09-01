@@ -115,6 +115,9 @@ Java相关
 - [ ] 面试长谈[问题](http://www.cnblogs.com/zuoxiaolong/p/life51.html)
 - [ ] jvm字节码看函数调用[链接](https://mp.weixin.qq.com/s/jv7avKM3Z3zK8sJNdtii_g)，Jit for dummies
 - [ ] OkHttp跑分[github](https://github.com/square/okhttp/blob/master/benchmarks/src/main/java/okhttp3/benchmarks/Benchmark.java)以及作者的[Gplus](https://plus.google.com/+JesseWilson/posts/EJCDEiPrN42)，以及外国人做的[High-Concurrency HTTP Clients on the JVM](https://dzone.com/articles/high-concurrency-http-clients-on-the-jvm)，纯属好玩。
+- [ ] 指令重排序，内存栅栏，JVM垃圾回收机制，何时触发MinorGC
+- [ ] Eden和Survivor的比例分配等
+
 
 
 Android相关

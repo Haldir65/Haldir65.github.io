@@ -266,6 +266,14 @@ Http长连接不如说tcp长连接,Tcp是可以不断开的，http连接服务�
 ### 5.4 Http这玩意就不是为了视频流设计的
 [HTTP wasn't really designed for streaming](https://stackoverflow.com/questions/14352599/how-to-send-chunks-of-video-for-streaming-using-http-protocol)
 
+
+### 5.5 主流浏览器浏览器默认最大并发连接数
+浏览器不可能同时发起10000个请求，所以主流浏览器都设定了限制,主要是http1.1,http2的话，只有一条connection。
+[解释](https://www.zhihu.com/question/20474326)
+
+###5.6 TLS,SSL
+
+
 ## 6. WebSocket、SPDY、Http2
 WebSocket一种在单个TCP 连接上进行全双工通讯的协议。
 HTTP/2（超文本传输协议第2版，最初命名为HTTP 2.0），简称为h2（基于TLS/1.2或以上版本的加密连接）或h2c（非加密连接），是HTTP协议的的第二个主要版本

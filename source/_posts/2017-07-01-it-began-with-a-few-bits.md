@@ -428,6 +428,32 @@ CallAdapterFactory和ConverterFactory类似，也可以自定义，所以这样�
 所以，Retrofit就是将HttpClient、Converter和CallAdapter这三样职能结合起来，又提供了足够的定制化。
 
 
+### 1.6 补充
+OkHttp本身没有将response挪到主线程，Retrofit这么干了，具体在
+Retrofit.Builder.build方法里面
+```java
+public Retrofit build() {
+  Executor callbackExecutor = this.callbackExecutor;
+  if (callbackExecutor == null) {
+    callbackExecutor = platform.defaultCallbackExecutor();
+    //Andriod平台默认挪到主线程，就是一个持有主线程的线程池
+    //这个线程池的excute方法就是用一个hadler推到主线程了。
+  }
+  // Make a defensive copy of the adapters and add the default Call adapter.
+  List<CallAdapter.Factory> adapterFactories = new ArrayList<>(this.adapterFactories);
+  adapterFactories.add(platform.defaultCallAdapterFactory(callbackExecutor));
+  //如果不加CallAdapterFactory的话，
+  //Android平台默认直接把response丢回给callback，默认配置也是在主线程干的。
+  //如果不希望在主线程接收Response的话，自己在Builder里面添加callbackExecutor.
+
+  // Make a defensive copy of the converters.
+  List<Converter.Factory> converterFactories = new ArrayList<>(this.converterFactories);
+
+  return new Retrofit(callFactory, baseUrl, converterFactories, adapterFactories,
+      callbackExecutor, validateEagerly);
+}
+```
+
 
 
 
