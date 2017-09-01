@@ -21,6 +21,7 @@ tags: [python,tools]
 
 ## 2. Flask相关
 ### 2.1 Flask Admin Pannel[Flask-Admin中文入门教程](http://flask123.sinaapp.com/article/57/)Please  run on linux
+### 2.7 [小Web](http://www.jianshu.com/p/f9d668490bc6)
 
 ## 3.
 

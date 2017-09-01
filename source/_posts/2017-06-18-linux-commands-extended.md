@@ -101,8 +101,6 @@ cat -n rsyslog.conf # 显示行号，报错的时候方便处理
 统计某个目录下的所有js文件：
 - ls -lR /home/user|grep js|wc -l
 
-<<<<<<< Updated upstream
-
 ### 15. curl命令
 写shell脚本可能会用到网络交互，curl可以发起网络请求，下载文件，上传文件，cookie处理，断点续传，分段下载,ftp下载文件
 随便写两个：
@@ -125,11 +123,8 @@ cat -n rsyslog.conf # 显示行号，报错的时候方便处理
 - echo $(date) | tee -a date.log 
 tee命令能够吧程序的输出输出到stdo,同时还能将输出写进文件(-a 表示append，否则就是覆盖)
 >>>>>>> Stashed changes
-=======
-### 15. tee命令
-- echo $(date) | tee -a date.log 
-tee命令能够吧程序的输出输出到stdo,同时还能将输出写进文件(-a 表示append，否则就是覆盖)
->>>>>>> Stashed changes
+
+
 
 ## 参考
 - [每天一个Linux命令](http://www.cnblogs.com/peida/archive/2012/12/05/2803591.html)
