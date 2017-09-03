@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://haldir65.github.io/"/>
-  <updated>2017-08-27T15:04:00.410Z</updated>
+  <updated>2017-09-02T11:22:31.713Z</updated>
   <id>https://haldir65.github.io/</id>
   
   <author>
@@ -16,11 +16,95 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>http2笔记</title>
+    <link href="https://haldir65.github.io/2017/09/01/2017-09-01-how-much-an-http-s-cost/"/>
+    <id>https://haldir65.github.io/2017/09/01/2017-09-01-how-much-an-http-s-cost/</id>
+    <published>2017-08-31T22:52:35.000Z</published>
+    <updated>2017-09-02T11:22:31.713Z</updated>
+    
+    <content type="html"><![CDATA[<p>http建立在tcp,ip基础上，tcp协议的可靠性意味着每次http请求都会分解为多次ip请求。很多出于book keeping的东西占用了实际发送数据的相当一部分，具体占用多少。由此顺便展开到http和tcp的基本关系。<br><img src="http://odzl05jxx.bkt.clouddn.com/Cg-4V1Kg7NCIMLH-AAwW6gNGe9cAAOB4AFTanwADBcC664.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
+<p>大部分基于Hadi在2016年的<a href="https://www.youtube.com/watch?v=F5smqpbz2sU">演讲</a></p>
+<h2 id="1-Http的几个概念"><a href="#1-Http的几个概念" class="headerlink" title="1. Http的几个概念"></a>1. Http的几个概念</h2><h3 id="1-1-bandwidth和latency的概念"><a href="#1-1-bandwidth和latency的概念" class="headerlink" title="1.1 bandwidth和latency的概念"></a>1.1 bandwidth和latency的概念</h3><p>bandwidth是指数据传输的速度上限（运营商设置），latency是物理距离限制的信号传递到达的时间(中美之间的延迟一般180ms左右，这是物理距离决定的)。</p>
+<h3 id="1-2-为什么http1-1差劲"><a href="#1-2-为什么http1-1差劲" class="headerlink" title="1.2 为什么http1.1差劲"></a>1.2 为什么http1.1差劲</h3><p>这是由于latency决定的，跟bandwidth无关。假设客户端和服务器之间存在一定带宽限制，随着带宽上限的提高，两者之间的传输速度趋于平衡。只有在路不够宽的时候，路的宽度才会成为交通的阻碍，如果路足够宽，那么通信双方的通信速度只和两者之间的物理距离有关。<br>要命的是，每一次连接都受到延迟影响。</p>
+<h3 id="1-3-现代网站的复杂化程度使得网络请求越来越频繁"><a href="#1-3-现代网站的复杂化程度使得网络请求越来越频繁" class="headerlink" title="1.3 现代网站的复杂化程度使得网络请求越来越频繁"></a>1.3 现代网站的复杂化程度使得网络请求越来越频繁</h3><p>http（超文本传输协议），最初设计的时候确实只需要传输一些固定的文字，可能只要一条连接就够了。随着现在网页越来越复杂，打开一个网页，在chrome里面能看到一瞬间请求的资源多达几十个甚至上百个。想象下，每条连接都会受到latency的影响，浪费的时间成倍数增长。<a href="https://www.webpagetest.org/">webpagetest</a>可以展示加载一个页面的过程中都发起了哪些请求，并以waterfall view的形式展示出来。比直接在chrome里面看更加直观。</p>
+<h3 id="1-4-ISO-OSI-Layer一共七层"><a href="#1-4-ISO-OSI-Layer一共七层" class="headerlink" title="1.4 ISO OSI Layer一共七层"></a>1.4 ISO OSI Layer一共七层</h3><ol>
+<li>Application (Http在这一层，但人们习惯把它当做第四层)</li>
+<li>Presentation</li>
+<li>Session</li>
+<li>Transport (Tcp在这)</li>
+<li>Network</li>
+<li>Link</li>
+<li>Physical</li>
+</ol>
+<p>Http本身是OK的，tcp为了确保可靠性，建立连接要三次握手，断开连接要四次挥手。真正有用的数据传输只在这两者之间。每次发起请求，都需要带上这些必要的数据传输。<br>这里面还有Handshake，客户端每收到一个包，都要向服务端发Acknowledgement(ACK)。<br>还有Flow Control(两端之间传输数据，实现并不知道两者之间的道路有多宽，所以先传100byte试试，一切ok在提到200byte，接着提到500byte,万一出现问题，退回到200byte,这就叫congestion)。<br>Flow Control的存在是有道理，但却使得每一条连接都得从很小的传输速度进行尝试，这就造成了延迟的增大。</p>
+<h3 id="1-5-HTTP-0-9-始于-1991年"><a href="#1-5-HTTP-0-9-始于-1991年" class="headerlink" title="1.5 HTTP 0.9 始于 1991年"></a>1.5 HTTP 0.9 始于 1991年</h3><p>0.9版本的Http还没有header,1996年的Http 1.0 加入了Header。但这种协议的设计初衷并不是为了现在这种一个网页带上300个请求的事实而设计的。 1999年，http 1.1 加入了Connection close（默认是Keep-Alive）。Keep-Alive的好处是Tcp连接不会在一个http请求结束之后就断开，也就没有三次握手这种东西了。</p>
+<h3 id="1-6-一些前人总结的优化技巧"><a href="#1-6-一些前人总结的优化技巧" class="headerlink" title="1.6 一些前人总结的优化技巧"></a>1.6 一些前人总结的优化技巧</h3><ol>
+<li>Sigle connection (/index.html；style.css全都放在一个连接里面)</li>
+<li>Pipelining  (一次性请求index.html以及style.css，这些东西全都放在一个请求里面)。这种方式的问题叫做 Head-of-line Blocking,由于tcp是可靠的协议，所以必须得等第一个请求的response回来，后续的请求才能执行。所以很多浏览器后来都放弃了对这种技术的支持。</li>
+<li>于是人们开始一次性发出多个tcp请求。客户端能同时向一个host(不同host之间不影响)发起的请求最多6(不同浏览器数量不同)到8个。这么干的原因一方面是客户端自我保护，另一方面也是为了保护服务器不至于崩溃。具体在知乎上有<a href="https://www.zhihu.com/question/19997004">讨论</a><br>所以我们经常看到知乎把api数据放在zhihu.com上，图片放在zhimg.com,统计放在zhstatic.com上。有时候还会有pic2.zhimg.com，pic3.zhimg.com。。。等等这些，还不是为了加快网页加载速度。(这就叫Domian Sharding)，这么干也有坏处，More DNS lookups。找dns花的时间多了。</li>
+<li>Inline resources<br>直接把图片放在html里面传回来，这造成缓存失效。还有编码的问题</li>
+<li>Concatenating and Spriting resources<br>Concatenating是把所有的js文件塞在一个大的js里面返回，这也造成缓存失效，处理缓慢等问题。<br>Spriting是把一大堆图片放在一整张图片里面，通过复杂的css选择其中的图片。</li>
+</ol>
+<h2 id="2-http2的开始"><a href="#2-http2的开始" class="headerlink" title="2. http2的开始"></a>2. http2的开始</h2><p>Http有点像一种谈话式的协议，但tcp并不是。http并没有什么错,慢就慢在tcp<br>http2的一些要点如下</p>
+<ul>
+<li>Binary Communication(http1.X 就是往socket里面写文字，h2直接写binary， 解析binary的速度要比解析文字快)</li>
+<li>Compression and optimization techniques(GZip没法压header，h2压缩了header)</li>
+<li>No change in HTTP semantics(主要是为了backward compatibility，GET,POST这些都没变)</li>
+<li>Not compatible with HTTP1.X but can be used ontop of it</li>
+</ul>
+<h3 id="2-1-SPDY"><a href="#2-1-SPDY" class="headerlink" title="2.1 SPDY"></a>2.1 SPDY</h3><p>谷歌设计了SPDY，h2建立在SPDY的基础上，google已经废弃了SPDY,据说是为了给h2让路。</p>
+<h3 id="2-2-h2过程"><a href="#2-2-h2过程" class="headerlink" title="2.2 h2过程"></a>2.2 h2过程</h3><p>h2传输的是Binary Frame，这里面包括HEADER FRAME和DATA FRAME, request的body和response的body都通过DATA FRAME传输。<br>client发起一个请求，header里面包括(Upgrade:2c),一切OK的话，服务器返回一个status code 101(switching Protocol)。<br>在response header里面返回一个Upgrade: h2c。</p>
+<h3 id="2-3-TLS-SSL"><a href="#2-3-TLS-SSL" class="headerlink" title="2.3 TLS ,SSL"></a>2.3 TLS ,SSL</h3><p>用于两点间传输binary数据<br>ALPN(Application Level Protcol Negotitation)</p>
+<h3 id="2-4-数据传输的模型"><a href="#2-4-数据传输的模型" class="headerlink" title="2.4 数据传输的模型"></a>2.4 数据传输的模型</h3><p>h2只有一条connection，里面有多个STREAM，STREAM里面包括了Request的HEADER FRAME和DATA FRAME以及Response的HEADER FRAME和DATA FRAME。<br>FRAME里面有length,Type，Flags,ID(有了ID就能有sequence,也就能multiplexing，多路复用)以及Payload(数据)。<br>FRAME TYPE有很多种，DATA,HEADER,WINDOW_UPDATE,SETTING，GOAWAY,这些在okhttp里面都能看到.<br>用WireShark可以查看<br>h2为什么快，Multiplexing，多路复用允许同时通过单一的 HTTP/2 连接发起多重的请求-响应消息</p>
+<h3 id="2-5-Header-Compression"><a href="#2-5-Header-Compression" class="headerlink" title="2.5 Header Compression"></a>2.5 Header Compression</h3><p>本来GZip是不能压缩Header的，h2使用HPACK(很复杂的协议)，讲header(无非是键值对)中的key,value映射一份表，所以每一次发起请求，h2会将那些header变成数字，同时，只会发送改变了的header。（应用层无需关心，十分复杂）</p>
+<h3 id="2-6-Streams可以设置优先级"><a href="#2-6-Streams可以设置优先级" class="headerlink" title="2.6 Streams可以设置优先级"></a>2.6 Streams可以设置优先级</h3><p>都是在一条Connection中发送出去，开发者可以设置，例如，js优先级高点，image优先级低一点。</p>
+<h3 id="2-7-Flow-Control"><a href="#2-7-Flow-Control" class="headerlink" title="2.7 Flow Control"></a>2.7 Flow Control</h3><ul>
+<li>Multiplexing requires ability of flow control</li>
+<li>WINDOW_UPDATE</li>
+</ul>
+<h3 id="2-8-Server-Push"><a href="#2-8-Server-Push" class="headerlink" title="2.8 Server Push"></a>2.8 Server Push</h3><p>客户端请求一个网页如 index.html，服务器会觉得，客户端很有可能还想要style.css和script.js。于是顺带着也给丢过来了。server push大致如此。<br>这样的好处就是，client无需发起请求，省了流量。同时，client还可以说GO_AWAY,也就是拒绝SERVER的push。</p>
+<h2 id="3-现状"><a href="#3-现状" class="headerlink" title="3.现状"></a>3.现状</h2><p>现在很多网站已经支持了h2，twitter好像就是。一个很简单的方法就是看chrome里面的network，h2只有一条线。<br>服务器这边，Ngnix 1.9.5支持h2，Apache 2.4.12开始支持<br>客户端这边 Netty,OkHttp,Curl 都行<br>进入h2，domain sharding,Concatenation and Spriting,InLining这些techniques都没有意义了。</p>
+<p><a href="https://http2.akamai.com/demo">演示</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://stackoverflow.com/questions/3613989/what-of-traffic-is-network-overhead-on-top-of-http-s-requests">what-of-traffic-is-network-overhead-on-top-of-http-s-requests</a></li>
+<li><a href="https://www.youtube.com/watch?v=F5smqpbz2sU">Hadi Hariri — HTTP/2 – What do I need to know?</a></li>
+</ul>
+<!-- ## 1. WireShark+tcpdump抓包
+
+## 2. tcp握手
+
+### 2.x tls 1.3
+### 2. xx http2
+### 2.xxxx https
+
+## 3. 应用层能做的事情
+
+### 3.1 引申到http2的原理
+OkHttp神一样的[注释](https://github.com/square/okhttp/blob/master/okhttp/src/main/java/okhttp3/internal/http2/Http2Reader.java)
+一些线上问题[okhttp和http 2.0相遇引发的"血案"](https://zhuanlan.zhihu.com/p/28958516)
+http2服务器[搭建](https://www.youtube.com/watch?v=OLWyOIOaeP4&list=PLNYkxOF6rcIDXTg3Gm8Y9Q_D8Ag_RDyQO)
+http2解释[原理](https://www.youtube.com/watch?v=r5oT_2ndjms)
+tcu、udp[抽象](https://www.youtube.com/watch?v=cTKQAe4DN6g)
+[须知](https://www.youtube.com/watch?v=F5smqpbz2sU) -->
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;http建立在tcp,ip基础上，tcp协议的可靠性意味着每次http请求都会分解为多次ip请求。很多出于book keeping的东西占用了实际发送数据的相当一部分，具体占用多少。由此顺便展开到http和tcp的基本关系。&lt;br&gt;&lt;img src=&quot;http://odzl05jxx.bkt.clouddn.com/Cg-4V1Kg7NCIMLH-AAwW6gNGe9cAAOB4AFTanwADBcC664.jpg?imageView2/2/w/600&quot; alt=&quot;&quot;&gt;&lt;br&gt;
+    
+    </summary>
+    
+    
+      <category term="tools" scheme="https://haldir65.github.io/tags/tools/"/>
+    
+  </entry>
+  
+  <entry>
     <title>JQuery手册</title>
     <link href="https://haldir65.github.io/2017/08/27/2017-08-27-jquery-stuff/"/>
     <id>https://haldir65.github.io/2017/08/27/2017-08-27-jquery-stuff/</id>
     <published>2017-08-27T13:48:52.000Z</published>
-    <updated>2017-08-27T15:04:00.410Z</updated>
+    <updated>2017-09-01T00:28:48.186Z</updated>
     
     <content type="html"><![CDATA[<p>jQuery只是javascript的公开库，掌握javascript语法对于解决问题更重要。jQuery能干的事情包括：</p>
 <ol>
@@ -34,8 +118,10 @@
 </ol>
 <a id="more"></a>
 <h2 id="1-使用微软或者谷歌的CDN-放在head-tag里面"><a href="#1-使用微软或者谷歌的CDN-放在head-tag里面" class="headerlink" title="1.使用微软或者谷歌的CDN,放在head tag里面"></a>1.使用微软或者谷歌的CDN,放在head tag里面</h2><p>这样做的好处是别的网站已经加载过的js文件可以直接读缓存，加快加载速度<br>其实自己下载一份，用src引用也行<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js"</span>&gt;</span><span class="undefined"></div><div class="line"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></div></pre></td></tr></table></figure></p>
-<h3 id="1-1所有的jQuery函数都放在ready里面"><a href="#1-1所有的jQuery函数都放在ready里面" class="headerlink" title="1.1所有的jQuery函数都放在ready里面"></a>1.1所有的jQuery函数都放在ready里面</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">$(<span class="built_in">document</span>).ready(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line"></div><div class="line">--- jQuery functions go here ----</div><div class="line"></div><div class="line">&#125;);</div></pre></td></tr></table></figure>
-<p>基本上就是window渲染完毕之后开始做一些事情，随便抄了一段知乎首页的Button<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">$(<span class="string">'button#button1'</span>).css(<span class="string">"background-color"</span>,<span class="string">"#0f88eb"</span>)</div><div class="line">.css(<span class="string">'border-radius'</span>,<span class="string">'8px'</span>).css(<span class="string">'padding-right'</span>,<span class="string">'14px'</span>)</div><div class="line">.css(<span class="string">'padding-left'</span>,<span class="string">'14px'</span>).css(<span class="string">'color'</span>,<span class="string">'white'</span>)</div><div class="line">.css(<span class="string">'line-height'</span>,<span class="string">'30px'</span>)</div></pre></td></tr></table></figure></p>
+<p>这一段必须放在head里面，用自己的src或者微软，谷歌的cdn都可以</p>
+<h3 id="1-1所有的jQuery函数都放在ready里面"><a href="#1-1所有的jQuery函数都放在ready里面" class="headerlink" title="1.1所有的jQuery函数都放在ready里面"></a>1.1所有的jQuery函数都放在ready里面</h3><p>这一段script放在body后面也行，放在head里面也行<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">$(<span class="built_in">document</span>).ready(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line"></div><div class="line">--- jQuery functions go here ----</div><div class="line"></div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>基本上就是window渲染完毕之后开始做一些事情，随便抄了一段知乎首页的Button<br>这里面双引号(“”)和单引号(‘’)都行</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">$(<span class="string">'button#button1'</span>).css(<span class="string">"background-color"</span>,<span class="string">"#0f88eb"</span>)</div><div class="line">.css(<span class="string">'border-radius'</span>,<span class="string">'8px'</span>).css(<span class="string">'padding-right'</span>,<span class="string">'14px'</span>)</div><div class="line">.css(<span class="string">'padding-left'</span>,<span class="string">'14px'</span>).css(<span class="string">'color'</span>,<span class="string">'white'</span>)</div><div class="line">.css(<span class="string">'line-height'</span>,<span class="string">'30px'</span>)</div></pre></td></tr></table></figure>
 <p>前提是body里面放了一个class = button1 的button tag.这里只是改变了按钮的css样式，<br>jQuery选择器有一些规则需要记住，主要就是如何选择html中的元素</p>
 <ul>
 <li>$(this)表示当前html对象</li>
@@ -45,6 +131,13 @@
 <li>$(‘#intro’)表示所有id为intro的元素</li>
 <li>￥（’div#intro.head’) 所有id= ‘intro’的div中，找到class为’head’的元素</li>
 </ul>
+<h3 id="1-2-常用函数"><a href="#1-2-常用函数" class="headerlink" title="1.2 常用函数"></a>1.2 常用函数</h3><p>在script tag里面添加这一段，因为比对框架可能使用了$符号，为避免冲突，用var替代$符号<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> jq=jQuery.noConflict()，</div></pre></td></tr></table></figure></p>
+<h3 id="1-3-selector怎么写"><a href="#1-3-selector怎么写" class="headerlink" title="1.3 selector怎么写"></a>1.3 selector怎么写</h3><p>写一个tag，后面要么写id=’’，要么写class = ‘’，id要用”#”查找，class要用’.’查找。<br>所以</p>
+<ul>
+<li><a id="2.2">文字</a> 这种id是不会有响应的</li>
+</ul>
+<h3 id="1-4-还可以加事件回调"><a href="#1-4-还可以加事件回调" class="headerlink" title="1.4 还可以加事件回调"></a>1.4 还可以加事件回调</h3><p>可以在事件后面加回调，例如<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">jq(<span class="string">'.click_btn'</span>).slideUp(<span class="number">300</span>)</div><div class="line"><span class="comment">//可以认为第二个参数是一个function</span></div><div class="line"> jq(<span class="string">'.click_btn'</span>).slideUp(<span class="number">300</span>,<span class="function"><span class="keyword">function</span> </span>&#123;</div><div class="line">    alert(<span class="string">'this will invoke after slideup finished'</span>)</div><div class="line"> &#125;)</div></pre></td></tr></table></figure></p>
+<p>可以自己写函数，可以引用之前定义的函数。当然函数回调里面还可以加回调，当然会有callback hell。简单的解决方式，把作为第二个参数的函数提取成一个函数，引用函数名作为参数传进去就好了。<br>另外，在js里面var myFunction = function(){//stuff }是完全成立的，函数也是var。</p>
 <h2 id="Todo"><a href="#Todo" class="headerlink" title="Todo"></a>Todo</h2><ul>
 <li>去复制一大堆文字，button，img的css样式，修改，继承，引用。手写实在太慢<br>-</li>
 </ul>
@@ -77,7 +170,7 @@
     <link href="https://haldir65.github.io/2017/08/24/2017-08-24-python-cookbook/"/>
     <id>https://haldir65.github.io/2017/08/24/2017-08-24-python-cookbook/</id>
     <published>2017-08-24T14:25:18.000Z</published>
-    <updated>2017-08-27T14:04:32.618Z</updated>
+    <updated>2017-09-01T14:20:27.370Z</updated>
     
     <content type="html"><![CDATA[<h2 id="苦海无涯，Python是岸"><a href="#苦海无涯，Python是岸" class="headerlink" title="苦海无涯，Python是岸"></a>苦海无涯，Python是岸</h2><p><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/essay-with-programming-lang.jpg" alt=""></p>
 <a id="more"></a>
@@ -88,7 +181,12 @@
 <li>面向对象</li>
 <li>多线程，多进程</li>
 </ul>
-<h2 id="2-Flask相关"><a href="#2-Flask相关" class="headerlink" title="2. Flask相关"></a>2. Flask相关</h2><h3 id="2-1-Flask-Admin-PannelFlask-Admin中文入门教程Please-run-on-linux"><a href="#2-1-Flask-Admin-PannelFlask-Admin中文入门教程Please-run-on-linux" class="headerlink" title="2.1 Flask Admin PannelFlask-Admin中文入门教程Please  run on linux"></a>2.1 Flask Admin Pannel<a href="http://flask123.sinaapp.com/article/57/">Flask-Admin中文入门教程</a>Please  run on linux</h3><h2 id="3"><a href="#3" class="headerlink" title="3."></a>3.</h2><p><img src="http://odzl05jxx.bkt.clouddn.com/40164340_40164340_1414330224938_mthumb.jpg?imageView2/2/w/600" alt=""></p>
+<h2 id="2-Flask相关"><a href="#2-Flask相关" class="headerlink" title="2. Flask相关"></a>2. Flask相关</h2><h3 id="2-1-Flask-Admin-PannelFlask-Admin中文入门教程Please-run-on-linux"><a href="#2-1-Flask-Admin-PannelFlask-Admin中文入门教程Please-run-on-linux" class="headerlink" title="2.1 Flask Admin PannelFlask-Admin中文入门教程Please  run on linux"></a>2.1 Flask Admin Pannel<a href="http://flask123.sinaapp.com/article/57/">Flask-Admin中文入门教程</a>Please  run on linux</h3><h3 id="2-7-小Web"><a href="#2-7-小Web" class="headerlink" title="2.7 小Web"></a>2.7 <a href="http://www.jianshu.com/p/f9d668490bc6">小Web</a></h3><h3 id="2-2-log上颜色"><a href="#2-2-log上颜色" class="headerlink" title="2.2.log上颜色"></a>2.2.log上颜色</h3><p><a href="https://blog.phpgao.com/python_colorful_log.html">博客</a>，Pycharm的console无效，内置Terminal有效</p>
+<h3 id="2-3-Pycharm里面import各种can’t-resolve-的解决方法"><a href="#2-3-Pycharm里面import各种can’t-resolve-的解决方法" class="headerlink" title="2.3 Pycharm里面import各种can’t resolve 的解决方法"></a>2.3 Pycharm里面import各种can’t resolve 的解决方法</h3><ul>
+<li>from werkzeug import secure_filename</li>
+<li>from werkzeug.utils import secure_filename<br>只是因为这个文件的包的位置挪了，import只能用绝对路径</li>
+</ul>
+<p><img src="http://odzl05jxx.bkt.clouddn.com/40164340_40164340_1414330224938_mthumb.jpg?imageView2/2/w/600" alt=""></p>
 ]]></content>
     
     <summary type="html">
@@ -109,7 +207,7 @@
     <link href="https://haldir65.github.io/2017/08/12/2017-08-12-algorithm-enlightenment/"/>
     <id>https://haldir65.github.io/2017/08/12/2017-08-12-algorithm-enlightenment/</id>
     <published>2017-08-12T11:04:16.000Z</published>
-    <updated>2017-08-24T20:40:33.448Z</updated>
+    <updated>2017-09-02T12:03:52.664Z</updated>
     
     <content type="html"><![CDATA[<p><img src="http://odzl05jxx.bkt.clouddn.com/10013-1109230P20693.jpg?imageView2/2/w/600" alt="FlamingFlowers"><br><a id="more"></a></p>
 <h2 id="1-各种Search的原理及java代码实现"><a href="#1-各种Search的原理及java代码实现" class="headerlink" title="1. 各种Search的原理及java代码实现"></a>1. 各种Search的原理及java代码实现</h2><p>java.utils.Arrays这个类中有各种经典的实现，直接对照着学就好了。</p>
@@ -118,6 +216,14 @@
 <p>最后一个用的是位非操作，就是把int(4 bytes)转成2进制所有的0变成1，所有的1变成0.</p>
 <h3 id="1-2-BubbleSort"><a href="#1-2-BubbleSort" class="headerlink" title="1.2 BubbleSort"></a>1.2 BubbleSort</h3><p>把较大的元素挪到右边，较小的元素挪到左边。<br>每次从左到右边，两个两个的比较，大的往右挪，第一次完成后，最大的一个一定已经挪到最后了。接下里对n-1个元素进行同样的操作。<br>java代码<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">bubbleSort</span><span class="params">(<span class="keyword">int</span>[] numArray)</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">int</span> n = numArray.length;</div><div class="line">    <span class="keyword">int</span> temp = <span class="number">0</span>;</div><div class="line"></div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">1</span>; j &lt; (n - i); j++) &#123;</div><div class="line"></div><div class="line">            <span class="keyword">if</span> (numArray[j - <span class="number">1</span>] &gt; numArray[j]) &#123;</div><div class="line">                temp = numArray[j - <span class="number">1</span>];</div><div class="line">                numArray[j - <span class="number">1</span>] = numArray[j];</div><div class="line">                numArray[j] = temp;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>the worst case scenario ：array完全倒序 o(n^2)<br>the best case scenario : array已经排序好 Ω（n）</p>
+<h3 id="1-3-Insertion-Sort"><a href="#1-3-Insertion-Sort" class="headerlink" title="1.3 Insertion Sort"></a>1.3 Insertion Sort</h3><p>基本上就是把一个数组从左到右迭代，第一遍声明第一个元素是sorted，第二遍看下第二个和第一个是不是有序的，第二遍完成后第二个元素是sorted。第三遍把前三个排序好。<br>下面这段代码是从<a href="https://courses.cs.washington.edu/courses/cse373/02wi/slides/Measurement/sld010.htm">华盛顿大学教程</a>抄的，应该没问题。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">insertionSort</span><span class="params">(<span class="keyword">int</span>[] a)</span></span>&#123;</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;a.length;i++)&#123;</div><div class="line">        <span class="keyword">int</span> temp = a[i];</div><div class="line">        <span class="keyword">int</span> j;</div><div class="line">        <span class="keyword">for</span>(j=i-<span class="number">1</span>;j&gt;=<span class="number">0</span>&amp;&amp;temp&lt;a[j];j--)</div><div class="line">            a[j+<span class="number">1</span>] = a[j]</div><div class="line">        a[j+<span class="number">1</span>] = temp;</div><div class="line"></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>核心算法就是第N此排序完成后，前N个元素已经排序完毕。</p>
+<p>the worst case scenario ：array完全倒序 o(n^2)<br>the best case scenario : array已经排序好 Ω（n）</p>
+<h3 id="1-4-Merge-Sort"><a href="#1-4-Merge-Sort" class="headerlink" title="1.4 Merge Sort"></a>1.4 Merge Sort</h3><p>这个算法比较复杂，一图胜千言<br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/merge_sort.png" alt=""><br><a href="http://www.java2novice.com/java-sorting-algorithms/merge-sort/">参考</a><br>其实就是把array打成一半一半，直到变成多个大小为2的数组，然后再合并起来。java代码直接复制粘贴了，保留包名是对作者的尊重：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> com.java2novice.sorting;</div><div class="line"> </div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyMergeSort</span> </span>&#123;</div><div class="line">     </div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span>[] array;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span>[] tempMergArr;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> length;</div><div class="line"> </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String a[])</span></span>&#123;</div><div class="line">         </div><div class="line">        <span class="keyword">int</span>[] inputArr = &#123;<span class="number">45</span>,<span class="number">23</span>,<span class="number">11</span>,<span class="number">89</span>,<span class="number">77</span>,<span class="number">98</span>,<span class="number">4</span>,<span class="number">28</span>,<span class="number">65</span>,<span class="number">43</span>&#125;;</div><div class="line">        MyMergeSort mms = <span class="keyword">new</span> MyMergeSort();</div><div class="line">        mms.sort(inputArr);</div><div class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i:inputArr)&#123;</div><div class="line">            System.out.print(i);</div><div class="line">            System.out.print(<span class="string">" "</span>);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">     </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sort</span><span class="params">(<span class="keyword">int</span> inputArr[])</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.array = inputArr;</div><div class="line">        <span class="keyword">this</span>.length = inputArr.length;</div><div class="line">        <span class="keyword">this</span>.tempMergArr = <span class="keyword">new</span> <span class="keyword">int</span>[length];</div><div class="line">        doMergeSort(<span class="number">0</span>, length - <span class="number">1</span>);</div><div class="line">    &#125;</div><div class="line"> </div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">doMergeSort</span><span class="params">(<span class="keyword">int</span> lowerIndex, <span class="keyword">int</span> higherIndex)</span> </span>&#123;</div><div class="line">         </div><div class="line">        <span class="keyword">if</span> (lowerIndex &lt; higherIndex) &#123;</div><div class="line">            <span class="keyword">int</span> middle = lowerIndex + (higherIndex - lowerIndex) / <span class="number">2</span>;</div><div class="line">            <span class="comment">// Below step sorts the left side of the array</span></div><div class="line">            doMergeSort(lowerIndex, middle);</div><div class="line">            <span class="comment">// Below step sorts the right side of the array</span></div><div class="line">            doMergeSort(middle + <span class="number">1</span>, higherIndex);</div><div class="line">            <span class="comment">// Now merge both sides</span></div><div class="line">            mergeParts(lowerIndex, middle, higherIndex);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"> </div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">mergeParts</span><span class="params">(<span class="keyword">int</span> lowerIndex, <span class="keyword">int</span> middle, <span class="keyword">int</span> higherIndex)</span> </span>&#123;</div><div class="line"> </div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = lowerIndex; i &lt;= higherIndex; i++) &#123;</div><div class="line">            tempMergArr[i] = array[i];</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">int</span> i = lowerIndex;</div><div class="line">        <span class="keyword">int</span> j = middle + <span class="number">1</span>;</div><div class="line">        <span class="keyword">int</span> k = lowerIndex;</div><div class="line">        <span class="keyword">while</span> (i &lt;= middle &amp;&amp; j &lt;= higherIndex) &#123;</div><div class="line">            <span class="keyword">if</span> (tempMergArr[i] &lt;= tempMergArr[j]) &#123;</div><div class="line">                array[k] = tempMergArr[i];</div><div class="line">                i++;</div><div class="line">            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                array[k] = tempMergArr[j];</div><div class="line">                j++;</div><div class="line">            &#125;</div><div class="line">            k++;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">while</span> (i &lt;= middle) &#123;</div><div class="line">            array[k] = tempMergArr[i];</div><div class="line">            k++;</div><div class="line">            i++;</div><div class="line">        &#125;</div><div class="line"> </div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><a href="https://www.youtube.com/watch?v=sWtYJv_YXbo">看视频比较方便</a></p>
+<h3 id="1-5-Selection-Sort"><a href="#1-5-Selection-Sort" class="headerlink" title="1.5 Selection Sort"></a>1.5 Selection Sort</h3><p>每次把数组里面最小的元素挪到最左边,图片是从<a href="http://www.java2novice.com/java-sorting-algorithms/selection-sort/">这里</a>抄的<br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/selectionsort.jpg" alt=""><br>java代码也是抄的<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> com.java2novice.algos;</div><div class="line"> </div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MySelectionSort</span> </span>&#123;</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span>[] doSelectionSort(<span class="keyword">int</span>[] arr)&#123;</div><div class="line">         </div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; arr.length - <span class="number">1</span>; i++)</div><div class="line">        &#123;</div><div class="line">            <span class="keyword">int</span> index = i;</div><div class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = i + <span class="number">1</span>; j &lt; arr.length; j++)</div><div class="line">                <span class="keyword">if</span> (arr[j] &lt; arr[index]) </div><div class="line">                    index = j;</div><div class="line">      </div><div class="line">            <span class="keyword">int</span> smallerNumber = arr[index];  </div><div class="line">            arr[index] = arr[i];</div><div class="line">            arr[i] = smallerNumber;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> arr;</div><div class="line">    &#125;</div><div class="line">     </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String a[])</span></span>&#123;</div><div class="line">         </div><div class="line">        <span class="keyword">int</span>[] arr1 = &#123;<span class="number">10</span>,<span class="number">34</span>,<span class="number">2</span>,<span class="number">56</span>,<span class="number">7</span>,<span class="number">67</span>,<span class="number">88</span>,<span class="number">42</span>&#125;;</div><div class="line">        <span class="keyword">int</span>[] arr2 = doSelectionSort(arr1);</div><div class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i:arr2)&#123;</div><div class="line">            System.out.print(i);</div><div class="line">            System.out.print(<span class="string">", "</span>);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>注意，每次遍历都都会意味着数组分为有序和无序两部分，遍历是从无序的数组第一个开始的，并且将无序数组中的最小值与无序数组第一个元素swap一下。<br>就是很直观的每次把最小的拿到最左边的做法。</p>
+<h3 id="1-6-Quicksort"><a href="#1-6-Quicksort" class="headerlink" title="1.6 Quicksort"></a>1.6 Quicksort</h3><p>一种比较快速的排序方法<br><a href="https://www.youtube.com/watch?v=aQiWF4E8flQ">视频</a><br>选中数组最后一个元素，称之为pivot。然后从左到右找，把所有小于pivot的元素挪到左边。然后把pivot挪到刚才那个元素右边，一直重复下去。</p>
 ]]></content>
     
     <summary type="html">
@@ -138,10 +244,10 @@
     <link href="https://haldir65.github.io/2017/08/03/2017-08-03-high-concurrency-recipes/"/>
     <id>https://haldir65.github.io/2017/08/03/2017-08-03-high-concurrency-recipes/</id>
     <published>2017-08-03T13:04:28.000Z</published>
-    <updated>2017-08-27T13:50:10.975Z</updated>
+    <updated>2017-09-02T02:27:27.506Z</updated>
     
     <content type="html"><![CDATA[<p><img src="http://odzl05jxx.bkt.clouddn.com/image/blog/be3c80a11edfd0fdb75d098550ed2c8e.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
-<p><img src="http://odzl05jxx.bkt.clouddn.com/Cg-4V1Kg7NCIMLH-AAwW6gNGe9cAAOB4AFTanwADBcC664.jpg?imageView2/2/w/600" alt=""></p>
+<p><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/1102531047-2.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/1102533137-5.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/1102533911-1.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/20120103214255_nTsVt.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/apic5964_sc115.com.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/apic6283_sc115.com.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/bamboo-buds-wallpaper-53859567dd31a.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/fresh-sparkle-dew-drops-on-red-flower-wallpaper-53861cf580909.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/pretty-orange-mushroom-wallpaper-5386b0c8c3459.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/timg.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/unclassified_unclassified--115_07-1920x1440.jpg?imageView2/2/w/600" alt=""></p>
 <h2 id="1-同时对共享资源进行操作好一点的加锁的方式"><a href="#1-同时对共享资源进行操作好一点的加锁的方式" class="headerlink" title="1. 同时对共享资源进行操作好一点的加锁的方式"></a>1. 同时对共享资源进行操作好一点的加锁的方式</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line">       <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">           <span class="keyword">final</span> ReentrantLock lock = <span class="keyword">this</span>.lock;</div><div class="line">           lock.lock(); <span class="comment">//拿不到lock的Thread会挂起</span></div><div class="line">           <span class="keyword">try</span> &#123;</div><div class="line">               <span class="keyword">this</span>.mList.add(<span class="string">"new elements added by"</span> + mIndex + <span class="string">""</span>); <span class="comment">//对共享资源的操作放这里</span></div><div class="line">           &#125;</div><div class="line">           <span class="keyword">finally</span> &#123;</div><div class="line">               lock.unlock(); <span class="comment">//记得解锁</span></div><div class="line">           &#125;</div><div class="line">       &#125;</div></pre></td></tr></table></figure>
 <h2 id="2-ThreadLocal当做一个HashMap来用就好了"><a href="#2-ThreadLocal当做一个HashMap来用就好了" class="headerlink" title="2. ThreadLocal当做一个HashMap来用就好了"></a>2. ThreadLocal当做一个HashMap来用就好了</h2><p><strong>volatile并不是Atomic操作，例如，A线程对volatile变量进行写操作(实际上是读和写操作)，B线程可能在这两个操作之间进行了写操作；</strong></p>
 <h2 id="3-Fork-join-since-java-7"><a href="#3-Fork-join-since-java-7" class="headerlink" title="3. Fork/join since java 7"></a>3. Fork/join since java 7</h2><p>有些任务是可以分块的。<a href="http://ifeve.com/java7-fork-join-and-closure/">work-stealing的实现</a></p>
@@ -162,9 +268,9 @@
     
       <category term="tools" scheme="https://haldir65.github.io/tags/tools/"/>
     
-      <category term="concurrency" scheme="https://haldir65.github.io/tags/concurrency/"/>
-    
       <category term="java" scheme="https://haldir65.github.io/tags/java/"/>
+    
+      <category term="concurrency" scheme="https://haldir65.github.io/tags/concurrency/"/>
     
   </entry>
   
@@ -761,7 +867,7 @@
     <link href="https://haldir65.github.io/2017/07/21/2017-07-21-network-manual/"/>
     <id>https://haldir65.github.io/2017/07/21/2017-07-21-network-manual/</id>
     <published>2017-07-20T16:05:32.000Z</published>
-    <updated>2017-08-25T13:03:25.480Z</updated>
+    <updated>2017-09-02T12:09:33.513Z</updated>
     
     <content type="html"><![CDATA[<p>网络相关的查找手册<br><img src="http://odzl05jxx.bkt.clouddn.com/b9ae1189145b4a4d9dfe4d0b89a21b47.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
 <h2 id="1-URI和URL是两件事"><a href="#1-URI和URL是两件事" class="headerlink" title="1. URI和URL是两件事"></a>1. URI和URL是两件事</h2><p>根据<a href="https://zh.wikipedia.org/wiki/%E7%BB%9F%E4%B8%80%E8%B5%84%E6%BA%90%E6%A0%87%E5%BF%97%E7%AC%A6">wiki的解释</a><br>URL是URI的子集，URL的一般格式包括三部分：资源类型、存放资源的主机域名，资源文件名。语法格式上,根据<a href="https://baike.baidu.com/item/URL%E6%A0%BC%E5%BC%8F/10056474?fr=aladdin">百度百科</a>找到一个能用的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">protocol :// hostname[:port] / path / [;parameters][?query]#fragment</div></pre></td></tr></table></figure></p>
@@ -865,17 +971,19 @@
 </ul>
 <p>Http长连接不如说tcp长连接,Tcp是可以不断开的，http连接服务器给到response之后就断开了。<a href="http://www.cnblogs.com/zuoxiaolong/p/life49.html">TCP连接</a>Http不过是做了tcp连接复用,http通道是一次性的，tcp不是的，这样做也是为了节省tcp通道。<br>长连接就是Connection  keep-Alive那玩意，客户端和服务器都得设置才有效。<br>长短轮询的间隔是服务器通过代码控制的。</p>
 <h3 id="5-2-keep-Alive和WebSocket的区别"><a href="#5-2-keep-Alive和WebSocket的区别" class="headerlink" title="5.2 keep-Alive和WebSocket的区别"></a>5.2 keep-Alive和WebSocket的区别</h3><p><img src="http://odzl05jxx.bkt.clouddn.com/ed541bc1ed61ead0bf6ea8233ef01c0a.jpg?imageView2/2/w/600" alt=""></p>
-<h3 id="5-3-http2可以实现推送了"><a href="#5-3-http2可以实现推送了" class="headerlink" title="5.3 http2可以实现推送了"></a>5.3 http2可以实现推送了</h3><h2 id="6-WebSocket、SPDY、Http2"><a href="#6-WebSocket、SPDY、Http2" class="headerlink" title="6. WebSocket、SPDY、Http2"></a>6. WebSocket、SPDY、Http2</h2><p>WebSocket一种在单个TCP 连接上进行全双工通讯的协议。<br>HTTP/2（超文本传输协议第2版，最初命名为HTTP 2.0），简称为h2（基于TLS/1.2或以上版本的加密连接）或h2c（非加密连接），是HTTP协议的的第二个主要版本<br>SPDY也就是HTTP/2的前身，一种开放的网络传输协议，由Google开发，用来发送网页内容。基于传输控制协议（TCP）的应用层协议</p>
-<p>网络协议，架构，规范，spdy,http2,url规范.<br>OSI七层网络体系结构 ： 物理层、数据链路层、网络层、传输层、表示层、会话层、应用层</p>
+<h3 id="5-3-http2可以实现推送了"><a href="#5-3-http2可以实现推送了" class="headerlink" title="5.3 http2可以实现推送了"></a>5.3 http2可以实现推送了</h3><h3 id="5-4-Http这玩意就不是为了视频流设计的"><a href="#5-4-Http这玩意就不是为了视频流设计的" class="headerlink" title="5.4 Http这玩意就不是为了视频流设计的"></a>5.4 Http这玩意就不是为了视频流设计的</h3><p><a href="https://stackoverflow.com/questions/14352599/how-to-send-chunks-of-video-for-streaming-using-http-protocol">HTTP wasn’t really designed for streaming</a></p>
+<h3 id="5-5-主流浏览器浏览器默认最大并发连接数"><a href="#5-5-主流浏览器浏览器默认最大并发连接数" class="headerlink" title="5.5 主流浏览器浏览器默认最大并发连接数"></a>5.5 主流浏览器浏览器默认最大并发连接数</h3><p>浏览器不可能同时发起10000个请求，所以主流浏览器都设定了限制,主要是http1.1,http2的话，只有一条connection。<br><a href="https://www.zhihu.com/question/20474326">解释</a></p>
+<p>###5.6 TLS,SSL</p>
+<h2 id="6-WebSocket、SPDY、Http2"><a href="#6-WebSocket、SPDY、Http2" class="headerlink" title="6. WebSocket、SPDY、Http2"></a>6. WebSocket、SPDY、Http2</h2><p>WebSocket一种在单个TCP 连接上进行全双工通讯的协议。<br>HTTP/2（超文本传输协议第2版，最初命名为HTTP 2.0），简称为h2（基于TLS/1.2或以上版本的加密连接）或h2c（非加密连接），是HTTP协议的的第二个主要版本<br>SPDY也就是HTTP/2的前身，一种开放的网络传输协议，由Google开发，用来发送网页内容。基于传输控制协议（TCP）的应用层协议</p>
+<p>###7. DNS(Domian Name System)<br>通过java代码调用DNS的方式<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;  </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> UnknownHostException </span>&#123;  </div><div class="line">        <span class="comment">//获取本机IP地址  </span></div><div class="line">        System.out.println(InetAddress.getLocalHost().getHostAddress());  </div><div class="line">        <span class="comment">//获取www.baidu.com的地址  </span></div><div class="line">        System.out.println(InetAddress.getByName(<span class="string">"www.baidu.com"</span>));  </div><div class="line">        <span class="comment">//获取www.baidu.com的真实IP地址  </span></div><div class="line">        System.out.println(InetAddress.getByName(<span class="string">"www.baidu.com"</span>).getHostAddress());  </div><div class="line">        <span class="comment">//获取配置在HOST中的域名IP地址  </span></div><div class="line">        System.out.println(InetAddress.getByName(<span class="string">"TEST"</span>).getHostAddress());  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>===========================trash here=====================================<br>网络协议，架构，规范，spdy,http2,url规范.<br>OSI七层网络体系结构 ： 物理层、数据链路层、网络层、传输层、表示层、会话层、应用层</p>
 <p>应用层面的Http，SMTP,FTP,POP,TLS/SSL,IMAP</p>
 <p>tcp三次握手，四次挥手<br>udp使用</p>
 <p>tls,https加密过程，sha1和sha256加密算法</p>
+<p>ping ,traceRouter</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="http://www.cnblogs.com/zuoxiaolong/p/life49.html">谈谈HTTP协议中的短轮询、长轮询、长连接和短连接</a></li>
 <li><a href="https://bhsc881114.github.io/2015/06/23/HTTP%E8%AF%B7%E6%B1%82%E7%9A%84TCP%E7%93%B6%E9%A2%88%E5%88%86%E6%9E%90/">http请求的TCP瓶颈</a></li>
-</ul>
-<p>ping ,traceRouter</p>
-<ul>
 <li><a href="http://www.runoob.com/w3cnote/restful-architecture.html">Restfull架构详解</a></li>
 <li><a href="http://blog.csdn.net/zhuhuiby/article/details/6725951">文件断点续传原理,CountdownLatch</a></li>
 <li><a href="http://lcodecorex.github.io/2016/08/01/%E6%96%87%E4%BB%B6%E5%88%86%E7%89%87%E4%B8%8E%E6%96%AD%E7%82%B9%E7%BB%AD%E4%BC%A0%E5%8E%9F%E7%90%86%E4%B8%8E%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0/">断点续传实现</a></li>
@@ -889,9 +997,9 @@
     </summary>
     
     
-      <category term="linux" scheme="https://haldir65.github.io/tags/linux/"/>
-    
       <category term="tools" scheme="https://haldir65.github.io/tags/tools/"/>
+    
+      <category term="linux" scheme="https://haldir65.github.io/tags/linux/"/>
     
   </entry>
   
@@ -1007,7 +1115,7 @@
     <link href="https://haldir65.github.io/2017/07/12/2017-07-12-android-cookbook/"/>
     <id>https://haldir65.github.io/2017/07/12/2017-07-12-android-cookbook/</id>
     <published>2017-07-12T00:40:08.000Z</published>
-    <updated>2017-08-25T13:03:25.479Z</updated>
+    <updated>2017-09-01T14:20:27.351Z</updated>
     
     <content type="html"><![CDATA[<p>A Cookbook shall look like a collection of Recipes, or an index page from where dinner are made. And it keeps you sane.<br><img src="http://odzl05jxx.bkt.clouddn.com/Cg-4zFVJ0xGITwm_AA688WRj8n8AAXZ9wGMpd0ADr0J195.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
 <p>github上已经star了四百多个项目，应该复习下了。</p>
@@ -1052,6 +1160,9 @@
 <li>[ ] java的包结构：java.lang(Language核心类);java.io(I/O相关);java.util(包含collection和concurrent);java.nio(另一种I/O);java.net(网络操作)</li>
 <li>[ ] 面试长谈<a href="http://www.cnblogs.com/zuoxiaolong/p/life51.html">问题</a></li>
 <li>[ ] jvm字节码看函数调用<a href="https://mp.weixin.qq.com/s/jv7avKM3Z3zK8sJNdtii_g">链接</a>，Jit for dummies</li>
+<li>[ ] OkHttp跑分<a href="https://github.com/square/okhttp/blob/master/benchmarks/src/main/java/okhttp3/benchmarks/Benchmark.java">github</a>以及作者的<a href="https://plus.google.com/+JesseWilson/posts/EJCDEiPrN42">Gplus</a>，以及外国人做的<a href="https://dzone.com/articles/high-concurrency-http-clients-on-the-jvm">High-Concurrency HTTP Clients on the JVM</a>，纯属好玩。</li>
+<li>[ ] 指令重排序，内存栅栏，JVM垃圾回收机制，何时触发MinorGC</li>
+<li>[ ] Eden和Survivor的比例分配等</li>
 </ul>
 <p>Android相关</p>
 <ul>
@@ -1077,14 +1188,15 @@
 <li>[ ] Zygote进程启动流程</li>
 <li>[ ] SystemServer进程启动流程</li>
 <li>[ ] Launcher启动流程</li>
+<li>[ ] Android生命周期在不同版本的表现形式<a href="http://blog.csdn.net/liuweiballack/article/details/47026263">有些onXXX在高版本不会调</a></li>
 </ul>
 <p>Linux相关</p>
 <ul>
 <li>[ ] linux进程间通信方式有哪些（信号量这种）</li>
 <li>[ ] Linux command extended</li>
 <li>[ ] 搭建mail服务</li>
-<li>[ ] win10加ubuntu<a href="http://www.jianshu.com/p/2eebd6ad284d">双系统</a>安装[如果不需要了直接删分区，删除引导即可]</li>
-<li>[ ]win10 装ubuntu有时候失败是因为删除了C盘的一个文件夹<a href="http://blog.csdn.net/fesdgasdgasdg/article/details/54183577">参考</a></li>
+<li>[x] win10加ubuntu<a href="http://www.jianshu.com/p/2eebd6ad284d">双系统</a>安装[如果不需要了直接删分区，删除引导即可]</li>
+<li>[x]win10 装ubuntu有时候失败是因为删除了C盘的一个文件夹<a href="http://blog.csdn.net/fesdgasdgasdg/article/details/54183577">参考</a></li>
 </ul>
 <p>网络通信</p>
 <ul>
@@ -1190,7 +1302,7 @@
     <link href="https://haldir65.github.io/2017/07/12/2017-07-12-fragment-decoded/"/>
     <id>https://haldir65.github.io/2017/07/12/2017-07-12-fragment-decoded/</id>
     <published>2017-07-12T00:37:23.000Z</published>
-    <updated>2017-07-20T15:19:39.775Z</updated>
+    <updated>2017-09-02T02:37:42.359Z</updated>
     
     <content type="html"><![CDATA[<p>We been told Fragment itself should only trust official docs, the implementation detail are prone to any change any time, don’t count on it!<br><img src="http://odzl05jxx.bkt.clouddn.com/2009528111321773591934.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
 <p>Fragment源码解析（support Library 25.3.0），不要以为看了源码就可以不鸟官方文档了，源码的内容经常变，只有官方的文档才是可靠的，谷歌保证会实现的效果。</p>
@@ -1238,7 +1350,7 @@
 <h2 id="5-Fragment的一些不常用的API"><a href="#5-Fragment的一些不常用的API" class="headerlink" title="5. Fragment的一些不常用的API"></a>5. Fragment的一些不常用的API</h2><p>attach,detach,FragmentLifecycleCallbacks,commitNow，setAllowOptimization(26.0.0又被deprecated了)<br>onCreateView这个名字是怎么来的，其实是在dispatchFragmentsOnCreateView里面调用的。Activity实现了onCreateView(LayoutInflater定义的，会在getSytemService返回LayoutInflater时调用，获取系统服务毕竟是一个异步过程)。</p>
 <h2 id="6-关于Glide是如何实现生命周期绑定的"><a href="#6-关于Glide是如何实现生命周期绑定的" class="headerlink" title="6. 关于Glide是如何实现生命周期绑定的"></a>6. 关于Glide是如何实现生命周期绑定的</h2><p>Fragment本身提供了生命周期监听回调<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">registerFragmentLifecycleCallbacks <span class="number">25.1</span>.0</div><div class="line">unregisterFragmentLifecycleCallbacks <span class="number">25.1</span>.0</div><div class="line"></div><div class="line">addOnBackStackChangedListener <span class="number">22.2</span>.0</div><div class="line">removeOnBackStackChangedListener <span class="number">22.2</span>.0</div></pre></td></tr></table></figure></p>
 <p>Glide的做法是写了一个<strong>SupportRequestManagerFragment</strong> 在这个Fragment的构造函数里放了一个ActivityFragmentLifecycle<br> <a href="http://blog.leanote.com/post/qq-tank/Glide%E4%B8%AD">参考</a><br> 在这个Fragment的onStart，OnStop等方法里面调用该lifeCycle的onStart,onStop等回调(lifeCycle是接口，由RequestManager实现)<br> 关键代码<br> <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (current == <span class="keyword">null</span>) &#123;</div><div class="line">               current = <span class="keyword">new</span> RequestManagerFragment();</div><div class="line">               pendingRequestManagerFragments.put(fm, current);</div><div class="line">               fm.beginTransaction().add(current, FRAGMENT_TAG).commitAllowingStateLoss();</div><div class="line">               handler.obtainMessage(ID_REMOVE_FRAGMENT_MANAGER, fm).sendToTarget();</div><div class="line">           &#125;</div></pre></td></tr></table></figure></p>
-<p> 所以经常会在Debug的时候看到FragmentManager里面有个”com.bumptech.glide.manager”的Fragment。这个Fragemnt没有实现onCreateView，所以直接返回null。Fragment本身是可以不带View的。</p>
+<p> 所以经常会在Debug的时候看到FragmentManager里面有个”com.bumptech.glide.manager”的Fragment。这个Fragment没有实现onCreateView，所以直接返回null。Fragment本身是可以不带View的。</p>
 <h2 id="7-总结"><a href="#7-总结" class="headerlink" title="7. 总结"></a>7. 总结</h2><p>Fragment的一些生命周期还是需要跟Activity的生命周期一起看，大部分是异步操作。FragmentManager类似一个管理者，也是一个容器，在Activity的生命周期中顺手实现了容器中元素所要求的UI状态。Fragment本质上是一个View的Controllers，通过FragmentManger和FragmentActivity的生命周期挂钩，并自动做好View的状态保存和恢复。具体的UI展示无非是addView，setVisibility等常规的方法，也正因为这样，support包里的Fragment才能做到3.0以下的适配。日常开发中，Fragment能够将原本堆在Activity中的逻辑承载过来,以异步的方式减轻主线程的压力，对外提供了获取(onViewCreated)，操作(Transaction)，销毁(onDestoryView)这些业务对象的回调方法。由于Android本身就是异步的系统，系统随时(asynchronous)可能会对Fragment的资源进行更改，开发者的代码也随时(asynchronous)会对这些资源进行操作。由于存在这种无法改变的’并发’现状，Fragment不得不为保证资源的一致性而主动抛出一些错误。本文有意忽略掉了一些transition动画(使用了hardwareLayer)和Loader加载的细节，希望能够对日常开发有点帮助。</p>
 <h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ol>
 <li><a href="http://stackoverflow.com/questions/9156406/whats-the-difference-between-detaching-a-fragment-and-removing-it">Fragment的onAttach和onDetach什么时候会调用</a></li>
@@ -1265,7 +1377,7 @@
     <link href="https://haldir65.github.io/2017/07/01/2017-07-01-it-began-with-a-few-bits/"/>
     <id>https://haldir65.github.io/2017/07/01/2017-07-01-it-began-with-a-few-bits/</id>
     <published>2017-07-01T15:03:00.000Z</published>
-    <updated>2017-07-23T10:43:10.509Z</updated>
+    <updated>2017-09-01T14:20:27.350Z</updated>
     
     <content type="html"><![CDATA[<h3 id="This-is-gonna-be-nasty……-TL-DR"><a href="#This-is-gonna-be-nasty……-TL-DR" class="headerlink" title="This is gonna be nasty…… TL;DR"></a>This is gonna be nasty…… TL;DR</h3><p><img src="http://odzl05jxx.bkt.clouddn.com/d653491fb55bec754b8471aa6a3f6eed.jpg?imageView2/2/w/600" alt=""></p>
 <a id="more"></a>
@@ -1309,6 +1421,7 @@
 <h4 id="1-5-7-和Rxjava配合使用"><a href="#1-5-7-和Rxjava配合使用" class="headerlink" title="1.5.7 和Rxjava配合使用"></a>1.5.7 和Rxjava配合使用</h4><p>CallAdapterFactory和ConverterFactory类似，也可以自定义，所以这样可以直接将所有的Observable返回到主线程</p>
 <p><img src="http://odzl05jxx.bkt.clouddn.com/always_observe_on_mian_thread.JPG" alt=""></p>
 <p>所以，Retrofit就是将HttpClient、Converter和CallAdapter这三样职能结合起来，又提供了足够的定制化。</p>
+<h3 id="1-6-补充"><a href="#1-6-补充" class="headerlink" title="1.6 补充"></a>1.6 补充</h3><p>OkHttp本身没有将response挪到主线程，Retrofit这么干了，具体在<br>Retrofit.Builder.build方法里面<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> Retrofit <span class="title">build</span><span class="params">()</span> </span>&#123;</div><div class="line">  Executor callbackExecutor = <span class="keyword">this</span>.callbackExecutor;</div><div class="line">  <span class="keyword">if</span> (callbackExecutor == <span class="keyword">null</span>) &#123;</div><div class="line">    callbackExecutor = platform.defaultCallbackExecutor();</div><div class="line">    <span class="comment">//Andriod平台默认挪到主线程，就是一个持有主线程的线程池</span></div><div class="line">    <span class="comment">//这个线程池的excute方法就是用一个hadler推到主线程了。</span></div><div class="line">  &#125;</div><div class="line">  <span class="comment">// Make a defensive copy of the adapters and add the default Call adapter.</span></div><div class="line">  List&lt;CallAdapter.Factory&gt; adapterFactories = <span class="keyword">new</span> ArrayList&lt;&gt;(<span class="keyword">this</span>.adapterFactories);</div><div class="line">  adapterFactories.add(platform.defaultCallAdapterFactory(callbackExecutor));</div><div class="line">  <span class="comment">//如果不加CallAdapterFactory的话，</span></div><div class="line">  <span class="comment">//Android平台默认直接把response丢回给callback，默认配置也是在主线程干的。</span></div><div class="line">  <span class="comment">//如果不希望在主线程接收Response的话，自己在Builder里面添加callbackExecutor.</span></div><div class="line"></div><div class="line">  <span class="comment">// Make a defensive copy of the converters.</span></div><div class="line">  List&lt;Converter.Factory&gt; converterFactories = <span class="keyword">new</span> ArrayList&lt;&gt;(<span class="keyword">this</span>.converterFactories);</div><div class="line"></div><div class="line">  <span class="keyword">return</span> <span class="keyword">new</span> Retrofit(callFactory, baseUrl, converterFactories, adapterFactories,</div><div class="line">      callbackExecutor, validateEagerly);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <h3 id="2-OkHttp"><a href="#2-OkHttp" class="headerlink" title="2. OkHttp"></a>2. OkHttp</h3><h3 id="3-A-few-‘ok’-libraries"><a href="#3-A-few-‘ok’-libraries" class="headerlink" title="3. A few ‘ok’ libraries"></a>3. A few ‘ok’ libraries</h3><p>why moshi ? why Retrofit call can be clone cheap？<br>why SinkedSource?<br>why protolBuffer cost less ?</p>
 <h3 id="Ref"><a href="#Ref" class="headerlink" title="Ref"></a>Ref</h3><ol>
 <li><a href="https://blog.piasy.com/2016/06/25/Understand-Retrofit/">Paisy解析Retrofit</a></li>
@@ -1526,85 +1639,6 @@ Deque(双端队列)
     
     
       <category term="python" scheme="https://haldir65.github.io/tags/python/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>linux常用命令扩展</title>
-    <link href="https://haldir65.github.io/2017/06/18/2017-06-18-linux-commands-extended/"/>
-    <id>https://haldir65.github.io/2017/06/18/2017-06-18-linux-commands-extended/</id>
-    <published>2017-06-18T08:51:49.000Z</published>
-    <updated>2017-08-24T20:40:33.432Z</updated>
-    
-    <content type="html"><![CDATA[<blockquote>
-<p>一些linux的常用命令，linux环境下运行server ,bash的语法</p>
-</blockquote>
-<p><img src="http://odzl05jxx.bkt.clouddn.com/ChMkJ1gq00WIXw_GAA47r_8gjqgAAXxJAH8qOMADjvH566.jpg?imageView2/2/w/600" alt=""></p>
-<a id="more"></a>
-<h3 id="1-常用软件安装"><a href="#1-常用软件安装" class="headerlink" title="1. 常用软件安装"></a>1. 常用软件安装</h3><p><a href="http://blog.topspeedsnail.com/archives/5752">utorrent</a><br>apache,mysql</p>
-<h3 id="2-环境变量怎么改"><a href="#2-环境变量怎么改" class="headerlink" title="2. 环境变量怎么改"></a>2. 环境变量怎么改</h3><p>平时在shell中输入sudo XXX ,系统是如何知道怎么执行这条指令的呢。首先，可以查看which XXX ，用于查找某项指令对应的文件的位置。而像sudo这种都放在PATH位置，系统会在几个关键位置查找sudo命令。用户本身完全可以创建一个叫做sudo的文件chmod+X ，然后运行这个sudo。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">查看PATH : echo $PATH</div><div class="line">/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games (注意，系统是按照这个顺序找的，如果在第一个目录下找到一个叫sudo的东西，就会直接执行了，所以这里是有潜在的危险的)</div><div class="line">看下哪个命令对应的位置在哪里</div><div class="line">which XXXk</div><div class="line">比如sudo 就放在 /usr/bin/sudo</div></pre></td></tr></table></figure></p>
-<blockquote>
-<p>$PATH<br>环境变量修改在~./bashrc或者 ~./profile里面<br>具体来说，比如要把/etc/apache/bin目录添加到PATH中<br>PATH=$PATH:/etc/apache/bin  #只对本次回话有效<br>或者  PATH=$PATH:/etc/apache/bin #在~./bashrc或者~./profile里面添加这句话</p>
-</blockquote>
-<h3 id="3-alias设置"><a href="#3-alias设置" class="headerlink" title="3. alias设置"></a>3. alias设置</h3><p>vi 中输入 /XXX 可以搜索<br>vi ~/.bashrc<br>添加 alias yourcommand=’ls -alr’<br>重开session即可生效</p>
-<h3 id="4-pushd和popd（类似于文件夹stack）"><a href="#4-pushd和popd（类似于文件夹stack）" class="headerlink" title="4. pushd和popd（类似于文件夹stack）"></a>4. pushd和popd（类似于文件夹stack）</h3><h3 id="5-小硬盘linux磁盘要经常清理需要的命令"><a href="#5-小硬盘linux磁盘要经常清理需要的命令" class="headerlink" title="5. 小硬盘linux磁盘要经常清理需要的命令"></a>5. 小硬盘linux磁盘要经常清理需要的命令</h3><ul>
-<li>du –max-depth=1 -h # 查看当前路径下所有文件/文件夹的大小</li>
-<li>du -k –max-depth=2 | sort -rn # 加上排序</li>
-</ul>
-<h3 id="6-AWK文本分析工具"><a href="#6-AWK文本分析工具" class="headerlink" title="6. AWK文本分析工具"></a>6. AWK文本分析工具</h3><ul>
-<li>awk ‘{print $0}’ /etc/passwd # 和cat差不多，显示文本内容</li>
-</ul>
-<h3 id="7-tar命令"><a href="#7-tar命令" class="headerlink" title="7.tar命令"></a>7.tar命令</h3><p>主要是跟压缩和解压文件有关的,<a href="http://man.linuxde.net/tar">参考</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">tar -cvf log.tar log2012.log 仅打包，不压缩！</div><div class="line">tar -zcvf log.tar.gz log2012.log 打包后，以 gzip 压缩</div><div class="line">tar -jcvf log.tar.bz2 log2012.log 打包后，以 bzip2 压缩</div></pre></td></tr></table></figure></p>
-<p>对照手册来看：<br>-c //小写的c，–create，表示创建新的备份文件<br>-v //verbose,显示进度什么的<br>-f 指定备份文件<br>-z –gzip，通过gzip压缩或者解压文件</p>
-<h3 id="8-定时任务怎么写"><a href="#8-定时任务怎么写" class="headerlink" title="8.定时任务怎么写"></a>8.定时任务怎么写</h3><p>已经有网站把各种常用的<a href="https://crontab.guru/every-6-hours">example</a>写出来了，直接照抄就是<br>后面跟上需要的命令，例如重启就是 /sbin/reboot</p>
-<h3 id="9-查找相关-grep-find"><a href="#9-查找相关-grep-find" class="headerlink" title="9. 查找相关(grep,find)"></a>9. 查找相关(grep,find)</h3><p>在文件中查找字符串，不区分大小写</p>
-<ul>
-<li>grep -i “sometext” filenname<br>在一个文件夹里面的所有文件中递归查找含有特定字符串的文件</li>
-<li>grep -r “sometext” *</li>
-</ul>
-<p>find<br>根据文件名查找文件</p>
-<ul>
-<li>find -name *.config  #在当前目录下查找</li>
-<li>find / -name finename # 在根目录下查找filename的文件(“filename”用双引号包起来)</li>
-<li></li>
-</ul>
-<h3 id="10-已安装的软件"><a href="#10-已安装的软件" class="headerlink" title="10.已安装的软件"></a>10.已安装的软件</h3><ul>
-<li>sudo dpkg -l</li>
-</ul>
-<h3 id="11-Ping一个主机"><a href="#11-Ping一个主机" class="headerlink" title="11.Ping一个主机"></a>11.Ping一个主机</h3><ul>
-<li>ping -c 5 gmail.com #只发送5次</li>
-</ul>
-<h3 id="12-Wget"><a href="#12-Wget" class="headerlink" title="12.Wget"></a>12.Wget</h3><p>下载文件 </p>
-<ul>
-<li>wget url<br>下载文件并以指定的文件名保存下来</li>
-<li>wget -0 filename url</li>
-</ul>
-<h3 id="13-查看文件的时候显示行号"><a href="#13-查看文件的时候显示行号" class="headerlink" title="13.查看文件的时候显示行号"></a>13.查看文件的时候显示行号</h3><p>cat -n rsyslog.conf # 显示行号，报错的时候方便处理<br>-n   显示行号（包括空行）<br>-b   显示行号（不包括空行）</p>
-<h3 id="14-统计文件夹下特定文件类型的数目"><a href="#14-统计文件夹下特定文件类型的数目" class="headerlink" title="14.统计文件夹下特定文件类型的数目"></a>14.统计文件夹下特定文件类型的数目</h3><ul>
-<li>ls -l |grep “^-“|wc -l  ##统计某文件夹下文件的个数</li>
-<li>ls -l |grep “^ｄ”|wc -l ##统计当前目录中文件夹的数量</li>
-<li>ls -lR|grep “^-“|wc -l ##递归一层层往下找的话，加上一个R就可以了<br>统计某个目录下的所有js文件：</li>
-<li>ls -lR /home/user|grep js|wc -l</li>
-</ul>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li><a href="http://www.cnblogs.com/peida/archive/2012/12/05/2803591.html">每天一个Linux命令</a></li>
-<li><a href="https://mp.weixin.qq.com/s/L0oViwqjIgudY-SrV0paRA">awk是三个人的名字</a></li>
-</ul>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;blockquote&gt;
-&lt;p&gt;一些linux的常用命令，linux环境下运行server ,bash的语法&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;&lt;img src=&quot;http://odzl05jxx.bkt.clouddn.com/ChMkJ1gq00WIXw_GAA47r_8gjqgAAXxJAH8qOMADjvH566.jpg?imageView2/2/w/600&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="blog" scheme="https://haldir65.github.io/categories/blog/"/>
-    
-    
-      <category term="linux" scheme="https://haldir65.github.io/tags/linux/"/>
     
   </entry>
   

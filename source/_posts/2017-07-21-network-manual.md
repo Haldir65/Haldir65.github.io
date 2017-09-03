@@ -280,8 +280,26 @@ HTTP/2（超文本传输协议第2版，最初命名为HTTP 2.0），简称为h2
 SPDY也就是HTTP/2的前身，一种开放的网络传输协议，由Google开发，用来发送网页内容。基于传输控制协议（TCP）的应用层协议
 
 
+###7. DNS(Domian Name System)
+通过java代码调用DNS的方式
+```java
+public class Test {  
+    public static void main(String[] args) throws UnknownHostException {  
+        //获取本机IP地址  
+        System.out.println(InetAddress.getLocalHost().getHostAddress());  
+        //获取www.baidu.com的地址  
+        System.out.println(InetAddress.getByName("www.baidu.com"));  
+        //获取www.baidu.com的真实IP地址  
+        System.out.println(InetAddress.getByName("www.baidu.com").getHostAddress());  
+        //获取配置在HOST中的域名IP地址  
+        System.out.println(InetAddress.getByName("TEST").getHostAddress());  
+    }  
+}  
+```
 
 
+
+===========================trash here=====================================
 网络协议，架构，规范，spdy,http2,url规范.
 OSI七层网络体系结构 ： 物理层、数据链路层、网络层、传输层、表示层、会话层、应用层
 
@@ -292,14 +310,11 @@ udp使用
 
 tls,https加密过程，sha1和sha256加密算法
 
-
+ping ,traceRouter
 
 ## 参考
 - [谈谈HTTP协议中的短轮询、长轮询、长连接和短连接](http://www.cnblogs.com/zuoxiaolong/p/life49.html)
 - [http请求的TCP瓶颈](https://bhsc881114.github.io/2015/06/23/HTTP%E8%AF%B7%E6%B1%82%E7%9A%84TCP%E7%93%B6%E9%A2%88%E5%88%86%E6%9E%90/)
-
-ping ,traceRouter
-
 - [Restfull架构详解](http://www.runoob.com/w3cnote/restful-architecture.html)
 - [文件断点续传原理,CountdownLatch](http://blog.csdn.net/zhuhuiby/article/details/6725951)
 - [断点续传实现](http://lcodecorex.github.io/2016/08/01/%E6%96%87%E4%BB%B6%E5%88%86%E7%89%87%E4%B8%8E%E6%96%AD%E7%82%B9%E7%BB%AD%E4%BC%A0%E5%8E%9F%E7%90%86%E4%B8%8E%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0/)

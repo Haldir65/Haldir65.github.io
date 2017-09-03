@@ -21,7 +21,7 @@
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/different_response.JPG">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/delegaet_converters.JPG">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/always_observe_on_mian_thread.JPG">
-<meta property="og:updated_time" content="2017-07-23T10:43:10.509Z">
+<meta property="og:updated_time" content="2017-09-01T14:20:27.350Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Retrofit源码阅读笔记">
 <meta name="twitter:description" content="This is gonna be nasty…… TL;DR">
@@ -246,6 +246,7 @@ ga('send', 'pageview');
 <h4 id="1-5-7-和Rxjava配合使用"><a href="#1-5-7-和Rxjava配合使用" class="headerlink" title="1.5.7 和Rxjava配合使用"></a>1.5.7 和Rxjava配合使用</h4><p>CallAdapterFactory和ConverterFactory类似，也可以自定义，所以这样可以直接将所有的Observable返回到主线程</p>
 <p><img src="http://odzl05jxx.bkt.clouddn.com/always_observe_on_mian_thread.JPG" alt=""></p>
 <p>所以，Retrofit就是将HttpClient、Converter和CallAdapter这三样职能结合起来，又提供了足够的定制化。</p>
+<h3 id="1-6-补充"><a href="#1-6-补充" class="headerlink" title="1.6 补充"></a>1.6 补充</h3><p>OkHttp本身没有将response挪到主线程，Retrofit这么干了，具体在<br>Retrofit.Builder.build方法里面<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> Retrofit <span class="title">build</span><span class="params">()</span> </span>&#123;</div><div class="line">  Executor callbackExecutor = <span class="keyword">this</span>.callbackExecutor;</div><div class="line">  <span class="keyword">if</span> (callbackExecutor == <span class="keyword">null</span>) &#123;</div><div class="line">    callbackExecutor = platform.defaultCallbackExecutor();</div><div class="line">    <span class="comment">//Andriod平台默认挪到主线程，就是一个持有主线程的线程池</span></div><div class="line">    <span class="comment">//这个线程池的excute方法就是用一个hadler推到主线程了。</span></div><div class="line">  &#125;</div><div class="line">  <span class="comment">// Make a defensive copy of the adapters and add the default Call adapter.</span></div><div class="line">  List&lt;CallAdapter.Factory&gt; adapterFactories = <span class="keyword">new</span> ArrayList&lt;&gt;(<span class="keyword">this</span>.adapterFactories);</div><div class="line">  adapterFactories.add(platform.defaultCallAdapterFactory(callbackExecutor));</div><div class="line">  <span class="comment">//如果不加CallAdapterFactory的话，</span></div><div class="line">  <span class="comment">//Android平台默认直接把response丢回给callback，默认配置也是在主线程干的。</span></div><div class="line">  <span class="comment">//如果不希望在主线程接收Response的话，自己在Builder里面添加callbackExecutor.</span></div><div class="line"></div><div class="line">  <span class="comment">// Make a defensive copy of the converters.</span></div><div class="line">  List&lt;Converter.Factory&gt; converterFactories = <span class="keyword">new</span> ArrayList&lt;&gt;(<span class="keyword">this</span>.converterFactories);</div><div class="line"></div><div class="line">  <span class="keyword">return</span> <span class="keyword">new</span> Retrofit(callFactory, baseUrl, converterFactories, adapterFactories,</div><div class="line">      callbackExecutor, validateEagerly);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <h3 id="2-OkHttp"><a href="#2-OkHttp" class="headerlink" title="2. OkHttp"></a>2. OkHttp</h3><h3 id="3-A-few-‘ok’-libraries"><a href="#3-A-few-‘ok’-libraries" class="headerlink" title="3. A few ‘ok’ libraries"></a>3. A few ‘ok’ libraries</h3><p>why moshi ? why Retrofit call can be clone cheap？<br>why SinkedSource?<br>why protolBuffer cost less ?</p>
 <h3 id="Ref"><a href="#Ref" class="headerlink" title="Ref"></a>Ref</h3><ol>
 <li><a href="https://blog.piasy.com/2016/06/25/Understand-Retrofit/">Paisy解析Retrofit</a></li>
@@ -470,15 +471,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Window</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -490,19 +491,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">adb</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">linux</a>
+                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -518,7 +515,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -526,11 +523,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
+                <a href="javascript:void(0)" class="js-tag color1">linux</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -546,10 +547,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
@@ -558,11 +555,19 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">transition</a>
+                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">service</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -575,10 +580,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">foreground</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">service</a>
               </li>
             
             <div class="clearfix"></div>

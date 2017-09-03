@@ -506,7 +506,7 @@ Glide的做法是写了一个**SupportRequestManagerFragment** 在这个Fragment
                 handler.obtainMessage(ID_REMOVE_FRAGMENT_MANAGER, fm).sendToTarget();
             }
  ```
- 所以经常会在Debug的时候看到FragmentManager里面有个"com.bumptech.glide.manager"的Fragment。这个Fragemnt没有实现onCreateView，所以直接返回null。Fragment本身是可以不带View的。
+ 所以经常会在Debug的时候看到FragmentManager里面有个"com.bumptech.glide.manager"的Fragment。这个Fragment没有实现onCreateView，所以直接返回null。Fragment本身是可以不带View的。
 
 
 
