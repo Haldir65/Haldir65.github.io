@@ -59,7 +59,7 @@ http2的一些要点如下
 - No change in HTTP semantics(主要是为了backward compatibility，GET,POST这些都没变)
 - Not compatible with HTTP1.X but can be used ontop of it
 
-### 2.1 SPDY 
+### 2.1 SPDY
 谷歌设计了SPDY，h2建立在SPDY的基础上，google已经废弃了SPDY,据说是为了给h2让路。
 
 ### 2.2 h2过程
@@ -72,7 +72,7 @@ client发起一个请求，header里面包括(Upgrade:2c),一切OK的话，服�
 ALPN(Application Level Protcol Negotitation)
 
 ### 2.4 数据传输的模型
-h2只有一条connection，里面有多个STREAM，STREAM里面包括了Request的HEADER FRAME和DATA FRAME以及Response的HEADER FRAME和DATA FRAME。 
+h2只有一条connection，里面有多个STREAM，STREAM里面包括了Request的HEADER FRAME和DATA FRAME以及Response的HEADER FRAME和DATA FRAME。
 FRAME里面有length,Type，Flags,ID(有了ID就能有sequence,也就能multiplexing，多路复用)以及Payload(数据)。
 FRAME TYPE有很多种，DATA,HEADER,WINDOW_UPDATE,SETTING，GOAWAY,这些在okhttp里面都能看到.
 用WireShark可以查看
@@ -105,6 +105,7 @@ h2为什么快，Multiplexing，多路复用允许同时通过单一的 HTTP/2 �
 ## 参考
 - [what-of-traffic-is-network-overhead-on-top-of-http-s-requests](https://stackoverflow.com/questions/3613989/what-of-traffic-is-network-overhead-on-top-of-http-s-requests)
 - [Hadi Hariri — HTTP/2 – What do I need to know?](https://www.youtube.com/watch?v=F5smqpbz2sU)
+- [WEB加速，协议先行](https://www.qcloud.com/community/article/995080)腾讯技术工程事业群基础架构部高级工程师lancelot演讲
 
 <!-- ## 1. WireShark+tcpdump抓包
 
@@ -123,11 +124,3 @@ http2服务器[搭建](https://www.youtube.com/watch?v=OLWyOIOaeP4&list=PLNYkxOF
 http2解释[原理](https://www.youtube.com/watch?v=r5oT_2ndjms)
 tcu、udp[抽象](https://www.youtube.com/watch?v=cTKQAe4DN6g)
 [须知](https://www.youtube.com/watch?v=F5smqpbz2sU) -->
-
-
-
-
-
-
-
-
