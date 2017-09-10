@@ -303,6 +303,8 @@ public class Test {
 网络协议，架构，规范，spdy,http2,url规范.
 OSI七层网络体系结构 ： 物理层、数据链路层、网络层、传输层、表示层、会话层、应用层
 
+HLS直播流慢是因为基于HTTP，而rmtp这种就不是基于HTTP了。
+
 应用层面的Http，SMTP,FTP,POP,TLS/SSL,IMAP
 
 tcp三次握手，四次挥手
