@@ -106,6 +106,7 @@ h2为什么快，Multiplexing，多路复用允许同时通过单一的 HTTP/2 �
 - [what-of-traffic-is-network-overhead-on-top-of-http-s-requests](https://stackoverflow.com/questions/3613989/what-of-traffic-is-network-overhead-on-top-of-http-s-requests)
 - [Hadi Hariri — HTTP/2 – What do I need to know?](https://www.youtube.com/watch?v=F5smqpbz2sU)
 - [WEB加速，协议先行](https://www.qcloud.com/community/article/995080)腾讯技术工程事业群基础架构部高级工程师lancelot演讲
+- [HTTP1.1中的一些优化策略失效](https://www.youtube.com/watch?v=yURLTwZ3ehk)
 
 <!-- ## 1. WireShark+tcpdump抓包
 

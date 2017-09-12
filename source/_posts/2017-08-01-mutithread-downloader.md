@@ -45,6 +45,12 @@ at com.android.okhttp.internal.http.DelegatingHttpsURLConnection.getResponseCode
 [HttpURLConnection教程](http://www.cnblogs.com/begin1949/p/5060802.html)
 
 
+## 3. 现有的实现方案
+非常优秀的library，英语流利说喜欢搞多进程。
+[Aspsine](https://github.com/Aspsine/MultiThreadDownload)
+[英语流利说](https://github.com/lingochamp/FileDownloader)
+下载文件的本质是inputstream.read
+
 ## 参考
 - [简书](http://www.jianshu.com/p/2b82db0a5181)
 - [Demo](https://github.com/AriaLyy/Aria)
