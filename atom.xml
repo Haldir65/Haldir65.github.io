@@ -41,7 +41,7 @@
     <link href="https://haldir65.github.io/2017/09/08/2017-09-08-all-about-Vue/"/>
     <id>https://haldir65.github.io/2017/09/08/2017-09-08-all-about-Vue/</id>
     <published>2017-09-08T13:41:43.000Z</published>
-    <updated>2017-09-10T15:53:17.919Z</updated>
+    <updated>2017-09-12T14:40:32.416Z</updated>
     
     <content type="html"><![CDATA[<p>Vue Js学习笔记<br><img src="http://odzl05jxx.bkt.clouddn.com/VueJsLogo.jpg" alt=""><br><a id="more"></a></p>
 <h2 id="1-前提"><a href="#1-前提" class="headerlink" title="1. 前提"></a>1. 前提</h2><p>使用cmder ,安装了nodejs<br>基本命令 </p>
@@ -56,7 +56,7 @@
 <li>template 标签用于显示模板，内部可以使用获取json对象的数据</li>
 <li>data 标签用于存储json类型的数据</li>
 <li>methods 标签用于声明方法，内部使用this.xxx可以获得data中的json对象</li>
-<li>components 标签用于引入可复用的模板</li>
+<li>components 标签用于引入可复用的模板,用于注册</li>
 <li>computed computed就像一个template的一个属性</li>
 </ul>
 <p>一些常用的事件绑定: </p>
@@ -77,7 +77,15 @@
 </ul>
 <h3 id="2-1-进行POST操作"><a href="#2-1-进行POST操作" class="headerlink" title="2.1 进行POST操作"></a>2.1 进行POST操作</h3><p><a href="https://jsonplaceholder.typicode.com/">jsonPlaceHolder</a>是一个免费的API网站。<br>vue-resource提交表单的操作如下:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">post:<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="comment">//use http here</span></div><div class="line">    <span class="keyword">this</span>.$http.post(<span class="string">'https://jsonplaceholder.typicode.com/posts'</span>,&#123;</div><div class="line">      title:<span class="keyword">this</span>.blog.title,</div><div class="line">      body:<span class="keyword">this</span>.blog.content,</div><div class="line">      userId:<span class="number">1</span>,</div><div class="line">    &#125;).then(<span class="function"><span class="keyword">function</span> (<span class="params">data</span>) </span>&#123;</div><div class="line">      <span class="comment">// body...</span></div><div class="line">      <span class="built_in">console</span>.log(data)</div><div class="line">      <span class="keyword">this</span>.summited = <span class="literal">true</span></div><div class="line">    &#125;);</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
 <p>post方法返回的是一个promise，加回调即可打印出api返回结果。</p>
+<h3 id="2-2-ajax跨域操作"><a href="#2-2-ajax跨域操作" class="headerlink" title="2.2 ajax跨域操作"></a>2.2 ajax跨域操作</h3><p><a href="https://stackoverflow.com/questions/25860304/how-do-i-set-response-headers-in-flask">XMLHttpRequest cannot load http://localhost:5000/hello.<br>No ‘Access-Control-Allow-Origin’ header is present on the requested resource.</a><br>用Flask做后台，大概的代码这样<br><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">@app.route("/posts", methods=['GET'])</div><div class="line">def create_post()</div><div class="line">    resp = Response(json.dumps(post_lists), mimetype='application/json')</div><div class="line">    resp.headers['Access-Control-Allow-Origin'] = '*'</div><div class="line">    return resp</div></pre></td></tr></table></figure></p>
+<h2 id="3-Router"><a href="#3-Router" class="headerlink" title="3. Router"></a>3. Router</h2><p>安装:</p>
+<blockquote>
+<p>npm install vue-router –save</p>
+</blockquote>
 <hr>
+<h3 id="基础复习"><a href="#基础复习" class="headerlink" title="基础复习"></a>基础复习</h3><ol>
+<li>id和class的问题<br>html tag的class，不同tag可以有相同的class，引用的时候用.classname来查找<br>id这个tag唯一的，一个页面不能有两个tag有相同的id，引用的时候用#id来找<br>一个是点，一个是#<br>2.js 里面有一个promise的概念，和java8的一些流式理念有点像</li>
+</ol>
 <p><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/1102531047-2.jpg?imageView2/2/w/600" alt=""></p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
 <li><a href="https://www.youtube.com/watch?v=5LYrN_cAJoA&amp;list=PL4cUxeGkcC9gQcYgjhBoeQH7wiAyZNrYa">Vue JS 2 Tutorial</a></li>
@@ -105,7 +113,7 @@
     <link href="https://haldir65.github.io/2017/09/01/2017-09-01-how-much-an-http-s-cost/"/>
     <id>https://haldir65.github.io/2017/09/01/2017-09-01-how-much-an-http-s-cost/</id>
     <published>2017-08-31T22:52:35.000Z</published>
-    <updated>2017-09-08T13:39:10.317Z</updated>
+    <updated>2017-09-12T14:13:00.840Z</updated>
     
     <content type="html"><![CDATA[<p>http建立在tcp,ip基础上，tcp协议的可靠性意味着每次http请求都会分解为多次ip请求。很多出于book keeping的东西占用了实际发送数据的相当一部分，具体占用多少。由此顺便展开到http和tcp的基本关系。<br><img src="http://odzl05jxx.bkt.clouddn.com/Cg-4V1Kg7NCIMLH-AAwW6gNGe9cAAOB4AFTanwADBcC664.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
 <p>大部分基于Hadi在2016年的<a href="https://www.youtube.com/watch?v=F5smqpbz2sU">演讲</a></p>
@@ -154,6 +162,7 @@
 <li><a href="https://stackoverflow.com/questions/3613989/what-of-traffic-is-network-overhead-on-top-of-http-s-requests">what-of-traffic-is-network-overhead-on-top-of-http-s-requests</a></li>
 <li><a href="https://www.youtube.com/watch?v=F5smqpbz2sU">Hadi Hariri — HTTP/2 – What do I need to know?</a></li>
 <li><a href="https://www.qcloud.com/community/article/995080">WEB加速，协议先行</a>腾讯技术工程事业群基础架构部高级工程师lancelot演讲</li>
+<li><a href="https://www.youtube.com/watch?v=yURLTwZ3ehk">HTTP1.1中的一些优化策略失效</a></li>
 </ul>
 <!-- ## 1. WireShark+tcpdump抓包
 
@@ -366,7 +375,7 @@ tcu、udp[抽象](https://www.youtube.com/watch?v=cTKQAe4DN6g)
     <link href="https://haldir65.github.io/2017/08/01/2017-08-01-mutithread-downloader/"/>
     <id>https://haldir65.github.io/2017/08/01/2017-08-01-mutithread-downloader/</id>
     <published>2017-08-01T14:19:31.000Z</published>
-    <updated>2017-08-05T14:33:32.968Z</updated>
+    <updated>2017-09-12T14:13:00.839Z</updated>
     
     <content type="html"><![CDATA[<p>主要讲一下在java中实现多线程断点续传的原理,主要讲断点下载的原理。<br><img src="http://odzl05jxx.bkt.clouddn.com/4b52d8db2e9d86b95c730af1db127a81.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
 <p>其实就是在Http请求里面加上一个”range”的header，HttpUrlConnection可以这么干：</p>
@@ -378,6 +387,7 @@ tcu、udp[抽象](https://www.youtube.com/watch?v=cTKQAe4DN6g)
 <h2 id="1-获取要下载的内容的contentLength"><a href="#1-获取要下载的内容的contentLength" class="headerlink" title="1. 获取要下载的内容的contentLength"></a>1. 获取要下载的内容的contentLength</h2><p>HttpUrlConnection有一个connection.getContentLength()方法，用于获取内容大小(bytes)</p>
 <h2 id="2-大文件上传避免oom"><a href="#2-大文件上传避免oom" class="headerlink" title="2. 大文件上传避免oom"></a>2. 大文件上传避免oom</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">Caused by java.lang.OutOfMemoryError: Failed to allocate a <span class="number">65548</span> <span class="keyword">byte</span> allocation with <span class="number">32012</span> free bytes and <span class="number">31</span>KB until OOM</div><div class="line">at com.android.okio.Segment.&lt;init&gt;(Segment.java:<span class="number">37</span>)</div><div class="line">at com.android.okio.SegmentPool.take(SegmentPool.java:<span class="number">48</span>)</div><div class="line">at com.android.okio.OkBuffer.writableSegment(OkBuffer.java:<span class="number">511</span>)</div><div class="line">at com.android.okio.OkBuffer.write(OkBuffer.java:<span class="number">424</span>)</div><div class="line">at com.android.okio.OkBuffer.clone(OkBuffer.java:<span class="number">740</span>)</div><div class="line">at com.android.okhttp.internal.http.RetryableSink.writeToSocket(RetryableSink.java:<span class="number">77</span>)</div><div class="line">at com.android.okhttp.internal.http.HttpConnection.writeRequestBody(HttpConnection.java:<span class="number">263</span>)</div><div class="line">at com.android.okhttp.internal.http.HttpTransport.writeRequestBody(HttpTransport.java:<span class="number">84</span>)</div><div class="line">at com.android.okhttp.internal.http.HttpEngine.readResponse(HttpEngine.java:<span class="number">790</span>)</div><div class="line">at com.android.okhttp.internal.http.HttpURLConnectionImpl.execute(HttpURLConnectionImpl.java:<span class="number">405</span>)</div><div class="line">at com.android.okhttp.internal.http.HttpURLConnectionImpl.getResponse(HttpURLConnectionImpl.java:<span class="number">349</span>)</div><div class="line">at com.android.okhttp.internal.http.HttpURLConnectionImpl.getResponseCode(HttpURLConnectionImpl.java:<span class="number">517</span>)</div><div class="line">at com.android.okhttp.internal.http.DelegatingHttpsURLConnection.getResponseCode(DelegatingHttpsURLConnection.java:<span class="number">105</span>)</div></pre></td></tr></table></figure>
 <p><a href="http://blog.sina.com.cn/s/blog_bfdb961b0101mkbo.html">参考</a> con.setChunkedStreamingMode(1024);//内部缓冲区—分段上传防止oom<br><a href="https://github.com/square/retrofit/issues/2270">解决方案</a>,RequestBody的contentLength设置为-1就好了<br><a href="http://www.cnblogs.com/begin1949/p/5060802.html">HttpURLConnection教程</a></p>
+<h2 id="3-现有的实现方案"><a href="#3-现有的实现方案" class="headerlink" title="3. 现有的实现方案"></a>3. 现有的实现方案</h2><p>非常优秀的library，英语流利说喜欢搞多进程。<br><a href="https://github.com/Aspsine/MultiThreadDownload">Aspsine</a><br><a href="https://github.com/lingochamp/FileDownloader">英语流利说</a><br>下载文件的本质是inputstream.read</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="http://www.jianshu.com/p/2b82db0a5181">简书</a></li>
 <li><a href="https://github.com/AriaLyy/Aria">Demo</a></li>
