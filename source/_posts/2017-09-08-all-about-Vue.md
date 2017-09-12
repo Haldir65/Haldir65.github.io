@@ -28,7 +28,7 @@ import Data from ./xxx/stuff.vue
 - template 标签用于显示模板，内部可以使用{{data}}获取json对象的数据
 - data 标签用于存储json类型的数据
 - methods 标签用于声明方法，内部使用this.xxx可以获得data中的json对象
-- components 标签用于引入可复用的模板
+- components 标签用于引入可复用的模板,用于注册
 - computed computed就像一个template的一个属性
 
 
@@ -123,6 +123,9 @@ data{
 ```
 SelectBox会从authors数组中提供选项，选中后，blog.author对象将会被赋予相应的值。
 
+
+
+
 ## 2.使用Http进行CURD操作
 安装：[Repo](https://github.com/pagekit/vue-resource)
 注意：需要在当前工作目录.
@@ -166,7 +169,21 @@ def create_post()
 
 
 
+## 3. Router
+安装:
+> npm install vue-router --save
+
 ---------------------------------------------------
+
+
+###  基础复习
+1. id和class的问题
+html tag的class，不同tag可以有相同的class，引用的时候用.classname来查找
+id这个tag唯一的，一个页面不能有两个tag有相同的id，引用的时候用#id来找
+一个是点，一个是#
+2.js 里面有一个promise的概念，和java8的一些流式理念有点像
+
+
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/1102531047-2.jpg?imageView2/2/w/600)
 
 ## 参考
