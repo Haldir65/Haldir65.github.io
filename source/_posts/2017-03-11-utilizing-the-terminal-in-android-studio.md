@@ -1,7 +1,7 @@
 ---
 title: 使用IDE内置的Terminal
 date: 2017-03-11 22:28:51
-categories: blog 
+categories: blog
 tags: [android]
 ---
 
@@ -12,7 +12,7 @@ tags: [android]
 <!-- more -->
 
 
-### 1. 编译Android client并安装到本地设备 
+### 1. 编译Android client并安装到本地设备
 官方提供了比较完善的Build Instructions，对于习惯于shift+F10的我来说，还是有点麻烦。
 
 clone下来[iosched](https://github.com/google/iosched)，修改gradle.properities里面的supportLib等值，参考Build Instruction ，
@@ -49,7 +49,3 @@ try {
     }
 ```
 计算一段方法到底花了多长时间，当然还是要在Android device monitor里面begin trace，注意要勾选**Enable Application Traces from XXXX**，选中自己的包名就好了。一开始可能不是特别好找，只要在html中ctrl+f找到了自己写的TAG，慢慢来应该能找到的。
-
-
-
-

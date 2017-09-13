@@ -297,9 +297,39 @@ Log.debug(() -> "list is"+list) //这个方法接受一个Supplier<String>
 String s = "someThing";
 System.out.println(s.length())
 
-//可以改成 
+//可以改成
 System.out.println("something".length()) // 这就叫inline，没必要多创建一根指针出来
 ```
+一种说法是，一个method只被用了一次，完全没必要声明这个method，vm调用method需要invokestatic或者invokeInterface,提取出来省掉这部分消耗。据说有些vm可以自动做好这部分优化。
+
+### 19. for loop的写法
+```java
+int i = 0;
+for (; i < 10; i++) {
+  // do stuff here
+}
+```
+这么写也是可以的，其实很像
+```java
+for (;;) {}
+```
+[解释](https://stackoverflow.com/questions/5676992/what-do-two-semicolons-mean-in-java-for-loop),这跟while(true)是一样的。
+
+java7的enhanced for loop[只是一个syntax sugar](https://stackoverflow.com/questions/85190/how-does-the-java-for-each-loop-work):
+```java
+List<String> somelist = new ArrayList<>();//右边只有两个<>是jdk7出现的diamond operator。
+for (Iterator<String> i = someList.iterator(); i.hasNext();) {
+    String item = i.next();
+    System.out.println(item);
+}
+//由于实在是一样的东西，intellij idea里面会变黄色，提醒 replace with for each
+// debug 一下确实发现 hasNext和next方法在每一个循环都被调用了
+```
+
+
+
+
+
 
 ## 参考
 
