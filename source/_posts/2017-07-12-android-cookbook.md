@@ -194,6 +194,7 @@ C语言从入门到放弃
 ## 一些需要看的演讲
 [Droidcon Montreal Jake Wharton - A Few Ok Libraries](https://www.youtube.com/watch?v=WvyScM_S88c)
 [Advanced Scrolling Techniques on Android](https://www.youtube.com/watch?v=N3J4ZFiR_3Q)
+[Android Graphics Performance](https://www.youtube.com/watch?v=vQZFaec9NpA&feature=youtu.be&t=29m51s) the cost of setAlpha
 
 ## 一些有名的人
 [GDE](https://developers.google.com/experts/all/technology/android)
