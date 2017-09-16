@@ -181,7 +181,9 @@ def create_post()
 html tag的class，不同tag可以有相同的class，引用的时候用.classname来查找
 id这个tag唯一的，一个页面不能有两个tag有相同的id，引用的时候用#id来找
 一个是点，一个是#
-2.js 里面有一个promise的概念，和java8的一些流式理念有点像
+2. js 里面有一个promise的概念，和java8的一些流式理念有点像
+3. 关闭ESlint，[Eslint](https://jingyan.baidu.com/article/4b52d702b5f490fc5d774b10.html)实在是太严格了，有点妨碍开发效率
+
 
 
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/1102531047-2.jpg?imageView2/2/w/600)
