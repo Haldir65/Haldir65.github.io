@@ -7,7 +7,8 @@ top : 1
 ---
 
 一些常用的linux基本命令,仅作为参考。</br>
-![](http://odzl05jxx.bkt.clouddn.com/849c18412f8e7a0b18df09f6f87e6516.jpg?imageView2/2/w/600)
+![](http://odzl05jxx.bkt.clouddn.com/image/jpg/bamboo-buds-wallpaper-53859567dd31a.jpg?imageView2/2/w/600)
+
  <!--more-->
 
 首先是连接vps的ssh(Secure Shell)工具，putty或者xshell都可以,putty改颜色[教程](http://www.cnblogs.com/nayitian/archive/2013/01/18/2866690.html)。
