@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="interesting stuff in java that don’t seem to get enough pubilicity">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/34a7d57ccabb18c69d085247cf009b22.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-08-31T22:46:27.899Z">
+<meta property="og:updated_time" content="2017-09-17T12:55:07.300Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="For those tiny details in Java">
 <meta name="twitter:description" content="interesting stuff in java that don’t seem to get enough pubilicity">
@@ -244,7 +244,20 @@ ga('send', 'pageview');
 </ul>
 <h3 id="17-函数的执行顺序，由此带来的性能影响"><a href="#17-函数的执行顺序，由此带来的性能影响" class="headerlink" title="17.函数的执行顺序，由此带来的性能影响"></a>17.函数的执行顺序，由此带来的性能影响</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Log.Debug(<span class="string">"list is "</span>+list) <span class="comment">//传一个list进去，list的长度未知</span></div><div class="line">其实应该改为</div><div class="line">Log.debug(() -&gt; <span class="string">"list is"</span>+list) <span class="comment">//这个方法接受一个Supplier&lt;String&gt;</span></div></pre></td></tr></table></figure>
 <p>区别在于，前者无论是否DEBUG都会去创建一个String，后者只是提供了如何创建String的思路，并没有真的创建。</p>
-<h3 id="18-inline的解释"><a href="#18-inline的解释" class="headerlink" title="18.inline的解释"></a>18.inline的解释</h3><p>这种说辞更多见于C或者C++,java里面，例如<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">String s = &quot;someThing&quot;;</div><div class="line">System.out.println(s.length())</div><div class="line"></div><div class="line">//可以改成 </div><div class="line">System.out.println(&quot;something&quot;.length()) // 这就叫inline，没必要多创建一根指针出来</div></pre></td></tr></table></figure></p>
+<h3 id="18-inline的解释"><a href="#18-inline的解释" class="headerlink" title="18.inline的解释"></a>18.inline的解释</h3><p>这种说辞更多见于C或者C++,java里面，例如<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">String s = &quot;someThing&quot;;</div><div class="line">System.out.println(s.length())</div><div class="line"></div><div class="line">//可以改成</div><div class="line">System.out.println(&quot;something&quot;.length()) // 这就叫inline，没必要多创建一根指针出来</div></pre></td></tr></table></figure></p>
+<p>一种说法是，一个method只被用了一次，完全没必要声明这个method，vm调用method需要invokestatic或者invokeInterface,提取出来省掉这部分消耗。据说有些vm可以自动做好这部分优化。</p>
+<h3 id="19-for-loop的写法"><a href="#19-for-loop的写法" class="headerlink" title="19. for loop的写法"></a>19. for loop的写法</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span> i = <span class="number">0</span>;</div><div class="line"><span class="keyword">for</span> (; i &lt; <span class="number">10</span>; i++) &#123;</div><div class="line">  <span class="comment">// do stuff here</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这么写也是可以的，其实很像<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> (;;) &#123;&#125;</div></pre></td></tr></table></figure></p>
+<p><a href="https://stackoverflow.com/questions/5676992/what-do-two-semicolons-mean-in-java-for-loop">解释</a>,这跟while(true)是一样的。</p>
+<p>java7的enhanced for loop<a href="https://stackoverflow.com/questions/85190/how-does-the-java-for-each-loop-work">只是一个syntax sugar</a>:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">List&lt;String&gt; somelist = <span class="keyword">new</span> ArrayList&lt;&gt;();<span class="comment">//右边只有两个&lt;&gt;是jdk7出现的diamond operator。</span></div><div class="line"><span class="keyword">for</span> (Iterator&lt;String&gt; i = someList.iterator(); i.hasNext();) &#123;</div><div class="line">    String item = i.next();</div><div class="line">    System.out.println(item);</div><div class="line">&#125;</div><div class="line"><span class="comment">//由于实在是一样的东西，intellij idea里面会变黄色，提醒 replace with for each</span></div><div class="line"><span class="comment">// debug 一下确实发现 hasNext和next方法在每一个循环都被调用了</span></div></pre></td></tr></table></figure></p>
+<h3 id="20-关于泛型"><a href="#20-关于泛型" class="headerlink" title="20. 关于泛型"></a>20. 关于泛型</h3><p>一般泛型要这么写：</p>
+<blockquote>
+<p>class A <T> 或者class B<V extends List></p>
+</blockquote>
+<p>实际上IDE不在乎选择了什么字母，所以可以这么写：</p>
+<blockquote>
+<p>class A <CALLBACK extends Binder><br>这样写完全没问题</p>
+</blockquote>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="https://www.youtube.com/watch?v=6uroXz5l7Gk">Jake Wharton and Jesse Wilson - Death, Taxes, and HTTP</a></li>
 <li><a href="https://www.youtube.com/watch?v=tfD2uYjzXFo">Android Tech Talk: HTTP In A Hostile World</a></li>

@@ -16,7 +16,7 @@
 <meta property="og:description" content="网络相关的查找手册">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/b9ae1189145b4a4d9dfe4d0b89a21b47.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/ed541bc1ed61ead0bf6ea8233ef01c0a.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-09-09T13:54:22.979Z">
+<meta property="og:updated_time" content="2017-09-17T11:52:28.207Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="网络通信手册">
 <meta name="twitter:description" content="网络相关的查找手册">
@@ -271,6 +271,7 @@ ga('send', 'pageview');
 </ul>
 <p>Header其实就是个字典，比较麻烦的就是Cache-Control了，这个还要结合If-None-Match，Etag来看。需要用的时候再看应该也不迟。</p>
 <p><a href="https://zh.wikipedia.org/wiki/HTTP%E5%A4%B4%E5%AD%97%E6%AE%B5">WikI上比较完整</a></p>
+<p><strong>Transfer-Encoding: chunked 有时候要传输的Content-Length实在太大，服务器计算长度需要开很大的Buffer，干脆把文件分块传输。</strong></p>
 <h2 id="4-Cookie和Session"><a href="#4-Cookie和Session" class="headerlink" title="4. Cookie和Session"></a>4. Cookie和Session</h2><h3 id="4-1-Cookie"><a href="#4-1-Cookie" class="headerlink" title="4.1 Cookie"></a>4.1 Cookie</h3><p>先看<a href="https://zh.wikipedia.org/wiki/Cookie">Wiki</a>上的解释:</p>
 <ul>
 <li>指某些网站为了辨别用户身份而储存在用户本地终端（Client Side）上的数据（通常经过加密.主要是因为Http是无状态的，服务器不知道这一次连接和上一次连接是不是同一个客户端<br>Cookie总是保存在客户端中，按在客户端中的存储位置，可分为内存Cookie和硬盘Cookie。内存Cookie由浏览器维护，保存在内存中，浏览器关闭后就消失了，其存在时间是短暂的。硬盘Cookie保存在硬盘里，有一个过期时间，除非用户手工清理或到了过期时间，硬盘Cookie不会被删除，其存在时间是长期的。所以，按存在时间，可分为非持久Cookie和持久Cookie。</li>
@@ -306,7 +307,10 @@ ga('send', 'pageview');
 <p>###5.6 TLS,SSL</p>
 <h2 id="6-WebSocket、SPDY、Http2"><a href="#6-WebSocket、SPDY、Http2" class="headerlink" title="6. WebSocket、SPDY、Http2"></a>6. WebSocket、SPDY、Http2</h2><p>WebSocket一种在单个TCP 连接上进行全双工通讯的协议。<br>HTTP/2（超文本传输协议第2版，最初命名为HTTP 2.0），简称为h2（基于TLS/1.2或以上版本的加密连接）或h2c（非加密连接），是HTTP协议的的第二个主要版本<br>SPDY也就是HTTP/2的前身，一种开放的网络传输协议，由Google开发，用来发送网页内容。基于传输控制协议（TCP）的应用层协议</p>
 <p>###7. DNS(Domian Name System)<br>通过java代码调用DNS的方式<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;  </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> UnknownHostException </span>&#123;  </div><div class="line">        <span class="comment">//获取本机IP地址  </span></div><div class="line">        System.out.println(InetAddress.getLocalHost().getHostAddress());  </div><div class="line">        <span class="comment">//获取www.baidu.com的地址  </span></div><div class="line">        System.out.println(InetAddress.getByName(<span class="string">"www.baidu.com"</span>));  </div><div class="line">        <span class="comment">//获取www.baidu.com的真实IP地址  </span></div><div class="line">        System.out.println(InetAddress.getByName(<span class="string">"www.baidu.com"</span>).getHostAddress());  </div><div class="line">        <span class="comment">//获取配置在HOST中的域名IP地址  </span></div><div class="line">        System.out.println(InetAddress.getByName(<span class="string">"TEST"</span>).getHostAddress());  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>===========================trash here=====================================<br>网络协议，架构，规范，spdy,http2,url规范.<br>OSI七层网络体系结构 ： 物理层、数据链路层、网络层、传输层、表示层、会话层、应用层</p>
+<p>===========================trash here=====================================</p>
+<p>一些优化<br>[TTFB] TTFB（Time To First Byte），客户端发出请求到收到响应的第一个字节所花费的时间。一般浏览器里面都能看到，这也是服务端可以优化的指标。</p>
+<p>GZip压缩文本还可以，图片就没必要开压缩了，因为图片本身就高度压缩了，再压只是浪费CPU。</p>
+<p>网络协议，架构，规范，spdy,http2,url规范.<br>OSI七层网络体系结构 ： 物理层、数据链路层、网络层、传输层、表示层、会话层、应用层</p>
 <p>HLS直播流慢是因为基于HTTP，而rmtp这种就不是基于HTTP了。</p>
 <p>应用层面的Http，SMTP,FTP,POP,TLS/SSL,IMAP</p>
 <p>tcp三次握手，四次挥手<br>udp使用</p>
@@ -318,6 +322,7 @@ ga('send', 'pageview');
 <li><a href="http://www.runoob.com/w3cnote/restful-architecture.html">Restfull架构详解</a></li>
 <li><a href="http://blog.csdn.net/zhuhuiby/article/details/6725951">文件断点续传原理,CountdownLatch</a></li>
 <li><a href="http://lcodecorex.github.io/2016/08/01/%E6%96%87%E4%BB%B6%E5%88%86%E7%89%87%E4%B8%8E%E6%96%AD%E7%82%B9%E7%BB%AD%E4%BC%A0%E5%8E%9F%E7%90%86%E4%B8%8E%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0/">断点续传实现</a></li>
+<li><a href="http://www.cnblogs.com/mayingbao/archive/2007/11/30/978530.html">一张非常好的解释status code的表格</a></li>
 </ul>
 
       
