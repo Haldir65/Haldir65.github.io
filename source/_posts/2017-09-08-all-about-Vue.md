@@ -183,7 +183,9 @@ id这个tag唯一的，一个页面不能有两个tag有相同的id，引用的�
 一个是点，一个是#
 2. js 里面有一个promise的概念，和java8的一些流式理念有点像
 3. 关闭ESlint，[Eslint](https://jingyan.baidu.com/article/4b52d702b5f490fc5d774b10.html)实在是太严格了，有点妨碍开发效率
-
+4. html中audio tag不识别本地文件，需要放在static文件下，放在src文件夹里就是404，一开始的时候我这么写"src='../assets/赵雷-成都.mp3'"，死活放不出来，换成"file://"开头也不行，换成网易云音乐的http地址就好了。最后换成'static目录下'。终于放出来了，“让我掉下眼泪的是，简直日了X”，还蛮押韵的。
+5. atom可以同时预览两个选项卡，右键,split right，用于copy and paste比较方便
+6. css里面可以写"background-image: url(./somefile.png)"，就是相对路径的意思。
 
 
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/1102531047-2.jpg?imageView2/2/w/600)

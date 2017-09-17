@@ -326,8 +326,13 @@ for (Iterator<String> i = someList.iterator(); i.hasNext();) {
 // debug 一下确实发现 hasNext和next方法在每一个循环都被调用了
 ```
 
+### 20. 关于泛型
+一般泛型要这么写：
+> class A <T> 或者class B<V extends List>
 
-
+实际上IDE不在乎选择了什么字母，所以可以这么写：
+> class A <CALLBACK extends Binder>
+这样写完全没问题
 
 
 

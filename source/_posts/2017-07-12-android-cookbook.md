@@ -137,8 +137,11 @@ Android相关
     - [ ] ViewGroup，View的源码
     - [ ] View的绘制原理
     - [ ] ListView,RecyclerView原理,加载优化(prefetcher什么的，滑动过程中不去加载图片，参考我写的Glide笔记)
+    - [ ] FrameLayout、LinearLayout、RelativeLayout,ImageView,TextView源码解析
+    - [ ] RecyclerView（这货最早的时候9K行，现在好像1.2W行）
     - [ ] SurfaceView，TextureView从入门到解析
 - [ ] Zygote进程启动流程
+- [ ] 属性动画据说用了反射，源码解析
 - [ ] SystemServer进程启动流程
 - [ ] Launcher启动流程
 - [ ] Android生命周期在不同版本的表现形式[有些onXXX在高版本不会调](http://blog.csdn.net/liuweiballack/article/details/47026263)

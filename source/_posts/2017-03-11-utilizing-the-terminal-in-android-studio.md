@@ -53,3 +53,22 @@ try {
 ## 2. FileObserver
 [FileObserver](https://developer.android.com/reference/android/os/FileObserver.html)可以监控设备上文件的更改，删除，读取。
 底层原理是使用了linux内核的inotify机制。
+
+## 3. Environment.getXXX长什么样
+私有文件应该放在哪里，公开的文件适合放在哪里，tmp文件可以放在哪里。
+```java
+Log.i("codecraeer", "getFilesDir = " + getFilesDir());
+Log.i("codecraeer", "getExternalFilesDir = " + getExternalFilesDir("exter_test").getAbsolutePath());
+Log.i("codecraeer", "getDownloadCacheDirectory = " + Environment.getDownloadCacheDirectory().getAbsolutePath());
+Log.i("codecraeer", "getDataDirectory = " + Environment.getDataDirectory().getAbsolutePath());
+Log.i("codecraeer", "getExternalStorageDirectory = " + Environment.getExternalStorageDirectory().getAbsolutePath());
+Log.i("codecraeer", "getExternalStoragePublicDirectory = " + Environment.getExternalStoragePublicDirectory("pub_test"));
+```
+
+
+
+##  4.对象池
+
+## 5.MediaScanner是一个和有趣的可以扫描多媒体文件的类
+[技术小黑屋](http://droidyue.com/blog/2014/07/12/scan-media-files-in-android-chinese-edition/)
+
