@@ -72,3 +72,26 @@ Log.i("codecraeer", "getExternalStoragePublicDirectory = " + Environment.getExte
 ## 5.MediaScanner是一个和有趣的可以扫描多媒体文件的类
 [技术小黑屋](http://droidyue.com/blog/2014/07/12/scan-media-files-in-android-chinese-edition/)
 
+### 6. Drawable跟单例有点像
+[官方文档](https://developer.android.com/guide/topics/graphics/2d-graphics.html#drawables)上有这么一句，看起来很不起眼的
+Note: Each unique resource in your project can maintain only one state, no matter how many different objects you instantiate for it. For example, if you instantiate two Drawable objects from the same image resource and change a property (such as the alpha) for one object, then it also affects the other. When dealing with multiple instances of an image resource, instead of directly transforming the Drawable object you should perform a tween animation.
+这件事的意义在于，Drawable在整个Application中是单例。
+简单来说，getDrawable每次返回的都是一个新的Drawable，但Drawable只是一个Wrapper，放在res文件夹里的Drawable资源在整个Application中是单例。
+证明的方式很简单: 两个相同资源的Drawable可能不一样，但Drawable.getConstantState都是同一个instance。
+原理的话，参考 [Cyril Mottier在2013年的演讲](https://www.youtube.com/watch?v=JuE13KXRMxg)
+xml是binary optimized的，
+亲测，在一个Activity中改变Drawable的Alpha属性，退出重新进，Drawable的Alpha就已经是被更改了的。在另一个Activity中引用这个Drawable，Alpha也受到影响。
+更严重的是，在一个Activity中使用((BitmapDrawable)getDrawable).getBitmap().recycle()，在另一个Activity中使用这个Drawable，直接报错：
+```
+java.lang.RuntimeException: Canvas: trying to use a recycled bitmap android.graphics.Bitmap@c08bbc6
+at android.graphics.Canvas.throwIfCannotDraw(Canvas.java:1270)
+at android.graphics.Canvas.drawBitmap(Canvas.java:1404)
+at android.graphics.drawable.BitmapDrawable.draw(BitmapDrawable.java:544)
+at android.widget.ImageView.onDraw(ImageView.java:1228)
+```
+**这种东西根本防不胜防。**
+被人为调用Bitmap.recycle()的res中的图片资源直接不能用了，怎么办，重新用BitmapFactory去decode呗。照说Android 3.0之后就不应该调用Recycle方法了，记得Chet Haase说过，Recycle doesn't do anything。
+
+### 7. Aidl里面有些关键字
+oneway关键字。
+AIDL 接口的实现必须是完全线程安全实现。 oneway 关键字用于修改远程调用的行为。使用该关键字时，远程调用不会阻塞；它只是发送事务数据并立即返回

@@ -336,7 +336,56 @@ for (Iterator<String> i = someList.iterator(); i.hasNext();) {
 
 ### 21.子类和父类的关系
 子类里面写一个和父类一样名字的变量，会把父类protected变量的值冲刷掉；
-调用父类被override的方法，
+```java
+public class FatherClass {
+    protected int mId;
+
+}
+
+
+public class ChildClass extends FatherClass {
+   private int mId;
+
+    public static void main(String[] args) {
+        FatherClass fatherClass = new ChildClass();
+        fatherClass.mId = 10;
+        System.out.println(fatherClass.mId); //10
+
+        ChildClass childClass = (ChildClass) fatherClass;
+        childClass.mId = 20;
+        System.out.println(fatherClass.mId); //10
+        System.out.println(childClass.mId); //20
+    }
+}
+输出
+10
+10
+20
+换成
+public class ChildClass extends FatherClass {
+   private int mId;
+
+    public static void main(String[] args) {
+        ChildClass fatherClass = new ChildClass();
+        fatherClass.mId = 10;
+        System.out.println(fatherClass.mId);
+
+        ChildClass childClass = (ChildClass) fatherClass;
+        childClass.mId = 20;
+        System.out.println(fatherClass.mId);
+        System.out.println(childClass.mId);
+    }
+}
+输出
+10
+20
+20
+```
+所基本上就是，把一个对象当成什么class来用，操作的范围就在这个层面造成影响；
+debug会看见两个变量
+mId和FatherClass.mId，所以完全是两个int。
+
+调用父类被override的方法，目测只能用super.someMethod()
 
 ## 参考
 
