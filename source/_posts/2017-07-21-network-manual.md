@@ -28,7 +28,7 @@ fragment（信息片断）字符串，用于指定网络资源中的片断。例
 
 
 ### 1.1 Http的GET请求的url长度是有限制的
-Http1.1协议中并没有做这个限制，但通信的两端，服务器(Nginx和Tomcat)和客户端(浏览器长厂商)都做了限制。[参考](https://cnbin.github.io/blog/2016/02/20/httpxie-yi-zhong-de-ge-chong-chang-du-xian-zhi-zong-jie/)
+Http1.1协议中并没有做这个限制，但通信的两端，服务器(Nginx和Tomcat)和客户端(浏览器厂商)都做了限制。[参考](https://cnbin.github.io/blog/2016/02/20/httpxie-yi-zhong-de-ge-chong-chang-du-xian-zhi-zong-jie/)
 一些浏览器的url长度限制，即url长度不能超过这么多个字符
 - IE : 2803
 - Firefox:65536
@@ -273,7 +273,7 @@ Http长连接不如说tcp长连接,Tcp是可以不断开的，http连接服务�
 浏览器不可能同时发起10000个请求，所以主流浏览器都设定了限制,主要是http1.1,http2的话，只有一条connection。
 [解释](https://www.zhihu.com/question/20474326)
 
-###5.6 TLS,SSL
+### 5.6 TLS,SSL
 
 
 ## 6. WebSocket、SPDY、Http2

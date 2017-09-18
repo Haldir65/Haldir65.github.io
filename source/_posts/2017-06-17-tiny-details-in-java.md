@@ -334,7 +334,9 @@ for (Iterator<String> i = someList.iterator(); i.hasNext();) {
 > class A <CALLBACK extends Binder>
 这样写完全没问题
 
-
+### 21.子类和父类的关系
+子类里面写一个和父类一样名字的变量，会把父类protected变量的值冲刷掉；
+调用父类被override的方法，
 
 ## 参考
 
