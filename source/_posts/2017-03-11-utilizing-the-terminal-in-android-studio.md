@@ -79,7 +79,7 @@ Note: Each unique resource in your project can maintain only one state, no matte
 简单来说，getDrawable每次返回的都是一个新的Drawable，但Drawable只是一个Wrapper，放在res文件夹里的Drawable资源在整个Application中是单例。
 证明的方式很简单: 两个相同资源的Drawable可能不一样，但Drawable.getConstantState都是同一个instance。
 原理的话，参考 [Cyril Mottier在2013年的演讲](https://www.youtube.com/watch?v=JuE13KXRMxg)
-xml是binary optimized的，
+就跟xml是binary optimized的一样，
 亲测，在一个Activity中改变Drawable的Alpha属性，退出重新进，Drawable的Alpha就已经是被更改了的。在另一个Activity中引用这个Drawable，Alpha也受到影响。
 更严重的是，在一个Activity中使用((BitmapDrawable)getDrawable).getBitmap().recycle()，在另一个Activity中使用这个Drawable，直接报错：
 ```
@@ -95,3 +95,130 @@ at android.widget.ImageView.onDraw(ImageView.java:1228)
 ### 7. Aidl里面有些关键字
 oneway关键字。
 AIDL 接口的实现必须是完全线程安全实现。 oneway 关键字用于修改远程调用的行为。使用该关键字时，远程调用不会阻塞；它只是发送事务数据并立即返回
+
+### 8. 自定义View一个不容易发现的点
+自定义View的套路一般是这样的
+```java
+public CustomTitleView(Context context, AttributeSet attrs)  
+   {  
+       this(context, attrs, 0);  
+   }  
+
+   public CustomTitleView(Context context)  
+   {  
+       this(context, null);  
+   }  
+
+   public CustomTitleView(Context context, AttributeSet attrs, int defStyle)  
+   {  
+       super(context, attrs, defStyle);  
+       /**
+        * 获得我们所定义的自定义样式属性
+        */  
+        init();
+   }  
+```
+然后在layout里面去findViewById，妥妥的找不到。写在xml里面，会调到两个参数的构造函数，因为id这种东西写是在xml里面的，所以在两个参数的构造函数里面做事情就好了。
+
+### 9. Dialog会出的一些错误
+1. showDialog之前最好判断下,activity.isFinishing
+否则会崩成这样：
+```
+E/AndroidRuntime: FATAL EXCEPTION: main
+Process: com.xxx.xxx, PID: 30025
+ android.view.WindowManager$BadTokenException: Unable to add window -- token android.os.BinderProxy@59d55fe is not valid; is your activity running?
+ at android.view.ViewRootImpl.setView(ViewRootImpl.java:579)
+ at android.view.WindowManagerGlobal.addView(WindowManagerGlobal.java:310)
+ at android.view.WindowManagerImpl.addView(WindowManagerImpl.java:91)
+ at android.app.Dialog.show(Dialog.java:319)
+ ...
+```
+
+
+2. show一个Dialog，忘记关掉就finish，App不会崩，但日志里面有error：
+从用户角度来看，Dialog随着页面的关闭也关了
+```
+ E/WindowManager: android.view.WindowLeaked: Activity com.example.SomeActivity has leaked window com.android.internal.policy.PhoneWindow$DecorView
+ at android.view.ViewRootImpl.<init>(ViewRootImpl.java:380)
+ at android.view.WindowManagerGlobal.addView(WindowManagerGlobal.java:299)
+ at android.view.WindowManagerImpl.addView(WindowManagerImpl.java:91)
+ at android.app.Dialog.show(Dialog.java:319)
+ ...
+```
+对比一下上面那个error，目测只有FATAL EXCEPTION才会导致App崩溃
+
+3. activity finish掉之后再去Dismiss，先出2的日志，然后是一个fatal exception
+```java
+button.setOnClickListener { v ->
+            showDialog()
+            finish() // onBackPressed也一样
+            v.postDelayed( Runnable { mDialg!!.dismiss() },2000)
+}
+```
+```
+//第一个是这个
+E/WindowManager: android.view.WindowLeaked: Activity com.xxx.DialogActivity has leaked window com.android.internal.policy.PhoneWindow$DecorView{240a531 V
+//2秒之后出现这个
+E/AndroidRuntime: FATAL EXCEPTION: main
+ Process: com.harris.simplezhihu, PID: 7256
+  java.lang.IllegalArgumentException: View=com.android.internal.policy.PhoneWindow$DecorView{240a531 V.E...... R......D 0,0-1026,716} not attached to window manager
+at android.view.WindowManagerGlobal.findViewLocked(WindowManagerGlobal.java:424)
+at android.view.WindowManagerGlobal.removeView(WindowManagerGlobal.java:350)
+at android.view.WindowManagerImpl.removeViewImmediate(WindowManagerImpl.java:123)
+at android.app.Dialog.dismissDialog(Dialog.java:362)
+```
+就崩了，dismiss之前先判断下isFinishing就没事了
+
+
+4. dialog.show不是异步方法
+```java
+showDialog()
+finish()
+```
+App不会崩，和2一样的error日志,看来不是Fatal
+瞅一眼源码
+Dialog.java:
+```java
+public void show() {
+      // .......
+      mWindowManager.addView(mDecor, l);
+      mShowing = true;
+      sendShowMessage();//发个消息给，OnShowListener
+    }
+
+private void sendShowMessage() {
+     if (mShowMessage != null) {
+         // Obtain a new message so this dialog can be re-used
+         Message.obtain(mShowMessage).sendToTarget();
+         //sendToTarget是到主线程的MessageQueue去排队了
+     }
+ }
+```
+所以ui上显示出Dialog和onShow不是一前一后(在同一个消息里面)调用的。
+```java
+private static final class ListenersHandler extends Handler {
+    private final WeakReference<DialogInterface> mDialog;
+
+    public ListenersHandler(Dialog dialog) {
+        mDialog = new WeakReference<>(dialog);
+    }
+
+    @Override
+    public void handleMessage(Message msg) {
+        switch (msg.what) {
+            case DISMISS:
+                ((OnDismissListener) msg.obj).onDismiss(mDialog.get());
+                break;
+            case CANCEL:
+                ((OnCancelListener) msg.obj).onCancel(mDialog.get());
+                break;
+            case SHOW:
+                ((OnShowListener) msg.obj).onShow(mDialog.get());
+                break;
+        }
+    }
+}
+```
+很容易想到onDismiss(Dialog)里面的dialog可能为null，(主线程恰好在排队，正好来一次GC)，可能性应该不大。
+
+5. Dialog中有一个OnKeyListener，所以用户手动按返回键会去dismissDialog并消费掉事件，代码调用onBackPressed和手动按返回键是不一样的。

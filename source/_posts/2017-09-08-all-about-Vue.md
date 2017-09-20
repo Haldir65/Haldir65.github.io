@@ -11,9 +11,9 @@ Vue Js学习笔记
 
 
 ## 1. 前提
-使用cmder ,安装了nodejs 
-基本命令 
-- npm install 
+使用cmder ,安装了nodejs
+基本命令
+- npm install
 - npm run dev
 
 参考系列[教程](https://github.com/iamshaunjp/vuejs-playlist)
@@ -32,7 +32,7 @@ import Data from ./xxx/stuff.vue
 - computed computed就像一个template的一个属性
 
 
-一些常用的事件绑定: 
+一些常用的事件绑定:
 - v-if='' //控制某个tag显示或者隐藏
 - v-on:click='somefunction' //点击事件发生时触发某个method
 - template v-is='some_template_name' //用于在页面模板中导入现成的模板
@@ -47,7 +47,7 @@ import Data from ./xxx/stuff.vue
 import formOne from './components/formOne.vue';
 import formTwo from './components/formTwo.vue';
 
-<form-one></form-one> 
+<form-one></form-one>
 //这和下面这种写法是一样的
  <component v-bind:is='component'></component> //component标签注册在data中，可以随时改变。例如
  <button v-on:click="component='form-one'">Show form one</button>
@@ -103,7 +103,7 @@ data中返回的是一个json object，json本身的定义就是(JavaScript Obje
   <ul>
     <li v-for='cat in blog.categories'>{{cat}}</li>
   </ul>
- 如果checkbox被选中，blog的categories数组中就加入了这个元素，取消选中则从数组中移除。 
+ 如果checkbox被选中，blog的categories数组中就加入了这个元素，取消选中则从数组中移除。
 ```
 
 
@@ -156,7 +156,7 @@ vue-resource提交表单的操作如下:
 post方法返回的是一个promise，加回调即可打印出api返回结果。
 
 ### 2.2 ajax跨域操作
-[XMLHttpRequest cannot load http://localhost:5000/hello. 
+[XMLHttpRequest cannot load http://localhost:5000/hello.
 No 'Access-Control-Allow-Origin' header is present on the requested resource.](https://stackoverflow.com/questions/25860304/how-do-i-set-response-headers-in-flask)
 用Flask做后台，大概的代码这样
 ```python
@@ -176,6 +176,21 @@ def create_post()
 ---------------------------------------------------
 
 
+## 4. Vuex
+在js眼中，一段json字符串就是一个object。
+这是vuex 中改变某项属性的代码：
+```javaScript
+mutations: {
+  increment (state, payload) {
+    state.count += payload.amount
+  }
+}
+store.commit('increment', {
+  amount: 10
+})
+两个花括号括起来的(json)，才是对象。这里，函数名叫做'increment'，传进去的payLoad即有效信息，是通过json转达的。
+```
+
 ###  基础复习
 1. id和class的问题
 html tag的class，不同tag可以有相同的class，引用的时候用.classname来查找
@@ -187,7 +202,6 @@ id这个tag唯一的，一个页面不能有两个tag有相同的id，引用的�
 5. atom可以同时预览两个选项卡，右键,split right，用于copy and paste比较方便
 6. css里面可以写"background-image: url(./somefile.png)"，就是相对路径的意思。
 
-
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/1102531047-2.jpg?imageView2/2/w/600)
 
 ## 参考
@@ -195,4 +209,4 @@ id这个tag唯一的，一个页面不能有两个tag有相同的id，引用的�
 2. [github repo](https://github.com/iamshaunjp/vuejs-playlist)
 3. [jsonPlaceHoder](https://jsonplaceholder.typicode.com/)
 4. [css](https://mp.weixin.qq.com/s/wYTejsTjHldDMKJ7QqCYBA)
-
+5. [Sass](https://zh.wikipedia.org/wiki/Sass)
