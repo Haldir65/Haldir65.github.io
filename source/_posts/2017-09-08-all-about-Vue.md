@@ -16,6 +16,9 @@ Vue Js学习笔记
 - npm install
 - npm run dev
 
+npm 设置淘宝镜像
+> npm config set registry https://registry.npm.taobao.org
+
 参考系列[教程](https://github.com/iamshaunjp/vuejs-playlist)
 
 

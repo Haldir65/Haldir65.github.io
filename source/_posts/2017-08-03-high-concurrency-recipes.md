@@ -30,7 +30,8 @@ tags: [java,tools,concurrency]
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/single-yellow-beauty-flower-on-the-fence-wallpaper-56801fde208df.jpg?imageView2/2/w/600)
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/yellow-autumn-leaves-wallpaper-537f1e4672a31.jpg?imageView2/2/w/600)
 
-
+> The difference between “concurrent” and “parallel” execution
+[Good to know](https://stackoverflow.com/questions/1897993/what-is-the-difference-between-concurrent-programming-and-parallel-programming)
 
 ## 1. 同时对共享资源进行操作好一点的加锁的方式
 
@@ -61,9 +62,18 @@ tags: [java,tools,concurrency]
 ## 5.ReentrantLock 不公平锁
 在jdk1.5里面，ReentrantLock的性能是明显优于synchronized的，但是在jdk1.6里面，synchronized做了优化，他们之间的性能差别已经不明显了。
 
+## 6. StampedLocks(java 8)
+java 1.5 就有了ReentrantReadWriteLock，用于实现专门针对读或者写的lock
+java 8提供了StampedLocks,lock方法返回一个long的时间戳，可以用这个时间戳release lock，或者检测lock是否有效。例如，tryConvertToOptimisticRead,假如在这个读的时间段内未发生其他线程的写操作，可以认为数据是有效的。像这样
+- 假如有线程通过lock.writeLock()获得了写锁，只要不unlockWrite，所有的调用lock.readLock或者tryConvertToOptimisticRead都不会成功。
+- 假如有线程获取了读锁，即调用了lock.readLock()，或者tryReadLock获得读取锁。读取获取锁并不是加锁，读并不是危险操作，获取锁只是为了检测读取的过程中是否发生过写
+- Optimistic Reading ，即tryConvertToOptimisticRead,只有在当前锁不被写持有的时候才返回一个非零值，这个值用于在读取完毕之后用validate检测本次读取的间隙中是否发生过写操作。
+
 
 
 ## 参考
 - [看起来 ReentrantLock 无论在哪方面都比 synchronized 好](http://blog.csdn.net/fw0124/article/details/6672522)
 - [Jesse Wilson - Coordinating Space and Time](https://www.youtube.com/watch?v=yS0Nc-L1Uuk)
 - [一级缓存，时钟周期](http://www.cnblogs.com/xrq730/p/7048693.html)volatile硬件层面的实现原理
+- [StampedLock in Java](https://netjs.blogspot.ca/2016/08/stampedlock-in-java.html)
+- [Java 8 StampedLocks vs. ReadWriteLocks and Synchronized](http://blog.takipi.com/java-8-stampedlocks-vs-readwritelocks-and-synchronized/)

@@ -121,7 +121,7 @@ public CustomTitleView(Context context, AttributeSet attrs)
 然后在layout里面去findViewById，妥妥的找不到。写在xml里面，会调到两个参数的构造函数，因为id这种东西写是在xml里面的，所以在两个参数的构造函数里面做事情就好了。
 
 ### 9. Dialog会出的一些错误
-1. showDialog之前最好判断下,activity.isFinishing
+9.1. showDialog之前最好判断下,activity.isFinishing
 否则会崩成这样：
 ```
 E/AndroidRuntime: FATAL EXCEPTION: main
@@ -135,7 +135,7 @@ Process: com.xxx.xxx, PID: 30025
 ```
 
 
-2. show一个Dialog，忘记关掉就finish，App不会崩，但日志里面有error：
+9.2. show一个Dialog，忘记关掉就finish，App不会崩，但日志里面有error：
 从用户角度来看，Dialog随着页面的关闭也关了
 ```
  E/WindowManager: android.view.WindowLeaked: Activity com.example.SomeActivity has leaked window com.android.internal.policy.PhoneWindow$DecorView
@@ -147,7 +147,7 @@ Process: com.xxx.xxx, PID: 30025
 ```
 对比一下上面那个error，目测只有FATAL EXCEPTION才会导致App崩溃
 
-3. activity finish掉之后再去Dismiss，先出2的日志，然后是一个fatal exception
+9.3. activity finish掉之后再去Dismiss，先出2的日志，然后是一个fatal exception
 ```java
 button.setOnClickListener { v ->
             showDialog()
@@ -170,7 +170,7 @@ at android.app.Dialog.dismissDialog(Dialog.java:362)
 就崩了，dismiss之前先判断下isFinishing就没事了
 
 
-4. dialog.show不是异步方法
+9.4. dialog.show不是异步方法
 ```java
 showDialog()
 finish()
@@ -221,4 +221,7 @@ private static final class ListenersHandler extends Handler {
 ```
 很容易想到onDismiss(Dialog)里面的dialog可能为null，(主线程恰好在排队，正好来一次GC)，可能性应该不大。
 
-5. Dialog中有一个OnKeyListener，所以用户手动按返回键会去dismissDialog并消费掉事件，代码调用onBackPressed和手动按返回键是不一样的。
+9.5. Dialog中有一个OnKeyListener，所以用户手动按返回键会去dismissDialog并消费掉事件，代码调用onBackPressed和手动按返回键是不一样的。
+
+### 10. RecyclerView的ItemAnimator有很多方法可以override
+Chet的[Demo](https://github.com/google/android-ui-toolkit-demos)
