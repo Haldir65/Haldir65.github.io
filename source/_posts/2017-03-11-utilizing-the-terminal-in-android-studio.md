@@ -225,3 +225,13 @@ private static final class ListenersHandler extends Handler {
 
 ### 10. RecyclerView的ItemAnimator有很多方法可以override
 Chet的[Demo](https://github.com/google/android-ui-toolkit-demos)
+
+### 11. 一些点
+- 图片缓存策略
+- Rxjava如何管理生命周期
+- Okio源码
+- OkHttp中和WebView中Cookie是怎么处理的
+- Android上Socket的使用
+- 注解
+- Android上的进程通信，共享内存问题
+- Webp格式

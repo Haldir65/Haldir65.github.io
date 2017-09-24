@@ -194,6 +194,9 @@ store.commit('increment', {
 两个花括号括起来的(json)，才是对象。这里，函数名叫做'increment'，传进去的payLoad即有效信息，是通过json转达的。
 ```
 
+
+
+
 ###  基础复习
 1. id和class的问题
 html tag的class，不同tag可以有相同的class，引用的时候用.classname来查找
@@ -204,6 +207,21 @@ id这个tag唯一的，一个页面不能有两个tag有相同的id，引用的�
 4. html中audio tag不识别本地文件，需要放在static文件下，放在src文件夹里就是404，一开始的时候我这么写"src='../assets/赵雷-成都.mp3'"，死活放不出来，换成"file://"开头也不行，换成网易云音乐的http地址就好了。最后换成'static目录下'。终于放出来了，“让我掉下眼泪的是，简直日了X”，还蛮押韵的。
 5. atom可以同时预览两个选项卡，右键,split right，用于copy and paste比较方便
 6. css里面可以写"background-image: url(./somefile.png)"，就是相对路径的意思。
+7. javaScript debug的方法：选中一个html 的tag，break on 。。。 自然会在执行到的时候停下来，evalulate value需要自己在console里面敲（注意此时应该位于Sources标签页下）。
+8. 可以检测是ES5还是ES6
+```javaScript
+function f() { console.log('I am outside!'); }
+(function () {
+if(false) {
+// 重复声明一次函数f,ES5会输出'i am insider', ES6会输出'i am outsider'
+function f() { console.log('I am inside!'); }
+}
+f();
+}());
+```
+9. setTimeout是schedule一个task，setInterval是设定一个周期性执行的任务。
+
+
 
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/1102531047-2.jpg?imageView2/2/w/600)
 
@@ -213,3 +231,6 @@ id这个tag唯一的，一个页面不能有两个tag有相同的id，引用的�
 3. [jsonPlaceHoder](https://jsonplaceholder.typicode.com/)
 4. [css](https://mp.weixin.qq.com/s/wYTejsTjHldDMKJ7QqCYBA)
 5. [Sass](https://zh.wikipedia.org/wiki/Sass)
+6. [JavaScript 教程](http://www.w3school.com.cn/jsref/jsref_obj_array.asp)
+7. [ES6相关](https://wohugb.gitbooks.io/ecmascript-6/content/docs/array.html)
+8. [css教程](https://www.w3cschool.cn/css/css-padding.html)
