@@ -90,7 +90,9 @@ at android.graphics.drawable.BitmapDrawable.draw(BitmapDrawable.java:544)
 at android.widget.ImageView.onDraw(ImageView.java:1228)
 ```
 **这种东西根本防不胜防。**
+[stackOverFlow](https://stackoverflow.com/questions/25858362/issue-when-recycling-bitmap-obtained-from-bitmapdrawable)上也有讨论
 被人为调用Bitmap.recycle()的res中的图片资源直接不能用了，怎么办，重新用BitmapFactory去decode呗。照说Android 3.0之后就不应该调用Recycle方法了，记得Chet Haase说过，Recycle doesn't do anything。
+
 
 ### 7. Aidl里面有些关键字
 oneway关键字。
@@ -226,6 +228,7 @@ private static final class ListenersHandler extends Handler {
 ### 10. RecyclerView的ItemAnimator有很多方法可以override
 Chet的[Demo](https://github.com/google/android-ui-toolkit-demos)
 
+
 ### 11. 一些点
 - 图片缓存策略
 - Rxjava如何管理生命周期
@@ -235,3 +238,4 @@ Chet的[Demo](https://github.com/google/android-ui-toolkit-demos)
 - 注解
 - Android上的进程通信，共享内存问题
 - Webp格式
+- UI widget检查Thread是在ViewRootImpl里面有一段方法checkThread() 。

@@ -69,7 +69,8 @@ java 8提供了StampedLocks,lock方法返回一个long的时间戳，可以用�
 - 假如有线程获取了读锁，即调用了lock.readLock()，或者tryReadLock获得读取锁。读取获取锁并不是加锁，读并不是危险操作，获取锁只是为了检测读取的过程中是否发生过写
 - Optimistic Reading ，即tryConvertToOptimisticRead,只有在当前锁不被写持有的时候才返回一个非零值，这个值用于在读取完毕之后用validate检测本次读取的间隙中是否发生过写操作。
 
-
+## 7. Android官方文档上对于happens-before的准则有详细的描述
+[happens-before](https://developer.android.com/reference/java/util/concurrent/package-summary.html#MemoryVisibility)，主要是jdk本身提供的primitive遵守的并发准则。
 
 ## 参考
 - [看起来 ReentrantLock 无论在哪方面都比 synchronized 好](http://blog.csdn.net/fw0124/article/details/6672522)

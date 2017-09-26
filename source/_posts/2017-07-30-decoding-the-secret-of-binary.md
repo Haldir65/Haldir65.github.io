@@ -146,6 +146,17 @@ for(int i =0 ,size = s.length();i<size;){
     i+=Cahracter.charCount(c);//正确识别char数量
 }
 ```
+汉字用UTF-8编码的话，有些还是会超出两个字节的，比如“𠮷”，[wiki](https://zh.wiktionary.org/zh-hans/%F0%A0%AE%B7)给这货的解释。十进制是134071，已经超出两个字节(65536)了。
+转成十六进制的话就是“F0 A0 AE B7”，utf-8本身就是可变长度的编码format，所以这货占了4个字节也正常。
+```java
+String w = "\uD842\uDFB7"; //这个“\u”是ide自己加上去的，注意和上面的十六进制不一样，是因为utf-8前面要加一些0,1什么的
+      System.out.println(String.valueOf(hex));  // 134071
+      for (int i = 0,size = w.length(); i <size;) {
+          int c = w.codePointAt(i);
+          System.out.println(String.format("The character at %d is %c  ", i, c)); //成功打印出这个汉字
+          i += Character.charCount(c);
+      }
+```
 
 
 ### 3.3 UTF-8出现
