@@ -387,6 +387,11 @@ mId和FatherClass.mId，所以完全是两个int。
 
 调用父类被override的方法，目测只能用super.someMethod()
 
+### 22.打印出一个方法执行到这里的方法栈
+> Thread.dumpStack();
+还有，e.printStakTrace是非常昂贵的
+
+
 ## 参考
 
 - [Jake Wharton and Jesse Wilson - Death, Taxes, and HTTP](https://www.youtube.com/watch?v=6uroXz5l7Gk)

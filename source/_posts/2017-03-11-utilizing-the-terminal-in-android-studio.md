@@ -239,3 +239,40 @@ Chet的[Demo](https://github.com/google/android-ui-toolkit-demos)
 - Android上的进程通信，共享内存问题
 - Webp格式
 - UI widget检查Thread是在ViewRootImpl里面有一段方法checkThread() 。
+
+### 12. No Activity found to handle Intent { act=com.android.camera.action.CROP
+[com.android.camera.action.CROP](https://commonsware.com/blog/2013/01/23/no-android-does-not-have-crop-intent.html)并不是一个AOSP官方规定的Intent，有些设备上是会报错的。这个链接的作者是[Mark Murphy](https://stackoverflow.com/users/115145/commonsware)，很有趣的一个人。
+[stackOverFlow上也有讨论](https://stackoverflow.com/questions/41890891/no-activity-found-to-handle-intent-com-android-camera-action-crop)
+解决办法就是加一个catch(ActivityNotFoundException)就好了
+
+
+### 13. Dalvik和Art崩的时候堆栈是不一样的
+```java
+at android.view.View.performClick(View.java:4438)
+at android.view.View$PerformClick.run(View.java:18439)
+at android.os.Handler.handleCallback(Handler.java:733)
+at android.os.Handler.dispatchMessage(Handler.java:95)
+at android.os.Looper.loop(Looper.java:136)
+at android.app.ActivityThread.main(ActivityThread.java:5095)
+at java.lang.reflect.Method.invokeNative(Method.java)
+at java.lang.reflect.Method.invoke(Method.java:515)
+at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:786)
+at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:602)
+at dalvik.system.NativeStart.main(NativeStart.java)
+```
+```java
+at android.app.Activity.performStart(Activity.java:6311)
+at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:2387)
+at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:2484)
+at android.app.ActivityThread.access$900(ActivityThread.java:158)
+at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1352)
+at android.os.Handler.dispatchMessage(Handler.java:102)
+at android.os.Looper.loop(Looper.java:171)
+at android.app.ActivityThread.main(ActivityThread.java:5454)
+at java.lang.reflect.Method.invoke(Method.java)
+at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:726)
+at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:616)
+```
+### 14. 理解Canvas,surface,window等概念
+[Dianne Hackborn的回答](https://stackoverflow.com/questions/4576909/understanding-canvas-and-surface-concepts/4577249#4577249)
+onDraw里面的canvas是lock surface得到的
