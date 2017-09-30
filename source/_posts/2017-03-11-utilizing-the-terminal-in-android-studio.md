@@ -276,3 +276,6 @@ at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:616)
 ### 14. 理解Canvas,surface,window等概念
 [Dianne Hackborn的回答](https://stackoverflow.com/questions/4576909/understanding-canvas-and-surface-concepts/4577249#4577249)
 onDraw里面的canvas是lock surface得到的
+
+### 15. Object pool
+参考Glide里面的Bitmap pool

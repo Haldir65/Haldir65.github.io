@@ -220,7 +220,7 @@ f();
 }());
 ```
 9. setTimeout是schedule一个task，setInterval是设定一个周期性执行的任务。
-
+10.css里面的class继承是同时在一个tag里面添加class="class_a class_b"，中间一个空格，需要什么拿什么
 
 
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/1102531047-2.jpg?imageView2/2/w/600)
