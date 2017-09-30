@@ -279,3 +279,6 @@ onDraw里面的canvas是lock surface得到的
 
 ### 15. Object pool
 参考Glide里面的Bitmap pool
+
+### 16.如果想要用一个动画移动一个View的话，没必要animate更改LayoutParams
+更改LayoutParams看上去是现实生活中应该做的，但其实只需要用setTranslationX或者setTranslationY就好了。如果动画的每一帧都去更改layoutParams（会requestLayout，非常慢）,正确的做法是在视觉上做到正确的，animate TranslationX，这些是postLayout params，等动画结束后再把应有的layout属性设置上去。这样动画会更加流畅。 ---- Android for Java Developers(Big Android BBQ 2015)  -- Chet Haase
