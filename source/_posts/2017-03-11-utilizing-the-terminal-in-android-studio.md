@@ -67,7 +67,30 @@ Log.i("codecraeer", "getExternalStoragePublicDirectory = " + Environment.getExte
 
 
 
-##  4.对象池
+##  4.对象池(Object Pool)
+这个看一下Glide里面的BitmapPool就好了
+LruBitmapPool.java
+pool的大小是MemorySizeCalculator算出来的，考虑了App可以使用的最大内存和屏幕分辨率像素对应容量这两个因素。
+对象池主要关注put和get这两个方法。
+Glide中的LruBitmapPool.java中有一段很有意思的注释
+```java
+ @Override
+    public synchronized Bitmap get(int width, int height, Bitmap.Config config) {
+        Bitmap result = getDirty(width, height, config);
+        if (result != null) {
+            // Bitmaps in the pool contain random data that in some cases must be cleared for an image to be rendered
+            // correctly. we shouldn't force all consumers to independently erase the contents individually, so we do so
+            // here. See issue #131.
+            result.eraseColor(Color.TRANSPARENT);
+        }
+
+        return result;
+    }
+```
+就是说，从回收池里面取出来的Bitmap可能存储了一些脏数据，在复用之前要清除下旧数据。
+
+> 另外，MotionEvent,Message以及Okio里面的Segment都是可以被recycle和obtain的可回收再利用对象。Andorid Bitmap后期支持了inBitmap，也是类似于回收再利用的概念。
+Bitmap有点不同，虽然内存中的表现形式只是二维byte数组。但在支持inBitmap之前，并不是每一个Bitmap都可以被直接回收用于存储下一个Bitmap.
 
 ## 5.MediaScanner是一个和有趣的可以扫描多媒体文件的类
 [技术小黑屋](http://droidyue.com/blog/2014/07/12/scan-media-files-in-android-chinese-edition/)
@@ -91,8 +114,8 @@ at android.widget.ImageView.onDraw(ImageView.java:1228)
 ```
 **这种东西根本防不胜防。**
 [stackOverFlow](https://stackoverflow.com/questions/25858362/issue-when-recycling-bitmap-obtained-from-bitmapdrawable)上也有讨论
-被人为调用Bitmap.recycle()的res中的图片资源直接不能用了，怎么办，重新用BitmapFactory去decode呗。照说Android 3.0之后就不应该调用Recycle方法了，记得Chet Haase说过，Recycle doesn't do anything。
-
+被人为调用Bitmap.recycle()的res中的图片资源直接不能用了，怎么办，重新用BitmapFactory去decode或者创建一张Canvas，用原来的bitmap去画呗。照说Android 3.0之后就不应该调用Recycle方法了，记得Chet Haase说过，Recycle doesn't do anything。
+另外一种说法是，**bitmap.isMutable**返回是false的话(从res加载的)就不该去mutate。真要更改像素属性的话，可以创建一个Canvas，然后用原来的bitmap去画一个一样大的，或者用bitmap.copy方法创建一个新的。
 
 ### 7. Aidl里面有些关键字
 oneway关键字。
@@ -277,8 +300,6 @@ at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:616)
 [Dianne Hackborn的回答](https://stackoverflow.com/questions/4576909/understanding-canvas-and-surface-concepts/4577249#4577249)
 onDraw里面的canvas是lock surface得到的
 
-### 15. Object pool
-参考Glide里面的Bitmap pool
 
-### 16.如果想要用一个动画移动一个View的话，没必要animate更改LayoutParams
+### 15.如果想要用一个动画移动一个View的话，没必要animate更改LayoutParams
 更改LayoutParams看上去是现实生活中应该做的，但其实只需要用setTranslationX或者setTranslationY就好了。如果动画的每一帧都去更改layoutParams（会requestLayout，非常慢）,正确的做法是在视觉上做到正确的，animate TranslationX，这些是postLayout params，等动画结束后再把应有的layout属性设置上去。这样动画会更加流畅。 ---- Android for Java Developers(Big Android BBQ 2015)  -- Chet Haase
