@@ -8,6 +8,7 @@ tags: [tools]
 <!--more-->
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/fresh-sparkle-dew-drops-on-red-flower-wallpaper-53861cf580909.jpg?imageView2/2/w/600)
 
+一般情况下不要乱用正则
 
 ### 参考
 - [DFA和NFA](http://www.importnew.com/26560.html)

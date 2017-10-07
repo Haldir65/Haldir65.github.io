@@ -37,6 +37,10 @@ Google io 2016 Android Client提供了Map Intergation和Youtube video display以
 
 --------------------------------------------------------------------
 
+关于性能优化有一些建议：
+> don't do premature optimazition
+在你整天思考到底要用Enum还是IntDef的时候，你的网络库已经allocate了一大堆的垃圾。将精力集中在解决最严重的问题上。，
+
 
 
 ## 1. Systrace用于跟踪一段方法执行过程中的影响
@@ -91,6 +95,8 @@ Glide中的LruBitmapPool.java中有一段很有意思的注释
 
 > 另外，MotionEvent,Message以及Okio里面的Segment都是可以被recycle和obtain的可回收再利用对象。Andorid Bitmap后期支持了inBitmap，也是类似于回收再利用的概念。
 Bitmap有点不同，虽然内存中的表现形式只是二维byte数组。但在支持inBitmap之前，并不是每一个Bitmap都可以被直接回收用于存储下一个Bitmap.
+
+[V4包里提供了简单的实现](https://developer.android.com/reference/android/support/v4/util/Pools.html)
 
 ## 5.MediaScanner是一个和有趣的可以扫描多媒体文件的类
 [技术小黑屋](http://droidyue.com/blog/2014/07/12/scan-media-files-in-android-chinese-edition/)
@@ -303,3 +309,12 @@ onDraw里面的canvas是lock surface得到的
 
 ### 15.如果想要用一个动画移动一个View的话，没必要animate更改LayoutParams
 更改LayoutParams看上去是现实生活中应该做的，但其实只需要用setTranslationX或者setTranslationY就好了。如果动画的每一帧都去更改layoutParams（会requestLayout，非常慢）,正确的做法是在视觉上做到正确的，animate TranslationX，这些是postLayout params，等动画结束后再把应有的layout属性设置上去。这样动画会更加流畅。 ---- Android for Java Developers(Big Android BBQ 2015)  -- Chet Haase
+
+### 16. tint跑在GPU上，background会invalidate整个Drawable
+如果想要动画渐变一个View的Background的话,[animate tint](https://www.youtube.com/watch?v=71ISWyJPSEY&index=9&list=PLWz5rJ2EKKc_HyE1QX9heAgTPdAMqc50z)即可，性能更好
+
+
+### 17. SpringAnimation(具有弹性的动画)
+Facebook早在15年就推出了具有弹性的[动画](https://github.com/facebook/rebound),谷歌在16年给supportLib添加了[Spring Animation](https://developer.android.com/guide/topics/graphics/spring-animation.html)，都是相似的理念。
+弹性动画的关键是在keyFrame处算出非线性的值，用于设定UI控件展示状态。
+
