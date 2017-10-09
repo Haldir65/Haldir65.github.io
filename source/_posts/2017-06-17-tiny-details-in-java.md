@@ -391,6 +391,33 @@ mId和FatherClass.mId，所以完全是两个int。
 > Thread.dumpStack();
 还有，e.printStakTrace是非常昂贵的
 
+### 23. try with resource(since jdk 7)
+Joshua Bloch设计了jdk7中的try with resource特性。
+在程序开发中，代表资源的对象，一般用完了需要及时释放掉。
+例如，jdk7之前
+```java
+static String readFirstLineFromFileWithFinallyBlock(String path) throws IOException {
+      BufferedReader br = new BufferedReader(new FileReader(path));
+      try {
+        return br.readLine();
+      } finally {
+        if (br != null) br.close();
+      }
+    }
+```
+放在finally里面就是确保资源能够被释放掉
+jdk7之后
+```java
+static String readFirstLineFromFile(String path) throws IOException {
+      try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+        return br.readLine();
+      }
+    }
+```
+jdk7添加了AutoCloseable接口，当try语句块运行结束时，BufferReader会被自动关闭。即会自动调用close方法，假如这个close方法抛出异常，异常可以通过Exception.getSuppressed获得，所以这里面的Exception是try语句块里面抛出来的。[oracle给出的解释](http://www.oracle.com/technetwork/cn/articles/java/trywithresources-401775-zhs.html)
+
+### 24. java提供了文件zip功能的接口
+jdk7开始添加了java.util.zip包。
 
 ## 参考
 

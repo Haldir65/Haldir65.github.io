@@ -739,6 +739,7 @@ HashSet的源码只有三百多行，内部有一个map（HashMap）相对来说
     java.util.concurrent.LinkedBlockingQueue
     java.util.concurrent.PriorityBlockingQueue
     作者都是大名鼎鼎的Doug Lea
+    另外，LinkedList也能直接拿来当做queue使用
 
     Stack是Vector的子类(属于LIFO的栈)
     The Stack class represents a last-in-first-out (LIFO) stack of object
@@ -788,3 +789,4 @@ can not change the elemeet type, for that you need an stream
 4. [Arrays.asList()返回的List不是jva.util.ArrayList](http://www.programcreek.com/2014/01/java%E7%A8%8B%E5%BA%8F%E5%91%98%E5%B8%B8%E7%8A%AF%E7%9A%8410%E4%B8%AA%E9%94%99%E8%AF%AF/)
 5. [WeakHashMap和HashMap的区别](http://blog.csdn.net/yangzl2008/article/details/6980709)
 6. [Hashmap的死锁问题](http://blog.csdn.net/lantian0802/article/details/42487803)
+7. [Young Pups: New Collections APIs for Java 9 by Stuart Marks](https://www.youtube.com/watch?v=OJrIMv4dAek)

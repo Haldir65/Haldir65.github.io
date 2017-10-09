@@ -155,7 +155,8 @@ val inputstram = FileInputStream("/") as FileInputStream
     // it will close for you
    }
 ```
-
+### 9. 获取this
+使用this@MyActivity即可
 
 
 

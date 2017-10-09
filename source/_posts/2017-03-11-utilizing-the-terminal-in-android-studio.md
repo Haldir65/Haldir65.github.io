@@ -121,7 +121,7 @@ at android.widget.ImageView.onDraw(ImageView.java:1228)
 **这种东西根本防不胜防。**
 [stackOverFlow](https://stackoverflow.com/questions/25858362/issue-when-recycling-bitmap-obtained-from-bitmapdrawable)上也有讨论
 被人为调用Bitmap.recycle()的res中的图片资源直接不能用了，怎么办，重新用BitmapFactory去decode或者创建一张Canvas，用原来的bitmap去画呗。照说Android 3.0之后就不应该调用Recycle方法了，记得Chet Haase说过，Recycle doesn't do anything。
-另外一种说法是，**bitmap.isMutable**返回是false的话(从res加载的)就不该去mutate。真要更改像素属性的话，可以创建一个Canvas，然后用原来的bitmap去画一个一样大的，或者用bitmap.copy方法创建一个新的。
+另外一种说法是，bitmap.isMutable()返回是false的话(从res加载的)就不该去mutate。真要更改像素属性的话，可以创建一个Canvas，然后用原来的bitmap去画一个一样大的，或者用bitmap.copy方法创建一个新的。
 
 ### 7. Aidl里面有些关键字
 oneway关键字。
@@ -130,7 +130,7 @@ AIDL 接口的实现必须是完全线程安全实现。 oneway 关键字用于�
 ### 8. 自定义View一个不容易发现的点
 自定义View的套路一般是这样的
 ```java
-public CustomTitleView(Context context, AttributeSet attrs)  
+public CustomTitleView(Context context, AttributeSet attrs) {
    {  
        this(context, attrs, 0);  
    }  
@@ -143,11 +143,10 @@ public CustomTitleView(Context context, AttributeSet attrs)
    public CustomTitleView(Context context, AttributeSet attrs, int defStyle)  
    {  
        super(context, attrs, defStyle);  
-       /**
-        * 获得我们所定义的自定义样式属性
-        */  
+      // 获得我们所定义的自定义样式属性
         init();
    }  
+}
 ```
 然后在layout里面去findViewById，妥妥的找不到。写在xml里面，会调到两个参数的构造函数，因为id这种东西写是在xml里面的，所以在两个参数的构造函数里面做事情就好了。
 
@@ -318,3 +317,13 @@ onDraw里面的canvas是lock surface得到的
 Facebook早在15年就推出了具有弹性的[动画](https://github.com/facebook/rebound),谷歌在16年给supportLib添加了[Spring Animation](https://developer.android.com/guide/topics/graphics/spring-animation.html)，都是相似的理念。
 弹性动画的关键是在keyFrame处算出非线性的值，用于设定UI控件展示状态。
 
+### 18. Choreographer可以添加callback
+doFrame方法的参数是(long FrameTimeNanos)，这个时间需要除以1000 1000
+测试了一下，Frame确实是16毫秒更新一次，也就是接收到VSYNC信号的时机。
+其实简单的想一下，这样可以用来显示当前应用的帧率，16ms就是60FPS,20ms就是50FPS.
+论那些跑分软件是怎么做出来的。。。。
+
+### 19. 网络请求的Batch
+网络较差的情况下，可以将Request cache下来，等到网络较好的时候再执行。
+Jesse Wilson[推荐](https://stackoverflow.com/questions/37529303/how-to-cache-the-request-queue-not-responses-with-okhttp)使用[TAPE](https://github.com/square/tape)
+有两种实现，基于文件系统的和基于内存的。基于内存的很简单，基于文件的能够在crash发生时自动回退。
