@@ -407,17 +407,23 @@ static String readFirstLineFromFileWithFinallyBlock(String path) throws IOExcept
 ```
 放在finally里面就是确保资源能够被释放掉
 jdk7之后
-```java
+```
 static String readFirstLineFromFile(String path) throws IOException {
-      try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+      try (BufferedReader br = new BufferedReader(new FileReader(path)) {
         return br.readLine();
       }
-    }
+  }
 ```
 jdk7添加了AutoCloseable接口，当try语句块运行结束时，BufferReader会被自动关闭。即会自动调用close方法，假如这个close方法抛出异常，异常可以通过Exception.getSuppressed获得，所以这里面的Exception是try语句块里面抛出来的。[oracle给出的解释](http://www.oracle.com/technetwork/cn/articles/java/trywithresources-401775-zhs.html)
 
 ### 24. java提供了文件zip功能的接口
 jdk7开始添加了java.util.zip包。
+
+### 25. String为什么要设计成final的
+[解释](https://www.programcreek.com/2013/04/why-string-is-immutable-in-java/)非常多
+有人猜测Java想用这种方式让String在形式上成为一种基本数据类型，而不是一个普通的类。确实String基本在所有的类中都用到了。
+
+
 
 ## 参考
 

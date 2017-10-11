@@ -334,3 +334,21 @@ Jesse Wilson[推荐](https://stackoverflow.com/questions/37529303/how-to-cache-t
 context.getSystemService源码分析到最后，是从一个Hashmap里面取出Service
 activity.getSystemService -> ContextImpl.getSystemService -> SystemServiceRegistry.getSystemService(SystemServiceRegistry里面有个HashMap<String, ServiceFetcher<?>>)
 WifiManager存在leak的[issue](https://issuetracker.google.com/issues/63244509)
+
+### 21. PopupWindow在7.0和7.1上是存在问题的
+[参考](http://www.jianshu.com/p/dbd792b910ce)解决方式
+```java
+if (Build.VERSION.SDK_INT < 24) {
+                    popupWindow.showAsDropDown(button);
+   } else {
+        int[] location = new int[2];  // 获取控件在屏幕的位置
+        button.getLocationOnScreen(location);
+      if (Build.VERSION.SDK_INT == 25) {
+         int tempheight = popupWindow.getHeight();
+      if (tempheight == WindowManager.LayoutParams.MATCH_PARENT || screenHeight <= tempheight) {
+             popupWindow.setHeight(screenHeight - location[1] - button.getHeight());
+           }
+     }
+       popupWindow.showAtLocation(button, Gravity.NO_GRAVITY, location[0], location[1] + button.getHeight());
+ }
+```
