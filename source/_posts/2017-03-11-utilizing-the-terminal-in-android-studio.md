@@ -321,9 +321,16 @@ Facebook早在15年就推出了具有弹性的[动画](https://github.com/facebo
 doFrame方法的参数是(long FrameTimeNanos)，这个时间需要除以1000 1000
 测试了一下，Frame确实是16毫秒更新一次，也就是接收到VSYNC信号的时机。
 其实简单的想一下，这样可以用来显示当前应用的帧率，16ms就是60FPS,20ms就是50FPS.
-论那些跑分软件是怎么做出来的。。。。
+论那些跑分软件是怎么做出来的。。。。当然更专业的方式应该是这个命令
+> adb shell dumpsys SurfaceFlinger --latency + <window名>
+网上有人写了python脚本，看起来更加直观一点
 
 ### 19. 网络请求的Batch
 网络较差的情况下，可以将Request cache下来，等到网络较好的时候再执行。
 Jesse Wilson[推荐](https://stackoverflow.com/questions/37529303/how-to-cache-the-request-queue-not-responses-with-okhttp)使用[TAPE](https://github.com/square/tape)
 有两种实现，基于文件系统的和基于内存的。基于内存的很简单，基于文件的能够在crash发生时自动回退。
+
+### 20.getSystemService是存在[memory leak](https://segmentfault.com/a/1190000004882511)问题的
+context.getSystemService源码分析到最后，是从一个Hashmap里面取出Service
+activity.getSystemService -> ContextImpl.getSystemService -> SystemServiceRegistry.getSystemService(SystemServiceRegistry里面有个HashMap<String, ServiceFetcher<?>>)
+WifiManager存在leak的[issue](https://issuetracker.google.com/issues/63244509)

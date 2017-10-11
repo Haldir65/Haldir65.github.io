@@ -282,7 +282,7 @@ HTTP/2（超文本传输协议第2版，最初命名为HTTP 2.0），简称为h2
 SPDY也就是HTTP/2的前身，一种开放的网络传输协议，由Google开发，用来发送网页内容。基于传输控制协议（TCP）的应用层协议
 
 
-###7. DNS(Domian Name System)
+### 7. DNS(Domian Name System)
 通过java代码调用DNS的方式
 ```java
 public class Test {  
@@ -299,7 +299,13 @@ public class Test {
 }  
 ```
 
-
+### 8.Fiddler抓包
+- 手机和电脑连接同一个wifi
+- 从https://www.telerik.com/download/fiddler 下载Fiddler
+- 启动并配置: Tools->Fiddler->Connections, check "allow remote computers to connect" and default port is 8888
+- 配置手机：选择连接的网络->修改网络->代理设置:手动; 代理服务器主机名为电脑的ip，端口8888，ip DHCP
+- 抓包查看
+[详细教程](http://www.trinea.cn/android/tcpdump_wireshark/)
 
 ===========================trash here=====================================
 

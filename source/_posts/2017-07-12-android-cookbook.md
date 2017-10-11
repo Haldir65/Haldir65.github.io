@@ -189,11 +189,6 @@ C语言从入门到放弃
 
 
 
-
-
-
-
-
 ## 一些精彩的的演讲
 [Droidcon Montreal Jake Wharton - A Few Ok Libraries](https://www.youtube.com/watch?v=WvyScM_S88c)
 [Advanced Scrolling Techniques on Android](https://www.youtube.com/watch?v=N3J4ZFiR_3Q)
@@ -204,6 +199,9 @@ C语言从入门到放弃
 [GDE](https://developers.google.com/experts/all/technology/android)
 Dianne Hackborn
 [Jesse Wilson](https://github.com/swankjesse)
+
+## Good Reading
+[Android Source code](https://android-review.googlesource.com)
 
 ## 一些列入的规划的想法
 - 多线程下载实例

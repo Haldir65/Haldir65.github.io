@@ -423,6 +423,24 @@ RTF – Little Endian
 ### 8.2 读取一个json文件
 先用BufferedSource将文件变成一个Source，再用Moshi从这个Source里面读数据
 
+### 8.3 从一个byte[]中读取一个int或者写一个int可以这样
+在com.square.tape.QueueFile中看到
+```java
+private static int readInt(byte[] buffer, int offset) {
+  return ((buffer[offset] & 0xff) << 24)
+      + ((buffer[offset + 1] & 0xff) << 16)
+      + ((buffer[offset + 2] & 0xff) << 8)
+      + (buffer[offset + 3] & 0xff);
+}
+
+private static void writeInt(byte[] buffer, int offset, int value) {
+  buffer[offset] = (byte) (value >> 24);
+  buffer[offset + 1] = (byte) (value >> 16);
+  buffer[offset + 2] = (byte) (value >> 8);
+  buffer[offset + 3] = (byte) value;
+}
+```
+一个int占据4个字节，没问题。
 
 
 ## 总结

@@ -295,6 +295,41 @@ public static void main(String[] args) {
 八进制： int res = 0110; 七十二
 十六进制： int res = 0xA;  十
 
+5. View.MeasureSpec就是32位的int
+前2位是mode(能表示四种，够了),后30位是size
+文档的定义是：
+MeasureSpecs are implemented as ints to reduce object allocation. This class
+is provided to pack and unpack the size, mode tuple into the int
+就是为了节省内存，才用的位运算
+```java
+public static class MeasureSpec {
+       private static final int MODE_SHIFT = 30;
+       private static final int MODE_MASK  = 0x3 << MODE_SHIFT;
+
+       /** @hide */
+       @IntDef({UNSPECIFIED, EXACTLY, AT_MOST})
+       @Retention(RetentionPolicy.SOURCE)
+       public @interface MeasureSpecMode {}
+
+       public static final int UNSPECIFIED = 0 << MODE_SHIFT;//(就是00后面跟30个0)
+
+       public static final int EXACTLY     = 1 << MODE_SHIFT;//（就是01后面跟30个0）
+
+       public static final int AT_MOST     = 2 << MODE_SHIFT;// (就是10后面跟30个0)
+
+       public static int getMode(int measureSpec) {
+                  //noinspection ResourceType
+                  return (measureSpec & MODE_MASK); //按位与，都是1才能得到1，再加上前面的IndeDef
+              }
+
+        public static int getSize(int measureSpec) {
+            return (measureSpec & ~MODE_MASK); //按位与加上位非，二进制取反，结果加一
+        }      // ~MODE_MASK就是01后面跟30个0，所以等于直接把measureSpec后三十位拿出来转成int。
+     }
+```
+所以就是一个int存了状态以及大小两部分信息。
+多说一句measureSpec是在ViewGroup.getChildMeasureSpec里面算出来的，是parent用来跟child交流的，一般用View.resolveSize就知道到底得多大了。
+
 ## 参考
 - [Java位运算操作全面总结](https://my.oschina.net/xianggao/blog/412967)
 - [Java 位运算(移位、位与、或、异或、非）](http://blog.csdn.net/xiaochunyong/article/details/7748713)
