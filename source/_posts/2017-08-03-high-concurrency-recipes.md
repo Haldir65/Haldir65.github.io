@@ -72,6 +72,32 @@ java 8提供了StampedLocks,lock方法返回一个long的时间戳，可以用�
 ## 7. Android官方文档上对于happens-before的准则有详细的描述
 [happens-before](https://developer.android.com/reference/java/util/concurrent/package-summary.html#MemoryVisibility)，主要是jdk本身提供的primitive遵守的并发准则。
 
+## 8. lock的声明方式
+一般synchronize(object)就好了,但有更经济的方式
+```java
+Object lock = new Object();
+
+private byte[] lock = new byte[0]; // 特殊的instance变量
+
+  Public void methodA()
+  {
+
+     synchronized(lock) { //… }
+
+  }
+
+```
+零长度的byte数组对象创建起来将比任何对象都经济――查看编译后的字节码：生成零长度的byte[]对象只需3条操作码，而Object lock = new Object()则需要7行操作码。
+
+
+
+------------------------------mere trash-------------------------------------------------
+1. 构造函数也不是线程安全的
+2. 同步一个对象的前提是各方都同意使用同一把锁作为调用方法的前提，单方面加锁并不限制不尊重锁机制的使用者。
+3. 在多线程的场景下，无逻辑相关的代码写的前后顺序并无意义，原因是编译器会进行指令重排。
+
+
+
 ## 参考
 - [看起来 ReentrantLock 无论在哪方面都比 synchronized 好](http://blog.csdn.net/fw0124/article/details/6672522)
 - [Jesse Wilson - Coordinating Space and Time](https://www.youtube.com/watch?v=yS0Nc-L1Uuk)

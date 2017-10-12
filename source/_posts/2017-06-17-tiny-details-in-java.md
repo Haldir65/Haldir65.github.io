@@ -423,6 +423,18 @@ jdk7开始添加了java.util.zip包。
 [解释](https://www.programcreek.com/2013/04/why-string-is-immutable-in-java/)非常多
 有人猜测Java想用这种方式让String在形式上成为一种基本数据类型，而不是一个普通的类。确实String基本在所有的类中都用到了。
 
+### 26.从Exploring java's hidden cost得到的
+在intellij中，Setting -> Editor -> Inspection -> Synthetic accessor call
+The docs explains as these:
+>
+This inspection is intended for J2ME and other highly resource constrained environments. Applying the results of this inspection without consideration might have negative effects on code clarity and design.
+Reports references to non-constant private members of a different class, for which javac will generate a package-private synthetic accessor method.
+An inner class and its containing class are compiled to separate class files. The Java virtual machine normally prohibits access from a class to private fields and methods of another class. To enable access from an inner class to private members of a containing class or the other way around javac creates a package-private synthetic accessor method. Less use of memory and greater performance may be achieved by making the member package-private, thus allowing direct access without the creation of a synthetic accessor method.
+
+There 's no actual inner class'
+
+### 27. Why use an abstract class without abstract methods?
+[Why use an abstract class without abstract methods?](https://stackoverflow.com/questions/6856133/why-use-an-abstract-class-without-abstract-methods)
 
 
 ## 参考
