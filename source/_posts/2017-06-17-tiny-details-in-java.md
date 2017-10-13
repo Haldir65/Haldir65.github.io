@@ -433,8 +433,29 @@ An inner class and its containing class are compiled to separate class files. Th
 
 There 's no actual inner class'
 
-### 27. Why use an abstract class without abstract methods?
+### 27. abstract class可以没有抽象方法
 [Why use an abstract class without abstract methods?](https://stackoverflow.com/questions/6856133/why-use-an-abstract-class-without-abstract-methods)
+
+### 28. 一般说map迭代读取的顺序和存进去的顺序是不一样的（有例外）
+[文档](https://stackoverflow.com/questions/2973751/how-to-maintain-order-of-insertion-using-collections)是这样说的：
+LinkedHashMap: "with predictable iteration order [...] which is normally the order in which keys were inserted into the map (insertion-order)."
+HashMap: "makes no guarantees as to the order of the map"
+TreeMap: "is sorted according to the natural ordering of its keys, or by a Comparator"
+实际开发中想要有序就用LinkedHashMap。
+但是
+```java
+HashMap<String, Integer> map = new HashMap<>(10);
+map.put("A", 1);
+map.put("B", 2);
+map.put("C", 3);
+map.put("D", 4);
+map.forEach((s, integer) -> System.out.println("key = "+s+" value is "+integer));
+```
+实际是有序的，文档是说[no guarantees]。看下源码，其实是在Hashmap算hashcode的时候，String的hashCode比较耿。。。
+[Stuart Mark提到了这一点](https://www.youtube.com/watch?v=ogRVWXuuAU4)，并希望开发者不要寄希望于这种edge case。
+
+
+
 
 
 ## 参考

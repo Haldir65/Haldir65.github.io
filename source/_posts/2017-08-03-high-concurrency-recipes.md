@@ -52,7 +52,7 @@ tags: [java,tools,concurrency]
 
 ## 2. ThreadLocal当做一个HashMap来用就好了
 
-**volatile并不是Atomic操作，例如，A线程对volatile变量进行写操作(实际上是读和写操作)，B线程可能在这两个操作之间进行了写操作；**
+
 
 ## 3. Fork/join since java 7
 有些任务是可以分块的。[work-stealing的实现](http://ifeve.com/java7-fork-join-and-closure/)
@@ -95,7 +95,8 @@ private byte[] lock = new byte[0]; // 特殊的instance变量
 1. 构造函数也不是线程安全的
 2. 同步一个对象的前提是各方都同意使用同一把锁作为调用方法的前提，单方面加锁并不限制不尊重锁机制的使用者。
 3. 在多线程的场景下，无逻辑相关的代码写的前后顺序并无意义，原因是编译器会进行指令重排。
-
+4. volatile并不是Atomic操作，例如，A线程对volatile变量进行写操作(实际上是读和写操作)，B线程可能在这两个操作之间进行了写操作；例如用volatile修饰count变量那么 count++ 操作就不是原子性的。而AtomicInteger类提供的atomic方法可以让这种操作具有原子性如getAndIncrement()方法会原子性的进行增量操作把当前值加一
+5. CopyOnWriteArrayList和Collections.synchronizedList相比。在高并发前提下，前者读的性能更好，后者写的性能更好（前者的写性能极差）。[CopyOnWriteArrayList与Collections.synchronizedList的性能对比](http://blog.csdn.net/yangzl2008/article/details/39456817)。CopyOnWriteArrayList适合做缓存。
 
 
 ## 参考
