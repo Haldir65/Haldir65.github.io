@@ -415,6 +415,16 @@ static String readFirstLineFromFile(String path) throws IOException {
   }
 ```
 jdk7添加了AutoCloseable接口，当try语句块运行结束时，BufferReader会被自动关闭。即会自动调用close方法，假如这个close方法抛出异常，异常可以通过Exception.getSuppressed获得，所以这里面的Exception是try语句块里面抛出来的。[oracle给出的解释](http://www.oracle.com/technetwork/cn/articles/java/trywithresources-401775-zhs.html)
+其实跟python很像:
+```python
+with open('','wb+') as f:
+     f.read()
+with urllib.request.urlopen(url) as u:
+    page = u.read()
+    print(len(page))     
+```
+会自动完成文件的关闭或者socket的关闭
+
 
 ### 24. java提供了文件zip功能的接口
 jdk7开始添加了java.util.zip包。

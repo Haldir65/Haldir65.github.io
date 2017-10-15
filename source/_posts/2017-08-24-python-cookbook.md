@@ -18,6 +18,17 @@ tags: [python,tools]
 - unicodeError
 - 面向对象
 - 多线程，多进程
+多线程基本无用，基本语法很简单：
+```python
+import threading
+
+def readIo()
+    print('do stuff heavy')
+
+for i in range(10):
+    threading.Thread(target=readIo).start()
+print('Finishing up')        
+```
 
 ## 2. Flask相关
 ### 2.1 Flask Admin Pannel[Flask-Admin中文入门教程](http://flask123.sinaapp.com/article/57/)Please  run on linux
