@@ -352,3 +352,70 @@ if (Build.VERSION.SDK_INT < 24) {
        popupWindow.showAtLocation(button, Gravity.NO_GRAVITY, location[0], location[1] + button.getHeight());
  }
 ```
+
+### 22. onSaveInstance的调用顺序以及ActivityThread的一些点
+onSaveInstance在HoneyComb之前会在onPause前调用，HoneyComb开始，会在onStop前调用
+3.0之前的基本不用看了，目前在Android 25 sdk中
+ActivityThread.performStopActivityInner
+```java
+if (!r.activity.mFinished && saveState) {
+          if (r.state == null) {
+              callCallActivityOnSaveInstanceState(r);
+          }
+      }
+
+try {
+      // Now we are idle.
+       r.activity.performStop(false /*preserveWindow*/);
+   } catch (Exception e) {
+       if (!mInstrumentation.onException(r.activity, e)) {
+           throw new RuntimeException(
+                   "Unable to stop activity "
+                   + r.intent.getComponent().toShortString()
+                   + ": " + e.toString(), e);
+       }
+   }
+```
+其实Activity的所有onXXX都是由ActivityThread发起的，其实主函数也在这里。
+那么开始吧
+ActivityThread.handleLaunchActivity
+```java
+ private void handleLaunchActivity(ActivityClientRecord r, Intent customIntent, String reason){
+      // ...................
+     Activity a = performLaunchActivity(r, customIntent);
+     //'''''''''
+     if (a != null) {
+        handleResumeActivity(r.token, false, r.isForward,
+                !r.activity.mFinished && !r.startsNotResumed, r.lastProcessedSeq, reason);
+                  }
+     //''''''''''
+
+ }
+
+ private Activity performLaunchActivity(ActivityClientRecord r, Intent customIntent){
+   // ............
+   activity = mInstrumentation.newActivity(
+                   cl, component.getClassName(), r.intent);
+   //Activity实例就是在这里面反射创建出来的
+    if (activity != null) {
+      //......
+      mInstrumentation.callActivityOnCreate(activity, r.state);   /// onCreate
+      if (!r.activity.mFinished) { //经常会有人在onCreate里面finish
+                   activity.performStart();   // onStart
+                   r.stopped = false;
+               }
+    }
+
+ }
+```
+
+所以总的顺序是
+ActivityThread#handleLaunchActivity ->
+ActivityThread#performLaunchActivity ->
+反射创建Activity实例 ->
+mInstrumentation.callActivityOnCreate ->
+activity.performStart() ->
+handleResumeActivity()
+以上都是在一个Message里面做的这个Message的what是“LAUNCH_ACTIVITY =100”，这个Message是
+基本的尿性是 handleXXX -> performXXX
+另外,onActivityResult是在ActivityThread的deliverResults里面触发的

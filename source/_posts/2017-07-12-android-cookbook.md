@@ -100,7 +100,7 @@ Java相关
 - [ ] 垃圾回收器的分类及优缺点
 - [ ] ThreadLocal原理及可能的内存泄漏
 - [ ] Understanding Dagger2's generated code
-- [ ] 单例模式需要考虑到jvm优化的问题（为什么要写两个synchronized）
+- [X] 单例模式需要考虑到jvm优化的问题（为什么要写两个synchronized）
 - [ ] java类加载机制(classLoader相关的，类的加载顺序)
 - [ ] Java四种引用
 - [ ] Future和FutureTask,CompletableFuture这些怎么用
@@ -133,7 +133,7 @@ Android相关
 - [ ] Media相关，视频播放etc，相机，滤镜等.[Demo](https://github.com/w1123440793/VideoListDemo)
 - [ ] FFMpeg，[IjkPlayer](http://www.jianshu.com/p/a4eea7ea4664)，[弹幕](https://github.com/Bilibili/DanmakuFlameMaster)
 - [ ] UI Toolkit源码解析
-    - [ ] ViewPager的原理
+    - [ ] ViewPager的原理，作者Adam Powell
     - [ ] ViewGroup，View的源码
     - [ ] View的绘制原理
     - [ ] ListView,RecyclerView原理,加载优化(prefetcher什么的，滑动过程中不去加载图片，参考我写的Glide笔记)
@@ -144,8 +144,9 @@ Android相关
 - [ ] 属性动画据说用了反射，源码解析
 - [ ] SystemServer进程启动流程
 - [ ] Launcher启动流程
-- [ ] Android生命周期在不同版本的表现形式[有些onXXX在高版本不会调](http://blog.csdn.net/liuweiballack/article/details/47026263)
+- [X] Android生命周期在不同版本的表现形式[有些onXXX在高版本不会调](http://blog.csdn.net/liuweiballack/article/details/47026263)，[原因是HoneyComb之后对Activity LifeCycle进行了改动](http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html)
 
+> Studio里面看源码，find usage没有的话，find in path , choose android sdk
 
 Linux相关
 - [ ] linux进程间通信方式有哪些（信号量这种）

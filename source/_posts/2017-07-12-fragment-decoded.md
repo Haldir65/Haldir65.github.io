@@ -514,6 +514,9 @@ Glide的做法是写了一个**SupportRequestManagerFragment** 在这个Fragment
 Fragment的一些生命周期还是需要跟Activity的生命周期一起看，大部分是异步操作。FragmentManager类似一个管理者，也是一个容器，在Activity的生命周期中顺手实现了容器中元素所要求的UI状态。Fragment本质上是一个View的Controllers，通过FragmentManger和FragmentActivity的生命周期挂钩，并自动做好View的状态保存和恢复。具体的UI展示无非是addView，setVisibility等常规的方法，也正因为这样，support包里的Fragment才能做到3.0以下的适配。日常开发中，Fragment能够将原本堆在Activity中的逻辑承载过来,以异步的方式减轻主线程的压力，对外提供了获取(onViewCreated)，操作(Transaction)，销毁(onDestoryView)这些业务对象的回调方法。由于Android本身就是异步的系统，系统随时(asynchronous)可能会对Fragment的资源进行更改，开发者的代码也随时(asynchronous)会对这些资源进行操作。由于存在这种无法改变的'并发'现状，Fragment不得不为保证资源的一致性而主动抛出一些错误。本文有意忽略掉了一些transition动画(使用了hardwareLayer)和Loader加载的细节，希望能够对日常开发有点帮助。
 
 
+## 更新，拿来主义
+1. [一份2013年的文档](http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html),不要在FragmentActivity#onResume中beginTransaction，需要的话，在onPostResume或者onPostResume中做。也不要在onActivityResult里面去做，onActivityResult会触发onPostResume，推迟到onPostResume去做。
+
 ## Reference
 1. [Fragment的onAttach和onDetach什么时候会调用](http://stackoverflow.com/questions/9156406/whats-the-difference-between-detaching-a-fragment-and-removing-it)
 2. [Glide是怎么跟生命周期挂钩的](http://blog.leanote.com/post/qq-tank/Glide%E4%B8%AD)
