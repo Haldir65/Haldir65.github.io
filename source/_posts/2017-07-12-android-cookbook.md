@@ -98,7 +98,7 @@ Java相关
 - [X] java位运算，Collection框架中多次用到了
 - [ ] gson的原理，cache什么的，常规json解析器的原理
 - [ ] 垃圾回收器的分类及优缺点
-- [ ] ThreadLocal原理及可能的内存泄漏
+- [X] ThreadLocal原理及可能的内存泄漏
 - [ ] Understanding Dagger2's generated code
 - [X] 单例模式需要考虑到jvm优化的问题（为什么要写两个synchronized）
 - [ ] java类加载机制(classLoader相关的，类的加载顺序)

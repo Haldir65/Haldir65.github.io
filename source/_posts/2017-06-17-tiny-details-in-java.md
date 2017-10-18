@@ -464,6 +464,24 @@ map.forEach((s, integer) -> System.out.println("key = "+s+" value is "+integer))
 实际是有序的，文档是说[no guarantees]。看下源码，其实是在Hashmap算hashcode的时候，String的hashCode比较耿。。。
 [Stuart Mark提到了这一点](https://www.youtube.com/watch?v=ogRVWXuuAU4)，并希望开发者不要寄希望于这种edge case。
 
+### 29. 自动装箱使用不小心会造成NullPointerException
+[参考](http://mazhuang.org/2017/08/20/java-auto-boxing-unboxing/)
+```java
+public class Test {
+    public static long test(long value) {
+        return value;
+    }
+
+    public static void main(String[] args) {
+        Long value = null;
+        // ...
+        test(value);
+    }
+}
+```
+其实重点在于看javap -c 生成的字节码
+
+
 
 
 

@@ -50,9 +50,27 @@ tags: [java,tools,concurrency]
 ```
 
 
-## 2. ThreadLocal当做一个HashMap来用就好了
+## 2. ThreadLocal比较好的用例在Andriod的Looper中
+Looper.prepare()
+```java
+private static void prepare(boolean quitAllowed) {
+      if (sThreadLocal.get() != null) {
+          throw new RuntimeException("Only one Looper may be created per thread");
+      }
+      sThreadLocal.set(new Looper(quitAllowed));//sThreadLocal是static的，注意leak
+  }
 
-
+// ThreadLocal
+  public void set(T value) {
+        Thread t = Thread.currentThread();
+        ThreadLocalMap map = getMap(t); //ThreadLocalMap就是一个Entry为WeakReference（WeakRWeakReference不是有get方法嘛，也是key-value的形式）。上面返回当前Thread的成员变量。（所以说Thread创建也是很耗费内存的嘛）
+        if (map != null)
+            map.set(this, value);//注意这个this是sThreadLocal，static的
+        else
+            createMap(t, value);
+    }  
+```
+所以避免leak的话，记得调用ThreadLocal.remove
 
 ## 3. Fork/join since java 7
 有些任务是可以分块的。[work-stealing的实现](http://ifeve.com/java7-fork-join-and-closure/)
