@@ -45,7 +45,7 @@
     <link href="https://haldir65.github.io/2017/09/08/2017-09-08-all-about-Vue/"/>
     <id>https://haldir65.github.io/2017/09/08/2017-09-08-all-about-Vue/</id>
     <published>2017-09-08T13:41:43.000Z</published>
-    <updated>2017-09-26T23:02:22.521Z</updated>
+    <updated>2017-10-21T02:53:07.940Z</updated>
     
     <content type="html"><![CDATA[<p>Vue Js学习笔记<br><img src="http://odzl05jxx.bkt.clouddn.com/VueJsLogo.jpg" alt=""><br><a id="more"></a></p>
 <h2 id="1-前提"><a href="#1-前提" class="headerlink" title="1. 前提"></a>1. 前提</h2><p>使用cmder ,安装了nodejs<br>基本命令</p>
@@ -105,6 +105,7 @@
 </li>
 <li><p>setTimeout是schedule一个task，setInterval是设定一个周期性执行的任务。<br>10.css里面的class继承是同时在一个tag里面添加class=”class_a class_b”，中间一个空格，需要什么拿什么</p>
 </li>
+<li>css分三种，外部样式表（写在另一个css文件里），内部样式表(写在header tag中)和内联样式表(写在单独的tag里面)</li>
 </ol>
 <p><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/1102531047-2.jpg?imageView2/2/w/600" alt=""></p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
@@ -364,7 +365,7 @@ tcu、udp[抽象](https://www.youtube.com/watch?v=cTKQAe4DN6g)
     <link href="https://haldir65.github.io/2017/08/03/2017-08-03-high-concurrency-recipes/"/>
     <id>https://haldir65.github.io/2017/08/03/2017-08-03-high-concurrency-recipes/</id>
     <published>2017-08-03T13:04:28.000Z</published>
-    <updated>2017-10-14T14:53:41.504Z</updated>
+    <updated>2017-10-21T02:53:02.375Z</updated>
     
     <content type="html"><![CDATA[<p><img src="http://odzl05jxx.bkt.clouddn.com/image/blog/be3c80a11edfd0fdb75d098550ed2c8e.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
 <p><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/1102533137-5.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/1102533911-1.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/20120103214255_nTsVt.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/apic5964_sc115.com.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/apic6283_sc115.com.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/849c18412f8e7a0b18df09f6f87e6516.jpg?imageView2/2/w/600" alt=""></p>
@@ -373,7 +374,9 @@ tcu、udp[抽象](https://www.youtube.com/watch?v=cTKQAe4DN6g)
 <p>The difference between “concurrent” and “parallel” execution<br><a href="https://stackoverflow.com/questions/1897993/what-is-the-difference-between-concurrent-programming-and-parallel-programming">Good to know</a></p>
 </blockquote>
 <h2 id="1-同时对共享资源进行操作好一点的加锁的方式"><a href="#1-同时对共享资源进行操作好一点的加锁的方式" class="headerlink" title="1. 同时对共享资源进行操作好一点的加锁的方式"></a>1. 同时对共享资源进行操作好一点的加锁的方式</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line">       <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">           <span class="keyword">final</span> ReentrantLock lock = <span class="keyword">this</span>.lock;</div><div class="line">           lock.lock(); <span class="comment">//拿不到lock的Thread会挂起</span></div><div class="line">           <span class="keyword">try</span> &#123;</div><div class="line">               <span class="keyword">this</span>.mList.add(<span class="string">"new elements added by"</span> + mIndex + <span class="string">""</span>); <span class="comment">//对共享资源的操作放这里</span></div><div class="line">           &#125;</div><div class="line">           <span class="keyword">finally</span> &#123;</div><div class="line">               lock.unlock(); <span class="comment">//记得解锁</span></div><div class="line">           &#125;</div><div class="line">       &#125;</div></pre></td></tr></table></figure>
-<h2 id="2-ThreadLocal当做一个HashMap来用就好了"><a href="#2-ThreadLocal当做一个HashMap来用就好了" class="headerlink" title="2. ThreadLocal当做一个HashMap来用就好了"></a>2. ThreadLocal当做一个HashMap来用就好了</h2><h2 id="3-Fork-join-since-java-7"><a href="#3-Fork-join-since-java-7" class="headerlink" title="3. Fork/join since java 7"></a>3. Fork/join since java 7</h2><p>有些任务是可以分块的。<a href="http://ifeve.com/java7-fork-join-and-closure/">work-stealing的实现</a></p>
+<h2 id="2-ThreadLocal比较好的用例在Andriod的Looper中"><a href="#2-ThreadLocal比较好的用例在Andriod的Looper中" class="headerlink" title="2. ThreadLocal比较好的用例在Andriod的Looper中"></a>2. ThreadLocal比较好的用例在Andriod的Looper中</h2><p>Looper.prepare()<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">prepare</span><span class="params">(<span class="keyword">boolean</span> quitAllowed)</span> </span>&#123;</div><div class="line">      <span class="keyword">if</span> (sThreadLocal.get() != <span class="keyword">null</span>) &#123;</div><div class="line">          <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"Only one Looper may be created per thread"</span>);</div><div class="line">      &#125;</div><div class="line">      sThreadLocal.set(<span class="keyword">new</span> Looper(quitAllowed));<span class="comment">//sThreadLocal是static的，注意leak</span></div><div class="line">  &#125;</div><div class="line"></div><div class="line"><span class="comment">// ThreadLocal</span></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">(T value)</span> </span>&#123;</div><div class="line">        Thread t = Thread.currentThread();</div><div class="line">        ThreadLocalMap map = getMap(t); <span class="comment">//ThreadLocalMap就是一个Entry为WeakReference（WeakRWeakReference不是有get方法嘛，也是key-value的形式）。上面返回当前Thread的成员变量。（所以说Thread创建也是很耗费内存的嘛）</span></div><div class="line">        <span class="keyword">if</span> (map != <span class="keyword">null</span>)</div><div class="line">            map.set(<span class="keyword">this</span>, value);<span class="comment">//注意这个this是sThreadLocal，static的</span></div><div class="line">        <span class="keyword">else</span></div><div class="line">            createMap(t, value);</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>所以避免leak的话，记得调用ThreadLocal.remove</p>
+<h2 id="3-Fork-join-since-java-7"><a href="#3-Fork-join-since-java-7" class="headerlink" title="3. Fork/join since java 7"></a>3. Fork/join since java 7</h2><p>有些任务是可以分块的。<a href="http://ifeve.com/java7-fork-join-and-closure/">work-stealing的实现</a></p>
 <h2 id="4-ArrayBlockingQueue-Thread-Safe"><a href="#4-ArrayBlockingQueue-Thread-Safe" class="headerlink" title="4. ArrayBlockingQueue Thread Safe"></a>4. ArrayBlockingQueue<E> Thread Safe</h2><h2 id="5-ReentrantLock-不公平锁"><a href="#5-ReentrantLock-不公平锁" class="headerlink" title="5.ReentrantLock 不公平锁"></a>5.ReentrantLock 不公平锁</h2><p>在jdk1.5里面，ReentrantLock的性能是明显优于synchronized的，但是在jdk1.6里面，synchronized做了优化，他们之间的性能差别已经不明显了。</p>
 <h2 id="6-StampedLocks-java-8"><a href="#6-StampedLocks-java-8" class="headerlink" title="6. StampedLocks(java 8)"></a>6. StampedLocks(java 8)</h2><p>java 1.5 就有了ReentrantReadWriteLock，用于实现专门针对读或者写的lock<br>java 8提供了StampedLocks,lock方法返回一个long的时间戳，可以用这个时间戳release lock，或者检测lock是否有效。例如，tryConvertToOptimisticRead,假如在这个读的时间段内未发生其他线程的写操作，可以认为数据是有效的。像这样</p>
 <ul>
@@ -1280,7 +1283,7 @@ tcu、udp[抽象](https://www.youtube.com/watch?v=cTKQAe4DN6g)
     <link href="https://haldir65.github.io/2017/07/12/2017-07-12-android-cookbook/"/>
     <id>https://haldir65.github.io/2017/07/12/2017-07-12-android-cookbook/</id>
     <published>2017-07-12T00:40:08.000Z</published>
-    <updated>2017-10-11T14:36:04.501Z</updated>
+    <updated>2017-10-21T02:53:02.352Z</updated>
     
     <content type="html"><![CDATA[<p>A Cookbook shall look like a collection of Recipes, or an index page from where dinner are made. And it keeps you sane.<br><img src="http://odzl05jxx.bkt.clouddn.com/Cg-4zFVJ0xGITwm_AA688WRj8n8AAXZ9wGMpd0ADr0J195.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
 <p>github上已经star了四百多个项目，应该复习下了。</p>
@@ -1309,9 +1312,9 @@ tcu、udp[抽象](https://www.youtube.com/watch?v=cTKQAe4DN6g)
 <li>[X] java位运算，Collection框架中多次用到了</li>
 <li>[ ] gson的原理，cache什么的，常规json解析器的原理</li>
 <li>[ ] 垃圾回收器的分类及优缺点</li>
-<li>[ ] ThreadLocal原理及可能的内存泄漏</li>
+<li>[X] ThreadLocal原理及可能的内存泄漏</li>
 <li>[ ] Understanding Dagger2’s generated code</li>
-<li>[ ] 单例模式需要考虑到jvm优化的问题（为什么要写两个synchronized）</li>
+<li>[X] 单例模式需要考虑到jvm优化的问题（为什么要写两个synchronized）</li>
 <li>[ ] java类加载机制(classLoader相关的，类的加载顺序)</li>
 <li>[ ] Java四种引用</li>
 <li>[ ] Future和FutureTask,CompletableFuture这些怎么用</li>
@@ -1343,7 +1346,7 @@ tcu、udp[抽象](https://www.youtube.com/watch?v=cTKQAe4DN6g)
 <li>[ ] Media相关，视频播放etc，相机，滤镜等.<a href="https://github.com/w1123440793/VideoListDemo">Demo</a></li>
 <li>[ ] FFMpeg，<a href="http://www.jianshu.com/p/a4eea7ea4664">IjkPlayer</a>，<a href="https://github.com/Bilibili/DanmakuFlameMaster">弹幕</a></li>
 <li>[ ] UI Toolkit源码解析<ul>
-<li>[ ] ViewPager的原理</li>
+<li>[ ] ViewPager的原理，作者Adam Powell</li>
 <li>[ ] ViewGroup，View的源码</li>
 <li>[ ] View的绘制原理</li>
 <li>[ ] ListView,RecyclerView原理,加载优化(prefetcher什么的，滑动过程中不去加载图片，参考我写的Glide笔记)</li>
@@ -1356,8 +1359,11 @@ tcu、udp[抽象](https://www.youtube.com/watch?v=cTKQAe4DN6g)
 <li>[ ] 属性动画据说用了反射，源码解析</li>
 <li>[ ] SystemServer进程启动流程</li>
 <li>[ ] Launcher启动流程</li>
-<li>[ ] Android生命周期在不同版本的表现形式<a href="http://blog.csdn.net/liuweiballack/article/details/47026263">有些onXXX在高版本不会调</a></li>
+<li>[X] Android生命周期在不同版本的表现形式<a href="http://blog.csdn.net/liuweiballack/article/details/47026263">有些onXXX在高版本不会调</a>，<a href="http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html">原因是HoneyComb之后对Activity LifeCycle进行了改动</a></li>
 </ul>
+<blockquote>
+<p>Studio里面看源码，find usage没有的话，find in path , choose android sdk</p>
+</blockquote>
 <p>Linux相关</p>
 <ul>
 <li>[ ] linux进程间通信方式有哪些（信号量这种）</li>
@@ -1471,7 +1477,7 @@ tcu、udp[抽象](https://www.youtube.com/watch?v=cTKQAe4DN6g)
     <link href="https://haldir65.github.io/2017/07/12/2017-07-12-fragment-decoded/"/>
     <id>https://haldir65.github.io/2017/07/12/2017-07-12-fragment-decoded/</id>
     <published>2017-07-12T00:37:23.000Z</published>
-    <updated>2017-09-02T02:37:42.359Z</updated>
+    <updated>2017-10-17T15:21:39.391Z</updated>
     
     <content type="html"><![CDATA[<p>We been told Fragment itself should only trust official docs, the implementation detail are prone to any change any time, don’t count on it!<br><img src="http://odzl05jxx.bkt.clouddn.com/2009528111321773591934.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
 <p>Fragment源码解析（support Library 25.3.0），不要以为看了源码就可以不鸟官方文档了，源码的内容经常变，只有官方的文档才是可靠的，谷歌保证会实现的效果。</p>
@@ -1521,6 +1527,9 @@ tcu、udp[抽象](https://www.youtube.com/watch?v=cTKQAe4DN6g)
 <p>Glide的做法是写了一个<strong>SupportRequestManagerFragment</strong> 在这个Fragment的构造函数里放了一个ActivityFragmentLifecycle<br> <a href="http://blog.leanote.com/post/qq-tank/Glide%E4%B8%AD">参考</a><br> 在这个Fragment的onStart，OnStop等方法里面调用该lifeCycle的onStart,onStop等回调(lifeCycle是接口，由RequestManager实现)<br> 关键代码<br> <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (current == <span class="keyword">null</span>) &#123;</div><div class="line">               current = <span class="keyword">new</span> RequestManagerFragment();</div><div class="line">               pendingRequestManagerFragments.put(fm, current);</div><div class="line">               fm.beginTransaction().add(current, FRAGMENT_TAG).commitAllowingStateLoss();</div><div class="line">               handler.obtainMessage(ID_REMOVE_FRAGMENT_MANAGER, fm).sendToTarget();</div><div class="line">           &#125;</div></pre></td></tr></table></figure></p>
 <p> 所以经常会在Debug的时候看到FragmentManager里面有个”com.bumptech.glide.manager”的Fragment。这个Fragment没有实现onCreateView，所以直接返回null。Fragment本身是可以不带View的。</p>
 <h2 id="7-总结"><a href="#7-总结" class="headerlink" title="7. 总结"></a>7. 总结</h2><p>Fragment的一些生命周期还是需要跟Activity的生命周期一起看，大部分是异步操作。FragmentManager类似一个管理者，也是一个容器，在Activity的生命周期中顺手实现了容器中元素所要求的UI状态。Fragment本质上是一个View的Controllers，通过FragmentManger和FragmentActivity的生命周期挂钩，并自动做好View的状态保存和恢复。具体的UI展示无非是addView，setVisibility等常规的方法，也正因为这样，support包里的Fragment才能做到3.0以下的适配。日常开发中，Fragment能够将原本堆在Activity中的逻辑承载过来,以异步的方式减轻主线程的压力，对外提供了获取(onViewCreated)，操作(Transaction)，销毁(onDestoryView)这些业务对象的回调方法。由于Android本身就是异步的系统，系统随时(asynchronous)可能会对Fragment的资源进行更改，开发者的代码也随时(asynchronous)会对这些资源进行操作。由于存在这种无法改变的’并发’现状，Fragment不得不为保证资源的一致性而主动抛出一些错误。本文有意忽略掉了一些transition动画(使用了hardwareLayer)和Loader加载的细节，希望能够对日常开发有点帮助。</p>
+<h2 id="更新，拿来主义"><a href="#更新，拿来主义" class="headerlink" title="更新，拿来主义"></a>更新，拿来主义</h2><ol>
+<li><a href="http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html">一份2013年的文档</a>,不要在FragmentActivity#onResume中beginTransaction，需要的话，在onPostResume或者onPostResume中做。也不要在onActivityResult里面去做，onActivityResult会触发onPostResume，推迟到onPostResume去做。</li>
+</ol>
 <h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ol>
 <li><a href="http://stackoverflow.com/questions/9156406/whats-the-difference-between-detaching-a-fragment-and-removing-it">Fragment的onAttach和onDetach什么时候会调用</a></li>
 <li><a href="http://blog.leanote.com/post/qq-tank/Glide%E4%B8%AD">Glide是怎么跟生命周期挂钩的</a></li>
