@@ -30,7 +30,7 @@ import Data from ./xxx/stuff.vue
 一些常用的标签
 - template 标签用于显示模板，内部可以使用{{data}}获取json对象的数据
 - data 标签用于存储json类型的数据
-- methods 标签用于声明方法，内部使用this.xxx可以获得data中的json对象
+- methods 标签用于声明方法，内部使用this.xxx可以获得data中的json对象。在html里面不需要this，在export语句里面需要
 - components 标签用于引入可复用的模板,用于注册
 - computed computed就像一个template的一个属性
 
@@ -170,14 +170,42 @@ def create_post()
     return resp    
 ```
 
+## 3. Router,Eventbus,mixin，axios等
 
-
-## 3. Router
 安装:
 > npm install vue-router --save
-
+> npm install vue-bus --save
 ---------------------------------------------------
+### 3.1 关于Bus， 是用来在不同的Vue文件中传递事件(数据)用的，安装好后，main.js里面improt并使用
+> import Vue from 'vue'
+> import VueBus from 'vue-bus';
+> Vue.use(VueBus);
 
+A.vue中
+``` javaScript
+created(){
+  this.$bus.emit('loadSuccess', '创建成功！');
+},
+beforedestory(){
+  this.$bus.off('loadSuccess')
+}
+ // B.vue中
+created(){
+  this.$bus.on('loadSuccess',text=> {
+      console.log('receieve msg from another vue component '+ text)
+  })
+}
+```
+
+3.2 关于mixin，有比较好的[介绍](https://css-tricks.com/using-mixins-vue-js/)
+其实就是把一些公用的methods放到一个js文件中export掉，然后需要的vue文件，自己去import，在data中设置mixins: [] ,使用的时候就可以用this.method()使用这些共有的方法了。其实主要是为了复用。
+
+3.3 添加全局变量(常量)的[方法](http://www.jianshu.com/p/7547ff8760c3)，vuex是官方的
+
+
+3.4 router就是建立internal link 页面之间跳转的桥梁
+在template中添加router-link的tag,会生成一个对应的a Tag,点击跳转即可。
+router-view标签表示预先准备好的布局会被渲染进入这个标签内（将其取代）
 
 ## 4. Vuex
 在js眼中，一段json字符串就是一个object。
@@ -222,6 +250,7 @@ f();
 9. setTimeout是schedule一个task，setInterval是设定一个周期性执行的任务。
 10.css里面的class继承是同时在一个tag里面添加class="class_a class_b"，中间一个空格，需要什么拿什么
 11. css分三种，外部样式表（写在另一个css文件里），内部样式表(写在header tag中)和内联样式表(写在单独的tag里面)
+12. MicroTask和MacroTask的执行顺序是：Stack -> MacroTask -> MicroTask [参考](https://juejin.im/entry/59e95b4c518825579d131fad)
 
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/1102531047-2.jpg?imageView2/2/w/600)
 

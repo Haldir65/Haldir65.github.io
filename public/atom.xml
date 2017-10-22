@@ -45,7 +45,7 @@
     <link href="https://haldir65.github.io/2017/09/08/2017-09-08-all-about-Vue/"/>
     <id>https://haldir65.github.io/2017/09/08/2017-09-08-all-about-Vue/</id>
     <published>2017-09-08T13:41:43.000Z</published>
-    <updated>2017-10-21T02:53:07.940Z</updated>
+    <updated>2017-10-22T14:46:19.852Z</updated>
     
     <content type="html"><![CDATA[<p>Vue Js学习笔记<br><img src="http://odzl05jxx.bkt.clouddn.com/VueJsLogo.jpg" alt=""><br><a id="more"></a></p>
 <h2 id="1-前提"><a href="#1-前提" class="headerlink" title="1. 前提"></a>1. 前提</h2><p>使用cmder ,安装了nodejs<br>基本命令</p>
@@ -63,7 +63,7 @@
 <ul>
 <li>template 标签用于显示模板，内部可以使用获取json对象的数据</li>
 <li>data 标签用于存储json类型的数据</li>
-<li>methods 标签用于声明方法，内部使用this.xxx可以获得data中的json对象</li>
+<li>methods 标签用于声明方法，内部使用this.xxx可以获得data中的json对象。在html里面不需要this，在export语句里面需要</li>
 <li>components 标签用于引入可复用的模板,用于注册</li>
 <li>computed computed就像一个template的一个属性</li>
 </ul>
@@ -86,11 +86,15 @@
 <h3 id="2-1-进行POST操作"><a href="#2-1-进行POST操作" class="headerlink" title="2.1 进行POST操作"></a>2.1 进行POST操作</h3><p><a href="https://jsonplaceholder.typicode.com/">jsonPlaceHolder</a>是一个免费的API网站。<br>vue-resource提交表单的操作如下:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">post:<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="comment">//use http here</span></div><div class="line">    <span class="keyword">this</span>.$http.post(<span class="string">'https://jsonplaceholder.typicode.com/posts'</span>,&#123;</div><div class="line">      title:<span class="keyword">this</span>.blog.title,</div><div class="line">      body:<span class="keyword">this</span>.blog.content,</div><div class="line">      userId:<span class="number">1</span>,</div><div class="line">    &#125;).then(<span class="function"><span class="keyword">function</span> (<span class="params">data</span>) </span>&#123;</div><div class="line">      <span class="comment">// body...</span></div><div class="line">      <span class="built_in">console</span>.log(data)</div><div class="line">      <span class="keyword">this</span>.summited = <span class="literal">true</span></div><div class="line">    &#125;);</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
 <p>post方法返回的是一个promise，加回调即可打印出api返回结果。</p>
 <h3 id="2-2-ajax跨域操作"><a href="#2-2-ajax跨域操作" class="headerlink" title="2.2 ajax跨域操作"></a>2.2 ajax跨域操作</h3><p><a href="https://stackoverflow.com/questions/25860304/how-do-i-set-response-headers-in-flask">XMLHttpRequest cannot load http://localhost:5000/hello.<br>No ‘Access-Control-Allow-Origin’ header is present on the requested resource.</a><br>用Flask做后台，大概的代码这样<br><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">@app.route("/posts", methods=['GET'])</div><div class="line">def create_post()</div><div class="line">    resp = Response(json.dumps(post_lists), mimetype='application/json')</div><div class="line">    resp.headers['Access-Control-Allow-Origin'] = '*'</div><div class="line">    return resp</div></pre></td></tr></table></figure></p>
-<h2 id="3-Router"><a href="#3-Router" class="headerlink" title="3. Router"></a>3. Router</h2><p>安装:</p>
+<h2 id="3-Router-Eventbus-mixin，axios等"><a href="#3-Router-Eventbus-mixin，axios等" class="headerlink" title="3. Router,Eventbus,mixin，axios等"></a>3. Router,Eventbus,mixin，axios等</h2><p>安装:</p>
 <blockquote>
 <p>npm install vue-router –save</p>
+<h2 id="npm-install-vue-bus-–save"><a href="#npm-install-vue-bus-–save" class="headerlink" title="npm install vue-bus –save"></a>npm install vue-bus –save</h2><h3 id="3-1-关于Bus，-是用来在不同的Vue文件中传递事件-数据-用的，安装好后，main-js里面improt并使用"><a href="#3-1-关于Bus，-是用来在不同的Vue文件中传递事件-数据-用的，安装好后，main-js里面improt并使用" class="headerlink" title="3.1 关于Bus， 是用来在不同的Vue文件中传递事件(数据)用的，安装好后，main.js里面improt并使用"></a>3.1 关于Bus， 是用来在不同的Vue文件中传递事件(数据)用的，安装好后，main.js里面improt并使用</h3><p>import Vue from ‘vue’<br>import VueBus from ‘vue-bus’;<br>Vue.use(VueBus);</p>
 </blockquote>
-<hr>
+<p>A.vue中<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">created()&#123;</div><div class="line">  <span class="keyword">this</span>.$bus.emit(<span class="string">'loadSuccess'</span>, <span class="string">'创建成功！'</span>);</div><div class="line">&#125;,</div><div class="line">beforedestory()&#123;</div><div class="line">  <span class="keyword">this</span>.$bus.off(<span class="string">'loadSuccess'</span>)</div><div class="line">&#125;</div><div class="line"> <span class="comment">// B.vue中</span></div><div class="line">created()&#123;</div><div class="line">  <span class="keyword">this</span>.$bus.on(<span class="string">'loadSuccess'</span>,text=&gt; &#123;</div><div class="line">      <span class="built_in">console</span>.log(<span class="string">'receieve msg from another vue component '</span>+ text)</div><div class="line">  &#125;)</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>3.2 关于mixin，有比较好的<a href="https://css-tricks.com/using-mixins-vue-js/">介绍</a><br>其实就是把一些公用的methods放到一个js文件中export掉，然后需要的vue文件，自己去import，在data中设置mixins: [] ,使用的时候就可以用this.method()使用这些共有的方法了。其实主要是为了复用。</p>
+<p>3.3 添加全局变量(常量)的<a href="http://www.jianshu.com/p/7547ff8760c3">方法</a>，vuex是官方的</p>
+<p>3.4 router就是建立internal link 页面之间跳转的桥梁<br>在template中添加router-link的tag,会生成一个对应的a Tag,点击跳转即可。<br>router-view标签表示预先准备好的布局会被渲染进入这个标签内（将其取代）</p>
 <h2 id="4-Vuex"><a href="#4-Vuex" class="headerlink" title="4. Vuex"></a>4. Vuex</h2><p>在js眼中，一段json字符串就是一个object。<br>这是vuex 中改变某项属性的代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">mutations: &#123;</div><div class="line">  increment (state, payload) &#123;</div><div class="line">    state.count += payload.amount</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">store.commit(<span class="string">'increment'</span>, &#123;</div><div class="line">  amount: <span class="number">10</span></div><div class="line">&#125;)</div><div class="line">两个花括号括起来的(json)，才是对象。这里，函数名叫做<span class="string">'increment'</span>，传进去的payLoad即有效信息，是通过json转达的。</div></pre></td></tr></table></figure></p>
 <h3 id="基础复习"><a href="#基础复习" class="headerlink" title="基础复习"></a>基础复习</h3><ol>
 <li>id和class的问题<br>html tag的class，不同tag可以有相同的class，引用的时候用.classname来查找<br>id这个tag唯一的，一个页面不能有两个tag有相同的id，引用的时候用#id来找<br>一个是点，一个是#</li>
@@ -106,6 +110,7 @@
 <li><p>setTimeout是schedule一个task，setInterval是设定一个周期性执行的任务。<br>10.css里面的class继承是同时在一个tag里面添加class=”class_a class_b”，中间一个空格，需要什么拿什么</p>
 </li>
 <li>css分三种，外部样式表（写在另一个css文件里），内部样式表(写在header tag中)和内联样式表(写在单独的tag里面)</li>
+<li>MicroTask和MacroTask的执行顺序是：Stack -&gt; MacroTask -&gt; MicroTask <a href="https://juejin.im/entry/59e95b4c518825579d131fad">参考</a></li>
 </ol>
 <p><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/1102531047-2.jpg?imageView2/2/w/600" alt=""></p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
