@@ -37,6 +37,9 @@ print('Finishing up')
 ### 2.2.log上颜色
 [博客](https://blog.phpgao.com/python_colorful_log.html)，Pycharm的console无效，内置Terminal有效
 
+### 2.2.log上颜色
+[博客](https://blog.phpgao.com/python_colorful_log.html)，Pycharm的console无效，内置Terminal有效
+
 ### 2.3 Pycharm里面import各种can't resolve 的解决方法
 - from werkzeug import secure_filename
 - from werkzeug.utils import secure_filename

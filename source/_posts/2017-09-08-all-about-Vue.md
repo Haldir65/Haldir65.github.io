@@ -252,6 +252,17 @@ f();
 11. css分三种，外部样式表（写在另一个css文件里），内部样式表(写在header tag中)和内联样式表(写在单独的tag里面)
 12. MicroTask和MacroTask的执行顺序是：Stack -> MacroTask -> MicroTask [参考](https://juejin.im/entry/59e95b4c518825579d131fad)
 
+
+### tools,tangiable takeaways
+ 1. atom plugin  ide-typescript sucks , after disable the plugin ,the autocomplete feature works againself.
+ 2. config atom behind a firewall :
+ > apm config set https-proxy https://127.0.0.1:1080
+  apm config set strict-ssl false
+
+
+
+
+
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/1102531047-2.jpg?imageView2/2/w/600)
 
 ## 参考

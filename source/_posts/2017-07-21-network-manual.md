@@ -181,7 +181,7 @@ Host: www.baidu.com
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36
 Android设备发出来的可能长这样： Mozilla/5.0 (Linux; U; Android 4.4.4; zh-cn; HTC_D820u Build/KTU84P) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30
 ios设备发出来的长这样: Mozilla/5.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Version/8.0 Mobile/12A365 Safari/600.1.4
-
+至少Chrome团队给出了自家浏览器的[UA](https://developer.chrome.com/multidevice/user-agent#webview_user_agent)
 
 - Referer 一般是一个url，代表当前请求时从哪个页面发出的，写爬虫有用
 
