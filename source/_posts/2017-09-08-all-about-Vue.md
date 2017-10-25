@@ -207,7 +207,7 @@ created(){
 在template中添加router-link的tag,会生成一个对应的a Tag,点击跳转即可。
 router-view标签表示预先准备好的布局会被渲染进入这个标签内（将其取代）
 
-## 4. Vuex
+## 4. Vuex及状态管理
 在js眼中，一段json字符串就是一个object。
 这是vuex 中改变某项属性的代码：
 ```javaScript
@@ -258,6 +258,10 @@ f();
  2. config atom behind a firewall :
  > apm config set https-proxy https://127.0.0.1:1080
   apm config set strict-ssl false
+
+ 官方的库
+ Vuex是负责全局状态管理的，[参考](http://whutzkj.space/2017/10/24/vuex/#more)
+ 组件间[通信](https://juejin.im/post/59ec95006fb9a0451c398b1a)的方式
 
 
 

@@ -163,8 +163,9 @@ tags:
 
 查看wifi密码：
 
->adb shell cat /data/misc/wifi/*.conf
-
+```
+adb shell cat /data/misc/wifi/*.conf
+```
 清除log缓存：
 
 > adb logcat -c
@@ -192,7 +193,12 @@ tags:
 注意，最好在开发者选项里面，把显示触摸操作打开，这样视频中能显示用户点击操作位置
 
 
+ADB无线调试
+> $adb tcpip 5555
+>$ adb connect <\device-ip-address>
+> $ adb devices
+done
 
-### Ref: 
-
+### 参考:
 - [张明云的博客](http://zmywly8866.github.io/2015/01/24/all-adb-command.html)
+- [adb无线调试](http://blog.csdn.net/ykttt1/article/details/52058717)
