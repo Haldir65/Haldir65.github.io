@@ -314,6 +314,9 @@ PostDelayed最终会调用到enqueMessage方法，看一下:
 
 主线程作为一个Thread，持有一个Looper对象，Looper持有一个MessageQueue的消息队列，并一个一个地从中取出满足执行时间条件的Message，执行Messgae的callback或者交给Handler的handleMessage去处理。
 
+### 5. update
+MessageQueue里面有个IdleHandler,可以在消息队列空了时候安插一些事情去做，Glide用了这个特性，在主线程不那么忙的时候做了一些事
+
 ### Reference
 1. [Handler.postDelayed()是如何精确延迟指定时间的](http://www.dss886.com/android/2016/08/17/17-18)
 2. [How the Main Thread works](https://www.youtube.com/watch?v=aFGbv9Ih9qQ)
