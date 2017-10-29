@@ -18,9 +18,9 @@ tags: [java,tools,concurrency]
 
 ![](http://odzl05jxx.bkt.clouddn.com/pretty-orange-mushroom-wallpaper-5386b0c8c3459.jpg?imageView2/2/w/600)
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/timg.jpg?imageView2/2/w/600)
-![](http://odzl05jxx.bkt.clouddn.com/unclassified_unclassified--115_07-1920x1440.jpg?imageView2/2/w/600)
+
 ![](http://odzl05jxx.bkt.clouddn.com/beautiful-dandelion-wallpaper-5384b7d0e8b09.jpg?imageView2/2/w/600)
-![](http://odzl05jxx.bkt.clouddn.com/beautiful-red-rose-petals-wallpaper-56801fc038122.jpg?imageView2/2/w/600)
+
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/bee-getting-the-pollen-wallpaper-538358eb5d5a3.jpg?imageView2/2/w/600)
 ![](http://odzl05jxx.bkt.clouddn.com/bullet-shots-over-the-flower-wallpaper-56ee6081c7f2b.jpg?imageView2/2/w/600)
 ![](http://odzl05jxx.bkt.clouddn.com/cotton-grass-whip-wallpaper-5383509d2bd13.jpg?imageView2/2/w/600)

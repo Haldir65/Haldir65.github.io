@@ -207,6 +207,40 @@ created(){
 在template中添加router-link的tag,会生成一个对应的a Tag,点击跳转即可。
 router-view标签表示预先准备好的布局会被渲染进入这个标签内（将其取代）
 
+3.5 axios取代vue-resource用于发起http请求
+安装在官方介绍页有，子组件可以使用import从mainjs里面拿到。
+于是，尝试在一个component里面去获取百度首页，结果出错，换成豆瓣电影250还是出错：
+```
+about:1 Failed to load http://api.douban.com/v2/movie/top250: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource. Origin 'http://localhost:8080' is therefore not allowed access.
+```
+查了好久，原因是CORS(Control of Shared Resources)，通过ajax发起另一个domian(port)资源的请求默认是不安全的。主要是在js里面代码请求另一个网站(只要不满足host和port完全相同就不是同一个网站)，默认是被[禁止](http://www.ruanyifeng.com/blog/2016/04/cors.html)的。chrome里面查看network的话，发现这条request确实发出去了，request header里面多了一个
+> Origin:http://localhost:8080
+显然这不是axios设置的，服务器在看到这条header后，如果'/movie/top250'这个资源文件没有设置'Access-Control-Allow-Origin: http://localhost:8080'的话，就不会允许被获取。这是服务器方面做出的策略，显然客户端（浏览器）不能修改什么。
+解决方法：
+1.和服务器商量好CORS
+2.使用jsonp(跨域请求并不限制带src属性的tag，比如script img这些)
+
+CORS还是比较重要的东西，[详解](http://www.ruanyifeng.com/blog/2016/04/cors.html)，据说会发两次请求,且只支持GET请求。
+
+回到axios，作者表示[不打算支持jsonp](https://github.com/axios/axios/issues/75)，想用jsonp的话可以用jquery,或者使用[jsonp插件](https://github.com/axios/axios/blob/master/COOKBOOK.md#jsonp)
+```javaScript
+ $ npm install jsonp --save
+ var jsonp = require('jsonp');
+
+jsonp('http://api.douban.com/v2/movie/top250', null, function (err, data) {
+  if (err) {
+    console.error(err.message);
+  } else {
+    console.log(data);
+  }
+});
+```
+亲测有效。
+
+
+
+*XSS注入就是利用了CORS*
+
 ## 4. Vuex及状态管理
 在js眼中，一段json字符串就是一个object。
 这是vuex 中改变某项属性的代码：
@@ -235,22 +269,10 @@ id这个tag唯一的，一个页面不能有两个tag有相同的id，引用的�
 4. html中audio tag不识别本地文件，需要放在static文件下，放在src文件夹里就是404，一开始的时候我这么写"src='../assets/赵雷-成都.mp3'"，死活放不出来，换成"file://"开头也不行，换成网易云音乐的http地址就好了。最后换成'static目录下'。终于放出来了，“让我掉下眼泪的是，简直日了X”，还蛮押韵的。
 5. atom可以同时预览两个选项卡，右键,split right，用于copy and paste比较方便
 6. css里面可以写"background-image: url(./somefile.png)"，就是相对路径的意思。
-7. javaScript debug的方法：选中一个html 的tag，break on 。。。 自然会在执行到的时候停下来，evalulate value需要自己在console里面敲（注意此时应该位于Sources标签页下）。
-8. 可以检测是ES5还是ES6
-```javaScript
-function f() { console.log('I am outside!'); }
-(function () {
-if(false) {
-// 重复声明一次函数f,ES5会输出'i am insider', ES6会输出'i am outsider'
-function f() { console.log('I am inside!'); }
-}
-f();
-}());
-```
-9. setTimeout是schedule一个task，setInterval是设定一个周期性执行的任务。
+
 10.css里面的class继承是同时在一个tag里面添加class="class_a class_b"，中间一个空格，需要什么拿什么
 11. css分三种，外部样式表（写在另一个css文件里），内部样式表(写在header tag中)和内联样式表(写在单独的tag里面)
-12. MicroTask和MacroTask的执行顺序是：Stack -> MacroTask -> MicroTask [参考](https://juejin.im/entry/59e95b4c518825579d131fad)
+
 
 
 ### tools,tangiable takeaways

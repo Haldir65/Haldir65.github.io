@@ -188,6 +188,10 @@ UrlLib，Socket这些属于Python底层的基础性的network库，属于基础�
 
 
 
+## Update
+[请教flask ,laravel , rails对初学者那个更友好？](https://segmentfault.com/q/1010000003799544)
+这三个分别是python,php,ruby。懂python的话，flask上手很快。没必要学会每一种，就好像会用15种语言写hello world并没有卵用，一个意思。
+
 ### Reference
 1. xxxx
 2. xxxx
