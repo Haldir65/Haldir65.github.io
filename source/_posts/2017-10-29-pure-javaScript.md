@@ -37,3 +37,18 @@ f();
 ```
 
 7. javaScript debug的方法：选中一个html 的tag，break on 。。。 自然会在执行到的时候停下来，evalulate value需要自己在console里面敲（注意此时应该位于Sources标签页下）。
+8. HTML DOM的一些方法
+通过 id 找到 HTML 元素 window.document.getElementById()
+通过标签名找到 HTML 元素 window.document.getElementsByTagName()
+通过类名找到 HTML 元素 window.document.getElementsByClassName()
+9.交互事件的捕获，拦截，消费（冒泡）
+```javaScript
+function cancelEvent(e) {
+    if(e) {
+        e.stopPropagation();  //非IE
+    } else {
+        window.event.cancelBubble = true;  //IE
+    }
+}
+```
+在一个元素上触发事件，如果此元素定义了处理程序，那么此次事件就会被捕获，根据程序进行该事件的处理。否则这个事件会根据DOM树向父节点逐级传播，如果从始至终都没有被处理，那么最终会到达document或window根元素。所以事件是往上传递的，即冒泡。

@@ -16,7 +16,7 @@
 <meta property="og:description" content="Vue Js学习笔记">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/VueJsLogo.jpg">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/1102531047-2.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-10-29T06:38:19.553Z">
+<meta property="og:updated_time" content="2017-11-04T10:02:30.611Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="VueJs学习笔记">
 <meta name="twitter:description" content="Vue Js学习笔记">
@@ -214,16 +214,23 @@ ga('send', 'pageview');
 <p>一些常用的标签</p>
 <ul>
 <li>template 标签用于显示模板，内部可以使用获取json对象的数据</li>
-<li>data 标签用于存储json类型的数据</li>
+<li>data 普通属性，标签用于存储json类型的数据，是属于这个实例的变量</li>
 <li>methods 标签用于声明方法，内部使用this.xxx可以获得data中的json对象。在html里面不需要this，在export语句里面需要</li>
 <li>components 标签用于引入可复用的模板,用于注册</li>
-<li>computed computed就像一个template的一个属性</li>
+<li>computed 计算属性，computed和data一样，也是方法，只不过只是返回了变量的值的一份copy。不会影响data的值</li>
 </ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">var vm = new Vue(&#123;</div><div class="line">  el: &apos;#example&apos;,</div><div class="line">  data: &#123;</div><div class="line">    message: &apos;Hello&apos;</div><div class="line">  &#125;,</div><div class="line">  computed: &#123;</div><div class="line">    // 计算属性的 getter</div><div class="line">    reversedMessage: function () &#123;</div><div class="line">      // `this` 指向 vm 实例</div><div class="line">      return this.message.split(&apos;&apos;).reverse().join(&apos;&apos;)</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<p>你可以像绑定普通属性一样在模板中绑定计算属性。Vue 知道 vm.reversedMessage 依赖于 vm.message，因此当 vm.message 发生改变时，所有依赖 vm.reversedMessage 的绑定也会更新。而且最妙的是我们已经以声明的方式创建了这种依赖关系：计算属性的 getter 函数是没有副作用 (side effect) 的，这使它更易于测试和理解。<br>普通属性更改的话就真的改了，计算属性只是把这种操作预期的结果返回，并不会修改原来的值。<br>还有一个好处是，计算属性的值依赖于普通属性的值，前者不更改的话，后者直接返回缓存的值。所以这种获取时间的东西就不要放在计算属性里了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">computed: &#123;</div><div class="line">  now: function () &#123;</div><div class="line">    return Date.now()</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>一些常用的事件绑定:</p>
 <ul>
-<li>v-if=’’ //控制某个tag显示或者隐藏</li>
+<li>v-if=’’ //移除或者显示某个Tag，(display:none是隐藏或显示)</li>
 <li>v-on:click=’somefunction’ //点击事件发生时触发某个method</li>
 <li>template v-is=’some_template_name’ //用于在页面模板中导入现成的模板</li>
+</ul>
+<p>缩写：</p>
+<ul>
+<li>v-on的缩写是@符号</li>
+<li>v-bind:的缩写就是: 那个冒号</li>
 </ul>
 <h3 id="1-1-Dynamic-Components"><a href="#1-1-Dynamic-Components" class="headerlink" title="1.1 Dynamic Components"></a>1.1 Dynamic Components</h3><p>页面中需要随时展示不同template是，可以使用component标签。<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">// Imports</div><div class="line">import formOne from './components/formOne.vue';</div><div class="line">import formTwo from './components/formTwo.vue';</div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">form-one</span>&gt;</span><span class="tag">&lt;/<span class="name">form-one</span>&gt;</span></div><div class="line">//这和下面这种写法是一样的</div><div class="line"> <span class="tag">&lt;<span class="name">component</span> <span class="attr">v-bind:is</span>=<span class="string">'component'</span>&gt;</span><span class="tag">&lt;/<span class="name">component</span>&gt;</span> //component标签注册在data中，可以随时改变。例如</div><div class="line"> <span class="tag">&lt;<span class="name">button</span> <span class="attr">v-on:click</span>=<span class="string">"component='form-one'"</span>&gt;</span>Show form one<span class="tag">&lt;/<span class="name">button</span>&gt;</span></div><div class="line"> <span class="tag">&lt;<span class="name">button</span> <span class="attr">v-on:click</span>=<span class="string">"component='form-two'"</span>&gt;</span>Show form two<span class="tag">&lt;/<span class="name">button</span>&gt;</span></div></pre></td></tr></table></figure></p>
 <h3 id="1-2-InputBinding"><a href="#1-2-InputBinding" class="headerlink" title="1.2 InputBinding"></a>1.2 InputBinding</h3><p>将input标签中用户输入的文字显示在一个tag中<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">//在template中</div><div class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">v-model.lazy</span>=<span class="string">'title'</span> <span class="attr">required</span>/&gt;</span> //lazy是指preview部分只会在点击后显示内容</div><div class="line">//在data中注册</div><div class="line">data () &#123;</div><div class="line">    return &#123;</div><div class="line">      title :'',</div><div class="line">      content: ''</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">在需要展示内容的标签中可以实时获取内容</div><div class="line">如<span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123;title&#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span>&gt;  </div><div class="line"></div><div class="line">或者</div><div class="line">data () &#123;</div><div class="line">    return &#123;</div><div class="line">      blog:&#123;</div><div class="line">      title :'',</div><div class="line">      content: '',</div><div class="line">      categories:[]</div><div class="line">      &#125;  </div><div class="line">    &#125;</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
@@ -231,6 +238,8 @@ ga('send', 'pageview');
 <h3 id="1-3-Checkbox-Binding"><a href="#1-3-Checkbox-Binding" class="headerlink" title="1.3 Checkbox Binding"></a>1.3 Checkbox Binding</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"checkboxes"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">label</span>&gt;</span>Apple<span class="tag">&lt;/<span class="name">label</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"checkbox"</span> <span class="attr">value</span>=<span class="string">"apple"</span> <span class="attr">v-model</span>=<span class="string">"blog.categories"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">label</span>&gt;</span>Juice<span class="tag">&lt;/<span class="name">label</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"checkbox"</span> <span class="attr">value</span>=<span class="string">"juice"</span> <span class="attr">v-model</span>=<span class="string">"blog.categories"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">label</span>&gt;</span>Panda<span class="tag">&lt;/<span class="name">label</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"checkbox"</span> <span class="attr">value</span>=<span class="string">"panda"</span> <span class="attr">v-model</span>=<span class="string">"blog.categories"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">label</span>&gt;</span>rocky<span class="tag">&lt;/<span class="name">label</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"checkbox"</span> <span class="attr">value</span>=<span class="string">"rocky"</span> <span class="attr">v-model</span>=<span class="string">"blog.categories"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">label</span>&gt;</span>moon<span class="tag">&lt;/<span class="name">label</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"checkbox"</span> <span class="attr">value</span>=<span class="string">"moon"</span> <span class="attr">v-model</span>=<span class="string">"blog.categories"</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"></div><div class="line">在预览区，可以这样展示</div><div class="line">  <span class="tag">&lt;<span class="name">ul</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">v-for</span>=<span class="string">'cat in blog.categories'</span>&gt;</span>&#123;&#123;cat&#125;&#125;<span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">ul</span>&gt;</span></div><div class="line"> 如果checkbox被选中，blog的categories数组中就加入了这个元素，取消选中则从数组中移除。</div></pre></td></tr></table></figure>
 <h3 id="1-4-Select-Box-Binding"><a href="#1-4-Select-Box-Binding" class="headerlink" title="1.4 Select Box Binding"></a>1.4 Select Box Binding</h3><p>SelctBox只能单选，绑定数据这样:<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">v-model</span>=<span class="string">'blog.author'</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">option</span> <span class="attr">v-for</span>=<span class="string">'a in authors'</span> &gt;</span>&#123;&#123;a&#125;&#125;<span class="tag">&lt;/<span class="name">option</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></div><div class="line"></div><div class="line">data&#123;</div><div class="line">    blog:&#123;</div><div class="line">        author:'default'</div><div class="line">    &#125;,</div><div class="line">    authors:['bob','Jessy','Jean','Jean','Dave']</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>SelectBox会从authors数组中提供选项，选中后，blog.author对象将会被赋予相应的值。</p>
+<h3 id="1-5-HTML模板复用"><a href="#1-5-HTML模板复用" class="headerlink" title="1.5 HTML模板复用"></a>1.5 HTML模板复用</h3><p>组件的意义就在于可以复用UI元素，就像Flask的renderTemplate方法里面可以接收若干参数，vue Component也是一样<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">1. 在父Component中引入子Component</div><div class="line">2. 子Component中添加props:[&apos;variable1&apos;,&apos;variable2&apos;]数组</div><div class="line">3. 在父控件中直接在html标签上添加 :variable1 =&apos;&apos; ，注意这个冒号其实是  v-bind: 的缩写，不能省略</div><div class="line">4. 在子控件的html中就像引用data一样使用props</div></pre></td></tr></table></figure></p>
+<h3 id="1-6各种引用"><a href="#1-6各种引用" class="headerlink" title="1.6各种引用"></a>1.6各种引用</h3><p>在vue组件中this指的是当前的VueComponent（也就是常说的vm），self指的是window对象，this.$el指的是所渲染的template</p>
 <h2 id="2-使用Http进行CURD操作"><a href="#2-使用Http进行CURD操作" class="headerlink" title="2.使用Http进行CURD操作"></a>2.使用Http进行CURD操作</h2><p>安装：<a href="https://github.com/pagekit/vue-resource">Repo</a><br>注意：需要在当前工作目录.<br>安装完成在package.json中看到</p>
 <ul>
 <li>“dependencies”: {<br>  “vue”: “^2.3.3”,<br>  “Vue-resource”:”^1.3.4”<br>},<br>类似这样即可。</li>
@@ -247,7 +256,17 @@ ga('send', 'pageview');
 <p>3.2 关于mixin，有比较好的<a href="https://css-tricks.com/using-mixins-vue-js/">介绍</a><br>其实就是把一些公用的methods放到一个js文件中export掉，然后需要的vue文件，自己去import，在data中设置mixins: [] ,使用的时候就可以用this.method()使用这些共有的方法了。其实主要是为了复用。</p>
 <p>3.3 添加全局变量(常量)的<a href="http://www.jianshu.com/p/7547ff8760c3">方法</a>，vuex是官方的</p>
 <p>3.4 router就是建立internal link 页面之间跳转的桥梁<br>在template中添加router-link的tag,会生成一个对应的a Tag,点击跳转即可。<br>router-view标签表示预先准备好的布局会被渲染进入这个标签内（将其取代）</p>
+<p>3.5 axios取代vue-resource用于发起http请求<br>安装在官方介绍页有，子组件可以使用import从mainjs里面拿到。<br>于是，尝试在一个component里面去获取百度首页，结果出错，换成豆瓣电影250还是出错：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">about:1 Failed to load http://api.douban.com/v2/movie/top250: Response to preflight request doesn&apos;t pass access control check: No &apos;Access-Control-Allow-Origin&apos; header is present on the requested resource. Origin &apos;http://localhost:8080&apos; is therefore not allowed access.</div></pre></td></tr></table></figure></p>
+<p>查了好久，原因是CORS(Control of Shared Resources)，通过ajax发起另一个domian(port)资源的请求默认是不安全的。主要是在js里面代码请求另一个网站(只要不满足host和port完全相同就不是同一个网站)，默认是被<a href="http://www.ruanyifeng.com/blog/2016/04/cors.html">禁止</a>的。chrome里面查看network的话，发现这条request确实发出去了，request header里面多了一个</p>
+<blockquote>
+<p>Origin:<a href="http://localhost:8080">http://localhost:8080</a><br>显然这不是axios设置的，服务器在看到这条header后，如果’/movie/top250’这个资源文件没有设置’Access-Control-Allow-Origin: <a href="http://localhost:8080&#39;的话，就不会允许被获取。这是服务器方面做出的策略，显然客户端（浏览器）不能修改什么。">http://localhost:8080&#39;的话，就不会允许被获取。这是服务器方面做出的策略，显然客户端（浏览器）不能修改什么。</a><br>解决方法：<br>1.和服务器商量好CORS<br>2.使用jsonp(跨域请求并不限制带src属性的tag，比如script img这些)</p>
+</blockquote>
+<p>CORS还是比较重要的东西，<a href="http://www.ruanyifeng.com/blog/2016/04/cors.html">详解</a>，据说会发两次请求,且只支持GET请求。</p>
+<p>回到axios，作者表示<a href="https://github.com/axios/axios/issues/75">不打算支持jsonp</a>，想用jsonp的话可以用jquery,或者使用<a href="https://github.com/axios/axios/blob/master/COOKBOOK.md#jsonp">jsonp插件</a><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"> $ npm install jsonp --save</div><div class="line"> <span class="keyword">var</span> jsonp = <span class="built_in">require</span>(<span class="string">'jsonp'</span>);</div><div class="line"></div><div class="line">jsonp(<span class="string">'http://api.douban.com/v2/movie/top250'</span>, <span class="literal">null</span>, <span class="function"><span class="keyword">function</span> (<span class="params">err, data</span>) </span>&#123;</div><div class="line">  <span class="keyword">if</span> (err) &#123;</div><div class="line">    <span class="built_in">console</span>.error(err.message);</div><div class="line">  &#125; <span class="keyword">else</span> &#123;</div><div class="line">    <span class="built_in">console</span>.log(data);</div><div class="line">  &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>亲测有效。</p>
+<p><em>XSS注入就是利用了CORS</em></p>
 <h2 id="4-Vuex及状态管理"><a href="#4-Vuex及状态管理" class="headerlink" title="4. Vuex及状态管理"></a>4. Vuex及状态管理</h2><p>在js眼中，一段json字符串就是一个object。<br>这是vuex 中改变某项属性的代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">mutations: &#123;</div><div class="line">  increment (state, payload) &#123;</div><div class="line">    state.count += payload.amount</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">store.commit(<span class="string">'increment'</span>, &#123;</div><div class="line">  amount: <span class="number">10</span></div><div class="line">&#125;)</div><div class="line">两个花括号括起来的(json)，才是对象。这里，函数名叫做<span class="string">'increment'</span>，传进去的payLoad即有效信息，是通过json转达的。</div></pre></td></tr></table></figure></p>
+<h2 id="事件处理"><a href="#事件处理" class="headerlink" title="事件处理"></a>事件处理</h2><p>点击时会发生MouseEvent,如果想要获取这里面的一些属性，比如点击位置screenX,ScreenY这些，可以在html中绑定事件时，使用$event这个符号将事件传递到方法中。</p>
 <h3 id="基础复习"><a href="#基础复习" class="headerlink" title="基础复习"></a>基础复习</h3><ol>
 <li>id和class的问题<br>html tag的class，不同tag可以有相同的class，引用的时候用.classname来查找<br>id这个tag唯一的，一个页面不能有两个tag有相同的id，引用的时候用#id来找<br>一个是点，一个是#</li>
 <li>js 里面有一个promise的概念，和java8的一些流式理念有点像</li>
@@ -255,14 +274,10 @@ ga('send', 'pageview');
 <li>html中audio tag不识别本地文件，需要放在static文件下，放在src文件夹里就是404，一开始的时候我这么写”src=’../assets/赵雷-成都.mp3’”，死活放不出来，换成”file://“开头也不行，换成网易云音乐的http地址就好了。最后换成’static目录下’。终于放出来了，“让我掉下眼泪的是，简直日了X”，还蛮押韵的。</li>
 <li>atom可以同时预览两个选项卡，右键,split right，用于copy and paste比较方便</li>
 <li>css里面可以写”background-image: url(./somefile.png)”，就是相对路径的意思。</li>
-<li>javaScript debug的方法：选中一个html 的tag，break on 。。。 自然会在执行到的时候停下来，evalulate value需要自己在console里面敲（注意此时应该位于Sources标签页下）。</li>
-<li><p>可以检测是ES5还是ES6</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">f</span>(<span class="params"></span>) </span>&#123; <span class="built_in">console</span>.log(<span class="string">'I am outside!'</span>); &#125;</div><div class="line">(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line"><span class="keyword">if</span>(<span class="literal">false</span>) &#123;</div><div class="line"><span class="comment">// 重复声明一次函数f,ES5会输出'i am insider', ES6会输出'i am outsider'</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">f</span>(<span class="params"></span>) </span>&#123; <span class="built_in">console</span>.log(<span class="string">'I am inside!'</span>); &#125;</div><div class="line">&#125;</div><div class="line">f();</div><div class="line">&#125;());</div></pre></td></tr></table></figure>
-</li>
-<li><p>setTimeout是schedule一个task，setInterval是设定一个周期性执行的任务。<br>10.css里面的class继承是同时在一个tag里面添加class=”class_a class_b”，中间一个空格，需要什么拿什么</p>
-</li>
+</ol>
+<p>10.css里面的class继承是同时在一个tag里面添加class=”class_a class_b”，中间一个空格，需要什么拿什么</p>
+<ol>
 <li>css分三种，外部样式表（写在另一个css文件里），内部样式表(写在header tag中)和内联样式表(写在单独的tag里面)</li>
-<li>MicroTask和MacroTask的执行顺序是：Stack -&gt; MacroTask -&gt; MicroTask <a href="https://juejin.im/entry/59e95b4c518825579d131fad">参考</a></li>
 </ol>
 <h3 id="tools-tangiable-takeaways"><a href="#tools-tangiable-takeaways" class="headerlink" title="tools,tangiable takeaways"></a>tools,tangiable takeaways</h3><ol>
 <li>atom plugin  ide-typescript sucks , after disable the plugin ,the autocomplete feature works againself.</li>
@@ -490,6 +505,10 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">android</a>
               </li>
              
@@ -502,15 +521,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -526,7 +541,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -538,6 +553,10 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
@@ -546,7 +565,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -554,23 +573,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -590,10 +593,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
@@ -602,7 +601,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">service</a>
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -614,7 +613,23 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">service</a>
               </li>
             
             <div class="clearfix"></div>

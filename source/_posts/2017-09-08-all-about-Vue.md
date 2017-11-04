@@ -29,18 +29,47 @@ import Data from ./xxx/stuff.vue
 
 一些常用的标签
 - template 标签用于显示模板，内部可以使用{{data}}获取json对象的数据
-- data 标签用于存储json类型的数据
+- data 普通属性，标签用于存储json类型的数据，是属于这个实例的变量
 - methods 标签用于声明方法，内部使用this.xxx可以获得data中的json对象。在html里面不需要this，在export语句里面需要
 - components 标签用于引入可复用的模板,用于注册
-- computed computed就像一个template的一个属性
+- computed 计算属性，computed和data一样，也是方法，只不过只是返回了变量的值的一份copy。不会影响data的值
+
+
+```
+var vm = new Vue({
+  el: '#example',
+  data: {
+    message: 'Hello'
+  },
+  computed: {
+    // 计算属性的 getter
+    reversedMessage: function () {
+      // `this` 指向 vm 实例
+      return this.message.split('').reverse().join('')
+    }
+  }
+})
+```
+你可以像绑定普通属性一样在模板中绑定计算属性。Vue 知道 vm.reversedMessage 依赖于 vm.message，因此当 vm.message 发生改变时，所有依赖 vm.reversedMessage 的绑定也会更新。而且最妙的是我们已经以声明的方式创建了这种依赖关系：计算属性的 getter 函数是没有副作用 (side effect) 的，这使它更易于测试和理解。
+普通属性更改的话就真的改了，计算属性只是把这种操作预期的结果返回，并不会修改原来的值。
+还有一个好处是，计算属性的值依赖于普通属性的值，前者不更改的话，后者直接返回缓存的值。所以这种获取时间的东西就不要放在计算属性里了。
+```
+computed: {
+  now: function () {
+    return Date.now()
+  }
+}
+```
 
 
 一些常用的事件绑定:
-- v-if='' //控制某个tag显示或者隐藏
+- v-if='' //移除或者显示某个Tag，(display:none是隐藏或显示)
 - v-on:click='somefunction' //点击事件发生时触发某个method
 - template v-is='some_template_name' //用于在页面模板中导入现成的模板
 
-
+缩写：
+- v-on的缩写是@符号
+- v-bind:的缩写就是: 那个冒号
 
 ### 1.1 Dynamic Components
 页面中需要随时展示不同template是，可以使用component标签。
@@ -125,6 +154,20 @@ data{
 }
 ```
 SelectBox会从authors数组中提供选项，选中后，blog.author对象将会被赋予相应的值。
+
+
+
+### 1.5 HTML模板复用
+组件的意义就在于可以复用UI元素，就像Flask的renderTemplate方法里面可以接收若干参数，vue Component也是一样
+```
+1. 在父Component中引入子Component
+2. 子Component中添加props:['variable1','variable2']数组
+3. 在父控件中直接在html标签上添加 :variable1 ='' ，注意这个冒号其实是  v-bind: 的缩写，不能省略
+4. 在子控件的html中就像引用data一样使用props
+```
+
+### 1.6各种引用
+在vue组件中this指的是当前的VueComponent（也就是常说的vm），self指的是window对象，this.$el指的是所渲染的template
 
 
 
@@ -256,7 +299,8 @@ store.commit('increment', {
 两个花括号括起来的(json)，才是对象。这里，函数名叫做'increment'，传进去的payLoad即有效信息，是通过json转达的。
 ```
 
-
+## 事件处理
+点击时会发生MouseEvent,如果想要获取这里面的一些属性，比如点击位置screenX,ScreenY这些，可以在html中绑定事件时，使用$event这个符号将事件传递到方法中。
 
 
 ###  基础复习
