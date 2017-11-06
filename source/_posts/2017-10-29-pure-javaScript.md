@@ -12,10 +12,17 @@ tags: [javaScript]
 [cors的概念](http://www.ruanyifeng.com/blog/2016/04/cors.html)
 > search "原生javaScript跨域"、'jsonp跨域请求豆瓣250'
 
-[jsonp跨域获取豆瓣250接口](http://www.jianshu.com/p/1f32c9a96064)
+[jsonp跨域获取豆瓣250接口](http://www.jianshu.com/p/1f32c9a96064)，豆瓣能支持jsonp是因为豆瓣服务器响应了
+> http://api.douban.com/v2/movie/top250?callback=anything这个query,这个anything是我们自己网页里面script里面定义的方法，豆瓣会返回一个: anything({json})的数据回来，直接调用anything方法
+
 [MDN上的corz](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS)
 
+[jsonp的解释](http://schock.net/articles/2013/02/05/how-jsonp-really-works-examples/)
 
+亲测，Flask里面给response添加Header:
+>  response.headers['Access-Control-Allow-Origin'] = 'http://localhost:8080'
+
+在8080端口的web页面发起请求就能成功
 
 ## 使用Atom的时候，按下ctrl+shift+i ，会发现原来atom编辑页面就特么是一个网页。
 
@@ -37,6 +44,7 @@ f();
 ```
 
 7. javaScript debug的方法：选中一个html 的tag，break on 。。。 自然会在执行到的时候停下来，evalulate value需要自己在console里面敲（注意此时应该位于Sources标签页下）。
+
 8. HTML DOM的一些方法
 通过 id 找到 HTML 元素 window.document.getElementById()
 通过标签名找到 HTML 元素 window.document.getElementsByTagName()
@@ -101,3 +109,13 @@ var watchExampleVM = new Vue({
 ```
 
 在一个元素上触发事件，如果此元素定义了处理程序，那么此次事件就会被捕获，根据程序进行该事件的处理。否则这个事件会根据DOM树向父节点逐级传播，如果从始至终都没有被处理，那么最终会到达document或window根元素。所以事件是往上传递的，即冒泡。
+
+
+8. js去刷新当前页面，返回上级页面。。
+```html
+<a href="javascript:history.go(-1)">返回上一页</a>
+<a href="javascript:location.reload()">刷新当前页面</a>
+<a href="javascript:" onclick="history.go(-2); ">返回前两页</a>
+<a href="javascript:" onclick="self.location=document.referrer;">返回上一页并刷新</a>
+<a href="javascript:" onclick="history.back(); ">返回上一页</a>
+```
