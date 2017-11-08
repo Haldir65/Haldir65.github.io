@@ -363,6 +363,113 @@ Flowable -> ignoreElements() ->Completable
 - [Combining Observables](https://github.com/ReactiveX/RxJava/wiki/Combining-Observables) 多个数据来源的加工
 
 
+### updates: 复制一些实例
+merge():
+```java
+// 用于存放最终展示的数据
+        String result = "数据源来自 = " ;
+
+        /*
+         * 设置第1个Observable：通过网络获取数据
+         * 此处仅作网络请求的模拟
+         **/
+        Observable<String> network = Observable.just("网络");
+
+        /*
+         * 设置第2个Observable：通过本地文件获取数据
+         * 此处仅作本地文件请求的模拟
+         **/
+        Observable<String> file = Observable.just("本地文件");
+
+
+        /*
+         * 通过merge（）合并事件 & 同时发送事件
+         **/
+        Observable.merge(network, file)
+                .subscribe(new Observer<String>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(String value) {
+                        Log.d(TAG, "数据源有： "+ value  );
+                        result += value + "+";
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.d(TAG, "对Error事件作出响应");
+                    }
+
+                    // 接收合并事件后，统一展示
+                    @Override
+                    public void onComplete() {
+                        Log.d(TAG, "获取数据完成");
+                        Log.d(TAG,  result  );
+                    }
+                });
+```
+zip()，比如要同时拉两个接口
+```java
+public class MainActivity extends AppCompatActivity {
+
+
+        private static final String TAG = "Rxjava";
+
+
+        // 定义Observable接口类型的网络请求对象
+        Observable<Translation1> observable1;
+        Observable<Translation2> observable2;
+
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_main);
+
+            // 步骤1：创建Retrofit对象
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl("http://fy.iciba.com/") // 设置 网络请求 Url
+                    .addConverterFactory(GsonConverterFactory.create()) //设置使用Gson解析(记得加入依赖)
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create()) // 支持RxJava
+                    .build();
+
+            // 步骤2：创建 网络请求接口 的实例
+            GetRequest_Interface request = retrofit.create(GetRequest_Interface.class);
+
+            // 步骤3：采用Observable<...>形式 对 2个网络请求 进行封装
+            observable1 = request.getCall().subscribeOn(Schedulers.io()); // 新开线程进行网络请求1
+            observable2 = request.getCall_2().subscribeOn(Schedulers.io());// 新开线程进行网络请求2
+            // 即2个网络请求异步 & 同时发送
+
+            // 步骤4：通过使用Zip（）对两个网络请求进行合并再发送
+            Observable.zip(observable1, observable2,
+                    new BiFunction<Translation1, Translation2, String>() {
+                        // 注：创建BiFunction对象传入的第3个参数 = 合并后数据的数据类型
+                        @Override
+                        public String apply(Translation1 translation1,
+                                            Translation2 translation2) throws Exception {
+                            return translation1.show() + " & " +translation2.show();
+                        }
+                    }).observeOn(AndroidSchedulers.mainThread()) // 在主线程接收 & 处理数据
+                    .subscribe(new Consumer<String>() {
+                        // 成功返回数据时调用
+                        @Override
+                        public void accept(String combine_infro) throws Exception {
+                            // 结合显示2个网络请求的数据结果
+                            Log.d(TAG, "最终接收到的数据是：" + combine_infro);
+                        }
+                    }, new Consumer<Throwable>() {
+                        // 网络请求错误时调用
+                        @Override
+                        public void accept(Throwable throwable) throws Exception {
+                            System.out.println("登录失败");
+                        }
+                    });
+        }
+}
+```
 
 
 
@@ -377,3 +484,4 @@ Reactive programming allow us to model it in the proper way: asynchronously. Emb
 ### Reference
 
 -- [GOTO 2016 • Exploring RxJava 2 for Android • Jake Wharton - YouTube](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=6&cad=rja&uact=8&ved=0ahUKEwjlvrfg8bnTAhUI0mMKHcXZC1MQtwIITDAF&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DhtIXKI5gOQU&usg=AFQjCNEYczqXGkjYXOUbovtP1CxDPARcXA&sig2=gmLYEd2cVOhI7C2WjOHr9g)
+-- [掘金](https://juejin.im/entry/5a025b3b51882561a3265bb7)

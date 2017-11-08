@@ -119,3 +119,27 @@ var watchExampleVM = new Vue({
 <a href="javascript:" onclick="self.location=document.referrer;">返回上一页并刷新</a>
 <a href="javascript:" onclick="history.back(); ">返回上一页</a>
 ```
+
+9. js中好像没有像java中那种javaBean的特殊的数据类型的存在。
+ES6开始可以使用import和export语法，有类似的效果，[参考](https://stackoverflow.com/questions/34741111/exporting-importing-json-object-in-es6)
+states.js
+```javaScript
+export default {
+  STATES: {
+    'AU' : {...},
+    'US' : {...}
+  }
+};
+
+import STATES from 'states';
+// 或者
+var STATES = {};
+STATES.AU = {...};
+STATES.US = {...};
+export STATES;
+
+import { STATES } from 'states';
+//
+import whatever from 'states';
+// whatever会变成export default中的内容
+```
