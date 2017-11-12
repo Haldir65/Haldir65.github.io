@@ -100,4 +100,49 @@ var watchExampleVM = new Vue({
 </script>
 ```
 
+
+10. Ajax请求的套路
+```javaScript
+var getJSON = function(url) {
+  var promise = new Promise(function(resolve, reject){
+    var client = new XMLHttpRequest();
+    client.open("GET", url);
+    client.onreadystatechange = handler;
+    client.responseType = "json";
+    client.setRequestHeader("Accept", "application/json");
+    client.send();
+
+    function handler() {
+      if (this.status === 200) {
+        resolve(this.response);
+      } else {
+        reject(new Error(this.statusText));
+      }
+    };
+  });
+
+  return promise;
+};
+
+getJSON("/posts.json").then(function(json) {
+  console.log('Contents: ' + json);
+}, function(error) {
+  console.error('出错了', error);
+});
+```
+
+11.js里面判断两个变量相等的方式，建议一律使用三个等号（严格相等）
+= 赋值运算符
+== 等于
+=== 严格等于
+例：
+var a = 3;
+var b = "3";
+
+a==b 返回 true
+a===b 返回 false
+
+因为a,b的类型不一样
+===用来进行严格的比较判断
+
 在一个元素上触发事件，如果此元素定义了处理程序，那么此次事件就会被捕获，根据程序进行该事件的处理。否则这个事件会根据DOM树向父节点逐级传播，如果从始至终都没有被处理，那么最终会到达document或window根元素。所以事件是往上传递的，即冒泡。

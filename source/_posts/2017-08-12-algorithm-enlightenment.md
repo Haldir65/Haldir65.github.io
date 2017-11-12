@@ -92,20 +92,20 @@ the best case scenario : array已经排序好 Ω（n）
 
 ### 1.4 Merge Sort
 这个算法比较复杂，一图胜千言
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/merge_sort.png) 
+![](http://odzl05jxx.bkt.clouddn.com/image/jpg/merge_sort.png)
 [参考](http://www.java2novice.com/java-sorting-algorithms/merge-sort/)
 其实就是把array打成一半一半，直到变成多个大小为2的数组，然后再合并起来。java代码直接复制粘贴了，保留包名是对作者的尊重：
 ```java
 package com.java2novice.sorting;
- 
+
 public class MyMergeSort {
-     
+
     private int[] array;
     private int[] tempMergArr;
     private int length;
- 
+
     public static void main(String a[]){
-         
+
         int[] inputArr = {45,23,11,89,77,98,4,28,65,43};
         MyMergeSort mms = new MyMergeSort();
         mms.sort(inputArr);
@@ -114,16 +114,16 @@ public class MyMergeSort {
             System.out.print(" ");
         }
     }
-     
+
     public void sort(int inputArr[]) {
         this.array = inputArr;
         this.length = inputArr.length;
         this.tempMergArr = new int[length];
         doMergeSort(0, length - 1);
     }
- 
+
     private void doMergeSort(int lowerIndex, int higherIndex) {
-         
+
         if (lowerIndex < higherIndex) {
             int middle = lowerIndex + (higherIndex - lowerIndex) / 2;
             // Below step sorts the left side of the array
@@ -134,9 +134,9 @@ public class MyMergeSort {
             mergeParts(lowerIndex, middle, higherIndex);
         }
     }
- 
+
     private void mergeParts(int lowerIndex, int middle, int higherIndex) {
- 
+
         for (int i = lowerIndex; i <= higherIndex; i++) {
             tempMergArr[i] = array[i];
         }
@@ -158,7 +158,7 @@ public class MyMergeSort {
             k++;
             i++;
         }
- 
+
     }
 }
 ```
@@ -170,27 +170,27 @@ public class MyMergeSort {
 java代码也是抄的
 ```java
 package com.java2novice.algos;
- 
+
 public class MySelectionSort {
- 
+
     public static int[] doSelectionSort(int[] arr){
-         
+
         for (int i = 0; i < arr.length - 1; i++)
         {
             int index = i;
             for (int j = i + 1; j < arr.length; j++)
-                if (arr[j] < arr[index]) 
+                if (arr[j] < arr[index])
                     index = j;
-      
+
             int smallerNumber = arr[index];  
             arr[index] = arr[i];
             arr[i] = smallerNumber;
         }
         return arr;
     }
-     
+
     public static void main(String a[]){
-         
+
         int[] arr1 = {10,34,2,56,7,67,88,42};
         int[] arr2 = doSelectionSort(arr1);
         for(int i:arr2){
@@ -207,3 +207,7 @@ public class MySelectionSort {
 一种比较快速的排序方法
 [视频](https://www.youtube.com/watch?v=aQiWF4E8flQ)
 选中数组最后一个元素，称之为pivot。然后从左到右找，把所有小于pivot的元素挪到左边。然后把pivot挪到刚才那个元素右边，一直重复下去。
+
+### 1.7 TimSort
+java的Collections.sort的算法，
+[Comparison Method Violates Its General Contract!]((https://www.youtube.com/watch?v=bvnmbRo7a1Y))

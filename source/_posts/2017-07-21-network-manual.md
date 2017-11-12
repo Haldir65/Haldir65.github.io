@@ -329,6 +329,14 @@ tls,https加密过程，sha1和sha256加密算法
 
 ping ,traceRouter
 
+tcp三次握手四次挥手，用人话说：
+因为HTTP是一个基于TCP的协议,而TCP是一种可靠的传输层协议.建立TCP连接时会发生:三次握手(three-way handshake)firefox > nginx [SYN] 在么nginx > firefox [SYN, ACK] 在firefox > nginx [ACK] 知道了关闭TCP连接时会发生:四次挥手(four-way handshake)firefox > nginx [FIN] 我要关闭连接了nginx > firefox [ACK] 知道了,等我发完包先nginx > firefox [FIN] 我也关闭连接了firefox > nginx [ACK] 好的,知道了几个报文的标识的解释:SYN: synchronization(同步)ACK: acknowledgement(确认:告知已收到)FIN: finish(结束)
+
+作者：eechen
+链接：https://www.zhihu.com/question/67772889/answer/257170215
+来源：知乎
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
 ## 参考
 - [谈谈HTTP协议中的短轮询、长轮询、长连接和短连接](http://www.cnblogs.com/zuoxiaolong/p/life49.html)
 - [http请求的TCP瓶颈](https://bhsc881114.github.io/2015/06/23/HTTP%E8%AF%B7%E6%B1%82%E7%9A%84TCP%E7%93%B6%E9%A2%88%E5%88%86%E6%9E%90/)
