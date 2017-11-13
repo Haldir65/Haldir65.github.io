@@ -188,3 +188,7 @@ import { STATES } from 'states';
 import whatever from 'states';
 // whatever会变成export default中的内容
 ```
+
+[atom安装插件被墙问题](http://blog.csdn.net/qianghaohao/article/details/52331432)
+Atom推荐插件
+[atom-beautify](https://atom.io/packages/atom-beautify)

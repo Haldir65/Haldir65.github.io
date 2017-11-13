@@ -204,6 +204,8 @@ Dianne Hackborn
 ## Good Reading
 [Android Source code](https://android-review.googlesource.com)
 
+[Project Butter and other stuff](http://www.jianshu.com/p/75139692b8e6)
+
 ## 一些列入的规划的想法
 - 多线程下载实例
 - 自己写一个ImageLoader(主要是多线程同步的问题,queue)

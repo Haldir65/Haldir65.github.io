@@ -169,6 +169,9 @@ SelectBox会从authors数组中提供选项，选中后，blog.author对象将�
 ### 1.6各种引用
 在vue组件中this指的是当前的VueComponent（也就是常说的vm），self指的是window对象，this.$el指的是所渲染的template
 
+### 1.7 嵌套路由破坏了静态资源的引用路径
+[nested-routes-breaks-the-static-path](https://stackoverflow.com/questions/45133669/nested-routes-breaks-the-static-path)
+解决方法是在 html中置顶css或js等静态资源的location，从绝对路径，根路径开始
 
 
 
