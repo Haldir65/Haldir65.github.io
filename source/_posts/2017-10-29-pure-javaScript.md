@@ -183,12 +183,18 @@ STATES.AU = {...};
 STATES.US = {...};
 export STATES;
 
-import { STATES } from 'states';
+import { STATES } from 'states';//接受方最好写上大括号包起来
 //
 import whatever from 'states';
 // whatever会变成export default中的内容
 ```
 
+10. 监听关闭窗口事件
+```javaScript
+window.onbeforeunload = function () {
+       return "Bye now!"
+   }
+```   
 [atom安装插件被墙问题](http://blog.csdn.net/qianghaohao/article/details/52331432)
 Atom推荐插件
 [atom-beautify](https://atom.io/packages/atom-beautify)

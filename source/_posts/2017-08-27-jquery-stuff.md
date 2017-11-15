@@ -27,7 +27,7 @@ jQuery只是javascript的公开库，掌握javascript语法对于解决问题更
 </script>
 </head>
 ```
-这一段必须放在head里面，用自己的src或者微软，谷歌的cdn都可以
+这一段必须放在head里面，用自己的src或者微软，谷歌的cdn都可以。如果自己的js文件引用到了jQuery，[需要把jQuery写在其他js前面](https://stackoverflow.com/questions/8886614/uncaught-referenceerror-jquery-is-not-defined)
 
 ### 1.1所有的jQuery函数都放在ready里面
 这一段script放在body后面也行，放在head里面也行

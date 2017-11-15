@@ -107,6 +107,66 @@ private byte[] lock = new byte[0]; // 特殊的instance变量
 ```
 零长度的byte数组对象创建起来将比任何对象都经济――查看编译后的字节码：生成零长度的byte[]对象只需3条操作码，而Object lock = new Object()则需要7行操作码。
 
+## 9. CountdownLatch的简单使用
+作者：天然鱼
+链接：http://www.jianshu.com/p/cef6243cdfd9
+來源：简书
+```java
+public class CountDownLatchTest {
+
+    private int threadNum = 5;//执行任务的子线程数量
+    private int workNum = 20;//任务数量
+    private ExecutorService service;
+    private ArrayBlockingQueue<String> blockingQueue;
+    private CountDownLatch latch;
+
+    @Before
+    public void setUp() {
+        service = Executors.newFixedThreadPool(threadNum, new ThreadFactoryBuilder().setNameFormat("WorkThread-%d").build());
+        blockingQueue = new ArrayBlockingQueue<>(workNum);
+        for (int i = 0; i < workNum; i++) {
+            blockingQueue.add("任务-" + i);
+        }
+        latch = new CountDownLatch(workNum);//计数器的值为任务的数量
+    }
+
+    @Test
+    public void test() throws InterruptedException {
+        SoutUtil.print("主线程开始运行");
+        for (int i = 0; i < workNum; i++) {
+            service.execute(new WorkRunnable());
+        }
+        latch.await();//等待子线程的所有任务完成
+        SoutUtil.print("主线程去做其它事");
+    }
+
+    //用blockQueue中的元素模拟任务
+    public String getWork() {
+        return blockingQueue.poll();
+    }
+
+    class WorkRunnable implements Runnable {
+
+        public void run() {
+            String work = getWork();
+            performWork(work);
+            latch.countDown();//完成一个任务就调用一次
+        }
+    }
+
+    private void performWork(String work) {
+        SoutUtil.print("处理任务：" + work);
+        try {
+            //模拟耗时的任务
+            Thread.currentThread().sleep(60);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+}
+```
+## 10. CyclicBarrier
 
 
 ------------------------------mere trash-------------------------------------------------
