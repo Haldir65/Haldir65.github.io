@@ -204,9 +204,13 @@ Dianne Hackborn
 
 ## Good Reading
 [Android Source code](https://android-review.googlesource.com)
+<<<<<<< Updated upstream
 
 [Project Butter and other stuff](http://www.jianshu.com/p/75139692b8e6)
 
+=======
+[SurfaceFlinger](https://speakerdeck.com/brittbarak/view-to-pixel-2-dot-0-droidcon-sf-17)
+>>>>>>> Stashed changes
 ## 一些列入的规划的想法
 - 多线程下载实例
 - 自己写一个ImageLoader(主要是多线程同步的问题,queue)

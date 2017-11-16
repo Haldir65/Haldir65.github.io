@@ -481,6 +481,12 @@ public class Test {
 ```
 其实重点在于看javap -c 生成的字节码
 
+### 30. 假如没有override hashCode方法，那么deug里面看到的是什么？
+```java
+@HotSpotIntrinsicCandidate
+   public native int hashCode();//是一个native方法
+```
+[默认返回内存中的地址](https://stackoverflow.com/questions/2237720/what-is-an-objects-hash-code-if-hashcode-is-not-overridden)，
 
 
 
