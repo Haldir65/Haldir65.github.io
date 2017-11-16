@@ -71,6 +71,7 @@ private static void prepare(boolean quitAllowed) {
     }  
 ```
 所以避免leak的话，记得调用ThreadLocal.remove
+每一条线程调用ThreadLocal的set方法时都只能改变属于自己（线程）的值，调用get的时候也只能读到自己曾经设置的值。在多条线程面前，一个ThreadLocal类似于一个银行，每条线程只能保存或者更改读取自己的保险柜里的东西，保险柜钥匙即Thread自身。
 
 ## 3. Fork/join since java 7
 有些任务是可以分块的。[work-stealing的实现](http://ifeve.com/java7-fork-join-and-closure/)

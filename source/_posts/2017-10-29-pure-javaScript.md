@@ -195,6 +195,8 @@ window.onbeforeunload = function () {
        return "Bye now!"
    }
 ```   
+[JavaScript使用哪一种编码？](http://www.ruanyifeng.com/blog/2014/12/unicode.html),不是utf-8
+
 [atom安装插件被墙问题](http://blog.csdn.net/qianghaohao/article/details/52331432)
 Atom推荐插件
 [atom-beautify](https://atom.io/packages/atom-beautify)

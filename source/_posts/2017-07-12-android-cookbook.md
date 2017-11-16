@@ -117,6 +117,7 @@ Java相关
 - [ ] OkHttp跑分[github](https://github.com/square/okhttp/blob/master/benchmarks/src/main/java/okhttp3/benchmarks/Benchmark.java)以及作者的[Gplus](https://plus.google.com/+JesseWilson/posts/EJCDEiPrN42)，以及外国人做的[High-Concurrency HTTP Clients on the JVM](https://dzone.com/articles/high-concurrency-http-clients-on-the-jvm)，纯属好玩。
 - [ ] 指令重排序，内存栅栏，JVM垃圾回收机制，何时触发MinorGC
 - [ ] Eden和Survivor的比例分配等
+- [ ] Gson主要的代码在JsonWriter里面，打几个断点即可
 
 
 
