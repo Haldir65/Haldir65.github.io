@@ -27,7 +27,6 @@ tags: [java,tools,concurrency]
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/macro-of-yellow-narcisa-flower-wallpaper-53834d45b40a1.jpg?imageView2/2/w/600)
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/nature-grass-wet-plants-high-resolution-wallpaper-573f2c6413708.jpg?imageView2/2/w/600)
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/ripe-grapes-macro-wallpaper-1920x1080-538350f32e183.jpg?imageView2/2/w/600)
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/single-yellow-beauty-flower-on-the-fence-wallpaper-56801fde208df.jpg?imageView2/2/w/600)
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/yellow-autumn-leaves-wallpaper-537f1e4672a31.jpg?imageView2/2/w/600)
 
 > The difference between “concurrent” and “parallel” execution

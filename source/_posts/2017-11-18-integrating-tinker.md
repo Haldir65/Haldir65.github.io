@@ -1,0 +1,181 @@
+---
+title: 集成Tinker的一些记录
+date: 2017-11-18 17:25:29
+tags: [android]
+---
+
+关于Android Application集成Tinker的一次记录。
+![](http://odzl05jxx.bkt.clouddn.com/image/jpg/single-yellow-beauty-flower-on-the-fence-wallpaper-56801fde208df.jpg?imageView2/2/w/600)
+<!--more-->
+
+## 1. 首先从官方Demo项目开始
+[Tinker](https://github.com/Tencent/tinker)是2016年开源的，先直接clone下来。
+我的环境：
+> Android Studio 3.0 稳定版
+gradle版本：distributionUrl=https\://services.gradle.org/distributions/gradle-4.1-all.zip
+gradle插件版本:  classpath 'com.android.tools.build:gradle:3.0.0'
+TINKER_VERSION=1.9.1
+compileSdkVersion 26
+buildToolsVersion '26.0.2'
+
+Android Studio 3.0 因为刚出来，所以遇到了一些问题，不过好在Google一下或者在issue里面查一下，都能找到合适的解答
+
+[官方Demo](https://github.com/Tencent/tinker/tree/master/tinker-sample-android)
+先把官方Demo按照普通App的流程安装上来。
+这时候在app/build/bakApk/目录下就会出现“app-debug-1118-15-50-07.apk”这样的文件，其实是复制了一份当前的apk
+
+然后，在MainActivity代码中，把原本注释掉的一行Log取消注释，运行如下命令
+> gradlew tinkerPatchDebug
+或者在Andriod Studio的Gradle tab里面找到这个task，运行一下
+
+打releasePatch其实也差不多
+> gradlew tinkerRelease
+
+一切顺利的话，在
+app/build/outputs/apk/tinkerPatch/debug文件夹下就会看到一些新生成的文件，例如
+“app/build/outputs/apk/tinkerPatch/debug/patch_signed.apk”，
+“app/build/outputs/apk/tinkerPatch/debug/patch_signed_7zip.apk”
+等等，具体每个文件是干嘛的文档上都说了。
+这时候通过adb push命令把这个7zip文件上传到手机根目录下
+> adb push ./app/build/outputs/tinkerPatch/debug/patch_signed_7zip.apk /storage/sdcard0/patch_signed_7zip.apk
+或者在Android Studio 3.0右下角有一个Device File Explorer,把这个文件上传到手机里
+
+上面那个路径不一定准，总之需要和这里面的路径一样，所以我在模拟器里面是sdcard/emulated/0这个目录下
+```java
+TinkerInstaller.onReceiveUpgradePatch(getApplicationContext(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/patch_signed_7zip.apk");
+```
+
+上传完毕之后，在当前页面点击Button，点击事件调用到上面这一行代码.
+一切Ok的话（运气好的话），会出现Toast,其实这个Toast是在SampleResultService（一个IntentService）里面写的，也就是说Patch打上的话，开发者可以自定义一些UI事件。
+
+这时候再Kill Porcess,据说锁屏也行？
+重新启动后，刚才取消注释的那一行代码就在logcat里面出现了。
+
+到此，在没有重新打包的情况下，热修复完成。
+
+
+## 2. 已有的项目改造
+照着改成这样
+在Gradle.properties里面添加
+> TINKER_VERSION = 1.9.1 //只是为了集中管理
+> TINKER_ID = 1.0 //这个不添加会报错
+
+
+project的build.gradle中添加
+>  classpath "com.tencent.tinker:tinker-patch-gradle-plugin:${TINKER_VERSION}"
+
+app的build.gradle中需要新增很多东西，建议直接[复制](https://github.com/Tencent/tinker/blob/master/tinker-sample-android/app/build.gradle)过来。
+需要改的地方就是
+```
+ext {
+    tinkerOldApkPath = "${bakPath}/app-debug-1118-15-50-07.apk"
+    // 找到当前app/build/bakApk/目录下的apk文件，把名字改成自己和当前的文件一样的
+}
+
+ignoreWarning = true //默认是false，不改经常编译报错
+
+implementation("com.tencent.tinker:tinker-android-lib:${TINKER_VERSION}") { changing = true }
+provided("com.tencent.tinker:tinker-android-anno:${TINKER_VERSION}")
+annotationProcessor("com.tencent.tinker:tinker-android-anno:${TINKER_VERSION}")
+```
+
+接下来是Application，如果自己继承了android.app.Application的话，得改一下
+```java
+//原来
+public MyApplication extends Application{
+
+}
+
+//现在
+@SuppressWarnings("unused")
+@DefaultLifeCycle(application = "com.包名.SomeName",
+        flags = ShareConstants.TINKER_ENABLE_ALL,
+        loadVerifyFlag = false)
+public class AppLike extends DefaultApplicationLike {
+     static Context context;
+
+    public AppLike(Application application, int tinkerFlags, boolean tinkerLoadVerifyFlag,
+                   long applicationStartElapsedTime, long applicationStartMillisTime, Intent tinkerResultIntent) {
+        super(application, tinkerFlags, tinkerLoadVerifyFlag, applicationStartElapsedTime, applicationStartMillisTime, tinkerResultIntent);
+    }
+
+    /**
+     * install multiDex before install tinker
+     * so we don't need to put the tinker lib classes in the main dex
+     *
+     * @param base
+     */
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    @Override
+    public void onBaseContextAttached(Context base) {
+        super.onBaseContextAttached(base);
+        //you must install multiDex whatever tinker is installed!
+        MultiDex.install(base);
+        AppLike.context = getApplication();
+        //初始化Tinker
+        TinkerInstaller.install(this);
+
+    }
+
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    public void registerActivityLifecycleCallbacks(Application.ActivityLifecycleCallbacks callback) {
+        getApplication().registerActivityLifecycleCallbacks(callback);
+    }
+    public static Context getContext() {
+        return context;
+    }
+}
+
+Mainfest里面要改成上面那个“com.包名.SomeName”
+```
+接下来按照之前的步骤就Ok了。
+
+## 3. Configuration
+以上只是简单的把Demo跑通，接下里需要看下Tinker提供的定制项
+
+=======================================================================
+
+
+## 4. 常见问题
+Q: 我只不过改了一个Toast的文案，为毛生成的patch_signed_7zip.apk文件这么大？
+A: 看下tinkerPatch文件夹下面的log.txt文件（建议用Notepad打开），里面一大堆“Found add resource: res/drawable-hdpi-v4/abc_list_pressed_holo_light.9.png”这样的类似的出现，具体原因跟aapt有关，好像可以设置detect resource change （大概就这意思）为false，这样就不会那么大了。
+
+
+=======================================================================
+
+
+## 5. 源码解析
+至少我现在看到7个包：
+> com.tencent.tinker:aosp-dexutils:1.91.@jar
+> com.tencent.tinker:bsdiff-util:1.91.@jar
+> com.tencent.tinker:tinker-android-anno:1.91.@jar
+> com.tencent.tinker:tinker-android-lib:1.91.@jar
+> com.tencent.tinker:tinker-android-loader:1.91.@jar
+> com.tencent.tinker:tinker-commons:1.91.@jar
+> com.tencent.tinker:tinker-ziputils:1.91.@jar
+
+分的这么散估计也是希望能够好扩展吧。
+=======================================================================
+
+网上关于源码解析的文章已经很多，有时间看看，应该不难。
+关于Tinker-Patch这个外包给第三方的服务，纯属好奇就去看了下url到底长什么样。在[TinkerClientAPI](https://github.com/TinkerPatch/tinkerpatch-sdk/blob/master/tinkerpatch-sdk/src/main/java/com/tencent/tinker/server/client/TinkerClientAPI.java)里面有这么一段，其实跟Tinker本身庞大的架构比起来，已经算不上什么了。
+```java
+Uri.Builder urlBuilder = Uri.parse(this.host).buildUpon(); // "http://q.tinkerpatch.com"
+        if (clientAPI.debug) {
+            urlBuilder.appendPath("dev");
+        }
+        final String url = urlBuilder.appendPath(this.appKey)
+            .appendPath(this.appVersion)
+            .appendQueryParameter("d", versionUtils.id())
+            .appendQueryParameter("v", String.valueOf(System.currentTimeMillis()))
+            .build().toString();
+```
+除此之外，为了能够在测试环境验证补丁，还提供了一个[小工具](https://github.com/TinkerPatch/tinkerpatch-debug-tool)
+
+很感谢鹅厂能够将Tinker这样的工具开源出来造福广大开发者，抛开技术上的实力不说，能够一直积极维护也是一件了不起的事情。
+
+## 参考
+1. [微信热修复tinker及tinker-server快速接入](http://jp1017.top/2016/11/25/%E5%BE%AE%E4%BF%A1%E7%83%AD%E4%BF%AE%E5%A4%8Dtinker%E5%8F%8Atinker-server%E5%BF%AB%E9%80%9F%E6%8E%A5%E5%85%A5/)
+2. [TinkerPatch](https://github.com/TinkerPatch/tinkerpatch-sdk)，其实就是帮你把下发“patch_signed_7zip.apk”这个文件的活干了，还给了非常直观的报表，收费也是合情合理。
+3. [Android热补丁之Tinker原理解析](http://w4lle.com/2016/12/16/tinker/index.html)
+3. [热更新Tinker研究（三）：加载补丁](http://blog.csdn.net/huweigoodboy/article/details/62428170)

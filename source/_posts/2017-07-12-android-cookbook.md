@@ -124,7 +124,7 @@ Java相关
 Android相关
 - [ ] AppCompat源码解析
 - [ ] ContentProvider的启动过程
-- [ ] IPC，Binder原理
+- [ ] IPC，Binder原理[Binder学习指南](http://weishu.me/2016/01/12/binder-index-for-newer/)
 - [ ] [Android Internals](https://academy.realm.io/posts/360-andev-2017-effie-barak-android-internals/)
 - [ ] cookie存储位置(/webviewCookiesChromium.db),db存储位置
 - [ ] Binder的原理，Binder里面引用计数的原理，Binder底层为什么用红黑树
@@ -146,6 +146,7 @@ Android相关
 - [ ] SystemServer进程启动流程
 - [ ] Launcher启动流程
 - [X] Android生命周期在不同版本的表现形式[有些onXXX在高版本不会调](http://blog.csdn.net/liuweiballack/article/details/47026263)，[原因是HoneyComb之后对Activity LifeCycle进行了改动](http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html)
+- [ ] 要不是Jake Wharton在DroidConNYC2017上提到，还不知道有v4包里面有**AtomicFile**这玩意
 
 > Studio里面看源码，find usage没有的话，find in path , choose android sdk
 
@@ -204,13 +205,9 @@ Dianne Hackborn
 
 ## Good Reading
 [Android Source code](https://android-review.googlesource.com)
-<<<<<<< Updated upstream
-
 [Project Butter and other stuff](http://www.jianshu.com/p/75139692b8e6)
-
-=======
 [SurfaceFlinger](https://speakerdeck.com/brittbarak/view-to-pixel-2-dot-0-droidcon-sf-17)
->>>>>>> Stashed changes
+
 ## 一些列入的规划的想法
 - 多线程下载实例
 - 自己写一个ImageLoader(主要是多线程同步的问题,queue)
