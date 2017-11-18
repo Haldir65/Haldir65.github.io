@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://haldir65.github.io/"/>
-  <updated>2017-11-16T13:47:43.462Z</updated>
+  <updated>2017-11-18T14:23:05.978Z</updated>
   <id>https://haldir65.github.io/</id>
   
   <author>
@@ -14,6 +14,77 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>集成Tinker的一些记录</title>
+    <link href="https://haldir65.github.io/2017/11/18/2017-11-18-integrating-tinker/"/>
+    <id>https://haldir65.github.io/2017/11/18/2017-11-18-integrating-tinker/</id>
+    <published>2017-11-18T09:25:29.000Z</published>
+    <updated>2017-11-18T14:23:05.978Z</updated>
+    
+    <content type="html"><![CDATA[<p>关于Android Application集成Tinker的一次记录。<br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/single-yellow-beauty-flower-on-the-fence-wallpaper-56801fde208df.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
+<h2 id="1-首先从官方Demo项目开始"><a href="#1-首先从官方Demo项目开始" class="headerlink" title="1. 首先从官方Demo项目开始"></a>1. 首先从官方Demo项目开始</h2><p><a href="https://github.com/Tencent/tinker">Tinker</a>是2016年开源的，先直接clone下来。<br>我的环境：</p>
+<blockquote>
+<p>Android Studio 3.0 稳定版<br>gradle版本：distributionUrl=https\://services.gradle.org/distributions/gradle-4.1-all.zip<br>gradle插件版本:  classpath ‘com.android.tools.build:gradle:3.0.0’<br>TINKER_VERSION=1.9.1<br>compileSdkVersion 26<br>buildToolsVersion ‘26.0.2’</p>
+</blockquote>
+<p>Android Studio 3.0 因为刚出来，所以遇到了一些问题，不过好在Google一下或者在issue里面查一下，都能找到合适的解答</p>
+<p><a href="https://github.com/Tencent/tinker/tree/master/tinker-sample-android">官方Demo</a><br>先把官方Demo按照普通App的流程安装上来。<br>这时候在app/build/bakApk/目录下就会出现“app-debug-1118-15-50-07.apk”这样的文件，其实是复制了一份当前的apk</p>
+<p>然后，在MainActivity代码中，把原本注释掉的一行Log取消注释，运行如下命令</p>
+<blockquote>
+<p>gradlew tinkerPatchDebug<br>或者在Andriod Studio的Gradle tab里面找到这个task，运行一下</p>
+</blockquote>
+<p>打releasePatch其实也差不多</p>
+<blockquote>
+<p>gradlew tinkerRelease</p>
+</blockquote>
+<p>一切顺利的话，在<br>app/build/outputs/apk/tinkerPatch/debug文件夹下就会看到一些新生成的文件，例如<br>“app/build/outputs/apk/tinkerPatch/debug/patch_signed.apk”，<br>“app/build/outputs/apk/tinkerPatch/debug/patch_signed_7zip.apk”<br>等等，具体每个文件是干嘛的文档上都说了。<br>这时候通过adb push命令把这个7zip文件上传到手机根目录下</p>
+<blockquote>
+<p>adb push ./app/build/outputs/tinkerPatch/debug/patch_signed_7zip.apk /storage/sdcard0/patch_signed_7zip.apk<br>或者在Android Studio 3.0右下角有一个Device File Explorer,把这个文件上传到手机里</p>
+</blockquote>
+<p>上面那个路径不一定准，总之需要和这里面的路径一样，所以我在模拟器里面是sdcard/emulated/0这个目录下<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">TinkerInstaller.onReceiveUpgradePatch(getApplicationContext(), Environment.getExternalStorageDirectory().getAbsolutePath() + <span class="string">"/patch_signed_7zip.apk"</span>);</div></pre></td></tr></table></figure></p>
+<p>上传完毕之后，在当前页面点击Button，点击事件调用到上面这一行代码.<br>一切Ok的话（运气好的话），会出现Toast,其实这个Toast是在SampleResultService（一个IntentService）里面写的，也就是说Patch打上的话，开发者可以自定义一些UI事件。</p>
+<p>这时候再Kill Porcess,据说锁屏也行？<br>重新启动后，刚才取消注释的那一行代码就在logcat里面出现了。</p>
+<p>到此，在没有重新打包的情况下，热修复完成。</p>
+<h2 id="2-已有的项目改造"><a href="#2-已有的项目改造" class="headerlink" title="2. 已有的项目改造"></a>2. 已有的项目改造</h2><p>照着改成这样<br>在Gradle.properties里面添加</p>
+<blockquote>
+<p>TINKER_VERSION = 1.9.1 //只是为了集中管理<br>TINKER_ID = 1.0 //这个不添加会报错</p>
+</blockquote>
+<p>project的build.gradle中添加</p>
+<blockquote>
+<p> classpath “com.tencent.tinker:tinker-patch-gradle-plugin:${TINKER_VERSION}”</p>
+</blockquote>
+<p>app的build.gradle中需要新增很多东西，建议直接<a href="https://github.com/Tencent/tinker/blob/master/tinker-sample-android/app/build.gradle">复制</a>过来。<br>需要改的地方就是<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">ext &#123;</div><div class="line">    tinkerOldApkPath = &quot;$&#123;bakPath&#125;/app-debug-1118-15-50-07.apk&quot;</div><div class="line">    // 找到当前app/build/bakApk/目录下的apk文件，把名字改成自己和当前的文件一样的</div><div class="line">&#125;</div><div class="line"></div><div class="line">ignoreWarning = true //默认是false，不改经常编译报错</div><div class="line"></div><div class="line">implementation(&quot;com.tencent.tinker:tinker-android-lib:$&#123;TINKER_VERSION&#125;&quot;) &#123; changing = true &#125;</div><div class="line">provided(&quot;com.tencent.tinker:tinker-android-anno:$&#123;TINKER_VERSION&#125;&quot;)</div><div class="line">annotationProcessor(&quot;com.tencent.tinker:tinker-android-anno:$&#123;TINKER_VERSION&#125;&quot;)</div></pre></td></tr></table></figure></p>
+<p>接下来是Application，如果自己继承了android.app.Application的话，得改一下<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//原来</span></div><div class="line"><span class="keyword">public</span> MyApplication extends Application&#123;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//现在</span></div><div class="line"><span class="meta">@SuppressWarnings</span>(<span class="string">"unused"</span>)</div><div class="line"><span class="meta">@DefaultLifeCycle</span>(application = <span class="string">"com.包名.SomeName"</span>,</div><div class="line">        flags = ShareConstants.TINKER_ENABLE_ALL,</div><div class="line">        loadVerifyFlag = <span class="keyword">false</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AppLike</span> <span class="keyword">extends</span> <span class="title">DefaultApplicationLike</span> </span>&#123;</div><div class="line">     <span class="keyword">static</span> Context context;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">AppLike</span><span class="params">(Application application, <span class="keyword">int</span> tinkerFlags, <span class="keyword">boolean</span> tinkerLoadVerifyFlag,</div><div class="line">                   <span class="keyword">long</span> applicationStartElapsedTime, <span class="keyword">long</span> applicationStartMillisTime, Intent tinkerResultIntent)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>(application, tinkerFlags, tinkerLoadVerifyFlag, applicationStartElapsedTime, applicationStartMillisTime, tinkerResultIntent);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</div><div class="line">     * install multiDex before install tinker</div><div class="line">     * so we don't need to put the tinker lib classes in the main dex</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> base</div><div class="line">     */</span></div><div class="line">    <span class="meta">@TargetApi</span>(Build.VERSION_CODES.ICE_CREAM_SANDWICH)</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onBaseContextAttached</span><span class="params">(Context base)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.onBaseContextAttached(base);</div><div class="line">        <span class="comment">//you must install multiDex whatever tinker is installed!</span></div><div class="line">        MultiDex.install(base);</div><div class="line">        AppLike.context = getApplication();</div><div class="line">        <span class="comment">//初始化Tinker</span></div><div class="line">        TinkerInstaller.install(<span class="keyword">this</span>);</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@TargetApi</span>(Build.VERSION_CODES.ICE_CREAM_SANDWICH)</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">registerActivityLifecycleCallbacks</span><span class="params">(Application.ActivityLifecycleCallbacks callback)</span> </span>&#123;</div><div class="line">        getApplication().registerActivityLifecycleCallbacks(callback);</div><div class="line">    &#125;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Context <span class="title">getContext</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> context;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">Mainfest里面要改成上面那个“com.包名.SomeName”</div></pre></td></tr></table></figure></p>
+<p>接下来按照之前的步骤就Ok了。</p>
+<h2 id="3-Configuration"><a href="#3-Configuration" class="headerlink" title="3. Configuration"></a>3. Configuration</h2><p>以上只是简单的把Demo跑通，接下里需要看下Tinker提供的定制项</p>
+<p>=======================================================================</p>
+<h2 id="4-常见问题"><a href="#4-常见问题" class="headerlink" title="4. 常见问题"></a>4. 常见问题</h2><p>Q: 我只不过改了一个Toast的文案，为毛生成的patch_signed_7zip.apk文件这么大？<br>A: 看下tinkerPatch文件夹下面的log.txt文件（建议用Notepad打开），里面一大堆“Found add resource: res/drawable-hdpi-v4/abc_list_pressed_holo_light.9.png”这样的类似的出现，具体原因跟aapt有关，好像可以设置detect resource change （大概就这意思）为false，这样就不会那么大了。</p>
+<p>=======================================================================</p>
+<h2 id="5-源码解析"><a href="#5-源码解析" class="headerlink" title="5. 源码解析"></a>5. 源码解析</h2><p>至少我现在看到7个包：</p>
+<blockquote>
+<p>com.tencent.tinker:aosp-dexutils:1.91.@jar<br>com.tencent.tinker:bsdiff-util:1.91.@jar<br>com.tencent.tinker:tinker-android-anno:1.91.@jar<br>com.tencent.tinker:tinker-android-lib:1.91.@jar<br>com.tencent.tinker:tinker-android-loader:1.91.@jar<br>com.tencent.tinker:tinker-commons:1.91.@jar<br>com.tencent.tinker:tinker-ziputils:1.91.@jar</p>
+</blockquote>
+<h1 id="分的这么散估计也是希望能够好扩展吧。"><a href="#分的这么散估计也是希望能够好扩展吧。" class="headerlink" title="分的这么散估计也是希望能够好扩展吧。"></a>分的这么散估计也是希望能够好扩展吧。</h1><p>网上关于源码解析的文章已经很多，有时间看看，应该不难。<br>关于Tinker-Patch这个外包给第三方的服务，纯属好奇就去看了下url到底长什么样。在<a href="https://github.com/TinkerPatch/tinkerpatch-sdk/blob/master/tinkerpatch-sdk/src/main/java/com/tencent/tinker/server/client/TinkerClientAPI.java">TinkerClientAPI</a>里面有这么一段，其实跟Tinker本身庞大的架构比起来，已经算不上什么了。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">Uri.Builder urlBuilder = Uri.parse(<span class="keyword">this</span>.host).buildUpon(); <span class="comment">// "http://q.tinkerpatch.com"</span></div><div class="line">        <span class="keyword">if</span> (clientAPI.debug) &#123;</div><div class="line">            urlBuilder.appendPath(<span class="string">"dev"</span>);</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">final</span> String url = urlBuilder.appendPath(<span class="keyword">this</span>.appKey)</div><div class="line">            .appendPath(<span class="keyword">this</span>.appVersion)</div><div class="line">            .appendQueryParameter(<span class="string">"d"</span>, versionUtils.id())</div><div class="line">            .appendQueryParameter(<span class="string">"v"</span>, String.valueOf(System.currentTimeMillis()))</div><div class="line">            .build().toString();</div></pre></td></tr></table></figure></p>
+<p>除此之外，为了能够在测试环境验证补丁，还提供了一个<a href="https://github.com/TinkerPatch/tinkerpatch-debug-tool">小工具</a></p>
+<p>很感谢鹅厂能够将Tinker这样的工具开源出来造福广大开发者，抛开技术上的实力不说，能够一直积极维护也是一件了不起的事情。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
+<li><a href="http://jp1017.top/2016/11/25/%E5%BE%AE%E4%BF%A1%E7%83%AD%E4%BF%AE%E5%A4%8Dtinker%E5%8F%8Atinker-server%E5%BF%AB%E9%80%9F%E6%8E%A5%E5%85%A5/">微信热修复tinker及tinker-server快速接入</a></li>
+<li><a href="https://github.com/TinkerPatch/tinkerpatch-sdk">TinkerPatch</a>，其实就是帮你把下发“patch_signed_7zip.apk”这个文件的活干了，还给了非常直观的报表，收费也是合情合理。</li>
+<li><a href="http://w4lle.com/2016/12/16/tinker/index.html">Android热补丁之Tinker原理解析</a></li>
+<li><a href="http://blog.csdn.net/huweigoodboy/article/details/62428170">热更新Tinker研究（三）：加载补丁</a></li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;关于Android Application集成Tinker的一次记录。&lt;br&gt;&lt;img src=&quot;http://odzl05jxx.bkt.clouddn.com/image/jpg/single-yellow-beauty-flower-on-the-fence-wallpaper-56801fde208df.jpg?imageView2/2/w/600&quot; alt=&quot;&quot;&gt;&lt;br&gt;
+    
+    </summary>
+    
+    
+      <category term="android" scheme="https://haldir65.github.io/tags/android/"/>
+    
+  </entry>
   
   <entry>
     <title>2017-10-29-pure-css</title>
@@ -510,13 +581,13 @@ tcu、udp[抽象](https://www.youtube.com/watch?v=cTKQAe4DN6g)
     <link href="https://haldir65.github.io/2017/08/03/2017-08-03-high-concurrency-recipes/"/>
     <id>https://haldir65.github.io/2017/08/03/2017-08-03-high-concurrency-recipes/</id>
     <published>2017-08-03T13:04:28.000Z</published>
-    <updated>2017-11-16T13:47:43.432Z</updated>
+    <updated>2017-11-18T09:28:47.872Z</updated>
     
     <content type="html"><![CDATA[<p><img src="http://odzl05jxx.bkt.clouddn.com/image/blog/be3c80a11edfd0fdb75d098550ed2c8e.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
 <p><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/1102533137-5.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/1102533911-1.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/20120103214255_nTsVt.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/apic5964_sc115.com.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/apic6283_sc115.com.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/849c18412f8e7a0b18df09f6f87e6516.jpg?imageView2/2/w/600" alt=""></p>
 <p><img src="http://odzl05jxx.bkt.clouddn.com/pretty-orange-mushroom-wallpaper-5386b0c8c3459.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/timg.jpg?imageView2/2/w/600" alt=""></p>
 <p><img src="http://odzl05jxx.bkt.clouddn.com/beautiful-dandelion-wallpaper-5384b7d0e8b09.jpg?imageView2/2/w/600" alt=""></p>
-<p><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/bee-getting-the-pollen-wallpaper-538358eb5d5a3.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/bullet-shots-over-the-flower-wallpaper-56ee6081c7f2b.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/cotton-grass-whip-wallpaper-5383509d2bd13.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/macro-of-yellow-narcisa-flower-wallpaper-53834d45b40a1.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/nature-grass-wet-plants-high-resolution-wallpaper-573f2c6413708.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/ripe-grapes-macro-wallpaper-1920x1080-538350f32e183.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/single-yellow-beauty-flower-on-the-fence-wallpaper-56801fde208df.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/yellow-autumn-leaves-wallpaper-537f1e4672a31.jpg?imageView2/2/w/600" alt=""></p>
+<p><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/bee-getting-the-pollen-wallpaper-538358eb5d5a3.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/bullet-shots-over-the-flower-wallpaper-56ee6081c7f2b.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/cotton-grass-whip-wallpaper-5383509d2bd13.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/macro-of-yellow-narcisa-flower-wallpaper-53834d45b40a1.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/nature-grass-wet-plants-high-resolution-wallpaper-573f2c6413708.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/ripe-grapes-macro-wallpaper-1920x1080-538350f32e183.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/yellow-autumn-leaves-wallpaper-537f1e4672a31.jpg?imageView2/2/w/600" alt=""></p>
 <blockquote>
 <p>The difference between “concurrent” and “parallel” execution<br><a href="https://stackoverflow.com/questions/1897993/what-is-the-difference-between-concurrent-programming-and-parallel-programming">Good to know</a></p>
 </blockquote>
@@ -1433,7 +1504,7 @@ tcu、udp[抽象](https://www.youtube.com/watch?v=cTKQAe4DN6g)
     <link href="https://haldir65.github.io/2017/07/12/2017-07-12-android-cookbook/"/>
     <id>https://haldir65.github.io/2017/07/12/2017-07-12-android-cookbook/</id>
     <published>2017-07-12T00:40:08.000Z</published>
-    <updated>2017-11-16T13:48:40.919Z</updated>
+    <updated>2017-11-18T13:30:19.004Z</updated>
     
     <content type="html"><![CDATA[<p>A Cookbook shall look like a collection of Recipes, or an index page from where dinner are made. And it keeps you sane.<br><img src="http://odzl05jxx.bkt.clouddn.com/Cg-4zFVJ0xGITwm_AA688WRj8n8AAXZ9wGMpd0ADr0J195.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
 <p>github上已经star了四百多个项目，应该复习下了。</p>
@@ -1487,7 +1558,7 @@ tcu、udp[抽象](https://www.youtube.com/watch?v=cTKQAe4DN6g)
 <ul>
 <li>[ ] AppCompat源码解析</li>
 <li>[ ] ContentProvider的启动过程</li>
-<li>[ ] IPC，Binder原理</li>
+<li>[ ] IPC，Binder原理<a href="http://weishu.me/2016/01/12/binder-index-for-newer/">Binder学习指南</a></li>
 <li>[ ] <a href="https://academy.realm.io/posts/360-andev-2017-effie-barak-android-internals/">Android Internals</a></li>
 <li>[ ] cookie存储位置(/webviewCookiesChromium.db),db存储位置</li>
 <li>[ ] Binder的原理，Binder里面引用计数的原理，Binder底层为什么用红黑树</li>
@@ -1511,6 +1582,7 @@ tcu、udp[抽象](https://www.youtube.com/watch?v=cTKQAe4DN6g)
 <li>[ ] SystemServer进程启动流程</li>
 <li>[ ] Launcher启动流程</li>
 <li>[X] Android生命周期在不同版本的表现形式<a href="http://blog.csdn.net/liuweiballack/article/details/47026263">有些onXXX在高版本不会调</a>，<a href="http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html">原因是HoneyComb之后对Activity LifeCycle进行了改动</a></li>
+<li>[ ] 要不是Jake Wharton在DroidConNYC2017上提到，还不知道有v4包里面有<strong>AtomicFile</strong>这玩意</li>
 </ul>
 <blockquote>
 <p>Studio里面看源码，find usage没有的话，find in path , choose android sdk</p>
@@ -1560,28 +1632,11 @@ tcu、udp[抽象](https://www.youtube.com/watch?v=cTKQAe4DN6g)
 </ul>
 <h2 id="一些精彩的的演讲"><a href="#一些精彩的的演讲" class="headerlink" title="一些精彩的的演讲"></a>一些精彩的的演讲</h2><p><a href="https://www.youtube.com/watch?v=WvyScM_S88c">Droidcon Montreal Jake Wharton - A Few Ok Libraries</a><br><a href="https://www.youtube.com/watch?v=N3J4ZFiR_3Q">Advanced Scrolling Techniques on Android</a><br><a href="https://www.youtube.com/watch?v=vQZFaec9NpA&amp;feature=youtu.be&amp;t=29m51s">Android Graphics Performance</a> the cost of setAlpha<br><a href="https://www.youtube.com/watch?v=PBnU0GXtGFY">Developing Mobile Experiences at Facebook’s scale</a></p>
 <h2 id="一些有名的人"><a href="#一些有名的人" class="headerlink" title="一些有名的人"></a>一些有名的人</h2><p><a href="https://developers.google.com/experts/all/technology/android">GDE</a><br>Dianne Hackborn<br><a href="https://github.com/swankjesse">Jesse Wilson</a></p>
-<h2 id="Good-Reading"><a href="#Good-Reading" class="headerlink" title="Good Reading"></a>Good Reading</h2><p><a href="https://android-review.googlesource.com">Android Source code</a><br>&lt;&lt;&lt;&lt;&lt;&lt;&lt; Updated upstream</p>
-<p><a href="http://www.jianshu.com/p/75139692b8e6">Project Butter and other stuff</a></p>
-<p>=======<br><a href="https://speakerdeck.com/brittbarak/view-to-pixel-2-dot-0-droidcon-sf-17">SurfaceFlinger</a></p>
-<blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>Stashed changes</p>
+<h2 id="Good-Reading"><a href="#Good-Reading" class="headerlink" title="Good Reading"></a>Good Reading</h2><p><a href="https://android-review.googlesource.com">Android Source code</a><br><a href="http://www.jianshu.com/p/75139692b8e6">Project Butter and other stuff</a><br><a href="https://speakerdeck.com/brittbarak/view-to-pixel-2-dot-0-droidcon-sf-17">SurfaceFlinger</a></p>
 <h2 id="一些列入的规划的想法"><a href="#一些列入的规划的想法" class="headerlink" title="一些列入的规划的想法"></a>一些列入的规划的想法</h2><ul>
 <li>多线程下载实例</li>
 <li>自己写一个ImageLoader(主要是多线程同步的问题,queue)</li>
 </ul>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
 ]]></content>
     
     <summary type="html">
@@ -1596,47 +1651,6 @@ tcu、udp[抽象](https://www.youtube.com/watch?v=cTKQAe4DN6g)
       <category term="tools" scheme="https://haldir65.github.io/tags/tools/"/>
     
       <category term="java" scheme="https://haldir65.github.io/tags/java/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>2017-07-12-scrapy-notes</title>
-    <link href="https://haldir65.github.io/2017/07/12/2017-07-12-scrapy-notes/"/>
-    <id>https://haldir65.github.io/2017/07/12/2017-07-12-scrapy-notes/</id>
-    <published>2017-07-12T00:37:55.000Z</published>
-    <updated>2017-07-20T16:01:31.205Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="Scrappy框架学习"><a href="#Scrappy框架学习" class="headerlink" title="Scrappy框架学习"></a>Scrappy框架学习</h2><p>首先建议安装virtualenv，在env中进行操作。</p>
-<p><img src="http://odzl05jxx.bkt.clouddn.com/u=3180342558,2746910171&amp;fm=214&amp;gp=0.jpg?imageView2/2/w/600" alt=""></p>
-<a id="more"></a>
-<p>pip install Scrappy 报错</p>
-<h1 id="error-Microsoft-Visual-C-14-0-is-required-Get-it-with-“Microsoft-Visual-C-Build-Tools”-http-landinghub-visualstudio-com-visual-cpp-build-tools"><a href="#error-Microsoft-Visual-C-14-0-is-required-Get-it-with-“Microsoft-Visual-C-Build-Tools”-http-landinghub-visualstudio-com-visual-cpp-build-tools" class="headerlink" title="error: Microsoft Visual C++ 14.0 is required. Get it with “Microsoft Visual C++ Build Tools”: http://landinghub.visualstudio.com/visual-cpp-build-tools"></a>error: Microsoft Visual C++ 14.0 is required. Get it with “Microsoft Visual C++ Build Tools”: <a href="http://landinghub.visualstudio.com/visual-cpp-build-tools">http://landinghub.visualstudio.com/visual-cpp-build-tools</a></h1><p>解决办法是安装vs,4个GB左右。。。。</p>
-<p>以下开始在命令行中操作：<br>安装完毕后，首先创建scrapy 项目</p>
-<blockquote>
-<p>scrapy startproject tutorial #创建一个project。会生成一个tutorial的文件夹，在tutorial/spiders文件夹中新建一个quotes_spider.py</p>
-</blockquote>
-<p>参考<a href="http://cuiqingcai.com/3952.html/2">Scrapy教程</a><br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> scrapy</div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">QuotesSpider</span><span class="params">(scrapy.Spider)</span>:</span></div><div class="line">    name = <span class="string">"quotes"</span></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start_requests</span><span class="params">(self)</span>:</span></div><div class="line">        urls = [</div><div class="line">            <span class="string">'http://quotes.toscrape.com/page/1/'</span>,</div><div class="line">            <span class="string">'http://quotes.toscrape.com/page/2/'</span>,</div><div class="line">        ]</div><div class="line">        <span class="keyword">for</span> url <span class="keyword">in</span> urls:</div><div class="line">            <span class="keyword">yield</span> scrapy.Request(url=url, callback=self.parse) </div><div class="line">     <span class="comment">#这个callback就是response拉下来之后的解析过程 </span></div><div class="line">     <span class="comment">#下面的这个做法只是把response写到一个文件中，通常还可以使用css或者xpath解析获得相应值。</span></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse</span><span class="params">(self, response)</span>:</span></div><div class="line">        page = response.url.split(<span class="string">"/"</span>)[<span class="number">-2</span>]</div><div class="line">        filename = <span class="string">'quotes-%s.html'</span> % page</div><div class="line">        <span class="keyword">with</span> open(filename, <span class="string">'wb'</span>) <span class="keyword">as</span> f:</div><div class="line">            f.write(response.body)</div><div class="line">        self.log(<span class="string">'Saved file %s'</span> % filename)</div></pre></td></tr></table></figure></p>
-<blockquote>
-<p>scrapy crawl quotes #开始爬quotes.toscrape.com的内容,需要切换到tutorial文件夹下</p>
-<p>scrapy shell ‘<a href="http://quotes.toscrape.com/page/1/">http://quotes.toscrape.com/page/1/</a>‘ #从Response中提取所需的值  </p>
-</blockquote>
-<p>输入就能得到大致这样的交互<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; response.css(&apos;title::text&apos;).extract()</div><div class="line">[&apos;Quotes to Scrape&apos;]</div></pre></td></tr></table></figure></p>
-<p>由于没有安装vc2014，只能在virtualenv中运行,pycharm中也是显示scrapy没有安装。只能用命令行运行。想要看具体的值需要这样<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span>response.css(<span class="string">'title::text'</span>).extract_first()</div><div class="line"><span class="string">'Quotes to Scrape'</span></div><div class="line"></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>response.css(<span class="string">'title::text'</span>).re(<span class="string">r'Quotes.*'</span>) <span class="comment">#这里是正则了</span></div><div class="line">[<span class="string">'Quotes to Scrape'</span>]</div><div class="line"></div><div class="line"><span class="comment">#或者使用xpath</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>response.xpath(<span class="string">'//title/text()'</span>).extract_first()</div><div class="line"><span class="string">'Quotes to Scrape'</span></div></pre></td></tr></table></figure></p>
-<p>处理登录请求，afterLogin<br>网站登录多数需要提交一个表单（Dict）</p>
-<blockquote>
-<p>formadata = {‘userName’:  ‘Bob’,’pwd’：123456}<br>中间件(MiddleWare)的作用<br>Cookie，UserAgent处理 setting.py中设置需要的参数，Cookie默认是接受的<br>PipeLine是用来持久化的，中间件用于处理Cookie,Ajax等，rules用于筛选需要跟进的url</p>
-</blockquote>
-<h2 id="2-MongoDB存储"><a href="#2-MongoDB存储" class="headerlink" title="2. MongoDB存储"></a>2. MongoDB存储</h2>]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;Scrappy框架学习&quot;&gt;&lt;a href=&quot;#Scrappy框架学习&quot; class=&quot;headerlink&quot; title=&quot;Scrappy框架学习&quot;&gt;&lt;/a&gt;Scrappy框架学习&lt;/h2&gt;&lt;p&gt;首先建议安装virtualenv，在env中进行操作。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://odzl05jxx.bkt.clouddn.com/u=3180342558,2746910171&amp;amp;fm=214&amp;amp;gp=0.jpg?imageView2/2/w/600&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-    
-    </summary>
-    
-    
-      <category term="python" scheme="https://haldir65.github.io/tags/python/"/>
     
   </entry>
   
