@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="少一点Web，多一些原生javaScript">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/unclassified_unclassified--115_07-1920x1440.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-11-16T13:47:43.463Z">
+<meta property="og:updated_time" content="2017-11-19T12:38:37.830Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="2017-10-29-pure-javaScript">
 <meta name="twitter:description" content="少一点Web，多一些原生javaScript">
@@ -198,16 +198,16 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>少一点Web，多一些原生javaScript<br><a id="more"></a><br><img src="http://odzl05jxx.bkt.clouddn.com/unclassified_unclassified--115_07-1920x1440.jpg?imageView2/2/w/600" alt=""></p>
+        <p>少一点Web，多一些原生javaScript<br><img src="http://odzl05jxx.bkt.clouddn.com/unclassified_unclassified--115_07-1920x1440.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
+<p>关于js的历史，根据Patrick Dubroy在2014年的一次<a href="https://www.youtube.com/watch?v=34cw-XRknWM">演讲</a>，ES3是1999年出来的，ES3之前的版本简直是翔。ES4设计的实在太牛逼，一直拖到2008年也没搞定，所以大家决定直接跳过ES4(历史上也从未有过ES4)，推出了ES5（只把ES4中的一部分实现了），实际上2015年6月ES6(也就是2008年那帮人所称呼的harmony)才发布。关于Patrick Dubroy，这人在2011年的Google IO上做过关于用mat检测Android Memory Leak的演讲，老外真是全才。</p>
 <h2 id="1-js跨域请求"><a href="#1-js跨域请求" class="headerlink" title="1. js跨域请求"></a>1. js跨域请求</h2><p><a href="http://www.ruanyifeng.com/blog/2016/04/cors.html">cors的概念</a></p>
 <blockquote>
 <p>search “原生javaScript跨域”、’jsonp跨域请求豆瓣250’</p>
 </blockquote>
 <p><a href="http://www.jianshu.com/p/1f32c9a96064">jsonp跨域获取豆瓣250接口</a>，豆瓣能支持jsonp是因为豆瓣服务器响应了</p>
 <blockquote>
-<p><a href="http://api.douban.com/v2/movie/top250?callback=anything这个query,这个anything是我们自己网页里面script里面定义的方法，豆瓣会返回一个">http://api.douban.com/v2/movie/top250?callback=anything这个query,这个anything是我们自己网页里面script里面定义的方法，豆瓣会返回一个</a>: anything({json})的数据回来，直接调用anything方法</p>
+<p><a href="http://api.douban.com/v2/movie/top250?callback=anything这个query,这个anything是我们自己网页里面script里面定义的方法，豆瓣会返回一个">http://api.douban.com/v2/movie/top250?callback=anything这个query,这个anything是我们自己网页里面script里面定义的方法，豆瓣会返回一个</a>: anything({json})的数据回来，直接调用anything方法<br>json【JavaScript Object Notation】<br><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS">MDN上的corz</a></p>
 </blockquote>
-<p><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS">MDN上的corz</a></p>
 <p><a href="http://schock.net/articles/2013/02/05/how-jsonp-really-works-examples/">jsonp的解释</a></p>
 <p>亲测，Flask里面给response添加Header:</p>
 <blockquote>
@@ -224,9 +224,20 @@ ga('send', 'pageview');
 </li>
 <li><p>javaScript debug的方法：选中一个html 的tag，break on 。。。 自然会在执行到的时候停下来，evalulate value需要自己在console里面敲（注意此时应该位于Sources标签页下）。</p>
 </li>
-<li><p>HTML DOM的一些方法<br>通过 id 找到 HTML 元素 window.document.getElementById()<br>通过标签名找到 HTML 元素 window.document.getElementsByTagName()<br>通过类名找到 HTML 元素 window.document.getElementsByClassName()<br>9.交互事件的捕获，拦截，消费（冒泡）</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">cancelEvent</span>(<span class="params">e</span>) </span>&#123;</div><div class="line">    <span class="keyword">if</span>(e) &#123;</div><div class="line">        e.stopPropagation();  <span class="comment">//非IE</span></div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        <span class="built_in">window</span>.event.cancelBubble = <span class="literal">true</span>;  <span class="comment">//IE</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<li><p>HTML DOM的一些方法<br>通过 id 找到 HTML 元素 window.document.getElementById()<br>通过标签名找到 HTML 元素 window.document.getElementsByTagName()//比如说’h2’这种<br>通过类名找到 HTML 元素 window.document.getElementsByClassName()<br>注意方法名称，带s的返回的是一个数组，不带s返回一个object<br>找form 标签的话，还有一种方法:<br>先手写一段html</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">&lt;html lang="en"&gt;</div><div class="line">&lt;head&gt;</div><div class="line">  &lt;meta charset="utf-8"/&gt;</div><div class="line">  &lt;title&gt;有时候手写html不是坏事&lt;/title&gt;</div><div class="line">  &lt;link href="style.css" type="text/css" rel="stylesheet"&gt;&lt;/link&gt;</div><div class="line">&lt;/head&gt;</div><div class="line">&lt;body&gt;</div><div class="line">  &lt;div&gt;</div><div class="line">    &lt;form id='my-form' name='myForm' action="#"&gt;</div><div class="line">      &lt;label for="name"&gt;Name: &lt;/label&gt;</div><div class="line">      &lt;input type="text" name="name"&gt;&lt;br/&gt;</div><div class="line">      &lt;label&gt;Hobbies: &lt;/label&lt;br/&gt;</div><div class="line">      &lt;input type="checkbox" name="biking" value="biking"&gt;Biking&lt;/br&gt;</div><div class="line">      &lt;input type="checkbox" name="sking" value="sking"&gt;Sking&lt;/br&gt;</div><div class="line">      &lt;input type="checkbox" name="diving" value="diving"&gt;Diving&lt;/br&gt;</div><div class="line">      &lt;label for="colour"&gt;Fav colour: &lt;/label&gt;</div><div class="line">      &lt;select name="colour"&gt;</div><div class="line">        &lt;option&gt;Red&lt;/option&gt;</div><div class="line">        &lt;option&gt;Blue&lt;/option&gt;</div><div class="line">        &lt;option&gt;Green&lt;/option&gt;</div><div class="line">      &lt;/select&gt;</div><div class="line">      &lt;input type="submit" name="submit" value='Submit'&gt;</div><div class="line">    &lt;/form&gt;</div><div class="line">  &lt;/div&gt;</div><div class="line">  &lt;script src="test.js"&gt;&lt;/script&gt;</div><div class="line">&lt;/body&gt;</div><div class="line">&lt;/html&gt;</div></pre></td></tr></table></figure>
 </li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> myForm = <span class="built_in">document</span>.forms.myForm<span class="comment">//myForm是这个Form标签的name属性,form是跟input配合使用的</span></div><div class="line">myForm.name  &gt; 那个input标</div><div class="line">myForm.name.value  &gt; 那个input标签，其实也就是那个输入框里面的文字</div><div class="line">myForm.colour.vaule &gt; 显示当前选中的select值</div></pre></td></tr></table></figure>
+<p>还是上面那个表单<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> myForm = <span class="built_in">document</span>.forms.myForm</div><div class="line"><span class="keyword">var</span> message = <span class="built_in">document</span>.getElementById(<span class="string">'message'</span>)</div><div class="line"></div><div class="line">myForm.onsubmit = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;<span class="comment">//就是上面那个submit被点击时触发</span></div><div class="line">  <span class="keyword">if</span>(myForm.name.value === <span class="string">''</span>)&#123;</div><div class="line">    message.innerHtml = <span class="string">'please enter an not empty name'</span></div><div class="line">    <span class="keyword">return</span> <span class="literal">false</span> <span class="comment">//summit事件被终止</span></div><div class="line">  &#125;<span class="keyword">else</span> &#123;</div><div class="line">    message.innerHtml = <span class="string">''</span></div><div class="line">    <span class="keyword">return</span> <span class="literal">true</span></div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<ol>
+<li>交互事件的捕获，拦截，消费（冒泡）<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//添加点击事件点击事件：</span></div><div class="line"><span class="keyword">var</span> button = <span class="built_in">document</span>.getElementById(<span class="string">'btn'</span>)</div><div class="line">button.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(<span class="string">'you click this button'</span>);</div><div class="line">&#125;</div><div class="line">button.onfocus = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="comment">// body...</span></div><div class="line">&#125;</div><div class="line">button.onblur = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="comment">//</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">cancelEvent</span>(<span class="params">e</span>) </span>&#123;</div><div class="line">    <span class="keyword">if</span>(e) &#123;</div><div class="line">        e.stopPropagation();  <span class="comment">//非IE</span></div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        <span class="built_in">window</span>.event.cancelBubble = <span class="literal">true</span>;  <span class="comment">//IE</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>在一个元素上触发事件，如果此元素定义了处理程序，那么此次事件就会被捕获，根据程序进行该事件的处理。否则这个事件会根据DOM树向父节点逐级传播，如果从始至终都没有被处理，那么最终会到达document或window根元素。所以事件是往上传递的，即冒泡。</p>
+<p>//事件注册的时机<br>对于简单的script，需要在body的最后一行，因为浏览器是从上到下解析的，轮到script解析的时候，需要操作dom，这就要求dom元素已经建立好。有时候，就算你把script写在body最后一行，轮到解析script的时候，前面的html还在加载（比如说非常大的html什么的，总之是有可能的）。所以一般用window.onLoad来注册事件。</p>
+<p>复杂点的script放在外面，用src引用。 也要用window.onLoad来注册事件。所以，一般的js长这样（假如的你js要操作dom）：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">setUpEvents</span>(<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> button = ....</div><div class="line">  var ....</div><div class="line">  button.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="comment">//</span></div><div class="line">  &#125;</div><div class="line"></div><div class="line">  button.</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">window</span>.onLoad = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">  setUpEvents()</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<ol>
 <li><p>this的作用范围<br>代码<a href="https://cn.vuejs.org/v2/guide/computed.html">来源</a></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line">&lt;script src=&quot;https://cdn.jsdelivr.net/npm/axios@0.12.0/dist/axios.min.js&quot;&gt;&lt;/script&gt;</div><div class="line">&lt;script src=&quot;https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js&quot;&gt;&lt;/script&gt;</div><div class="line">&lt;script&gt;</div><div class="line">var watchExampleVM = new Vue(&#123;</div><div class="line">  el: &apos;#watch-example&apos;,</div><div class="line">  data: &#123;</div><div class="line">    question: &apos;&apos;,</div><div class="line">    answer: &apos;I cannot give you an answer until you ask a question!&apos;</div><div class="line">  &#125;,</div><div class="line">  watch: &#123;</div><div class="line">    // 如果 `question` 发生改变，这个函数就会运行</div><div class="line">    question: function (newQuestion) &#123;</div><div class="line">      this.answer = &apos;Waiting for you to stop typing...&apos;</div><div class="line">      this.getAnswer()</div><div class="line">    &#125;</div><div class="line">  &#125;,</div><div class="line">  methods: &#123;</div><div class="line">    // `_.debounce` 是一个通过 Lodash 限制操作频率的函数。</div><div class="line">    // 在这个例子中，我们希望限制访问 yesno.wtf/api 的频率</div><div class="line">    // AJAX 请求直到用户输入完毕才会发出。想要了解更多关于</div><div class="line">    // `_.debounce` 函数 (及其近亲 `_.throttle`) 的知识，</div><div class="line">    // 请参考：https://lodash.com/docs#debounce</div><div class="line">    getAnswer: _.debounce(</div><div class="line">      function () &#123;</div><div class="line">        if (this.question.indexOf(&apos;?&apos;) === -1) &#123;</div><div class="line">          this.answer = &apos;Questions usually contain a question mark. ;-)&apos;</div><div class="line">          return</div><div class="line">        &#125;</div><div class="line">        this.answer = &apos;Thinking...&apos;</div><div class="line">        var vm = this //这里需要把this（VewComponent）作为一个变量</div><div class="line">        axios.get(&apos;https://yesno.wtf/api&apos;)</div><div class="line">          .then(function (response) &#123;</div><div class="line">            vm.answer = _.capitalize(response.data.answer)</div><div class="line">          &#125;)</div><div class="line">          .catch(function (error) &#123;</div><div class="line">            vm.answer = &apos;Error! Could not reach the API. &apos; + error</div><div class="line">          &#125;)</div><div class="line">      &#125;,</div><div class="line">      // 这是我们为判定用户停止输入等待的毫秒数</div><div class="line">      500</div><div class="line">    )</div><div class="line">  &#125;</div><div class="line">&#125;)</div><div class="line">&lt;/script&gt;</div></pre></td></tr></table></figure>
 </li>
@@ -234,11 +245,42 @@ ga('send', 'pageview');
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> getJSON = <span class="function"><span class="keyword">function</span>(<span class="params">url</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> promise = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>)</span>&#123;</div><div class="line">    <span class="keyword">var</span> client = <span class="keyword">new</span> XMLHttpRequest();</div><div class="line">    client.open(<span class="string">"GET"</span>, url);</div><div class="line">    client.onreadystatechange = handler;</div><div class="line">    client.responseType = <span class="string">"json"</span>;</div><div class="line">    client.setRequestHeader(<span class="string">"Accept"</span>, <span class="string">"application/json"</span>);</div><div class="line">    client.send();</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">function</span> <span class="title">handler</span>(<span class="params"></span>) </span>&#123;</div><div class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.status === <span class="number">200</span>) &#123;</div><div class="line">        resolve(<span class="keyword">this</span>.response);</div><div class="line">      &#125; <span class="keyword">else</span> &#123;</div><div class="line">        reject(<span class="keyword">new</span> <span class="built_in">Error</span>(<span class="keyword">this</span>.statusText));</div><div class="line">      &#125;</div><div class="line">    &#125;;</div><div class="line">  &#125;);</div><div class="line"></div><div class="line">  <span class="keyword">return</span> promise;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">getJSON(<span class="string">"/posts.json"</span>).then(<span class="function"><span class="keyword">function</span>(<span class="params">json</span>) </span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(<span class="string">'Contents: '</span> + json);</div><div class="line">&#125;, <span class="function"><span class="keyword">function</span>(<span class="params">error</span>) </span>&#123;</div><div class="line">  <span class="built_in">console</span>.error(<span class="string">'出错了'</span>, error);</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
 </li>
 </ol>
-<p>11.js里面判断两个变量相等的方式，建议一律使用三个等号（严格相等）<br>= 赋值运算符<br>== 等于<br>=== 严格等于<br>例：<br>var a = 3;<br>var b = “3”;</p>
-<p>a==b 返回 true<br>a===b 返回 false</p>
-<p>因为a,b的类型不一样<br>===用来进行严格的比较判断</p>
-<p>在一个元素上触发事件，如果此元素定义了处理程序，那么此次事件就会被捕获，根据程序进行该事件的处理。否则这个事件会根据DOM树向父节点逐级传播，如果从始至终都没有被处理，那么最终会到达document或window根元素。所以事件是往上传递的，即冒泡。</p>
+<p>11.js里面判断两个变量相等的方式，建议一律使用三个等号（严格相等）<br>= 赋值运算符<br>== 等于<br>=== 严格等于<br>例：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="number">3</span>;</div><div class="line"><span class="keyword">var</span> b = <span class="string">"3"</span>;</div></pre></td></tr></table></figure>
+<p>a==b 返回 true<br>a===b 返回 false<br>因为a,b的类型不一样<br>==只比较了值<br>===只有在值和类型完全相同的时候才为true，用来进行严格的比较判断</p>
+<p>!=（只检查值）和!==（检查值和类型）也差不多的意思。</p>
+<p>truthy的概念<br>在console里面输入：<br>Boolan(5)  &gt; 输出true<br>Boolean(-5) &gt;输出false<br>Boolean(7&gt;5) &gt; 输出true<br>Boolean(‘someword’) &gt; true<br>Boolean(‘’) &gt; false<br>只有Boolan(0)才是false</p>
 <ol>
+<li><p>String的function很多</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// var myString = 'i 'm a "funny" string' #这样是不行的</span></div><div class="line"><span class="keyword">var</span> myString = <span class="string">'i \'m a "funny" string'</span>;<span class="comment">//加一个转义就好了</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> a = <span class="string">'abc'</span></div><div class="line"><span class="keyword">var</span> b = <span class="string">'bcd'</span></div><div class="line">a&lt;b <span class="comment">// true,因为ASCII表里面，a在b前面</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> str = <span class="string">'hello world'</span></div><div class="line"><span class="keyword">var</span> str2 = str.slice(<span class="number">2</span>,<span class="number">9</span>);</div><div class="line">str2 <span class="comment">// 'llo,wo'</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> tags = <span class="string">'meat,ham ,salami,prok,beef,chicken'</span></div><div class="line"><span class="keyword">var</span> tagsArray = tags.split(<span class="string">","</span>)</div><div class="line"><span class="comment">//生成</span></div><div class="line">[<span class="string">"meat"</span>,<span class="string">"ham"</span>,<span class="string">"salami"</span>,<span class="string">"prok"</span>,<span class="string">"beef"</span>,<span class="string">"chicken"</span>]</div></pre></td></tr></table></figure>
+</li>
+<li><p>js的Array里面能够装不同类型的数据，跟Python很像</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//创建Array的方式很多</span></div><div class="line"><span class="keyword">var</span> array = []</div><div class="line"><span class="keyword">var</span> array1 = [<span class="string">'stuff'</span>,<span class="string">'jeff'</span>,<span class="number">20</span>]</div><div class="line"><span class="keyword">var</span> array2 = <span class="keyword">new</span> <span class="built_in">Array</span>()</div><div class="line"></div><div class="line"><span class="keyword">var</span> myArray = []<span class="comment">// 初始化就好了，无需指定容量</span></div><div class="line">myArray[<span class="number">0</span>] =<span class="string">'stuff'</span></div><div class="line">myArray[<span class="number">1</span>] = <span class="number">70</span></div><div class="line">myArray &gt; [<span class="string">'stuff'</span>,<span class="number">70</span>]</div><div class="line"></div><div class="line">myArray[<span class="number">30</span>] = <span class="literal">true</span></div><div class="line"></div><div class="line"><span class="comment">// 以下为亲测console中的输出就这样</span></div><div class="line">myArray &gt; (<span class="number">31</span>) [<span class="string">"stuff"</span>, <span class="number">70</span>, empty × <span class="number">28</span>, <span class="literal">true</span>]</div><div class="line">myArray[<span class="number">12</span>] &gt; <span class="string">'undefined'</span></div><div class="line">myArray.length &gt; <span class="number">31</span></div><div class="line">myArray.sort() &gt; (<span class="number">31</span>) [<span class="number">70</span>, <span class="string">"stuff"</span>, <span class="literal">true</span>, empty × <span class="number">28</span>]</div></pre></td></tr></table></figure>
+</li>
+<li><p>Object，class什么的</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> myCaR = <span class="keyword">new</span> Car()</div><div class="line">VM315:<span class="number">1</span> Uncaught <span class="built_in">ReferenceError</span>: Car is not defined</div><div class="line">    at &lt;anonymous&gt;:<span class="number">1</span>:<span class="number">13</span></div><div class="line"><span class="keyword">var</span> myString = <span class="keyword">new</span> <span class="built_in">String</span>()</div><div class="line">myString = <span class="string">'hello'</span>    </div><div class="line">myString.length &gt; <span class="number">5</span></div><div class="line"><span class="keyword">var</span> mystring23 = <span class="keyword">new</span> <span class="built_in">String</span>(<span class="string">'stuff'</span>)<span class="comment">//这也是行的</span></div><div class="line"></div><div class="line"><span class="comment">// 直接在console里写</span></div><div class="line"><span class="keyword">var</span> myCar = <span class="keyword">new</span> <span class="built_in">Object</span>()</div><div class="line"><span class="literal">undefined</span></div><div class="line">myCar.speed = <span class="number">20</span></div><div class="line"><span class="number">20</span></div><div class="line">myCar.speed</div><div class="line"><span class="number">20</span></div><div class="line">myCar.name = <span class="string">'benz'</span></div><div class="line"><span class="string">"benz"</span></div><div class="line">myCar.name</div><div class="line"><span class="string">"benz"</span></div><div class="line">myCar</div><div class="line">&#123;speed: <span class="number">20</span>, name: <span class="string">"benz"</span>&#125; <span class="comment">//json即object</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> car2 = &#123;speed: <span class="number">30</span>, name: <span class="string">"tesla"</span>&#125;</div><div class="line"></div><div class="line">car2</div><div class="line">&#123;speed: <span class="number">30</span>, name: <span class="string">"tesla"</span>&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>this是什么</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// console直接输入</span></div><div class="line"><span class="keyword">this</span></div><div class="line">Window &#123;frames: Window, postMessage: ƒ, blur: ƒ, focus: ƒ, close: ƒ, …&#125;<span class="comment">//window是一个有很多变量(function也是变量)的对象，在当前语义下，就是window</span></div><div class="line"></div><div class="line">car2.test = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="built_in">console</span>.log(<span class="keyword">this</span>)&#125;</div><div class="line">car2</div><div class="line">&#123;speed: <span class="number">30</span>, name: <span class="string">"tesla"</span>, test: ƒ&#125;</div><div class="line"></div><div class="line">car2.test</div><div class="line">ƒ ()&#123;<span class="built_in">console</span>.log(<span class="keyword">this</span>)&#125;</div><div class="line"></div><div class="line">car2.test()<span class="comment">//这时候this就是car2这个Object了</span></div><div class="line">VM592:<span class="number">1</span> &#123;speed: <span class="number">30</span>, name: <span class="string">"tesla"</span>, test: ƒ&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>this应该是当前上下文</p>
+<ol>
+<li><p>Construction function</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> Car = <span class="function"><span class="keyword">function</span> (<span class="params">name,speed</span>) </span>&#123;</div><div class="line">  <span class="keyword">this</span>.name = name</div><div class="line">  <span class="keyword">this</span>.speed = speed</div><div class="line">  <span class="keyword">this</span>.test = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'speed is '</span>+speed)</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> car24 = <span class="keyword">new</span> Car(<span class="string">'jim'</span>,<span class="number">40</span>)</div><div class="line">car24</div><div class="line">Car &#123;name: <span class="string">"jim"</span>, speed: <span class="number">40</span>, test: ƒ&#125;</div><div class="line">car24.test()</div><div class="line">VM621:<span class="number">5</span> speed is <span class="number">40</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>Date Object的使用</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">let</span> past = <span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2007</span>,<span class="number">11</span>,<span class="number">9</span>)</div><div class="line"><span class="literal">undefined</span></div><div class="line">past</div><div class="line"><span class="comment">// Sun Dec 09 2007 00:00:00 GMT+0800 (中国标准时间)</span></div><div class="line">past.getDay</div><div class="line">ƒ getDay() &#123; [native code] &#125;</div><div class="line">past.getDay()</div><div class="line"><span class="number">0</span></div><div class="line">past.getFullYear()</div><div class="line"><span class="number">2007</span></div><div class="line">past.getDate</div><div class="line">ƒ getDate() &#123; [native code] &#125;</div><div class="line">past.getDate()</div><div class="line"><span class="number">9</span></div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>div.innerHtml（把整个html对象都返回了）和div.textContent(只返回文字)。所以innerHtml可以用来把一个div里面的tag全部替换掉（比如原来是个p，现在换成h1），而textContent只能把某一个tag里面的文字改掉。<br>想要<a href="https://stackoverflow.com/questions/4365246/how-to-change-href-of-a-tag-on-button-click-through-javascript">改href</a>的话，得这样：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> link = <span class="built_in">document</span>.getElementById(<span class="string">"abc"</span>);</div><div class="line">link.setAttribute(<span class="string">"href"</span>, <span class="string">"xyz.php"</span>);</div></pre></td></tr></table></figure></p>
+<p>setAttribute()可以用于设置一个在当前tag上不存在的attr<br>设置class可以用setAttribute(‘class’,’XXX’)，也可以用div.className = ‘XXX’<br>对于一个a标签<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/subpage"</span>&gt;</span>Some Thing<span class="tag">&lt;/<span class="name">a</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>这时候调用a.href &gt; 会输出’<a href="http://www.host.com/subpage&#39;，即输出完整的路径">http://www.host.com/subpage&#39;，即输出完整的路径</a><br>但是如果使用a.getAttribute(‘href’) &gt; 输出’/subpage’</p>
+<p>改一个tag的背景元素不能这么改：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">a.style.background-color= <span class="string">'blue'</span></div><div class="line"><span class="comment">//得这样</span></div><div class="line">a.style.backgroundColor= <span class="string">'blue'</span><span class="comment">//其实就是横线换成CammelCase</span></div></pre></td></tr></table></figure></p>
+<ol>
+<li><p>在dom中新增一个element的方法</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> li = <span class="built_in">document</span>.createElement(<span class="string">'li'</span>) <span class="comment">//创建一个新的li标签,</span></div><div class="line">parentTag.appendChild(li)<span class="comment">//添加到尾部</span></div><div class="line">parentTag.insertBefore(li,parentTag.getElementsByTagName(<span class="string">'li'</span>)[<span class="number">0</span>])<span class="comment">//添加到原来的0元素前面</span></div><div class="line"></div><div class="line"><span class="comment">//删除一个tag的话</span></div><div class="line"><span class="keyword">var</span> removed = parentTag.removeChild(li)<span class="comment">//移除方法会返回被移除的元素</span></div></pre></td></tr></table></figure>
+</li>
 <li><p>js去刷新当前页面，返回上级页面。。</p>
 <figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"javascript:history.go(-1)"</span>&gt;</span>返回上一页<span class="tag">&lt;/<span class="name">a</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"javascript:location.reload()"</span>&gt;</span>刷新当前页面<span class="tag">&lt;/<span class="name">a</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"javascript:"</span> <span class="attr">onclick</span>=<span class="string">"history.go(-2); "</span>&gt;</span>返回前两页<span class="tag">&lt;/<span class="name">a</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"javascript:"</span> <span class="attr">onclick</span>=<span class="string">"self.location=document.referrer;"</span>&gt;</span>返回上一页并刷新<span class="tag">&lt;/<span class="name">a</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"javascript:"</span> <span class="attr">onclick</span>=<span class="string">"history.back(); "</span>&gt;</span>返回上一页<span class="tag">&lt;/<span class="name">a</span>&gt;</span></div></pre></td></tr></table></figure>
 </li>
@@ -464,6 +506,22 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Window</a>
               </li>
              
@@ -472,23 +530,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">adb</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -496,7 +538,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -508,11 +550,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -521,6 +563,10 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">java</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -536,7 +582,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -548,23 +594,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Vue</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">service</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -580,7 +614,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">service</a>
               </li>
             
             <div class="clearfix"></div>
