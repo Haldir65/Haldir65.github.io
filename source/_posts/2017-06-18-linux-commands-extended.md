@@ -73,9 +73,10 @@ tar -jcvf log.tar.bz2 log2012.log 打包后，以 bzip2 压缩
 
 find
 根据文件名查找文件
+```
 - find -name *.config  #在当前目录下查找
 - find / -name finename # 在根目录下查找filename的文件("filename"用双引号包起来)
-- 
+```
 
 ### 10.已安装的软件
 - sudo dpkg -l
@@ -83,8 +84,8 @@ find
 ### 11.Ping一个主机
 - ping -c 5 gmail.com #只发送5次
 
-### 12.Wget 
-下载文件 
+### 12.Wget
+下载文件
 - wget url
 下载文件并以指定的文件名保存下来
 - wget -0 filename url
@@ -106,6 +107,34 @@ cat -n rsyslog.conf # 显示行号，报错的时候方便处理
 随便写两个：
 - curl -o home.html http://www.baidu.com  #把百度首页抓下来，写到home.html中
 - curl -d "user=nick&password=12345" http://www.xxx.com/login.jsp # 提交表单，发起POST请求
+记得http statusCode 302是重定向什么 ：
+- curl -v mail.qq.com
+输出：
+```
+curl -v mail.qq.com
+* Rebuilt URL to: mail.qq.com/
+*   Trying 103.7.30.100...
+* Connected to mail.qq.com (103.7.30.100) port 80 (#0)
+> GET / HTTP/1.1
+> Host: mail.qq.com
+> User-Agent: curl/7.47.0
+> Accept: */*
+>
+< HTTP/1.1 302 Found
+< Server: TWS
+< Connection: close
+< Date: Sun, 19 Nov 2017 09:19:46 GMT
+< Content-Type: text/html; charset=GB18030
+< Location: https://mail.qq.com/cgi-bin/loginpage
+< Content-Security-Policy: referrer origin; script-src 'self' https://hm.baidu.com http://hm.baidu.com *.google-analytics.com http://mat1.gtimg.com https://mat1.gtimg.com http://*.soso.com https://*.soso.com http://*.qq.com https://*.qq.com http://*.qqmail.com  https://*.qqmail.com http://pub.idqqimg.com blob: 'unsafe-inline' 'unsafe-eval'; report-uri https://mail.qq.com/cgi-bin/report_cgi?r_subtype=csp&nocheck=false
+< Referrer-Policy: origin
+< Content-Length: 0
+<
+* Closing connection 0
+```
+
+
+
 
 ### 16. 搭建samba服务器
 这个主要是用来从windows上访问linux主机上的文件的
@@ -120,7 +149,7 @@ cat -n rsyslog.conf # 显示行号，报错的时候方便处理
 
 
 ### 18. tee命令
-- echo $(date) | tee -a date.log 
+- echo $(date) | tee -a date.log
 tee命令能够吧程序的输出输出到stdo,同时还能将输出写进文件(-a 表示append，否则就是覆盖)
 >>>>>>> Stashed changes
 
