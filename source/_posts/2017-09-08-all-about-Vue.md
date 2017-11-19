@@ -1,7 +1,7 @@
 ---
 title: VueJs学习笔记
 date: 2017-09-08 21:41:43
-tags: [javaScript,Vue]
+tags: [javaScript,Vue,前端]
 ---
 
 Vue Js学习笔记
@@ -9,6 +9,7 @@ Vue Js学习笔记
 <!--more-->
 
 
+>  有句话放在前面，所有的javaScript库都比不上Vanilla JS，即原生js代码。
 
 ## 1. 前提
 使用cmder ,安装了nodejs

@@ -448,6 +448,7 @@ private static void writeInt(byte[] buffer, int offset, int value) {
 2. 图片只是无数颜色的组合，用byte表示RGB的方式使得电子产品显示图片变为可能。
 3. 在数据传输中，数据传输双方可以协商采取合理的传输协议，让通信量变得小，通信速度变快。
 4. hexadecimal简化了写无数个01的过程，日常开发尽量写0xffffff这种形式。两个十六进制数字的组合通常代表一个byte的范围。
+5. 根据阮一峰的[介绍](http://www.ruanyifeng.com/blog/2014/12/unicode.html)，目前，Unicode的最新版本是7.0版，一共收入了109449个符号，其中的中日韩文字为74500个。可以近似认为，全世界现有的符号当中，三分之二以上来自东亚文字。
 
 
 

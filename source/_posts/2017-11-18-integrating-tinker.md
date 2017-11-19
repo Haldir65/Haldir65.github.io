@@ -1,7 +1,7 @@
 ---
 title: 集成Tinker的一些记录
 date: 2017-11-18 17:25:29
-tags: [android]
+tags: [android,热修复]
 ---
 
 关于Android Application集成Tinker的一次记录。

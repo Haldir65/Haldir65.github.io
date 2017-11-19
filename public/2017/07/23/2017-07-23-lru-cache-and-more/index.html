@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="LruCache在android3.1中加入，即android.util.LruCache，主要是作为一种合理的缓存策略的实现，用于替代原来的SoftReference。v4包提供了static version的实现，即android.support.v4.util.LruCache。此外，还有DiskLruCache对应磁盘缓存，在OkHttp和Glide等开源项目中都有，可直接复制过来，改下包">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/e73669d80265feff2adcb227b7113f2d.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-08-24T20:40:33.432Z">
+<meta property="og:updated_time" content="2017-11-19T13:59:26.446Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="LruCache阅读笔记">
 <meta name="twitter:description" content="LruCache在android3.1中加入，即android.util.LruCache，主要是作为一种合理的缓存策略的实现，用于替代原来的SoftReference。v4包提供了static version的实现，即android.support.v4.util.LruCache。此外，还有DiskLruCache对应磁盘缓存，在OkHttp和Glide等开源项目中都有，可直接复制过来，改下包">
@@ -204,7 +204,7 @@ ga('send', 'pageview');
 <h2 id="2-简单介绍"><a href="#2-简单介绍" class="headerlink" title="2.简单介绍"></a>2.简单介绍</h2><p>LruCache是线程安全的，在内部的 get、put、remove 包括 trimToSize 都是安全的（因为都上锁了）</p>
 <h2 id="简书作者写的比较好"><a href="#简书作者写的比较好" class="headerlink" title="简书作者写的比较好"></a>简书作者写的比较好</h2><p>这种链表最好结合着<a href="http://www.jianshu.com/p/1182237a1940">图</a>来看</p>
 <p>HashMap只是一个HashMap.Node的数组，因为Hash Collision产生链表（单向，通过Node.next实现）<br>LinkedHashMap extends HashMap。 基本元素是LinkedHashMap.Entry(extends HashMap.Node，继承不过是添加了before和after的Entry)，由此在HashMap的基础上再构造了一个<strong>双向循环链表</strong>。</p>
-<p>LinkedHashMap继承HashMap之后主要Override了几个HashMap预留的回调函数。<br>afterNodeAccess(把最近用过的元素挪到双向链表的尾部),afterNodeInsertion，afterNodeRemoval等</p>
+<p>LinkedHashMap继承HashMap之后主要Override了几个HashMap预留的回调函数。<br>afterNodeAccess(把最近用过的元素挪到双向链表的尾部),afterNodeInsertion，afterNodeRemoval等<br>也就是说，每次CRUD操作都会把最近使用过的元素挪到最上面(不一定准确，大致这个意思)，而且这项操作只不过是挪一下指针，并不费事</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="http://www.jianshu.com/p/b49a111147ee">彻底解析Android缓存机制——LruCache</a></li>
 <li><a href="http://www.jianshu.com/p/bdbfdfd0641b">Android源码解析——LruCache</a></li>
@@ -537,6 +537,18 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">service</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">前端</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
             
             <div class="clearfix"></div>

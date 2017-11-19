@@ -35,16 +35,7 @@ LinkedHashMap extends HashMap。 基本元素是LinkedHashMap.Entry(extends Hash
 
 LinkedHashMap继承HashMap之后主要Override了几个HashMap预留的回调函数。
 afterNodeAccess(把最近用过的元素挪到双向链表的尾部),afterNodeInsertion，afterNodeRemoval等
-
-
-
-
-
-
-
-
-
-
+也就是说，每次CRUD操作都会把最近使用过的元素挪到最上面(不一定准确，大致这个意思)，而且这项操作只不过是挪一下指针，并不费事
 
 ## 参考
 - [彻底解析Android缓存机制——LruCache](http://www.jianshu.com/p/b49a111147ee)

@@ -1,7 +1,7 @@
 ---
 title: JQuery手册
 date: 2017-08-27 21:48:52
-tags: [jQuery,tools]
+tags: [jQuery,tools,前端]
 ---
 
 jQuery只是javascript的公开库，掌握javascript语法对于解决问题更重要。jQuery能干的事情包括：

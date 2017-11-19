@@ -53,6 +53,7 @@ Cookie: BAIDUID=325243543:FG=1; PSTM=543534543; BIDUPSID=54353; pgv_pvi=5435; MC
 
 ###1.2 GET和POST的一些小区别
 GET只会发一个TCP包，POST发两个(一个是Header,一个是Body)。所以GET快一点，POST要求服务器长时间处于连接状态，可能造成服务器负载升高。
+一个比较实在的例子是，我在七牛的CDN上看到的收费价格1万次PUT/10万次GET，不用想也知道GET对于服务器的压力要比PUT小
 
 
 ## 2. http请求本质上是发送了一堆字符给服务器
