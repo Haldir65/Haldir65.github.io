@@ -127,7 +127,7 @@ Transfer-Encoding: chunked
 request中常见的请求头包括：
 
 - Accept：指定客户端能够接收的内容类型
-示例 : Accept:image/webp,image/apng,image/*,*/*;q=0.8
+<!-- 示例 : Accept:image/webp,image/apng,image/*,*/*;q=0.8 -->
 
 - Accept-Charset ：浏览器可以接受的字符编码集
 
@@ -333,7 +333,19 @@ tls,https加密过程，sha1和sha256加密算法
 ping ,traceRouter
 
 tcp三次握手四次挥手，用人话说：
-因为HTTP是一个基于TCP的协议,而TCP是一种可靠的传输层协议.建立TCP连接时会发生:三次握手(three-way handshake)firefox > nginx [SYN] 在么nginx > firefox [SYN, ACK] 在firefox > nginx [ACK] 知道了关闭TCP连接时会发生:四次挥手(four-way handshake)firefox > nginx [FIN] 我要关闭连接了nginx > firefox [ACK] 知道了,等我发完包先nginx > firefox [FIN] 我也关闭连接了firefox > nginx [ACK] 好的,知道了几个报文的标识的解释:SYN: synchronization(同步)ACK: acknowledgement(确认:告知已收到)FIN: finish(结束)
+因为HTTP是一个基于TCP的协议,而TCP是一种可靠的传输层协议.建立TCP连接时会发生:
+三次握手(three-way handshake)
+firefox > nginx [SYN] 在么
+nginx > firefox [SYN, ACK] 在
+firefox > nginx [ACK] 知道了
+
+关闭TCP连接时会发生:四次挥手(four-way handshake)
+firefox > nginx [FIN] 我要关闭连接了
+nginx > firefox [ACK] 知道了,等我发完包先
+nginx > firefox [FIN] 我也关闭连接了
+firefox > nginx [ACK] 好的,知道了
+
+几个报文的标识的解释:SYN: synchronization(同步)ACK: acknowledgement(确认:告知已收到)FIN: finish(结束)
 
 作者：eechen
 链接：https://www.zhihu.com/question/67772889/answer/257170215
