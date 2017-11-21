@@ -158,7 +158,12 @@ val inputstram = FileInputStream("/") as FileInputStream
 ### 9. 获取this
 使用this@MyActivity即可
 
+### 10. findViewById怎么写
+> change
+val listView = findViewById(R.id.list) as ListView to
+val listView = findViewById<ListView>(R.id.list)
 
+[stackoverflow](https://stackoverflow.com/questions/45267041/not-enough-information-to-infer-parameter-t-with-kotlin-and-android)
 
 ### ref
 

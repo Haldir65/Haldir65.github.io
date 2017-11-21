@@ -117,7 +117,7 @@ Java相关
 - [ ] OkHttp跑分[github](https://github.com/square/okhttp/blob/master/benchmarks/src/main/java/okhttp3/benchmarks/Benchmark.java)以及作者的[Gplus](https://plus.google.com/+JesseWilson/posts/EJCDEiPrN42)，以及外国人做的[High-Concurrency HTTP Clients on the JVM](https://dzone.com/articles/high-concurrency-http-clients-on-the-jvm)，纯属好玩。
 - [ ] 指令重排序，内存栅栏，JVM垃圾回收机制，何时触发MinorGC
 - [ ] Eden和Survivor的比例分配等
-- [ ] Gson主要的代码在JsonWriter里面，打几个断点即可
+- [ ] Gson主要的代码在JsonWriter里面，打几个断点即可。gson这类parser的劣势就在于allocating a bounch of String(array) and throw them away。
 
 
 
@@ -133,13 +133,21 @@ Android相关
 - [ ] WebView JS交互，WebView存在的[漏洞](http://www.jianshu.com/p/9f7e9ab8d2fa),通过反射可看可能存在的[安全问题](https://my.oschina.net/fengheju/blog/673629)以及[C代码](http://blog.csdn.net/xueerfei008/article/details/26750659)
 - [ ] Media相关，视频播放etc，相机，滤镜等.[Demo](https://github.com/w1123440793/VideoListDemo)
 - [ ] FFMpeg，[IjkPlayer](http://www.jianshu.com/p/a4eea7ea4664)，[弹幕](https://github.com/Bilibili/DanmakuFlameMaster)
-- [ ] UI Toolkit源码解析
+- [ ] UI Toolkit源码解析(android.widget包下面的)
     - [ ] ViewPager的原理，作者Adam Powell
-    - [ ] ViewGroup，View的源码
-    - [ ] View的绘制原理
-    - [ ] ListView,RecyclerView原理,加载优化(prefetcher什么的，滑动过程中不去加载图片，参考我写的Glide笔记)
-    - [ ] FrameLayout、LinearLayout、RelativeLayout,ImageView,TextView源码解析
-    - [ ] RecyclerView（这货最早的时候9K行，现在好像1.2W行）
+    - [ ] View的源码, View的绘制原理(往displayList那边靠)
+    - [ ] ViewGroup源码
+    - [X] FrameLayout
+    - [ ] LinearLayout
+    - [ ] RelativeLayout
+    - [ ] PopupWindow(api24以上的深坑网上也有解决方法)
+    - [X] Dialog
+    - [ ] ImageView
+    - [ ] TextView(super complicated)
+    - [ ] ScrollView(不到2000行)
+    - [ ] NestedScrollView
+    - [ ] ListView原理,加载优化
+    - [ ] RecyclerView（这货最早的时候9K行，现在好像1.2W行。prefetcher什么的，滑动过程中不去加载图片，参考我写的Glide笔记）
     - [ ] SurfaceView，TextureView从入门到解析
 - [ ] Zygote进程启动流程
 - [ ] 属性动画据说用了反射，源码解析

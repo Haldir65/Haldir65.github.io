@@ -478,6 +478,9 @@ public class MainActivity extends AppCompatActivity {
 ### RxJava 2 is not something new. Reactive programming is not new by any stretch, but Android itself is a highly reactive world that we’ve been taught to model in a very imperative, stateful fashion.
 Reactive programming allow us to model it in the proper way: asynchronously. Embrace the asynchronicity of the sources, and instead of trying to manage all the state ourselves, compose them together such that our apps become truly reactive.
 
+## updates:
+### How about Error Handling ?
+[Error handling in RxJava](http://blog.danlew.net/2015/12/08/error-handling-in-rxjava/)
 
 
 

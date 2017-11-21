@@ -7,7 +7,7 @@ tags: [git,tools]
 
 记录一下常用git的命令，作为日常使用的参考手册
 
-[](http://odzl05jxx.bkt.clouddn.com/f787b2e8d757dc83b782bcd6d4c9f523.jpg?imageView2/2/w/600)
+![](http://odzl05jxx.bkt.clouddn.com/f787b2e8d757dc83b782bcd6d4c9f523.jpg?imageView2/2/w/600)
 
 <!--more-->
 
@@ -129,7 +129,17 @@ git push origin --delete <branchName>
 ```git
 git push origin --delete tag <tagName>
 ```
-
+顺便说一下[打tag](http://blog.csdn.net/wangjia55/article/details/8793577)，这个实在太简单
+```git
+git tag //看下当前仓库有哪些tags
+git tag myTag // 在当前head打一个myTag的标签
+git push origin myTag //刚才那个tag还只是在本地，需要提交到远程
+git checkout myTag //打tag的好处就在于埋下一个里程碑，你随时可以回到当时的状态
+git tag -d myTag //删除这个tag也很简单
+git tag -a myTag adjksdas31231//假如当前head不在想打的位置，找到想打的位置的log，照着打就好
+git push origin -tags //将本地所有标签一次性提交到git服务器
+git ls-remote --tags //查看远程仓库所有的tags
+```
 
 ## 9. pull和rebase的区别
 pull = fetch +merge ，会生成新的提交
