@@ -772,6 +772,7 @@ WeakHashMap的value不要持有key的强引用，否则，key永远不会被清�
 list.replaceAll(String::toUpperCase) //method reference
 can not change the elemeet type, for that you need an stream
 [Collections Refuled by Stuart Marks](https://www.youtube.com/watch?v=q6zF3vf114M)
+putIfAbsent是Atmmic的[Is putIfAbsent an atomic operation](http://forums.terracotta.org/forums/posts/list/7968.page)
 
 ## 8.结束语
 8.1 [Doug Lea](https://en.wikipedia.org/wiki/Doug_Lea) 是非常聪明的人，估计并发经常会牵涉到集合，所以jdk里面很多集合都有他的作品
