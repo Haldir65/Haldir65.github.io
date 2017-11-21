@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://haldir65.github.io/"/>
-  <updated>2017-11-19T13:56:48.151Z</updated>
+  <updated>2017-11-20T00:49:42.817Z</updated>
   <id>https://haldir65.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://haldir65.github.io/2017/11/18/2017-11-18-integrating-tinker/"/>
     <id>https://haldir65.github.io/2017/11/18/2017-11-18-integrating-tinker/</id>
     <published>2017-11-18T09:25:29.000Z</published>
-    <updated>2017-11-19T13:56:48.151Z</updated>
+    <updated>2017-11-20T00:49:42.817Z</updated>
     
     <content type="html"><![CDATA[<p>关于Android Application集成Tinker的一次记录。<br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/single-yellow-beauty-flower-on-the-fence-wallpaper-56801fde208df.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
 <h2 id="1-首先从官方Demo项目开始"><a href="#1-首先从官方Demo项目开始" class="headerlink" title="1. 首先从官方Demo项目开始"></a>1. 首先从官方Demo项目开始</h2><p><a href="https://github.com/Tencent/tinker">Tinker</a>是2016年开源的，先直接clone下来。<br>我的环境：</p>
@@ -64,7 +64,9 @@
 <blockquote>
 <p>com.tencent.tinker:aosp-dexutils:1.91.@jar<br>com.tencent.tinker:bsdiff-util:1.91.@jar<br>com.tencent.tinker:tinker-android-anno:1.91.@jar<br>com.tencent.tinker:tinker-android-lib:1.91.@jar<br>com.tencent.tinker:tinker-android-loader:1.91.@jar<br>com.tencent.tinker:tinker-commons:1.91.@jar<br>com.tencent.tinker:tinker-ziputils:1.91.@jar</p>
 </blockquote>
-<h1 id="分的这么散估计也是希望能够好扩展吧。"><a href="#分的这么散估计也是希望能够好扩展吧。" class="headerlink" title="分的这么散估计也是希望能够好扩展吧。"></a>分的这么散估计也是希望能够好扩展吧。</h1><p>网上关于源码解析的文章已经很多，有时间看看，应该不难。<br>关于Tinker-Patch这个外包给第三方的服务，纯属好奇就去看了下url到底长什么样。在<a href="https://github.com/TinkerPatch/tinkerpatch-sdk/blob/master/tinkerpatch-sdk/src/main/java/com/tencent/tinker/server/client/TinkerClientAPI.java">TinkerClientAPI</a>里面有这么一段，其实跟Tinker本身庞大的架构比起来，已经算不上什么了。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">Uri.Builder urlBuilder = Uri.parse(<span class="keyword">this</span>.host).buildUpon(); <span class="comment">// "http://q.tinkerpatch.com"</span></div><div class="line">        <span class="keyword">if</span> (clientAPI.debug) &#123;</div><div class="line">            urlBuilder.appendPath(<span class="string">"dev"</span>);</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">final</span> String url = urlBuilder.appendPath(<span class="keyword">this</span>.appKey)</div><div class="line">            .appendPath(<span class="keyword">this</span>.appVersion)</div><div class="line">            .appendQueryParameter(<span class="string">"d"</span>, versionUtils.id())</div><div class="line">            .appendQueryParameter(<span class="string">"v"</span>, String.valueOf(System.currentTimeMillis()))</div><div class="line">            .build().toString();</div></pre></td></tr></table></figure></p>
+<h1 id="分的这么散估计也是希望能够好扩展吧。"><a href="#分的这么散估计也是希望能够好扩展吧。" class="headerlink" title="分的这么散估计也是希望能够好扩展吧。"></a>分的这么散估计也是希望能够好扩展吧。</h1><p>网上关于源码解析的文章已经很多，有时间看看，应该不难。</p>
+<p>看一下官方Tinker项目中的文件夹，有一个tinker-build，里面有两个python文件，这就很有意思了。再看看tinker-patch-gradle-plugin，里面一大堆groovy文件，所以看懂这个对于gradle插件开发是有好处的。</p>
+<p>=======================================================================<br>关于Tinker-Patch这个外包给第三方的服务，纯属好奇就去看了下url到底长什么样。在<a href="https://github.com/TinkerPatch/tinkerpatch-sdk/blob/master/tinkerpatch-sdk/src/main/java/com/tencent/tinker/server/client/TinkerClientAPI.java">TinkerClientAPI</a>里面有这么一段，其实跟Tinker本身庞大的架构比起来，已经算不上什么了。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">Uri.Builder urlBuilder = Uri.parse(<span class="keyword">this</span>.host).buildUpon(); <span class="comment">// "http://q.tinkerpatch.com"</span></div><div class="line">        <span class="keyword">if</span> (clientAPI.debug) &#123;</div><div class="line">            urlBuilder.appendPath(<span class="string">"dev"</span>);</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">final</span> String url = urlBuilder.appendPath(<span class="keyword">this</span>.appKey)</div><div class="line">            .appendPath(<span class="keyword">this</span>.appVersion)</div><div class="line">            .appendQueryParameter(<span class="string">"d"</span>, versionUtils.id())</div><div class="line">            .appendQueryParameter(<span class="string">"v"</span>, String.valueOf(System.currentTimeMillis()))</div><div class="line">            .build().toString();</div></pre></td></tr></table></figure></p>
 <p>除此之外，为了能够在测试环境验证补丁，还提供了一个<a href="https://github.com/TinkerPatch/tinkerpatch-debug-tool">小工具</a></p>
 <p>很感谢鹅厂能够将Tinker这样的工具开源出来造福广大开发者，抛开技术上的实力不说，能够一直积极维护也是一件了不起的事情。</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
@@ -137,7 +139,7 @@
     <link href="https://haldir65.github.io/2017/10/29/2017-10-29-pure-javaScript/"/>
     <id>https://haldir65.github.io/2017/10/29/2017-10-29-pure-javaScript/</id>
     <published>2017-10-29T14:10:27.000Z</published>
-    <updated>2017-11-19T14:24:38.726Z</updated>
+    <updated>2017-11-21T14:38:22.233Z</updated>
     
     <content type="html"><![CDATA[<p>论运行速度，在Vanilla JS面前，所有的js library都是渣<br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery04e31f5513d62958957b4caa1d944ae4.jpg?imageView2/2/w/600" alt=""></p>
 <a id="more"></a>
@@ -146,7 +148,9 @@
 <li><a href="#1-一些作为一门语言基本的操作都有">基本语法</a></li>
 <li><a href="#2-操作HTML-DOM的一些方法">操作html的一些点</a></li>
 <li><a href="#3-从onclick开始到整个交互事件模型">交互事件的注册，捕获，拦截</a></li>
-<li>[异步]</li>
+<li><a href="#4-异步的实现">异步</a></li>
+<li><a href="#5-ES6新增的一些东西">ES6新增的东西</a></li>
+<li><a href="#6-我也不知道归到哪一类的问题">我也不知道归到哪一类的问题</a></li>
 </ol>
 <h2 id="1-一些作为一门语言基本的操作都有"><a href="#1-一些作为一门语言基本的操作都有" class="headerlink" title="1. 一些作为一门语言基本的操作都有"></a>1. 一些作为一门语言基本的操作都有</h2><p><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery151110078544.jpg?imageView2/2/w/600" alt=""></p>
 <h3 id="1-1-比如说module（就是import，export这种，虽然是ES6才补上的）"><a href="#1-1-比如说module（就是import，export这种，虽然是ES6才补上的）" class="headerlink" title="1.1 比如说module（就是import，export这种，虽然是ES6才补上的）"></a>1.1 比如说module（就是import，export这种，虽然是ES6才补上的）</h3><p> js中好像没有像java中那种javaBean的特殊的数据类型的存在。<br>ES6开始可以使用import和export语法，有类似的效果，<a href="https://stackoverflow.com/questions/34741111/exporting-importing-json-object-in-es6">参考</a><br>states.js<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</div><div class="line">  STATES: &#123;</div><div class="line">    <span class="string">'AU'</span> : &#123;...&#125;,</div><div class="line">    <span class="string">'US'</span> : &#123;...&#125;</div><div class="line">  &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">import</span> STATES <span class="keyword">from</span> <span class="string">'states'</span>;</div><div class="line"><span class="comment">// 或者</span></div><div class="line"><span class="keyword">var</span> STATES = &#123;&#125;;</div><div class="line">STATES.AU = &#123;...&#125;;</div><div class="line">STATES.US = &#123;...&#125;;</div><div class="line"><span class="keyword">export</span> STATES;</div><div class="line"></div><div class="line"><span class="keyword">import</span> &#123; STATES &#125; <span class="keyword">from</span> <span class="string">'states'</span>;<span class="comment">//接受方最好写上大括号包起来</span></div><div class="line"><span class="comment">//</span></div><div class="line"><span class="keyword">import</span> whatever <span class="keyword">from</span> <span class="string">'states'</span>;</div><div class="line"><span class="comment">// whatever会变成export default中的内容</span></div></pre></td></tr></table></figure></p>
@@ -181,7 +185,7 @@
 <li>在dom中新增一个element的方法<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> li = <span class="built_in">document</span>.createElement(<span class="string">'li'</span>) <span class="comment">//创建一个新的li标签,</span></div><div class="line">parentTag.appendChild(li)<span class="comment">//添加到尾部</span></div><div class="line">parentTag.insertBefore(li,parentTag.getElementsByTagName(<span class="string">'li'</span>)[<span class="number">0</span>])<span class="comment">//添加到原来的0元素前面</span></div><div class="line"></div><div class="line"><span class="comment">//删除一个tag的话</span></div><div class="line"><span class="keyword">var</span> removed = parentTag.removeChild(li)<span class="comment">//移除方法会返回被移除的元素</span></div></pre></td></tr></table></figure>
 </li>
 </ol>
-<h2 id="3-从onclick开始到整个交互事件模型"><a href="#3-从onclick开始到整个交互事件模型" class="headerlink" title="3.从onclick开始到整个交互事件模型"></a>3.从onclick开始到整个交互事件模型</h2><ol>
+<h2 id="3-从onclick开始到整个交互事件模型"><a href="#3-从onclick开始到整个交互事件模型" class="headerlink" title="3.从onclick开始到整个交互事件模型"></a>3.从onclick开始到整个交互事件模型</h2><h2 id="4-异步的实现"><a href="#4-异步的实现" class="headerlink" title="4. 异步的实现"></a>4. 异步的实现</h2><h2 id="5-ES6新增的一些东西"><a href="#5-ES6新增的一些东西" class="headerlink" title="5. ES6新增的一些东西"></a>5. ES6新增的一些东西</h2><h2 id="6-我也不知道归到哪一类的问题"><a href="#6-我也不知道归到哪一类的问题" class="headerlink" title="6. 我也不知道归到哪一类的问题"></a>6. 我也不知道归到哪一类的问题</h2><ol>
 <li>交互事件的捕获，拦截，消费（冒泡）<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//添加点击事件点击事件：</span></div><div class="line"><span class="keyword">var</span> button = <span class="built_in">document</span>.getElementById(<span class="string">'btn'</span>)</div><div class="line">button.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(<span class="string">'you click this button'</span>);</div><div class="line">&#125;</div><div class="line">button.onfocus = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="comment">// body...</span></div><div class="line">&#125;</div><div class="line">button.onblur = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="comment">//</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">cancelEvent</span>(<span class="params">e</span>) </span>&#123;</div><div class="line">    <span class="keyword">if</span>(e) &#123;</div><div class="line">        e.stopPropagation();  <span class="comment">//非IE</span></div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        <span class="built_in">window</span>.event.cancelBubble = <span class="literal">true</span>;  <span class="comment">//IE</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 </li>
 </ol>
@@ -1285,7 +1289,7 @@ tcu、udp[抽象](https://www.youtube.com/watch?v=cTKQAe4DN6g)
     <link href="https://haldir65.github.io/2017/07/21/2017-07-21-network-manual/"/>
     <id>https://haldir65.github.io/2017/07/21/2017-07-21-network-manual/</id>
     <published>2017-07-20T16:05:32.000Z</published>
-    <updated>2017-11-19T14:30:29.604Z</updated>
+    <updated>2017-11-21T14:38:22.225Z</updated>
     
     <content type="html"><![CDATA[<p>网络相关的查找手册<br><img src="http://odzl05jxx.bkt.clouddn.com/b9ae1189145b4a4d9dfe4d0b89a21b47.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
 <h2 id="1-URI和URL是两件事"><a href="#1-URI和URL是两件事" class="headerlink" title="1. URI和URL是两件事"></a>1. URI和URL是两件事</h2><p>根据<a href="https://zh.wikipedia.org/wiki/%E7%BB%9F%E4%B8%80%E8%B5%84%E6%BA%90%E6%A0%87%E5%BF%97%E7%AC%A6">wiki的解释</a><br>URL是URI的子集，URL的一般格式包括三部分：资源类型、存放资源的主机域名，资源文件名。语法格式上,根据<a href="https://baike.baidu.com/item/URL%E6%A0%BC%E5%BC%8F/10056474?fr=aladdin">百度百科</a>找到一个能用的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">protocol :// hostname[:port] / path / [;parameters][?query]#fragment</div></pre></td></tr></table></figure></p>
@@ -1315,7 +1319,8 @@ tcu、udp[抽象](https://www.youtube.com/watch?v=cTKQAe4DN6g)
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;version&gt; &lt;status&gt; &lt;reason-phrase&gt;</div><div class="line">&lt;headers&gt;</div><div class="line">&lt;entity-body&gt;</div></pre></td></tr></table></figure>
 <p>request中常见的请求头包括：</p>
 <ul>
-<li><p>Accept：指定客户端能够接收的内容类型<br>示例 : Accept:image/webp,image/apng,image/<em>,</em>/*;q=0.8</p>
+<li><p>Accept：指定客户端能够接收的内容类型</p>
+<!-- 示例 : Accept:image/webp,image/apng,image/*,*/*;q=0.8 -->
 </li>
 <li><p>Accept-Charset ：浏览器可以接受的字符编码集</p>
 </li>
@@ -1410,7 +1415,9 @@ tcu、udp[抽象](https://www.youtube.com/watch?v=cTKQAe4DN6g)
 <p>tcp三次握手，四次挥手<br>udp使用</p>
 <p>tls,https加密过程，sha1和sha256加密算法</p>
 <p>ping ,traceRouter</p>
-<p>tcp三次握手四次挥手，用人话说：<br>因为HTTP是一个基于TCP的协议,而TCP是一种可靠的传输层协议.建立TCP连接时会发生:三次握手(three-way handshake)firefox &gt; nginx [SYN] 在么nginx &gt; firefox [SYN, ACK] 在firefox &gt; nginx [ACK] 知道了关闭TCP连接时会发生:四次挥手(four-way handshake)firefox &gt; nginx [FIN] 我要关闭连接了nginx &gt; firefox [ACK] 知道了,等我发完包先nginx &gt; firefox [FIN] 我也关闭连接了firefox &gt; nginx [ACK] 好的,知道了几个报文的标识的解释:SYN: synchronization(同步)ACK: acknowledgement(确认:告知已收到)FIN: finish(结束)</p>
+<p>tcp三次握手四次挥手，用人话说：<br>因为HTTP是一个基于TCP的协议,而TCP是一种可靠的传输层协议.建立TCP连接时会发生:<br>三次握手(three-way handshake)<br>firefox &gt; nginx [SYN] 在么<br>nginx &gt; firefox [SYN, ACK] 在<br>firefox &gt; nginx [ACK] 知道了</p>
+<p>关闭TCP连接时会发生:四次挥手(four-way handshake)<br>firefox &gt; nginx [FIN] 我要关闭连接了<br>nginx &gt; firefox [ACK] 知道了,等我发完包先<br>nginx &gt; firefox [FIN] 我也关闭连接了<br>firefox &gt; nginx [ACK] 好的,知道了</p>
+<p>几个报文的标识的解释:SYN: synchronization(同步)ACK: acknowledgement(确认:告知已收到)FIN: finish(结束)</p>
 <p>作者：eechen<br>链接：<a href="https://www.zhihu.com/question/67772889/answer/257170215">https://www.zhihu.com/question/67772889/answer/257170215</a><br>来源：知乎<br>著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="http://www.cnblogs.com/zuoxiaolong/p/life49.html">谈谈HTTP协议中的短轮询、长轮询、长连接和短连接</a></li>
@@ -1547,7 +1554,7 @@ tcu、udp[抽象](https://www.youtube.com/watch?v=cTKQAe4DN6g)
     <link href="https://haldir65.github.io/2017/07/12/2017-07-12-android-cookbook/"/>
     <id>https://haldir65.github.io/2017/07/12/2017-07-12-android-cookbook/</id>
     <published>2017-07-12T00:40:08.000Z</published>
-    <updated>2017-11-19T06:04:49.267Z</updated>
+    <updated>2017-11-21T14:38:22.218Z</updated>
     
     <content type="html"><![CDATA[<p>A Cookbook shall look like a collection of Recipes, or an index page from where dinner are made. And it keeps you sane.<br><img src="http://odzl05jxx.bkt.clouddn.com/Cg-4zFVJ0xGITwm_AA688WRj8n8AAXZ9wGMpd0ADr0J195.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
 <p>github上已经star了四百多个项目，应该复习下了。</p>
@@ -1595,7 +1602,7 @@ tcu、udp[抽象](https://www.youtube.com/watch?v=cTKQAe4DN6g)
 <li>[ ] OkHttp跑分<a href="https://github.com/square/okhttp/blob/master/benchmarks/src/main/java/okhttp3/benchmarks/Benchmark.java">github</a>以及作者的<a href="https://plus.google.com/+JesseWilson/posts/EJCDEiPrN42">Gplus</a>，以及外国人做的<a href="https://dzone.com/articles/high-concurrency-http-clients-on-the-jvm">High-Concurrency HTTP Clients on the JVM</a>，纯属好玩。</li>
 <li>[ ] 指令重排序，内存栅栏，JVM垃圾回收机制，何时触发MinorGC</li>
 <li>[ ] Eden和Survivor的比例分配等</li>
-<li>[ ] Gson主要的代码在JsonWriter里面，打几个断点即可</li>
+<li>[ ] Gson主要的代码在JsonWriter里面，打几个断点即可。gson这类parser的劣势就在于allocating a bounch of String(array) and throw them away。</li>
 </ul>
 <p>Android相关</p>
 <ul>
@@ -1610,13 +1617,21 @@ tcu、udp[抽象](https://www.youtube.com/watch?v=cTKQAe4DN6g)
 <li>[ ] WebView JS交互，WebView存在的<a href="http://www.jianshu.com/p/9f7e9ab8d2fa">漏洞</a>,通过反射可看可能存在的<a href="https://my.oschina.net/fengheju/blog/673629">安全问题</a>以及<a href="http://blog.csdn.net/xueerfei008/article/details/26750659">C代码</a></li>
 <li>[ ] Media相关，视频播放etc，相机，滤镜等.<a href="https://github.com/w1123440793/VideoListDemo">Demo</a></li>
 <li>[ ] FFMpeg，<a href="http://www.jianshu.com/p/a4eea7ea4664">IjkPlayer</a>，<a href="https://github.com/Bilibili/DanmakuFlameMaster">弹幕</a></li>
-<li>[ ] UI Toolkit源码解析<ul>
+<li>[ ] UI Toolkit源码解析(android.widget包下面的)<ul>
 <li>[ ] ViewPager的原理，作者Adam Powell</li>
-<li>[ ] ViewGroup，View的源码</li>
-<li>[ ] View的绘制原理</li>
-<li>[ ] ListView,RecyclerView原理,加载优化(prefetcher什么的，滑动过程中不去加载图片，参考我写的Glide笔记)</li>
-<li>[ ] FrameLayout、LinearLayout、RelativeLayout,ImageView,TextView源码解析</li>
-<li>[ ] RecyclerView（这货最早的时候9K行，现在好像1.2W行）</li>
+<li>[ ] View的源码, View的绘制原理(往displayList那边靠)</li>
+<li>[ ] ViewGroup源码</li>
+<li>[X] FrameLayout</li>
+<li>[ ] LinearLayout</li>
+<li>[ ] RelativeLayout</li>
+<li>[ ] PopupWindow(api24以上的深坑网上也有解决方法)</li>
+<li>[X] Dialog</li>
+<li>[ ] ImageView</li>
+<li>[ ] TextView(super complicated)</li>
+<li>[ ] ScrollView(不到2000行)</li>
+<li>[ ] NestedScrollView</li>
+<li>[ ] ListView原理,加载优化</li>
+<li>[ ] RecyclerView（这货最早的时候9K行，现在好像1.2W行。prefetcher什么的，滑动过程中不去加载图片，参考我写的Glide笔记）</li>
 <li>[ ] SurfaceView，TextureView从入门到解析</li>
 </ul>
 </li>
