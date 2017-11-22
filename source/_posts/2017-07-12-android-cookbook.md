@@ -152,10 +152,13 @@ Android相关
 - [ ] Zygote进程启动流程
 - [ ] 属性动画据说用了反射，源码解析
 - [ ] SystemServer进程启动流程
+- [ ] Context是什么，现在我可以说在ContextImpl中createActivityContext方法中使用new的方式创建了一个ContextImpl，整个流程就是ActivityThread在创建一个Activity后，给它不断赋值的过程。ContextImpl只是一个各种资源的容器（比如Resource,Display,PackageInfo,构造函数里面塞了一些，创建出来之后还给一些变量赋了值）
 - [ ] Launcher启动流程
-- [ ] 美团那个Walle还是要玩玩的
+- [ ] 美团那个Walle 还是要玩玩的
 - [X] Android生命周期在不同版本的表现形式[有些onXXX在高版本不会调](http://blog.csdn.net/liuweiballack/article/details/47026263)，[原因是HoneyComb之后对Activity LifeCycle进行了改动](http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html)
 - [ ] 要不是Jake Wharton在DroidConNYC2017上提到，还不知道有v4包里面有**AtomicFile**这玩意
+- [ ] Hook(使用Invokcation handler，将一个接口的调用原本的实现包揽下来，把原来的结果占为己有，同时添加一些自己要做的事情)[修改getSystemService，添加自定义功能](http://weishu.me/2016/02/16/understand-plugin-framework-binder-hook/)
+- [ ] Hook掉AMS,在startActivity里面添加一些私货
 
 > Studio里面看源码，find usage没有的话，find in path , choose android sdk
 
