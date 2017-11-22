@@ -128,7 +128,7 @@ Android相关
 - [ ] [Android Internals](https://academy.realm.io/posts/360-andev-2017-effie-barak-android-internals/)
 - [ ] cookie存储位置(/webviewCookiesChromium.db),db存储位置
 - [ ] Binder的原理，Binder里面引用计数的原理，Binder底层为什么用红黑树
-- [ ] onSaveInstance,不仅仅是Activity,Fragment，View中也有，具体实现原理。View一定要有id.[继承BaseSavedState]
+- [X] onSaveInstance,不仅仅是Activity,Fragment，View中也有，具体实现原理。View一定要有id.[继承BaseSavedState]
 - [X] 热修复框架原理
 - [ ] WebView JS交互，WebView存在的[漏洞](http://www.jianshu.com/p/9f7e9ab8d2fa),通过反射可看可能存在的[安全问题](https://my.oschina.net/fengheju/blog/673629)以及[C代码](http://blog.csdn.net/xueerfei008/article/details/26750659)
 - [ ] Media相关，视频播放etc，相机，滤镜等.[Demo](https://github.com/w1123440793/VideoListDemo)
@@ -152,13 +152,12 @@ Android相关
 - [ ] Zygote进程启动流程
 - [ ] 属性动画据说用了反射，源码解析
 - [ ] SystemServer进程启动流程
-- [ ] Context是什么，现在我可以说在ContextImpl中createActivityContext方法中使用new的方式创建了一个ContextImpl，整个流程就是ActivityThread在创建一个Activity后，给它不断赋值的过程。ContextImpl只是一个各种资源的容器（比如Resource,Display,PackageInfo,构造函数里面塞了一些，创建出来之后还给一些变量赋了值）
+- [X] Context是什么
 - [ ] Launcher启动流程
 - [ ] 美团那个Walle 还是要玩玩的
 - [X] Android生命周期在不同版本的表现形式[有些onXXX在高版本不会调](http://blog.csdn.net/liuweiballack/article/details/47026263)，[原因是HoneyComb之后对Activity LifeCycle进行了改动](http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html)
-- [ ] 要不是Jake Wharton在DroidConNYC2017上提到，还不知道有v4包里面有**AtomicFile**这玩意
-- [ ] Hook(使用Invokcation handler，将一个接口的调用原本的实现包揽下来，把原来的结果占为己有，同时添加一些自己要做的事情)[修改getSystemService，添加自定义功能](http://weishu.me/2016/02/16/understand-plugin-framework-binder-hook/)
-- [ ] Hook掉AMS,在startActivity里面添加一些私货
+- [ ] 要不是Jake Wharton在DroidConNYC2017上提到，还真不知道有v4包里面有**AtomicFile**这玩意
+
 
 > Studio里面看源码，find usage没有的话，find in path , choose android sdk
 
