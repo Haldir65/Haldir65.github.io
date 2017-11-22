@@ -174,31 +174,30 @@ ga('send', 'pageview');
           <div id="js-content" class="content-ll">
             
   
-    <article id="post-2017-07-21-okhttp-demisified" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-2016-10-13-Android-coordinate-System" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2017/07/21/2017-07-21-okhttp-demisified/">OkHttp和Okio阅读笔记</a>
+      <a class="article-title" href="/2016/10/13/2016-10-13-Android-coordinate-System/">安卓坐标系常用方法</a>
     </h1>
   
 
         
-        <a href="/2017/07/21/2017-07-21-okhttp-demisified/" class="archive-article-date">
-  	<time datetime="2017-07-20T16:02:56.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-07-21</time>
+        <a href="/2016/10/13/2016-10-13-Android-coordinate-System/" class="archive-article-date">
+  	<time datetime="2016-10-13T10:17:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-10-13</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>很早的时候就知道，OkHttp在io层面上的操作是由Okio代为完成的，所以实际意义上和Socket打交道的应该是Okio。而Okio又比传统的java io要高效。所以，在分析OkHttp之前，有必要针对Okio的一些方法进行展开，作为后面读写操作的铺垫。</p>
-<p>Okio -&gt; OkHttp -&gt; Picaso  -&gt; Retrofit<br>Okio版本 1.13.0<br>OkHttp版本 3.8.0</p>
-<p><img src="http://odzl05jxx.bkt.clouddn.com/6da83b3b20094b044a320d1e89dfcd00.jpg?imageView2/2/w/600" alt=""><br>
+        <p>记录一些Android系统坐标系的常用方法，因为日常开发中难免会碰到需要单独计算View系统坐标的情况。</p>
+<p><img src="http://odzl05jxx.bkt.clouddn.com/minion.jpg?imageView2/2/w/400" alt=""><br>
         
-          <a class="article-more-a" href="/2017/07/21/2017-07-21-okhttp-demisified/#more">more >></a>
+          <a class="article-more-a" href="/2016/10/13/2016-10-13-Android-coordinate-System/#more">more >></a>
         
       
 
@@ -216,17 +215,28 @@ ga('send', 'pageview');
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">java</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">TouchEvent</a>
         		</li>
       		
 		</ul>
 	</div>
 
       
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/blog/" class="article-tag-list-link color5">blog</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2017/07/21/2017-07-21-okhttp-demisified/">展开全文 >></a>
+          <a class="article-more-a" href="/2016/10/13/2016-10-13-Android-coordinate-System/">展开全文 >></a>
         </p>
       
 
@@ -241,29 +251,327 @@ ga('send', 'pageview');
 
 
   
-    <article id="post-2017-07-12-android-cookbook" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-2016-10-12-How-the-mainThread-work" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2017/07/12/2017-07-12-android-cookbook/">日常开发手册</a>
+      <a class="article-title" href="/2016/10/12/2016-10-12-How-the-mainThread-work/">主线程的工作原理</a>
     </h1>
   
 
         
-        <a href="/2017/07/12/2017-07-12-android-cookbook/" class="archive-article-date">
-  	<time datetime="2017-07-12T00:40:08.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-07-12</time>
+        <a href="/2016/10/12/2016-10-12-How-the-mainThread-work/" class="archive-article-date">
+  	<time datetime="2016-10-12T08:47:42.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-10-12</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>A Cookbook shall look like a collection of Recipes, or an index page from where dinner are made. And it keeps you sane.<br><img src="http://odzl05jxx.bkt.clouddn.com/Cg-4zFVJ0xGITwm_AA688WRj8n8AAXZ9wGMpd0ADr0J195.jpg?imageView2/2/w/600" alt=""><br>
+        <p><img src="http://odzl05jxx.bkt.clouddn.com/writing%20code%20that%20nobody%20else%20can%20read.jpg" alt=""></p>
+<p>​    今天突然找到这样一个问题: “Handler的postDelayed会阻塞线程吗？”。基于自己之前对于Handler的线程间通讯机制的理解，还是不能给出明确的答案。正好打算把一篇关于主线程的工作原理的文章写出来，顺带看下能否把这个问题从源码的角度解释清楚。
         
-          <a class="article-more-a" href="/2017/07/12/2017-07-12-android-cookbook/#more">more >></a>
+          <a class="article-more-a" href="/2016/10/12/2016-10-12-How-the-mainThread-work/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Handler Message</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/blog/" class="article-tag-list-link color5">blog</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2016/10/12/2016-10-12-How-the-mainThread-work/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+  
+    <article id="post-theme-versus-style" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/10/10/theme-versus-style/">Theme和Style的区别</a>
+    </h1>
+  
+
+        
+        <a href="/2016/10/10/theme-versus-style/" class="archive-article-date">
+  	<time datetime="2016-10-10T11:35:32.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-10-10</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>认识Theme和Styles</p>
+<p>重新看一遍Using Themes and styles without going crazy，大部分属于直接翻译</p>
+<h2 id="1-Styles"><a href="#1-Styles" class="headerlink" title="1. Styles"></a>1. Styles</h2><h3 id="1-1-首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来"><a href="#1-1-首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来" class="headerlink" title="1.1 首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来"></a>1.1 首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">View</span> <span class="attr">android:background</span>= <span class="string">"#ff0000"</span> /&gt;</span></div></pre></td></tr></table></figure>
+<p>变成</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">View</span> <span class="attr">style</span>= <span class="string">"@Style/MyStyle"</span> /&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">Style</span> <span class="attr">name</span> = <span class="string">"MyStyle"</span>&gt;</span><span class="xml"></div><div class="line">true<span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span> = <span class="string">"android:background"</span>&gt;</span>#ff0000<span class="tag">&lt;/<span class="name">item</span>&gt;</span></div><div class="line"></span><span class="tag">&lt;/<span class="name">Style</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>这种形式，对于大量的具有相同属性的且具有<em>共性</em>的View，可以直接使用对应的Style，这能够让layout文件更加整洁。前提是确信layout文件中使用的View具有相同的属性。</p>
+        
+          <a class="article-more-a" href="/2016/10/10/theme-versus-style/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">android</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/blog/" class="article-tag-list-link color5">blog</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2016/10/10/theme-versus-style/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+  
+    <article id="post-android-7-0-new-features" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/10/08/android-7-0-new-features/">android 7.0一些新特性介绍及适配方案</a>
+    </h1>
+  
+
+        
+        <a href="/2016/10/08/android-7-0-new-features/" class="archive-article-date">
+  	<time datetime="2016-10-07T19:02:26.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-10-08</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Google I/O 2016上的<a href="https://www.youtube.com/watch?v=B08iLAtS3AQ">What’s new in Android</a>介绍的比较全面，MultiWindow、Notification、ConstraintLayout等都比较简单。这里拎出来开发者不得不注意的几点来介绍。<br>
+        
+          <a class="article-more-a" href="/2016/10/08/android-7-0-new-features/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">android</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/blog/" class="article-tag-list-link color5">blog</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2016/10/08/android-7-0-new-features/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+  
+    <article id="post-touch-event-distribution" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/10/06/touch-event-distribution/">安卓事件分发流程</a>
+    </h1>
+  
+
+        
+        <a href="/2016/10/06/touch-event-distribution/" class="archive-article-date">
+  	<time datetime="2016-10-06T15:32:30.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-10-06</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="http://odzl05jxx.bkt.clouddn.com/dispatch_touch_event_video.JPG" alt=""></p>
+<p>图1 默认情况下事件传递的路径 </p>
+<blockquote>
+<p>Touch事件始于ACTION_DOWN, 终止于ACTION_UP, 这其中可能会伴随着ACTION_MOVE,ACTION_CANCEL等等。<br>
+        
+          <a class="article-more-a" href="/2016/10/06/touch-event-distribution/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">android</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/blog/" class="article-tag-list-link color5">blog</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2016/10/06/touch-event-distribution/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+  
+    <article id="post-service-activity-communication" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/09/30/service-activity-communication/">service和activity的通信方式</a>
+    </h1>
+  
+
+        
+        <a href="/2016/09/30/service-activity-communication/" class="archive-article-date">
+  	<time datetime="2016-09-30T07:25:28.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-09-30</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="http://odzl05jxx.bkt.clouddn.com/service_lifecycle.png" alt=""></p>
+<p>一年以前写过一篇关于service和Activity相互通信的很详细的博客，当时真的是费了很大心思在上面。现在回过头来看，还是有些不完善的地方，比如aidl没有给，demo不够全面。现在补上。</p>
+        
+          <a class="article-more-a" href="/2016/09/30/service-activity-communication/#more">more >></a>
         
       
 
@@ -280,84 +588,106 @@ ga('send', 'pageview');
         			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">android</a>
         		</li>
       		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">service</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/blog/" class="article-tag-list-link color5">blog</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2016/09/30/service-activity-communication/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+  
+    <article id="post-git-manual" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/09/27/git-manual/">git常用操作手册</a>
+    </h1>
+  
+
+        
+        <a href="/2016/09/27/git-manual/" class="archive-article-date">
+  	<time datetime="2016-09-27T09:24:51.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-09-27</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>记录一下常用git的命令，作为日常使用的参考手册</p>
+<p><img src="http://odzl05jxx.bkt.clouddn.com/f787b2e8d757dc83b782bcd6d4c9f523.jpg?imageView2/2/w/600" alt=""></p>
+        
+          <a class="article-more-a" href="/2016/09/27/git-manual/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
         		<li class="article-tag-list-item">
         			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">tools</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">java</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">git</a>
         		</li>
       		
 		</ul>
 	</div>
 
       
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/07/12/2017-07-12-android-cookbook/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-  
-    <article id="post-2017-07-12-scrapy-notes" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/07/12/2017-07-12-scrapy-notes/">2017-07-12-scrapy-notes</a>
-    </h1>
-  
-
-        
-        <a href="/2017/07/12/2017-07-12-scrapy-notes/" class="archive-article-date">
-  	<time datetime="2017-07-12T00:37:55.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-07-12</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="Scrappy框架学习"><a href="#Scrappy框架学习" class="headerlink" title="Scrappy框架学习"></a>Scrappy框架学习</h2><p>首先建议安装virtualenv，在env中进行操作。</p>
-<p><img src="http://odzl05jxx.bkt.clouddn.com/u=3180342558,2746910171&amp;fm=214&amp;gp=0.jpg?imageView2/2/w/600" alt=""></p>
-        
-          <a class="article-more-a" href="/2017/07/12/2017-07-12-scrapy-notes/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">python</a>
+        			<a href="/categories/blog/" class="article-tag-list-link color5">blog</a>
         		</li>
       		
 		</ul>
 	</div>
 
-      
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2017/07/12/2017-07-12-scrapy-notes/">展开全文 >></a>
+          <a class="article-more-a" href="/2016/09/27/git-manual/">展开全文 >></a>
         </p>
       
 
@@ -372,29 +702,30 @@ ga('send', 'pageview');
 
 
   
-    <article id="post-2017-07-12-fragment-decoded" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-activity-transition-pre-and-post-lollipop" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2017/07/12/2017-07-12-fragment-decoded/">Fragment源码解析记录(supportLibrary 25.3.0)</a>
+      <a class="article-title" href="/2016/09/27/activity-transition-pre-and-post-lollipop/">activity transition pre and post lollipop</a>
     </h1>
   
 
         
-        <a href="/2017/07/12/2017-07-12-fragment-decoded/" class="archive-article-date">
-  	<time datetime="2017-07-12T00:37:23.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-07-12</time>
+        <a href="/2016/09/27/activity-transition-pre-and-post-lollipop/" class="archive-article-date">
+  	<time datetime="2016-09-27T06:53:25.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-09-27</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>We been told Fragment itself should only trust official docs, the implementation detail are prone to any change any time, don’t count on it!<br><img src="http://odzl05jxx.bkt.clouddn.com/2009528111321773591934.jpg?imageView2/2/w/600" alt=""><br>
+        <p>Lollipop开始引入了新的Activity Transition动画效果，比起常用的overridePendingTransaction() 效果要强大许多</p>
+<p>测试环境<br>supportLibVersion = “24.2.1”<br>gradle plugin version : “classpath ‘com.android.tools.build:gradle:2.2.0’”<br>gradle version : 3.1<br>compileSdkVersion 24<br>buildToolsVersion “24.0.2”</p>
         
-          <a class="article-more-a" href="/2017/07/12/2017-07-12-fragment-decoded/#more">more >></a>
+          <a class="article-more-a" href="/2016/09/27/activity-transition-pre-and-post-lollipop/#more">more >></a>
         
       
 
@@ -410,15 +741,196 @@ ga('send', 'pageview');
         		<li class="article-tag-list-item">
         			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">android</a>
         		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">transition</a>
+        		</li>
       		
 		</ul>
 	</div>
 
       
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/blog/" class="article-tag-list-link color5">blog</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2017/07/12/2017-07-12-fragment-decoded/">展开全文 >></a>
+          <a class="article-more-a" href="/2016/09/27/activity-transition-pre-and-post-lollipop/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+  
+    <article id="post-selectableItemBackground-foreground" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/09/23/selectableItemBackground-foreground/">android使用selectableItemBackground的一些坑</a>
+    </h1>
+  
+
+        
+        <a href="/2016/09/23/selectableItemBackground-foreground/" class="archive-article-date">
+  	<time datetime="2016-09-23T11:56:39.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-09-23</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>android:foreground=”?android:attr/selectableItemBackground”</p>
+</blockquote>
+<p>或是</p>
+<blockquote>
+<p>android:background=”?android:attr/selectableItemBackground”</p>
+</blockquote>
+<p>这个xml属性最早是我学着写recyclerVeiw的item xml的时候接触到的，简单来说就是，在API 21及以上，用户点击这个itemView时候会出现一个Ripple效果<br>非常好看，而在API 21以下则会表现为MonoChrome的类似按压色的效果<img src="https://cloud.githubusercontent.com/assets/12274855/18787855/2a6d93f2-81d7-11e6-8026-58cdbd8583d4.JPG" alt=""> </br><br>而这个点击时的水波纹颜色也是可以Customize的<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;item name=&quot;android:colorControlHighlight&quot;&gt;@color/my_ripple_color&lt;/item&gt;</div></pre></td></tr></table></figure></p>
+<p>//这个要写在自己的Activity的Theme(style-v21)里，注意，当前Activity的Theme必须继承自Appcompat!!<br>于是，我写了这样的xml<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">LinearLayout</span></div><div class="line">        <span class="attr">android:id</span>=<span class="string">"@+id/item_root"</span></div><div class="line">        <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></div><div class="line">        <span class="attr">android:layout_height</span>=<span class="string">"?android:attr/listPreferredItemHeight"</span></div><div class="line">        <span class="attr">android:orientation</span>=<span class="string">"vertical"</span></div><div class="line">        <span class="attr">android:gravity</span>=<span class="string">"center"</span></div><div class="line">        <span class="attr">android:onClick</span>=<span class="string">"@&#123;(view) -&gt; callback.onClick(view,data)&#125;"</span></div><div class="line">        <span class="attr">android:elevation</span>=<span class="string">"2dp"</span></div><div class="line">        <span class="attr">android:background</span>=<span class="string">"@color/md_amber_200"</span></div><div class="line">        <span class="attr">android:foreground</span>=<span class="string">"?android:attr/selectableItemBackground"</span></div><div class="line">        /&gt;</span></div></pre></td></tr></table></figure></p>
+<p>然而，点击之后并没有出现水波纹(模拟器 API 21)，换成CardView或是将foreground改为background之后才有效。查了很多博客，最后得出结论:<br>android:foreground在API 23之前只对FrameLayout有效(CardView继承自FrameLayout当然有效)。<br>
+        
+          <a class="article-more-a" href="/2016/09/23/selectableItemBackground-foreground/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">android</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">foreground</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/blog/" class="article-tag-list-link color5">blog</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2016/09/23/selectableItemBackground-foreground/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+  
+    <article id="post-replace-butterKnife-with-databinding" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/09/22/replace-butterKnife-with-databinding/">replace butterKnife with databinding</a>
+    </h1>
+  
+
+        
+        <a href="/2016/09/22/replace-butterKnife-with-databinding/" class="archive-article-date">
+  	<time datetime="2016-09-22T07:17:39.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-09-22</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Yigit Boyar 在2015年的android Dev summit上介绍了Databinding，当时好像提到一句:<br>“no binding libraries will be created from now on “，大意如此。<br>本文介绍使用Databinding替代ButterKnife的用法</p>
+<h2 id="本文大部分代码来自网络，我只是觉得简单的代码直接复制粘贴可能会比较好。"><a href="#本文大部分代码来自网络，我只是觉得简单的代码直接复制粘贴可能会比较好。" class="headerlink" title="本文大部分代码来自网络，我只是觉得简单的代码直接复制粘贴可能会比较好。"></a>本文大部分代码来自网络，我只是觉得简单的代码直接复制粘贴可能会比较好。</h2>
+        
+          <a class="article-more-a" href="/2016/09/22/replace-butterKnife-with-databinding/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">android</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">databinding</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">Butterknife</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/blog/" class="article-tag-list-link color5">blog</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2016/09/22/replace-butterKnife-with-databinding/">展开全文 >></a>
         </p>
       
 
@@ -435,7 +947,7 @@ ga('send', 'pageview');
   
   
     <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/page/5/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><a class="page-number" href="/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><a class="extend next" rel="next" href="/page/7/">Next &raquo;</a>
+      <a class="extend prev" rel="prev" href="/page/5/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/7/">Next &raquo;</a>
     </nav>
   
 
@@ -529,27 +1041,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">android</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">adb</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -561,15 +1061,23 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">adb</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -581,11 +1089,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -593,11 +1101,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -613,10 +1125,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
@@ -625,11 +1133,27 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">前端</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Vue</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -654,18 +1178,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">service</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">前端</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
             
             <div class="clearfix"></div>
