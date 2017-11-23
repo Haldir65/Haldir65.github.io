@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://haldir65.github.io/"/>
-  <updated>2017-11-22T14:33:44.678Z</updated>
+  <updated>2017-11-22T15:04:59.502Z</updated>
   <id>https://haldir65.github.io/</id>
   
   <author>
@@ -16,16 +16,32 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>2017-11-22-from-Droid-plugin-onto-more</title>
+    <title>从DroidPlugin谈插件化开发</title>
     <link href="https://haldir65.github.io/2017/11/22/2017-11-22-from-Droid-plugin-onto-more/"/>
     <id>https://haldir65.github.io/2017/11/22/2017-11-22-from-Droid-plugin-onto-more/</id>
     <published>2017-11-22T14:33:44.000Z</published>
-    <updated>2017-11-22T14:33:44.678Z</updated>
+    <updated>2017-11-22T15:04:59.502Z</updated>
+    
+    <content type="html"><![CDATA[<p>最近在看关于热修复和插件化开发的东西，热修复主要就是Tinker了。插件化开发则是360团队出开源的<a href="https://github.com/DroidPluginTeam/DroidPlugin">DroidPlugin</a><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery15111006999.jpg?imageView2/2/w/600" alt="">。然后发现了关于插件化，Hook系统方法的操作，摘录下来。<br><a id="more"></a></p>
+<h2 id="1-从Context的本质说起"><a href="#1-从Context的本质说起" class="headerlink" title="1. 从Context的本质说起"></a>1. 从Context的本质说起</h2><p>其实也简单，就是ContextImpl，一个各种资源的容器。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Activity extends ContextThemeWrapper</div><div class="line">ContextThemeWrapper extends ContextWrapper</div><div class="line">ContextWrapper extends Context</div></pre></td></tr></table></figure></p>
+<p>Activity作为一个天然的交互核心，能够以一个容器的身份（继承而来）轻易获取这些外部资源，也使得基于UI页面的开发变得简单。<br>如果对于ActivityThread有所了解的话，就知道Activity的生命周期都是在这个类中完成的<br>简单来说在ContextImpl中createActivityContext方法中使用new的方式创建了一个ContextImpl，整个流程就是ActivityThread在创建一个Activity后，给它不断赋值的过程。ContextImpl只是一个各种资源的容器（比如Resource,Display,PackageInfo,构造函数里面塞了一些，创建出来之后还给一些变量赋了值）。</p>
+<p>Hook(使用Invokcation handler，将一个接口的调用原本的实现包揽下来，把原来的结果占为己有，同时添加一些自己要做的事情)<a href="http://weishu.me/2016/02/16/understand-plugin-framework-binder-hook/">修改getSystemService，添加自定义功能</a><br>Hook掉AMS,在startActivity里面添加一些私货</p>
+<h3 id="1-1-ActivityThread做了很多事"><a href="#1-1-ActivityThread做了很多事" class="headerlink" title="1.1 ActivityThread做了很多事"></a>1.1 ActivityThread做了很多事</h3><p>onSaveInstance是从ActivityThread的callCallActivityOnSaveInstanceState方法dispatch下来的。</p>
+<h2 id="2-Hook作为插件化的切入点给了开发者篡改系统api实现的通道"><a href="#2-Hook作为插件化的切入点给了开发者篡改系统api实现的通道" class="headerlink" title="2. Hook作为插件化的切入点给了开发者篡改系统api实现的通道"></a>2. Hook作为插件化的切入点给了开发者篡改系统api实现的通道</h2><p><a href="http://weishu.me/2016/02/16/understand-plugin-framework-binder-hook/">比如Hook掉剪切板SystemService</a>,<br><a href="http://weishu.me/2016/03/07/understand-plugin-framework-ams-pms-hook/">比如在ActivityManagerService调用IPC操作时添加私货</a></p>
+<p><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery2a2241cc5c1278cf7a28f15f91dbbb7f.jpg?imageView2/2/w/600" alt=""></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://github.com/tiann/understand-plugin-framework">分析DroidPlugin，深入理解插件化框架</a></p>
+]]></content>
     
     <summary type="html">
     
+      &lt;p&gt;最近在看关于热修复和插件化开发的东西，热修复主要就是Tinker了。插件化开发则是360团队出开源的&lt;a href=&quot;https://github.com/DroidPluginTeam/DroidPlugin&quot;&gt;DroidPlugin&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery15111006999.jpg?imageView2/2/w/600&quot; alt=&quot;&quot;&gt;。然后发现了关于插件化，Hook系统方法的操作，摘录下来。&lt;br&gt;
+    
     </summary>
     
+    
+      <category term="android" scheme="https://haldir65.github.io/tags/android/"/>
+    
+      <category term="插件化" scheme="https://haldir65.github.io/tags/%E6%8F%92%E4%BB%B6%E5%8C%96/"/>
     
   </entry>
   
@@ -253,11 +269,13 @@
     <link href="https://haldir65.github.io/2017/09/10/2017-09-10-wielding-regular-expressions/"/>
     <id>https://haldir65.github.io/2017/09/10/2017-09-10-wielding-regular-expressions/</id>
     <published>2017-09-10T15:10:05.000Z</published>
-    <updated>2017-11-19T14:24:36.593Z</updated>
+    <updated>2017-11-22T15:04:59.500Z</updated>
     
     <content type="html"><![CDATA[<p>关于正则的一些收集<br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/fresh-sparkle-dew-drops-on-red-flower-wallpaper-53861cf580909.jpg?imageView2/2/w/600" alt=""></p>
 <a id="more"></a>
-<p>一般情况下不要乱用正则<br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/bee-getting-the-pollen-wallpaper-538358eb5d5a3.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery151110067848.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100718415.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100670897.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery2a2241cc5c1278cf7a28f15f91dbbb7f.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/sceneryc7fd99f667c9d98a583a174872d58d13.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100729187.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100775410.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100746620.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery15111006999.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery151110074347.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery151110073841.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100756208.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100694324.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100794441.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100802774.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100734648.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/sceneryd15ddf2ba4fb7b5f4e51dfa6cb74cb70.jpg?imageView2/2/w/600" alt=""></p>
+<p>一般情况下不要乱用正则<br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/bee-getting-the-pollen-wallpaper-538358eb5d5a3.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery151110067848.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100718415.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100670897.jpg?imageView2/2/w/600" alt=""></p>
+<p><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/sceneryc7fd99f667c9d98a583a174872d58d13.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100729187.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100775410.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100746620.jpg?imageView2/2/w/600" alt=""></p>
+<p><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery151110074347.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery151110073841.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100756208.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100694324.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100794441.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100802774.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100734648.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/sceneryd15ddf2ba4fb7b5f4e51dfa6cb74cb70.jpg?imageView2/2/w/600" alt=""></p>
 <h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
 <li><a href="http://www.importnew.com/26560.html">DFA和NFA</a></li>
 </ul>
