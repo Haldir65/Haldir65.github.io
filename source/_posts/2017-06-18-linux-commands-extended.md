@@ -15,6 +15,8 @@ tags:
 ### 1. 常用软件安装
 [utorrent](http://blog.topspeedsnail.com/archives/5752)
 apache,mysql
+没事不要手贱升级软件
+> apt-get -u upgrade //就像这样，stable挺好的
 
 ### 2. 环境变量怎么改
 平时在shell中输入sudo XXX ,系统是如何知道怎么执行这条指令的呢。首先，可以查看which XXX ，用于查找某项指令对应的文件的位置。而像sudo这种都放在PATH位置，系统会在几个关键位置查找sudo命令。用户本身完全可以创建一个叫做sudo的文件chmod+X ，然后运行这个sudo。
@@ -40,9 +42,27 @@ vi ~/.bashrc
 
 ### 4. pushd和popd（类似于文件夹stack）
 
-### 5. 小硬盘linux磁盘要经常清理需要的命令
-- du --max-depth=1 -h # 查看当前路径下所有文件/文件夹的大小
-- du -k --max-depth=2 | sort -rn # 加上排序
+### 5. linux删除垃圾文件（小硬盘linux磁盘要经常清理需要的命令）
+IBM给出了删除一些垃圾文件的建议[使用 Linux 命令删除垃圾文件](https://www.ibm.com/developerworks/cn/linux/1310_caoyq_linuxdelete/index.html)
+
+> sudo apt-get autoclean 清理旧版本的软件缓存
+sudo apt-get clean 清理所有软件缓存
+sudo apt-get autoremove 删除系统不再使用的孤立软件
+du --max-depth=1 -h # 查看当前路径下所有文件/文件夹的大小
+du -k --max-depth=2 | sort -rn # 加上排序
+find / -name core -print -exec rm -rf {} \; //分号也要，亲测
+find / -size +100M：列出所有大于100M的文件，亲测。靠着这个找到了shadowsocks的日志文件,170MB
+
+删除/boot分区不需要的内核
+先df -h看/boot分区使用情况；
+然后 dpkg --get-selections|grep linux-image ;
+查看当前使用的内核 uname -a ;
+清理不用的内核 sudo apt-get purge linux-image-3.13.0-24-generic （注意，不要删正在使用的内核）
+删除不要的内核文件
+首先看下
+> uname- a
+dpkg --get-selections|grep linux //查找所有的文件，有image的就是内核文件
+sudo apt-get remove 内核文件名 （例如：linux-image-4.4.0-92-generic）
 
 ### 6. AWK文本分析工具
 - awk '{print $0}' /etc/passwd # 和cat差不多，显示文本内容
@@ -132,6 +152,7 @@ curl -v mail.qq.com
 <
 * Closing connection 0
 ```
+http 302的意思也就说明qq邮箱已经把http重定向到别的地方的
 
 
 
@@ -141,22 +162,26 @@ curl -v mail.qq.com
 - sudo apt-get install samba
 剩下的就是设定要分享的目录，给权限，设定访问密码，启动服务这些了[教程](http://www.cnblogs.com/gzdaijie/p/5194033.html)
 
-### 17.删除/boot分区不需要的内核
-先df -h看/boot分区使用情况；
-然后 dpkg --get-selections|grep linux-image ;
-查看当前使用的内核 uname -a ;
-清理不用的内核 sudo apt-get purge linux-image-3.13.0-24-generic （注意，不要删正在使用的内核）
 
 
-### 18. tee命令
+### 17. tee命令
 - echo $(date) | tee -a date.log
 tee命令能够吧程序的输出输出到stdo,同时还能将输出写进文件(-a 表示append，否则就是覆盖)
->>>>>>> Stashed changes
+
+### 18.  missing argument to \`-exec'
+```shell
+find /u03 -name server.xml -exec grep '9080' {}\;
+```
+简单来说，就是把exec前面的结果执行某项操作，语法上，大括号不能少，反斜杠不能少，分号不能少
+感觉exec和find 命令的xargs差不多
+[xargs命令](http://www.cnblogs.com/peida/archive/2012/11/15/2770888.html)
+
 
 
 
 ## 参考
 - [每天一个Linux命令](http://www.cnblogs.com/peida/archive/2012/12/05/2803591.html)
+- [Linux命令大全](http://man.linuxde.net/xargs)
 - [awk是三个人的名字](https://mp.weixin.qq.com/s/L0oViwqjIgudY-SrV0paRA)
 - [树莓派搭建局域网媒体服务器，下载机](http://www.cnblogs.com/xiaowuyi/p/4051238.html)
 - [Linux中国](https://linux.cn/tech/sa/index.php?page=4)

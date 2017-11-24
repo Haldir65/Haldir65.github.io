@@ -137,9 +137,17 @@ Mainfest里面要改成上面那个“com.包名.SomeName”
 
 
 ## 4. 常见问题
-Q: 我只不过改了一个Toast的文案，为毛生成的patch_signed_7zip.apk文件这么大？
+Q: 我只不过改了一个Toast的文案，为毛生成的patch_signed_7zip.apk文件这么大()？
 A: 看下tinkerPatch文件夹下面的log.txt文件（建议用Notepad打开），里面一大堆“Found add resource: res/drawable-hdpi-v4/abc_list_pressed_holo_light.9.png”这样的类似的出现，具体原因跟aapt有关，好像可以设置detect resource change （大概就这意思）为false，这样就不会那么大了。
 
+Q: Tinker-Patch把补丁文件放在什么位置
+A: 因为接收补丁的代码就在TinkerInstaller.onReceiveUpgradePatch这一段了。在UpgradePatchRetry.java中，有这么一段：tempPatchFile = new File(SharePatchFileUtil.getPatchTempDirectory(context), TEMP_PATCH_NAME); （/data/data/com.example.myApp/data/tinker_temp/temp.apk）。当然还有其他的，总之就是放在当前应用data文件夹下面的tinker或者tinker_temp文件夹下。
+
+Q: TinkerPatch和Tinker什么关系
+A：TinkerPatch的SDK里面包含了Tinker必要的功能，开发者只需要添加TinkerPatch这一条依赖，也不需要去继承ApplicationLike这些东西了，开发者不用自己开一个下载服务去下发patch_signed_7zip.apk这个文件了，onReceiveUpgradePatch这些事也做好了。确实是接入成本最低的方案，搭建后台假如交由自己公司的API团队处理，起码得好几天，还得耽误产品正常的开发节奏。而TinkerPatch给出的报价是399元/月。短期来看，显然前者的成本要高出不少，还得顾虑自家团队维护的代价。算一笔经济账的话，显然企业倾向于花钱买稳定服务。对于个人来讲，目前有免费版可以使用，估计也是为了给测试Demo使用的，想玩简单版的话可以试试。
+
+Q: 如何更换Dex的
+A: 引用[Android热补丁之Tinker原理解析](http://w4lle.com/2016/12/16/tinker/index.html)中的话：“由于Tinker的方案是基于Multidex实现的修改dexElements的顺序实现的，所以最终还是要修改classLoder中dexPathList中dexElements的顺序。Android中有两种ClassLoader用于加载dex文件，BootClassLoader、PathClassLoader和DexClassLoader都是继承自BaseDexClassLoader。最终在DexPathList的findClass中遍历dexElements，谁在前面用谁。”。所以其实就是根据下发的补丁文件，把dex文件给修改了，这一点跟MultiDex很像。
 
 =======================================================================
 
@@ -160,8 +168,9 @@ A: 看下tinkerPatch文件夹下面的log.txt文件（建议用Notepad打开）�
 网上关于源码解析的文章已经很多，有时间看看，应该不难。
 
 看一下官方Tinker项目中的文件夹，有一个tinker-build，里面有两个python文件，这就很有意思了。再看看tinker-patch-gradle-plugin，里面一大堆groovy文件，所以看懂这个对于gradle插件开发是有好处的。
-
+目前在1.9.1版本里面好像看到了一个*tinkerFastCrashProtect*，看来也是跟风天猫快速修复启动保护那一套。
 =======================================================================
+
 关于Tinker-Patch这个外包给第三方的服务，纯属好奇就去看了下url到底长什么样。在[TinkerClientAPI](https://github.com/TinkerPatch/tinkerpatch-sdk/blob/master/tinkerpatch-sdk/src/main/java/com/tencent/tinker/server/client/TinkerClientAPI.java)里面有这么一段，其实跟Tinker本身庞大的架构比起来，已经算不上什么了。
 ```java
 Uri.Builder urlBuilder = Uri.parse(this.host).buildUpon(); // "http://q.tinkerpatch.com"
@@ -181,5 +190,7 @@ Uri.Builder urlBuilder = Uri.parse(this.host).buildUpon(); // "http://q.tinkerpa
 ## 参考
 1. [微信热修复tinker及tinker-server快速接入](http://jp1017.top/2016/11/25/%E5%BE%AE%E4%BF%A1%E7%83%AD%E4%BF%AE%E5%A4%8Dtinker%E5%8F%8Atinker-server%E5%BF%AB%E9%80%9F%E6%8E%A5%E5%85%A5/)
 2. [TinkerPatch](https://github.com/TinkerPatch/tinkerpatch-sdk)，其实就是帮你把下发“patch_signed_7zip.apk”这个文件的活干了，还给了非常直观的报表，收费也是合情合理。
-3. [Android热补丁之Tinker原理解析](http://w4lle.com/2016/12/16/tinker/index.html)
-3. [热更新Tinker研究（三）：加载补丁](http://blog.csdn.net/huweigoodboy/article/details/62428170)
+3. [Android热补丁之Tinker原理解析](http://w4lle.com/2016/12/16/tinker/index.html)，这篇文章基本将整个流程都讲清楚了
+4. [热更新Tinker研究（三）：加载补丁](http://blog.csdn.net/huweigoodboy/article/details/62428170)
+5. [微信Tinker的一切都在这里，包括源码](https://mp.weixin.qq.com/s?__biz=MzAwNDY1ODY2OQ==&mid=2649286384&idx=1&sn=f1aff31d6a567674759be476bcd12549&scene=4#wechat_redirect)
+6. [Enabling Android Teams: Dex Ed by Jesse Wilson](https://www.youtube.com/watch?v=v4Ewjq6r9XI)Jesse Wilson谈Dex文件的结构，可惜视频清晰度垃圾

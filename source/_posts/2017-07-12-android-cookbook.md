@@ -156,8 +156,8 @@ Android相关
 - [ ] Launcher启动流程
 - [ ] 美团那个Walle 还是要玩玩的
 - [X] Android生命周期在不同版本的表现形式[有些onXXX在高版本不会调](http://blog.csdn.net/liuweiballack/article/details/47026263)，[原因是HoneyComb之后对Activity LifeCycle进行了改动](http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html)
-- [ ] 要不是Jake Wharton在DroidConNYC2017上提到，还真不知道有v4包里面有**AtomicFile**这玩意
-
+- [ ] 要不是Jake Wharton在DroidConNYC2017上提到，还不知道有v4包里面有**AtomicFile**这玩意
+- [ ] LocalBroadCastReceiver好像是基于handler实现的
 
 > Studio里面看源码，find usage没有的话，find in path , choose android sdk
 

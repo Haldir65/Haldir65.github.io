@@ -488,7 +488,49 @@ public class Test {
 ```
 [默认返回内存中的地址](https://stackoverflow.com/questions/2237720/what-is-an-objects-hash-code-if-hashcode-is-not-overridden)，
 
+### 31. 接口里面放一个接口这种事情也不是没干过
+android.content.DialogInterface.java
+```java
+public interface DialogInterface {    
 
+    public static final int BUTTON_POSITIVE = -1;
+
+    public static final int BUTTON_NEGATIVE = -2;
+
+    public static final int BUTTON_NEUTRAL = -3;
+
+    public void cancel();
+
+    public void dismiss();
+
+    interface OnCancelListener {
+        public void onCancel(DialogInterface dialog);
+    }
+
+    interface OnDismissListener {
+        public void onDismiss(DialogInterface dialog);
+    }
+
+    interface OnShowListener {
+        public void onShow(DialogInterface dialog);
+    }
+    interface OnClickListener {
+        public void onClick(DialogInterface dialog, int which);
+    }
+
+    interface OnMultiChoiceClickListener {
+        public void onClick(DialogInterface dialog, int which, boolean isChecked);
+    }
+
+    interface OnKeyListener {
+        public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event);
+    }
+}
+```
+接口里面放常量也行啊
+
+### 32.Stuart Marks又提到了写comparatr时可能出现的错误
+[Comparison Method Violates Its General Contract! (Part 1) by Stuart Marks](https://www.youtube.com/watch?v=Enwbh6wpnYs)
 
 
 

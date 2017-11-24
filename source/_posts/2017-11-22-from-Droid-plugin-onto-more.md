@@ -4,8 +4,10 @@ date: 2017-11-22 22:33:44
 tags: [android,插件化]
 ---
 
-最近在看关于热修复和插件化开发的东西，热修复主要就是Tinker了。插件化开发则是360团队出开源的[DroidPlugin](https://github.com/DroidPluginTeam/DroidPlugin)
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery15111006999.jpg?imageView2/2/w/600)。然后发现了关于插件化，Hook系统方法的操作，摘录下来。
+关于360团队出开源的[DroidPlugin](https://github.com/DroidPluginTeam/DroidPlugin)的一些记录
+![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery15111006999.jpg?imageView2/2/w/600)
+
+过程中发现了关于插件化，Hook系统方法的操作，摘录下来。
 <!--more-->
 ## 1. 从Context的本质说起
 其实也简单，就是ContextImpl，一个各种资源的容器。
