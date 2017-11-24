@@ -102,6 +102,11 @@ h2为什么快，Multiplexing，多路复用允许同时通过单一的 HTTP/2 �
 [演示](https://http2.akamai.com/demo)
 
 
+## Update
+> With 100Mbit/s Ethernet, a large file transfers at 94.1Mbit/s. That's 6% overhead.
+所以本地记录的下载到的文件的速度要比运营商报告的实际带宽小一点，当然这只是一部分原因。
+
+
 ## 参考
 - [what-of-traffic-is-network-overhead-on-top-of-http-s-requests](https://stackoverflow.com/questions/3613989/what-of-traffic-is-network-overhead-on-top-of-http-s-requests)
 - [Hadi Hariri — HTTP/2 – What do I need to know?](https://www.youtube.com/watch?v=F5smqpbz2sU)
