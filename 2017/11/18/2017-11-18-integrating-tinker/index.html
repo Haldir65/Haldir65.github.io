@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="关于Android Application集成Tinker的一次记录。">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/single-yellow-beauty-flower-on-the-fence-wallpaper-56801fde208df.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-11-20T00:49:42.817Z">
+<meta property="og:updated_time" content="2017-11-24T13:59:04.756Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="集成Tinker的一些记录">
 <meta name="twitter:description" content="关于Android Application集成Tinker的一次记录。">
@@ -234,7 +234,10 @@ ga('send', 'pageview');
 <p>接下来按照之前的步骤就Ok了。</p>
 <h2 id="3-Configuration"><a href="#3-Configuration" class="headerlink" title="3. Configuration"></a>3. Configuration</h2><p>以上只是简单的把Demo跑通，接下里需要看下Tinker提供的定制项</p>
 <p>=======================================================================</p>
-<h2 id="4-常见问题"><a href="#4-常见问题" class="headerlink" title="4. 常见问题"></a>4. 常见问题</h2><p>Q: 我只不过改了一个Toast的文案，为毛生成的patch_signed_7zip.apk文件这么大？<br>A: 看下tinkerPatch文件夹下面的log.txt文件（建议用Notepad打开），里面一大堆“Found add resource: res/drawable-hdpi-v4/abc_list_pressed_holo_light.9.png”这样的类似的出现，具体原因跟aapt有关，好像可以设置detect resource change （大概就这意思）为false，这样就不会那么大了。</p>
+<h2 id="4-常见问题"><a href="#4-常见问题" class="headerlink" title="4. 常见问题"></a>4. 常见问题</h2><p>Q: 我只不过改了一个Toast的文案，为毛生成的patch_signed_7zip.apk文件这么大()？<br>A: 看下tinkerPatch文件夹下面的log.txt文件（建议用Notepad打开），里面一大堆“Found add resource: res/drawable-hdpi-v4/abc_list_pressed_holo_light.9.png”这样的类似的出现，具体原因跟aapt有关，好像可以设置detect resource change （大概就这意思）为false，这样就不会那么大了。</p>
+<p>Q: Tinker-Patch把补丁文件放在什么位置<br>A: 因为接收补丁的代码就在TinkerInstaller.onReceiveUpgradePatch这一段了。在UpgradePatchRetry.java中，有这么一段：tempPatchFile = new File(SharePatchFileUtil.getPatchTempDirectory(context), TEMP_PATCH_NAME); （/data/data/com.example.myApp/data/tinker_temp/temp.apk）。当然还有其他的，总之就是放在当前应用data文件夹下面的tinker或者tinker_temp文件夹下。</p>
+<p>Q: TinkerPatch和Tinker什么关系<br>A：TinkerPatch的SDK里面包含了Tinker必要的功能，开发者只需要添加TinkerPatch这一条依赖，也不需要去继承ApplicationLike这些东西了，开发者不用自己开一个下载服务去下发patch_signed_7zip.apk这个文件了，onReceiveUpgradePatch这些事也做好了。确实是接入成本最低的方案，搭建后台假如交由自己公司的API团队处理，起码得好几天，还得耽误产品正常的开发节奏。而TinkerPatch给出的报价是399元/月。短期来看，显然前者的成本要高出不少，还得顾虑自家团队维护的代价。算一笔经济账的话，显然企业倾向于花钱买稳定服务。对于个人来讲，目前有免费版可以使用，估计也是为了给测试Demo使用的，想玩简单版的话可以试试。</p>
+<p>Q: 如何更换Dex的<br>A: 引用<a href="http://w4lle.com/2016/12/16/tinker/index.html">Android热补丁之Tinker原理解析</a>中的话：“由于Tinker的方案是基于Multidex实现的修改dexElements的顺序实现的，所以最终还是要修改classLoder中dexPathList中dexElements的顺序。Android中有两种ClassLoader用于加载dex文件，BootClassLoader、PathClassLoader和DexClassLoader都是继承自BaseDexClassLoader。最终在DexPathList的findClass中遍历dexElements，谁在前面用谁。”。所以其实就是根据下发的补丁文件，把dex文件给修改了，这一点跟MultiDex很像。</p>
 <p>=======================================================================</p>
 <h2 id="5-源码解析"><a href="#5-源码解析" class="headerlink" title="5. 源码解析"></a>5. 源码解析</h2><p>至少我现在看到7个包：</p>
 <blockquote>
@@ -242,14 +245,16 @@ ga('send', 'pageview');
 </blockquote>
 <h1 id="分的这么散估计也是希望能够好扩展吧。"><a href="#分的这么散估计也是希望能够好扩展吧。" class="headerlink" title="分的这么散估计也是希望能够好扩展吧。"></a>分的这么散估计也是希望能够好扩展吧。</h1><p>网上关于源码解析的文章已经很多，有时间看看，应该不难。</p>
 <p>看一下官方Tinker项目中的文件夹，有一个tinker-build，里面有两个python文件，这就很有意思了。再看看tinker-patch-gradle-plugin，里面一大堆groovy文件，所以看懂这个对于gradle插件开发是有好处的。</p>
-<p>=======================================================================<br>关于Tinker-Patch这个外包给第三方的服务，纯属好奇就去看了下url到底长什么样。在<a href="https://github.com/TinkerPatch/tinkerpatch-sdk/blob/master/tinkerpatch-sdk/src/main/java/com/tencent/tinker/server/client/TinkerClientAPI.java">TinkerClientAPI</a>里面有这么一段，其实跟Tinker本身庞大的架构比起来，已经算不上什么了。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">Uri.Builder urlBuilder = Uri.parse(<span class="keyword">this</span>.host).buildUpon(); <span class="comment">// "http://q.tinkerpatch.com"</span></div><div class="line">        <span class="keyword">if</span> (clientAPI.debug) &#123;</div><div class="line">            urlBuilder.appendPath(<span class="string">"dev"</span>);</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">final</span> String url = urlBuilder.appendPath(<span class="keyword">this</span>.appKey)</div><div class="line">            .appendPath(<span class="keyword">this</span>.appVersion)</div><div class="line">            .appendQueryParameter(<span class="string">"d"</span>, versionUtils.id())</div><div class="line">            .appendQueryParameter(<span class="string">"v"</span>, String.valueOf(System.currentTimeMillis()))</div><div class="line">            .build().toString();</div></pre></td></tr></table></figure></p>
+<h1 id="目前在1-9-1版本里面好像看到了一个tinkerFastCrashProtect，看来也是跟风天猫快速修复启动保护那一套。"><a href="#目前在1-9-1版本里面好像看到了一个tinkerFastCrashProtect，看来也是跟风天猫快速修复启动保护那一套。" class="headerlink" title="目前在1.9.1版本里面好像看到了一个tinkerFastCrashProtect，看来也是跟风天猫快速修复启动保护那一套。"></a>目前在1.9.1版本里面好像看到了一个<em>tinkerFastCrashProtect</em>，看来也是跟风天猫快速修复启动保护那一套。</h1><p>关于Tinker-Patch这个外包给第三方的服务，纯属好奇就去看了下url到底长什么样。在<a href="https://github.com/TinkerPatch/tinkerpatch-sdk/blob/master/tinkerpatch-sdk/src/main/java/com/tencent/tinker/server/client/TinkerClientAPI.java">TinkerClientAPI</a>里面有这么一段，其实跟Tinker本身庞大的架构比起来，已经算不上什么了。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">Uri.Builder urlBuilder = Uri.parse(<span class="keyword">this</span>.host).buildUpon(); <span class="comment">// "http://q.tinkerpatch.com"</span></div><div class="line">        <span class="keyword">if</span> (clientAPI.debug) &#123;</div><div class="line">            urlBuilder.appendPath(<span class="string">"dev"</span>);</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">final</span> String url = urlBuilder.appendPath(<span class="keyword">this</span>.appKey)</div><div class="line">            .appendPath(<span class="keyword">this</span>.appVersion)</div><div class="line">            .appendQueryParameter(<span class="string">"d"</span>, versionUtils.id())</div><div class="line">            .appendQueryParameter(<span class="string">"v"</span>, String.valueOf(System.currentTimeMillis()))</div><div class="line">            .build().toString();</div></pre></td></tr></table></figure></p>
 <p>除此之外，为了能够在测试环境验证补丁，还提供了一个<a href="https://github.com/TinkerPatch/tinkerpatch-debug-tool">小工具</a></p>
 <p>很感谢鹅厂能够将Tinker这样的工具开源出来造福广大开发者，抛开技术上的实力不说，能够一直积极维护也是一件了不起的事情。</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
 <li><a href="http://jp1017.top/2016/11/25/%E5%BE%AE%E4%BF%A1%E7%83%AD%E4%BF%AE%E5%A4%8Dtinker%E5%8F%8Atinker-server%E5%BF%AB%E9%80%9F%E6%8E%A5%E5%85%A5/">微信热修复tinker及tinker-server快速接入</a></li>
 <li><a href="https://github.com/TinkerPatch/tinkerpatch-sdk">TinkerPatch</a>，其实就是帮你把下发“patch_signed_7zip.apk”这个文件的活干了，还给了非常直观的报表，收费也是合情合理。</li>
-<li><a href="http://w4lle.com/2016/12/16/tinker/index.html">Android热补丁之Tinker原理解析</a></li>
+<li><a href="http://w4lle.com/2016/12/16/tinker/index.html">Android热补丁之Tinker原理解析</a>，这篇文章基本将整个流程都讲清楚了</li>
 <li><a href="http://blog.csdn.net/huweigoodboy/article/details/62428170">热更新Tinker研究（三）：加载补丁</a></li>
+<li><a href="https://mp.weixin.qq.com/s?__biz=MzAwNDY1ODY2OQ==&amp;mid=2649286384&amp;idx=1&amp;sn=f1aff31d6a567674759be476bcd12549&amp;scene=4#wechat_redirect">微信Tinker的一切都在这里，包括源码</a></li>
+<li><a href="https://www.youtube.com/watch?v=v4Ewjq6r9XI">Enabling Android Teams: Dex Ed by Jesse Wilson</a>Jesse Wilson谈Dex文件的结构，可惜视频清晰度垃圾</li>
 </ol>
 
       
@@ -457,15 +462,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">android</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">android</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -481,7 +482,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -493,7 +494,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">annotation</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -505,15 +514,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -521,11 +522,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">java</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -557,6 +562,10 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
               </li>
              
@@ -565,15 +574,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">transition</a>
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -585,11 +594,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+                <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -597,7 +602,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
             
             <div class="clearfix"></div>

@@ -8,18 +8,21 @@
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>从DroidPlugin谈插件化开发 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="最近在看关于热修复和插件化开发的东西，热修复主要就是Tinker了。插件化开发则是360团队出开源的DroidPlugin。然后发现了关于插件化，Hook系统方法的操作，摘录下来。">
+  <meta name="description" content="关于360团队出开源的DroidPlugin的一些记录
+过程中发现了关于插件化，Hook系统方法的操作，摘录下来。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="从DroidPlugin谈插件化开发">
 <meta property="og:url" content="https://haldir65.github.io/2017/11/22/2017-11-22-from-Droid-plugin-onto-more/index.html">
 <meta property="og:site_name" content="Haldir的博客">
-<meta property="og:description" content="最近在看关于热修复和插件化开发的东西，热修复主要就是Tinker了。插件化开发则是360团队出开源的DroidPlugin。然后发现了关于插件化，Hook系统方法的操作，摘录下来。">
+<meta property="og:description" content="关于360团队出开源的DroidPlugin的一些记录
+过程中发现了关于插件化，Hook系统方法的操作，摘录下来。">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery15111006999.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery2a2241cc5c1278cf7a28f15f91dbbb7f.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-11-22T15:04:59.502Z">
+<meta property="og:updated_time" content="2017-11-24T13:59:04.759Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从DroidPlugin谈插件化开发">
-<meta name="twitter:description" content="最近在看关于热修复和插件化开发的东西，热修复主要就是Tinker了。插件化开发则是360团队出开源的DroidPlugin。然后发现了关于插件化，Hook系统方法的操作，摘录下来。">
+<meta name="twitter:description" content="关于360团队出开源的DroidPlugin的一些记录
+过程中发现了关于插件化，Hook系统方法的操作，摘录下来。">
 <meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery15111006999.jpg?imageView2/2/w/600">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
@@ -199,7 +202,8 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>最近在看关于热修复和插件化开发的东西，热修复主要就是Tinker了。插件化开发则是360团队出开源的<a href="https://github.com/DroidPluginTeam/DroidPlugin">DroidPlugin</a><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery15111006999.jpg?imageView2/2/w/600" alt="">。然后发现了关于插件化，Hook系统方法的操作，摘录下来。<br><a id="more"></a></p>
+        <p>关于360团队出开源的<a href="https://github.com/DroidPluginTeam/DroidPlugin">DroidPlugin</a>的一些记录<br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery15111006999.jpg?imageView2/2/w/600" alt=""></p>
+<p>过程中发现了关于插件化，Hook系统方法的操作，摘录下来。<br><a id="more"></a></p>
 <h2 id="1-从Context的本质说起"><a href="#1-从Context的本质说起" class="headerlink" title="1. 从Context的本质说起"></a>1. 从Context的本质说起</h2><p>其实也简单，就是ContextImpl，一个各种资源的容器。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Activity extends ContextThemeWrapper</div><div class="line">ContextThemeWrapper extends ContextWrapper</div><div class="line">ContextWrapper extends Context</div></pre></td></tr></table></figure></p>
 <p>Activity作为一个天然的交互核心，能够以一个容器的身份（继承而来）轻易获取这些外部资源，也使得基于UI页面的开发变得简单。<br>如果对于ActivityThread有所了解的话，就知道Activity的生命周期都是在这个类中完成的<br>简单来说在ContextImpl中createActivityContext方法中使用new的方式创建了一个ContextImpl，整个流程就是ActivityThread在创建一个Activity后，给它不断赋值的过程。ContextImpl只是一个各种资源的容器（比如Resource,Display,PackageInfo,构造函数里面塞了一些，创建出来之后还给一些变量赋了值）。</p>
 <p>Hook(使用Invokcation handler，将一个接口的调用原本的实现包揽下来，把原来的结果占为己有，同时添加一些自己要做的事情)<a href="http://weishu.me/2016/02/16/understand-plugin-framework-binder-hook/">修改getSystemService，添加自定义功能</a><br>Hook掉AMS,在startActivity里面添加一些私货</p>
@@ -293,6 +297,15 @@ ga('send', 'pageview');
 
   
 <nav id="article-nav">
+  
+    <a href="/2017/11/25/2017-11-25-front-end-cook-book/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          前端速查手册
+        
+      </div>
+    </a>
   
   
     <a href="/2017/11/18/2017-11-18-integrating-tinker/" id="article-nav-older" class="article-nav-link-wrap">
@@ -404,15 +417,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">android</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">android</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -428,7 +437,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -440,7 +449,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">annotation</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -452,15 +469,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -468,11 +477,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">java</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -504,6 +517,10 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
               </li>
              
@@ -512,15 +529,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">transition</a>
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -532,11 +549,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+                <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -544,7 +557,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
             
             <div class="clearfix"></div>
