@@ -12,10 +12,10 @@ top : 2
 
 <!--more-->
 
-### 1. 经常更新yilia的theme
+## 1. 经常更新yilia的theme
 [yilia](https://github.com/litten/hexo-theme-yilia)主题经常会更新，及时更新theme会发现很多新的特性及bug fix
 
-### 2. 部署相关
+## 2. 部署相关
 - 部署到github
 ```javascript
 hexo clean //清除缓存
@@ -81,7 +81,7 @@ INFO  4 files generated in 2.26 s
 INFO  Deploying: git
 
 ```
-找了好久，有说 _config.xml有空格的，有说title被乱改的，试了好长时间，改成这样就不再报错了。所以，**冒号后面一定要加空格，英文半角的**
+找了好久，有说"\_config.xml" 文件 有空格的，有说title被乱改的，试了好长时间，改成这样就不再报错了。所以，**冒号后面一定要加空格，英文半角的**
 
 ```
 ---
@@ -104,7 +104,7 @@ tags: [linux,python]
 ```
 
 
-### 3. 一些功能的实现
+## 3. 一些功能的实现
 
 - 置顶功能
     将node_modules/hexo-generator-index/lib/generator.js的文件内容替换成以下内容
@@ -150,7 +150,7 @@ categories: Hexo
 top: 0 # 0或者1
 ```
 
-### 4. SublimeText的一些快捷键
+## 4. SublimeText的一些快捷键
 由于文章大部分都是使用SublimeText写的，Typroa这种所见即所得的编辑器也不错，但对于掌握MardkDown语法没有帮助。这里摘录一些SubLimeText的快捷键。
 
 > **Ctrl+Shift+P：打开命令面板**
@@ -205,20 +205,28 @@ Alt+数字：切换打开第N个文件
 
 
 
-### 5. title不能以[]开头
+## 5. title不能以[]开头
 前面加上###确实能够让字号变大，但不要写4个#，后面的字母会大小写不分的
 
 
-### 6. markdown语法
+## 6. markdown语法
 MarkDown页面内部跳转
 [MarkDown技巧：两种方式实现页内跳转](http://www.cnblogs.com/JohnTsai/p/4027229.html)
 
-### 7.github提交commit的时候显示Emoji
+> *一个星星包起来是斜体字*
+**两个星星包起来是粗体字**
+***那么三个星星呢***
+
+## 7.github提交commit的时候显示Emoji
 链接[在此](https://www.webpagefx.com/tools/emoji-cheat-sheet/)
 
-### 8.换电脑了怎么办
+## 8.换电脑了怎么办
 亲测，把整个目录下所有文件全部复制粘贴到新电脑上，装上node，然后装上hexo，记得勾选添加到PATH,然后就可以了。需要注意的是小文件比较多，所以复制粘贴可能要十几分钟。
 
-### ref
+## 9. 有时候写的代码会给你在每一行前面加上true
+比如写一段css的代码时候，很多时候预览会给每一行前面加上一个true，解决办法：用TAB键缩进即可
+
+### 参考
 - [Hexo博文置顶技巧](http://yanhuili.github.io/2016/11/21/hexo%E5%8D%9A%E6%96%87%E7%BD%AE%E9%A1%B6%E6%8A%80%E5%B7%A7/)
 - [SublimeText快捷键](http://www.daqianduan.com/4820.html)
+- [MarkDown语法学起来很快的](http://itmyhome.com/markdown/article/syntax/emphasis.html)

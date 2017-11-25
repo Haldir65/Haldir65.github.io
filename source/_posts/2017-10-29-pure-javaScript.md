@@ -4,7 +4,7 @@ date: 2017-10-29 22:10:27
 tags: [javaScript,前端]
 ---
 
-论运行速度，在Vanilla JS面前，所有的js library都是渣
+Vanilla JS其实就是原生javascript了。论运行速度，在Vanilla JS面前，所有的js library都要慢很多。
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery04e31f5513d62958957b4caa1d944ae4.jpg?imageView2/2/w/600)
 
 <!--more-->
@@ -29,7 +29,7 @@ tags: [javaScript,前端]
  js中好像没有像java中那种javaBean的特殊的数据类型的存在。
 ES6开始可以使用import和export语法，有类似的效果，[参考](https://stackoverflow.com/questions/34741111/exporting-importing-json-object-in-es6)
 states.js
-```javaScript
+```js
 export default {
   STATES: {
     'AU' : {...},
@@ -52,7 +52,7 @@ import whatever from 'states';
 
 ### 1.2 基本的操作符，dynanic type,函数，变量，oop,class（ES6）,for循环,while这些都有
 - js里面判断两个变量相等的方式，建议一律使用三个等号（严格相等）
-```javaScript
+```js
 var a = 3;
 var b = "3";
 a==b 返回 true
@@ -499,3 +499,4 @@ json【JavaScript Object Notation】
 
 
 ### 参考
+[5 分钟彻底明白 JSONP](https://tonghuashuo.github.io/blog/jsonp.html)

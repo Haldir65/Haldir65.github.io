@@ -5,7 +5,9 @@ tags: [javaScript,Vue,前端]
 ---
 
 Vue Js学习笔记
-![](http://odzl05jxx.bkt.clouddn.com/VueJsLogo.jpg)
+
+![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100775410.jpg?imageView2/2/w/600)
+
 <!--more-->
 
 
@@ -338,6 +340,7 @@ id这个tag唯一的，一个页面不能有两个tag有相同的id，引用的�
 
 
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/1102531047-2.jpg?imageView2/2/w/600)
+![](http://odzl05jxx.bkt.clouddn.com/VueJsLogo.jpg)
 
 ## 参考
 1. [Vue JS 2 Tutorial](https://www.youtube.com/watch?v=5LYrN_cAJoA&list=PL4cUxeGkcC9gQcYgjhBoeQH7wiAyZNrYa)

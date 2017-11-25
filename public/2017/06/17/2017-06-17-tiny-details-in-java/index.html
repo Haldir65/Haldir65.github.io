@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="interesting stuff in java that don’t seem to get enough pubilicity">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/34a7d57ccabb18c69d085247cf009b22.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-11-16T13:47:45.381Z">
+<meta property="og:updated_time" content="2017-11-24T13:59:04.749Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="For those tiny details in Java">
 <meta name="twitter:description" content="interesting stuff in java that don’t seem to get enough pubilicity">
@@ -279,7 +279,10 @@ ga('send', 'pageview');
 <p>其实重点在于看javap -c 生成的字节码</p>
 <h3 id="30-假如没有override-hashCode方法，那么deug里面看到的是什么？"><a href="#30-假如没有override-hashCode方法，那么deug里面看到的是什么？" class="headerlink" title="30. 假如没有override hashCode方法，那么deug里面看到的是什么？"></a>30. 假如没有override hashCode方法，那么deug里面看到的是什么？</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@HotSpotIntrinsicCandidate</span></div><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">native</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span></span>;<span class="comment">//是一个native方法</span></div></pre></td></tr></table></figure>
 <p><a href="https://stackoverflow.com/questions/2237720/what-is-an-objects-hash-code-if-hashcode-is-not-overridden">默认返回内存中的地址</a>，</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<h3 id="31-接口里面放一个接口这种事情也不是没干过"><a href="#31-接口里面放一个接口这种事情也不是没干过" class="headerlink" title="31. 接口里面放一个接口这种事情也不是没干过"></a>31. 接口里面放一个接口这种事情也不是没干过</h3><p>android.content.DialogInterface.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">DialogInterface</span> </span>&#123;    </div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> BUTTON_POSITIVE = -<span class="number">1</span>;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> BUTTON_NEGATIVE = -<span class="number">2</span>;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> BUTTON_NEUTRAL = -<span class="number">3</span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">cancel</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">dismiss</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line">    <span class="class"><span class="keyword">interface</span> <span class="title">OnCancelListener</span> </span>&#123;</div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCancel</span><span class="params">(DialogInterface dialog)</span></span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="class"><span class="keyword">interface</span> <span class="title">OnDismissListener</span> </span>&#123;</div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onDismiss</span><span class="params">(DialogInterface dialog)</span></span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="class"><span class="keyword">interface</span> <span class="title">OnShowListener</span> </span>&#123;</div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onShow</span><span class="params">(DialogInterface dialog)</span></span>;</div><div class="line">    &#125;</div><div class="line">    <span class="class"><span class="keyword">interface</span> <span class="title">OnClickListener</span> </span>&#123;</div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(DialogInterface dialog, <span class="keyword">int</span> which)</span></span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="class"><span class="keyword">interface</span> <span class="title">OnMultiChoiceClickListener</span> </span>&#123;</div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(DialogInterface dialog, <span class="keyword">int</span> which, <span class="keyword">boolean</span> isChecked)</span></span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="class"><span class="keyword">interface</span> <span class="title">OnKeyListener</span> </span>&#123;</div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onKey</span><span class="params">(DialogInterface dialog, <span class="keyword">int</span> keyCode, KeyEvent event)</span></span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>接口里面放常量也行啊</p>
+<h3 id="32-Stuart-Marks又提到了写comparatr时可能出现的错误"><a href="#32-Stuart-Marks又提到了写comparatr时可能出现的错误" class="headerlink" title="32.Stuart Marks又提到了写comparatr时可能出现的错误"></a>32.Stuart Marks又提到了写comparatr时可能出现的错误</h3><p><a href="https://www.youtube.com/watch?v=Enwbh6wpnYs">Comparison Method Violates Its General Contract! (Part 1) by Stuart Marks</a></p>
+<h3 id="33-java也是有二维数组的"><a href="#33-java也是有二维数组的" class="headerlink" title="33. java也是有二维数组的"></a>33. java也是有二维数组的</h3><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="https://www.youtube.com/watch?v=6uroXz5l7Gk">Jake Wharton and Jesse Wilson - Death, Taxes, and HTTP</a></li>
 <li><a href="https://www.youtube.com/watch?v=tfD2uYjzXFo">Android Tech Talk: HTTP In A Hostile World</a></li>
 </ul>
@@ -485,15 +488,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">android</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">android</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -509,7 +508,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -521,7 +520,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">annotation</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -533,15 +540,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -549,11 +548,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">java</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -585,6 +588,10 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
               </li>
              
@@ -593,15 +600,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">transition</a>
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -613,11 +620,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+                <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -625,7 +628,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
             
             <div class="clearfix"></div>

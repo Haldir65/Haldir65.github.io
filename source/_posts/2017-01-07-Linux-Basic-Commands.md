@@ -6,7 +6,9 @@ tags: [置顶,linux,tools]
 top : 1
 ---
 
-一些常用的linux基本命令,仅作为参考。</br>
+一些常用的linux基本命令,仅作为参考。
+>  nohup node server.js > /dev/null 2>&1 &
+
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/bamboo-buds-wallpaper-53859567dd31a.jpg?imageView2/2/w/600)
 
  <!--more-->
@@ -14,7 +16,7 @@ top : 1
 首先是连接vps的ssh(Secure Shell)工具，putty或者xshell都可以,putty改颜色[教程](http://www.cnblogs.com/nayitian/archive/2013/01/18/2866690.html)。
 
 重启 reboot
-关机 shutdown -h now # 
+关机 shutdown -h now #
 或者 halt
 
 ## 速查手册
@@ -586,7 +588,7 @@ sh build.sh
  ./net_speeder venet0:0 "tcp src port 8989"
 
 
- 
+
 
 
  [KVM架构升级内核开启BBR](https://qiujunya.com/linodebbr.html)
