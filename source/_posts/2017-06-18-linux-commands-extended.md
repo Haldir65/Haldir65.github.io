@@ -12,6 +12,10 @@ tags:
 
 <!--more-->
 
+## 速查
+1. [清理大文件](#5-linux删除垃圾文件（小硬盘linux磁盘要经常清理需要的命令）)
+
+
 ### 1. 常用软件安装
 [utorrent](http://blog.topspeedsnail.com/archives/5752)
 apache,mysql
@@ -64,8 +68,19 @@ find / -size +100M：列出所有大于100M的文件，亲测。靠着这个找�
 dpkg --get-selections|grep linux //查找所有的文件，有image的就是内核文件
 sudo apt-get remove 内核文件名 （例如：linux-image-4.4.0-92-generic）
 
+/var/log/btmp 这个文件是记录错误登录的日志，如果开放22端口的话，用不了多久这个文件就会变得很大
+系统 /var/log 下面的文件：btmp, wtmp, utmp 等都是二进制文件，是不可以使用 tail 命令来读取的，[这样会导致终端出错](https://blog.lmlphp.com/archives/212/Modify_sshd_config_file_configuration_to_prevent_the_Linux_var_log_btmp_file_content_size_is_too_large)。一般使用 last 系列命令来读取，如 last, lastb, lastlog。
+
+一个目录下按照文件大小排序
+-  ls -Sralh ## 亲测，从小到大排序出来
+加上-S参数，就可以根据文件的大小进行排序，默认是从大到小的顺序。在此基础上加上参数-r变成-Sr，就可以一自小到大的顺序打印出文件。-l参数表示打印出详细信息。
+
+
+
 ### 6. AWK文本分析工具
 - awk '{print $0}' /etc/passwd # 和cat差不多，显示文本内容
+查看恶意IP试图登录次数：
+- lastb | awk '{ print $3 }' | sort | uniq -c | sort -n  ## 亲测可用,看上去挺吓人的
 
 ### 7.tar命令
 主要是跟压缩和解压文件有关的,[参考](http://man.linuxde.net/tar)
@@ -121,6 +136,7 @@ cat -n rsyslog.conf # 显示行号，报错的时候方便处理
 - ls -lR|grep "^-"|wc -l ##递归一层层往下找的话，加上一个R就可以了
 统计某个目录下的所有js文件：
 - ls -lR /home/user|grep js|wc -l
+- ls -alh ## 亲测，可以显示当前目录下各个文件的大小
 
 ### 15. curl命令
 写shell脚本可能会用到网络交互，curl可以发起网络请求，下载文件，上传文件，cookie处理，断点续传，分段下载,ftp下载文件
@@ -175,6 +191,16 @@ find /u03 -name server.xml -exec grep '9080' {}\;
 简单来说，就是把exec前面的结果执行某项操作，语法上，大括号不能少，反斜杠不能少，分号不能少
 感觉exec和find 命令的xargs差不多
 [xargs命令](http://www.cnblogs.com/peida/archive/2012/11/15/2770888.html)
+
+
+
+
+===============================================================================
+sort命令排序什么的
+
+
+### 19.iptables命令
+用防火墙屏蔽掉指定ip
 
 
 

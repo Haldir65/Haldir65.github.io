@@ -493,6 +493,16 @@ Port 22 (ssh默认端口修改)
 PermitRootLogin without-Password no
 AllowUsers userName
 ```
+把登录端口改大一点还是很有必要的，亲测不难
+```
+vi /etc/ssh/sshd_config
+service ssh restart
+```
+搞定
+
+看下成功登录历史
+- last | less | sort -rn
+
 压缩文件命令
 将/home/video/ 这个目录下所有文件和文件夹打包为当前目录下的video.zip
 
@@ -597,7 +607,7 @@ sh build.sh
 ### 9. 网络监控
 
 
-```
+```shell
 tcpdump -i "venet0:0"  //抓包的
 tcpdump -c 10 //count
 tcpdump -c -A  //Asicii码形式展示出来每个package
