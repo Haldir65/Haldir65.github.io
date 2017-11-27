@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="一些linux的常用命令，linux环境下运行server ,bash的语法">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/ChMkJ1gq00WIXw_GAA47r_8gjqgAAXxJAH8qOMADjvH566.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-11-24T13:59:04.751Z">
+<meta property="og:updated_time" content="2017-11-27T14:34:21.417Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="linux常用命令扩展">
 <meta name="twitter:description" content="一些linux的常用命令，linux环境下运行server ,bash的语法">
@@ -203,6 +203,9 @@ ga('send', 'pageview');
 </blockquote>
 <p><img src="http://odzl05jxx.bkt.clouddn.com/ChMkJ1gq00WIXw_GAA47r_8gjqgAAXxJAH8qOMADjvH566.jpg?imageView2/2/w/600" alt=""></p>
 <a id="more"></a>
+<h2 id="速查"><a href="#速查" class="headerlink" title="速查"></a>速查</h2><ol>
+<li><a href="#5-linux删除垃圾文件（小硬盘linux磁盘要经常清理需要的命令）">清理大文件</a></li>
+</ol>
 <h3 id="1-常用软件安装"><a href="#1-常用软件安装" class="headerlink" title="1. 常用软件安装"></a>1. 常用软件安装</h3><p><a href="http://blog.topspeedsnail.com/archives/5752">utorrent</a><br>apache,mysql<br>没事不要手贱升级软件</p>
 <blockquote>
 <p>apt-get -u upgrade //就像这样，stable挺好的</p>
@@ -220,8 +223,14 @@ ga('send', 'pageview');
 <blockquote>
 <p>uname- a<br>dpkg –get-selections|grep linux //查找所有的文件，有image的就是内核文件<br>sudo apt-get remove 内核文件名 （例如：linux-image-4.4.0-92-generic）</p>
 </blockquote>
+<p>/var/log/btmp 这个文件是记录错误登录的日志，如果开放22端口的话，用不了多久这个文件就会变得很大<br>系统 /var/log 下面的文件：btmp, wtmp, utmp 等都是二进制文件，是不可以使用 tail 命令来读取的，<a href="https://blog.lmlphp.com/archives/212/Modify_sshd_config_file_configuration_to_prevent_the_Linux_var_log_btmp_file_content_size_is_too_large">这样会导致终端出错</a>。一般使用 last 系列命令来读取，如 last, lastb, lastlog。</p>
+<p>一个目录下按照文件大小排序</p>
+<ul>
+<li>ls -Sralh ## 亲测，从小到大排序出来<br>加上-S参数，就可以根据文件的大小进行排序，默认是从大到小的顺序。在此基础上加上参数-r变成-Sr，就可以一自小到大的顺序打印出文件。-l参数表示打印出详细信息。</li>
+</ul>
 <h3 id="6-AWK文本分析工具"><a href="#6-AWK文本分析工具" class="headerlink" title="6. AWK文本分析工具"></a>6. AWK文本分析工具</h3><ul>
-<li>awk ‘{print $0}’ /etc/passwd # 和cat差不多，显示文本内容</li>
+<li>awk ‘{print $0}’ /etc/passwd # 和cat差不多，显示文本内容<br>查看恶意IP试图登录次数：</li>
+<li>lastb | awk ‘{ print $3 }’ | sort | uniq -c | sort -n  ## 亲测可用,看上去挺吓人的</li>
 </ul>
 <h3 id="7-tar命令"><a href="#7-tar命令" class="headerlink" title="7.tar命令"></a>7.tar命令</h3><p>主要是跟压缩和解压文件有关的,<a href="http://man.linuxde.net/tar">参考</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">tar -cvf log.tar log2012.log 仅打包，不压缩！</div><div class="line">tar -zcvf log.tar.gz log2012.log 打包后，以 gzip 压缩</div><div class="line">tar -jcvf log.tar.bz2 log2012.log 打包后，以 bzip2 压缩</div></pre></td></tr></table></figure></p>
 <p>对照手册来看：<br>-c //小写的c，–create，表示创建新的备份文件<br>-v //verbose,显示进度什么的<br>-f 指定备份文件<br>-z –gzip，通过gzip压缩或者解压文件</p>
@@ -249,6 +258,7 @@ ga('send', 'pageview');
 <li>ls -l |grep “^ｄ”|wc -l ##统计当前目录中文件夹的数量</li>
 <li>ls -lR|grep “^-“|wc -l ##递归一层层往下找的话，加上一个R就可以了<br>统计某个目录下的所有js文件：</li>
 <li>ls -lR /home/user|grep js|wc -l</li>
+<li>ls -alh ## 亲测，可以显示当前目录下各个文件的大小</li>
 </ul>
 <h3 id="15-curl命令"><a href="#15-curl命令" class="headerlink" title="15. curl命令"></a>15. curl命令</h3><p>写shell脚本可能会用到网络交互，curl可以发起网络请求，下载文件，上传文件，cookie处理，断点续传，分段下载,ftp下载文件<br>随便写两个：</p>
 <ul>
@@ -267,6 +277,8 @@ ga('send', 'pageview');
 </ul>
 <h3 id="18-missing-argument-to-exec’"><a href="#18-missing-argument-to-exec’" class="headerlink" title="18.  missing argument to `-exec’"></a>18.  missing argument to `-exec’</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">find /u03 -name server.xml -exec grep &apos;9080&apos; &#123;&#125;\;</div></pre></td></tr></table></figure>
 <p>简单来说，就是把exec前面的结果执行某项操作，语法上，大括号不能少，反斜杠不能少，分号不能少<br>感觉exec和find 命令的xargs差不多<br><a href="http://www.cnblogs.com/peida/archive/2012/11/15/2770888.html">xargs命令</a></p>
+<p>===============================================================================<br>sort命令排序什么的</p>
+<h3 id="19-iptables命令"><a href="#19-iptables命令" class="headerlink" title="19.iptables命令"></a>19.iptables命令</h3><p>用防火墙屏蔽掉指定ip</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="http://www.cnblogs.com/peida/archive/2012/12/05/2803591.html">每天一个Linux命令</a></li>
 <li><a href="http://man.linuxde.net/xargs">Linux命令大全</a></li>

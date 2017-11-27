@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&amp;gt;  CacheDispatch  —&amp;gt; NetworkDispatcher  —-&amp;gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/a11f41e0b1df95212c71920b3959cd72.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-07-30T10:43:56.324Z">
+<meta property="og:updated_time" content="2017-11-27T14:33:26.200Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从glide源码到图片加载框架设计思路">
 <meta name="twitter:description" content="glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&amp;gt;  CacheDispatch  —&amp;gt; NetworkDispatcher  —-&amp;gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是">
@@ -297,6 +297,13 @@ ga('send', 'pageview');
 </li>
 </ul>
 <p>根据之前的分析，打印出来的应该是context.getCacheDir+”image_manager_disk_cache”+”/xxxxxx.xxx” ，我没研究过后缀，不过这个后缀没意义吧。</p>
+<ul>
+<li><ol>
+<li>在2017年的Droidcon2017NYC上，有一个演讲提到了关于图片尺寸大小和内存关系。大致情形就是在使用加载图片的时候，使用了一张3594pixel<em>5421pixel(1900万像素)的图片（内存占用19million pixels X 4 bytes/pixel = 78MB），填进了一个50dp</em>50dp的avatar中。而如果使用和ImageView大小一样的图片源的话(150pxX150px)，只需要90kb。这之间的内存消耗差异几乎是1000倍。这位speaker说的解决方案是请求图片是加上宽度和高度参数，或者调用Picasso的fit方法。目前看来，Glide从onSizeReady之后获取资源的每一步，读取缓存，读磁盘，解码图片这些过程都带上了width和height参数，所以应该也是不存在这种浪费内存的问题</li>
+</ol>
+</li>
+</ul>
+<p>-</p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
 <li>4层缓存（MemoryCache是内存中的一层，activeResources是一层（HashMap）,cacheService和SourceService这俩线程池干活需要一个DiskLruCache，另外decode还有一个bitmapPool，其实这不算缓存吧）。</li>
 <li>默认的缓存大小考虑了屏幕尺寸和可用内存大小，科学合理。线程池的keepAlive数量上，一个是可用cpu核心数，所以快吧，一个是1。</li>

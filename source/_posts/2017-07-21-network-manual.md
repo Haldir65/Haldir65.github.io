@@ -196,6 +196,38 @@ Header其实就是个字典，比较麻烦的就是Cache-Control了，这个还�
 [浏览器对于缓存的实际处理](http://www.jianshu.com/p/fd00f0d02f5f)，是否过期由Cache-Control标识的max-age和Expires判断。Cache-Control的优先级较高。[From Chrome](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=zh-cn)
 简单来说就是先看客户端是否Expire，然后去服务器看下Etag,最后看Last-Modified那个。
 
+
+补上一个http statuscode = 302的实际例子吧，今晚看腾讯新闻的时候抓到的
+```
+Request URL:http://tdd.3g.qq.com/17421/e8475fe7-7418-43bf-9be7-c6b116730cac.gif?a=0.33637654883709955&b=1511790303321
+Request Method:GET
+Status Code:302 Found
+Remote Address:123.151.152.123:80
+Referrer Policy:no-referrer-when-downgrade
+
+
+Request Header
+Accept:image/webp,image/apng,image/*,*/*;q=0.8
+Accept-Encoding:gzip, deflate
+Accept-Language:zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7
+Connection:keep-alive
+Cookie:XX=SDSDSADSA0; SADSAD=21FDGFDGF; //cookie是我编的
+DNT:1
+Host:tdd.3g.qq.com
+Referer:http://new.qq.com/omn/20171127A0OHHD00
+User-Agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.62 Safari/537.36
+
+Response Header
+Cache-Control:max-age=0
+Connection:close
+Content-Length:0
+Date:Mon, 27 Nov 2017 13:45:04 GMT
+Expires:Mon, 27 Nov 2017 13:45:04 GMT
+Location:http://210.22.248.167/tdd.3g.qq.com/17421/e8475fe7-7418-43bf-9be7-c6b116730cac.gif?mkey=5a1c30156df5812a&f=4f20&c=0&a=0.33637654883709955&b=1511790303321&p=.gif //注意这个新的location
+Server:nws 1.2.15
+```
+
+
 ## 4. Cookie和Session
 
 ### 4.1 Cookie

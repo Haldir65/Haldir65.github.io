@@ -763,7 +763,9 @@ Glide.with(itemView.getContext())
 ```
 根据之前的分析，打印出来的应该是context.getCacheDir+"image_manager_disk_cache"+"/xxxxxx.xxx" ，我没研究过后缀，不过这个后缀没意义吧。
 
+- 5. 在2017年的Droidcon2017NYC上，有一个演讲提到了关于图片尺寸大小和内存关系。大致情形就是在使用加载图片的时候，使用了一张3594pixel*5421pixel(1900万像素)的图片（内存占用19million pixels X 4 bytes/pixel = 78MB），填进了一个50dp*50dp的avatar中。而如果使用和ImageView大小一样的图片源的话(150pxX150px)，只需要90kb。这之间的内存消耗差异几乎是1000倍。这位speaker说的解决方案是请求图片是加上宽度和高度参数，或者调用Picasso的fit方法。目前看来，Glide从onSizeReady之后获取资源的每一步，读取缓存，读磁盘，解码图片这些过程都带上了width和height参数，所以应该也是不存在这种浪费内存的问题
 
+-
 
 ## 总结
 - 4层缓存（MemoryCache是内存中的一层，activeResources是一层（HashMap）,cacheService和SourceService这俩线程池干活需要一个DiskLruCache，另外decode还有一个bitmapPool，其实这不算缓存吧）。
