@@ -170,15 +170,10 @@ curl -v mail.qq.com
 ```
 http 302的意思也就说明qq邮箱已经把http重定向到别的地方的
 
-
-
-
 ### 16. 搭建samba服务器
 这个主要是用来从windows上访问linux主机上的文件的
 - sudo apt-get install samba
 剩下的就是设定要分享的目录，给权限，设定访问密码，启动服务这些了[教程](http://www.cnblogs.com/gzdaijie/p/5194033.html)
-
-
 
 ### 17. tee命令
 - echo $(date) | tee -a date.log
@@ -187,23 +182,42 @@ tee命令能够吧程序的输出输出到stdo,同时还能将输出写进文件
 ### 18.  missing argument to \`-exec'
 ```shell
 find /u03 -name server.xml -exec grep '9080' {}\;
+find . -type f -exec ls -l {} \; ## exec执行删除之前最好先打印出来，避免删错了
+find . -type f -mtime +14 -exec rm {} \;
 ```
+exec是和find一起使用的，分号是要执行的命令的终止标志，前面得加上斜杠。
 简单来说，就是把exec前面的结果执行某项操作，语法上，大括号不能少，反斜杠不能少，分号不能少
 感觉exec和find 命令的xargs差不多
 [xargs命令](http://www.cnblogs.com/peida/archive/2012/11/15/2770888.html)
+[exec命令](http://www.cnblogs.com/peida/archive/2012/11/14/2769248.html)
 
-
-
-
-===============================================================================
+### 19. sort命令
 sort命令排序什么的
+```
+ls -al | sort -n ## 按照文件名ASCII码值进行比较
+ls -al | sort -rn ## 按照文件名倒序排序
+du -hsBM ./* | sort -n  ##查看当前目录下所有文件，从小到大排序
+```
+-u(unique)是忽略相同行，查找登录记录的时候有用
+-t 指定按照栏和栏之间的分隔符
+
+### 20. history命令
+```
+history ## 列出曾经执行过的命令
+!99 ##执行上面列表中第99条命令
+!! ##执行上一条命令
+history 10 ##列出最近执行的10条命令
+```
+===============================================================================
 
 
 ### 19.iptables命令
 用防火墙屏蔽掉指定ip
 
 
-
+[装java](https://www.digitalocean.com/community/tutorials/how-to-install-java-with-apt-get-on-ubuntu-16-04)
+[装Jenkins](https://www.digitalocean.com/community/tutorials/how-to-install-jenkins-on-ubuntu-16-04)
+Could not find or load main class的问题
 
 ## 参考
 - [每天一个Linux命令](http://www.cnblogs.com/peida/archive/2012/12/05/2803591.html)

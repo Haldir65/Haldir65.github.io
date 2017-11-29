@@ -42,6 +42,7 @@ top : 1
 - > cd /  返回根目录
 - > pwd // 显示当前目录
 - > ls // 显示当前目录下内容
+# ls -halt is for human readable, show hidden, print details, sort by date
 
 - > mkdir //新建目录
 - > rmdir //删除目录,如果目录不为空，
@@ -120,10 +121,6 @@ Vi分为命令模式和编辑模式，一进来是命令模式，输入'a'进入
 在编辑模式下,输入 'dd'删除一行 ，输入'dw'删除一个词
 输入'o'插入一行。。。。。。
 
-
-
-
-
 ```shell
 - > more filename//查看文件内容
 
@@ -133,9 +130,7 @@ Vi分为命令模式和编辑模式，一进来是命令模式，输入'a'进入
 
 - > head - 3 filename //只查看文件前面三行
 - > tail - 3 filename //只查看倒数后三行
-
-
-
+- > xxd -b fileName // 看binaryFile不能用cat
 ```
 
 
@@ -471,7 +466,7 @@ du -h //查看当前目录下各个子目录分别的大小
 dh -h img// 查看img目录下文件及文件夹的大小
 dh -h img/1.jpg //查看指定文件的大小
 du -hsBM //查看当前目录的大小(s表示summary)，以MB为单位
-du -hsBM /var/* | sort -n //该目录下全部文件，从小到大排列
+du -hsBM /var/* | sort -n //查看/var目录下全部文件，从小到大排列
 ````
 
 查看cpu信息

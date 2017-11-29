@@ -48,3 +48,4 @@ Xposed的原理与Multidex及动态加载问题
 
 ## 参考
 [分析DroidPlugin，深入理解插件化框架](https://github.com/tiann/understand-plugin-framework)
+[逆向大全](http://www.wjdiankong.cn/)
