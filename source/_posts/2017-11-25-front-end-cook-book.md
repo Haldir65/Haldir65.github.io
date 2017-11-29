@@ -27,6 +27,14 @@ p tag 里面能够放一个小的Strong tag
 ## jQuery要点
 ## Vue知识点
 
+atom的emmet插件很好用
+比如想要创建一个
+```html
+<div class='test'></div>
+```
+只需要输入div.test或者.test然后按tab键
+[好玩的Atom插件](https://www.youtube.com/watch?v=aiXNKHKWlmY)
+minimap,emmet,file icons，atom liveserver,atom beautify
 
 ## 参考
 

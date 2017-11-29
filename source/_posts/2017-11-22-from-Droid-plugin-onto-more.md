@@ -35,7 +35,15 @@ onSaveInstance是从ActivityThread的callCallActivityOnSaveInstanceState方法di
 
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery2a2241cc5c1278cf7a28f15f91dbbb7f.jpg?imageView2/2/w/600)
 
+=-============================-============================-============================-=========================
+adb getEvent sendEvent
+input tap x y
+input touchescreen
+input text helloworld
+input keyevent
 
+Xposed的介绍与入门
+Xposed的原理与Multidex及动态加载问题
 
 
 ## 参考
