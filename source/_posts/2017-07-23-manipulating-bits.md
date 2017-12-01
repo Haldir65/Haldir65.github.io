@@ -142,7 +142,7 @@ int n = -1;
 System.out.println((n ^ (n >> 31)) - (n >> 31));
 /* n>>31 取得n的符号，若n为正数，n>>31等于0，若n为负数，n>>31等于-1
 若n为正数 n^0-0数不变，若n为负数n^-1 需要计算n和-1的补码，异或后再取补码，
-结果n变号并且绝对值减1，再减去-1就是绝对值 */
+结果n变号并且绝对值减1，再减去-1就是绝对值
 
 // 11. 取两个数的最大值（某些机器上，效率比a>b ? a:b高）
 System.out.println(b&((a-b)>>31) | a&(~(a-b)>>31));
@@ -152,6 +152,24 @@ System.out.println(a&((a-b)>>31) | b&(~(a-b)>>31));
 
 // 13. 判断符号是否相同(true 表示 x和y有相同的符号， false表示x，y有相反的符号。)
 System.out.println((a ^ b) > 0);
+所以在Android的View.java中
+```java
+void setFlags(int flags, int mask) {
+      final boolean accessibilityEnabled =
+              AccessibilityManager.getInstance(mContext).isEnabled();
+      final boolean oldIncludeForAccessibility = accessibilityEnabled && includeForAccessibility();
+
+      int old = mViewFlags;
+      mViewFlags = (mViewFlags & ~mask) | (flags & mask);
+
+      int changed = mViewFlags ^ old; //如果和旧的flag一致，直接return
+      if (changed == 0) {
+          return;
+      }
+    // 以下省略、、、、、、、
+    }
+```
+
 
 // 14. 计算2的n次方 n > 0
 System.out.println(2<<(n-1));
@@ -182,11 +200,16 @@ n再和这个数做与运算*/
 
 ## 结束
 1. 记得Chet Haase和Romain Guy曾经在2013年的一次[演讲](https://www.youtube.com/watch?v=Ho-anLsWvJo)中提到,Android中View内部使用了3个int来表示70多个Flags。如果换做boolean(4byte大小)的话，就需要接近300bytes。由于View在Application中被广泛（成百上千）使用，framework这样做事实上为开发者节约了相当多的内存。
+View.java里面放了好几个flags。
 android.view.View.java
-```
-int mPrivateFlags;
-int mPrivateFlags2;
-int mPrivateFlags3;
+```java
+/* @hide */
+   public int mPrivateFlags;
+   int mPrivateFlags2;
+   int mPrivateFlags3;
+
+   // The view flags hold various views states.
+   int mViewFlags;
 ```
 int中的每一个bit都成为一个boolean，一共只用了12bytes(96bits)的内存.和300bytes相比，节省的内存总量还是相当可观的。
 一个onClickListener大概500bytes

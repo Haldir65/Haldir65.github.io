@@ -36,6 +36,8 @@ atom的emmet插件很好用
 [好玩的Atom插件](https://www.youtube.com/watch?v=aiXNKHKWlmY)
 minimap,emmet,file icons，atom liveserver,atom beautify
 
+atom中输入vue,会自动提示生成vue模板,输入re会生成react Boilplate。前提是在js,vue,html文件中。
+
 ## 参考
 
 
