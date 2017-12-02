@@ -208,11 +208,30 @@ history ## 列出曾经执行过的命令
 !! ##执行上一条命令
 history 10 ##列出最近执行的10条命令
 ```
+
+### 21. 使用sshKeyGen免密码登录的方式
+首先在windows上安装putty，默认会装上puttyGen。
+在开始菜单里面总归能找到。
+点击那个generate按钮，按照提示鼠标不停挪动，进度条走完。会生成公钥，点击Save private key生成私钥。提示保存在一个文件中，这个要保存好。
+密码登录到服务器端，cd到~/.ssh/文件夹下，没有就mkdir一个，创建一个authorized_keys的文件，要是本来就有，echo > autorized_keys，把内容清除干净。
+把自己刚才生成的public key粘贴进去，保存文件。
+看下/etc/ssh/sshd_config中是否符合如下描述如下条件
+> RSAAuthentication yes
+PubkeyAuthentication yes
+PermitRootLogin yes
+
+
+重启ssh服务： service sshd restart
+putty登录窗口左侧又一个loggin-auth，进去选择自己windows上刚才保存的私钥文件。登录输入账户名即可自动登录成功。
+[PUTTYGEN - KEY GENERATOR FOR PUTTY ON WINDOWS](https://www.ssh.com/ssh/putty/windows/puttygen)
 ===============================================================================
 
 
 ### 19.iptables命令
 用防火墙屏蔽掉指定ip
+
+ls -al = l -al（可以少敲一个字母）
+
 
 
 [装java](https://www.digitalocean.com/community/tutorials/how-to-install-java-with-apt-get-on-ubuntu-16-04)
