@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="位运算的好处至少有两点，由于是直接操作bit,没有任何包装类，速度快。另外一个就是节省内存了。">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/8af185ed137a586be732d63425d8bcb8.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-12-01T14:12:30.333Z">
+<meta property="og:updated_time" content="2017-12-03T10:12:00.164Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="位运算总结">
 <meta name="twitter:description" content="位运算的好处至少有两点，由于是直接操作bit,没有任何包装类，速度快。另外一个就是节省内存了。">
@@ -243,9 +243,16 @@ ga('send', 'pageview');
 <p>int中的每一个bit都成为一个boolean，一共只用了12bytes(96bits)的内存.和300bytes相比，节省的内存总量还是相当可观的。<br>一个onClickListener大概500bytes<br>所以View.java中到处是这样的奇怪的Flags<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setDrawingCacheEnabled</span><span class="params">(<span class="keyword">boolean</span> enabled)</span> </span>&#123;</div><div class="line">      mCachingFailed = <span class="keyword">false</span>;</div><div class="line">      setFlags(enabled ? <span class="number">0x00008000</span> : <span class="number">0</span>, <span class="number">0x00008000</span>);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="meta">@ViewDebug</span>.ExportedProperty(category = <span class="string">"drawing"</span>)</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isDrawingCacheEnabled</span><span class="params">()</span> </span>&#123;</div><div class="line">      <span class="keyword">return</span> (mViewFlags &amp; <span class="number">0x00008000</span>) == <span class="number">0x00008000</span>;</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
 <p>除了省内存，位运算速度快也有一定的好处。</p>
 <ol>
-<li><p>来看看Android中的ViewGroup是怎么干的</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Set by default</span></div><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FLAG_CLIP_CHILDREN = <span class="number">0x1</span>;   <span class="comment">//二进制的1</span></div><div class="line"></div><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FLAG_CLIP_TO_PADDING = <span class="number">0x2</span>; <span class="comment">//二进制的10</span></div><div class="line"></div><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FLAG_INVALIDATE_REQUIRED  = <span class="number">0x4</span>; <span class="comment">//二进制 100</span></div><div class="line"></div><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FLAG_RUN_ANIMATION = <span class="number">0x8</span>; <span class="comment">//二进制1000</span></div><div class="line"></div><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FLAG_ANIMATION_DONE = <span class="number">0x10</span>; <span class="comment">//二进制 10000</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FLAG_PADDING_NOT_NULL = <span class="number">0x20</span>;<span class="comment">//二进制 100000</span></div><div class="line"></div><div class="line"><span class="comment">/** <span class="doctag">@deprecated</span> - functionality removed */</span></div><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FLAG_ANIMATION_CACHE = <span class="number">0x40</span>;<span class="comment">//二进制 1000000</span></div><div class="line"></div><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FLAG_OPTIMIZE_INVALIDATE = <span class="number">0x80</span>;<span class="comment">//二进制 10000000</span></div><div class="line"></div><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FLAG_CLEAR_TRANSFORMATION = <span class="number">0x100</span>;<span class="comment">//二进制 100000000</span></div><div class="line"></div><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FLAG_NOTIFY_ANIMATION_LISTENER = <span class="number">0x200</span>;<span class="comment">//二进制 1000000000</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">protected</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FLAG_USE_CHILD_DRAWING_ORDER = <span class="number">0x400</span>;<span class="comment">//二进制 10000000000</span></div><div class="line"></div><div class="line"><span class="comment">//还有更多。</span></div><div class="line"></div><div class="line"><span class="keyword">if</span> ((flags &amp; FLAG_INVALIDATE_REQUIRED) == FLAG_INVALIDATE_REQUIRED) &#123;</div><div class="line">  <span class="comment">//按为与 两个都为1才为1，所以只有当前flag小于FLAG_INVALIDATE_REQUIRED的时候这个表达式才成立</span></div><div class="line">          invalidate(<span class="keyword">true</span>);</div><div class="line">      &#125;</div></pre></td></tr></table></figure>
+<li>来看看Android中的ViewGroup是怎么干的<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Set by default</span></div><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FLAG_CLIP_CHILDREN = <span class="number">0x1</span>;   <span class="comment">//二进制的1</span></div><div class="line"></div><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FLAG_CLIP_TO_PADDING = <span class="number">0x2</span>; <span class="comment">//二进制的10</span></div><div class="line"></div><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FLAG_INVALIDATE_REQUIRED  = <span class="number">0x4</span>; <span class="comment">//二进制 100</span></div><div class="line"></div><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FLAG_RUN_ANIMATION = <span class="number">0x8</span>; <span class="comment">//二进制1000</span></div><div class="line"></div><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FLAG_ANIMATION_DONE = <span class="number">0x10</span>; <span class="comment">//二进制 10000</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FLAG_PADDING_NOT_NULL = <span class="number">0x20</span>;<span class="comment">//二进制 100000</span></div><div class="line"></div><div class="line"><span class="comment">/** <span class="doctag">@deprecated</span> - functionality removed */</span></div><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FLAG_ANIMATION_CACHE = <span class="number">0x40</span>;<span class="comment">//二进制 1000000</span></div><div class="line"></div><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FLAG_OPTIMIZE_INVALIDATE = <span class="number">0x80</span>;<span class="comment">//二进制 10000000</span></div><div class="line"></div><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FLAG_CLEAR_TRANSFORMATION = <span class="number">0x100</span>;<span class="comment">//二进制 100000000</span></div><div class="line"></div><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FLAG_NOTIFY_ANIMATION_LISTENER = <span class="number">0x200</span>;<span class="comment">//二进制 1000000000</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">protected</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FLAG_USE_CHILD_DRAWING_ORDER = <span class="number">0x400</span>;<span class="comment">//二进制 10000000000</span></div><div class="line"></div><div class="line"><span class="comment">//还有更多。</span></div><div class="line"></div><div class="line"><span class="keyword">if</span> ((flags &amp; FLAG_INVALIDATE_REQUIRED) == FLAG_INVALIDATE_REQUIRED) &#123;</div><div class="line">  <span class="comment">//按为与 两个都为1才为1，所以只有当前flag小于FLAG_INVALIDATE_REQUIRED的时候这个表达式才成立</span></div><div class="line">          invalidate(<span class="keyword">true</span>);</div><div class="line">      &#125;</div></pre></td></tr></table></figure>
 </li>
+</ol>
+<p><a href="https://stackoverflow.com/questions/7415590/java-integer-flag-and-bitwise-operations-for-memory-reduction">java-integer-flag-and-bitwise-operations-for-memory-reduction</a>stackoverflow上有人回答了关于用一个int的flag替代32个boolean的利弊。要点如下:</p>
+<blockquote>
+<p>大多数jvm implementation都以一个int的方式存储boolean<br>如果一个class里面滥用一大堆boolean，但这个class的实例不过几百个，那么也不会有什么影响<br>位运算对于cpu来说非常快<br>jdk提供了BitSet，属于一种开箱即用的bit操作工具</p>
+</blockquote>
+<p>下面是google 关键词 int flag找到的一段java代码。这是代表各种state之间互斥的。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> UPPERCASE = <span class="number">1</span>;  <span class="comment">// 0001</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> REVERSE   = <span class="number">2</span>;  <span class="comment">// 0010</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FULL_STOP = <span class="number">4</span>;  <span class="comment">// 0100</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> EMPHASISE = <span class="number">8</span>;  <span class="comment">// 1000</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> ALL_OPTS  = <span class="number">15</span>; <span class="comment">// 1111</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">format</span><span class="params">(String value, <span class="keyword">int</span> flags)</span></div><div class="line"></span>&#123;</div><div class="line">    <span class="keyword">if</span> ((flags &amp; UPPERCASE) == UPPERCASE) value = value.toUpperCase();</div><div class="line"></div><div class="line">    <span class="keyword">if</span> ((flags &amp; REVERSE) == REVERSE) value = <span class="keyword">new</span> StringBuffer(value).reverse().toString();</div><div class="line"></div><div class="line">    <span class="keyword">if</span> ((flags &amp; FULL_STOP) == FULL_STOP) value += <span class="string">"."</span>;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> ((flags &amp; EMPHASISE) == EMPHASISE) value = <span class="string">"~*~ "</span> + value + <span class="string">" ~*~"</span>;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> value;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>可以想象的是，View中一个int，32个小槽子(bit)，每一位都能用来代表isSelected,isFocused,XXX等属性。<br>检查是否有某个flag只需要<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BitFlags</span></div><div class="line"></span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">isFlagSet</span><span class="params">(<span class="keyword">byte</span> value, <span class="keyword">byte</span> flags)</span></div><div class="line">    </span>&#123;</div><div class="line">        <span class="keyword">return</span> (flags &amp; value) == value;<span class="comment">//和上面的FLAG_INVALIDATE_REQUIRED一模一样</span></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">byte</span> <span class="title">setFlag</span><span class="params">(<span class="keyword">byte</span> value, <span class="keyword">byte</span> flags)</span></div><div class="line">    </span>&#123;</div><div class="line">        <span class="keyword">return</span> (<span class="keyword">byte</span>) (flags | value);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">byte</span> <span class="title">unsetFlag</span><span class="params">(<span class="keyword">byte</span> value, <span class="keyword">byte</span> flags)</span></div><div class="line">    </span>&#123;</div><div class="line">        <span class="keyword">return</span> (<span class="keyword">byte</span>) (flags &amp; ~value);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<ol>
 <li><p>不要迷信位运算，对于一些简单的操作，现代编译器还是能够帮助开发者自动做好优化的。</p>
 </li>
 <li><p>从java7开始，可以在java代码里<a href="https://www.bbsmax.com/A/xl569bA1Jr/">直接写二进制，八进制，十六进制的数字了</a></p>
@@ -492,7 +499,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
+                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -500,11 +507,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -512,11 +515,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">linux</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">tools</a>
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -524,11 +523,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+                <a href="javascript:void(0)" class="js-tag color1">tools</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -537,6 +540,10 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">linux</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -580,15 +587,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
+                <a href="javascript:void(0)" class="js-tag color1">transition</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -600,15 +607,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">transition</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">service</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
             
             <div class="clearfix"></div>
