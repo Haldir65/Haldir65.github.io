@@ -263,6 +263,54 @@ int中的每一个bit都成为一个boolean，一共只用了12bytes(96bits)的�
          }
 
 ```
+[java-integer-flag-and-bitwise-operations-for-memory-reduction](https://stackoverflow.com/questions/7415590/java-integer-flag-and-bitwise-operations-for-memory-reduction)stackoverflow上有人回答了关于用一个int的flag替代32个boolean的利弊。要点如下:
+> 大多数jvm implementation都以一个int的方式存储boolean
+> 如果一个class里面滥用一大堆boolean，但这个class的实例不过几百个，那么也不会有什么影响
+> 位运算对于cpu来说非常快
+> jdk提供了BitSet，属于一种开箱即用的bit操作工具
+
+下面是google 关键词 int flag找到的一段java代码。这是代表各种state之间互斥的。
+```java
+public static final int UPPERCASE = 1;  // 0001
+public static final int REVERSE   = 2;  // 0010
+public static final int FULL_STOP = 4;  // 0100
+public static final int EMPHASISE = 8;  // 1000
+public static final int ALL_OPTS  = 15; // 1111
+
+public static String format(String value, int flags)
+{
+    if ((flags & UPPERCASE) == UPPERCASE) value = value.toUpperCase();
+
+    if ((flags & REVERSE) == REVERSE) value = new StringBuffer(value).reverse().toString();
+
+    if ((flags & FULL_STOP) == FULL_STOP) value += ".";
+
+    if ((flags & EMPHASISE) == EMPHASISE) value = "~*~ " + value + " ~*~";
+
+    return value;
+}
+```
+可以想象的是，View中一个int，32个小槽子(bit)，每一位都能用来代表isSelected,isFocused,XXX等属性。
+检查是否有某个flag只需要
+```java
+public class BitFlags
+{
+    public static boolean isFlagSet(byte value, byte flags)
+    {
+        return (flags & value) == value;//和上面的FLAG_INVALIDATE_REQUIRED一模一样
+    }
+
+    public static byte setFlag(byte value, byte flags)
+    {
+        return (byte) (flags | value);
+    }
+
+    public static byte unsetFlag(byte value, byte flags)
+    {
+        return (byte) (flags & ~value);
+    }
+}
+```
 
 
 

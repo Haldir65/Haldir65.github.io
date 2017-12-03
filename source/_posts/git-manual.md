@@ -200,6 +200,11 @@ git push --force
 - git add . && git commit -m "stuff" && git push
 一部搞定，前提是每一步都得成功，原理就是bash脚本的&&和||操作符。
 
+## 15. git-error-please-make-sure-you-have-the-correct-access-rights-and-the-reposito
+总会有不小心的时候把本地的sshkey干掉了，解决方法就是本地生成sshkey，然后粘贴到你的github或者gitlab网站上
+> ssh-keygen ## 这个基本上在网上都能找到，可以传参数，生成的文件名，密码什么的
+> cat ~/.ssh/id_rsa.pub | clip ## 中间的管道是把内容搞到剪切板上，clip是windows上的命令
+> ## 去粘贴吧
 
 ## Reference
 -[git reset和revert](http://yijiebuyi.com/blog/8f985d539566d0bf3b804df6be4e0c90.html)
