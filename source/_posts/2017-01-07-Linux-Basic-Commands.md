@@ -592,12 +592,35 @@ sh build.sh
 前提是切换到net-speeder的目录下
  ./net_speeder venet0:0 "tcp src port 8989"
 
-
-
-
-
  [KVM架构升级内核开启BBR](https://qiujunya.com/linodebbr.html)
+
+
 ```
+[ubuntu 16.4安装shadowsocks-libev](http://www.itfanr.cc/2016/10/02/use-shadowsocks-to-have-better-internet-experience/)
+ 参考github[官方教程](https://github.com/shadowsocks/shadowsocks-libev)安装
+>
+sudo apt-get install software-properties-common -y
+sudo add-apt-repository ppa:max-c-lv/shadowsocks-libev -y
+sudo apt-get update
+sudo apt install shadowsocks-libev
+>
+# Edit the configuration file
+sudo vi /etc/shadowsocks-libev/config.json ## 这里记得把server address改成实际的ip
+>
+# Edit the default configuration for debian
+sudo vi /etc/default/shadowsocks-libev
+>
+# Start the service
+sudo /etc/init.d/shadowsocks-libev start    # for sysvinit, or
+sudo systemctl start shadowsocks-libev      # for systemd
+
+>加入开机启动
+在/etc/rc.local中加入
+sudo /etc/init.d/shadowsocks-libev start
+
+其实跟安装ss很像的
+
+
 
 ### 9. 网络监控
 

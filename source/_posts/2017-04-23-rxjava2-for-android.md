@@ -488,3 +488,4 @@ Reactive programming allow us to model it in the proper way: asynchronously. Emb
 
 -- [GOTO 2016 • Exploring RxJava 2 for Android • Jake Wharton - YouTube](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=6&cad=rja&uact=8&ved=0ahUKEwjlvrfg8bnTAhUI0mMKHcXZC1MQtwIITDAF&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DhtIXKI5gOQU&usg=AFQjCNEYczqXGkjYXOUbovtP1CxDPARcXA&sig2=gmLYEd2cVOhI7C2WjOHr9g)
 -- [掘金](https://juejin.im/entry/5a025b3b51882561a3265bb7)
+-- [使用concat从数据库，内存，网络三层中获取数据](http://www.jianshu.com/p/6f3b6b934787)
