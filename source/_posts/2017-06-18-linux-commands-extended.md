@@ -30,19 +30,34 @@ apache,mysql
 看下哪个命令对应的位置在哪里
 which XXXk
 比如sudo 就放在 /usr/bin/sudo
-```
+
 
 > $PATH
 环境变量修改在~./bashrc或者 ~./profile里面
 具体来说，比如要把/etc/apache/bin目录添加到PATH中
 PATH=$PATH:/etc/apache/bin  #只对本次回话有效
 或者  PATH=$PATH:/etc/apache/bin #在~./bashrc或者~./profile里面添加这句话
+```
+
 
 ### 3. alias设置
+查看已经设置过的alias：  alias或者 alias -p
 vi 中输入 /XXX 可以搜索
-vi ~/.bashrc
-添加 alias yourcommand='ls -alr'
+```shell
+vi ~/.bashrc  ## 这个是对当前用户生效的
+/etc/bashrc 写到文件这里面是对所有用户生效
+alias yourcommand='ls -alr' ##添加这一行，原来的命令也照样用
+```
 重开session即可生效
+急着要想马上生效可以
+source ~/.bashrc ## source命令其实就是执行一个脚本
+
+据说alias是可以传参数的，不过加上> /dev/null 2>&1 & 就不行了。所以还是写个script算了。
+```shell
+#!/bin/bash
+kwrite $1 > /dev/null 2>&1 &
+```
+然后chomod 755 fileName
 
 ### 4. pushd和popd（类似于文件夹stack）
 
@@ -216,14 +231,18 @@ history 10 ##列出最近执行的10条命令
 密码登录到服务器端，cd到~/.ssh/文件夹下，没有就mkdir一个，创建一个authorized_keys的文件，要是本来就有，echo > autorized_keys，把内容清除干净。
 把自己刚才生成的public key粘贴进去，保存文件。
 看下/etc/ssh/sshd_config中是否符合如下描述如下条件
-> RSAAuthentication yes
+```
+RSAAuthentication yes
 PubkeyAuthentication yes
 PermitRootLogin yes
-
+```
 
 重启ssh服务： service sshd restart
-putty登录窗口左侧又一个loggin-auth，进去选择自己windows上刚才保存的私钥文件。登录输入账户名即可自动登录成功。
+putty登录窗口左侧有一个loggin-auth，进去选择自己windows上刚才保存的私钥文件。登录输入账户名即可自动登录成功。
 [PUTTYGEN - KEY GENERATOR FOR PUTTY ON WINDOWS](https://www.ssh.com/ssh/putty/windows/puttygen)
+
+
+Mere trash
 ===============================================================================
 
 

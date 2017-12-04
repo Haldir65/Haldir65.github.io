@@ -30,7 +30,7 @@ top : 1
 8. [SS相关的命令](#8-SS相关的命令)
 9. [网络监控](#9-网络监控)
 10. [查看进程](#10-查看进程)
-11.[通用配置](#11-常用配置)
+11. [通用配置](#11-常用配置)
 
 [参考](#参考)
 
@@ -80,10 +80,11 @@ rename是实际意义上的重命名命令，但rename接受三个参数
 
 
 
-###重定向
+### 重定向
 
 ```
 重定向输出 >
+
 ls  > lsoutput.txt #用于将输出的结果写入一个新的文本文件中
 echo 'hey man' # 类似于print
 echo 'hello' > log.txt #把这句话写入到文本中 ，覆盖其原有内容
@@ -291,7 +292,7 @@ chown -R Jane /foldername # 把flodername文件夹的所有者改为Jane， -R �
 
 更改文件所有者
 
-- > chown username filename
+> chown username filename
 
 
 ### 6. 管道
@@ -311,8 +312,8 @@ $ ls -l | grep "^d" //只列出目录
 
 
 > git clone下来
-cd across
-wget -qO- bench.sh | bash （亲测可用，也可以自己看Readme）
+> cd across
+> wget -qO- bench.sh | bash （亲测可用，也可以自己看Readme）
 或者 > curl -Lso- bench.sh | bash
 
 
@@ -459,7 +460,7 @@ Softlayer, HongKong, CN         119.81.130.170          35.2MB/s
 
 
 查看硬盘存储空间:
-````
+```shell
 df -h //h的意思是human-readable
 du -sh //查看当前directory的大小
 du -h //查看当前目录下各个子目录分别的大小
@@ -467,8 +468,8 @@ dh -h img// 查看img目录下文件及文件夹的大小
 dh -h img/1.jpg //查看指定文件的大小
 du -hsBM //查看当前目录的大小(s表示summary)，以MB为单位
 du -hsBM /var/* | sort -n //查看/var目录下全部文件，从小到大排列
-````
-
+```
+```
 查看cpu信息
 > cat /proc/cpuinfo
 
@@ -479,11 +480,10 @@ free -h # human readable
 
 修改默认安全设置
 > vi /etc/ssh/ssd_config
-
+```
 
 添加或修改
-
-```
+```shell
 Port 22 (ssh默认端口修改)
 PermitRootLogin without-Password no
 AllowUsers userName
@@ -496,26 +496,28 @@ service ssh restart
 搞定
 
 看下成功登录历史
+```shell
 - last | less | sort -rn
+```
 
 压缩文件命令
 将/home/video/ 这个目录下所有文件和文件夹打包为当前目录下的video.zip
-
+```
 zip –q –r -v video.zip . #加上一个-v主要是为了能够实时查看输出
-
-
+```
 文件传输（linux ->windows）： 一般使用putty ssh到Linux主机，想要把Linux上的文件弄到Windows中，需要使用pscp工具。下载好pscp.exe后，放到c:/windows/system32下面。打开cmd。输入命令
-pscp -r root@202.123.123.123:"/root/fileonServer.mp4" d:/whateveriwantonmyPc.mp4  ，确认后输入root密码就好了。我主要是用来下载视频的。
+```shell
+ pscp -r root@202.123.123.123:"/root/fileonServer.mp4" d:/whateveriwantonmyPc.mp4  
+```
+ ，确认后输入root密码就好了。我主要是用来下载视频的。
 有时候会出现Connection Refused Error。
+```shell
 > netstat -anp | grep sshd
-
+```
 
 看下跑在哪个端口
 然后
-> pscp -P 12345-r root@202.123.123.123:"/root/fileonServer.mp4" d:/whateveriwantonmyPc.mp4  -p要大写
-
-
-
+> pscp -P 12345-r root@202.123.123.123:"/root/fileonServer.mp4" d:/whateveriwantonmyPc.mp4  ## -p要大写
 
 ### 8. SS相关的命令
 ```
@@ -596,35 +598,35 @@ sh build.sh
 
 
 ```
+
 [ubuntu 16.4安装shadowsocks-libev](http://www.itfanr.cc/2016/10/02/use-shadowsocks-to-have-better-internet-experience/)
- 参考github[官方教程](https://github.com/shadowsocks/shadowsocks-libev)安装
->
+
+参考github[官方教程](https://github.com/shadowsocks/shadowsocks-libev)安装
+```
+
 sudo apt-get install software-properties-common -y
 sudo add-apt-repository ppa:max-c-lv/shadowsocks-libev -y
 sudo apt-get update
 sudo apt install shadowsocks-libev
->
+
 # Edit the configuration file
 sudo vi /etc/shadowsocks-libev/config.json ## 这里记得把server address改成实际的ip
->
+
 # Edit the default configuration for debian
 sudo vi /etc/default/shadowsocks-libev
->
+
 # Start the service
 sudo /etc/init.d/shadowsocks-libev start    # for sysvinit, or
 sudo systemctl start shadowsocks-libev      # for systemd
 
->加入开机启动
+##加入开机启动
 在/etc/rc.local中加入
 sudo /etc/init.d/shadowsocks-libev start
 
+```
 其实跟安装ss很像的
 
-
-
 ### 9. 网络监控
-
-
 ```shell
 tcpdump -i "venet0:0"  //抓包的
 tcpdump -c 10 //count
@@ -658,9 +660,6 @@ ifconfig // 查看机器上的网卡
 en01 //Ethernet
 注意 RX bytes(接收到的数据)和TX bytes(发送出去的数据)后面的数字
 ```
-
-
-
 
 ### 10.查看进程
 
@@ -704,8 +703,7 @@ ps | grep 类似于 pgrep XXX //查找某个进程
 *实时监控，1秒刷新一次*
 watch -n 1 ps -aux --sort=-pmem,-pcpu
 ```
-查看端口占用
-```
+```shell
 #列出所有端口的占用情况
 netstat -anp
 lsof -i # 这个也行
@@ -714,10 +712,10 @@ lsof -i:80
 #查看某个进程占了哪些端口
 netstat -anp|grep pid
 lsof //list opened files
-```
+## 查看端口占用
 
-//杀进程（如果进程不属于当前用户，要sudo）
-> 杀进程，慎用。
+## 杀进程（如果进程不属于当前用户，要sudo）
+## 杀进程，慎用。
 kill -9 进程id // 9直接干掉进程，慎用。。。
 kill pid // 这个和kill 15是一样的 //15表示terminate,请求进程停下来  
 
@@ -738,39 +736,35 @@ renice -s pid //更改友善度
 
 df -ah  // 查看mounted文件系统
 proc
-
-
-
-
-
+```
 
 ### 11 .常用配置
-
-> 查看登陆失败日志
-grep "Failed password for root" /var/log/auth.log | awk '{print $11}' | sort | uniq -c | sort -nr | more
+ ***查看登陆失败日志***
+> grep "Failed password for root" /var/log/auth.log | awk '{print $11}' | sort | uniq -c | sort -nr | more
 
 防范措施
 修改登陆端口号
+```
 sudo vi /etc/ssh/sshd_config
 Port 4484
 PermitRootLogin no
 
-改了sshd_config之后千万记得重启ssh服务，不然会出现connection refused.
+###改了sshd_config之后千万记得重启ssh服务，不然会出现connection refused.
 /etc/init.d/ssh restart
 
-CentOS 重启SSH ：service sshd restart
-DeBian重启SSH：service ssh restart
-
-查看系统release版本
+##CentOS 重启SSH ：
+service sshd restart
+###DeBian重启SSH：
+service ssh restart
 ```
+查看系统release版本
+```shell
 more /etc/*release
 ```
 
-
-
 [编码的修改](https://perlgeek.de/en/article/set-up-a-clean-utf8-environment)
 更改locale为utf-8(ubuntu)
->
+```shell
 vi ~/.bashrc
 
 # add these lines
@@ -780,14 +774,11 @@ export LANGUAGE=en_US.UTF-8
 
 sudo locale-gen "en_US.UTF-8"
 sudo dpkg-reconfigure locales
-
-
-
-
+```
 ### 参考
 
-
 - ![](http://odzl05jxx.bkt.clouddn.com/fork_you_git.jpg)
+
 - [文件大小查看命令](https://my.oschina.net/liting/blog/392051)
 - [文件压缩命令](http://blog.sina.com.cn/s/blog_7479f7990100zwkp.html)
 - [硬件查询](https://my.oschina.net/hunterli/blog/140783)
