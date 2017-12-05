@@ -780,6 +780,7 @@ putIfAbsent是Atmmic的[Is putIfAbsent an atomic operation](http://forums.terrac
 8.3 平时只要记住ArrayList和HashMap的**大致内部实现**就可以了，至于别的，除非面试，平时没必要记录。
 8.4 [Stuart Mark](https://blogs.oracle.com/java/collections-refueled)特别喜欢把一个class搞成**@deprecated**
 8.5 就连[Joshua Bloch](https://www.youtube.com/watch?v=V1vQf4qyMXg) 都承认，除非性能真的很重要的，平时没必要过度优化。By the way , he said Doug Lea is very smart .
+8.6 [Stack这种东西有点过时了](https://stackoverflow.com/questions/1386275/why-is-java-vector-class-considered-obsolete-or-deprecated) 一个原因是Stack extends Vector（每个方法都加synchronized，多数场景下不需要，另外Vector是1.1还是1.0就有了）
 
 
 

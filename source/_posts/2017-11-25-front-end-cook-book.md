@@ -27,6 +27,8 @@ p tag 里面能够放一个小的Strong tag
 ## jQuery要点
 ## Vue知识点
 
+Babel是一个可以把ES6代码打包成ES5代码的插件，毕竟要兼容老的浏览器。
+
 
 npm的configuration非常方便设置,首先是[设置proxy](https://stackoverflow.com/questions/7559648/is-there-a-way-to-make-npm-install-the-command-to-work-behind-proxy)
 > npm config set strict-ssl false

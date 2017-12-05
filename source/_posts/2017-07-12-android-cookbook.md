@@ -151,6 +151,7 @@ Android相关
     - [ ] SurfaceView，TextureView从入门到解析
 - [ ] Zygote进程启动流程
 - [ ] 属性动画据说用了反射，源码解析
+- [ ] Aosp中的launcher地址[Launcher3](https://android.googlesource.com/platform/packages/apps/Launcher3/)，网上分析的也很多
 - [ ] SystemServer进程启动流程
 - [X] Context是什么
 - [ ] Launcher启动流程

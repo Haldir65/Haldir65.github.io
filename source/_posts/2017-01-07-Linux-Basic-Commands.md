@@ -653,6 +653,7 @@ netstat -i // 查看某个网络接口发出和接收了多少byte的数据
 netstat -ta //当前active的网络连接
 netstat -tan //以ip地址的方式展示出来
 netstat -tupln //tcp+udp+program name+监听的端口+numerically
+netstat -ie //比较友好的方式展示当前各个端口的流量
 ```
 
 ```

@@ -241,15 +241,90 @@ PermitRootLogin yes
 putty登录窗口左侧有一个loggin-auth，进去选择自己windows上刚才保存的私钥文件。登录输入账户名即可自动登录成功。
 [PUTTYGEN - KEY GENERATOR FOR PUTTY ON WINDOWS](https://www.ssh.com/ssh/putty/windows/puttygen)
 
+### 22.iptables命令
+用防火墙屏蔽掉指定ip
+
+```shell
+iptables -L -n ## 查看已添加的iptables规则
+清除已有iptables规则
+iptables -F
+iptables -X
+iptables -Z
+#允许所有本机向外的访问
+iptables -A OUTPUT -j ACCEPT
+# 允许访问22端口
+iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+#允许访问80端口
+iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+#允许访问443端口
+iptables -A INPUT -p tcp --dport 443 -j ACCEPT
+#允许FTP服务的21和20端口
+iptables -A INPUT -p tcp --dport 21 -j ACCEPT
+iptables -A INPUT -p tcp --dport 20 -j ACCEPT
+#如果有其他端口的话，规则也类似，稍微修改上述语句就行
+#允许ping
+iptables -A INPUT -p icmp -m icmp --icmp-type 8 -j ACCEPT
+#禁止其他未允许的规则访问
+iptables -A INPUT -j REJECT  #（注意：如果22端口未加入允许规则，SSH链接会直接断开。）
+iptables -A FORWARD -j REJECT
+```
+**注意还需要将上述规则添加到开机启动中**，还有使用iptables屏蔽来自[某个国家的IP](https://www.vpser.net/security/iptables-block-countries-ip.html)的教程
+
+
+## 23. 变量($其实就是美元符号了)
+变量调用符号($)
+```shell
+LI=date
+$LI ##
+# Tue Dec  5 04:06:18 EST 2017
+
+# 所以经常会有这样的脚本
+# Check if user is root
+if [ $(id -u) != "0" ]; then
+    echo " Not the root user! Try using sudo Command ! "
+    exit 1
+fi
+echo "Pass the test! You are the root user!"
+
+## 亲测下面这种可用户
+if [ `whoami` = "root" ];then  
+    echo "root用户！"  
+else  
+    echo "非root用户！"  
+fi
+```
+变量分为用户自定义的和环境变量（其实就是系统预设的）,有些区别
+> 用户自定义变量只在当前的shell中生效，环境变量在当前shell和这个shell的所有子shell中生效。
+环境变量是全局变量，用户自定义变量是局部变量。
+对系统生效的环境变量名和变量作用是固定的。
+
+### 常用的环境变量
+> HOSTNAME：主机名
+SHELL：当前的shell
+TREM：终端环境
+HISTSIZE：历史命令条数
+SSH_CLIENT：当前操作环境是用ssh链接的，这里记录客户端的ip
+SSH_TTY：ssh连接的终端是pts/1
+USER:当前登录的用户
+
+```shell
+echo $HOSTNAME
+## unbutu
+$? 最后一次执行的命令的返回状态。如果这个变量的值为0，证明上一个命令正确执行；如果这个变量的值非0（具体是哪个数，由命令自己决定），则证明上一个命令执行不正确了。
+$$ 当前进程的进程号（PID）
+$! 后台运行的最后一个进程的进程号（PID）
+```
+
 
 Mere trash
 ===============================================================================
+[LINUX下的21个特殊符号](http://blog.51cto.com/litaotao/1187983)
+[Shell学习笔记](https://notes.wanghao.work/2015-06-02-Shell%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html)
 
 
-### 19.iptables命令
-用防火墙屏蔽掉指定ip
 
-ls -al = l -al（可以少敲一个字母）
+
+ls -al = l -al（可以少敲一个字母,其实是alias）
 
 
 
