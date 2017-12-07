@@ -691,6 +691,141 @@ public class FruitRun {
  供应商编号：1 供应商名称：陕西红富士集团 供应商地址：陕西省西安市延安路89号红富士大厦
 ```
 
+### 35 .四舍五入问题，BigDecimal,BigInteger这些
+基本数据类型中float和double只能用于处理科学运算或者工程计算，商业应用中，需要使用BigDecimal来处理。
+```java
+System.out.println(0.06 + 0.01);
+System.out.println(1.0 - 0.42);
+System.out.println(4.015 * 100);
+System.out.println(303.1 / 1000);
+
+//下面是实际输出，显然是不对的
+// 0.06999999999999999
+// 0.5800000000000001
+// 401.49999999999994
+// 0.30310000000000004
+
+double a = 4887233385.5;
+double b = 0.85;
+BigDecimal a1 = new BigDecimal(a);
+BigDecimal b1 = new BigDecimal(b);
+System.out.println("==============================================================");
+System.out.println(a*b);
+System.out.println("result2-->"+a1.multiply(b1));//result2-->4154148377.674999891481619374022926649558939971029758453369140625无限不循环,其实后面还有
+System.out.println("result2-->"+a1.multiply(b1).setScale(1, RoundingMode.HALF_UP));
+System.out.println("result2-->"+a1.multiply(b1).setScale(5, RoundingMode.HALF_UP));
+System.out.println("result2-->"+a1.multiply(b1).setScale(9, RoundingMode.HALF_UP));
+System.out.println("result2-->"+a1.multiply(b1).setScale(11, RoundingMode.HALF_UP));
+System.out.println("==============================================================");
+```
+以下为实际输出
+> ==============================================================
+4.1541483776749997E9  //科学计数法在这种场景下几乎没法用（注意默认给出了16位，下面有解释）
+result2-->4154148377.674999891481619374022926649558939971029758453369140625 //这个是实际值
+result2-->4154148377.7
+result2-->4154148377.67500
+result2-->4154148377.674999891
+result2-->4154148377.67499989148
+==============================================================
+实在靠谱的四舍五入
+
+> RoundingMode.HALF_EVEN就是把这个小数化为离它最近的偶数
+RoundingMode.HALF_UP 就是碰到五就往上进一位
+RoundingMode.HALF_DOWN 就是碰到五就视为0
+RoundingMode.FLOOR 和Math.floor差不多
+RoundingMode.CEILING 和Math.ceiling差不多
+core Library的命名都很易懂
+
+由此引申出：
+```java
+System.out.println( 0.9999999f==1f ); // 7个9
+System.out.println( 0.99999999f==1f ); //8个9
+System.out.println( 0.999999999f==1f ); // 9个9
+// false
+// true
+// true
+```
+
+[Java 浮点数 float和double类型的表示范围和精度](http://blog.csdn.net/zq602316498/article/details/41148063)
+回顾下，float占用4bytes，32位。
+这32位是怎么分的：
+1bit（符号位） 8bits（指数位） 23bits（尾数位）（内存中就长这样）
+double占据64bit。
+1bit（符号位） 11bits（指数位） 52bits（尾数位）（内存中就长这样）
+
+所以float的指数范围是-128~127 。(2的8次方)
+double的指数范围为-1024~+1023。
+再具体点：
+float的范围为-2^128 ~ +2^127，也即-3.40E+38 ~ +3.40E+38；double的范围为-2^1024 ~ +2^1023，也即-1.79E+308 ~ +1.79E+308。就这么算出来的。
+至于float里面那剩下的23位和double里面剩下的52位，是用来表示精度的。
+>float：2^23 = 8388608，一共七位，由于最左为1的一位省略了，这意味着最多能表示8位数： 2*8388608 = 16777216 。有8位有效数字，但绝对能保证的为7位，也即float的精度为7~8位有效数字；
+double：2^52 = 4503599627370496，一共16位，同理，double的精度为16~17位。
+
+所以上面出现了小数点后最多16位的double。
+所以上面的java代码还可以想到：
+```java
+System.out.println( 0.9999999f==1f ); // 7个9
+System.out.println( 0.99999999f==1f ); //8个9
+System.out.println( 0.9999999996666666f==1f ); // 9个9
+```
+当一个float小数的小数点后位数超出了8个之后，java就无法用float表示这后面的数字了。
+所以上面的第8个9之后写什么都是true的。
+随手写一个
+> float aa = 1.123456789123456f
+double bb = 1.123456789123456789123456789d
+不要以为自己真的想要多少就有多少，float后面最多跟8位小数，double后面最多跟16位小数。为什么，数学这么说的。
+
+```java
+float f = 2.2f;  
+double d = (double) f;  
+System.out.println(d);   
+f = 2.25f;  
+d = (double) f;  
+System.out.println(d);
+```
+输出：
+> 2.200000047683716
+2.25
+
+这样的问题也能够理解了，给你32给bit，第一位表示正负，第2-9位表示指数，剩下23位表示实际的数字。
+对于2.2f，首先第一位表示正负，然后个位数2可以表示在第二位，剩下的0.2设法用22位表示。
+
+来看十进制小数转换二进制的问题，例如：
+22.8125转二进制
+> 整数和小数分别转换。
+整数除以2，商继续除以2，得到0为止，将余数逆序排列。
+22 / 2  11 余0
+11/2     5  余 1
+5 /2      2  余 1
+2 /2      1  余 0
+1 /2      0  余 1
+所以22的二进制是10110
+小数乘以2，取整，小数部分继续乘以2，取整，得到小数部分0为止，将整数顺序排列。
+0.8125x2=1.625 取整1,小数部分是0.625
+0.625x2=1.25 取整1,小数部分是0.25
+0.25x2=0.5 取整0,小数部分是0.5
+0.5x2=1.0 取整1,小数部分是0，结束
+所以0.8125的二进制是0.1101
+十进制22.8125等于二进制10110.1101
+
+对于0.2来说，得到的是一个无线循环的00110011001100110011....区区23位怎么够用。
+所以23位之后的数字被无视了，然后打印的时候尝试将这仅有的23位0101表示成10进制的时候，无论如何是得不到跟数学意义上的数字相等的数。但对于机器来说，就是一样的，Intelij里面float超过小数点后8位自动飚黄，说什么is always true。。。就这么23个槽子，确实没法满足实际需要的位数要求。
+所以实际上是2.2f需要无限个小槽子表示，2.25f正好停在：0 100 0000 0001 0010 0000 0000 0000 0000 就够用了。
+有时候float或者double的位数不够了，就用String吧。BigDecimal提供了String为参数的初始化方法。
+```java
+double currentLat2 = 2.455675;
+BigDecimal b = new BigDecimal(currentLat2);
+currentLat2 = b.setScale(5, BigDecimal.ROUND_HALF_UP).doubleValue();
+System.out.println(currentLat2);
+// 输出的是2.45567而不是2.45568
+
+String currentLat2 = "2.455675";
+BigDecimal b = new BigDecimal(currentLat2);   
+System.out.println(b.setScale(5,BigDecimal.ROUND_HALF_UP).doubleValue());
+```
+所以建议用String初始化BigDecimal.
+
+
 
 ## 参考
 

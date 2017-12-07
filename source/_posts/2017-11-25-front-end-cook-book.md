@@ -28,7 +28,9 @@ p tag 里面能够放一个小的Strong tag
 ## Vue知识点
 
 Babel是一个可以把ES6代码打包成ES5代码的插件，毕竟要兼容老的浏览器。
-
+[ua-parser-js](https://github.com/faisalman/ua-parser-js)是一个很好用的检测ua的library。
+[Backbone](http://www.css88.com/doc/backbone/)是一个mvc框架
+[移动开发中的一些有用meta标签](http://www.html-js.com/article/The-front-end-of-mobile-terminal-meta-tag-set-of-notes-the-role-of)
 
 npm的configuration非常方便设置,首先是[设置proxy](https://stackoverflow.com/questions/7559648/is-there-a-way-to-make-npm-install-the-command-to-work-behind-proxy)
 > npm config set strict-ssl false
