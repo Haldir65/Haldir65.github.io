@@ -111,6 +111,7 @@ myArray > ['stuff',70]
 
 myArray[30] = true
 
+
 // 以下为亲测console中的输出就这样
 myArray > (31) ["stuff", 70, empty × 28, true]
 myArray[12] > 'undefined'
@@ -332,6 +333,130 @@ var removed = parentTag.removeChild(li)//移除方法会返回被移除的元素
 ## 4. 异步的实现
 
 ## 5. ES6新增的一些东西
+let(lexical)的用法就在一个循环里给function赋值，很常见。
+注意的是var的作用域是跨大括号的。所以大括号里面的var是能被大括号外面访问的，let就不行。
+async await 都是ES2017（比ES2015更高的版本）中出现的。
+default parameters： 默认参数，和python中很像
+```js
+function myLog(name,age,id){
+
+}
+
+function myDefaultFunction(name='john',age=27,id =100){
+
+}
+
+// 调用：
+myDefalutFunction()// 不传参也可
+```
+
+
+spread operator
+```js
+var num1 = [1,2,3]
+var num2 = [num1,5,6]
+console.log(num2)
+// var num2 = [num1,5,6]
+var num2 = [...num1,5,6] //三个点
+console.log(num2)
+// (5) [1, 2, 3, 5, 6]
+
+//另外一个用处
+var num3 = [1,2,3]
+function acceptAnArray(a,b,c){
+  console.log(a+b+c)
+}
+
+//调用
+acceptAnArray(...num3) // 输出6
+```
+
+template String(这个不是引号，是在tab键上面那个)
+```js
+var myString = `This is an template String ,
+          note we have some line break here,that will be honored. Also there are some whiteSpace afront , which will be honored too`
+console.log(myString)          
+var nextString = `This is `
+
+function logLiteralString(name,age) {
+  console.log(`the name is ${name} and the age is ${10+12}`);
+}
+// the name is hhaha and the age is 22 。 String literals.
+```
+
+String新增了一些方法
+```js
+var str = 'hahhaha'
+console.log(str.repeat(3));
+// hahhahahahhahahahhaha
+
+var str2 = 'goodbye'
+console.log(str2.startWith('good')); // true
+console.log(str2.startWith('bye',4)); // true
+console.log(str2.endsWith('good')); //false
+console.log(str2.endsWith('good',str2.length-3)); //true
+
+var str3 = 'Good Day'
+console.log(str3.includes('Day')); //true
+```
+
+Object Literal notation
+```js
+// es5得这么写
+var name = 'Josh'
+var age = 27
+
+var person = {
+  name: name,
+  age: age,
+  greet: function (X) {
+    console.log(`you say ${X} in your greets`);
+  }
+}
+
+// es6这样就行了
+var person = {
+  name,age,
+  greet(X){
+    console.log(`you say ${X} in your greets`);
+  }
+}
+```
+简明很多
+
+Arrow Function（箭头函数）
+```js
+window.onload = function () {
+  var stuff = function () {
+    console.log('say Stuff');
+  }
+  var stuff2 = () =>{
+    console.log('this is more precise');
+  }
+  var stuff3 = () =>   console.log('只有一行的话可以不要大括号');
+
+  var stuff4 = (name) => console.log(`the name is ${name} and hi`);
+
+  var stuff5 = name => console.log(`只有一个参数 ${name}的话，参数的小括号也不要了`);
+}
+```
+还有一个好处就是: the addrow function will bind the this keyword lexically.
+```js
+window.onload = function () {
+  var jam = {
+    name : 'Jane',
+    greeting: function (X) {
+      window.setInterval(function () {
+          if (X>0) {
+            console.log(this.name+' greet you');
+          }
+      },500)
+    }
+  }
+  jam.greeting()
+}
+```
+
 
 ## 6. 我也不知道归到哪一类的问题
 

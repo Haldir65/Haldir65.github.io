@@ -22,8 +22,8 @@ sudo chmod a+rx /usr/local/bin/youtube-dl
 > mkdir youtube   
 
 
-以一个普通的[视频链接](https://www.youtube.com/watch?v=7PtDrv5AUmA)为例 
-直接使用 
+以一个普通的[视频链接](https://www.youtube.com/watch?v=7PtDrv5AUmA)为例
+直接使用
 > youtube-dl https://www.youtube.com/watch?v=7PtDrv5AUmA
 
 
@@ -31,11 +31,15 @@ sudo chmod a+rx /usr/local/bin/youtube-dl
 还有一个要注意的，生成的文件名是随机的，比如
 > -yj74P_BY1zI.mp4
 
-由于前面带了一个横杠，很多命令是不认这种名字的，需要手动重命名一下 
+由于前面带了一个横杠，很多命令是不认这种名字的，需要手动重命名一下
 > mv -yj74P_BY1zI.mp4 porn.video
 > mv ./-yj74P_BY1zI.mp4 porn.video #. 表示当前目录
 
-
+谁也不想要后面的乱码
+```shell
+youtube-dl -o '%(title)s.%(ext)s' https://www.youtube.com/watch?v=rimXGaUdaLg
+```
+youtube-dl的可扩展性好很多
 
 
 有时候下载的文件带有空格，有时候带有中文，用单引号包起来就好了。
@@ -45,7 +49,7 @@ youtube-dl还有一些命令行参数可以设置
 
 
 这样会列出所有的可供下载的分辨率选项，每个选项前面带有一个序号，选择特定分辨率的选项下载只需要
-> youtube-dl -f 13 https://www.youtube.com/watch?v=7PtDrv5AUmA 
+> youtube-dl -f 13 https://www.youtube.com/watch?v=7PtDrv5AUmA
 
 
 ### 2.从vps的硬盘上把下载好的视频拖下来

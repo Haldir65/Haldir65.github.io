@@ -39,6 +39,8 @@ npm的configuration非常方便设置,首先是[设置proxy](https://stackoverfl
 > npm config list ##列出当前所有的设置
 > npm config get stuff ##比如说registry等等
 
+VS Code好用
+
 npm有个dependencies的概念，此外还有dev-dependencies的概念，主要看package.json这个文件
 ```json
 {

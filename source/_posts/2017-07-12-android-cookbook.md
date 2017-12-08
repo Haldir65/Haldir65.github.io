@@ -161,6 +161,7 @@ Android相关
 - [X] Android生命周期在不同版本的表现形式[有些onXXX在高版本不会调](http://blog.csdn.net/liuweiballack/article/details/47026263)，[原因是HoneyComb之后对Activity LifeCycle进行了改动](http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html)
 - [ ] 要不是Jake Wharton在DroidConNYC2017上提到，还不知道有v4包里面有**AtomicFile**这玩意
 - [ ] LocalBroadCastReceiver好像是基于handler实现的
+- [ ] armeabiv,arm64-v8a等问题[Android 设备的CPU类型(通常称为”ABIs”)](https://zhuanlan.zhihu.com/p/23102158)
 
 > Studio里面看源码，find usage没有的话，find in path , choose android sdk
 

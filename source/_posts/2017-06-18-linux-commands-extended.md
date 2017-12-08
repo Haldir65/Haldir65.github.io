@@ -322,6 +322,11 @@ Mere trash
 [Shell学习笔记](https://notes.wanghao.work/2015-06-02-Shell%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html)
 
 
+youtube-dl的安装途径就是下一个软件下来，然后chmod给权限，然后
+/usr/local/bin/youtube-dl和直接敲youtube-dl是一个命令。好像放在这个目录下面就好了。
+```shell
+youtube-dl -o '%(title)s.%(ext)s' https://www.youtube.com/watch?v=rimXGaUdaLg
+```
 
 
 ls -al = l -al（可以少敲一个字母,其实是alias）
