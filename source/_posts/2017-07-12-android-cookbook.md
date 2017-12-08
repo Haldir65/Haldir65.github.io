@@ -162,6 +162,7 @@ Android相关
 - [ ] 要不是Jake Wharton在DroidConNYC2017上提到，还不知道有v4包里面有**AtomicFile**这玩意
 - [ ] LocalBroadCastReceiver好像是基于handler实现的
 - [ ] armeabiv,arm64-v8a等问题[Android 设备的CPU类型(通常称为”ABIs”)](https://zhuanlan.zhihu.com/p/23102158)
+- [ ] Romain Guy提到了android asset atlas，顺带看下[ZygotoInit](http://blog.csdn.net/luoshengyang/article/details/45831269)
 
 > Studio里面看源码，find usage没有的话，find in path , choose android sdk
 
