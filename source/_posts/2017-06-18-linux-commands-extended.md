@@ -97,6 +97,41 @@ sudo apt-get remove 内核文件名 （例如：linux-image-4.4.0-92-generic）
 查看恶意IP试图登录次数：
 - lastb | awk '{ print $3 }' | sort | uniq -c | sort -n  ## 亲测可用,看上去挺吓人的
 
+awk怎么用[Using Linux AWK Utility](https://www.youtube.com/watch?v=az6vd0tGhJI)，一个没有废话的教程，非常好。
+
+> drwxr-xr-x  3 root root    4096 Mar 14  2017 ufw
+-rw-r--r--  1 root root     338 Nov 18  2014 updatedb.conf
+drwxr-xr-x  3 root root    4096 Aug 30 03:53 update-manager
+drwxr-xr-x  2 root root    4096 Aug 30 03:53 update-motd.d
+drwxr-xr-x  2 root root    4096 Mar 14  2017 update-notifier
+drwxr-xr-x  2 root root    4096 Mar 14  2017 vim
+drwxr-xr-x  3 root root    4096 Mar 14  2017 vmware-tools
+lrwxrwxrwx  1 root root      23 Mar 14  2017 vtrgb -> /etc/alternatives/vtrgb
+-rw-r--r--  1 root root    4942 Jun 14  2016 wgetrc
+drwxr-xr-x  5 root root    4096 Mar 14  2017 X11
+drwxr-xr-x  3 root root    4096 Mar 14  2017 xdg
+drwxr-xr-x  2 root root    4096 Mar 14  2017 xml
+-rw-r--r--  1 root root     477 Jul 19  2015 zsh_command_not_found
+
+假设你面对一个这样的文件test.txt
+print 每一行 :  awk '{ print }' test.txt
+print第一行 ： awk '{ print $1 }' test.txt
+print第二行: awk '{ print $2 }' test.txt
+print第一行和第二行 awk '{ print $1,$2 }' test.txt
+print第一行和第二行中间不带空格 awk '{ print $1$2 }' test.txt
+print包含'test'的行 awk '/test/ { print } test.txt'
+print第二行包含'test'的行 awk '{if(2 ~ /test/) print }' test.txt
+awk '/[a-z]/ { print }' test.txt  //包含a-z任一字母的
+awk '/[0-8]/ { print }' test.txt // 包含0-8任一数字的
+awk '/^[0-8]/ { print }' test.txt // 以0-8任一数字开头的
+awk '/[0-8]$/ { print }' test.txt //以0-8任一数字结尾的
+
+和管道结合的：
+grep -i test test.txt | awk '/[0-9]/ { print }'
+-i表示case insensitive,大小写都算.然后找出其中包含数字的。
+
+
+
 ### 7.tar命令
 主要是跟压缩和解压文件有关的,[参考](http://man.linuxde.net/tar)
 ```
@@ -324,8 +359,21 @@ Mere trash
 
 youtube-dl的安装途径就是下一个软件下来，然后chmod给权限，然后
 /usr/local/bin/youtube-dl和直接敲youtube-dl是一个命令。好像放在这个目录下面就好了。
+关于这些目录的[解释](http://blog.csdn.net/test1280/article/details/70143465)
+/bin是系统的一些指令。bin为binary的简写；
+/sbin一般是指超级用户指令。就是只有管理员才能执行的命令
+/usr/bin：通常是一些非必要的，但是普通用户和超级用户都可能使用到的命令
+/usr/local/bin：通常是用户后来安装的软件，可能被普通用户或超级用户使用
+
+
 ```shell
 youtube-dl -o '%(title)s.%(ext)s' https://www.youtube.com/watch?v=rimXGaUdaLg
+```
+
+dropbox的网盘空间不用感觉有点浪费了，一个将本地文件上传到dropBox的脚本[Dropbox-Uploader](https://github.com/andreafabrizi/Dropbox-Uploader)
+亲测可用，也不是一个需要启动时跑起来的程序，就是一个给参数就上传的脚本。
+```shell
+./dropbox_uploader.sh upload /localFileOrDir /dropBoxFileOrDir
 ```
 
 

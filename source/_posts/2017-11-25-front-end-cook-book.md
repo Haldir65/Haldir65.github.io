@@ -11,6 +11,9 @@ tags: [前端]
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600)
 ## html一些容易忽视的点
 
+Ajax(Asynchronous javaScript & xml)，从命名上来看就是异步的
+json(JavaScript Object notation),摆明着就是给js用的
+
 p tag 里面能够放一个小的Strong tag
 ```html
 <p>You Know <strong>No</strong> Mystery</p>
@@ -22,15 +25,31 @@ p tag 里面能够放一个小的Strong tag
   <div>哈哈</div>
 </p>
 ```
+## vsCode插件推荐
+- Auto Close tag
+- Beautify
+- HTML CSS supported
+- Live Server
+- Prettier
+- Vetur
+- Vue2 Snippets
+
+
 ## Vanilla js要点
 ## css要点
 ## jQuery要点
 ## Vue知识点
+## Twitter BootStrap [BootStrap速查手册](https://getbootstrap.com/docs/4.0/layout/grid/#stacked-to-horizontal)
+
 
 Babel是一个可以把ES6代码打包成ES5代码的插件，毕竟要兼容老的浏览器。
 [ua-parser-js](https://github.com/faisalman/ua-parser-js)是一个很好用的检测ua的library。
 [Backbone](http://www.css88.com/doc/backbone/)是一个mvc框架
 [移动开发中的一些有用meta标签](http://www.html-js.com/article/The-front-end-of-mobile-terminal-meta-tag-set-of-notes-the-role-of)
+
+- [ ]如何使用js显示一个Dialog
+- [ ]Express js
+- [ ] css3 属性大全
 
 npm的configuration非常方便设置,首先是[设置proxy](https://stackoverflow.com/questions/7559648/is-there-a-way-to-make-npm-install-the-command-to-work-behind-proxy)
 > npm config set strict-ssl false

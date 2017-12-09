@@ -206,12 +206,12 @@ past.getDate()
 ```
 ![](http://odzl05jxx.bkt.clouddn.com/unclassified_unclassified--115_07-1920x1440.jpg?imageView2/2/w/600)
 
-网络请求，Ajax请求的套路也有
+网络请求，Ajax(Asynchronous javaScript & xml)请求的套路也有(AJAX命名上就是异步的)
 ```javaScript
 var getJSON = function(url) {
   var promise = new Promise(function(resolve, reject){
     var client = new XMLHttpRequest();
-    client.open("GET", url);
+    client.open("GET", url,true);
     client.onreadystatechange = handler;
     client.responseType = "json";
     client.setRequestHeader("Accept", "application/json");
@@ -331,6 +331,79 @@ var removed = parentTag.removeChild(li)//移除方法会返回被移除的元素
 ## 3.从onclick开始到整个交互事件模型
 
 ## 4. 异步的实现
+
+首先js里面也是有callback hell这种概念的，一个接口好了请求另一个接口，好了之后在请求第三个接口，这样一层套一层谁也不喜欢。
+```js
+var http = new XMLHttpRequest();
+   http.onreadystatechange=function(){
+       if(http.readyState==4&&http.status==200){
+           console.log(JSON.parse(http.response))
+       }
+   };
+
+   http.open("GET",'data/tweets.json',true);
+   http.send();
+```
+上面这段直接在chrome里面跑的话会出错： Cross origin requests are only supported
+ for protocol schemes: http, data, chrome, chrome-extension, https
+ Chrome 默认不支持跨域请求，启动时要加上个flag就行了
+
+> ajax的readyState有四种
+0.  request not initialized
+1. request has been set up
+2. request has been set
+3. request is in process
+4. request is complete
+
+ajax的open第三个参数表示是异步还是同步，一般都得异步。由于js是单线程的，
+所以会把实际的网络请求工作放到一条js以外的线程中，完成后丢到当前js线程任务池的最后。 当前线程的任务完成后就可以执行这段回调
+
+
+ES6提供了Promise，能够将事情简化。
+
+```js
+//promise(ES6) is a placeholder for something that will happen in the future
+function get(url){
+        return new Promise(function(resolve,reject){
+            var http = new XMLHttpRequest();
+            http.open('GET',url,true);
+            http.onload = function(){
+                if(http.status==200){
+                    resolve(JSON.parse(http.response));
+                }else{
+                    reject(http.statusText);
+                }
+            }
+            http.onerror = function () {
+                reject(http.statusText)
+            }
+            http.send();
+        });
+
+        var promise = get('data/tweets.json');
+        promise.then(function (tweets) {
+            console.log(tweets);
+            return get('data/friends.json')
+        }).then(function name(friends) {
+           console.log(friends);
+        }).
+        catch(function(error){
+            console.log(error);
+        })
+    };
+```
+
+更加有效的方式是使用generator，还不是很了解
+```js
+function* gen() {
+  yield 10;
+}
+
+var myGen = gen()
+// myGen.done
+//myGen.value()
+```
+
 
 ## 5. ES6新增的一些东西
 let(lexical)的用法就在一个循环里给function赋值，很常见。
@@ -453,13 +526,66 @@ window.onload = function () {
       },500)
     }
   }
-  jam.greeting()
+  jam.greeting(3)
+}
+// 输出 greet you
+```
+原因是this已经不是jam这个object了，也就是闭包问题.es6之前用下面这种方式规避一下
+```js
+window.onload = function () {
+  var jam = {
+    name : 'Jane',
+    greeting(X) {
+      var _this =this;
+      window.setInterval(function () {
+          if (X>0) {
+            console.log(_this.name+' greet you');
+            X--;
+          }
+      },500)
+    }
+  }
+  jam.greeting(3)
+}
+
+window.onload = function () {
+  var jam = {
+    name : 'Jane',
+    greeting(X) {
+      window.setInterval(() => {
+          if (X>0) {
+            console.log(this.name+' greet you');
+            X--;
+          }
+      },500)
+    }
+  }
+  jam.greeting(3)
 }
 ```
 
+Sets是新增的用于存储unique数据的集合(元素不能重复)
+```js
+var names = new Set();
+names.add("josh").add('bob').add('neo')
+console.log(names);
+console.log(names.size);
+names.delete('bob') // 返回true表示删除成功，false表示删除失败
+names.clear()
+names.has('bob') //就是contains的意思
+
+var duplicatedArray = [1,2,'jane','harry',2];
+var undepulicatedSet = new Set(duplicatedArray);
+console.log(undepulicatedSet);
+duplicatedArray = [...undepulicatedSet] //使用spread operater将set变成各个单一的元素
+console.log(duplicatedArray);
+```
+add的时候如果存在重复元素直接无视新增的重复元素
+
+
 
 ## 6. 我也不知道归到哪一类的问题
-
+js语法上虽说不用加分号，但实际应用中为避免压缩js文件时出现歧义，还是得老老实实加上分号
 
 9. 交互事件的捕获，拦截，消费（冒泡）
 ```javaScript

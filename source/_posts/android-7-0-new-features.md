@@ -32,7 +32,7 @@ Google I/O 2016上的[What's new in Android](https://www.youtube.com/watch?v=B08
                     build();
             js.schedule(job);
         }
-      
+
     }
 ```
 
@@ -64,7 +64,7 @@ Google I/O 2016上的[What's new in Android](https://www.youtube.com/watch?v=B08
 
 ### 2. 文件系统的权限更改(FileProvider)
 
- File storage permission change 
+ File storage permission change
  简单来说就是Uri.fromFile(file://URI)不能再用了，需要使用FileProvider，这主要是为了6.0开始引进的permission model 考虑的，storage permission例如WRITE_EXTERNAL_STORAGE这种都已经属于Dangerous permission了。
  一个常见的场景就是调用系统相机拍照，给Intent设置一个uri，在7.0上直接用Uri.FromFile会崩
  需要通过FileProvider提供Uri,写了一个[Demo](https://github.com/Haldir65/FileProviderDmo)，使用FileProvider传递文件给另一个App。
