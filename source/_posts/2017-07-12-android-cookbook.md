@@ -129,7 +129,6 @@ Android相关
 - [ ] cookie存储位置(/webviewCookiesChromium.db),db存储位置
 - [ ] Binder的原理，Binder里面引用计数的原理，Binder底层为什么用红黑树
 - [X] onSaveInstance,不仅仅是Activity,Fragment，View中也有，具体实现原理。View一定要有id(在View.dispatchSaveInstanceState中判断了id不为-1).[继承BaseSavedState]
-- [X] onDetachedFromWindow是从ActivityThread的handleDestoryActivity传下来的，走到windowManager.removeViewImediate,然后ViewRootImpl.doDie,然后ViewRootImpl.dispatchDetachedFromWindow，然后DecoreView.dispatchDetachedFromWindow，然后一个个child传下去。所有的View走完了之后，DecorView在onDetachedFromWindow中以Window.Callback的方式顺手通知了Activity的onDetachedFromWindow。其实打个断点快一点看出来。
 - [X] 热修复框架原理
 - [ ] WebView JS交互，WebView存在的[漏洞](http://www.jianshu.com/p/9f7e9ab8d2fa),通过反射可看可能存在的[安全问题](https://my.oschina.net/fengheju/blog/673629)以及[C代码](http://blog.csdn.net/xueerfei008/article/details/26750659)
 - [ ] Media相关，视频播放etc，相机，滤镜等.[Demo](https://github.com/w1123440793/VideoListDemo)
@@ -182,6 +181,7 @@ Linux相关
 
 Gradle相关
 - [ ]写一些DSL吧[Old Driver](https://github.com/Ccixyj/JBusDriver)
+- [ ] 狗日的Gradle下载的cache都放在C盘了，问题是C盘哪里，能删吗，C盘快不够用了
 
 
 Python
