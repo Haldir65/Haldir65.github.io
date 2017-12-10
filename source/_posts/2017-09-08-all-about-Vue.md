@@ -22,7 +22,26 @@ Vue Js学习笔记
 npm 设置淘宝镜像
 > npm config set registry https://registry.npm.taobao.org
 
-参考系列[教程](https://github.com/iamshaunjp/vuejs-playlist)
+或者直接用本地ss代理[设置proxy](https://stackoverflow.com/questions/7559648/is-there-a-way-to-make-npm-install-the-command-to-work-behind-proxy)
+> npm config set strict-ssl false
+> npm config set registry "http://registry.npmjs.org/"
+> npm config set proxy http://127.0.0.1:1080 ## 以上三句话设置代理
+> npm config list ##列出当前所有的设置
+> npm config get stuff ##比如说registry等等
+
+上面的npm run run dev只是为了方便本地开发，具有live reload功能。实际生产环境中，需要在CI服务器上运行
+> npm run build
+
+然后把dist文件夹中的静态文件推送到正式服务器
+在本地起nginx，设置好config,port,location什么的，然后把dist文件夹下所有东西复制到ngix config的目录下。
+
+```
+error_page   500 502 503 504  /50x.html;
+location = /50x.html {
+    root   html;
+}
+```
+然后直接在浏览器里面localhost打开查看，这是生产环境的大致描述，实际过程中代码还需要经历开发机器，编译机器，测试机器，cdn机器等等环节。
 
 
 

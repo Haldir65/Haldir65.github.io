@@ -11,6 +11,8 @@ tags: [前端]
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600)
 ## html一些容易忽视的点
 
+
+
 Ajax(Asynchronous javaScript & xml)，从命名上来看就是异步的
 json(JavaScript Object notation),摆明着就是给js用的
 
@@ -25,7 +27,10 @@ p tag 里面能够放一个小的Strong tag
   <div>哈哈</div>
 </p>
 ```
-## vsCode插件推荐
+
+## 工具
+
+### vsCode插件推荐
 - Auto Close tag
 - Beautify
 - HTML CSS supported
@@ -34,12 +39,48 @@ p tag 里面能够放一个小的Strong tag
 - Vetur
 - Vue2 Snippets
 
+VSCode快捷键
+
+
+在不会自己搭服务的情况下只好拿一些免费的api凑合了
+[posts](http://jsonplaceholder.typicode.com/posts)
+
 
 ## Vanilla js要点
 ## css要点
 ## jQuery要点
+jQuery是一个Dom Manipulate Library
 ## Vue知识点
 ## Twitter BootStrap [BootStrap速查手册](https://getbootstrap.com/docs/4.0/layout/grid/#stacked-to-horizontal)
+
+## nginx使用
+官方说nginx的windows版本只供测试使用，性能不怎么样，但用于前端部署还是够用的。去[nginx网站](http://nginx.org/en/docs/windows.html)下载windows版本的nginx，解压缩，双击可执行文件nginx.exe。在这之前，最好先打开conf文件夹，编辑nginx.conf。设置一下端口，因为默认的80说不定就给谁占用了。其实用命令行也能启动：
+> start nginx
+tasklist /fi "imagename eq nginx.exe" //这个是windows下查看当前在运行的nginx的命令
+nginx -s stop // 立即关闭
+nginx -s quit // graceful shutdown
+这些东西官网上都写得很明白。
+
+生产环境部署前端静态资源可以这么设置，参考知乎的[回答](https://www.zhihu.com/question/46630687)
+>
+用vue-cli搭建的做法:
+1、npm run build
+2、把dist里的文件打包上传至服务器 例 /data/www/，我一般把index.html放在static里
+所以我的文件路径为：
+/data/www/static    
+|-----index.html   
+|-----js    
+|-----css    
+|-----images   
+ ....
+3、配置nginx监听80端口，
+location /static alias 到 /data/www/static，
+重启nginx   
+location /static {       
+  alias  /data/www/static/;   
+  }
+4、浏览器访问http://ip/static/index.html即可
+
 
 
 Babel是一个可以把ES6代码打包成ES5代码的插件，毕竟要兼容老的浏览器。

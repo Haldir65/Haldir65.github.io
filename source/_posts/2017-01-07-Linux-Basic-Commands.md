@@ -212,7 +212,13 @@ eg: echo类似于print
 
 ### 4. 用户和用户组的问题
 ```shell
+id userName // 查看当前用户的信息，比如是不是sudo之类的
+
 useradd user //添加用户，(-g 指定用户所在用户组)/home目录下会多一个user的目录，作为该用户的主目录
+
+sudo su - userName // 从root直接切到userName，具有sudo权限
+给一个user管理员权限:
+usermod -aG sudo userName
 
 passwd user //设置user的密码，会提示输入密码，密码不会显示在窗口中
 
@@ -776,6 +782,11 @@ export LANGUAGE=en_US.UTF-8
 sudo locale-gen "en_US.UTF-8"
 sudo dpkg-reconfigure locales
 ```
+
+
+### 12. Putty使用sshKey登录
+[Deploy Node.js App To Digital Ocean Server](https://www.youtube.com/watch?v=RE2PLyFqCzE)
+
 ### 参考
 
 - ![](http://odzl05jxx.bkt.clouddn.com/fork_you_git.jpg)

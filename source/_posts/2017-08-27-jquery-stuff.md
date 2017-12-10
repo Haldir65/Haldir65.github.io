@@ -1,10 +1,10 @@
 ---
-title: JQuery手册
+title: jQuery手册
 date: 2017-08-27 21:48:52
 tags: [jQuery,tools,前端]
 ---
 
-jQuery只是javascript的公开库，掌握javascript语法对于解决问题更重要。jQuery能干的事情包括：
+jQuery是一个dom manipulate library，非常大。jQuery能干的事情包括：
 
 1. html 的元素选取
 2. html的元素操作

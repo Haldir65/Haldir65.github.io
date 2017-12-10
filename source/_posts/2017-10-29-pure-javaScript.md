@@ -207,6 +207,26 @@ past.getDate()
 ![](http://odzl05jxx.bkt.clouddn.com/unclassified_unclassified--115_07-1920x1440.jpg?imageView2/2/w/600)
 
 网络请求，Ajax(Asynchronous javaScript & xml)请求的套路也有(AJAX命名上就是异步的)
+XMLHttpRequest缩写是(XHR)
+关于XHR Object
+- API In the form of an object
+- Provided by the browser's js environment
+- can be used with other protocols than http
+- Can work with data other than XML(Json ,plain text)
+
+有很多的Library能干ajax一样的事情:
+jQuery,Axios,Superagent,Fetch API,Prototype,Node HTTP
+
+ajax的onload只会在onreadystatechange==4的时候才会触发
+MDN文档上说ajax的readyState有五种：
+0	UNSENT	代理被创建，但尚未调用 open() 方法。
+1	OPENED	open() 方法已经被调用。
+2	HEADERS_RECEIVED	send() 方法已经被调用，并且头部和状态已经可获得。
+3	LOADING	下载中； responseText 属性已经包含部分数据。
+4	DONE	下载操作已完成。
+
+xhr.onProgress的readyState是3，这个时候显示加载进入条就可以了。
+
 ```javaScript
 var getJSON = function(url) {
   var promise = new Promise(function(resolve, reject){
@@ -234,6 +254,65 @@ getJSON("/posts.json").then(function(json) {
 }, function(error) {
   console.error('出错了', error);
 });
+```
+
+表单的操作
+```html
+<h1>Normal get form</h1>
+<form method="GET" action="process.php">
+  <input type="text" name='name'>
+  <input type="submit" value="Submit">
+</form>
+
+<h1>Ajax get form</h1>
+<form id='getForm' >
+  <input type="text" name='name' id='name1'>
+  <input type="submit" value="Submit">
+</form>
+
+<h1>Normal post form</h1>
+<form method="POST" action="process.php">
+  <input type="text" name='name'>
+  <input type="submit" value="Submit">
+</form>
+
+<h1>Ajax post form</h1>
+<form id='postForm' name='name' id='name2'>
+  <input type="text" name='name'>
+  <input type="submit" value="Submit">
+</form>
+```
+
+```js
+document.getElementById('getForm').addEventListener('submit',
+getName);
+
+function getName(e){
+  e.preventDefault();
+  var name = document.getElementById('name1').value;//用户输入的内容
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET','process.php?name='+name,true);
+  xhr.onload = function(){
+    console.log(this.responseText);
+  }
+  xhr.send();
+}
+
+document.getElementById('postForm').addEventListener('submit',
+postName);
+
+function postName(e){
+  e.preventDefault();
+  var name = document.getElementById('name2').value;//用户输入的内容
+  var params ="name="+name;
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST','process.php',true);
+  xhr.setRequestHeader('Content-type','application/x-www-form-urlencoded')
+  xhr.onload = function(){
+    console.log(this.responseText);
+  }
+  xhr.send();
+}
 ```
 
 

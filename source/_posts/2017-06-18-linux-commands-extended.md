@@ -93,6 +93,11 @@ sudo apt-get remove 内核文件名 （例如：linux-image-4.4.0-92-generic）
 
 
 ### 6. AWK文本分析工具
+> AWK is a language for processing text files
+awk was created at Bell labs released in 1977
+Named after Alfred Aho, Peter Weinberger,and Brain Kernighan
+TAPL= The AWK Programming Language
+
 - awk '{print $0}' /etc/passwd # 和cat差不多，显示文本内容
 查看恶意IP试图登录次数：
 - lastb | awk '{ print $3 }' | sort | uniq -c | sort -n  ## 亲测可用,看上去挺吓人的
