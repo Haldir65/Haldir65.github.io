@@ -9,9 +9,12 @@ top : 1
 一些常用的linux基本命令,仅作为参考。
 >  nohup node server.js > /dev/null 2>&1 &
 
+
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/bamboo-buds-wallpaper-53859567dd31a.jpg?imageView2/2/w/600)
 
  <!--more-->
+
+
 
 首先是连接vps的ssh(Secure Shell)工具，putty或者xshell都可以,putty改颜色[教程](http://www.cnblogs.com/nayitian/archive/2013/01/18/2866690.html)。
 
@@ -33,6 +36,8 @@ top : 1
 11. [通用配置](#11-常用配置)
 
 [参考](#参考)
+
+ 另外一篇关于[linux命令的补充](http://haldir65.github.io/2017/06/18/2017-06-18-linux-commands-extended/)
 
 
 ### 1. 文件操作常用命令
