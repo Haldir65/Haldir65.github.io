@@ -267,7 +267,7 @@ history 10 ##列出最近执行的10条命令
 ### 21. 使用sshKeyGen免密码登录的方式
 首先在windows上安装putty，默认会装上puttyGen。
 在开始菜单里面总归能找到。
-点击那个generate按钮，按照提示鼠标不停挪动，进度条走完。会生成公钥，点击Save private key生成私钥。提示保存在一个文件中，这个要保存好。
+点击那个generate按钮，按照提示鼠标不停挪动，进度条走完。会生成公钥，点击Save private key生成私钥。提示保存在一个文件中，这个要保存好。暂时不要关闭puttygen,需要直接去复制粘贴那个public key(因为要是生成了一个public key，由于windows的原因，中间可能存在换行，就得在文本编辑器里面删掉所有的换行符，非常麻烦)
 密码登录到服务器端，cd到~/.ssh/文件夹下，没有就mkdir一个，创建一个authorized_keys的文件，要是本来就有，echo > autorized_keys，把内容清除干净。
 把自己刚才生成的public key粘贴进去，保存文件。
 看下/etc/ssh/sshd_config中是否符合如下描述如下条件
@@ -276,10 +276,12 @@ RSAAuthentication yes
 PubkeyAuthentication yes
 PermitRootLogin yes
 ```
-
+还要给权限
+chmod 700 ~/.ssh && chmod 600 ~/.ssh/authorized_keys
 重启ssh服务： service sshd restart
 putty登录窗口左侧有一个loggin-auth，进去选择自己windows上刚才保存的私钥文件。登录输入账户名即可自动登录成功。
 [PUTTYGEN - KEY GENERATOR FOR PUTTY ON WINDOWS](https://www.ssh.com/ssh/putty/windows/puttygen)
+[有什么问题的话看这个](https://stackoverflow.com/questions/6377009/adding-public-key-to-ssh-authorized-keys-does-not-log-me-in-automatically)
 
 ### 22.iptables命令
 用防火墙屏蔽掉指定ip
