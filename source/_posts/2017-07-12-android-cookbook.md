@@ -140,7 +140,7 @@ Android相关
     - [X] FrameLayout
     - [ ] LinearLayout
     - [ ] RelativeLayout
-    - [ ] PopupWindow(api24以上的深坑网上也有解决方法)
+    - [X] PopupWindow(api24以上的深坑网上也有解决方法)
     - [X] Dialog
     - [ ] ImageView
     - [ ] TextView(super complicated)

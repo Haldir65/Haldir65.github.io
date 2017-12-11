@@ -67,6 +67,15 @@ IBM给出了删除一些垃圾文件的建议[使用 Linux 命令删除垃圾文
 > sudo apt-get autoclean 清理旧版本的软件缓存
 sudo apt-get clean 清理所有软件缓存
 sudo apt-get autoremove 删除系统不再使用的孤立软件
+
+autoremove有时候会报错：
+> The link /initrd.img.old is a damaged link
+Removing symbolic link initrd.img.old
+ you may need to re-run your boot loader[grub]
+
+ 根据[askubuntu](https://askubuntu.com/questions/518997/how-do-i-re-run-boot-loader)的解答，不用管
+
+>
 du --max-depth=1 -h # 查看当前路径下所有文件/文件夹的大小
 du -k --max-depth=2 | sort -rn # 加上排序
 find / -name core -print -exec rm -rf {} \; //分号也要，亲测
@@ -357,13 +366,18 @@ $$ 当前进程的进程号（PID）
 $! 后台运行的最后一个进程的进程号（PID）
 ```
 
+## 24.  Linux软件安装目录惯例
+转载自[](http://blog.csdn.net/aqxin/article/details/48324377)。
+一般特定文件夹里放什么东西是有惯例的。
 
-Mere trash
-===============================================================================
-[LINUX下的21个特殊符号](http://blog.51cto.com/litaotao/1187983)
-[Shell学习笔记](https://notes.wanghao.work/2015-06-02-Shell%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html)
+/usr：系统级的目录，可以理解为C:/Windows/，/usr/lib理解为C:/Windows/System32。
+/usr/local：用户级的程序目录，可以理解为C:/Progrem Files/。用户自己编译的软件默认会安装到这个目录下。
+/opt：用户级的程序目录，可以理解为D:/Software，opt有可选的意思，这里可以用于放置第三方大型软件（或游戏），当你不需要时，直接rm -rf掉即可。在硬盘容量不够时，也可将/opt单独挂载到其他磁盘上使用。
 
+/usr/src：系统级的源码目录。
+/usr/local/src：用户级的源码目录。
 
+各个目录
 youtube-dl的安装途径就是下一个软件下来，然后chmod给权限，然后
 /usr/local/bin/youtube-dl和直接敲youtube-dl是一个命令。好像放在这个目录下面就好了。
 关于这些目录的[解释](http://blog.csdn.net/test1280/article/details/70143465)
@@ -372,15 +386,23 @@ youtube-dl的安装途径就是下一个软件下来，然后chmod给权限，�
 /usr/bin：通常是一些非必要的，但是普通用户和超级用户都可能使用到的命令
 /usr/local/bin：通常是用户后来安装的软件，可能被普通用户或超级用户使用
 
-
-```shell
-youtube-dl -o '%(title)s.%(ext)s' https://www.youtube.com/watch?v=rimXGaUdaLg
-```
-
+## 25. 一个往dropBox上传文件的Script
 dropbox的网盘空间不用感觉有点浪费了，一个将本地文件上传到dropBox的脚本[Dropbox-Uploader](https://github.com/andreafabrizi/Dropbox-Uploader)
 亲测可用，也不是一个需要启动时跑起来的程序，就是一个给参数就上传的脚本。
 ```shell
 ./dropbox_uploader.sh upload /localFileOrDir /dropBoxFileOrDir
+```
+
+
+
+
+Mere trash
+===============================================================================
+[LINUX下的21个特殊符号](http://blog.51cto.com/litaotao/1187983)
+[Shell学习笔记](https://notes.wanghao.work/2015-06-02-Shell%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html)
+
+```shell
+youtube-dl -o '%(title)s.%(ext)s' https://www.youtube.com/watch?v=rimXGaUdaLg
 ```
 
 

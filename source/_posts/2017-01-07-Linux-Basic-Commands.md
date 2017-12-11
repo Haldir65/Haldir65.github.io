@@ -30,12 +30,12 @@ top : 1
 5. [文件权限](#5-文件权限的问题)
 6. [管道](#6-管道)
 7. [硬件相关的命令](#7-硬件相关的命令)
-8. [SS相关的命令](#8-SS相关的命令)
-9. [网络监控](#9-网络监控)
+8. [软件的安装，卸载](#8-软件的安装，卸载)
+9.  [网络监控](#9-网络监控)
 10. [查看进程](#10-查看进程)
 11. [通用配置](#11-常用配置)
 
-[参考](#参考)
+    [参考](#参考)
 
  另外一篇关于[linux命令的补充](http://haldir65.github.io/2017/06/18/2017-06-18-linux-commands-extended/)
 
@@ -108,8 +108,6 @@ zip –q –r video.zip .  # .代表当前目录
 
 ```
 
-
-
 ### 2. Vi文本编辑器
 ```shell
 - > vi 3.txt // 如果有则编辑，没有则直接创建
@@ -139,6 +137,10 @@ Vi分为命令模式和编辑模式，一进来是命令模式，输入'a'进入
 - > xxd -b fileName // 看binaryFile不能用cat
 ```
 
+tail还有一个好处，可以实时查看文件内容，比如文件正在更新，可以实时查看最新的日志
+> tail -f /var/log/messages
+
+***所以后台开发就喜欢这么干: tail一个日志，狂按回车键，然后用客户端访问某个url，看下有没有报错。***
 
 更多命令如 find 、 whereis 、 Li(Link)
 查找：
@@ -290,7 +292,6 @@ chmod a+x a.txt
 #其余自行发挥
 chmod a-x a.txt  #删除所有用户的可执行权限
 
-
 chmod 755 filename  
 751应该是读/写/执行
 chomod 444 filename# 为所有用户分配读权限
@@ -318,158 +319,6 @@ $ ls -l | grep "^d" //只列出目录
 
 
 ### 7. 硬件相关的命令
-
-[VPS跑分软件](https://github.com/Teddysun/across)
-
-
-> git clone下来
-> cd across
-> wget -qO- bench.sh | bash （亲测可用，也可以自己看Readme）
-或者 > curl -Lso- bench.sh | bash
-
-
-### BandWagon
-```
-----------------------------------------------------------------------
-CPU model            : Intel(R) Xeon(R) CPU E3-1275 v5 @ 3.60GHz
-Number of cores      : 1
-CPU frequency        : 3600.041 MHz
-Total size of Disk   : 12.0 GB (10.0 GB Used)
-Total amount of Mem  : 256 MB (217 MB Used)
-Total amount of Swap : 128 MB (122 MB Used)
-System uptime        : 2 days, 4 hour 20 min
-Load average         : 0.06, 0.05, 0.01
-OS                   : Ubuntu 14.04.1 LTS
-Arch                 : i686 (32 Bit)
-Kernel               : 2.6.32-042stab123.3
-----------------------------------------------------------------------
-I/O speed(1st run)   : 855 MB/s
-I/O speed(2nd run)   : 1.0 GB/s
-I/O speed(3rd run)   : 1.0 GB/s
-Average I/O speed    : 967.7 MB/s
-----------------------------------------------------------------------
-Node Name                       IPv4 address            Download Speed
-CacheFly                        205.234.175.175         76.5MB/s
-Linode, Tokyo, JP               106.187.96.148          17.6MB/s
-Linode, Singapore, SG           139.162.23.4            8.18MB/s
-Linode, London, UK              176.58.107.39           8.67MB/s
-Linode, Frankfurt, DE           139.162.130.8           12.8MB/s
-Linode, Fremont, CA             50.116.14.9             9.40MB/s
-Softlayer, Dallas, TX           173.192.68.18           62.3MB/s
-Softlayer, Seattle, WA          67.228.112.250          66.0MB/s
-Softlayer, Frankfurt, DE        159.122.69.4            12.2MB/s
-Softlayer, Singapore, SG        119.81.28.170           11.8MB/s
-Softlayer, HongKong, CN         119.81.130.170          13.2MB/s
-----------------------------------------------------------------------
-
-```
-### BuyVm
-```
-CPU model            : Intel(R) Xeon(R) CPU           L5639  @ 2.13GHz
-Number of cores      : 1
-CPU frequency        : 2000.070 MHz
-Total size of Disk   : 15.0 GB (1.3 GB Used)
-Total amount of Mem  : 128 MB (80 MB Used)
-Total amount of Swap : 128 MB (32 MB Used)
-System uptime        : 0 days, 22 hour 28 min
-Load average         : 0.10, 0.04, 0.05
-OS                   : Ubuntu 14.04.2 LTS
-Arch                 : i686 (32 Bit)
-Kernel               : 2.6.32-openvz-042stab116.2-amd64
-----------------------------------------------------------------------
-I/O speed(1st run)   : 102 MB/s
-I/O speed(2nd run)   : 97.1 MB/s
-I/O speed(3rd run)   : 147 MB/s
-Average I/O speed    : 115.4 MB/s
-----------------------------------------------------------------------
-Node Name                       IPv4 address            Download Speed
-CacheFly                        205.234.175.175         14.7MB/s
-Linode, Tokyo, JP               106.187.96.148          6.15MB/s
-Linode, Singapore, SG           139.162.23.4            2.54MB/s
-Linode, London, UK              176.58.107.39           2.99MB/s
-Linode, Frankfurt, DE           139.162.130.8           2.96MB/s
-Linode, Fremont, CA             50.116.14.9             4.27MB/s
-Softlayer, Dallas, TX           173.192.68.18           11.7MB/s
-Softlayer, Seattle, WA          67.228.112.250          13.0MB/s
-Softlayer, Frankfurt, DE        159.122.69.4            1.89MB/s
-Softlayer, Singapore, SG        119.81.28.170           3.26MB/s
-Softlayer, HongKong, CN         119.81.130.170          3.72MB/s
-----------------------------------------------------------------------
-```
-
-### DigitalOcean Los Angeles
-
-```
-----------------------------------------------------------------------
-CPU model            : Intel(R) Xeon(R) CPU E5-2650L v3 @ 1.80GHz
-Number of cores      : 1
-CPU frequency        : 1799.998 MHz
-Total size of Disk   : 20.2 GB (1.0 GB Used)
-Total amount of Mem  : 488 MB (33 MB Used)
-Total amount of Swap : 0 MB (0 MB Used)
-System uptime        : 0 days, 0 hour 3 min
-Load average         : 0.16, 0.10, 0.03
-OS                   : Ubuntu 16.04.2 LTS
-Arch                 : x86_64 (64 Bit)
-Kernel               : 4.4.0-78-generic
-----------------------------------------------------------------------
-I/O speed(1st run)   : 581 MB/s
-I/O speed(2nd run)   : 711 MB/s
-I/O speed(3rd run)   : 777 MB/s
-Average I/O speed    : 689.7 MB/s
-----------------------------------------------------------------------
-Node Name                       IPv4 address            Download Speed
-CacheFly                        205.234.175.175         161MB/s
-Linode, Tokyo, JP               106.187.96.148          15.7MB/s
-Linode, Singapore, SG           139.162.23.4            5.96MB/s
-Linode, London, UK              176.58.107.39           5.71MB/s
-Linode, Frankfurt, DE           139.162.130.8           6.45MB/s
-Linode, Fremont, CA             50.116.14.9             30.4MB/s
-Softlayer, Dallas, TX           173.192.68.18           29.9MB/s
-Softlayer, Seattle, WA          67.228.112.250          57.7MB/s
-Softlayer, Frankfurt, DE        159.122.69.4            3.64MB/s
-Softlayer, Singapore, SG        119.81.28.170           7.59MB/s
-Softlayer, HongKong, CN         119.81.130.170          8.84MB/s
-----------------------------------------------------------------------
-```
-
-### DigitalOcean Sinapore (ip adress lokks like Russian)
-```
-----------------------------------------------------------------------
-CPU model            : Intel(R) Xeon(R) CPU E5-2630L 0 @ 2.00GHz
-Number of cores      : 1
-CPU frequency        : 1999.999 MHz
-Total size of Disk   : 20.2 GB (1.0 GB Used)
-Total amount of Mem  : 488 MB (36 MB Used)
-Total amount of Swap : 0 MB (0 MB Used)
-System uptime        : 0 days, 0 hour 2 min
-Load average         : 0.17, 0.20, 0.09
-OS                   : Ubuntu 16.04.2 LTS
-Arch                 : x86_64 (64 Bit)
-Kernel               : 4.4.0-78-generic
-----------------------------------------------------------------------
-I/O speed(1st run)   : 662 MB/s
-I/O speed(2nd run)   : 741 MB/s
-I/O speed(3rd run)   : 728 MB/s
-Average I/O speed    : 710.3 MB/s
-----------------------------------------------------------------------
-Node Name                       IPv4 address            Download Speed
-CacheFly                        205.234.175.175         20.8MB/s
-Linode, Tokyo, JP               106.187.96.148          18.6MB/s
-Linode, Singapore, SG           139.162.23.4            83.8MB/s
-Linode, London, UK              176.58.107.39           5.71MB/s
-Linode, Frankfurt, DE           139.162.130.8           8.13MB/s
-Linode, Fremont, CA             50.116.14.9             2.82MB/s
-Softlayer, Dallas, TX           173.192.68.18           6.18MB/s
-Softlayer, Seattle, WA          67.228.112.250          8.47MB/s
-Softlayer, Frankfurt, DE        159.122.69.4            6.77MB/s
-Softlayer, Singapore, SG        119.81.28.170           97.9MB/s
-Softlayer, HongKong, CN         119.81.130.170          35.2MB/s
-----------------------------------------------------------------------
-
-```
-
-
 查看硬盘存储空间:
 ```shell
 df -h //h的意思是human-readable
@@ -509,6 +358,9 @@ service ssh restart
 看下成功登录历史
 ```shell
 - last | less | sort -rn
+
+### who 命令更好，是指wtmp文件创建以来的登录记录
+who /var/log/wtmp
 ```
 
 压缩文件命令
@@ -530,112 +382,69 @@ zip –q –r -v video.zip . #加上一个-v主要是为了能够实时查看输
 然后
 > pscp -P 12345-r root@202.123.123.123:"/root/fileonServer.mp4" d:/whateveriwantonmyPc.mp4  ## -p要大写
 
-### 8. SS相关的命令
+### 8. 软件的安装，卸载(dpkg命令，不要只会apt-get)
+ 在debian下，你可以使用dpkg(Debian package system)来安装和卸载软件包。
+ 还是那句话，没事不要手贱升级软件
+```shell
+### （1）移除式卸载：
+apt-get remove softname1 softname2 …; （移除软件包，当包尾部有+时，意为安装）
+### （2）清除式卸载 ：
+apt-get --purge remove softname1 softname2...;(同时清除配置)
+### 清除式卸载：
+apt-get purge sofname1 softname2...;(同上，也清除配置文件)
+
+### （1）移除式卸载：
+dpkg -r pkg1 pkg2 ...;
+
+###（2）清除式卸载：
+dpkg -P pkg1 pkg2...;
+
+### 使用dpkg安装deb包
+dpkg -i tcl8.4_8.4.19-2_amd64.deb  
+
+###使用kpkg -r来删除deb包
+dpkg -r tcl8.4
 ```
-  1. 刚装好的ubuntu需要执行以下步骤
-  安装git > apt-get install git
-  安装python > apt-get install python-2.7
-  安装python-setuptools > apt-get install python-setuptools
-  检查是否安装好： python --version
+参考[Ubuntu 中软件的安装、卸载以及查看的方法总结](http://qiuye.iteye.com/blog/461394)
 
+关于apt-get
+```shell
+apt-cache search # ------(package 搜索包)
+apt-cache show #------(package 获取包的相关信息，如说明、大小、版本等)
+apt-get install # ------(package 安装包)
+apt-get install # -----(package --reinstall 重新安装包)
+apt-get -f install # -----(强制安装, "-f = --fix-missing"当是修复安装吧...)
+apt-get remove #-----(package 删除包)
+apt-get remove --purge # ------(package 删除包，包括删除配置文件等)
+apt-get autoremove --purge # ----(package 删除包及其依赖的软件包+配置文件等（只对6.10有效，强烈推荐）)
+apt-get update #------更新源
+apt-get upgrade #------更新已安装的包
+apt-get dist-upgrade # ---------升级系统
+apt-get dselect-upgrade #------使用 dselect 升级
+apt-cache depends #-------(package 了解使用依赖)
+apt-cache rdepends # ------(package 了解某个具体的依赖,当是查看该包被哪些包依赖吧...)
+apt-get build-dep # ------(package 安装相关的编译环境)
+apt-get source #------(package 下载该包的源代码)
+apt-get clean && apt-get autoclean # --------清理下载文件的存档 && 只清理过时的包
+apt-get check #-------检查是否有损坏的依赖
+dpkg -S filename -----查找filename属于哪个软件包
+apt-file search filename -----查找filename属于哪个软件包
+apt-file list packagename -----列出软件包的内容
+apt-file update --更新apt-file的数据库
 
-  2. 下载shadowsocks源码编译
- > git clone https://github.com/shadowsocks/shadowsocks
-  # 记得切换到master分支
-  python setup.py build
-  python setup.py install
-
-  检查下版本 ssserver --version
-
-  3. 编辑配置文件
-  vim config.json
-  {
-   "server":"my_server_ip",
-   "server_port":8388,
-   "local_address": "127.0.0.1",
-   "local_port":1080,
-   "password":"mypassword",
-   "timeout":300,
-   "method":"aes-256-cfb",
-   "fast_open": false
-}
-
-ssserver -c config.json -d start #启动完成
-
-检查下是否启动了
-ps -ef |grep sss
-
-ss 命令
-ssserver -c /etc/shadowsocks/config.json # 前台运行
-
-- 后台运行和停止
-ssserver -c /etc/shadowsocks.json -d start
-ssserver -c /etc/shadowsocks.json -d stop
-
-- 加入开机启动
-
-在/etc/rc.local中加入
-sudo ssserver -c /etc/shadowsocks.json --user username -d start - 不要总是用root用户做事，adduser来做，给sudo权限即可
-
-[ShadowsocksR](https://github.com/breakwa11/shadowsocks-rss/wiki)启动后台运行命令
-> python server.py -p 443 -k password -m aes-256-cfb -O auth_sha1_v4 -o http_simple -d start
-
-[net-speeder](https://zhgcao.github.io/2016/05/26/ubuntu-install-net-speeder/)
-venetX，OpenVZ架构
-
-cd net-speeder-master/
-sh build.sh -DCOOKED
-
-Xen，KVM，物理机
-cd net-speeder-master/
-sh build.sh
-
-
-加速所有ip协议数据
-
-> ./net_speeder venet0 "ip"
-
-只加速指定端口，例如只加速TCP协议的 8989端口
-前提是切换到net-speeder的目录下
-> ./net_speeder venet0:0 "tcp src port 8989"
-
-./net_speeder venet0 "ip"
-
-只加速指定端口，例如只加速TCP协议的 8989端口
-前提是切换到net-speeder的目录下
- ./net_speeder venet0:0 "tcp src port 8989"
-
- [KVM架构升级内核开启BBR](https://qiujunya.com/linodebbr.html)
-
-
+dpkg --info "软件包名" --列出软件包解包后的包名称.
+dpkg -l --列出当前系统中所有的包.可以和参数less一起使用在分屏查看. (类似于rpm -qa)
+dpkg -l |grep -i "软件包名" --查看系统中与"软件包名"相关联的包.
+dpkg -s 查询已安装的包的详细信息.
+dpkg -L 查询系统中已安装的软件包所安装的位置. (类似于rpm -ql)
+dpkg -S 查询系统中某个文件属于哪个软件包. (类似于rpm -qf)
+dpkg -I 查询deb包的详细信息,在一个软件包下载到本地之后看看用不用安装(看一下呗).
+dpkg -i 手动安装软件包(这个命令并不能解决软件包之前的依赖性问题),如果在安装某一个软件包的时候遇到了软件依赖的问题,可以用apt-get -f install在解决信赖性这个问题.
+dpkg -r 卸载软件包.不是完全的卸载,它的配置文件还存在.
+dpkg -P 全部卸载(但是还是不能解决软件包的依赖性的问题)
+dpkg -reconfigure 重新配置
 ```
 
-[ubuntu 16.4安装shadowsocks-libev](http://www.itfanr.cc/2016/10/02/use-shadowsocks-to-have-better-internet-experience/)
-
-参考github[官方教程](https://github.com/shadowsocks/shadowsocks-libev)安装
-```
-
-sudo apt-get install software-properties-common -y
-sudo add-apt-repository ppa:max-c-lv/shadowsocks-libev -y
-sudo apt-get update
-sudo apt install shadowsocks-libev
-
-# Edit the configuration file
-sudo vi /etc/shadowsocks-libev/config.json ## 这里记得把server address改成实际的ip
-
-# Edit the default configuration for debian
-sudo vi /etc/default/shadowsocks-libev
-
-# Start the service
-sudo /etc/init.d/shadowsocks-libev start    # for sysvinit, or
-sudo systemctl start shadowsocks-libev      # for systemd
-
-##加入开机启动
-在/etc/rc.local中加入
-sudo /etc/init.d/shadowsocks-libev start
-
-```
-其实跟安装ss很像的
 
 ### 9. 网络监控
 ```shell
@@ -789,8 +598,6 @@ sudo dpkg-reconfigure locales
 ```
 
 
-### 12. Putty使用sshKey登录
-[Deploy Node.js App To Digital Ocean Server](https://www.youtube.com/watch?v=RE2PLyFqCzE)
 
 ### 参考
 

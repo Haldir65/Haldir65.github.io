@@ -11,10 +11,10 @@ tags: [python]
 ## 1. virtualenv install
 
 ```bash
-sudo pip install virtualenv 
+sudo pip install virtualenv
 sudo virtualenv venv
-source venv/bin/activate 
-sudo pip install Flask 
+source venv/bin/activate
+sudo pip install Flask
 
 
 # sudo python __init__.py
@@ -35,9 +35,6 @@ activate.bat # 此时光标变成(env) >.
 
 ## 2. install apache2 , mysql-server... on ubuntu
     重启apache2服务 service apache2 restart
-
-
-
 
 
 ### Reference

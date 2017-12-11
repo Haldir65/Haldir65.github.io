@@ -226,6 +226,16 @@ MarkDown页面内部跳转
 ## 9. 有时候写的代码会给你在每一行前面加上true
 比如写一段css的代码时候，很多时候预览会给每一行前面加上一个true，解决办法：用TAB键缩进即可
 
+## 10. markdown-live是一个非常好用的node module
+[项目地址](https://www.npmjs.com/package/markdown-live)
+**前提是安装了node**
+>  npm install -g markdown-live
+
+>md-live
+
+<br>
+***编辑md文件的同时，保存就会同步刷新网页预览，非常好用***
+
 ### 参考
 - [Hexo博文置顶技巧](http://yanhuili.github.io/2016/11/21/hexo%E5%8D%9A%E6%96%87%E7%BD%AE%E9%A1%B6%E6%8A%80%E5%B7%A7/)
 - [SublimeText快捷键](http://www.daqianduan.com/4820.html)
