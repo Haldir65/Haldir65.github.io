@@ -11,7 +11,7 @@ tags: [前端]
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600)
 ## html一些容易忽视的点
 
-
+html标签中可以添加data-XXX标签用于把数据和ui块绑定。
 
 Ajax(Asynchronous javaScript & xml)，从命名上来看就是异步的
 json(JavaScript Object notation),摆明着就是给js用的
@@ -27,6 +27,9 @@ p tag 里面能够放一个小的Strong tag
   <div>哈哈</div>
 </p>
 ```
+In JavaScript these two are equivalent:
+>object.Property
+object["Property"];
 
 ## 工具
 

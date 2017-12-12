@@ -1,5 +1,5 @@
 ---
-title: 在ubuntu服务器上部署flask web app
+title: 在ubuntu服务器上部署web app
 date: 2017-06-25 22:46:23
 categories: blog
 tags: [python]
@@ -35,6 +35,20 @@ activate.bat # 此时光标变成(env) >.
 
 ## 2. install apache2 , mysql-server... on ubuntu
     重启apache2服务 service apache2 restart
+
+
+
+## 3. Deploying node app on ubuntu(backgroud)
+三种方法
+
+> 1.  nohup node /home/zhoujie/ops/app.js & ## nohup就是不挂起的意思( no hang up)。 ignoring input and appending output to nohup.out // 输出被写入当前目录下的nohup.out文件中
+> 2. screen ## 新开一个screen
+> 3. pm2
+npm install -g pm2
+pm2 start app.js
+
+[Configure Nginx as a web server and reverse proxy for Nodejs application on AWS Ubuntu 16.04 server](https://medium.com/@utkarsh_verma/configure-nginx-as-a-web-server-and-reverse-proxy-for-nodejs-application-on-aws-ubuntu-16-04-server-872922e21d38)
+
 
 
 ### Reference
