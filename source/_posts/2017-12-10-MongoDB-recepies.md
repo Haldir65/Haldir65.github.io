@@ -8,3 +8,22 @@ tags:
 
 MongoDB
 Mongoose // a wrapper around the mongo db interface
+
+
+
+## 安装(windows )
+
+
+MongoDB默认装到C盘的program files文件夹里面,需要一个data文件夹
+[official on installation](https://docs.mongodb.com/v3.4/tutorial/install-mongodb-on-windows/)
+
+
+##
+
+[Tutorial, not official](https://www.tutorialspoint.com/mongodb/mongodb_create_collection.htm)
+
+
+
+语法：
+>           
+创建Database的

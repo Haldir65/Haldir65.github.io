@@ -4,9 +4,38 @@ tags: [tools,linux]
 ---
 
 we need a new blog post on vps and ssserver,entitled
+
+todo:
+Add new post on SpringBoot setup and stuffs
+在windows里面查看内网ip，从控制面板进去看是不准的，DHCP有效期过了自动换掉，得自己敲ipconfig，这样才是最及时的。
+
+Spring Boot修改内置Tomcat端口号：
+EmbeddedServletContainerCustomizer
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Creating a Spring Application in Intelij is darn Simple](https://medium.com/@ahmetkapusuz/spring-boot-hello-world-application-with-intellij-idea-1524c68ddaae)
+
+
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100756208.jpg?imageView2/2/w/600)
 <!--more-->
 
+## 装ss
 
 ```
   1. 刚装好的ubuntu需要执行以下步骤
@@ -115,6 +144,7 @@ sudo /etc/init.d/shadowsocks-libev start
 其实跟安装ss很像的
 
 
+## 跑分
 [VPS跑分软件](https://github.com/Teddysun/across)
 
 
