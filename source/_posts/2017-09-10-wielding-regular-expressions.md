@@ -13,7 +13,6 @@ tags: [tools]
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/bee-getting-the-pollen-wallpaper-538358eb5d5a3.jpg?imageView2/2/w/600)
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery151110067848.jpg?imageView2/2/w/600)
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100718415.jpg?imageView2/2/w/600)
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100670897.jpg?imageView2/2/w/600)
 
 
 

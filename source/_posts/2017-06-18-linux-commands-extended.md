@@ -322,7 +322,7 @@ iptables -A FORWARD -j REJECT
 **注意还需要将上述规则添加到开机启动中**，还有使用iptables屏蔽来自[某个国家的IP](https://www.vpser.net/security/iptables-block-countries-ip.html)的教程
 
 
-## 23. 变量($其实就是美元符号了)
+### 23. 变量($其实就是美元符号了)
 变量调用符号($)
 ```shell
 LI=date
@@ -366,7 +366,7 @@ $$ 当前进程的进程号（PID）
 $! 后台运行的最后一个进程的进程号（PID）
 ```
 
-## 24.  Linux软件安装目录惯例
+### 24.  Linux软件安装目录惯例
 转载自[](http://blog.csdn.net/aqxin/article/details/48324377)。
 一般特定文件夹里放什么东西是有惯例的。
 
@@ -386,13 +386,14 @@ youtube-dl的安装途径就是下一个软件下来，然后chmod给权限，�
 /usr/bin：通常是一些非必要的，但是普通用户和超级用户都可能使用到的命令
 /usr/local/bin：通常是用户后来安装的软件，可能被普通用户或超级用户使用
 
-## 25. 一个往dropBox上传文件的Script
+### 25. 一个往dropBox上传文件的Script
 dropbox的网盘空间不用感觉有点浪费了，一个将本地文件上传到dropBox的脚本[Dropbox-Uploader](https://github.com/andreafabrizi/Dropbox-Uploader)
 亲测可用，也不是一个需要启动时跑起来的程序，就是一个给参数就上传的脚本。
 ```shell
 ./dropbox_uploader.sh upload /localFileOrDir /dropBoxFileOrDir
 ```
 
+### 26. Nano文本编辑器
 
 
 

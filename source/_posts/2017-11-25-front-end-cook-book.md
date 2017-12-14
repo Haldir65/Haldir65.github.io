@@ -11,9 +11,6 @@ tags: [前端]
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600)
 ## html一些容易忽视的点
 
-
-[前端常用的js和css库](https://juejin.im/post/5a30870c6fb9a04522077c88)
-
 html标签中可以添加data-XXX标签用于把数据和ui块绑定。
 
 Ajax(Asynchronous javaScript & xml)，从命名上来看就是异步的
@@ -44,8 +41,9 @@ object["Property"];
 - Prettier
 - Vetur
 - Vue2 Snippets
+- Bracket Pair Colorizer
 
-VSCode快捷键
+VSCode快捷键(其实可以自己配置的，vs的设置文件就是一个很大的json)
 
 
 在不会自己搭服务的情况下只好拿一些免费的api凑合了
@@ -150,28 +148,6 @@ atom的emmet插件很好用
 minimap,emmet,file icons，atom liveserver,atom beautify
 
 atom中输入vue,会自动提示生成vue模板,输入re会生成react Boilplate。前提是在js,vue,html文件中。
-
-
-
-关于跨域：
-解决方案有很多:
-跨域资源共享 CORS、jsonp,iframe跨域
-CORS属于主流，关键在于后台实现了接口。不仅支持GET,还支持POST。浏览器方面,IE10及以上都支持。
-[前端常见跨域方案](https://segmentfault.com/a/1190000011145364)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ## 参考
 
