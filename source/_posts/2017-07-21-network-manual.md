@@ -27,7 +27,7 @@ query(查询) 一般GET请求可以在这里面查找。可选，用于给动态
 fragment（信息片断）字符串，用于指定网络资源中的片断。例如一个网页中有多个名词解释，可使用fragment直接定位到某一名词解释。
 
 
-### 1.1 Http的GET请求的url长度是有限制的
+### 1.1 Http的GET请求的url长度是有限制的(服务器和浏览器都限制了)
 Http1.1协议中并没有做这个限制，但通信的两端，服务器(Nginx和Tomcat)和客户端(浏览器厂商)都做了限制。[参考](https://cnbin.github.io/blog/2016/02/20/httpxie-yi-zhong-de-ge-chong-chang-du-xian-zhi-zong-jie/)
 一些浏览器的url长度限制，即url长度不能超过这么多个字符
 - IE : 2803
@@ -53,7 +53,7 @@ Cookie: BAIDUID=325243543:FG=1; PSTM=543534543; BIDUPSID=54353; pgv_pvi=5435; MC
 
 ###1.2 GET和POST的一些小区别
 GET只会发一个TCP包，POST发两个(一个是Header,一个是Body)。所以GET快一点，POST要求服务器长时间处于连接状态，可能造成服务器负载升高。
-一个比较实在的例子是，我在七牛的CDN上看到的收费价格1万次PUT/10万次GET，不用想也知道GET对于服务器的压力要比PUT小
+***一个比较实在的例子是，我在七牛的CDN上看到的收费价格1万次PUT/10万次GET，不用想也知道GET对于服务器的压力要比PUT小***
 
 
 ## 2. http请求本质上是发送了一堆字符给服务器
@@ -61,6 +61,23 @@ GET只会发一个TCP包，POST发两个(一个是Header,一个是Body)。所以
 而在http请求的header中经常或看到
 Host: www.baidu.com\r\n 这样的一行，其实这是[Http头字段](https://zh.wikipedia.org/wiki/HTTP%E5%A4%B4%E5%AD%97%E6%AE%B5)的标准请求字段，总之就是标准。这个Host指的是服务器的域名，就是domian。
 wiki上的[http名词解释](https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6%9C%AC%E4%BC%A0%E8%BE%93%E5%8D%8F%E8%AE%AE)
+
+### 2.1 statusCode有些常用的还是要记住的：
+[比较好的一个表格](http://www.cnblogs.com/mayingbao/archive/2007/11/30/978530.html)
+> 101 Switching Protocols (注意WebSocket)
+200 一切正常，对GET和POST请求的应答文档跟在后面。
+201 Created 比如刚刚向服务器提交了一次POST请求创建了一项资源
+301 Moved Permanently 客户请求的文档在其他地方，新的URL在Location头中给出，浏览器应该自动地访问新的URL。
+302 Found 类似于301，但新的URL应该被视为临时性的替代，而不是永久性的。
+304 Not Modified 客户端有缓冲的文档并发出了一个条件性的请求（一般是提供If-Modified-Since头表示客户只想比指定日期更新的文档）。服务器告诉客户，原来缓冲的文档还可以继续使用。
+401 Unauthorized
+403 Forbidden
+404 Not Found
+414 Request URI Too Long URI太长（HTTP 1.1新）。这就是上面说的Http的GET请求的url长度是有限制的，是服务器方做出的限制
+500 Internal Server Error
+502 Bad Gateway 服务器作为网关或者代理时，为了完成请求访问下一个服务器，但该服务器返回了非法的应答。
+503 Service Unavailable 服务器由于维护或者负载过重未能应答。例如，Servlet可能在数据库连接池已满的情况下返回503。服务器返回503时可以提供一个Retry-After头。就是服务器扛不住了的意思
+504 Gateway Timeout 由作为代理或网关的服务器使用，表示不能及时地从远程服务器获得应答。（HTTP 1.1新）
 
 ## 3. Header相关的
 首先看下请求百度首页的request和response
@@ -342,6 +359,12 @@ public class Test {
 - 抓包查看
 [详细教程](http://www.trinea.cn/android/tcpdump_wireshark/)
 
+
+### 9.Ajax和jQuery发起POST请求的时候设置的Content-Type对于服务器很重要
+[AJAX POST请求中参数以form data和request payload形式在servlet中的获取方式](http://blog.csdn.net/mhmyqn/article/details/25561535)
+> 最近在看书时才真正搞明白，服务器为什么会对表单提交和文件上传做特殊处理，因为表单提交数据是名值对的方式，且Content-Type为application/x-www-form-urlencoded，而文件上传服务器需要特殊处理，普通的post请求（Content-Type不是application/x-www-form-urlencoded）数据格式不固定，不一定是名值对的方式，所以服务器无法知道具体的处理方式，所以只能通过获取原始数据流的方式来进行解析。
+jquery在执行post请求时，会设置Content-Type为application/x-www-form-urlencoded，所以服务器能够正确解析，而使用原生ajax请求时，如果不显示的设置Content-Type，那么默认是text/plain，这时服务器就不知道怎么解析数据了，所以才只能通过获取原始数据流的方式来进行解析请求数据。
+
 ===========================trash here=====================================
 
 一些优化
@@ -364,7 +387,7 @@ tls,https加密过程，sha1和sha256加密算法
 
 ping ,traceRouter
 
-tcp三次握手四次挥手，用人话说：
+***tcp三次握手四次挥手，用人话说：***
 因为HTTP是一个基于TCP的协议,而TCP是一种可靠的传输层协议.建立TCP连接时会发生:
 三次握手(three-way handshake)
 firefox > nginx [SYN] 在么

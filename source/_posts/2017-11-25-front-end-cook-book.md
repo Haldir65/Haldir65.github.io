@@ -9,12 +9,13 @@ tags: [前端]
 
 <!--more-->
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600)
-## html一些容易忽视的点
 
+
+
+
+***Index***
+## html Related
 html标签中可以添加data-XXX标签用于把数据和ui块绑定。
-
-Ajax(Asynchronous javaScript & xml)，从命名上来看就是异步的
-json(JavaScript Object notation),摆明着就是给js用的
 
 p tag 里面能够放一个小的Strong tag
 ```html
@@ -27,12 +28,44 @@ p tag 里面能够放一个小的Strong tag
   <div>哈哈</div>
 </p>
 ```
+
+[什么在阻塞DOM？](https://juejin.im/post/587f4afb61ff4b00651b3c18)
+
+## css Related
+
+## Vanilla javaScript Related
+Ajax(Asynchronous javaScript & xml)，从命名上来看就是异步的
+
+json(JavaScript Object notation),摆明着就是给js用的
+
 In JavaScript these two are equivalent:
 >object.Property
 object["Property"];
 
-## 工具
 
+对于POST请求，如果Request中明确设置了:
+>
+xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+
+后台会认为这是一个提交表单的请求，body就应该设置为''
+[What is the difference between form data and request payload?](https://stackoverflow.com/questions/10494574/what-is-the-difference-between-form-data-and-request-payload)
+
+
+
+
+
+***Third Party Library***
+
+## Vue Related
+
+## jQuery Related
+jQuery是一个Dom Manipulate Library
+
+
+## Twitter BootStrap
+[BootStrap速查手册](https://getbootstrap.com/docs/4.0/layout/grid/#stacked-to-horizontal)
+
+## 工具
 ### vsCode插件推荐
 - Auto Close tag
 - Beautify
@@ -46,16 +79,11 @@ object["Property"];
 VSCode快捷键(其实可以自己配置的，vs的设置文件就是一个很大的json)
 
 
-在不会自己搭服务的情况下只好拿一些免费的api凑合了
+
+在<del>不会自己搭服务</dev>的情况下只好拿一些免费的api凑合了
 [posts](http://jsonplaceholder.typicode.com/posts)
+[cnodejs](https://cnodejs.org/api/v1/topics)
 
-
-## Vanilla js要点
-## css要点
-## jQuery要点
-jQuery是一个Dom Manipulate Library
-## Vue知识点
-## Twitter BootStrap [BootStrap速查手册](https://getbootstrap.com/docs/4.0/layout/grid/#stacked-to-horizontal)
 
 ## nginx使用
 官方说nginx的windows版本只供测试使用，性能不怎么样，但用于前端部署还是够用的。去[nginx网站](http://nginx.org/en/docs/windows.html)下载windows版本的nginx，解压缩，双击可执行文件nginx.exe。在这之前，最好先打开conf文件夹，编辑nginx.conf。设置一下端口，因为默认的80说不定就给谁占用了。其实用命令行也能启动：

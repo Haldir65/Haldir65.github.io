@@ -810,6 +810,9 @@ f();
 
 7. javaScript debug的方法：选中一个html 的tag，break on 。。。 自然会在执行到的时候停下来，evalulate value需要自己在console里面敲（注意此时应该位于Sources标签页下）。
 
+8.  json object有一个prototype属性，表面其所代表的类型。
+
+
 ## 1. js跨域请求
 [cors的概念](http://www.ruanyifeng.com/blog/2016/04/cors.html)
 > search "原生javaScript跨域"、'jsonp跨域请求豆瓣250'

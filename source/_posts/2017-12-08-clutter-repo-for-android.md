@@ -37,3 +37,18 @@ onDetachedFromWindow是从ActivityThread的handleDestoryActivity传下来的，�
 
 ### 7. Android默认的launcher的repo在
 [Launcher3](https://android.googlesource.com/platform/packages/apps/Launcher3/),应该是属于System UI Team在维护。
+
+### 8. 在string.xml里面放一些format的字符
+
+```java
+public static void main(String[] args) {
+   String s1 = "这里面可以放多个字符串%1$s,%2$s前面加上一个百分号和数字，代表顺序";
+   String s2 = "百分号的d和百分号的s可以混着%1$s用的，比如这个%2$d数字什么的，第三个是带百分号的数字%3$d%%这个由于需要显示百分号，所以加上两个百分号";
+
+   System.out.println(String.format(s1,"XXXX","XXX"));
+   System.out.println(String.format(s2,"XXX", 100, 100));
+}
+```
+实际输出
+> 这里面可以放多个字符串XXXX,XXX前面加上一个百分号和数字，代表顺序
+百分号的d和百分号的s可以混着XXX用的，比如这个100数字什么的，第三个是带百分号的数字100%这个由于需要显示百分号，所以加上两个百分号
