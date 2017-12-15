@@ -154,18 +154,20 @@ request中常见的请求头包括：
 - Accept-Language 指定Http客户端浏览器用来优先展示的语言
 示例: Accept-Language:zh-CN,zh;q=0.8,en-US;q=0.6,en;q=0.4
 
-- Cache-Control： [参考](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=zh-cn)
+  - Cache-Control： [参考](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=zh-cn)
 具体操作[百度百科](https://baike.baidu.com/item/Cache-Control)写的很清楚
 可能的值包括：
 
 public 所有内容都将被缓存(客户端和代理服务器都可缓存)
 private 内容只缓存到私有缓存中(仅客户端可以缓存，代理服务器不可缓存)
 no-cache 必须先与服务器确认返回的响应是否被更改，然后才能使用该响应来满足后续对同一个网址的请求。因此，如果存在合适的验证令牌 (ETag)，no-cache 会发起往返通信来验证缓存的响应，如果资源未被更改，可以避免下载。
-no-store 所有内容都不会被缓存到缓存或 Internet 临时文件中
+no-store 所有内容都不会被缓存到缓存或 Internet 临时文件中(和no-cache相比，“no-store”则要简单得多。它直接禁止浏览器以及所有中间缓存存储任何版本的返回响应，例如，包含个人隐私数据或银行业务数据的响应。每次用户请求该资产时，都会向服务器发送请求，并下载完整的响应。发现虽然设置了no-cache，但是没有设置ETag可以进行校验，最终还是从缓存里读取)。有些敏感信息，用户账户列表这种，就应该完全不缓存在本地。
 max-age=xxx (xxx is numeric) 缓存的内容将在 xxx 秒后失效, 这个选项只在HTTP 1.1可用, 并如果和Last-Modified一起使用时, 优先级较高
 
 实际过程中我看到了这种：
-Cache-Control:private, no-cache, no-cache=Set-Cookie, no-store, proxy-revalidate
+Cache-Control:private, no-cache, no-cache=Set-Cookie, no-store, proxy-revalidate，must-revalidate....
+
+而浏览器的前进后退，默认会从缓存里读取，完全不发请求。
 
 - Connection:keep-alive  http1.1 默认为keep-alive
 http 1.0需要手动设置。原理就是服务器保持客户端到服务器的连接持续有效，避免了重新建立连接的开销(tcp三次握手)。这种情况下，客户端不能根据读取到EOF(-1)来判断传输完毕。有两种解决方案：对于静态文件，客户端和服务器能够知道其大小，使用content-length，根据这个判断数据是否已经接收完成；对于动态页面，不可能预先知道内容大小。可以使用Transfer-Encoding:chunked的模式进行传输。基本上就是服务器把文件分成几块，一块一块的发送过去。[参考](https://www.byvoid.com/zhs/blog/http-keep-alive-header)
@@ -406,6 +408,9 @@ firefox > nginx [ACK] 好的,知道了
 链接：https://www.zhihu.com/question/67772889/answer/257170215
 来源：知乎
 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
+
+### 开启浏览器内支持webp[关于WebP接入方案](https://www.xuanfengge.com/webp-access-scheme.html)
 
 ## 参考
 - [谈谈HTTP协议中的短轮询、长轮询、长连接和短连接](http://www.cnblogs.com/zuoxiaolong/p/life49.html)

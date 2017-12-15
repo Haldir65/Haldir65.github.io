@@ -178,9 +178,34 @@ minimap,emmet,file icons，atom liveserver,atom beautify
 atom中输入vue,会自动提示生成vue模板,输入re会生成react Boilplate。前提是在js,vue,html文件中。
 
 ## 参考
+- [一个腾讯前端的博客](https://www.xuanfengge.com/page-back-does-not-cache.html)
 
 
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/lith/IMG_0766.jpg?imageView2/2/w/600)
+
+=======================================================================================
+[TBS]腾讯浏览服务(Tencent Browsing Service, TBS)。网上很多人喷的微信浏览器慢就是这个
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ***再过几天就要生日了，想到又要变老，挺舍不得的。
 送给，这两年来的你，不负韶华***
