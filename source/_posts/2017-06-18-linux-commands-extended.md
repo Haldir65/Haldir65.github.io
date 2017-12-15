@@ -32,11 +32,18 @@ which XXXk
 比如sudo 就放在 /usr/bin/sudo
 
 
-> $PATH
+ $PATH
 环境变量修改在~./bashrc或者 ~./profile里面
 具体来说，比如要把/etc/apache/bin目录添加到PATH中
-PATH=$PATH:/etc/apache/bin  #只对本次回话有效
+PATH=$PATH:/etc/apache/bin  #只对本次会话有效
 或者  PATH=$PATH:/etc/apache/bin #在~./bashrc或者~./profile里面添加这句话
+```
+比如把facebook 的buck添加到环境变量：
+```shell
+$ cd ~
+$ vim ~/.bash_profile
+export PATH=$HOME/buck/bin:$PATH
+$ source ~/.bash_profile ## 立刻生效
 ```
 
 

@@ -128,38 +128,6 @@ Babel是一个可以把ES6代码打包成ES5代码的插件，毕竟要兼容老
 
 VS Code好用
 
-npm有个dependencies的概念，此外还有dev-dependencies的概念，主要看package.json这个文件
-```json
-{
-  "name": "foo",
-  "version": "0.0.0",
-  "scripts": {
-    "dev": "node build/dev-server.js",
-    "build": "node build/build.js",
-    "test": "",
-    "lint": "eslint --ext .js,.vue src test/unit/specs test/e2e/specs"
-  },
-  "dependencies": {
-    "axios": "^0.15.3",
-    "jsonp": "^0.2.1"
-  },
-  "devDependencies": {
-    "webpack": "^2.6.1",
-    "webpack-dev-middleware": "^1.10.0",
-    "webpack-hot-middleware": "^2.18.0",
-    "webpack-merge": "^4.1.0"
-  }
-}
-/*script的意思是输入npm run dev = node build/dev-server.js  类似于 linux下的alias*/
-
-/*向上箭头的意思是安装的时候会自动去查找安装最新的minor version。关于版本号，第一位表示major version，may incur code imcompatibility,第二位表示minor version，代表new features,第三位表示bug fixes.所以向上箭头意味着安装时不会动第一位，只会升级为第二位最新的版本*/
-```
-> npm install -g grunt --save-dev # 安装，成为全局(-g)module，保存为dev-dependencies(--save-dev)
-> npm install -g grunt --save # 安装，保存为dependencies
-
-> npm run dev # 打开发环境包
-> npm run build # 打release包
-
 
 预处理语言
 1. Sass 诞生于 2007 年，Ruby 编写，其语法功能都十分全面，可以说 它完全把 CSS 变成了一门编程语言。另外 在国内外都很受欢迎，并且它的项目团队很是强大 ，是一款十分优秀的预处理语言。

@@ -283,10 +283,11 @@ about:1 Failed to load http://api.douban.com/v2/movie/top250: Response to prefli
 ```
 查了好久，原因是CORS(Control of Shared Resources)，通过ajax发起另一个domian(port)资源的请求默认是不安全的。主要是在js里面代码请求另一个网站(只要不满足host和port完全相同就不是同一个网站)，默认是被[禁止](http://www.ruanyifeng.com/blog/2016/04/cors.html)的。chrome里面查看network的话，发现这条request确实发出去了，request header里面多了一个
 > Origin:http://localhost:8080
-显然这不是axios设置的，服务器在看到这条header后，如果'/movie/top250'这个资源文件没有设置'Access-Control-Allow-Origin: http://localhost:8080'的话，就不会允许被获取。这是服务器方面做出的策略，显然客户端（浏览器）不能修改什么。
+显然这不是axios设置的，在看到这条header后，如果'/movie/top250'这个资源文件没有设置'Access-Control-Allow-Origin: http://localhost:8080'的话，浏览器就算拿到了服务器的回复也不会允许被开发者获取。这是CORS做出的策略，也是前端开发常提到的跨域问题。
 解决方法：
 1.和服务器商量好CORS
 2.使用jsonp(跨域请求并不限制带src属性的tag，比如script img这些)
+3. 使用iframe跨域
 
 CORS还是比较重要的东西，[详解](http://www.ruanyifeng.com/blog/2016/04/cors.html)，据说会发两次请求,且只支持GET请求。
 
