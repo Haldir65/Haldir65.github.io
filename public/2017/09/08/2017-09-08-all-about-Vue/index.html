@@ -17,7 +17,7 @@
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100775410.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/1102531047-2.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/VueJsLogo.jpg">
-<meta property="og:updated_time" content="2017-12-10T08:28:40.128Z">
+<meta property="og:updated_time" content="2017-12-16T03:23:45.454Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="VueJs学习笔记">
 <meta name="twitter:description" content="Vue Js学习笔记">
@@ -276,7 +276,10 @@ ga('send', 'pageview');
 <p>3.5 axios取代vue-resource用于发起http请求<br>安装在官方介绍页有，子组件可以使用import从mainjs里面拿到。<br>于是，尝试在一个component里面去获取百度首页，结果出错，换成豆瓣电影250还是出错：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">about:1 Failed to load http://api.douban.com/v2/movie/top250: Response to preflight request doesn&apos;t pass access control check: No &apos;Access-Control-Allow-Origin&apos; header is present on the requested resource. Origin &apos;http://localhost:8080&apos; is therefore not allowed access.</div></pre></td></tr></table></figure></p>
 <p>查了好久，原因是CORS(Control of Shared Resources)，通过ajax发起另一个domian(port)资源的请求默认是不安全的。主要是在js里面代码请求另一个网站(只要不满足host和port完全相同就不是同一个网站)，默认是被<a href="http://www.ruanyifeng.com/blog/2016/04/cors.html">禁止</a>的。chrome里面查看network的话，发现这条request确实发出去了，request header里面多了一个</p>
 <blockquote>
-<p>Origin:<a href="http://localhost:8080">http://localhost:8080</a><br>显然这不是axios设置的，服务器在看到这条header后，如果’/movie/top250’这个资源文件没有设置’Access-Control-Allow-Origin: <a href="http://localhost:8080&#39;的话，就不会允许被获取。这是服务器方面做出的策略，显然客户端（浏览器）不能修改什么。">http://localhost:8080&#39;的话，就不会允许被获取。这是服务器方面做出的策略，显然客户端（浏览器）不能修改什么。</a><br>解决方法：<br>1.和服务器商量好CORS<br>2.使用jsonp(跨域请求并不限制带src属性的tag，比如script img这些)</p>
+<p>Origin:<a href="http://localhost:8080">http://localhost:8080</a><br>显然这不是axios设置的，在看到这条header后，如果’/movie/top250’这个资源文件没有设置’Access-Control-Allow-Origin: <a href="http://localhost:8080&#39;的话，浏览器就算拿到了服务器的回复也不会允许被开发者获取。这是CORS做出的策略，也是前端开发常提到的跨域问题。">http://localhost:8080&#39;的话，浏览器就算拿到了服务器的回复也不会允许被开发者获取。这是CORS做出的策略，也是前端开发常提到的跨域问题。</a><br>解决方法：<br>1.和服务器商量好CORS<br>2.使用jsonp(跨域请求并不限制带src属性的tag，比如script img这些)</p>
+<ol>
+<li>使用iframe跨域</li>
+</ol>
 </blockquote>
 <p>CORS还是比较重要的东西，<a href="http://www.ruanyifeng.com/blog/2016/04/cors.html">详解</a>，据说会发两次请求,且只支持GET请求。</p>
 <p>回到axios，作者表示<a href="https://github.com/axios/axios/issues/75">不打算支持jsonp</a>，想用jsonp的话可以用jquery,或者使用<a href="https://github.com/axios/axios/blob/master/COOKBOOK.md#jsonp">jsonp插件</a><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"> $ npm install jsonp --save</div><div class="line"> <span class="keyword">var</span> jsonp = <span class="built_in">require</span>(<span class="string">'jsonp'</span>);</div><div class="line"></div><div class="line">jsonp(<span class="string">'http://api.douban.com/v2/movie/top250'</span>, <span class="literal">null</span>, <span class="function"><span class="keyword">function</span> (<span class="params">err, data</span>) </span>&#123;</div><div class="line">  <span class="keyword">if</span> (err) &#123;</div><div class="line">    <span class="built_in">console</span>.error(err.message);</div><div class="line">  &#125; <span class="keyword">else</span> &#123;</div><div class="line">    <span class="built_in">console</span>.log(data);</div><div class="line">  &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
@@ -526,15 +529,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">android</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">android</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -546,7 +545,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -554,23 +553,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">adb</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">linux</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">tools</a>
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -578,7 +565,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">tools</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -586,15 +577,19 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">linux</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+                <a href="javascript:void(0)" class="js-tag color4">adb</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -610,7 +605,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -634,7 +637,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -642,19 +645,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">nginx</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">transition</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -666,11 +657,23 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">service</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
             
             <div class="clearfix"></div>
