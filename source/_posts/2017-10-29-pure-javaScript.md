@@ -792,6 +792,8 @@ Atom推荐插件
 ===============================================================================================
 ## 使用Atom的时候，按下ctrl+shift+i ，会发现原来atom编辑页面就特么是一个网页。
 
+[javaScript自己的Utils](https://juejin.im/post/5a2a7a5051882535cd4abfce)
+
 12. MicroTask和MacroTask的执行顺序是：Stack -> MacroTask -> MicroTask [参考](https://juejin.im/entry/59e95b4c518825579d131fad)
 
 9. setTimeout是schedule一个task，setInterval是设定一个周期性执行的任务。
