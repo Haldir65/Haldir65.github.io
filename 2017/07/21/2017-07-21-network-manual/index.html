@@ -16,7 +16,7 @@
 <meta property="og:description" content="网络相关的查找手册">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/b9ae1189145b4a4d9dfe4d0b89a21b47.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/ed541bc1ed61ead0bf6ea8233ef01c0a.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-12-03T10:21:40.744Z">
+<meta property="og:updated_time" content="2017-12-15T00:54:19.124Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="网络通信手册">
 <meta name="twitter:description" content="网络相关的查找手册">
@@ -204,7 +204,7 @@ ga('send', 'pageview');
 <ul>
 <li>protocol 指使用的传输协议(http、file、https、mailto、ed2k、thunder等)<br>hostname 是指存放资源的服务器的域名系统(DNS) 主机名或 IP 地址。有时，在主机名前也可以包含连接到服务器所需的用户名和密码（格式：username:password@hostname）。有时候是ip,有时候前面还带账号密码<br>port http默认是80，https是443 ,ssh默认端口号是20<br>path(路径) 由零或多个“/”符号隔开的字符串，一般用来表示主机上的一个目录或文件地址。<br>parameters（参数）这是用于指定特殊参数的可选项。<br>query(查询) 一般GET请求可以在这里面查找。可选，用于给动态网页（如使用CGI、ISAPI、PHP/JSP/ASP/ASP。NET等技术制作的网页）传递参数，可有多个参数，用“&amp;”符号隔开，每个参数的名和值用“=”符号隔开。<br>fragment（信息片断）字符串，用于指定网络资源中的片断。例如一个网页中有多个名词解释，可使用fragment直接定位到某一名词解释。</li>
 </ul>
-<h3 id="1-1-Http的GET请求的url长度是有限制的"><a href="#1-1-Http的GET请求的url长度是有限制的" class="headerlink" title="1.1 Http的GET请求的url长度是有限制的"></a>1.1 Http的GET请求的url长度是有限制的</h3><p>Http1.1协议中并没有做这个限制，但通信的两端，服务器(Nginx和Tomcat)和客户端(浏览器厂商)都做了限制。<a href="https://cnbin.github.io/blog/2016/02/20/httpxie-yi-zhong-de-ge-chong-chang-du-xian-zhi-zong-jie/">参考</a><br>一些浏览器的url长度限制，即url长度不能超过这么多个字符</p>
+<h3 id="1-1-Http的GET请求的url长度是有限制的-服务器和浏览器都限制了"><a href="#1-1-Http的GET请求的url长度是有限制的-服务器和浏览器都限制了" class="headerlink" title="1.1 Http的GET请求的url长度是有限制的(服务器和浏览器都限制了)"></a>1.1 Http的GET请求的url长度是有限制的(服务器和浏览器都限制了)</h3><p>Http1.1协议中并没有做这个限制，但通信的两端，服务器(Nginx和Tomcat)和客户端(浏览器厂商)都做了限制。<a href="https://cnbin.github.io/blog/2016/02/20/httpxie-yi-zhong-de-ge-chong-chang-du-xian-zhi-zong-jie/">参考</a><br>一些浏览器的url长度限制，即url长度不能超过这么多个字符</p>
 <ul>
 <li>IE : 2803</li>
 <li>Firefox:65536</li>
@@ -214,8 +214,12 @@ ga('send', 'pageview');
 </li>
 </ul>
 <p>另外，Cookie就是一个键值对，放在header里面，所以如果服务器对于Http请求头长度做了限制，Cookie也会受限制。</p>
-<p>###1.2 GET和POST的一些小区别<br>GET只会发一个TCP包，POST发两个(一个是Header,一个是Body)。所以GET快一点，POST要求服务器长时间处于连接状态，可能造成服务器负载升高。<br>一个比较实在的例子是，我在七牛的CDN上看到的收费价格1万次PUT/10万次GET，不用想也知道GET对于服务器的压力要比PUT小</p>
+<p>###1.2 GET和POST的一些小区别<br>GET只会发一个TCP包，POST发两个(一个是Header,一个是Body)。所以GET快一点，POST要求服务器长时间处于连接状态，可能造成服务器负载升高。<br><strong><em>一个比较实在的例子是，我在七牛的CDN上看到的收费价格1万次PUT/10万次GET，不用想也知道GET对于服务器的压力要比PUT小</em></strong></p>
 <h2 id="2-http请求本质上是发送了一堆字符给服务器"><a href="#2-http请求本质上是发送了一堆字符给服务器" class="headerlink" title="2. http请求本质上是发送了一堆字符给服务器"></a>2. http请求本质上是发送了一堆字符给服务器</h2><p>另外,domain(域名)是指www.wikipedia.org这种，DNS会把它转成一个ip地址<br>而在http请求的header中经常或看到<br>Host: www.baidu.com\r\n 这样的一行，其实这是<a href="https://zh.wikipedia.org/wiki/HTTP%E5%A4%B4%E5%AD%97%E6%AE%B5">Http头字段</a>的标准请求字段，总之就是标准。这个Host指的是服务器的域名，就是domian。<br>wiki上的<a href="https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6%9C%AC%E4%BC%A0%E8%BE%93%E5%8D%8F%E8%AE%AE">http名词解释</a></p>
+<h3 id="2-1-statusCode有些常用的还是要记住的："><a href="#2-1-statusCode有些常用的还是要记住的：" class="headerlink" title="2.1 statusCode有些常用的还是要记住的："></a>2.1 statusCode有些常用的还是要记住的：</h3><p><a href="http://www.cnblogs.com/mayingbao/archive/2007/11/30/978530.html">比较好的一个表格</a></p>
+<blockquote>
+<p>101 Switching Protocols (注意WebSocket)<br>200 一切正常，对GET和POST请求的应答文档跟在后面。<br>201 Created 比如刚刚向服务器提交了一次POST请求创建了一项资源<br>301 Moved Permanently 客户请求的文档在其他地方，新的URL在Location头中给出，浏览器应该自动地访问新的URL。<br>302 Found 类似于301，但新的URL应该被视为临时性的替代，而不是永久性的。<br>304 Not Modified 客户端有缓冲的文档并发出了一个条件性的请求（一般是提供If-Modified-Since头表示客户只想比指定日期更新的文档）。服务器告诉客户，原来缓冲的文档还可以继续使用。<br>401 Unauthorized<br>403 Forbidden<br>404 Not Found<br>414 Request URI Too Long URI太长（HTTP 1.1新）。这就是上面说的Http的GET请求的url长度是有限制的，是服务器方做出的限制<br>500 Internal Server Error<br>502 Bad Gateway 服务器作为网关或者代理时，为了完成请求访问下一个服务器，但该服务器返回了非法的应答。<br>503 Service Unavailable 服务器由于维护或者负载过重未能应答。例如，Servlet可能在数据库连接池已满的情况下返回503。服务器返回503时可以提供一个Retry-After头。就是服务器扛不住了的意思<br>504 Gateway Timeout 由作为代理或网关的服务器使用，表示不能及时地从远程服务器获得应答。（HTTP 1.1新）</p>
+</blockquote>
 <h2 id="3-Header相关的"><a href="#3-Header相关的" class="headerlink" title="3. Header相关的"></a>3. Header相关的</h2><p>首先看下请求百度首页的request和response</p>
 <p>Request（其实发送的时候每一行后面都跟了一个\r\n用于换行）</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">GET / HTTP/1.1</div><div class="line">Host: www.baidu.com</div><div class="line">Connection: keep-alive</div><div class="line">Cache-Control: max-age=0</div><div class="line">Upgrade-Insecure-Requests: 1</div><div class="line">User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36</div><div class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8</div><div class="line">DNT: 1</div><div class="line">Accept-Encoding: gzip, deflate, br</div><div class="line">Accept-Language: zh-CN,zh;q=0.8,en-US;q=0.6,en;q=0.4</div><div class="line">Cookie: BAIDUID=B41D39A8836273546754tC7F0C5DE315B64E2:FG=1; MCITY=-289%3A;</div></pre></td></tr></table></figure>
@@ -235,12 +239,14 @@ ga('send', 'pageview');
 <li><p>Accept-Encoding:gzip, deflate, br<br>客户端浏览器可以支持的压缩编码类型。比如gzip，用于压缩数据，节省带宽。</p>
 </li>
 <li><p>Accept-Language 指定Http客户端浏览器用来优先展示的语言<br>示例: Accept-Language:zh-CN,zh;q=0.8,en-US;q=0.6,en;q=0.4</p>
-</li>
-<li><p>Cache-Control： <a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=zh-cn">参考</a><br>具体操作<a href="https://baike.baidu.com/item/Cache-Control">百度百科</a>写的很清楚<br>可能的值包括：</p>
+<ul>
+<li>Cache-Control： <a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=zh-cn">参考</a><br>具体操作<a href="https://baike.baidu.com/item/Cache-Control">百度百科</a>写的很清楚<br>可能的值包括：</li>
+</ul>
 </li>
 </ul>
-<p>public 所有内容都将被缓存(客户端和代理服务器都可缓存)<br>private 内容只缓存到私有缓存中(仅客户端可以缓存，代理服务器不可缓存)<br>no-cache 必须先与服务器确认返回的响应是否被更改，然后才能使用该响应来满足后续对同一个网址的请求。因此，如果存在合适的验证令牌 (ETag)，no-cache 会发起往返通信来验证缓存的响应，如果资源未被更改，可以避免下载。<br>no-store 所有内容都不会被缓存到缓存或 Internet 临时文件中<br>max-age=xxx (xxx is numeric) 缓存的内容将在 xxx 秒后失效, 这个选项只在HTTP 1.1可用, 并如果和Last-Modified一起使用时, 优先级较高</p>
-<p>实际过程中我看到了这种：<br>Cache-Control:private, no-cache, no-cache=Set-Cookie, no-store, proxy-revalidate</p>
+<p>public 所有内容都将被缓存(客户端和代理服务器都可缓存)<br>private 内容只缓存到私有缓存中(仅客户端可以缓存，代理服务器不可缓存)<br>no-cache 必须先与服务器确认返回的响应是否被更改，然后才能使用该响应来满足后续对同一个网址的请求。因此，如果存在合适的验证令牌 (ETag)，no-cache 会发起往返通信来验证缓存的响应，如果资源未被更改，可以避免下载。<br>no-store 所有内容都不会被缓存到缓存或 Internet 临时文件中(和no-cache相比，“no-store”则要简单得多。它直接禁止浏览器以及所有中间缓存存储任何版本的返回响应，例如，包含个人隐私数据或银行业务数据的响应。每次用户请求该资产时，都会向服务器发送请求，并下载完整的响应。发现虽然设置了no-cache，但是没有设置ETag可以进行校验，最终还是从缓存里读取)。有些敏感信息，用户账户列表这种，就应该完全不缓存在本地。<br>max-age=xxx (xxx is numeric) 缓存的内容将在 xxx 秒后失效, 这个选项只在HTTP 1.1可用, 并如果和Last-Modified一起使用时, 优先级较高</p>
+<p>实际过程中我看到了这种：<br>Cache-Control:private, no-cache, no-cache=Set-Cookie, no-store, proxy-revalidate，must-revalidate….</p>
+<p>而浏览器的前进后退，默认会从缓存里读取，完全不发请求。</p>
 <ul>
 <li><p>Connection:keep-alive  http1.1 默认为keep-alive<br>http 1.0需要手动设置。原理就是服务器保持客户端到服务器的连接持续有效，避免了重新建立连接的开销(tcp三次握手)。这种情况下，客户端不能根据读取到EOF(-1)来判断传输完毕。有两种解决方案：对于静态文件，客户端和服务器能够知道其大小，使用content-length，根据这个判断数据是否已经接收完成；对于动态页面，不可能预先知道内容大小。可以使用Transfer-Encoding:chunked的模式进行传输。基本上就是服务器把文件分成几块，一块一块的发送过去。<a href="https://www.byvoid.com/zhs/blog/http-keep-alive-header">参考</a></p>
 </li>
@@ -315,6 +321,10 @@ ga('send', 'pageview');
 <li>配置手机：选择连接的网络-&gt;修改网络-&gt;代理设置:手动; 代理服务器主机名为电脑的ip，端口8888，ip DHCP</li>
 <li>抓包查看<br><a href="http://www.trinea.cn/android/tcpdump_wireshark/">详细教程</a></li>
 </ul>
+<h3 id="9-Ajax和jQuery发起POST请求的时候设置的Content-Type对于服务器很重要"><a href="#9-Ajax和jQuery发起POST请求的时候设置的Content-Type对于服务器很重要" class="headerlink" title="9.Ajax和jQuery发起POST请求的时候设置的Content-Type对于服务器很重要"></a>9.Ajax和jQuery发起POST请求的时候设置的Content-Type对于服务器很重要</h3><p><a href="http://blog.csdn.net/mhmyqn/article/details/25561535">AJAX POST请求中参数以form data和request payload形式在servlet中的获取方式</a></p>
+<blockquote>
+<p>最近在看书时才真正搞明白，服务器为什么会对表单提交和文件上传做特殊处理，因为表单提交数据是名值对的方式，且Content-Type为application/x-www-form-urlencoded，而文件上传服务器需要特殊处理，普通的post请求（Content-Type不是application/x-www-form-urlencoded）数据格式不固定，不一定是名值对的方式，所以服务器无法知道具体的处理方式，所以只能通过获取原始数据流的方式来进行解析。<br>jquery在执行post请求时，会设置Content-Type为application/x-www-form-urlencoded，所以服务器能够正确解析，而使用原生ajax请求时，如果不显示的设置Content-Type，那么默认是text/plain，这时服务器就不知道怎么解析数据了，所以才只能通过获取原始数据流的方式来进行解析请求数据。</p>
+</blockquote>
 <p>===========================trash here=====================================</p>
 <p>一些优化<br>[TTFB] TTFB（Time To First Byte），客户端发出请求到收到响应的第一个字节所花费的时间。一般浏览器里面都能看到，这也是服务端可以优化的指标。</p>
 <p>GZip压缩文本还可以，图片就没必要开压缩了，因为图片本身就高度压缩了，再压只是浪费CPU。</p>
@@ -324,11 +334,11 @@ ga('send', 'pageview');
 <p>tcp三次握手，四次挥手<br>udp使用</p>
 <p>tls,https加密过程，sha1和sha256加密算法</p>
 <p>ping ,traceRouter</p>
-<p>tcp三次握手四次挥手，用人话说：<br>因为HTTP是一个基于TCP的协议,而TCP是一种可靠的传输层协议.建立TCP连接时会发生:<br>三次握手(three-way handshake)<br>firefox &gt; nginx [SYN] 在么<br>nginx &gt; firefox [SYN, ACK] 在<br>firefox &gt; nginx [ACK] 知道了</p>
+<p><strong><em>tcp三次握手四次挥手，用人话说：</em></strong><br>因为HTTP是一个基于TCP的协议,而TCP是一种可靠的传输层协议.建立TCP连接时会发生:<br>三次握手(three-way handshake)<br>firefox &gt; nginx [SYN] 在么<br>nginx &gt; firefox [SYN, ACK] 在<br>firefox &gt; nginx [ACK] 知道了</p>
 <p>关闭TCP连接时会发生:四次挥手(four-way handshake)<br>firefox &gt; nginx [FIN] 我要关闭连接了<br>nginx &gt; firefox [ACK] 知道了,等我发完包先<br>nginx &gt; firefox [FIN] 我也关闭连接了<br>firefox &gt; nginx [ACK] 好的,知道了</p>
 <p>几个报文的标识的解释:SYN: synchronization(同步)ACK: acknowledgement(确认:告知已收到)FIN: finish(结束)</p>
 <p>作者：eechen<br>链接：<a href="https://www.zhihu.com/question/67772889/answer/257170215">https://www.zhihu.com/question/67772889/answer/257170215</a><br>来源：知乎<br>著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<h3 id="开启浏览器内支持webp关于WebP接入方案"><a href="#开启浏览器内支持webp关于WebP接入方案" class="headerlink" title="开启浏览器内支持webp关于WebP接入方案"></a>开启浏览器内支持webp<a href="https://www.xuanfengge.com/webp-access-scheme.html">关于WebP接入方案</a></h3><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="http://www.cnblogs.com/zuoxiaolong/p/life49.html">谈谈HTTP协议中的短轮询、长轮询、长连接和短连接</a></li>
 <li><a href="https://bhsc881114.github.io/2015/06/23/HTTP%E8%AF%B7%E6%B1%82%E7%9A%84TCP%E7%93%B6%E9%A2%88%E5%88%86%E6%9E%90/">http请求的TCP瓶颈</a></li>
 <li><a href="http://www.runoob.com/w3cnote/restful-architecture.html">Restfull架构详解</a></li>
@@ -559,19 +569,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -579,23 +581,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -603,15 +597,23 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">linux</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -627,7 +629,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -643,10 +653,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
               </li>
              
@@ -659,11 +665,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">transition</a>
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -675,15 +681,23 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">transition</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">service</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
             
             <div class="clearfix"></div>

@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="一些linux的常用命令，linux环境下运行server ,bash的语法">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/ChMkJ1gq00WIXw_GAA47r_8gjqgAAXxJAH8qOMADjvH566.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-12-05T14:57:20.713Z">
+<meta property="og:updated_time" content="2017-12-16T03:23:45.438Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="linux常用命令扩展">
 <meta name="twitter:description" content="一些linux的常用命令，linux环境下运行server ,bash的语法">
@@ -210,15 +210,22 @@ ga('send', 'pageview');
 <blockquote>
 <p>apt-get -u upgrade //就像这样，stable挺好的</p>
 </blockquote>
-<h3 id="2-环境变量怎么改"><a href="#2-环境变量怎么改" class="headerlink" title="2. 环境变量怎么改"></a>2. 环境变量怎么改</h3><p>平时在shell中输入sudo XXX ,系统是如何知道怎么执行这条指令的呢。首先，可以查看which XXX ，用于查找某项指令对应的文件的位置。而像sudo这种都放在PATH位置，系统会在几个关键位置查找sudo命令。用户本身完全可以创建一个叫做sudo的文件chmod+X ，然后运行这个sudo。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">查看PATH : echo $PATH</div><div class="line">/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games (注意，系统是按照这个顺序找的，如果在第一个目录下找到一个叫sudo的东西，就会直接执行了，所以这里是有潜在的危险的)</div><div class="line">看下哪个命令对应的位置在哪里</div><div class="line">which XXXk</div><div class="line">比如sudo 就放在 /usr/bin/sudo</div><div class="line"></div><div class="line"></div><div class="line">&gt; $PATH</div><div class="line">环境变量修改在~./bashrc或者 ~./profile里面</div><div class="line">具体来说，比如要把/etc/apache/bin目录添加到PATH中</div><div class="line">PATH=$PATH:/etc/apache/bin  #只对本次回话有效</div><div class="line">或者  PATH=$PATH:/etc/apache/bin #在~./bashrc或者~./profile里面添加这句话</div></pre></td></tr></table></figure></p>
+<h3 id="2-环境变量怎么改"><a href="#2-环境变量怎么改" class="headerlink" title="2. 环境变量怎么改"></a>2. 环境变量怎么改</h3><p>平时在shell中输入sudo XXX ,系统是如何知道怎么执行这条指令的呢。首先，可以查看which XXX ，用于查找某项指令对应的文件的位置。而像sudo这种都放在PATH位置，系统会在几个关键位置查找sudo命令。用户本身完全可以创建一个叫做sudo的文件chmod+X ，然后运行这个sudo。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">查看PATH : echo $PATH</div><div class="line">/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games (注意，系统是按照这个顺序找的，如果在第一个目录下找到一个叫sudo的东西，就会直接执行了，所以这里是有潜在的危险的)</div><div class="line">看下哪个命令对应的位置在哪里</div><div class="line">which XXXk</div><div class="line">比如sudo 就放在 /usr/bin/sudo</div><div class="line"></div><div class="line"></div><div class="line"> $PATH</div><div class="line">环境变量修改在~./bashrc或者 ~./profile里面</div><div class="line">具体来说，比如要把/etc/apache/bin目录添加到PATH中</div><div class="line">PATH=$PATH:/etc/apache/bin  #只对本次会话有效</div><div class="line">或者  PATH=$PATH:/etc/apache/bin #在~./bashrc或者~./profile里面添加这句话</div></pre></td></tr></table></figure></p>
+<p>比如把facebook 的buck添加到环境变量：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">$ cd ~</div><div class="line">$ vim ~/.bash_profile</div><div class="line">export PATH=$HOME/buck/bin:$PATH</div><div class="line">$ source ~/.bash_profile ## 立刻生效</div></pre></td></tr></table></figure></p>
 <h3 id="3-alias设置"><a href="#3-alias设置" class="headerlink" title="3. alias设置"></a>3. alias设置</h3><p>查看已经设置过的alias：  alias或者 alias -p<br>vi 中输入 /XXX 可以搜索<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">vi ~/.bashrc  ## 这个是对当前用户生效的</div><div class="line">/etc/bashrc 写到文件这里面是对所有用户生效</div><div class="line">alias yourcommand=&apos;ls -alr&apos; ##添加这一行，原来的命令也照样用</div></pre></td></tr></table></figure></p>
 <p>重开session即可生效<br>急着要想马上生效可以<br>source ~/.bashrc ## source命令其实就是执行一个脚本</p>
 <p>据说alias是可以传参数的，不过加上&gt; /dev/null 2&gt;&amp;1 &amp; 就不行了。所以还是写个script算了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line">kwrite $1 &gt; /dev/null 2&gt;&amp;1 &amp;</div></pre></td></tr></table></figure></p>
 <p>然后chomod 755 fileName</p>
 <h3 id="4-pushd和popd（类似于文件夹stack）"><a href="#4-pushd和popd（类似于文件夹stack）" class="headerlink" title="4. pushd和popd（类似于文件夹stack）"></a>4. pushd和popd（类似于文件夹stack）</h3><h3 id="5-linux删除垃圾文件（小硬盘linux磁盘要经常清理需要的命令）"><a href="#5-linux删除垃圾文件（小硬盘linux磁盘要经常清理需要的命令）" class="headerlink" title="5. linux删除垃圾文件（小硬盘linux磁盘要经常清理需要的命令）"></a>5. linux删除垃圾文件（小硬盘linux磁盘要经常清理需要的命令）</h3><p>IBM给出了删除一些垃圾文件的建议<a href="https://www.ibm.com/developerworks/cn/linux/1310_caoyq_linuxdelete/index.html">使用 Linux 命令删除垃圾文件</a></p>
 <blockquote>
-<p>sudo apt-get autoclean 清理旧版本的软件缓存<br>sudo apt-get clean 清理所有软件缓存<br>sudo apt-get autoremove 删除系统不再使用的孤立软件<br>du –max-depth=1 -h # 查看当前路径下所有文件/文件夹的大小<br>du -k –max-depth=2 | sort -rn # 加上排序<br>find / -name core -print -exec rm -rf {} \; //分号也要，亲测<br>find / -size +100M：列出所有大于100M的文件，亲测。靠着这个找到了shadowsocks的日志文件,170MB</p>
+<p>sudo apt-get autoclean 清理旧版本的软件缓存<br>sudo apt-get clean 清理所有软件缓存<br>sudo apt-get autoremove 删除系统不再使用的孤立软件</p>
 </blockquote>
+<p>autoremove有时候会报错：</p>
+<blockquote>
+<p>The link /initrd.img.old is a damaged link<br>Removing symbolic link initrd.img.old<br> you may need to re-run your boot loader[grub]</p>
+</blockquote>
+<p> 根据<a href="https://askubuntu.com/questions/518997/how-do-i-re-run-boot-loader">askubuntu</a>的解答，不用管</p>
+<p>&gt;<br>du –max-depth=1 -h # 查看当前路径下所有文件/文件夹的大小<br>du -k –max-depth=2 | sort -rn # 加上排序<br>find / -name core -print -exec rm -rf {} \; //分号也要，亲测<br>find / -size +100M：列出所有大于100M的文件，亲测。靠着这个找到了shadowsocks的日志文件,170MB</p>
 <p>删除/boot分区不需要的内核<br>先df -h看/boot分区使用情况；<br>然后 dpkg –get-selections|grep linux-image ;<br>查看当前使用的内核 uname -a ;<br>清理不用的内核 sudo apt-get purge linux-image-3.13.0-24-generic （注意，不要删正在使用的内核）<br>删除不要的内核文件<br>首先看下</p>
 <blockquote>
 <p>uname- a<br>dpkg –get-selections|grep linux //查找所有的文件，有image的就是内核文件<br>sudo apt-get remove 内核文件名 （例如：linux-image-4.4.0-92-generic）</p>
@@ -228,10 +235,19 @@ ga('send', 'pageview');
 <ul>
 <li>ls -Sralh ## 亲测，从小到大排序出来<br>加上-S参数，就可以根据文件的大小进行排序，默认是从大到小的顺序。在此基础上加上参数-r变成-Sr，就可以一自小到大的顺序打印出文件。-l参数表示打印出详细信息。</li>
 </ul>
-<h3 id="6-AWK文本分析工具"><a href="#6-AWK文本分析工具" class="headerlink" title="6. AWK文本分析工具"></a>6. AWK文本分析工具</h3><ul>
+<h3 id="6-AWK文本分析工具"><a href="#6-AWK文本分析工具" class="headerlink" title="6. AWK文本分析工具"></a>6. AWK文本分析工具</h3><blockquote>
+<p>AWK is a language for processing text files<br>awk was created at Bell labs released in 1977<br>Named after Alfred Aho, Peter Weinberger,and Brain Kernighan<br>TAPL= The AWK Programming Language</p>
+</blockquote>
+<ul>
 <li>awk ‘{print $0}’ /etc/passwd # 和cat差不多，显示文本内容<br>查看恶意IP试图登录次数：</li>
 <li>lastb | awk ‘{ print $3 }’ | sort | uniq -c | sort -n  ## 亲测可用,看上去挺吓人的</li>
 </ul>
+<p>awk怎么用<a href="https://www.youtube.com/watch?v=az6vd0tGhJI">Using Linux AWK Utility</a>，一个没有废话的教程，非常好。</p>
+<blockquote>
+<p>drwxr-xr-x  3 root root    4096 Mar 14  2017 ufw<br>-rw-r–r–  1 root root     338 Nov 18  2014 updatedb.conf<br>drwxr-xr-x  3 root root    4096 Aug 30 03:53 update-manager<br>drwxr-xr-x  2 root root    4096 Aug 30 03:53 update-motd.d<br>drwxr-xr-x  2 root root    4096 Mar 14  2017 update-notifier<br>drwxr-xr-x  2 root root    4096 Mar 14  2017 vim<br>drwxr-xr-x  3 root root    4096 Mar 14  2017 vmware-tools<br>lrwxrwxrwx  1 root root      23 Mar 14  2017 vtrgb -&gt; /etc/alternatives/vtrgb<br>-rw-r–r–  1 root root    4942 Jun 14  2016 wgetrc<br>drwxr-xr-x  5 root root    4096 Mar 14  2017 X11<br>drwxr-xr-x  3 root root    4096 Mar 14  2017 xdg<br>drwxr-xr-x  2 root root    4096 Mar 14  2017 xml<br>-rw-r–r–  1 root root     477 Jul 19  2015 zsh_command_not_found</p>
+</blockquote>
+<p>假设你面对一个这样的文件test.txt<br>print 每一行 :  awk ‘{ print }’ test.txt<br>print第一行 ： awk ‘{ print $1 }’ test.txt<br>print第二行: awk ‘{ print $2 }’ test.txt<br>print第一行和第二行 awk ‘{ print $1,$2 }’ test.txt<br>print第一行和第二行中间不带空格 awk ‘{ print $1$2 }’ test.txt<br>print包含’test’的行 awk ‘/test/ { print } test.txt’<br>print第二行包含’test’的行 awk ‘{if(2 ~ /test/) print }’ test.txt<br>awk ‘/[a-z]/ { print }’ test.txt  //包含a-z任一字母的<br>awk ‘/[0-8]/ { print }’ test.txt // 包含0-8任一数字的<br>awk ‘/^[0-8]/ { print }’ test.txt // 以0-8任一数字开头的<br>awk ‘/[0-8]$/ { print }’ test.txt //以0-8任一数字结尾的</p>
+<p>和管道结合的：<br>grep -i test test.txt | awk ‘/[0-9]/ { print }’<br>-i表示case insensitive,大小写都算.然后找出其中包含数字的。</p>
 <h3 id="7-tar命令"><a href="#7-tar命令" class="headerlink" title="7.tar命令"></a>7.tar命令</h3><p>主要是跟压缩和解压文件有关的,<a href="http://man.linuxde.net/tar">参考</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">tar -cvf log.tar log2012.log 仅打包，不压缩！</div><div class="line">tar -zcvf log.tar.gz log2012.log 打包后，以 gzip 压缩</div><div class="line">tar -jcvf log.tar.bz2 log2012.log 打包后，以 bzip2 压缩</div></pre></td></tr></table></figure></p>
 <p>对照手册来看：<br>-c //小写的c，–create，表示创建新的备份文件<br>-v //verbose,显示进度什么的<br>-f 指定备份文件<br>-z –gzip，通过gzip压缩或者解压文件</p>
 <h3 id="8-定时任务怎么写"><a href="#8-定时任务怎么写" class="headerlink" title="8.定时任务怎么写"></a>8.定时任务怎么写</h3><p>已经有网站把各种常用的<a href="https://crontab.guru/every-6-hours">example</a>写出来了，直接照抄就是<br>后面跟上需要的命令，例如重启就是 /sbin/reboot</p>
@@ -280,12 +296,12 @@ ga('send', 'pageview');
 <h3 id="19-sort命令"><a href="#19-sort命令" class="headerlink" title="19. sort命令"></a>19. sort命令</h3><p>sort命令排序什么的<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">ls -al | sort -n ## 按照文件名ASCII码值进行比较</div><div class="line">ls -al | sort -rn ## 按照文件名倒序排序</div><div class="line">du -hsBM ./* | sort -n  ##查看当前目录下所有文件，从小到大排序</div></pre></td></tr></table></figure></p>
 <p>-u(unique)是忽略相同行，查找登录记录的时候有用<br>-t 指定按照栏和栏之间的分隔符</p>
 <h3 id="20-history命令"><a href="#20-history命令" class="headerlink" title="20. history命令"></a>20. history命令</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">history ## 列出曾经执行过的命令</div><div class="line">!99 ##执行上面列表中第99条命令</div><div class="line">!! ##执行上一条命令</div><div class="line">history 10 ##列出最近执行的10条命令</div></pre></td></tr></table></figure>
-<h3 id="21-使用sshKeyGen免密码登录的方式"><a href="#21-使用sshKeyGen免密码登录的方式" class="headerlink" title="21. 使用sshKeyGen免密码登录的方式"></a>21. 使用sshKeyGen免密码登录的方式</h3><p>首先在windows上安装putty，默认会装上puttyGen。<br>在开始菜单里面总归能找到。<br>点击那个generate按钮，按照提示鼠标不停挪动，进度条走完。会生成公钥，点击Save private key生成私钥。提示保存在一个文件中，这个要保存好。<br>密码登录到服务器端，cd到~/.ssh/文件夹下，没有就mkdir一个，创建一个authorized_keys的文件，要是本来就有，echo &gt; autorized_keys，把内容清除干净。<br>把自己刚才生成的public key粘贴进去，保存文件。<br>看下/etc/ssh/sshd_config中是否符合如下描述如下条件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">RSAAuthentication yes</div><div class="line">PubkeyAuthentication yes</div><div class="line">PermitRootLogin yes</div></pre></td></tr></table></figure></p>
-<p>重启ssh服务： service sshd restart<br>putty登录窗口左侧有一个loggin-auth，进去选择自己windows上刚才保存的私钥文件。登录输入账户名即可自动登录成功。<br><a href="https://www.ssh.com/ssh/putty/windows/puttygen">PUTTYGEN - KEY GENERATOR FOR PUTTY ON WINDOWS</a></p>
+<h3 id="21-使用sshKeyGen免密码登录的方式"><a href="#21-使用sshKeyGen免密码登录的方式" class="headerlink" title="21. 使用sshKeyGen免密码登录的方式"></a>21. 使用sshKeyGen免密码登录的方式</h3><p>首先在windows上安装putty，默认会装上puttyGen。<br>在开始菜单里面总归能找到。<br>点击那个generate按钮，按照提示鼠标不停挪动，进度条走完。会生成公钥，点击Save private key生成私钥。提示保存在一个文件中，这个要保存好。暂时不要关闭puttygen,需要直接去复制粘贴那个public key(因为要是生成了一个public key，由于windows的原因，中间可能存在换行，就得在文本编辑器里面删掉所有的换行符，非常麻烦)<br>密码登录到服务器端，cd到~/.ssh/文件夹下，没有就mkdir一个，创建一个authorized_keys的文件，要是本来就有，echo &gt; autorized_keys，把内容清除干净。<br>把自己刚才生成的public key粘贴进去，保存文件。<br>看下/etc/ssh/sshd_config中是否符合如下描述如下条件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">RSAAuthentication yes</div><div class="line">PubkeyAuthentication yes</div><div class="line">PermitRootLogin yes</div></pre></td></tr></table></figure></p>
+<p>还要给权限<br>chmod 700 ~/.ssh &amp;&amp; chmod 600 ~/.ssh/authorized_keys<br>重启ssh服务： service sshd restart<br>putty登录窗口左侧有一个loggin-auth，进去选择自己windows上刚才保存的私钥文件。登录输入账户名即可自动登录成功。<br><a href="https://www.ssh.com/ssh/putty/windows/puttygen">PUTTYGEN - KEY GENERATOR FOR PUTTY ON WINDOWS</a><br><a href="https://stackoverflow.com/questions/6377009/adding-public-key-to-ssh-authorized-keys-does-not-log-me-in-automatically">有什么问题的话看这个</a></p>
 <h3 id="22-iptables命令"><a href="#22-iptables命令" class="headerlink" title="22.iptables命令"></a>22.iptables命令</h3><p>用防火墙屏蔽掉指定ip</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">iptables -L -n ## 查看已添加的iptables规则</div><div class="line">清除已有iptables规则</div><div class="line">iptables -F</div><div class="line">iptables -X</div><div class="line">iptables -Z</div><div class="line">#允许所有本机向外的访问</div><div class="line">iptables -A OUTPUT -j ACCEPT</div><div class="line"># 允许访问22端口</div><div class="line">iptables -A INPUT -p tcp --dport 22 -j ACCEPT</div><div class="line">#允许访问80端口</div><div class="line">iptables -A INPUT -p tcp --dport 80 -j ACCEPT</div><div class="line">#允许访问443端口</div><div class="line">iptables -A INPUT -p tcp --dport 443 -j ACCEPT</div><div class="line">#允许FTP服务的21和20端口</div><div class="line">iptables -A INPUT -p tcp --dport 21 -j ACCEPT</div><div class="line">iptables -A INPUT -p tcp --dport 20 -j ACCEPT</div><div class="line">#如果有其他端口的话，规则也类似，稍微修改上述语句就行</div><div class="line">#允许ping</div><div class="line">iptables -A INPUT -p icmp -m icmp --icmp-type 8 -j ACCEPT</div><div class="line">#禁止其他未允许的规则访问</div><div class="line">iptables -A INPUT -j REJECT  #（注意：如果22端口未加入允许规则，SSH链接会直接断开。）</div><div class="line">iptables -A FORWARD -j REJECT</div></pre></td></tr></table></figure>
 <p><strong>注意还需要将上述规则添加到开机启动中</strong>，还有使用iptables屏蔽来自<a href="https://www.vpser.net/security/iptables-block-countries-ip.html">某个国家的IP</a>的教程</p>
-<h2 id="23-变量-其实就是美元符号了"><a href="#23-变量-其实就是美元符号了" class="headerlink" title="23. 变量($其实就是美元符号了)"></a>23. 变量($其实就是美元符号了)</h2><p>变量调用符号($)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">LI=date</div><div class="line">$LI ##</div><div class="line"># Tue Dec  5 04:06:18 EST 2017</div><div class="line"></div><div class="line"># 所以经常会有这样的脚本</div><div class="line"># Check if user is root</div><div class="line">if [ $(id -u) != &quot;0&quot; ]; then</div><div class="line">    echo &quot; Not the root user! Try using sudo Command ! &quot;</div><div class="line">    exit 1</div><div class="line">fi</div><div class="line">echo &quot;Pass the test! You are the root user!&quot;</div><div class="line"></div><div class="line">## 亲测下面这种可用户</div><div class="line">if [ `whoami` = &quot;root&quot; ];then  </div><div class="line">    echo &quot;root用户！&quot;  </div><div class="line">else  </div><div class="line">    echo &quot;非root用户！&quot;  </div><div class="line">fi</div></pre></td></tr></table></figure></p>
+<h3 id="23-变量-其实就是美元符号了"><a href="#23-变量-其实就是美元符号了" class="headerlink" title="23. 变量($其实就是美元符号了)"></a>23. 变量($其实就是美元符号了)</h3><p>变量调用符号($)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">LI=date</div><div class="line">$LI ##</div><div class="line"># Tue Dec  5 04:06:18 EST 2017</div><div class="line"></div><div class="line"># 所以经常会有这样的脚本</div><div class="line"># Check if user is root</div><div class="line">if [ $(id -u) != &quot;0&quot; ]; then</div><div class="line">    echo &quot; Not the root user! Try using sudo Command ! &quot;</div><div class="line">    exit 1</div><div class="line">fi</div><div class="line">echo &quot;Pass the test! You are the root user!&quot;</div><div class="line"></div><div class="line">## 亲测下面这种可用户</div><div class="line">if [ `whoami` = &quot;root&quot; ];then  </div><div class="line">    echo &quot;root用户！&quot;  </div><div class="line">else  </div><div class="line">    echo &quot;非root用户！&quot;  </div><div class="line">fi</div></pre></td></tr></table></figure></p>
 <p>变量分为用户自定义的和环境变量（其实就是系统预设的）,有些区别</p>
 <blockquote>
 <p>用户自定义变量只在当前的shell中生效，环境变量在当前shell和这个shell的所有子shell中生效。<br>环境变量是全局变量，用户自定义变量是局部变量。<br>对系统生效的环境变量名和变量作用是固定的。</p>
@@ -294,7 +310,13 @@ ga('send', 'pageview');
 <p>HOSTNAME：主机名<br>SHELL：当前的shell<br>TREM：终端环境<br>HISTSIZE：历史命令条数<br>SSH_CLIENT：当前操作环境是用ssh链接的，这里记录客户端的ip<br>SSH_TTY：ssh连接的终端是pts/1<br>USER:当前登录的用户</p>
 </blockquote>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">echo $HOSTNAME</div><div class="line">## unbutu</div><div class="line">$? 最后一次执行的命令的返回状态。如果这个变量的值为0，证明上一个命令正确执行；如果这个变量的值非0（具体是哪个数，由命令自己决定），则证明上一个命令执行不正确了。</div><div class="line">$$ 当前进程的进程号（PID）</div><div class="line">$! 后台运行的最后一个进程的进程号（PID）</div></pre></td></tr></table></figure>
-<h1 id="Mere-trash"><a href="#Mere-trash" class="headerlink" title="Mere trash"></a>Mere trash</h1><p><a href="http://blog.51cto.com/litaotao/1187983">LINUX下的21个特殊符号</a><br><a href="https://notes.wanghao.work/2015-06-02-Shell%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html">Shell学习笔记</a></p>
+<h3 id="24-Linux软件安装目录惯例"><a href="#24-Linux软件安装目录惯例" class="headerlink" title="24.  Linux软件安装目录惯例"></a>24.  Linux软件安装目录惯例</h3><p>转载自<a href="http://blog.csdn.net/aqxin/article/details/48324377"></a>。<br>一般特定文件夹里放什么东西是有惯例的。</p>
+<p>/usr：系统级的目录，可以理解为C:/Windows/，/usr/lib理解为C:/Windows/System32。<br>/usr/local：用户级的程序目录，可以理解为C:/Progrem Files/。用户自己编译的软件默认会安装到这个目录下。<br>/opt：用户级的程序目录，可以理解为D:/Software，opt有可选的意思，这里可以用于放置第三方大型软件（或游戏），当你不需要时，直接rm -rf掉即可。在硬盘容量不够时，也可将/opt单独挂载到其他磁盘上使用。</p>
+<p>/usr/src：系统级的源码目录。<br>/usr/local/src：用户级的源码目录。</p>
+<p>各个目录<br>youtube-dl的安装途径就是下一个软件下来，然后chmod给权限，然后<br>/usr/local/bin/youtube-dl和直接敲youtube-dl是一个命令。好像放在这个目录下面就好了。<br>关于这些目录的<a href="http://blog.csdn.net/test1280/article/details/70143465">解释</a><br>/bin是系统的一些指令。bin为binary的简写；<br>/sbin一般是指超级用户指令。就是只有管理员才能执行的命令<br>/usr/bin：通常是一些非必要的，但是普通用户和超级用户都可能使用到的命令<br>/usr/local/bin：通常是用户后来安装的软件，可能被普通用户或超级用户使用</p>
+<h3 id="25-一个往dropBox上传文件的Script"><a href="#25-一个往dropBox上传文件的Script" class="headerlink" title="25. 一个往dropBox上传文件的Script"></a>25. 一个往dropBox上传文件的Script</h3><p>dropbox的网盘空间不用感觉有点浪费了，一个将本地文件上传到dropBox的脚本<a href="https://github.com/andreafabrizi/Dropbox-Uploader">Dropbox-Uploader</a><br>亲测可用，也不是一个需要启动时跑起来的程序，就是一个给参数就上传的脚本。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./dropbox_uploader.sh upload /localFileOrDir /dropBoxFileOrDir</div></pre></td></tr></table></figure></p>
+<h3 id="26-Nano文本编辑器"><a href="#26-Nano文本编辑器" class="headerlink" title="26. Nano文本编辑器"></a>26. Nano文本编辑器</h3><h1 id="Mere-trash"><a href="#Mere-trash" class="headerlink" title="Mere trash"></a>Mere trash</h1><p><a href="http://blog.51cto.com/litaotao/1187983">LINUX下的21个特殊符号</a><br><a href="https://notes.wanghao.work/2015-06-02-Shell%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html">Shell学习笔记</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">youtube-dl -o &apos;%(title)s.%(ext)s&apos; https://www.youtube.com/watch?v=rimXGaUdaLg</div></pre></td></tr></table></figure>
 <p>ls -al = l -al（可以少敲一个字母,其实是alias）</p>
 <p><a href="https://www.digitalocean.com/community/tutorials/how-to-install-java-with-apt-get-on-ubuntu-16-04">装java</a><br><a href="https://www.digitalocean.com/community/tutorials/how-to-install-jenkins-on-ubuntu-16-04">装Jenkins</a><br>Could not find or load main class的问题</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
@@ -402,7 +424,7 @@ ga('send', 'pageview');
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          在ubuntu服务器上部署flask web app
+          在ubuntu服务器上部署web app
         
       </div>
     </a>
@@ -533,19 +555,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -553,23 +567,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -577,15 +583,23 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">linux</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -601,7 +615,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -617,10 +639,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
               </li>
              
@@ -633,11 +651,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">transition</a>
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -649,15 +667,23 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">transition</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">service</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
             
             <div class="clearfix"></div>
