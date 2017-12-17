@@ -172,3 +172,7 @@ fs.readFile('index.html',(err,html) => {
 ```
 dependencies里面向上箭头表示安装最新的minor version。而使用"\*"号的话就表示想要使用latest version
 
+
+=============================================================================
+Compile ES6 ES2017 Code to ES5 Code
+> npm install --save-dev webpack webpack-dev-server babel-core babel-loader babel-preset-env

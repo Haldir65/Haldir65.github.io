@@ -1,7 +1,7 @@
 ---
 title: replace butterKnife with databinding
 date: 2016-09-22 15:17:39
-categories: blog 
+categories: blog
 tags: [databinding, Butterknife,android]
 ---
 
@@ -29,7 +29,7 @@ class ExampleActivity extends Activity {
 }
 ```
 *after*
-首先需要将xml文件添加 **Layout** tag 
+首先需要将xml文件添加 **Layout** tag
 `R.layout.smple_activity`
 ```xml
 <layout>
@@ -117,7 +117,7 @@ public class MyAdapter extends BaseAdapter {
 ```
 
 *after*
-### ListView 
+### ListView
 ```java
 public class MyAdapter extends BaseAdapter {
   @Override
@@ -209,15 +209,15 @@ public class Pagination extends RelativeLayout {
 Databinding还有很多高级用法，目前给我带来的好处就是明显减少了boilerplate code </br>
 So ,感谢ButterKnife给我们带来的便利，Googbye ButterKnife，Hello DataBinding!
 
-＊todo＊ 
+＊todo＊
 ###　how did ButterKnife work?
+TODO 拆ButterKnife
 
 # Reference
 
  1. [Data Binding Library](https://developer.android.com/topic/libraries/data-binding/index.html)
- 2. [data-binding-android-boyar-mount](https://realm.io/cn/news/data-binding-android-boyar-mount/) 
+ 2. [data-binding-android-boyar-mount](https://realm.io/cn/news/data-binding-android-boyar-mount/)
  3. [Advanced Data Bindinding](https://www.youtube.com/watch?v=DAmMN7m3wLU) Two-Way Data Binding at google io 2016
  4. [Android Dev Summit 2015](https://www.youtube.com/watch?v=NBbeQMOcnZ0)
  5. [Goodbye Butter Knife](http://qiita.com/izumin5210/items/2784576d86ce6b9b51e6)
  6. [Google Sample](https://github.com/google/android-ui-toolkit-demos)
- 

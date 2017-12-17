@@ -128,6 +128,7 @@ Android相关
 - [ ] [Android Internals](https://academy.realm.io/posts/360-andev-2017-effie-barak-android-internals/)
 - [ ] cookie存储位置(/webviewCookiesChromium.db),db存储位置
 - [ ] Binder的原理，Binder里面引用计数的原理，Binder底层为什么用红黑树
+- [ ] 拆ButterKnife
 - [X] onSaveInstance,不仅仅是Activity,Fragment，View中也有，具体实现原理。View一定要有id(在View.dispatchSaveInstanceState中判断了id不为-1).[继承BaseSavedState]
 - [X] 热修复框架原理
 - [ ] WebView JS交互，WebView存在的[漏洞](http://www.jianshu.com/p/9f7e9ab8d2fa),通过反射可看可能存在的[安全问题](https://my.oschina.net/fengheju/blog/673629)以及[C代码](http://blog.csdn.net/xueerfei008/article/details/26750659)

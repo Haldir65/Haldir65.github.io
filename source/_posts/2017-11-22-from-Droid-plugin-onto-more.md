@@ -45,6 +45,9 @@ input keyevent
 Xposed的介绍与入门
 Xposed的原理与Multidex及动态加载问题
 
+[在Android中执行shell指令](https://github.com/jaredrummler/AndroidShell)
+[滴滴的virtualApp](https://github.com/didi/VirtualAPK)
+
 
 ## 参考
 [分析DroidPlugin，深入理解插件化框架](https://github.com/tiann/understand-plugin-framework)
