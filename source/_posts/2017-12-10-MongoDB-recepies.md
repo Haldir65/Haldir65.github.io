@@ -1,5 +1,5 @@
 ---
-title: 2017-12-10-MongoDB-recepies
+title: MongoDB手册
 date: 2017-12-10 16:13:54
 tags:
 ---

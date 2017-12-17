@@ -6,18 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://haldir65.github.io">
-  <title>2017-12-10-nginx-culinary-tips | Haldir的博客</title>
+  <title>Nginx使用记录 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="installing nginx on windows">
 <meta property="og:type" content="article">
-<meta property="og:title" content="2017-12-10-nginx-culinary-tips">
+<meta property="og:title" content="Nginx使用记录">
 <meta property="og:url" content="https://haldir65.github.io/2017/12/10/2017-12-10-nginx-culinary-tips/index.html">
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="installing nginx on windows">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery151110073841.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-12-14T14:24:11.621Z">
+<meta property="og:updated_time" content="2017-12-17T15:13:51.837Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="2017-12-10-nginx-culinary-tips">
+<meta name="twitter:title" content="Nginx使用记录">
 <meta name="twitter:description" content="installing nginx on windows">
 <meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery151110073841.jpg?imageView2/2/w/600">
   
@@ -185,7 +185,7 @@ ga('send', 'pageview');
         
   
     <h1 class="article-title" itemprop="name">
-      2017-12-10-nginx-culinary-tips
+      Nginx使用记录
     </h1>
   
 
@@ -226,7 +226,7 @@ ga('send', 'pageview');
 <h3 id="4-2-限制日志文件的大小"><a href="#4-2-限制日志文件的大小" class="headerlink" title="4.2 限制日志文件的大小"></a>4.2 限制日志文件的大小</h3><p>根据上面的config文件，默认的访问日志是在/var/log/nginx/access.log这个文件里面。限制这个文件的大小的方法：<br><a href="https://serverfault.com/questions/427144/how-to-limit-nginx-access-log-file-size-and-compress">serverfault</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">/etc/logrotate.d/nginx</div><div class="line">/var/log/nginx/access_log &#123;</div><div class="line">    rotate 7</div><div class="line">    size 5k</div><div class="line">    dateext</div><div class="line">    dateformat -%Y-%m-%d</div><div class="line">    missingok</div><div class="line">    compress</div><div class="line">    sharedscripts</div><div class="line">    postrotate</div><div class="line">        test -r /var/run/nginx.pid &amp;&amp; kill -USR1 `cat /var/run/nginx.pid`</div><div class="line">    endscript</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>需要注意的是，当网站访问量大后，日志数据就会很多，如果全部写到一个日志文件中去，文件会变得越来越大。文件大速度就会慢下来，比如一个文件几百兆。写入日志的时候，会影响操作速度。另外，如果我想看看访问日志，一个几百兆的文件，下载下来打开也很慢。为了方便对日志进行分析计算，需要对日志进行定时切割。定时切割的方式有按照月切割、按天切割，按小时切割等。最常用的是按天切割。<a href="http://www.codeceo.com/article/nginx-log.html">脚本</a></p>
 <h3 id="4-3-分享特定目录"><a href="#4-3-分享特定目录" class="headerlink" title="4.3 分享特定目录"></a>4.3 分享特定目录</h3><p><a href="https://stackoverflow.com/questions/33989060/how-to-serve-a-directory-of-static-files-at-a-certain-location-path-with-nginx">How to serve a directory of static files at a certain location path with nginx?</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">server &#123;</div><div class="line">  listen 80;</div><div class="line">  server_name   something.nateeagle.com;</div><div class="line"></div><div class="line">  location /something &#123;</div><div class="line">    alias /home/neagle/something;</div><div class="line">    index index.html index.htm;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h3 id="4-4-Nginx软链接"><a href="#4-4-Nginx软链接" class="headerlink" title="4.4 Nginx软链接"></a>4.4 Nginx软链接</h3><p>亲测，软链接</p>
+<h3 id="4-4-Nginx软链接"><a href="#4-4-Nginx软链接" class="headerlink" title="4.4 Nginx软链接"></a>4.4 Nginx软链接</h3><p>目测不能用软链接</p>
 <h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
 <li><a href="https://wizardforcel.gitbooks.io/nginx-doc/content/Text/6.1_nginx_windows.html">nginx Configurations</a></li>
 <li><a href="https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-16-04">How To Install Nginx on Ubuntu 16.04</a></li>
@@ -322,7 +322,7 @@ ga('send', 'pageview');
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          2017-12-10-node-js-cookbook
+          nodejs学习记录
         
       </div>
     </a>

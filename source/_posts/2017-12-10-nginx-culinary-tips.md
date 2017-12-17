@@ -1,5 +1,5 @@
 ---
-title: 2017-12-10-nginx-culinary-tips
+title: Nginx使用记录
 date: 2017-12-10 16:12:43
 tags: [nginx,tools]
 ---
