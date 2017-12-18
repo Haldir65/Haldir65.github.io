@@ -15,6 +15,12 @@ tags: [前端]
 [cssmatic](https://www.cssmatic.com/box-shadow),一个可以用拖拽的方式生成css代码的神奇的网站
 [不仅仅是font,还有很好的icon](http://fontawesome.io/)
 
+
+[TBS]腾讯浏览服务(Tencent Browsing Service, TBS)。网上很多人喷的微信浏览器慢就是这个
+
+[一个html里面有两个id一样的元素没问题](http://blog.csdn.net/lnn2007/article/details/8869057)
+[awesome css UI Design](https://github.com/CodeFrogShow/UI-Design-Music-Player),[Video link here](https://www.youtube.com/watch?v=ExnD_KV5q5g)
+
 ***Index***
 ## html Related
 html标签中可以添加data-XXX标签用于把数据和ui块绑定。
@@ -154,8 +160,6 @@ atom中输入vue,会自动提示生成vue模板,输入re会生成react Boilplate
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/lith/IMG_0766.jpg?imageView2/2/w/600)
 
 =======================================================================================
-[TBS]腾讯浏览服务(Tencent Browsing Service, TBS)。网上很多人喷的微信浏览器慢就是这个
-
 
 
 
