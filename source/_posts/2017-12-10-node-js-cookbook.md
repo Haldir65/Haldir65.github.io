@@ -176,3 +176,60 @@ dependencies里面向上箭头表示安装最新的minor version。而使用"\*"
 =============================================================================
 Compile ES6 ES2017 Code to ES5 Code
 > npm install --save-dev webpack webpack-dev-server babel-core babel-loader babel-preset-env
+npm install --save-dev babel-polyfill babel-preset-stage-0 ## 用async await的话需要安装polyfill
+
+package.json
+```json
+{
+  "name": "bable-assemble",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack",
+    "start": "webpack-dev-server --output-public-path=/build/"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "http-server": "^0.10.0",
+    "webpack": "^3.10.0",
+    "webpack-dev-server": "^2.9.7"
+  }
+}
+```
+output的文件夹名有些人喜欢叫dist，有些人用build。都行，没有区别的。
+
+webpack.config.js
+```js
+const path = require('path');
+module.exports = {
+    entry:{
+        app:['babel-polyfill','./src/app.js']
+    },
+    output:{
+        path:path.resolve(__dirname,"build"),
+        filename:"app.bundle.js"
+    },
+    module:{
+        loaders:[
+            {
+                test:/\.js?$/,
+                exclude:/node_modules/,
+                loader:"babel-loader",
+                query:{
+                    presets:['env']
+                }
+            }
+        ]
+    }
+};
+```

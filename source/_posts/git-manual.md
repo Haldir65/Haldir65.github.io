@@ -171,6 +171,11 @@ doc/*.txt
 
 # 忽略所有在doc目录下的.pdf文件
 doc/**/*.pdf
+
+# 让ignore文件立即生效的方法（如果不该上传到服务器的东西已经上传了，本次提交会把这些不该上传的东西从服务器删掉）
+git rm -r --cached .
+git add .
+git commit -m ".gitignore is now working"
 ```
 
 ## 12. git stash

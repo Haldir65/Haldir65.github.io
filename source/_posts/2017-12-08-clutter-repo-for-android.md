@@ -32,6 +32,15 @@ onDetachedFromWindow是从ActivityThread的handleDestoryActivity传下来的，�
 [Droidcon NYC 2016 - How LayoutInflater works](https://www.youtube.com/watch?v=Y06wmVIFlsw)
 [droidcon NYC 2017 - How Espresso Works](https://www.youtube.com/watch?v=7lCsp84wVPM)
 
+2016年的演讲中提到了LayoutInflater中的好玩的注释
+LayoutInflater.java
+```java
+if (name.equals(TAG_1995)) {
+            // Let's party like it's 1995!
+            return new BlinkLayout(context, attrs);
+        }
+```
+
 ### 6. Chris Banes在2017年给出了关于状态栏的解释
 [droidcon NYC 2017 - Becoming a master window fitter](https://www.youtube.com/watch?v=_mGDMVRO3iE)
 
