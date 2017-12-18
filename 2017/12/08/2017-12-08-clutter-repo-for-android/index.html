@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="之前的文章快装不下了，所以另外开一篇文章专门放Android相关的杂乱的知识点。">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100734648.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-12-17T15:15:16.486Z">
+<meta property="og:updated_time" content="2017-12-18T15:19:17.594Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android知识集合[三]">
 <meta name="twitter:description" content="之前的文章快装不下了，所以另外开一篇文章专门放Android相关的杂乱的知识点。">
@@ -204,6 +204,7 @@ ga('send', 'pageview');
 <h3 id="2-onSaveInstance对于有id的View，系统会自动帮忙存一点东西"><a href="#2-onSaveInstance对于有id的View，系统会自动帮忙存一点东西" class="headerlink" title="2. onSaveInstance对于有id的View，系统会自动帮忙存一点东西"></a>2. onSaveInstance对于有id的View，系统会自动帮忙存一点东西</h3><p>当然onSaveInstance也是从ActivityThread里面传递下来的。还有就是onCreate(Bundle)和onRestroreSaveInstanceState(Bundle)里面的bundle是同一个object。romain Guy说最初onSaveInstance和onRestroreSaveInstanceState本来叫onIcy(冻结)和onThaw（解冻），确实很形象。</p>
 <h3 id="3-android-asset-atlas"><a href="#3-android-asset-atlas" class="headerlink" title="3.android asset atlas"></a>3.android asset atlas</h3><p>就是为了节省asset耗费的内存，将一些系统公用的资源作为一个服务先跑起来，所有app的process共用这部分资源。</p>
 <h3 id="4-ZygoteInit"><a href="#4-ZygoteInit" class="headerlink" title="4. ZygoteInit"></a>4. ZygoteInit</h3><h3 id="5-Michael-Bailey每年的演讲都很精彩"><a href="#5-Michael-Bailey每年的演讲都很精彩" class="headerlink" title="5. Michael Bailey每年的演讲都很精彩"></a>5. Michael Bailey每年的演讲都很精彩</h3><p><a href="https://www.youtube.com/watch?v=eAtMon8ndfk">Droidcon NYC 2015 - How the Main Thread works</a><br><a href="https://www.youtube.com/watch?v=Y06wmVIFlsw">Droidcon NYC 2016 - How LayoutInflater works</a><br><a href="https://www.youtube.com/watch?v=7lCsp84wVPM">droidcon NYC 2017 - How Espresso Works</a></p>
+<p>2016年的演讲中提到了LayoutInflater中的好玩的注释<br>LayoutInflater.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (name.equals(TAG_1995)) &#123;</div><div class="line">            <span class="comment">// Let's party like it's 1995!</span></div><div class="line">            <span class="keyword">return</span> <span class="keyword">new</span> BlinkLayout(context, attrs);</div><div class="line">        &#125;</div></pre></td></tr></table></figure></p>
 <h3 id="6-Chris-Banes在2017年给出了关于状态栏的解释"><a href="#6-Chris-Banes在2017年给出了关于状态栏的解释" class="headerlink" title="6. Chris Banes在2017年给出了关于状态栏的解释"></a>6. Chris Banes在2017年给出了关于状态栏的解释</h3><p><a href="https://www.youtube.com/watch?v=_mGDMVRO3iE">droidcon NYC 2017 - Becoming a master window fitter</a></p>
 <h3 id="7-Android默认的launcher的repo在"><a href="#7-Android默认的launcher的repo在" class="headerlink" title="7. Android默认的launcher的repo在"></a>7. Android默认的launcher的repo在</h3><p><a href="https://android.googlesource.com/platform/packages/apps/Launcher3/">Launcher3</a>,应该是属于System UI Team在维护。</p>
 <h3 id="8-在string-xml里面放一些format的字符"><a href="#8-在string-xml里面放一些format的字符" class="headerlink" title="8. 在string.xml里面放一些format的字符"></a>8. 在string.xml里面放一些format的字符</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">   String s1 = <span class="string">"这里面可以放多个字符串%1$s,%2$s前面加上一个百分号和数字，代表顺序"</span>;</div><div class="line">   String s2 = <span class="string">"百分号的d和百分号的s可以混着%1$s用的，比如这个%2$d数字什么的，第三个是带百分号的数字%3$d%%这个由于需要显示百分号，所以加上两个百分号"</span>;</div><div class="line"></div><div class="line">   System.out.println(String.format(s1,<span class="string">"XXXX"</span>,<span class="string">"XXX"</span>));</div><div class="line">   System.out.println(String.format(s2,<span class="string">"XXX"</span>, <span class="number">100</span>, <span class="number">100</span>));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
@@ -211,6 +212,10 @@ ga('send', 'pageview');
 <blockquote>
 <p>这里面可以放多个字符串XXXX,XXX前面加上一个百分号和数字，代表顺序<br>百分号的d和百分号的s可以混着XXX用的，比如这个100数字什么的，第三个是带百分号的数字100%这个由于需要显示百分号，所以加上两个百分号</p>
 </blockquote>
+<h3 id="9-我记得Chet-Haase说过Lollipop及以上的Button默认是有一个elevation的"><a href="#9-我记得Chet-Haase说过Lollipop及以上的Button默认是有一个elevation的" class="headerlink" title="9.我记得Chet Haase说过Lollipop及以上的Button默认是有一个elevation的"></a>9.我记得Chet Haase说过Lollipop及以上的Button默认是有一个elevation的</h3><p>记得Chet在一次演讲中说到Appcompat在5.0以上默认使用material Theme, Button的默认elevation好像是3dp。日常开发中也经常会看见button和设置elevation=0的button相比确实有些阴影。在Button的构造函数里面打了断点，在setElevation也打了断点，最后发现是在View创建之后Choregrapher在doFrame的时候run了一个Animation，在这个animation中设置了一个6px的elevation(2dp，原来Chet记错了)。<br>至于这个2dp是那来的呢：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">Button</span></div><div class="line">    <span class="attr">...</span></div><div class="line"></div><div class="line">    <span class="attr">android:stateListAnimator</span>=<span class="string">"@null"</span> /&gt;</span></div><div class="line"></div><div class="line">    <span class="tag">&lt;<span class="name">Button</span></div><div class="line">    <span class="attr">...</span></div><div class="line"></div><div class="line">    <span class="attr">android:stateListAnimator</span>=<span class="string">"@anim/my_animator"</span> /&gt;</span></div></pre></td></tr></table></figure></p>
+<p>最终在网上<a href="http://www.itmmd.com/201412/240.html">找到了</a><br>core/res/res/anim/button_state_list_anim_material.xml<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</div><div class="line"><span class="comment">&lt;!-- Copyright (C) 2014 The Android Open Source Project</div><div class="line">   Licensed under the Apache License, Version 2.0 (the "License");</div><div class="line">   you may not use this file except in compliance with the License.</div><div class="line">   You may obtain a copy of the License at</div><div class="line">        http://www.apache.org/licenses/LICENSE-2.0</div><div class="line">   Unless required by applicable law or agreed to in writing, software</div><div class="line">   distributed under the License is distributed on an "AS IS" BASIS,</div><div class="line">   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</div><div class="line">   See the License for the specific language governing permissions and</div><div class="line">   limitations under the License.</div><div class="line">--&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">selector</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">item</span> <span class="attr">android:state_pressed</span>=<span class="string">"true"</span> <span class="attr">android:state_enabled</span>=<span class="string">"true"</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">set</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="name">objectAnimator</span> <span class="attr">android:propertyName</span>=<span class="string">"translationZ"</span></div><div class="line">                          <span class="attr">android:duration</span>=<span class="string">"@integer/button_pressed_animation_duration"</span></div><div class="line">                          <span class="attr">android:valueTo</span>=<span class="string">"@dimen/button_pressed_z_material"</span></div><div class="line">                          <span class="attr">android:valueType</span>=<span class="string">"floatType"</span>/&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="name">objectAnimator</span> <span class="attr">android:propertyName</span>=<span class="string">"elevation"</span></div><div class="line">                          <span class="attr">android:duration</span>=<span class="string">"0"</span></div><div class="line">                          <span class="attr">android:valueTo</span>=<span class="string">"@dimen/button_elevation_material"</span></div><div class="line">                          <span class="attr">android:valueType</span>=<span class="string">"floatType"</span>/&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">set</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">item</span>&gt;</span></div><div class="line">  <span class="comment">&lt;!-- base state --&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">item</span> <span class="attr">android:state_enabled</span>=<span class="string">"true"</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">set</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="name">objectAnimator</span> <span class="attr">android:propertyName</span>=<span class="string">"translationZ"</span></div><div class="line">                          <span class="attr">android:duration</span>=<span class="string">"@integer/button_pressed_animation_duration"</span>  ##<span class="attr">100ms</span></div><div class="line">                          <span class="attr">android:valueTo</span>=<span class="string">"0"</span></div><div class="line">                          <span class="attr">android:startDelay</span>=<span class="string">"@integer/button_pressed_animation_delay"</span> ## <span class="attr">100ms</span></div><div class="line">                          <span class="attr">android:valueType</span>=<span class="string">"floatType"</span>/&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="name">objectAnimator</span> <span class="attr">android:propertyName</span>=<span class="string">"elevation"</span></div><div class="line">                          <span class="attr">android:duration</span>=<span class="string">"0"</span></div><div class="line">                          <span class="attr">android:valueTo</span>=<span class="string">"@dimen/button_elevation_material"</span></div><div class="line">                          <span class="attr">android:valueType</span>=<span class="string">"floatType"</span> /&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">set</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">item</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">item</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">set</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="name">objectAnimator</span> <span class="attr">android:propertyName</span>=<span class="string">"translationZ"</span></div><div class="line">                          <span class="attr">android:duration</span>=<span class="string">"0"</span></div><div class="line">                          <span class="attr">android:valueTo</span>=<span class="string">"0"</span></div><div class="line">                          <span class="attr">android:valueType</span>=<span class="string">"floatType"</span>/&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="name">objectAnimator</span> <span class="attr">android:propertyName</span>=<span class="string">"elevation"</span></div><div class="line">                          <span class="attr">android:duration</span>=<span class="string">"0"</span></div><div class="line">                          <span class="attr">android:valueTo</span>=<span class="string">"0"</span></div><div class="line">                          <span class="attr">android:valueType</span>=<span class="string">"floatType"</span>/&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">set</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">item</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">selector</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>注意那个button_elevation_material：<br>在<a href="https://android.googlesource.com/platform/frameworks/base/+/master/core/res/res/values/dimens_material.xml">aosp</a>中<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- Elevation when button is pressed --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dimen</span> <span class="attr">name</span>=<span class="string">"button_elevation_material"</span>&gt;</span>2dp<span class="tag">&lt;/<span class="name">dimen</span>&gt;</span></div><div class="line">    <span class="comment">&lt;!-- Z translation to apply when button is pressed --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dimen</span> <span class="attr">name</span>=<span class="string">"button_pressed_z_material"</span>&gt;</span>4dp<span class="tag">&lt;/<span class="name">dimen</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p><strong><em>所以Lollipop上使用Appcompat主题，什么都不改，button默认是会有2dp的elevation的</em></strong><br>至于这个elevation为什么不是在初始化的时候就设置的（打断点的时候走完构造函数,getElevation还是0），就在于这上面这个AnimationDelay(其实是100ms之后再去运行这个动画)，从堆栈来看，最终导致调用setElevation的地方实在drawableStateChange这个方法里面。</p>
 <p>=============================================================================</p>
 <h3 id="9-Facebook出品的BUCK能够用于编译Android-项目，速度比较快。"><a href="#9-Facebook出品的BUCK能够用于编译Android-项目，速度比较快。" class="headerlink" title="9. Facebook出品的BUCK能够用于编译Android 项目，速度比较快。"></a>9. Facebook出品的BUCK能够用于编译Android 项目，速度比较快。</h3><p><a href="https://github.com/1hakr/AnExplorer">一个具有网络传输的FileExplorer</a></p>
 
@@ -427,15 +432,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Window</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -451,19 +456,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -471,15 +468,31 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+                <a href="javascript:void(0)" class="js-tag color1">tools</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -495,19 +508,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -519,11 +520,19 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Vue</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -539,6 +548,14 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">transition</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">databinding</a>
               </li>
              
@@ -547,23 +564,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">transition</a>
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">service</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
             
             <div class="clearfix"></div>
