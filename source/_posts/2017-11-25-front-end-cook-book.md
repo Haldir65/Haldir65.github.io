@@ -5,7 +5,7 @@ tags: [前端]
 ---
 
 每一个领域都有些不知道该放哪的零碎的点，这里开辟一个新的地方，作为前端杂乱知识的汇总。
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/girlfriend lake green nature water cold.jpg?imageView2/2/w/600)
+![](http://odzl05jxx.bkt.clouddn.com/image/jpg/Cute and sexy asian girl in purple strapeless gown.jpg?imageView2/2/w/600)
 
 
 <!--more-->

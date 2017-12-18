@@ -31,7 +31,6 @@ tags: [tools]
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/iu kpop star music sony.jpg?imageView2/2/w/600)
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/street lights dark night car city.jpg?imageView2/2/w/600)
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/coffee art life nature living drip dark bw.jpg?imageView2/2/w/600)
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/Cute and sexy asian girl in purple strapeless gown.jpg?imageView2/2/w/600)
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/water foot cold dark river.jpg?imageView2/2/w/600)
 
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/street lights dark night car city bw.jpg?imageView2/2/w/600)

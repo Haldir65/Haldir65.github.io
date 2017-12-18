@@ -62,6 +62,89 @@ public static void main(String[] args) {
 > 这里面可以放多个字符串XXXX,XXX前面加上一个百分号和数字，代表顺序
 百分号的d和百分号的s可以混着XXX用的，比如这个100数字什么的，第三个是带百分号的数字100%这个由于需要显示百分号，所以加上两个百分号
 
+### 9.我记得Chet Haase说过Lollipop及以上的Button默认是有一个elevation的
+记得Chet在一次演讲中说到Appcompat在5.0以上默认使用material Theme, Button的默认elevation好像是3dp。日常开发中也经常会看见button和设置elevation=0的button相比确实有些阴影。在Button的构造函数里面打了断点，在setElevation也打了断点，最后发现是在View创建之后Choregrapher在doFrame的时候run了一个Animation，在这个animation中设置了一个6px的elevation(2dp，原来Chet记错了)。
+至于这个2dp是那来的呢：
+```xml
+<Button
+    ...
+
+    android:stateListAnimator="@null" />
+
+    <Button
+    ...
+
+    android:stateListAnimator="@anim/my_animator" />
+```
+最终在网上[找到了](http://www.itmmd.com/201412/240.html)
+core/res/res/anim/button_state_list_anim_material.xml
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2014 The Android Open Source Project
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+        http://www.apache.org/licenses/LICENSE-2.0
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+  <item android:state_pressed="true" android:state_enabled="true">
+      <set>
+          <objectAnimator android:propertyName="translationZ"
+                          android:duration="@integer/button_pressed_animation_duration"
+                          android:valueTo="@dimen/button_pressed_z_material"
+                          android:valueType="floatType"/>
+          <objectAnimator android:propertyName="elevation"
+                          android:duration="0"
+                          android:valueTo="@dimen/button_elevation_material"
+                          android:valueType="floatType"/>
+      </set>
+  </item>
+  <!-- base state -->
+  <item android:state_enabled="true">
+      <set>
+          <objectAnimator android:propertyName="translationZ"
+                          android:duration="@integer/button_pressed_animation_duration"  ##100ms
+                          android:valueTo="0"
+                          android:startDelay="@integer/button_pressed_animation_delay" ## 100ms
+                          android:valueType="floatType"/>
+          <objectAnimator android:propertyName="elevation"
+                          android:duration="0"
+                          android:valueTo="@dimen/button_elevation_material"
+                          android:valueType="floatType" />
+      </set>
+  </item>
+  <item>
+      <set>
+          <objectAnimator android:propertyName="translationZ"
+                          android:duration="0"
+                          android:valueTo="0"
+                          android:valueType="floatType"/>
+          <objectAnimator android:propertyName="elevation"
+                          android:duration="0"
+                          android:valueTo="0"
+                          android:valueType="floatType"/>
+      </set>
+  </item>
+</selector>
+```
+注意那个button_elevation_material：
+在[aosp](https://android.googlesource.com/platform/frameworks/base/+/master/core/res/res/values/dimens_material.xml)中
+```xml
+<!-- Elevation when button is pressed -->
+    <dimen name="button_elevation_material">2dp</dimen>
+    <!-- Z translation to apply when button is pressed -->
+    <dimen name="button_pressed_z_material">4dp</dimen>
+```
+***所以Lollipop上使用Appcompat主题，什么都不改，button默认是会有2dp的elevation的***
+至于这个elevation为什么不是在初始化的时候就设置的（打断点的时候走完构造函数,getElevation还是0），就在于这上面这个AnimationDelay(其实是100ms之后再去运行这个动画)，从堆栈来看，最终导致调用setElevation的地方实在drawableStateChange这个方法里面。
+
+
+
 =============================================================================
 ### 9. Facebook出品的BUCK能够用于编译Android 项目，速度比较快。
 

@@ -6,7 +6,6 @@ tags: [tools]
 
 
 关于Spring Boot的基本知识要点
-在windows里面查看内网ip，从控制面板进去看是不准的，DHCP有效期过了自动换掉，得自己敲ipconfig，这样才是最及时的。
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100670897.jpg?imageView2/2/w/600)
 <!--more-->
 
@@ -25,3 +24,6 @@ tags: [tools]
 ## 3. 一些配置
 Spring Boot修改内置Tomcat端口号：
 EmbeddedServletContainerCustomizer
+
+=================================================================
+在windows里面查看内网ip，从控制面板进去看是不准的，DHCP有效期过了自动换掉，得自己敲ipconfig，这样才是最及时的。
