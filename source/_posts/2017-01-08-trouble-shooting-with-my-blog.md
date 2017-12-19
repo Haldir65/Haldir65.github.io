@@ -149,6 +149,7 @@ tags:[置顶]
 categories: Hexo
 top: 0 # 0或者1
 ```
+个人建议：置顶不要太多
 
 ## 4. SublimeText的一些快捷键
 由于文章大部分都是使用SublimeText写的，Typroa这种所见即所得的编辑器也不错，但对于掌握MardkDown语法没有帮助。这里摘录一些SubLimeText的快捷键。

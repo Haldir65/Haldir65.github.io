@@ -5,8 +5,7 @@ tags: [前端]
 ---
 
 每一个领域都有些不知道该放哪的零碎的点，这里开辟一个新的地方，作为前端杂乱知识的汇总。
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/Cute and sexy asian girl in purple strapeless gown.jpg?imageView2/2/w/600)
-
+![](http://odzl05jxx.bkt.clouddn.com/image/jpg/coffee art life nature living drip dark bw.jpg?imageView2/2/w/600)
 
 <!--more-->
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600)
@@ -158,6 +157,9 @@ atom中输入vue,会自动提示生成vue模板,输入re会生成react Boilplate
 
 
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/lith/IMG_0766.jpg?imageView2/2/w/600)
+
+![](http://odzl05jxx.bkt.clouddn.com/image/jpg/Cute%20and%20sexy%20asian%20girl%20in%20purple%20strapless%20gown.jpg?imageView2/2/w/600)
+
 
 =======================================================================================
 

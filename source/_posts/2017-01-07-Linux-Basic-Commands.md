@@ -3,7 +3,6 @@ title: linux基本命令介绍
 date: 2017-01-07 15:38:43
 categories: blog
 tags: [置顶,linux,tools]
-top : 1
 ---
 
 一些常用的linux基本命令,仅作为参考。
