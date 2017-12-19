@@ -15,7 +15,7 @@ tags:
 ### 1. Retrofit
 
 #### 1.1 使用方法
-Retrofit本身并不局限于Andriod平台，java应用也可以用来和服务器沟通。
+Retrofit本身并不局限于Android平台，java应用也可以用来和服务器沟通。
 Retrofit一般的用法看上去很简单
 ```java
  public interface GitHub {

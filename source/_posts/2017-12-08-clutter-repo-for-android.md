@@ -141,7 +141,7 @@ core/res/res/anim/button_state_list_anim_material.xml
     <dimen name="button_pressed_z_material">4dp</dimen>
 ```
 ***所以Lollipop上使用Appcompat主题，什么都不改，button默认是会有2dp的elevation的***
-至于这个elevation为什么不是在初始化的时候就设置的（打断点的时候走完构造函数,getElevation还是0），就在于这上面这个AnimationDelay(其实是100ms之后再去运行这个动画)，从堆栈来看，最终导致调用setElevation的地方实在drawableStateChange这个方法里面。
+至于这个elevation为什么不是在初始化的时候就设置的（打断点的时候走完构造函数,getElevation还是0），就在于这上面这个AnimationDelay(其实是100ms之后再去运行这个动画)，从堆栈来看，最终导致调用setElevation的地方是在drawableStateChange这个方法里面。
 
 
 

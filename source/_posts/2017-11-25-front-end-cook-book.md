@@ -16,7 +16,7 @@ tags: [前端]
 
 
 [TBS]腾讯浏览服务(Tencent Browsing Service, TBS)。网上很多人喷的微信浏览器慢就是这个
-
+[handlebars](https://github.com/wycats/handlebars.js)
 [一个html里面有两个id一样的元素没问题](http://blog.csdn.net/lnn2007/article/details/8869057)
 [awesome css UI Design](https://github.com/CodeFrogShow/UI-Design-Music-Player),[Video link here](https://www.youtube.com/watch?v=ExnD_KV5q5g)
 
