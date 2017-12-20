@@ -18,7 +18,6 @@ github上已经star了四百多个项目，应该复习下了。
 [theme和Style](http://haldir65.github.io/2016/10/10/theme-versus-style/)  **Dan lew**
 
 
-
 ### 事件分发，动画，自定义View
 [android使用selectableItemBackground的一些坑](http://haldir65.github.io/2016/09/23/selectableItemBackground-foreground/)
 [activity transition pre and post lollipop](http://haldir65.github.io/2016/09/27/activity-transition-pre-and-post-lollipop/)

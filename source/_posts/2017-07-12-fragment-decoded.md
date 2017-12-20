@@ -279,7 +279,7 @@ FragmentFransaction只是将所有操作保留到一次Transaction的一个任�
 
 moveToState的方法比较长，删掉一些不必要的，重点关注Fragment的那些生命周期回调是什么时候被调用的。建议看源码，我这里删除了很多还有一大坨。
 ```java
-// FragmentImpl.java
+// FragmentManagerImpl.java
     void moveToState(Fragment f, int newState, int transit, int transitionStyle,
             boolean keepActive) {
 //Fragment的state将提高，例如从ACTIVITY_CREATED到ACTIVITYCREATED

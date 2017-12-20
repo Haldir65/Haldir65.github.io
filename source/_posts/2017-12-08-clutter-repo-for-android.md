@@ -143,6 +143,11 @@ core/res/res/anim/button_state_list_anim_material.xml
 ***所以Lollipop上使用Appcompat主题，什么都不改，button默认是会有2dp的elevation的***
 至于这个elevation为什么不是在初始化的时候就设置的（打断点的时候走完构造函数,getElevation还是0），就在于这上面这个AnimationDelay(其实是100ms之后再去运行这个动画)，从堆栈来看，最终导致调用setElevation的地方是在drawableStateChange这个方法里面。
 
+### 10. 内网传输功能的原理
+有些App提供局域网内无限传输文件的能力：本质上是用了TCP或者UDP。在java层的话，TCP用的是java.net.Socket，UDP用的是java.net.DatagramSocket。由于数据传输是双向的，客户端和Server端都需要创建这样的Object Instance。
+[一个比较好的Demo](https://github.com/xanarry/LanTrans-android)
+Unix的输入输出(IO)系统遵循Open-Read-Write-Close这样的操作范本。
+
 
 
 =============================================================================

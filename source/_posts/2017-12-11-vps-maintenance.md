@@ -8,92 +8,108 @@ tags: [tools,linux]
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100756208.jpg?imageView2/2/w/600)
 <!--more-->
 
-## 装ss
+以下在ubuntu 16.04.3 LTS上通过
 
-```
-  1. 刚装好的ubuntu需要执行以下步骤
-  安装git > apt-get install git
+## 1. 小硬盘清理垃圾
+
+> sudo apt-get autoclean 清理旧版本的软件缓存
+sudo apt-get clean 清理所有软件缓存
+sudo apt-get autoremove 删除系统不再使用的孤立软件
+
+
+## 2.必要软件
+ 刚装好的ubuntu需要执行以下步骤,都是些常用的软件
+>   安装git > apt-get install git
   安装python > apt-get install python-2.7
   安装python-setuptools > apt-get install python-setuptools
   检查是否安装好： python --version
 
+  还有一些，比如htop
 
-  2. 下载shadowsocks源码编译
- > git clone https://github.com/shadowsocks/shadowsocks
-  # 记得切换到master分支
-  python setup.py build
-  python setup.py install
 
-  检查下版本 ssserver --version
+### 2.1 装ss
+>
+下载shadowsocks源码编译
+git clone https://github.com/shadowsocks/shadowsocks
+ # 记得切换到master分支
 
-  3. 编辑配置文件
-  vim config.json
-  {
-   "server":"my_server_ip",
-   "server_port":8388,
-   "local_address": "127.0.0.1",
-   "local_port":1080,
-   "password":"mypassword",
-   "timeout":300,
-   "method":"aes-256-cfb",
-   "fast_open": false
+```python
+python setup.py build
+python setup.py install
+```
+
+检查下版本
+> ssserver --version
+
+编辑配置文件
+>vim config.json
+
+```json
+{
+ "server":"my_server_ip",
+ "server_port":8388,
+ "local_address": "127.0.0.1",
+ "local_port":1080,
+ "password":"mypassword",
+ "timeout":300,
+ "method":"aes-256-cfb",
+ "fast_open": false
 }
-
-ssserver -c config.json -d start #启动完成
+```
+> ssserver -c config.json -d start #启动完成
 
 检查下是否启动了
-ps -ef |grep sss
+> ps -ef |grep sss
 
 ss 命令
+```shell
 ssserver -c /etc/shadowsocks/config.json # 前台运行
 
-- 后台运行和停止
+### 后台运行和停止
 ssserver -c /etc/shadowsocks.json -d start
 ssserver -c /etc/shadowsocks.json -d stop
 
-- 加入开机启动
-
-在/etc/rc.local中加入
+###  加入开机启动
+### 在/etc/rc.local中加入
 sudo ssserver -c /etc/shadowsocks.json --user username -d start - 不要总是用root用户做事，adduser来做，给sudo权限即可
+```
 
+
+### 2.2 SSR以及一些衍生的软件
 [ShadowsocksR](https://github.com/breakwa11/shadowsocks-rss/wiki)启动后台运行命令
 > python server.py -p 443 -k password -m aes-256-cfb -O auth_sha1_v4 -o http_simple -d start
 
 [net-speeder](https://zhgcao.github.io/2016/05/26/ubuntu-install-net-speeder/)
-venetX，OpenVZ架构
 
+> venetX，OpenVZ架构
+
+```shell
 cd net-speeder-master/
 sh build.sh -DCOOKED
 
-Xen，KVM，物理机
+###Xen，KVM，物理机
 cd net-speeder-master/
 sh build.sh
 
 
-加速所有ip协议数据
-
-> ./net_speeder venet0 "ip"
-
-只加速指定端口，例如只加速TCP协议的 8989端口
-前提是切换到net-speeder的目录下
-> ./net_speeder venet0:0 "tcp src port 8989"
+### 加速所有ip协议数据
 
 ./net_speeder venet0 "ip"
 
-只加速指定端口，例如只加速TCP协议的 8989端口
-前提是切换到net-speeder的目录下
- ./net_speeder venet0:0 "tcp src port 8989"
 
- [KVM架构升级内核开启BBR](https://qiujunya.com/linodebbr.html)
+###只加速指定端口，例如只加速TCP协议的 8989端口, 切换到net-speeder的目录下
+./net_speeder venet0:0 "tcp src port 8989"
 
-
+./net_speeder venet0 "ip"
 ```
+
+### 2.3 升级内核开启BBR
+[KVM架构升级内核开启BBR](https://qiujunya.com/linodebbr.html)
 
 [ubuntu 16.4安装shadowsocks-libev](http://www.itfanr.cc/2016/10/02/use-shadowsocks-to-have-better-internet-experience/)
 
 参考github[官方教程](https://github.com/shadowsocks/shadowsocks-libev)安装
-```
-
+```shell
 sudo apt-get install software-properties-common -y
 sudo add-apt-repository ppa:max-c-lv/shadowsocks-libev -y
 sudo apt-get update
@@ -110,23 +126,30 @@ sudo /etc/init.d/shadowsocks-libev start    # for sysvinit, or
 sudo systemctl start shadowsocks-libev      # for systemd
 
 ##加入开机启动
-在/etc/rc.local中加入
+##在/etc/rc.local中加入
 sudo /etc/init.d/shadowsocks-libev start
 
 ```
 其实跟安装ss很像的
 
 
-## 跑分
+## 3. 一些常用的命令
+> 写alias算了
+
+
+
+
+## 10.跑分
 [VPS跑分软件](https://github.com/Teddysun/across)
+git clone下来
+```shell
+cd across
+wget -qO- bench.sh | bash ###（亲测可用，也可以自己看Readme）
+### 或者
+curl -Lso- bench.sh | bash
+```
 
-
-> git clone下来
-> cd across
-> wget -qO- bench.sh | bash （亲测可用，也可以自己看Readme）
-或者 > curl -Lso- bench.sh | bash
-
-
+下面是一些自己试过的
 ### BandWagon
 ```
 ----------------------------------------------------------------------
@@ -265,12 +288,12 @@ Softlayer, Frankfurt, DE        159.122.69.4            6.77MB/s
 Softlayer, Singapore, SG        119.81.28.170           97.9MB/s
 Softlayer, HongKong, CN         119.81.130.170          35.2MB/s
 ----------------------------------------------------------------------
-
 ```
 
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600)
 
-
+=====================================================================================
 据说Docker很简单
 
 ### 参考
+ [vps优化](https://www.vpser.net/opt/vps-add-swap.html)

@@ -582,6 +582,8 @@ service ssh restart
 查看系统release版本
 ```shell
 more /etc/*release
+### 这个也行
+lsb_release -a
 ```
 
 [编码的修改](https://perlgeek.de/en/article/set-up-a-clean-utf8-environment)
