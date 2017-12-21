@@ -117,6 +117,7 @@ Java相关
 - [ ] 指令重排序，内存栅栏，JVM垃圾回收机制，何时触发MinorGC
 - [ ] Eden和Survivor的比例分配等
 - [ ] Gson主要的代码在JsonWriter里面，打几个断点即可。gson这类parser的劣势就在于allocating a bounch of String(array) and throw them away。
+- [ ] 类[加载机制和时序](http://www.51gjie.com/java/554.html)
 
 
 

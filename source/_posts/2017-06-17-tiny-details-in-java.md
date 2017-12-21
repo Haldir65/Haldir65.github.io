@@ -825,6 +825,25 @@ System.out.println(b.setScale(5,BigDecimal.ROUND_HALF_UP).doubleValue());
 ```
 所以建议用String初始化BigDecimal.
 
+### 36.调jvm参数
+先看怎么get:
+在Intelij里面，写一个helloworld程序，看下console的输出，然后复制出来。中间加上这么一行：
+> -XX:+PrintFlagsFinal and -XX:+PrintFlagsInitial
+
+打印出来的东西很长，在console中不好找，最好拿管道复制出来:  XXXXX | clip 。然后在文本编辑器中粘贴，自己找想要的参数
+挑几个好玩的：
+
+> InitialHeapSize                          = 132120576
+  MaxJavaStackTraceDepth                   = 1024
+
+具体教程搜索打印jvm参数即可。
+
+再看怎么set:
+Intelij里面，Setting-Build-maven-runner，有个VM Options。把网上找到的“jvm 参数粘贴进去”。比如这些
+> -Xmx3550m:设置JVM最大可用内存为3550M.
+   -Xms3550m:设置JVM促使内存为3550m.此值可以设置与-Xmx相同,以避免每次垃圾回收完成后JVM重新分配内存.
+   -Xmn2g:设置年轻代大小为2G.
+
 
 
 ## 参考

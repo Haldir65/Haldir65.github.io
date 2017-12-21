@@ -815,6 +815,49 @@ f();
 8.  json object有一个prototype属性，表面其所代表的类型。
 
 
+9. js迭代一个数组的方法：
+```js
+for (var i = 0; i < array.length; i++) {
+  // array[i]
+}
+
+for (var i = 0,len=array.length; i < len; i++) {
+  // array[i]
+}
+
+array.forEach(function(item){
+  // item
+})
+
+// 用于列出对象所有的属性
+var obj = {
+    name: 'test',
+    color: 'red',
+    day: 'sunday',
+    number: 5
+}
+for (var key in obj) {
+    console.log(obj[key])
+}
+//
+
+
+// es6
+for (variable of iterable) {
+
+}
+
+array.map(function(item){
+
+})
+
+array.filter(function(item){
+
+})
+```
+基本上就这些了[参考](https://juejin.im/post/5a3a59e7518825698e72376b)
+
+
 ## 1. js跨域请求
 [cors的概念](http://www.ruanyifeng.com/blog/2016/04/cors.html)
 > search "原生javaScript跨域"、'jsonp跨域请求豆瓣250'

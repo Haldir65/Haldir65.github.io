@@ -28,8 +28,7 @@ sudo apt-get autoremove 删除系统不再使用的孤立软件
 
 
 ### 2.1 装ss
->
-下载shadowsocks源码编译
+>下载shadowsocks源码编译
 git clone https://github.com/shadowsocks/shadowsocks
  # 记得切换到master分支
 

@@ -149,6 +149,59 @@ core/res/res/anim/button_state_list_anim_material.xml
 Unix的输入输出(IO)系统遵循Open-Read-Write-Close这样的操作范本。
 
 
+### 11.v7包里面的Toolbar只是一个自定义View
+随便举一个例子，右上角的optionMenu点击跳出的弹窗里面其实是一个ListView，具体的class是android.support.v7.view.menu.ListMenuItemView。都是很常规的自定义View的做法，这个ListView的Adapter叫做MenuAdapter，这个Adapter的itemLayout布局文件叫做abc_popup_menu_item_layout.xml
+abc_popup_menu_item_layout.xml
+```xml
+<android.support.v7.internal.view.menu.ListMenuItemView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="?attr/dropdownListPreferredItemHeight"
+        android:minWidth="196dip"
+        android:paddingRight="16dip">
+
+    <!-- Icon will be inserted here. -->
+
+    <!-- The title and summary have some gap between them, and this 'group' should be centered vertically. -->
+    <RelativeLayout
+            android:layout_width="0dip"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="16dip"
+            android:duplicateParentState="true">
+
+        <TextView
+                android:id="@+id/title"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:textAppearance="?attr/textAppearanceLargePopupMenu"
+                android:singleLine="true"
+                android:duplicateParentState="true"
+                android:ellipsize="marquee"
+                android:fadingEdge="horizontal"/>
+
+        <TextView
+                android:id="@+id/shortcut"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/title"
+                android:layout_alignParentLeft="true"
+                android:textAppearance="?attr/textAppearanceSmallPopupMenu"
+                android:singleLine="true"
+                android:duplicateParentState="true"/>
+
+    </RelativeLayout>
+
+    <!-- Checkbox, and/or radio button will be inserted here. -->
+
+</android.support.v7.internal.view.menu.ListMenuItemView>
+```
+一般来讲，MenuItem的字体大小，颜色都是需要在theme中写的。所以照说硬要用findViewById(ViewGroup的findViewTraversal)其实是能找到的。
+
+
 
 =============================================================================
 ### 9. Facebook出品的BUCK能够用于编译Android 项目，速度比较快。
