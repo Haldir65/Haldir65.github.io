@@ -845,8 +845,163 @@ Intelij里面，Setting-Build-maven-runner，有个VM Options。把网上找到�
    -Xmn2g:设置年轻代大小为2G.
 
 
+### 37. Serializable的原理
+刚学java的时候没人会跟你讲Serializable为什么是一个没有抽象方法的接口，那时甚至不知道serialize和deserialize是怎么回事。
+关于Serializable主要的点有几个：
+- 为什么一个没有抽象方法的接口也能算接口
+- 为什么总是说序列化一定要实现serializable接口
+- 那个serialVersionUID干什么用的
+- 为什么写了transient就不会被序列化了。
+
+现在回答下这些问题，serialize（序列化，就是把一个对象写进磁盘），deserialize（反序列化，就是把写在磁盘上的0110这些东西重新组装成一个对象）。
+```java
+public interface Serializable {
+}
+private static final long serialVersionUID = 2906642554793891381L;
+
+// 网上随便找到的序列化和反序列化的demo如下
+// Serializable：把对象序列化
+public static void writeSerializableObject() {
+    try {
+        Man man = new Man("lat", "123456");
+        Person person = new Person(man, "王尼玛", 21);
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("output.txt"));
+        objectOutputStream.writeObject("string");
+        objectOutputStream.writeObject(person);
+        objectOutputStream.close();
+    } catch (FileNotFoundException e) {
+        e.printStackTrace();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
+
+// Serializable：反序列化对象
+public static void readSerializableObject() {
+    try {
+        ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("output.txt"));
+        String string = (String) objectInputStream.readObject();
+        Person person = (Person) objectInputStream.readObject();
+        objectInputStream.close();
+        System.out.println(string + ", age: " + person.getAge() + ", man username: " + person.getMan().getUsername());
+    } catch (FileNotFoundException e) {
+        e.printStackTrace();
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+```
+
+为什么说序列化一定要实现serializable接口。上面的objectOutputStream.writeObject方法走进去。
+ObjectOutputStream.java
+```java
+public final void writeObject(Object obj) throws IOException {
+    if (enableOverride) {
+        writeObjectOverride(obj);
+        return;
+    }
+    try {
+        writeObject0(obj, false);
+    } catch (IOException ex) {
+        if (depth == 0) {
+            writeFatalException(ex);
+        }
+        throw ex;
+    }
+}
+
+private void writeObject0(Object obj, boolean unshared)
+        throws IOException{
+          // 省略省略
+          // remaining cases
+            if (obj instanceof String) {
+                writeString((String) obj, unshared);
+            } else if (cl.isArray()) {
+                writeArray(obj, desc, unshared);
+            } else if (obj instanceof Enum) {
+                writeEnum((Enum<?>) obj, desc, unshared);
+            } else if (obj instanceof Serializable) {
+                writeOrdinaryObject(obj, desc, unshared);
+            } else {
+                if (extendedDebugInfo) {
+                    throw new NotSerializableException(
+                        cl.getName() + "\n" + debugInfoStack.toString());
+                } else {
+                    throw new NotSerializableException(cl.getName());
+                }
+            }
+            // 省略省略
+
+```
+果然还是用了**instanceof**这个关键词啊。这是写进磁盘(serialize的情况)，从磁盘里取出来的话
+ObjecInputStream.java
+```java
+ public final Object readObject(){
+   // 省略
+     Object obj = readObject0(false);
+     // 省略
+ }
+
+ /**
+     * Underlying readObject implementation.
+     */
+    private Object readObject0(boolean unshared) throws IOException {
+      // 省略
+      case TC_OBJECT:
+                  return checkResolve(readOrdinaryObject(unshared));
+                  // 省略
+    }
+
+      private Object readOrdinaryObject(boolean unshared){
+        //省略
+        try {
+           obj = desc.isInstantiable() ? desc.newInstance() : null;
+       } catch (Exception ex) {
+           throw (IOException) new InvalidClassException(
+               desc.forClass().getName(),
+               "unable to create instance").initCause(ex);
+       }
+       //省略
+}
+```
+就是反射调用无参的构造函数。
+
+
+以前我问过那个serialVersionUID是干什么的，怎么写，老手告诉我说，瞎写就行了。后来的项目中就一直瞎写了，倒也没出过什么问题。现在来回答这个serialVersionUID是干什么的：
+序列化和反序列化就是存进去和取出来，为了保证存进磁盘的A在取出来的时候不会去拿B的二进制数据，所以需要这个。这个值就相当于每一个存进去的class的身份证号，保证存进去和取出来的是一个东西。
+ObjectStreamClass.java
+```java
+private static Long getDeclaredSUID(Class<?> cl) {
+      try {
+          Field f = cl.getDeclaredField("serialVersionUID");
+          int mask = Modifier.STATIC | Modifier.FINAL;
+          if ((f.getModifiers() & mask) == mask) {
+              f.setAccessible(true);
+              return Long.valueOf(f.getLong(null));
+          }
+      } catch (Exception ex) {
+      }
+      return null;
+  }
+```
+假如忘记写的话，呵呵
+```java
+throw new InvalidClassException(osc.name,
+                       "local class incompatible: " +
+                               "stream classdesc serialVersionUID = " + suid +
+                               ", local class serialVersionUID = " +
+                               osc.getSerialVersionUID());
+```
+
+<quote>
+没有指定serialVersionUID的，那么java编译器会自动给这个class进行一个摘要算法，类似于指纹算法，只要这个文件多一个空格，得到的UID就会截然不同的，可以保证在这么多类中，这个编号是唯一的。所以，我们添加了一个字段后，由于没有显指定serialVersionUID，编译器又为我们生成了一个UID，当然和前面保存在文件中的那个不会一样了，于是就出现了2个号码不一致的错误。因此，只要我们自己指定了serialVersionUID，就可以在序列化后，去添加一个字段，或者方法，而不会影响到后期的还原，还原后的对象照样可以使用，而且还多了方法可以用
+</quote>
+
+所以还是得老老实实写，而且一次写了之后就不用**也不要**改了
+现在可以不用瞎写了，在Intelij里面有小工具：
+"File->Setting->Editor->Inspections->Serialization issues->Serializable class without ’serialVersionUID’ ->勾选操作"
+
 
 ## 参考
-
 - [Jake Wharton and Jesse Wilson - Death, Taxes, and HTTP](https://www.youtube.com/watch?v=6uroXz5l7Gk)
 - [Android Tech Talk: HTTP In A Hostile World](https://www.youtube.com/watch?v=tfD2uYjzXFo)

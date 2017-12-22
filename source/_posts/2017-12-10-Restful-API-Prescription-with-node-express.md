@@ -6,6 +6,20 @@ tags: [前端]
 
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/sceneryc7fd99f667c9d98a583a174872d58d13.jpg?imageView2/2/w/600)
 <!--more-->
+
+
+## 1. 安装
+
+
+
+
+## 2. 配置
+
+MiddleWare(中间件)的概念：
+从Request到response之间的流程中，任何组件都可以对这个过程中的数据进行修改，所以router其实也是中间件。中间件需要注意的就是***顺序很重要***。
+
+
+
 [Nginx 是前端工程师的好帮手](http://www.restran.net/2015/08/19/nginx-frontend-helper/)
 
 
