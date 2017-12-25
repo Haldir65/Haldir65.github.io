@@ -21,7 +21,7 @@
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/different_response.JPG">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/delegaet_converters.JPG">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/always_observe_on_mian_thread.JPG">
-<meta property="og:updated_time" content="2017-09-01T14:20:27.350Z">
+<meta property="og:updated_time" content="2017-12-19T14:31:10.602Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Retrofit源码阅读笔记">
 <meta name="twitter:description" content="This is gonna be nasty…… TL;DR">
@@ -206,7 +206,7 @@ ga('send', 'pageview');
       
         <h3 id="This-is-gonna-be-nasty……-TL-DR"><a href="#This-is-gonna-be-nasty……-TL-DR" class="headerlink" title="This is gonna be nasty…… TL;DR"></a>This is gonna be nasty…… TL;DR</h3><p><img src="http://odzl05jxx.bkt.clouddn.com/d653491fb55bec754b8471aa6a3f6eed.jpg?imageView2/2/w/600" alt=""></p>
 <a id="more"></a>
-<h3 id="1-Retrofit"><a href="#1-Retrofit" class="headerlink" title="1. Retrofit"></a>1. Retrofit</h3><h4 id="1-1-使用方法"><a href="#1-1-使用方法" class="headerlink" title="1.1 使用方法"></a>1.1 使用方法</h4><p>Retrofit本身并不局限于Andriod平台，java应用也可以用来和服务器沟通。<br>Retrofit一般的用法看上去很简单<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"> <span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">GitHub</span> </span>&#123;</div><div class="line">    <span class="meta">@GET</span>(<span class="string">"/repos/&#123;owner&#125;/&#123;repo&#125;/contributors"</span>)</div><div class="line">    Call&lt;List&lt;Contributor&gt;&gt; contributors(</div><div class="line">        <span class="meta">@Path</span>(<span class="string">"owner"</span>) String owner,</div><div class="line">        <span class="meta">@Path</span>(<span class="string">"repo"</span>) String repo);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">Retrofit retrofit = <span class="keyword">new</span> Retrofit.Builder()</div><div class="line">        .baseUrl(API_URL)   <span class="comment">// end_point</span></div><div class="line">        .addConverterFactory(GsonConverterFactory.create())</div><div class="line">        .build();</div><div class="line"></div><div class="line">    <span class="comment">// Create an instance of our GitHub API interface.</span></div><div class="line">    GitHub github = retrofit.create(GitHub.class);</div><div class="line"></div><div class="line">    <span class="comment">// Create a call instance for looking up Retrofit contributors.</span></div><div class="line">    Call&lt;List&lt;Contributor&gt;&gt; call = github.contributors(<span class="string">"square"</span>, <span class="string">"retrofit"</span>);</div><div class="line"></div><div class="line">    <span class="comment">// Fetch and print a list of the contributors to the library.</span></div><div class="line">    List&lt;Contributor&gt; contributors = call.execute().body();</div><div class="line">    <span class="keyword">for</span> (Contributor contributor : contributors) &#123;</div><div class="line">      System.out.println(contributor.login + <span class="string">" ("</span> + contributor.contributions + <span class="string">")"</span>);</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<h3 id="1-Retrofit"><a href="#1-Retrofit" class="headerlink" title="1. Retrofit"></a>1. Retrofit</h3><h4 id="1-1-使用方法"><a href="#1-1-使用方法" class="headerlink" title="1.1 使用方法"></a>1.1 使用方法</h4><p>Retrofit本身并不局限于Android平台，java应用也可以用来和服务器沟通。<br>Retrofit一般的用法看上去很简单<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"> <span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">GitHub</span> </span>&#123;</div><div class="line">    <span class="meta">@GET</span>(<span class="string">"/repos/&#123;owner&#125;/&#123;repo&#125;/contributors"</span>)</div><div class="line">    Call&lt;List&lt;Contributor&gt;&gt; contributors(</div><div class="line">        <span class="meta">@Path</span>(<span class="string">"owner"</span>) String owner,</div><div class="line">        <span class="meta">@Path</span>(<span class="string">"repo"</span>) String repo);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">Retrofit retrofit = <span class="keyword">new</span> Retrofit.Builder()</div><div class="line">        .baseUrl(API_URL)   <span class="comment">// end_point</span></div><div class="line">        .addConverterFactory(GsonConverterFactory.create())</div><div class="line">        .build();</div><div class="line"></div><div class="line">    <span class="comment">// Create an instance of our GitHub API interface.</span></div><div class="line">    GitHub github = retrofit.create(GitHub.class);</div><div class="line"></div><div class="line">    <span class="comment">// Create a call instance for looking up Retrofit contributors.</span></div><div class="line">    Call&lt;List&lt;Contributor&gt;&gt; call = github.contributors(<span class="string">"square"</span>, <span class="string">"retrofit"</span>);</div><div class="line"></div><div class="line">    <span class="comment">// Fetch and print a list of the contributors to the library.</span></div><div class="line">    List&lt;Contributor&gt; contributors = call.execute().body();</div><div class="line">    <span class="keyword">for</span> (Contributor contributor : contributors) &#123;</div><div class="line">      System.out.println(contributor.login + <span class="string">" ("</span> + contributor.contributions + <span class="string">")"</span>);</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
 <p>关键来看这段 retroft.create ,重点都在这里面。关键的代码就在这三行里面了</p>
 <blockquote>
 <p>ServiceMethod serviceMethod = loadServiceMethod(method);<br>OkHttpCall okHttpCall = new OkHttpCall&lt;&gt;(serviceMethod, args);<br>return serviceMethod.callAdapter.adapt(okHttpCall);</p>
@@ -471,27 +471,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Window</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -499,7 +479,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -511,19 +499,23 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Window</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -531,7 +523,19 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">java</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -544,10 +548,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">Okio</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -571,7 +571,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -579,11 +579,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -591,7 +587,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
+                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -600,6 +596,10 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
               <li class="article-tag-list-item">

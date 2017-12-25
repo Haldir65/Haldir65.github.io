@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="interesting stuff in java that don’t seem to get enough pubilicity">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/34a7d57ccabb18c69d085247cf009b22.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-12-07T14:31:39.936Z">
+<meta property="og:updated_time" content="2017-12-24T14:38:21.677Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="For those tiny details in Java">
 <meta name="twitter:description" content="interesting stuff in java that don’t seem to get enough pubilicity">
@@ -313,6 +313,35 @@ ga('send', 'pageview');
 </blockquote>
 <p>对于0.2来说，得到的是一个无线循环的00110011001100110011….区区23位怎么够用。<br>所以23位之后的数字被无视了，然后打印的时候尝试将这仅有的23位0101表示成10进制的时候，无论如何是得不到跟数学意义上的数字相等的数。但对于机器来说，就是一样的，Intelij里面float超过小数点后8位自动飚黄，说什么is always true。。。就这么23个槽子，确实没法满足实际需要的位数要求。<br>所以实际上是2.2f需要无限个小槽子表示，2.25f正好停在：0 100 0000 0001 0010 0000 0000 0000 0000 就够用了。<br>有时候float或者double的位数不够了，就用String吧。BigDecimal提供了String为参数的初始化方法。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">double</span> currentLat2 = <span class="number">2.455675</span>;</div><div class="line">BigDecimal b = <span class="keyword">new</span> BigDecimal(currentLat2);</div><div class="line">currentLat2 = b.setScale(<span class="number">5</span>, BigDecimal.ROUND_HALF_UP).doubleValue();</div><div class="line">System.out.println(currentLat2);</div><div class="line"><span class="comment">// 输出的是2.45567而不是2.45568</span></div><div class="line"></div><div class="line">String currentLat2 = <span class="string">"2.455675"</span>;</div><div class="line">BigDecimal b = <span class="keyword">new</span> BigDecimal(currentLat2);   </div><div class="line">System.out.println(b.setScale(<span class="number">5</span>,BigDecimal.ROUND_HALF_UP).doubleValue());</div></pre></td></tr></table></figure></p>
 <p>所以建议用String初始化BigDecimal.</p>
+<h3 id="36-调jvm参数"><a href="#36-调jvm参数" class="headerlink" title="36.调jvm参数"></a>36.调jvm参数</h3><p>先看怎么get:<br>在Intelij里面，写一个helloworld程序，看下console的输出，然后复制出来。中间加上这么一行：</p>
+<blockquote>
+<p>-XX:+PrintFlagsFinal and -XX:+PrintFlagsInitial</p>
+</blockquote>
+<p>打印出来的东西很长，在console中不好找，最好拿管道复制出来:  XXXXX | clip 。然后在文本编辑器中粘贴，自己找想要的参数<br>挑几个好玩的：</p>
+<blockquote>
+<p>InitialHeapSize                          = 132120576<br>  MaxJavaStackTraceDepth                   = 1024</p>
+</blockquote>
+<p>具体教程搜索打印jvm参数即可。</p>
+<p>再看怎么set:<br>Intelij里面，Setting-Build-maven-runner，有个VM Options。把网上找到的“jvm 参数粘贴进去”。比如这些</p>
+<blockquote>
+<p>-Xmx3550m:设置JVM最大可用内存为3550M.<br>   -Xms3550m:设置JVM促使内存为3550m.此值可以设置与-Xmx相同,以避免每次垃圾回收完成后JVM重新分配内存.<br>   -Xmn2g:设置年轻代大小为2G.</p>
+</blockquote>
+<h3 id="37-Serializable的原理"><a href="#37-Serializable的原理" class="headerlink" title="37. Serializable的原理"></a>37. Serializable的原理</h3><p>刚学java的时候没人会跟你讲Serializable为什么是一个没有抽象方法的接口，那时甚至不知道serialize和deserialize是怎么回事。<br>关于Serializable主要的点有几个：</p>
+<ul>
+<li>为什么一个没有抽象方法的接口也能算接口</li>
+<li>为什么总是说序列化一定要实现serializable接口</li>
+<li>那个serialVersionUID干什么用的</li>
+<li>为什么写了transient就不会被序列化了。</li>
+</ul>
+<p>现在回答下这些问题，serialize（序列化，就是把一个对象写进磁盘），deserialize（反序列化，就是把写在磁盘上的0110这些东西重新组装成一个对象）。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Serializable</span> </span>&#123;</div><div class="line">&#125;</div><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">2906642554793891381L</span>;</div><div class="line"></div><div class="line"><span class="comment">// 网上随便找到的序列化和反序列化的demo如下</span></div><div class="line"><span class="comment">// Serializable：把对象序列化</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">writeSerializableObject</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">try</span> &#123;</div><div class="line">        Man man = <span class="keyword">new</span> Man(<span class="string">"lat"</span>, <span class="string">"123456"</span>);</div><div class="line">        Person person = <span class="keyword">new</span> Person(man, <span class="string">"王尼玛"</span>, <span class="number">21</span>);</div><div class="line">        ObjectOutputStream objectOutputStream = <span class="keyword">new</span> ObjectOutputStream(<span class="keyword">new</span> FileOutputStream(<span class="string">"output.txt"</span>));</div><div class="line">        objectOutputStream.writeObject(<span class="string">"string"</span>);</div><div class="line">        objectOutputStream.writeObject(person);</div><div class="line">        objectOutputStream.close();</div><div class="line">    &#125; <span class="keyword">catch</span> (FileNotFoundException e) &#123;</div><div class="line">        e.printStackTrace();</div><div class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</div><div class="line">        e.printStackTrace();</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// Serializable：反序列化对象</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">readSerializableObject</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">try</span> &#123;</div><div class="line">        ObjectInputStream objectInputStream = <span class="keyword">new</span> ObjectInputStream(<span class="keyword">new</span> FileInputStream(<span class="string">"output.txt"</span>));</div><div class="line">        String string = (String) objectInputStream.readObject();</div><div class="line">        Person person = (Person) objectInputStream.readObject();</div><div class="line">        objectInputStream.close();</div><div class="line">        System.out.println(string + <span class="string">", age: "</span> + person.getAge() + <span class="string">", man username: "</span> + person.getMan().getUsername());</div><div class="line">    &#125; <span class="keyword">catch</span> (FileNotFoundException e) &#123;</div><div class="line">        e.printStackTrace();</div><div class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">        e.printStackTrace();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>为什么说序列化一定要实现serializable接口。上面的objectOutputStream.writeObject方法走进去。<br>ObjectOutputStream.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">writeObject</span><span class="params">(Object obj)</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">    <span class="keyword">if</span> (enableOverride) &#123;</div><div class="line">        writeObjectOverride(obj);</div><div class="line">        <span class="keyword">return</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">try</span> &#123;</div><div class="line">        writeObject0(obj, <span class="keyword">false</span>);</div><div class="line">    &#125; <span class="keyword">catch</span> (IOException ex) &#123;</div><div class="line">        <span class="keyword">if</span> (depth == <span class="number">0</span>) &#123;</div><div class="line">            writeFatalException(ex);</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">throw</span> ex;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">writeObject0</span><span class="params">(Object obj, <span class="keyword">boolean</span> unshared)</span></div><div class="line">        <span class="keyword">throws</span> IOException</span>&#123;</div><div class="line">          <span class="comment">// 省略省略</span></div><div class="line">          <span class="comment">// remaining cases</span></div><div class="line">            <span class="keyword">if</span> (obj <span class="keyword">instanceof</span> String) &#123;</div><div class="line">                writeString((String) obj, unshared);</div><div class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (cl.isArray()) &#123;</div><div class="line">                writeArray(obj, desc, unshared);</div><div class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (obj <span class="keyword">instanceof</span> Enum) &#123;</div><div class="line">                writeEnum((Enum&lt;?&gt;) obj, desc, unshared);</div><div class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (obj <span class="keyword">instanceof</span> Serializable) &#123;</div><div class="line">                writeOrdinaryObject(obj, desc, unshared);</div><div class="line">            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                <span class="keyword">if</span> (extendedDebugInfo) &#123;</div><div class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> NotSerializableException(</div><div class="line">                        cl.getName() + <span class="string">"\n"</span> + debugInfoStack.toString());</div><div class="line">                &#125; <span class="keyword">else</span> &#123;</div><div class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> NotSerializableException(cl.getName());</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            <span class="comment">// 省略省略</span></div></pre></td></tr></table></figure></p>
+<p>果然还是用了<strong>instanceof</strong>这个关键词啊。这是写进磁盘(serialize的情况)，从磁盘里取出来的话<br>ObjecInputStream.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> Object <span class="title">readObject</span><span class="params">()</span></span>&#123;</div><div class="line">   <span class="comment">// 省略</span></div><div class="line">     Object obj = readObject0(<span class="keyword">false</span>);</div><div class="line">     <span class="comment">// 省略</span></div><div class="line"> &#125;</div><div class="line"></div><div class="line"> <span class="comment">/**</div><div class="line">     * Underlying readObject implementation.</div><div class="line">     */</span></div><div class="line">    <span class="function"><span class="keyword">private</span> Object <span class="title">readObject0</span><span class="params">(<span class="keyword">boolean</span> unshared)</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">      <span class="comment">// 省略</span></div><div class="line">      <span class="keyword">case</span> TC_OBJECT:</div><div class="line">                  <span class="keyword">return</span> checkResolve(readOrdinaryObject(unshared));</div><div class="line">                  <span class="comment">// 省略</span></div><div class="line">    &#125;</div><div class="line"></div><div class="line">      <span class="function"><span class="keyword">private</span> Object <span class="title">readOrdinaryObject</span><span class="params">(<span class="keyword">boolean</span> unshared)</span></span>&#123;</div><div class="line">        <span class="comment">//省略</span></div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">           obj = desc.isInstantiable() ? desc.newInstance() : <span class="keyword">null</span>;</div><div class="line">       &#125; <span class="keyword">catch</span> (Exception ex) &#123;</div><div class="line">           <span class="keyword">throw</span> (IOException) <span class="keyword">new</span> InvalidClassException(</div><div class="line">               desc.forClass().getName(),</div><div class="line">               <span class="string">"unable to create instance"</span>).initCause(ex);</div><div class="line">       &#125;</div><div class="line">       <span class="comment">//省略</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>就是反射调用无参的构造函数。</p>
+<p>以前我问过那个serialVersionUID是干什么的，怎么写，老手告诉我说，瞎写就行了。后来的项目中就一直瞎写了，倒也没出过什么问题。现在来回答这个serialVersionUID是干什么的：<br>序列化和反序列化就是存进去和取出来，为了保证存进磁盘的A在取出来的时候不会去拿B的二进制数据，所以需要这个。这个值就相当于每一个存进去的class的身份证号，保证存进去和取出来的是一个东西。<br>ObjectStreamClass.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> Long <span class="title">getDeclaredSUID</span><span class="params">(Class&lt;?&gt; cl)</span> </span>&#123;</div><div class="line">      <span class="keyword">try</span> &#123;</div><div class="line">          Field f = cl.getDeclaredField(<span class="string">"serialVersionUID"</span>);</div><div class="line">          <span class="keyword">int</span> mask = Modifier.STATIC | Modifier.FINAL;</div><div class="line">          <span class="keyword">if</span> ((f.getModifiers() &amp; mask) == mask) &#123;</div><div class="line">              f.setAccessible(<span class="keyword">true</span>);</div><div class="line">              <span class="keyword">return</span> Long.valueOf(f.getLong(<span class="keyword">null</span>));</div><div class="line">          &#125;</div><div class="line">      &#125; <span class="keyword">catch</span> (Exception ex) &#123;</div><div class="line">      &#125;</div><div class="line">      <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
+<p>假如忘记写的话，呵呵<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">throw</span> <span class="keyword">new</span> InvalidClassException(osc.name,</div><div class="line">                       <span class="string">"local class incompatible: "</span> +</div><div class="line">                               <span class="string">"stream classdesc serialVersionUID = "</span> + suid +</div><div class="line">                               <span class="string">", local class serialVersionUID = "</span> +</div><div class="line">                               osc.getSerialVersionUID());</div></pre></td></tr></table></figure></p>
+<quote><br>没有指定serialVersionUID的，那么java编译器会自动给这个class进行一个摘要算法，类似于指纹算法，只要这个文件多一个空格，得到的UID就会截然不同的，可以保证在这么多类中，这个编号是唯一的。所以，我们添加了一个字段后，由于没有显指定serialVersionUID，编译器又为我们生成了一个UID，当然和前面保存在文件中的那个不会一样了，于是就出现了2个号码不一致的错误。因此，只要我们自己指定了serialVersionUID，就可以在序列化后，去添加一个字段，或者方法，而不会影响到后期的还原，还原后的对象照样可以使用，而且还多了方法可以用<br></quote>
+
+<p>所以还是得老老实实写，而且一次写了之后就不用<strong>也不要</strong>改了<br>现在可以不用瞎写了，在Intelij里面有小工具：<br>“File-&gt;Setting-&gt;Editor-&gt;Inspections-&gt;Serialization issues-&gt;Serializable class without ’serialVersionUID’ -&gt;勾选操作”</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="https://www.youtube.com/watch?v=6uroXz5l7Gk">Jake Wharton and Jesse Wilson - Death, Taxes, and HTTP</a></li>
 <li><a href="https://www.youtube.com/watch?v=tfD2uYjzXFo">Android Tech Talk: HTTP In A Hostile World</a></li>
@@ -527,27 +556,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Window</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -555,7 +564,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -567,19 +584,23 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Window</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -587,7 +608,19 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">java</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -600,10 +633,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">Okio</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -627,7 +656,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -635,11 +664,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -647,7 +672,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
+                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -656,6 +681,10 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
               <li class="article-tag-list-item">
