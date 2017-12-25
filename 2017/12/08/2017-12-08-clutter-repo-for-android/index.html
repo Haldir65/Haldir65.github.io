@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="之前的文章快装不下了，所以另外开一篇文章专门放Android相关的杂乱的知识点。">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100734648.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-12-20T14:25:57.251Z">
+<meta property="og:updated_time" content="2017-12-24T14:38:21.695Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android知识集合[三]">
 <meta name="twitter:description" content="之前的文章快装不下了，所以另外开一篇文章专门放Android相关的杂乱的知识点。">
@@ -217,6 +217,8 @@ ga('send', 'pageview');
 <p>注意那个button_elevation_material：<br>在<a href="https://android.googlesource.com/platform/frameworks/base/+/master/core/res/res/values/dimens_material.xml">aosp</a>中<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- Elevation when button is pressed --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dimen</span> <span class="attr">name</span>=<span class="string">"button_elevation_material"</span>&gt;</span>2dp<span class="tag">&lt;/<span class="name">dimen</span>&gt;</span></div><div class="line">    <span class="comment">&lt;!-- Z translation to apply when button is pressed --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dimen</span> <span class="attr">name</span>=<span class="string">"button_pressed_z_material"</span>&gt;</span>4dp<span class="tag">&lt;/<span class="name">dimen</span>&gt;</span></div></pre></td></tr></table></figure></p>
 <p><strong><em>所以Lollipop上使用Appcompat主题，什么都不改，button默认是会有2dp的elevation的</em></strong><br>至于这个elevation为什么不是在初始化的时候就设置的（打断点的时候走完构造函数,getElevation还是0），就在于这上面这个AnimationDelay(其实是100ms之后再去运行这个动画)，从堆栈来看，最终导致调用setElevation的地方是在drawableStateChange这个方法里面。</p>
 <h3 id="10-内网传输功能的原理"><a href="#10-内网传输功能的原理" class="headerlink" title="10. 内网传输功能的原理"></a>10. 内网传输功能的原理</h3><p>有些App提供局域网内无限传输文件的能力：本质上是用了TCP或者UDP。在java层的话，TCP用的是java.net.Socket，UDP用的是java.net.DatagramSocket。由于数据传输是双向的，客户端和Server端都需要创建这样的Object Instance。<br><a href="https://github.com/xanarry/LanTrans-android">一个比较好的Demo</a><br>Unix的输入输出(IO)系统遵循Open-Read-Write-Close这样的操作范本。</p>
+<h3 id="11-v7包里面的Toolbar只是一个自定义View"><a href="#11-v7包里面的Toolbar只是一个自定义View" class="headerlink" title="11.v7包里面的Toolbar只是一个自定义View"></a>11.v7包里面的Toolbar只是一个自定义View</h3><p>随便举一个例子，右上角的optionMenu点击跳出的弹窗里面其实是一个ListView，具体的class是android.support.v7.view.menu.ListMenuItemView。都是很常规的自定义View的做法，这个ListView的Adapter叫做MenuAdapter，这个Adapter的itemLayout布局文件叫做abc_popup_menu_item_layout.xml<br>abc_popup_menu_item_layout.xml<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">android.support.v7.internal.view.menu.ListMenuItemView</span></div><div class="line">        <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></div><div class="line">        <span class="attr">android:layout_width</span>=<span class="string">"fill_parent"</span></div><div class="line">        <span class="attr">android:layout_height</span>=<span class="string">"?attr/dropdownListPreferredItemHeight"</span></div><div class="line">        <span class="attr">android:minWidth</span>=<span class="string">"196dip"</span></div><div class="line">        <span class="attr">android:paddingRight</span>=<span class="string">"16dip"</span>&gt;</span></div><div class="line"></div><div class="line">    <span class="comment">&lt;!-- Icon will be inserted here. --&gt;</span></div><div class="line"></div><div class="line">    <span class="comment">&lt;!-- The title and summary have some gap between them, and this 'group' should be centered vertically. --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">RelativeLayout</span></div><div class="line">            <span class="attr">android:layout_width</span>=<span class="string">"0dip"</span></div><div class="line">            <span class="attr">android:layout_weight</span>=<span class="string">"1"</span></div><div class="line">            <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></div><div class="line">            <span class="attr">android:layout_gravity</span>=<span class="string">"center_vertical"</span></div><div class="line">            <span class="attr">android:layout_marginLeft</span>=<span class="string">"16dip"</span></div><div class="line">            <span class="attr">android:duplicateParentState</span>=<span class="string">"true"</span>&gt;</span></div><div class="line"></div><div class="line">        <span class="tag">&lt;<span class="name">TextView</span></div><div class="line">                <span class="attr">android:id</span>=<span class="string">"@+id/title"</span></div><div class="line">                <span class="attr">android:layout_width</span>=<span class="string">"fill_parent"</span></div><div class="line">                <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></div><div class="line">                <span class="attr">android:layout_alignParentTop</span>=<span class="string">"true"</span></div><div class="line">                <span class="attr">android:layout_alignParentLeft</span>=<span class="string">"true"</span></div><div class="line">                <span class="attr">android:textAppearance</span>=<span class="string">"?attr/textAppearanceLargePopupMenu"</span></div><div class="line">                <span class="attr">android:singleLine</span>=<span class="string">"true"</span></div><div class="line">                <span class="attr">android:duplicateParentState</span>=<span class="string">"true"</span></div><div class="line">                <span class="attr">android:ellipsize</span>=<span class="string">"marquee"</span></div><div class="line">                <span class="attr">android:fadingEdge</span>=<span class="string">"horizontal"</span>/&gt;</span></div><div class="line"></div><div class="line">        <span class="tag">&lt;<span class="name">TextView</span></div><div class="line">                <span class="attr">android:id</span>=<span class="string">"@+id/shortcut"</span></div><div class="line">                <span class="attr">android:layout_width</span>=<span class="string">"wrap_content"</span></div><div class="line">                <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></div><div class="line">                <span class="attr">android:layout_below</span>=<span class="string">"@id/title"</span></div><div class="line">                <span class="attr">android:layout_alignParentLeft</span>=<span class="string">"true"</span></div><div class="line">                <span class="attr">android:textAppearance</span>=<span class="string">"?attr/textAppearanceSmallPopupMenu"</span></div><div class="line">                <span class="attr">android:singleLine</span>=<span class="string">"true"</span></div><div class="line">                <span class="attr">android:duplicateParentState</span>=<span class="string">"true"</span>/&gt;</span></div><div class="line"></div><div class="line">    <span class="tag">&lt;/<span class="name">RelativeLayout</span>&gt;</span></div><div class="line"></div><div class="line">    <span class="comment">&lt;!-- Checkbox, and/or radio button will be inserted here. --&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;/<span class="name">android.support.v7.internal.view.menu.ListMenuItemView</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>一般来讲，MenuItem的字体大小，颜色都是需要在theme中写的。所以照说硬要用findViewById(ViewGroup的findViewTraversal)其实是能找到的。</p>
 <p>=============================================================================</p>
 <h3 id="9-Facebook出品的BUCK能够用于编译Android-项目，速度比较快。"><a href="#9-Facebook出品的BUCK能够用于编译Android-项目，速度比较快。" class="headerlink" title="9. Facebook出品的BUCK能够用于编译Android 项目，速度比较快。"></a>9. Facebook出品的BUCK能够用于编译Android 项目，速度比较快。</h3><p><a href="https://github.com/1hakr/AnExplorer">一个具有网络传输的FileExplorer</a></p>
 
@@ -433,27 +435,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Window</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -461,7 +443,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -473,19 +463,23 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Window</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -493,7 +487,19 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">java</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -506,10 +512,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">Okio</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -533,7 +535,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -541,11 +543,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -553,7 +551,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
+                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -562,6 +560,10 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
               <li class="article-tag-list-item">
