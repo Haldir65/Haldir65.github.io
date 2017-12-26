@@ -371,3 +371,4 @@ id这个tag唯一的，一个页面不能有两个tag有相同的id，引用的�
 6. [JavaScript 教程](http://www.w3school.com.cn/jsref/jsref_obj_array.asp)
 7. [ES6相关](https://wohugb.gitbooks.io/ecmascript-6/content/docs/array.html)
 8. [css教程](https://www.w3cschool.cn/css/css-padding.html)
+9. [widgets](https://medium.com/the-web-tub/improve-ux-with-swiping-tab-bar-using-onsen-ui-for-vue-4c7d0e5171f0)

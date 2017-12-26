@@ -233,3 +233,19 @@ module.exports = {
     }
 };
 ```
+
+
+yarn 是facebook设计的，yarn is faster than npm
+npm install yarn -g
+
+>npm install express
+yarn add express
+
+这俩是一样的,一些常用的command
+
+>yarn init
+yarn global add nodemon
+yarn outdated
+yarn cache clean
+yarn run dev
+yarn upgrade express
