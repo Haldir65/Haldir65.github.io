@@ -126,6 +126,12 @@ Transfer-Encoding: chunked
 报文的[语法](http://www.cnblogs.com/klguang/p/4618526.html)：
 请求的格式
 
+注意上面的“path=/”
+document.cookie = "username=cfangxu;path=/;domain=qq.com"
+如上：“www.qq.com" 与 "sports.qq.com" 公用一个关联的域名"qq.com"，我们如果想让 "sports.qq.com" 下的cookie被 "www.qq.com" 访问，我们就需要用到 cookie 的domain属性，并且需要把path属性设置为 "/"。
+[cookie还有domain和path的概念](https://segmentfault.com/a/1190000012578794)
+
+
 ```
 <method> <request-URL> <version>
 <headers>
@@ -255,9 +261,12 @@ Server:nws 1.2.15
 Cookie总是保存在客户端中，按在客户端中的存储位置，可分为内存Cookie和硬盘Cookie。内存Cookie由浏览器维护，保存在内存中，浏览器关闭后就消失了，其存在时间是短暂的。硬盘Cookie保存在硬盘里，有一个过期时间，除非用户手工清理或到了过期时间，硬盘Cookie不会被删除，其存在时间是长期的。所以，按存在时间，可分为非持久Cookie和持久Cookie。
 
 Cookie的一些缺点，直接照搬WiKi了
-- Cookie会被附加在每个HTTP请求中，所以无形中增加了流量。
+- Cookie会被附加在每个HTTP请求中，所以无形中增加了流量。(其实这里面只应该放“每次请求都要携带的信息”)
 - 由于在HTTP请求中的Cookie是明文传递的，所以安全性成问题。（除非用HTTPS）
 - Cookie的大小限制在4KB左右。对于复杂的存储需求来说是不够用的。
+- 一个域名下存放的cookie的个数是有限制的，不同的浏览器存放的个数不一样,一般为20个。
+
+cookie也可以设置过期的时间，默认是会话结束的时候，当时间到期自动销毁
 
 另外，不同域名是无法共享浏览器端本地信息，包括cookies，这即是跨域问题。百度是不能读取爱奇艺的Cookie的，这是安全性问题。
 需要注意的是，虽然网站images.google.com与网站www.google.com同属于Google，但是域名不一样，二者同样不能互相操作彼此的Cookie。必须域名一样才能操作。

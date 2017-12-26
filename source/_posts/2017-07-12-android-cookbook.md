@@ -228,3 +228,5 @@ Dianne Hackborn
 ## 一些列入的规划的想法
 - 多线程下载实例
 - 自己写一个ImageLoader(主要是多线程同步的问题,queue)
+
+对于Android来说，平台技术发展相对缓慢，这是跟前端比。

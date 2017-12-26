@@ -419,3 +419,13 @@ handleResumeActivity()
 以上都是在一个Message里面做的这个Message的what是“LAUNCH_ACTIVITY =100”，这个Message是
 基本的尿性是 handleXXX -> performXXX
 另外,onActivityResult是在ActivityThread的deliverResults里面触发的
+
+### 23. 编译出错
+>duplicate files copied in apk lib/x86/libRoadLineRebuildAPI.so 集成高德地图的时候
+
+在app的build.gradle中添加
+```
+packagingOptions {
+    pickFirst 'lib/**.so'
+}
+```
