@@ -35,7 +35,19 @@ onSaveInstance是从ActivityThread的callCallActivityOnSaveInstanceState方法di
 
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery2a2241cc5c1278cf7a28f15f91dbbb7f.jpg?imageView2/2/w/600)
 
+
+
 =-============================-============================-============================-=========================
+
+
+
+
+
+[为什么 Android 要采用 Binder 作为 IPC 机制？](https://www.zhihu.com/question/39440766)
+[听说你Binder机制学的不错，来面试下这几个问题](https://www.jianshu.com/p/adaa1a39a274)
+
+Client发起IPC请求，是阻塞的吗？
+
 adb getEvent sendEvent
 input tap x y
 input touchescreen
@@ -44,6 +56,9 @@ input keyevent
 
 Xposed的介绍与入门
 Xposed的原理与Multidex及动态加载问题
+
+### 组件化、插件化
+组件化、插件化的前提就是解耦
 
 [在Android中执行shell指令](https://github.com/jaredrummler/AndroidShell)
 [滴滴的virtualApp](https://github.com/didi/VirtualAPK)

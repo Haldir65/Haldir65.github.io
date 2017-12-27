@@ -20,6 +20,17 @@ onDetachedFromWindow是从ActivityThread的handleDestoryActivity传下来的，�
 
 ### 2. onSaveInstance对于有id的View，系统会自动帮忙存一点东西
 当然onSaveInstance也是从ActivityThread里面传递下来的。还有就是onCreate(Bundle)和onRestroreSaveInstanceState(Bundle)里面的bundle是同一个object。romain Guy说最初onSaveInstance和onRestroreSaveInstanceState本来叫onIcy(冻结)和onThaw（解冻），确实很形象。
+其实这个到现在还有一些痕迹:
+ViewGroup.java
+```java
+protected void dispatchFreezeSelfOnly(SparseArray<Parcelable> container) {
+     super.dispatchSaveInstanceState(container);
+ }
+
+ protected void dispatchThawSelfOnly(SparseArray<Parcelable> container) {
+     super.dispatchRestoreInstanceState(container);
+ }
+```
 
 ### 3.android asset atlas
 就是为了节省asset耗费的内存，将一些系统公用的资源作为一个服务先跑起来，所有app的process共用这部分资源。
@@ -201,7 +212,70 @@ abc_popup_menu_item_layout.xml
 ```
 一般来讲，MenuItem的字体大小，颜色都是需要在theme中写的。所以照说硬要用findViewById(ViewGroup的findViewTraversal)其实是能找到的。
 
+### 12. Message.ontain以及相似的场景
+MotionEvent.ontain()，TouchTarget.ontain(),HoverTarget.ontain()....
+MotionEvent最多缓存10个，TouchTarget和HoverTarget这些都是在看ViewGroup源码的时候瞅到的，简单点。
+稍微看下就知道这种ontain,recycle写法的套路。
+```java
+private static final class TouchTarget {
+      private static final int MAX_RECYCLED = 32;
+      private static final Object sRecycleLock = new Object[0];
+      private static TouchTarget sRecycleBin;
+      private static int sRecycledCount;
 
+      public static final int ALL_POINTER_IDS = -1; // all ones
+
+      // The touched child view.
+      public View child;
+
+      // The combined bit mask of pointer ids for all pointers captured by the target.
+      public int pointerIdBits;
+
+      // The next target in the target list.
+      public TouchTarget next;
+
+      private TouchTarget() {
+      }
+
+      public static TouchTarget obtain(@NonNull View child, int pointerIdBits) {
+          if (child == null) {
+              throw new IllegalArgumentException("child must be non-null");
+          }
+
+          final TouchTarget target;
+          synchronized (sRecycleLock) {
+              if (sRecycleBin == null) {
+                  target = new TouchTarget();
+              } else {
+                  target = sRecycleBin;
+                  sRecycleBin = target.next;
+                   sRecycledCount--;
+                  target.next = null;
+              }
+          }
+          target.child = child;
+          target.pointerIdBits = pointerIdBits;
+          return target;
+      }
+
+      public void recycle() {
+          if (child == null) {
+              throw new IllegalStateException("already recycled once");
+          }
+
+          synchronized (sRecycleLock) {
+              if (sRecycledCount < MAX_RECYCLED) {
+                  next = sRecycleBin;
+                  sRecycleBin = this;
+                  sRecycledCount += 1;
+              } else {
+                  next = null;
+              }
+              child = null;
+          }
+      }
+  }
+```
 
 =============================================================================
 ### 9. Facebook出品的BUCK能够用于编译Android 项目，速度比较快。

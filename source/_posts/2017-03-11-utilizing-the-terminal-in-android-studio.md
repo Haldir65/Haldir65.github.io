@@ -429,3 +429,13 @@ packagingOptions {
     pickFirst 'lib/**.so'
 }
 ```
+
+### 24. Could not resolve com.android.support:appcompat-v7:26.1.0
+Android Studio里面设置httpProxy要生效其实得看gradle.properities文件里面这几行
+```
+systemProp.http.proxyPort=1080
+systemProp.http.proxyHost=127.0.0.1
+systemProp.https.proxyPort=1080
+systemProp.https.proxyHost=127.0.0.1
+```
+注意，maven(),google()这些库都是https的，所以得把https也勾上。
