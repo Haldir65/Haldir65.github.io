@@ -207,3 +207,4 @@ abc_popup_menu_item_layout.xml
 ### 9. Facebook出品的BUCK能够用于编译Android 项目，速度比较快。
 
 [一个具有网络传输的FileExplorer](https://github.com/1hakr/AnExplorer)
+[MultiDex原理](http://mouxuejie.com/blog/2016-06-11/multidex-source-analysis/)
