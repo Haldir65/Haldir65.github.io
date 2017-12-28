@@ -57,6 +57,7 @@ if (name.equals(TAG_1995)) {
 
 ### 7. Android默认的launcher的repo在
 [Launcher3](https://android.googlesource.com/platform/packages/apps/Launcher3/),应该是属于System UI Team在维护。
+todo 那个点击了icon进应用的点击事件在哪里。大致是在Launcher.java这个文件的startActivitySafely里面
 
 ### 8. 在string.xml里面放一些format的字符
 
@@ -278,7 +279,34 @@ private static final class TouchTarget {
 ```
 
 =============================================================================
+
+### 13. 从点击Launcher到应用启动的过程
+> 借助binder驱动
+ActivityManagerService.startActivity-> (AMS)  
+...
+//一系类AMS的调用链和一些与Launcher通过Binder的互相调用过程，此时仍然未创建应用程序的进程。
+...
+ AMS创建一个新的进程，用来启动一个ActivityThread实例，
+ 即将要启动的Activity就是在这个ActivityThread实例中运行
+Process.start("android.app.ActivityThread",...)->    
+// 通过zygote机制创建一个新的进程    
+Process.startViaZygote->调用新进程的main()
+ActivityThread.main->
+
+[Android 应用点击图标到Activity界面显示的过程分析](https://juejin.im/entry/5a0d02086fb9a045263b2387)
+
+### 14. Context是什么
+ActivityThread.java  
+```java
+createBaseContextForActivity{
+  ContextImpl appContext = ContextImpl.createActivityContext(
+                 this, r.packageInfo, r.activityInfo, r.token, displayId, r.overrideConfig);
+}
+```
+ContextImpl包含资源信息、对Context的一些函数的实现等。每次创建Activity都会新建一个ContextImpl
+
 ### 9. Facebook出品的BUCK能够用于编译Android 项目，速度比较快。
 
 [一个具有网络传输的FileExplorer](https://github.com/1hakr/AnExplorer)
 [MultiDex原理](http://mouxuejie.com/blog/2016-06-11/multidex-source-analysis/)
+[偏向native层面的内存占用分析](http://wetest.qq.com/lab/view/359.html)

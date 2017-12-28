@@ -150,12 +150,11 @@ Android相关
     - [ ] ListView原理,加载优化
     - [ ] RecyclerView（这货最早的时候9K行，现在好像1.2W行。prefetcher什么的，滑动过程中不去加载图片，参考我写的Glide笔记）
     - [ ] SurfaceView，TextureView从入门到解析
-- [ ] Zygote进程启动流程
+
+
 - [ ] 属性动画据说用了反射，源码解析
 - [ ] Aosp中的launcher地址[Launcher3](https://android.googlesource.com/platform/packages/apps/Launcher3/)，网上分析的也很多
-- [ ] SystemServer进程启动流程
 - [X] Context是什么
-- [ ] Launcher启动流程
 - [ ][Android View的显示框架原理](https://juejin.im/post/5a1e8d5ef265da431280ae19)，讲的比较全
 - [ ] 美团那个Walle 还是要玩玩的
 - [X] Android生命周期在不同版本的表现形式[有些onXXX在高版本不会调](http://blog.csdn.net/liuweiballack/article/details/47026263)，[原因是HoneyComb之后对Activity LifeCycle进行了改动](http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html)
@@ -163,6 +162,13 @@ Android相关
 - [ ] LocalBroadCastReceiver好像是基于handler实现的
 - [ ] armeabiv,arm64-v8a等问题[Android 设备的CPU类型(通常称为”ABIs”)](https://zhuanlan.zhihu.com/p/23102158)
 - [ ] Romain Guy提到了android asset atlas，顺带看下[ZygotoInit](http://blog.csdn.net/luoshengyang/article/details/45831269)
+- [ ] Android Stuido点击build按钮做了什么[Configure Your Build](https://developer.android.com/studio/build/index.html)
+- [ ] Zygote进程启动流程
+- [ ] SystemServer进程启动流程
+- [ ] Launcher启动流程
+- [Android 应用点击图标到Activity界面显示的过程分析](https://juejin.im/entry/5a0d02086fb9a045263b2387)
+- [Android面试题汇总](https://juejin.im/entry/59dd75cd51882578d5037626)
+
 
 > Studio里面看源码，find usage没有的话，find in path , choose android sdk
 

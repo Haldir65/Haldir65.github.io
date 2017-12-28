@@ -377,6 +377,8 @@ public class Test {
 jquery在执行post请求时，会设置Content-Type为application/x-www-form-urlencoded，所以服务器能够正确解析，而使用原生ajax请求时，如果不显示的设置Content-Type，那么默认是text/plain，这时服务器就不知道怎么解析数据了，所以才只能通过获取原始数据流的方式来进行解析请求数据。
 
 ===========================trash here=====================================
+经常说的网速 bps (bits per second)，所以跟byte比起来，要除以8。1024kbps的带宽就意味着每秒传递的数据大小为1024/8=128KB。
+1024s就是128MB（这下清楚了）
 
 一些优化
 [TTFB] TTFB（Time To First Byte），客户端发出请求到收到响应的第一个字节所花费的时间。一般浏览器里面都能看到，这也是服务端可以优化的指标。
