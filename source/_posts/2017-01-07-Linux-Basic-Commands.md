@@ -86,9 +86,8 @@ rename是实际意义上的重命名命令，但rename接受三个参数
 
 ### 重定向
 
-```
+```shell
 重定向输出 >
-
 ls  > lsoutput.txt #用于将输出的结果写入一个新的文本文件中
 
 cat > newfile // 所以重定向也能用于创建新的文件
@@ -99,25 +98,27 @@ echo 'hello' > log.txt #把这句话写入到文本中 ，覆盖其原有内容
 重定向输入 <
 wall < aa.txt # wall是向所有用户发广播， 即从aa.txt中读取内容，然后广播发出去
 
-
 #service命令
 service XXX start/stop/status #原理是将这些程序注册成为系统服务，这样调用这些程序的时候就不需要写一大堆绝对路径了，具体用法help已经很详细了。
 
 zip –q –r video.zip /home/video
 zip –q –r video.zip .  # .代表当前目录
 建议加上-v，不然等很久
-
 ```
 
 ### 2. Vi文本编辑器
 ```shell
 - > vi 3.txt // 如果有则编辑，没有则直接创建
+## 跳到文件开头处
+[[
 
-Vi分为命令模式和编辑模式，一进来是命令模式，输入'a'进入编辑模式
-切换回命令模式按'esc'
-命令模式下 :w 表示存盘
+##跳到文件结尾处
+]]
+
+##Vi分为命令模式和编辑模式，一进来是命令模式，输入'a'进入编辑模式
+##切换回命令模式按'esc'
+## 命令模式下 :w 表示存盘
 - :q 退出
-
 - :wq 保存并退出
 - :q! 不保存退出（无内容变化）
 ```
@@ -127,19 +128,30 @@ Vi分为命令模式和编辑模式，一进来是命令模式，输入'a'进入
 输入'o'插入一行。。。。。。
 
 ```shell
-- > more filename//查看文件内容
+- > more filename//查看文件内容(一页一页的显示档案内容)
+
+- > less filename// 也是查看(less 与 more 类似，但是比 more 更好的是，他可以[pg dn][pg up]翻页！)
 
 - > cat filename //正序查看文件内容
-
 - > tac filename //逆序查看文件内容
+- > nl： 显示的时候，随便输出行号！
+- > more： 一页一页的显示档案内容
+- > less 与 more 类似，但是比 more 更好的是，他可以[pg dn][pg up]翻页！对less显示出的内容中可以使用 /'字符' 输入需要查找的字符或者字符串并高亮显示，而more 不具备(亲测很好用)
+- > head： 查看头几行
+- > tail： 查看尾几行
+- > od： 以二进制的方式读取档案内容！
+
 
 - > head - 3 filename //只查看文件前面三行
 - > tail - 3 filename //只查看倒数后三行
+- > tail -n 3 filename //和上面是一样的
 - > xxd -b fileName // 看binaryFile不能用cat
 ```
 
 tail还有一个好处，可以实时查看文件内容，比如文件正在更新，可以实时查看最新的日志
 > tail -f /var/log/messages
+
+亲测，一个10MB的log文件，就这么cat的话，会把putty搞死
 
 ***所以后台开发就喜欢这么干: tail一个日志，狂按回车键，然后用客户端访问某个url，看下有没有报错。***
 

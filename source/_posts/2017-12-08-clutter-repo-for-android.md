@@ -107,12 +107,12 @@ core/res/res/anim/button_state_list_anim_material.xml
   <item android:state_pressed="true" android:state_enabled="true">
       <set>
           <objectAnimator android:propertyName="translationZ"
-                          android:duration="@integer/button_pressed_animation_duration"
-                          android:valueTo="@dimen/button_pressed_z_material"
+                          android:duration="@integer/button_pressed_animation_duration" 100ms
+                          android:valueTo="@dimen/button_pressed_z_material" ## 4dp 其实稍微注意下，手指按住一个Button的时候，Button底部的阴影会扩大，就是这个4dp的属性动画在跑
                           android:valueType="floatType"/>
           <objectAnimator android:propertyName="elevation"
                           android:duration="0"
-                          android:valueTo="@dimen/button_elevation_material"
+                          android:valueTo="@dimen/button_elevation_material" ## 2dp
                           android:valueType="floatType"/>
       </set>
   </item>
@@ -126,7 +126,7 @@ core/res/res/anim/button_state_list_anim_material.xml
                           android:valueType="floatType"/>
           <objectAnimator android:propertyName="elevation"
                           android:duration="0"
-                          android:valueTo="@dimen/button_elevation_material"
+                          android:valueTo="@dimen/button_elevation_material" ## 2dp
                           android:valueType="floatType" />
       </set>
   </item>

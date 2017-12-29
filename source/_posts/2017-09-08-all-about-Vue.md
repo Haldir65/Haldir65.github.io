@@ -306,6 +306,33 @@ jsonp('http://api.douban.com/v2/movie/top250', null, function (err, data) {
 ```
 亲测有效。
 
+take aways:
+```javaScript
+##同源：
+$.ajax({
+    url:"persons.json",
+    success:function(data){
+　　　　console.log(data);
+　　 　 //ToDo..
+　 }
+});
+
+##跨域：
+$.ajax({
+    url:"http://www.B.com/open.php?callback=?",
+    dataType:"jsonp",
+    success:function(data){
+        console.log(data);
+        //ToDo..
+    }
+});
+```
+其实一开始没有callback=?这些个东西的，http://www.B.com/open.js 这个链接就是一个简单的js
+```javaScript
+foo({"name":"B","age":23});
+```
+所以A网站往document里面写一个script之后，直接就执行了A网站的foo() function。 但假如B网站还对C网站提供服务，C网站说foo()这个方法名已经被占用了。所以B就约定，不管是A,B,C D哪家网站，想要调各自的什么方法自己传上来，B负责调用以下。因为jsonp只能是GET，所以只好放在queryParameters里面了。[为什么叫callback的原因我也是最近才想清楚的](https://juejin.im/entry/5a45b363f265da431c709fc7)
+上面那个callback不一定非要写callback，其实写什么都行，主要看对方网站是怎么定义的。就是对方这个链接是怎么拿这个url里面的queryParams的。
 
 
 *XSS注入就是利用了CORS*

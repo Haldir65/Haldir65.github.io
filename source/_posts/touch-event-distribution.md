@@ -480,7 +480,7 @@ public boolean onTouchEvent(MotionEvent event) {
                                // performClick directly. This lets other visual state
                                // of the view update before click actions start.
                                //这段注释其实说到了post这个方法，messageQueue本身是一个个处理的。手指抬起的时候，优先更新UI，点击事件can wait . 比方onClick里面耗时10s，抬起手10s后才看到按钮变成unPressedState，这显然是不合理的
-                               if (!post(mPerformClick)) {
+                               if (!post(mPerformClick)) { //所以我们在onClick里面打断点，堆栈前面从来不是OnTouchEvent
                                    performClick(); // 我们喜爱的onClickListener就在这里啦
                                }
                            }
