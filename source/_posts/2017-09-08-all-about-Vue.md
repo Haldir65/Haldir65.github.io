@@ -230,13 +230,14 @@ post方法返回的是一个promise，加回调即可打印出api返回结果。
 [XMLHttpRequest cannot load http://localhost:5000/hello.
 No 'Access-Control-Allow-Origin' header is present on the requested resource.](https://stackoverflow.com/questions/25860304/how-do-i-set-response-headers-in-flask)
 用Flask做后台，大概的代码这样
+<!--
 ```python
 @app.route("/posts", methods=['GET'])
 def create_post()
     resp = Response(json.dumps(post_lists), mimetype='application/json')
     resp.headers['Access-Control-Allow-Origin'] = '*'
     return resp    
-```
+``` -->
 
 ## 3. Router,Eventbus,mixin，axios等
 
@@ -369,6 +370,10 @@ id这个tag唯一的，一个页面不能有两个tag有相同的id，引用的�
 
 10.css里面的class继承是同时在一个tag里面添加class="class_a class_b"，中间一个空格，需要什么拿什么
 11. css分三种，外部样式表（写在另一个css文件里），内部样式表(写在header tag中)和内联样式表(写在单独的tag里面)
+
+
+### 日常开发出错记录
+1. [[Vue warn]: Property or method is not defined on the instance but referenced during render](https://stackoverflow.com/questions/42908525/vue-warn-property-or-method-is-not-defined-on-the-instance-but-referenced-dur)。原来是template里面的html某个元素里面调用了XXX，而这个XXX并没有在当前Vue实例中声明。
 
 
 
