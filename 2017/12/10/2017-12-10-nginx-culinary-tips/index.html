@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="installing nginx on windows">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery151110073841.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-12-17T15:13:51.837Z">
+<meta property="og:updated_time" content="2017-12-30T14:57:58.828Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Nginx使用记录">
 <meta name="twitter:description" content="installing nginx on windows">
@@ -218,7 +218,7 @@ ga('send', 'pageview');
 </blockquote>
 <h2 id="2-常用command"><a href="#2-常用command" class="headerlink" title="2. 常用command"></a>2. 常用command</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">## 查看当前status</div><div class="line">systemctl status nginx</div><div class="line">## stop</div><div class="line">sudo systemctl stop nginx</div><div class="line">## start</div><div class="line">sudo systemctl start nginx</div><div class="line">##重启</div><div class="line">sudo systemctl restart nginx</div><div class="line">##  改了配置文件之后可以直接reload，而不会失去连接</div><div class="line">sudo systemctl reload nginx</div><div class="line">## nginx默认开机启动的,取消开机启动</div><div class="line">sudo systemctl disable nginx</div><div class="line">##  加入开机启动</div><div class="line">sudo systemctl enable nginx</div></pre></td></tr></table></figure>
 <h2 id="3-常用目录和文件-直接从DigitalOcean复制过来了"><a href="#3-常用目录和文件-直接从DigitalOcean复制过来了" class="headerlink" title="3. 常用目录和文件(直接从DigitalOcean复制过来了)"></a>3. 常用目录和文件(直接从DigitalOcean复制过来了)</h2><ul>
-<li>/var/www/html ## 就是放默认首页的地方<br>&gt;<br>/etc/nginx: The Nginx configuration directory. All of the Nginx configuration files reside here.<br>/etc/nginx/nginx.conf: The main Nginx configuration file. This can be modified to make changes to the Nginx global configuration.<br>/etc/nginx/sites-available/: The directory where per-site “server blocks” can be stored. Nginx will not use the configuration files found in this directory unless they are linked to the sites-enabled directory (see below). Typically, all server block configuration is done in this directory, and then enabled by linking to the other directory.<br>/etc/nginx/sites-enabled/: The directory where enabled per-site “server blocks” are stored. Typically, these are created by linking to configuration files found in the sites-available directory.<br>/etc/nginx/snippets: This directory contains configuration fragments that can be included elsewhere in the Nginx configuration. Potentially repeatable configuration segments are good candidates for refactoring into snippets.</li>
+<li>/var/www/html ## 就是放默认首页的地方（原因是 /etc/nginx/sites-enabled/default这里面设置的）<br>&gt;<br>/etc/nginx: The Nginx configuration directory. All of the Nginx configuration files reside here.<br>/etc/nginx/nginx.conf: The main Nginx configuration file. This can be modified to make changes to the Nginx global configuration.<br>/etc/nginx/sites-available/: The directory where per-site “server blocks” can be stored. Nginx will not use the configuration files found in this directory unless they are linked to the sites-enabled directory (see below). Typically, all server block configuration is done in this directory, and then enabled by linking to the other directory.<br>/etc/nginx/sites-enabled/: The directory where enabled per-site “server blocks” are stored. Typically, these are created by linking to configuration files found in the sites-available directory.<br>/etc/nginx/snippets: This directory contains configuration fragments that can be included elsewhere in the Nginx configuration. Potentially repeatable configuration segments are good candidates for refactoring into snippets.</li>
 </ul>
 <p>访问日志都在这里<br>&gt;<br>/var/log/nginx/access.log: Every request to your web server is recorded in this log file unless Nginx is configured to do otherwise.<br>/var/log/nginx/error.log: Any Nginx errors will be recorded in this log.</p>
 <h2 id="4-配置文件"><a href="#4-配置文件" class="headerlink" title="4.配置文件"></a>4.配置文件</h2><h3 id="4-1-不想用80端口怎么办-比如跟apache冲突了"><a href="#4-1-不想用80端口怎么办-比如跟apache冲突了" class="headerlink" title="4.1 不想用80端口怎么办(比如跟apache冲突了)"></a>4.1 不想用80端口怎么办(比如跟apache冲突了)</h3><p>修改 /etc/nginx/nginx.conf文件<br>config文件的大致结构就是这样,来自<a href="https://stackoverflow.com/questions/10829402/how-to-start-nginx-via-different-portother-than-80">stackoverflow</a><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div></pre></td><td class="code"><pre><div class="line">user www-data;</div><div class="line">worker_processes  1;</div><div class="line"></div><div class="line">error_log  /var/<span class="built_in">log</span>/nginx/error.log;</div><div class="line">pid        /var/run/nginx.pid;</div><div class="line"></div><div class="line">events &#123;</div><div class="line">    worker_connections  1024;</div><div class="line">    <span class="comment"># multi_accept on;</span></div><div class="line">&#125;</div><div class="line"></div><div class="line">http &#123;</div><div class="line">    include       /etc/nginx/mime.types;</div><div class="line"></div><div class="line">    access_log  /var/<span class="built_in">log</span>/nginx/access.log;</div><div class="line"></div><div class="line">    sendfile        on;</div><div class="line">    <span class="comment">#tcp_nopush     on;</span></div><div class="line"></div><div class="line">    <span class="comment">#keepalive_timeout  0;</span></div><div class="line">    keepalive_timeout  65;</div><div class="line">    tcp_nodelay        on;</div><div class="line"></div><div class="line">    gzip  on;</div><div class="line">    gzip_disable <span class="string">"MSIE [1-6]\.(?!.*SV1)"</span>;</div><div class="line"></div><div class="line">    include /etc/nginx/conf.d/*.conf;</div><div class="line">    include /etc/nginx/sites-enabled/*;</div><div class="line"></div><div class="line">   server &#123;</div><div class="line"></div><div class="line">        listen       81;</div><div class="line"></div><div class="line">        location / &#123;</div><div class="line">         proxy_pass  http://94.143.9.34:9500;</div><div class="line">         proxy_set_header   Host             <span class="variable">$host</span>:81;</div><div class="line">         proxy_set_header   X-Real-IP        <span class="variable">$remote_addr</span>;</div><div class="line">         proxy_set_header   X-Forwarded-For  <span class="variable">$proxy_add_x_forwarded_for</span>;</div><div class="line">         proxy_set_header Via    <span class="string">"nginx"</span>;</div><div class="line">        &#125;</div><div class="line"></div><div class="line"></div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"> mail &#123;</div><div class="line">      See sample authentication script at:</div><div class="line">      http://wiki.nginx.org/NginxImapAuthenticateWithApachePhpScript</div><div class="line"></div><div class="line">      auth_http localhost/auth.php;</div><div class="line">      pop3_capabilities <span class="string">"TOP"</span> <span class="string">"USER"</span>;</div><div class="line">      imap_capabilities <span class="string">"IMAP4rev1"</span> <span class="string">"UIDPLUS"</span>;</div><div class="line"></div><div class="line">     server &#123;</div><div class="line">         listen     localhost:110;</div><div class="line">         protocol   pop3;</div><div class="line">         proxy      on;</div><div class="line">     &#125;</div><div class="line"></div><div class="line">     server &#123;</div><div class="line">         listen     localhost:143;</div><div class="line">         protocol   imap;</div><div class="line">         proxy      on;</div><div class="line">     &#125;</div><div class="line"> &#125;</div></pre></td></tr></table></figure></p>
@@ -226,7 +226,13 @@ ga('send', 'pageview');
 <h3 id="4-2-限制日志文件的大小"><a href="#4-2-限制日志文件的大小" class="headerlink" title="4.2 限制日志文件的大小"></a>4.2 限制日志文件的大小</h3><p>根据上面的config文件，默认的访问日志是在/var/log/nginx/access.log这个文件里面。限制这个文件的大小的方法：<br><a href="https://serverfault.com/questions/427144/how-to-limit-nginx-access-log-file-size-and-compress">serverfault</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">/etc/logrotate.d/nginx</div><div class="line">/var/log/nginx/access_log &#123;</div><div class="line">    rotate 7</div><div class="line">    size 5k</div><div class="line">    dateext</div><div class="line">    dateformat -%Y-%m-%d</div><div class="line">    missingok</div><div class="line">    compress</div><div class="line">    sharedscripts</div><div class="line">    postrotate</div><div class="line">        test -r /var/run/nginx.pid &amp;&amp; kill -USR1 `cat /var/run/nginx.pid`</div><div class="line">    endscript</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>需要注意的是，当网站访问量大后，日志数据就会很多，如果全部写到一个日志文件中去，文件会变得越来越大。文件大速度就会慢下来，比如一个文件几百兆。写入日志的时候，会影响操作速度。另外，如果我想看看访问日志，一个几百兆的文件，下载下来打开也很慢。为了方便对日志进行分析计算，需要对日志进行定时切割。定时切割的方式有按照月切割、按天切割，按小时切割等。最常用的是按天切割。<a href="http://www.codeceo.com/article/nginx-log.html">脚本</a></p>
 <h3 id="4-3-分享特定目录"><a href="#4-3-分享特定目录" class="headerlink" title="4.3 分享特定目录"></a>4.3 分享特定目录</h3><p><a href="https://stackoverflow.com/questions/33989060/how-to-serve-a-directory-of-static-files-at-a-certain-location-path-with-nginx">How to serve a directory of static files at a certain location path with nginx?</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">server &#123;</div><div class="line">  listen 80;</div><div class="line">  server_name   something.nateeagle.com;</div><div class="line"></div><div class="line">  location /something &#123;</div><div class="line">    alias /home/neagle/something;</div><div class="line">    index index.html index.htm;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>有的时候会看到两种写法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">location /static/ &#123;</div><div class="line">        root /var/www/app/static/;</div><div class="line">        autoindex off;</div><div class="line">&#125;</div><div class="line">## 结果是/var/www/app/static/static目录</div><div class="line"></div><div class="line">location /static/ &#123;</div><div class="line">        alias /var/www/app/static/;</div><div class="line">        autoindex off;</div><div class="line">&#125;</div><div class="line">##这才是/var/www/app/static目录</div></pre></td></tr></table></figure></p>
+<p><a href="https://stackoverflow.com/questions/10631933/nginx-static-file-serving-confusion-with-root-alias">location里面写root还是alias</a></p>
 <h3 id="4-4-Nginx软链接"><a href="#4-4-Nginx软链接" class="headerlink" title="4.4 Nginx软链接"></a>4.4 Nginx软链接</h3><p>目测不能用软链接</p>
+<h2 id="5-问题速查"><a href="#5-问题速查" class="headerlink" title="5. 问题速查"></a>5. 问题速查</h2><ul>
+<li>nginx.service - A high performance web server and a reverse proxy server<br> Loaded: loaded (/lib/systemd/system/nginx.service; enabled; vendor preset: enabled)<br> Active: failed (Result: exit-code) since Fri 2017-12-29 20:12:50 EST; 3min 21s ago</li>
+</ul>
+<p>启动失败，检查/var/log/nginx/error.log 或者/var/log/syslog。</p>
 <h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
 <li><a href="https://wizardforcel.gitbooks.io/nginx-doc/content/Text/6.1_nginx_windows.html">nginx Configurations</a></li>
 <li><a href="https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-16-04">How To Install Nginx on Ubuntu 16.04</a></li>
@@ -449,39 +455,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">adb</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">linux</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -493,6 +471,34 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">linux</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">tools</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
@@ -501,15 +507,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -525,15 +527,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">前端</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
+                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -545,7 +539,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+                <a href="javascript:void(0)" class="js-tag color3">前端</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -557,11 +559,23 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -570,14 +584,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
              
               <li class="article-tag-list-item">

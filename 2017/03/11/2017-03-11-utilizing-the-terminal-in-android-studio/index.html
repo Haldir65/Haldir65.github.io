@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="这周终于把Google I/O 2016的Android App在Device上跑起来了，顺便尝试多多使用命令行进行编译或者安装。">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/device-2017-03-11-222239.png?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-10-17T15:21:39.373Z">
+<meta property="og:updated_time" content="2017-12-28T00:22:01.499Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用IDE内置的Terminal">
 <meta name="twitter:description" content="这周终于把Google I/O 2016的Android App在Device上跑起来了，顺便尝试多多使用命令行进行编译或者安装。">
@@ -276,6 +276,12 @@ ga('send', 'pageview');
 <h3 id="22-onSaveInstance的调用顺序以及ActivityThread的一些点"><a href="#22-onSaveInstance的调用顺序以及ActivityThread的一些点" class="headerlink" title="22. onSaveInstance的调用顺序以及ActivityThread的一些点"></a>22. onSaveInstance的调用顺序以及ActivityThread的一些点</h3><p>onSaveInstance在HoneyComb之前会在onPause前调用，HoneyComb开始，会在onStop前调用<br>3.0之前的基本不用看了，目前在Android 25 sdk中<br>ActivityThread.performStopActivityInner<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (!r.activity.mFinished &amp;&amp; saveState) &#123;</div><div class="line">          <span class="keyword">if</span> (r.state == <span class="keyword">null</span>) &#123;</div><div class="line">              callCallActivityOnSaveInstanceState(r);</div><div class="line">          &#125;</div><div class="line">      &#125;</div><div class="line"></div><div class="line"><span class="keyword">try</span> &#123;</div><div class="line">      <span class="comment">// Now we are idle.</span></div><div class="line">       r.activity.performStop(<span class="keyword">false</span> <span class="comment">/*preserveWindow*/</span>);</div><div class="line">   &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">       <span class="keyword">if</span> (!mInstrumentation.onException(r.activity, e)) &#123;</div><div class="line">           <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(</div><div class="line">                   <span class="string">"Unable to stop activity "</span></div><div class="line">                   + r.intent.getComponent().toShortString()</div><div class="line">                   + <span class="string">": "</span> + e.toString(), e);</div><div class="line">       &#125;</div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
 <p>其实Activity的所有onXXX都是由ActivityThread发起的，其实主函数也在这里。<br>那么开始吧<br>ActivityThread.handleLaunchActivity<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">handleLaunchActivity</span><span class="params">(ActivityClientRecord r, Intent customIntent, String reason)</span></span>&#123;</div><div class="line">     <span class="comment">// ...................</span></div><div class="line">    Activity a = performLaunchActivity(r, customIntent);</div><div class="line">    <span class="comment">//'''''''''</span></div><div class="line">    <span class="keyword">if</span> (a != <span class="keyword">null</span>) &#123;</div><div class="line">       handleResumeActivity(r.token, <span class="keyword">false</span>, r.isForward,</div><div class="line">               !r.activity.mFinished &amp;&amp; !r.startsNotResumed, r.lastProcessedSeq, reason);</div><div class="line">                 &#125;</div><div class="line">    <span class="comment">//''''''''''</span></div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">private</span> Activity <span class="title">performLaunchActivity</span><span class="params">(ActivityClientRecord r, Intent customIntent)</span></span>&#123;</div><div class="line">  <span class="comment">// ............</span></div><div class="line">  activity = mInstrumentation.newActivity(</div><div class="line">                  cl, component.getClassName(), r.intent);</div><div class="line">  <span class="comment">//Activity实例就是在这里面反射创建出来的</span></div><div class="line">   <span class="keyword">if</span> (activity != <span class="keyword">null</span>) &#123;</div><div class="line">     <span class="comment">//......</span></div><div class="line">     mInstrumentation.callActivityOnCreate(activity, r.state);   <span class="comment">/// onCreate</span></div><div class="line">     <span class="keyword">if</span> (!r.activity.mFinished) &#123; <span class="comment">//经常会有人在onCreate里面finish</span></div><div class="line">                  activity.performStart();   <span class="comment">// onStart</span></div><div class="line">                  r.stopped = <span class="keyword">false</span>;</div><div class="line">              &#125;</div><div class="line">   &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>所以总的顺序是<br>ActivityThread#handleLaunchActivity -&gt;<br>ActivityThread#performLaunchActivity -&gt;<br>反射创建Activity实例 -&gt;<br>mInstrumentation.callActivityOnCreate -&gt;<br>activity.performStart() -&gt;<br>handleResumeActivity()<br>以上都是在一个Message里面做的这个Message的what是“LAUNCH_ACTIVITY =100”，这个Message是<br>基本的尿性是 handleXXX -&gt; performXXX<br>另外,onActivityResult是在ActivityThread的deliverResults里面触发的</p>
+<h3 id="23-编译出错"><a href="#23-编译出错" class="headerlink" title="23. 编译出错"></a>23. 编译出错</h3><blockquote>
+<p>duplicate files copied in apk lib/x86/libRoadLineRebuildAPI.so 集成高德地图的时候</p>
+</blockquote>
+<p>在app的build.gradle中添加<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">packagingOptions &#123;</div><div class="line">    pickFirst &apos;lib/**.so&apos;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="24-Could-not-resolve-com-android-support-appcompat-v7-26-1-0"><a href="#24-Could-not-resolve-com-android-support-appcompat-v7-26-1-0" class="headerlink" title="24. Could not resolve com.android.support:appcompat-v7:26.1.0"></a>24. Could not resolve com.android.support:appcompat-v7:26.1.0</h3><p>Android Studio里面设置httpProxy要生效其实得看gradle.properities文件里面这几行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">systemProp.http.proxyPort=1080</div><div class="line">systemProp.http.proxyHost=127.0.0.1</div><div class="line">systemProp.https.proxyPort=1080</div><div class="line">systemProp.https.proxyHost=127.0.0.1</div></pre></td></tr></table></figure></p>
+<p>注意，maven(),google()这些库都是https的，所以得把https也勾上。</p>
 
       
 
@@ -501,39 +507,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">adb</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">linux</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -545,6 +523,34 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">linux</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">tools</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
@@ -553,15 +559,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -577,15 +579,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">前端</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
+                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -597,7 +591,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+                <a href="javascript:void(0)" class="js-tag color3">前端</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -609,11 +611,23 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -622,14 +636,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
              
               <li class="article-tag-list-item">
