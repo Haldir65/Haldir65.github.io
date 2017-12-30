@@ -15,9 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="Vue Js学习笔记">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100775410.jpg?imageView2/2/w/600">
-<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/1102531047-2.jpg?imageView2/2/w/600">
-<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/VueJsLogo.jpg">
-<meta property="og:updated_time" content="2017-12-16T03:23:45.454Z">
+<meta property="og:updated_time" content="2017-12-30T14:57:49.691Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="VueJs学习笔记">
 <meta name="twitter:description" content="Vue Js学习笔记">
@@ -263,13 +261,8 @@ ga('send', 'pageview');
 </ul>
 <h3 id="2-1-进行POST操作"><a href="#2-1-进行POST操作" class="headerlink" title="2.1 进行POST操作"></a>2.1 进行POST操作</h3><p><a href="https://jsonplaceholder.typicode.com/">jsonPlaceHolder</a>是一个免费的API网站。<br>vue-resource提交表单的操作如下:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">post:<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="comment">//use http here</span></div><div class="line">    <span class="keyword">this</span>.$http.post(<span class="string">'https://jsonplaceholder.typicode.com/posts'</span>,&#123;</div><div class="line">      title:<span class="keyword">this</span>.blog.title,</div><div class="line">      body:<span class="keyword">this</span>.blog.content,</div><div class="line">      userId:<span class="number">1</span>,</div><div class="line">    &#125;).then(<span class="function"><span class="keyword">function</span> (<span class="params">data</span>) </span>&#123;</div><div class="line">      <span class="comment">// body...</span></div><div class="line">      <span class="built_in">console</span>.log(data)</div><div class="line">      <span class="keyword">this</span>.summited = <span class="literal">true</span></div><div class="line">    &#125;);</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
 <p>post方法返回的是一个promise，加回调即可打印出api返回结果。</p>
-<h3 id="2-2-ajax跨域操作"><a href="#2-2-ajax跨域操作" class="headerlink" title="2.2 ajax跨域操作"></a>2.2 ajax跨域操作</h3><p><a href="https://stackoverflow.com/questions/25860304/how-do-i-set-response-headers-in-flask">XMLHttpRequest cannot load http://localhost:5000/hello.<br>No ‘Access-Control-Allow-Origin’ header is present on the requested resource.</a><br>用Flask做后台，大概的代码这样<br><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">@app.route("/posts", methods=['GET'])</div><div class="line">def create_post()</div><div class="line">    resp = Response(json.dumps(post_lists), mimetype='application/json')</div><div class="line">    resp.headers['Access-Control-Allow-Origin'] = '*'</div><div class="line">    return resp</div></pre></td></tr></table></figure></p>
-<h2 id="3-Router-Eventbus-mixin，axios等"><a href="#3-Router-Eventbus-mixin，axios等" class="headerlink" title="3. Router,Eventbus,mixin，axios等"></a>3. Router,Eventbus,mixin，axios等</h2><p>安装:</p>
-<blockquote>
-<p>npm install vue-router –save</p>
-<h2 id="npm-install-vue-bus-–save"><a href="#npm-install-vue-bus-–save" class="headerlink" title="npm install vue-bus –save"></a>npm install vue-bus –save</h2><h3 id="3-1-关于Bus，-是用来在不同的Vue文件中传递事件-数据-用的，安装好后，main-js里面improt并使用"><a href="#3-1-关于Bus，-是用来在不同的Vue文件中传递事件-数据-用的，安装好后，main-js里面improt并使用" class="headerlink" title="3.1 关于Bus， 是用来在不同的Vue文件中传递事件(数据)用的，安装好后，main.js里面improt并使用"></a>3.1 关于Bus， 是用来在不同的Vue文件中传递事件(数据)用的，安装好后，main.js里面improt并使用</h3><p>import Vue from ‘vue’<br>import VueBus from ‘vue-bus’;<br>Vue.use(VueBus);</p>
-</blockquote>
-<p>A.vue中<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">created()&#123;</div><div class="line">  <span class="keyword">this</span>.$bus.emit(<span class="string">'loadSuccess'</span>, <span class="string">'创建成功！'</span>);</div><div class="line">&#125;,</div><div class="line">beforedestory()&#123;</div><div class="line">  <span class="keyword">this</span>.$bus.off(<span class="string">'loadSuccess'</span>)</div><div class="line">&#125;</div><div class="line"> <span class="comment">// B.vue中</span></div><div class="line">created()&#123;</div><div class="line">  <span class="keyword">this</span>.$bus.on(<span class="string">'loadSuccess'</span>,text=&gt; &#123;</div><div class="line">      <span class="built_in">console</span>.log(<span class="string">'receieve msg from another vue component '</span>+ text)</div><div class="line">  &#125;)</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="2-2-ajax跨域操作"><a href="#2-2-ajax跨域操作" class="headerlink" title="2.2 ajax跨域操作"></a>2.2 ajax跨域操作</h3><p><a href="https://stackoverflow.com/questions/25860304/how-do-i-set-response-headers-in-flask">XMLHttpRequest cannot load http://localhost:5000/hello.<br>No ‘Access-Control-Allow-Origin’ header is present on the requested resource.</a><br>用Flask做后台，大概的代码这样<br><!--
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">@app.route("/posts", methods=['GET'])</div><div class="line">def create_post()</div><div class="line">    resp = Response(json.dumps(post_lists), mimetype='application/json')</div><div class="line">    resp.headers['Access-Control-Allow-Origin'] = '*'</div><div class="line">    return resp    </div><div class="line">``` --&gt;</div><div class="line"></div><div class="line">## 3. Router,Eventbus,mixin，axios等</div><div class="line"></div><div class="line">安装:</div><div class="line">&gt; npm install vue-router --save</div><div class="line">&gt; npm install vue-bus --save</div><div class="line">---------------------------------------------------</div><div class="line">### 3.1 关于Bus， 是用来在不同的Vue文件中传递事件(数据)用的，安装好后，main.js里面improt并使用</div><div class="line">&gt; import Vue from 'vue'</div><div class="line">&gt; import VueBus from 'vue-bus';</div><div class="line">&gt; Vue.use(VueBus);</div><div class="line"></div><div class="line">A.vue中</div><div class="line">``` javaScript</div><div class="line">created()&#123;</div><div class="line">  this.$bus.emit('loadSuccess', '创建成功！');</div><div class="line">&#125;,</div><div class="line">beforedestory()&#123;</div><div class="line">  this.$bus.off('loadSuccess')</div><div class="line">&#125;</div><div class="line"> // B.vue中</div><div class="line">created()&#123;</div><div class="line">  this.$bus.on('loadSuccess',text=&gt; &#123;</div><div class="line">      console.log('receieve msg from another vue component '+ text)</div><div class="line">  &#125;)</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>3.2 关于mixin，有比较好的<a href="https://css-tricks.com/using-mixins-vue-js/">介绍</a><br>其实就是把一些公用的methods放到一个js文件中export掉，然后需要的vue文件，自己去import，在data中设置mixins: [] ,使用的时候就可以用this.method()使用这些共有的方法了。其实主要是为了复用。</p>
 <p>3.3 添加全局变量(常量)的<a href="http://www.jianshu.com/p/7547ff8760c3">方法</a>，vuex是官方的</p>
 <p>3.4 router就是建立internal link 页面之间跳转的桥梁<br>在template中添加router-link的tag,会生成一个对应的a Tag,点击跳转即可。<br>router-view标签表示预先准备好的布局会被渲染进入这个标签内（将其取代）</p>
@@ -284,6 +277,9 @@ ga('send', 'pageview');
 <p>CORS还是比较重要的东西，<a href="http://www.ruanyifeng.com/blog/2016/04/cors.html">详解</a>，据说会发两次请求,且只支持GET请求。</p>
 <p>回到axios，作者表示<a href="https://github.com/axios/axios/issues/75">不打算支持jsonp</a>，想用jsonp的话可以用jquery,或者使用<a href="https://github.com/axios/axios/blob/master/COOKBOOK.md#jsonp">jsonp插件</a><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"> $ npm install jsonp --save</div><div class="line"> <span class="keyword">var</span> jsonp = <span class="built_in">require</span>(<span class="string">'jsonp'</span>);</div><div class="line"></div><div class="line">jsonp(<span class="string">'http://api.douban.com/v2/movie/top250'</span>, <span class="literal">null</span>, <span class="function"><span class="keyword">function</span> (<span class="params">err, data</span>) </span>&#123;</div><div class="line">  <span class="keyword">if</span> (err) &#123;</div><div class="line">    <span class="built_in">console</span>.error(err.message);</div><div class="line">  &#125; <span class="keyword">else</span> &#123;</div><div class="line">    <span class="built_in">console</span>.log(data);</div><div class="line">  &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
 <p>亲测有效。</p>
+<p>take aways:<br><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">##同源：</div><div class="line">$.ajax(&#123;</div><div class="line">    url:"persons.json",</div><div class="line">    success:function(data)&#123;</div><div class="line">　　　　console.log(data);</div><div class="line">　　 　 //ToDo..</div><div class="line">　 &#125;</div><div class="line">&#125;);</div><div class="line"></div><div class="line">##跨域：</div><div class="line">$.ajax(&#123;</div><div class="line">    url:"http://www.B.com/open.php?callback=?",</div><div class="line">    dataType:"jsonp",</div><div class="line">    success:function(data)&#123;</div><div class="line">        console.log(data);</div><div class="line">        //ToDo..</div><div class="line">    &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>其实一开始没有callback=?这些个东西的，<a href="http://www.B.com/open.js">http://www.B.com/open.js</a> 这个链接就是一个简单的js<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">foo(&#123;<span class="string">"name"</span>:<span class="string">"B"</span>,<span class="string">"age"</span>:<span class="number">23</span>&#125;);</div></pre></td></tr></table></figure></p>
+<p>所以A网站往document里面写一个script之后，直接就执行了A网站的foo() function。 但假如B网站还对C网站提供服务，C网站说foo()这个方法名已经被占用了。所以B就约定，不管是A,B,C D哪家网站，想要调各自的什么方法自己传上来，B负责调用以下。因为jsonp只能是GET，所以只好放在queryParameters里面了。<a href="https://juejin.im/entry/5a45b363f265da431c709fc7">为什么叫callback的原因我也是最近才想清楚的</a><br>上面那个callback不一定非要写callback，其实写什么都行，主要看对方网站是怎么定义的。就是对方这个链接是怎么拿这个url里面的queryParams的。</p>
 <p><em>XSS注入就是利用了CORS</em></p>
 <h2 id="4-Vuex及状态管理"><a href="#4-Vuex及状态管理" class="headerlink" title="4. Vuex及状态管理"></a>4. Vuex及状态管理</h2><p>在js眼中，一段json字符串就是一个object。<br>这是vuex 中改变某项属性的代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">mutations: &#123;</div><div class="line">  increment (state, payload) &#123;</div><div class="line">    state.count += payload.amount</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">store.commit(<span class="string">'increment'</span>, &#123;</div><div class="line">  amount: <span class="number">10</span></div><div class="line">&#125;)</div><div class="line">两个花括号括起来的(json)，才是对象。这里，函数名叫做<span class="string">'increment'</span>，传进去的payLoad即有效信息，是通过json转达的。</div></pre></td></tr></table></figure></p>
 <h2 id="事件处理"><a href="#事件处理" class="headerlink" title="事件处理"></a>事件处理</h2><p>点击时会发生MouseEvent,如果想要获取这里面的一些属性，比如点击位置screenX,ScreenY这些，可以在html中绑定事件时，使用$event这个符号将事件传递到方法中。</p>
@@ -298,6 +294,9 @@ ga('send', 'pageview');
 <p>10.css里面的class继承是同时在一个tag里面添加class=”class_a class_b”，中间一个空格，需要什么拿什么</p>
 <ol>
 <li>css分三种，外部样式表（写在另一个css文件里），内部样式表(写在header tag中)和内联样式表(写在单独的tag里面)</li>
+</ol>
+<h3 id="日常开发出错记录"><a href="#日常开发出错记录" class="headerlink" title="日常开发出错记录"></a>日常开发出错记录</h3><ol>
+<li><a href="https://stackoverflow.com/questions/42908525/vue-warn-property-or-method-is-not-defined-on-the-instance-but-referenced-dur">[Vue warn]: Property or method is not defined on the instance but referenced during render</a>。原来是template里面的html某个元素里面调用了XXX，而这个XXX并没有在当前Vue实例中声明。</li>
 </ol>
 <h3 id="tools-tangiable-takeaways"><a href="#tools-tangiable-takeaways" class="headerlink" title="tools,tangiable takeaways"></a>tools,tangiable takeaways</h3><ol>
 <li>atom plugin  ide-typescript sucks , after disable the plugin ,the autocomplete feature works againself.</li>
@@ -318,6 +317,7 @@ ga('send', 'pageview');
 <li><a href="http://www.w3school.com.cn/jsref/jsref_obj_array.asp">JavaScript 教程</a></li>
 <li><a href="https://wohugb.gitbooks.io/ecmascript-6/content/docs/array.html">ES6相关</a></li>
 <li><a href="https://www.w3cschool.cn/css/css-padding.html">css教程</a></li>
+<li><a href="https://medium.com/the-web-tub/improve-ux-with-swiping-tab-bar-using-onsen-ui-for-vue-4c7d0e5171f0">widgets</a></li>
 </ol>
 
       
@@ -332,15 +332,15 @@ ga('send', 'pageview');
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">前端</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
         			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">javaScript</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
         			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Vue</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">前端</a>
         		</li>
       		
 		</ul>
@@ -541,39 +541,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">adb</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">linux</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -585,6 +557,34 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">linux</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">tools</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
@@ -593,15 +593,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -617,15 +613,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">前端</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
+                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -637,7 +625,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+                <a href="javascript:void(0)" class="js-tag color3">前端</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -649,11 +645,23 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -662,14 +670,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
              
               <li class="article-tag-list-item">

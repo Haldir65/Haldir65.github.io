@@ -16,7 +16,7 @@
 <meta property="og:description" content="网络相关的查找手册">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/b9ae1189145b4a4d9dfe4d0b89a21b47.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/ed541bc1ed61ead0bf6ea8233ef01c0a.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-12-20T14:25:57.248Z">
+<meta property="og:updated_time" content="2017-12-28T13:24:57.950Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="网络通信手册">
 <meta name="twitter:description" content="网络相关的查找手册">
@@ -226,6 +226,7 @@ ga('send', 'pageview');
 <p>Response(同样，无线电传输的时候是没有换行的概念的，每一行末尾都有一个\r\n)</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">HTTP/1.1 200 OK</div><div class="line">Bdpagetype: 1</div><div class="line">Bdqid: 0xa1524365407b7</div><div class="line">Bduserid: 0</div><div class="line">Cache-Control: private</div><div class="line">Connection: Keep-Alive</div><div class="line">Content-Encoding: gzip</div><div class="line">Content-Type: text/html; charset=utf-8</div><div class="line">Cxy_all: baidu+9bdfb3567324332546a7cb482b3</div><div class="line">Date: Sun, 23 Jul 2017 08:27:22 GMT</div><div class="line">Expires: Sun, 23 Jul 2017 08:26:51 GMT</div><div class="line">Server: BWS/1.1</div><div class="line">Set-Cookie: BDSVRTM=0; path=/</div><div class="line">Set-Cookie: BD_HOME=0; path=/</div><div class="line">Set-Cookie: H_PS_PSSID=1430_210543_17001; path=/; domain=.baidu.com</div><div class="line">Strict-Transport-Security: max-age=172800</div><div class="line">Vary: Accept-Encoding</div><div class="line">X-Powered-By: HPHP</div><div class="line">X-Ua-Compatible: IE=Edge,chrome=1</div><div class="line">Transfer-Encoding: chunked</div></pre></td></tr></table></figure>
 <p>报文的<a href="http://www.cnblogs.com/klguang/p/4618526.html">语法</a>：<br>请求的格式</p>
+<p>注意上面的“path=/”<br>document.cookie = “username=cfangxu;path=/;domain=qq.com”<br>如上：“www.qq.com” 与 “sports.qq.com” 公用一个关联的域名”qq.com”，我们如果想让 “sports.qq.com” 下的cookie被 “www.qq.com” 访问，我们就需要用到 cookie 的domain属性，并且需要把path属性设置为 “/“。<br><a href="https://segmentfault.com/a/1190000012578794">cookie还有domain和path的概念</a></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;method&gt; &lt;request-URL&gt; &lt;version&gt;</div><div class="line">&lt;headers&gt;</div><div class="line">&lt;entity-body&gt;</div></pre></td></tr></table></figure>
 <p>响应的格式</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;version&gt; &lt;status&gt; &lt;reason-phrase&gt;</div><div class="line">&lt;headers&gt;</div><div class="line">&lt;entity-body&gt;</div></pre></td></tr></table></figure>
@@ -286,10 +287,12 @@ ga('send', 'pageview');
 </ul>
 <p>Cookie的一些缺点，直接照搬WiKi了</p>
 <ul>
-<li>Cookie会被附加在每个HTTP请求中，所以无形中增加了流量。</li>
+<li>Cookie会被附加在每个HTTP请求中，所以无形中增加了流量。(其实这里面只应该放“每次请求都要携带的信息”)</li>
 <li>由于在HTTP请求中的Cookie是明文传递的，所以安全性成问题。（除非用HTTPS）</li>
 <li>Cookie的大小限制在4KB左右。对于复杂的存储需求来说是不够用的。</li>
+<li>一个域名下存放的cookie的个数是有限制的，不同的浏览器存放的个数不一样,一般为20个。</li>
 </ul>
+<p>cookie也可以设置过期的时间，默认是会话结束的时候，当时间到期自动销毁</p>
 <p>另外，不同域名是无法共享浏览器端本地信息，包括cookies，这即是跨域问题。百度是不能读取爱奇艺的Cookie的，这是安全性问题。<br>需要注意的是，虽然网站images.google.com与网站www.google.com同属于Google，但是域名不一样，二者同样不能互相操作彼此的Cookie。必须域名一样才能操作。<br>Java中把Cookie封装成了javax.servlet.http.Cookie类，直接用就可以了。</p>
 <p>Cookie并不提供修改、删除操作。如果要修改某个Cookie，只需要新建一个同名的Cookie，添加到response中覆盖原来的Cookie。</p>
 <p>对了，在众多的Header中Cookie一般长这样:</p>
@@ -325,7 +328,7 @@ ga('send', 'pageview');
 <blockquote>
 <p>最近在看书时才真正搞明白，服务器为什么会对表单提交和文件上传做特殊处理，因为表单提交数据是名值对的方式，且Content-Type为application/x-www-form-urlencoded，而文件上传服务器需要特殊处理，普通的post请求（Content-Type不是application/x-www-form-urlencoded）数据格式不固定，不一定是名值对的方式，所以服务器无法知道具体的处理方式，所以只能通过获取原始数据流的方式来进行解析。<br>jquery在执行post请求时，会设置Content-Type为application/x-www-form-urlencoded，所以服务器能够正确解析，而使用原生ajax请求时，如果不显示的设置Content-Type，那么默认是text/plain，这时服务器就不知道怎么解析数据了，所以才只能通过获取原始数据流的方式来进行解析请求数据。</p>
 </blockquote>
-<p>===========================trash here=====================================</p>
+<p>===========================trash here=====================================<br>经常说的网速 bps (bits per second)，所以跟byte比起来，要除以8。1024kbps的带宽就意味着每秒传递的数据大小为1024/8=128KB。<br>1024s就是128MB（这下清楚了）</p>
 <p>一些优化<br>[TTFB] TTFB（Time To First Byte），客户端发出请求到收到响应的第一个字节所花费的时间。一般浏览器里面都能看到，这也是服务端可以优化的指标。</p>
 <p>GZip压缩文本还可以，图片就没必要开压缩了，因为图片本身就高度压缩了，再压只是浪费CPU。</p>
 <p>网络协议，架构，规范，spdy,http2,url规范.<br>OSI七层网络体系结构 ： 物理层、数据链路层、网络层、传输层、表示层、会话层、应用层</p>
@@ -568,39 +571,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">adb</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">linux</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -612,6 +587,34 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">linux</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">tools</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
@@ -620,15 +623,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -644,15 +643,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">前端</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
+                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -664,7 +655,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+                <a href="javascript:void(0)" class="js-tag color3">前端</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -676,11 +675,23 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -689,14 +700,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
              
               <li class="article-tag-list-item">

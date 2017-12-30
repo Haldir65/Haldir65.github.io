@@ -64,7 +64,7 @@ sudo systemctl enable nginx
 ```
 ## 3. 常用目录和文件(直接从DigitalOcean复制过来了)
 
-- /var/www/html ## 就是放默认首页的地方
+- /var/www/html ## 就是放默认首页的地方（原因是 /etc/nginx/sites-enabled/default这里面设置的）
 >
 /etc/nginx: The Nginx configuration directory. All of the Nginx configuration files reside here.
 /etc/nginx/nginx.conf: The main Nginx configuration file. This can be modified to make changes to the Nginx global configuration.
@@ -192,8 +192,33 @@ server {
 }
 ```
 
+有的时候会看到两种写法
+```
+location /static/ {
+        root /var/www/app/static/;
+        autoindex off;
+}
+## 结果是/var/www/app/static/static目录
+
+location /static/ {
+        alias /var/www/app/static/;
+        autoindex off;
+}
+##这才是/var/www/app/static目录
+```
+[location里面写root还是alias](https://stackoverflow.com/questions/10631933/nginx-static-file-serving-confusion-with-root-alias)
+
 ### 4.4 Nginx软链接
 目测不能用软链接
+
+## 5. 问题速查
+- nginx.service - A high performance web server and a reverse proxy server
+   Loaded: loaded (/lib/systemd/system/nginx.service; enabled; vendor preset: enabled)
+   Active: failed (Result: exit-code) since Fri 2017-12-29 20:12:50 EST; 3min 21s ago
+
+启动失败，检查/var/log/nginx/error.log 或者/var/log/syslog。
+
+
 
 
 

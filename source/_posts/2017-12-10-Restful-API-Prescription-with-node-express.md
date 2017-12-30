@@ -51,3 +51,11 @@ req.params   //  Object ，Json.String = {}
 req.body    //  {name:'Josn',age:'12'}  //这个是post里面发送的body数据
 req.query  // {"age","10"}  // 显然这是url里面的query
 ```
+
+
+## 3. Serving static files
+```javaScript
+app.use(express.static(path.join(__dirname,'public')))
+```
+然后在当前目录新建一个public文件夹，添加img文件夹，里面放一张porn.jpg。
+浏览器访问： localhost:port/img/porn.jpg 。 就能看到放进去的的那张图片了。
