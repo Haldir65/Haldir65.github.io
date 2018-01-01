@@ -249,3 +249,13 @@ yarn outdated
 yarn cache clean
 yarn run dev
 yarn upgrade express
+
+
+eslint修改配置，让js文件每一行后面都得加冒号(allow semi colons)
+[allow semi colons in javascript eslint](https://stackoverflow.com/questions/40453894/allow-semi-colons-in-javascript-eslint)
+在.eslintrc中，添加custom rules
+```json
+"rules": {
+        "semi": [2, "always"]
+    }
+```

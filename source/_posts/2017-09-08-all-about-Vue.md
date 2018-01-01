@@ -373,8 +373,18 @@ id这个tag唯一的，一个页面不能有两个tag有相同的id，引用的�
 
 
 ### 日常开发出错记录
-1. [[Vue warn]: Property or method is not defined on the instance but referenced during render](https://stackoverflow.com/questions/42908525/vue-warn-property-or-method-is-not-defined-on-the-instance-but-referenced-dur)。原来是template里面的html某个元素里面调用了XXX，而这个XXX并没有在当前Vue实例中声明。
-
+1. [Vue warn]: Property or method is not defined on the instance but referenced during render](https://stackoverflow.com/questions/42908525/vue-warn-property-or-method-is-not-defined-on-the-instance-but-referenced-dur)。原来是template里面的html某个元素里面调用了XXX，而这个XXX并没有在当前Vue实例中声明。
+2. [Cannot read property 'state' of undefined](https://forum.vuejs.org/t/vuex-error-state/1879/6).这其实就是在vue component中访问this.$store ===undefines了，需要确保Vue的声明中
+```js
+// root instance
+new Vue({  // eslint-disable-line no-new
+    el: "#app",
+    store,
+    router,
+    render: h => h(App)
+})
+```
+3.
 
 
 ### tools,tangiable takeaways

@@ -28,3 +28,4 @@ top : 1
 - [一个用于优化png图片的gradle插件](https://github.com/chenenyu/img-optimizer-gradle-plugin)，用来看groovy语法挺好的。以及 How to write gradle plugin
 - [scheme这东西算跨客户端平台的](https://sspai.com/post/31500)，比如在App中调起支付宝(用的是alipayqr://)。其实就是一个系统内跨应用调用。
 - [基于 Docker 打造前端持续集成开发环境](https://juejin.im/post/5a157b7a5188257bfe457ff0)
+- 使用express 模拟网络延迟
