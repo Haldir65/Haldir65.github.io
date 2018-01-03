@@ -259,3 +259,86 @@ eslint修改配置，让js文件每一行后面都得加冒号(allow semi colons
         "semi": [2, "always"]
     }
 ```
+
+
+node js不支持es2015的import 和export语法，需要使用mudule的话，可使用commonJs，即:
+```js
+// library.js
+module.export.awesome = function () {
+  consle.log('awesome');
+};
+
+// index.js
+var library = require('./library');
+library.awesome();
+
+// 需要注意两点，
+// 1. require()后面跟的路径是('./library')，是指在当前路径下，而不是在node_modules那个大的文件夹里面找
+// 2. require('./library') 和require('./library.js')没有区别
+```
+
+
+babel的作用是把es2015的代码编译成es5的代码, 安装方式
+> yarn add babel-cli babel-preset-env
+
+然后创建一个.babelrc文件
+```json
+{
+  "presets": ["env"]
+}
+```
+
+package.json中添加script:
+babel : "babel"
+命令行 ： npm run babel -- index.js -o bundle.js -w
+
+
+sourcemaps
+开发过程中使用的是ES2015代码，编译之后就成了非常长的es5代码，在浏览器里面几乎无法断点。使用sourcemap就能在浏览器中将es5代码“反编译”成ES2015代码，还可以打断点。
+> babel-node "index.js" "-o" "bundle.js" "-w" "source-maps"  // o的意思是输出文件 -w的意思是watch文件变化，babel要改成babel-node
+
+babel能够把**一个**ES2015文件编译成**一个**es5的js文件。但假如有一大堆es2015文件，想要整合到一个es5文件中的话，就需要module loaders了。
+webpack是一个module bundler(module loader),其作用就是把项目中所有的零散的文件整合到一个文件中。常见的包括gulp和webpack，后者更popular。
+首先安装：
+yarn add webpack babel-core babel-loader
+```js
+module.exports = {
+    entry: './index.js',
+    output: {
+        path: __dirname,
+        filename: 'bundle.js'
+    },
+    watch : true,
+    module: {
+        loaders: [
+            {
+                loader: "babel-loader",
+                exclude: "/node_modules/"
+            }
+        ]
+    }
+}
+```
+
+es6的import和export需要注意
+```js
+// A.js
+export default function greet(params) {
+    console.log('hello');
+}
+
+// B.js
+import firstGreet from '.A.js'; //this works
+import { firstGreet } from '.A.js'; // undefined !
+
+// A.js
+const sayHi = function hi() {
+    console.log("hi");
+}
+export { sayHi }
+
+// B.js
+import { firstGreet } from '.A.js'; // this works
+```
+
+原因就在于第一种方式是使用匿名export的。
