@@ -26,10 +26,12 @@ Vanilla JS其实就是原生javascript了。论运行速度，在Vanilla JS面�
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery151110078544.jpg?imageView2/2/w/600)
 
 ### 1.1 比如说module（就是import，export这种，虽然是ES6才补上的）
- js中好像没有像java中那种javaBean的特殊的数据类型的存在。
+ <del>js中好像没有像java中那种javaBean的特殊的数据类型的存在。</del>其实也不需要，js并不是一种用class来model real world object的语言。
 ES6开始可以使用import和export语法，有类似的效果，[参考](https://stackoverflow.com/questions/34741111/exporting-importing-json-object-in-es6)
-states.js
+但node js目前(version 8.x)还不支持es 2015的import export语法，偏偏node对于其他es2015的特性都支持到位了。
+
 ```js
+// states.js
 export default {
   STATES: {
     'AU' : {...},
@@ -37,17 +39,20 @@ export default {
   }
 };
 
-import STATES from 'states';
-// 或者
+// accept.js
+import { STATES } from './states';  //undefined
+import  STATES  from './states';  // concrete object ,this works
+import whatever from 'states'; // concrete object, this works
+
+
+// 另一种情况
 var STATES = {};
 STATES.AU = {...};
 STATES.US = {...};
 export STATES;
 
-import { STATES } from 'states';//接受方最好写上大括号包起来
-//
-import whatever from 'states';
-// whatever会变成export default中的内容
+import { STATES } from 'states';//如果输出方使用export default，接收方不应加上大括号。此时输出方输出的是匿名Object，接收方随便起什么名字都行。
+// 如果输出方输出有明确定义的function, object，接收方需要添加大括号。
 ```
 
 ### 1.2 基本的操作符，dynanic type,函数，变量，oop,class（ES6）,for循环,while这些都有
@@ -186,7 +191,7 @@ VM621:5 speed is 40
 - 还有随便用的log
 
 
-### 1.3 一些工具，时间,Math，io操作也有
+### 1.3 一些工具，时间,Math，io操作（文件系统、网络）也有
 Date Object的使用
 ```javaScript
 let past = new Date(2007,11,9)
@@ -592,7 +597,7 @@ window.onload = function () {
   var stuff5 = name => console.log(`只有一个参数 ${name}的话，参数的小括号也不要了`);
 }
 ```
-还有一个好处就是: the addrow function will bind the this keyword lexically.
+还有一个好处就是: the arrow function will bind the this keyword lexically.
 ```js
 window.onload = function () {
   var jam = {
@@ -642,6 +647,36 @@ window.onload = function () {
   jam.greeting(3)
 }
 ```
+
+class definition
+es6 新增了class的概念，还有extends的概念
+```js
+class Band {
+  constructor(name ,location) {
+    this.name = name;
+    this.location = location;
+  }
+
+  function greet() {
+    console.log(this.name);
+  }
+}
+
+
+class SubBand extends Band {
+  construcor(name ,location,popularity) {
+    super(name ,location); // this is essential , 如果后面想要使用parent 的属性的话，需要加上super()
+    this.popularity = popularity;
+  }
+}
+
+
+// 调用
+
+let garage = new Band('john', 'Doe');
+garage.greet();
+```
+
 
 Sets是新增的用于存储unique数据的集合(元素不能重复)
 ```js
@@ -873,6 +908,9 @@ json【JavaScript Object Notation】
 >  response.headers['Access-Control-Allow-Origin'] = 'http://localhost:8080'
 
 在8080端口的web页面发起请求就能成功
+
+
+异常捕获(try catch也有)
 
 
 

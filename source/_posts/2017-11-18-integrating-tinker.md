@@ -165,6 +165,8 @@ A: 引用[Android热补丁之Tinker原理解析](http://w4lle.com/2016/12/16/tin
 分的这么散估计也是希望能够好扩展吧。
 =======================================================================
 
+换dex文件的关键方法在[DexPathList.findClass这个方法里面](http://androidxref.com/5.0.0_r2/xref/libcore/dalvik/src/main/java/dalvik/system/DexPathList.java#316)。[参考](https://juejin.im/post/5a42f29ef265da43333eaba0)
+
 网上关于源码解析的文章已经很多，有时间看看，应该不难。
 
 看一下官方Tinker项目中的文件夹，有一个tinker-build，里面有两个python文件，这就很有意思了。再看看tinker-patch-gradle-plugin，里面一大堆groovy文件，所以看懂这个对于gradle插件开发是有好处的。

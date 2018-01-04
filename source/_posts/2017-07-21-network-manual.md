@@ -380,6 +380,9 @@ jquery在执行post请求时，会设置Content-Type为application/x-www-form-ur
 经常说的网速 bps (bits per second)，所以跟byte比起来，要除以8。1024kbps的带宽就意味着每秒传递的数据大小为1024/8=128KB。
 1024s就是128MB（这下清楚了）
 
+
+[css sprites在http2的环境下并不完全无效](https://stackoverflow.com/questions/32160790/does-using-image-sprites-make-sense-in-http-2)
+
 一些优化
 [TTFB] TTFB（Time To First Byte），客户端发出请求到收到响应的第一个字节所花费的时间。一般浏览器里面都能看到，这也是服务端可以优化的指标。
 
