@@ -67,7 +67,7 @@ Xposed的原理与Multidex及动态加载问题
 组件化、插件化的前提就是解耦
 
 [在Android中执行shell指令](https://github.com/jaredrummler/AndroidShell)
-[滴滴的virtualApp](https://github.com/didi/VirtualAPK)
+[滴滴的virtualApp](https://github.com/didi/VirtualAPK)。 目前看来就是用android.content.pm.PackageParse去解析一个apk文件，封装成一个LoadedPlugin对象（Cache下来），后续调用apk中描述的功能进行操作。所以应该还是在host的进程中跑的。由此联系到[PackageInstaller 原理简述](http://www.cnblogs.com/myitm/archive/2012/05/17/2506635.html)
 
 
 ## 参考

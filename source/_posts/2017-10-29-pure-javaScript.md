@@ -699,7 +699,11 @@ add的时候如果存在重复元素直接无视新增的重复元素
 
 
 ## 6. 我也不知道归到哪一类的问题
-js语法上虽说不用加分号，但实际应用中为避免压缩js文件时出现歧义，还是得老老实实加上分号
+- js语法上虽说不用加分号，但实际应用中为避免压缩js文件时出现歧义，还是得老老实实加上分号
+
+- IIFE(Immediately Invoked Function Expression) Library use this to avoid polluting global environment
+
+- 如果引用一个未声明的变量，js会直接创建一个（除非使用use strict）
 
 9. 交互事件的捕获，拦截，消费（冒泡）
 ```javaScript
@@ -911,6 +915,7 @@ json【JavaScript Object Notation】
 
 
 异常捕获(try catch也有)
+
 
 
 

@@ -278,7 +278,6 @@ private static final class TouchTarget {
   }
 ```
 
-=============================================================================
 
 ### 13. 从点击Launcher到应用启动的过程
 > 借助binder驱动
@@ -304,6 +303,17 @@ createBaseContextForActivity{
 }
 ```
 ContextImpl包含资源信息、对Context的一些函数的实现等。每次创建Activity都会新建一个ContextImpl
+
+
+### 15. Dex file explained
+[The Dex File Format](https://blog.bugsnag.com/dex-and-d8/)
+
+
+### 16 .PackageParser和Android.manifest文件有关
+[Android APK应用安装原理(1)-解析AndroidManifest原理-](http://blog.csdn.net/zhbinary/article/details/7353739).
+
+=============================================================================
+
 
 ### 9. Facebook出品的BUCK能够用于编译Android 项目，速度比较快。
 

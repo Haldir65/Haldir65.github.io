@@ -783,6 +783,9 @@ putIfAbsent是Atmmic的[Is putIfAbsent an atomic operation](http://forums.terrac
 8.6 [Stack这种东西有点过时了](https://stackoverflow.com/questions/1386275/why-is-java-vector-class-considered-obsolete-or-deprecated) 一个原因是Stack extends Vector（每个方法都加synchronized，多数场景下不需要，另外Vector是1.1还是1.0就有了）
 
 
+### update
+jdk 1.8对于长度超过8的链表改用红黑树。
+
 
 ### Reference
 1. [Collections Refuled by Stuart Marks](https://www.youtube.com/watch?v=q6zF3vf114M)
