@@ -81,9 +81,9 @@ jq('.click_btn').slideUp(300)
 
 ## Todo
 - 去复制一大堆文字，button，img的css样式，修改，继承，引用。手写实在太慢
--
+- jQuery插件
 
 
 
 ## TakeAway
-- Jquery必须写在最前面，如果网页中还有其他的js引用到了jQuery的话
+- jQuery必须写在最前面，如果网页中还有其他的js引用到了jQuery的话

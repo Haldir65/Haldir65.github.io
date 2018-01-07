@@ -27,3 +27,5 @@ EmbeddedServletContainerCustomizer
 
 =================================================================
 在windows里面查看内网ip，从控制面板进去看是不准的，DHCP有效期过了自动换掉，得自己敲ipconfig，这样才是最及时的。
+
+[2小时学会SpringBoot](https://www.youtube.com/playlist?list=PLO5e_-yXpYLDcuEz8BlB_J_hQpzI-ZM4Y)

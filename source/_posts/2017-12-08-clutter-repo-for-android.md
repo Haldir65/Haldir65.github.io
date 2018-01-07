@@ -312,6 +312,9 @@ ContextImpl包含资源信息、对Context的一些函数的实现等。每次�
 ### 16 .PackageParser和Android.manifest文件有关
 [Android APK应用安装原理(1)-解析AndroidManifest原理-](http://blog.csdn.net/zhbinary/article/details/7353739).
 
+### 17. 在Dialog中getContext获取的是ContextThemeWrapper
+ContextThemeWrapper是API 1就有了的，主要是包装一下context，将Context的外部调用添加一些包装。
+
 =============================================================================
 
 
