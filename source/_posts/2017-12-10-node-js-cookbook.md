@@ -57,7 +57,7 @@ npm有个dependencies的概念，此外还有dev-dependencies的概念，主要�
 ```
 [stackoverflow上的解释](https://stackoverflow.com/questions/22343224/whats-the-difference-between-tilde-and-caret-in-package-json)
 
-> npm install -g grunt --save-dev # 安装，成为全局(-g)module，保存为dev-dependencies(--save-dev)
+> npm install -g grunt --save-dev # 安装，成为全局(-g)module，保存为dev-dependencies(--save-dev) 简写 -D 一个意思
 > npm install -g grunt --save # 安装，保存为dependencies
 
 > npm run dev # 打开发环境包

@@ -25,6 +25,11 @@ tags: [tools]
 Spring Boot修改内置Tomcat端口号：
 EmbeddedServletContainerCustomizer
 
+>或者在
+src/main/resources/application.yml文件中添加
+server
+  port: 8081
+
 =================================================================
 在windows里面查看内网ip，从控制面板进去看是不准的，DHCP有效期过了自动换掉，得自己敲ipconfig，这样才是最及时的。
 

@@ -97,7 +97,7 @@ ul {
 
 ```
 
-filepath
+**filepath**
 比如经常把一些文件挪到其他位置了，这下在css中引用的位置全部都要换，
 ```less
 @images: "images/"
@@ -109,7 +109,7 @@ img {
 ```
 
 
-import功能
+**import功能**
 在main.less文件中
 > @import header.less
 @import menu.less
@@ -165,12 +165,7 @@ form input[type=button]
 
 
 
-
-
-
-
-
-
+=======================================================================================
 ### 6. Sss和Scss
 SCSS 是 Sass 3 引入新的语法，其语法完全兼容 CSS3，并且继承了 Sass 的强大功能。也就是说，任何标准的 CSS3 样式表都是具有相同语义的有效的 SCSS 文件。
 ```css

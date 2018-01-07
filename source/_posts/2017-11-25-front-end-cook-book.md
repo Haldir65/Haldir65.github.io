@@ -8,7 +8,6 @@ tags: [前端]
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/coffee art life nature living drip dark bw.jpg?imageView2/2/w/600)
 
 <!--more-->
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600)
 
 # 常用网站
 [cssmatic](https://www.cssmatic.com/box-shadow),一个可以用拖拽的方式生成css代码的神奇的网站
@@ -58,12 +57,71 @@ xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 [What is the difference between form data and request payload?](https://stackoverflow.com/questions/10494574/what-is-the-difference-between-form-data-and-request-payload)
 
 
+## Webpack configuration
+> 安装
+yarn add webpack -g
+// 初始化项目
+npm init -y  
+// 使用
+webpack app.js bundle.js --watch // 将app.js编译成bundle.js， 实时监控文件变化。 Html文件中就可以引用bundle.js
 
+
+a.js
+```js
+let resources = 'this is some external resources'; // let 能用是因为node 支持es6这个特性
+module.exports = resources;
+```
+app.js
+```js
+alert(require('./a.js'));
+```
+
+可以为webpack提供config文件
+webpack.config.js
+```js
+module.exports = {
+  entry: './src/js/app.js',
+  outpath: {
+    path: __dirname+'/dist',
+    filename: 'bundle.js'
+  },
+  module: {
+    loaders: {
+      {test: /\.css$/,loader: 'style-loader!css-loader'} // 前面那个正则意思是针对所有的css文件，后面是需要安装的loader名称
+    }
+  }
+}
+```
+有了config文件，只需要输入webpack，就能自动根据config文件编译。
+在package.json文件中，添加script: "build": "webpack" ， npm run build ，会自动根据configuration文件编译生成可用于生产环境的编译后文件。
+
+webpack-dev-server(提供一个development server，因为之前只是走的file system)
+> 安装
+yarn add webpack-dev-server
+package.json中添加script :
+start: webpack-dev-server --entry ./src/js/app.js --out-filename .dist/bundle.js
+npm run start
+
+babel-loader(前提是安装了babel)
+安装参考[官方文档](https://webpack.js.org/loaders/babel-loader/)
+babel就是把es6语法的js文件编译成es5文件的，单独使用的语法大概这样。 webpack的loader成百上千，babel-loader只是其中的一种
+> npm run babel -- index.js -o bundle.js -w
+
+安装好babel-loader之后，在webpack.config.js中添加loader(loaders本来就是一个数组)
+```js
+loaders {
+    { test: /\.js$/,
+      loader: 'babel-loader',
+      exculde: /node_modules/, //排除所有node_modules下面的文件
+      query: {preset: ['es2015']}} //这个正则的意思是所有js后缀的文件
+}
+```
 
 
 ***Third Party Library***
 
 ## Vue Related
+[better-scroll](https://github.com/ustbhuangyi/better-scroll) 滴滴的员工写的
 
 ## jQuery Related
 jQuery是一个Dom Manipulate Library
@@ -127,13 +185,9 @@ Babel是一个可以把ES6代码打包成ES5代码的插件，毕竟要兼容老
 [Backbone](http://www.css88.com/doc/backbone/)是一个mvc框架
 [移动开发中的一些有用meta标签](http://www.html-js.com/article/The-front-end-of-mobile-terminal-meta-tag-set-of-notes-the-role-of)
 
-- [ ]如何使用js显示一个Dialog
+- [X]如何使用js显示一个Dialog
 - [ ]Express js
 - [ ] css3 属性大全
-
-
-
-VS Code好用
 
 
 
@@ -147,38 +201,12 @@ atom的emmet插件很好用
 [好玩的Atom插件](https://www.youtube.com/watch?v=aiXNKHKWlmY)
 minimap,emmet,file icons，atom liveserver,atom beautify
 
+=======================================================================================
 atom中输入vue,会自动提示生成vue模板,输入re会生成react Boilplate。前提是在js,vue,html文件中。
+![](http://odzl05jxx.bkt.clouddn.com/image/jpg/Cute%20and%20sexy%20asian%20girl%20in%20purple%20strapless%20gown.jpg?imageView2/2/w/600)
+![](http://odzl05jxx.bkt.clouddn.com/image/jpg/lith/IMG_0766.jpg?imageView2/2/w/600)
 
 ## 参考
 - [一个腾讯前端的博客](https://www.xuanfengge.com/page-back-does-not-cache.html)
-
-
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/lith/IMG_0766.jpg?imageView2/2/w/600)
-
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/Cute%20and%20sexy%20asian%20girl%20in%20purple%20strapless%20gown.jpg?imageView2/2/w/600)
-
-
-=======================================================================================
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-***再过几天就要生日了，想到又要变老，挺舍不得的。
-送给，这两年来的你，不负韶华***
+- [Webpack Crash Course](https://www.youtube.com/watch?v=lziuNMk_8eQ)
+- [Use Babel & Webpack To Compile ES2015 - ES2017](https://www.youtube.com/watch?v=iWUR04B42Hc)

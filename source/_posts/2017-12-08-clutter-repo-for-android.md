@@ -316,6 +316,7 @@ ContextImpl包含资源信息、对Context的一些函数的实现等。每次�
 ContextThemeWrapper是API 1就有了的，主要是包装一下context，将Context的外部调用添加一些包装。
 
 =============================================================================
+![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600)
 
 
 ### 9. Facebook出品的BUCK能够用于编译Android 项目，速度比较快。
