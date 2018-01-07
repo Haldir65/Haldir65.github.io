@@ -15,10 +15,9 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="每一个领域都有些不知道该放哪的零碎的点，这里开辟一个新的地方，作为前端杂乱知识的汇总。">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/coffee art life nature living drip dark bw.jpg?imageView2/2/w/600">
-<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600">
-<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/lith/IMG_0766.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/Cute%20and%20sexy%20asian%20girl%20in%20purple%20strapless%20gown.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-12-28T00:22:05.684Z">
+<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/lith/IMG_0766.jpg?imageView2/2/w/600">
+<meta property="og:updated_time" content="2018-01-07T12:10:02.234Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="前端速查手册">
 <meta name="twitter:description" content="每一个领域都有些不知道该放哪的零碎的点，这里开辟一个新的地方，作为前端杂乱知识的汇总。">
@@ -203,7 +202,6 @@ ga('send', 'pageview');
       
         <p>每一个领域都有些不知道该放哪的零碎的点，这里开辟一个新的地方，作为前端杂乱知识的汇总。<br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/coffee art life nature living drip dark bw.jpg?imageView2/2/w/600" alt=""></p>
 <a id="more"></a>
-<p><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600" alt=""></p>
 <h1 id="常用网站"><a href="#常用网站" class="headerlink" title="常用网站"></a>常用网站</h1><p><a href="https://www.cssmatic.com/box-shadow">cssmatic</a>,一个可以用拖拽的方式生成css代码的神奇的网站<br><a href="http://fontawesome.io/">不仅仅是font,还有很好的icon</a></p>
 <p>[TBS]腾讯浏览服务(Tencent Browsing Service, TBS)。网上很多人喷的微信浏览器慢就是这个<br><a href="https://github.com/wycats/handlebars.js">handlebars</a><br><a href="http://blog.csdn.net/lnn2007/article/details/8869057">一个html里面有两个id一样的元素没问题</a><br><a href="https://github.com/CodeFrogShow/UI-Design-Music-Player">awesome css UI Design</a>,<a href="https://www.youtube.com/watch?v=ExnD_KV5q5g">Video link here</a></p>
 <p><strong><em>Index</em></strong></p>
@@ -219,8 +217,25 @@ ga('send', 'pageview');
 </blockquote>
 <p>对于POST请求，如果Request中明确设置了:<br>&gt;<br>xhr.setRequestHeader(“Content-type”,”application/x-www-form-urlencoded”);</p>
 <p>后台会认为这是一个提交表单的请求，body就应该设置为’’<br><a href="https://stackoverflow.com/questions/10494574/what-is-the-difference-between-form-data-and-request-payload">What is the difference between form data and request payload?</a></p>
+<h2 id="Webpack-configuration"><a href="#Webpack-configuration" class="headerlink" title="Webpack configuration"></a>Webpack configuration</h2><blockquote>
+<p>安装<br>yarn add webpack -g<br>// 初始化项目<br>npm init -y<br>// 使用<br>webpack app.js bundle.js –watch // 将app.js编译成bundle.js， 实时监控文件变化。 Html文件中就可以引用bundle.js</p>
+</blockquote>
+<p>a.js<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">let</span> resources = <span class="string">'this is some external resources'</span>; <span class="comment">// let 能用是因为node 支持es6这个特性</span></div><div class="line"><span class="built_in">module</span>.exports = resources;</div></pre></td></tr></table></figure></p>
+<p>app.js<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">alert(<span class="built_in">require</span>(<span class="string">'./a.js'</span>));</div></pre></td></tr></table></figure></p>
+<p>可以为webpack提供config文件<br>webpack.config.js<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">module</span>.exports = &#123;</div><div class="line">  entry: <span class="string">'./src/js/app.js'</span>,</div><div class="line">  outpath: &#123;</div><div class="line">    path: __dirname+<span class="string">'/dist'</span>,</div><div class="line">    filename: <span class="string">'bundle.js'</span></div><div class="line">  &#125;,</div><div class="line">  <span class="built_in">module</span>: &#123;</div><div class="line">    loaders: &#123;</div><div class="line">      &#123;test: <span class="regexp">/\.css$/</span>,loader: <span class="string">'style-loader!css-loader'</span>&#125; <span class="comment">// 前面那个正则意思是针对所有的css文件，后面是需要安装的loader名称</span></div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>有了config文件，只需要输入webpack，就能自动根据config文件编译。<br>在package.json文件中，添加script: “build”: “webpack” ， npm run build ，会自动根据configuration文件编译生成可用于生产环境的编译后文件。</p>
+<p>webpack-dev-server(提供一个development server，因为之前只是走的file system)</p>
+<blockquote>
+<p>安装<br>yarn add webpack-dev-server<br>package.json中添加script :<br>start: webpack-dev-server –entry ./src/js/app.js –out-filename .dist/bundle.js<br>npm run start</p>
+</blockquote>
+<p>babel-loader(前提是安装了babel)<br>安装参考<a href="https://webpack.js.org/loaders/babel-loader/">官方文档</a><br>babel就是把es6语法的js文件编译成es5文件的，单独使用的语法大概这样。 webpack的loader成百上千，babel-loader只是其中的一种</p>
+<blockquote>
+<p>npm run babel – index.js -o bundle.js -w</p>
+</blockquote>
+<p>安装好babel-loader之后，在webpack.config.js中添加loader(loaders本来就是一个数组)<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">loaders &#123;</div><div class="line">    &#123; test: <span class="regexp">/\.js$/</span>,</div><div class="line">      loader: <span class="string">'babel-loader'</span>,</div><div class="line">      exculde: <span class="regexp">/node_modules/</span>, <span class="comment">//排除所有node_modules下面的文件</span></div><div class="line">      query: &#123;preset: [<span class="string">'es2015'</span>]&#125;&#125; <span class="comment">//这个正则的意思是所有js后缀的文件</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p><strong><em>Third Party Library</em></strong></p>
-<h2 id="Vue-Related"><a href="#Vue-Related" class="headerlink" title="Vue Related"></a>Vue Related</h2><h2 id="jQuery-Related"><a href="#jQuery-Related" class="headerlink" title="jQuery Related"></a>jQuery Related</h2><p>jQuery是一个Dom Manipulate Library</p>
+<h2 id="Vue-Related"><a href="#Vue-Related" class="headerlink" title="Vue Related"></a>Vue Related</h2><p><a href="https://github.com/ustbhuangyi/better-scroll">better-scroll</a> 滴滴的员工写的</p>
+<h2 id="jQuery-Related"><a href="#jQuery-Related" class="headerlink" title="jQuery Related"></a>jQuery Related</h2><p>jQuery是一个Dom Manipulate Library</p>
 <h2 id="Twitter-BootStrap"><a href="#Twitter-BootStrap" class="headerlink" title="Twitter BootStrap"></a>Twitter BootStrap</h2><p><a href="https://getbootstrap.com/docs/4.0/layout/grid/#stacked-to-horizontal">BootStrap速查手册</a></p>
 <h2 id="工具"><a href="#工具" class="headerlink" title="工具"></a>工具</h2><h3 id="vsCode插件推荐"><a href="#vsCode插件推荐" class="headerlink" title="vsCode插件推荐"></a>vsCode插件推荐</h3><ul>
 <li>Auto Close tag</li>
@@ -241,21 +256,18 @@ ga('send', 'pageview');
 <p>生产环境部署前端静态资源可以这么设置，参考知乎的<a href="https://www.zhihu.com/question/46630687">回答</a><br>&gt;<br>用vue-cli搭建的做法:<br>1、npm run build<br>2、把dist里的文件打包上传至服务器 例 /data/www/，我一般把index.html放在static里<br>所以我的文件路径为：<br>/data/www/static<br>|—–index.html<br>|—–js<br>|—–css<br>|—–images<br> ….<br>3、配置nginx监听80端口，<br>location /static alias 到 /data/www/static，<br>重启nginx<br>location /static {<br>  alias  /data/www/static/;<br>  }<br>4、浏览器访问<a href="http://ip/static/index.html即可">http://ip/static/index.html即可</a></p>
 <p>Babel是一个可以把ES6代码打包成ES5代码的插件，毕竟要兼容老的浏览器。<br><a href="https://github.com/faisalman/ua-parser-js">ua-parser-js</a>是一个很好用的检测ua的library。<br><a href="http://www.css88.com/doc/backbone/">Backbone</a>是一个mvc框架<br><a href="http://www.html-js.com/article/The-front-end-of-mobile-terminal-meta-tag-set-of-notes-the-role-of">移动开发中的一些有用meta标签</a></p>
 <ul>
-<li>[ ]如何使用js显示一个Dialog</li>
+<li>[X]如何使用js显示一个Dialog</li>
 <li>[ ]Express js</li>
 <li>[ ] css3 属性大全</li>
 </ul>
-<p>VS Code好用</p>
 <p>atom的emmet插件很好用<br>比如想要创建一个<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">'test'</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure></p>
 <p>只需要输入div.test或者.test然后按tab键<br><a href="https://www.youtube.com/watch?v=aiXNKHKWlmY">好玩的Atom插件</a><br>minimap,emmet,file icons，atom liveserver,atom beautify</p>
-<p>atom中输入vue,会自动提示生成vue模板,输入re会生成react Boilplate。前提是在js,vue,html文件中。</p>
+<p>=======================================================================================<br>atom中输入vue,会自动提示生成vue模板,输入re会生成react Boilplate。前提是在js,vue,html文件中。<br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/Cute%20and%20sexy%20asian%20girl%20in%20purple%20strapless%20gown.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/lith/IMG_0766.jpg?imageView2/2/w/600" alt=""></p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="https://www.xuanfengge.com/page-back-does-not-cache.html">一个腾讯前端的博客</a></li>
+<li><a href="https://www.youtube.com/watch?v=lziuNMk_8eQ">Webpack Crash Course</a></li>
+<li><a href="https://www.youtube.com/watch?v=iWUR04B42Hc">Use Babel &amp; Webpack To Compile ES2015 - ES2017</a></li>
 </ul>
-<p><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/lith/IMG_0766.jpg?imageView2/2/w/600" alt=""></p>
-<p><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/Cute%20and%20sexy%20asian%20girl%20in%20purple%20strapless%20gown.jpg?imageView2/2/w/600" alt=""></p>
-<p>=======================================================================================</p>
-<p><strong><em>再过几天就要生日了，想到又要变老，挺舍不得的。<br>送给，这两年来的你，不负韶华</em></strong></p>
 
       
 
@@ -376,7 +388,7 @@ ga('send', 'pageview');
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2017 Haldir
+    		&copy; 2018 Haldir
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
