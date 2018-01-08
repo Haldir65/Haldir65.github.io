@@ -30,8 +30,12 @@ top : 1
 - [基于 Docker 打造前端持续集成开发环境](https://juejin.im/post/5a157b7a5188257bfe457ff0)
 - 使用express 模拟网络延迟
 - git hook
-- 用express转接一个知乎Api，添加Access-control-allow-origin,或许还可以用redis缓存数据结果（一个就好）由此想到一篇文章"How to use Pythonto build a restful Web Service".只不过用的是Tornado
 - Promise链式调用与终止，异常处理
 - 前后端同构
 - 前后端分离
 - iview，elementUi
+
+
+
+已完成
+- 用express转接一个知乎Api，添加Access-control-allow-origin,或许还可以用redis缓存数据结果（一个就好）由此想到一篇文章"How to use Pythonto build a restful Web Service".只不过用的是Tornado

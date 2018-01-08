@@ -315,6 +315,22 @@ ContextImpl包含资源信息、对Context的一些函数的实现等。每次�
 ### 17. 在Dialog中getContext获取的是ContextThemeWrapper
 ContextThemeWrapper是API 1就有了的，主要是包装一下context，将Context的外部调用添加一些包装。
 
+### 18. 低版本的xml属性怎么写
+mylayout.xml
+```xml
+<Button
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:elevation="10dp"
+       />
+```
+这样写的话，Lint肯定会报warning。
+解决办法，alt+enter，Android studio自动生成一个/layout-v21/maylayout.xml。现在想起来很多项目里v-xx文件夹，其实是这个意思。
+还有一种写法
+> style="?android:attr/borderlessButtonStyle"
+自己写style也是行的
+
+
 =============================================================================
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600)
 
