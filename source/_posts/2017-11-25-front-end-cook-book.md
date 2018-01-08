@@ -59,35 +59,39 @@ xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 
 ## Webpack configuration
 > 安装
-yarn add webpack -g
+yarn add webpack //官网不推荐global安装
 // 初始化项目
 npm init -y  
 // 使用
-webpack app.js bundle.js --watch // 将app.js编译成bundle.js， 实时监控文件变化。 Html文件中就可以引用bundle.js
+webpack app.js bundle.js --watch // 将app.js编译成bundle.js， 实时监控文件变化。 Html文件中就可以引用bundle.js.
+build的话，就是把bundle.js minify的话 webpack app.js bundle.js -p ,其实就是帮忙把所有的空格删掉了
+
 
 
 a.js
 ```js
 let resources = 'this is some external resources'; // let 能用是因为node 支持es6这个特性
-module.exports = resources;
+module.exports = resources;   //如果不是用于浏览器的项目的话，node本身就支持require，只是浏览器不支持require
 ```
 app.js
 ```js
 alert(require('./a.js'));
 ```
 
+
 可以为webpack提供config文件
 webpack.config.js
 ```js
 module.exports = {
-  entry: './src/js/app.js',
+  entry: './src/js/app.js',    // 提供了一个entry,app.js又引用了其他的Js，最终追根溯源，会把所有的自定义和第三方框架全部打到一个bundle.js里面
   outpath: {
     path: __dirname+'/dist',
     filename: 'bundle.js'
   },
   module: {
     loaders: {
-      {test: /\.css$/,loader: 'style-loader!css-loader'} // 前面那个正则意思是针对所有的css文件，后面是需要安装的loader名称
+      { test: /\.css$/,  //这个test的意思就是说这是个正则，webpack你自己拿去试，正斜杠表示当前目录下，反斜杠表示转义字符，就是后面那个点就把它当成"."好了
+        loader: 'style-loader!css-loader'} // 前面那个正则意思是针对所有的css文件，后面是需要安装的loader名称。 这个loader的顺序是从右往左的！
     }
   }
 }
