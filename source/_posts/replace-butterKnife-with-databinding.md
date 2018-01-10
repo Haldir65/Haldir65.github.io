@@ -211,7 +211,10 @@ So ,感谢ButterKnife给我们带来的便利，Googbye ButterKnife，Hello Data
 
 ＊todo＊
 ###　how did ButterKnife work?
-TODO 拆ButterKnife
+[ButterKnife](https://github.com/JakeWharton/butterknife)
+[原理基本上从ButterKnifeAnnotationProcess.process开始](https://medium.com/@lgvalle/how-butterknife-actually-works-85be0afbc5ab)
+
+
 
 # Reference
 

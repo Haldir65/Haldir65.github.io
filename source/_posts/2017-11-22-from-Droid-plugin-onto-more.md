@@ -68,6 +68,123 @@ Xposed的原理与Multidex及动态加载问题
 
 [在Android中执行shell指令](https://github.com/jaredrummler/AndroidShell)
 [滴滴的virtualApp](https://github.com/didi/VirtualAPK)。 目前看来就是用android.content.pm.PackageParse去解析一个apk文件，封装成一个LoadedPlugin对象（Cache下来），后续调用apk中描述的功能进行操作。所以应该还是在host的进程中跑的。由此联系到[PackageInstaller 原理简述](http://www.cnblogs.com/myitm/archive/2012/05/17/2506635.html)
+[美团的热修复叫Robust](https://github.com/Meituan-Dianping/Robust)
+[美团的walle接入指南](https://www.jianshu.com/p/0ba717f7385f),原理都在[新一代开源Android渠道包生成工具Walle](https://tech.meituan.com/android-apk-v2-signature-scheme.html)
+[还有一个开源的gradle plugin](https://github.com/mcxiaoke/packer-ng-plugin)
+
+
+关于gradlew
+打包release之前，先Build -> Generate Singed apk 创建一个新的keystore , 密码记住，keystore文件保存好。
+
+
+关于打包: 根据[Android 多渠道打包梳理](https://www.jianshu.com/p/4f2990cf53bf)
+Gradle UMeng 多渠道打包
+1. Android.manifest文件添加
+> <meta-data
+    android:name="UMENG_CHANNEL"
+    android:value="${UMENG_CHANNEL_VALUE}" />
+
+2. app的build.gradle中添加
+```
+android {  
+    ...
+    productFlavors {
+        xiaomi {
+            manifestPlaceholders = [UMENG_CHANNEL_VALUE: "xiaomi"]
+        }
+        _360 {
+            manifestPlaceholders = [UMENG_CHANNEL_VALUE: "_360"]
+        }
+        baidu {
+            manifestPlaceholders = [UMENG_CHANNEL_VALUE: "baidu"]
+        }
+        wandoujia {
+            manifestPlaceholders = [UMENG_CHANNEL_VALUE: "wandoujia"]
+        }
+        ...
+    }  
+    ...
+}
+
+
+android {  
+    productFlavors {
+        xiaomi {}
+        _360 {}
+        baidu {}
+        wandoujia {}
+    }  
+
+    productFlavors.all {
+        flavor -> flavor.manifestPlaceholders = [UMENG_CHANNEL_VALUE: name]
+    }
+}
+
+```
+
+3. 打包
+除此之外 assemble 还能和 Product Flavor 结合创建新的任务（assemble + Build Variants），Build Variants = Build Type + Product Flavor
+> ./gradlew assembleDebug # 会打包 Debug apk
+./gradlew assembleRelease # 打包 Release apk
+./gradlew assembleWandoujiaRelease # 打包 wandoujia Release 版本，大小写不敏感
+./gradlew assembleWandoujia  # 此命令会生成wandoujia渠道的Release和Debug版本
+
+4. 多渠道的话这样的命令要跑多次
+使用walle就好了。
+> project 的 build.gradle 添加:
+dependencies {
+    classpath 'com.meituan.android.walle:plugin:1.0.3'
+}
+app/build.gradle 添加：
+apply plugin: 'walle'
+dependencies {
+    ...
+    compile 'com.meituan.android.walle:library:1.0.3'
+}
+在工程目录下创建 channel 文件：
+meituan # 美团
+samsungapps #三星
+hiapk
+anzhi
+xiaomi # 小米
+91com
+gfan
+appchina
+nduoa
+3gcn
+mumayi
+10086com
+wostore
+189store
+lenovomm
+hicloud
+meizu
+wandou
+# Google Play
+# googleplay
+# 百度
+baidu
+#
+# 360
+360cn
+#
+# 应用宝
+myapp
+
+编译全部渠道
+> gradlew clean assembleReleaseChannels
+gradlew clean assembleReleaseChannels -PchannelList=huawei // 只编译华为的
+gradlew clean assembleReleaseChannels -PchannelList=huawei,xiaomi // 小米跟华为的
+
+以上亲测通过，原本装的jdk 9，一直报错。在java home里换成jdk 1.8后，就没什么问题了。有问题gradlew的时候后面跟上--stacktrace，出错了粘贴到google里就好了。
+
+在java代码中获取渠道信息
+>
+String channel = WalleChannelReader.getChannel(this.getApplicationContext());
+
+
+
+
 
 
 ## 参考

@@ -349,3 +349,4 @@ import { firstGreet } from '.A.js'; // this works
 webpack.config.js配置举例
 webpack-dev-server 使用教程
 node里面就不要用Ajax了，推荐axios，原生自带也有https。
+[node社区最终决定使用mjs文件后缀](https://medium.com/dailyjs/es6-modules-node-js-and-the-michael-jackson-solution-828dc244b8b)

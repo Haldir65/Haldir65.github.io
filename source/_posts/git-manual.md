@@ -214,6 +214,11 @@ git push --force
 ## 16. 空目录推送到远端
 常常在node项目中看到一个static文件夹，里面只有一个.gitkeep文件，这个文件的意思是，就算这个目录是空的，也得推送到远端。
 
+
+
+### 一些看上去很神奇的操作
+git clone --depth=50 --branch=branchName https://github.com/XXX/XXX.git myFolder/theNameIwantItToBe
+
 ## Reference
 -[git reset和revert](http://yijiebuyi.com/blog/8f985d539566d0bf3b804df6be4e0c90.html)
 -[git recipes](https://github.com/geeeeeeeeek/git-recipes)
