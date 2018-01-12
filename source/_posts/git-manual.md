@@ -214,10 +214,21 @@ git push --force
 ## 16. 空目录推送到远端
 常常在node项目中看到一个static文件夹，里面只有一个.gitkeep文件，这个文件的意思是，就算这个目录是空的，也得推送到远端。
 
+## 17. stale和prune的概念
+prune(stale的概念 - 一个原本分支叫做dev，远程叫origin/dev，如果删除了dev，合到master，提交到origin/master之后，远程的origin/dev就成了stale的了)
+man prune是这么说的：
+> Deletes all stale tracking branches under <name>.
+These stale branches have already been removed from the remote repository
+referenced by <name>, but are still locally available in "remotes/<name>".
 
+prune的[解释](https://stackoverflow.com/questions/4040717/git-remote-prune-didnt-show-as-many-pruned-branches-as-i-expected)
 
 ### 一些看上去很神奇的操作
 git clone --depth=50 --branch=branchName https://github.com/XXX/XXX.git myFolder/theNameIwantItToBe
+
+
+git fetch -v
+
 
 ## Reference
 -[git reset和revert](http://yijiebuyi.com/blog/8f985d539566d0bf3b804df6be4e0c90.html)

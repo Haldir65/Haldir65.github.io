@@ -39,7 +39,16 @@ onSaveInstance是从ActivityThread的callCallActivityOnSaveInstanceState方法di
 
 =-============================-============================-============================-=========================
 
-
+```Python
+for line in channels:
+    target_channel = line.strip()
+    target_apk = output_dir + apk_names[0] + "-" + target_channel+"-"+apk_names[2] + src_apk_extension
+    shutil.copy(src_apk,  target_apk)
+    zipped = zipfile.ZipFile(target_apk, 'a', zipfile.ZIP_DEFLATED)
+    empty_channel_file = "META-INF/uuchannel_{channel}".format(channel = target_channel) //所以渠道号简单来说就是往META-INF里写了一个"uuchannel_xiaomi"之类的文件
+    zipped.write(src_empty_file, empty_channel_file)
+    zipped.close()
+```
 
 
 

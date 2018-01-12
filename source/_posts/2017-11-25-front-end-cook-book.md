@@ -210,6 +210,8 @@ atom中输入vue,会自动提示生成vue模板,输入re会生成react Boilplate
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/Cute%20and%20sexy%20asian%20girl%20in%20purple%20strapless%20gown.jpg?imageView2/2/w/600)
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/lith/IMG_0766.jpg?imageView2/2/w/600)
 
+把vscode 加入command line，将'C:\\Program Files (x86)\\Microsoft VS Code\\bin'添加到windows的环境变量中即可。cmd里输入code即可打开当前目录。
+
 ## 参考
 - [一个腾讯前端的博客](https://www.xuanfengge.com/page-back-does-not-cache.html)
 - [Webpack Crash Course](https://www.youtube.com/watch?v=lziuNMk_8eQ)
