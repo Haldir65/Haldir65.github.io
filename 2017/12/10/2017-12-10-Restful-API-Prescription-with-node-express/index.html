@@ -13,7 +13,7 @@
 <meta property="og:url" content="https://haldir65.github.io/2017/12/10/2017-12-10-Restful-API-Prescription-with-node-express/index.html">
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/sceneryc7fd99f667c9d98a583a174872d58d13.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2017-12-30T14:57:58.826Z">
+<meta property="og:updated_time" content="2018-01-14T14:41:36.990Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用Node和express开发Restful API">
 <meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/sceneryc7fd99f667c9d98a583a174872d58d13.jpg?imageView2/2/w/600">
@@ -196,16 +196,25 @@ ga('send', 'pageview');
     <div class="article-entry" itemprop="articleBody">
       
         <p><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/sceneryc7fd99f667c9d98a583a174872d58d13.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
-<h2 id="1-安装"><a href="#1-安装" class="headerlink" title="1. 安装"></a>1. 安装</h2><h2 id="2-配置"><a href="#2-配置" class="headerlink" title="2. 配置"></a>2. 配置</h2><p>MiddleWare(中间件)的概念：<br>从Request到response之间的流程中，任何组件都可以对这个过程中的数据进行修改，所以router其实也是中间件。中间件需要注意的就是<strong><em>顺序很重要</em></strong>。</p>
+<h2 id="1-安装"><a href="#1-安装" class="headerlink" title="1. 安装"></a>1. 安装</h2><blockquote>
+<p>yarn add express</p>
+</blockquote>
+<h2 id="2-配置"><a href="#2-配置" class="headerlink" title="2. 配置"></a>2. 配置</h2><p>MiddleWare(中间件)的概念：<br>从Request到response之间的流程中，任何组件都可以对这个过程中的数据进行修改，所以router其实也是中间件。中间件需要注意的就是<strong><em>顺序很重要</em></strong>。</p>
+<p>调试使用postMan</p>
+<h3 id="Request"><a href="#Request" class="headerlink" title="Request"></a>Request</h3><p>get请求的参数怎么拿<br>get的参数本身都是写在url里面的</p>
+<p>比如<br>GET /student/getById/27<br>app.get(‘/getById/:age’,functin(req,res){<br>    res.send(req.prarms.age);<br>})</p>
+<p>在postMan发起post请求<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">POST /api/personal?age=10 HTTP/1.1</div><div class="line">Host: localhost:8080</div><div class="line">Content-Type: application/x-www-form-urlencoded</div><div class="line">Cache-Control: no-cache</div><div class="line">Postman-Token: 79c6d9a1-de8d-3b0b-8d3d-0ed6e1910f69</div><div class="line"></div><div class="line">name=Josn&amp;age=12</div></pre></td></tr></table></figure></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">req.params   <span class="comment">//  Object ，Json.String = &#123;&#125;</span></div><div class="line">req.body    <span class="comment">//  &#123;name:'Josn',age:'12'&#125;  //这个是post里面发送的body数据</span></div><div class="line">req.query  <span class="comment">// &#123;"age","10"&#125;  // 显然这是url里面的query</span></div></pre></td></tr></table></figure>
+<h2 id="3-Serving-static-files"><a href="#3-Serving-static-files" class="headerlink" title="3. Serving static files"></a>3. Serving static files</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">app.use(express.static(path.join(__dirname,<span class="string">'public'</span>)))</div></pre></td></tr></table></figure>
+<p>然后在当前目录新建一个public文件夹，添加img文件夹，里面放一张porn.jpg。<br>浏览器访问： localhost:port/img/porn.jpg 。 就能看到放进去的的那张图片了。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">app.use(<span class="string">'/jquery'</span>, express.static(__dirname + <span class="string">'/node_modules/jquery/dist/'</span>));</div></pre></td></tr></table></figure>
+<p>这意思就是请求/jquery这个目录下的资源就等于访问/node_modules/jquery/dist/目录下同名的资源</p>
+<h2 id="4-response"><a href="#4-response" class="headerlink" title="4. response"></a>4. response</h2><p>response.redirect(‘’/all’); //在浏览器里面看，response的header是这样的<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">HTTP/1.1 302 Found</div><div class="line">X-Powered-By: Express</div><div class="line">Location: /all</div><div class="line">Vary: Accept</div><div class="line">Content-Type: text/html; charset=utf-8</div><div class="line">Content-Length: 68</div><div class="line">Date: Sun, 14 Jan 2018 10:08:50 GMT</div><div class="line">Connection: keep-alive</div></pre></td></tr></table></figure></p>
+<p>response.direction();<br>和window.location.href差不多</p>
 <p><a href="http://www.restran.net/2015/08/19/nginx-frontend-helper/">Nginx 是前端工程师的好帮手</a></p>
 <p><a href="http://expressjs.jser.us/api#req.param">Express Api book</a></p>
 <p><a href="http://imweb.io/topic/570130a306f2400432c1396c">在NodeJs中玩转protoBuffer</a></p>
 <p><a href="http://blog.desmondyao.com/fake-server/">使用nodejs 和express搭建本地API服务器</a></p>
-<p>调试使用postMan</p>
-<h3 id="Request"><a href="#Request" class="headerlink" title="Request"></a>Request</h3><p>在postMan发起post请求<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">POST /api/personal?age=10 HTTP/1.1</div><div class="line">Host: localhost:8080</div><div class="line">Content-Type: application/x-www-form-urlencoded</div><div class="line">Cache-Control: no-cache</div><div class="line">Postman-Token: 79c6d9a1-de8d-3b0b-8d3d-0ed6e1910f69</div><div class="line"></div><div class="line">name=Josn&amp;age=12</div></pre></td></tr></table></figure></p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">req.params   <span class="comment">//  Object ，Json.String = &#123;&#125;</span></div><div class="line">req.body    <span class="comment">//  &#123;name:'Josn',age:'12'&#125;  //这个是post里面发送的body数据</span></div><div class="line">req.query  <span class="comment">// &#123;"age","10"&#125;  // 显然这是url里面的query</span></div></pre></td></tr></table></figure>
-<h2 id="3-Serving-static-files"><a href="#3-Serving-static-files" class="headerlink" title="3. Serving static files"></a>3. Serving static files</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">app.use(express.static(path.join(__dirname,<span class="string">'public'</span>)))</div></pre></td></tr></table></figure>
-<p>然后在当前目录新建一个public文件夹，添加img文件夹，里面放一张porn.jpg。<br>浏览器访问： localhost:port/img/porn.jpg 。 就能看到放进去的的那张图片了。</p>
 
       
 
@@ -416,15 +425,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -433,6 +434,18 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -448,15 +461,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -468,11 +477,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -496,18 +505,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">前端</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
@@ -516,11 +513,27 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+                <a href="javascript:void(0)" class="js-tag color3">前端</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -532,15 +545,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">foreground</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
               <li class="article-tag-list-item">
