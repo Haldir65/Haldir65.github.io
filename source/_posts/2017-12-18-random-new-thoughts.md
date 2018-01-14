@@ -33,7 +33,7 @@ top : 1
 - iview，elementUi
 - XSS攻击
 - [写groovy用intelij就可以了](https://www.jetbrains.com/help/idea/getting-started-with-groovy.html) 》 how to
-
+- [ ] jQuery插件
 - [ ] vS Code Vender Prefix plugin  => auto prefix loader
 
 
@@ -43,3 +43,4 @@ top : 1
 已完成
 - 用express转接一个知乎Api，添加Access-control-allow-origin,或许还可以用redis缓存数据结果（一个就好）由此想到一篇文章"How to use Pythonto build a restful Web Service".只不过用的是Tornado
 - git hook (github travis持续集成，git push会触发服务器的一系列操作)
+- 基于前后端分离的理念，后台只负责提供数据，render page的任务应该交给前端。（所以用express-handlebars写页面的方式写着很累）

@@ -10,7 +10,7 @@ tags:
 
 MongoDB可以作为Spring boot的数据库DAO，也可以和node平台的express module结合。作为后台开发的数据库，应用很广。
 
-Mongoose // a wrapper around the mongo db interface
+
 
 ## 安装(windows平台下)
 MongoDB默认装到C盘的program files文件夹里面,需要一个data文件夹
@@ -36,7 +36,10 @@ MongoDB默认装到C盘的program files文件夹里面,需要一个data文件夹
 语法：
 >            
 use mydb ## 创建一个名mydb的数据库
-mydb.createCollection("students") ## 创建一个students的collections(类似于sql的table)
+db.createCollection("students") ## 创建一个students的collections(类似于sql的table)
 show collections  ## 显示当前数据库中的所有collections
 db.students.insert({name: 'Json',age: 22,title:['teacher','professor','versatile']}) ## 往数据库里添加一条数据
 db.students.find().pretty() // 显示students的collection中的所有元素，pretty只是好看点
+
+## 在node环境下可以使用
+Mongoose // a wrapper around the mongo db interface

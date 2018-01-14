@@ -17,18 +17,9 @@ npm的configuration非常方便设置,首先是[设置proxy](https://stackoverfl
 > npm config get stuff ##比如说registry等等
 
 
-用过的module
-path(core module, 无需安装)
-http(core module, 无需安装)
-express
-nodemon // 实时监控本地文件变化，重启服务，安装npm install nodemon -g
-body-parser
-ejs
-pm2 //starting an node app as a bcakground service
-mongoose
 
 
-
+[whats-the-difference-between-dependencies-devdependencies-and-peerdependencies](https://stackoverflow.com/questions/18875674/whats-the-difference-between-dependencies-devdependencies-and-peerdependencies)
 npm有个dependencies的概念，此外还有dev-dependencies的概念，主要看package.json这个文件
 ```json
 {
@@ -208,6 +199,8 @@ package.json
 ```
 output的文件夹名有些人喜欢叫dist，有些人用build。都行，没有区别的。
 
+如果手动敲webpack的话，会提示你找不到webpack，这是因为没有globally install webpack,webpack还只是个local file。 这也就是写在script里面的原因了: 让npm去node_modules里面找一个叫做webpack的依赖，然后运行webpack。
+
 webpack.config.js
 ```js
 const path = require('path');
@@ -345,8 +338,18 @@ import { firstGreet } from '.A.js'; // this works
 
 
 
+好用的module
+path(core module, 无需安装)
+http(core module, 无需安装)
+express
+nodemon // 实时监控本地文件变化，重启服务，安装npm install nodemon -g
+body-parser
+ejs
+pm2 //starting an node app as a bcakground service
+mongoose
+
 =============================================================================
 webpack.config.js配置举例
-webpack-dev-server 使用教程
+webpack-dev-server 使用教程（本地起一个服务器，修改了js文件，不用在浏览器里F5，自动帮你刷新）[教程](https://www.youtube.com/watch?v=s1UdeDaEKo4) hot module replacement的概念就是，不是简单粗暴window.refresh。而是只刷新改动的一小点。
 node里面就不要用Ajax了，推荐axios，原生自带也有https。
 [node社区最终决定使用mjs文件后缀](https://medium.com/dailyjs/es6-modules-node-js-and-the-michael-jackson-solution-828dc244b8b)

@@ -16,7 +16,7 @@
 <meta property="og:description" content="之前的文章快装不下了，所以另外开一篇文章专门放Android相关的杂乱的知识点。">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100734648.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-01-07T12:10:20.517Z">
+<meta property="og:updated_time" content="2018-01-12T13:40:38.118Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android知识集合[三]">
 <meta name="twitter:description" content="之前的文章快装不下了，所以另外开一篇文章专门放Android相关的杂乱的知识点。">
@@ -230,6 +230,12 @@ ga('send', 'pageview');
 <h3 id="15-Dex-file-explained"><a href="#15-Dex-file-explained" class="headerlink" title="15. Dex file explained"></a>15. Dex file explained</h3><p><a href="https://blog.bugsnag.com/dex-and-d8/">The Dex File Format</a></p>
 <h3 id="16-PackageParser和Android-manifest文件有关"><a href="#16-PackageParser和Android-manifest文件有关" class="headerlink" title="16 .PackageParser和Android.manifest文件有关"></a>16 .PackageParser和Android.manifest文件有关</h3><p><a href="http://blog.csdn.net/zhbinary/article/details/7353739">Android APK应用安装原理(1)-解析AndroidManifest原理-</a>.</p>
 <h3 id="17-在Dialog中getContext获取的是ContextThemeWrapper"><a href="#17-在Dialog中getContext获取的是ContextThemeWrapper" class="headerlink" title="17. 在Dialog中getContext获取的是ContextThemeWrapper"></a>17. 在Dialog中getContext获取的是ContextThemeWrapper</h3><p>ContextThemeWrapper是API 1就有了的，主要是包装一下context，将Context的外部调用添加一些包装。</p>
+<h3 id="18-低版本的xml属性怎么写"><a href="#18-低版本的xml属性怎么写" class="headerlink" title="18. 低版本的xml属性怎么写"></a>18. 低版本的xml属性怎么写</h3><p>mylayout.xml<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">Button</span></div><div class="line">       <span class="attr">android:layout_width</span>=<span class="string">"wrap_content"</span></div><div class="line">       <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></div><div class="line">       <span class="attr">android:elevation</span>=<span class="string">"10dp"</span></div><div class="line">       /&gt;</span></div></pre></td></tr></table></figure></p>
+<p>这样写的话，Lint肯定会报warning。<br>解决办法，alt+enter，Android studio自动生成一个/layout-v21/maylayout.xml。现在想起来很多项目里v-xx文件夹，其实是这个意思。<br>还有一种写法</p>
+<blockquote>
+<p>style=”?android:attr/borderlessButtonStyle”<br>自己写style也是行的</p>
+</blockquote>
+<h3 id="19-LocalBroadCastManager好像确实是基于handler实现的"><a href="#19-LocalBroadCastManager好像确实是基于handler实现的" class="headerlink" title="19. LocalBroadCastManager好像确实是基于handler实现的"></a>19. LocalBroadCastManager<del>好像</del>确实是基于handler实现的</h3><p>App内部全局拥有一个LocalBroadCastManager实例，内部持有一个handler，对外暴露功能sendBroadcast。就是往handler里丢一个message MSG_EXEC_PENDING_BROADCASTS，处理这个message就是executePendingBroadcasts。所以默认是在下一个message中处理的。如果想在当前message中就处理掉，还有一个sendBroadcastSync方法，但这会把当前持有的所有待处理消息全部flush掉。sendBroadcast，unregisterReceiver，registerReceiver内部用了synchronize，所以是线程安全的。</p>
 <p>=============================================================================<br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600" alt=""></p>
 <h3 id="9-Facebook出品的BUCK能够用于编译Android-项目，速度比较快。"><a href="#9-Facebook出品的BUCK能够用于编译Android-项目，速度比较快。" class="headerlink" title="9. Facebook出品的BUCK能够用于编译Android 项目，速度比较快。"></a>9. Facebook出品的BUCK能够用于编译Android 项目，速度比较快。</h3><p><a href="https://github.com/1hakr/AnExplorer">一个具有网络传输的FileExplorer</a><br><a href="http://mouxuejie.com/blog/2016-06-11/multidex-source-analysis/">MultiDex原理</a><br><a href="http://wetest.qq.com/lab/view/359.html">偏向native层面的内存占用分析</a></p>
 
@@ -446,15 +452,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -463,6 +461,18 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -478,15 +488,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -498,11 +504,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -526,18 +532,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">前端</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
@@ -546,11 +540,27 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+                <a href="javascript:void(0)" class="js-tag color3">前端</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -562,15 +572,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">foreground</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
               <li class="article-tag-list-item">

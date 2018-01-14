@@ -21,19 +21,20 @@ MiddleWare(中间件)的概念：
 
 
 
-[Nginx 是前端工程师的好帮手](http://www.restran.net/2015/08/19/nginx-frontend-helper/)
-
-
-[Express Api book](http://expressjs.jser.us/api#req.param)
-
-[在NodeJs中玩转protoBuffer](http://imweb.io/topic/570130a306f2400432c1396c)
-
-[使用nodejs 和express搭建本地API服务器](http://blog.desmondyao.com/fake-server/)
 
 
 调试使用postMan
 
 ### Request
+
+get请求的参数怎么拿
+get的参数本身都是写在url里面的
+
+比如
+GET /student/getById/27
+app.get('/getById/:age',functin(req,res){
+    res.send(req.prarms.age);
+})
 
 在postMan发起post请求
 ```
@@ -60,3 +61,35 @@ app.use(express.static(path.join(__dirname,'public')))
 ```
 然后在当前目录新建一个public文件夹，添加img文件夹，里面放一张porn.jpg。
 浏览器访问： localhost:port/img/porn.jpg 。 就能看到放进去的的那张图片了。
+
+```js
+app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist/'));
+```
+这意思就是请求/jquery这个目录下的资源就等于访问/node_modules/jquery/dist/目录下同名的资源
+
+## 4. response
+
+response.redirect(''/all'); //在浏览器里面看，response的header是这样的
+```
+HTTP/1.1 302 Found
+X-Powered-By: Express
+Location: /all
+Vary: Accept
+Content-Type: text/html; charset=utf-8
+Content-Length: 68
+Date: Sun, 14 Jan 2018 10:08:50 GMT
+Connection: keep-alive
+```
+
+response.direction();
+和window.location.href差不多
+
+
+[Nginx 是前端工程师的好帮手](http://www.restran.net/2015/08/19/nginx-frontend-helper/)
+
+
+[Express Api book](http://expressjs.jser.us/api#req.param)
+
+[在NodeJs中玩转protoBuffer](http://imweb.io/topic/570130a306f2400432c1396c)
+
+[使用nodejs 和express搭建本地API服务器](http://blog.desmondyao.com/fake-server/)

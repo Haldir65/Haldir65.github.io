@@ -146,6 +146,7 @@ jQuery是一个Dom Manipulate Library
 - Bracket Pair Colorizer
 
 VSCode快捷键(其实可以自己配置的，vs的设置文件就是一个很大的json)
+vs code 调整锁进的命令叫做reindent
 
 
 
@@ -154,7 +155,7 @@ VSCode快捷键(其实可以自己配置的，vs的设置文件就是一个很�
 [cnodejs](https://cnodejs.org/api/v1/topics)
 
 
-## nginx使用
+## 使用nginx搭建本地服务器
 官方说nginx的windows版本只供测试使用，性能不怎么样，但用于前端部署还是够用的。去[nginx网站](http://nginx.org/en/docs/windows.html)下载windows版本的nginx，解压缩，双击可执行文件nginx.exe。在这之前，最好先打开conf文件夹，编辑nginx.conf。设置一下端口，因为默认的80说不定就给谁占用了。其实用命令行也能启动：
 > start nginx
 tasklist /fi "imagename eq nginx.exe" //这个是windows下查看当前在运行的nginx的命令
@@ -211,6 +212,36 @@ atom中输入vue,会自动提示生成vue模板,输入re会生成react Boilplate
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/lith/IMG_0766.jpg?imageView2/2/w/600)
 
 把vscode 加入command line，将'C:\\Program Files (x86)\\Microsoft VS Code\\bin'添加到windows的环境变量中即可。cmd里输入code即可打开当前目录。
+
+handlebars渲染template的过程就是把写在模板里面的大括号包着的变量换成String。所以，在hbs文件里内嵌的js是[没有办法轻易拿到data的](https://stackoverflow.com/questions/19247150/is-it-possible-to-access-the-data-that-is-sent-to-handlebars-through-js-inside-t)。这跟flask很像。
+这里顺便提到iffe的概念[Immediately-invoked_function_expression](https://stackoverflow.com/questions/8228281/what-is-the-function-construct-in-javascript)
+```html
+<script src="http://cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.0.0/handlebars.min.js"></script>
+
+<script id="test-template" type="text/x-handlebars-template">
+  <label>Label here</label>
+{{textField dataAttribs='{"text":"Hello", "class":"input"}'}}
+</script>
+```
+
+```js
+Handlebars.registerHelper('textField', function(options) {
+    var dom = '<input type="text">', attribs;
+
+    attribs = JSON.parse(options.hash.dataAttribs);
+    console.log(attribs.text + " -- " + attribs.class);
+
+    return new Handlebars.SafeString(dom);
+});
+
+$(function() {
+
+    var markup = $('#test-template').html();
+    var template = Handlebars.compile(markup);
+    $('body').append(template());
+
+});
+```
 
 ## 参考
 - [一个腾讯前端的博客](https://www.xuanfengge.com/page-back-does-not-cache.html)

@@ -17,7 +17,7 @@
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/coffee art life nature living drip dark bw.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/Cute%20and%20sexy%20asian%20girl%20in%20purple%20strapless%20gown.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/lith/IMG_0766.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-01-07T12:10:02.234Z">
+<meta property="og:updated_time" content="2018-01-14T14:52:34.724Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="前端速查手册">
 <meta name="twitter:description" content="每一个领域都有些不知道该放哪的零碎的点，这里开辟一个新的地方，作为前端杂乱知识的汇总。">
@@ -218,11 +218,11 @@ ga('send', 'pageview');
 <p>对于POST请求，如果Request中明确设置了:<br>&gt;<br>xhr.setRequestHeader(“Content-type”,”application/x-www-form-urlencoded”);</p>
 <p>后台会认为这是一个提交表单的请求，body就应该设置为’’<br><a href="https://stackoverflow.com/questions/10494574/what-is-the-difference-between-form-data-and-request-payload">What is the difference between form data and request payload?</a></p>
 <h2 id="Webpack-configuration"><a href="#Webpack-configuration" class="headerlink" title="Webpack configuration"></a>Webpack configuration</h2><blockquote>
-<p>安装<br>yarn add webpack -g<br>// 初始化项目<br>npm init -y<br>// 使用<br>webpack app.js bundle.js –watch // 将app.js编译成bundle.js， 实时监控文件变化。 Html文件中就可以引用bundle.js</p>
+<p>安装<br>yarn add webpack //官网不推荐global安装<br>// 初始化项目<br>npm init -y<br>// 使用<br>webpack app.js bundle.js –watch // 将app.js编译成bundle.js， 实时监控文件变化。 Html文件中就可以引用bundle.js.<br>build的话，就是把bundle.js minify的话 webpack app.js bundle.js -p ,其实就是帮忙把所有的空格删掉了</p>
 </blockquote>
-<p>a.js<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">let</span> resources = <span class="string">'this is some external resources'</span>; <span class="comment">// let 能用是因为node 支持es6这个特性</span></div><div class="line"><span class="built_in">module</span>.exports = resources;</div></pre></td></tr></table></figure></p>
+<p>a.js<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">let</span> resources = <span class="string">'this is some external resources'</span>; <span class="comment">// let 能用是因为node 支持es6这个特性</span></div><div class="line"><span class="built_in">module</span>.exports = resources;   <span class="comment">//如果不是用于浏览器的项目的话，node本身就支持require，只是浏览器不支持require</span></div></pre></td></tr></table></figure></p>
 <p>app.js<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">alert(<span class="built_in">require</span>(<span class="string">'./a.js'</span>));</div></pre></td></tr></table></figure></p>
-<p>可以为webpack提供config文件<br>webpack.config.js<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">module</span>.exports = &#123;</div><div class="line">  entry: <span class="string">'./src/js/app.js'</span>,</div><div class="line">  outpath: &#123;</div><div class="line">    path: __dirname+<span class="string">'/dist'</span>,</div><div class="line">    filename: <span class="string">'bundle.js'</span></div><div class="line">  &#125;,</div><div class="line">  <span class="built_in">module</span>: &#123;</div><div class="line">    loaders: &#123;</div><div class="line">      &#123;test: <span class="regexp">/\.css$/</span>,loader: <span class="string">'style-loader!css-loader'</span>&#125; <span class="comment">// 前面那个正则意思是针对所有的css文件，后面是需要安装的loader名称</span></div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>可以为webpack提供config文件<br>webpack.config.js<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">module</span>.exports = &#123;</div><div class="line">  entry: <span class="string">'./src/js/app.js'</span>,    <span class="comment">// 提供了一个entry,app.js又引用了其他的Js，最终追根溯源，会把所有的自定义和第三方框架全部打到一个bundle.js里面</span></div><div class="line">  outpath: &#123;</div><div class="line">    path: __dirname+<span class="string">'/dist'</span>,</div><div class="line">    filename: <span class="string">'bundle.js'</span></div><div class="line">  &#125;,</div><div class="line">  <span class="built_in">module</span>: &#123;</div><div class="line">    loaders: &#123;</div><div class="line">      &#123; test: <span class="regexp">/\.css$/</span>,  <span class="comment">//这个test的意思就是说这是个正则，webpack你自己拿去试，正斜杠表示当前目录下，反斜杠表示转义字符，就是后面那个点就把它当成"."好了</span></div><div class="line">        loader: <span class="string">'style-loader!css-loader'</span>&#125; <span class="comment">// 前面那个正则意思是针对所有的css文件，后面是需要安装的loader名称。 这个loader的顺序是从右往左的！</span></div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>有了config文件，只需要输入webpack，就能自动根据config文件编译。<br>在package.json文件中，添加script: “build”: “webpack” ， npm run build ，会自动根据configuration文件编译生成可用于生产环境的编译后文件。</p>
 <p>webpack-dev-server(提供一个development server，因为之前只是走的file system)</p>
 <blockquote>
@@ -247,9 +247,9 @@ ga('send', 'pageview');
 <li>Vue2 Snippets</li>
 <li>Bracket Pair Colorizer</li>
 </ul>
-<p>VSCode快捷键(其实可以自己配置的，vs的设置文件就是一个很大的json)</p>
+<p>VSCode快捷键(其实可以自己配置的，vs的设置文件就是一个很大的json)<br>vs code 调整锁进的命令叫做reindent</p>
 <p>在<del>不会自己搭服务</dev>的情况下只好拿一些免费的api凑合了<br><a href="http://jsonplaceholder.typicode.com/posts">posts</a><br><a href="https://cnodejs.org/api/v1/topics">cnodejs</a></p>
-<h2 id="nginx使用"><a href="#nginx使用" class="headerlink" title="nginx使用"></a>nginx使用</h2><p>官方说nginx的windows版本只供测试使用，性能不怎么样，但用于前端部署还是够用的。去<a href="http://nginx.org/en/docs/windows.html">nginx网站</a>下载windows版本的nginx，解压缩，双击可执行文件nginx.exe。在这之前，最好先打开conf文件夹，编辑nginx.conf。设置一下端口，因为默认的80说不定就给谁占用了。其实用命令行也能启动：</p>
+<h2 id="使用nginx搭建本地服务器"><a href="#使用nginx搭建本地服务器" class="headerlink" title="使用nginx搭建本地服务器"></a>使用nginx搭建本地服务器</h2><p>官方说nginx的windows版本只供测试使用，性能不怎么样，但用于前端部署还是够用的。去<a href="http://nginx.org/en/docs/windows.html">nginx网站</a>下载windows版本的nginx，解压缩，双击可执行文件nginx.exe。在这之前，最好先打开conf文件夹，编辑nginx.conf。设置一下端口，因为默认的80说不定就给谁占用了。其实用命令行也能启动：</p>
 <blockquote>
 <p>start nginx<br>tasklist /fi “imagename eq nginx.exe” //这个是windows下查看当前在运行的nginx的命令<br>nginx -s stop // 立即关闭<br>nginx -s quit // graceful shutdown<br>这些东西官网上都写得很明白。</p>
 </blockquote>
@@ -263,6 +263,9 @@ ga('send', 'pageview');
 <p>atom的emmet插件很好用<br>比如想要创建一个<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">'test'</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure></p>
 <p>只需要输入div.test或者.test然后按tab键<br><a href="https://www.youtube.com/watch?v=aiXNKHKWlmY">好玩的Atom插件</a><br>minimap,emmet,file icons，atom liveserver,atom beautify</p>
 <p>=======================================================================================<br>atom中输入vue,会自动提示生成vue模板,输入re会生成react Boilplate。前提是在js,vue,html文件中。<br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/Cute%20and%20sexy%20asian%20girl%20in%20purple%20strapless%20gown.jpg?imageView2/2/w/600" alt=""><br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/lith/IMG_0766.jpg?imageView2/2/w/600" alt=""></p>
+<p>把vscode 加入command line，将’C:\Program Files (x86)\Microsoft VS Code\bin’添加到windows的环境变量中即可。cmd里输入code即可打开当前目录。</p>
+<p>handlebars渲染template的过程就是把写在模板里面的大括号包着的变量换成String。所以，在hbs文件里内嵌的js是<a href="https://stackoverflow.com/questions/19247150/is-it-possible-to-access-the-data-that-is-sent-to-handlebars-through-js-inside-t">没有办法轻易拿到data的</a>。这跟flask很像。<br>这里顺便提到iffe的概念<a href="https://stackoverflow.com/questions/8228281/what-is-the-function-construct-in-javascript">Immediately-invoked_function_expression</a><br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"http://cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.0.0/handlebars.min.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">id</span>=<span class="string">"test-template"</span> <span class="attr">type</span>=<span class="string">"text/x-handlebars-template"</span>&gt;</span><span class="xml"></div><div class="line">  <span class="tag">&lt;<span class="name">label</span>&gt;</span>Label here<span class="tag">&lt;/<span class="name">label</span>&gt;</span></div><div class="line">&#123;&#123;textField dataAttribs='&#123;"text":"Hello", "class":"input"&#125;'&#125;&#125;</div><div class="line"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">Handlebars.registerHelper(<span class="string">'textField'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">options</span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> dom = <span class="string">'&lt;input type="text"&gt;'</span>, attribs;</div><div class="line"></div><div class="line">    attribs = <span class="built_in">JSON</span>.parse(options.hash.dataAttribs);</div><div class="line">    <span class="built_in">console</span>.log(attribs.text + <span class="string">" -- "</span> + attribs.class);</div><div class="line"></div><div class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Handlebars.SafeString(dom);</div><div class="line">&#125;);</div><div class="line"></div><div class="line">$(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">var</span> markup = $(<span class="string">'#test-template'</span>).html();</div><div class="line">    <span class="keyword">var</span> template = Handlebars.compile(markup);</div><div class="line">    $(<span class="string">'body'</span>).append(template());</div><div class="line"></div><div class="line">&#125;);</div></pre></td></tr></table></figure>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="https://www.xuanfengge.com/page-back-does-not-cache.html">一个腾讯前端的博客</a></li>
 <li><a href="https://www.youtube.com/watch?v=lziuNMk_8eQ">Webpack Crash Course</a></li>
@@ -478,15 +481,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -495,6 +490,18 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -510,15 +517,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -530,11 +533,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -558,18 +561,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">前端</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
@@ -578,11 +569,27 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+                <a href="javascript:void(0)" class="js-tag color3">前端</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -594,15 +601,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">foreground</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
               <li class="article-tag-list-item">

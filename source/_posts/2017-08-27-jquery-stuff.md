@@ -18,7 +18,8 @@ jQuery是一个dom manipulate library，非常大。jQuery能干的事情包括�
 <!--more-->
 
 
-## 1.使用微软或者谷歌的CDN,放在head tag里面
+## 1.安装
+### 1.1 使用微软或者谷歌的CDN,放在head tag里面
 这样做的好处是别的网站已经加载过的js文件可以直接读缓存，加快加载速度
 其实自己下载一份，用src引用也行
 ```html
@@ -29,6 +30,25 @@ jQuery是一个dom manipulate library，非常大。jQuery能干的事情包括�
 ```
 这一段必须放在head里面，用自己的src或者微软，谷歌的cdn都可以。如果自己的js文件引用到了jQuery，[需要把jQuery写在其他js前面](https://stackoverflow.com/questions/8886614/uncaught-referenceerror-jquery-is-not-defined)
 
+这之后，在console中输入
+>
+window.jQuery
+ƒ (a,b){return new r.fn.init(a,b)}
+
+显然是已经注册了全局常量
+
+
+### 2. 使用npm和express
+> yarn add jquery express
+
+然后在app.js中
+```js
+ app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist/'));
+ ```
+ 在html里
+ ```html
+<script src="/jquery/jquery.js"></script>
+```
 ### 1.1所有的jQuery函数都放在ready里面
 这一段script放在body后面也行，放在head里面也行
 ```javascript
@@ -54,7 +74,7 @@ jQuery选择器有一些规则需要记住，主要就是如何选择html中的�
 - $('p.intro')表示所有class为intro的<p>标签
 - $('.intro')表示所有class为intro的标签
 - $('#intro')表示所有id为intro的元素
-- ￥（'div#intro.head') 所有id= 'intro'的div中，找到class为'head'的元素
+- $（'div#intro.head') 所有id= 'intro'的div中，找到class为'head'的元素
 
 ### 1.2 常用函数
 在script tag里面添加这一段，因为比对框架可能使用了$符号，为避免冲突，用var替代$符号

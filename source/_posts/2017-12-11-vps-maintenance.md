@@ -291,8 +291,8 @@ Softlayer, HongKong, CN         119.81.130.170          35.2MB/s
 
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600)
 
-=====================================================================================
-据说Docker很简单
+### 关于docker
+youtube上有人在Digital Ocean的vps上安装docker，主要作用就是将一个复杂的操作系统打包成一个下载即用的容器。进入容器中，可以像在实际的操作系统中一样运行指令。所以虚拟化的机器随时可以使用其他操作系统。
 
 ### 参考
  [vps优化](https://www.vpser.net/opt/vps-add-swap.html)
