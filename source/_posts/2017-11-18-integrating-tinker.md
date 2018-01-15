@@ -149,6 +149,18 @@ A：TinkerPatch的SDK里面包含了Tinker必要的功能，开发者只需要�
 Q: 如何更换Dex的
 A: 引用[Android热补丁之Tinker原理解析](http://w4lle.com/2016/12/16/tinker/index.html)中的话：“由于Tinker的方案是基于Multidex实现的修改dexElements的顺序实现的，所以最终还是要修改classLoder中dexPathList中dexElements的顺序。Android中有两种ClassLoader用于加载dex文件，BootClassLoader、PathClassLoader和DexClassLoader都是继承自BaseDexClassLoader。最终在DexPathList的findClass中遍历dexElements，谁在前面用谁。”。所以其实就是根据下发的补丁文件，把dex文件给修改了，这一点跟MultiDex很像。
 
+Q: Dex文件格式
+A： [The Dex File Format](https://blog.bugsnag.com/dex-and-d8/)。值得一提的是，这篇文章提到了文件头，dex的头是
+>
+6465780A 30333800
+dex
+038
+
+这个是hexoDecimal，十六进制2个数字（字母）代表一个byte(2*8bits = 2 bytes)，按照二进制0101的方式来看的话就是： 6465（0110 0100 0110 0101） 780A(0111 1000 0000 1010)。
+
+Q: borken.apk + patch_signed_7zip = fixed apk的过程
+A: 在UpgradePatch.tryPath -> DexDiffPatchInternal.tryRecoverDexFiles -> dexOptimizeDexFiles -> TinkerDexOptimizer.optimizeAll ->OptimizeWorker.run -> DexFile.loadDex(DexFile是dalvik.system包下的)。
+
 =======================================================================
 
 

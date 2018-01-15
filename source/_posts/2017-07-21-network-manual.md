@@ -217,7 +217,7 @@ Header其实就是个字典，比较麻烦的就是Cache-Control了，这个还�
 [WikI上比较完整](https://zh.wikipedia.org/wiki/HTTP%E5%A4%B4%E5%AD%97%E6%AE%B5)
 
 **Transfer-Encoding: chunked 有时候要传输的Content-Length实在太大，服务器计算长度需要开很大的Buffer，干脆把文件分块传输。**
-
+[wiki的解释](https://zh.wikipedia.org/wiki/%E5%88%86%E5%9D%97%E4%BC%A0%E8%BE%93%E7%BC%96%E7%A0%81)，注意此时content-length无效。
 [浏览器对于缓存的实际处理](http://www.jianshu.com/p/fd00f0d02f5f)，是否过期由Cache-Control标识的max-age和Expires判断。Cache-Control的优先级较高。[From Chrome](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=zh-cn)
 简单来说就是先看客户端是否Expire，然后去服务器看下Etag,最后看Last-Modified那个。
 
