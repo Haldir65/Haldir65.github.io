@@ -55,6 +55,29 @@ import { STATES } from 'states';//如果输出方使用export default，接收�
 // 如果输出方输出有明确定义的function, object，接收方需要添加大括号。
 ```
 
+es6的import和export需要注意
+```js
+// A.js
+export default function greet(params) {
+    console.log('hello');
+}
+
+// B.js
+import firstGreet from '.A.js'; //this works
+import { firstGreet } from '.A.js'; // undefined !
+
+// A.js
+const sayHi = function hi() {
+    console.log("hi");
+}
+export { sayHi }
+
+// B.js
+import { firstGreet } from '.A.js'; // this works
+```
+
+原因就在于第一种方式是使用匿名export的。
+
 ### 1.2 基本的操作符，dynanic type,函数，变量，oop,class（ES6）,for循环,while这些都有
 - js里面判断两个变量相等的方式，建议一律使用三个等号（严格相等）
 ```js

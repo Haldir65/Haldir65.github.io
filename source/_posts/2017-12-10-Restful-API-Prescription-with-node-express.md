@@ -11,6 +11,8 @@ tags: [前端]
 ## 1. 安装
 > yarn add express
 
+mongoose安装
+
 
 
 

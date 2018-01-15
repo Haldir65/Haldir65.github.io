@@ -4,7 +4,7 @@ date: 2017-12-10 16:12:43
 tags: [nginx,tools]
 ---
 
-[installing nginx on windows](http://nginx.org/en/docs/windows.html)
+[Installing nginx on windows](http://nginx.org/en/docs/windows.html)
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery151110073841.jpg?imageView2/2/w/600)
 <!--more-->
 

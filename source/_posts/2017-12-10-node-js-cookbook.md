@@ -271,71 +271,10 @@ library.awesome();
 ```
 
 
-babel的作用是把es2015的代码编译成es5的代码, 安装方式
-> yarn add babel-cli babel-preset-env
-
-然后创建一个.babelrc文件
-```json
-{
-  "presets": ["env"]
-}
-```
-
-package.json中添加script:
-babel : "babel"
-命令行 ： npm run babel -- index.js -o bundle.js -w
 
 
 sourcemaps
 开发过程中使用的是ES2015代码，编译之后就成了非常长的es5代码，在浏览器里面几乎无法断点。使用sourcemap就能在浏览器中将es5代码“反编译”成ES2015代码，还可以打断点。
-> babel-node "index.js" "-o" "bundle.js" "-w" "source-maps"  // o的意思是输出文件 -w的意思是watch文件变化，babel要改成babel-node
-
-babel能够把**一个**ES2015文件编译成**一个**es5的js文件。但假如有一大堆es2015文件，想要整合到一个es5文件中的话，就需要module loaders了。
-webpack是一个module bundler(module loader),其作用就是把项目中所有的零散的文件整合到一个文件中。常见的包括gulp和webpack，后者更popular。
-首先安装：
-yarn add webpack babel-core babel-loader
-```js
-module.exports = {
-    entry: './index.js',
-    output: {
-        path: __dirname,
-        filename: 'bundle.js'
-    },
-    watch : true,
-    module: {
-        loaders: [
-            {
-                loader: "babel-loader",
-                exclude: "/node_modules/"
-            }
-        ]
-    }
-}
-```
-
-es6的import和export需要注意
-```js
-// A.js
-export default function greet(params) {
-    console.log('hello');
-}
-
-// B.js
-import firstGreet from '.A.js'; //this works
-import { firstGreet } from '.A.js'; // undefined !
-
-// A.js
-const sayHi = function hi() {
-    console.log("hi");
-}
-export { sayHi }
-
-// B.js
-import { firstGreet } from '.A.js'; // this works
-```
-
-原因就在于第一种方式是使用匿名export的。
-
 
 
 好用的module
@@ -349,7 +288,6 @@ pm2 //starting an node app as a bcakground service
 mongoose
 
 =============================================================================
-webpack.config.js配置举例
-webpack-dev-server 使用教程（本地起一个服务器，修改了js文件，不用在浏览器里F5，自动帮你刷新）[教程](https://www.youtube.com/watch?v=s1UdeDaEKo4) hot module replacement的概念就是，不是简单粗暴window.refresh。而是只刷新改动的一小点。
+
 node里面就不要用Ajax了，推荐axios，原生自带也有https。
 [node社区最终决定使用mjs文件后缀](https://medium.com/dailyjs/es6-modules-node-js-and-the-michael-jackson-solution-828dc244b8b)
