@@ -343,6 +343,16 @@ function postName(e){
 }
 ```
 
+JavaScript random方法得到随机整数
+```js
+document.write(Math.ceil(Math.random()*3))  //得到1-3的整数
+
+document.write(Math.floor(Math.random()*4)); //得到0-3的整数
+
+Math.round() //当小数是0.5或者大于0.5的时候向上一位
+Math.ceil() //始终向上一位
+Math.floor() // 始终向下舍入
+```
 
 ## 2. 操作HTML-DOM的一些方法
 通过 id 找到 HTML 元素 window.document.getElementById()

@@ -32,6 +32,7 @@ MongoDB默认装到C盘的program files文件夹里面,需要一个data文件夹
 [Tutorial, not official](https://www.tutorialspoint.com/mongodb/mongodb_create_collection.htm)
 [Mongoose教程](https://code.tutsplus.com/articles/an-introduction-to-mongoose-for-mongodb-and-nodejs--cms-29527)
 [官方手册](https://docs.mongodb.com/manual/reference/method/db.collection.findOneAndDelete/#db.collection.findOneAndDelete)
+[Mongoose CURD](https://scotch.io/tutorials/using-mongoosejs-in-node-js-and-mongodb-applications#what-is-mongoose)
 
 
 语法：
@@ -45,7 +46,41 @@ db.students.find().pretty() // 显示students的collection中的所有元素，p
 db.students.updateOne( { "name": "Bob" }, { $set: {"age" : 99}} ); // UPDATE语句 set
 db.students.find( { age : { $gt:24, $lt: 28} } )  // QUERY 语句 greater than and less than
 db.students.deleteOne( { "_id" : ObjectId("5a584a109f157d455472ff11") } ); // DELETE 语句
+
+## batchInsert
+try {
+   db.products.insertMany( [
+      { item: "card", qty: 15 },
+      { item: "envelope", qty: 20 },
+      { item: "stamps" , qty: 30 }
+   ] );
+} catch (e) {
+   print (e);
+}
+
 ```
+
+
+
 
 ## 在node环境下可以使用
 Mongoose // a wrapper around the mongo db interface
+
+
+schema  definition
+```js
+// correct
+var studentSchema = mongoose.Schema({
+    _id: String,
+    name: String,
+    age: Number
+});
+
+// wrong
+var studentSchema = mongoose.Schema({
+    name: String,
+    age: Number
+});
+```
+===========================================================================
+// todo validate request data, error handling.

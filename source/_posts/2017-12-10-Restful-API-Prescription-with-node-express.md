@@ -71,7 +71,7 @@ app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist/'));
 
 ## 4. response
 
-response.redirect(''/all'); //在浏览器里面看，response的header是这样的
+response.redirect('/all'); //在浏览器里面看，response的header是这样的
 ```
 HTTP/1.1 302 Found
 X-Powered-By: Express
@@ -85,6 +85,28 @@ Connection: keep-alive
 
 response.direction();
 和window.location.href差不多
+
+```js
+/*
+GET
+/api/user */ much extra information you can set on its header
+app.get("/user",function (req,res) {
+    res.set({
+        'Content-Type': 'application/json',
+        'Content-Length': '123',
+        'ETag': '12345',
+        'Cache-Control': 'max-age=5',
+        "Access-Control-Allow-Origin": 'http://127.0.0.1:8080'
+    });
+    res.cookie('name', 'tobi', { domain: '.example.com', path: '/admin', secure: true });
+    console.log('response send');
+    res.json({
+        "name":"John",
+        "age":10
+    });
+});
+
+```
 
 
 [Nginx 是前端工程师的好帮手](http://www.restran.net/2015/08/19/nginx-frontend-helper/)
