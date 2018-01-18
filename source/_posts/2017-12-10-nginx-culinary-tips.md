@@ -157,6 +157,11 @@ server {
     root         /var/www/html/
 }
 
+Checking nginx config file syntax
+> nginx -t -c conf/nginx.conf
+nginx -s quit  //gracefully stop  on windows
+nginx -s stop // force stop on windows
+
 ### 4.2 限制日志文件的大小
 根据上面的config文件，默认的访问日志是在/var/log/nginx/access.log这个文件里面。限制这个文件的大小的方法：
 [serverfault](https://serverfault.com/questions/427144/how-to-limit-nginx-access-log-file-size-and-compress)
@@ -178,7 +183,7 @@ server {
 
 需要注意的是，当网站访问量大后，日志数据就会很多，如果全部写到一个日志文件中去，文件会变得越来越大。文件大速度就会慢下来，比如一个文件几百兆。写入日志的时候，会影响操作速度。另外，如果我想看看访问日志，一个几百兆的文件，下载下来打开也很慢。为了方便对日志进行分析计算，需要对日志进行定时切割。定时切割的方式有按照月切割、按天切割，按小时切割等。最常用的是按天切割。[脚本](http://www.codeceo.com/article/nginx-log.html)
 
-### 4.3 分享特定目录
+### 4.3 分享特定目录(serve static files)
 [How to serve a directory of static files at a certain location path with nginx?](https://stackoverflow.com/questions/33989060/how-to-serve-a-directory-of-static-files-at-a-certain-location-path-with-nginx)
 ```
 server {
@@ -208,20 +213,97 @@ location /static/ {
 ```
 [location里面写root还是alias](https://stackoverflow.com/questions/10631933/nginx-static-file-serving-confusion-with-root-alias)
 
+在windows平台下这么写
+```
+location / {
+           root D:/VDownload;
+           index index.html index.htm;
+       }
+```
+> nginx -s reload 然后重启nginx
+
+
 ### 4.4 Nginx软链接
 目测不能用软链接
 
-## 5. 问题速查
+
+###4.5 Nginx通过CORS实现跨域
+在nginx.conf里找到server项,并在里面添加如下配置
+```
+location / {
+add_header 'Access-Control-Allow-Origin' 'http://example.com';
+add_header 'Access-Control-Allow-Credentials' 'true';
+add_header 'Access-Control-Allow-Headers' 'Authorization,Content-Type,Accept,Origin,User-Agent,DNT,Cache-Control,X-Mx-ReqToken,X-Requested-With';
+add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS';
+...
+}
+```
+
+但上述配置只能实现允许一个domain或者*实现跨域，Nginx允许多个域名跨域访问
+在location context的上层添加
+```config
+map $http_origin $corsHost {
+    default 0;
+    "~http://www.example.com" http://www.example.com;
+    "~http://m.example.com" http://m.example.com;
+    "~http://wap.example.com" http://wap.example.com;
+}
+
+server
+{
+    listen 80;
+    server_name www.example2.com;
+    root /usr/share/nginx/html;
+    location /
+    {
+        add_header Access-Control-Allow-Origin $corsHost;
+    }
+}
+```
+
+## 5. proxy_pass
+根据[how-to-set-up-a-node-js-application-for-production-on-ubuntu-14-04](https://www.digitalocean.com/community/tutorials/how-to-set-up-a-node-js-application-for-production-on-ubuntu-14-04)
+> /etc/nginx/sites-available/default
+``` config
+server {
+    listen 80;
+
+    server_name example.com;
+
+    location / {
+        proxy_pass http://APP_PRIVATE_IP_ADDRESS:8080; // A应用跑在8080端口，外部访问http://example.com/即可访问应用服务
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    location /app2 {
+       proxy_pass http://APP_PRIVATE_IP_ADDRESS:8081; // B应用跑在8081端口，外部访问http://example.com/app2即可访问应用服务
+       proxy_http_version 1.1;
+       proxy_set_header Upgrade $http_upgrade;
+       proxy_set_header Connection 'upgrade';
+       proxy_set_header Host $host;
+       proxy_cache_bypass $http_upgrade;
+   }
+}
+```
+
+
+
+### 5. 问题速查
 - nginx.service - A high performance web server and a reverse proxy server
    Loaded: loaded (/lib/systemd/system/nginx.service; enabled; vendor preset: enabled)
    Active: failed (Result: exit-code) since Fri 2017-12-29 20:12:50 EST; 3min 21s ago
 
 启动失败，检查/var/log/nginx/error.log 或者/var/log/syslog。
-
-
+windows下应该在nginx/logs/error.log文件里面
 
 
 
 ### 参考
 - [nginx Configurations](https://wizardforcel.gitbooks.io/nginx-doc/content/Text/6.1_nginx_windows.html)
 - [How To Install Nginx on Ubuntu 16.04](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-16-04)
+- [understanding-the-nginx-configuration-file](https://www.digitalocean.com/community/tutorials/understanding-the-nginx-configuration-file-structure-and-configuration-contexts)
+- [if is evil, 可以,但不要在config文件里面写if](https://www.nginx.com/resources/wiki/start/topics/depth/ifisevil/)

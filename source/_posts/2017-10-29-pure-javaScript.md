@@ -939,6 +939,13 @@ array.filter(function(item){
 json【JavaScript Object Notation】
 [MDN上的corz](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS)
 
+将网页设置为允许 XMLHttpRequest 跨域访问
+```html
+<meta http-equiv="Access-Control-Allow-Origin" content="*">
+
+<meta http-equiv="Access-Control-Allow-Origin" content="http://www.1688hot.com:80">
+```
+
 [jsonp的解释](http://schock.net/articles/2013/02/05/how-jsonp-really-works-examples/)
 
 亲测，Flask里面给response添加Header:

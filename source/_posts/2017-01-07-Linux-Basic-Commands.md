@@ -621,6 +621,16 @@ sudo locale-gen "en_US.UTF-8"
 sudo dpkg-reconfigure locales
 ```
 
+### 12. sed命令
+sed 是一种在线编辑器，***它一次处理一行内容***。处理时，把当前处理的行存储在临时缓冲区中，称为“模式空间”（pattern space），接着用sed命令处理缓冲区中的内容，处理完成后，把缓冲区的内容送往屏幕。接着处理下一行，这样不断重复，直到文件末尾。文件内容并没有 改变，除非你使用重定向存储输出。
+本身是不会更改文件内容的。
+```shell
+##把一段字符串插入文件的第四行和第五行之间，默认是送到了标准输出，加一个重定向更改了文件内容
+sed -e 4a\/"this will be append to the 5th line" sample.txt >> sample.txt ## 注意这个斜杠是为了语法高亮加的
+
+## 将 /etc/passwd 的内容列出并且列印行号，同时，请将第 2~5 行删除！
+nl /etc/passwd | sed '2,5d'
+```
 
 
 ### 参考

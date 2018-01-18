@@ -333,6 +333,12 @@ mylayout.xml
 ### 19. LocalBroadCastManager<del>好像</del>确实是基于handler实现的
 App内部全局拥有一个LocalBroadCastManager实例，内部持有一个handler，对外暴露功能sendBroadcast。就是往handler里丢一个message MSG_EXEC_PENDING_BROADCASTS，处理这个message就是executePendingBroadcasts。所以默认是在下一个message中处理的。如果想在当前message中就处理掉，还有一个sendBroadcastSync方法，但这会把当前持有的所有待处理消息全部flush掉。sendBroadcast，unregisterReceiver，registerReceiver内部用了synchronize，所以是线程安全的。
 
+### 20. ViewPager为什么没有那些attrs的可以写在xml里面的属性
+ Adam Powell在15年的Android Dev summit上说过：this is pre aar gradle age, if we were to do it today , we definitely would add。
+ 看了下aosp的git日志，ViewPager是2011年就有了的。而[aar](https://developer.android.com/studio/projects/android-library.html#CreateLibrary)是随着android studio的发布推出的。
+ jar和aar的区别:
+ jar : JAR 文件就是 Java Archive File，顾名思意，它的应用是与 Java 息息相关的，是 Java 的一种文档格式。只包含了class文件与清单文件 ，不包含资源文件，如图片等所有res中的文件。
+ aar: aar，AAR（Android Archive）包是一个Android库项目的二进制归档文件,包含一些自己写的控件布局文件以及字体等资源文件那么就只能使用*.aar文件。
 
 
 

@@ -23,7 +23,7 @@ top : 1
 - [个人分享--web前端学习资源分享](https://juejin.im/post/5a0c1956f265da430a501f51)
 - [Android编译及Dex过程源码分析](http://mouxuejie.com/blog/2016-06-21/multidex-compile-and-dex-source-analysis/)
 - [如何调试Android打包流程？](http://www.wangyuwei.me/)
-- [一个用于优化png图片的gradle插件](https://github.com/chenenyu/img-optimizer-gradle-plugin)，用来看groovy语法挺好的。以及 How to write gradle plugin
+- [一个用于优化png图片的gradle插件](https://github.com/chenenyu/img-optimizer-gradle-plugin)，用来看groovy语法挺好的。以及 [How to write gradle plugin](http://yuanfentiank789.github.io/2017/09/20/%E5%9C%A8AndroidStudio%E4%B8%AD%E8%87%AA%E5%AE%9A%E4%B9%89Gradle%E6%8F%92%E4%BB%B6/)
 - [scheme这东西算跨客户端平台的](https://sspai.com/post/31500)，比如在App中调起支付宝(用的是alipayqr://)。其实就是一个系统内跨应用调用。[用法](http://blog.csdn.net/qq_23547831/article/details/51685310)
 - [基于 Docker 打造前端持续集成开发环境](https://juejin.im/post/5a157b7a5188257bfe457ff0)
 - 使用express 模拟网络延迟
