@@ -24,7 +24,6 @@ tags: [tools]
 
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/1513521623756.jpg?imageView2/2/w/600)
 
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/apple logo dark bw life night.jpg?imageView2/2/w/600)
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/black-mountains.jpg?imageView2/2/w/600)
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/Carla Ossa in strapless gown.jpg?imageView2/2/w/600)
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/iu kpop star music sony.jpg?imageView2/2/w/600)
