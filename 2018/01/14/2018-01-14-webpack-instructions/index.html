@@ -13,7 +13,7 @@
 <meta property="og:url" content="https://haldir65.github.io/2018/01/14/2018-01-14-webpack-instructions/index.html">
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/hot coffee city life winter.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-01-14T15:00:11.207Z">
+<meta property="og:updated_time" content="2018-01-19T14:28:09.337Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Webpack资源汇总">
 <meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/hot coffee city life winter.jpg?imageView2/2/w/600">
@@ -196,7 +196,18 @@ ga('send', 'pageview');
     <div class="article-entry" itemprop="articleBody">
       
         <p><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/hot coffee city life winter.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
-<h2 id="1-安装"><a href="#1-安装" class="headerlink" title="1.安装"></a>1.安装</h2><h2 id="2-使用"><a href="#2-使用" class="headerlink" title="2.使用"></a>2.使用</h2><h2 id="3-loaders"><a href="#3-loaders" class="headerlink" title="3. loaders"></a>3. loaders</h2><h2 id="4-webpack-config-js"><a href="#4-webpack-config-js" class="headerlink" title="4. webpack.config.js"></a>4. webpack.config.js</h2><h2 id="5-babel-css-precomiler"><a href="#5-babel-css-precomiler" class="headerlink" title="5. babel,css precomiler"></a>5. babel,css precomiler</h2><h2 id="6-react-cli"><a href="#6-react-cli" class="headerlink" title="6. react cli"></a>6. react cli</h2>
+<h2 id="1-安装"><a href="#1-安装" class="headerlink" title="1.安装"></a>1.安装</h2><p>yarn add webpack</p>
+<h2 id="2-使用"><a href="#2-使用" class="headerlink" title="2.使用"></a>2.使用</h2><p>&gt;<br>webpack is basically pulling  all external js files into on build.js file that we can bundle into our html.<br>这样做的好处很多，能够有效减少浏览器发出的请求数量。</p>
+<p>minify js(删掉所有的空行) webpack -p即可</p>
+<h2 id="3-webpack-config-js"><a href="#3-webpack-config-js" class="headerlink" title="3. webpack.config.js"></a>3. webpack.config.js</h2><p>一个基本的config长这样<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">module</span>.exports = &#123;</div><div class="line">    entry: <span class="string">'./app.js'</span>,</div><div class="line">    output: &#123;</div><div class="line">        filename: <span class="string">"./bundle.js"</span></div><div class="line">    &#125;,</div><div class="line">    watch: <span class="literal">true</span>,</div><div class="line">    <span class="built_in">module</span>:&#123;</div><div class="line">        rules: [</div><div class="line">           &#123;</div><div class="line">            test: <span class="regexp">/\.js$/</span>,</div><div class="line">            exclude: <span class="regexp">/(node_modules|bower_components)/</span>,</div><div class="line">            use: &#123;</div><div class="line">                loader: <span class="string">'babel-loader'</span>,</div><div class="line">                options: &#123;</div><div class="line">                  presets: [<span class="string">'babel-preset-env'</span>]</div><div class="line">                &#125;</div><div class="line">              &#125;</div><div class="line">           &#125;,</div><div class="line">           &#123;</div><div class="line">            test: <span class="regexp">/\.css$/</span>,</div><div class="line">            use: [ <span class="string">'style-loader'</span>, <span class="string">'css-loader'</span> ]</div><div class="line">          &#125;</div><div class="line">        ]</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="4-babel"><a href="#4-babel" class="headerlink" title="4. babel"></a>4. babel</h2><p>首先需要知道的是mudule.exports那一套在浏览器里是不支持的。会出现”require is undefined…”。解决办法也有，安装babel就行了。<br>babel的作用是把es2015的代码编译成es5的代码, 安装方式</p>
+<blockquote>
+<p>yarn add babel-cli babel-preset-env</p>
+</blockquote>
+<p>然后创建一个.babelrc文件<br><figure class="highlight json"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  <span class="attr">"presets"</span>: [<span class="string">"env"</span>]</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>package.json中添加script:<br>babel : “babel”<br>命令行 ： npm run babel – index.js -o bundle.js -w</p>
+<h2 id="5-loaders"><a href="#5-loaders" class="headerlink" title="5. loaders"></a>5. loaders</h2><h2 id="6-babel-css-precomiler"><a href="#6-babel-css-precomiler" class="headerlink" title="6. babel, css precomiler"></a>6. babel, css precomiler</h2><h2 id="7-react-cli"><a href="#7-react-cli" class="headerlink" title="7. react cli"></a>7. react cli</h2><p>=======================================================================================================</p>
+
       
 
       
@@ -278,6 +289,15 @@ ga('send', 'pageview');
 
   
 <nav id="article-nav">
+  
+    <a href="/2018/01/19/2018-01-19-react-native-cookbook/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          react-native-cookbook
+        
+      </div>
+    </a>
   
   
     <a href="/2017/12/26/2017-12-26-less-is-more/" id="article-nav-older" class="article-nav-link-wrap">
@@ -397,10 +417,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Window</a>
               </li>
              
@@ -413,6 +429,10 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
@@ -421,7 +441,23 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -430,22 +466,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -481,7 +501,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
+                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -489,19 +509,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
+                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -513,15 +529,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -530,6 +542,14 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
              
               <li class="article-tag-list-item">
