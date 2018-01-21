@@ -290,9 +290,67 @@ server {
 }
 ```
 
+### Nginx模块
+http_image_filter_module（图片裁剪模块）
+首先查看是否已安装http_image_filter_module模块
+> nginx -V
+
+/etc/nginx/nginx.conf文件添加
+```config
+location /image {
+		   alias "/imgdirectory/";  ## 这样直接输入 yourip/image/imgname.jpeg就能返回原始图片
+}
+location ~* (.*\.(jpg|jpeg|gif|png))!(.*)!(.*)$ {  ## 这个是匹配全站图片资源
+        		set $width      $3;  
+        		set $height     $4;  
+        		rewrite "(.*\.(jpg|jpeg|gif|png))(.*)$" $1;  ## 这样输入 yourip/image/imgname.jpeg!200!200就能返回200*200的图片
+}  
+
+location ~* /imgs/.*\.(jpg|jpeg|gif|png|jpeg)$ {  
+			root "/var/www/";
+  		image_filter resize $width $height;  
+}
+```
+亲测上述可行，python也有类似库[thumbor](https://github.com/thumbor/thumbor)
+
+关于正则匹配：
+```config
+## 比如匹配全站所有的结尾图片
+location ~* \.(jpg|gif|png)$ {
+
+               image_filter resize 500 500;
+
+       }
+
+### 匹配某个目录所有图片       
+location ~* /image/.*\.(jpg|gif|png)$ {
+
+            image_filter resize 500 500;
+
+    }
+```
+更多直接google吧。
 
 
-### 5. 问题速查
+### 添加黑名单
+```shell
+##获取各个IP访问次数
+
+awk '{print $1}' nginx.access.log |sort |uniq -c|sort -n
+
+## 新建一个黑名单文件 blacklist.conf ,放在 nginx/conf下面。
+
+  ##添加一个IP ，deny 192.168.59.1;
+
+### 在http或者server模块引入
+
+  include blacklist.conf ;
+
+##需要重启服务器, nginx -s reload; 即可生效
+```
+防御DDOS是一个系统工程，这里只是一小点。
+
+### 问题速查
 - nginx.service - A high performance web server and a reverse proxy server
    Loaded: loaded (/lib/systemd/system/nginx.service; enabled; vendor preset: enabled)
    Active: failed (Result: exit-code) since Fri 2017-12-29 20:12:50 EST; 3min 21s ago

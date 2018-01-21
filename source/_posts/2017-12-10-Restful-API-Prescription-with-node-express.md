@@ -105,7 +105,9 @@ app.get("/user",function (req,res) {
         "age":10
     });
 });
+app.get("/user",function (req,res,next) {
 
+}
 ```
 
 
