@@ -64,3 +64,5 @@ Transition这个词应该是卡通中使用的，用于显示from state到to sta
 ```
 
 ***和animation一样，如果transition的duration不写的话，是不会起效的***
+
+- [css-flex-box-guide](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)

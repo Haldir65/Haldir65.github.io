@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="npm = node package manager">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100694324.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-01-14T14:51:34.268Z">
+<meta property="og:updated_time" content="2018-01-19T14:27:17.446Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="nodejs学习记录">
 <meta name="twitter:description" content="npm = node package manager">
@@ -251,21 +251,11 @@ ga('send', 'pageview');
 </blockquote>
 <p>eslint修改配置，让js文件每一行后面都得加冒号(allow semi colons)<br><a href="https://stackoverflow.com/questions/40453894/allow-semi-colons-in-javascript-eslint">allow semi colons in javascript eslint</a><br>在.eslintrc中，添加custom rules<br><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">"rules": &#123;</div><div class="line">        "semi": [2, "always"]</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
 <p>node js不支持es2015的import 和export语法，需要使用mudule的话，可使用commonJs，即:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// library.js</span></div><div class="line"><span class="built_in">module</span>.export.awesome = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">  consle.log(<span class="string">'awesome'</span>);</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="comment">// index.js</span></div><div class="line"><span class="keyword">var</span> library = <span class="built_in">require</span>(<span class="string">'./library'</span>);</div><div class="line">library.awesome();</div><div class="line"></div><div class="line"><span class="comment">// 需要注意两点，</span></div><div class="line"><span class="comment">// 1. require()后面跟的路径是('./library')，是指在当前路径下，而不是在node_modules那个大的文件夹里面找</span></div><div class="line"><span class="comment">// 2. require('./library') 和require('./library.js')没有区别</span></div></pre></td></tr></table></figure></p>
-<p>babel的作用是把es2015的代码编译成es5的代码, 安装方式</p>
-<blockquote>
-<p>yarn add babel-cli babel-preset-env</p>
-</blockquote>
-<p>然后创建一个.babelrc文件<br><figure class="highlight json"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  <span class="attr">"presets"</span>: [<span class="string">"env"</span>]</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>package.json中添加script:<br>babel : “babel”<br>命令行 ： npm run babel – index.js -o bundle.js -w</p>
 <p>sourcemaps<br>开发过程中使用的是ES2015代码，编译之后就成了非常长的es5代码，在浏览器里面几乎无法断点。使用sourcemap就能在浏览器中将es5代码“反编译”成ES2015代码，还可以打断点。</p>
-<blockquote>
-<p>babel-node “index.js” “-o” “bundle.js” “-w” “source-maps”  // o的意思是输出文件 -w的意思是watch文件变化，babel要改成babel-node</p>
-</blockquote>
-<p>babel能够把<strong>一个</strong>ES2015文件编译成<strong>一个</strong>es5的js文件。但假如有一大堆es2015文件，想要整合到一个es5文件中的话，就需要module loaders了。<br>webpack是一个module bundler(module loader),其作用就是把项目中所有的零散的文件整合到一个文件中。常见的包括gulp和webpack，后者更popular。<br>首先安装：<br>yarn add webpack babel-core babel-loader<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">module</span>.exports = &#123;</div><div class="line">    entry: <span class="string">'./index.js'</span>,</div><div class="line">    output: &#123;</div><div class="line">        path: __dirname,</div><div class="line">        filename: <span class="string">'bundle.js'</span></div><div class="line">    &#125;,</div><div class="line">    watch : <span class="literal">true</span>,</div><div class="line">    <span class="built_in">module</span>: &#123;</div><div class="line">        loaders: [</div><div class="line">            &#123;</div><div class="line">                loader: <span class="string">"babel-loader"</span>,</div><div class="line">                exclude: <span class="string">"/node_modules/"</span></div><div class="line">            &#125;</div><div class="line">        ]</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>es6的import和export需要注意<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// A.js</span></div><div class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="function"><span class="keyword">function</span> <span class="title">greet</span>(<span class="params">params</span>) </span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'hello'</span>);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// B.js</span></div><div class="line"><span class="keyword">import</span> firstGreet <span class="keyword">from</span> <span class="string">'.A.js'</span>; <span class="comment">//this works</span></div><div class="line"><span class="keyword">import</span> &#123; firstGreet &#125; <span class="keyword">from</span> <span class="string">'.A.js'</span>; <span class="comment">// undefined !</span></div><div class="line"></div><div class="line"><span class="comment">// A.js</span></div><div class="line"><span class="keyword">const</span> sayHi = <span class="function"><span class="keyword">function</span> <span class="title">hi</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">"hi"</span>);</div><div class="line">&#125;</div><div class="line"><span class="keyword">export</span> &#123; sayHi &#125;</div><div class="line"></div><div class="line"><span class="comment">// B.js</span></div><div class="line"><span class="keyword">import</span> &#123; firstGreet &#125; <span class="keyword">from</span> <span class="string">'.A.js'</span>; <span class="comment">// this works</span></div></pre></td></tr></table></figure></p>
-<p>原因就在于第一种方式是使用匿名export的。</p>
 <p>好用的module<br>path(core module, 无需安装)<br>http(core module, 无需安装)<br>express<br>nodemon // 实时监控本地文件变化，重启服务，安装npm install nodemon -g<br>body-parser<br>ejs<br>pm2 //starting an node app as a bcakground service<br>mongoose</p>
-<p>=============================================================================<br>webpack.config.js配置举例<br>webpack-dev-server 使用教程（本地起一个服务器，修改了js文件，不用在浏览器里F5，自动帮你刷新）<a href="https://www.youtube.com/watch?v=s1UdeDaEKo4">教程</a> hot module replacement的概念就是，不是简单粗暴window.refresh。而是只刷新改动的一小点。<br>node里面就不要用Ajax了，推荐axios，原生自带也有https。<br><a href="https://medium.com/dailyjs/es6-modules-node-js-and-the-michael-jackson-solution-828dc244b8b">node社区最终决定使用mjs文件后缀</a></p>
+<p>=============================================================================</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">path.join(__dirname,<span class="string">'filename'</span>); <span class="comment">// ./filename</span></div><div class="line">path.join(__dirname,<span class="string">".."</span>,filename); <span class="comment">// ../filename ,go to parent directory</span></div></pre></td></tr></table></figure>
+<p>node里面就不要用Ajax了，推荐axios，原生自带也有https。<br><a href="https://medium.com/dailyjs/es6-modules-node-js-and-the-michael-jackson-solution-828dc244b8b">node社区最终决定使用mjs文件后缀</a></p>
 
       
 
@@ -476,10 +466,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Window</a>
               </li>
              
@@ -492,6 +478,10 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
@@ -500,7 +490,23 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -509,22 +515,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -560,7 +550,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
+                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -568,19 +558,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
+                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -592,15 +578,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -609,6 +591,14 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
              
               <li class="article-tag-list-item">

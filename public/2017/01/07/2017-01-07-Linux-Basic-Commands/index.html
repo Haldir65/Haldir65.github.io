@@ -20,7 +20,7 @@
  nohup node server.js &amp;gt; /dev/null 2&amp;gt;&amp;amp;1 &amp;amp;">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/bamboo-buds-wallpaper-53859567dd31a.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/fork_you_git.jpg">
-<meta property="og:updated_time" content="2017-12-30T14:57:58.868Z">
+<meta property="og:updated_time" content="2018-01-21T08:42:31.794Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="linux基本命令介绍">
 <meta name="twitter:description" content="一些常用的linux基本命令,仅作为参考。
@@ -291,6 +291,12 @@ ga('send', 'pageview');
 <p>防范措施<br>修改登陆端口号<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">sudo vi /etc/ssh/sshd_config</div><div class="line">Port 4484</div><div class="line">PermitRootLogin no</div><div class="line"></div><div class="line">###改了sshd_config之后千万记得重启ssh服务，不然会出现connection refused.</div><div class="line">/etc/init.d/ssh restart</div><div class="line"></div><div class="line">##CentOS 重启SSH ：</div><div class="line">service sshd restart</div><div class="line">###DeBian重启SSH：</div><div class="line">service ssh restart</div></pre></td></tr></table></figure></p>
 <p>查看系统release版本<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">more /etc/*release</div><div class="line">### 这个也行</div><div class="line">lsb_release -a</div></pre></td></tr></table></figure></p>
 <p><a href="https://perlgeek.de/en/article/set-up-a-clean-utf8-environment">编码的修改</a><br>更改locale为utf-8(ubuntu)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">vi ~/.bashrc</div><div class="line"></div><div class="line"># add these lines</div><div class="line">export LC_ALL=en_US.UTF-8</div><div class="line">export LANG=en_US.UTF-8</div><div class="line">export LANGUAGE=en_US.UTF-8</div><div class="line"></div><div class="line">sudo locale-gen &quot;en_US.UTF-8&quot;</div><div class="line">sudo dpkg-reconfigure locales</div></pre></td></tr></table></figure></p>
+<h3 id="12-sed命令"><a href="#12-sed命令" class="headerlink" title="12. sed命令"></a>12. sed命令</h3><p>sed 是一种在线编辑器，<strong><em>它一次处理一行内容</em></strong>。处理时，把当前处理的行存储在临时缓冲区中，称为“模式空间”（pattern space），接着用sed命令处理缓冲区中的内容，处理完成后，把缓冲区的内容送往屏幕。接着处理下一行，这样不断重复，直到文件末尾。文件内容并没有 改变，除非你使用重定向存储输出。<br>本身是不会更改文件内容的。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">##把一段字符串插入文件的第四行和第五行之间，默认是送到了标准输出，加一个重定向更改了文件内容</div><div class="line">sed -e 4a\/&quot;this will be append to the 5th line&quot; sample.txt &gt;&gt; sample.txt ## 注意这个斜杠是为了语法高亮加的</div><div class="line"></div><div class="line">## 将 /etc/passwd 的内容列出并且列印行号，同时，请将第 2~5 行删除！</div><div class="line">nl /etc/passwd | sed &apos;2,5d&apos;</div></pre></td></tr></table></figure></p>
+<h3 id="13-iptable"><a href="#13-iptable" class="headerlink" title="13. iptable"></a>13. iptable</h3><blockquote>
+<p>iptables -L -n -v ## 查看已添加的iptables规则</p>
+</blockquote>
+<p>默认是全部接受的<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">Chain INPUT (policy ACCEPT) ## 允许进入这台电脑</div><div class="line">target     prot opt source               destination</div><div class="line"></div><div class="line">Chain FORWARD (policy ACCEPT)  ## 路由相关</div><div class="line">target     prot opt source               destination</div><div class="line"></div><div class="line">Chain OUTPUT (policy ACCEPT) ## 允许发出这台电脑</div><div class="line">target     prot opt source               destination</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">iptables -P FORWARD DROP ## 把forward 一律改为drop</div><div class="line">iptables -A INPUT -s  192.168.1.3  ## A是append s是source，拒绝接受192.168.1.3的访问，就是黑名单了</div><div class="line">iptables -A INPUT -s  192.168.0.0/24 -p tcp --destination-port 25 -j DROP  ## block all devices on this network ,  p是protocol,SMTP一般是25端口</div><div class="line"></div><div class="line">iptables -A INPUT -s 192.168.0.66 -j ACCEPT  ## 白名单</div><div class="line">iptables -D INPUT 3 ##这个3是当前INPUT表的第3条规则</div><div class="line">iptables -I INPUT -s 192.168.0.66 -j ACCEPT  ## 白名单，和-A不同，A是加到尾部，I是加到list的头部，顺序很重要。</div><div class="line"></div><div class="line">iptables -I INPUT -s 123.45.6.7 -j DROP       #屏蔽单个IP的命令</div><div class="line">iptables -I INPUT -s 123.0.0.0/8 -j DROP      #封整个段即从123.0.0.1到123.255.255.254的命令</div><div class="line">iptables -I INPUT -s 124.45.0.0/16 -j DROP    #封IP段即从123.45.0.1到123.45.255.254的命令</div><div class="line"></div><div class="line"></div><div class="line">## 清除已有iptables规则</div><div class="line">iptables -F</div><div class="line">iptables -X</div><div class="line">iptables -Z</div></pre></td></tr></table></figure>
 <h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
 <li><p><img src="http://odzl05jxx.bkt.clouddn.com/fork_you_git.jpg" alt=""></p>
 </li>
@@ -531,10 +537,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Window</a>
               </li>
              
@@ -547,6 +549,10 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
@@ -555,7 +561,23 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -564,22 +586,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -615,7 +621,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
+                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -623,19 +629,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
+                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -647,15 +649,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -664,6 +662,14 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
              
               <li class="article-tag-list-item">

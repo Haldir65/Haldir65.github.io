@@ -13,7 +13,7 @@
 <meta property="og:url" content="https://haldir65.github.io/2017/12/10/2017-12-10-MongoDB-recepies/index.html">
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100794441.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-01-14T14:55:18.615Z">
+<meta property="og:updated_time" content="2018-01-19T14:27:17.417Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MongoDB手册">
 <meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100794441.jpg?imageView2/2/w/600">
@@ -199,12 +199,14 @@ ga('send', 'pageview');
 <p>MongoDB可以作为Spring boot的数据库DAO，也可以和node平台的express module结合。作为后台开发的数据库，应用很广。</p>
 <h2 id="安装-windows平台下"><a href="#安装-windows平台下" class="headerlink" title="安装(windows平台下)"></a>安装(windows平台下)</h2><p>MongoDB默认装到C盘的program files文件夹里面,需要一个data文件夹<br><a href="https://docs.mongodb.com/v3.4/tutorial/install-mongodb-on-windows/">official on installation</a><br>这个文件夹不一定要在c盘，可以放f盘，比如”f://mongndb//data”<br>//这样启动server时记得把–dbpath传一下</p>
 <h2 id="establish-connection"><a href="#establish-connection" class="headerlink" title="establish connection"></a>establish connection</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">// start db server</div><div class="line">&quot;C:\Program Files\MongoDB\Server\3.4\bin\mongod.exe&quot; --dbpath d:\test\mongodb\data</div><div class="line">// open another shell window to connect to server</div><div class="line">&quot;C:\Program Files\MongoDB\Server\3.4\bin\mongo.exe&quot;</div><div class="line">// then you can start interact with mongo db server</div></pre></td></tr></table></figure>
-<h2 id="速查手册"><a href="#速查手册" class="headerlink" title="速查手册"></a>速查手册</h2><p><a href="https://www.tutorialspoint.com/mongodb/mongodb_create_collection.htm">Tutorial, not official</a><br><a href="https://code.tutsplus.com/articles/an-introduction-to-mongoose-for-mongodb-and-nodejs--cms-29527">Mongoose教程</a></p>
+<h2 id="速查手册"><a href="#速查手册" class="headerlink" title="速查手册"></a>速查手册</h2><p><a href="https://www.tutorialspoint.com/mongodb/mongodb_create_collection.htm">Tutorial, not official</a><br><a href="https://code.tutsplus.com/articles/an-introduction-to-mongoose-for-mongodb-and-nodejs--cms-29527">Mongoose教程</a><br><a href="https://docs.mongodb.com/manual/reference/method/db.collection.findOneAndDelete/#db.collection.findOneAndDelete">官方手册</a><br><a href="https://scotch.io/tutorials/using-mongoosejs-in-node-js-and-mongodb-applications#what-is-mongoose">Mongoose CURD</a></p>
 <p>语法：</p>
 <blockquote>
-<p>use mydb ## 创建一个名mydb的数据库<br>db.createCollection(“students”) ## 创建一个students的collections(类似于sql的table)<br>show collections  ## 显示当前数据库中的所有collections<br>db.students.insert({name: ‘Json’,age: 22,title:[‘teacher’,’professor’,’versatile’]}) ## 往数据库里添加一条数据<br>db.students.find().pretty() // 显示students的collection中的所有元素，pretty只是好看点</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">use mydb ## 创建一个名mydb的数据库</div><div class="line">db.createCollection("students") ## 创建一个students的collections(类似于sql的table)</div><div class="line">show collections  ## 显示当前数据库中的所有collections</div><div class="line">db.students.insert(&#123;name: 'Json',age: 22,title:['teacher','professor','versatile']&#125;) ## 往数据库里添加一条数据</div><div class="line">db.students.find().pretty() // 显示students的collection中的所有元素，pretty只是好看点</div><div class="line">db.students.updateOne( &#123; "name": "Bob" &#125;, &#123; $set: &#123;"age" : 99&#125;&#125; ); // UPDATE语句 set</div><div class="line">db.students.find( &#123; age : &#123; $gt:24, $lt: 28&#125; &#125; )  // QUERY 语句 greater than and less than</div><div class="line">db.students.deleteOne( &#123; "_id" : ObjectId("5a584a109f157d455472ff11") &#125; ); // DELETE 语句</div><div class="line"></div><div class="line">## batchInsert</div><div class="line">try &#123;</div><div class="line">   db.products.insertMany( [</div><div class="line">      &#123; item: "card", qty: 15 &#125;,</div><div class="line">      &#123; item: "envelope", qty: 20 &#125;,</div><div class="line">      &#123; item: "stamps" , qty: 30 &#125;</div><div class="line">   ] );</div><div class="line">&#125; catch (e) &#123;</div><div class="line">   print (e);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 </blockquote>
 <h2 id="在node环境下可以使用"><a href="#在node环境下可以使用" class="headerlink" title="在node环境下可以使用"></a>在node环境下可以使用</h2><p>Mongoose // a wrapper around the mongo db interface</p>
+<p>schema  definition<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// correct</span></div><div class="line"><span class="keyword">var</span> studentSchema = mongoose.Schema(&#123;</div><div class="line">    _id: <span class="built_in">String</span>,</div><div class="line">    name: <span class="built_in">String</span>,</div><div class="line">    age: <span class="built_in">Number</span></div><div class="line">&#125;);</div><div class="line"></div><div class="line"><span class="comment">// wrong</span></div><div class="line"><span class="keyword">var</span> studentSchema = mongoose.Schema(&#123;</div><div class="line">    name: <span class="built_in">String</span>,</div><div class="line">    age: <span class="built_in">Number</span></div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>===========================================================================<br>// todo validate request data, error handling.</p>
 
       
 
@@ -404,10 +406,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Window</a>
               </li>
              
@@ -420,6 +418,10 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
@@ -428,7 +430,23 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -437,22 +455,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -488,7 +490,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
+                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -496,19 +498,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
+                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -520,15 +518,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -537,6 +531,14 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
              
               <li class="article-tag-list-item">

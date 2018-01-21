@@ -17,7 +17,7 @@
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery04e31f5513d62958957b4caa1d944ae4.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery151110078544.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/unclassified_unclassified--115_07-1920x1440.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-01-06T02:39:31.331Z">
+<meta property="og:updated_time" content="2018-01-21T12:53:20.523Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Vanilla JS Tips">
 <meta name="twitter:description" content="Vanilla JS其实就是原生javascript了。论运行速度，在Vanilla JS面前，所有的js library都要慢很多。">
@@ -214,6 +214,8 @@ ga('send', 'pageview');
 <h2 id="1-一些作为一门语言基本的操作都有"><a href="#1-一些作为一门语言基本的操作都有" class="headerlink" title="1. 一些作为一门语言基本的操作都有"></a>1. 一些作为一门语言基本的操作都有</h2><p><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery151110078544.jpg?imageView2/2/w/600" alt=""></p>
 <h3 id="1-1-比如说module（就是import，export这种，虽然是ES6才补上的）"><a href="#1-1-比如说module（就是import，export这种，虽然是ES6才补上的）" class="headerlink" title="1.1 比如说module（就是import，export这种，虽然是ES6才补上的）"></a>1.1 比如说module（就是import，export这种，虽然是ES6才补上的）</h3><p> <del>js中好像没有像java中那种javaBean的特殊的数据类型的存在。</del>其实也不需要，js并不是一种用class来model real world object的语言。<br>ES6开始可以使用import和export语法，有类似的效果，<a href="https://stackoverflow.com/questions/34741111/exporting-importing-json-object-in-es6">参考</a><br>但node js目前(version 8.x)还不支持es 2015的import export语法，偏偏node对于其他es2015的特性都支持到位了。</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// states.js</span></div><div class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</div><div class="line">  STATES: &#123;</div><div class="line">    <span class="string">'AU'</span> : &#123;...&#125;,</div><div class="line">    <span class="string">'US'</span> : &#123;...&#125;</div><div class="line">  &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="comment">// accept.js</span></div><div class="line"><span class="keyword">import</span> &#123; STATES &#125; <span class="keyword">from</span> <span class="string">'./states'</span>;  <span class="comment">//undefined</span></div><div class="line"><span class="keyword">import</span>  STATES  <span class="keyword">from</span> <span class="string">'./states'</span>;  <span class="comment">// concrete object ,this works</span></div><div class="line"><span class="keyword">import</span> whatever <span class="keyword">from</span> <span class="string">'states'</span>; <span class="comment">// concrete object, this works</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="comment">// 另一种情况</span></div><div class="line"><span class="keyword">var</span> STATES = &#123;&#125;;</div><div class="line">STATES.AU = &#123;...&#125;;</div><div class="line">STATES.US = &#123;...&#125;;</div><div class="line"><span class="keyword">export</span> STATES;</div><div class="line"></div><div class="line"><span class="keyword">import</span> &#123; STATES &#125; <span class="keyword">from</span> <span class="string">'states'</span>;<span class="comment">//如果输出方使用export default，接收方不应加上大括号。此时输出方输出的是匿名Object，接收方随便起什么名字都行。</span></div><div class="line"><span class="comment">// 如果输出方输出有明确定义的function, object，接收方需要添加大括号。</span></div></pre></td></tr></table></figure>
+<p>es6的import和export需要注意<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// A.js</span></div><div class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="function"><span class="keyword">function</span> <span class="title">greet</span>(<span class="params">params</span>) </span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'hello'</span>);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// B.js</span></div><div class="line"><span class="keyword">import</span> firstGreet <span class="keyword">from</span> <span class="string">'.A.js'</span>; <span class="comment">//this works</span></div><div class="line"><span class="keyword">import</span> &#123; firstGreet &#125; <span class="keyword">from</span> <span class="string">'.A.js'</span>; <span class="comment">// undefined !</span></div><div class="line"></div><div class="line"><span class="comment">// A.js</span></div><div class="line"><span class="keyword">const</span> sayHi = <span class="function"><span class="keyword">function</span> <span class="title">hi</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">"hi"</span>);</div><div class="line">&#125;</div><div class="line"><span class="keyword">export</span> &#123; sayHi &#125;</div><div class="line"></div><div class="line"><span class="comment">// B.js</span></div><div class="line"><span class="keyword">import</span> &#123; firstGreet &#125; <span class="keyword">from</span> <span class="string">'.A.js'</span>; <span class="comment">// this works</span></div></pre></td></tr></table></figure></p>
+<p>原因就在于第一种方式是使用匿名export的。</p>
 <h3 id="1-2-基本的操作符，dynanic-type-函数，变量，oop-class（ES6）-for循环-while这些都有"><a href="#1-2-基本的操作符，dynanic-type-函数，变量，oop-class（ES6）-for循环-while这些都有" class="headerlink" title="1.2 基本的操作符，dynanic type,函数，变量，oop,class（ES6）,for循环,while这些都有"></a>1.2 基本的操作符，dynanic type,函数，变量，oop,class（ES6）,for循环,while这些都有</h3><ul>
 <li><p>js里面判断两个变量相等的方式，建议一律使用三个等号（严格相等）</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="number">3</span>;</div><div class="line"><span class="keyword">var</span> b = <span class="string">"3"</span>;</div><div class="line">a==b 返回 <span class="literal">true</span></div><div class="line">a===b 返回 <span class="literal">false</span></div><div class="line"></div><div class="line"><span class="comment">// 因为a,b的类型不一样</span></div><div class="line"><span class="comment">// ==只比较了值</span></div><div class="line"><span class="comment">// ===只有在值和类型完全相同的时候才为true，用来进行严格的比较判断</span></div><div class="line"><span class="comment">// !=（只检查值）和!==（检查值和类型）也差不多的意思。</span></div><div class="line">= 赋值运算符</div><div class="line">== 等于</div><div class="line">=== 严格等于</div><div class="line">&amp;&amp;和||也有，!=也有</div><div class="line"></div><div class="line">- <span class="literal">true</span>和<span class="literal">false</span>也有</div><div class="line"><span class="comment">// truthy的概念是js里面特有的</span></div><div class="line"><span class="comment">// 在console里面输入：</span></div><div class="line">Boolan(<span class="number">5</span>)  &gt; 输出<span class="literal">true</span></div><div class="line"><span class="built_in">Boolean</span>(<span class="number">-5</span>) &gt;输出<span class="literal">false</span></div><div class="line"><span class="built_in">Boolean</span>(<span class="number">7</span>&gt;<span class="number">5</span>) &gt; 输出<span class="literal">true</span></div><div class="line"><span class="built_in">Boolean</span>(<span class="string">'someword'</span>) &gt; <span class="literal">true</span></div><div class="line"><span class="built_in">Boolean</span>(<span class="string">''</span>) &gt; <span class="literal">false</span></div><div class="line"><span class="comment">// 只有Boolan(0)才是false</span></div></pre></td></tr></table></figure>
@@ -246,6 +248,7 @@ ga('send', 'pageview');
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> getJSON = <span class="function"><span class="keyword">function</span>(<span class="params">url</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> promise = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>)</span>&#123;</div><div class="line">    <span class="keyword">var</span> client = <span class="keyword">new</span> XMLHttpRequest();</div><div class="line">    client.open(<span class="string">"GET"</span>, url,<span class="literal">true</span>);</div><div class="line">    client.onreadystatechange = handler;</div><div class="line">    client.responseType = <span class="string">"json"</span>;</div><div class="line">    client.setRequestHeader(<span class="string">"Accept"</span>, <span class="string">"application/json"</span>);</div><div class="line">    client.send();</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">function</span> <span class="title">handler</span>(<span class="params"></span>) </span>&#123;</div><div class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.status === <span class="number">200</span>) &#123;</div><div class="line">        resolve(<span class="keyword">this</span>.response);</div><div class="line">      &#125; <span class="keyword">else</span> &#123;</div><div class="line">        reject(<span class="keyword">new</span> <span class="built_in">Error</span>(<span class="keyword">this</span>.statusText));</div><div class="line">      &#125;</div><div class="line">    &#125;;</div><div class="line">  &#125;);</div><div class="line"></div><div class="line">  <span class="keyword">return</span> promise;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">getJSON(<span class="string">"/posts.json"</span>).then(<span class="function"><span class="keyword">function</span>(<span class="params">json</span>) </span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(<span class="string">'Contents: '</span> + json);</div><div class="line">&#125;, <span class="function"><span class="keyword">function</span>(<span class="params">error</span>) </span>&#123;</div><div class="line">  <span class="built_in">console</span>.error(<span class="string">'出错了'</span>, error);</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
 <p>表单的操作<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>Normal get form<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">method</span>=<span class="string">"GET"</span> <span class="attr">action</span>=<span class="string">"process.php"</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">'name'</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"Submit"</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>Ajax get form<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">id</span>=<span class="string">'getForm'</span> &gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">'name'</span> <span class="attr">id</span>=<span class="string">'name1'</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"Submit"</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>Normal post form<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">method</span>=<span class="string">"POST"</span> <span class="attr">action</span>=<span class="string">"process.php"</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">'name'</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"Submit"</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>Ajax post form<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">id</span>=<span class="string">'postForm'</span> <span class="attr">name</span>=<span class="string">'name'</span> <span class="attr">id</span>=<span class="string">'name2'</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">'name'</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"Submit"</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></div></pre></td></tr></table></figure></p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">document</span>.getElementById(<span class="string">'getForm'</span>).addEventListener(<span class="string">'submit'</span>,</div><div class="line">getName);</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">getName</span>(<span class="params">e</span>)</span>&#123;</div><div class="line">  e.preventDefault();</div><div class="line">  <span class="keyword">var</span> name = <span class="built_in">document</span>.getElementById(<span class="string">'name1'</span>).value;<span class="comment">//用户输入的内容</span></div><div class="line">  <span class="keyword">var</span> xhr = <span class="keyword">new</span> XMLHttpRequest();</div><div class="line">  xhr.open(<span class="string">'GET'</span>,<span class="string">'process.php?name='</span>+name,<span class="literal">true</span>);</div><div class="line">  xhr.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="keyword">this</span>.responseText);</div><div class="line">  &#125;</div><div class="line">  xhr.send();</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">document</span>.getElementById(<span class="string">'postForm'</span>).addEventListener(<span class="string">'submit'</span>,</div><div class="line">postName);</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">postName</span>(<span class="params">e</span>)</span>&#123;</div><div class="line">  e.preventDefault();</div><div class="line">  <span class="keyword">var</span> name = <span class="built_in">document</span>.getElementById(<span class="string">'name2'</span>).value;<span class="comment">//用户输入的内容</span></div><div class="line">  <span class="keyword">var</span> params =<span class="string">"name="</span>+name;</div><div class="line">  <span class="keyword">var</span> xhr = <span class="keyword">new</span> XMLHttpRequest();</div><div class="line">  xhr.open(<span class="string">'POST'</span>,<span class="string">'process.php'</span>,<span class="literal">true</span>);</div><div class="line">  xhr.setRequestHeader(<span class="string">'Content-type'</span>,<span class="string">'application/x-www-form-urlencoded'</span>)</div><div class="line">  xhr.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="keyword">this</span>.responseText);</div><div class="line">  &#125;</div><div class="line">  xhr.send();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>JavaScript random方法得到随机整数<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">document</span>.write(<span class="built_in">Math</span>.ceil(<span class="built_in">Math</span>.random()*<span class="number">3</span>))  <span class="comment">//得到1-3的整数</span></div><div class="line"></div><div class="line"><span class="built_in">document</span>.write(<span class="built_in">Math</span>.floor(<span class="built_in">Math</span>.random()*<span class="number">4</span>)); <span class="comment">//得到0-3的整数</span></div><div class="line"></div><div class="line"><span class="built_in">Math</span>.round() <span class="comment">//当小数是0.5或者大于0.5的时候向上一位</span></div><div class="line"><span class="built_in">Math</span>.ceil() <span class="comment">//始终向上一位</span></div><div class="line"><span class="built_in">Math</span>.floor() <span class="comment">// 始终向下舍入</span></div></pre></td></tr></table></figure></p>
 <h2 id="2-操作HTML-DOM的一些方法"><a href="#2-操作HTML-DOM的一些方法" class="headerlink" title="2. 操作HTML-DOM的一些方法"></a>2. 操作HTML-DOM的一些方法</h2><p>通过 id 找到 HTML 元素 window.document.getElementById()<br>通过标签名找到 HTML 元素 window.document.getElementsByTagName()//比如说’h2’这种<br>通过类名找到 HTML 元素 window.document.getElementsByClassName()<br>注意方法名称，带s的返回的是一个数组，不带s返回一个object<br>找form 标签的话，还有一种方法:<br>先手写一段html<br><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">&lt;html lang="en"&gt;</div><div class="line">&lt;head&gt;</div><div class="line">  &lt;meta charset="utf-8"/&gt;</div><div class="line">  &lt;title&gt;有时候手写html不是坏事&lt;/title&gt;</div><div class="line">  &lt;link href="style.css" type="text/css" rel="stylesheet"&gt;&lt;/link&gt;</div><div class="line">&lt;/head&gt;</div><div class="line">&lt;body&gt;</div><div class="line">  &lt;div&gt;</div><div class="line">    &lt;form id='my-form' name='myForm' action="#"&gt;</div><div class="line">      &lt;label for="name"&gt;Name: &lt;/label&gt;</div><div class="line">      &lt;input type="text" name="name"&gt;&lt;br/&gt;</div><div class="line">      &lt;label&gt;Hobbies: &lt;/label&lt;br/&gt;</div><div class="line">      &lt;input type="checkbox" name="biking" value="biking"&gt;Biking&lt;/br&gt;</div><div class="line">      &lt;input type="checkbox" name="sking" value="sking"&gt;Sking&lt;/br&gt;</div><div class="line">      &lt;input type="checkbox" name="diving" value="diving"&gt;Diving&lt;/br&gt;</div><div class="line">      &lt;label for="colour"&gt;Fav colour: &lt;/label&gt;</div><div class="line">      &lt;select name="colour"&gt;</div><div class="line">        &lt;option&gt;Red&lt;/option&gt;</div><div class="line">        &lt;option&gt;Blue&lt;/option&gt;</div><div class="line">        &lt;option&gt;Green&lt;/option&gt;</div><div class="line">      &lt;/select&gt;</div><div class="line">      &lt;input type="submit" name="submit" value='Submit'&gt;</div><div class="line">    &lt;/form&gt;</div><div class="line">  &lt;/div&gt;</div><div class="line">  &lt;script src="test.js"&gt;&lt;/script&gt;</div><div class="line">&lt;/body&gt;</div><div class="line">&lt;/html&gt;</div></pre></td></tr></table></figure></p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> myForm = <span class="built_in">document</span>.forms.myForm<span class="comment">//myForm是这个Form标签的name属性,form是跟input配合使用的</span></div><div class="line">myForm.name  &gt; 那个input标</div><div class="line">myForm.name.value  &gt; 那个input标签，其实也就是那个输入框里面的文字</div><div class="line">myForm.colour.vaule &gt; 显示当前选中的select值</div></pre></td></tr></table></figure>
 <p>还是上面那个表单<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> myForm = <span class="built_in">document</span>.forms.myForm</div><div class="line"><span class="keyword">var</span> message = <span class="built_in">document</span>.getElementById(<span class="string">'message'</span>)</div><div class="line"></div><div class="line">myForm.onsubmit = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;<span class="comment">//就是上面那个submit被点击时触发</span></div><div class="line">  <span class="keyword">if</span>(myForm.name.value === <span class="string">''</span>)&#123;</div><div class="line">    message.innerHtml = <span class="string">'please enter an not empty name'</span></div><div class="line">    <span class="keyword">return</span> <span class="literal">false</span> <span class="comment">//summit事件被终止</span></div><div class="line">  &#125;<span class="keyword">else</span> &#123;</div><div class="line">    message.innerHtml = <span class="string">''</span></div><div class="line">    <span class="keyword">return</span> <span class="literal">true</span></div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
@@ -328,6 +331,7 @@ ga('send', 'pageview');
 <blockquote>
 <p><a href="http://api.douban.com/v2/movie/top250?callback=anything这个query,这个anything是我们自己网页里面script里面定义的方法，豆瓣会返回一个">http://api.douban.com/v2/movie/top250?callback=anything这个query,这个anything是我们自己网页里面script里面定义的方法，豆瓣会返回一个</a>: anything({json})的数据回来，直接调用anything方法<br>json【JavaScript Object Notation】<br><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS">MDN上的corz</a></p>
 </blockquote>
+<p>将网页设置为允许 XMLHttpRequest 跨域访问<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">"Access-Control-Allow-Origin"</span> <span class="attr">content</span>=<span class="string">"*"</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">"Access-Control-Allow-Origin"</span> <span class="attr">content</span>=<span class="string">"http://www.1688hot.com:80"</span>&gt;</span></div></pre></td></tr></table></figure></p>
 <p><a href="http://schock.net/articles/2013/02/05/how-jsonp-really-works-examples/">jsonp的解释</a></p>
 <p>亲测，Flask里面给response添加Header:</p>
 <blockquote>
@@ -335,6 +339,7 @@ ga('send', 'pageview');
 </blockquote>
 <p>在8080端口的web页面发起请求就能成功</p>
 <p>异常捕获(try catch也有)</p>
+<p>javaScript操作cookie:</p>
 <h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="https://tonghuashuo.github.io/blog/jsonp.html">5 分钟彻底明白 JSONP</a></p>
 
       
@@ -349,11 +354,11 @@ ga('send', 'pageview');
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">前端</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">javaScript</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">javaScript</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">前端</a>
         		</li>
       		
 		</ul>
@@ -550,10 +555,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Window</a>
               </li>
              
@@ -566,6 +567,10 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
@@ -574,7 +579,23 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -583,22 +604,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -634,7 +639,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
+                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -642,19 +647,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
+                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -666,15 +667,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -683,6 +680,14 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
              
               <li class="article-tag-list-item">

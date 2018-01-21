@@ -13,7 +13,7 @@
 <meta property="og:url" content="https://haldir65.github.io/2017/12/10/2017-12-10-Restful-API-Prescription-with-node-express/index.html">
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/sceneryc7fd99f667c9d98a583a174872d58d13.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-01-14T14:41:36.990Z">
+<meta property="og:updated_time" content="2018-01-21T08:42:31.809Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用Node和express开发Restful API">
 <meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/sceneryc7fd99f667c9d98a583a174872d58d13.jpg?imageView2/2/w/600">
@@ -199,6 +199,7 @@ ga('send', 'pageview');
 <h2 id="1-安装"><a href="#1-安装" class="headerlink" title="1. 安装"></a>1. 安装</h2><blockquote>
 <p>yarn add express</p>
 </blockquote>
+<p>mongoose安装</p>
 <h2 id="2-配置"><a href="#2-配置" class="headerlink" title="2. 配置"></a>2. 配置</h2><p>MiddleWare(中间件)的概念：<br>从Request到response之间的流程中，任何组件都可以对这个过程中的数据进行修改，所以router其实也是中间件。中间件需要注意的就是<strong><em>顺序很重要</em></strong>。</p>
 <p>调试使用postMan</p>
 <h3 id="Request"><a href="#Request" class="headerlink" title="Request"></a>Request</h3><p>get请求的参数怎么拿<br>get的参数本身都是写在url里面的</p>
@@ -209,8 +210,9 @@ ga('send', 'pageview');
 <p>然后在当前目录新建一个public文件夹，添加img文件夹，里面放一张porn.jpg。<br>浏览器访问： localhost:port/img/porn.jpg 。 就能看到放进去的的那张图片了。</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">app.use(<span class="string">'/jquery'</span>, express.static(__dirname + <span class="string">'/node_modules/jquery/dist/'</span>));</div></pre></td></tr></table></figure>
 <p>这意思就是请求/jquery这个目录下的资源就等于访问/node_modules/jquery/dist/目录下同名的资源</p>
-<h2 id="4-response"><a href="#4-response" class="headerlink" title="4. response"></a>4. response</h2><p>response.redirect(‘’/all’); //在浏览器里面看，response的header是这样的<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">HTTP/1.1 302 Found</div><div class="line">X-Powered-By: Express</div><div class="line">Location: /all</div><div class="line">Vary: Accept</div><div class="line">Content-Type: text/html; charset=utf-8</div><div class="line">Content-Length: 68</div><div class="line">Date: Sun, 14 Jan 2018 10:08:50 GMT</div><div class="line">Connection: keep-alive</div></pre></td></tr></table></figure></p>
+<h2 id="4-response"><a href="#4-response" class="headerlink" title="4. response"></a>4. response</h2><p>response.redirect(‘/all’); //在浏览器里面看，response的header是这样的<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">HTTP/1.1 302 Found</div><div class="line">X-Powered-By: Express</div><div class="line">Location: /all</div><div class="line">Vary: Accept</div><div class="line">Content-Type: text/html; charset=utf-8</div><div class="line">Content-Length: 68</div><div class="line">Date: Sun, 14 Jan 2018 10:08:50 GMT</div><div class="line">Connection: keep-alive</div></pre></td></tr></table></figure></p>
 <p>response.direction();<br>和window.location.href差不多</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/*</div><div class="line">GET</div><div class="line">/api/user */</span> much extra information you can set on its header</div><div class="line">app.get(<span class="string">"/user"</span>,<span class="function"><span class="keyword">function</span> (<span class="params">req,res</span>) </span>&#123;</div><div class="line">    res.set(&#123;</div><div class="line">        <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>,</div><div class="line">        <span class="string">'Content-Length'</span>: <span class="string">'123'</span>,</div><div class="line">        <span class="string">'ETag'</span>: <span class="string">'12345'</span>,</div><div class="line">        <span class="string">'Cache-Control'</span>: <span class="string">'max-age=5'</span>,</div><div class="line">        <span class="string">"Access-Control-Allow-Origin"</span>: <span class="string">'http://127.0.0.1:8080'</span></div><div class="line">    &#125;);</div><div class="line">    res.cookie(<span class="string">'name'</span>, <span class="string">'tobi'</span>, &#123; domain: <span class="string">'.example.com'</span>, path: <span class="string">'/admin'</span>, secure: <span class="literal">true</span> &#125;);</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'response send'</span>);</div><div class="line">    res.json(&#123;</div><div class="line">        <span class="string">"name"</span>:<span class="string">"John"</span>,</div><div class="line">        <span class="string">"age"</span>:<span class="number">10</span></div><div class="line">    &#125;);</div><div class="line">&#125;);</div><div class="line">app.get(<span class="string">"/user"</span>,<span class="function"><span class="keyword">function</span> (<span class="params">req,res,next</span>) </span>&#123;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p><a href="http://www.restran.net/2015/08/19/nginx-frontend-helper/">Nginx 是前端工程师的好帮手</a></p>
 <p><a href="http://expressjs.jser.us/api#req.param">Express Api book</a></p>
 <p><a href="http://imweb.io/topic/570130a306f2400432c1396c">在NodeJs中玩转protoBuffer</a></p>
@@ -425,10 +427,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Window</a>
               </li>
              
@@ -441,6 +439,10 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
@@ -449,7 +451,23 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -458,22 +476,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -509,7 +511,7 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
+                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -517,19 +519,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
+                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -541,15 +539,11 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -558,6 +552,14 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
              
               <li class="article-tag-list-item">
