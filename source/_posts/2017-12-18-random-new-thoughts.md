@@ -44,4 +44,4 @@ top : 1
 - 用express转接一个知乎Api，添加Access-control-allow-origin,或许还可以用redis缓存数据结果（一个就好）由此想到一篇文章"How to use Pythonto build a restful Web Service".只不过用的是Tornado
 - git hook (github travis持续集成，git push会触发服务器的一系列操作)
 - 基于前后端分离的理念，后台只负责提供数据，render page的任务应该交给前端。（所以用express-handlebars写页面的方式写着很累）
-- 集成travis-ci，记得after-success script的结果并不会影响build的结果（即，after-success执行脚本发生了错误，在日志里有输出error，但实际显示的build result仍为success），还有travis的输出log需要默认是折叠的，要展开才能看清楚，但一定是有的。
+- 集成travis-ci，记得after-success script的结果并不会影响build的结果（即，after-success执行脚本发生了错误，在日志里有输出error，但实际显示的build result仍为success），还有travis的输出log需要默认是折叠的，要展开才能看清楚，但在afterSuccess里面的指令的输出一定是有的。
