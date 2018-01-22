@@ -10,7 +10,7 @@ ls -al ./public
 
 cd ./public
 
-mv -f * ~/Haldir65/Haldir65.github.io
+mv  * -f  ~/Haldir65/Haldir65.github.io
 
 ls -al ~/Haldir65/Haldir65.github.io
 
