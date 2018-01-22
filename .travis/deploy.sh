@@ -8,7 +8,9 @@ git clone --depth=50 --branch=master git@github.com:Haldir65/Haldir65.github.io.
 
 ls -al ./public
 
-mv  ./public/ ~/Haldir65/Haldir65.github.io
+cd ./public
+
+mv -f * ~/Haldir65/Haldir65.github.io
 
 ls -al ~/Haldir65/Haldir65.github.io
 
