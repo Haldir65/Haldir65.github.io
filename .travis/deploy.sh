@@ -4,7 +4,7 @@ export TZ='Asia/Shanghai'
 
 echo "begin of clone static repo"
 # 先 clone 再 commit，避免直接 force commit
-git clone --depth=50 --branch=master https://github.com/Haldir65/Haldir65.github.io.git ~/Haldir65/Haldir65.github.io
+git clone --depth=50 --branch=master git@github.com:Haldir65/Haldir65.github.io.git ~/Haldir65/Haldir65.github.io
 
 ls -al ./public
 
