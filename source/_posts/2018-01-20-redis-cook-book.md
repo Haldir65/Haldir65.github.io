@@ -8,3 +8,5 @@ tags:
 <!--more-->
 
 [The Redis project does not officially support Windows. However, the Microsoft Open Tech group develops and maintains this Windows port targeting Win64. ](https://github.com/MicrosoftArchive/redis)
+
+ ## general rules
