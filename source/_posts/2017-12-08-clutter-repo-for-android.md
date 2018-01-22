@@ -351,3 +351,4 @@ App内部全局拥有一个LocalBroadCastManager实例，内部持有一个handl
 [一个具有网络传输的FileExplorer](https://github.com/1hakr/AnExplorer)
 [MultiDex原理](http://mouxuejie.com/blog/2016-06-11/multidex-source-analysis/)
 [偏向native层面的内存占用分析](http://wetest.qq.com/lab/view/359.html)
+[Android进程框架：进程的启动创建、启动与调度流程](https://juejin.im/post/5a646211f265da3e3f4cc997)
