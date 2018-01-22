@@ -4,12 +4,13 @@ export TZ='Asia/Shanghai'
 
 echo "begin of clone static repo"
 # 先 clone 再 commit，避免直接 force commit
-git clone -b master git@github.com:Haldir65/Haldir65.github.io.git .deploy_git
+git clone --depth=50 --branch=source https://github.com/Haldir65/Haldir65.github.io.git ~/Haldir65/Haldir65.github.io
 
-cd .deploy_git
-git checkout master
-mv .git/ ../public/
-cd ../public
+ls -al ./public
+
+mv -r ./public/ ~/Haldir65/Haldir65.github.io
+
+cd ~/Haldir65/Haldir65.github.io
 
 git add .
 git commit -m "Site auto updated: `date +"%Y-%m-%d %H:%M:%S"`"
