@@ -247,3 +247,4 @@ WARN  No layout: tags/service/index.html
 - [Hexo博文置顶技巧](http://yanhuili.github.io/2016/11/21/hexo%E5%8D%9A%E6%96%87%E7%BD%AE%E9%A1%B6%E6%8A%80%E5%B7%A7/)
 - [SublimeText快捷键](http://www.daqianduan.com/4820.html)
 - [MarkDown语法学起来很快的](http://itmyhome.com/markdown/article/syntax/emphasis.html)
+- [travis自动部署](https://blessing.studio/deploy-hexo-blog-automatically-with-travis-ci/)
