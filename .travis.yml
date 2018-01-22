@@ -26,7 +26,6 @@ script:
 after_success:
 # - .travis/deploy.sh
 - echo "begin of clone static repo"
-- hexo d
 # 先 clone 再 commit，避免直接 force commit
 - git clone -b master git@github.com:Haldir65/Haldir65.github.io.git .deploy_git
 - cd .deploy_git
@@ -34,11 +33,13 @@ after_success:
 - mv .git/ ../public/
 - cd ../public
 - git add .
-- set -ev
-- export TZ='Asia/Shanghai'
+# - set -ev
+# - export TZ='Asia/Shanghai'
 # - git commit -m \" Site auto updated: `date +"%Y-%m-%d %H:%M:%S"` \"
 - git commit -m "site updated"
+- hexo d
 - echo "end of commit"
+- git status -v
 - git push origin master
 - echo "end of push"
 - .travis/deploy.sh
