@@ -158,7 +158,7 @@ dex
 
 这个是hexoDecimal，十六进制2个数字（字母）代表一个byte(2*8bits = 2 bytes)，按照二进制0101的方式来看的话就是： 6465（0110 0100 0110 0101） 780A(0111 1000 0000 1010)。
 
-Q: borken.apk + patch_signed_7zip = fixed apk的过程
+Q: broken.apk + patch_signed_7zip = fixed apk的过程
 A: 在UpgradePatch.tryPath -> DexDiffPatchInternal.tryRecoverDexFiles -> dexOptimizeDexFiles -> TinkerDexOptimizer.optimizeAll ->OptimizeWorker.run -> DexFile.loadDex(DexFile是dalvik.system包下的)。
 
 =======================================================================

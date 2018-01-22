@@ -213,6 +213,21 @@ location /static/ {
 ```
 [location里面写root还是alias](https://stackoverflow.com/questions/10631933/nginx-static-file-serving-confusion-with-root-alias)
 
+[那alias标签和root标签到底有哪些区别呢？](http://blog.51cto.com/nolinux/1317109)
+1、alias后跟的指定目录是准确的,并且末尾必须加“/”，否则找不到文件
+
+location /c/ {
+      alias /a/
+}
+如果访问站点http://location/c访问的就是/a/目录下的站点信息。
+2、root后跟的指定目录是上级目录，并且该上级目录下要含有和location后指定名称的同名目录才行，末尾“/”加不加无所谓。
+
+location /c/ {
+      root /a/
+}
+如果访问站点http://location/c访问的就是/a/c目录下的站点信息。
+3、一般情况下，在location /中配置root，在location /other中配置alias是一个好习惯。
+
 在windows平台下这么写
 ```
 location / {
@@ -290,11 +305,13 @@ server {
 }
 ```
 
+### 5.1 pratical take aways
+[nginx配置location总结及rewrite规则写法](http://seanlook.com/2015/05/17/nginx-location-rewrite/)
+
 ### Nginx模块
 http_image_filter_module（图片裁剪模块）
 首先查看是否已安装http_image_filter_module模块
 > nginx -V
-
 /etc/nginx/nginx.conf文件添加
 ```config
 location /image {
@@ -350,7 +367,7 @@ awk '{print $1}' nginx.access.log |sort |uniq -c|sort -n
 ```
 防御DDOS是一个系统工程，这里只是一小点。
 
-### 问题速查
+### 6. 问题速查
 - nginx.service - A high performance web server and a reverse proxy server
    Loaded: loaded (/lib/systemd/system/nginx.service; enabled; vendor preset: enabled)
    Active: failed (Result: exit-code) since Fri 2017-12-29 20:12:50 EST; 3min 21s ago
