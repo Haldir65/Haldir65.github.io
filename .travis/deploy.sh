@@ -8,7 +8,7 @@ git clone --depth=50 --branch=source https://github.com/Haldir65/Haldir65.github
 
 ls -al ./public
 
-mv -r ./public/ ~/Haldir65/Haldir65.github.io
+mv  ./public/ ~/Haldir65/Haldir65.github.io
 
 cd ~/Haldir65/Haldir65.github.io
 
