@@ -237,6 +237,12 @@ MarkDown页面内部跳转
 <br>
 ***编辑md文件的同时，保存就会同步刷新网页预览，非常好用***
 
+## 11. 如果运行hexo g生成的index.html是空的
+输出
+>
+WARN  No layout: tags/service/index.html
+原因是themes/文件夹下没有clone对应的主题
+
 ### 参考
 - [Hexo博文置顶技巧](http://yanhuili.github.io/2016/11/21/hexo%E5%8D%9A%E6%96%87%E7%BD%AE%E9%A1%B6%E6%8A%80%E5%B7%A7/)
 - [SublimeText快捷键](http://www.daqianduan.com/4820.html)
