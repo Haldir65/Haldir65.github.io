@@ -1,36 +1,38 @@
 ---
 title: VPS维护的日常
+date: 2017-12-11 16:20:16
 tags: [tools,linux]
 ---
 
-
-
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100756208.jpg?imageView2/2/w/600)
+
 <!--more-->
 
-以下在ubuntu 16.04.3 LTS上通过
+以下在 ubuntu 16.04.3 LTS 上通过
 
 ## 1. 小硬盘清理垃圾
 
 > sudo apt-get autoclean 清理旧版本的软件缓存
-sudo apt-get clean 清理所有软件缓存
-sudo apt-get autoremove 删除系统不再使用的孤立软件
-
+> sudo apt-get clean 清理所有软件缓存
+> sudo apt-get autoremove 删除系统不再使用的孤立软件
 
 ## 2.必要软件
- 刚装好的ubuntu需要执行以下步骤,都是些常用的软件
->   安装git > apt-get install git
-  安装python > apt-get install python-2.7
-  安装python-setuptools > apt-get install python-setuptools
-  检查是否安装好： python --version
 
-  还有一些，比如htop
+刚装好的 ubuntu 需要执行以下步骤,都是些常用的软件
 
+> 安装 git > apt-get install git
+> 安装 python > apt-get install python-2.7
+> 安装 python-setuptools > apt-get install python-setuptools
+> 检查是否安装好： python --version
 
-### 2.1 装ss
->下载shadowsocks源码编译
-git clone https://github.com/shadowsocks/shadowsocks
- # 记得切换到master分支
+还有一些，比如 htop
+
+### 2.1 装 ss
+
+> 下载 shadowsocks 源码编译
+> git clone https://github.com/shadowsocks/shadowsocks
+
+# 记得切换到 master 分支
 
 ```python
 python setup.py build
@@ -38,29 +40,34 @@ python setup.py install
 ```
 
 检查下版本
+
 > ssserver --version
 
 编辑配置文件
->vim config.json
+
+> vim config.json
 
 ```json
 {
- "server":"my_server_ip",
- "server_port":8388,
- "local_address": "127.0.0.1",
- "local_port":1080,
- "password":"mypassword",
- "timeout":300,
- "method":"aes-256-cfb",
- "fast_open": false
+  "server": "my_server_ip",
+  "server_port": 8388,
+  "local_address": "127.0.0.1",
+  "local_port": 1080,
+  "password": "mypassword",
+  "timeout": 300,
+  "method": "aes-256-cfb",
+  "fast_open": false
 }
 ```
+
 > ssserver -c config.json -d start #启动完成
 
 检查下是否启动了
+
 > ps -ef |grep sss
 
 ss 命令
+
 ```shell
 ssserver -c /etc/shadowsocks/config.json # 前台运行
 
@@ -73,14 +80,15 @@ ssserver -c /etc/shadowsocks.json -d stop
 sudo ssserver -c /etc/shadowsocks.json --user username -d start - 不要总是用root用户做事，adduser来做，给sudo权限即可
 ```
 
+### 2.2 SSR 以及一些衍生的软件
 
-### 2.2 SSR以及一些衍生的软件
 [ShadowsocksR](https://github.com/breakwa11/shadowsocks-rss/wiki)启动后台运行命令
+
 > python server.py -p 443 -k password -m aes-256-cfb -O auth_sha1_v4 -o http_simple -d start
 
 [net-speeder](https://zhgcao.github.io/2016/05/26/ubuntu-install-net-speeder/)
 
-> venetX，OpenVZ架构
+> venetX，OpenVZ 架构
 
 ```shell
 cd net-speeder-master/
@@ -102,12 +110,14 @@ sh build.sh
 ./net_speeder venet0 "ip"
 ```
 
-### 2.3 升级内核开启BBR
-[KVM架构升级内核开启BBR](https://qiujunya.com/linodebbr.html)
+### 2.3 升级内核开启 BBR
 
-[ubuntu 16.4安装shadowsocks-libev](http://www.itfanr.cc/2016/10/02/use-shadowsocks-to-have-better-internet-experience/)
+[KVM 架构升级内核开启 BBR](https://qiujunya.com/linodebbr.html)
 
-参考github[官方教程](https://github.com/shadowsocks/shadowsocks-libev)安装
+[ubuntu 16.4 安装 shadowsocks-libev](http://www.itfanr.cc/2016/10/02/use-shadowsocks-to-have-better-internet-experience/)
+
+参考 github[官方教程](https://github.com/shadowsocks/shadowsocks-libev)安装
+
 ```shell
 sudo apt-get install software-properties-common -y
 sudo add-apt-repository ppa:max-c-lv/shadowsocks-libev -y
@@ -127,20 +137,19 @@ sudo systemctl start shadowsocks-libev      # for systemd
 ##加入开机启动
 ##在/etc/rc.local中加入
 sudo /etc/init.d/shadowsocks-libev start
-
 ```
-其实跟安装ss很像的
 
+其实跟安装 ss 很像的
 
 ## 3. 一些常用的命令
-> 写alias算了
 
-
-
+> 写 alias 算了
 
 ## 10.跑分
-[VPS跑分软件](https://github.com/Teddysun/across)
-git clone下来
+
+[VPS 跑分软件](https://github.com/Teddysun/across)
+git clone 下来
+
 ```shell
 cd across
 wget -qO- bench.sh | bash ###（亲测可用，也可以自己看Readme）
@@ -149,7 +158,9 @@ curl -Lso- bench.sh | bash
 ```
 
 下面是一些自己试过的
+
 ### BandWagon
+
 ```
 ----------------------------------------------------------------------
 CPU model            : Intel(R) Xeon(R) CPU E3-1275 v5 @ 3.60GHz
@@ -182,9 +193,10 @@ Softlayer, Frankfurt, DE        159.122.69.4            12.2MB/s
 Softlayer, Singapore, SG        119.81.28.170           11.8MB/s
 Softlayer, HongKong, CN         119.81.130.170          13.2MB/s
 ----------------------------------------------------------------------
-
 ```
+
 ### BuyVm
+
 ```
 CPU model            : Intel(R) Xeon(R) CPU           L5639  @ 2.13GHz
 Number of cores      : 1
@@ -255,6 +267,7 @@ Softlayer, HongKong, CN         119.81.130.170          8.84MB/s
 ```
 
 ### DigitalOcean Sinapore (ip adress lokks like Russian)
+
 ```
 ----------------------------------------------------------------------
 CPU model            : Intel(R) Xeon(R) CPU E5-2630L 0 @ 2.00GHz
@@ -291,8 +304,10 @@ Softlayer, HongKong, CN         119.81.130.170          35.2MB/s
 
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600)
 
-### 关于docker
-youtube上有人在Digital Ocean的vps上安装docker，主要作用就是将一个复杂的操作系统打包成一个下载即用的容器。进入容器中，可以像在实际的操作系统中一样运行指令。所以虚拟化的机器随时可以使用其他操作系统。
+### 关于 docker
+
+youtube 上有人在 Digital Ocean 的 vps 上安装 docker，主要作用就是将一个复杂的操作系统打包成一个下载即用的容器。进入容器中，可以像在实际的操作系统中一样运行指令。所以虚拟化的机器随时可以使用其他操作系统。
 
 ### 参考
- [vps优化](https://www.vpser.net/opt/vps-add-swap.html)
+
+[vps 优化](https://www.vpser.net/opt/vps-add-swap.html)
