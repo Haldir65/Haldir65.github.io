@@ -12,6 +12,8 @@ cd ./public
 
 # rm -rf * ~/Haldir65/Haldir65.github.io
 # mv  * -f  ~/Haldir65/Haldir65.github.io
+rm -f ~/Haldir65/Haldir65.github.io/index.html
+
 cp -TRv ./ ~/Haldir65/Haldir65.github.io
 
 ls -al ~/Haldir65/Haldir65.github.io
