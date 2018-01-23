@@ -15,8 +15,7 @@ cd ./public
 
 cp -TRv ./ ~/Haldir65/Haldir65.github.io
 
-touch ~/Haldir65/Haldir65.github.io/index.html
-cat ./public/archives/index.html > ~/Haldir65/Haldir65.github.io/index.html
+cat ./archives/index.html > ~/Haldir65/Haldir65.github.io/index.html
 
 
 ls -al ~/Haldir65/Haldir65.github.io
