@@ -143,6 +143,8 @@ module.exports = function(locals) {
 
 * 同时在文章开头添加 top : 1 即可 ，实际排序按照这个数字从大到小排序
 
+另一种做法是手动将date改大，日期越靠后的越在前面。
+
 ```java
  title: Hexo置顶文章
 date: 2016-11-11 23:26:22
