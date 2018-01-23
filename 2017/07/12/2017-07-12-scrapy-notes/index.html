@@ -17,7 +17,7 @@
 <meta property="og:description" content="Scrappy框架学习首先建议安装virtualenv，在env中进行操作。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/u=3180342558,2746910171&fm=214&gp=0.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-01-23T03:42:00.888Z">
+<meta property="og:updated_time" content="2018-01-23T10:48:37.444Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="2017-07-12-scrapy-notes">
 <meta name="twitter:description" content="Scrappy框架学习首先建议安装virtualenv，在env中进行操作。">
@@ -207,7 +207,7 @@ ga('send', 'pageview');
 <blockquote>
 <p>scrapy startproject tutorial #创建一个project。会生成一个tutorial的文件夹，在tutorial/spiders文件夹中新建一个quotes_spider.py</p>
 </blockquote>
-<p>参考<a href="http://cuiqingcai.com/3952.html/2">Scrapy教程</a><br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scrapy</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">QuotesSpider</span><span class="params">(scrapy.Spider)</span>:</span></span><br><span class="line">    name = <span class="string">"quotes"</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start_requests</span><span class="params">(self)</span>:</span></span><br><span class="line">        urls = [</span><br><span class="line">            <span class="string">'http://quotes.toscrape.com/page/1/'</span>,</span><br><span class="line">            <span class="string">'http://quotes.toscrape.com/page/2/'</span>,</span><br><span class="line">        ]</span><br><span class="line">        <span class="keyword">for</span> url <span class="keyword">in</span> urls:</span><br><span class="line">            <span class="keyword">yield</span> scrapy.Request(url=url, callback=self.parse) </span><br><span class="line">     <span class="comment">#这个callback就是response拉下来之后的解析过程 </span></span><br><span class="line">     <span class="comment">#下面的这个做法只是把response写到一个文件中，通常还可以使用css或者xpath解析获得相应值。</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        page = response.url.split(<span class="string">"/"</span>)[<span class="number">-2</span>]</span><br><span class="line">        filename = <span class="string">'quotes-%s.html'</span> % page</span><br><span class="line">        <span class="keyword">with</span> open(filename, <span class="string">'wb'</span>) <span class="keyword">as</span> f:</span><br><span class="line">            f.write(response.body)</span><br><span class="line">        self.log(<span class="string">'Saved file %s'</span> % filename)</span><br></pre></td></tr></table></figure></p>
+<p>参考<a href="http://cuiqingcai.com/3952.html/2">Scrapy教程</a><br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scrapy</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">QuotesSpider</span><span class="params">(scrapy.Spider)</span>:</span></span><br><span class="line">    name = <span class="string">"quotes"</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start_requests</span><span class="params">(self)</span>:</span></span><br><span class="line">        urls = [</span><br><span class="line">            <span class="string">'http://quotes.toscrape.com/page/1/'</span>,</span><br><span class="line">            <span class="string">'http://quotes.toscrape.com/page/2/'</span>,</span><br><span class="line">        ]</span><br><span class="line">        <span class="keyword">for</span> url <span class="keyword">in</span> urls:</span><br><span class="line">            <span class="keyword">yield</span> scrapy.Request(url=url, callback=self.parse)</span><br><span class="line">     <span class="comment">#这个callback就是response拉下来之后的解析过程</span></span><br><span class="line">     <span class="comment">#下面的这个做法只是把response写到一个文件中，通常还可以使用css或者xpath解析获得相应值。</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        page = response.url.split(<span class="string">"/"</span>)[<span class="number">-2</span>]</span><br><span class="line">        filename = <span class="string">'quotes-%s.html'</span> % page</span><br><span class="line">        <span class="keyword">with</span> open(filename, <span class="string">'wb'</span>) <span class="keyword">as</span> f:</span><br><span class="line">            f.write(response.body)</span><br><span class="line">        self.log(<span class="string">'Saved file %s'</span> % filename)</span><br></pre></td></tr></table></figure></p>
 <blockquote>
 <p>scrapy crawl quotes #开始爬quotes.toscrape.com的内容,需要切换到tutorial文件夹下</p>
 <p>scrapy shell ‘<a href="http://quotes.toscrape.com/page/1/">http://quotes.toscrape.com/page/1/</a>‘ #从Response中提取所需的值  </p>
@@ -218,7 +218,8 @@ ga('send', 'pageview');
 <blockquote>
 <p>formadata = {‘userName’:  ‘Bob’,’pwd’：123456}<br>中间件(MiddleWare)的作用<br>Cookie，UserAgent处理 setting.py中设置需要的参数，Cookie默认是接受的<br>PipeLine是用来持久化的，中间件用于处理Cookie,Ajax等，rules用于筛选需要跟进的url</p>
 </blockquote>
-<h2 id="2-MongoDB存储"><a href="#2-MongoDB存储" class="headerlink" title="2. MongoDB存储"></a>2. MongoDB存储</h2>
+<h2 id="2-MongoDB存储"><a href="#2-MongoDB存储" class="headerlink" title="2. MongoDB存储"></a>2. MongoDB存储</h2><p><a href="http://api.mongodb.com/python/current/tutorial.html">pymongo</a>，就像node环境下有mongoose可以调用mongodb api一样，python环境下也有对于的driver</p>
+
       
 
       
@@ -483,6 +484,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
@@ -492,10 +497,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">

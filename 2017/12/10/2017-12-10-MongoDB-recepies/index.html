@@ -14,7 +14,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100794441.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-01-23T03:42:00.892Z">
+<meta property="og:updated_time" content="2018-01-23T10:48:37.448Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MongoDB手册">
 <meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100794441.jpg?imageView2/2/w/600">
@@ -198,7 +198,7 @@ ga('send', 'pageview');
 <p>MongoDB可以作为Spring boot的数据库DAO，也可以和node平台的express module结合。作为后台开发的数据库，应用很广。</p>
 <h2 id="安装-windows平台下"><a href="#安装-windows平台下" class="headerlink" title="安装(windows平台下)"></a>安装(windows平台下)</h2><p>MongoDB默认装到C盘的program files文件夹里面,需要一个data文件夹<br><a href="https://docs.mongodb.com/v3.4/tutorial/install-mongodb-on-windows/">official on installation</a><br>这个文件夹不一定要在c盘，可以放f盘，比如”f://mongndb//data”<br>//这样启动server时记得把–dbpath传一下</p>
 <h2 id="establish-connection"><a href="#establish-connection" class="headerlink" title="establish connection"></a>establish connection</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// start db server</span><br><span class="line">"C:\Program Files\MongoDB\Server\3.4\bin\mongod.exe" --dbpath d:\test\mongodb\data</span><br><span class="line">// open another shell window to connect to server</span><br><span class="line">"C:\Program Files\MongoDB\Server\3.4\bin\mongo.exe"</span><br><span class="line">// then you can start interact with mongo db server</span><br></pre></td></tr></table></figure>
-<h2 id="速查手册"><a href="#速查手册" class="headerlink" title="速查手册"></a>速查手册</h2><p><a href="https://www.tutorialspoint.com/mongodb/mongodb_create_collection.htm">Tutorial, not official</a><br><a href="https://code.tutsplus.com/articles/an-introduction-to-mongoose-for-mongodb-and-nodejs--cms-29527">Mongoose教程</a><br><a href="https://docs.mongodb.com/manual/reference/method/db.collection.findOneAndDelete/#db.collection.findOneAndDelete">官方手册</a><br><a href="https://scotch.io/tutorials/using-mongoosejs-in-node-js-and-mongodb-applications#what-is-mongoose">Mongoose CURD</a></p>
+<h2 id="速查手册"><a href="#速查手册" class="headerlink" title="速查手册"></a>速查手册</h2><p><a href="https://www.tutorialspoint.com/mongodb/mongodb_create_collection.htm">Tutorial, not official</a><br><a href="https://code.tutsplus.com/articles/an-introduction-to-mongoose-for-mongodb-and-nodejs--cms-29527">Mongoose教程</a><br><a href="https://docs.mongodb.com/manual/reference/method/db.collection.findOneAndDelete/#db.collection.findOneAndDelete">官方手册</a><br><a href="https://scotch.io/tutorials/using-mongoosejs-in-node-js-and-mongodb-applications#what-is-mongoose">Mongoose CURD</a><br><a href="https://docs.mongodb.com/ecosystem/drivers/">支持多种语言环境调用mongodb api</a></p>
 <p>语法：</p>
 <blockquote>
 <figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">use mydb <span class="comment">## 创建一个名mydb的数据库</span></span><br><span class="line">db.createCollection(<span class="string">"students"</span>) <span class="comment">## 创建一个students的collections(类似于sql的table)</span></span><br><span class="line">show collections  <span class="comment">## 显示当前数据库中的所有collections</span></span><br><span class="line">db.students.insert(&#123;<span class="symbol">name:</span> <span class="string">'Json'</span>,<span class="symbol">age:</span> <span class="number">22</span>,<span class="symbol">title:</span>[<span class="string">'teacher'</span>,<span class="string">'professor'</span>,<span class="string">'versatile'</span>]&#125;) <span class="comment">## 往数据库里添加一条数据</span></span><br><span class="line">db.students.find().pretty() /<span class="regexp">/ 显示students的collection中的所有元素，pretty只是好看点</span></span><br><span class="line"><span class="regexp">db.students.updateOne( &#123; "name": "Bob" &#125;, &#123; $set: &#123;"age" : 99&#125;&#125; ); /</span><span class="regexp">/ UPDATE语句 set</span></span><br><span class="line"><span class="regexp">db.students.find( &#123; age : &#123; $gt:24, $lt: 28&#125; &#125; )  /</span><span class="regexp">/ QUERY 语句 greater than and less than</span></span><br><span class="line"><span class="regexp">db.students.deleteOne( &#123; "_id" : ObjectId("5a584a109f157d455472ff11") &#125; ); /</span><span class="regexp">/ DELETE 语句</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">## batchInsert</span></span><br><span class="line"><span class="regexp">try &#123;</span></span><br><span class="line"><span class="regexp">   db.products.insertMany( [</span></span><br><span class="line"><span class="regexp">      &#123; item: "card", qty: 15 &#125;,</span></span><br><span class="line"><span class="regexp">      &#123; item: "envelope", qty: 20 &#125;,</span></span><br><span class="line"><span class="regexp">      &#123; item: "stamps" , qty: 30 &#125;</span></span><br><span class="line"><span class="regexp">   ] );</span></span><br><span class="line"><span class="regexp">&#125; catch (e) &#123;</span></span><br><span class="line"><span class="regexp">   print (e);</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br></pre></td></tr></table></figure>
@@ -460,6 +460,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
@@ -469,10 +473,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
