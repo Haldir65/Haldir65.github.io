@@ -15,6 +15,9 @@ cd ./public
 
 cp -TRv ./ ~/Haldir65/Haldir65.github.io
 
+echo "may be cache issue"
+cat ../themes/yilia/_config.yml
+
 echo "start of archive"
 cat ./archives/index.html
 
