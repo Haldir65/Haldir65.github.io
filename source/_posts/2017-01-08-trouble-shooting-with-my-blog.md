@@ -246,6 +246,17 @@ MarkDown 页面内部跳转
 > WARN No layout: tags/service/index.html
 > 原因是 themes/文件夹下没有 clone 对应的主题
 
+换成travis之后，在travis.yml文件中，添加了
+```config
+cache:
+  yarn: true
+  directories:
+  - node_modules
+  - themes
+```
+cahe也就意味着后续所有对于，themes文件夹中的_config.yml文件的修改都不会生效。这也就是我一遍遍尝试更改themee文件夹中_config文件不生效的原因。
+所以要么去掉cache ，要么自己写bash script一行行的改。
+
 ### 参考
 
 * [Hexo 博文置顶技巧](http://yanhuili.github.io/2016/11/21/hexo%E5%8D%9A%E6%96%87%E7%BD%AE%E9%A1%B6%E6%8A%80%E5%B7%A7/)
