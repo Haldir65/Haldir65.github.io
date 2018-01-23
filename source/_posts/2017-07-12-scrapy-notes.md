@@ -32,8 +32,8 @@ class QuotesSpider(scrapy.Spider):
             'http://quotes.toscrape.com/page/2/',
         ]
         for url in urls:
-            yield scrapy.Request(url=url, callback=self.parse) 
-     #这个callback就是response拉下来之后的解析过程 
+            yield scrapy.Request(url=url, callback=self.parse)
+     #这个callback就是response拉下来之后的解析过程
      #下面的这个做法只是把response写到一个文件中，通常还可以使用css或者xpath解析获得相应值。
 
     def parse(self, response):
@@ -76,3 +76,4 @@ PipeLine是用来持久化的，中间件用于处理Cookie,Ajax等，rules用�
 
 
 ## 2. MongoDB存储
+[pymongo](http://api.mongodb.com/python/current/tutorial.html)，就像node环境下有mongoose可以调用mongodb api一样，python环境下也有对于的driver

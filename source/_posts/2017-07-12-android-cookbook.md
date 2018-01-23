@@ -139,11 +139,11 @@ Android相关
     - [ ] View的源码, View的绘制原理(往displayList那边靠)
     - [ ] ViewGroup源码
     - [X] FrameLayout
-    - [ ] LinearLayout
+    - [X] LinearLayout(主要代码在measureHorizontal,layoutHorizontal)
     - [ ] RelativeLayout
     - [X] PopupWindow(api24以上的深坑网上也有解决方法)
     - [X] Dialog
-    - [ ] ImageView
+    - [X] ImageView(onMeasure主要是尊重drawable的aspect ratio)[setImageResource前后图片大小不一致会有些问题](https://www.jianshu.com/p/bebe0029be57)
     - [ ] TextView(super complicated)
     - [ ] ScrollView(不到2000行)
     - [ ] NestedScrollView

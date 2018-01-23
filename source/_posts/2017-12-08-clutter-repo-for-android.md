@@ -340,7 +340,19 @@ App内部全局拥有一个LocalBroadCastManager实例，内部持有一个handl
  jar : JAR 文件就是 Java Archive File，顾名思意，它的应用是与 Java 息息相关的，是 Java 的一种文档格式。只包含了class文件与清单文件 ，不包含资源文件，如图片等所有res中的文件。
  aar: aar，AAR（Android Archive）包是一个Android库项目的二进制归档文件,包含一些自己写的控件布局文件以及字体等资源文件那么就只能使用*.aar文件。
 
-
+### 21. 都知道RelativeLayout会measure两次child，LinearLayout在加weight的时候也会measure两次
+LinearLayout.java
+measureVertical()
+```java
+// We have no limit, so make all weighted views as tall as the largest child.
+        // Children will have already been measured once.
+        if (useLargestChild && heightMode != MeasureSpec.EXACTLY) {
+            for (int i = 0; i < count; i++) {
+                final View child = getVirtualChildAt(i);
+                  // ......
+            }
+        }
+```
 
 =============================================================================
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600)

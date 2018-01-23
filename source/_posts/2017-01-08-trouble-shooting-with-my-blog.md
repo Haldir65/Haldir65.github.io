@@ -256,7 +256,7 @@ cache:
   - node_modules
   - themes
 ```
-cahe也就意味着后续所有对于，themes文件夹中的_config.yml文件的修改都不会生效。这也就是我一遍遍尝试更改themee文件夹中_config文件不生效的原因。
+cahe也就意味着后续，所有对于themes文件夹中的_config.yml文件的修改都不会生效。这也就是我一遍遍尝试更改themee文件夹中_config文件不生效的原因。
 所以要么去掉cache ，要么自己写bash script一行行的改。
 
 ### 参考
