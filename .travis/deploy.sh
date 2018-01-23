@@ -15,11 +15,16 @@ cd ./public
 
 cp -TRv ./ ~/Haldir65/Haldir65.github.io
 
+echo "start of archive"
+cat ./archives/index.html
+
+
 cat ./archives/index.html > ~/Haldir65/Haldir65.github.io/index.html
 
 
 ls -al ~/Haldir65/Haldir65.github.io
 
+echo "start of parent dir"
 cat ~/Haldir65/Haldir65.github.io/index.html
 
 cd ~/Haldir65/Haldir65.github.io
