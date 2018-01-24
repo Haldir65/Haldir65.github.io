@@ -374,6 +374,12 @@ awk '{print $1}' nginx.access.log |sort |uniq -c|sort -n
 
 启动失败，检查/var/log/nginx/error.log 或者/var/log/syslog。
 windows下应该在nginx/logs/error.log文件里面
+windows平台下查找当前正在跑的nginx进程：
+> tasklist /fi "imagename eq nginx.exe"
+
+
+==============================================================================================================================
+[nginx搭建rtmp推流服务](https://www.jianshu.com/p/fc64102d6162)
 
 
 

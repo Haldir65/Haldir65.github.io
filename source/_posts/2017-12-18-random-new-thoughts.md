@@ -31,6 +31,7 @@ top : 1
 - [写 groovy 用 intelij 就可以了](https://www.jetbrains.com/help/idea/getting-started-with-groovy.html) 》 how to
 - [ ] jQuery 插件
 - [ ] vS Code Vender Prefix plugin => auto prefix loader
+- [ ] websocket nodejs
 
 已完成
 

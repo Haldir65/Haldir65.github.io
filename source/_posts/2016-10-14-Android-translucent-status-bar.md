@@ -117,9 +117,9 @@ java代码里添加一句
 就行了。实际效果就是图片完全展开时可以扩展到statusBar下面，图片收缩起来后可以让Toolbar停在statusBar下面。但同样的代码在4.4的手机上会使得实际绘图区域落到statusBar以下，statusBar位置变成带灰色遮罩的白色背景。
 
 ### 4. fitSystemWindow是什么意思
-fitSystemWindows属性： 
-官方描述: 
-Boolean internal attribute to adjust view layout based on system windows such as the status bar. If true, adjusts the padding of this view to leave space for the system windows. Will only take effect if this view is in a non-embedded activity. 
+fitSystemWindows属性：
+官方描述:
+Boolean internal attribute to adjust view layout based on system windows such as the status bar. If true, adjusts the padding of this view to leave space for the system windows. Will only take effect if this view is in a non-embedded activity.
 简单来说就是如果设置为true,机会根据statusbar来添加一个padding.
 假定:
 布局文件只是一个普通的LinearLayout(fitSystemWindow = false（默认情况）),顶部include一个toolbar(fitSystemWindow = true )
@@ -211,6 +211,34 @@ ContentView, 实质为 ContentFrameLayout, 但是重写了 dispatchFitSystemWind
 ContentParent, 实质为 FitWindowsLinearLayout, 里面第一个 View 是 ViewStubCompat, 如果主题没有设置 title ,它就不会 inflate .第二个 View 就是 ContentView.
 另外，如果使用AppCompat，在api21以上，会自动将状态栏颜色设置为colorPrimaryDark。
 最后感谢网上各位博主不辞辛苦写出来的干货，让我能够比较简单的复制粘贴他们的代码来检验，写博客真的很累。
+
+
+### Updates
+这个是用来显示或者隐藏状态栏位置的文字的，其实也就是youtube上一个google dev的视频中的部分内容了，亲测好用，比如全屏播放视频的时候可以调用一下。
+```java
+// This snippet hides the system bars.
+private void hideSystemUI() {
+    // Set the IMMERSIVE flag.
+    // Set the content to appear under the system bars so that the content
+    // doesn't resize when the system bars hide and show.
+    mDecorView.setSystemUiVisibility(
+            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+            | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+            | View.SYSTEM_UI_FLAG_IMMERSIVE);
+}
+// This snippet shows the system bars. It does this by removing all the flags
+// except for the ones that make the content appear under the system bars.
+private void showSystemUI() {
+    mDecorView.setSystemUiVisibility(
+            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+}
+```
+
 
 ### Reference
 1. [Android-transulcent-status-bar总结](http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2016/0330/4104.html)

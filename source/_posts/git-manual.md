@@ -226,6 +226,7 @@ prune的[解释](https://stackoverflow.com/questions/4040717/git-remote-prune-di
 ### 一些看上去很神奇的操作
 git clone --depth=50 --branch=branchName https://github.com/XXX/XXX.git myFolder/theNameIwantItToBe
 
+git -c core.quotepath=false push --progress --porcelain origin refs/heads/master:master // idea内置git push操作实际执行了这一行指令
 
 git fetch -v
 
