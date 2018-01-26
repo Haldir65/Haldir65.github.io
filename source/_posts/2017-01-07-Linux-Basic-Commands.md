@@ -489,19 +489,28 @@ Usage: tcpdump [-aAbdDefhHIJKlLnNOpqRStuUvxX] [ -B size ] [ -c count ]
 
 tcpdump结合wireshark可实现完整的网络抓包
 
-```
+```shell
 netstat
-netstat -i // 查看某个网络接口发出和接收了多少byte的数据
-netstat -ta //当前active的网络连接
-netstat -tan //以ip地址的方式展示出来
-netstat -tupln //tcp+udp+program name+监听的端口+numerically
-netstat -ie //比较友好的方式展示当前各个端口的流量
+netstat -i ## 查看某个网络接口发出和接收了多少byte的数据
+netstat -ta ##当前active的网络连接  t: tcp a: all u: udp p:process
+netstat -tan ##以ip地址的方式展示出来 n: 禁止域名解析，就是不显示域名，直接显示ip
+netstat -tupln ##tcp+udp+program name+监听的端口+numerically
+netstat -ie ##比较友好的方式展示当前各个端口的流量，就是显示每个网卡发送的流量，接收的流量一共多少MB,这种
+netstat -nlpt ##获取进程名、进程号以及用户 ID
+netstat -s ##可以打印出网络统计数据，包括某个协议下的收发包数量。
+netstat -ct ## c:持续输出
+
+## 使用watch命令监视active状态的连接，实时显示网络流量
+watch -d -n0 "netstat -atnp | grep ESTA"
 ```
 
-```
-ifconfig // 查看机器上的网卡
-en01 //Ethernet
-注意 RX bytes(接收到的数据)和TX bytes(发送出去的数据)后面的数字
+```shell
+ifconfig ## 查看机器上的网卡
+en01 ##Ethernet
+##注意 RX bytes(接收到的数据)和TX bytes(发送出去的数据)后面的数字
+
+
+sudo curl ifconfig.me ## 需要sudo，查看本机的外网地址，有点慢
 ```
 
 ### 10.查看进程
@@ -666,6 +675,15 @@ iptables -F
 iptables -X
 iptables -Z
 ```
+
+
+### 14. 多个tty(TeleTYpewriter)
+[how-to-multitask-in-the-linux-terminal-3-ways-to-use-multiple-shells-at-once](https://www.howtogeek.com/111417/how-to-multitask-in-the-linux-terminal-3-ways-to-use-multiple-shells-at-once/)
+> sudo apt-get install screen
+> screen 。进入一个新的GNU screen // 可以执行耗时指令
+> 按住ctrl +a ，再按d 。退出screen
+> screen -r // 重新进刚才的screen
+
 
 ### 参考
 

@@ -25,3 +25,4 @@ tags:
 
 ## 参考
 [Redis supports 5 types of data types] (https://www.tutorialspoint.com/redis/redis_data_types.htm)
+[Redis 高级特性与性能调优](http://www.ttlsa.com/redis/redis-advanced-features-and-performance-tuning/)

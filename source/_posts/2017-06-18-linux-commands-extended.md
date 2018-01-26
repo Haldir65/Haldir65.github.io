@@ -177,6 +177,8 @@ tar -jcvf log.tar.bz2 log2012.log 打包后，以 bzip2 压缩
 在一个文件夹里面的所有文件中递归查找含有特定字符串的文件
 - grep -r "sometext" *
 
+[Linux 中 grep 命令的 12 个实践例子](http://blog.jobbole.com/112580/)
+
 find
 根据文件名查找文件
 ```
@@ -393,6 +395,12 @@ youtube-dl的安装途径就是下一个软件下来，然后chmod给权限，�
 /usr/bin：通常是一些非必要的，但是普通用户和超级用户都可能使用到的命令
 /usr/local/bin：通常是用户后来安装的软件，可能被普通用户或超级用户使用
 
+
+/var：某些大文件的溢出 区，比方说各种服务的日志文件。
+/usr：最庞大的目录，要用 到的应用程序和文件几乎都在这个目录。
+/usr/local: 本地安装的程序和其他东西在/usr/local下
+一份比较全面的[Linux 下各文件夹的结构说明及用途介绍](http://blog.jobbole.com/113519/)
+
 ### 25. 一个往dropBox上传文件的Script
 dropbox的网盘空间不用感觉有点浪费了，一个将本地文件上传到dropBox的脚本[Dropbox-Uploader](https://github.com/andreafabrizi/Dropbox-Uploader)
 亲测可用，也不是一个需要启动时跑起来的程序，就是一个给参数就上传的脚本。
@@ -410,6 +418,7 @@ Mere trash
 ===============================================================================
 [LINUX下的21个特殊符号](http://blog.51cto.com/litaotao/1187983)
 [Shell学习笔记](https://notes.wanghao.work/2015-06-02-Shell%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html)
+[gdb调试器,debug用的](http://blog.jobbole.com/112547/)
 
 ```shell
 youtube-dl -o '%(title)s.%(ext)s' https://www.youtube.com/watch?v=rimXGaUdaLg

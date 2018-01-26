@@ -211,3 +211,7 @@ public class MySelectionSort {
 ### 1.7 TimSort
 java的Collections.sort的算法，
 [Comparison Method Violates Its General Contract!]((https://www.youtube.com/watch?v=bvnmbRo7a1Y))
+
+
+### 参考
+[Java关于数据结构的实现：树](https://juejin.im/post/59cc55b95188250b4007539b)

@@ -443,3 +443,7 @@ firefox > nginx [ACK] 好的,知道了
 - [断点续传实现](http://lcodecorex.github.io/2016/08/01/%E6%96%87%E4%BB%B6%E5%88%86%E7%89%87%E4%B8%8E%E6%96%AD%E7%82%B9%E7%BB%AD%E4%BC%A0%E5%8E%9F%E7%90%86%E4%B8%8E%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0/)
 - [一张非常好的解释status code的表格](http://www.cnblogs.com/mayingbao/archive/2007/11/30/978530.html)
 - [tcp-ip较好的解释](https://juejin.im/entry/5a20ca8f5188254dd936320b)
+- [基本算是计算机网络教程的](https://juejin.im/post/5a2614b8f265da432652af7d)
+
+
+[服务器常用端口以及TCP/UDP端口列表](https://wsgzao.github.io/post/service-names-port-numbers/)

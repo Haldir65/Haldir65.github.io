@@ -377,10 +377,7 @@ windows下应该在nginx/logs/error.log文件里面
 windows平台下查找当前正在跑的nginx进程：
 > tasklist /fi "imagename eq nginx.exe"
 
-
 ==============================================================================================================================
-[nginx搭建rtmp推流服务](https://www.jianshu.com/p/fc64102d6162)
-
 
 
 ### 参考

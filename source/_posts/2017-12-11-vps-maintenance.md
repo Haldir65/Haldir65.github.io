@@ -56,9 +56,13 @@ python setup.py install
   "password": "mypassword",
   "timeout": 300,
   "method": "aes-256-cfb",
-  "fast_open": false
+  "fast_open": true
 }
 ```
+
+如果你的服务器Linux 内核在3.7+，可以开启fast_open 以降低延迟。
+linux 内核版本查看：
+> cat /proc/version 
 
 > ssserver -c config.json -d start #启动完成
 
@@ -307,6 +311,11 @@ Softlayer, HongKong, CN         119.81.130.170          35.2MB/s
 ### 关于 docker
 
 youtube 上有人在 Digital Ocean 的 vps 上安装 docker，主要作用就是将一个复杂的操作系统打包成一个下载即用的容器。进入容器中，可以像在实际的操作系统中一样运行指令。所以虚拟化的机器随时可以使用其他操作系统。
+
+
+===================================================================================================
+### Dnsmasq vps自建DNS服务器
+
 
 ### 参考
 
