@@ -12,6 +12,7 @@ tags: [前端]
 yarn add webpack
 
 ## 2.使用
+
 >
 webpack is basically pulling  all external js files into on build.js file that we can bundle into our html.
 这样做的好处很多，能够有效减少浏览器发出的请求数量。

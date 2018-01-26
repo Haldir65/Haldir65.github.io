@@ -62,7 +62,7 @@ python setup.py install
 
 如果你的服务器Linux 内核在3.7+，可以开启fast_open 以降低延迟。
 linux 内核版本查看：
-> cat /proc/version 
+> cat /proc/version
 
 > ssserver -c config.json -d start #启动完成
 
@@ -141,6 +141,7 @@ sudo systemctl start shadowsocks-libev      # for systemd
 ##加入开机启动
 ##在/etc/rc.local中加入
 sudo /etc/init.d/shadowsocks-libev start
+sudo ss-server -c /etc/shadowsocks-libev/config.json -u ## 开启udp转发  netstat -lnp确认ss-server确实监听了udp端口
 ```
 
 其实跟安装 ss 很像的
