@@ -504,6 +504,7 @@ netstat -ct ## c:持续输出
 watch -d -n0 "netstat -atnp | grep ESTA"
 ```
 
+
 ```shell
 ifconfig ## 查看机器上的网卡
 en01 ##Ethernet
@@ -685,10 +686,18 @@ iptables -Z
 > screen -r // 重新进刚才的screen
 
 
+
+==================================================================================
+nc指令()
+```shell
+
+============================
+```
+
 ### 参考
 
 - ![](http://odzl05jxx.bkt.clouddn.com/fork_you_git.jpg)
-
+- [工具参考](http://linuxtools-rst.readthedocs.io/zh_CN/latest/tool/sar.html)
 - [文件大小查看命令](https://my.oschina.net/liting/blog/392051)
 - [文件压缩命令](http://blog.sina.com.cn/s/blog_7479f7990100zwkp.html)
 - [硬件查询](https://my.oschina.net/hunterli/blog/140783)

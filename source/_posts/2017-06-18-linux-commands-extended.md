@@ -59,6 +59,8 @@ alias yourcommand='ls -alr' ##添加这一行，原来的命令也照样用
 急着要想马上生效可以
 source ~/.bashrc ## source命令其实就是执行一个脚本
 
+> touch ~/.bash_aliases  ## unbuntu建议把所有的alias写到一个 ~/.bash_aliases文件里。保存之后,source ~/.bash_aliases。立即生效
+
 据说alias是可以传参数的，不过加上> /dev/null 2>&1 & 就不行了。所以还是写个script算了。
 ```shell
 #!/bin/bash
@@ -423,7 +425,7 @@ Mere trash
 ```shell
 youtube-dl -o '%(title)s.%(ext)s' https://www.youtube.com/watch?v=rimXGaUdaLg
 ```
-
+文件描述符限制
 
 ls -al = l -al（可以少敲一个字母,其实是alias）
 
