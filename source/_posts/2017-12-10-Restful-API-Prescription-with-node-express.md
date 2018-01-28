@@ -33,10 +33,12 @@ get请求的参数怎么拿
 get的参数本身都是写在url里面的
 
 比如
+```js
 GET /student/getById/27
 app.get('/getById/:age',functin(req,res){
     res.send(req.prarms.age);
 })
+```
 
 在postMan发起post请求
 ```
@@ -70,10 +72,9 @@ app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist/'));
 这意思就是请求/jquery这个目录下的资源就等于访问/node_modules/jquery/dist/目录下同名的资源
 
 ## 4. response
-
 response.redirect('/all'); //在浏览器里面看，response的header是这样的
-```
-HTTP/1.1 302 Found
+
+>HTTP/1.1 302 Found
 X-Powered-By: Express
 Location: /all
 Vary: Accept
@@ -81,15 +82,14 @@ Content-Type: text/html; charset=utf-8
 Content-Length: 68
 Date: Sun, 14 Jan 2018 10:08:50 GMT
 Connection: keep-alive
-```
 
-response.direction();
+
+>response.direction();
 和window.location.href差不多
 
-```js
-/*
-GET
-/api/user */ much extra information you can set on its header
+
+```javaScript
+/* GET  /api/user */ much extra information you can set on its header
 app.get("/user",function (req,res) {
     res.set({
         'Content-Type': 'application/json',
@@ -105,11 +105,16 @@ app.get("/user",function (req,res) {
         "age":10
     });
 });
-app.get("/user",function (req,res,next) {
 
-}
+
+app.get("/user",function (req,res,next) {
+};
+
 ```
 
+
+
+## 参考
 
 [Nginx 是前端工程师的好帮手](http://www.restran.net/2015/08/19/nginx-frontend-helper/)
 

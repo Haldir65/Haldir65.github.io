@@ -7,7 +7,6 @@ tags:
 <!--more-->
 
 
-
 MongoDB可以作为Spring boot的数据库DAO，也可以和node平台的express module结合。作为后台开发的数据库，应用很广。
 
 

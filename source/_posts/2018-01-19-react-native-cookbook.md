@@ -10,8 +10,7 @@ tags:
 
 install cli
 
->
-npm install -g react-native-cli
+>npm install -g react-native-cli
 react-native init myproject ## 最好全部小写字母
 cd myproject
 react-native run-android

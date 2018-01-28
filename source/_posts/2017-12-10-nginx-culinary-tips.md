@@ -4,14 +4,16 @@ date: 2017-12-10 16:12:43
 tags: [nginx,tools]
 ---
 
-[Installing nginx on windows](http://nginx.org/en/docs/windows.html)
+Nginx参考手册
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery151110073841.jpg?imageView2/2/w/600)
 <!--more-->
 
 
 ### 1.安装
+[Installing nginx on windows](http://nginx.org/en/docs/windows.html)
 安装教程，google 'installing nginx on ubuntu'
 基本上就是把DigitalOcean写的这些复制粘贴过来
+
 
 ```shell
 sudo apt-get update
