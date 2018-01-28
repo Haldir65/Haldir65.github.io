@@ -14,7 +14,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/apple logo dark bw life night.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-01-27T10:13:21.719Z">
+<meta property="og:updated_time" content="2018-01-28T15:17:54.949Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="redis-cook-book">
 <meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/apple logo dark bw life night.jpg?imageView2/2/w/600">
@@ -238,7 +238,9 @@ ga('send', 'pageview');
 <h3 id="和其他语言的整合"><a href="#和其他语言的整合" class="headerlink" title="和其他语言的整合"></a>和其他语言的整合</h3><p><a href="https://redis.io/clients">支持的lanaguage client</a></p>
 <p><a href="https://github.com/xetorthio/jedis">jedis</a><br><strong>java</strong><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">pipeline</span><span class="params">()</span></span>&#123;  </span><br><span class="line">        String key = <span class="string">"pipeline-test"</span>;  </span><br><span class="line">        String old = jedis.get(key);  </span><br><span class="line">        <span class="keyword">if</span>(old != <span class="keyword">null</span>)&#123;  </span><br><span class="line">            System.out.println(<span class="string">"Key:"</span> + key + <span class="string">",old value:"</span> + old);  </span><br><span class="line">        &#125;  </span><br><span class="line">        <span class="comment">//代码模式1,这种模式是最常见的方式  </span></span><br><span class="line">        Pipeline p1 = jedis.pipelined();  </span><br><span class="line">        p1.incr(key);  </span><br><span class="line">        System.out.println(<span class="string">"Request incr"</span>);  </span><br><span class="line">        p1.incr(key);  </span><br><span class="line">        System.out.println(<span class="string">"Request incr"</span>);  </span><br><span class="line">        <span class="comment">//结束pipeline，并开始从相应中获得数据  </span></span><br><span class="line">        List&lt;Object&gt; responses = p1.syncAndReturnAll();  </span><br><span class="line">        <span class="keyword">if</span>(responses == <span class="keyword">null</span> || responses.isEmpty())&#123;  </span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"Pipeline error: no response..."</span>);  </span><br><span class="line">        &#125;  </span><br><span class="line">        <span class="keyword">for</span>(Object resp : responses)&#123;  </span><br><span class="line">            System.out.println(<span class="string">"Response:"</span> + resp.toString());<span class="comment">//注意，此处resp的类型为Long  </span></span><br><span class="line">        &#125;  </span><br><span class="line">        <span class="comment">//代码模式2  </span></span><br><span class="line">        Pipeline p2 = jedis.pipelined();  </span><br><span class="line">        Response&lt;Long&gt; r1 = p2.incr(key);  </span><br><span class="line">        <span class="keyword">try</span>&#123;  </span><br><span class="line">            r1.get();  </span><br><span class="line">        &#125;<span class="keyword">catch</span>(Exception e)&#123;  </span><br><span class="line">            System.out.println(<span class="string">"Error,you cant get() before sync,because IO of response hasn't begin.."</span>);  </span><br><span class="line">        &#125;  </span><br><span class="line">        Response&lt;Long&gt; r2 = p2.incr(key);  </span><br><span class="line">        p2.sync();  </span><br><span class="line">        System.out.println(<span class="string">"Pipeline,mode 2,---&gt;"</span> + r1.get());  </span><br><span class="line">        System.out.println(<span class="string">"Pipeline,mode 2,---&gt;"</span> + r2.get());  </span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
 <p><strong>python</strong><br><a href="https://github.com/andymccurdy/redis-py">redis-py</a><br><a href="http://debugo.com/python-redis/">使用Python操作Redis</a></p>
-<h3 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h3><p>&gt;<br>《Redis Cookbook》对这个经典场景进行详细描述。假定我们对一系列页面需要记录点击次数。例如论坛的每个帖子都要记录点击次数，而点击次数比回帖的次数的多得多。如果使用关系数据库来存储点击，可能存在大量的行级锁争用。所以，点击数的增加使用redis的INCR命令最好不过了。</p>
+<h3 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h3><blockquote>
+<p>《Redis Cookbook》对这个经典场景进行详细描述。假定我们对一系列页面需要记录点击次数。例如论坛的每个帖子都要记录点击次数，而点击次数比回帖的次数的多得多。如果使用关系数据库来存储点击，可能存在大量的行级锁争用。所以，点击数的增加使用redis的INCR命令最好不过了。</p>
+</blockquote>
 <h3 id="存储多层次级别的object"><a href="#存储多层次级别的object" class="headerlink" title="存储多层次级别的object"></a>存储多层次级别的object</h3><p><a href="https://stackoverflow.com/questions/16375188/redis-strings-vs-redis-hashes-to-represent-json-efficiency">Redis strings vs Redis hashes to represent JSON: efficiency?
 </a><br>由于redis各种commands本质上只能存储key-value形式的object，对于多层级的object，需要将key扁平化<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> house = &#123;</span><br><span class="line">  roof: &#123;</span><br><span class="line">    color: <span class="string">'black'</span></span><br><span class="line">  &#125;,</span><br><span class="line">  street: <span class="string">'Market'</span>,</span><br><span class="line">  buildYear: <span class="string">'1996'</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
 <blockquote>
@@ -501,10 +503,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
@@ -514,6 +512,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">annotation</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
