@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100734648.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-01-28T15:17:54.945Z">
+<meta property="og:updated_time" content="2018-01-29T10:49:40.182Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android知识集合[三]">
 <meta name="twitter:description" content="之前的文章快装不下了，所以另外开一篇文章专门放Android相关的杂乱的知识点。">
@@ -238,6 +238,10 @@ ga('send', 'pageview');
 <h3 id="19-LocalBroadCastManager好像确实是基于handler实现的"><a href="#19-LocalBroadCastManager好像确实是基于handler实现的" class="headerlink" title="19. LocalBroadCastManager好像确实是基于handler实现的"></a>19. LocalBroadCastManager<del>好像</del>确实是基于handler实现的</h3><p>App内部全局拥有一个LocalBroadCastManager实例，内部持有一个handler，对外暴露功能sendBroadcast。就是往handler里丢一个message MSG_EXEC_PENDING_BROADCASTS，处理这个message就是executePendingBroadcasts。所以默认是在下一个message中处理的。如果想在当前message中就处理掉，还有一个sendBroadcastSync方法，但这会把当前持有的所有待处理消息全部flush掉。sendBroadcast，unregisterReceiver，registerReceiver内部用了synchronize，所以是线程安全的。</p>
 <h3 id="20-ViewPager为什么没有那些attrs的可以写在xml里面的属性"><a href="#20-ViewPager为什么没有那些attrs的可以写在xml里面的属性" class="headerlink" title="20. ViewPager为什么没有那些attrs的可以写在xml里面的属性"></a>20. ViewPager为什么没有那些attrs的可以写在xml里面的属性</h3><p> Adam Powell在15年的Android Dev summit上说过：this is pre aar gradle age, if we were to do it today , we definitely would add。<br> 看了下aosp的git日志，ViewPager是2011年就有了的。而<a href="https://developer.android.com/studio/projects/android-library.html#CreateLibrary">aar</a>是随着android studio的发布推出的。<br> jar和aar的区别:<br> jar : JAR 文件就是 Java Archive File，顾名思意，它的应用是与 Java 息息相关的，是 Java 的一种文档格式。只包含了class文件与清单文件 ，不包含资源文件，如图片等所有res中的文件。<br> aar: aar，AAR（Android Archive）包是一个Android库项目的二进制归档文件,包含一些自己写的控件布局文件以及字体等资源文件那么就只能使用*.aar文件。</p>
 <h3 id="21-都知道RelativeLayout会measure两次child，LinearLayout在加weight的时候也会measure两次"><a href="#21-都知道RelativeLayout会measure两次child，LinearLayout在加weight的时候也会measure两次" class="headerlink" title="21. 都知道RelativeLayout会measure两次child，LinearLayout在加weight的时候也会measure两次"></a>21. 都知道RelativeLayout会measure两次child，LinearLayout在加weight的时候也会measure两次</h3><p>LinearLayout.java<br>measureVertical()<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// We have no limit, so make all weighted views as tall as the largest child.</span></span><br><span class="line">        <span class="comment">// Children will have already been measured once.</span></span><br><span class="line">        <span class="keyword">if</span> (useLargestChild &amp;&amp; heightMode != MeasureSpec.EXACTLY) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; count; i++) &#123;</span><br><span class="line">                <span class="keyword">final</span> View child = getVirtualChildAt(i);</span><br><span class="line">                  <span class="comment">// ......</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="22-gradlw文件的作用"><a href="#22-gradlw文件的作用" class="headerlink" title="22. gradlw文件的作用"></a>22. gradlw文件的作用</h3><p><a href="https://medium.com/@bherbst/understanding-the-gradle-wrapper-a62f35662ab7">understanding-the-gradle-wrapper</a><br>进一个新目录</p>
+<blockquote>
+<p>gradle wrapper 命令会生成如下目录<br>├─.gradle<br>│  ├─4.4.1<br>│  │  ├─fileChanges<br>│  │  ├─fileHashes<br>│  │  └─taskHistory<br>│  └─buildOutputCleanup<br>└─gradle<br>    └─wrapper<br>这里提到了一些点：gradlew.bat是给windows平台用的，gradlew是给unix平台用的。<br>gradle/wrapper/gradle-wrapper.jar 里面装的是Gradle Wrapper的代码<br>gradlew就是一个调用gradle命令的脚本，内部会根据gradle-wrapper.properties里面的distributionUrl下载对应版本的gradle distribution zip文件并解压缩，并只会使用该版本的gralde进行编译</p>
+</blockquote>
 <p>=============================================================================<br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600" alt=""></p>
 <h3 id="9-Facebook出品的BUCK能够用于编译Android-项目，速度比较快。"><a href="#9-Facebook出品的BUCK能够用于编译Android-项目，速度比较快。" class="headerlink" title="9. Facebook出品的BUCK能够用于编译Android 项目，速度比较快。"></a>9. Facebook出品的BUCK能够用于编译Android 项目，速度比较快。</h3><p><a href="https://github.com/1hakr/AnExplorer">一个具有网络传输的FileExplorer</a><br><a href="http://mouxuejie.com/blog/2016-06-11/multidex-source-analysis/">MultiDex原理</a><br><a href="http://wetest.qq.com/lab/view/359.html">偏向native层面的内存占用分析</a><br><a href="https://juejin.im/post/5a646211f265da3e3f4cc997">Android进程框架：进程的启动创建、启动与调度流程</a><br><a href="https://juejin.im/post/59fafa3351882529642107d2">Android进程框架：进程的启动创建、启动与调度流程</a></p>
 
@@ -509,6 +513,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
@@ -518,10 +526,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">

@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery15111006999.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery2a2241cc5c1278cf7a28f15f91dbbb7f.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-01-28T15:17:54.945Z">
+<meta property="og:updated_time" content="2018-01-29T10:49:40.182Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从DroidPlugin谈插件化开发">
 <meta name="twitter:description" content="关于360团队出开源的DroidPlugin的一些记录 过程中发现了关于插件化，Hook系统方法的操作，摘录下来。">
@@ -218,7 +218,8 @@ ga('send', 'pageview');
 <p>adb getEvent sendEvent<br>input tap x y<br>input touchescreen<br>input text helloworld<br>input keyevent</p>
 <p>Xposed的介绍与入门<br>Xposed的原理与Multidex及动态加载问题</p>
 <h3 id="组件化、插件化"><a href="#组件化、插件化" class="headerlink" title="组件化、插件化"></a>组件化、插件化</h3><p>组件化、插件化的前提就是解耦</p>
-<p><a href="https://github.com/jaredrummler/AndroidShell">在Android中执行shell指令</a><br><a href="https://github.com/didi/VirtualAPK">滴滴的virtualApp</a>。 目前看来就是用android.content.pm.PackageParse去解析一个apk文件，封装成一个LoadedPlugin对象（Cache下来），后续调用apk中描述的功能进行操作。所以应该还是在host的进程中跑的。由此联系到<a href="http://www.cnblogs.com/myitm/archive/2012/05/17/2506635.html">PackageInstaller 原理简述</a><br><a href="https://github.com/Meituan-Dianping/Robust">美团的热修复叫Robust</a><br><a href="https://www.jianshu.com/p/0ba717f7385f">美团的walle接入指南</a>,原理都在<a href="https://tech.meituan.com/android-apk-v2-signature-scheme.html">新一代开源Android渠道包生成工具Walle</a><br><a href="https://github.com/mcxiaoke/packer-ng-plugin">还有一个开源的gradle plugin</a></p>
+<p><a href="https://github.com/jaredrummler/AndroidShell">在Android中执行shell指令</a><br><a href="https://github.com/didi/VirtualAPK">滴滴的virtualApp</a>。 目前看来就是用android.content.pm.PackageParse去解析一个apk文件，封装成一个LoadedPlugin对象（Cache下来），后续调用apk中描述的功能进行操作。所以应该还是在host的进程中跑的。由此联系到<a href="http://www.cnblogs.com/myitm/archive/2012/05/17/2506635.html">PackageInstaller 原理简述</a></p>
+<p><a href="https://www.jianshu.com/p/0ba717f7385f">美团的walle接入指南</a>,原理都在<a href="https://tech.meituan.com/android-apk-v2-signature-scheme.html">新一代开源Android渠道包生成工具Walle</a><br><a href="https://github.com/mcxiaoke/packer-ng-plugin">还有一个开源的gradle plugin</a></p>
 <p>关于gradlew<br>打包release之前，先Build -&gt; Generate Singed apk 创建一个新的keystore , 密码记住，keystore文件保存好。</p>
 <p>关于打包: 根据<a href="https://www.jianshu.com/p/4f2990cf53bf">Android 多渠道打包梳理</a><br>Gradle UMeng 多渠道打包</p>
 <ol>
@@ -251,7 +252,22 @@ ga('send', 'pageview');
 <p>gradlew clean assembleReleaseChannels<br>gradlew clean assembleReleaseChannels -PchannelList=huawei // 只编译华为的<br>gradlew clean assembleReleaseChannels -PchannelList=huawei,xiaomi // 小米跟华为的</p>
 </blockquote>
 <p>以上亲测通过，原本装的jdk 9，一直报错。在java home里换成jdk 1.8后，就没什么问题了。有问题gradlew的时候后面跟上–stacktrace，出错了粘贴到google里就好了。</p>
-<p>在java代码中获取渠道信息<br>&gt;<br>String channel = WalleChannelReader.getChannel(this.getApplicationContext());</p>
+<p>在java代码中获取渠道信息</p>
+<blockquote>
+<p>String channel = WalleChannelReader.getChannel(this.getApplicationContext());</p>
+</blockquote>
+<p>关于美团的热修复方案，亲测可用，生成的patch.jar文件大小5.0kB(改了个方法)<br><a href="https://github.com/Meituan-Dianping/Robust">美团的热修复叫Robust</a></p>
+<blockquote>
+<ol>
+<li>按照官方wiki在build.gradle中添加需要的依赖。还有一个robust.xml文件，把packageName和patchPackageName改成自己的，看下别的配置，注释都很清楚</li>
+<li>先打release包，记得开progurad。gradlew clean assembleRelease –stacktrace</li>
+<li>在activity里面放一个button,在onClick的时候loadPatch.记得PatchManipulateImpl里面写的setPatchesImfoImplClassFullName要和roubust.xml里面写的一样</li>
+<li>在activity里面修改的代码添加@mofidy注解，@Add作为新加的方法的注解</li>
+<li>开始打补丁包.在gradle中注释掉apply plugin: ‘robust’，开启apply plugin: ‘auto-patch-plugin’。把app/build/outputs/mappings/mapping.txt文件和app/build/outputs/robust/methodsMap.robust这两个文件粘贴到app/robust文件夹中。重新打release包：gradlew clean assembleRelease –stacktrace。报错是正常的。</li>
+<li>在app/build/outputs/robust文件夹中找到patch.jar文件。 adb push app/build/outputs/robust/patch.jar /sdcard/robust/patch.jar</li>
+<li>进Activity，点击那个loadPath的按钮，就是去刚才adb push的路径去加载这个patch（当然生产环境应该是搭建https服务了）。</li>
+</ol>
+</blockquote>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://github.com/tiann/understand-plugin-framework">分析DroidPlugin，深入理解插件化框架</a><br><a href="http://www.wjdiankong.cn/">逆向大全</a></p>
 
       
@@ -522,6 +538,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
@@ -531,10 +551,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
