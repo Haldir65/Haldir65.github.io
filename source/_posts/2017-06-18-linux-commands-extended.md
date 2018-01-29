@@ -169,7 +169,7 @@ tar -jcvf log.tar.bz2 log2012.log 打包后，以 bzip2 压缩
 -f 指定备份文件
 -z --gzip，通过gzip压缩或者解压文件
 
-### 8.定时任务怎么写
+### 8.定时任务怎么写(crontab)
 已经有网站把各种常用的[example](https://crontab.guru/every-6-hours)写出来了，直接照抄就是
 后面跟上需要的命令，例如重启就是 /sbin/reboot
 
@@ -410,7 +410,10 @@ dropbox的网盘空间不用感觉有点浪费了，一个将本地文件上传�
 ./dropbox_uploader.sh upload /localFileOrDir /dropBoxFileOrDir
 ```
 
-### 26. Nano文本编辑器
+### 26. fuser显示当前文件正在被哪些进程使用
+fuser -m -u redis-server
+
+### 27. Nano文本编辑器
 
 
 

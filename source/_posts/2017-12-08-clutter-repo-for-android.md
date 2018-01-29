@@ -354,6 +354,23 @@ measureVertical()
         }
 ```
 
+### 22. gradlw文件的作用
+[understanding-the-gradle-wrapper](https://medium.com/@bherbst/understanding-the-gradle-wrapper-a62f35662ab7)
+进一个新目录
+> gradle wrapper 命令会生成如下目录
+├─.gradle
+│  ├─4.4.1
+│  │  ├─fileChanges
+│  │  ├─fileHashes
+│  │  └─taskHistory
+│  └─buildOutputCleanup
+└─gradle
+    └─wrapper
+这里提到了一些点：gradlew.bat是给windows平台用的，gradlew是给unix平台用的。
+gradle/wrapper/gradle-wrapper.jar 里面装的是Gradle Wrapper的代码
+gradlew就是一个调用gradle命令的脚本，内部会根据gradle-wrapper.properties里面的distributionUrl下载对应版本的gradle distribution zip文件并解压缩，并只会使用该版本的gralde进行编译
+
+
 =============================================================================
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600)
 

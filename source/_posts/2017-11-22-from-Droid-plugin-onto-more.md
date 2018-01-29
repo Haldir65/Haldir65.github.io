@@ -77,7 +77,7 @@ Xposed的原理与Multidex及动态加载问题
 
 [在Android中执行shell指令](https://github.com/jaredrummler/AndroidShell)
 [滴滴的virtualApp](https://github.com/didi/VirtualAPK)。 目前看来就是用android.content.pm.PackageParse去解析一个apk文件，封装成一个LoadedPlugin对象（Cache下来），后续调用apk中描述的功能进行操作。所以应该还是在host的进程中跑的。由此联系到[PackageInstaller 原理简述](http://www.cnblogs.com/myitm/archive/2012/05/17/2506635.html)
-[美团的热修复叫Robust](https://github.com/Meituan-Dianping/Robust)
+
 [美团的walle接入指南](https://www.jianshu.com/p/0ba717f7385f),原理都在[新一代开源Android渠道包生成工具Walle](https://tech.meituan.com/android-apk-v2-signature-scheme.html)
 [还有一个开源的gradle plugin](https://github.com/mcxiaoke/packer-ng-plugin)
 
@@ -188,9 +188,17 @@ gradlew clean assembleReleaseChannels -PchannelList=huawei,xiaomi // 小米跟�
 以上亲测通过，原本装的jdk 9，一直报错。在java home里换成jdk 1.8后，就没什么问题了。有问题gradlew的时候后面跟上--stacktrace，出错了粘贴到google里就好了。
 
 在java代码中获取渠道信息
->
-String channel = WalleChannelReader.getChannel(this.getApplicationContext());
+> String channel = WalleChannelReader.getChannel(this.getApplicationContext());
 
+关于美团的热修复方案，亲测可用，生成的patch.jar文件大小5.0kB(改了个方法)
+[美团的热修复叫Robust](https://github.com/Meituan-Dianping/Robust)
+> 1. 按照官方wiki在build.gradle中添加需要的依赖。还有一个robust.xml文件，把packageName和patchPackageName改成自己的，看下别的配置，注释都很清楚
+> 2. 先打release包，记得开progurad。gradlew clean assembleRelease --stacktrace
+> 3. 在activity里面放一个button,在onClick的时候loadPatch.记得PatchManipulateImpl里面写的setPatchesImfoImplClassFullName要和roubust.xml里面写的一样
+> 4. 在activity里面修改的代码添加@mofidy注解，@Add作为新加的方法的注解
+> 5. 开始打补丁包.在gradle中注释掉apply plugin: 'robust'，开启apply plugin: 'auto-patch-plugin'。把app/build/outputs/mappings/mapping.txt文件和app/build/outputs/robust/methodsMap.robust这两个文件粘贴到app/robust文件夹中。重新打release包：gradlew clean assembleRelease --stacktrace。报错是正常的。
+> 6. 在app/build/outputs/robust文件夹中找到patch.jar文件。 adb push app/build/outputs/robust/patch.jar /sdcard/robust/patch.jar
+> 7. 进Activity，点击那个loadPath的按钮，就是去刚才adb push的路径去加载这个patch（当然生产环境应该是搭建https服务了）。
 
 
 

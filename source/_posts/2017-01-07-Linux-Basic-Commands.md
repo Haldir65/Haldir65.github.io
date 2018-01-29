@@ -148,13 +148,23 @@ P：在当前光标处上面粘贴内容。
 - > less 与 more 类似，但是比 more 更好的是，他可以[pg dn][pg up]翻页！对less显示出的内容中可以使用 /'字符' 输入需要查找的字符或者字符串并高亮显示，而more 不具备(亲测很好用)
 - > head： 查看头几行
 - > tail： 查看尾几行
-- > od： 以二进制的方式读取档案内容！
 
 
 - > head - 3 filename //只查看文件前面三行
 - > tail - 3 filename //只查看倒数后三行
 - > tail -n 3 filename //和上面是一样的
+
 - > xxd -b fileName // 看binaryFile不能用cat
+
+- > od： 通常使用od命令查看特殊格式的文件内容。通过指定该命令的不同选项可以以十进制、八进制、十六进制和ASCII码来显示文件。
+d 十进制
+o 八进制（系统默认值）
+x 十六进制
+n 不打印位移值
+
+od -c filename(以字符方式显示)
+od -Ax -tcx4 filename(以十六进制和字符同时显示)
+
 ```
 
 tail还有一个好处，可以实时查看文件内容，比如文件正在更新，可以实时查看最新的日志
@@ -296,6 +306,16 @@ r(read权限)w(写权限)-(无权限)x(执行权限)
 ```shell
 chmod +x filename //加上可执行权限，所有用户都加上了
 chmod u+x filename //给当前用户加上可执行权限
+u：用户
+g：组
+o：其它用户
+a：所有用户
+
+```shell
+$chmod a+x main         对所有用户给文件main增加可执行权限
+$chmod g+w blogs        对组用户给文件blogs增加可写权限
+```
+
 //其他命令不一一列举
 
 > u ：目录或者文件的当前的用户
@@ -704,3 +724,4 @@ nc指令()
 - [Python源码编译安装ss](http://www.jianshu.com/p/3d80c7cb7b17)
 - [源码编译安装ss](http://blog.csdn.net/program_thinker/article/details/45787395)
 - [修改系统编码为utf-8](https://askubuntu.com/questions/162391/how-do-i-fix-my-locale-issue)
+- [Linux工具快速教程](http://linuxtools-rst.readthedocs.io/zh_CN/latest/index.html)

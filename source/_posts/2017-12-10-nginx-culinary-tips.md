@@ -310,7 +310,107 @@ server {
 ### 5.1 pratical take aways
 [nginx配置location总结及rewrite规则写法](http://seanlook.com/2015/05/17/nginx-location-rewrite/)
 
-### Nginx模块
+
+### ddos防御
+from [mitigating-ddos-attacks-with-nginx-and-nginx-plus/](https://www.nginx.com/blog/mitigating-ddos-attacks-with-nginx-and-nginx-plus/)
+
+**allow a single client IP address to attempt to login only every 2 seconds (equivalent to 30 requests per minute):**
+
+
+1. Limiting the Rate of Requests
+eg: 单ip访问login接口频率不能超过2秒每次。
+```config
+limit_req_zone $binary_remote_addr zone=one:10m rate=30r/m;
+
+server {
+    # ...
+    location /login.html {
+        limit_req zone=one;
+    # ...
+    }
+}
+```
+2. Limiting the Number of Connections
+eg: 单ip访问/store/不能创建超过10条connections
+```config
+limit_conn_zone $binary_remote_addr zone=addr:10m;
+
+server {
+    # ...
+    location /store/ {
+        limit_conn addr 10;
+        # ...
+    }
+}
+```
+
+3. Closing Slow Connections
+eg: 限定nginx一条connection写client header和写client body的时间间隔为5s，默认为60s
+```config
+server {
+    client_body_timeout 5s;
+    client_header_timeout 5s;
+    # ...
+}
+```
+
+4. 黑名单
+```config
+// 123.123.123.1 through 123.123.123.16 拉黑
+location / {
+    deny 123.123.123.0/28;
+    # ...
+}
+
+location / {
+    deny 123.123.123.3;
+    deny 123.123.123.5;
+    deny 123.123.123.7;
+    # ...
+}
+
+//只允许特定白名单
+location / {
+    allow 192.168.1.0/24;
+    deny all;
+    # ...
+}
+```
+
+5.  ngx_http_proxy_module的configuration
+proxy_cache_use_stale
+当客户端请求一项过期的资源时，只发送一次请求，在backend server返回新的资源之前，不再发送新的请求，并只向客户端返回已有的过期资源。这有助于缓解backend server的压力。
+proxy_cache_key:包含内置三个key$scheme$proxy_host$request_uri。但不要添加$query_string，这会造成过多的caching.
+
+6. 几种情况是应该直接拉黑的
+>Requests to a specific URL that seems to be targeted  
+Requests in which the User-Agent header is set to a value that does not correspond to normal client traffic
+Requests in which the Referer header is set to a value that can be associated with an attack
+Requests in which other headers have values that can be associated with an attack
+
+```config
+location /foo.php {
+    deny all; //直接让这个接口不响应
+}
+
+location / {
+    if ($http_user_agent ~* foo|bar) {
+        return 403;  //User-Agent中有foo或者bar的时候直接forbidden
+    }
+    # ...
+}
+
+// NGINX Plus提供的
+// An NGINX or NGINX Plus instance can usually handle many more simultaneous connections than the backend servers it is load balancing.
+//作为代理，nginx能够接受的连接数要远超其代理的后台服务
+upstream website {
+    server 192.168.100.1:80 max_conns=200;
+    server 192.168.100.2:80 max_conns=200;
+    queue 10 timeout=30s;
+}
+```
+
+### 5.2 Nginx模块
 http_image_filter_module（图片裁剪模块）
 首先查看是否已安装http_image_filter_module模块
 > nginx -V
@@ -369,6 +469,43 @@ awk '{print $1}' nginx.access.log |sort |uniq -c|sort -n
 ```
 防御DDOS是一个系统工程，这里只是一小点。
 
+
+### 5.3 return rewrite and try_files
+```config
+server {
+    listen 80;
+    listen 443 ssl;
+    server_name www.old-name.com;
+    return 301 $scheme://www.new-name.com$request_uri;
+}
+301 (Moved Permanently)
+//上面的scheme是http或者https，request_url就是请求的url。
+```
+
+rewrite就更加复杂一点，比如可以manipulate url
+Here’s a sample NGINX rewrite rule that uses the rewrite directive. It matches URLs that begin with the string /download and then include the /media/ or /audio/ directory somewhere later in the path. It replaces those elements with /mp3/ and adds the appropriate file extension, .mp3 or .ra. The $1 and $2 variables capture the path elements that aren't changing. As an example, /download/cdn-west/media/file1 becomes /download/cdn-west/mp3/file1.mp3. If there is an extension on the filename (such as .flv), the expression strips it off and replaces it with .mp3.
+```config
+server {
+    # ...
+    rewrite ^(/download/.*)/media/(\w+)\.?.*$ $1/mp3/$2.mp3 last;
+    rewrite ^(/download/.*)/audio/(\w+)\.?.*$ $1/mp3/$2.ra  last;
+    return  403;
+    # ...
+}
+```
+
+
+In the following example, NGINX serves a default GIF file if the file requested by the client doesn’t exist. When the client requests (for example) http://www.domain.com/images/image1.gif, NGINX first looks for image1.gif in the local directory specified by the root or alias directive that applies to the location (not shown in the snippet). If image1.gif doesn’t exist, NGINX looks for image1.gif/, and if that doesn’t exist, it redirects to /images/default.gif. That value exactly matches the second location directive, so processing stops and NGINX serves that file and marks it to be cached for 30 seconds.
+```config
+location /images/ {
+    try_files $uri $uri/ /images/default.gif;
+}
+
+location = /images/default.gif {
+    expires 30s;
+}
+```
+
 ### 6. 问题速查
 - nginx.service - A high performance web server and a reverse proxy server
    Loaded: loaded (/lib/systemd/system/nginx.service; enabled; vendor preset: enabled)
@@ -388,3 +525,4 @@ windows平台下查找当前正在跑的nginx进程：
 - [understanding-the-nginx-configuration-file](https://www.digitalocean.com/community/tutorials/understanding-the-nginx-configuration-file-structure-and-configuration-contexts)
 - [if is evil, 可以,但不要在config文件里面写if](https://www.nginx.com/resources/wiki/start/topics/depth/ifisevil/)
 - [nginx的一些优化策略](https://www.digitalocean.com/community/tutorials/how-to-optimize-nginx-configuration)
+- [rewrite rules怎么写](https://www.nginx.com/blog/creating-nginx-rewrite-rules/)
