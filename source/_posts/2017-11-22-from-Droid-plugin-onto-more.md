@@ -88,13 +88,16 @@ Xposed的原理与Multidex及动态加载问题
 
 关于打包: 根据[Android 多渠道打包梳理](https://www.jianshu.com/p/4f2990cf53bf)
 Gradle UMeng 多渠道打包
-1. Android.manifest文件添加
-> <meta-data
+
+-  Android.manifest文件添加
+```xml
+<meta-data
     android:name="UMENG_CHANNEL"
     android:value="${UMENG_CHANNEL_VALUE}" />
-
-2. app的build.gradle中添加
 ```
+
+-  app的build.gradle中添加
+```gradle
 android {  
     ...
     productFlavors {
@@ -115,7 +118,6 @@ android {
     ...
 }
 
-
 android {  
     productFlavors {
         xiaomi {}
@@ -131,16 +133,17 @@ android {
 
 ```
 
-3. 打包
+-  打包
 除此之外 assemble 还能和 Product Flavor 结合创建新的任务（assemble + Build Variants），Build Variants = Build Type + Product Flavor
 > ./gradlew assembleDebug # 会打包 Debug apk
 ./gradlew assembleRelease # 打包 Release apk
 ./gradlew assembleWandoujiaRelease # 打包 wandoujia Release 版本，大小写不敏感
 ./gradlew assembleWandoujia  # 此命令会生成wandoujia渠道的Release和Debug版本
 
-4. 多渠道的话这样的命令要跑多次
+-  多渠道的话这样的命令要跑多次
 使用walle就好了。
 > project 的 build.gradle 添加:
+```gradle
 dependencies {
     classpath 'com.meituan.android.walle:plugin:1.0.3'
 }
@@ -179,6 +182,7 @@ baidu
 #
 # 应用宝
 myapp
+```
 
 编译全部渠道
 > gradlew clean assembleReleaseChannels

@@ -216,7 +216,7 @@ abc_popup_menu_item_layout.xml
 ### 12. Message.ontain以及相似的场景
 MotionEvent.ontain()，TouchTarget.ontain(),HoverTarget.ontain()....
 MotionEvent最多缓存10个，TouchTarget和HoverTarget这些都是在看ViewGroup源码的时候瞅到的，简单点。
-稍微看下就知道这种ontain,recycle写法的套路。
+稍微看下就知道这种obtain,recycle写法的套路。
 ```java
 private static final class TouchTarget {
       private static final int MAX_RECYCLED = 32;
