@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/b9ae1189145b4a4d9dfe4d0b89a21b47.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/ed541bc1ed61ead0bf6ea8233ef01c0a.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-01-29T15:18:23.077Z">
+<meta property="og:updated_time" content="2018-01-30T11:08:12.909Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="网络通信手册">
 <meta name="twitter:description" content="网络相关的查找手册">
@@ -304,6 +304,11 @@ ga('send', 'pageview');
 <p>知乎上有一段比较好的<a href="https://www.zhihu.com/question/19786827/answer/66706108">描述</a>,这里直接引用了。<br>http是无状态的协议，客户每次读取web页面时，服务器都打开新的会话，而且服务器也不会自动维护客户的上下文信息，那么要怎么才能实现网上商店中的购物车呢，session就是一种保存上下文信息的机制，它是针对每一个用户的，变量的值保存在服务器端，通过SessionID来区分不同的客户,session是以cookie或URL重写为基础的，默认使用cookie来实现，系统会创造一个名为JSESSIONID的输出cookie，我们叫做session cookie,以区别persistent cookies,也就是我们通常所说的cookie,注意session cookie是存储于浏览器内存中的，并不是写到硬盘上的，这也就是我们刚才看到的JSESSIONID，我们通常情是看不到JSESSIONID的，但是当我们把浏览器的cookie禁止后，web服务器会采用URL重写的方式传递Sessionid，我们就可以在地址栏看到 sessionid=KWJHUG6JJM65HS2K6之类的字符串。<br>javax.servlet.http.HttpServletRequest.getSession() 将会返回当前request相关联的HttpSession对象，如果不存在，将会创建一个。翻译一下，当一个浏览器请求来到之后，Servlet处理程序（Servlet容器内部实现）将会主动检查请求信息Cookie当中是否有JSESSIONID，若有，找到对应JSESSION的HttpSession对象，如果没有，创建一个，具体的机制在Servlet容器的实现当中。</p>
 <p>Session就是维护会话的。</p>
 <h3 id="4-3-自动登录的实现"><a href="#4-3-自动登录的实现" class="headerlink" title="4.3 自动登录的实现"></a>4.3 自动登录的实现</h3><p>一些网站的“记住密码，自动登录功能”，据说discuz直接将加密的（可逆）uid和密码保存到cookie中。<br>另外一种做法是可以尝试将Session的过期时间设置的长一点，比如一年，下次访问网站的时候就能实现自动登录了。<br>更好一点的是是本地绝不保存用户敏感信息，登录生成一个有过期时间的的cookie或者token返回给客户端，下次打开浏览器判断下过期时间就好了。另外，现在浏览器大多带有记住密码的功能，这个锅还是丢给浏览器(用户)好了。</p>
+<p>论Token为什么要<a href="https://segmentfault.com/a/1190000013010835">放在内存里</a></p>
+<blockquote>
+<p>为了解决在操作过程不能让用户感到 Token 失效这个问题，有一种方案是在服务器端保存 Token 状态，用户每次操作都会自动刷新（推迟） Token 的过期时间——Session 就是采用这种策略来保持用户登录状态的。然而仍然存在这样一个问题，在前后端分离、单页 App 这些情况下，每秒种可能发起很多次请求，每次都去刷新过期时间会产生非常大的代价。如果 Token 的过期时间被持久化到数据库或文件，代价就更大了。所以通常为了提升效率，减少消耗，会把 Token 的过期时保存在缓存或者内存中。</p>
+</blockquote>
+<p>这篇文章顺便提到了如果在Token过期的时候去实现重刷Token的操作，首先客户端<strong>绝对不会</strong>存账户密码这种敏感信息。第一次登录成功后，后台返回token(有一定时长有效期)和一个refreshToken(如果前面的token失效了，直接拿着这个去请求后台给个新的Token)。所以客户端基本上就是在onError里面判断如果是Token失效的话，拿着refreshToken去重新获取Token。</p>
 <h2 id="5-长连接"><a href="#5-长连接" class="headerlink" title="5. 长连接"></a>5. 长连接</h2><p>像即时通讯软件，或者消息推送这种场景，都得维护一个长连接。<br><a href="http://blog.csdn.net/mr_liabill/article/details/50705130">HTTP长连接和短连接</a></p>
 <h3 id="5-1长连接的实现原理"><a href="#5-1长连接的实现原理" class="headerlink" title="5.1长连接的实现原理"></a>5.1长连接的实现原理</h3><ul>
 <li>轮询</li>
@@ -344,7 +349,7 @@ ga('send', 'pageview');
 <p>关闭TCP连接时会发生:四次挥手(four-way handshake)<br>firefox &gt; nginx [FIN] 我要关闭连接了<br>nginx &gt; firefox [ACK] 知道了,等我发完包先<br>nginx &gt; firefox [FIN] 我也关闭连接了<br>firefox &gt; nginx [ACK] 好的,知道了</p>
 <p>几个报文的标识的解释:SYN: synchronization(同步)ACK: acknowledgement(确认:告知已收到)FIN: finish(结束)</p>
 <p>作者：eechen<br>链接：<a href="https://www.zhihu.com/question/67772889/answer/257170215">https://www.zhihu.com/question/67772889/answer/257170215</a><br>来源：知乎<br>著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</p>
-<h3 id="开启浏览器内支持webp关于WebP接入方案"><a href="#开启浏览器内支持webp关于WebP接入方案" class="headerlink" title="开启浏览器内支持webp关于WebP接入方案"></a>开启浏览器内支持webp<a href="https://www.xuanfengge.com/webp-access-scheme.html">关于WebP接入方案</a></h3><p><a href="https://www.google.com/search?q=%E5%8D%95%E4%B8%AA%E7%BD%91%E5%8D%A1%E6%9C%80%E5%A4%9A65535%E4%B8%AA%E7%AB%AF%E5%8F%A3">单个网卡最多65535个端口</a></p>
+<h3 id="开启浏览器内支持webp关于WebP接入方案"><a href="#开启浏览器内支持webp关于WebP接入方案" class="headerlink" title="开启浏览器内支持webp关于WebP接入方案"></a>开启浏览器内支持webp<a href="https://www.xuanfengge.com/webp-access-scheme.html">关于WebP接入方案</a></h3><p><a href="https://www.google.com/search?q=%E5%8D%95%E4%B8%AA%E7%BD%91%E5%8D%A1%E6%9C%80%E5%A4%9A65535%E4%B8%AA%E7%AB%AF%E5%8F%A3">单个网卡最多65535个端口</a><br>2的16次方 = 65536。 2的32次方 = 4GB（大致是32位系统不能识别4G以上内存的原因）</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="http://www.cnblogs.com/zuoxiaolong/p/life49.html">谈谈HTTP协议中的短轮询、长轮询、长连接和短连接</a></li>
 <li><a href="https://bhsc881114.github.io/2015/06/23/HTTP%E8%AF%B7%E6%B1%82%E7%9A%84TCP%E7%93%B6%E9%A2%88%E5%88%86%E6%9E%90/">http请求的TCP瓶颈</a></li>
@@ -354,6 +359,7 @@ ga('send', 'pageview');
 <li><a href="http://www.cnblogs.com/mayingbao/archive/2007/11/30/978530.html">一张非常好的解释status code的表格</a></li>
 <li><a href="https://juejin.im/entry/5a20ca8f5188254dd936320b">tcp-ip较好的解释</a></li>
 <li><a href="https://juejin.im/post/5a2614b8f265da432652af7d">基本算是计算机网络教程的</a></li>
+<li><a href="https://medium.com/@chijianqiang/%E7%A8%8B%E5%BA%8F%E5%91%98%E6%80%8E%E4%B9%88%E4%BC%9A%E4%B8%8D%E7%9F%A5%E9%81%93-c10k-%E9%97%AE%E9%A2%98%E5%91%A2-d024cb7880f3">C10K问题</a></li>
 </ul>
 <p><a href="https://wsgzao.github.io/post/service-names-port-numbers/">服务器常用端口以及TCP/UDP端口列表</a></p>
 
@@ -601,6 +607,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">android</a>
               </li>
              
@@ -609,7 +619,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+                <a href="javascript:void(0)" class="js-tag color2">Window</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -645,15 +663,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Window</a>
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -677,15 +691,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -741,11 +747,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">service</a>
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+                <a href="javascript:void(0)" class="js-tag color3">service</a>
               </li>
             
             <div class="clearfix"></div>
