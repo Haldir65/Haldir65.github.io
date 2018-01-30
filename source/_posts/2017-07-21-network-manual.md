@@ -304,6 +304,11 @@ Session就是维护会话的。
 另外一种做法是可以尝试将Session的过期时间设置的长一点，比如一年，下次访问网站的时候就能实现自动登录了。
 更好一点的是是本地绝不保存用户敏感信息，登录生成一个有过期时间的的cookie或者token返回给客户端，下次打开浏览器判断下过期时间就好了。另外，现在浏览器大多带有记住密码的功能，这个锅还是丢给浏览器(用户)好了。
 
+论Token为什么要[放在内存里](https://segmentfault.com/a/1190000013010835)
+> 为了解决在操作过程不能让用户感到 Token 失效这个问题，有一种方案是在服务器端保存 Token 状态，用户每次操作都会自动刷新（推迟） Token 的过期时间——Session 就是采用这种策略来保持用户登录状态的。然而仍然存在这样一个问题，在前后端分离、单页 App 这些情况下，每秒种可能发起很多次请求，每次都去刷新过期时间会产生非常大的代价。如果 Token 的过期时间被持久化到数据库或文件，代价就更大了。所以通常为了提升效率，减少消耗，会把 Token 的过期时保存在缓存或者内存中。
+
+这篇文章顺便提到了如果在Token过期的时候去实现重刷Token的操作，首先客户端**绝对不会**存账户密码这种敏感信息。第一次登录成功后，后台返回token(有一定时长有效期)和一个refreshToken(如果前面的token失效了，直接拿着这个去请求后台给个新的Token)。所以客户端基本上就是在onError里面判断如果是Token失效的话，拿着refreshToken去重新获取Token。
+
 
 
 ## 5. 长连接
@@ -437,6 +442,7 @@ firefox > nginx [ACK] 好的,知道了
 
 
 [单个网卡最多65535个端口](https://www.google.com/search?q=%E5%8D%95%E4%B8%AA%E7%BD%91%E5%8D%A1%E6%9C%80%E5%A4%9A65535%E4%B8%AA%E7%AB%AF%E5%8F%A3)
+2的16次方 = 65536。 2的32次方 = 4GB（大致是32位系统不能识别4G以上内存的原因）
 
 ## 参考
 - [谈谈HTTP协议中的短轮询、长轮询、长连接和短连接](http://www.cnblogs.com/zuoxiaolong/p/life49.html)
@@ -447,6 +453,7 @@ firefox > nginx [ACK] 好的,知道了
 - [一张非常好的解释status code的表格](http://www.cnblogs.com/mayingbao/archive/2007/11/30/978530.html)
 - [tcp-ip较好的解释](https://juejin.im/entry/5a20ca8f5188254dd936320b)
 - [基本算是计算机网络教程的](https://juejin.im/post/5a2614b8f265da432652af7d)
+- [C10K问题](https://medium.com/@chijianqiang/%E7%A8%8B%E5%BA%8F%E5%91%98%E6%80%8E%E4%B9%88%E4%BC%9A%E4%B8%8D%E7%9F%A5%E9%81%93-c10k-%E9%97%AE%E9%A2%98%E5%91%A2-d024cb7880f3)
 
 
 [服务器常用端口以及TCP/UDP端口列表](https://wsgzao.github.io/post/service-names-port-numbers/)

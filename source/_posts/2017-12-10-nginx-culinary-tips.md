@@ -4,7 +4,9 @@ date: 2017-12-10 16:12:43
 tags: [nginx,tools]
 ---
 
-Nginx参考手册
+[linode的docs里面是这么介绍的](https://linode.com/docs/web-servers/nginx/how-to-configure-nginx/)
+>nginx is a lightweight, high performance web server designed to deliver large amounts of static content quickly with efficient use of system resources. nginx’s strong point is its ability to efficiently serve static content, like plain HTML and media files. Some consider it a less than ideal server for dynamic content.
+
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery151110073841.jpg?imageView2/2/w/600)
 <!--more-->
 
