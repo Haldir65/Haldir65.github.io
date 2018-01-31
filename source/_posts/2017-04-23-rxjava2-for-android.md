@@ -471,6 +471,8 @@ public class MainActivity extends AppCompatActivity {
 }
 ```
 
+replay操作符：一个source先创建，发送了3个事件后，有一个subscriber才开始subscribe，这时会把之前的3个事件和之后的陆续事件都丢给subscriber。
+
 
 
 ## 链式调用每一步都生成了新的object，Rxjava2和Rxjava1相比，对GC更加友好。

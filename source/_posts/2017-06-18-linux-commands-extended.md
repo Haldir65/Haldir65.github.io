@@ -424,6 +424,7 @@ Mere trash
 [LINUX下的21个特殊符号](http://blog.51cto.com/litaotao/1187983)
 [Shell学习笔记](https://notes.wanghao.work/2015-06-02-Shell%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html)
 [gdb调试器,debug用的](http://blog.jobbole.com/112547/)
+[chsh命令](http://man.linuxde.net/chsh)
 
 ```shell
 youtube-dl -o '%(title)s.%(ext)s' https://www.youtube.com/watch?v=rimXGaUdaLg
