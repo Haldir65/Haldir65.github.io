@@ -519,7 +519,9 @@ windows平台下查找当前正在跑的nginx进程：
 > tasklist /fi "imagename eq nginx.exe"
 
 ==============================================================================================================================
-
+benchmark
+[Apache Benchmarking tool.](https://www.garron.me/en/go2linux/how-benchmark-stress-your-apache-nginx-or-iis-server.html)
+> ab -kc 1000 -n 10000 http://www.some-site.cc/tmp/index.html
 
 ### 参考
 - [nginx Configurations](https://wizardforcel.gitbooks.io/nginx-doc/content/Text/6.1_nginx_windows.html)

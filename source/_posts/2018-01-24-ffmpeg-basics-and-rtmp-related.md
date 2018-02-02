@@ -1,5 +1,5 @@
 ---
-title: 2018-01-24-ffmpeg-basics-and-rtmp-related
+title: ffmpeg知识手册
 date: 2018-01-24 13:44:33
 tags:
 ---

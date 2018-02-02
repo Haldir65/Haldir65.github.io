@@ -443,6 +443,7 @@ pushd and popd can help you jump to some directory can come back later
 
 gdebi ##  like dpkg command , will install required dependency if needed
 
+cpulimit command  ##limit the cpu usage to certain process
 ```
 
 

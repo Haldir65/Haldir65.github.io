@@ -9,6 +9,18 @@ tags: [tools]
 
 <!--more-->
 
+
+javaScript中的正则
+比如说webpack.config.js中，loader模块有:
+```js
+{
+  ...
+  test: /\.css$/,
+  ...
+}
+```
+
+第一个正斜杠和最后一个正斜杠表示正则的开始和结束，反斜杠表示后面那个点就当做一个文字的点来处理，$代表以css结束
 ***We need more Pictures***
 
 一般情况下不要乱用正则
@@ -35,7 +47,8 @@ tags: [tools]
 
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/480617.jpg?imageView2/2/w/600)
 
-
+![](http://odzl05jxx.bkt.clouddn.com/image/jpglight-and-shadow-2411321_960_720.jpg?imageView2/2/w/600)
+![](http://odzl05jxx.bkt.clouddn.com/image/jpg/fuchsia-973x547.jpg?imageView2/2/w/600)
 
 
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery151110074347.jpg?imageView2/2/w/600)
