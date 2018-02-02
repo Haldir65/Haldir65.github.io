@@ -20,7 +20,7 @@
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/android_screen_coordinate_system.png?imageView2/2/w/500">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/view_hirearchy_1013.png">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/support_lib_methods_summary.jpg">
-<meta property="og:updated_time" content="2018-01-31T08:12:30.004Z">
+<meta property="og:updated_time" content="2018-02-02T10:47:00.112Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="安卓坐标系常用方法">
 <meta name="twitter:description" content="记录一些Android系统坐标系的常用方法，因为日常开发中难免会碰到需要单独计算View系统坐标的情况。">
@@ -220,14 +220,14 @@ ga('send', 'pageview');
 </blockquote>
 <p>关于window，DecorWindow的文章网上有很多，仔细研究下会对理解View的测量机制有一定好处，这对于View的工作原理也能够更彻底的理解。<br><a href="http://blog.csdn.net/qibin0506/article/details/49245601">参考文章</a><br>日常开发中，setContentView这个方法只是将我们自己写的activiy_main.xml布局文件inflate出来的view添加到<br>android.R.id.content这个ViewGroup中，实践下来发现这是一个ContentFrameLayout的实例，它的child只有一个，就是我们通过setContentView添加的View</p>
 <h3 id="5-让View滑动起来"><a href="#5-让View滑动起来" class="headerlink" title="5. 让View滑动起来"></a>5. 让View滑动起来</h3><blockquote>
-<p>offsetLeftAndRight(int offset) //给left和right加上一个值，改变的是View的位置<br>offsetTopAndBottom(int offset) </p>
+<p>offsetLeftAndRight(int offset) //给left和right加上一个值，改变的是View的位置<br>offsetTopAndBottom(int offset)</p>
 <p>scrollTo(int x,int y)  // 将View中的内容移动，坐标原点为parentView左上角，注意，参数为正，效果为反<br>例如scrollTo(-100,0) 在手机上看效果是往右移动了</p>
 <p>scrollBy(int x, int y)</p>
 </blockquote>
 <p>scrollBy的源码如下:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">scrollBy</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</span><br><span class="line">      scrollTo(mScrollX + x, mScrollY + y);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
 <p>还有一些不常用的：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setScrollX</span><span class="params">(<span class="keyword">int</span> value)</span> </span>&#123;</span><br><span class="line">        scrollTo(value, mScrollY);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
 <h3 id="6-改变LayoutParams的margin让View移动"><a href="#6-改变LayoutParams的margin让View移动" class="headerlink" title="6. 改变LayoutParams的margin让View移动"></a>6. 改变LayoutParams的margin让View移动</h3><p>这是一种很生硬的方式，不常用<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MarginLayoutParams params = (MarginLayoutParams)mTextView.getLayoutParams(); <span class="comment">//可能为null</span></span><br><span class="line">params.leftMargin + = <span class="number">100</span>;</span><br><span class="line">mTextView.setLayoutParams();<span class="comment">// 这里面调用了requestLayout</span></span><br></pre></td></tr></table></figure></p>
-<h3 id="7-使用Animation让View动起来"><a href="#7-使用Animation让View动起来" class="headerlink" title="7.使用Animation让View动起来"></a>7.使用Animation让View动起来</h3><p>根据官方文档的<a href="https://developer.android.com/guide/topics/graphics/overview.html">定义</a>Android中一共两种Animation: </p>
+<h3 id="7-使用Animation让View动起来"><a href="#7-使用Animation让View动起来" class="headerlink" title="7.使用Animation让View动起来"></a>7.使用Animation让View动起来</h3><p>根据官方文档的<a href="https://developer.android.com/guide/topics/graphics/overview.html">定义</a>Android中一共两种Animation:</p>
 <blockquote>
 <p>Property Animation<br>View Animation(包括Tween animation, Frame animation)</p>
 </blockquote>
@@ -236,13 +236,14 @@ ga('send', 'pageview');
 <p>属性动画可以代码创建，也可以写在R.animator文件夹下,用法:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">AnimatorSet set = (AnimatorSet) AnimatorInflater.loadAnimator(myContext,</span><br><span class="line">    R.anim.property_animator);</span><br><span class="line">set.setTarget(myObject);</span><br><span class="line">set.start();</span><br></pre></td></tr></table></figure></p>
 <p>推荐使用ViewPropertyAnimator，这是一个位于android.view下面的class，感觉更像是一个Util,大部分的方法都是在API 12 ,API 14引入的，<br>实际开发中推荐使用ViewCompat.animate() 返回一个ViewPropertyAnimator对象，省去了开发者版本判断的麻烦<br>语法更为简单：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ViewCompat.animate(view).x(<span class="number">500</span>).y(<span class="number">500</span>).setDuration(<span class="number">5000</span>).setInterpolator(<span class="keyword">new</span> DecelaratorInterpolator());  <span class="comment">//不需要调用start()</span></span><br></pre></td></tr></table></figure></p>
 <p>据说这种方式性能最好，Google官方强烈推荐,参考DevByte。<br>另外，据说大部分Google的App使用的都是DecelaratorInterpolator，当然这跟设计有关。</p>
-<h3 id="8-使用Scroller实现smoothScroll"><a href="#8-使用Scroller实现smoothScroll" class="headerlink" title="8.使用Scroller实现smoothScroll"></a>8.使用Scroller实现smoothScroll</h3><p>View有一个方法computeScroll(),复写，像这样就可以了<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Scroller scroller = <span class="keyword">new</span> Scroller(mContext);</span><br><span class="line"> </span><br><span class="line"> <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">smoothScrollTo</span><span class="params">(<span class="keyword">int</span> dstX, <span class="keyword">int</span> dstY)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">int</span> scrollX = getScrollX();</span><br><span class="line">      <span class="keyword">int</span> delta = dstX - scrollX;</span><br><span class="line">      scroller.startScroll(scrollX, <span class="number">0</span>, delta, <span class="number">0</span>, <span class="number">1000</span>);</span><br><span class="line">      invalidate();</span><br><span class="line"> &#125;</span><br><span class="line">  </span><br><span class="line"> <span class="meta">@Override</span></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">computeScroll</span><span class="params">()</span> </span>&#123;</span><br><span class="line">     <span class="keyword">if</span> (scroller.computeScrollOffset()) &#123;</span><br><span class="line">         scrollTo(scroller.getCurrX(), scroller.getCurY());</span><br><span class="line">         postInvalidate();</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="8-使用Scroller实现smoothScroll"><a href="#8-使用Scroller实现smoothScroll" class="headerlink" title="8.使用Scroller实现smoothScroll"></a>8.使用Scroller实现smoothScroll</h3><p>View有一个方法computeScroll(),复写，像这样就可以了<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Scroller scroller = <span class="keyword">new</span> Scroller(mContext);</span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">smoothScrollTo</span><span class="params">(<span class="keyword">int</span> dstX, <span class="keyword">int</span> dstY)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">int</span> scrollX = getScrollX();</span><br><span class="line">      <span class="keyword">int</span> delta = dstX - scrollX;</span><br><span class="line">      scroller.startScroll(scrollX, <span class="number">0</span>, delta, <span class="number">0</span>, <span class="number">1000</span>);</span><br><span class="line">      invalidate();</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> <span class="meta">@Override</span></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">computeScroll</span><span class="params">()</span> </span>&#123;</span><br><span class="line">     <span class="keyword">if</span> (scroller.computeScrollOffset()) &#123;</span><br><span class="line">         scrollTo(scroller.getCurrX(), scroller.getCurY());</span><br><span class="line">         postInvalidate();</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></p>
 <h3 id="9-补充几个好玩的函数"><a href="#9-补充几个好玩的函数" class="headerlink" title="9. 补充几个好玩的函数"></a>9. 补充几个好玩的函数</h3><p>View.canScrollVertically(int)<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">canChildScrollUp</span><span class="params">(View view)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">if</span> (android.os.Build.VERSION.SDK_INT &lt; <span class="number">14</span>) &#123;</span><br><span class="line">           <span class="keyword">if</span> (view <span class="keyword">instanceof</span> AbsListView) &#123;</span><br><span class="line">               <span class="keyword">final</span> AbsListView absListView = (AbsListView) view;</span><br><span class="line">               <span class="keyword">return</span> absListView.getChildCount() &gt; <span class="number">0</span></span><br><span class="line">                       &amp;&amp; (absListView.getFirstVisiblePosition() &gt; <span class="number">0</span> || absListView.getChildAt(<span class="number">0</span>)</span><br><span class="line">                       .getTop() &lt; absListView.getPaddingTop());</span><br><span class="line">           &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">               <span class="keyword">return</span> view.getScrollY() &gt; <span class="number">0</span>;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">           <span class="keyword">return</span> view.canScrollVertically(-<span class="number">1</span>);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
 <p>这段是我在秋百万的android-ultra-pulltorefresh里面找到的，想当初为了自己写下拉刷新，一遍一遍的打Log，最后甚至用上getVisibleRect才算搞定。<br>其实很多东西前人已经帮我们整理好了。<br>对了这东西在v4包里有ViewCompat.canScrollVertically，v4包除了方法数有点多(10k+好像)这点不好以外，一直都很好用<br>附上supportLibrary各个包的方法数，如果对65536这个数字熟悉的话，还是会注意点的。<br><img src="http://odzl05jxx.bkt.clouddn.com/support_lib_methods_summary.jpg" alt="pic"></p>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
 <li>使用getLocalVisibleRect可以判断一个view是否完全可见</li>
 <li>scrollBy,setScrollX等内部都是调用了scrollTo方法，ScrollTo方法传参数与实际效果是相反的</li>
 </ul>
+<h2 id="updates"><a href="#updates" class="headerlink" title="updates"></a>updates</h2><p>Android device Monitor里面有一个Dump UI Hierarchy for UI Automator，直接查看视图层级</p>
 <h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><ol>
 <li><a href="http://blog.csdn.net/yanbober/article/details/50419117">Android应用坐标系统全面详解</a></li>
 <li>​[如何取得View的位置之View.getLocationInWindow()的小秘密](<a href="http://blog.csdn.net/imyfriend/article/details/8564781">http://blog.csdn.net/imyfriend/article/details/8564781</a></li>
@@ -544,6 +545,14 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">linux</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">tools</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
@@ -552,19 +561,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">linux</a>
               </li>
              
               <li class="article-tag-list-item">
