@@ -8,8 +8,10 @@ tags: [前端]
 <!--more-->
 
 
+使用webpack的一个好处是，浏览器的并发请求资源数是有一个上限的，把所有资源打成一个包，能够减少请求数量。
+
 ## 1.安装
-yarn add webpack
+> yarn add webpack
 
 ## 2.使用
 
@@ -44,9 +46,23 @@ module.exports = {
             use: [ 'style-loader', 'css-loader' ]
           }
         ]
-    }
+    },
+    /* webpack dev server configuration */
+  devServer: {
+    contentBase: __dirname,
+    compress: true,
+    port: 8080,
+    hot: true,
+    inline: true
+  }
 }
 ```
+
+webpack devServer(内置一个express，在本地起一个local server)
+> yarn add webpack-dev-server
+
+但是devServer 的hot reload 只能监视js文件的变化，并不能监视html或者server content的变化。这需要[browserSync](https://browsersync.io/)以及BrowserSync plugin for Webpack.
+> yarn add browsersync browser-sync-webpack-plugin
 
 ## 4. babel
 首先需要知道的是mudule.exports那一套在浏览器里是不支持的。会出现"require is undefined..."。解决办法也有，安装babel就行了。

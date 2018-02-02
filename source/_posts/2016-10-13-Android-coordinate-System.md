@@ -32,7 +32,7 @@ Y = Top + getTranslationY
 ### 4. 几个跟Rect相关的
 获得的是当前View左上角距离屏幕左上角的位置，为此我专门测试了一下
 >  W/ViewAnimationActivity.java: [32 | onWindowFocusChanged]statusBarHeight = 75
->  W/ViewAnimationActivity.java: [35 | onWindowFocusChanged]getLocationInWindow  x = 0 y = 75 
+>  W/ViewAnimationActivity.java: [35 | onWindowFocusChanged]getLocationInWindow  x = 0 y = 75
 >  W/ViewAnimationActivity.java: [38 | onWindowFocusChanged]getLocationOnScreen x = 0 y = 75
 可以看到返回的就是View左上角的坐标，一般情况下两者区别不重要，stackoverFlow上有[讨论](http://stackoverflow.com/questions/17672891/getlocationonscreen-vs-getlocationinwindow)
 
@@ -68,7 +68,7 @@ android.R.id.content这个ViewGroup中，实践下来发现这是一个ContentFr
 
 ### 5. 让View滑动起来
 > offsetLeftAndRight(int offset) //给left和right加上一个值，改变的是View的位置
-> offsetTopAndBottom(int offset) 
+> offsetTopAndBottom(int offset)
 
 > scrollTo(int x,int y)  // 将View中的内容移动，坐标原点为parentView左上角，注意，参数为正，效果为反
 例如scrollTo(-100,0) 在手机上看效果是往右移动了
@@ -98,7 +98,7 @@ mTextView.setLayoutParams();// 这里面调用了requestLayout
 
 
 ### 7.使用Animation让View动起来
-根据官方文档的[定义](https://developer.android.com/guide/topics/graphics/overview.html)Android中一共两种Animation: 
+根据官方文档的[定义](https://developer.android.com/guide/topics/graphics/overview.html)Android中一共两种Animation:
 > Property Animation
 > View Animation(包括Tween animation, Frame animation)
 
@@ -132,14 +132,14 @@ ViewCompat.animate(view).x(500).y(500).setDuration(5000).setInterpolator(new Dec
 View有一个方法computeScroll(),复写，像这样就可以了
 ```java
 Scroller scroller = new Scroller(mContext);
- 
+
  private void smoothScrollTo(int dstX, int dstY) {
       int scrollX = getScrollX();
       int delta = dstX - scrollX;
       scroller.startScroll(scrollX, 0, delta, 0, 1000);
       invalidate();
  }
-  
+
  @Override
  public void computeScroll() {
      if (scroller.computeScrollOffset()) {
@@ -178,6 +178,9 @@ View.canScrollVertically(int)
 ### 总结
 - 使用getLocalVisibleRect可以判断一个view是否完全可见
 - scrollBy,setScrollX等内部都是调用了scrollTo方法，ScrollTo方法传参数与实际效果是相反的
+
+## updates
+Android device Monitor里面有一个Dump UI Hierarchy for UI Automator，直接查看视图层级
 
 
 

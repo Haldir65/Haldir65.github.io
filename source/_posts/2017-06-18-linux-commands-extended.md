@@ -433,6 +433,17 @@ youtube-dl -o '%(title)s.%(ext)s' https://www.youtube.com/watch?v=rimXGaUdaLg
 
 ls -al = l -al（可以少敲一个字母,其实是alias）
 
+small tricks
+```shell
+cat > filename.txt
+then start typing your text content
+ctrl +d to finish
+
+pushd and popd can help you jump to some directory can come back later
+
+gdebi ##  like dpkg command , will install required dependency if needed
+
+```
 
 
 [装java](https://www.digitalocean.com/community/tutorials/how-to-install-java-with-apt-get-on-ubuntu-16-04)

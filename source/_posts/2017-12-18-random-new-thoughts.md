@@ -13,7 +13,6 @@ top : 1
 * [x] flex,grid
 
 - [WPA 所代表的 Web 开发应是未来](https://huangxuan.me/2017/02/09/nextgen-web-pwa/)
-- [How To Install Jenkins on Ubuntu 16.04](https://www.digitalocean.com/community/tutorials/how-to-install-jenkins-on-ubuntu-16-04)
 - [js 循环闭包的解决方法](https://segmentfault.com/a/1190000003818163)
 - [Android Studio 编译过程](https://fucknmb.com/2017/05/11/Android-Studio-Library%E6%A8%A1%E5%9D%97%E4%B8%ADNative%E4%BB%A3%E7%A0%81%E8%BF%9B%E8%A1%8Cdebug%E7%9A%84%E4%B8%80%E4%BA%9B%E5%9D%91/)
 - [个人分享--web 前端学习资源分享](https://juejin.im/post/5a0c1956f265da430a501f51)
@@ -32,6 +31,8 @@ top : 1
 - [ ] jQuery 插件
 - [ ] vS Code Vender Prefix plugin => auto prefix loader
 - [ ] websocket nodejs
+- [ ]单个网卡最多65535个端口
+- [ ] install nginx , jenkin ci, deploying nginx in docker(Http Load Balaning with Docker and nginx)(https://www.digitalocean.com/community/tutorials/how-to-configure-nginx-with-ssl-as-a-reverse-proxy-for-jenkins)
 
 已完成
 
