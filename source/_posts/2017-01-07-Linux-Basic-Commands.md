@@ -713,6 +713,8 @@ nc指令()
 
 ============================
 ```
+## [shell script tutorial](https://www.youtube.com/watch?v=hwrnmQumtPw)
+
 
 ### 参考
 

@@ -38,7 +38,6 @@ javaScript中的正则
 
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/black-mountains.jpg?imageView2/2/w/600)
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/Carla Ossa in strapless gown.jpg?imageView2/2/w/600)
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/street lights dark night car city.jpg?imageView2/2/w/600)
 
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/street lights dark night car city bw.jpg?imageView2/2/w/600)
 
