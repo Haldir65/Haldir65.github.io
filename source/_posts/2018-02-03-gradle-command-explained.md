@@ -1,5 +1,5 @@
 ---
-title: 2018-02-03-gradle-command-explained
+title: gradle command记事本
 date: 2018-02-03 14:46:09
 tags:
 ---
@@ -26,3 +26,7 @@ subprojects {
 
 [All com.android.support libraries must use the exact same version [duplicate]
 ](https://stackoverflow.com/questions/42374151/all-com-android-support-libraries-must-use-the-exact-same-version-specification)
+
+
+[关于Android Gradle你需要知道这些（4）](https://juejin.im/post/5a756f11f265da4e7c185bc5)
+[Gradle插件学习笔记（四)](https://juejin.im/post/5a767c7cf265da4e9c6300a1#heading-5)

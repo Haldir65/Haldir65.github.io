@@ -380,6 +380,34 @@ $! 后台运行的最后一个进程的进程号（PID）
 ### 24.  Linux软件安装目录惯例
 转载自[](http://blog.csdn.net/aqxin/article/details/48324377)。
 一般特定文件夹里放什么东西是有惯例的。
+cd到根目录下长这样
+drwxr-xr-x  26 root   root     4096 Jan 26 10:08 .
+drwxr-xr-x  26 root   root     4096 Jan 26 10:08 ..
+drwxr-xr-x   2 root   root    12288 Jan  5 22:52 bin ##sbin和bin一样，存executable programs
+drwxr-xr-x   4 root   root     3072 Jan 26 10:08 boot
+drwxr-xr-x  18 root   root     4060 Feb  3 17:00 dev
+drwxr-xr-x 109 root   root     4096 Feb  4 04:18 etc ##configuration files , 比如passwd
+drwxr-xr-x   3 root   root     4096 Aug  6 05:42 home ##所有用户的home directory
+drwxr-xr-x  22 root   root     4096 Jan  5 22:53 lib ## 系统用的common library
+drwxr-xr-x   2 root   root     4096 Jan 19 06:30 lib64 ##
+drwx------   2 root   root    16384 Mar 14  2017 lost+found
+drwxr-xr-x   3 root   root     4096 Mar 14  2017 media
+drwxr-xr-x   2 root   root     4096 Feb 15  2017 mnt ##temp file systems are attached like cd rom or usb drive(就当优盘好了)
+drwxr-xr-x   2 root   root     4096 Feb 15  2017 opt
+dr-xr-xr-x 130 root   root        0 Feb  3 17:00 proc ##这个念procedure, 代表virtual file system stores kernel info，知道为什么看cpu型号要cat /proc了吧
+drwx------   6 root   root     4096 Dec 21 02:16 root  ##root account的根目录
+drwxr-xr-x  25 root   root      940 Feb  4 08:07 run
+drwxr-xr-x   2 root   root    12288 Jan 19 06:30 sbin ##sbin和bin一样，存executable programs,s代表essential system binary
+drwxr-xr-x   2 root   root     4096 Jan 14  2017 snap
+drwxr-xr-x   2 root   root     4096 Feb 15  2017 srv
+dr-xr-xr-x  13 root   root        0 Feb  4 08:08 sys
+drwxrwxrwt   9 root   root     4096 Feb  4 08:05 tmp ## contain temporary data,注意，该目录下文件重启后被erased
+drwxr-xr-x  11 root   root     4096 Dec 10 01:04 usr ##这里面有bin man sbin等目录，存放user program and other data
+drwxr-xr-x  14 root   root     4096 Dec 10 22:21 var ## 全称variable，存放variable data where system must be able to write during operation(就是log)
+
+
+
+
 
 /usr：系统级的目录，可以理解为C:/Windows/，/usr/lib理解为C:/Windows/System32。
 /usr/local：用户级的程序目录，可以理解为C:/Progrem Files/。用户自己编译的软件默认会安装到这个目录下。
@@ -444,6 +472,36 @@ pushd and popd can help you jump to some directory can come back later
 gdebi ##  like dpkg command , will install required dependency if needed
 
 cpulimit command  ##limit the cpu usage to certain process
+
+htop中按f4可以filter，按f9可以杀进程。 按下空格键可以选中某个process（用于多选）
+
+bleachbit可以帮助清理垃圾
+
+rsync用于做系统备份
+rsync -avz --delete Pictures/ 192.168.0.10:Pictures/  ## a表示archive，就是说保留源文件的permission,timestamp等等， v表示verbose, z表示zip(就像gzip一样，通过网络传输的时候能够节省流量),记得Pictures后面的斜杠不能少
+
+ubuntu上使用sudo xxx ，输入密码后，下次sudo就不会再次要求密码了，但其实系统会起一个倒计时，如果接下来的30分钟（大概这个时间）内没有执行sudo命令，将会再次提示要求输入密码
+解决方法sudo -s // 即后续sudo指令不需要秘密
+
+打开tty的方法: ctrl + alt + (f1-f8)
+
+sfpt cindy@192.168.0.2  ##以cindy的身份登录这台机器
+
+## bash的窗口在等待输入的时候一般张这样:
+john@server ~ $
+john表示当前用户名称
+sever表示当前主机名称
+~表示当前所在目录
+$表示没有特殊权限，就是说不是root previledge的意思
+
+### 下面这三个要跟ctrl+z一起用
+bg ##看之前按ctrl+z退到后台的程序
+jobs ##查看当前在跑的程序
+fg job name ##把这个程序拉到前台
+
+比方说当前目录下有一个dump.sh文件，想要执行的话，输入dump是没有用的。因为echo $PATH中并没有这个dump:目录/dusp.sh。
+所以要执行这个sh，需要./dump.sh
+
 ```
 
 

@@ -287,6 +287,16 @@ ejs
 pm2 //starting an node app as a bcakground service
 mongoose
 
+vscode debug node js的方式，打开调试窗口，点击那个小齿轮(打开launch.json)。直接在代码中断点即可。注意底下有一个debug console(调试控制台)，可以输入变量，查看当前值，和一些大型Ide很像。
+
+在chrome里面debug的方式：
+node --inspect app.js ##  一闪而过了
+node --inspect-brk app.js ##在第一行就给我停下来
+
+在chrome的地址栏输入 about:inspect , open dedicated DevTools for Node，点一下就会出现一个小窗口
+或者f12，会出现一个绿色的node的图标，点一下和上面那个open dedicated DevTools for Node是一样的
+[Debugging in 2017 with Node.js](https://www.youtube.com/watch?v=Xb_0awoShR8)
+
 =============================================================================
 
 

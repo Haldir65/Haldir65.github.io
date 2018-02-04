@@ -33,6 +33,8 @@ top : 1
 - [ ] websocket nodejs
 - [ ]单个网卡最多65535个端口
 - [ ] install nginx , jenkin ci, deploying nginx in docker(Http Load Balaning with Docker and nginx)(https://www.digitalocean.com/community/tutorials/how-to-configure-nginx-with-ssl-as-a-reverse-proxy-for-jenkins)
+- [ ] 用GDB调试程序
+- [ ] Paul Irish from google
 
 已完成
 
