@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/b9ae1189145b4a4d9dfe4d0b89a21b47.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/ed541bc1ed61ead0bf6ea8233ef01c0a.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-02-04T15:07:37.975Z">
+<meta property="og:updated_time" content="2018-02-05T14:10:26.992Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="网络通信手册">
 <meta name="twitter:description" content="网络相关的查找手册">
@@ -305,6 +305,10 @@ ga('send', 'pageview');
 <p>Session超时：超时指的是连续一定时间服务器没有收到该Session所对应客户端的请求，并且这个时间超过了服务器设置的Session超时的最大时间。<br>Session的maxAge一般为-1，表示仅当前浏览器内有效，关闭浏览器就会失效。</p>
 <p>知乎上有一段比较好的<a href="https://www.zhihu.com/question/19786827/answer/66706108">描述</a>,这里直接引用了。<br>http是无状态的协议，客户每次读取web页面时，服务器都打开新的会话，而且服务器也不会自动维护客户的上下文信息，那么要怎么才能实现网上商店中的购物车呢，session就是一种保存上下文信息的机制，它是针对每一个用户的，变量的值保存在服务器端，通过SessionID来区分不同的客户,session是以cookie或URL重写为基础的，默认使用cookie来实现，系统会创造一个名为JSESSIONID的输出cookie，我们叫做session cookie,以区别persistent cookies,也就是我们通常所说的cookie,注意session cookie是存储于浏览器内存中的，并不是写到硬盘上的，这也就是我们刚才看到的JSESSIONID，我们通常情是看不到JSESSIONID的，但是当我们把浏览器的cookie禁止后，web服务器会采用URL重写的方式传递Sessionid，我们就可以在地址栏看到 sessionid=KWJHUG6JJM65HS2K6之类的字符串。<br>javax.servlet.http.HttpServletRequest.getSession() 将会返回当前request相关联的HttpSession对象，如果不存在，将会创建一个。翻译一下，当一个浏览器请求来到之后，Servlet处理程序（Servlet容器内部实现）将会主动检查请求信息Cookie当中是否有JSESSIONID，若有，找到对应JSESSION的HttpSession对象，如果没有，创建一个，具体的机制在Servlet容器的实现当中。</p>
 <p>Session就是维护会话的。</p>
+<p><a href="http://wiki.jikexueyuan.com/project/node-lessons/cookie-session.html">session在express js中是这么维护的</a></p>
+<blockquote>
+<p>这意思就是说，当你浏览一个网页时，服务端随机产生一个 1024 比特长的字符串，然后存在你 cookie 中的 connect.sid 字段中。当你下次访问时，cookie 会带有这个字符串，然后浏览器就知道你是上次访问过的某某某，然后从服务器的存储中取出上次记录在你身上的数据。由于字符串是随机产生的，而且位数足够多，所以也不担心有人能够伪造。伪造成功的概率比坐在家里编程时被邻居家的狗突然闯入并咬死的几率还低。</p>
+</blockquote>
 <h3 id="4-3-自动登录的实现"><a href="#4-3-自动登录的实现" class="headerlink" title="4.3 自动登录的实现"></a>4.3 自动登录的实现</h3><p>一些网站的“记住密码，自动登录功能”，据说discuz直接将加密的（可逆）uid和密码保存到cookie中。<br>另外一种做法是可以尝试将Session的过期时间设置的长一点，比如一年，下次访问网站的时候就能实现自动登录了。<br>更好一点的是是本地绝不保存用户敏感信息，登录生成一个有过期时间的的cookie或者token返回给客户端，下次打开浏览器判断下过期时间就好了。另外，现在浏览器大多带有记住密码的功能，这个锅还是丢给浏览器(用户)好了。</p>
 <p>论Token为什么要<a href="https://segmentfault.com/a/1190000013010835">放在内存里</a></p>
 <blockquote>
@@ -328,7 +332,7 @@ ga('send', 'pageview');
 <li>从<a href="https://www.telerik.com/download/fiddler">https://www.telerik.com/download/fiddler</a> 下载Fiddler</li>
 <li>启动并配置: Tools-&gt;Fiddler-&gt;Connections, check “allow remote computers to connect” and default port is 8888</li>
 <li>配置手机：选择连接的网络-&gt;修改网络-&gt;代理设置:手动; 代理服务器主机名为电脑的ip，端口8888，ip DHCP</li>
-<li>抓包查看<br><a href="http://www.trinea.cn/android/tcpdump_wireshark/">详细教程</a></li>
+<li>抓包查看</li>
 </ul>
 <h3 id="9-Ajax和jQuery发起POST请求的时候设置的Content-Type对于服务器很重要"><a href="#9-Ajax和jQuery发起POST请求的时候设置的Content-Type对于服务器很重要" class="headerlink" title="9.Ajax和jQuery发起POST请求的时候设置的Content-Type对于服务器很重要"></a>9.Ajax和jQuery发起POST请求的时候设置的Content-Type对于服务器很重要</h3><p><a href="http://blog.csdn.net/mhmyqn/article/details/25561535">AJAX POST请求中参数以form data和request payload形式在servlet中的获取方式</a></p>
 <blockquote>
@@ -339,6 +343,7 @@ ga('send', 'pageview');
 <p>一些优化<br>[TTFB] TTFB（Time To First Byte），客户端发出请求到收到响应的第一个字节所花费的时间。一般浏览器里面都能看到，这也是服务端可以优化的指标。</p>
 <p>GZip压缩文本还可以，图片就没必要开压缩了，因为图片本身就高度压缩了，再压只是浪费CPU。</p>
 <p>网络协议，架构，规范，spdy,http2,url规范.<br>OSI七层网络体系结构 ： 物理层、数据链路层、网络层、传输层、表示层、会话层、应用层</p>
+<p><strong>OSI Model</strong><br>&gt;<br>application firefox/chrome/email<br>Presentation OS / letters$numbers -&gt; ASCII<br>Session Conversation between computers<br>Transport Packets are delived reliably(比如发送顺序和接受顺序一致)<br>Network Dtetermine best route for data<br>Data link NICS’s(Network interface cards) checking for errors(比如switches)<br>Physical Cabel / fiber optic cable / electronic signals</p>
 <p>HLS直播流慢(延迟高)是因为基于HTTP，(http live streaming，苹果提出的)<br>如果要低延迟还得rmtp</p>
 <p>应用层面的Http，SMTP,FTP,POP,TLS/SSL,IMAP</p>
 <p>tcp三次握手，四次挥手<br>在UDP中，每次发送数据报时，需要附带上本机的socket描述符和接收端的socket描述符。而由于TCP是基于连接的协议，在通信的socket对之间需要在通信之前建立连接，因此会有建立连接这一耗时存在于TCP协议的socket编程。</p>
@@ -356,6 +361,8 @@ ga('send', 'pageview');
 <blockquote>
 <p>301 是永久重定向，302 是临时重定向。短地址一经生成就不会变化，所以用 301 是符合 http 语义的。同时对服务器压力也会有一定减少。<br>但是如果使用了 301，我们就无法统计到短地址被点击的次数了。而这个点击次数是一个非常有意思的大数据分析数据源。能够分析出的东西非常非常多。所以选择302虽然会增加服务器压力，但是我想是一个更好的选择。</p>
 </blockquote>
+<p><a href="https://mp.weixin.qq.com/s?__biz=MzAwNDY1ODY2OQ==&amp;mid=207243549&amp;idx=1&amp;sn=4ebe4beb8123f1b5ab58810ac8bc5994">Android微信智能心跳方案</a><br><a href="http://hengyunabc.github.io/why-we-need-heartbeat/">为什么基于TCP的应用需要心跳包（TCP keep-alive原理分析）</a></p>
+<p>ipv6 ping6</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="http://www.cnblogs.com/zuoxiaolong/p/life49.html">谈谈HTTP协议中的短轮询、长轮询、长连接和短连接</a></li>
 <li><a href="https://bhsc881114.github.io/2015/06/23/HTTP%E8%AF%B7%E6%B1%82%E7%9A%84TCP%E7%93%B6%E9%A2%88%E5%88%86%E6%9E%90/">http请求的TCP瓶颈</a></li>
@@ -368,6 +375,21 @@ ga('send', 'pageview');
 <li><a href="https://medium.com/@chijianqiang/%E7%A8%8B%E5%BA%8F%E5%91%98%E6%80%8E%E4%B9%88%E4%BC%9A%E4%B8%8D%E7%9F%A5%E9%81%93-c10k-%E9%97%AE%E9%A2%98%E5%91%A2-d024cb7880f3">C10K问题</a></li>
 </ul>
 <p><a href="https://wsgzao.github.io/post/service-names-port-numbers/">服务器常用端口以及TCP/UDP端口列表</a></p>
+<p>tcp dump + wireShark抓包<br><a href="http://www.trinea.cn/android/tcpdump_wireshark/">详细教程</a></p>
+<p>httpOnly：浏览器不允许脚本操作 document.cookie 去更改 cookie</p>
+<p><a href="http://wiki.jikexueyuan.com/project/node-lessons/cookie-session.html">cookie 和 session参考</a></p>
+<h3 id="签名-signedCookies"><a href="#签名-signedCookies" class="headerlink" title="签名(signedCookies)"></a>签名(signedCookies)</h3><p>server一般不会在client端cookie中保留敏感信息，所以比方说我们要存一个user_id，正常也应该存在session中（后台的redis根据请求头中的session_id自己去找）。假如非要存client端的cookie中，可以这么干：<br>sever端保留一段随机的String，server将用户的user_id(存在后台)用sha1算法加密<br>比如<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> secret = <span class="string">"some_very_important_key"</span>; <span class="comment">// 这段secret越长，暴力破解的难度越大</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sha1</span>(<span class="params">real_user_id</span>)</span>&#123;</span><br><span class="line">    <span class="keyword">return</span> sha1(secret+real_user_id);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>实际使用中:<br>user_id： John Doe<br>即 “some_very_important_keyJohn Doe” = ‘a0d63c5c4194a1d2a67b96391d8d52954ac3512e’;<br><a href="http://tool.oschina.net/encrypt?type=2">在线sha1工具</a><br>所以client端最终保存的是”user_id_signed”: “a0d63c5c4194a1d2a67b96391d8d52954ac3512e”<br>后台收到请求之后，在后台服务的数据库中SELECT * FROM USER_TABLE WHERE user_id_signed = “a0d63c5c4194a1d2a67b96391d8d52954ac3512e”;<br>找到了的话就一切正常，找不到就403；<br>上述过程即”签名，专业点说，叫 信息摘要算法”。</p>
+<p>在yahoo上找到这样的评论:</p>
+<blockquote>
+<p>SHA1通常不是用來加密資料，而是用來產生資料的特徵碼 (fingerprint)，你是不是用錯演算法啦 ??<br>是的~~sha-1是不可逆的</p>
+</blockquote>
+<p>也即sha1过程是不可逆的<br>加密解密需要耗费cpu资源，暴力破解哈希值的成本太高。值得注意的是，上面那个在线加密网站中有些加密方法是可加密可解密(AES)的，有些根本没有解密的选项(SHA1,MD5),有些比较奇怪的(BASE64编码，BASE64解码，BASE64还能将图片转成一大串字符串)；</p>
+<h3 id="对称加密-cookie-session"><a href="#对称加密-cookie-session" class="headerlink" title="对称加密(cookie-session)"></a>对称加密(cookie-session)</h3><p>session 可以存在 cookie 中sessionData 中，丢到客户端。<br>var sessionData = {username: ‘alsotang’, age: 22, company: ‘alibaba’, location: ‘hangzhou’}<br>用sha1算法加密之后丢到cookie的</p>
+<blockquote>
+<p>signedCookies 跟 cookie-session 还是有区别的：<br>1）是前者信息可见不可篡改，后者不可见也不可篡改<br>2）是前者一般是长期保存，而后者是 session cookie<br>cookie-session 的实现跟 signedCookies 差不多。<br>不过 cookie-session 我个人建议不要使用，有受到回放攻击的危险。<br>所以最好把cookie session 也丢进缓存</p>
+<p>初学者容易犯的一个错误是，忘记了 session_id 在 cookie 中的存储方式是 session cookie。即，当用户一关闭浏览器，浏览器 cookie 中的 session_id 字段就会消失。<br>常见的场景就是在开发用户登陆状态保持时。</p>
+</blockquote>
 
       
 
@@ -729,6 +751,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">nginx</a>
               </li>
              
@@ -754,10 +780,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">service</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
             
             <div class="clearfix"></div>

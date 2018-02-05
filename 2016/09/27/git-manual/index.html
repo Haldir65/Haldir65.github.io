@@ -17,7 +17,7 @@
 <meta property="og:description" content="记录一下常用git的命令，作为日常使用的参考手册">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/f787b2e8d757dc83b782bcd6d4c9f523.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-02-04T15:07:37.979Z">
+<meta property="og:updated_time" content="2018-02-05T14:10:26.996Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="git常用操作手册">
 <meta name="twitter:description" content="记录一下常用git的命令，作为日常使用的参考手册">
@@ -219,12 +219,13 @@ ga('send', 'pageview');
 <h2 id="5-设置代理"><a href="#5-设置代理" class="headerlink" title="5. 设置代理"></a>5. 设置代理</h2><p>设置全局代理<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config --global http.proxy socks5://127.0.0.1:1080</span><br></pre></td></tr></table></figure></p>
 <p>对指定url设置代理</p>
 <p>###<br>git config –global http.&lt;要设置代理的URL&gt;.proxy socks5://127.0.0.1:1080</p>
-<p>git config –global http.<a href="https://github.com.proxy">https://github.com.proxy</a> socks5://127.0.0.1:1080<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">## 6. 对上一次commit进行修改(在不添加新的commit的基础上)</span><br><span class="line">```git</span><br><span class="line">git commit --amend</span><br></pre></td></tr></table></figure></p>
+<p>git config –global http.<a href="https://github.com.proxy">https://github.com.proxy</a> socks5://127.0.0.1:1080</p>
+<h2 id="6-对上一次commit进行修改-在不添加新的commit的基础上"><a href="#6-对上一次commit进行修改-在不添加新的commit的基础上" class="headerlink" title="6. 对上一次commit进行修改(在不添加新的commit的基础上)"></a>6. 对上一次commit进行修改(在不添加新的commit的基础上)</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git commit --amend</span><br></pre></td></tr></table></figure>
 <h2 id="7-git-revert和reset的区别"><a href="#7-git-revert和reset的区别" class="headerlink" title="7. git revert和reset的区别"></a>7. git revert和reset的区别</h2><blockquote>
 <p>reset 是在正常的commit历史中,删除了指定的commit,这时 HEAD 是向后移动了,而 revert 是在正常的commit历史中再commit一次,只不过是反向提交,他的 HEAD 是一直向前的. 即reset是通过一次反向的commit操作撤销之前的commit，而reset则会直接从提交历史里删除commit。如果还没有push，用reset可以在本地解决问题，之后重新commit再push。如果已经push，可以考虑通过一次revert来实现“撤销”的效果。</p>
 </blockquote>
 <p>语法：</p>
-<h3 id="reset"><a href="#reset" class="headerlink" title="reset"></a>reset</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git reset --hard HEAD //本地仓库文件修改也会消失</span><br><span class="line">git reset --soft HEAD //本地文件修改不会消失，类似于回到git add 之前的状态</span><br><span class="line">git reset --hard HEAD~3 //最近的三次提交全部撤销</span><br></pre></td></tr></table></figure>
+<h3 id="reset"><a href="#reset" class="headerlink" title="reset"></a>reset</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git reset --hard HEAD //本地仓库文件修改也会消失</span><br><span class="line">git reset --soft HEAD //本地文件修改不会消失，类似于回到git add 之前的状态(把绿色的改成红色)</span><br><span class="line">git reset --hard HEAD~3 //最近的三次提交全部撤销</span><br></pre></td></tr></table></figure>
 <h3 id="revert"><a href="#revert" class="headerlink" title="revert"></a>revert</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git revert c011eb3c20ba6fb38cc94fe //之后在分支图上就能看到一个新的反向的commit，push即可。</span><br></pre></td></tr></table></figure>
 <h2 id="8-切分支-删除分支"><a href="#8-切分支-删除分支" class="headerlink" title="8. 切分支, 删除分支"></a>8. 切分支, 删除分支</h2><p>本地新建分支<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout -b &lt;branchName&gt;</span><br></pre></td></tr></table></figure></p>
 <p>将这条分支与远程同步的方式<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git branch --set-upstream &lt;laocalBranchName&gt; origin/&lt;RemoteBranchName&gt;</span><br><span class="line">// 或者</span><br><span class="line">git branch -u origin/dev</span><br></pre></td></tr></table></figure></p>
@@ -629,6 +630,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">nginx</a>
               </li>
              
@@ -654,10 +659,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">service</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
             
             <div class="clearfix"></div>
