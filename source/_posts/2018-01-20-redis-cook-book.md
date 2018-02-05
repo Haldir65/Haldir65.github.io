@@ -181,6 +181,7 @@ expireat
 
 ### 对Value的操作
 ```shell
+KEYS * 列出所有的key
 exists(key)：确认一个key是否存在
 del(key)：删除一个key
 type(key)：返回值的类型
@@ -238,6 +239,11 @@ Request---->执行，Server将响应结果队列化
 
 ### 和其他语言的整合
 [支持的lanaguage client](https://redis.io/clients)
+
+
+**javaScript**
+[npm install redis](https://github.com/NodeRedis/node_redis)
+[在 Node.js 应用中集成 Redis](https://www.ibm.com/developerworks/cn/opensource/os-cn-nodejs-redis/index.html)
 
 
 [jedis](https://github.com/xetorthio/jedis)
@@ -304,6 +310,9 @@ var house = {
 > HMSET house:1 roof "house:1:roof" street "Market" buildYear "1996"
 
 [在redis中存储关系型数据](https://alexandergugel.svbtle.com/storing-relational-data-in-redis)
+
+[在redis中缓存session](http://wiki.jikexueyuan.com/project/node-lessons/cookie-session.html)
+> session 可以存放在 1）内存、2）cookie本身、3）redis 或 memcached 等缓存中，或者4）数据库中。线上来说，缓存的方案比较常见，存数据库的话，查询效率相比前三者都太低，不推荐
 
 =================================================================================
 

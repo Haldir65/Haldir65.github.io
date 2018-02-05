@@ -22,6 +22,14 @@ mysql连接多了容易爆内存，关掉的[方法](https://stackoverflow.com/q
 
 > mysqladmin -u root -p shutdown
 
+[host-xxx-xx-xxx-xxx-is-not-allowed-to-connect-to-this-mysql-server](https://stackoverflow.com/questions/1559955/host-xxx-xx-xxx-xxx-is-not-allowed-to-connect-to-this-mysql-server)
+
+## language support
+[using mysql in node js](https://github.com/mysqljs/mysql)
+
+## CURD COMMANDS
+首先要注意的是所有sql语句最后面都要跟一个分号
+> SELECT * FROM potluck;
 ### Another choice
 
 [mariadb](https://mariadb.org/)

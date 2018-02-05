@@ -35,6 +35,7 @@ top : 1
 - [ ] install nginx , jenkin ci, deploying nginx in docker(Http Load Balaning with Docker and nginx)(https://www.digitalocean.com/community/tutorials/how-to-configure-nginx-with-ssl-as-a-reverse-proxy-for-jenkins)
 - [ ] 用GDB调试程序
 - [ ] Paul Irish from google
+- [ ] npm install graphql(mostly a serverside javascript stuff)
 
 已完成
 

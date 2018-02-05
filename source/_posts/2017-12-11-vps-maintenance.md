@@ -49,7 +49,7 @@ python setup.py install
 
 ```json
 {
-  "server": "my_server_ip",
+  "server": "my_server_ip",  
   "server_port": 8388,
   "local_address": "127.0.0.1",
   "local_port": 1080,
@@ -59,6 +59,8 @@ python setup.py install
   "fast_open": true
 }
 ```
+
+使用ipv6的话(把"my_server_ip"改成"::"),这样访问通过ss访问ipv6.google.com就ok了(当然这要在确认host已有ipv6的前提下)
 
 如果你的服务器Linux 内核在3.7+，可以开启fast_open 以降低延迟。
 linux 内核版本查看：

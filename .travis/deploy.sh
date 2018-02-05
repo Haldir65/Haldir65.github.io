@@ -3,6 +3,21 @@ set -ev
 export TZ='Asia/Shanghai'
 
 echo "begin of clone static repo"
+
+## this is for string concatenation
+##foo="Hello"
+##foo="$foo World"
+##echo $foo
+
+## this is for how to send outputs of a program into a variable
+##OUTPUT="$(ls -1)"
+###echo "${OUTPUT}"
+
+### so we want to grab the latest commit msg
+msg="$(git log -1 --pretty=%B)"
+echo "${msg}"
+
+
 # 先 clone 再 commit，避免直接 force commit
 git clone --depth=50 --branch=master git@github.com:Haldir65/Haldir65.github.io.git ~/Haldir65/Haldir65.github.io
 
@@ -34,7 +49,8 @@ cd ~/Haldir65/Haldir65.github.io
 
 git status
 git add .
-git commit -m "Site auto updated: `date +"%Y-%m-%d %H:%M:%S"`"
+##git commit -m "Site auto updated: `date +"%Y-%m-%d %H:%M:%S"`"
+git commit -m ${msg} 
 git status
 echo "end of commit"
 

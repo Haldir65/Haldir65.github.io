@@ -489,25 +489,10 @@ dpkg -reconfigure 重新配置
 
 
 ### 9. 网络监控
-```shell
-tcpdump -i "venet0:0"  //抓包的
-tcpdump -c 10 //count
-tcpdump -c -A  //Asicii码形式展示出来每个package
-tcpdump -c 5 -i wlo1 // 监听某一个网卡
-tcpdump -c 5 -i wlo1 port 22// 监听某一个网卡某一个端口
+tcpdump结合wireshark可实现完整的网络抓包，这个放在下面写。
 
-tcpdump version 4.5.1
-libpcap version 1.5.3
-Usage: tcpdump [-aAbdDefhHIJKlLnNOpqRStuUvxX] [ -B size ] [ -c count ]
-                [ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]
-                [ -i interface ] [ -j tstamptype ] [ -M secret ]
-                [ -P in|out|inout ]
-                [ -r file ] [ -s snaplen ] [ -T type ] [ -V file ] [ -w file ]
-                [ -W filecount ] [ -y datalinktype ] [ -z command ]
-                [ -Z user ] [ expression ]
-```
 
-tcpdump结合wireshark可实现完整的网络抓包
+
 
 ```shell
 netstat
@@ -690,13 +675,11 @@ iptables -I INPUT -s 123.45.6.7 -j DROP       #屏蔽单个IP的命令
 iptables -I INPUT -s 123.0.0.0/8 -j DROP      #封整个段即从123.0.0.1到123.255.255.254的命令
 iptables -I INPUT -s 124.45.0.0/16 -j DROP    #封IP段即从123.45.0.1到123.45.255.254的命令
 
-
 ## 清除已有iptables规则
 iptables -F
 iptables -X
 iptables -Z
 ```
-
 
 ### 14. 多个tty(TeleTYpewriter)
 [how-to-multitask-in-the-linux-terminal-3-ways-to-use-multiple-shells-at-once](https://www.howtogeek.com/111417/how-to-multitask-in-the-linux-terminal-3-ways-to-use-multiple-shells-at-once/)
@@ -705,14 +688,92 @@ iptables -Z
 > 按住ctrl +a ，再按d 。退出screen
 > screen -r // 重新进刚才的screen
 
+### 15. ipv6 howto
+```shell
+## 首先在开启ipv6的机器上确认是否开启了ipv6
+ifconfig ## 看下是否有ipv6 address
+netstat -tuln ## 看下当前连接中是否有ipv6 addr
+ifconfig的输出大致如下：
+
+inet6 addr: 2001:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx/64 Scope:Global
+inet6 addr: fe80::xxxx:xxxx:xxxx:xxxx/64 Scope:Link
+[What’s that % sign after ipconfig IPv6 address?](https://howdoesinternetwork.com/2013/ipv6-zone-id)
+## 那个/64不要管，2001.xxx粘贴到[ipv6now](http://ipv6now.com.au/pingme.php)
+## 然后用一些online ipv6 website ping一下
+```
+
+
+### 16.netcat , cryptcat
+[oracle page](https://docs.oracle.com/cd/E56344_01/html/E54075/netcat-1.html)
+netcat是网络工具中的瑞士军刀，它能通过TCP和UDP在网络中读写数据。netcat所做的就是在两台电脑之间建立链接并返回两个数据流。
+netcat = nc
+```shell
+nc -z -v -n 172.31.100.7 21-100  ##用来扫描这台机器上开放的端口，用来识别漏洞
+z 参数告诉netcat使用0 IO,连接成功后立即关闭连接， 不进行数据交换
+v 参数指使用冗余选项 verbose
+n 参数告诉netcat 不要使用DNS反向查询IP地址的域名 numeric
+u 参数使用udp ，默认是tcp
+
+## on the server side ，创建一个chat 服务器
+netcat -l -p 38929 ## l listen p port ，大写的L表示socket断了之后自动重连
+## client
+nc 172.31.100.7 38929
+
+### now the server and client can talk to each other
+
+## 文件传输
+### server
+nc -l 1567 < file.txt
+## client
+nc -n 172.31.100.7 1567 > file.txt
+
+### 传输目录
+### server
+tar -cvf – dir_name | nc -l 1567
+### client
+nc -n 172.31.100.7 1567 | tar -xvf -
+```
+[Linux Netcat 命令——网络工具中的瑞士军刀 ](http://www.oschina.net/translate/linux-netcat-command)
+
+
+### 17. WireShark and netcap
+首先是wireShark和fiddle的对比[Wireshark vs Firebug vs Fiddler - pros and cons?](https://stackoverflow.com/questions/4263116/wireshark-vs-firebug-vs-fiddler-pros-and-cons)
+
+> Wireshark, Firebug, Fiddler all do similar things - capture network traffic.
+Wireshark captures any kind of a network packet. It can capture packet details below TCP/IP(Http is at the top). It does have filters to reduce the noise it captures.
+Fiddler works as a http/https proxy. It captures each http request the computer makes and records everything associated with it. Does allow things like converting post varibles to a table form and editing/replaying requests. It doesn't, by default, capture localhost traffic in IE, see the FAQ for the workaround.
+The benefit of WireShark is that it could possibly show you errors in levels below the HTTP protocol. Fiddler will show you errors in the HTTP protocol.
+
+简单来说就是fiddle只抓http(s)层的packet,wireShark抓的是tcp(udp)层的。 wireShark > fiddler(Charles 也差不多，只抓http层的)
+
+基本的流程是：首先在linux上生成dump.pcap文件，然后在wireShark中打开(对了要先去wireshark官网下windows的安装文件，注意不要装上全家桶就是了)；
+
+[聊聊tcpdump与Wireshark抓包分析](https://my.oschina.net/xianggao/blog/678644)
+```shell
+sudo tcpdump -i "venet0:0"  //tcpdump需要sudo权限
+sudo tcpdump -c 10 //count
+sudo tcpdump -c -A  //Asicii码形式展示出来每个package
+sudo tcpdump -c 5 -i wlo1 // 监听某一个网卡
+sudo tcpdump -c 5 -i wlo1 port 22// 监听某一个网卡某一个端口
+sudo tcpdump -i eth0 -w dump.pcap -v //w表示要保存的文件的位置
+// 注意运行上述指令的时候，会显示Got 18 这种提示，意味着已经抓到了多少个包，这个数其实也是随着时间流逝一直增长的。
+ctrl+c停止抓包，会生成一个dump.pcap文件(不要尝试着去cat 或者less，是一个binary 文件，会崩的)。
+
+
+tcpdump version 4.5.1
+libpcap version 1.5.3
+Usage: tcpdump [-aAbdDefhHIJKlLnNOpqRStuUvxX] [ -B size ] [ -c count ]
+                [ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]
+                [ -i interface ] [ -j tstamptype ] [ -M secret ]
+                [ -P in|out|inout ]
+                [ -r file ] [ -s snaplen ] [ -T type ] [ -V file ] [ -w file ]
+                [ -W filecount ] [ -y datalinktype ] [ -z command ]
+                [ -Z user ] [ expression ]
+```
+
 
 
 ==================================================================================
-nc指令()
-```shell
-
-============================
-```
 ## [shell script tutorial](https://www.youtube.com/watch?v=hwrnmQumtPw)
 
 

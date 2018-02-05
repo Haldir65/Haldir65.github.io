@@ -299,6 +299,9 @@ javax.servlet.http.HttpServletRequest.getSession() 将会返回当前request相�
 
 Session就是维护会话的。
 
+[session在express js中是这么维护的](http://wiki.jikexueyuan.com/project/node-lessons/cookie-session.html)
+> 这意思就是说，当你浏览一个网页时，服务端随机产生一个 1024 比特长的字符串，然后存在你 cookie 中的 connect.sid 字段中。当你下次访问时，cookie 会带有这个字符串，然后浏览器就知道你是上次访问过的某某某，然后从服务器的存储中取出上次记录在你身上的数据。由于字符串是随机产生的，而且位数足够多，所以也不担心有人能够伪造。伪造成功的概率比坐在家里编程时被邻居家的狗突然闯入并咬死的几率还低。
+
 ### 4.3 自动登录的实现
 一些网站的“记住密码，自动登录功能”，据说discuz直接将加密的（可逆）uid和密码保存到cookie中。
 另外一种做法是可以尝试将Session的过期时间设置的长一点，比如一年，下次访问网站的时候就能实现自动登录了。
@@ -373,7 +376,9 @@ public class Test {
 - 启动并配置: Tools->Fiddler->Connections, check "allow remote computers to connect" and default port is 8888
 - 配置手机：选择连接的网络->修改网络->代理设置:手动; 代理服务器主机名为电脑的ip，端口8888，ip DHCP
 - 抓包查看
-[详细教程](http://www.trinea.cn/android/tcpdump_wireshark/)
+
+
+
 
 
 ### 9.Ajax和jQuery发起POST请求的时候设置的Content-Type对于服务器很重要
@@ -461,3 +466,52 @@ firefox > nginx [ACK] 好的,知道了
 
 
 [服务器常用端口以及TCP/UDP端口列表](https://wsgzao.github.io/post/service-names-port-numbers/)
+
+tcp dump + wireShark抓包
+[详细教程](http://www.trinea.cn/android/tcpdump_wireshark/)
+
+
+httpOnly：浏览器不允许脚本操作 document.cookie 去更改 cookie
+
+
+[cookie 和 session参考](http://wiki.jikexueyuan.com/project/node-lessons/cookie-session.html)
+### 签名(signedCookies)
+server一般不会在client端cookie中保留敏感信息，所以比方说我们要存一个user_id，正常也应该存在session中（后台的redis根据请求头中的session_id自己去找）。假如非要存client端的cookie中，可以这么干：
+sever端保留一段随机的String，server将用户的user_id(存在后台)用sha1算法加密
+比如
+```js
+var secret = "some_very_important_key"; // 这段secret越长，暴力破解的难度越大
+function sha1(real_user_id){
+    return sha1(secret+real_user_id);
+}
+```
+实际使用中:
+user_id： John Doe
+即 "some_very_important_keyJohn Doe" = 'a0d63c5c4194a1d2a67b96391d8d52954ac3512e';
+[在线sha1工具](http://tool.oschina.net/encrypt?type=2)
+所以client端最终保存的是"user_id_signed": "a0d63c5c4194a1d2a67b96391d8d52954ac3512e"
+后台收到请求之后，在后台服务的数据库中SELECT * FROM USER_TABLE WHERE user_id_signed = "a0d63c5c4194a1d2a67b96391d8d52954ac3512e";
+找到了的话就一切正常，找不到就403；
+上述过程即"签名，专业点说，叫 信息摘要算法"。
+
+在yahoo上找到这样的评论:
+>SHA1通常不是用來加密資料，而是用來產生資料的特徵碼 (fingerprint)，你是不是用錯演算法啦 ??
+是的~~sha-1是不可逆的
+
+也即sha1过程是不可逆的
+加密解密需要耗费cpu资源，暴力破解哈希值的成本太高。值得注意的是，上面那个在线加密网站中有些加密方法是可加密可解密(AES)的，有些根本没有解密的选项(SHA1,MD5),有些比较奇怪的(BASE64编码，BASE64解码，BASE64还能将图片转成一大串字符串)；
+
+
+###  对称加密(cookie-session)
+session 可以存在 cookie 中sessionData 中，丢到客户端。
+var sessionData = {username: 'alsotang', age: 22, company: 'alibaba', location: 'hangzhou'}
+用sha1算法加密之后丢到cookie的
+>signedCookies 跟 cookie-session 还是有区别的：
+1）是前者信息可见不可篡改，后者不可见也不可篡改
+2）是前者一般是长期保存，而后者是 session cookie
+cookie-session 的实现跟 signedCookies 差不多。
+不过 cookie-session 我个人建议不要使用，有受到回放攻击的危险。
+所以最好把cookie session 也丢进缓存
+
+> 初学者容易犯的一个错误是，忘记了 session_id 在 cookie 中的存储方式是 session cookie。即，当用户一关闭浏览器，浏览器 cookie 中的 session_id 字段就会消失。
+常见的场景就是在开发用户登陆状态保持时。

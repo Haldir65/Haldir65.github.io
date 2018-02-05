@@ -60,6 +60,7 @@ req.query  // {"age","10"}  // 显然这是url里面的query
 
 
 ## 3. Serving static files
+
 ```javaScript
 app.use(express.static(path.join(__dirname,'public')))
 ```
@@ -70,6 +71,9 @@ app.use(express.static(path.join(__dirname,'public')))
 app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist/'));
 ```
 这意思就是请求/jquery这个目录下的资源就等于访问/node_modules/jquery/dist/目录下同名的资源
+
+
+
 
 ## 4. response
 response.redirect('/all'); //在浏览器里面看，response的header是这样的
@@ -88,7 +92,7 @@ Connection: keep-alive
 和window.location.href差不多
 
 
-```javaScript
+```js
 /* GET  /api/user */ much extra information you can set on its header
 app.get("/user",function (req,res) {
     res.set({
@@ -105,12 +109,47 @@ app.get("/user",function (req,res) {
         "age":10
     });
 });
-
-
-app.get("/user",function (req,res,next) {
-};
-
 ```
+
+
+
+简单的session处理:
+> yarn add express cookie-parser express-session
+```js
+router.get("/", function(req, res, next) {
+  if (req.session.user) {
+    var user = req.session.user;
+    var name = user.name;
+    res.send("你好" + name + "，欢迎来到我的家园。");
+  } else {
+    let user = {
+      name: "Chen-xy",
+      age: "22",
+      address: "bj"
+    };
+    req.session.user = user;
+    res.send("你还没有登录，先登录下再试试！");
+  }
+
+  // res.render("index", {
+  //   title: "the test for nodejs session",
+  //   name: "sessiontest"
+  // });
+});
+```
+
+
+
+======================================================
+how about error handling
+
+```js
+app.get("/user",function (req,res,next) {
+
+};
+```
+
+
 
 
 

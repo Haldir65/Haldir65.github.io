@@ -78,7 +78,7 @@ git config --global http.proxy socks5://127.0.0.1:1080
 git config --global http.<要设置代理的URL>.proxy socks5://127.0.0.1:1080
 
 git config --global http.https://github.com.proxy socks5://127.0.0.1:1080
-```
+
 
 ## 6. 对上一次commit进行修改(在不添加新的commit的基础上)
 ```git
@@ -93,7 +93,7 @@ git commit --amend
 ### reset
 ```git
 git reset --hard HEAD //本地仓库文件修改也会消失
-git reset --soft HEAD //本地文件修改不会消失，类似于回到git add 之前的状态
+git reset --soft HEAD //本地文件修改不会消失，类似于回到git add 之前的状态(把绿色的改成红色)
 git reset --hard HEAD~3 //最近的三次提交全部撤销
 ```
 
