@@ -4,7 +4,6 @@ date: 2018-02-04 21:37:37
 tags:
 ---
 
-
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/fuchsia-973x547.jpg?imageView2/2/w/600)
 <!--more-->
 
@@ -24,12 +23,22 @@ mysql连接多了容易爆内存，关掉的[方法](https://stackoverflow.com/q
 
 [host-xxx-xx-xxx-xxx-is-not-allowed-to-connect-to-this-mysql-server](https://stackoverflow.com/questions/1559955/host-xxx-xx-xxx-xxx-is-not-allowed-to-connect-to-this-mysql-server)
 
-## language support
-[using mysql in node js](https://github.com/mysqljs/mysql)
 
 ## CURD COMMANDS
 首先要注意的是所有sql语句最后面都要跟一个分号
 > SELECT * FROM potluck;
+
+
+
+
+
+
+
+## language support
+[using mysql in node js](https://github.com/mysqljs/mysql)
+
+
+
 ### Another choice
 
 [mariadb](https://mariadb.org/)

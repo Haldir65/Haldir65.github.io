@@ -401,6 +401,18 @@ GZip压缩文本还可以，图片就没必要开压缩了，因为图片本身�
 网络协议，架构，规范，spdy,http2,url规范.
 OSI七层网络体系结构 ： 物理层、数据链路层、网络层、传输层、表示层、会话层、应用层
 
+**OSI Model**
+>
+application firefox/chrome/email
+Presentation OS / letters$numbers -> ASCII
+Session Conversation between computers
+Transport Packets are delived reliably(比如发送顺序和接受顺序一致)
+Network Dtetermine best route for data
+Data link NICS's(Network interface cards) checking for errors(比如switches)
+Physical Cabel / fiber optic cable / electronic signals
+
+
+
 HLS直播流慢(延迟高)是因为基于HTTP，(http live streaming，苹果提出的)
 如果要低延迟还得rmtp
 
@@ -453,6 +465,11 @@ firefox > nginx [ACK] 好的,知道了
 >301 是永久重定向，302 是临时重定向。短地址一经生成就不会变化，所以用 301 是符合 http 语义的。同时对服务器压力也会有一定减少。
 但是如果使用了 301，我们就无法统计到短地址被点击的次数了。而这个点击次数是一个非常有意思的大数据分析数据源。能够分析出的东西非常非常多。所以选择302虽然会增加服务器压力，但是我想是一个更好的选择。
 
+[Android微信智能心跳方案](https://mp.weixin.qq.com/s?__biz=MzAwNDY1ODY2OQ==&mid=207243549&idx=1&sn=4ebe4beb8123f1b5ab58810ac8bc5994)
+[为什么基于TCP的应用需要心跳包（TCP keep-alive原理分析）](http://hengyunabc.github.io/why-we-need-heartbeat/)
+
+
+ipv6 ping6
 ## 参考
 - [谈谈HTTP协议中的短轮询、长轮询、长连接和短连接](http://www.cnblogs.com/zuoxiaolong/p/life49.html)
 - [http请求的TCP瓶颈](https://bhsc881114.github.io/2015/06/23/HTTP%E8%AF%B7%E6%B1%82%E7%9A%84TCP%E7%93%B6%E9%A2%88%E5%88%86%E6%9E%90/)
