@@ -33,7 +33,7 @@ top : 1
 - [写 groovy 用 intelij 就可以了](https://www.jetbrains.com/help/idea/getting-started-with-groovy.html) 》 how to
 - [X] vS Code Vender Prefix plugin => auto prefix loader
 - [ ] websocket nodejs
-- [ ]单个网卡最多65535个端口
+- [X]单个网卡最多65535个端口，c10K
 - [ ] install nginx , jenkin ci, deploying nginx in docker(Http Load Balaning with Docker and nginx)(https://www.digitalocean.com/community/tutorials/how-to-configure-nginx-with-ssl-as-a-reverse-proxy-for-jenkins)
 - [ ] Paul Irish from google
 

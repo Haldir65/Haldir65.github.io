@@ -508,6 +508,38 @@ location = /images/default.gif {
 }
 ```
 
+### 5.4 NGINX LOAD BALANCING 负载均衡
+Load balancing across multiple application instances is a commonly used technique for optimizing resource utilization, maximizing throughput, reducing latency, and ensuring fault-tolerant configurations.
+```config
+http {
+    upstream backend {
+        server backend1.example.com weight=5;
+        server backend2.example.com;
+        server 192.0.0.1 backup;
+    }
+    server {
+        location / {
+            proxy_pass http://backend; ## 所有的访问http://backend的流量都被导向上面的三个服务器
+            ## proxy_pass只是其中一种，还有fastcgi_pass, memcached_pass, uwsgi_pass, scgi_pass
+        }
+    }
+}
+```
+导向策略有多种：
+1. Round-robin (默认) 1, 2 , 1, 2 ,1 ....如此反复
+2. least_conn 连接数最少的优先（如果有weight，加权选择）
+```config
+upstream backend {
+    least_conn;
+    server backend1.example.com;
+    server backend2.example.com;
+}
+```
+3. ip_hash (一个ip只会导向固定的一个server，这个适合做ab test)
+这些是主要的策略
+
+
+
 ### 6. 问题速查
 - nginx.service - A high performance web server and a reverse proxy server
    Loaded: loaded (/lib/systemd/system/nginx.service; enabled; vendor preset: enabled)
@@ -518,10 +550,19 @@ windows下应该在nginx/logs/error.log文件里面
 windows平台下查找当前正在跑的nginx进程：
 > tasklist /fi "imagename eq nginx.exe"
 
-==============================================================================================================================
-benchmark
+
+benchmark，[压力测试](https://www.digitalocean.com/community/tutorials/how-to-use-apachebench-to-do-load-testing-on-an-ubuntu-13-10-vps)
 [Apache Benchmarking tool.](https://www.garron.me/en/go2linux/how-benchmark-stress-your-apache-nginx-or-iis-server.html)
 > ab -kc 1000 -n 10000 http://www.some-site.cc/tmp/index.html
+-n表示一共要请求多少次,-c表示每次请求模拟多少个并发
+
+
+==========================================================================================================================
+
+add_header not working on ubuntu server?
+
+
+
 
 ### 参考
 - [nginx Configurations](https://wizardforcel.gitbooks.io/nginx-doc/content/Text/6.1_nginx_windows.html)
@@ -530,3 +571,4 @@ benchmark
 - [if is evil, 可以,但不要在config文件里面写if](https://www.nginx.com/resources/wiki/start/topics/depth/ifisevil/)
 - [nginx的一些优化策略](https://www.digitalocean.com/community/tutorials/how-to-optimize-nginx-configuration)
 - [rewrite rules怎么写](https://www.nginx.com/blog/creating-nginx-rewrite-rules/)
+- [NGINX LOAD BALANCING – HTTP LOAD BALANCER](https://www.nginx.com/resources/admin-guide/load-balancer/)

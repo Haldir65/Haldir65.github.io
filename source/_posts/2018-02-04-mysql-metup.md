@@ -19,12 +19,16 @@ tags:
 [Too many connections](https://stackoverflow.com/questions/4932503/how-to-kill-mysql-connections)
 mysql连接多了容易爆内存，关掉的[方法](https://stackoverflow.com/questions/11091414/how-to-stop-mysqld)
 
-> mysqladmin -u root -p shutdown
+> mysqladmin -u root -p shutdown ## 关闭
+> sudo /etc/init.d/mysql restart ## 重启
 
 [host-xxx-xx-xxx-xxx-is-not-allowed-to-connect-to-this-mysql-server](https://stackoverflow.com/questions/1559955/host-xxx-xx-xxx-xxx-is-not-allowed-to-connect-to-this-mysql-server)
 > 1。 改表法。
 可能是你的帐号不允许从远程登陆，只能在localhost。这个时候只要在localhost的那台电脑，登入mysql后，更改 "mysql" 数据库里的 "user" 表里的 "host" 项，从"localhost"改称"%"
 
+
+配置文件的位置:
+> nano /etc/mysql/mysql.conf.d/mysqld.conf
 
 ```sql
 mysql -u root -p
@@ -59,8 +63,44 @@ Collation: 'utf_8_general_cli';
 
 ## CURD COMMANDS
 首先要注意的是所有sql语句最后面都要跟一个分号
-> SELECT * FROM potluck;
+```sql
+SHOW DATABASES;
+CREATE DATABASE dbname;
+USE dbname;
 
+## show how many tables are there in this table
+SHOW TABLES;
+
+## create table
+CREATE TABLE potluck (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,name VARCHAR(20),food VARCHAR(30),confirmed CHAR(1),signup_date DATE);
+
+## show everyting
+SELECT * FROM potluck;
+
+## how does potluck look like?
+DESCRIBE potluck;
+
+## ADD STUFF
+INSERT INTO `potluck` (`id`,`name`,`food`,`confirmed`,`signup_date`) VALUES (NULL, "John", "Casserole","Y", '2012-04-11');
+
+## update stuff
+UPDATE `potluck` SET `confirmed` = 'Y' WHERE `potluck`.`name` ='Sandy';
+
+## we want to add a column to table
+ALTER TABLE potluck ADD email VARCHAR(40);
+
+## this way we add to a specific position
+ALTER TABLE potluck ADD email VARCHAR(40) AFTER name;
+
+## drop this column
+ALTER TABLE potluck DROP email;
+
+## how about delete this row
+DELETE from potluck  where name='Sandy';
+
+```
+
+### 支持的数据类型
 
 
 
