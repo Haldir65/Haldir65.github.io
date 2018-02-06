@@ -17,7 +17,7 @@
 <meta property="og:description" content="linode的docs里面是这么介绍的  nginx is a lightweight, high performance web server designed to deliver large amounts of static content quickly with efficient use of system resources. nginx’s strong point is its">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery151110073841.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-02-06T10:46:51.581Z">
+<meta property="og:updated_time" content="2018-02-06T14:43:29.731Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Nginx使用记录">
 <meta name="twitter:description" content="linode的docs里面是这么介绍的  nginx is a lightweight, high performance web server designed to deliver large amounts of static content quickly with efficient use of system resources. nginx’s strong point is its">
@@ -310,6 +310,20 @@ ga('send', 'pageview');
 <blockquote>
 <p>ab -kc 1000 -n 10000 <a href="http://www.some-site.cc/tmp/index.html">http://www.some-site.cc/tmp/index.html</a><br>-n表示一共要请求多少次,-c表示每次请求模拟多少个并发</p>
 </blockquote>
+<h3 id="7-整理一下linode的文章"><a href="#7-整理一下linode的文章" class="headerlink" title="7. 整理一下linode的文章"></a>7. 整理一下linode的文章</h3><p><a href="https://linode.com/docs/web-servers/nginx/how-to-configure-nginx/">linoe关于nginx配置的文章写得特别好</a><br>/etc/nginx/nginx.conf<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">http &#123;</span><br><span class="line"></span><br><span class="line">    ##</span><br><span class="line">    # Basic Settings</span><br><span class="line">    ##</span><br><span class="line"></span><br><span class="line">    sendfile on;</span><br><span class="line">    tcp_nopush on;</span><br><span class="line">    tcp_nodelay on;</span><br><span class="line">    keepalive_timeout 65;</span><br><span class="line">    types_hash_max_size 2048;</span><br><span class="line">    # server_tokens off;</span><br><span class="line"></span><br><span class="line">    # server_names_hash_bucket_size 64;</span><br><span class="line">    # server_name_in_redirect off;</span><br><span class="line"></span><br><span class="line">    include /etc/nginx/mime.types;</span><br><span class="line">    default_type application/octet-stream;</span><br><span class="line"></span><br><span class="line">    ##</span><br><span class="line">    # Logging Settings</span><br><span class="line">    ##</span><br><span class="line"></span><br><span class="line">    access_log /var/log/nginx/access.log;</span><br><span class="line">    error_log /var/log/nginx/error.log;</span><br><span class="line"></span><br><span class="line">    ##</span><br><span class="line">    # Gzip Settings</span><br><span class="line">    ##</span><br><span class="line"></span><br><span class="line">    gzip on;</span><br><span class="line">    gzip_disable &quot;msie6&quot;;</span><br><span class="line">    # gzip_vary on;</span><br><span class="line">    # gzip_proxied any;</span><br><span class="line">    # gzip_comp_level 6;  // gzip基本上就是用cpu资源节省带宽，默认是1，最高是9，越大压缩效果越好，也越费cpu</span><br><span class="line">    # gzip_buffers 16 8k;</span><br><span class="line">    # gzip_http_version 1.1;</span><br><span class="line">    include /etc/nginx/sites-enabled/*; //引入site-enabled中所有文件</span><br><span class="line">    include /etc/nginx/conf.d/*.conf; //或者引入config.d文件夹中所有.config文件</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
+<p>http这个directive下一层就是server了,一般来说，一个虚拟域名(virtual domain)就对应着一个server块。</p>
+<p><strong>接下来的东西就不要写在/etc/nginx/nginx.conf文件里了,这里应该是一个domian写一个.conf文件</strong><br>/etc/nginx/sites-available/default<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">        listen 80 default_server;  //  default_server means this virtual host will answer requests on port 80 that don’t specifically match another virtual host’s listen statement.</span><br><span class="line">        listen [::]:80 default_server ipv6only=on; // 这个是给ipv6用的</span><br><span class="line"></span><br><span class="line">        listen     80;   ## 80端口</span><br><span class="line">        listen     *:80;  ## 80端口，和上面一样</span><br><span class="line">        listen     8080;  ## 8080端口</span><br><span class="line">        listen     *:8080;  ## 8080端口，和上面一样</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        root /usr/share/nginx/html;</span><br><span class="line">        index index.html index.htm;</span><br><span class="line"></span><br><span class="line">        # Make site accessible from http://localhost/ ## localhost其实就是127.0.0.1，这是写在/etc/hosts里面的</span><br><span class="line">        server_name localhost; ## 这可以使得一个ip地址支持多个domian( This allows multiple domains to be served from a single IP address.)</span><br><span class="line"></span><br><span class="line">        ### 这时的文件名应该叫/etc/nginx/sites-available/example.com</span><br><span class="line">        server_name   example.com www.example.com; ##  example.com www.example.com都支持,example.com就支持旗下所有子域名。www.example.com, foo.example.com，等等</span><br><span class="line"></span><br><span class="line">        ### 这时的文件名应该叫/etc/nginx/sites-available/example.com</span><br><span class="line">        server_name   example.*; ## example开头的都行</span><br><span class="line"></span><br><span class="line">        ## 下面这俩意思一样，这时的文件名应该叫/etc/nginx/sites-available/example.com</span><br><span class="line">        server_name   *.example.com;</span><br><span class="line">        server_name   .example.com;</span><br><span class="line"></span><br><span class="line">        ### 这时的文件名应该叫/etc/nginx/sites-available/example</span><br><span class="line">        server_name   example.*; ## example.com, example.org, example.net, example.foo.com, etc.</span><br><span class="line"></span><br><span class="line">        ### 文件名随意啦/etc/nginx/sites-available/multi-list</span><br><span class="line">        server_name   example.com linode.com icann.org  whatever.you.wantwite.isok.org; ## 一个server_name后面跟任何域名都是没问题的</span><br><span class="line"></span><br><span class="line">        ## 比如说你在局域网有个linux机器挂着nginx，你可以创建这样一个文件，/etc/nginx/sites-available/local</span><br><span class="line">        server_name   localhost linode galloway; ### 这样局域网(LAN)内用户访问linode，galloway都能走到你这一块指定的走向（再具体一点，假如你是个前端开发，你跟测试说，手机连我代理，访问galloway就行了）</span><br><span class="line"></span><br><span class="line">        ### /etc/nginx/sites-available/catchall</span><br><span class="line">        server_name   &quot;&quot;;</span><br><span class="line">        ## nginx will process all requests that either do not have a hostname, or that have an unspecified hostname, such as requests for the IP address itself.</span><br><span class="line">        ## 要么是没有hostname，要么是没有一个具体的hostname，说的就是直接浏览器输入ip地址的那帮人</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        location / &#123;</span><br><span class="line">                # First attempt to serve request as file, then</span><br><span class="line">                # as directory, then fall back to displaying a 404.</span><br><span class="line">                try_files $uri $uri/ /index.html; ## 说的很清楚，先当做文件试试，再当做文件夹试试，再不行试试index.html</span><br><span class="line">                # Uncomment to enable naxsi on this location</span><br><span class="line">                # include /etc/nginx/naxsi.rules</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="access-log是跟着server走的，毕竟你不希望两台不相干的服务器的访问日志搅和在一起"><a href="#access-log是跟着server走的，毕竟你不希望两台不相干的服务器的访问日志搅和在一起" class="headerlink" title="access_log是跟着server走的，毕竟你不希望两台不相干的服务器的访问日志搅和在一起"></a>access_log是跟着server走的，毕竟你不希望两台不相干的服务器的访问日志搅和在一起</h3><p>/etc/nginx/sites-available/example.com文件中写入这么一行</p>
+<blockquote>
+<p>access_log /srv/www/example.com/logs/access.log;</p>
+</blockquote>
+<h3 id="关闭日志也是可以的，不过请不要随便这么做"><a href="#关闭日志也是可以的，不过请不要随便这么做" class="headerlink" title="关闭日志也是可以的，不过请不要随便这么做"></a>关闭日志也是可以的，不过请不要随便这么做</h3><p>/etc/nginx/nginx.conf<br>access_log off;</p>
+<h3 id="接下来是location"><a href="#接下来是location" class="headerlink" title="接下来是location"></a>接下来是location</h3><p>/etc/nginx/sites-available/example.com<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">location / &#123; &#125;  </span><br><span class="line">location /images/ &#123; &#125;</span><br><span class="line">location /blog/ &#123; &#125;</span><br><span class="line">location /planet/ &#123; &#125;</span><br><span class="line">location /planet/blog/ &#123; &#125;</span><br><span class="line"></span><br><span class="line">/* 现在客户端访问http://example.com/，假如前面server_name配置了一个example.com.那个这次请求被location / 获取</span><br><span class="line">Nginx总是会使用匹配程度最高的：比如</span><br><span class="line">Request: http://example.com/planet/blog/ or http://example.com/planet/blog/about/</span><br><span class="line">这俩请求会走到location /planet/blog/ &#123; &#125;而不是location /planet/ &#123; &#125; */</span><br><span class="line"></span><br><span class="line">location ~ IndexPage\.php$ &#123; &#125;</span><br><span class="line">location ~ ^/BlogPlanet(/|/index\.php)$ &#123; &#125; ## 美元符号代表以此结束，反斜杠代表转义字符</span><br><span class="line"></span><br><span class="line">前面这个~符号代表后面跟着的是一个正则表达式（nginx uses Perl Compatible Regular Expressions (PCRE).）但这里还是大小写敏感的正则表达式</span><br><span class="line"></span><br><span class="line">location ~* \.(pl|cgi|perl|prl)$ &#123; &#125;</span><br><span class="line">location ~* \.(md|mdwn|txt|mkdn)$ &#123; &#125;</span><br><span class="line">// 想要大小写不敏感~*即可</span><br><span class="line">## 这回.pl, .PL, .cgi, .CGI, .perl, .Perl, .prl结尾的都能匹配了</span><br><span class="line"></span><br><span class="line">location ^~ /images/IndexPage/ &#123; &#125;</span><br><span class="line">location ^~ /blog/BlogPlanet/ &#123; &#125;</span><br><span class="line">这个^~符号表示告诉nginx，如果找到了匹配，就用这了。意思就是说 /images/IndexPage/info 也会直接用这个了，就算后面有更佳匹配location  /images/IndexPage/info &#123; &#125;也不管</span><br><span class="line"></span><br><span class="line">location = / &#123; &#125;</span><br><span class="line">注意这个中间的等号，意思是访问只有url是http://example.com/的时候才匹配 ，而 http://example.com/index.html 就不会匹配</span><br><span class="line">用=有一个好处就是匹配会稍微快一点，常用于匹配一些特别热门的url</span><br></pre></td></tr></table></figure></p>
+<p>Directives are processed in the following order:（搜索url匹配的顺序如下）<br>1： Exact string matches are processed first.（就是url字符一模一样的最先匹配上并停止后续搜索）<br>2： Remaining literal string directives are processed next. 如果碰到了^~修饰的匹配的字符，停止搜索<br>3： All location directives with regular expressions (~ and ~* ) are processed.正则表达式搜索开始<br>4： 如果上述都没找到，If no regular expressions match, the most specific literal string match is used.</p>
+<p>Make sure each file and folder under a domain will match at least one location directive.写配置的时候请确保某个domian下的所有文件都能至少被一条规则匹配上</p>
+<blockquote>
+<p>While nginx’s configuration parser is technically capable of reading nested location blocks, this is neither recommended nor supported. ## 不建议写这种location一层套一层的</p>
+</blockquote>
 <p>==========================================================================================================================</p>
 <p>add_header not working on ubuntu server?</p>
 <h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
@@ -320,6 +334,7 @@ ga('send', 'pageview');
 <li><a href="https://www.digitalocean.com/community/tutorials/how-to-optimize-nginx-configuration">nginx的一些优化策略</a></li>
 <li><a href="https://www.nginx.com/blog/creating-nginx-rewrite-rules/">rewrite rules怎么写</a></li>
 <li><a href="https://www.nginx.com/resources/admin-guide/load-balancer/">NGINX LOAD BALANCING – HTTP LOAD BALANCER</a></li>
+<li><a href="https://linode.com/docs/web-servers/nginx/nginx-reverse-proxy/">How to Use NGINX as a Reverse Proxy</a>，不仅是http(s)层的代理，还有其他的protocol也支持</li>
 </ul>
 
       
@@ -566,6 +581,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">android</a>
               </li>
              
@@ -630,10 +649,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
@@ -647,10 +662,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">Okio</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -674,15 +685,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
               <li class="article-tag-list-item">
