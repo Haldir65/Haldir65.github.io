@@ -557,6 +557,164 @@ benchmark，[压力测试](https://www.digitalocean.com/community/tutorials/how-
 -n表示一共要请求多少次,-c表示每次请求模拟多少个并发
 
 
+### 7. 整理一下linode的文章
+[linoe关于nginx配置的文章写得特别好](https://linode.com/docs/web-servers/nginx/how-to-configure-nginx/)
+/etc/nginx/nginx.conf
+```config
+http {
+
+    ##
+    # Basic Settings
+    ##
+
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+    keepalive_timeout 65;
+    types_hash_max_size 2048;
+    # server_tokens off;
+
+    # server_names_hash_bucket_size 64;
+    # server_name_in_redirect off;
+
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+    ##
+    # Logging Settings
+    ##
+
+    access_log /var/log/nginx/access.log;
+    error_log /var/log/nginx/error.log;
+
+    ##
+    # Gzip Settings
+    ##
+
+    gzip on;
+    gzip_disable "msie6";
+    # gzip_vary on;
+    # gzip_proxied any;
+    # gzip_comp_level 6;  // gzip基本上就是用cpu资源节省带宽，默认是1，最高是9，越大压缩效果越好，也越费cpu
+    # gzip_buffers 16 8k;
+    # gzip_http_version 1.1;
+    include /etc/nginx/sites-enabled/*; //引入site-enabled中所有文件
+    include /etc/nginx/conf.d/*.conf; //或者引入config.d文件夹中所有.config文件
+  }
+```
+
+http这个directive下一层就是server了,一般来说，一个虚拟域名(virtual domain)就对应着一个server块。
+
+**接下来的东西就不要写在/etc/nginx/nginx.conf文件里了,这里应该是一个domian写一个.conf文件**
+/etc/nginx/sites-available/default
+```server
+server {
+        listen 80 default_server;  //  default_server means this virtual host will answer requests on port 80 that don’t specifically match another virtual host’s listen statement.
+        listen [::]:80 default_server ipv6only=on; // 这个是给ipv6用的
+
+        listen     80;   ## 80端口
+        listen     *:80;  ## 80端口，和上面一样
+        listen     8080;  ## 8080端口
+        listen     *:8080;  ## 8080端口，和上面一样
+
+
+        root /usr/share/nginx/html;
+        index index.html index.htm;
+
+        # Make site accessible from http://localhost/ ## localhost其实就是127.0.0.1，这是写在/etc/hosts里面的
+        server_name localhost; ## 这可以使得一个ip地址支持多个domian( This allows multiple domains to be served from a single IP address.)
+
+        ### 这时的文件名应该叫/etc/nginx/sites-available/example.com
+        server_name   example.com www.example.com; ##  example.com www.example.com都支持,example.com就支持旗下所有子域名。www.example.com, foo.example.com，等等
+
+        ### 这时的文件名应该叫/etc/nginx/sites-available/example.com
+        server_name   example.*; ## example开头的都行
+
+        ## 下面这俩意思一样，这时的文件名应该叫/etc/nginx/sites-available/example.com
+        server_name   *.example.com;
+        server_name   .example.com;
+
+        ### 这时的文件名应该叫/etc/nginx/sites-available/example
+        server_name   example.*; ## example.com, example.org, example.net, example.foo.com, etc.
+
+        ### 文件名随意啦/etc/nginx/sites-available/multi-list
+        server_name   example.com linode.com icann.org  whatever.you.wantwite.isok.org; ## 一个server_name后面跟任何域名都是没问题的
+
+        ## 比如说你在局域网有个linux机器挂着nginx，你可以创建这样一个文件，/etc/nginx/sites-available/local
+        server_name   localhost linode galloway; ### 这样局域网(LAN)内用户访问linode，galloway都能走到你这一块指定的走向（再具体一点，假如你是个前端开发，你跟测试说，手机连我代理，访问galloway就行了）
+
+        ### /etc/nginx/sites-available/catchall
+        server_name   "";
+        ## nginx will process all requests that either do not have a hostname, or that have an unspecified hostname, such as requests for the IP address itself.
+        ## 要么是没有hostname，要么是没有一个具体的hostname，说的就是直接浏览器输入ip地址的那帮人
+
+
+        location / {
+                # First attempt to serve request as file, then
+                # as directory, then fall back to displaying a 404.
+                try_files $uri $uri/ /index.html; ## 说的很清楚，先当做文件试试，再当做文件夹试试，再不行试试index.html
+                # Uncomment to enable naxsi on this location
+                # include /etc/nginx/naxsi.rules
+        }
+}
+```
+
+
+### access_log是跟着server走的，毕竟你不希望两台不相干的服务器的访问日志搅和在一起
+/etc/nginx/sites-available/example.com文件中写入这么一行
+> access_log /srv/www/example.com/logs/access.log;
+
+### 关闭日志也是可以的，不过请不要随便这么做
+/etc/nginx/nginx.conf
+access_log off;
+
+### 接下来是location
+/etc/nginx/sites-available/example.com
+```config
+location / { }  
+location /images/ { }
+location /blog/ { }
+location /planet/ { }
+location /planet/blog/ { }
+
+/* 现在客户端访问http://example.com/，假如前面server_name配置了一个example.com.那个这次请求被location / 获取
+Nginx总是会使用匹配程度最高的：比如
+Request: http://example.com/planet/blog/ or http://example.com/planet/blog/about/
+这俩请求会走到location /planet/blog/ { }而不是location /planet/ { } */
+
+location ~ IndexPage\.php$ { }
+location ~ ^/BlogPlanet(/|/index\.php)$ { } ## 美元符号代表以此结束，反斜杠代表转义字符
+
+前面这个~符号代表后面跟着的是一个正则表达式（nginx uses Perl Compatible Regular Expressions (PCRE).）但这里还是大小写敏感的正则表达式
+
+location ~* \.(pl|cgi|perl|prl)$ { }
+location ~* \.(md|mdwn|txt|mkdn)$ { }
+// 想要大小写不敏感~*即可
+## 这回.pl, .PL, .cgi, .CGI, .perl, .Perl, .prl结尾的都能匹配了
+
+location ^~ /images/IndexPage/ { }
+location ^~ /blog/BlogPlanet/ { }
+这个^~符号表示告诉nginx，如果找到了匹配，就用这了。意思就是说 /images/IndexPage/info 也会直接用这个了，就算后面有更佳匹配location  /images/IndexPage/info { }也不管
+
+location = / { }
+注意这个中间的等号，意思是访问只有url是http://example.com/的时候才匹配 ，而 http://example.com/index.html 就不会匹配
+用=有一个好处就是匹配会稍微快一点，常用于匹配一些特别热门的url
+```
+Directives are processed in the following order:（搜索url匹配的顺序如下）
+1： Exact string matches are processed first.（就是url字符一模一样的最先匹配上并停止后续搜索）
+2： Remaining literal string directives are processed next. 如果碰到了^~修饰的匹配的字符，停止搜索
+3： All location directives with regular expressions (~ and ~* ) are processed.正则表达式搜索开始
+4： 如果上述都没找到，If no regular expressions match, the most specific literal string match is used.
+
+Make sure each file and folder under a domain will match at least one location directive.写配置的时候请确保某个domian下的所有文件都能至少被一条规则匹配上
+>While nginx’s configuration parser is technically capable of reading nested location blocks, this is neither recommended nor supported. ## 不建议写这种location一层套一层的
+
+
+
+
+
+
+
 ==========================================================================================================================
 
 add_header not working on ubuntu server?
@@ -572,3 +730,4 @@ add_header not working on ubuntu server?
 - [nginx的一些优化策略](https://www.digitalocean.com/community/tutorials/how-to-optimize-nginx-configuration)
 - [rewrite rules怎么写](https://www.nginx.com/blog/creating-nginx-rewrite-rules/)
 - [NGINX LOAD BALANCING – HTTP LOAD BALANCER](https://www.nginx.com/resources/admin-guide/load-balancer/)
+- [How to Use NGINX as a Reverse Proxy](https://linode.com/docs/web-servers/nginx/nginx-reverse-proxy/)，不仅是http(s)层的代理，还有其他的protocol也支持
