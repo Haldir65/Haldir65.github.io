@@ -61,6 +61,9 @@ python setup.py install
 ```
 
 使用ipv6的话(把"my_server_ip"改成"::"),这样访问通过ss访问ipv6.google.com就ok了(当然这要在确认host已有ipv6的前提下)
+这跟nginx ipv6 server block很像：
+> listen 80 default_server;
+listen [::]:80 default_server ipv6only=on;
 
 如果你的服务器Linux 内核在3.7+，可以开启fast_open 以降低延迟。
 linux 内核版本查看：

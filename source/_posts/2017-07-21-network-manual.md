@@ -531,3 +531,11 @@ cookie-session 的实现跟 signedCookies 差不多。
 
 > 初学者容易犯的一个错误是，忘记了 session_id 在 cookie 中的存储方式是 session cookie。即，当用户一关闭浏览器，浏览器 cookie 中的 session_id 字段就会消失。
 常见的场景就是在开发用户登陆状态保持时。
+
+
+### GZIP是需要耗费cpu的，也就是一种以cpu资源换取带宽的策略
+> If you keep gzip compression enabled here, note that you are trading increased CPU costs in exchange for your lower bandwidth use. Set the gzip_comp_level to a value between 1 and 9, where 9 requires the greatest amount of CPU resources and 1 requires the least. The default value is 1.
+
+
+### windows下host文件修改很简单，linux下在/etc/hosts里。
+这里面都写了一句映射： localhost : 127.0.0.1 ## the local loopback interface. 

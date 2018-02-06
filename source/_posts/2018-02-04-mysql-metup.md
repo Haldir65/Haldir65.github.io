@@ -27,6 +27,7 @@ mysql连接多了容易爆内存，关掉的[方法](https://stackoverflow.com/q
 可能是你的帐号不允许从远程登陆，只能在localhost。这个时候只要在localhost的那台电脑，登入mysql后，更改 "mysql" 数据库里的 "user" 表里的 "host" 项，从"localhost"改称"%"
 
 
+
 配置文件的位置:
 > nano /etc/mysql/mysql.conf.d/mysqld.conf
 
@@ -61,6 +62,7 @@ FLUSH   PRIVILEGES;
 ## HeidiSQL 中创建database记得选择character set 'utf-8'
 Collation: 'utf_8_general_cli';
 
+[sql tutorials](https://www.tutorialspoint.com/sql/sql-select-query.htm)
 ## CURD COMMANDS
 首先要注意的是所有sql语句最后面都要跟一个分号
 ```sql
