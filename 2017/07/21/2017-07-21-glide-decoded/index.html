@@ -17,7 +17,7 @@
 <meta property="og:description" content="glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&amp;gt;  CacheDispatch  —&amp;gt; NetworkDispatcher  —-&amp;gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/a11f41e0b1df95212c71920b3959cd72.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-02-07T10:59:20.113Z">
+<meta property="og:updated_time" content="2018-02-07T15:28:13.205Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从glide源码到图片加载框架设计思路">
 <meta name="twitter:description" content="glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&amp;gt;  CacheDispatch  —&amp;gt; NetworkDispatcher  —-&amp;gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是">
@@ -255,7 +255,7 @@ ga('send', 'pageview');
 <p>Engine先去Cache里面查找，找到了直接调用ResourceCallback(GenericRequest)的onResourceReady(EngineResource&lt;?&gt; resource)，注意这个EngineResource里面包装了一个Resource，主要是为了引用计数。</p>
 <p> Engine的loadFromCache(key, isMemoryCacheable)是第一步，从成员变量cache中获取。找到了就挪到activeResources里面。<br> Engine.java<br> <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Engine</span> <span class="keyword">implements</span> <span class="title">EngineJobListener</span>,</span></span><br><span class="line"><span class="class">        <span class="title">MemoryCache</span>.<span class="title">ResourceRemovedListener</span>,</span></span><br><span class="line"><span class="class">        <span class="title">EngineResource</span>.<span class="title">ResourceListener</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String TAG = <span class="string">"Engine"</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;Key, EngineJob&gt; jobs;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> EngineKeyFactory keyFactory;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> MemoryCache cache;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> EngineJobFactory engineJobFactory;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;Key, WeakReference&lt;EngineResource&lt;?&gt;&gt;&gt; activeResources;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ResourceRecycler resourceRecycler;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> LazyDiskCacheProvider diskCacheProvider;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>如果在MemoryCache这个Lru里面没找到，就调用loadFromActiveResources，从activeResources里面找到。</p>
-<p><strong>所以这里已经出现两层缓存了，先去Lru(内存)找，再去activeResources(HashMap)里面找。缓存都是放在Enginel里面的，全局只有一份</strong></p>
+<p><strong>所以这里已经出现两层缓存了，先去Lru(内存)找，再去activeResources(HashMap)里面找。缓存都是放在Engine里面的，全局只有一份</strong></p>
 <p>缓存里面的Value都是EngineResource。</p>
 <p>这个MemoryCache是一个LruCache，大小是在MemorySizeCalculator中获得的，<br>对于一般的设备，activityManager.getMemoryClass() <em> 1024 </em> 1024获得每个App能够使用的Size,乘以0.4。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">MemorySizeCalculator(Context context, ActivityManager activityManager, ScreenDimensions screenDimensions) &#123;</span><br><span class="line">       <span class="keyword">this</span>.context = context;</span><br><span class="line">       <span class="keyword">final</span> <span class="keyword">int</span> maxSize = getMaxSize(activityManager);</span><br><span class="line"></span><br><span class="line">       <span class="keyword">final</span> <span class="keyword">int</span> screenSize = screenDimensions.getWidthPixels() * screenDimensions.getHeightPixels()</span><br><span class="line">               * BYTES_PER_ARGB_8888_PIXEL; <span class="comment">//算出占满整个屏幕的一张图的大小</span></span><br><span class="line"></span><br><span class="line">       <span class="keyword">int</span> targetPoolSize = screenSize * BITMAP_POOL_TARGET_SCREENS; <span class="comment">//乘以4就是bitmappool的大小</span></span><br><span class="line">       <span class="keyword">int</span> targetMemoryCacheSize = screenSize * MEMORY_CACHE_TARGET_SCREENS;</span><br><span class="line">       <span class="comment">//乘以2就是MemoryCache的大小</span></span><br><span class="line"></span><br><span class="line">       <span class="keyword">if</span> (targetMemoryCacheSize + targetPoolSize &lt;= maxSize) &#123;</span><br><span class="line">           memoryCacheSize = targetMemoryCacheSize;</span><br><span class="line">           bitmapPoolSize = targetPoolSize;</span><br><span class="line">       &#125; <span class="keyword">else</span> &#123; <span class="comment">//这里判断了BitmapPool和MemoryCache的大小之和不能超出应用可以使用的内存大小的0.4倍。</span></span><br><span class="line">           <span class="keyword">int</span> part = Math.round((<span class="keyword">float</span>) maxSize / (BITMAP_POOL_TARGET_SCREENS + MEMORY_CACHE_TARGET_SCREENS));</span><br><span class="line">           memoryCacheSize = part * MEMORY_CACHE_TARGET_SCREENS;</span><br><span class="line">           bitmapPoolSize = part * BITMAP_POOL_TARGET_SCREENS;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
 <p>所以缓存的大小综合考虑了屏幕分辨率和内存大小。只要屏幕像素不是特别高，一般都会走到第一步。</p>
@@ -643,6 +643,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
               </li>
              
@@ -652,10 +656,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">Okio</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -679,6 +679,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
@@ -691,15 +695,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -716,6 +712,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">service</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
             
             <div class="clearfix"></div>
