@@ -69,6 +69,7 @@ client发起一个请求，header里面包括(Upgrade:2c),一切OK的话，服�
 
 ### 2.3 TLS ,SSL
 用于两点间传输binary数据
+TLS(Transport Layer Security),SSL(Secure Sockets Layer)
 ALPN(Application Level Protcol Negotitation)
 
 ### 2.4 数据传输的模型

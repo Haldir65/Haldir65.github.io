@@ -7,6 +7,9 @@ tags: [android]
 
 转眼就十一月了，java的分析越来越少，虽然常常在业务上碰到不少坑。。。
 
+![](http://odzl05jxx.bkt.clouddn.com/image/jpg/480617.jpg?imageView2/2/w/600)
+<!-- more -->
+
 ### 问题的由来
 这周碰到一个需要画时间轴样式的自定义View的需求，大概像这样(图片来自网络)：
 ![](http://odzl05jxx.bkt.clouddn.com/timelineView.png)

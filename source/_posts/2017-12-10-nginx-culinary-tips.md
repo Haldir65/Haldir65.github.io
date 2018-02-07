@@ -115,6 +115,7 @@ http {
 
     include /etc/nginx/conf.d/*.conf;
     include /etc/nginx/sites-enabled/*;
+    ## include F:/nginx/conf/sites-enabled/default; 必须是绝对路径，include不认相对路径
 
    server {
 
@@ -556,6 +557,8 @@ benchmark，[压力测试](https://www.digitalocean.com/community/tutorials/how-
 > ab -kc 1000 -n 10000 http://www.some-site.cc/tmp/index.html
 -n表示一共要请求多少次,-c表示每次请求模拟多少个并发
 
+在http response中隐藏nginx版本：在server块添加
+> server_tokens off;   
 
 ### 7. 整理一下linode的文章
 [linoe关于nginx配置的文章写得特别好](https://linode.com/docs/web-servers/nginx/how-to-configure-nginx/)
@@ -731,3 +734,4 @@ add_header not working on ubuntu server?
 - [rewrite rules怎么写](https://www.nginx.com/blog/creating-nginx-rewrite-rules/)
 - [NGINX LOAD BALANCING – HTTP LOAD BALANCER](https://www.nginx.com/resources/admin-guide/load-balancer/)
 - [How to Use NGINX as a Reverse Proxy](https://linode.com/docs/web-servers/nginx/nginx-reverse-proxy/)，不仅是http(s)层的代理，还有其他的protocol也支持
+- [use-nginx-as-a-front-end-proxy-and-software-load-balancer](https://linode.com/docs/uptime/loadbalancing/use-nginx-as-a-front-end-proxy-and-software-load-balancer/)

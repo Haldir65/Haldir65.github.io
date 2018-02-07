@@ -6,8 +6,11 @@ tags:
 
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/fuchsia-973x547.jpg?imageView2/2/w/600)
 <!--more-->
+读音：
+MySQL is pronounced as "my ess-que-ell," in contrast with SQL, pronounced "sequel."
 
-
+RDBMS(关系型数据库)
+RDBMS stands for Relational Database Management System. RDBMS is the basis for SQL, and for all modern database systems like MS SQL Server, IBM DB2, Oracle, MySQL, and Microsoft Access.
  mySql相关
 ## 安装
 [How to Install MySQL on Ubuntu](https://www.digitalocean.com/community/tutorials/a-basic-mysql-tutorial)
