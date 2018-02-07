@@ -503,7 +503,7 @@ Engine先去Cache里面查找，找到了直接调用ResourceCallback(GenericReq
 
 如果在MemoryCache这个Lru里面没找到，就调用loadFromActiveResources，从activeResources里面找到。
 
-**所以这里已经出现两层缓存了，先去Lru(内存)找，再去activeResources(HashMap)里面找。缓存都是放在Enginel里面的，全局只有一份**
+**所以这里已经出现两层缓存了，先去Lru(内存)找，再去activeResources(HashMap)里面找。缓存都是放在Engine里面的，全局只有一份**
 
 缓存里面的Value都是EngineResource。
 

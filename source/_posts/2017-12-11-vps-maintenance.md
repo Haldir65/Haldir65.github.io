@@ -151,9 +151,7 @@ sudo ss-server -c /etc/shadowsocks-libev/config.json -u ## 开启udp转发  nets
 
 其实跟安装 ss 很像的
 
-## 3. 一些常用的命令
-
-> 写 alias 算了
+## 3. ubuntu自带的防火墙叫做ufw，用起来也很简单
 
 ## 10.跑分
 
