@@ -17,7 +17,7 @@
 <meta property="og:description" content="http建立在tcp,ip基础上，tcp协议的可靠性意味着每次http请求都会分解为多次ip请求。很多出于book keeping的东西占用了实际发送数据的相当一部分，具体占用多少。由此顺便展开到http和tcp的基本关系。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/Cg-4V1Kg7NCIMLH-AAwW6gNGe9cAAOB4AFTanwADBcC664.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-02-06T14:43:29.731Z">
+<meta property="og:updated_time" content="2018-02-07T10:59:20.117Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="http2笔记">
 <meta name="twitter:description" content="http建立在tcp,ip基础上，tcp协议的可靠性意味着每次http请求都会分解为多次ip请求。很多出于book keeping的东西占用了实际发送数据的相当一部分，具体占用多少。由此顺便展开到http和tcp的基本关系。">
@@ -232,7 +232,7 @@ ga('send', 'pageview');
 </ul>
 <h3 id="2-1-SPDY"><a href="#2-1-SPDY" class="headerlink" title="2.1 SPDY"></a>2.1 SPDY</h3><p>谷歌设计了SPDY，h2建立在SPDY的基础上，google已经废弃了SPDY,据说是为了给h2让路。</p>
 <h3 id="2-2-h2过程"><a href="#2-2-h2过程" class="headerlink" title="2.2 h2过程"></a>2.2 h2过程</h3><p>h2传输的是Binary Frame，这里面包括HEADER FRAME和DATA FRAME, request的body和response的body都通过DATA FRAME传输。<br>client发起一个请求，header里面包括(Upgrade:2c),一切OK的话，服务器返回一个status code 101(switching Protocol)。<br>在response header里面返回一个Upgrade: h2c。</p>
-<h3 id="2-3-TLS-SSL"><a href="#2-3-TLS-SSL" class="headerlink" title="2.3 TLS ,SSL"></a>2.3 TLS ,SSL</h3><p>用于两点间传输binary数据<br>ALPN(Application Level Protcol Negotitation)</p>
+<h3 id="2-3-TLS-SSL"><a href="#2-3-TLS-SSL" class="headerlink" title="2.3 TLS ,SSL"></a>2.3 TLS ,SSL</h3><p>用于两点间传输binary数据<br>TLS(Transport Layer Security),SSL(Secure Sockets Layer)<br>ALPN(Application Level Protcol Negotitation)</p>
 <h3 id="2-4-数据传输的模型"><a href="#2-4-数据传输的模型" class="headerlink" title="2.4 数据传输的模型"></a>2.4 数据传输的模型</h3><p>h2只有一条connection，里面有多个STREAM，STREAM里面包括了Request的HEADER FRAME和DATA FRAME以及Response的HEADER FRAME和DATA FRAME。<br>FRAME里面有length,Type，Flags,ID(有了ID就能有sequence,也就能multiplexing，多路复用)以及Payload(数据)。<br>FRAME TYPE有很多种，DATA,HEADER,WINDOW_UPDATE,SETTING，GOAWAY,这些在okhttp里面都能看到.<br>用WireShark可以查看<br>h2为什么快，Multiplexing，多路复用允许同时通过单一的 HTTP/2 连接发起多重的请求-响应消息</p>
 <h3 id="2-5-Header-Compression"><a href="#2-5-Header-Compression" class="headerlink" title="2.5 Header Compression"></a>2.5 Header Compression</h3><p>本来GZip是不能压缩Header的，h2使用HPACK(很复杂的协议)，讲header(无非是键值对)中的key,value映射一份表，所以每一次发起请求，h2会将那些header变成数字，同时，只会发送改变了的header。（应用层无需关心，十分复杂）</p>
 <h3 id="2-6-Streams可以设置优先级"><a href="#2-6-Streams可以设置优先级" class="headerlink" title="2.6 Streams可以设置优先级"></a>2.6 Streams可以设置优先级</h3><p>都是在一条Connection中发送出去，开发者可以设置，例如，js优先级高点，image优先级低一点。</p>
@@ -596,6 +596,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
@@ -616,11 +620,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -628,11 +628,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
              
               <li class="article-tag-list-item">
