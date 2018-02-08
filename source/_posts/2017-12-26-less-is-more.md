@@ -116,9 +116,44 @@ img {
 直接用
 
 
-
-
 更多的使用直接去[Less](http://lesscss.org/)查找就好了
+
+
+### less搭配webpack(webpack-dev-server使用)使用方式
+deadsimple-less-watch-compiler ---  watch less
+webpack-dev-server --  watch js file changes
+webpack-less-loader
+
+webpack.config.js
+```js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.less$/,
+        use: [
+          'style-loader',
+          { loader: 'css-loader', options: { importLoaders: 1 } },
+          'less-loader'
+        ]
+      }
+    ]
+  }
+}
+```
+在index.js中:
+> import css from 'styles.less';
+
+找了好久没有找到关于less-loader hot reload的设置，只好在package.json中设置
+>"dev": "less-watch-compiler",
+"start":"webpack-dev-server --progress --hot --inline --config webpack.config.js && yarn dev"
+
+把两个command chain起来就是了
+
+
+
+
+
 
 ## 2.Stylus
 >安装

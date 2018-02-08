@@ -36,3 +36,4 @@ server
 
 
 [2小时学会SpringBoot](https://www.youtube.com/playlist?list=PLO5e_-yXpYLDcuEz8BlB_J_hQpzI-ZM4Y)
+[accessing-data-mysql](https://spring.io/guides/gs/accessing-data-mysql/)

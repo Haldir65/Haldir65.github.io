@@ -106,7 +106,21 @@ DELETE from potluck  where name='Sandy';
 ```
 
 ### 支持的数据类型
-
+signed or unsigned.(有符号或者无符号的)
+- Numeric
+INT (signed : -2147483648 to 2147483647  or unsigned: 0 to 4294967295.)，2的32次方(4 byte)
+TINYINT(signed : -128 to 127, or unsigned: from 0 to 255)，2的八次方(1 byte)
+BIGINT( signed :-32768 to 32767, or unsigned: from 0 to 65535.)，2的四次方(2 byte)
+FLOAT(只能是signed)，
+DOUBLE，
+DECIMAL
+- Date and Time
+DATE (1973-12-30), DATETIME (1973-12-30 15:30:00),TIMESTAMP (19731230153000),TIME (HH:MM:SS),
+- String Types.
+CHAR(fixed-length，长度固定，不强制要求设置长度，默认1) ,
+VARCHAR(ariable-length string between 1 and 255，长度可变， ),
+BLOB or TEXT(BLOBs case sensitive，TEXT not case sensitive,这俩不需要设定长度，最大长度65535 )
+ENUM (置顶的枚举类型中之一，可以为NULL)
 
 
 

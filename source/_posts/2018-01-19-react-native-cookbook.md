@@ -15,6 +15,8 @@ react-native init myproject ## 最好全部小写字母
 cd myproject
 react-native run-android
 
+在android手机上打开显示布局边界，发现react-native app并不是一个webview，而是一个个实在的buttom,text。
+
 ### tips
 目前暂不支持java 9
 Double tap R on your keyboard to reload其实并不是按电脑键盘上的R，而是模拟器上的，所以需要鼠标上去，ctrl+m即可
