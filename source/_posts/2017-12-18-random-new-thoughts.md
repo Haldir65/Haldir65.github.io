@@ -34,6 +34,7 @@ top : 1
 - [X] vS Code Vender Prefix plugin => auto prefix loader
 - [ ] websocket nodejs
 - [X]单个网卡最多65535个端口，c10K
+- [ ] intelij 点击run 实际调用的command line 是什么。。。（--javapath的写法）
 - [ ] install nginx , jenkin ci, deploying nginx in docker(Http Load Balaning with Docker and nginx)(https://www.digitalocean.com/community/tutorials/how-to-configure-nginx-with-ssl-as-a-reverse-proxy-for-jenkins)
 - [ ] Paul Irish from google
 
