@@ -747,7 +747,7 @@ System.out.println( 0.999999999f==1f ); // 9个9
 ```
 
 [Java 浮点数 float和double类型的表示范围和精度](http://blog.csdn.net/zq602316498/article/details/41148063)
-回顾下，float占用4bytes，32位。
+和整数型是signed的不一样,float和double是unsigned。
 这32位是怎么分的：
 1bit（符号位） 8bits（指数位） 23bits（尾数位）（内存中就长这样）
 double占据64bit。
@@ -756,8 +756,46 @@ double占据64bit。
 所以float的指数范围是-128~127 。(2的8次方)
 double的指数范围为-1024~+1023。
 再具体点：
-float的范围为-2^128 ~ +2^127，也即-3.40E+38 ~ +3.40E+38；double的范围为-2^1024 ~ +2^1023，也即-1.79E+308 ~ +1.79E+308。就这么算出来的。
+<br>float的范围为-2^128 ~ +2^127，也即-3.40E+38 ~ +3.40E+38；</br>
+
+update : From 3.402,823,5 E+38 to 1.4 E-45(由于是unsigned，这只是正数部分)
+
+the correct way: [-3.40E+38,-1.4 E-45 ] && [1.4 E-45, +3.40E+38] ## 站在十进制的角度来看，是相对于0对称的两个区间。整个实数轴并未完全覆盖。
+
+很多人都说这些最大值最小值不用记，对应的包装类都有常量MIN_VALUE和MAX_VALUE。然而，这个还是有些需要注意的。
+Float.MIN_VALUE 并不是负数，而是一个0.00000XXX 的小数。[一般认为这个常量应该起一个更合适的名字](https://stackoverflow.com/questions/3884793/why-is-double-min-value-in-not-negative)，另外不要把Float.MIN_VALUE和Float.MIN_NORMAL搞混淆；
+```java
+  // Float
+  public static final float MIN_NORMAL = 0x1.0p-126f; // 1.17549435E-38f
+                                //          这个是2^-126=1.175494350822..(注意小数点后的值就没有了，实在表示不了)
+  public static final float MIN_VALUE = 0x0.000002P-126f; // 1.4e-45f 真正的MIN_VALUE应该是MAX_VALUE的负值
+  public static final float MAX_VALUE = 0x1.fffffeP+127f; // 3.4028235e+38f //这个max倒是起名起的很好
+                           // 怎么算的 拿个计算器算下：2^128 = 3.402823669209...。是不是小数点后第七位就不对了，这个就看上面的23bit了
+
+  // Double
+  public static final double MAX_VALUE = 0x1.fffffffffffffP+1023; // 1.7976931348623157e+308 //这个确实是最大值
+  public static final double MIN_NORMAL = 0x1.0p-1022; // 2.2250738585072014E-308
+  public static final double MIN_VALUE = 0x0.0000000000001P-1022; // 4.9e-324  -Double.MAX_VALUE才是你能用double表示的最小值
+
+  Float.MAX_VALUE + 1 == Float.MAX_VALUE  // true
+
+
+```
+MIN_VALUE和NIN_NORMAL的[区别](https://stackoverflow.com/questions/3728309/difference-between-double-min-normal-and-double-min-value)
+float和double最终在内存中都是以a^n次方来表示为十进制数值的。
+以float为例来解释下：float一共32bit，就是32个槽子，第一个拿来表示符号(unsigned)，那还剩下31个，最终要用剩下的31个bit表示出一个科学计数法的Decimal.
+上面说了，8个用来表示指数，也就是2^8 = 128，也就是指数方面最小是-127，最大是128。也就是说上面那个a^n的n的范围是[-127,128]。
+根据stackoverFlow的解释，MIN_NORMAL就是二进制小数点前有一个1开头的，MIN_VALUE就是可以用0开头的
+所以就是23个槽子前22个都放了0，最后一个放了1，也就是十进制的2，算上指数层的-127，也就是2乘以2^-127 = 2^-126，论MIN_NORMAL是怎么来的。
+还剩下32-1-8 = 23个，用来表示确切的值， 2^23 = 8388608(7个数字，所以7个数字保不准，但6个是有把握的，让7位给指数位吧，把10的-38次方变成10的-45次方)。也就是说上面个a^n的a的范围是[1,8388608]，论MIN_VALUE是怎么来的。
+
+
+
+double和float都属于The IEEE 754 format has one bit reserved for the sign and the remaining bits representing the magnitude.
+
+double的范围为-2^1024 ~ +2^1023，也即-1.79E+308 ~ +1.79E+308。就这么算出来的。
 至于float里面那剩下的23位和double里面剩下的52位，是用来表示精度的。
+
 >float：2^23 = 8388608，一共七位，由于最左为1的一位省略了，这意味着最多能表示8位数： 2*8388608 = 16777216 。有8位有效数字，但绝对能保证的为7位，也即float的精度为7~8位有效数字；
 double：2^52 = 4503599627370496，一共16位，同理，double的精度为16~17位。
 
@@ -768,12 +806,19 @@ System.out.println( 0.9999999f==1f ); // 7个9
 System.out.println( 0.99999999f==1f ); //8个9
 System.out.println( 0.9999999996666666f==1f ); // 9个9
 ```
-当一个float小数的小数点后位数超出了8个之后，java就无法用float表示这后面的数字了。
+<del>当一个float小数的小数点后位数超出了8个之后，java就无法用float表示这后面的数字了。</del>
+应该说一个float数据类型能够保证不损失精度的限制就是有效数字6-7位（6个是准的，7个不好说）。
 所以上面的第8个9之后写什么都是true的。
 随手写一个
-> float aa = 1.123456789123456f
-double bb = 1.123456789123456789123456789d
-不要以为自己真的想要多少就有多少，float后面最多跟8位小数，double后面最多跟16位小数。为什么，数学这么说的。
+```java
+float aa = 1123456789123456f;
+float bb = 1123456789123456.1f;
+System.out.println(aa==bb); // ide自动飚黄，显示always 为true
+```
+不要以为自己真的想要多少就有多少，float后面最多使用8位有效数字，double最多能表示16位有效数字。为什么，数学这么说的。
+这么说吧，从整个数轴来看，整个数轴最左边和最右边都是接触不到的。
+另外，0左右各有一小块宽度为0.0000000xxx的小范围是表示不了的。
+就算是已经覆盖到的位置，计算机这种二进制表达的方式只是**零零散散**的占据了很少的一部分。
 
 ```java
 float f = 2.2f;  
@@ -787,7 +832,7 @@ System.out.println(d);
 > 2.200000047683716
 2.25
 
-这样的问题也能够理解了，给你32给bit，第一位表示正负，第2-9位表示指数，剩下23位表示实际的数字。
+这样的问题也能够理解了，给你32个bit，第一位表示正负，第2-9位表示指数，剩下23位表示实际的数字。
 对于2.2f，首先第一位表示正负，然后个位数2可以表示在第二位，剩下的0.2设法用22位表示。
 
 来看十进制小数转换二进制的问题，例如：
