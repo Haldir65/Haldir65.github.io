@@ -17,7 +17,7 @@
 <meta property="og:description" content="interesting stuff in java that don’t seem to get enough pubilicity">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/34a7d57ccabb18c69d085247cf009b22.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-02-08T10:29:19.395Z">
+<meta property="og:updated_time" content="2018-02-09T06:31:05.088Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="For those tiny details in Java">
 <meta name="twitter:description" content="interesting stuff in java that don’t seem to get enough pubilicity">
@@ -293,22 +293,26 @@ ga('send', 'pageview');
 <p>RoundingMode.HALF_EVEN就是把这个小数化为离它最近的偶数<br>RoundingMode.HALF_UP 就是碰到五就往上进一位<br>RoundingMode.HALF_DOWN 就是碰到五就视为0<br>RoundingMode.FLOOR 和Math.floor差不多<br>RoundingMode.CEILING 和Math.ceiling差不多<br>core Library的命名都很易懂</p>
 </blockquote>
 <p>由此引申出：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">System.out.println( <span class="number">0.9999999f</span>==<span class="number">1f</span> ); <span class="comment">// 7个9</span></span><br><span class="line">System.out.println( <span class="number">0.99999999f</span>==<span class="number">1f</span> ); <span class="comment">//8个9</span></span><br><span class="line">System.out.println( <span class="number">0.999999999f</span>==<span class="number">1f</span> ); <span class="comment">// 9个9</span></span><br><span class="line"><span class="comment">// false</span></span><br><span class="line"><span class="comment">// true</span></span><br><span class="line"><span class="comment">// true</span></span><br></pre></td></tr></table></figure></p>
-<p><a href="http://blog.csdn.net/zq602316498/article/details/41148063">Java 浮点数 float和double类型的表示范围和精度</a><br>回顾下，float占用4bytes，32位。<br>这32位是怎么分的：<br>1bit（符号位） 8bits（指数位） 23bits（尾数位）（内存中就长这样）<br>double占据64bit。<br>1bit（符号位） 11bits（指数位） 52bits（尾数位）（内存中就长这样）</p>
-<p>所以float的指数范围是-128~127 。(2的8次方)<br>double的指数范围为-1024~+1023。<br>再具体点：<br>float的范围为-2^128 ~ +2^127，也即-3.40E+38 ~ +3.40E+38；double的范围为-2^1024 ~ +2^1023，也即-1.79E+308 ~ +1.79E+308。就这么算出来的。<br>至于float里面那剩下的23位和double里面剩下的52位，是用来表示精度的。</p>
+<p><a href="http://blog.csdn.net/zq602316498/article/details/41148063">Java 浮点数 float和double类型的表示范围和精度</a><br>和整数型是signed的不一样,float和double是unsigned。<br>这32位是怎么分的：<br>1bit（符号位） 8bits（指数位） 23bits（尾数位）（内存中就长这样）<br>double占据64bit。<br>1bit（符号位） 11bits（指数位） 52bits（尾数位）（内存中就长这样）</p>
+<p>所以float的指数范围是-128~127 。(2的8次方)<br>double的指数范围为-1024~+1023。<br>再具体点：<br><br>float的范围为-2^128 ~ +2^127，也即-3.40E+38 ~ +3.40E+38；</br></p>
+<p>update : From 3.402,823,5 E+38 to 1.4 E-45(由于是unsigned，这只是正数部分)</p>
+<p>the correct way: [-3.40E+38,-1.4 E-45 ] &amp;&amp; [1.4 E-45, +3.40E+38] ## 站在十进制的角度来看，是相对于0对称的两个区间。整个实数轴并未完全覆盖。</p>
+<p>很多人都说这些最大值最小值不用记，对应的包装类都有常量MIN_VALUE和MAX_VALUE。然而，这个还是有些需要注意的。<br>Float.MIN_VALUE 并不是负数，而是一个0.00000XXX 的小数。<a href="https://stackoverflow.com/questions/3884793/why-is-double-min-value-in-not-negative">一般认为这个常量应该起一个更合适的名字</a>，另外不要把Float.MIN_VALUE和Float.MIN_NORMAL搞混淆；<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Float</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">float</span> MIN_NORMAL = <span class="number">0x1</span>.0p-<span class="number">126f</span>; <span class="comment">// 1.17549435E-38f</span></span><br><span class="line">                              <span class="comment">//          这个是2^-126=1.175494350822..(注意小数点后的值就没有了，实在表示不了)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">float</span> MIN_VALUE = <span class="number">0x0</span>.000002P-<span class="number">126f</span>; <span class="comment">// 1.4e-45f 真正的MIN_VALUE应该是MAX_VALUE的负值</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">float</span> MAX_VALUE = <span class="number">0x1</span>.fffffeP+<span class="number">127f</span>; <span class="comment">// 3.4028235e+38f //这个max倒是起名起的很好</span></span><br><span class="line">                         <span class="comment">// 怎么算的 拿个计算器算下：2^128 = 3.402823669209...。是不是小数点后第七位就不对了，这个就看上面的23bit了</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Double</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">double</span> MAX_VALUE = <span class="number">0x1</span>.fffffffffffffP+<span class="number">1023</span>; <span class="comment">// 1.7976931348623157e+308 //这个确实是最大值</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">double</span> MIN_NORMAL = <span class="number">0x1</span>.0p-<span class="number">1022</span>; <span class="comment">// 2.2250738585072014E-308</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">double</span> MIN_VALUE = <span class="number">0x0</span>.0000000000001P-<span class="number">1022</span>; <span class="comment">// 4.9e-324  -Double.MAX_VALUE才是你能用double表示的最小值</span></span><br><span class="line"></span><br><span class="line">Float.MAX_VALUE + <span class="number">1</span> == Float.MAX_VALUE  <span class="comment">// true</span></span><br></pre></td></tr></table></figure></p>
+<p>MIN_VALUE和NIN_NORMAL的<a href="https://stackoverflow.com/questions/3728309/difference-between-double-min-normal-and-double-min-value">区别</a><br>float和double最终在内存中都是以a^n次方来表示为十进制数值的。<br>以float为例来解释下：float一共32bit，就是32个槽子，第一个拿来表示符号(unsigned)，那还剩下31个，最终要用剩下的31个bit表示出一个科学计数法的Decimal.<br>上面说了，8个用来表示指数，也就是2^8 = 128，也就是指数方面最小是-127，最大是128。也就是说上面那个a^n的n的范围是[-127,128]。<br>根据stackoverFlow的解释，MIN_NORMAL就是二进制小数点前有一个1开头的，MIN_VALUE就是可以用0开头的<br>所以就是23个槽子前22个都放了0，最后一个放了1，也就是十进制的2，算上指数层的-127，也就是2乘以2^-127 = 2^-126，论MIN_NORMAL是怎么来的。<br>还剩下32-1-8 = 23个，用来表示确切的值， 2^23 = 8388608(7个数字，所以7个数字保不准，但6个是有把握的，让7位给指数位吧，把10的-38次方变成10的-45次方)。也就是说上面个a^n的a的范围是[1,8388608]，论MIN_VALUE是怎么来的。</p>
+<p>double和float都属于The IEEE 754 format has one bit reserved for the sign and the remaining bits representing the magnitude.</p>
+<p>double的范围为-2^1024 ~ +2^1023，也即-1.79E+308 ~ +1.79E+308。就这么算出来的。<br>至于float里面那剩下的23位和double里面剩下的52位，是用来表示精度的。</p>
 <blockquote>
 <p>float：2^23 = 8388608，一共七位，由于最左为1的一位省略了，这意味着最多能表示8位数： 2*8388608 = 16777216 。有8位有效数字，但绝对能保证的为7位，也即float的精度为7~8位有效数字；<br>double：2^52 = 4503599627370496，一共16位，同理，double的精度为16~17位。</p>
 </blockquote>
 <p>所以上面出现了小数点后最多16位的double。<br>所以上面的java代码还可以想到：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">System.out.println( <span class="number">0.9999999f</span>==<span class="number">1f</span> ); <span class="comment">// 7个9</span></span><br><span class="line">System.out.println( <span class="number">0.99999999f</span>==<span class="number">1f</span> ); <span class="comment">//8个9</span></span><br><span class="line">System.out.println( <span class="number">0.9999999996666666f</span>==<span class="number">1f</span> ); <span class="comment">// 9个9</span></span><br></pre></td></tr></table></figure></p>
-<p>当一个float小数的小数点后位数超出了8个之后，java就无法用float表示这后面的数字了。<br>所以上面的第8个9之后写什么都是true的。<br>随手写一个</p>
-<blockquote>
-<p>float aa = 1.123456789123456f<br>double bb = 1.123456789123456789123456789d<br>不要以为自己真的想要多少就有多少，float后面最多跟8位小数，double后面最多跟16位小数。为什么，数学这么说的。</p>
-</blockquote>
+<p><del>当一个float小数的小数点后位数超出了8个之后，java就无法用float表示这后面的数字了。</del><br>应该说一个float数据类型能够保证不损失精度的限制就是有效数字6-7位（6个是准的，7个不好说）。<br>所以上面的第8个9之后写什么都是true的。<br>随手写一个<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">float</span> aa = <span class="number">1123456789123456f</span>;</span><br><span class="line"><span class="keyword">float</span> bb = <span class="number">1123456789123456.1f</span>;</span><br><span class="line">System.out.println(aa==bb); <span class="comment">// ide自动飚黄，显示always 为true</span></span><br></pre></td></tr></table></figure></p>
+<p>不要以为自己真的想要多少就有多少，float后面最多使用8位有效数字，double最多能表示16位有效数字。为什么，数学这么说的。<br>这么说吧，从整个数轴来看，整个数轴最左边和最右边都是接触不到的。<br>另外，0左右各有一小块宽度为0.0000000xxx的小范围是表示不了的。<br>就算是已经覆盖到的位置，计算机这种二进制表达的方式只是<strong>零零散散</strong>的占据了很少的一部分。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">float</span> f = <span class="number">2.2f</span>;  </span><br><span class="line"><span class="keyword">double</span> d = (<span class="keyword">double</span>) f;  </span><br><span class="line">System.out.println(d);   </span><br><span class="line">f = <span class="number">2.25f</span>;  </span><br><span class="line">d = (<span class="keyword">double</span>) f;  </span><br><span class="line">System.out.println(d);</span><br></pre></td></tr></table></figure>
 <p>输出：</p>
 <blockquote>
 <p>2.200000047683716<br>2.25</p>
 </blockquote>
-<p>这样的问题也能够理解了，给你32给bit，第一位表示正负，第2-9位表示指数，剩下23位表示实际的数字。<br>对于2.2f，首先第一位表示正负，然后个位数2可以表示在第二位，剩下的0.2设法用22位表示。</p>
+<p>这样的问题也能够理解了，给你32个bit，第一位表示正负，第2-9位表示指数，剩下23位表示实际的数字。<br>对于2.2f，首先第一位表示正负，然后个位数2可以表示在第二位，剩下的0.2设法用22位表示。</p>
 <p>来看十进制小数转换二进制的问题，例如：<br>22.8125转二进制</p>
 <blockquote>
 <p>整数和小数分别转换。<br>整数除以2，商继续除以2，得到0为止，将余数逆序排列。<br>22 / 2  11 余0<br>11/2     5  余 1<br>5 /2      2  余 1<br>2 /2      1  余 0<br>1 /2      0  余 1<br>所以22的二进制是10110<br>小数乘以2，取整，小数部分继续乘以2，取整，得到小数部分0为止，将整数顺序排列。<br>0.8125x2=1.625 取整1,小数部分是0.625<br>0.625x2=1.25 取整1,小数部分是0.25<br>0.25x2=0.5 取整0,小数部分是0.5<br>0.5x2=1.0 取整1,小数部分是0，结束<br>所以0.8125的二进制是0.1101<br>十进制22.8125等于二进制10110.1101</p>
@@ -630,14 +634,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">linux</a>
               </li>
              
@@ -646,11 +642,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -659,6 +663,18 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">java</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -686,22 +702,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
@@ -711,6 +711,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
              
               <li class="article-tag-list-item">
