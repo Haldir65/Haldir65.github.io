@@ -39,7 +39,8 @@ top : 1
 - [ ] Paul Irish from google
 - [ ]随便放一个文件到/usr/bin/就可以直接调用这个文件名来起这个命令了吗？
 - [ ] form表单可以跨域一个是历史原因要保持兼容性
-- [ ] 通过file input上传图片，原生ajax以及Ajax，自己搭建上传服务器
+- [ ] 通过file input上传图片，原生ajax以及Ajax，自己搭建上传服务器[大概能猜到暴风影音的局域网传输实现了](https://zhuanlan.zhihu.com/p/24513281?refer=flask)
+- [ ] oAuth2
 
 
 已完成
