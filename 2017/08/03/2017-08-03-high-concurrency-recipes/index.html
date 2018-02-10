@@ -30,7 +30,7 @@
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/nature-grass-wet-plants-high-resolution-wallpaper-573f2c6413708.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/ripe-grapes-macro-wallpaper-1920x1080-538350f32e183.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/yellow-autumn-leaves-wallpaper-537f1e4672a31.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-02-09T10:41:56.937Z">
+<meta property="og:updated_time" content="2018-02-10T08:38:36.700Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="高并发实践手册">
 <meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/image/blog/be3c80a11edfd0fdb75d098550ed2c8e.jpg?imageView2/2/w/600">
@@ -222,6 +222,7 @@ ga('send', 'pageview');
 </blockquote>
 <h2 id="1-同时对共享资源进行操作好一点的加锁的方式"><a href="#1-同时对共享资源进行操作好一点的加锁的方式" class="headerlink" title="1. 同时对共享资源进行操作好一点的加锁的方式"></a>1. 同时对共享资源进行操作好一点的加锁的方式</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">       <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">           <span class="keyword">final</span> ReentrantLock lock = <span class="keyword">this</span>.lock;</span><br><span class="line">           lock.lock(); <span class="comment">//拿不到lock的Thread会挂起</span></span><br><span class="line">           <span class="keyword">try</span> &#123;</span><br><span class="line">               <span class="keyword">this</span>.mList.add(<span class="string">"new elements added by"</span> + mIndex + <span class="string">""</span>); <span class="comment">//对共享资源的操作放这里</span></span><br><span class="line">           &#125;</span><br><span class="line">           <span class="keyword">finally</span> &#123;</span><br><span class="line">               lock.unlock(); <span class="comment">//记得解锁</span></span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br></pre></td></tr></table></figure>
 <h2 id="2-ThreadLocal比较好的用例在Andriod的Looper中"><a href="#2-ThreadLocal比较好的用例在Andriod的Looper中" class="headerlink" title="2. ThreadLocal比较好的用例在Andriod的Looper中"></a>2. ThreadLocal比较好的用例在Andriod的Looper中</h2><p>Looper.prepare()<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">prepare</span><span class="params">(<span class="keyword">boolean</span> quitAllowed)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (sThreadLocal.get() != <span class="keyword">null</span>) &#123;</span><br><span class="line">          <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"Only one Looper may be created per thread"</span>);</span><br><span class="line">      &#125;</span><br><span class="line">      sThreadLocal.set(<span class="keyword">new</span> Looper(quitAllowed));<span class="comment">//sThreadLocal是static的，注意leak</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ThreadLocal</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">(T value)</span> </span>&#123;</span><br><span class="line">        Thread t = Thread.currentThread();</span><br><span class="line">        ThreadLocalMap map = getMap(t); <span class="comment">//ThreadLocalMap就是一个Entry为WeakReference（WeakRWeakReference不是有get方法嘛，也是key-value的形式）。上面返回当前Thread的成员变量。（所以说Thread创建也是很耗费内存的嘛）</span></span><br><span class="line">        <span class="keyword">if</span> (map != <span class="keyword">null</span>)</span><br><span class="line">            map.set(<span class="keyword">this</span>, value);<span class="comment">//注意这个this是sThreadLocal，static的</span></span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            createMap(t, value);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>一个比较好的关于ThreadlLocal为什么容易leak的<a href="http://blog.xiaohansong.com/2016/08/06/ThreadLocal-memory-leak/">解释</a>，ThreadLocal是作为ThreadLocalMap中的Entry的key存在的，也就是Thread-&gt; ThreadLocalMap -&gt; Entry -&gt; WeakReference of ThreadLocal 。想想一下，假如外部调用者释放了ThreadLocal的引用，这个Entry中的key就成为null了，但是这个Entry中的Value还在，一直被Thread持有着。所以这事还是在于Thread的生命周期可能很长。fix的方案： 外部确定不用的时候记得调用下remove就好了。</p>
 <p>所以避免leak的话，记得调用ThreadLocal.remove<br>每一条线程调用ThreadLocal的set方法时都只能改变属于自己（线程）的值，调用get的时候也只能读到自己曾经设置的值。在多条线程面前，一个ThreadLocal类似于一个银行，每条线程只能保存或者更改读取自己的保险柜里的东西，保险柜钥匙即Thread自身。</p>
 <h2 id="3-Fork-join-since-java-7"><a href="#3-Fork-join-since-java-7" class="headerlink" title="3. Fork/join since java 7"></a>3. Fork/join since java 7</h2><p>有些任务是可以分块的。<a href="http://ifeve.com/java7-fork-join-and-closure/">work-stealing的实现</a></p>
 <h2 id="4-ArrayBlockingQueue-Thread-Safe"><a href="#4-ArrayBlockingQueue-Thread-Safe" class="headerlink" title="4. ArrayBlockingQueue Thread Safe"></a>4. ArrayBlockingQueue<E> Thread Safe</h2><h2 id="5-ReentrantLock-不公平锁"><a href="#5-ReentrantLock-不公平锁" class="headerlink" title="5.ReentrantLock 不公平锁"></a>5.ReentrantLock 不公平锁</h2><p>在jdk1.5里面，ReentrantLock的性能是明显优于synchronized的，但是在jdk1.6里面，synchronized做了优化，他们之间的性能差别已经不明显了。</p>
@@ -524,11 +525,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -540,19 +541,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">linux</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -564,7 +561,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">java</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -577,10 +582,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">Okio</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
               <li class="article-tag-list-item">
