@@ -28,7 +28,7 @@ top : 1
 - [scheme 这东西算跨客户端平台的](https://sspai.com/post/31500)，比如在 App 中调起支付宝(用的是 alipayqr://)。其实就是一个系统内跨应用调用。[用法](http://blog.csdn.net/qq_23547831/article/details/51685310)
 
 - 前后端同构
-- 前后端分离
+- [X] 前后端分离
 - XSS 攻击
 - [写 groovy 用 intelij 就可以了](https://www.jetbrains.com/help/idea/getting-started-with-groovy.html) 》 how to
 - [X] vS Code Vender Prefix plugin => auto prefix loader
@@ -38,6 +38,8 @@ top : 1
 - [ ] install nginx , jenkin ci, deploying nginx in docker(Http Load Balaning with Docker and nginx)(https://www.digitalocean.com/community/tutorials/how-to-configure-nginx-with-ssl-as-a-reverse-proxy-for-jenkins)
 - [ ] Paul Irish from google
 - [ ]随便放一个文件到/usr/bin/就可以直接调用这个文件名来起这个命令了吗？
+- [ ] form表单可以跨域一个是历史原因要保持兼容性
+- [ ] 通过file input上传图片，原生ajax以及Ajax，自己搭建上传服务器
 
 
 已完成
