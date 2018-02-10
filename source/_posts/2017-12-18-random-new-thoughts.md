@@ -37,6 +37,7 @@ top : 1
 - [ ] intelij 点击run 实际调用的command line 是什么。。。（--javapath的写法）
 - [ ] install nginx , jenkin ci, deploying nginx in docker(Http Load Balaning with Docker and nginx)(https://www.digitalocean.com/community/tutorials/how-to-configure-nginx-with-ssl-as-a-reverse-proxy-for-jenkins)
 - [ ] Paul Irish from google
+- [ ]随便放一个文件到/usr/bin/就可以直接调用这个文件名来起这个命令了吗？
 
 
 已完成

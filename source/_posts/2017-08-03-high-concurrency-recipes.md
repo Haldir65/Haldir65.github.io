@@ -68,6 +68,9 @@ private static void prepare(boolean quitAllowed) {
             createMap(t, value);
     }  
 ```
+一个比较好的关于ThreadlLocal为什么容易leak的[解释](http://blog.xiaohansong.com/2016/08/06/ThreadLocal-memory-leak/)，ThreadLocal是作为ThreadLocalMap中的Entry的key存在的，也就是Thread-> ThreadLocalMap -> Entry -> WeakReference of ThreadLocal 。想想一下，假如外部调用者释放了ThreadLocal的引用，这个Entry中的key就成为null了，但是这个Entry中的Value还在，一直被Thread持有着。所以这事还是在于Thread的生命周期可能很长。fix的方案： 外部确定不用的时候记得调用下remove就好了。
+
+
 所以避免leak的话，记得调用ThreadLocal.remove
 每一条线程调用ThreadLocal的set方法时都只能改变属于自己（线程）的值，调用get的时候也只能读到自己曾经设置的值。在多条线程面前，一个ThreadLocal类似于一个银行，每条线程只能保存或者更改读取自己的保险柜里的东西，保险柜钥匙即Thread自身。
 
