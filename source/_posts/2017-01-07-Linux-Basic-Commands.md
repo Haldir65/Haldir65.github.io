@@ -300,12 +300,13 @@ d代表目录
 后面九位划分为三块，可能的权限有这么几种
 r(read权限)w(写权限)-(无权限)x(执行权限)
 
-第一组代表所有者(u)权限，第二组代表与所有者一个用户组的用户(g)的权限，第三组代表其他用户(0)的权限
+第一组代表所有者(u)权限，第二组代表与所有者一个用户组的用户(g)的权限，第三组代表其他用户(O)的权限
+user,user group还有other
 
-更改文件权限命令: chmod
+更改文件权限命令: chmod(个人测下来要加sudo才行)
 ```shell
-chmod +x filename //加上可执行权限，所有用户都加上了
-chmod u+x filename //给当前用户加上可执行权限
+sudo chmod +x filename //加上可执行权限，所有用户都加上了
+sudo chmod u+x filename //给当前用户加上可执行权限
 u：用户
 g：组
 o：其它用户
@@ -451,7 +452,7 @@ dpkg -r tcl8.4
 
 关于apt-get
 ```shell
-apt-cache search # ------(package 搜索包)
+apt-cache search # ------(package 搜索包)就是看下符合这个名称的在repository中包有哪些
 apt-cache show #------(package 获取包的相关信息，如说明、大小、版本等)
 apt-get install # ------(package 安装包)
 apt-get install # -----(package --reinstall 重新安装包)

@@ -959,6 +959,31 @@ json【JavaScript Object Notation】
 javaScript操作cookie:
 
 
+这种方式就是给String全局添加一个方法，当然不是说推荐这么干
+```js
+String.prototype.hashCode = function() {
+  var hash = 0,
+    i,
+    chr;
+  if (this.length === 0) return hash;
+  for (i = 0; i < this.length; i++) {
+    chr = this.charCodeAt(i);
+    hash = (hash << 5) - hash + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+};
+
+```
+string concatnate的方法也有，然而[最快的方式](https://stackoverflow.com/questions/16696632/best-way-to-concatenate-strings-in-javascript)还是使用+=这种
+```js
+var hello = 'Hello, ';
+console.log(hello.concat('Kevin', '. Have a nice day.'));
+```
+
+FileReader是什么
+
+
 
 
 

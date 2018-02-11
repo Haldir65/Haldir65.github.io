@@ -32,13 +32,15 @@ print('Finishing up')
 
 ## 2. Flask相关
 ### 2.1 Flask Admin Pannel[Flask-Admin中文入门教程](http://flask123.sinaapp.com/article/57/)Please  run on linux
+
+### 2.2.log上颜色
+[博客](https://blog.phpgao.com/python_colorful_log.html)，Pycharm的console无效，内置Terminal有效
+
 ### 2.7 [小Web](http://www.jianshu.com/p/f9d668490bc6)
 
-### 2.2.log上颜色
-[博客](https://blog.phpgao.com/python_colorful_log.html)，Pycharm的console无效，内置Terminal有效
 
-### 2.2.log上颜色
-[博客](https://blog.phpgao.com/python_colorful_log.html)，Pycharm的console无效，内置Terminal有效
+
+
 
 ### 2.3 Pycharm里面import各种can't resolve 的解决方法
 - from werkzeug import secure_filename

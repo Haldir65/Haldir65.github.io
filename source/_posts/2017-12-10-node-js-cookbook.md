@@ -298,7 +298,7 @@ node --inspect-brk app.js ##在第一行就给我停下来
 [Debugging in 2017 with Node.js](https://www.youtube.com/watch?v=Xb_0awoShR8)
 
 =============================================================================
-
+开发环境用nodemon，生产环境用pm2(PM2的优胜之处在于当你要将app需要多核处理的时候，PM2内部集成的负载均衡可以让你很容易的去指定运行多少个实例。)
 
 ```js
 path.join(__dirname,'filename'); // ./filename

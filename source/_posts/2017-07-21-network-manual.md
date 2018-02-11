@@ -538,4 +538,38 @@ cookie-session 的实现跟 signedCookies 差不多。
 
 
 ### windows下host文件修改很简单，linux下在/etc/hosts里。
-这里面都写了一句映射： localhost : 127.0.0.1 ## the local loopback interface. 
+这里面都写了一句映射： localhost : 127.0.0.1 ## the local loopback interface.
+
+### 补上一个在windows上安装curl的方法
+[how-do-i-install-set-up-and-use-curl-on-windows](https://stackoverflow.com/questions/9507353/how-do-i-install-set-up-and-use-curl-on-windows)。简单说就是下一个windows x64的版本，然后把curl.exe所在位置添加到环境变量的PATH中，重启cmd就好了。
+然后开始测试一些主流网站
+
+126邮箱返回301(Moved Permanently)，同时告诉浏览器去https站点访问
+```
+curl -v mail.126.com
+* Rebuilt URL to: mail.126.com/
+*   Trying 220.181.15.150...
+* TCP_NODELAY set
+* Connected to mail.126.com (220.181.15.150) port 80 (#0)
+> GET / HTTP/1.1
+> Host: mail.126.com
+> User-Agent: curl/7.58.0
+> Accept: */*
+>
+< HTTP/1.1 301 Moved Permanently
+< Server: nginx
+< Date: Sun, 11 Feb 2018 06:16:02 GMT
+< Content-Type: text/html
+< Content-Length: 178
+< Connection: keep-alive
+< Location: https://mail.126.com/
+<
+<html>
+<head><title>301 Moved Permanently</title></head>
+<body bgcolor="white">
+<center><h1>301 Moved Permanently</h1></center>
+<hr><center>nginx</center>
+</body>
+</html>
+* Connection #0 to host mail.126.com left intact
+```

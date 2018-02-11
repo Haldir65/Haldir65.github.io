@@ -151,10 +151,6 @@ module.exports = {
 把两个command chain起来就是了
 
 
-
-
-
-
 ## 2.Stylus
 >安装
 yarn add stylus

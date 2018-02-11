@@ -502,6 +502,11 @@ fg job name ##把这个程序拉到前台
 比方说当前目录下有一个dump.sh文件，想要执行的话，输入dump是没有用的。因为echo $PATH中并没有这个dump:目录/dusp.sh。
 所以要执行这个sh，需要./dump.sh
 
+或者建一个symbolic link到 /usr/local/bin下面，比如这样
+sudo ln -s /full/path/to/your/file /usr/local/bin/name_of_new_command
+想要可执行的话，记得给权限。chmod +x /full/path/to/your/file
+当然，想要移除这个软链接的话.
+sudo rm -rf /usr/local/bin/name_of_new_command
 ```
 
 

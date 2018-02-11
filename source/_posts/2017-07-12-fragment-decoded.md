@@ -516,6 +516,57 @@ Fragment的一些生命周期还是需要跟Activity的生命周期一起看，�
 
 ## 更新，拿来主义
 1. [一份2013年的文档](http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html),不要在FragmentActivity#onResume中beginTransaction，需要的话，在onPostResume或者onPostResume中做。也不要在onActivityResult里面去做，onActivityResult会触发onPostResume，推迟到onPostResume去做。
+2. [关于Can not perform this action after onSaveInstanceState] 今天很好奇的查了下FragmentActivity的onBackpressed
+特地把supportLibVersion改成\25.\3.\0看下，还是
+```java
+@Override
+   public void onBackPressed() {
+       if (!mFragments.getSupportFragmentManager().popBackStackImmediate()) {
+           super.onBackPressed();
+       }
+   }
+```
+改到\26.1.\0之后就变成
+```java
+@Override
+public void onBackPressed() {
+    FragmentManager fragmentManager = mFragments.getSupportFragmentManager();
+    final boolean isStateSaved = fragmentManager.isStateSaved();
+    if (isStateSaved && Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
+        // Older versions will throw an exception from the framework
+        // FragmentManager.popBackStackImmediate(), so we'll just
+        // return here. The Activity is likely already on its way out
+        // since the fragmentManager has already been saved.
+        return;
+    }
+    if (isStateSaved || !fragmentManager.popBackStackImmediate()) {
+        super.onBackPressed();
+    }
+}
+```
+特意查了下aosp的git log，
+George Mount <mount@google.com>	Tue Feb 21 11:04:14 2017 -0800。
+```java
+@Override
+public void onBackPressed() {
+-        if (!mFragments.getSupportFragmentManager().popBackStackImmediate()) {
++        FragmentManager fragmentManager = mFragments.getSupportFragmentManager();
++        final boolean isStateSaved = fragmentManager.isStateSaved();
++        if (isStateSaved && Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
++            // Older versions will throw an exception from the framework
++            // FragmentManager.popBackStackImmediate(), so we'll just
++            // return here. The Activity is likely already on its way out
++            // since the fragmentManager has already been saved.
++            return;
++        }
++        if (isStateSaved || !fragmentManager.popBackStackImmediate()) {
+        super.onBackPressed();
+    }
+}
+```
+怎么说呢，fragmentManager.isStateSaved()对外暴露mStateSaved还是挺开明的。
+
+
 
 ## Reference
 1. [Fragment的onAttach和onDetach什么时候会调用](http://stackoverflow.com/questions/9156406/whats-the-difference-between-detaching-a-fragment-and-removing-it)
