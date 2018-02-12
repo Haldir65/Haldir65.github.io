@@ -402,7 +402,7 @@ drwxr-xr-x   2 root   root     4096 Jan 14  2017 snap
 drwxr-xr-x   2 root   root     4096 Feb 15  2017 srv
 dr-xr-xr-x  13 root   root        0 Feb  4 08:08 sys
 drwxrwxrwt   9 root   root     4096 Feb  4 08:05 tmp ## contain temporary data,注意，该目录下文件重启后被erased
-drwxr-xr-x  11 root   root     4096 Dec 10 01:04 usr ##这里面有bin man sbin等目录，存放user program and other data
+drwxr-xr-x  11 root   root     4096 Dec 10 01:04 usr ##这里面有bin man sbin等目录，存放user program and other data(并不是user，而是universal system resources)
 drwxr-xr-x  14 root   root     4096 Dec 10 22:21 var ## 全称variable，存放variable data where system must be able to write during operation(就是log)
 
 
@@ -507,6 +507,12 @@ sudo ln -s /full/path/to/your/file /usr/local/bin/name_of_new_command
 想要可执行的话，记得给权限。chmod +x /full/path/to/your/file
 当然，想要移除这个软链接的话.
 sudo rm -rf /usr/local/bin/name_of_new_command
+
+visudo //via sudo
+为什么不要总以root权限做事:
+sudo rm -rf /etc/dummyfile ## 看上去ok
+sudo rm -rf / etc/dummyfile ## 不小心多了个空格，系统并不会拦着你，这样就删掉了所有的文件
+
 ```
 
 
