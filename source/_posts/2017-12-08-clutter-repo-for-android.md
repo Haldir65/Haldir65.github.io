@@ -370,6 +370,8 @@ measureVertical()
 gradle/wrapper/gradle-wrapper.jar 里面装的是Gradle Wrapper的代码
 gradlew就是一个调用gradle命令的脚本，内部会根据gradle-wrapper.properties里面的distributionUrl下载对应版本的gradle distribution zip文件并解压缩，并只会使用该版本的gralde进行编译
 
+### 23. java平台下扫描本地samba服务器用的的一个library叫做import jcifs.smb.SmbFile
+[找到一个实例代码](https://github.com/eriklupander/microgramcaster/blob/master/src/com/squeed/microgramcaster/smb/SambaExplorer.java)
 
 =============================================================================
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600)

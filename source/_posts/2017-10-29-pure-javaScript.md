@@ -930,28 +930,7 @@ array.filter(function(item){
 基本上就这些了[参考](https://juejin.im/post/5a3a59e7518825698e72376b)
 
 
-## 1. js跨域请求
-[cors的概念](http://www.ruanyifeng.com/blog/2016/04/cors.html)
-> search "原生javaScript跨域"、'jsonp跨域请求豆瓣250'
 
-[jsonp跨域获取豆瓣250接口](http://www.jianshu.com/p/1f32c9a96064)，豆瓣能支持jsonp是因为豆瓣服务器响应了
-> http://api.douban.com/v2/movie/top250?callback=anything这个query,这个anything是我们自己网页里面script里面定义的方法，豆瓣会返回一个: anything({json})的数据回来，直接调用anything方法
-json【JavaScript Object Notation】
-[MDN上的corz](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS)
-
-将网页设置为允许 XMLHttpRequest 跨域访问
-```html
-<meta http-equiv="Access-Control-Allow-Origin" content="*">
-
-<meta http-equiv="Access-Control-Allow-Origin" content="http://www.1688hot.com:80">
-```
-
-[jsonp的解释](http://schock.net/articles/2013/02/05/how-jsonp-really-works-examples/)
-
-亲测，Flask里面给response添加Header:
->  response.headers['Access-Control-Allow-Origin'] = 'http://localhost:8080'
-
-在8080端口的web页面发起请求就能成功
 
 
 异常捕获(try catch也有)

@@ -226,18 +226,7 @@ vue-resource提交表单的操作如下:
 ```
 post方法返回的是一个promise，加回调即可打印出api返回结果。
 
-### 2.2 ajax跨域操作
-[XMLHttpRequest cannot load http://localhost:5000/hello.
-No 'Access-Control-Allow-Origin' header is present on the requested resource.](https://stackoverflow.com/questions/25860304/how-do-i-set-response-headers-in-flask)
-用Flask做后台，大概的代码这样
-<!--
-```python
-@app.route("/posts", methods=['GET'])
-def create_post()
-    resp = Response(json.dumps(post_lists), mimetype='application/json')
-    resp.headers['Access-Control-Allow-Origin'] = '*'
-    return resp    
-``` -->
+
 
 ## 3. Router,Eventbus,mixin，axios等
 

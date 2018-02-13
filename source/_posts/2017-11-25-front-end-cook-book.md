@@ -56,6 +56,48 @@ xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 后台会认为这是一个提交表单的请求，body就应该设置为''
 [What is the difference between form data and request payload?](https://stackoverflow.com/questions/10494574/what-is-the-difference-between-form-data-and-request-payload)
 
+### 跨域是一个比较大的知识点
+[cors的概念](http://www.ruanyifeng.com/blog/2016/04/cors.html)
+> search "原生javaScript跨域"、'jsonp跨域请求豆瓣250'
+
+[jsonp跨域获取豆瓣250接口](http://www.jianshu.com/p/1f32c9a96064)，豆瓣能支持jsonp是因为豆瓣服务器响应了
+> http://api.douban.com/v2/movie/top250?callback=anything这个query,这个anything是我们自己网页里面script里面定义的方法，豆瓣会返回一个: anything({json})的数据回来，直接调用anything方法
+json【JavaScript Object Notation】
+[MDN上的corz](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS)
+
+将网页设置为允许 XMLHttpRequest 跨域访问
+```html
+<meta http-equiv="Access-Control-Allow-Origin" content="*">
+
+<meta http-equiv="Access-Control-Allow-Origin" content="http://www.1688hot.com:80">
+```
+
+跨域的方法有很多，iframe是一种，iframe是在一个网页中展示另一个url页面资源的方式
+```html
+<iframe id="video" width="420" height="315" src="https://www.baidu.com" frameborder="0" allowfullscreen></iframe>
+```
+然后在localhost起一个服务器预览，就能在页面中正常展示百度首页。
+
+[jsonp的解释](http://schock.net/articles/2013/02/05/how-jsonp-really-works-examples/)
+
+亲测，Flask里面给response添加Header:
+>  response.headers['Access-Control-Allow-Origin'] = 'http://localhost:8080'
+
+在8080端口的web页面发起请求就能成功
+
+### 2.2 ajax跨域操作
+[XMLHttpRequest cannot load http://localhost:5000/hello.
+No 'Access-Control-Allow-Origin' header is present on the requested resource.](https://stackoverflow.com/questions/25860304/how-do-i-set-response-headers-in-flask)
+用Flask做后台，大概的代码这样
+<!--
+```python
+@app.route("/posts", methods=['GET'])
+def create_post()
+    resp = Response(json.dumps(post_lists), mimetype='application/json')
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp    
+``` -->
+
 
 ## Webpack configuration
 > 安装
@@ -242,6 +284,9 @@ $(function() {
 
 });
 ```
+
+
+
 
 ## 参考
 - [一个腾讯前端的博客](https://www.xuanfengge.com/page-back-does-not-cache.html)

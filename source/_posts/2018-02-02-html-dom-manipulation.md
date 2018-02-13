@@ -58,3 +58,6 @@ $('#file_2').change( () => {
   showPreview2(this.id,'portrait2');
 })
 ```
+
+### 为毛浏览器内嵌视频要用iframe
+因为video source是host在其他的sites的啊，因为跨域的问题，不得不使用iframe。因为就算用iframe，里面其实还是一个vide的tg。

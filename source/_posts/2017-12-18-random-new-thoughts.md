@@ -17,17 +17,13 @@ top : 1
 - Promise 链式调用与终止，异常处理
 - iview，elementUi
 - [ ] jQuery 插件
-- [embeed video with iframe](https://css-tricks.com/NetMag/FluidWidthVideo/Article-FluidWidthVideo.php)
-- [x] flex,grid
-
--
-
+- [embeed video with iframe](https://css-tricks.com/NetMag/FluidWidthVideo/Article-FluidWidthVideo.php)[AC2016腾讯前端技术大会 1 1 1 H5直播那些事](https://www.youtube.com/watch?v=g3F7Imjcd4k)
+- [ ] flex,grid
 - [Android Studio 编译过程](https://fucknmb.com/2017/05/11/Android-Studio-Library%E6%A8%A1%E5%9D%97%E4%B8%ADNative%E4%BB%A3%E7%A0%81%E8%BF%9B%E8%A1%8Cdebug%E7%9A%84%E4%B8%80%E4%BA%9B%E5%9D%91/)
 - [Android 编译及 Dex 过程源码分析](http://mouxuejie.com/blog/2016-06-21/multidex-compile-and-dex-source-analysis/)
 - [如何调试 Android 打包流程？](http://www.wangyuwei.me/)
 - [一个用于优化 png 图片的 gradle 插件](https://github.com/chenenyu/img-optimizer-gradle-plugin)，用来看 groovy 语法挺好的。以及 [How to write gradle plugin](http://yuanfentiank789.github.io/2017/09/20/%E5%9C%A8AndroidStudio%E4%B8%AD%E8%87%AA%E5%AE%9A%E4%B9%89Gradle%E6%8F%92%E4%BB%B6/)
 - [scheme 这东西算跨客户端平台的](https://sspai.com/post/31500)，比如在 App 中调起支付宝(用的是 alipayqr://)。其实就是一个系统内跨应用调用。[用法](http://blog.csdn.net/qq_23547831/article/details/51685310)
-
 - 前后端同构
 - [X] 前后端分离
 - XSS 攻击
@@ -44,7 +40,7 @@ top : 1
 - [ ] [nio stuff](https://juejin.im/post/59fffdb76fb9a0450a66bd58)
 
 
-已完成
+### 已完成
 * 用 express 转接一个知乎 Api，添加 Access-control-allow-origin,或许还可以用 redis 缓存数据结果（一个就好）由此想到一篇文章"How to use Pythonto build a restful Web Service".只不过用的是 Tornado
 * git hook (github travis 持续集成，git push 会触发服务器的一系列操作)
 * 基于前后端分离的理念，后台只负责提供数据，render page 的任务应该交给前端。（所以用 express-handlebars 写页面的方式写着很累）
@@ -52,7 +48,7 @@ top : 1
 * 随便放一个文件到/usr/bin/就可以直接调用这个文件名来起这个命令了吗？（实际操作只需要建立一个symbolic link就好了）
 
 
-Good For Nothing
+### Good For Nothing
 - [ ] 用GDB调试程序
 - [ ] npm install graphql(mostly a server side javascript stuff)
 - 使用 express 模拟网络延迟
