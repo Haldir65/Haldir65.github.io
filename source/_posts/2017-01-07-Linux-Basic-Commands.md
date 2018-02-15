@@ -782,6 +782,8 @@ Usage: tcpdump [-aAbdDefhHIJKlLnNOpqRStuUvxX] [ -B size ] [ -c count ]
                 [ -Z user ] [ expression ]
 ```
 
+### 18.ubuntu desktop预设的desktop environment叫做unity
+比较常见的linux desktop 还有gnome,KDE ,plasma,Ma tei, cinnamon.
 
 
 ==================================================================================

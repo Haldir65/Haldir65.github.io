@@ -57,6 +57,18 @@ xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 [What is the difference between form data and request payload?](https://stackoverflow.com/questions/10494574/what-is-the-difference-between-form-data-and-request-payload)
 
 ### 跨域是一个比较大的知识点
+```
+about:1 Failed to load http://api.douban.com/v2/movie/top250: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource. Origin 'http://localhost:8080' is therefore not allowed access.
+```
+查了好久，原因是CORS(Control of Shared Resources)，通过ajax发起另一个domian(port)资源的请求默认是不安全的。主要是在js里面代码请求另一个网站(只要不满足host和port完全相同就不是同一个网站)，默认是被[禁止](http://www.ruanyifeng.com/blog/2016/04/cors.html)的。chrome里面查看network的话，发现这条request确实发出去了，request header里面多了一个
+> Origin:http://localhost:8080
+显然这不是axios设置的，在看到这条header后，如果'/movie/top250'这个资源文件没有设置'Access-Control-Allow-Origin: http://localhost:8080'的话，浏览器就算拿到了服务器的回复也不会允许被开发者获取。这是CORS做出的策略，也是前端开发常提到的跨域问题。
+解决方法：
+1.和服务器商量好CORS
+2.使用jsonp(跨域请求并不限制带src属性的tag，比如script img这些)
+3. 使用iframe跨域
+
+CORS还是比较重要的东西，[详解](http://www.ruanyifeng.com/blog/2016/04/cors.html)，据说会发两次请求,且只支持GET请求。
 [cors的概念](http://www.ruanyifeng.com/blog/2016/04/cors.html)
 > search "原生javaScript跨域"、'jsonp跨域请求豆瓣250'
 
@@ -84,6 +96,8 @@ json【JavaScript Object Notation】
 >  response.headers['Access-Control-Allow-Origin'] = 'http://localhost:8080'
 
 在8080端口的web页面发起请求就能成功
+
+
 
 ### 2.2 ajax跨域操作
 [XMLHttpRequest cannot load http://localhost:5000/hello.
@@ -233,7 +247,7 @@ Babel是一个可以把ES6代码打包成ES5代码的插件，毕竟要兼容老
 [移动开发中的一些有用meta标签](http://www.html-js.com/article/The-front-end-of-mobile-terminal-meta-tag-set-of-notes-the-role-of)
 
 - [X]如何使用js显示一个Dialog
-- [ ]Express js
+- [X]Express js
 - [ ] css3 属性大全
 
 

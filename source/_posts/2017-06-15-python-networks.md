@@ -156,6 +156,35 @@ Http底层TCP ,ACK 等等需要tcpcump结合wireShark抓包
 ### 1.3 Flask + gevent 提高web 框架的性能
 [docs](http://flask.pocoo.org/docs/0.12/deploying/wsgi-standalone/)
 
+### 1.4 Flask Session management
+这段示例代码展示了如何为请求设置session
+```python
+from flask import Flask ,session
+import os
+
+app = Flask(__name__)
+app.secret_key = os.urname(24)
+
+@app.route('/')
+def index():
+    session('user') = 'Anthony'
+    return 'Index'
+
+@app.route('/getsession')
+def getsession():
+    if 'user' in session:
+        return session['user']
+    return 'not logged in!'
+
+@app.router('/dropsession')
+def dropsession():
+    session.pop('user',None)
+    return 'Dropped'
+
+if  __name__ == '__main__':
+    app.run(debug=True)
+```
+
 ### 2. The Django Way
 Django是**web framework**，不是**WebServer**
 
