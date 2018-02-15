@@ -17,7 +17,7 @@
 <meta property="og:description" content="每一个领域都有些不知道该放哪的零碎的点，这里开辟一个新的地方，作为前端杂乱知识的汇总。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/coffee art life nature living drip dark bw.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-02-15T12:50:04.718Z">
+<meta property="og:updated_time" content="2018-02-15T15:50:17.931Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="前端速查手册">
 <meta name="twitter:description" content="每一个领域都有些不知道该放哪的零碎的点，这里开辟一个新的地方，作为前端杂乱知识的汇总。">
@@ -217,7 +217,15 @@ ga('send', 'pageview');
 </blockquote>
 <p>对于POST请求，如果Request中明确设置了:<br>&gt;<br>xhr.setRequestHeader(“Content-type”,”application/x-www-form-urlencoded”);</p>
 <p>后台会认为这是一个提交表单的请求，body就应该设置为’’<br><a href="https://stackoverflow.com/questions/10494574/what-is-the-difference-between-form-data-and-request-payload">What is the difference between form data and request payload?</a></p>
-<h3 id="跨域是一个比较大的知识点"><a href="#跨域是一个比较大的知识点" class="headerlink" title="跨域是一个比较大的知识点"></a>跨域是一个比较大的知识点</h3><p><a href="http://www.ruanyifeng.com/blog/2016/04/cors.html">cors的概念</a></p>
+<h3 id="跨域是一个比较大的知识点"><a href="#跨域是一个比较大的知识点" class="headerlink" title="跨域是一个比较大的知识点"></a>跨域是一个比较大的知识点</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">about:1 Failed to load http://api.douban.com/v2/movie/top250: Response to preflight request doesn&apos;t pass access control check: No &apos;Access-Control-Allow-Origin&apos; header is present on the requested resource. Origin &apos;http://localhost:8080&apos; is therefore not allowed access.</span><br></pre></td></tr></table></figure>
+<p>查了好久，原因是CORS(Control of Shared Resources)，通过ajax发起另一个domian(port)资源的请求默认是不安全的。主要是在js里面代码请求另一个网站(只要不满足host和port完全相同就不是同一个网站)，默认是被<a href="http://www.ruanyifeng.com/blog/2016/04/cors.html">禁止</a>的。chrome里面查看network的话，发现这条request确实发出去了，request header里面多了一个</p>
+<blockquote>
+<p>Origin:<a href="http://localhost:8080">http://localhost:8080</a><br>显然这不是axios设置的，在看到这条header后，如果’/movie/top250’这个资源文件没有设置’Access-Control-Allow-Origin: <a href="http://localhost:8080&#39;的话，浏览器就算拿到了服务器的回复也不会允许被开发者获取。这是CORS做出的策略，也是前端开发常提到的跨域问题。">http://localhost:8080&#39;的话，浏览器就算拿到了服务器的回复也不会允许被开发者获取。这是CORS做出的策略，也是前端开发常提到的跨域问题。</a><br>解决方法：<br>1.和服务器商量好CORS<br>2.使用jsonp(跨域请求并不限制带src属性的tag，比如script img这些)</p>
+<ol>
+<li>使用iframe跨域</li>
+</ol>
+</blockquote>
+<p>CORS还是比较重要的东西，<a href="http://www.ruanyifeng.com/blog/2016/04/cors.html">详解</a>，据说会发两次请求,且只支持GET请求。<br><a href="http://www.ruanyifeng.com/blog/2016/04/cors.html">cors的概念</a></p>
 <blockquote>
 <p>search “原生javaScript跨域”、’jsonp跨域请求豆瓣250’</p>
 </blockquote>
@@ -272,7 +280,7 @@ ga('send', 'pageview');
 <p>Babel是一个可以把ES6代码打包成ES5代码的插件，毕竟要兼容老的浏览器。<br><a href="https://github.com/faisalman/ua-parser-js">ua-parser-js</a>是一个很好用的检测ua的library。<br><a href="http://www.css88.com/doc/backbone/">Backbone</a>是一个mvc框架<br><a href="http://www.html-js.com/article/The-front-end-of-mobile-terminal-meta-tag-set-of-notes-the-role-of">移动开发中的一些有用meta标签</a></p>
 <ul>
 <li>[X]如何使用js显示一个Dialog</li>
-<li>[ ]Express js</li>
+<li>[X]Express js</li>
 <li>[ ] css3 属性大全</li>
 </ul>
 <p>atom的emmet插件很好用<br>比如想要创建一个<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">'test'</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
