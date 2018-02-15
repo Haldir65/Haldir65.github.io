@@ -149,6 +149,8 @@ app.get("/user",function (req,res,next) {
 };
 ```
 
+另一种选择，graphQl是和restful功能类似的模式
+
 
 
 

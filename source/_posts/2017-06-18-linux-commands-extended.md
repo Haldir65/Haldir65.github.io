@@ -513,6 +513,8 @@ visudo //via sudo
 sudo rm -rf /etc/dummyfile ## 看上去ok
 sudo rm -rf / etc/dummyfile ## 不小心多了个空格，系统并不会拦着你，这样就删掉了所有的文件
 
+raspberry Pi使用的是Raspbian -- 基于debian
+
 ```
 
 

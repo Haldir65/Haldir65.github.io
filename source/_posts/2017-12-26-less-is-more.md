@@ -197,7 +197,10 @@ form input[type=button]
 当然日常开发中不可能一直手敲 stylus xxx xxx或者 lessc xxx xxx，因为有webpack-loader。
 
 =======================================================================================
-### 6. Sss和Scss
+### 6. Sass
+安装，Sass需要安装Ruby。
+
+
 SCSS 是 Sass 3 引入新的语法，其语法完全兼容 CSS3，并且继承了 Sass 的强大功能。也就是说，任何标准的 CSS3 样式表都是具有相同语义的有效的 SCSS 文件。
 ```css
 @mixin rounded($amount) {
