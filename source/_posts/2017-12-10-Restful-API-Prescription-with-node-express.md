@@ -22,9 +22,6 @@ MiddleWare(中间件)的概念：
 从Request到response之间的流程中，任何组件都可以对这个过程中的数据进行修改，所以router其实也是中间件。中间件需要注意的就是***顺序很重要***。
 
 
-
-
-
 调试使用postMan
 
 ### Request
@@ -60,7 +57,7 @@ req.query  // {"age","10"}  // 显然这是url里面的query
 
 
 ## 3. Serving static files
-
+照说serving static file这种事应该交给nginx来做，express只是提供了一种选择。
 ```javaScript
 app.use(express.static(path.join(__dirname,'public')))
 ```
@@ -71,9 +68,6 @@ app.use(express.static(path.join(__dirname,'public')))
 app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist/'));
 ```
 这意思就是请求/jquery这个目录下的资源就等于访问/node_modules/jquery/dist/目录下同名的资源
-
-
-
 
 ## 4. response
 response.redirect('/all'); //在浏览器里面看，response的header是这样的

@@ -4,10 +4,20 @@ date: 2017-12-10 16:13:30
 tags: [前端]
 ---
 
-npm = node package manager
+npm run start
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100694324.jpg?imageView2/2/w/600)
 <!--more-->
 
+
+## 安装
+windows上的安装十分方便，就跟安装普通软件一样，一路下一步点下去即可。
+
+> npm install -g grunt --save-dev # 安装，成为全局(-g)module，保存为dev-dependencies(--save-dev) 简写 -D 一个意思
+> npm install -g grunt --save # 安装，保存为dependencies
+
+> npm run dev # 打开发环境包
+> npm run build # 打release包
+node is based on chrome v8 engine,it's javaScript without the browser.
 
 npm的configuration非常方便设置,首先是[设置proxy](https://stackoverflow.com/questions/7559648/is-there-a-way-to-make-npm-install-the-command-to-work-behind-proxy)
 > npm config set strict-ssl false
@@ -15,8 +25,6 @@ npm的configuration非常方便设置,首先是[设置proxy](https://stackoverfl
 > npm config set proxy http://127.0.0.1:1080 ## 以上三句话设置代理
 > npm config list ##列出当前所有的设置
 > npm config get stuff ##比如说registry等等
-
-
 
 
 [whats-the-difference-between-dependencies-devdependencies-and-peerdependencies](https://stackoverflow.com/questions/18875674/whats-the-difference-between-dependencies-devdependencies-and-peerdependencies)
@@ -47,16 +55,6 @@ npm有个dependencies的概念，此外还有dev-dependencies的概念，主要�
 /*向上箭头的意思是安装的时候会自动去查找安装最新的minor version。关于版本号，第一位表示major version，may incur code imcompatibility,第二位表示minor version，代表new features,第三位表示bug fixes.所以向上箭头意味着安装时不会动第一位，只会升级为第二位最新的版本*/
 ```
 [stackoverflow上的解释](https://stackoverflow.com/questions/22343224/whats-the-difference-between-tilde-and-caret-in-package-json)
-
-> npm install -g grunt --save-dev # 安装，成为全局(-g)module，保存为dev-dependencies(--save-dev) 简写 -D 一个意思
-> npm install -g grunt --save # 安装，保存为dependencies
-
-> npm run dev # 打开发环境包
-> npm run build # 打release包
-=======
-node is based on chrome v8 engine,it's javaScript without the browser.
-
-## 安装
 
 ## 示例
 app.js
@@ -164,8 +162,15 @@ fs.readFile('index.html',(err,html) => {
 dependencies里面向上箭头表示安装最新的minor version。而使用"\*"号的话就表示想要使用latest version
 
 
-=============================================================================
-Compile ES6 ES2017 Code to ES5 Code
+## 一些node自带的module
+比如fs,path,http，这些东西都是不需要安装的,bundled with node installation。
+
+```js
+path.join(__dirname,'filename'); // ./filename
+path.join(__dirname,"..",filename); // ../filename ,go to parent directory
+```
+
+Compile ES6 ES2017 Code to ES5 Code(这部分属于webpack的内容)
 > npm install --save-dev webpack webpack-dev-server babel-core babel-loader babel-preset-env
 npm install --save-dev babel-polyfill babel-preset-stage-0 ## 用async await的话需要安装polyfill
 
@@ -227,9 +232,8 @@ module.exports = {
 };
 ```
 
-
-yarn 是facebook设计的，yarn is faster than npm
-npm install yarn -g
+### yarn
+yarn 是facebook设计的，yarn的速度要比npm快。在windows平台上推荐使用msi安装包安装。
 
 >npm install express
 yarn add express
@@ -240,7 +244,7 @@ yarn add express
 yarn global add nodemon
 yarn outdated
 yarn cache clean
-yarn run dev
+yarn run dev // yarn dev 其实run都可以省略
 yarn upgrade express
 
 
@@ -255,6 +259,8 @@ eslint修改配置，让js文件每一行后面都得加冒号(allow semi colons
 
 
 node js不支持es2015的import 和export语法，需要使用mudule的话，可使用commonJs，即:
+其实这事说来就是node对于绝大多数es2015的语法都支持了，偏偏import,export这一套就不支持。
+[node社区最终决定使用mjs文件后缀](https://medium.com/dailyjs/es6-modules-node-js-and-the-michael-jackson-solution-828dc244b8b)
 ```js
 // library.js
 module.export.awesome = function () {
@@ -270,9 +276,6 @@ library.awesome();
 // 2. require('./library') 和require('./library.js')没有区别
 ```
 
-
-
-
 sourcemaps
 开发过程中使用的是ES2015代码，编译之后就成了非常长的es5代码，在浏览器里面几乎无法断点。使用sourcemap就能在浏览器中将es5代码“反编译”成ES2015代码，还可以打断点。
 
@@ -287,6 +290,9 @@ ejs
 pm2 //starting an node app as a bcakground service
 mongoose
 
+
+## Howto debug
+
 vscode debug node js的方式，打开调试窗口，点击那个小齿轮(打开launch.json)。直接在代码中断点即可。注意底下有一个debug console(调试控制台)，可以输入变量，查看当前值，和一些大型Ide很像。
 
 在chrome里面debug的方式：
@@ -300,9 +306,6 @@ node --inspect-brk app.js ##在第一行就给我停下来
 =============================================================================
 开发环境用nodemon，生产环境用pm2(PM2的优胜之处在于当你要将app需要多核处理的时候，PM2内部集成的负载均衡可以让你很容易的去指定运行多少个实例。)
 
-```js
-path.join(__dirname,'filename'); // ./filename
-path.join(__dirname,"..",filename); // ../filename ,go to parent directory
-```
+
 node里面就不要用Ajax了，推荐axios，原生自带也有https。
-[node社区最终决定使用mjs文件后缀](https://medium.com/dailyjs/es6-modules-node-js-and-the-michael-jackson-solution-828dc244b8b)
+而node中的一些module也不能用于浏览器端，比如fs这种属于偏Low level的api

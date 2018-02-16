@@ -34,7 +34,7 @@ element.addEventListener('submit', event => {
 <a href="javascript:void(0)"></a>
 ```
 
-## input[type='file']选出来的图片路径
+## input file选出来的图片路径
 [c-fakepath](https://stackoverflow.com/questions/4851595/how-to-resolve-the-c-fakepath).浏览器并不会将底层的文件实际路径暴露给开发者，这是出于安全考虑。所以使用
 ```js
 document.querySelectorAll('input')[3].value

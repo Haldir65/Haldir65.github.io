@@ -73,7 +73,7 @@ linux 内核版本查看：
 
 检查下是否启动了
 
-> ps -ef |grep sss
+> ps -ef | grep sss
 
 ss 命令
 
@@ -150,6 +150,25 @@ sudo ss-server -c /etc/shadowsocks-libev/config.json -u ## 开启udp转发  nets
 ```
 
 其实跟安装 ss 很像的
+
+## 2.4 安装libsodium
+转自[逗比](https://doub.io/ss-jc51/)
+```shell
+## debian系列
+apt-get update
+## 安装 编译所需组件包：
+apt-get install -y build-essential
+### 获取 libsodium最新版本：
+Libsodiumr_ver=$(wget -qO- "https://github.com/jedisct1/libsodium/tags"|grep "/jedisct1/libsodium/releases/tag/"|head -1|sed -r 's/.*tag\/(.+)\">.*/\1/') && echo "${Libsodiumr_ver}"
+## 下载最新 libsodium版本编译文件：
+wget --no-check-certificate -N "https://github.com/jedisct1/libsodium/releases/download/${Libsodiumr_ver}/libsodium-${Libsodiumr_ver}.tar.gz"
+tar -xzf libsodium-${Libsodiumr_ver}.tar.gz && cd libsodium-${Libsodiumr_ver}
+./configure --disable-maintainer-mode && make -j2 && make install ## 这段最好sudo 去做
+ldconfig
+## 删掉之前下载的文件
+cd .. && rm -rf libsodium-${Libsodiumr_ver}.tar.gz && rm -rf libsodium-${Libsodiumr_ver}
+```
+现在就可以去config.json文件中将加密方式改成: chacha20 了，重启下ss即可
 
 ## 3. ubuntu自带的防火墙叫做ufw，用起来也很简单
 

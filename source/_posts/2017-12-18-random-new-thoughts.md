@@ -28,9 +28,7 @@ top : 1
 - [X] 前后端分离
 - XSS 攻击
 - [写 groovy 用 intelij 就可以了](https://www.jetbrains.com/help/idea/getting-started-with-groovy.html) 》 how to
-- [X] vS Code Vender Prefix plugin => auto prefix loader
 - [ ] websocket nodejs
-- [X]单个网卡最多65535个端口，c10K
 - [ ] intelij 点击run 实际调用的command line 是什么。。。（--javapath的写法）
 - [ ] install nginx , jenkin ci, deploying nginx in docker(Http Load Balaning with Docker and nginx)(https://www.digitalocean.com/community/tutorials/how-to-configure-nginx-with-ssl-as-a-reverse-proxy-for-jenkins)
 - [ ] Paul Irish from google
@@ -46,6 +44,9 @@ top : 1
 * 基于前后端分离的理念，后台只负责提供数据，render page 的任务应该交给前端。（所以用 express-handlebars 写页面的方式写着很累）
 * 集成 travis-ci，记得 after-success script 的结果并不会影响 build 的结果（即，after-success 执行脚本发生了错误，在日志里有输出 error，但实际显示的 build result 仍为 success），还有 travis 的输出 log 需要默认是折叠的，要展开才能看清楚，但在 afterSuccess 里面的指令的输出一定是有的。
 * 随便放一个文件到/usr/bin/就可以直接调用这个文件名来起这个命令了吗？（实际操作只需要建立一个symbolic link就好了）
+* 单个网卡最多65535个端口，c10K
+
+
 
 
 ### Good For Nothing
@@ -53,4 +54,5 @@ top : 1
 - [ ] npm install graphql(mostly a server side javascript stuff)
 - 使用 express 模拟网络延迟
 - [基于 Docker 打造前端持续集成开发环境](https://juejin.im/post/5a157b7a5188257bfe457ff0)
+- vS Code Vender Prefix plugin => auto prefix loader
 -

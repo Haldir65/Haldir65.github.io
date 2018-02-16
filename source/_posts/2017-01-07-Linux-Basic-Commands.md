@@ -788,6 +788,7 @@ Usage: tcpdump [-aAbdDefhHIJKlLnNOpqRStuUvxX] [ -B size ] [ -c count ]
 
 ==================================================================================
 ## [shell script tutorial](https://www.youtube.com/watch?v=hwrnmQumtPw)
+fdisk -l ## show a list of hard drives that are attached to your computer, fdisk就是硬盘分区命令
 
 
 ### 参考

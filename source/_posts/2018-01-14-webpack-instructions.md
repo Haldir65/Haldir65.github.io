@@ -23,39 +23,57 @@ minify js(删掉所有的空行) webpack -p即可
 ## 3. webpack.config.js
 一个基本的config长这样
 ```javaScript
+var path = require("path");
+var BrowserSyncPlugin = require("browser-sync-webpack-plugin");
+
 module.exports = {
-    entry: './app.js',
-    output: {
-        filename: "./bundle.js"
-    },
-    watch: true,
-    module:{
-        rules: [
-           {
-            test: /\.js$/,
-            exclude: /(node_modules|bower_components)/,
-            use: {
-                loader: 'babel-loader',
-                options: {
-                  presets: ['babel-preset-env']
-                }
-              }
-           },
-           {
-            test: /\.css$/,
-            use: [ 'style-loader', 'css-loader' ]
+  entry: "./app.js",
+  output: {
+    path: path.resolve(__dirname, "dist"),
+    filename: "bundle.js"
+  },
+  watch: true,
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /(node_modules|bower_components)/,
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: ["babel-preset-env"]
+          }
+        }
+      },
+      {
+        test: /\.css$/ /*end with .css*/,
+        use: ["style-loader", "css-loader"]
+      },
+      {
+        test: /\.less$/,
+        use: [
+          {
+            loader: "style-loader" // creates style nodes from JS strings
+          },
+          {
+            loader: "css-loader" // translates CSS into CommonJS
+          },
+          {
+            loader: "less-loader" // compiles Less to CSS
           }
         ]
-    },
-    /* webpack dev server configuration */
+      }
+    ]
+  },
   devServer: {
     contentBase: __dirname,
     compress: true,
     port: 8080,
     hot: true,
     inline: true
-  }
-}
+  },
+  devtool: "source-map"
+};
 ```
 
 webpack devServer(内置一个express，在本地起一个local server)
