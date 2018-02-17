@@ -373,6 +373,9 @@ gradlew就是一个调用gradle命令的脚本，内部会根据gradle-wrapper.p
 ### 23. java平台下扫描本地samba服务器用的的一个library叫做import jcifs.smb.SmbFile
 [找到一个实例代码](https://github.com/eriklupander/microgramcaster/blob/master/src/com/squeed/microgramcaster/smb/SambaExplorer.java)
 
+### 24.Android平台上js交互的速度
+也是从别处看到的，说是java调js的效率不高，大概200ms，js调java好一点，大概50ms左右，所以尽量用js调java。
+
 =============================================================================
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600)
 
