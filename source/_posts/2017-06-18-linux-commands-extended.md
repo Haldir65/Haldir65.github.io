@@ -515,8 +515,13 @@ sudo rm -rf / etc/dummyfile ## 不小心多了个空格，系统并不会拦着�
 
 raspberry Pi使用的是Raspbian -- 基于debian
 
+查看内存除了free 和htop之外
+sudo sh -c "sync; echo 3 > /proc/sys/vm/drop_caches" ## 就是用sh执行一个command, 即dump memory cache，类似于windows上360那个点击清内存
+sudo bash -c "echo 'vm.swappiness =15' >> /etc/sysctl.conf" ## -c表示让bash执行一个命令， swappiness默认值是60，意思是系统在用掉了60%的内存后就将开始启用swap
 ```
 
+
+linux的swap文件需要经常读写，这对于ssd来说是一个需要注意的地方
 
 [装java](https://www.digitalocean.com/community/tutorials/how-to-install-java-with-apt-get-on-ubuntu-16-04)
 [装Jenkins](https://www.digitalocean.com/community/tutorials/how-to-install-jenkins-on-ubuntu-16-04)
