@@ -785,6 +785,43 @@ Usage: tcpdump [-aAbdDefhHIJKlLnNOpqRStuUvxX] [ -B size ] [ -c count ]
 ### 18.ubuntu desktop预设的desktop environment叫做unity
 比较常见的linux desktop 还有gnome,KDE ,plasma,Ma tei, cinnamon.
 
+### 19.tmux使用
+tmux是多窗口神器，再也不用傻乎乎的去开screen了，远程server也能用。
+[tmuxcheatsheet](https://tmuxcheatsheet.com/)tmux创建的窗口叫做pane，关闭的方式有exit和ctrl+b x
+ctrl+B // prefix,基本上就是让tmux开始接收后面的指令
+ctrl + b + " //纵向排列
+ctrl + b + %  //横向排列
+ctrl + b + z //zoom到这个pane,再按下ctrl+b +z 使当前pane退出全屏
+ctrl + b + c //创建一个新窗口
+ctrl + b +p //previous窗口 n就是next窗口
+ctrl + b 2 //跳到第2个窗口
+ctrl +b + & 干掉当前窗口
+ctrl +b + , 重命名当前窗口
+
+接下来看如何修改配置
+修改 ~/.tmux.conf 文件，如果没有就创建一个
+
+# 每次都要按ctrl+b实在是太麻烦，改成ctrl+a吧，因为a距离ctrl近一点。下面三行就改好了
+set-option -g prefix C-a
+UNBIND-KEY C-a
+bind key C a send prefix
+
+tmux有一个很重要的概念- session
+ tmux list-sessions // 列出当前所有sessions
+ tmux ls // 列出当前所有sessions
+ ctrl+b + $ //可以重命名session
+ 如果从一个terminal中开了一个tmux session，然后直接右上角关闭terminal，在其他的terminal中就能看到这个session不是attached的状态
+如果不想用点击右上角叉号的方式退出session，可以使用ctrl +B +d //disconnect from current session.这样就不用关闭整个terminal了
+ tmux attach -t vim-dev //假设vim-dev是一个session的名字
+ 一个好玩的现象是，如果开两个terminal，连接到同一个session，任何在一个session的操作都会在另一个session的terminal中显示，就像远程协助一样。
+ ctrl +b + ( //切换到前一个session
+ctrl +b + ) //切换到下一个session
+
+
+
+
+但是每次都要按下ctrl+b 实在是太麻烦了
+
 
 ==================================================================================
 ## [shell script tutorial](https://www.youtube.com/watch?v=hwrnmQumtPw)

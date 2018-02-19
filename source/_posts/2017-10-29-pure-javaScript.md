@@ -19,6 +19,7 @@ Vanilla JS其实就是原生javascript了。论运行速度，在Vanilla JS面�
 4. [异步](#4-异步的实现)
 5. [ES6新增的东西](#5-ES6新增的一些东西)
 6. [我也不知道归到哪一类的问题](#6-我也不知道归到哪一类的问题)
+7. [一些tricks](#7-小测试)
 
 
 ## 1. 一些作为一门语言基本的操作都有
@@ -734,9 +735,42 @@ add的时候如果存在重复元素直接无视新增的重复元素
 ## 6. 我也不知道归到哪一类的问题
 - js语法上虽说不用加分号，但实际应用中为避免压缩js文件时出现歧义，还是得老老实实加上分号
 
+- js 是大小写敏感的
+
 - IIFE(Immediately Invoked Function Expression) Library use this to avoid polluting global environment
 
 - 如果引用一个未声明的变量，js会直接创建一个（除非使用use strict）
+
+- undefined和null的关系
+null: absence of value for a variable; undefined: absence of variable itself;
+[what-is-the-difference-between-null-and-undefined-in-javascript](https://stackoverflow.com/questions/5076944/what-is-the-difference-between-null-and-undefined-in-javascript) undefined的意思是事先声明了一个var但没有给赋值，null是一个object，表示no value。
+typeof(Undefined) = 'undefined', typeof('Null') = 'object'
+[why-is-there-a-null-value-in-javascript](https://stackoverflow.com/questions/461966/why-is-there-a-null-value-in-javascript)
+[null is a special keyword that indicates an absence of value.](https://stackoverflow.com/questions/5076944/what-is-the-difference-between-null-and-undefined-in-javascript)
+```js
+var foo;
+defined empty variable is null of datatype undefined //这种声明了但是没给赋值的变量的值是null,数据类型是undefined
+
+var a = '';
+console.log(typeof a); // string
+console.log(a == null); //false
+console.log(a == undefined); // false
+
+// 两个等号表示只检查value
+var a;
+console.log(a == null); //true
+console.log(a == undefined); //true
+
+// 三个等号表示既检查value也检查type
+var a;
+console.log(a === null); //false
+console.log(a === undefined); // true
+
+var a = 'javascript';
+a = null ; // will change the type of variable "a" from string to object
+```
+js的数据类型包括：
+Number,String,Boolean,Object,Function,Undefined和Null
 
 9. 交互事件的捕获，拦截，消费（冒泡）
 ```javaScript
@@ -832,6 +866,65 @@ var watchExampleVM = new Vue({
 </script>
 ```
 
+## 7. 小测试
+[如何用js反转一个String](https://stackoverflow.com/questions/958908/how-do-you-reverse-a-string-in-place-in-javascript)
+```js
+function reverse(s){
+    return s.split("").reverse().join("");
+}
+
+// 另一种方式
+function revserse2(s){
+  let revString = "";
+  for(let i = s.length; i>=0;i--) {
+    revString = revString+str[i];
+  }
+  return revString;
+}
+
+// 用forEach的话
+function reverse3(string) {
+  let revString = "";
+  string.split('').forEach((c) => {
+    revString = c + revString;
+  });
+  return revString;
+}
+
+function reverse4(string){
+  return string.split('').reduce(function(revString, char) {
+    return char + revString;
+  },'');
+}
+```
+
+### 反转一个int
+```js
+function reverseInt(int) {
+  const revString = int.toString().split('').reverse().join('');
+  return parseInt(revString)*Math.sign(int);
+}
+```
+
+### 首字母大写
+```js
+function capitalizedLetters(str){
+  const strArr = str.toLowerCase().split(' ');
+  for(let i=0;i<strArr.length;i++){
+    strArr[i] = strArr[i].subString(0,1).toUpperCase()+
+    strArr[i].subString(1);
+  }
+  return strArr.join(' ');
+}
+
+function capitalizedLetters2(str){
+  return str
+  .toLowerCase()
+  .split(' ')
+  .map( (word) => word[0].toUpperCase()+word.subString[1])
+  .join(' ');
+}
+```
 
 
 

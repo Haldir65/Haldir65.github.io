@@ -61,3 +61,28 @@ $('#file_2').change( () => {
 
 ### 为毛浏览器内嵌视频要用iframe
 因为video source是host在其他的sites的啊，因为跨域的问题，不得不使用iframe。因为就算用iframe，里面其实还是一个vide的tg。
+
+### html js是不能写文件的
+node js提供了fs api来进行文件读写，浏览器中js不能读写本地文件。(html5提供了localStorage api，但最大容量好像是5MB，通过浏览器读文件也必须用户手动触发选择)
+
+### 头一次听说noscript这种东西
+```html
+<html>
+   <body>
+
+      <script language="javascript" type="text/javascript">
+         <!--
+            document.write("Hello World!")
+         //-->
+      </script>
+
+      <noscript>
+         Sorry...JavaScript is needed to go ahead.
+      </noscript>
+
+   </body>
+</html>
+```
+如果浏览器不支持javascript的话，noScript中的内容就会显示出来
+
+### document对象的所有方法在[mdn](https://developer.mozilla.org/zh-CN/docs/Web/API/Document/createTextNode)上都有
