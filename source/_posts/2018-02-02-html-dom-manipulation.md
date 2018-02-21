@@ -86,3 +86,32 @@ node js提供了fs api来进行文件读写，浏览器中js不能读写本地�
 如果浏览器不支持javascript的话，noScript中的内容就会显示出来
 
 ### document对象的所有方法在[mdn](https://developer.mozilla.org/zh-CN/docs/Web/API/Document/createTextNode)上都有
+
+### js操作cookie的方式
+随便开一个网页，在console中输入document.cookie就可以看到设置的cookie
+或者在chrome的resource tab中也能看到
+js能够操作cookie的前提是cookie中没有HttpOnly=true 字段
+```js
+document.cookie = "key1=value1;key2=value2;expires=date";
+```
+
+### 浏览器信息一般在Navigator对象里面拿
+```js
+var browsername=navigator.appName;
+if( browsername == "Netscape" )
+{
+   window.location="http://www.location.com/ns.htm";
+}
+else if ( browsername =="Microsoft Internet Explorer")
+{
+   window.location="http://www.location.com/ie.htm";
+}
+else
+{
+   window.location="http://www.location.com/other.htm";
+}
+```
+navigator里面常用的还有platform,userAgent等
+随便在chrome里面试了下
+navigator.appName ==> Netscape
+navigator.platform ==> win32

@@ -738,6 +738,12 @@ add的时候如果存在重复元素直接无视新增的重复元素
 - js 是大小写敏感的
 
 - IIFE(Immediately Invoked Function Expression) Library use this to avoid polluting global environment
+声明了之后立刻调用该函数执行
+iife的例子:
+```js
+(function () {console.log('this is invoked!')})();
+```
+Paul Irish的视频中提到了jQuery的Source中用到了这种做法。
 
 - 如果引用一个未声明的变量，js会直接创建一个（除非使用use strict）
 
@@ -772,6 +778,10 @@ a = null ; // will change the type of variable "a" from string to object
 js的数据类型包括：
 Number,String,Boolean,Object,Function,Undefined和Null
 
+js中是存在一些全局属性和全局函数的
+比如Infinity(代表正的无穷大),NaN(指某个值是不是数字)
+全局的函数比如decodeURI(),escape(),eval(),parseInt(),parseFloat()
+===================================================
 9. 交互事件的捕获，拦截，消费（冒泡）
 ```javaScript
 //添加点击事件点击事件：

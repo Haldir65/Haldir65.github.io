@@ -508,7 +508,7 @@ sudo ln -s /full/path/to/your/file /usr/local/bin/name_of_new_command
 当然，想要移除这个软链接的话.
 sudo rm -rf /usr/local/bin/name_of_new_command
 
-visudo //via sudo
+visudo //via sudo 这是一个控制用户权限的文件，比如说希望给特定用户一部分usdo特权，比如只给安装软件的权利，编辑这个文件就可以
 为什么不要总以root权限做事:
 sudo rm -rf /etc/dummyfile ## 看上去ok
 sudo rm -rf / etc/dummyfile ## 不小心多了个空格，系统并不会拦着你，这样就删掉了所有的文件

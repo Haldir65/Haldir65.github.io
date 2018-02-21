@@ -25,9 +25,8 @@ top : 1
 - [一个用于优化 png 图片的 gradle 插件](https://github.com/chenenyu/img-optimizer-gradle-plugin)，用来看 groovy 语法挺好的。以及 [How to write gradle plugin](http://yuanfentiank789.github.io/2017/09/20/%E5%9C%A8AndroidStudio%E4%B8%AD%E8%87%AA%E5%AE%9A%E4%B9%89Gradle%E6%8F%92%E4%BB%B6/)
 - [scheme 这东西算跨客户端平台的](https://sspai.com/post/31500)，比如在 App 中调起支付宝(用的是 alipayqr://)。其实就是一个系统内跨应用调用。[用法](http://blog.csdn.net/qq_23547831/article/details/51685310)
 - 前后端同构
-- [X] 前后端分离
 - XSS 攻击
-- [写 groovy 用 intelij 就可以了](https://www.jetbrains.com/help/idea/getting-started-with-groovy.html) 》 how to
+- [写 groovy 用 intelij 就可以了](https://www.jetbrains.com/help/idea/getting-started-with-groovy.html) > how to
 - [ ] websocket nodejs
 - [ ] intelij 点击run 实际调用的command line 是什么。。。（--javapath的写法）
 - [ ] install nginx , jenkin ci, deploying nginx in docker(Http Load Balaning with Docker and nginx)(https://www.digitalocean.com/community/tutorials/how-to-configure-nginx-with-ssl-as-a-reverse-proxy-for-jenkins)
@@ -55,4 +54,5 @@ top : 1
 - 使用 express 模拟网络延迟
 - [基于 Docker 打造前端持续集成开发环境](https://juejin.im/post/5a157b7a5188257bfe457ff0)
 - vS Code Vender Prefix plugin => auto prefix loader
+- 前后端分离
 -

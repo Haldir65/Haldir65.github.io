@@ -819,10 +819,6 @@ ctrl +b + ) //切换到下一个session
 
 
 
-
-但是每次都要按下ctrl+b 实在是太麻烦了
-
-
 ==================================================================================
 ## [shell script tutorial](https://www.youtube.com/watch?v=hwrnmQumtPw)
 fdisk -l ## show a list of hard drives that are attached to your computer, fdisk就是硬盘分区命令
