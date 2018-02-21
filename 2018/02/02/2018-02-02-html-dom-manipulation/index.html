@@ -17,7 +17,7 @@
 <meta property="og:description" content="HTML Document操作手册">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/2138000245bee1e3cc14.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-02-19T15:50:00.706Z">
+<meta property="og:updated_time" content="2018-02-21T15:23:57.396Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="DOM操作手册">
 <meta name="twitter:description" content="HTML Document操作手册">
@@ -212,7 +212,10 @@ ga('send', 'pageview');
 <h3 id="html-js是不能写文件的"><a href="#html-js是不能写文件的" class="headerlink" title="html js是不能写文件的"></a>html js是不能写文件的</h3><p>node js提供了fs api来进行文件读写，浏览器中js不能读写本地文件。(html5提供了localStorage api，但最大容量好像是5MB，通过浏览器读文件也必须用户手动触发选择)</p>
 <h3 id="头一次听说noscript这种东西"><a href="#头一次听说noscript这种东西" class="headerlink" title="头一次听说noscript这种东西"></a>头一次听说noscript这种东西</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"></span><br><span class="line">      <span class="tag">&lt;<span class="name">script</span> <span class="attr">language</span>=<span class="string">"javascript"</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="undefined">         &lt;!--</span></span><br><span class="line"><span class="javascript">            <span class="built_in">document</span>.write(<span class="string">"Hello World!"</span>)</span></span><br><span class="line"><span class="javascript">         <span class="comment">//--&gt;</span></span></span><br><span class="line"><span class="undefined">      </span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line">      <span class="tag">&lt;<span class="name">noscript</span>&gt;</span></span><br><span class="line">         Sorry...JavaScript is needed to go ahead.</span><br><span class="line">      <span class="tag">&lt;/<span class="name">noscript</span>&gt;</span></span><br><span class="line"></span><br><span class="line">   <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
 <p>如果浏览器不支持javascript的话，noScript中的内容就会显示出来</p>
-<h3 id="document对象的所有方法在mdn上都有"><a href="#document对象的所有方法在mdn上都有" class="headerlink" title="document对象的所有方法在mdn上都有"></a>document对象的所有方法在<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Document/createTextNode">mdn</a>上都有</h3>
+<h3 id="document对象的所有方法在mdn上都有"><a href="#document对象的所有方法在mdn上都有" class="headerlink" title="document对象的所有方法在mdn上都有"></a>document对象的所有方法在<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Document/createTextNode">mdn</a>上都有</h3><h3 id="js操作cookie的方式"><a href="#js操作cookie的方式" class="headerlink" title="js操作cookie的方式"></a>js操作cookie的方式</h3><p>随便开一个网页，在console中输入document.cookie就可以看到设置的cookie<br>或者在chrome的resource tab中也能看到<br>js能够操作cookie的前提是cookie中没有HttpOnly=true 字段<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">document</span>.cookie = <span class="string">"key1=value1;key2=value2;expires=date"</span>;</span><br></pre></td></tr></table></figure></p>
+<h3 id="浏览器信息一般在Navigator对象里面拿"><a href="#浏览器信息一般在Navigator对象里面拿" class="headerlink" title="浏览器信息一般在Navigator对象里面拿"></a>浏览器信息一般在Navigator对象里面拿</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> browsername=navigator.appName;</span><br><span class="line"><span class="keyword">if</span>( browsername == <span class="string">"Netscape"</span> )</span><br><span class="line">&#123;</span><br><span class="line">   <span class="built_in">window</span>.location=<span class="string">"http://www.location.com/ns.htm"</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> ( browsername ==<span class="string">"Microsoft Internet Explorer"</span>)</span><br><span class="line">&#123;</span><br><span class="line">   <span class="built_in">window</span>.location=<span class="string">"http://www.location.com/ie.htm"</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">&#123;</span><br><span class="line">   <span class="built_in">window</span>.location=<span class="string">"http://www.location.com/other.htm"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>navigator里面常用的还有platform,userAgent等<br>随便在chrome里面试了下<br>navigator.appName ==&gt; Netscape<br>navigator.platform ==&gt; win32</p>
+
       
 
       
@@ -477,6 +480,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
@@ -486,10 +493,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -506,6 +509,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -530,10 +537,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">Okio</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
