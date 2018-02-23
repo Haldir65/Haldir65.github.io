@@ -41,9 +41,8 @@ at com.android.okhttp.internal.http.DelegatingHttpsURLConnection.getResponseCode
 ```
 
 [参考](http://blog.sina.com.cn/s/blog_bfdb961b0101mkbo.html) con.setChunkedStreamingMode(1024);//内部缓冲区---分段上传防止oom
-[解决方案](https://github.com/square/retrofit/issues/2270),RequestBody的contentLength设置为-1就好了
 [HttpURLConnection教程](http://www.cnblogs.com/begin1949/p/5060802.html)
-
+[上传的时候不走HttpUrlConnection，直接创建Socket模拟POST避免大文件OOM](http://blog.csdn.net/lmj623565791/article/details/23781773)
 
 ## 3. 现有的实现方案
 非常优秀的library，英语流利说喜欢搞多进程。

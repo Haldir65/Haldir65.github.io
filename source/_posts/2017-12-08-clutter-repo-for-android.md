@@ -376,6 +376,98 @@ gradlew就是一个调用gradle命令的脚本，内部会根据gradle-wrapper.p
 ### 24.Android平台上js交互的速度
 也是从别处看到的，说是java调js的效率不高，大概200ms，js调java好一点，大概50ms左右，所以尽量用js调java。
 
+### 25.在Android平台发起上传图片请求的重点在于掌握http协议（关键词Boundary）
+自己用express写了一个上传文件的后台，前端请求/post接口即可上传图片
+看了下chrome里面的network
+```text
+POST /upload/ HTTP/1.1
+Host: localhost:3000
+Connection: keep-alive
+Content-Length: 9860
+Accept: */*
+Origin: http://localhost:3000
+X-Requested-With: XMLHttpRequest
+User-Agent: Mozilla/5.0 (iPhone; CPU iPhone OS 10_3 like Mac OS X) AppleWebKit/602.1.50 (KHTML, like Gecko) CriOS/56.0.2924.75 Mobile/14E5239e Safari/602.1
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryw0ZREBdOiJbbwuAg // 注意这句
+DNT: 1
+Referer: http://localhost:3000/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7
+```
+
+```text
+------WebKitFormBoundaryw0ZREBdOiJbbwuAg
+Content-Disposition: form-data; name="uploads[]"; filename="278a516893f31a16feee.jpg"
+Content-Type: image/jpeg
+
+
+------WebKitFormBoundaryw0ZREBdOiJbbwuAg--
+```
+那个WebKitFormBoundary是浏览器自动加的，Content-Disposition也是浏览器加的
+
+这里借用[鸿洋的代码](http://blog.csdn.net/lmj623565791/article/details/23781773)
+```java
+private static final String BOUNDARY = "----WebKitFormBoundaryT1HoybnYeFOGFlBR";  
+
+public void uploadForm(Map<String, String> params, String fileFormName,  
+            File uploadFile, String newFileName, String urlStr)  
+            throws IOException {  
+        if (newFileName == null || newFileName.trim().equals("")) {  
+            newFileName = uploadFile.getName();  
+        }  
+
+        StringBuilder sb = new StringBuilder();  
+        /**
+         * 普通的表单数据
+         */  
+        for (String key : params.keySet()) {  
+            sb.append("--" + BOUNDARY + "\r\n");  
+            sb.append("Content-Disposition: form-data; name=\"" + key + "\""  
+                    + "\r\n");  
+            sb.append("\r\n");  
+            sb.append(params.get(key) + "\r\n");  
+        }  
+        /**
+         * 上传文件的头
+         */  
+        sb.append("--" + BOUNDARY + "\r\n");  
+        sb.append("Content-Disposition: form-data; name=\"" + fileFormName  
+                + "\"; filename=\"" + newFileName + "\"" + "\r\n");  
+        sb.append("Content-Type: image/jpeg" + "\r\n");// 如果服务器端有文件类型的校验，必须明确指定ContentType  
+        sb.append("\r\n");  
+
+        byte[] headerInfo = sb.toString().getBytes("UTF-8");  
+        byte[] endInfo = ("\r\n--" + BOUNDARY + "--\r\n").getBytes("UTF-8");  
+        System.out.println(sb.toString());  
+        URL url = new URL(urlStr);  
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();  
+        conn.setRequestMethod("POST");  
+        conn.setRequestProperty("Content-Type",  
+                "multipart/form-data; boundary=" + BOUNDARY);  
+        conn.setRequestProperty("Content-Length", String  
+                .valueOf(headerInfo.length + uploadFile.length()  
+                        + endInfo.length));  
+        conn.setDoOutput(true);  
+
+        OutputStream out = conn.getOutputStream();  
+        InputStream in = new FileInputStream(uploadFile);  
+        out.write(headerInfo);  
+
+        byte[] buf = new byte[1024];  
+        int len;  
+        while ((len = in.read(buf)) != -1)  
+            out.write(buf, 0, len);  
+
+        out.write(endInfo);  
+        in.close();  
+        out.close();  
+        if (conn.getResponseCode() == 200) {  
+            System.out.println("上传成功");  
+        }  
+
+    }  
+```
+
 =============================================================================
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600)
 

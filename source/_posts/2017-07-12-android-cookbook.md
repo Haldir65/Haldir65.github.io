@@ -150,7 +150,6 @@ Android相关
     - [ ] NestedScrollView
     - [ ] ListView原理,加载优化
     - [ ] RecyclerView（这货最早的时候9K行，现在好像1.2W行。prefetcher什么的，滑动过程中不去加载图片，参考我写的Glide笔记）
-    - [ ] SurfaceView，TextureView从入门到解析
 
 
 - [ ] 属性动画据说用了反射，源码解析
@@ -169,6 +168,8 @@ Android相关
 - [ ] Launcher启动流程
 - [Android 应用点击图标到Activity界面显示的过程分析](https://juejin.im/entry/5a0d02086fb9a045263b2387)
 - [Android面试题汇总](https://juejin.im/entry/59dd75cd51882578d5037626)
+- [X] [SurfaceView，TextureView从入门到解析](https://cloud.tencent.com/developer/article/1034235)
+- 
 
 
 > Studio里面看源码，find usage没有的话，find in path , choose android sdk
