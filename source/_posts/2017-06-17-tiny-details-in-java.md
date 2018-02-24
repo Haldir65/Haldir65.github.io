@@ -902,6 +902,7 @@ Intelij里面，Setting-Build-maven-runner，有个VM Options。把网上找到�
 ```java
 public interface Serializable {
 }
+
 private static final long serialVersionUID = 2906642554793891381L;
 
 // 网上随便找到的序列化和反序列化的demo如下
@@ -976,7 +977,7 @@ private void writeObject0(Object obj, boolean unshared)
                 }
             }
             // 省略省略
-
+}
 ```
 果然还是用了**instanceof**这个关键词啊。这是写进磁盘(serialize的情况)，从磁盘里取出来的话
 ObjecInputStream.java
@@ -1101,6 +1102,21 @@ public final class Animal extends Enum
 ### 40. 关于动态代理(InvocationHandler这一套)
 [动态代理](http://www.wanandroid.com/blog/show/2038)。
 > System.getProperties().put("sun.misc.ProxyGenerator.saveGeneratedFiles", "true");  
+
+### 41. java io主要是装饰模式，另外，调用操作系统api实现读写文件的功能在FileInputStream和FilePutputStream里面，主要的native方法都在这里面，FileDescriptor的使用也在这里面
+```java
+  // FileInputStream.java
+ private native int read0() throws IOException;
+ private native int readBytes(byte b[], int off, int len) throws IOException;
+ private native void close0() throws IOException;
+
+//FileOutputStream.java
+private native void write(int b, boolean append) throws IOException;
+private native void writeBytes(byte b[], int off, int len, boolean append)
+       throws IOException;
+private native void close0() throws IOException;
+
+```
 
 ## 参考
 - [Jake Wharton and Jesse Wilson - Death, Taxes, and HTTP](https://www.youtube.com/watch?v=6uroXz5l7Gk)

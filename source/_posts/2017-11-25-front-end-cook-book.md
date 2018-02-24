@@ -251,6 +251,8 @@ Babel是一个可以把ES6代码打包成ES5代码的插件，毕竟要兼容老
 - [ ] css3 属性大全
 
 
+vscode disable eslint，在workspace setting中添加
+> "jshint.enable" : false
 
 
 atom的emmet插件很好用

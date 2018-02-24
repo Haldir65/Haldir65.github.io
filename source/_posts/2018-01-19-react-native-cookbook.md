@@ -45,15 +45,100 @@ debug:
 react-native run-android是把这个App安装到手机上，然后terminal就返回了，需要查看后续日志输出的话
 react-native log-android // 这个是帮助在console中输出log
 
+jsx文件开头的import要注意
+```js
+// 这是错误的
+import React, { AppRegistry,  Component,StyleSheet,Text,View} from 'react-native';
+//这才是正确的
+import React from "react";
+import { AppRegistry,  Component,StyleSheet,Text,View} from 'react-native';
+```
+
+## route
+Navigator is deprecated,use [stack navigator](https://reactnavigation.org/)
+```js
+import React from 'react';
+import { View, Text } from 'react-native';
+import { StackNavigator } from 'react-navigation'; // 1.0.0-beta.27
+
+class HomeScreen extends React.Component {
+  render() {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text>Home Screen</Text>
+      </View>
+    );
+  }
+}
+
+class DetailsScreen extends React.Component {
+  render() {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text>Details Screen</Text>
+      </View>
+    );
+  }
+}
+
+const RootStack = StackNavigator(
+  {
+    Home: {
+      screen: HomeScreen,
+    },
+    Details: {
+      screen: DetailsScreen,
+    },
+  },
+  {
+    initialRouteName: 'Home',
+  }
+);
+
+export default class App extends React.Component {
+  render() {
+    return <RootStack />;
+  }
+}
+```
+
+## 既然有路由就不免谈到各个组件之间的写法
+显然，你可以将LogoTitle写到另一个文件中去，然后export default，再import出来。
+下面这种只是为了说明你能这样写，一个很简单的小功能可以放在内部作为一个class自己使用。
+```js
+class LogoTitle extends React.Component {
+  render() {
+    return (
+      <Image
+        source={require('./spiro.png')}
+        style={{ width: 30, height: 30 }}
+      />
+    );
+  }
+}
+
+class HomeScreen extends React.Component {
+  static navigationOptions = {
+    // headerTitle instead of title
+    headerTitle: <LogoTitle />,
+  };
+
+  /* render function, etc */
+}
+```
+
 
 ## styling
 inline styling在每一个tag的后面跟上两个大括号，
 styling as seprate file在后面跟一个大括号，引用style对象的properity
+[Button组件的styling仅限于几个属性，可以用TouchableXXX来代替](https://stackoverflow.com/questions/43585297/react-native-button-style-not-work)
 
-
+## Components
+### ScrollView
+Android平台一个ScrollView只能有一个ChildView(Node)，在react-native上似乎没有这样的限制
 ==========================
 async storage
-Navigator is deprecated,use stack navigator
+
 camera Roll
 
 <!-- <audio src="http://m10.music.126.net/20180121230941/8d878803b3b0542d9c5482ccf613a86b/ymusic/d95e/bab6/a7f5/864661168da79b309c3d2fac971d1698.mp3" autoplay="autoplay">
