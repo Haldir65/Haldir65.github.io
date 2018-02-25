@@ -742,7 +742,51 @@ add的时候如果存在重复元素直接无视新增的重复元素
 iife的例子:
 ```js
 (function () {console.log('this is invoked!')})();
+
+// iife的好处是只对外提供必要功能，内部成员不用暴露给外部。 Javascript模块的基本写法
+var module1 = (function(){
+
+　　　　var _count = 0;
+
+　　　　var m1 = function(){
+　　　　　　//...
+　　　　};
+
+　　　　var m2 = function(){
+　　　　　　//...
+　　　　};
+
+　　　　return {
+　　　　　　m1 : m1,
+　　　　　　m2 : m2
+　　　　};
+
+　　})();
+console.info(module1._count); //undefined
+
+// 放大模式"（augmentation），一个模块继承另一个模块
+var module1 = (function (mod){
+
+　　　　mod.m3 = function () {
+　　　　　　//...
+　　　　};
+
+　　　　return mod;
+
+　　})(module1);
+
+// 宽放大模式（Loose augmentation）
+var module1 = ( function (mod){
+
+　　　　//...
+
+　　　　return mod;
+
+　　})(window.module1 || {});
 ```
+[Javascript模块化编程（一）：模块的写法](http://www.ruanyifeng.com/blog/2012/10/javascript_module.html)
+
+
 Paul Irish的视频中提到了jQuery的Source中用到了这种做法。
 
 - 如果引用一个未声明的变量，js会直接创建一个（除非使用use strict）

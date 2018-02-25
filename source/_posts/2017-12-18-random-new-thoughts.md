@@ -33,8 +33,13 @@ top : 1
 - [ ] Paul Irish from google
 - [ ] form表单可以跨域一个是历史原因要保持兼容性
 - [ ] 通过file input上传图片，原生ajax以及Ajax，自己搭建上传服务器[大概能猜到暴风影音的局域网传输实现了](https://zhuanlan.zhihu.com/p/24513281?refer=flask)
-- [ ] oAuth2
+- [ ] [lightbox一个很好看的js图片查看库](http://lokeshdhakar.com/projects/lightbox2/)
 - [ ] [nio stuff](https://juejin.im/post/59fffdb76fb9a0450a66bd58)
+- [ ] [仿门户网站js相册](https://www.js-css.cn/a/jscode/album/2014/0915/1319.html)， [js相册2](https://www.js-css.cn/a/jscode/album/2014/0914/1318.html)
+- [ ] [觉得gradle难学？先看一些简短的吧](https://github.com/JLLK/gradle-android-maindexlist-plugin)，还有，不一定要在ide里面写啊，vs code 也可以啊，直接命令行开搞
+- [ ] [八大排序算法的python实现](http://python.jobbole.com/82270/)
+- [ ] [如何编写 jQuery 插件](https://gist.github.com/quexer/3619237)
+- [ ] 尝试用一个unix domain socket用于localhost进程间ipc
 
 
 ### 已完成
@@ -44,6 +49,8 @@ top : 1
 * 集成 travis-ci，记得 after-success script 的结果并不会影响 build 的结果（即，after-success 执行脚本发生了错误，在日志里有输出 error，但实际显示的 build result 仍为 success），还有 travis 的输出 log 需要默认是折叠的，要展开才能看清楚，但在 afterSuccess 里面的指令的输出一定是有的。
 * 随便放一个文件到/usr/bin/就可以直接调用这个文件名来起这个命令了吗？（实际操作只需要建立一个symbolic link就好了）
 * 单个网卡最多65535个端口，c10K
+* oAuth2原理，其实流程上和很多客户端的微信登陆，新浪微博登陆很像的
+*
 
 
 
@@ -55,4 +62,4 @@ top : 1
 - [基于 Docker 打造前端持续集成开发环境](https://juejin.im/post/5a157b7a5188257bfe457ff0)
 - vS Code Vender Prefix plugin => auto prefix loader
 - 前后端分离
--
+- sql漏洞

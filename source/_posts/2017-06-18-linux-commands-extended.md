@@ -523,6 +523,8 @@ sudo bash -c "echo 'vm.swappiness =15' >> /etc/sysctl.conf" ## -c表示让bash�
 
 linux的swap文件需要经常读写，这对于ssd来说是一个需要注意的地方
 
+unix domain socket用于ipc
+
 [装java](https://www.digitalocean.com/community/tutorials/how-to-install-java-with-apt-get-on-ubuntu-16-04)
 [装Jenkins](https://www.digitalocean.com/community/tutorials/how-to-install-jenkins-on-ubuntu-16-04)
 Could not find or load main class的问题

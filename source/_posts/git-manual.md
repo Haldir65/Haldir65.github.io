@@ -237,6 +237,10 @@ git -c core.quotepath=false push --progress --porcelain origin refs/heads/master
 
 git fetch -v
 
+git submodule update --init ## 比如说shadowsocks工程
+
+我也是才发现，windows下的git bash集成了openssh，curl，好用的不行
+
 
 ## Reference
 -[git reset和revert](http://yijiebuyi.com/blog/8f985d539566d0bf3b804df6be4e0c90.html)

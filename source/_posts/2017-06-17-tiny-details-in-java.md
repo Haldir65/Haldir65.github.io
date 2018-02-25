@@ -1115,7 +1115,6 @@ private native void write(int b, boolean append) throws IOException;
 private native void writeBytes(byte b[], int off, int len, boolean append)
        throws IOException;
 private native void close0() throws IOException;
-
 ```
 
 ## 参考
