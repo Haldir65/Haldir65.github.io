@@ -722,7 +722,17 @@ Make sure each file and folder under a domain will match at least one location d
 
 add_header not working on ubuntu server?
 
-
+### 防盗链
+之间做爬虫的时候，request的header中不添加refer就会返回一张 固定的图片。
+这个功能nginx也行
+```
+location ~* \.(gif|jpg|swf)$ {
+    valid_referers none blocked start.igrow.cn sta.igrow.cn;
+    if ($invalid_referer) {
+       rewrite ^/ http://$host/logo.png;
+    }
+}
+```
 
 
 ### 参考

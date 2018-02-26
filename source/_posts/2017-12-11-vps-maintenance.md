@@ -15,6 +15,10 @@ tags: [tools,linux]
 > sudo apt-get autoclean 清理旧版本的软件缓存
 > sudo apt-get clean 清理所有软件缓存
 > sudo apt-get autoremove 删除系统不再使用的孤立软件
+>  sudo rm -rf /var/tmp ## 一般来说/tmp和/var/tmp/文件夹里面的东西可以随便删除，稳妥起见还是先看下这个目录下有没有什么文件被正在跑的程序使用：
+> sudo lsof +D /var ## 我看到一大堆mysql的东西 ，另外说一下，为什么/tmp文件夹这么小，因为ubuntu系统每次重启都会把这里面清一下
+
+
 
 ## 2.必要软件
 

@@ -40,6 +40,8 @@ top : 1
 - [ ] [八大排序算法的python实现](http://python.jobbole.com/82270/)
 - [ ] [如何编写 jQuery 插件](https://gist.github.com/quexer/3619237)
 - [ ] 尝试用一个unix domain socket用于localhost进程间ipc
+- [ ] [curl的几种常见用法](http://www.codebelief.com/article/2017/05/linux-command-line-curl-usage/)
+- [ ] [net-speeder写入开机脚本](https://blog.kuoruan.com/48.html)
 
 
 ### 已完成
