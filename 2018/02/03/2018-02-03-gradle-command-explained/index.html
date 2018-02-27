@@ -14,7 +14,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/street lights dark night car city.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-02-26T11:07:29.640Z">
+<meta property="og:updated_time" content="2018-02-27T10:46:23.966Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="gradle command记事本">
 <meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/street lights dark night car city.jpg?imageView2/2/w/600">
@@ -205,6 +205,16 @@ ga('send', 'pageview');
 </a></p>
 <blockquote>
 <p>./gradlew -v 版本号<br>./gradlew clean 清除app目录下的build文件夹<br>./gradlew build 检查依赖并编译打包<br>./gradlew assembleDebug 编译并打Debug包<br>./gradlew assembleRelease 编译并打Release的包<br>或者<br>./gradlew aR<br>./gradlew installRelease Release模式打包并安装<br>或者<br>./gradlew iR<br>./gradlew uninstallRelease 卸载Release模式包</p>
+</blockquote>
+<p>Android项目迁移到gradle 3.0需要注意的一些事</p>
+<ul>
+<li>implementation和api的区别：<blockquote>
+<p>When your module configures an implementation dependency, it’s letting Gradle know that the module does not want to leak the dependency to other modules at compile time. That is, the dependency is available to other modules only at runtime.<br>Using this dependency configuration instead of api or compile can result in significant build time improvements because it reduces the amount of projects that the build system needs to recompile. For example, if an implementation dependency changes its API, Gradle recompiles only that dependency and the modules that directly depend on it. Most app and test modules should use this configuration.<br>// a module 使用implementation引入了某个dependency，这个依赖就不会暴露给依赖于a的mudule。</p>
+</blockquote>
+</li>
+</ul>
+<blockquote>
+<p>When a module includes an api dependency, it’s letting Gradle know that the module wants to transitively export that dependency to other modules, so that it’s available to them at both runtime and compile time. This configuration behaves just like compile (which is now deprecated), and you should typically use this only in library modules. That’s because, if an api dependency changes its external API, Gradle recompiles all modules that have access to that dependency at compile time. So, having a large number of api dependencies can significantly increase build times. Unless you want to expose a dependency’s API to a separate test module, app modules should instead use implementation dependencies.<br>//所以如果想要把自己的某项依赖暴露出去，让依赖自己的mudule也能用到这项依赖，就要用api了<br>但是api和之前的compile是一样的，所以编译速度比implementation慢很多。</p>
 </blockquote>
 <p><a href="https://juejin.im/post/5a756f11f265da4e7c185bc5">关于Android Gradle你需要知道这些（4）</a><br><a href="https://juejin.im/post/5a767c7cf265da4e9c6300a1#heading-5">Gradle插件学习笔记（四)</a></p>
 
@@ -477,19 +487,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">linux</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">tools</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">

@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery15111006999.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery2a2241cc5c1278cf7a28f15f91dbbb7f.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-02-26T11:07:29.636Z">
+<meta property="og:updated_time" content="2018-02-27T10:46:23.966Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从DroidPlugin谈插件化开发">
 <meta name="twitter:description" content="关于360团队出开源的DroidPlugin的一些记录 过程中发现了关于插件化，Hook系统方法的操作，摘录下来。">
@@ -210,7 +210,7 @@ ga('send', 'pageview');
 <h2 id="2-Hook作为插件化的切入点给了开发者篡改系统api实现的通道"><a href="#2-Hook作为插件化的切入点给了开发者篡改系统api实现的通道" class="headerlink" title="2. Hook作为插件化的切入点给了开发者篡改系统api实现的通道"></a>2. Hook作为插件化的切入点给了开发者篡改系统api实现的通道</h2><p><a href="http://weishu.me/2016/02/16/understand-plugin-framework-binder-hook/">比如Hook掉剪切板SystemService</a>,<br><a href="http://weishu.me/2016/03/07/understand-plugin-framework-ams-pms-hook/">比如在ActivityManagerService调用IPC操作时添加私货</a></p>
 <p><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery2a2241cc5c1278cf7a28f15f91dbbb7f.jpg?imageView2/2/w/600" alt=""></p>
 <p>=-============================-============================-============================-=========================</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> line <span class="keyword">in</span> channels:</span><br><span class="line">    target_channel = line.strip()</span><br><span class="line">    target_apk = output_dir + apk_names[<span class="number">0</span>] + <span class="string">"-"</span> + target_channel+<span class="string">"-"</span>+apk_names[<span class="number">2</span>] + src_apk_extension</span><br><span class="line">    shutil.copy(src_apk,  target_apk)</span><br><span class="line">    zipped = zipfile.ZipFile(target_apk, <span class="string">'a'</span>, zipfile.ZIP_DEFLATED)</span><br><span class="line">    empty_channel_file = <span class="string">"META-INF/uuchannel_&#123;channel&#125;"</span>.format(channel = target_channel) //所以渠道号简单来说就是往META-INF里写了一个<span class="string">"uuchannel_xiaomi"</span>之类的文件</span><br><span class="line">    zipped.write(src_empty_file, empty_channel_file)</span><br><span class="line">    zipped.close()</span><br></pre></td></tr></table></figure>
+<p>这种往zip文件里面写数据的方式叫做zip comment<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> line <span class="keyword">in</span> channels:</span><br><span class="line">    target_channel = line.strip()</span><br><span class="line">    target_apk = output_dir + apk_names[<span class="number">0</span>] + <span class="string">"-"</span> + target_channel+<span class="string">"-"</span>+apk_names[<span class="number">2</span>] + src_apk_extension</span><br><span class="line">    shutil.copy(src_apk,  target_apk)</span><br><span class="line">    zipped = zipfile.ZipFile(target_apk, <span class="string">'a'</span>, zipfile.ZIP_DEFLATED)</span><br><span class="line">    empty_channel_file = <span class="string">"META-INF/uuchannel_&#123;channel&#125;"</span>.format(channel = target_channel) //所以渠道号简单来说就是往META-INF里写了一个<span class="string">"uuchannel_xiaomi"</span>之类的文件</span><br><span class="line">    zipped.write(src_empty_file, empty_channel_file)</span><br><span class="line">    zipped.close()</span><br></pre></td></tr></table></figure></p>
 <p><a href="https://www.zhihu.com/question/39440766">为什么 Android 要采用 Binder 作为 IPC 机制？</a></p>
 <blockquote>
 <p>传统的进程间通信方式有管道，消息队列，共享内存等，其中管道，消息队列采用存储-转发方式，即数据先从发送方缓存区拷贝到内核开辟的缓存区中，然后再从内核缓存区拷贝到接收方缓存区，至少有两次拷贝过程。共享内存虽然无需拷贝，但控制复杂，难以使用。socket作为一款通用接口，其传输效率低，开销大，主要用在跨网络的进程间通信和本机上进程间的低速通信。Binder通过内存映射的方式，使数据只需要在内存进行一次读写过程。<br>内存映射，简而言之就是将用户空间的一段内存区域映射到内核空间，映射成功后，用户对这段内存区域的修改可以直接反映到内核空间，相反，内核空间对这段区域的修改也直接反映用户空间。那么对于内核空间&lt;—-&gt;用户空间两者之间需要大量数据传输等操作的话效率是非常高的。</p>
@@ -550,19 +550,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">linux</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">tools</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">
