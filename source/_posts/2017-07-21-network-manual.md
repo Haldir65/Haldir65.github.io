@@ -574,5 +574,9 @@ curl -v mail.126.com
 * Connection #0 to host mail.126.com left intact
 ```
 
+wireshark在windows下也能抓包，首先安装，安装好之后如果没有检测出网卡，需要去下载一个[win10pcap](http://www.win10pcap.org/download/)。
 ===============================
+
+
+
 m38u就是很多ts文件的目录

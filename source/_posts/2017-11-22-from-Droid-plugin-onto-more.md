@@ -39,6 +39,7 @@ onSaveInstance是从ActivityThread的callCallActivityOnSaveInstanceState方法di
 
 =-============================-============================-============================-=========================
 
+这种往zip文件里面写数据的方式叫做zip comment
 ```Python
 for line in channels:
     target_channel = line.strip()

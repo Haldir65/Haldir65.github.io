@@ -30,6 +30,18 @@ tags: [tools,linux]
 > 检查是否安装好： python --version
 
 还有一些，比如 htop
+htop中各个process的state[参考](https://stackoverflow.com/questions/18470215/what-does-a-c-process-status-mean-in-htop)
+> D uninterruptible sleep (usually IO)
+R running or runnable (on run queue)
+S interruptible sleep (waiting for an event to complete)
+T stopped, either by a job control signal or because it is being traced.
+W paging (not valid since the 2.6.xx kernel)
+X dead (should never be seen)
+Z defunct ("zombie") process, terminated but not reaped by its parent.
+
+
+只安装security update
+> sudo unattended-upgrades -d ## 加上-d和verbose的意思差不多
 
 ### 2.1 装 ss
 
