@@ -39,9 +39,7 @@ top : 1
 - [ ] [觉得gradle难学？先看一些简短的吧](https://github.com/JLLK/gradle-android-maindexlist-plugin)，还有，不一定要在ide里面写啊，vs code 也可以啊，直接命令行开搞
 - [ ] [八大排序算法的python实现](http://python.jobbole.com/82270/)
 - [ ] [如何编写 jQuery 插件](https://gist.github.com/quexer/3619237)
-- [ ] 尝试用一个unix domain socket用于localhost进程间ipc
 - [ ] [curl的几种常见用法](http://www.codebelief.com/article/2017/05/linux-command-line-curl-usage/)
-- [ ] [net-speeder写入开机脚本](https://blog.kuoruan.com/48.html)
 - [ ] 用正则检测或者解析json(jQuery源码里有)
 
 
@@ -53,6 +51,7 @@ top : 1
 * 随便放一个文件到/usr/bin/就可以直接调用这个文件名来起这个命令了吗？（实际操作只需要建立一个symbolic link就好了）
 * 单个网卡最多65535个端口，c10K
 * oAuth2原理，其实流程上和很多客户端的微信登陆，新浪微博登陆很像的
+* 在Android手机上尝试用一个unix domain socket用于localhost进程间ipc(其实就是保证端口号一致，给网络权限就好了)
 *
 
 

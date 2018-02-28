@@ -112,6 +112,8 @@ sudo ssserver -c /etc/shadowsocks.json --user username -d start - 不要总是�
 > python server.py -p 443 -k password -m aes-256-cfb -O auth_sha1_v4 -o http_simple -d start
 
 [net-speeder](https://zhgcao.github.io/2016/05/26/ubuntu-install-net-speeder/)
+> apt-get install libnet1-dev
+apt-get install libpcap0.8-dev
 
 > venetX，OpenVZ 架构
 
@@ -134,6 +136,7 @@ sh build.sh
 
 ./net_speeder venet0 "ip"
 ```
+[net-speeder写入开机脚本](https://blog.kuoruan.com/48.html)
 
 ### 2.3 升级内核开启 BBR
 

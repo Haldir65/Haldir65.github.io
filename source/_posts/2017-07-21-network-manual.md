@@ -399,7 +399,8 @@ jquery在执行post请求时，会设置Content-Type为application/x-www-form-ur
 GZip压缩文本还可以，图片就没必要开压缩了，因为图片本身就高度压缩了，再压只是浪费CPU。
 
 网络协议，架构，规范，spdy,http2,url规范.
-OSI七层网络体系结构 ： 物理层、数据链路层、网络层、传输层、表示层、会话层、应用层
+OSI七层网络体系结构 ： 物理层(IEEE 802.2)、数据链路层(ARP,RARP)、网络层(ip,icmp)、传输层(tcp,udp)、表示层、会话层(SSL,TLS)、应用层(HTTP,FTP,SMTP,POP3).
+这里面Socket比较特殊，Socket是一组编程接口（API）。介于传输层和应用层，向应用层提供统一的编程接口。应用层不必了解TCP/IP协议细节。直接通过对Socket接口函数的调用完成数据在IP网络的传输。
 
 **OSI Model**
 >application firefox/chrome/email

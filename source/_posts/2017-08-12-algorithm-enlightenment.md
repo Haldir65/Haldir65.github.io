@@ -64,6 +64,18 @@ public static void bubbleSort(int[] numArray) {
     }
 }
 ```
+```python
+def bubble_sort(lists):
+    # 冒泡排序
+    count = len(lists)
+    for i in range(0, count):
+        for j in range(i + 1, count):
+            if lists[i] > lists[j]:
+                lists[i], lists[j] = lists[j], lists[i]
+    return lists
+```
+python中swap两个值非常方便：
+a , b = b , a 
 
 the worst case scenario ：array完全倒序 o(n^2)
 the best case scenario : array已经排序好 Ω（n）

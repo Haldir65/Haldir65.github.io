@@ -275,6 +275,7 @@ Chet的[Demo](https://github.com/google/android-ui-toolkit-demos)
 
 
 ### 13. Dalvik和Art崩的时候堆栈是不一样的
+//Dalvik是这么崩的
 ```java
 at android.view.View.performClick(View.java:4438)
 at android.view.View$PerformClick.run(View.java:18439)
@@ -288,6 +289,7 @@ at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:78
 at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:602)
 at dalvik.system.NativeStart.main(NativeStart.java)
 ```
+//art是这么崩的
 ```java
 at android.app.Activity.performStart(Activity.java:6311)
 at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:2387)
@@ -439,3 +441,67 @@ systemProp.https.proxyPort=1080
 systemProp.https.proxyHost=127.0.0.1
 ```
 注意，maven(),google()这些库都是https的，所以得把https也勾上。
+
+### 25. 执行gradlew命令多了之后c盘占用空间越来越小
+执行gradlew命令，会根据gradlew-wrapper.properities中设置的distributionUrl去下载对应的gradle-4.1-all.zip，然后unzip到
+> C://Users//username//.gradle//wrapper//dists
+
+这个目录。所以切换到这个目录，可以把之前2.x,3.x的全部都删掉了，看了下大小，将近3个GB。
+
+### 26. 在 AndroidStudio 工程点击 Run 按钮， 实际上做了什么操作呢？
+[知乎的回答](https://www.zhihu.com/question/65289196)
+看下日志就很清晰了
+```text
+17:35:33 Executing tasks: [:app:assembleDebug]
+17:35:34 Gradle build finished in 858ms
+
+09/14 17:35:34: Launching app
+$ adb push /Users/didi/github/VirtualAPK/app/build/outputs/apk/app-debug.apk /data/local/tmp/com.didi.virtualapk
+$ adb shell pm install -r "/data/local/tmp/com.didi.virtualapk"
+Success
+
+$ adb shell am start -n "com.didi.virtualapk/com.didi.virtualapk.MainActivity" -a android.intent.action.MAIN -c android.intent.category.LAUNCHER
+Client not ready yet..Waiting for process to come online
+Connected to process 21777 on device samsung-sm_g9500-98895a473737504e42
+```
+简单来说就是gradle installDebug
+ Android Stuido点击build按钮做了什么[Configure Your Build](https://developer.android.com/studio/build/index.html)
+
+### 27. 多进程场景下Application的onCreate是会被多次调用的
+在Application的onCreate中添加日志
+```java
+//正常的Application起来都是1
+Log.e("current-process-id is "+android.os.Process.myPid()); // 1
+Log.e("current-thread-id is "+Thread.currentThread().getId()); // 1
+
+//在应用内点击按钮起一个process，application的onCreate又被执行了一次
+Log.e("current-process-id is "+android.os.Process.myPid()); // 12055
+Log.e("current-thread-id is "+Thread.currentThread().getId()); // 1
+
+//这时候看下当前系统中跑的所有进程，这个12055的进程就在这里面
+ActivityManager mActivityManager = (ActivityManager)this.getSystemService(getApplicationContext().ACTIVITY_SERVICE);
+        for (ActivityManager.RunningAppProcessInfo appProcess : mActivityManager.getRunningAppProcesses()) {
+            if (appProcess.pid == pid) {
+                processNameString = appProcess.processName;
+            }
+        }
+```
+至于原因的话，ActivityThread的handleCreateService方法中有这么一句： Application app = packageInfo.makeApplication(false, mInstrumentation);
+
+至于为什么要用多进程，[微信Android客户端后台保活经验分享](http://www.infoq.com/cn/articles/wechat-android-background-keep-alive)这篇文章中提到了微信至少用了三个进程，这篇文章还提到Shadowsocks-Android就开了个进程跑C程序来维护代理。记得系统给每个Application分配的内存总量不那么多，可以通过   
+```java
+Runtime runtime = Runtime.getRuntime();
+LogUtil.w(TAG, String.valueOf(toMB(runtime.freeMemory()))); // 5.79MB
+LogUtil.w(TAG, String.valueOf(toMB(runtime.totalMemory()))); //14.13MB
+ private String toMB(long number) {
+         return String.format("%.2f", number / 1024.0 / 1024.0);
+     }               
+```
+大概也就几十个MB的样子，确实不是很多。多进程下，等于平白多了几十MB的内存，对于缓解性能压力还是有好处的。
+
+### 28. 关于Android APK 安装过程
+以下内容来自[Android APK 安装过程详解](http://blog.csdn.net/zhaokaiqiang1992/article/details/72863932)
+首先APK 的本质是一个 Zip 压缩包，只是后缀被修改为 apk，其中打包了源代码编译出的 class.dex、一些图片视频资源文件和一些 Native 库文件。APK 文件与 Zip 文件最大的一个不同是 APK 包含签名信息，用于保证安装包安全不被修改。
+> ODEX 文件是 Dalvik 将 DEX 文件中可执行文件——class.dex——文件解压出来后，存储在本地后生成的。因为 Android 系统无法直接运行 APK 文件，需要将其解压后找到 class.dex 文件后才可以运行，因此在安装时就将其取出放在本地，可以提高应用启动速度。除了这个原因，其实在将 class.dex 转换成 ODEX 文件过程中，还根据当前系统进行了优化（直接复制到其他系统不一定可以运行），文件大小会减少，ODEX 文件比 DEX 文件更难反编译，这也在一定程度上提高了安全性，因此在一些系统预装或系统级应用大多采用了 ODEX 优化。
+一般 ODEX 不直接运行，在 Dalvik 运行 ODEX 时，需要通过 JIT 进行优化，提高运行效率。JIT 是一种在运行时同步将字节码转化成机器码的过程，Dalvik 直接运行转化后的机器码，这会导致部分的内存和时间开销，但是整体来说，在某些情况下是会提高系统性能的。（有些动态编译器，可能根据经验或尝试编译，优化这一过程，可能运行次数越多，优化效果越好）
+OAT 文件是 ART 运行的文件，是一种二进制可运行文件，包含 DEX 文件和编译出的本地机器指令文件，其文件格式类似于网络数据报文，包含文件头和文件体，文件头的 oatdata、oatexec 和 oatlastword 字段分别描述 DEX 文件位置和本地机器指令的起止位置。因为 OAT 文件包含 DEX 文件，因此比 ODEX 文件占用空间更大，由于其在安装时经过了 ART 的处理，ART 加载 OAT 文件后不需要经过处理就可以直接运行，它没有了从字节码装换成机器码的过程，因此运行速度更快。可以理解为 JIT 从运行时才解析提前到了安装时解析，安装变慢，运行变快。

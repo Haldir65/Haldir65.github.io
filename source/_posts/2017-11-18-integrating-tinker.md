@@ -157,10 +157,13 @@ dex
 038
 
 这个是hexoDecimal，十六进制2个数字（字母）代表一个byte(2*8bits = 2 bytes)，按照二进制0101的方式来看的话就是： 6465（0110 0100 0110 0101） 780A(0111 1000 0000 1010)。
+[关于dex format的更多的分析](http://blog.csdn.net/sbsujjbcy/article/details/52869361)
 
 Q: broken.apk + patch_signed_7zip = fixed apk的过程
 A: 在UpgradePatch.tryPath -> DexDiffPatchInternal.tryRecoverDexFiles -> dexOptimizeDexFiles -> TinkerDexOptimizer.optimizeAll ->OptimizeWorker.run -> DexFile.loadDex(DexFile是dalvik.system包下的)。
 
+Q： 把Tinker导入Intelij中
+A： Intelij中open project -> 选择 tinker-build/tinker-build.iml 即可。顺带着其他的mudule都能查看了
 =======================================================================
 
 

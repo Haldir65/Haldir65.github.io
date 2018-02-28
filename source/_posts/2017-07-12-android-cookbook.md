@@ -162,14 +162,13 @@ Android相关
 - [X] LocalBroadCastManager好像是基于handler实现的
 - [ ] armeabiv,arm64-v8a等问题[Android 设备的CPU类型(通常称为”ABIs”)](https://zhuanlan.zhihu.com/p/23102158)
 - [ ] Romain Guy提到了android asset atlas，顺带看下[ZygotoInit](http://blog.csdn.net/luoshengyang/article/details/45831269)
-- [ ] Android Stuido点击build按钮做了什么[Configure Your Build](https://developer.android.com/studio/build/index.html)
 - [ ] Zygote进程启动流程
 - [ ] SystemServer进程启动流程
 - [ ] Launcher启动流程
 - [Android 应用点击图标到Activity界面显示的过程分析](https://juejin.im/entry/5a0d02086fb9a045263b2387)
 - [Android面试题汇总](https://juejin.im/entry/59dd75cd51882578d5037626)
 - [X] [SurfaceView，TextureView从入门到解析](https://cloud.tencent.com/developer/article/1034235)
-- 
+-
 
 
 > Studio里面看源码，find usage没有的话，find in path , choose android sdk
