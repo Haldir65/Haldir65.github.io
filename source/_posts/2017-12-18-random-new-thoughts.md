@@ -42,6 +42,7 @@ top : 1
 - [ ] 尝试用一个unix domain socket用于localhost进程间ipc
 - [ ] [curl的几种常见用法](http://www.codebelief.com/article/2017/05/linux-command-line-curl-usage/)
 - [ ] [net-speeder写入开机脚本](https://blog.kuoruan.com/48.html)
+- [ ] 用正则检测或者解析json(jQuery源码里有)
 
 
 ### 已完成

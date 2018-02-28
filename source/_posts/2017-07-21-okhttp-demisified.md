@@ -6,8 +6,8 @@ tags: [android,java]
 
 很早的时候就知道，OkHttp在io层面上的操作是由Okio代为完成的，所以实际意义上和Socket打交道的应该是Okio。而Okio又比传统的java io要高效。所以，在分析OkHttp之前，有必要针对Okio的一些方法进行展开，作为后面读写操作的铺垫。
 
-Okio -> OkHttp -> Picaso  -> Retrofit 
-Okio版本 1.13.0 
+Okio -> OkHttp -> Picaso  -> Retrofit
+Okio版本 1.13.0
 OkHttp版本 3.8.0
 
 ![](http://odzl05jxx.bkt.clouddn.com/6da83b3b20094b044a320d1e89dfcd00.jpg?imageView2/2/w/600)
@@ -38,7 +38,7 @@ public abstract class InputStream implements Closeable{
         }  
         out.close();// 关闭流  
         in.close();  
-    } 
+    }
 ```
 
 BufferedInputStream和BufferedOutputStream就是提供了这样的缓冲策略，其内部默认分配了一个默认大小的字节数组，或者在read方法中传入一个字节数组，每次一个byte一个byte的读，然后将读出来的内容写进outPutStream。读到-1就是文件终止(EOF)。具体原理可以参考IBM的[深入分析 Java I/O 的工作机制](https://www.ibm.com/developerworks/cn/java/j-lo-javaio/index.html)。
@@ -113,7 +113,7 @@ source = Okio.source(srcFile);
 ```
 看起来还是在数据源和数据终点之间塞了一个缓冲层，sink(dst)和source(src)都是接口，Buffer同时实现了这俩接口。
 write是从外面拿数据塞到自己的数组中，所以每次写的时候或让Buffer的Size变大(从segment pool中借用segment)。Buffer(Source)的read方法是把数据从Buffer中拿出来，所以会让Buffer的size变小(每一个Segment读完了会返回到segment pool中)
-在Buffer的所有readXXX方法中都能看到这么一句话 
+在Buffer的所有readXXX方法中都能看到这么一句话
  **SegmentPool.recycle(segment)**
 因为Buffer内部是通过Segment的next和prev实现了双向链表，write是在尾部添加数据，read是从头部读取数据并移除。
 
@@ -183,7 +183,7 @@ BufferedSource在读取Socket数据时，一边从socket里面拿一个Segment�
             } else { //剩下的byte足够组成一个int
                 byte[] data = segment.data;
                 int i = (data[pos++] & 255) << 24 | (data[pos++] & 255) << 16 | (data[pos++] & 255) << 8 | data[pos++] & 255; //从byte转int
-                this.size -= 4L; 
+                this.size -= 4L;
                 if(pos == limit) {
                     this.head = segment.pop();
                     SegmentPool.recycle(segment); //读完了就把segment回收
@@ -231,16 +231,16 @@ mClient = new OkHttpClient()
                 .url("http:www.baidu.com")
                 .build();
         Call call = mClient.newCall(request);
-        
+
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                
+
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                
+
             }
         });       
 ```
@@ -305,8 +305,8 @@ response = call.execute();
         interceptors.add(new BridgeInterceptor(this.client.cookieJar()));
         interceptors.add(new CacheInterceptor(this.client.internalCache()));
         interceptors.add(new ConnectInterceptor(this.client));
-        if(!this.forWebSocket) { 
-            interceptors.addAll(this.client.networkInterceptors()); 
+        if(!this.forWebSocket) {
+            interceptors.addAll(this.client.networkInterceptors());
         }
 
         interceptors.add(new CallServerInterceptor(this.forWebSocket));
@@ -321,7 +321,7 @@ Chain的proceed就是从List中一个个取出Inerceptor，然后执行
 
 ## 3. 自带的五个Interceptor
 ### 3.1 RetryAndFollowUpInterceptor
-```
+```java
     while(!this.canceled) {
             Response response = null;
             boolean releaseConnection = true;
@@ -343,10 +343,10 @@ Chain的proceed就是从List中一个个取出Inerceptor，然后执行
             }
             Request followUp = this.followUpRequest(response);
             if(followUp == null) {
-                return response; 
+                return response;
             }
             ++followUpCount;
-            if(followUpCount > 20) { 
+            if(followUpCount > 20) {
                 this.streamAllocation.release();
                 throw new ProtocolException("Too many follow-up requests: " + followUpCount);
             }
@@ -382,10 +382,10 @@ interceptors.add(new BridgeInterceptor(this.client.cookieJar()));//注意带进�
 
         Request networkRequest = strategy.networkRequest;
         Response cacheResponse = strategy.cacheResponse;
-   
+
             Response networkResponse = null;
 
-         networkResponse = chain.proceed(networkRequest); 
+         networkResponse = chain.proceed(networkRequest);
 
             Response response;
             if(cacheResponse != null) {
@@ -400,7 +400,7 @@ interceptors.add(new BridgeInterceptor(this.client.cookieJar()));//注意带进�
             }
             response = networkResponse.newBuilder().cacheResponse(stripBody(cacheResponse)).networkResponse(stripBody(networkResponse)).build();
             return response;
-        
+
     }
 ```
 
@@ -434,7 +434,7 @@ public final class StreamAllocation {
 }
 ```
 从HttpCodec httpCodec = streamAllocation.newStream(this.client, doExtensiveHealthChecks); 这句话一直往下走，会走到Socket.connect()，也就是大多数人初学网络编程时被教导的如何创建Socket连接。现在想想，能够从操作系统底层的Socket封装出这么多复杂的步骤，实在是高手。
-StreamAllocation.newStream  ----> StreamAllocation.findHealthyConnection  ---> StreamAallocation.findConnection ---> new RealConnection ---> RealConnection.connect 
+StreamAllocation.newStream  ----> StreamAllocation.findHealthyConnection  ---> StreamAallocation.findConnection ---> new RealConnection ---> RealConnection.connect
 
 RealConnection.connect()方法
 ```java
@@ -457,7 +457,7 @@ public void connect(int connectTimeout, int readTimeout, int writeTimeout, boole
                 }
             }
 
-           
+
 
         }
     }
@@ -487,7 +487,7 @@ connectSocket长这样:
         }
 
         try {
-            this.source = Okio.buffer(Okio.source(this.rawSocket)); 
+            this.source = Okio.buffer(Okio.source(this.rawSocket));
             this.sink = Okio.buffer(Okio.sink(this.rawSocket));
         } catch (NullPointerException var8) {
             if("throw with null exception".equals(var8.getMessage())) {
@@ -499,7 +499,7 @@ connectSocket长这样:
 ```
 
 **重点看**
-this.source = Okio.buffer(Okio.source(this.rawSocket)); 
+this.source = Okio.buffer(Okio.source(this.rawSocket));
 this.sink = Okio.buffer(Okio.sink(this.rawSocket));
 通过sink往Socket里面写数据，通过source网Socket里面写数据，通过Okio包装了，虽然本质上还是socket.getOutputStream和Socket.getInputStream。到这一步，RealConnection内部sink和source初始化完成，socket已经连接上，Socket的inputStream和outPutStream都准备就绪。其实在这种状态下就已经可以开始读写了。
 
@@ -563,7 +563,7 @@ this.sink = Okio.buffer(Okio.sink(this.rawSocket));
     }
 ```
 
-这里面就是一步步的开始写数据了。这里再借用下百度,chrome按下F12，打开百度首页，看下request的raw header 
+这里面就是一步步的开始写数据了。这里再借用下百度,chrome按下F12，打开百度首页，看下request的raw header
 ```
 GET / HTTP/1.1
 Host: www.baidu.com
@@ -582,7 +582,7 @@ Cookie: PSTM=122178321; BIDUPSID=CF3243290400VSDG52B3859AD4AEC2; BAIDUID=5176CC0
 ```java
  public static String get(Request request, Type proxyType) {
         StringBuilder result = new StringBuilder();
-        result.append(request.method()); // GET 
+        result.append(request.method()); // GET
         result.append(' '); //空格
         if(includeAuthorityInRequestLine(request, proxyType)) {
             result.append(request.url());
@@ -635,6 +635,27 @@ OkHttp总量过于庞大，很多方面，包括spdy,webSocket,RouterDatabase,DN
 
 
 写于2017年7月23日0:29
+
+
+
+## update
+OkHttp拦截器里面能不能把请求取消掉? 结论几乎是否
+[](https://stackoverflow.com/questions/37540616/do-we-have-any-possibility-to-stop-request-in-okhttp-interceptor)
+随便挑一个interceptor出来,上游传递下来的chain只能获取到Request，看了下,request并没有一个cancel的方法。真要cancel的话，得去OkHttpClient那边去cancel，这里并不能获得。就算你全局获得一个Client，这里还得返回一个Response。看了下proceed方法，如果返回null的话，会主动抛一个空指针出来的。
+```java
+@Override public Response intercept(Chain chain) throws IOException {
+  RealInterceptorChain realChain = (RealInterceptorChain) chain;
+  Request request = realChain.request();
+  StreamAllocation streamAllocation = realChain.streamAllocation();
+
+  // We need the network to satisfy this request. Possibly for validating a conditional GET.
+  boolean doExtensiveHealthChecks = !request.method().equals("GET");
+  HttpCodec httpCodec = streamAllocation.newStream(client, chain, doExtensiveHealthChecks);
+  RealConnection connection = streamAllocation.connection();
+
+  return realChain.proceed(request, streamAllocation, httpCodec, connection);
+}
+```
 
 ## 5. 参考
 - [Paisy](https://blog.piasy.com/2016/07/11/Understand-OkHttp/)
