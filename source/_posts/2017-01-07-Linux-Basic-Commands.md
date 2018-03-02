@@ -229,23 +229,25 @@ fi //else后面必须加fi
 
 eg: echo类似于print
 ```shell
-例：myvar=“Hi there！”
+##例：myvar=“Hi there！”
 
-    echo $myvar
+    echo $myvar  ## Hi there！
 
-    echo "$myvar"
+    echo "$myvar"  ## Hi there!
 
-    echo ' $myvar'
+    echo ' $myvar' ## $myvar
 
-    echo \$myvar
+    echo \$myvar ## $myvar
+```
 
-将会输出如下：Hi there！
-
-              Hi there!
-
-              $myvar
-
-              $myvar
+```shell
+#!/bin/bash
+echo "hello there"
+foo="Hello"
+foo="$foo World"  ## 拼接一个现成的string到另一个string的尾部，用冒号跟美元符号就好了
+echo $foo
+echo "Number of files in this directory: `ls | wc -l`"  ## 但是将ls | wc -l的输出作为一个String拼接到一个string中，用单引号
+echo "all the files under the directory `ls  /usr/*/g* | head -n3`"
 ```
 
 

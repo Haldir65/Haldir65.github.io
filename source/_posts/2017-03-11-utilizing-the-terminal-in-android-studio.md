@@ -486,7 +486,7 @@ ActivityManager mActivityManager = (ActivityManager)this.getSystemService(getApp
             }
         }
 ```
-至于原因的话，ActivityThread的handleCreateService方法中有这么一句： Application app = packageInfo.makeApplication(false, mInstrumentation);
+至于原因的话，ActivityThread的handleCreateService方法中有这么一句： Application app = packageInfo.makeApplication(false, mInstrumentation);但是这个不会把MainActivity重新创建一个。
 
 至于为什么要用多进程，[微信Android客户端后台保活经验分享](http://www.infoq.com/cn/articles/wechat-android-background-keep-alive)这篇文章中提到了微信至少用了三个进程，这篇文章还提到Shadowsocks-Android就开了个进程跑C程序来维护代理。记得系统给每个Application分配的内存总量不那么多，可以通过   
 ```java

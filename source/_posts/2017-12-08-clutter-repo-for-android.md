@@ -370,6 +370,8 @@ measureVertical()
 gradle/wrapper/gradle-wrapper.jar 里面装的是Gradle Wrapper的代码
 gradlew就是一个调用gradle命令的脚本，内部会根据gradle-wrapper.properties里面的distributionUrl下载对应版本的gradle distribution zip文件并解压缩，并只会使用该版本的gralde进行编译
 
+[gradlew就是帮忙安装好gradle然后调用gradle](https://stackoverflow.com/questions/39627231/difference-between-using-gradlew-and-gradle)
+
 ### 23. java平台下扫描本地samba服务器用的的一个library叫做import jcifs.smb.SmbFile
 [找到一个实例代码](https://github.com/eriklupander/microgramcaster/blob/master/src/com/squeed/microgramcaster/smb/SambaExplorer.java)
 
@@ -467,6 +469,153 @@ public void uploadForm(Map<String, String> params, String fileFormName,
 
     }  
 ```
+
+
+### 26.ScrollView，RecyclerView的截屏实现
+主要是用lru包装下，[参考](https://gist.github.com/PrashamTrivedi/809d2541776c8c141d9a)
+```java
+public static Bitmap shotRecyclerView(RecyclerView view) {
+    RecyclerView.Adapter adapter = view.getAdapter();
+    Bitmap bigBitmap = null;
+    if (adapter != null) {
+      int size = adapter.getItemCount();
+      int height = 0;
+      Paint paint = new Paint();
+      int iHeight = 0;
+      final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+
+      // Use 1/8th of the available memory for this memory cache.
+      final int cacheSize = maxMemory / 8;
+      LruCache<String, Bitmap> bitmaCache = new LruCache<>(cacheSize);
+      for (int i = 0; i < size; i++) {
+        RecyclerView.ViewHolder holder = adapter.createViewHolder(view, adapter.getItemViewType(i));
+        adapter.onBindViewHolder(holder, i);
+        holder.itemView.measure(
+            View.MeasureSpec.makeMeasureSpec(view.getWidth(), View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        holder.itemView.layout(0, 0, holder.itemView.getMeasuredWidth(),
+            holder.itemView.getMeasuredHeight());
+        holder.itemView.setDrawingCacheEnabled(true);
+        holder.itemView.buildDrawingCache();
+        Bitmap drawingCache = holder.itemView.getDrawingCache();
+        if (drawingCache != null) {
+
+          bitmaCache.put(String.valueOf(i), drawingCache);
+        }
+        height += holder.itemView.getMeasuredHeight();
+      }
+
+      bigBitmap = Bitmap.createBitmap(view.getMeasuredWidth(), height, Bitmap.Config.ARGB_8888);
+      Canvas bigCanvas = new Canvas(bigBitmap);
+      Drawable lBackground = view.getBackground();
+      if (lBackground instanceof ColorDrawable) {
+        ColorDrawable lColorDrawable = (ColorDrawable) lBackground;
+        int lColor = lColorDrawable.getColor();
+        bigCanvas.drawColor(lColor);
+      }
+
+      for (int i = 0; i < size; i++) {
+        Bitmap bitmap = bitmaCache.get(String.valueOf(i));
+        bigCanvas.drawBitmap(bitmap, 0f, iHeight, paint);
+        iHeight += bitmap.getHeight();
+        bitmap.recycle();
+      }
+    }
+    return bigBitmap;
+  }
+
+// 截取listView也是差不多，主要是一个makeMeasureSpec View.MeasureSpec.UNSPECIFIED
+  public static Bitmap shotListView(ListView listview) {
+
+     ListAdapter adapter = listview.getAdapter();
+     int itemscount = adapter.getCount();
+     int allitemsheight = 0;
+     List<Bitmap> bmps = new ArrayList<Bitmap>();
+
+     for (int i = 0; i < itemscount; i++) {
+
+       View childView = adapter.getView(i, null, listview);
+       childView.measure(
+           View.MeasureSpec.makeMeasureSpec(listview.getWidth(), View.MeasureSpec.EXACTLY),
+           View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+
+       childView.layout(0, 0, childView.getMeasuredWidth(), childView.getMeasuredHeight());
+       childView.setDrawingCacheEnabled(true);
+       childView.buildDrawingCache();
+       bmps.add(childView.getDrawingCache());
+       allitemsheight += childView.getMeasuredHeight();
+     }
+
+     Bitmap bigbitmap =
+         Bitmap.createBitmap(listview.getMeasuredWidth(), allitemsheight, Bitmap.Config.ARGB_8888);
+     Canvas bigcanvas = new Canvas(bigbitmap);
+
+     Paint paint = new Paint();
+     int iHeight = 0;
+
+     for (int i = 0; i < bmps.size(); i++) {
+       Bitmap bmp = bmps.get(i);
+       bigcanvas.drawBitmap(bmp, 0, iHeight, paint);
+       iHeight += bmp.getHeight();
+
+       bmp.recycle();
+       bmp = null;
+     }
+
+     return bigbitmap;
+   }
+```
+[都在这里了](http://www.cnblogs.com/onelikeone/p/7091246.html)
+
+### 27.正常使用Android WebView的方法大概这样
+```java
+mWebView = findViewById(R.id.my_webview)
+mWebView.getSettings().setJavaScriptEnabled(true) //这只是enable js
+mWebView.setWebViewClient(WebViewClient()) //没有这句LayoutInflater调用newInstance的时候就崩了
+mWebView.loadUrl("https://www.baidu.com")
+```
+然后是WebView的截屏
+```java
+private fun screenShot() {
+  //这种方式只能截出来当前屏幕上显示的内容，状态栏以下，手机屏幕底部以上的内容，仅此而已
+    val screenWidth :Float = Utils.getScreenWidth(this).toFloat()
+    val screenHeight = Utils.getScreenHeight(this).toFloat()
+    val shortImage = Bitmap.createBitmap(screenWidth.toInt(), screenHeight.toInt(), Bitmap.Config.RGB_565)
+    val canvas = Canvas(shortImage)   // 画布的宽高和屏幕的宽高保持一致
+    val paint = Paint()
+    canvas.drawBitmap(shortImage, screenWidth, screenHeight, paint)
+    mWebView.draw(canvas)
+    savebitmap("1_awesome",shortImage)
+}
+
+// 然而下面这种方式截出来的长度是对了，但底部是空的，得到的是一张很长的，但除了顶部有当前屏幕显示内容以外底部空白的图片
+//就是只能截下来可视区域
+private fun screenShotLong(){
+     mWebView.measure(View.MeasureSpec.makeMeasureSpec(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED),
+             View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED))
+     mWebView.layout(0,0,mWebView.measuredWidth,mWebView.measuredHeight)
+     mWebView.isDrawingCacheEnabled = true
+     mWebView.buildDrawingCache() //图片大的话，这段也卡很长时间
+     val longBitmap = Bitmap.createBitmap(mWebView.measuredWidth,mWebView.measuredHeight,Bitmap.Config.ARGB_8888)
+     val canvas = Canvas(longBitmap)
+     val  paint =  Paint()
+     canvas.drawBitmap(longBitmap,0f,mWebView.measuredHeight.toFloat(),paint)
+     mWebView.draw(canvas)
+     savebitmap("longbitmap",longBitmap)
+     ToastUtil.showTextLong(this,"All done!")
+ }
+
+//然后找了下，只要在setContentView前，调用这个方法就ok了。但这个方法得在App中所有WebView创建前调用
+ if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+       WebView.enableSlowWholeDocumentDraw();
+ }
+ setContentView(R.layout.activity_webview);
+ // 然而看到了这样的日志
+// View: WebView not displayed because it is too large to fit into a software layer (or drawing cache), needs 20710080 bytes, only 8294400 available
+//保存下来的png大小正好普遍在MB量级，另外，保存图片期间完全卡顿（把createBitmap和saveBitmap这段挪到子线程好点了，cpu占用25%以上持续10s，内存占用从32MB飙到400MB，一直不下来了）
+```
+还有,js调java的时候，走的是java的一个叫做jsbridge的线程，操作UI的话post就好了。
+
 
 =============================================================================
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600)

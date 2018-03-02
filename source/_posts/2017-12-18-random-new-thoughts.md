@@ -65,3 +65,4 @@ top : 1
 - vS Code Vender Prefix plugin => auto prefix loader
 - 前后端分离
 - sql漏洞
+- [深入浅出腾讯云 CDN：缓存篇](https://cloud.tencent.com/developer/article/1004755)不管SSD盘或者SATA盘都有最小的操作单位，可能是512B，4KB，8KB。如果读写过程中不进行对齐，底层的硬件或者驱动就需要替应用层来做对齐操作，并将一次读写操作分裂为多次读写操作。
