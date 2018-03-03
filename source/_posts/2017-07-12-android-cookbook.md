@@ -97,7 +97,7 @@ Java相关
 - [X] java位运算，Collection框架中多次用到了
 - [ ] gson的原理，cache什么的，常规json解析器的原理
 - [ ] 垃圾回收器的分类及优缺点
-- [X] ThreadLocal原理及可能的内存泄漏
+- [X] ThreadLocal原理及可能的内存泄漏(主要还是Thread的生命周期比较长)
 - [ ] Understanding Dagger2's generated code
 - [X] 单例模式需要考虑到jvm优化的问题（为什么要写两个synchronized）
 - [ ] java类加载机制(classLoader相关的，类的加载顺序)
@@ -136,7 +136,7 @@ Android相关
 - [X] FFMpeg，[IjkPlayer](http://www.jianshu.com/p/a4eea7ea4664)，[弹幕](https://github.com/Bilibili/DanmakuFlameMaster)
 - [ ] using protobuf on android
 - [ ] UI Toolkit源码解析(android.widget包下面的)
-    - [ ] ViewPager的原理，作者Adam Powell
+    - [X] ViewPager的原理，作者Adam Powell
     - [ ] View的源码, View的绘制原理(往displayList那边靠)
     - [ ] ViewGroup源码
     - [X] FrameLayout
@@ -168,6 +168,7 @@ Android相关
 - [Android 应用点击图标到Activity界面显示的过程分析](https://juejin.im/entry/5a0d02086fb9a045263b2387)
 - [Android面试题汇总](https://juejin.im/entry/59dd75cd51882578d5037626)
 - [X] [SurfaceView，TextureView从入门到解析](https://cloud.tencent.com/developer/article/1034235)
+- [ ] LeakCanary的原理就是registerActivityLifecycleCallbacks,在onDestory的时候，检查有没有该释放没有释放的东西，具体的Pierre-Yves Ricau在[Droidcon NYC 2015 - Detect all memory leaks with LeakCanary!](https://www.youtube.com/watch?v=mU1VcKx8Wzw) 都说过了。
 -
 
 
@@ -182,7 +183,7 @@ Linux相关
 
 网络通信
 - [ ] TCP UDP的不同 TCP三次握手，wireShark[抓包](https://www.youtube.com/watch?v=r0l_54thSYU),抓一个App的包，模拟请求
-- [ ] 如何维持一个长连接
+- [X] 如何维持一个长连接
 - [ ] 点击一个网址底层经历哪些过程
 - [ ] nginx搭建rmtp推流后台[搭建nginx-rtmp直播服务器，ffmpeg模拟推流](http://cxuef.github.io/linux/%E3%80%90%E7%BD%AE%E9%A1%B6%E3%80%91%E6%90%AD%E5%BB%BAnginx-rtmp%E7%9B%B4%E6%92%AD%E6%9C%8D%E5%8A%A1%E5%99%A8%EF%BC%8Cffmpeg%E6%A8%A1%E6%8B%9F%E6%8E%A8%E6%B5%81/)
 - [ ] ffmpeg[参考教程](http://blog.csdn.net/leixiaohua1020/article/details/15811977)

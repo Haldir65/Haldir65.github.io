@@ -17,7 +17,7 @@ java.utils.Arrays这个类中有各种经典的实现，直接对照着学就好
 二分法查找，前提是数组中元素全部按照顺序(从小到大或者从大到小)排列好了。Android中SparseArray中用到了binarySearch
 
 android.support.v4.util.ContainerHelpers
-```
+```java
    // This is Arrays.binarySearch(), but doesn't do any argument validation.
     static int binarySearch(int[] array, int size, int value) {
         int lo = 0;
@@ -64,6 +64,9 @@ public static void bubbleSort(int[] numArray) {
     }
 }
 ```
+Python实现，python中swap两个值非常方便：
+a , b = b , a
+
 ```python
 def bubble_sort(lists):
     # 冒泡排序
@@ -74,8 +77,6 @@ def bubble_sort(lists):
                 lists[i], lists[j] = lists[j], lists[i]
     return lists
 ```
-python中swap两个值非常方便：
-a , b = b , a 
 
 the worst case scenario ：array完全倒序 o(n^2)
 the best case scenario : array已经排序好 Ω（n）
@@ -224,6 +225,89 @@ public class MySelectionSort {
 java的Collections.sort的算法，
 [Comparison Method Violates Its General Contract!]((https://www.youtube.com/watch?v=bvnmbRo7a1Y))
 
+
+## 2. 其他算法
+[有环链表的判断问题](https://juejin.im/post/5a224e1551882535c56cb940)。时间复杂度和空间复杂度的最优解是创建两根迭代速度不一样的指针
+
+下面的代码来自[csdn](http://blog.csdn.net/jq_ak47/article/details/52739651)
+```java
+public class LinkLoop {
+
+    public static boolean hasLoop(Node n){
+        //定义两个指针tmp1,tmp2
+        Node tmp1 = n;
+        Node tmp2 = n.next;
+
+        while(tmp2!=null){
+
+            int d1 = tmp1.val;
+            int d2 = tmp2.val;
+            if(d1 == d2)return true;//当两个指针重逢时，说明存在环，否则不存在。
+            tmp1 = tmp1.next;  //每次迭代时，指针1走一步，指针2走两步
+            tmp2 = tmp2.next.next;
+            if(tmp2 == null)return false;//不存在环时，退出
+
+        }
+        return true; //如果tmp2为null，说明元素只有一个，也可以说明是存在环
+    }
+
+    //方法2：将每次走过的节点保存到hash表中，如果节点在hash表中，则表示存在环
+    public static boolean hasLoop2(Node n){
+        Node temp1 = n;
+        HashMap<Node,Node> ns = new HashMap<Node,Node>();
+        while(n!=null){
+            if(ns.get(temp1)!=null)return true;
+            else ns.put(temp1, temp1);
+            temp1 = temp1.next;
+            if(temp1 == null)return false;
+        }
+        return true;
+    }
+
+    public static void main(String[] args) {
+        Node n1 = new Node(1);
+        Node n2 = new Node(2);
+        Node n3 = new Node(3);
+        Node n4 = new Node(4);
+        Node n5 = new Node(5);
+
+        n1.next = n2;
+        n2.next = n3;
+        n3.next = n4;
+        n4.next = n5;
+        n5.next = n1;  //构造一个带环的链表,去除此句表示不带环
+
+        System.out.println(hasLoop(n1));
+        System.out.println(hasLoop2(n1));
+    }
+}
+```
+
+
+
+```
+给定两单链表A、B，只给出两头指针。请问：
+
+1、如何判断两单链表（无环）是否相交？
+
+有两种可取的办法：
+
+（1）人为构环，将链表A的尾节点指向链表B，再判断是否构环成功？从链表B的头指针往下遍历，如果能够回到B，则说明相交
+
+（2）判断两链表最后一个节点是否相同，如果相交，则尾节点肯定是同一节点
+
+
+
+2、如何判断两单链表（不知是否有环）相交？
+
+先判断是否有环，判断是否有环可以使用追逐办法，设置两个指针，一个走一步，一个走两步，如果能相遇则说明存在环
+
+（1）两个都没环：回到问题1
+
+（2）一个有环，一个没环：不用判断了，肯定两链表不相交
+
+（3）两个都有环：判断链表A的碰撞点是否出现在链表B的环中，如果在，则相交。（相交时，环必定是两链表共有的）
+```
 
 ### 参考
 [Java关于数据结构的实现：树](https://juejin.im/post/59cc55b95188250b4007539b)

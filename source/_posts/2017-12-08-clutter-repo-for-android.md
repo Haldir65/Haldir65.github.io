@@ -616,6 +616,178 @@ private fun screenShotLong(){
 ```
 还有,js调java的时候，走的是java的一个叫做jsbridge的线程，操作UI的话post就好了。
 
+### 28. 分析一点ViewPager的源码
+
+首先是快速滑动的时候为了性能只是挪了bitmap，这比调用layout要快得多。
+ViewPager.jav
+```java
+private void setScrollingCacheEnabled(boolean enabled) {
+       if (mScrollingCacheEnabled != enabled) {
+           mScrollingCacheEnabled = enabled;
+           if (USE_CACHE) { //这个一直是false
+               final int size = getChildCount();
+               for (int i = 0; i < size; ++i) {
+                   final View child = getChildAt(i);
+                   if (child.getVisibility() != GONE) {
+                       child.setDrawingCacheEnabled(enabled);
+                   }
+               }
+           }
+       }
+   }
+
+// 这里要说的是，PagerAdapter中可以复写的方法很多，比如一些状态的保存就可以写在adapter中
+   @Override
+     public Parcelable onSaveInstanceState() {
+         Parcelable superState = super.onSaveInstanceState();
+         SavedState ss = new SavedState(superState);
+         ss.position = mCurItem;
+         if (mAdapter != null) {
+             ss.adapterState = mAdapter.saveState();
+         }
+         return ss;
+     }   
+```
+ViewPager的 onMeasure中有这么一段话,这也就解释了为什么viewPager宽高不能设置为wrap_content。[](https://stackoverflow.com/questions/8394681/android-i-am-unable-to-have-viewpager-wrap-content)
+```java
+ @Override
+   protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+       // For simple implementation, our internal size is always 0.
+       // We depend on the container to specify the layout size of
+       // our view.  We can't really know what it is since we will be
+       // adding and removing different arbitrary views and do not
+       // want the layout to change as this happens.
+       setMeasuredDimension(getDefaultSize(0, widthMeasureSpec),
+               getDefaultSize(0, heightMeasureSpec));
+                // ................................
+
+             }     
+```
+ViewPager横向挪动child的方法是
+ViewPager.java
+```java
+
+@Override
+   public boolean onInterceptTouchEvent(MotionEvent ev) {
+       /*
+        * This method JUST determines whether we want to intercept the motion.
+        * If we return true, onMotionEvent will be called and we do the actual
+        * scrolling there.
+      */
+      // 这里只是做一个拦截，真正去挪动child的方法在onTouchEvent里面
+    }
+
+// Not else! Note that mIsBeingDragged can be set above.
+ if (mIsBeingDragged) {
+     // Scroll to follow the motion event
+     final int activePointerIndex = ev.findPointerIndex(mActivePointerId);
+     final float x = ev.getX(activePointerIndex);
+     needsInvalidate |= performDrag(x);
+ }
+
+ private boolean performDrag(float x) {
+       boolean needsInvalidate = false;
+       scrollTo((int) scrollX, getScrollY()); //其实是ViewPager自己在滑动
+       pageScrolled((int) scrollX);  //pageScrollView中并未涉及child的挪动
+
+       return needsInvalidate;
+   }
+
+// 因为在onLayout中是这么写的，所以后面的child其实已经被layout到屏幕右边排队了，手指往左滑动的时候带着ViewPager，相当于直接把右边的children拽出来了。
+child.layout(childLeft, childTop,
+                         childLeft + child.getMeasuredWidth(),
+                         childTop + child.getMeasuredHeight());   
+
+
+
+// offsetLeftAndRight底层的实现是修改displayList的数据，native方法
+mLeft += offset;
+mRight += offset;
+mRenderNode.offsetLeftAndRight(offset);
+```
+
+
+在smoothScrollTo中这个方法被调用，传了一个true。其实类似的[scrollCache](https://stackoverflow.com/questions/15570041/scrollingcache)的讨论还很多。原理就是调用所有child的setDrawingCacheEnabled方法（不过目前看来这个因为USE_CACHE一直是false所以没用）
+看ViewPager的时候又想到一件事，最早的时候以为这种跟adapter打交道的View不应该用setData，应该用addData，并天真的以为内部实现就是直接从外部的list中取数据。
+在ViewPager源码中，有一个mItems的ArrayList,这么看来实际上外部的数据也只是被拿来填充到内部的一个新的List中。
+```java
+ItemInfo addNewItem(int position, int index) {
+      ItemInfo ii = new ItemInfo();
+      ii.position = position;
+      ii.object = mAdapter.instantiateItem(this, position);
+      ii.widthFactor = mAdapter.getPageWidth(position);
+      if (index < 0 || index >= mItems.size()) {
+          mItems.add(ii);
+      } else {
+          mItems.add(index, ii);
+      }
+      return ii;
+  }
+
+
+// notifyDataSetChange的不过是调用了这个方法
+  void dataSetChanged() {
+         // This method only gets called if our observer is attached, so mAdapter is non-null.
+
+         final int adapterCount = mAdapter.getCount();
+         mExpectedAdapterCount = adapterCount;
+         boolean needPopulate = mItems.size() < mOffscreenPageLimit * 2 + 1
+                 && mItems.size() < adapterCount; // mOffscreenPageLimit默认是1
+        // 比如原来的数量只有2，或者添加了新的数据，都需要重走一遍layout
+
+         boolean isUpdating = false;
+         for (int i = 0; i < mItems.size(); i++) {
+             if (ii.position != newPos) {
+                 needPopulate = true; //多数不会走到这里
+             }
+         }
+         if (needPopulate) {
+             requestLayout();
+         }
+     }
+```
+
+最后是关于ViewPager的预加载问题
+```java
+ void populate(int newCurrentItem) {
+      if (curItem == null && N > 0) {
+           curItem = addNewItem(mCurItem, curIndex); //首先是加载当前的item
+       }
+
+       // Fill 3x the available width or up to the number of offscreen
+          // pages requested to either side, whichever is larger.
+          // If we have no current item we have no work to do.
+          // 左右两侧都放至少offscreenLimit*screenwidth的宽度，所以左右至少都加载一个
+          //实际加载的方法是在addNewItem里面，
+
+          // Fill 3x the available width or up to the number of offscreen
+          // pages requested to either side, whichever is larger.
+          // If we have no current item we have no work to do.
+
+      if (curItem != null) {
+          float extraWidthLeft = 0.f;
+          if(....){
+            addNewItem()
+          }
+          // .... 先填充左边
+
+          float extraWidthRight = curItem.widthFactor;
+          // ...然后是右边
+          if(....){
+            addNewItem()
+          }
+          calculatePageOffsets(curItem, curIndex, oldCurInfo);
+      }
+ }
+```
+
+在AbsListView中，setScrollingCacheEnabled这个方法也存在，同样是调用的child的drawingCacheEnabled
+[Romain Guy的博客提到了ListView默认开启，但他忘记了GridView默认开启](http://www.curious-creature.com/2008/12/22/why-is-my-list-black-an-android-optimization/)
+
+### 29.关于65536问题
+[Too many classes in --main-dex-list, main dex capacity exceeded | 主Dex引用太多怎么办？](http://www.jackywang.tech/2017/06/14/Too-many-classes-in-main-dex-list-main-dex-capacity-exceeded-%E4%B8%BBDex%E5%BC%95%E7%94%A8%E5%A4%AA%E5%A4%9A%E6%80%8E%E4%B9%88%E5%8A%9E%EF%BC%9F/)
+MultiDex对于minSdk> =21 不会生效，如果最低版本是21上面所有的任务都不会执行，也不会有主Dex列表的计算。这是因为在应用安装期间所有的dex文件都会被ART转换为一个.oat文件。所以minSdk高的也不用开multiDex了。
+
 
 =============================================================================
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600)

@@ -447,6 +447,7 @@ systemProp.https.proxyHost=127.0.0.1
 > C://Users//username//.gradle//wrapper//dists
 
 这个目录。所以切换到这个目录，可以把之前2.x,3.x的全部都删掉了，看了下大小，将近3个GB。
+还有每个Android项目的根目录下都有一个.gradle文件夹。按照linux文件系统的传统，前面加上一个点的意思都是隐藏文件。点进去看，里面的东西删除也没问题。
 
 ### 26. 在 AndroidStudio 工程点击 Run 按钮， 实际上做了什么操作呢？
 [知乎的回答](https://www.zhihu.com/question/65289196)

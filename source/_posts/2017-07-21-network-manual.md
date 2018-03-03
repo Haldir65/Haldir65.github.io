@@ -324,9 +324,20 @@ Session就是维护会话的。
 - 心跳
 - Tcp长连接
 
+
+HTTP1.1规定了默认保持长连接（HTTP persistent connection ，也有翻译为持久连接），数据传输完成了保持TCP连接不断开（不发RST包、不四次握手），等待在同域名下继续用这个通道传输数据；相反的就是短连接。
+TCP的keep alive是检查当前TCP连接是否活着；HTTP的Keep-alive是要让一个TCP连接活久点。它们是不同层次的概念。
+TCP keep alive的表现：
+当一个连接“一段时间”没有数据通讯时，一方会发出一个心跳包（Keep Alive包），如果对方有回包则表明当前连接有效，继续监控。
 Http长连接不如说tcp长连接,Tcp是可以不断开的，http连接服务器给到response之后就断开了。[TCP连接](http://www.cnblogs.com/zuoxiaolong/p/life49.html)Http不过是做了tcp连接复用,http通道是一次性的，tcp不是的，这样做也是为了节省tcp通道。
 长连接就是Connection  keep-Alive那玩意，客户端和服务器都得设置才有效。
 长短轮询的间隔是服务器通过代码控制的。
+
+> TCP 长连接是一种保持 TCP 连接的机制。当一个 TCP 连接建立之后，启用 TCP Keep Alive 的一端便会启动一个计时器，当这个计时器到达 0 之后，一个 TCP 探测包便会被发出。这个 TCP 探测包是一个纯 ACK 包，但是其 Seq 与上一个包是重复的。
+打个比喻，TCP Keep Alive 是这样的：
+TCP 连接两端好比两个人，这两个人之间保持通信往来（建立 TCP 连接）。如果他俩经常通信（经常发送 TCP 数据），那这个 TCP 连接自然是建立着的。但如果两人只是偶尔通信。那么，其中一个人（或两人同时）想知道对方是否还在，就会定期发送一份邮件（Keep Alive 探测包），这个邮件没有实质内容，只是问对方是否还在，如果对方收到，就会回复说还在（对这个探测包的 ACK 回应）。
+需要注意的是，keep alive 技术只是 TCP 技术中的一个可选项。因为不当的配置可能会引起诸如一个正在被使用的 TCP 连接被提前关闭这样的问题，所以默认是关闭的
+
 
 ### 5.2 keep-Alive和WebSocket的区别
 
