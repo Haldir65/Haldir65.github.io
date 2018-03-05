@@ -278,6 +278,16 @@ BitMap.config.ARGB_8888 : Each pixel is stored on 4 bytes. Each channel (RGB and
 Bitmap.Config RGB_565： Each pixel is stored on 2 bytes and only the RGB channels are encoded。(能这么省是因为这里面用5bit表示red，6bit表示green，5bit表示blue，这个划分似乎是UI行业的标准，用了一些近似算法。所以经常看到有人拿着两张ARGB_8888和RGB_565的图片来比较，然后批判RGB_565颜色不准)。RBG_565本来就不是冲着颜色准确去的。其实还有RBG_232这种更加不准确的。
 
 日常开发都是用的ARGB_8888,一个像素要用4bytes内存，所以bitmap真的非常耗内存。
+[一篇研究bitmap存储位置的文章，讲到cpp层](https://kotlintc.com/articles/3875?fr=sidebar)。
+根据[Dianne Hackborn的解释](https://stackoverflow.com/questions/4576909/understanding-canvas-and-surface-concepts/4577249#4577249)
+> A Bitmap is just an interface to some pixel data. The pixels may be allocated by Bitmap itself when you are directly creating one, or it may be pointing to pixels it doesn't own such as what internally happens to hook a Canvas up to a Surface for drawing. (A Bitmap is created and pointed to the current drawing buffer of the Surface.)
+
+看下java层的bitmap的成员变量，并没有什么特别大的数组，所以真正的像素数据的存储不是放在bitmap这个对象里的。
+> 根据懂c++人的分析，通过调用jni的CallObjectMethod来调用gVimRuntime的gVMRuntime_newNonMovableArray方法来创建一个数组，这个数组类型和长度分别用gByte_class和size表示。CallObjectMethod函数返回一个jbyteArray，此时，在Java层已经创建了一个长度为size的byte数组。
+
+也就符合official document中说的 **the pixel data is stored on the Dalvik heap along with the associated bitmap.** 说法了。我的理解是，庞大的像素数据是放在java层的，因为是直接gVimRuntime进行调用gVMRuntime_newNonMovableArray来创建的，并不会对开发者暴露这个数组的直接引用(直接乱改也不好吧)，而是使用bitmap这个对象进行间接操作。
+
+
 
 ## 6.来看一张图片是怎么写出来的(在文件系统中)
 

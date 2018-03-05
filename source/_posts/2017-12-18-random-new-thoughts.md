@@ -39,8 +39,8 @@ top : 1
 - [ ] [觉得gradle难学？先看一些简短的吧](https://github.com/JLLK/gradle-android-maindexlist-plugin)，还有，不一定要在ide里面写啊，vs code 也可以啊，直接命令行开搞
 - [ ] [八大排序算法的python实现](http://python.jobbole.com/82270/)
 - [ ] [如何编写 jQuery 插件](https://gist.github.com/quexer/3619237)
-- [ ] [curl的几种常见用法](http://www.codebelief.com/article/2017/05/linux-command-line-curl-usage/)
 - [ ] 用正则检测或者解析json(jQuery源码里有)
+- [ ]javascript中new FileReader()，以及canvas api,以及[js进行图片缩放和裁剪](https://juejin.im/post/5a98c5c26fb9a028d82b34ee)
 
 
 ### 已完成
@@ -66,3 +66,4 @@ top : 1
 - 前后端分离
 - sql漏洞
 - [深入浅出腾讯云 CDN：缓存篇](https://cloud.tencent.com/developer/article/1004755)不管SSD盘或者SATA盘都有最小的操作单位，可能是512B，4KB，8KB。如果读写过程中不进行对齐，底层的硬件或者驱动就需要替应用层来做对齐操作，并将一次读写操作分裂为多次读写操作。
+- [ ] [curl的几种常见用法](http://www.codebelief.com/article/2017/05/linux-command-line-curl-usage/)
