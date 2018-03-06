@@ -456,9 +456,16 @@ systemProp.https.proxyHost=127.0.0.1
 17:35:33 Executing tasks: [:app:assembleDebug]
 17:35:34 Gradle build finished in 858ms
 
-09/14 17:35:34: Launching app
-$ adb push /Users/didi/github/VirtualAPK/app/build/outputs/apk/app-debug.apk /data/local/tmp/com.didi.virtualapk
-$ adb shell pm install -r "/data/local/tmp/com.didi.virtualapk"
+03/06 15:50:39: Launching app
+$ adb push F:\workspace\clones\AndroidRepo\app\build\outputs\apk\debug\app-debug.apk /data/local/tmp/com.me.harris.myapplication
+$ adb shell pm install -t -r "/data/local/tmp/com.me.harris.myapplication"
+Success
+
+
+$ adb shell am start -n "com.me.harris.myapplication/com.me.harris.myapplication.MainActivity" -a android.intent.action.MAIN -c android.intent.category.LAUNCHER
+Client not ready yet..Waiting for process to come online
+Waiting for process to come online
+Connected to process 16409 on device vivo-vivo_x9-a9c690fb
 Success
 
 $ adb shell am start -n "com.didi.virtualapk/com.didi.virtualapk.MainActivity" -a android.intent.action.MAIN -c android.intent.category.LAUNCHER

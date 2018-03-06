@@ -614,7 +614,7 @@ private fun screenShotLong(){
 // View: WebView not displayed because it is too large to fit into a software layer (or drawing cache), needs 20710080 bytes, only 8294400 available
 //保存下来的png大小正好普遍在MB量级，另外，保存图片期间完全卡顿（把createBitmap和saveBitmap这段挪到子线程好点了，cpu占用25%以上持续10s，内存占用从32MB飙到400MB，一直不下来了）
 ```
-还有,js调java的时候，走的是java的一个叫做jsbridge的线程，操作UI的话post就好了。
+还有,js调java的时候，走的是java的一个叫做JavaBridge的线程，操作UI的话post就好了。
 
 ### 28. 分析一点ViewPager的源码
 

@@ -51,5 +51,42 @@ Using this dependency configuration instead of api or compile can result in sign
 但是api和之前的compile是一样的，所以编译速度比implementation慢很多。
 
 
+看到一份关于android build tasks解释的[文章](https://www.diycode.cc/topics/683)
+```
+mergeDebugResources任务的作用是解压所有的aar包输出到app/build/intermediates/exploded-aar，并且把所有的资源文件合并到app/build/intermediates/res/merged/debug目录里
+
+processDebugManifest任务是把所有aar包里的AndroidManifest.xml中的节点，合并到项目的AndroidManifest.xml中，并根据app/build.gradle中当前buildType的manifestPlaceholders配置内容替换manifest文件中的占位符，最后输出到app/build/intermediates/manifests/full/debug/AndroidManifest.xml
+
+processDebugResources的作用
+1、调用aapt生成项目和所有aar依赖的R.java,输出到app/build/generated/source/r/debug目录
+3、生成资源索引文件app/build/intermediates/res/resources-debug.ap_
+2、把符号表输出到app/build/intermediates/symbols/debug/R.txt
+
+compileDebugJavaWithJavac这个任务是用来把java文件编译成class文件，输出的路径是app/build/intermediates/classes/debug
+编译的输入目录有
+- 1、项目源码目录，默认路径是app/src/main/java，可以通过sourceSets的dsl配置，允许有多个（打印project.android.sourceSets.main.java.srcDirs可以查看当前所有的源码路径,具体配置可以参考android-doc
+- 2、app/build/generated/source/aidl
+- 3、app/build/generated/source/buildConfig
+- 4、app/build/generated/source/apt(继承javax.annotation.processing.AbstractProcessor做动态代码生成的一些库，输出在这个目录，具体可以参考Butterknife 和 Tinker)的代码
+
+transformClassesWithJarMergingForDebug的作用是把compileDebugJavaWithJavac任务的输出app/build/intermediates/classes/debug，和app/build/intermediates/exploded-aar中所有的classes.jar和libs里的jar包作为输入，合并起来输出到app/build/intermediates/transforms/jarMerging/debug/jars/1/1f/combined.jar，我们在开发中依赖第三方库的时候有时候报duplicate entry:xxx 的错误，就是因为在合并的过程中在不同jar包里发现了相同路径的类
+
+transformClassesWithMultidexlistForDebug这个任务花费的时间也很长将近8秒，它有两个作用
+- 1、扫描项目的AndroidManifest.xml文件和分析类之间的依赖关系，计算出那些类必须放在第一个dex里面,最后把分析的结果写到app/build/intermediates/multi-dex/debug/maindexlist.txt文件里面
+- 2、生成混淆配置项输出到app/build/intermediates/multi-dex/debug/manifest_keep.txt文件里
+
+项目里的代码入口是manifest中application节点的属性android.name配置的继承自Application的类，在android5.0以前的版本系统只会加载一个dex(classes.dex)，classes2.dex .......classesN.dex 一般是使用android.support.multidex.MultiDex加载的，所以如果入口的Application类不在classes.dex里5.0以下肯定会挂掉，另外当入口Application依赖的类不在classes.dex时初始化的时候也会因为类找不到而挂掉，还有如果混淆的时候类名变掉了也会因为对应不了而挂掉,综上所述就是这个任务的作用
+
+transformClassesWithDexForDebug这个任务的作用是把包含所有class文件的jar包转换为dex，class文件越多转换的越慢
+输入的jar包路径是app/build/intermediates/transforms/jarMerging/debug/jars/1/1f/combined.jar
+输出dex的目录是build/intermediates/transforms/dex/debug/folders/1000/1f/main
+```
+
+[gradle 4.4之后Clock 被Deprecated的方案是自己创建一个groovy文件](https://github.com/HujiangTechnology/gradle_plugin_android_aspectjx/pull/75/files#diff-a5277607f48bf80ac7edd5dbafa307ae)
+```java
+org.gradle.util.Clock() // 被Deprecated之后的解决方案
+```
+
+
 [关于Android Gradle你需要知道这些（4）](https://juejin.im/post/5a756f11f265da4e7c185bc5)
 [Gradle插件学习笔记（四)](https://juejin.im/post/5a767c7cf265da4e9c6300a1#heading-5)

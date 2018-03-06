@@ -95,8 +95,9 @@ echo 'hey man' # 类似于print
 echo 'hello' > log.txt #把这句话写入到文本中 ，覆盖其原有内容
 >> 表示追加，不覆盖,append
 
-重定向输入 <
+###重定向输入 <
 wall < aa.txt # wall是向所有用户发广播， 即从aa.txt中读取内容，然后广播发出去
+bash <(curl -L -s https://install.direct/go.sh) // 比如说随便从网上下一个sh文件下来，然后用bash执行
 
 #service命令
 service XXX start/stop/status #原理是将这些程序注册成为系统服务，这样调用这些程序的时候就不需要写一大堆绝对路径了，具体用法help已经很详细了。
