@@ -151,8 +151,7 @@ A: 引用[Android热补丁之Tinker原理解析](http://w4lle.com/2016/12/16/tin
 
 Q: Dex文件格式
 A： [The Dex File Format](https://blog.bugsnag.com/dex-and-d8/)。值得一提的是，这篇文章提到了文件头，dex的头是
->
-6465780A 30333800
+>6465780A 30333800
 dex
 038
 
@@ -163,9 +162,27 @@ Q: broken.apk + patch_signed_7zip = fixed apk的过程
 A: 在UpgradePatch.tryPath -> DexDiffPatchInternal.tryRecoverDexFiles -> dexOptimizeDexFiles -> TinkerDexOptimizer.optimizeAll ->OptimizeWorker.run -> DexFile.loadDex(DexFile是dalvik.system包下的)。
 
 Q： 把Tinker导入Intelij中
-A： Intelij中open project -> 选择 tinker-build/tinker-build.iml 即可。顺带着其他的mudule都能查看了
-=======================================================================
+A： Intelij中open project -> 选择 tinker-build/tinker-build.iml 即可。顺带着其他的mudule都能查看了。最好在tinker-sample-android/app/build.gradle文件中注释掉这两句话
+> // annotationProcessor("com.tencent.tinker:tinker-android-anno:${TINKER_VERSION}") { changing = true }
+//  compileOnly("com.tencent.tinker:tinker-android-anno:${TINKER_VERSION}") { changing = true }
 
+Q: 关于BSDiff
+A：windows下可以直接下载对应的exe ,cmd中执行
+> bsdiff old.apk new.apk old-to-new.patch
+bspatch old.apk new2.apk old-to-new.patch
+
+Q: patch进程是如何和业务进程交互的
+A： tinker-android/tinker-android-lib/src/main/AndroidManifest.xml中明确指明了打补丁是在一个youpackagename:patch的进程中去操作的。这样做也是为了减少对于主业务的影响。跨进程交互并没有写aidl，其实只是起了一个IntentService通知主业务进程。
+
+
+
+=======================================================================
+好的学习资料
+[Tinker学习计划(2)-Tinker的原理一](https://www.jianshu.com/p/7034c3fec6c8)
+[Android 基于gradle插件实现多渠道打包](https://www.jianshu.com/p/23ea8e332dcd)
+[加快apk的构建速度，如何把编译时间从130秒降到17秒](https://www.jianshu.com/p/53923d8f241c)
+[fastdex](https://github.com/typ0520/fastdex)
+[multiple-apk-generator](https://github.com/typ0520/multiple-apk-generator)
 
 ## 5. 源码解析
 至少我现在看到7个包：

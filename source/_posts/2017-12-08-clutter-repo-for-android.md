@@ -788,6 +788,16 @@ ItemInfo addNewItem(int position, int index) {
 [Too many classes in --main-dex-list, main dex capacity exceeded | 主Dex引用太多怎么办？](http://www.jackywang.tech/2017/06/14/Too-many-classes-in-main-dex-list-main-dex-capacity-exceeded-%E4%B8%BBDex%E5%BC%95%E7%94%A8%E5%A4%AA%E5%A4%9A%E6%80%8E%E4%B9%88%E5%8A%9E%EF%BC%9F/)
 MultiDex对于minSdk> =21 不会生效，如果最低版本是21上面所有的任务都不会执行，也不会有主Dex列表的计算。这是因为在应用安装期间所有的dex文件都会被ART转换为一个.oat文件。所以minSdk高的也不用开multiDex了。
 
+### 30 . 从已安装的app中提取apk
+[鸿洋的博客中提到过如何使用bsdiff比较旧的apk和新的apk的差异](http://blog.csdn.net/lmj623565791/article/details/52761658)
+```java
+context = context.getApplicationContext();
+ApplicationInfo applicationInfo = context.getApplicationInfo();
+String apkPath = applicationInfo.sourceDir;
+return apkPath;
+```
+在Android Studio 3.0后，直接在Device Explorer中查看data/app/com.example.appname，发现里面有个base.apk文件。几乎就是把原有的apk文件复制了一份。
+
 
 =============================================================================
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600)

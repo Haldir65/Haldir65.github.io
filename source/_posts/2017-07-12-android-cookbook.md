@@ -109,7 +109,7 @@ Java相关
 - [ ] try catch finally到底会不会执行
 - [ ] 并发编程，java.util.concurrent里面的类熟练掌握，粗略了解原理
 - [ ]写一个[生产者消费者](https://github.com/Mr-YangCheng/ForAndroidInterview/blob/master/java/%5BJava%5D%20%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E7%94%9F%E4%BA%A7%E8%80%85%E6%B6%88%E8%B4%B9%E8%80%85%E9%97%AE%E9%A2%98%E7%9A%84%E4%BA%94%E7%A7%8D%E5%90%8C%E6%AD%A5%E6%96%B9%E6%B3%95%E5%AE%9E%E7%8E%B0.md)模型
-- [ ] HashMap和conrrentHashmap区别(分段锁比较难)
+- [X] HashMap和conrrentHashmap区别(分段锁比较难)[Segement分段，获取size的时候先乐观，然后悲观](https://zhuanlan.zhihu.com/p/31614308)
 - [ ] java的包结构：java.lang(Language核心类);java.io(I/O相关);java.util(包含collection和concurrent);java.nio(另一种I/O);java.net(网络操作)
 - [ ] 面试长谈[问题](http://www.cnblogs.com/zuoxiaolong/p/life51.html)
 - [ ] jvm字节码看函数调用[链接](https://mp.weixin.qq.com/s/jv7avKM3Z3zK8sJNdtii_g)，Jit for dummies
@@ -131,6 +131,7 @@ Android相关
 - [X] 拆ButterKnife
 - [X] onSaveInstance,不仅仅是Activity,Fragment，View中也有，具体实现原理。View一定要有id(在View.dispatchSaveInstanceState中判断了id不为-1).[继承BaseSavedState]
 - [X] 热修复框架原理
+- [Android应用程序资源的编译和打包过程分析](http://blog.csdn.net/luoshengyang/article/details/8744683)
 - [ ] WebView JS交互，WebView存在的[漏洞](http://www.jianshu.com/p/9f7e9ab8d2fa),通过反射可看可能存在的[安全问题](https://my.oschina.net/fengheju/blog/673629)以及[C代码](http://blog.csdn.net/xueerfei008/article/details/26750659)
 - [ ] Media相关，视频播放etc，相机，滤镜等.[Demo](https://github.com/w1123440793/VideoListDemo)
 - [X] FFMpeg，[IjkPlayer](http://www.jianshu.com/p/a4eea7ea4664)，[弹幕](https://github.com/Bilibili/DanmakuFlameMaster)
@@ -156,7 +157,7 @@ Android相关
 - [ ] Aosp中的launcher地址[Launcher3](https://android.googlesource.com/platform/packages/apps/Launcher3/)，网上分析的也很多
 - [X] Context是什么
 - [ ][Android View的显示框架原理](https://juejin.im/post/5a1e8d5ef265da431280ae19)，讲的比较全
-- [ ] 美团那个Walle 还是要玩玩的
+- [X] 美团那个Walle 还是要玩玩的
 - [X] Android生命周期在不同版本的表现形式[有些onXXX在高版本不会调](http://blog.csdn.net/liuweiballack/article/details/47026263)，[原因是HoneyComb之后对Activity LifeCycle进行了改动](http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html)
 - [ ] 要不是Jake Wharton在DroidConNYC2017上提到，还不知道有v4包里面有**AtomicFile**这玩意
 - [X] LocalBroadCastManager好像是基于handler实现的

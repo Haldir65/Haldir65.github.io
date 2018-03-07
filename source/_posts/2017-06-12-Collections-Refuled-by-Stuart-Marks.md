@@ -793,5 +793,5 @@ jdk 1.8对于长度超过8的链表改用红黑树。
 3. [Java集合干货系列](http://www.jianshu.com/p/2cd7be850540)
 4. [Arrays.asList()返回的List不是jva.util.ArrayList](http://www.programcreek.com/2014/01/java%E7%A8%8B%E5%BA%8F%E5%91%98%E5%B8%B8%E7%8A%AF%E7%9A%8410%E4%B8%AA%E9%94%99%E8%AF%AF/)
 5. [WeakHashMap和HashMap的区别](http://blog.csdn.net/yangzl2008/article/details/6980709)
-6. [Hashmap的死锁问题](http://blog.csdn.net/lantian0802/article/details/42487803)
+6. [Hashmap的死锁问题](https://zhuanlan.zhihu.com/p/31614195) 
 7. [Young Pups: New Collections APIs for Java 9 by Stuart Marks](https://www.youtube.com/watch?v=OJrIMv4dAek)

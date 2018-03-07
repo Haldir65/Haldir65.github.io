@@ -51,7 +51,7 @@ Using this dependency configuration instead of api or compile can result in sign
 但是api和之前的compile是一样的，所以编译速度比implementation慢很多。
 
 
-看到一份关于android build tasks解释的[文章](https://www.diycode.cc/topics/683)
+看到一份关于android build tasks解释的[非常好的文章](https://www.diycode.cc/topics/683)
 ```
 mergeDebugResources任务的作用是解压所有的aar包输出到app/build/intermediates/exploded-aar，并且把所有的资源文件合并到app/build/intermediates/res/merged/debug目录里
 
@@ -81,6 +81,68 @@ transformClassesWithDexForDebug这个任务的作用是把包含所有class文�
 输入的jar包路径是app/build/intermediates/transforms/jarMerging/debug/jars/1/1f/combined.jar
 输出dex的目录是build/intermediates/transforms/dex/debug/folders/1000/1f/main
 ```
+
+app/build/intermediates/symbols/debug/R.txt这个文件长这样
+> int anim abc_fade_in 0x7f010000
+int anim abc_fade_out 0x7f010001
+int anim abc_grow_fade_in_from_bottom 0x7f010002
+int anim abc_popup_enter 0x7f010003
+int anim abc_popup_exit 0x7f010004
+int anim abc_shrink_fade_out_from_bottom 0x7f010005
+int anim abc_slide_in_bottom 0x7f010006
+int anim abc_slide_in_top 0x7f010007
+int anim abc_slide_out_bottom 0x7f010008
+int anim abc_slide_out_top 0x7f010009
+int anim design_bottom_sheet_slide_in 0x7f01000a
+int anim design_bottom_sheet_slide_out 0x7f01000b
+int anim design_snackbar_in 0x7f01000c
+int anim design_snackbar_out 0x7f01000d
+int anim tooltip_enter 0x7f01000e
+int anim tooltip_exit 0x7f01000f
+int animator design_appbar_state_list_animator 0x7f020000
+int attr actionBarDivider 0x7f030000
+int attr actionBarItemBackground 0x7f030001
+int attr actionBarPopupTheme 0x7f030002
+int attr actionBarSize 0x7f030003
+...
+按照字母从a-z开始，hex value自增(0x7f开头)
+
+Android Studio中点击run之后，执行了这些tasks
+> Task spend time:
+      2ms  :app:preBuild
+     64ms  :app:preDebugBuild
+      9ms  :app:compileDebugAidl
+      4ms  :app:compileDebugRenderscript
+      1ms  :app:checkDebugManifest
+      2ms  :app:generateDebugBuildConfig
+      1ms  :app:prepareLintJar
+      1ms  :app:generateDebugResValues
+      0ms  :app:generateDebugResources
+     57ms  :app:mergeDebugResources
+      1ms  :app:createDebugCompatibleScreenManifests
+      4ms  :app:processDebugManifest
+      1ms  :app:splitsDiscoveryTaskDebug
+     18ms  :app:processDebugResources
+      1ms  :app:generateDebugSources
+     11ms  :app:javaPreCompileDebug
+     10ms  :app:compileDebugJavaWithJavac
+      1ms  :app:compileDebugNdk
+      0ms  :app:compileDebugSources
+      4ms  :app:mergeDebugShaders
+      1ms  :app:compileDebugShaders
+      0ms  :app:generateDebugAssets
+      8ms  :app:mergeDebugAssets
+     19ms  :app:transformClassesWithDexBuilderForDebug
+      6ms  :app:transformDexArchiveWithExternalLibsDexMergerForDebug
+      7ms  :app:transformDexArchiveWithDexMergerForDebug
+      1ms  :app:mergeDebugJniLibFolders
+     12ms  :app:transformNativeLibsWithMergeJniLibsForDebug
+     10ms  :app:transformNativeLibsWithStripDebugSymbolForDebug
+      0ms  :app:processDebugJavaRes
+     24ms  :app:transformResourcesWithMergeJavaResForDebug
+      2ms  :app:validateSigningDebug
+      7ms  :app:packageDebug
+      0ms  :app:assembleDebug
 
 [gradle 4.4之后Clock 被Deprecated的方案是自己创建一个groovy文件](https://github.com/HujiangTechnology/gradle_plugin_android_aspectjx/pull/75/files#diff-a5277607f48bf80ac7edd5dbafa307ae)
 ```java
