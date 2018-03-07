@@ -17,7 +17,7 @@
 <meta property="og:description" content="关于Android Application集成Tinker的一次记录。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/single-yellow-beauty-flower-on-the-fence-wallpaper-56801fde208df.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-03-06T11:01:18.833Z">
+<meta property="og:updated_time" content="2018-03-07T10:43:30.249Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="集成Tinker的一些记录">
 <meta name="twitter:description" content="关于Android Application集成Tinker的一次记录。">
@@ -240,11 +240,23 @@ ga('send', 'pageview');
 <p>Q: Tinker-Patch把补丁文件放在什么位置<br>A: 因为接收补丁的代码就在TinkerInstaller.onReceiveUpgradePatch这一段了。在UpgradePatchRetry.java中，有这么一段：tempPatchFile = new File(SharePatchFileUtil.getPatchTempDirectory(context), TEMP_PATCH_NAME); （/data/data/com.example.myApp/data/tinker_temp/temp.apk）。当然还有其他的，总之就是放在当前应用data文件夹下面的tinker或者tinker_temp文件夹下。</p>
 <p>Q: TinkerPatch和Tinker什么关系<br>A：TinkerPatch的SDK里面包含了Tinker必要的功能，开发者只需要添加TinkerPatch这一条依赖，也不需要去继承ApplicationLike这些东西了，开发者不用自己开一个下载服务去下发patch_signed_7zip.apk这个文件了，onReceiveUpgradePatch这些事也做好了。确实是接入成本最低的方案，搭建后台假如交由自己公司的API团队处理，起码得好几天，还得耽误产品正常的开发节奏。而TinkerPatch给出的报价是399元/月。短期来看，显然前者的成本要高出不少，还得顾虑自家团队维护的代价。算一笔经济账的话，显然企业倾向于花钱买稳定服务。对于个人来讲，目前有免费版可以使用，估计也是为了给测试Demo使用的，想玩简单版的话可以试试。</p>
 <p>Q: 如何更换Dex的<br>A: 引用<a href="http://w4lle.com/2016/12/16/tinker/index.html">Android热补丁之Tinker原理解析</a>中的话：“由于Tinker的方案是基于Multidex实现的修改dexElements的顺序实现的，所以最终还是要修改classLoder中dexPathList中dexElements的顺序。Android中有两种ClassLoader用于加载dex文件，BootClassLoader、PathClassLoader和DexClassLoader都是继承自BaseDexClassLoader。最终在DexPathList的findClass中遍历dexElements，谁在前面用谁。”。所以其实就是根据下发的补丁文件，把dex文件给修改了，这一点跟MultiDex很像。</p>
-<p>Q: Dex文件格式<br>A： <a href="https://blog.bugsnag.com/dex-and-d8/">The Dex File Format</a>。值得一提的是，这篇文章提到了文件头，dex的头是<br>&gt;<br>6465780A 30333800<br>dex<br>038</p>
+<p>Q: Dex文件格式<br>A： <a href="https://blog.bugsnag.com/dex-and-d8/">The Dex File Format</a>。值得一提的是，这篇文章提到了文件头，dex的头是</p>
+<blockquote>
+<p>6465780A 30333800<br>dex<br>038</p>
+</blockquote>
 <p>这个是hexoDecimal，十六进制2个数字（字母）代表一个byte(2*8bits = 2 bytes)，按照二进制0101的方式来看的话就是： 6465（0110 0100 0110 0101） 780A(0111 1000 0000 1010)。<br><a href="http://blog.csdn.net/sbsujjbcy/article/details/52869361">关于dex format的更多的分析</a></p>
 <p>Q: broken.apk + patch_signed_7zip = fixed apk的过程<br>A: 在UpgradePatch.tryPath -&gt; DexDiffPatchInternal.tryRecoverDexFiles -&gt; dexOptimizeDexFiles -&gt; TinkerDexOptimizer.optimizeAll -&gt;OptimizeWorker.run -&gt; DexFile.loadDex(DexFile是dalvik.system包下的)。</p>
-<p>Q： 把Tinker导入Intelij中</p>
-<h1 id="A：-Intelij中open-project-gt-选择-tinker-build-tinker-build-iml-即可。顺带着其他的mudule都能查看了"><a href="#A：-Intelij中open-project-gt-选择-tinker-build-tinker-build-iml-即可。顺带着其他的mudule都能查看了" class="headerlink" title="A： Intelij中open project -&gt; 选择 tinker-build/tinker-build.iml 即可。顺带着其他的mudule都能查看了"></a>A： Intelij中open project -&gt; 选择 tinker-build/tinker-build.iml 即可。顺带着其他的mudule都能查看了</h1><h2 id="5-源码解析"><a href="#5-源码解析" class="headerlink" title="5. 源码解析"></a>5. 源码解析</h2><p>至少我现在看到7个包：</p>
+<p>Q： 把Tinker导入Intelij中<br>A： Intelij中open project -&gt; 选择 tinker-build/tinker-build.iml 即可。顺带着其他的mudule都能查看了。最好在tinker-sample-android/app/build.gradle文件中注释掉这两句话</p>
+<blockquote>
+<p>// annotationProcessor(“com.tencent.tinker:tinker-android-anno:${TINKER_VERSION}”) { changing = true }<br>//  compileOnly(“com.tencent.tinker:tinker-android-anno:${TINKER_VERSION}”) { changing = true }</p>
+</blockquote>
+<p>Q: 关于BSDiff<br>A：windows下可以直接下载对应的exe ,cmd中执行</p>
+<blockquote>
+<p>bsdiff old.apk new.apk old-to-new.patch<br>bspatch old.apk new2.apk old-to-new.patch</p>
+</blockquote>
+<p>Q: patch进程是如何和业务进程交互的<br>A： tinker-android/tinker-android-lib/src/main/AndroidManifest.xml中明确指明了打补丁是在一个youpackagename:patch的进程中去操作的。这样做也是为了减少对于主业务的影响。跨进程交互并没有写aidl，其实只是起了一个IntentService通知主业务进程。</p>
+<p>=======================================================================<br>好的学习资料<br><a href="https://www.jianshu.com/p/7034c3fec6c8">Tinker学习计划(2)-Tinker的原理一</a><br><a href="https://www.jianshu.com/p/23ea8e332dcd">Android 基于gradle插件实现多渠道打包</a><br><a href="https://www.jianshu.com/p/53923d8f241c">加快apk的构建速度，如何把编译时间从130秒降到17秒</a><br><a href="https://github.com/typ0520/fastdex">fastdex</a><br><a href="https://github.com/typ0520/multiple-apk-generator">multiple-apk-generator</a></p>
+<h2 id="5-源码解析"><a href="#5-源码解析" class="headerlink" title="5. 源码解析"></a>5. 源码解析</h2><p>至少我现在看到7个包：</p>
 <blockquote>
 <p>com.tencent.tinker:aosp-dexutils:1.91.@jar<br>com.tencent.tinker:bsdiff-util:1.91.@jar<br>com.tencent.tinker:tinker-android-anno:1.91.@jar<br>com.tencent.tinker:tinker-android-lib:1.91.@jar<br>com.tencent.tinker:tinker-android-loader:1.91.@jar<br>com.tencent.tinker:tinker-commons:1.91.@jar<br>com.tencent.tinker:tinker-ziputils:1.91.@jar</p>
 </blockquote>
@@ -547,6 +559,14 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">linux</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">tools</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
@@ -555,11 +575,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">linux</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">tools</a>
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -587,10 +603,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
@@ -615,6 +627,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
@@ -632,10 +648,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
              
               <li class="article-tag-list-item">

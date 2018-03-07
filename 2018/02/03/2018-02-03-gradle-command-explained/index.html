@@ -14,7 +14,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/street lights dark night car city.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-03-06T11:01:18.837Z">
+<meta property="og:updated_time" content="2018-03-07T10:43:30.253Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="gradle command记事本">
 <meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/street lights dark night car city.jpg?imageView2/2/w/600">
@@ -216,7 +216,15 @@ ga('send', 'pageview');
 <blockquote>
 <p>When a module includes an api dependency, it’s letting Gradle know that the module wants to transitively export that dependency to other modules, so that it’s available to them at both runtime and compile time. This configuration behaves just like compile (which is now deprecated), and you should typically use this only in library modules. That’s because, if an api dependency changes its external API, Gradle recompiles all modules that have access to that dependency at compile time. So, having a large number of api dependencies can significantly increase build times. Unless you want to expose a dependency’s API to a separate test module, app modules should instead use implementation dependencies.<br>//所以如果想要把自己的某项依赖暴露出去，让依赖自己的mudule也能用到这项依赖，就要用api了<br>但是api和之前的compile是一样的，所以编译速度比implementation慢很多。</p>
 </blockquote>
-<p>看到一份关于android build tasks解释的<a href="https://www.diycode.cc/topics/683">文章</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">mergeDebugResources任务的作用是解压所有的aar包输出到app/build/intermediates/exploded-aar，并且把所有的资源文件合并到app/build/intermediates/res/merged/debug目录里</span><br><span class="line"></span><br><span class="line">processDebugManifest任务是把所有aar包里的AndroidManifest.xml中的节点，合并到项目的AndroidManifest.xml中，并根据app/build.gradle中当前buildType的manifestPlaceholders配置内容替换manifest文件中的占位符，最后输出到app/build/intermediates/manifests/full/debug/AndroidManifest.xml</span><br><span class="line"></span><br><span class="line">processDebugResources的作用</span><br><span class="line">1、调用aapt生成项目和所有aar依赖的R.java,输出到app/build/generated/source/r/debug目录</span><br><span class="line">3、生成资源索引文件app/build/intermediates/res/resources-debug.ap_</span><br><span class="line">2、把符号表输出到app/build/intermediates/symbols/debug/R.txt</span><br><span class="line"></span><br><span class="line">compileDebugJavaWithJavac这个任务是用来把java文件编译成class文件，输出的路径是app/build/intermediates/classes/debug</span><br><span class="line">编译的输入目录有</span><br><span class="line">- 1、项目源码目录，默认路径是app/src/main/java，可以通过sourceSets的dsl配置，允许有多个（打印project.android.sourceSets.main.java.srcDirs可以查看当前所有的源码路径,具体配置可以参考android-doc</span><br><span class="line">- 2、app/build/generated/source/aidl</span><br><span class="line">- 3、app/build/generated/source/buildConfig</span><br><span class="line">- 4、app/build/generated/source/apt(继承javax.annotation.processing.AbstractProcessor做动态代码生成的一些库，输出在这个目录，具体可以参考Butterknife 和 Tinker)的代码</span><br><span class="line"></span><br><span class="line">transformClassesWithJarMergingForDebug的作用是把compileDebugJavaWithJavac任务的输出app/build/intermediates/classes/debug，和app/build/intermediates/exploded-aar中所有的classes.jar和libs里的jar包作为输入，合并起来输出到app/build/intermediates/transforms/jarMerging/debug/jars/1/1f/combined.jar，我们在开发中依赖第三方库的时候有时候报duplicate entry:xxx 的错误，就是因为在合并的过程中在不同jar包里发现了相同路径的类</span><br><span class="line"></span><br><span class="line">transformClassesWithMultidexlistForDebug这个任务花费的时间也很长将近8秒，它有两个作用</span><br><span class="line">- 1、扫描项目的AndroidManifest.xml文件和分析类之间的依赖关系，计算出那些类必须放在第一个dex里面,最后把分析的结果写到app/build/intermediates/multi-dex/debug/maindexlist.txt文件里面</span><br><span class="line">- 2、生成混淆配置项输出到app/build/intermediates/multi-dex/debug/manifest_keep.txt文件里</span><br><span class="line"></span><br><span class="line">项目里的代码入口是manifest中application节点的属性android.name配置的继承自Application的类，在android5.0以前的版本系统只会加载一个dex(classes.dex)，classes2.dex .......classesN.dex 一般是使用android.support.multidex.MultiDex加载的，所以如果入口的Application类不在classes.dex里5.0以下肯定会挂掉，另外当入口Application依赖的类不在classes.dex时初始化的时候也会因为类找不到而挂掉，还有如果混淆的时候类名变掉了也会因为对应不了而挂掉,综上所述就是这个任务的作用</span><br><span class="line"></span><br><span class="line">transformClassesWithDexForDebug这个任务的作用是把包含所有class文件的jar包转换为dex，class文件越多转换的越慢</span><br><span class="line">输入的jar包路径是app/build/intermediates/transforms/jarMerging/debug/jars/1/1f/combined.jar</span><br><span class="line">输出dex的目录是build/intermediates/transforms/dex/debug/folders/1000/1f/main</span><br></pre></td></tr></table></figure></p>
+<p>看到一份关于android build tasks解释的<a href="https://www.diycode.cc/topics/683">非常好的文章</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">mergeDebugResources任务的作用是解压所有的aar包输出到app/build/intermediates/exploded-aar，并且把所有的资源文件合并到app/build/intermediates/res/merged/debug目录里</span><br><span class="line"></span><br><span class="line">processDebugManifest任务是把所有aar包里的AndroidManifest.xml中的节点，合并到项目的AndroidManifest.xml中，并根据app/build.gradle中当前buildType的manifestPlaceholders配置内容替换manifest文件中的占位符，最后输出到app/build/intermediates/manifests/full/debug/AndroidManifest.xml</span><br><span class="line"></span><br><span class="line">processDebugResources的作用</span><br><span class="line">1、调用aapt生成项目和所有aar依赖的R.java,输出到app/build/generated/source/r/debug目录</span><br><span class="line">3、生成资源索引文件app/build/intermediates/res/resources-debug.ap_</span><br><span class="line">2、把符号表输出到app/build/intermediates/symbols/debug/R.txt</span><br><span class="line"></span><br><span class="line">compileDebugJavaWithJavac这个任务是用来把java文件编译成class文件，输出的路径是app/build/intermediates/classes/debug</span><br><span class="line">编译的输入目录有</span><br><span class="line">- 1、项目源码目录，默认路径是app/src/main/java，可以通过sourceSets的dsl配置，允许有多个（打印project.android.sourceSets.main.java.srcDirs可以查看当前所有的源码路径,具体配置可以参考android-doc</span><br><span class="line">- 2、app/build/generated/source/aidl</span><br><span class="line">- 3、app/build/generated/source/buildConfig</span><br><span class="line">- 4、app/build/generated/source/apt(继承javax.annotation.processing.AbstractProcessor做动态代码生成的一些库，输出在这个目录，具体可以参考Butterknife 和 Tinker)的代码</span><br><span class="line"></span><br><span class="line">transformClassesWithJarMergingForDebug的作用是把compileDebugJavaWithJavac任务的输出app/build/intermediates/classes/debug，和app/build/intermediates/exploded-aar中所有的classes.jar和libs里的jar包作为输入，合并起来输出到app/build/intermediates/transforms/jarMerging/debug/jars/1/1f/combined.jar，我们在开发中依赖第三方库的时候有时候报duplicate entry:xxx 的错误，就是因为在合并的过程中在不同jar包里发现了相同路径的类</span><br><span class="line"></span><br><span class="line">transformClassesWithMultidexlistForDebug这个任务花费的时间也很长将近8秒，它有两个作用</span><br><span class="line">- 1、扫描项目的AndroidManifest.xml文件和分析类之间的依赖关系，计算出那些类必须放在第一个dex里面,最后把分析的结果写到app/build/intermediates/multi-dex/debug/maindexlist.txt文件里面</span><br><span class="line">- 2、生成混淆配置项输出到app/build/intermediates/multi-dex/debug/manifest_keep.txt文件里</span><br><span class="line"></span><br><span class="line">项目里的代码入口是manifest中application节点的属性android.name配置的继承自Application的类，在android5.0以前的版本系统只会加载一个dex(classes.dex)，classes2.dex .......classesN.dex 一般是使用android.support.multidex.MultiDex加载的，所以如果入口的Application类不在classes.dex里5.0以下肯定会挂掉，另外当入口Application依赖的类不在classes.dex时初始化的时候也会因为类找不到而挂掉，还有如果混淆的时候类名变掉了也会因为对应不了而挂掉,综上所述就是这个任务的作用</span><br><span class="line"></span><br><span class="line">transformClassesWithDexForDebug这个任务的作用是把包含所有class文件的jar包转换为dex，class文件越多转换的越慢</span><br><span class="line">输入的jar包路径是app/build/intermediates/transforms/jarMerging/debug/jars/1/1f/combined.jar</span><br><span class="line">输出dex的目录是build/intermediates/transforms/dex/debug/folders/1000/1f/main</span><br></pre></td></tr></table></figure></p>
+<p>app/build/intermediates/symbols/debug/R.txt这个文件长这样</p>
+<blockquote>
+<p>int anim abc_fade_in 0x7f010000<br>int anim abc_fade_out 0x7f010001<br>int anim abc_grow_fade_in_from_bottom 0x7f010002<br>int anim abc_popup_enter 0x7f010003<br>int anim abc_popup_exit 0x7f010004<br>int anim abc_shrink_fade_out_from_bottom 0x7f010005<br>int anim abc_slide_in_bottom 0x7f010006<br>int anim abc_slide_in_top 0x7f010007<br>int anim abc_slide_out_bottom 0x7f010008<br>int anim abc_slide_out_top 0x7f010009<br>int anim design_bottom_sheet_slide_in 0x7f01000a<br>int anim design_bottom_sheet_slide_out 0x7f01000b<br>int anim design_snackbar_in 0x7f01000c<br>int anim design_snackbar_out 0x7f01000d<br>int anim tooltip_enter 0x7f01000e<br>int anim tooltip_exit 0x7f01000f<br>int animator design_appbar_state_list_animator 0x7f020000<br>int attr actionBarDivider 0x7f030000<br>int attr actionBarItemBackground 0x7f030001<br>int attr actionBarPopupTheme 0x7f030002<br>int attr actionBarSize 0x7f030003<br>…<br>按照字母从a-z开始，hex value自增(0x7f开头)</p>
+</blockquote>
+<p>Android Studio中点击run之后，执行了这些tasks</p>
+<blockquote>
+<p>Task spend time:<br>      2ms  :app:preBuild<br>     64ms  :app:preDebugBuild<br>      9ms  :app:compileDebugAidl<br>      4ms  :app:compileDebugRenderscript<br>      1ms  :app:checkDebugManifest<br>      2ms  :app:generateDebugBuildConfig<br>      1ms  :app:prepareLintJar<br>      1ms  :app:generateDebugResValues<br>      0ms  :app:generateDebugResources<br>     57ms  :app:mergeDebugResources<br>      1ms  :app:createDebugCompatibleScreenManifests<br>      4ms  :app:processDebugManifest<br>      1ms  :app:splitsDiscoveryTaskDebug<br>     18ms  :app:processDebugResources<br>      1ms  :app:generateDebugSources<br>     11ms  :app:javaPreCompileDebug<br>     10ms  :app:compileDebugJavaWithJavac<br>      1ms  :app:compileDebugNdk<br>      0ms  :app:compileDebugSources<br>      4ms  :app:mergeDebugShaders<br>      1ms  :app:compileDebugShaders<br>      0ms  :app:generateDebugAssets<br>      8ms  :app:mergeDebugAssets<br>     19ms  :app:transformClassesWithDexBuilderForDebug<br>      6ms  :app:transformDexArchiveWithExternalLibsDexMergerForDebug<br>      7ms  :app:transformDexArchiveWithDexMergerForDebug<br>      1ms  :app:mergeDebugJniLibFolders<br>     12ms  :app:transformNativeLibsWithMergeJniLibsForDebug<br>     10ms  :app:transformNativeLibsWithStripDebugSymbolForDebug<br>      0ms  :app:processDebugJavaRes<br>     24ms  :app:transformResourcesWithMergeJavaResForDebug<br>      2ms  :app:validateSigningDebug<br>      7ms  :app:packageDebug<br>      0ms  :app:assembleDebug</p>
+</blockquote>
 <p><a href="https://github.com/HujiangTechnology/gradle_plugin_android_aspectjx/pull/75/files#diff-a5277607f48bf80ac7edd5dbafa307ae">gradle 4.4之后Clock 被Deprecated的方案是自己创建一个groovy文件</a><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">org.gradle.util.Clock() <span class="comment">// 被Deprecated之后的解决方案</span></span><br></pre></td></tr></table></figure></p>
 <p><a href="https://juejin.im/post/5a756f11f265da4e7c185bc5">关于Android Gradle你需要知道这些（4）</a><br><a href="https://juejin.im/post/5a767c7cf265da4e9c6300a1#heading-5">Gradle插件学习笔记（四)</a></p>
 
@@ -489,6 +497,14 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">linux</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">tools</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
@@ -497,11 +513,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">linux</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">tools</a>
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -529,10 +541,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
@@ -557,6 +565,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
@@ -574,10 +586,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
              
               <li class="article-tag-list-item">

@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100734648.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-03-06T11:01:18.833Z">
+<meta property="og:updated_time" content="2018-03-07T10:43:30.253Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android知识集合[三]">
 <meta name="twitter:description" content="之前的文章快装不下了，所以另外开一篇文章专门放Android相关的杂乱的知识点。">
@@ -263,6 +263,8 @@ ga('send', 'pageview');
 <p>最后是关于ViewPager的预加载问题<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">populate</span><span class="params">(<span class="keyword">int</span> newCurrentItem)</span> </span>&#123;</span><br><span class="line">     <span class="keyword">if</span> (curItem == <span class="keyword">null</span> &amp;&amp; N &gt; <span class="number">0</span>) &#123;</span><br><span class="line">          curItem = addNewItem(mCurItem, curIndex); <span class="comment">//首先是加载当前的item</span></span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// Fill 3x the available width or up to the number of offscreen</span></span><br><span class="line">         <span class="comment">// pages requested to either side, whichever is larger.</span></span><br><span class="line">         <span class="comment">// If we have no current item we have no work to do.</span></span><br><span class="line">         <span class="comment">// 左右两侧都放至少offscreenLimit*screenwidth的宽度，所以左右至少都加载一个</span></span><br><span class="line">         <span class="comment">//实际加载的方法是在addNewItem里面，</span></span><br><span class="line"></span><br><span class="line">         <span class="comment">// Fill 3x the available width or up to the number of offscreen</span></span><br><span class="line">         <span class="comment">// pages requested to either side, whichever is larger.</span></span><br><span class="line">         <span class="comment">// If we have no current item we have no work to do.</span></span><br><span class="line"></span><br><span class="line">     <span class="keyword">if</span> (curItem != <span class="keyword">null</span>) &#123;</span><br><span class="line">         <span class="keyword">float</span> extraWidthLeft = <span class="number">0</span>.f;</span><br><span class="line">         <span class="keyword">if</span>(....)&#123;</span><br><span class="line">           addNewItem()</span><br><span class="line">         &#125;</span><br><span class="line">         <span class="comment">// .... 先填充左边</span></span><br><span class="line"></span><br><span class="line">         <span class="keyword">float</span> extraWidthRight = curItem.widthFactor;</span><br><span class="line">         <span class="comment">// ...然后是右边</span></span><br><span class="line">         <span class="keyword">if</span>(....)&#123;</span><br><span class="line">           addNewItem()</span><br><span class="line">         &#125;</span><br><span class="line">         calculatePageOffsets(curItem, curIndex, oldCurInfo);</span><br><span class="line">     &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>在AbsListView中，setScrollingCacheEnabled这个方法也存在，同样是调用的child的drawingCacheEnabled<br><a href="http://www.curious-creature.com/2008/12/22/why-is-my-list-black-an-android-optimization/">Romain Guy的博客提到了ListView默认开启，但他忘记了GridView默认开启</a></p>
 <h3 id="29-关于65536问题"><a href="#29-关于65536问题" class="headerlink" title="29.关于65536问题"></a>29.关于65536问题</h3><p><a href="http://www.jackywang.tech/2017/06/14/Too-many-classes-in-main-dex-list-main-dex-capacity-exceeded-%E4%B8%BBDex%E5%BC%95%E7%94%A8%E5%A4%AA%E5%A4%9A%E6%80%8E%E4%B9%88%E5%8A%9E%EF%BC%9F/">Too many classes in –main-dex-list, main dex capacity exceeded | 主Dex引用太多怎么办？</a><br>MultiDex对于minSdk&gt; =21 不会生效，如果最低版本是21上面所有的任务都不会执行，也不会有主Dex列表的计算。这是因为在应用安装期间所有的dex文件都会被ART转换为一个.oat文件。所以minSdk高的也不用开multiDex了。</p>
+<h3 id="30-从已安装的app中提取apk"><a href="#30-从已安装的app中提取apk" class="headerlink" title="30 . 从已安装的app中提取apk"></a>30 . 从已安装的app中提取apk</h3><p><a href="http://blog.csdn.net/lmj623565791/article/details/52761658">鸿洋的博客中提到过如何使用bsdiff比较旧的apk和新的apk的差异</a><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">context = context.getApplicationContext();</span><br><span class="line">ApplicationInfo applicationInfo = context.getApplicationInfo();</span><br><span class="line">String apkPath = applicationInfo.sourceDir;</span><br><span class="line"><span class="keyword">return</span> apkPath;</span><br></pre></td></tr></table></figure></p>
+<p>在Android Studio 3.0后，直接在Device Explorer中查看data/app/com.example.appname，发现里面有个base.apk文件。几乎就是把原有的apk文件复制了一份。</p>
 <p>=============================================================================<br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600" alt=""></p>
 <h3 id="9-Facebook出品的BUCK能够用于编译Android-项目，速度比较快。"><a href="#9-Facebook出品的BUCK能够用于编译Android-项目，速度比较快。" class="headerlink" title="9. Facebook出品的BUCK能够用于编译Android 项目，速度比较快。"></a>9. Facebook出品的BUCK能够用于编译Android 项目，速度比较快。</h3><p><a href="https://github.com/1hakr/AnExplorer">一个具有网络传输的FileExplorer</a><br><a href="http://mouxuejie.com/blog/2016-06-11/multidex-source-analysis/">MultiDex原理</a><br><a href="http://wetest.qq.com/lab/view/359.html">偏向native层面的内存占用分析</a><br><a href="https://juejin.im/post/5a646211f265da3e3f4cc997">Android进程框架：进程的启动创建、启动与调度流程</a><br><a href="https://juejin.im/post/59fafa3351882529642107d2">Android进程框架：进程的启动创建、启动与调度流程</a></p>
 
@@ -550,6 +552,14 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">linux</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">tools</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
@@ -558,11 +568,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">linux</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">tools</a>
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -590,10 +596,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
@@ -618,6 +620,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
@@ -635,10 +641,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
              
               <li class="article-tag-list-item">
