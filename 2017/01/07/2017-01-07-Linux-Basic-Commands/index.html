@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/bamboo-buds-wallpaper-53859567dd31a.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/fork_you_git.jpg">
-<meta property="og:updated_time" content="2018-03-07T10:43:30.241Z">
+<meta property="og:updated_time" content="2018-03-08T10:56:07.828Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="linux基本命令介绍">
 <meta name="twitter:description" content="一些常用的linux基本命令,仅作为参考。   nohup node server.js &amp;gt; /dev/null 2&amp;gt;&amp;amp;1 &amp;amp;">
@@ -320,6 +320,41 @@ ga('send', 'pageview');
 <p>接下来看如何修改配置<br>修改 ~/.tmux.conf 文件，如果没有就创建一个</p>
 <h1 id="每次都要按ctrl-b实在是太麻烦，改成ctrl-a吧，因为a距离ctrl近一点。下面三行就改好了"><a href="#每次都要按ctrl-b实在是太麻烦，改成ctrl-a吧，因为a距离ctrl近一点。下面三行就改好了" class="headerlink" title="每次都要按ctrl+b实在是太麻烦，改成ctrl+a吧，因为a距离ctrl近一点。下面三行就改好了"></a>每次都要按ctrl+b实在是太麻烦，改成ctrl+a吧，因为a距离ctrl近一点。下面三行就改好了</h1><p>set-option -g prefix C-a<br>UNBIND-KEY C-a<br>bind key C a send prefix</p>
 <p>tmux有一个很重要的概念- session<br> tmux list-sessions // 列出当前所有sessions<br> tmux ls // 列出当前所有sessions<br> ctrl+b + $ //可以重命名session<br> 如果从一个terminal中开了一个tmux session，然后直接右上角关闭terminal，在其他的terminal中就能看到这个session不是attached的状态<br>如果不想用点击右上角叉号的方式退出session，可以使用ctrl +B +d //disconnect from current session.这样就不用关闭整个terminal了<br> tmux attach -t vim-dev //假设vim-dev是一个session的名字<br> 一个好玩的现象是，如果开两个terminal，连接到同一个session，任何在一个session的操作都会在另一个session的terminal中显示，就像远程协助一样。<br> ctrl +b + ( //切换到前一个session<br>ctrl +b + ) //切换到下一个session</p>
+<h3 id="20-使用systemd管理程序"><a href="#20-使用systemd管理程序" class="headerlink" title="20. 使用systemd管理程序"></a>20. 使用systemd管理程序</h3><p>Systemctl是一个systemd工具，主要负责控制systemd系统和服务管理器。systemd中一项服务称为unit<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl start application ## 比方说nginx</span><br><span class="line">sudo systemctl status nginx ## 看下状态</span><br><span class="line">sudo systemctl restart application.service</span><br><span class="line">sudo systemctl reload application.service</span><br><span class="line">sudo systemctl reload-or-restart application.service</span><br><span class="line"></span><br><span class="line">sudo systemctl enable application.service ##开机启动</span><br><span class="line"><span class="meta">#</span># 开机启动的原理是往/lib/systemd/system或者/etc/systemd/system这个目录下创建了类似于nginx.service的symbolic link。</span><br><span class="line"><span class="meta">#</span># 指向在这个文件夹下创建的xxx.target.wants文件</span><br><span class="line"></span><br><span class="line">sudo systemctl disable application.service ## 禁止开机启动</span><br><span class="line"><span class="meta">#</span># 这句话就是取消了symbolic link</span><br><span class="line"></span><br><span class="line">sudo systemctl is-active nginx.service ## 看下在不在跑</span><br><span class="line">active</span><br><span class="line">systemctl is-enabled application.service</span><br><span class="line">systemctl is-failed application.service</span><br><span class="line"></span><br><span class="line">systemctl list-units --all ## 所有systemd加载（或者尝试过加载）的程序</span><br><span class="line">systemctl list-units --all --state=inactive ## 只看active的</span><br><span class="line"></span><br><span class="line">systemctl list-unit-files ## 和list-units不一样，这里还包括了systemd为尝试过parse的配置</span><br><span class="line"></span><br><span class="line">sudo systemctl halt ## 挂起</span><br><span class="line">sudo systemctl poweroff ## 关机</span><br><span class="line">sudo systemctl reboot ## 重启 其实sudo reboot也是指向/bin/systemctl的软链接</span><br><span class="line"></span><br><span class="line">systemctl cat sshd.service ## 查看一个服务的配置文件</span><br></pre></td></tr></table></figure></p>
+<p>系统基本service服务配置目录（此目录勿动，一般情况下只放系统核心基础服务配置，否存放应用注册类服务配置）：<br>/etc/systemd/system，自定义服务配置管理目录（存放自定义应用注册类服务和第三方服务类配置）：/usr/lib/systemd/system/</p>
+<p>自定义.service配置文件，实现开机自启(开机执行一个sh脚本)的步骤</p>
+<ol>
+<li>创建一个start-script.service文件(权限改成754),大致内容如下</li>
+</ol>
+<blockquote>
+<p>[Unit]<br>Description=”app-run@Author Jack Liu Process Daemon”    # 服务描述<br>After=rc-local.service                  # 服务类别：  </p>
+<pre><code>#       例启动顺序(默认在rc-local.service之后调用执行)  
+</code></pre><p>[Service]<br>Type=forking                        # 优先使用forking方式:</p>
+<pre><code>#       (遵循传统Unix做法,设置PIDFile=选项
+#        帮助systemd准确定位该服务的主进程)
+</code></pre><p>PIDFile=/var/run/app-run.pid                # 设置应用进程的PID（缺省）<br>Environment=”GOPATH=/usr/local/go”                      # 环境变量设置，可设置多个Environment=项</p>
+<pre><code>#    备注：Environment= 或 EnvironmentFile=
+#         引用文件, 两种方式皆可
+</code></pre><p>ExecStart=/data/auto_run.sh start           # 调用启动可执行文件：  这就是要执行的sh脚本</p>
+<pre><code>#        （Service配置全部使用绝对路径，  
+#         可执行文件内命令用绝对的路径格式）  
+</code></pre><p>ExecReload=/data/auto_run.sh reload                     # 重新加载（缺省）<br>ExecStop=/data/auto_run.sh stop                         # 停止服务（缺省）<br>DefaultTimeoutStartSec=30                               # 服务启动允许的最大时长，超时时间（默认无单位:秒）  </p>
+<pre><code>#     单位：&quot;ms&quot;(毫秒), &quot;s&quot;(秒), &quot;min&quot;(分钟),
+#           &quot;h&quot;(小时), &quot;d&quot;(天), &quot;w&quot;(周)  
+</code></pre><p>PrivateTmp=True                     # 是否分配独立的临时空间（缺省）<br>[Install]<br>WantedBy=multi-user.target</p>
+</blockquote>
+<ol>
+<li>把这个文件复制到/usr/lib/systemd/user文件夹中</li>
+<li><p>在/data/auto_run.sh这个脚本中写自己的业务逻辑,比如说</p>
+<blockquote>
+<p>#!/bin/bash<br>date &gt;&gt; /tmp/date</p>
+</blockquote>
+</li>
+<li><p>把这个service注册到系统中<br>systemctl enable start-script.service</p>
+</li>
+</ol>
+<p>搞定,如果service文件不会写的话，看下/lib/systemd/system/nginx.service就好了</p>
+<p>systemctl带来的一个好处是可以直接使用journalctl命令查看<strong>所有</strong>Unit的启动日志(内核日志和应用日志)。日志的配置文件是/etc/systemd/journald.conf<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span># 查看所有日志（默认情况下 ，只保存本次启动的日志）</span><br><span class="line"><span class="meta">$</span> sudo journalctl</span><br><span class="line"><span class="meta">#</span> 查看系统本次启动的日志</span><br><span class="line"><span class="meta">$</span> sudo journalctl -b</span><br><span class="line"><span class="meta">$</span> sudo journalctl --since yesterday</span><br><span class="line"><span class="meta">#</span># 还有很多，能够知道系统启动时发生了什么</span><br></pre></td></tr></table></figure></p>
 <p>==================================================================================</p>
 <h2 id="shell-script-tutorial"><a href="#shell-script-tutorial" class="headerlink" title="shell script tutorial"></a><a href="https://www.youtube.com/watch?v=hwrnmQumtPw">shell script tutorial</a></h2><p>fdisk -l ## show a list of hard drives that are attached to your computer, fdisk就是硬盘分区命令</p>
 <h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
@@ -601,18 +636,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Window</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
               </li>
              
@@ -650,6 +673,18 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Window</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
               </li>
              
               <li class="article-tag-list-item">
