@@ -821,7 +821,87 @@ tmux有一个很重要的概念- session
  ctrl +b + ( //切换到前一个session
 ctrl +b + ) //切换到下一个session
 
+### 20. 使用systemd管理程序
+Systemctl是一个systemd工具，主要负责控制systemd系统和服务管理器。systemd中一项服务称为unit
+```shell
+sudo systemctl start application ## 比方说nginx
+sudo systemctl status nginx ## 看下状态
+sudo systemctl restart application.service
+sudo systemctl reload application.service
+sudo systemctl reload-or-restart application.service
 
+sudo systemctl enable application.service ##开机启动
+## 开机启动的原理是往/lib/systemd/system或者/etc/systemd/system这个目录下创建了类似于nginx.service的symbolic link。
+## 指向在这个文件夹下创建的xxx.target.wants文件
+
+sudo systemctl disable application.service ## 禁止开机启动
+## 这句话就是取消了symbolic link
+
+sudo systemctl is-active nginx.service ## 看下在不在跑
+active
+systemctl is-enabled application.service
+systemctl is-failed application.service
+
+systemctl list-units --all ## 所有systemd加载（或者尝试过加载）的程序
+systemctl list-units --all --state=inactive ## 只看active的
+
+systemctl list-unit-files ## 和list-units不一样，这里还包括了systemd为尝试过parse的配置
+
+sudo systemctl halt ## 挂起
+sudo systemctl poweroff ## 关机
+sudo systemctl reboot ## 重启 其实sudo reboot也是指向/bin/systemctl的软链接
+
+systemctl cat sshd.service ## 查看一个服务的配置文件
+```
+系统基本service服务配置目录（此目录勿动，一般情况下只放系统核心基础服务配置，否存放应用注册类服务配置）：
+/etc/systemd/system，自定义服务配置管理目录（存放自定义应用注册类服务和第三方服务类配置）：/usr/lib/systemd/system/
+
+自定义.service配置文件，实现开机自启(开机执行一个sh脚本)的步骤
+1. 创建一个start-script.service文件(权限改成754),大致内容如下
+
+> [Unit]
+Description="app-run@Author Jack Liu Process Daemon"    # 服务描述
+After=rc-local.service                  # 服务类别：  
+                                                        #       例启动顺序(默认在rc-local.service之后调用执行)  
+[Service]
+Type=forking                        # 优先使用forking方式:
+                                                        #       (遵循传统Unix做法,设置PIDFile=选项
+                                                        #        帮助systemd准确定位该服务的主进程)
+PIDFile=/var/run/app-run.pid                # 设置应用进程的PID（缺省）
+Environment="GOPATH=/usr/local/go"                      # 环境变量设置，可设置多个Environment=项
+                                                        #    备注：Environment= 或 EnvironmentFile=
+                                                        #         引用文件, 两种方式皆可
+ExecStart=/data/auto_run.sh start           # 调用启动可执行文件：  这就是要执行的sh脚本
+                                                        #        （Service配置全部使用绝对路径，  
+                                                        #         可执行文件内命令用绝对的路径格式）  
+ExecReload=/data/auto_run.sh reload                     # 重新加载（缺省）
+ExecStop=/data/auto_run.sh stop                         # 停止服务（缺省）
+DefaultTimeoutStartSec=30                               # 服务启动允许的最大时长，超时时间（默认无单位:秒）  
+                                                        #     单位："ms"(毫秒), "s"(秒), "min"(分钟),
+                                                        #           "h"(小时), "d"(天), "w"(周)  
+PrivateTmp=True                     # 是否分配独立的临时空间（缺省）                               
+[Install]
+WantedBy=multi-user.target
+
+2. 把这个文件复制到/usr/lib/systemd/user文件夹中
+3. 在/data/auto_run.sh这个脚本中写自己的业务逻辑,比如说
+> #!/bin/bash                                                            
+date >> /tmp/date
+
+4. 把这个service注册到系统中
+systemctl enable start-script.service
+
+搞定,如果service文件不会写的话，看下/lib/systemd/system/nginx.service就好了
+
+systemctl带来的一个好处是可以直接使用journalctl命令查看**所有**Unit的启动日志(内核日志和应用日志)。日志的配置文件是/etc/systemd/journald.conf
+```shell
+## 查看所有日志（默认情况下 ，只保存本次启动的日志）
+$ sudo journalctl
+# 查看系统本次启动的日志
+$ sudo journalctl -b
+$ sudo journalctl --since yesterday
+## 还有很多，能够知道系统启动时发生了什么
+```
 
 ==================================================================================
 ## [shell script tutorial](https://www.youtube.com/watch?v=hwrnmQumtPw)

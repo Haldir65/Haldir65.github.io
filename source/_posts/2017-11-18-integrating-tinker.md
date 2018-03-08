@@ -162,7 +162,7 @@ Q: broken.apk + patch_signed_7zip = fixed apk的过程
 A: 在UpgradePatch.tryPath -> DexDiffPatchInternal.tryRecoverDexFiles -> dexOptimizeDexFiles -> TinkerDexOptimizer.optimizeAll ->OptimizeWorker.run -> DexFile.loadDex(DexFile是dalvik.system包下的)。
 
 Q： 把Tinker导入Intelij中
-A： Intelij中open project -> 选择 tinker-build/tinker-build.iml 即可。顺带着其他的mudule都能查看了。最好在tinker-sample-android/app/build.gradle文件中注释掉这两句话
+A： <Del>Intelij中open project -> 选择 tinker-build/tinker-build.iml 即可</Del>。顺带着其他的mudule都能查看了。最好在tinker-sample-android/app/build.gradle文件中注释掉这两句话
 > // annotationProcessor("com.tencent.tinker:tinker-android-anno:${TINKER_VERSION}") { changing = true }
 //  compileOnly("com.tencent.tinker:tinker-android-anno:${TINKER_VERSION}") { changing = true }
 

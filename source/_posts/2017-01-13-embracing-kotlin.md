@@ -139,6 +139,13 @@ private fun calcValue(name: String): Int {
     return 3
 }
 
+// 自定义getter和setter
+var stringRepresentation: String
+    get() = this.toString()
+    set(value) {
+        setDataFromString(value) // parses the string and assigns values to other properties
+    }
+
 ```
 
 ### 6. 具有更好语义的typealis

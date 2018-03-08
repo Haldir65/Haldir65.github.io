@@ -787,6 +787,46 @@ ItemInfo addNewItem(int position, int index) {
 ### 29.关于65536问题
 [Too many classes in --main-dex-list, main dex capacity exceeded | 主Dex引用太多怎么办？](http://www.jackywang.tech/2017/06/14/Too-many-classes-in-main-dex-list-main-dex-capacity-exceeded-%E4%B8%BBDex%E5%BC%95%E7%94%A8%E5%A4%AA%E5%A4%9A%E6%80%8E%E4%B9%88%E5%8A%9E%EF%BC%9F/)
 MultiDex对于minSdk> =21 不会生效，如果最低版本是21上面所有的任务都不会执行，也不会有主Dex列表的计算。这是因为在应用安装期间所有的dex文件都会被ART转换为一个.oat文件。所以minSdk高的也不用开multiDex了。
+在使用ART虚拟机的设备上(部分4.4设备，5.0+以上都默认ART环境)，已经原生支持多Dex，因此就不需要手动支持了
+看下MultiDex的源码，secondaryDex文件的路径是/date/date/<package_name>/code_cache/secondary-dexes/ 这是一个文件夹
+MultiDex的原理基本上在[简书](https://www.jianshu.com/p/33f22b21ef1e)
+```java
+private static final class V14
+    {
+        private static void install(final ClassLoader loader, final List<File> additionalClassPathEntries, final File optimizedDirectory) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, InvocationTargetException, NoSuchMethodException {
+            //通过反射获取loader的pathList字段，loader是由Application.getClassLoader()获取的，实际获取到的是PathClassLoader对象的pathList字段
+            final Field pathListField = findField(loader, "pathList");
+            final Object dexPathList = pathListField.get(loader);
+            //dexPathList是PathClassLoader的私有字段，里面保存的是Main Dex中的class
+            //dexElements是一个数组，里面的每一个item就是一个Dex文件
+            //makeDexElements()返回的是其他Dex文件中获取到的Elements[]对象，内部通过反射makeDexElements()获取
+            //expandFieldArray是为了把makeDexElements()返回的Elements[]对象添加到dexPathList字段的成员变量dexElements中
+            expandFieldArray(dexPathList, "dexElements", makeDexElements(dexPathList, new ArrayList<File>(additionalClassPathEntries), optimizedDirectory));
+        }
+
+        private static Object[] makeDexElements(final Object dexPathList, final ArrayList<File> files, final File optimizedDirectory) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+            final Method makeDexElements = findMethod(dexPathList, "makeDexElements", (Class<?>[])new Class[] { ArrayList.class, File.class });
+            return (Object[])makeDexElements.invoke(dexPathList, files, optimizedDirectory);
+        }
+    }
+```
+这里面注意makeDexElements方法，是通过反射调用了Dalvik的DexPathList class的这个方法[makeDexElements](https://android.googlesource.com/platform/libcore-snapshot/+/ics-mr1/dalvik/src/main/java/dalvik/system/DexPathList.java)。说白了，整个过程就是在/data/data/(packagename)/code_cache/这个目录下面复制粘贴文件(class.dex文件也是文件)，复制粘贴文件带来的影响就是classLoader(Android上是BaseDexClassLoader)在findClass的时候调用的是DexPathList的findClass方法:
+```java
+public Class findClass(String name) {
+      for (Element element : dexElements) {
+          DexFile dex = element.dexFile;
+          if (dex != null) {
+              Class clazz = dex.loadClassBinaryName(name, definingContext);
+              if (clazz != null) {
+                  return clazz;
+              }
+          }
+      }
+      return null;
+  }
+```
+当然，Tinker也是采用的极其相似的方法，完成了dex替换(谁在这个数组前面谁就先得到加载)
+[凯子哥提到由于在App冷启动的时候由于反射外加io操作，可能会比较卡甚至ANR](https://www.jianshu.com/p/33f22b21ef1e),把这部分操作弄到子线程也是行的，一种可能的方案是从Instrumentation下手。
 
 ### 30 . 从已安装的app中提取apk
 [鸿洋的博客中提到过如何使用bsdiff比较旧的apk和新的apk的差异](http://blog.csdn.net/lmj623565791/article/details/52761658)

@@ -199,6 +199,11 @@ ADB无线调试
 > $ adb devices
 done
 
+ANR的日志放在/data/anr/traces.txt里面
+./adb pull path_to_file location_to_save就能搞出来了
+
+
+
 ### 参考:
 - [张明云的博客](http://zmywly8866.github.io/2015/01/24/all-adb-command.html)
 - [adb无线调试](http://blog.csdn.net/ykttt1/article/details/52058717)
