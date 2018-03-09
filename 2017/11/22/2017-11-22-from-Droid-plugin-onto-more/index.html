@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery15111006999.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery2a2241cc5c1278cf7a28f15f91dbbb7f.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-03-08T10:56:07.836Z">
+<meta property="og:updated_time" content="2018-03-09T11:25:47.610Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从DroidPlugin谈插件化开发">
 <meta name="twitter:description" content="关于360团队出开源的DroidPlugin的一些记录 过程中发现了关于插件化，Hook系统方法的操作，摘录下来。">
@@ -209,21 +209,7 @@ ga('send', 'pageview');
 <h3 id="1-1-ActivityThread做了很多事"><a href="#1-1-ActivityThread做了很多事" class="headerlink" title="1.1 ActivityThread做了很多事"></a>1.1 ActivityThread做了很多事</h3><p>onSaveInstance是从ActivityThread的callCallActivityOnSaveInstanceState方法dispatch下来的。</p>
 <h2 id="2-Hook作为插件化的切入点给了开发者篡改系统api实现的通道"><a href="#2-Hook作为插件化的切入点给了开发者篡改系统api实现的通道" class="headerlink" title="2. Hook作为插件化的切入点给了开发者篡改系统api实现的通道"></a>2. Hook作为插件化的切入点给了开发者篡改系统api实现的通道</h2><p><a href="http://weishu.me/2016/02/16/understand-plugin-framework-binder-hook/">比如Hook掉剪切板SystemService</a>,<br><a href="http://weishu.me/2016/03/07/understand-plugin-framework-ams-pms-hook/">比如在ActivityManagerService调用IPC操作时添加私货</a></p>
 <p><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery2a2241cc5c1278cf7a28f15f91dbbb7f.jpg?imageView2/2/w/600" alt=""></p>
-<p>=-============================-============================-============================-=========================</p>
-<p>这种往zip文件里面写数据的方式叫做zip comment<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> line <span class="keyword">in</span> channels:</span><br><span class="line">    target_channel = line.strip()</span><br><span class="line">    target_apk = output_dir + apk_names[<span class="number">0</span>] + <span class="string">"-"</span> + target_channel+<span class="string">"-"</span>+apk_names[<span class="number">2</span>] + src_apk_extension</span><br><span class="line">    shutil.copy(src_apk,  target_apk)</span><br><span class="line">    zipped = zipfile.ZipFile(target_apk, <span class="string">'a'</span>, zipfile.ZIP_DEFLATED)</span><br><span class="line">    empty_channel_file = <span class="string">"META-INF/uuchannel_&#123;channel&#125;"</span>.format(channel = target_channel) //所以渠道号简单来说就是往META-INF里写了一个<span class="string">"uuchannel_xiaomi"</span>之类的文件</span><br><span class="line">    zipped.write(src_empty_file, empty_channel_file)</span><br><span class="line">    zipped.close()</span><br></pre></td></tr></table></figure></p>
-<p><a href="https://www.zhihu.com/question/39440766">为什么 Android 要采用 Binder 作为 IPC 机制？</a></p>
-<blockquote>
-<p>传统的进程间通信方式有管道，消息队列，共享内存等，其中管道，消息队列采用存储-转发方式，即数据先从发送方缓存区拷贝到内核开辟的缓存区中，然后再从内核缓存区拷贝到接收方缓存区，至少有两次拷贝过程。共享内存虽然无需拷贝，但控制复杂，难以使用。socket作为一款通用接口，其传输效率低，开销大，主要用在跨网络的进程间通信和本机上进程间的低速通信。Binder通过内存映射的方式，使数据只需要在内存进行一次读写过程。<br>内存映射，简而言之就是将用户空间的一段内存区域映射到内核空间，映射成功后，用户对这段内存区域的修改可以直接反映到内核空间，相反，内核空间对这段区域的修改也直接反映用户空间。那么对于内核空间&lt;—-&gt;用户空间两者之间需要大量数据传输等操作的话效率是非常高的。</p>
-</blockquote>
-<p><a href="https://www.jianshu.com/p/adaa1a39a274">听说你Binder机制学的不错，来面试下这几个问题</a></p>
-<p>Client发起IPC请求，是阻塞的吗？</p>
-<p>adb getEvent sendEvent<br>input tap x y<br>input touchescreen<br>input text helloworld<br>input keyevent</p>
-<p>Xposed的介绍与入门<br>Xposed的原理与Multidex及动态加载问题</p>
-<h3 id="组件化、插件化"><a href="#组件化、插件化" class="headerlink" title="组件化、插件化"></a>组件化、插件化</h3><p>组件化、插件化的前提就是解耦</p>
-<p><a href="https://github.com/jaredrummler/AndroidShell">在Android中执行shell指令</a><br><a href="https://github.com/didi/VirtualAPK">滴滴的virtualApp</a>。 目前看来就是用android.content.pm.PackageParse去解析一个apk文件，封装成一个LoadedPlugin对象（Cache下来），后续调用apk中描述的功能进行操作。所以应该还是在host的进程中跑的。由此联系到<a href="http://www.cnblogs.com/myitm/archive/2012/05/17/2506635.html">PackageInstaller 原理简述</a></p>
-<p><a href="https://www.jianshu.com/p/0ba717f7385f">美团的walle接入指南</a>,原理都在<a href="https://tech.meituan.com/android-apk-v2-signature-scheme.html">新一代开源Android渠道包生成工具Walle</a><br><a href="https://github.com/mcxiaoke/packer-ng-plugin">还有一个开源的gradle plugin</a></p>
-<p>关于gradlew<br>打包release之前，先Build -&gt; Generate Singed apk 创建一个新的keystore , 密码记住，keystore文件保存好。</p>
-<p>关于打包: 根据<a href="https://www.jianshu.com/p/4f2990cf53bf">Android 多渠道打包梳理</a><br>Gradle UMeng 多渠道打包</p>
+<h2 id="3-Android多渠道打包的实现"><a href="#3-Android多渠道打包的实现" class="headerlink" title="3. Android多渠道打包的实现"></a>3. Android多渠道打包的实现</h2><h3 id="3-1-历史上曾经有效的方式，原始方法"><a href="#3-1-历史上曾经有效的方式，原始方法" class="headerlink" title="3.1 历史上曾经有效的方式，原始方法"></a>3.1 历史上曾经有效的方式，原始方法</h3><p>关于gradlew<br>打包release之前，先Build -&gt; Generate Singed apk 创建一个新的keystore , 密码记住，keystore文件保存好。<br>关于打包: 根据<a href="https://www.jianshu.com/p/4f2990cf53bf">Android 多渠道打包梳理</a><br>Gradle UMeng 多渠道打包</p>
 <ul>
 <li><p>Android.manifest文件添加</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta-data</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:name</span>=<span class="string">"UMENG_CHANNEL"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:value</span>=<span class="string">"$&#123;UMENG_CHANNEL_VALUE&#125;"</span> /&gt;</span></span><br></pre></td></tr></table></figure>
@@ -236,8 +222,38 @@ ga('send', 'pageview');
 <p>./gradlew assembleDebug # 会打包 Debug apk<br>./gradlew assembleRelease # 打包 Release apk<br>./gradlew assembleWandoujiaRelease # 打包 wandoujia Release 版本，大小写不敏感<br>./gradlew assembleWandoujia  # 此命令会生成wandoujia渠道的Release和Debug版本</p>
 </blockquote>
 </li>
-<li><p>多渠道的话这样的命令要跑多次<br>使用walle就好了。</p>
+</ul>
+<p>但是，20个渠道就要编译20次，耗时冗长。</p>
+<h3 id="3-2-在META-INF目录内添加空文件，可以不用重新签名应用。已失效"><a href="#3-2-在META-INF目录内添加空文件，可以不用重新签名应用。已失效" class="headerlink" title="3.2 在META-INF目录内添加空文件，可以不用重新签名应用。已失效"></a>3.2 在META-INF目录内添加空文件，可以不用重新签名应用。<del>已失效</del></h3><p>比较出名的有python版本的，就是写了个空文件<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> line <span class="keyword">in</span> channels:</span><br><span class="line">    target_channel = line.strip()</span><br><span class="line">    target_apk = output_dir + apk_names[<span class="number">0</span>] + <span class="string">"-"</span> + target_channel+<span class="string">"-"</span>+apk_names[<span class="number">2</span>] + src_apk_extension</span><br><span class="line">    shutil.copy(src_apk,  target_apk)</span><br><span class="line">    zipped = zipfile.ZipFile(target_apk, <span class="string">'a'</span>, zipfile.ZIP_DEFLATED)</span><br><span class="line">    empty_channel_file = <span class="string">"META-INF/uuchannel_&#123;channel&#125;"</span>.format(channel = target_channel) //所以渠道号简单来说就是往META-INF里写了一个<span class="string">"uuchannel_xiaomi"</span>之类的文件</span><br><span class="line">    zipped.write(src_empty_file, empty_channel_file)</span><br><span class="line">    zipped.close()</span><br></pre></td></tr></table></figure></p>
+<p><strong>亲测</strong> 关于多渠道打包，由于新的签名机制的引入，上面的这种方法是会报错的。</p>
 <blockquote>
+<p>$ adb install app-release_channel_xiaomi.apk<br>Failed to install app-release_channel_xiaomi.apk: Failure [INSTALL_PARSE_FAILED_NO_CERTIFICATES: Failed to collect certificates from /data/app/vmdl185799136.tmp/base.apk: META-INF/CERT.SF indicates /data/app/vmdl185799136.tmp/base.apk is signed using APK Signature Scheme v2, but no such signature was found. Signature stripped?]</p>
+</blockquote>
+<p><a href="https://tech.meituan.com/android-apk-v2-signature-scheme.html">美团的技术团队给出了科普</a>，</p>
+<blockquote>
+<p>新的签名方案会在ZIP文件格式的 Central Directory 区块所在文件位置的前面添加一个APK Signing Block区块，下面按照ZIP文件的格式来分析新应用签名方案签名后的APK包。<br>整个APK（ZIP文件格式）会被分为以下四个区块：<br>Contents of ZIP entries（from offset 0 until the start of APK Signing Block）<br>APK Signing Block<br>ZIP Central Directory<br>ZIP End of Central Directory<br>新应用签名方案的签名信息会被保存在区块2（APK Signing Block）中， 而区块1（Contents of ZIP entries）、区块3（ZIP Central Directory）、区块4（ZIP End of Central Directory）是受保护的，在签名后任何对区块1、3、4的修改都逃不过新的应用签名方案的检查。</p>
+</blockquote>
+<h3 id="3-3-还有就是往apk-zip-文件尾部添加comment"><a href="#3-3-还有就是往apk-zip-文件尾部添加comment" class="headerlink" title="3.3 还有就是往apk(zip)文件尾部添加comment"></a>3.3 还有就是往apk(zip)文件尾部添加comment</h3><blockquote>
+<p>End of central directory record<br>Offset    Bytes    Description    译<br>0    4    End of central directory signature = 0x06054b50    核心目录结束标记（0x06054b50）<br>4    2    Number of this disk    当前磁盘编号<br>6    2    Disk where central directory starts    核心目录开始位置的磁盘编号<br>8    2    Number of central directory records on this disk    该磁盘上所记录的核心目录数量<br>10    2    Total number of central directory records    该磁盘上所记录的核心目录数量<br>12    4    Size of central directory (bytes)    核心目录的大小<br>16    4    Offset of start of central directory, relative to start of archive    核心目录开始位置相对于archive开始的位移<br>20    2    Comment length (n)    注释长度 (n)<br>22    n    Comment    注释内容</p>
+</blockquote>
+<p>apk 默认情况下没有comment，所以 comment length的short 两个字节为 0，我们需要把这个值修改为我们的comment的长度，然后把comment追加到后边即可。<br>Android N 中提到了 APK Signature Scheme v2，这种新引入的签名机制，会对整个文件的每个字节都会做校验，包括 comment 区域。所以到时候如果app使用新版本的签名工具的时候，如果启用 scheme v2，那么这个机制则不能工作。目前看代码，是可以disable v2 的。</p>
+<p>虽然目前暂时还是可以disable APK Signature Scheme v2的。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">signingConfigs &#123;</span><br><span class="line">    release &#123;</span><br><span class="line">        v2SigningEnabled false</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="3-3-当前比较合适的方案是使用美团的walle"><a href="#3-3-当前比较合适的方案是使用美团的walle" class="headerlink" title="3.3 当前比较合适的方案是使用美团的walle"></a>3.3 当前比较合适的方案是使用美团的walle</h3><p><a href="https://www.jianshu.com/p/e4ed249e4cab">Signature Scheme v2的出现让目前美团的walle成为公开已知的多渠道打包的最好选择</a><br><a href="https://github.com/mcxiaoke/packer-ng-plugin">还有一个开源的gradle plugin据说也支持V2签名模式</a></p>
+<p><a href="https://www.jianshu.com/p/0ba717f7385f">美团的walle接入指南</a>,原理都在<a href="https://tech.meituan.com/android-apk-v2-signature-scheme.html">新一代开源Android渠道包生成工具Walle</a></p>
+<p><a href="http://www.dss886.com/2017/11/21/01/">有人给出了Android多渠道打包的进化史，很有意思</a></p>
+<p>=-============================-============================-============================-=========================</p>
+<p><a href="https://www.zhihu.com/question/39440766">为什么 Android 要采用 Binder 作为 IPC 机制？</a></p>
+<blockquote>
+<p>传统的进程间通信方式有管道，消息队列，共享内存等，其中管道，消息队列采用存储-转发方式，即数据先从发送方缓存区拷贝到内核开辟的缓存区中，然后再从内核缓存区拷贝到接收方缓存区，至少有两次拷贝过程。共享内存虽然无需拷贝，但控制复杂，难以使用。socket作为一款通用接口，其传输效率低，开销大，主要用在跨网络的进程间通信和本机上进程间的低速通信。Binder通过内存映射的方式，使数据只需要在内存进行一次读写过程。<br>内存映射，简而言之就是将用户空间的一段内存区域映射到内核空间，映射成功后，用户对这段内存区域的修改可以直接反映到内核空间，相反，内核空间对这段区域的修改也直接反映用户空间。那么对于内核空间&lt;—-&gt;用户空间两者之间需要大量数据传输等操作的话效率是非常高的。</p>
+</blockquote>
+<p><a href="https://www.jianshu.com/p/adaa1a39a274">听说你Binder机制学的不错，来面试下这几个问题</a></p>
+<p>Client发起IPC请求，是阻塞的吗？</p>
+<p>adb getEvent sendEvent<br>input tap x y<br>input touchescreen<br>input text helloworld<br>input keyevent</p>
+<p>Xposed的介绍与入门<br>Xposed的原理与Multidex及动态加载问题</p>
+<h3 id="组件化、插件化"><a href="#组件化、插件化" class="headerlink" title="组件化、插件化"></a>组件化、插件化</h3><p>组件化、插件化的前提就是解耦</p>
+<p><a href="https://github.com/jaredrummler/AndroidShell">在Android中执行shell指令</a><br><a href="https://github.com/didi/VirtualAPK">滴滴的virtualApp</a>。 目前看来就是用android.content.pm.PackageParse去解析一个apk文件，封装成一个LoadedPlugin对象（Cache下来），后续调用apk中描述的功能进行操作。所以应该还是在host的进程中跑的。由此联系到<a href="http://www.cnblogs.com/myitm/archive/2012/05/17/2506635.html">PackageInstaller 原理简述</a></p>
+<ul>
+<li>多渠道的话这样的命令要跑多次<br>使用walle就好了。<blockquote>
 <p>project 的 build.gradle 添加:</p>
 <figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">dependencies</span> &#123;</span><br><span class="line">    <span class="keyword">classpath</span> <span class="string">'com.meituan.android.walle:plugin:1.0.3'</span></span><br><span class="line">&#125;</span><br><span class="line">app<span class="regexp">/build.gradle 添加：</span></span><br><span class="line"><span class="regexp">apply plugin: 'walle'</span></span><br><span class="line"><span class="regexp">dependencies &#123;</span></span><br><span class="line"><span class="regexp">    ...</span></span><br><span class="line"><span class="regexp">    compile 'com.meituan.android.walle:library:1.0.3'</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br><span class="line"><span class="regexp">在工程目录下创建 channel 文件：</span></span><br><span class="line"><span class="regexp">meituan # 美团</span></span><br><span class="line"><span class="regexp">samsungapps #三星</span></span><br><span class="line"><span class="regexp">hiapk</span></span><br><span class="line"><span class="regexp">anzhi</span></span><br><span class="line"><span class="regexp">xiaomi # 小米</span></span><br><span class="line"><span class="regexp">91com</span></span><br><span class="line"><span class="regexp">gfan</span></span><br><span class="line"><span class="regexp">appchina</span></span><br><span class="line"><span class="regexp">nduoa</span></span><br><span class="line"><span class="regexp">3gcn</span></span><br><span class="line"><span class="regexp">mumayi</span></span><br><span class="line"><span class="regexp">10086com</span></span><br><span class="line"><span class="regexp">wostore</span></span><br><span class="line"><span class="regexp">189store</span></span><br><span class="line"><span class="regexp">lenovomm</span></span><br><span class="line"><span class="regexp">hicloud</span></span><br><span class="line"><span class="regexp">meizu</span></span><br><span class="line"><span class="regexp">wandou</span></span><br><span class="line"><span class="regexp"># Google Play</span></span><br><span class="line"><span class="regexp"># googleplay</span></span><br><span class="line"><span class="regexp"># 百度</span></span><br><span class="line"><span class="regexp">baidu</span></span><br><span class="line"><span class="regexp">#</span></span><br><span class="line"><span class="regexp"># 360</span></span><br><span class="line"><span class="regexp">360cn</span></span><br><span class="line"><span class="regexp">#</span></span><br><span class="line"><span class="regexp"># 应用宝</span></span><br><span class="line"><span class="regexp">myapp</span></span><br></pre></td></tr></table></figure>
 </blockquote>
@@ -264,7 +280,7 @@ ga('send', 'pageview');
 <li>进Activity，点击那个loadPath的按钮，就是去刚才adb push的路径去加载这个patch（当然生产环境应该是搭建https服务了）。</li>
 </ol>
 </blockquote>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://github.com/tiann/understand-plugin-framework">分析DroidPlugin，深入理解插件化框架</a><br><a href="http://www.wjdiankong.cn/">逆向大全</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://github.com/tiann/understand-plugin-framework">分析DroidPlugin，深入理解插件化框架</a><br><a href="http://www.wjdiankong.cn/">逆向大全</a><br><a href="https://tech.meituan.com/android_anti_hooking.html">Android Hook技术防范漫谈</a></p>
 
       
 
@@ -518,6 +534,18 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Window</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
               </li>
              
@@ -555,18 +583,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Window</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
               </li>
              
               <li class="article-tag-list-item">
