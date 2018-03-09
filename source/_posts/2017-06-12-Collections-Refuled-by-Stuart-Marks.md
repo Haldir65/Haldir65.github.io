@@ -202,7 +202,7 @@ ArrayList implement RandomAccess接口，而LinkedList并没有。RandomAccess�
 >public class HashMap<K,V> extends AbstractMap<K,V>
     implements Map<K,V>, Cloneable, Serializable
 
-HashMap不是线程安全的，Key和Value都有可能为null，存储数据不是有序的(get的顺序不是put的顺序)
+HashMap不是线程安全的，Key和Value都有可能为null，存储数据不是有序的(get的顺序不是put的顺序)。比较专业的说法是 **链表数组结构**。
 
 HashMap中有几个默认值常量
 
@@ -512,6 +512,7 @@ final boolean accessOrder; 默认是false
 for access-order, false for insertion-order.
 
 LinkedHashMap常用的属性就是它支持有序，这个有序是指迭代的时候有序
+HashMap用来存放和获取对象，而双向链表用来实现有序
 
 ### 2.3 SparseArray
 先来看一段崩溃日志
@@ -793,5 +794,5 @@ jdk 1.8对于长度超过8的链表改用红黑树。
 3. [Java集合干货系列](http://www.jianshu.com/p/2cd7be850540)
 4. [Arrays.asList()返回的List不是jva.util.ArrayList](http://www.programcreek.com/2014/01/java%E7%A8%8B%E5%BA%8F%E5%91%98%E5%B8%B8%E7%8A%AF%E7%9A%8410%E4%B8%AA%E9%94%99%E8%AF%AF/)
 5. [WeakHashMap和HashMap的区别](http://blog.csdn.net/yangzl2008/article/details/6980709)
-6. [Hashmap的死锁问题](https://zhuanlan.zhihu.com/p/31614195) 
+6. [Hashmap的死锁问题](https://zhuanlan.zhihu.com/p/31614195)
 7. [Young Pups: New Collections APIs for Java 9 by Stuart Marks](https://www.youtube.com/watch?v=OJrIMv4dAek)

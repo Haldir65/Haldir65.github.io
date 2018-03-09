@@ -37,56 +37,10 @@ onSaveInstance是从ActivityThread的callCallActivityOnSaveInstanceState方法di
 
 
 
-=-============================-============================-============================-=========================
-
-这种往zip文件里面写数据的方式叫做zip comment
-```Python
-for line in channels:
-    target_channel = line.strip()
-    target_apk = output_dir + apk_names[0] + "-" + target_channel+"-"+apk_names[2] + src_apk_extension
-    shutil.copy(src_apk,  target_apk)
-    zipped = zipfile.ZipFile(target_apk, 'a', zipfile.ZIP_DEFLATED)
-    empty_channel_file = "META-INF/uuchannel_{channel}".format(channel = target_channel) //所以渠道号简单来说就是往META-INF里写了一个"uuchannel_xiaomi"之类的文件
-    zipped.write(src_empty_file, empty_channel_file)
-    zipped.close()
-```
-
-
-
-[为什么 Android 要采用 Binder 作为 IPC 机制？](https://www.zhihu.com/question/39440766)
-
-
-> 传统的进程间通信方式有管道，消息队列，共享内存等，其中管道，消息队列采用存储-转发方式，即数据先从发送方缓存区拷贝到内核开辟的缓存区中，然后再从内核缓存区拷贝到接收方缓存区，至少有两次拷贝过程。共享内存虽然无需拷贝，但控制复杂，难以使用。socket作为一款通用接口，其传输效率低，开销大，主要用在跨网络的进程间通信和本机上进程间的低速通信。Binder通过内存映射的方式，使数据只需要在内存进行一次读写过程。
-内存映射，简而言之就是将用户空间的一段内存区域映射到内核空间，映射成功后，用户对这段内存区域的修改可以直接反映到内核空间，相反，内核空间对这段区域的修改也直接反映用户空间。那么对于内核空间<—->用户空间两者之间需要大量数据传输等操作的话效率是非常高的。
-
-
-[听说你Binder机制学的不错，来面试下这几个问题](https://www.jianshu.com/p/adaa1a39a274)
-
-Client发起IPC请求，是阻塞的吗？
-
-adb getEvent sendEvent
-input tap x y
-input touchescreen
-input text helloworld
-input keyevent
-
-Xposed的介绍与入门
-Xposed的原理与Multidex及动态加载问题
-
-### 组件化、插件化
-组件化、插件化的前提就是解耦
-
-[在Android中执行shell指令](https://github.com/jaredrummler/AndroidShell)
-[滴滴的virtualApp](https://github.com/didi/VirtualAPK)。 目前看来就是用android.content.pm.PackageParse去解析一个apk文件，封装成一个LoadedPlugin对象（Cache下来），后续调用apk中描述的功能进行操作。所以应该还是在host的进程中跑的。由此联系到[PackageInstaller 原理简述](http://www.cnblogs.com/myitm/archive/2012/05/17/2506635.html)
-
-[美团的walle接入指南](https://www.jianshu.com/p/0ba717f7385f),原理都在[新一代开源Android渠道包生成工具Walle](https://tech.meituan.com/android-apk-v2-signature-scheme.html)
-[还有一个开源的gradle plugin](https://github.com/mcxiaoke/packer-ng-plugin)
-
-
+## 3. Android多渠道打包的实现
+### 3.1 历史上曾经有效的方式，原始方法
 关于gradlew
 打包release之前，先Build -> Generate Singed apk 创建一个新的keystore , 密码记住，keystore文件保存好。
-
-
 关于打包: 根据[Android 多渠道打包梳理](https://www.jianshu.com/p/4f2990cf53bf)
 Gradle UMeng 多渠道打包
 
@@ -140,6 +94,106 @@ android {
 ./gradlew assembleRelease # 打包 Release apk
 ./gradlew assembleWandoujiaRelease # 打包 wandoujia Release 版本，大小写不敏感
 ./gradlew assembleWandoujia  # 此命令会生成wandoujia渠道的Release和Debug版本
+
+但是，20个渠道就要编译20次，耗时冗长。
+
+### 3.2 在META-INF目录内添加空文件，可以不用重新签名应用。<del>已失效</del>
+比较出名的有python版本的，就是写了个空文件
+```python
+for line in channels:
+    target_channel = line.strip()
+    target_apk = output_dir + apk_names[0] + "-" + target_channel+"-"+apk_names[2] + src_apk_extension
+    shutil.copy(src_apk,  target_apk)
+    zipped = zipfile.ZipFile(target_apk, 'a', zipfile.ZIP_DEFLATED)
+    empty_channel_file = "META-INF/uuchannel_{channel}".format(channel = target_channel) //所以渠道号简单来说就是往META-INF里写了一个"uuchannel_xiaomi"之类的文件
+    zipped.write(src_empty_file, empty_channel_file)
+    zipped.close()
+```
+
+**亲测** 关于多渠道打包，由于新的签名机制的引入，上面的这种方法是会报错的。
+> $ adb install app-release_channel_xiaomi.apk
+Failed to install app-release_channel_xiaomi.apk: Failure [INSTALL_PARSE_FAILED_NO_CERTIFICATES: Failed to collect certificates from /data/app/vmdl185799136.tmp/base.apk: META-INF/CERT.SF indicates /data/app/vmdl185799136.tmp/base.apk is signed using APK Signature Scheme v2, but no such signature was found. Signature stripped?]
+
+
+[美团的技术团队给出了科普](https://tech.meituan.com/android-apk-v2-signature-scheme.html)，
+
+> 新的签名方案会在ZIP文件格式的 Central Directory 区块所在文件位置的前面添加一个APK Signing Block区块，下面按照ZIP文件的格式来分析新应用签名方案签名后的APK包。
+整个APK（ZIP文件格式）会被分为以下四个区块：
+Contents of ZIP entries（from offset 0 until the start of APK Signing Block）
+APK Signing Block
+ZIP Central Directory
+ZIP End of Central Directory
+新应用签名方案的签名信息会被保存在区块2（APK Signing Block）中， 而区块1（Contents of ZIP entries）、区块3（ZIP Central Directory）、区块4（ZIP End of Central Directory）是受保护的，在签名后任何对区块1、3、4的修改都逃不过新的应用签名方案的检查。
+
+
+
+### 3.3 还有就是往apk(zip)文件尾部添加comment
+> End of central directory record	 
+Offset	Bytes	Description	译
+0	4	End of central directory signature = 0x06054b50	核心目录结束标记（0x06054b50）
+4	2	Number of this disk	当前磁盘编号
+6	2	Disk where central directory starts	核心目录开始位置的磁盘编号
+8	2	Number of central directory records on this disk	该磁盘上所记录的核心目录数量
+10	2	Total number of central directory records	该磁盘上所记录的核心目录数量
+12	4	Size of central directory (bytes)	核心目录的大小
+16	4	Offset of start of central directory, relative to start of archive	核心目录开始位置相对于archive开始的位移
+20	2	Comment length (n)	注释长度 (n)
+22	n	Comment	注释内容
+
+apk 默认情况下没有comment，所以 comment length的short 两个字节为 0，我们需要把这个值修改为我们的comment的长度，然后把comment追加到后边即可。
+Android N 中提到了 APK Signature Scheme v2，这种新引入的签名机制，会对整个文件的每个字节都会做校验，包括 comment 区域。所以到时候如果app使用新版本的签名工具的时候，如果启用 scheme v2，那么这个机制则不能工作。目前看代码，是可以disable v2 的。
+
+虽然目前暂时还是可以disable APK Signature Scheme v2的。
+```
+signingConfigs {
+    release {
+        v2SigningEnabled false
+    }
+}
+```
+
+### 3.3 当前比较合适的方案是使用美团的walle
+[Signature Scheme v2的出现让目前美团的walle成为公开已知的多渠道打包的最好选择](https://www.jianshu.com/p/e4ed249e4cab)
+[还有一个开源的gradle plugin据说也支持V2签名模式](https://github.com/mcxiaoke/packer-ng-plugin)
+
+[美团的walle接入指南](https://www.jianshu.com/p/0ba717f7385f),原理都在[新一代开源Android渠道包生成工具Walle](https://tech.meituan.com/android-apk-v2-signature-scheme.html)
+
+
+[有人给出了Android多渠道打包的进化史，很有意思](http://www.dss886.com/2017/11/21/01/)
+
+=-============================-============================-============================-=========================
+
+
+[为什么 Android 要采用 Binder 作为 IPC 机制？](https://www.zhihu.com/question/39440766)
+
+
+> 传统的进程间通信方式有管道，消息队列，共享内存等，其中管道，消息队列采用存储-转发方式，即数据先从发送方缓存区拷贝到内核开辟的缓存区中，然后再从内核缓存区拷贝到接收方缓存区，至少有两次拷贝过程。共享内存虽然无需拷贝，但控制复杂，难以使用。socket作为一款通用接口，其传输效率低，开销大，主要用在跨网络的进程间通信和本机上进程间的低速通信。Binder通过内存映射的方式，使数据只需要在内存进行一次读写过程。
+内存映射，简而言之就是将用户空间的一段内存区域映射到内核空间，映射成功后，用户对这段内存区域的修改可以直接反映到内核空间，相反，内核空间对这段区域的修改也直接反映用户空间。那么对于内核空间<—->用户空间两者之间需要大量数据传输等操作的话效率是非常高的。
+
+
+[听说你Binder机制学的不错，来面试下这几个问题](https://www.jianshu.com/p/adaa1a39a274)
+
+Client发起IPC请求，是阻塞的吗？
+
+adb getEvent sendEvent
+input tap x y
+input touchescreen
+input text helloworld
+input keyevent
+
+Xposed的介绍与入门
+Xposed的原理与Multidex及动态加载问题
+
+### 组件化、插件化
+组件化、插件化的前提就是解耦
+
+[在Android中执行shell指令](https://github.com/jaredrummler/AndroidShell)
+[滴滴的virtualApp](https://github.com/didi/VirtualAPK)。 目前看来就是用android.content.pm.PackageParse去解析一个apk文件，封装成一个LoadedPlugin对象（Cache下来），后续调用apk中描述的功能进行操作。所以应该还是在host的进程中跑的。由此联系到[PackageInstaller 原理简述](http://www.cnblogs.com/myitm/archive/2012/05/17/2506635.html)
+
+
+
+
+
 
 -  多渠道的话这样的命令要跑多次
 使用walle就好了。
@@ -212,3 +266,4 @@ gradlew clean assembleReleaseChannels -PchannelList=huawei,xiaomi // 小米跟�
 ## 参考
 [分析DroidPlugin，深入理解插件化框架](https://github.com/tiann/understand-plugin-framework)
 [逆向大全](http://www.wjdiankong.cn/)
+[Android Hook技术防范漫谈](https://tech.meituan.com/android_anti_hooking.html)

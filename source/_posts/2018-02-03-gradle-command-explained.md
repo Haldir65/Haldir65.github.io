@@ -149,6 +149,30 @@ Android Studio中点击run之后，执行了这些tasks
 org.gradle.util.Clock() // 被Deprecated之后的解决方案
 ```
 
+[building-android-apps](https://guides.gradle.org/building-android-apps/)
 
+> gradlew :app:dependencies --configuration releaseCompileClasspath
+gradle tasks --all ## 查看当前project的所有tasks
+
+
+============================================
+How to create gradle Plugin
+1. add to your buidl script // 不可复用
+2. 创建BuildSrc文件夹 //依旧不可复用
+3. 创建一个Standalone Project //可复用
+
+
+project.extensions.create("makeChannel", MakeChannelParams)
+public class GreetingPlugin implements Plugin<Project> {
+    @Override
+    public void apply(Project project) {
+        project.task("hello")
+          .doLast(task -> System.out.println("Hello Gradle!"));
+    }
+}
+
+
+[official gradle docs 是最好的学习资料](https://guides.gradle.org/creating-new-gradle-builds/)
+[custom_plugins](https://docs.gradle.org/current/userguide/custom_plugins.html)
 [关于Android Gradle你需要知道这些（4）](https://juejin.im/post/5a756f11f265da4e7c185bc5)
 [Gradle插件学习笔记（四)](https://juejin.im/post/5a767c7cf265da4e9c6300a1#heading-5)
