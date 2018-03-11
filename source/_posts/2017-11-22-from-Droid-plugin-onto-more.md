@@ -267,3 +267,4 @@ gradlew clean assembleReleaseChannels -PchannelList=huawei,xiaomi // 小米跟�
 [分析DroidPlugin，深入理解插件化框架](https://github.com/tiann/understand-plugin-framework)
 [逆向大全](http://www.wjdiankong.cn/)
 [Android Hook技术防范漫谈](https://tech.meituan.com/android_anti_hooking.html)
+[爱奇艺组件化探索之原理篇](https://zhuanlan.zhihu.com/p/34346219)

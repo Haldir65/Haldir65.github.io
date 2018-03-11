@@ -517,7 +517,7 @@ Fragment的一些生命周期还是需要跟Activity的生命周期一起看，�
 ## 更新，拿来主义
 1. [一份2013年的文档](http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html),不要在FragmentActivity#onResume中beginTransaction，需要的话，在onPostResume或者onPostResume中做。也不要在onActivityResult里面去做，onActivityResult会触发onPostResume，推迟到onPostResume去做。
 2. [关于Can not perform this action after onSaveInstanceState] 今天很好奇的查了下FragmentActivity的onBackpressed
-特地把supportLibVersion改成\25.\3.\0看下，还是
+特地把supportLibVersion改成25.3.0看下，还是
 ```java
 @Override
    public void onBackPressed() {
@@ -526,7 +526,7 @@ Fragment的一些生命周期还是需要跟Activity的生命周期一起看，�
        }
    }
 ```
-改到\26.1.\0之后就变成
+改到26.1.0之后就变成
 ```java
 @Override
 public void onBackPressed() {
@@ -565,6 +565,7 @@ public void onBackPressed() {
 }
 ```
 怎么说呢，fragmentManager.isStateSaved()对外暴露mStateSaved还是挺开明的。
+3. [Jake Wharton建议不要用fragment的addtoBackStack](https://www.reddit.com/r/androiddev/comments/7hq00q/why_does_jake_wharton_recommend_one_activity_for/)，这是Reddit上的讨论，最后Jake本人出来选择了最佳解读(Nailed it)
 
 
 

@@ -7,6 +7,11 @@ tags:
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/street lights dark night car city.jpg?imageView2/2/w/600)
 <!--more-->
 
+[Gradle](https://gradle.org/)插件开发，官方推荐的具备first class supprot 的IDE包括Android Studio和Intelij Idea等。
+Gradle的编译流程分为三步[build_lifecycle](https://docs.gradle.org/current/userguide/build_lifecycle.html)
+Initialization -> Configuration -> Execution
+执行的单位叫做Task
+
 > Android dependency 'com.android.support:support-v4' has different version for the compile (21.0.3) and runtime (26.1.0) classpath. You should manually set the same version via DependencyResolution
 
 
@@ -144,6 +149,17 @@ Android Studio中点击run之后，执行了这些tasks
       7ms  :app:packageDebug
       0ms  :app:assembleDebug
 
+可以分成这5类吧
+- Preparation of dependencies. During this phase Gradle check that all libraries this module depends on are ready. If this module depends on another one, that module would be built as well.
+- Merging resources and processing Manifest. After this phase resources and Manifest are ready to be packaged in the result file.
+- Compiling. This phase started with Annotation Processors, in case you use them. Then source code is compiled into byte code. If you are using AspectJ, weaving also happens here.
+- Postprocessing. All Gradle tasks with a “transform” prefix are part of this phase. Most important ones are: transformClassesWithMultidexlist and transformClassesWithDex. They produce .DEX files.
+- Packaging and publishing. For libraries this stage means creating an .AAR file in the end, for applications — .APK.
+
+[简书上有人总结了](https://www.jianshu.com/p/cc88488e5163)
+
+
+
 [gradle 4.4之后Clock 被Deprecated的方案是自己创建一个groovy文件](https://github.com/HujiangTechnology/gradle_plugin_android_aspectjx/pull/75/files#diff-a5277607f48bf80ac7edd5dbafa307ae)
 ```java
 org.gradle.util.Clock() // 被Deprecated之后的解决方案
@@ -153,6 +169,155 @@ org.gradle.util.Clock() // 被Deprecated之后的解决方案
 
 > gradlew :app:dependencies --configuration releaseCompileClasspath
 gradle tasks --all ## 查看当前project的所有tasks
+
+JFrog 是软件管理和分发的领先通用解决方案JFrog 是软件管理和分发的领先通用解决方案，JFrog Bintray（通用分发平台）只是他家的众多服务之一。这个通用分发平台，就当CDN用好了。
+[bintray的注册地址]( https://bintray.com/signup/oss)。注册好了之后登录bintray，创建一个仓库，随便起名字，比如叫maven。在build.gradle中就可以引入
+> maven { url 'https://dl.bintray.com/yourusername/maven' }
+> compile 'com.yourusername:librayName:1.0.0'
+
+到这里，就可以自己直接使用了。要想提交到jcenter(就是说不用添加一个maven {url }这样的源)，jcenter(托管在Bintray网站上的官方库，官方和普通的区别就是提交上去要审核)和mavenCentral也是仓库。只不过是有官方维护的了。因为maven的标准写法是
+>  maven { url "https://someurl" }   //
+>  maven { url "https://jitpack.io" }   // 比如说jitpack仓库
+
+正儿八经的上传到jcenter的方式：
+1. 在最外层build.gradle中添加
+> classpath 'com.github.dcendents:android-maven-gradle-plugin:1.3'   //
+  classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
+
+配好了大概长这样
+```
+  // Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    repositories {
+        jcenter()
+        google()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.0.1'
+
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        google()
+    }
+}
+```
+
+android-maven-gradle-plugin插件是用来打包Maven所需文件的。
+gradle-bintray-plugin插件是用来将生成的Maven所需文件上传到Bintray的。
+
+2. 在library module的build.gradle中添加
+```config
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+// This is the library version used when deploying the artifact
+version = "1.0.0"
+
+def siteUrl = 'https://github.com/Haldir65/androidMedia'      // 项目的主页
+def gitUrl = 'https://github.com/Haldir65/androidMedia.git'   // Git仓库的url
+group = "com.github.haldir65.starry"                                        // Maven Group ID for the artifact，一般填你唯一的包名
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging 'aar'
+                // Add your description here
+                name 'Starry\n' +
+                        'Starry night\n' +
+                        'Paint your palette blue and grey'
+                url siteUrl
+                // Set your license
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'haldir'        //填写的一些基本信息
+                        name 'johnDoe'
+                        email 'mjw090608@gmail.com'
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+                }
+            }
+        }
+    }
+}
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+    configurations = ['archives']
+    pkg {
+        repo = "maven"
+        name = "Starry"    //发布到JCenter上的项目名字
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        licenses = ["Apache-2.0"]
+        publish = true
+    }
+}
+javadoc { //jav doc采用utf-8编码否则会报“GBK的不可映射字符”错误
+    options{
+        encoding "UTF-8"
+        charSet 'UTF-8'
+    }
+}
+```
+
+3. 在local.properities中添加
+>bintray.user=your bintray username
+bintray.apikey=your apikey
+
+记得把local.properties加到gitignore里面，搞定
+
+在需要使用的module的build.gradle中引入
+```
+buildscript {
+    repositories {
+        maven {
+            url 'https://dl.bintray.com/haldir65/maven'
+        }
+    }
+}
+
+dependencies {
+    implementation 'com.github.haldir65.starry:starry:1.0.0'
+}
+```
+
 
 
 ============================================
@@ -170,6 +335,7 @@ public class GreetingPlugin implements Plugin<Project> {
           .doLast(task -> System.out.println("Hello Gradle!"));
     }
 }
+
 
 
 [official gradle docs 是最好的学习资料](https://guides.gradle.org/creating-new-gradle-builds/)

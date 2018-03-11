@@ -338,7 +338,7 @@ App内部全局拥有一个LocalBroadCastManager实例，内部持有一个handl
  看了下aosp的git日志，ViewPager是2011年就有了的。而[aar](https://developer.android.com/studio/projects/android-library.html#CreateLibrary)是随着android studio的发布推出的。
  jar和aar的区别:
  jar : JAR 文件就是 Java Archive File，顾名思意，它的应用是与 Java 息息相关的，是 Java 的一种文档格式。只包含了class文件与清单文件 ，不包含资源文件，如图片等所有res中的文件。
- aar: aar，AAR（Android Archive）包是一个Android库项目的二进制归档文件,包含一些自己写的控件布局文件以及字体等资源文件那么就只能使用*.aar文件。
+ aar: aar，AAR（Android Archive）包是一个Android库项目的二进制归档文件,包含一些自己写的控件布局文件以及字体等资源文件(resources或者manifest文件)那么就只能使用*.aar文件。
 
 ### 21. 都知道RelativeLayout会measure两次child，LinearLayout在加weight的时候也会measure两次
 LinearLayout.java
@@ -787,7 +787,9 @@ ItemInfo addNewItem(int position, int index) {
 ### 29.关于65536问题
 [Too many classes in --main-dex-list, main dex capacity exceeded | 主Dex引用太多怎么办？](http://www.jackywang.tech/2017/06/14/Too-many-classes-in-main-dex-list-main-dex-capacity-exceeded-%E4%B8%BBDex%E5%BC%95%E7%94%A8%E5%A4%AA%E5%A4%9A%E6%80%8E%E4%B9%88%E5%8A%9E%EF%BC%9F/)
 MultiDex对于minSdk> =21 不会生效，如果最低版本是21上面所有的任务都不会执行，也不会有主Dex列表的计算。这是因为在应用安装期间所有的dex文件都会被ART转换为一个.oat文件。所以minSdk高的也不用开multiDex了。
-在使用ART虚拟机的设备上(部分4.4设备，5.0+以上都默认ART环境)，已经原生支持多Dex，因此就不需要手动支持了
+在使用ART虚拟机的设备上(部分4.4设备，5.0+以上都默认ART环境)，已经[原生支持](https://developer.android.com/studio/build/multidex.html)多Dex，因此就不需要手动支持了
+>Android 5.0 (API level 21) and higher uses a runtime called ART which natively supports loading multiple DEX files from APK files. ART performs pre-compilation at app install time which scans for classesN.dex files and compiles them into a single .oat file for execution by the Android device. Therefore, if your minSdkVersion is 21 or higher, you do not need the multidex support library.
+
 看下MultiDex的源码，secondaryDex文件的路径是/date/date/<package_name>/code_cache/secondary-dexes/ 这是一个文件夹
 MultiDex的原理基本上在[简书](https://www.jianshu.com/p/33f22b21ef1e)
 ```java

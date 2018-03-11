@@ -41,6 +41,8 @@ top : 1
 - [ ] [如何编写 jQuery 插件](https://gist.github.com/quexer/3619237)
 - [ ] 用正则检测或者解析json(jQuery源码里有)
 - [ ]javascript中new FileReader()，以及canvas api,以及[js进行图片缩放和裁剪](https://juejin.im/post/5a98c5c26fb9a028d82b34ee)
+- [ ] Android进程的[加载流程](https://juejin.im/post/5a646211f265da3e3f4cc997)
+- [ ] 不错的[博客](https://juejin.im/user/565c6d3100b0acaad47e9050)
 
 
 ### 已完成
