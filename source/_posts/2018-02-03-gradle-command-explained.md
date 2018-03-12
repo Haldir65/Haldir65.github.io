@@ -10,13 +10,21 @@ tags:
 [Gradle](https://gradle.org/)插件开发，官方推荐的具备first class supprot 的IDE包括Android Studio和Intelij Idea等。
 Gradle的编译流程分为三步[build_lifecycle](https://docs.gradle.org/current/userguide/build_lifecycle.html)
 Initialization -> Configuration -> Execution
-执行的单位叫做Task
+执行的单位叫做[Task](https://docs.gradle.org/current/userguide/more_about_tasks.html)
 
 > Android dependency 'com.android.support:support-v4' has different version for the compile (21.0.3) and runtime (26.1.0) classpath. You should manually set the same version via DependencyResolution
 
+一些常用的gralde的command 如下
+> gradlew :app:dependencies --configuration releaseCompileClasspath
+//前面这个:app只是代表app这个project的
+gradle tasks --all ## 查看当前project的所有tasks
+gradle taskA taskB ##多个task是可以同时执行的
+
+afterEvaluate是属于project的属性(也可以在allProject中加)
+
 
 I forced the version of support-v4 using this block in root build.gradle:
-```gradle
+```java
 subprojects {
     project.configurations.all {
         resolutionStrategy.eachDependency { details ->
@@ -167,9 +175,8 @@ org.gradle.util.Clock() // 被Deprecated之后的解决方案
 
 [building-android-apps](https://guides.gradle.org/building-android-apps/)
 
-> gradlew :app:dependencies --configuration releaseCompileClasspath
-gradle tasks --all ## 查看当前project的所有tasks
 
+## 2. 创建java Library并提交到jcenter的方法
 JFrog 是软件管理和分发的领先通用解决方案JFrog 是软件管理和分发的领先通用解决方案，JFrog Bintray（通用分发平台）只是他家的众多服务之一。这个通用分发平台，就当CDN用好了。
 [bintray的注册地址]( https://bintray.com/signup/oss)。注册好了之后登录bintray，创建一个仓库，随便起名字，比如叫maven。在build.gradle中就可以引入
 > maven { url 'https://dl.bintray.com/yourusername/maven' }
@@ -186,7 +193,7 @@ JFrog 是软件管理和分发的领先通用解决方案JFrog 是软件管理�
 
 配好了大概长这样
 ```
-  // Top-level build file where you can add configuration options common to all sub-projects/modules.
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
     repositories {
@@ -319,15 +326,149 @@ dependencies {
 ```
 
 
+## 3. Building LifeCycle
+[编译的各个阶段的hook](https://docs.gradle.org/current/userguide/build_lifecycle.html#sec:build_phases)
+正如gradle官网所介绍的，Build流程分为三个阶段(Initialization -> Configuration -> Execution) .
 
-============================================
-How to create gradle Plugin
+The settings file is executed during the initialization phase. 即settings.gradle中的语句是最早被执行的
+### setting.gradle
+> println 'This is executed during the initialization phase.'
+
+### build.gradle
+```java
+println 'This is executed during the configuration phase.'
+
+task configured {
+    println 'This is also executed during the configuration phase.'
+}
+
+task test {
+    doLast {
+        println 'This is executed during the execution phase.'
+    }
+}
+
+task testBoth {
+    doFirst {
+      println 'This is executed first during the execution phase.'
+    }
+    doLast {
+      println 'This is executed last during the execution phase.'
+    }
+    println 'This is executed during the configuration phase as well.'
+}
+```
+输出
+> > gradle test testBoth
+This is executed during the initialization phase.
+This is executed during the configuration phase.
+This is also executed during the configuration phase.
+This is executed during the configuration phase as well.
+:test
+This is executed during the execution phase.
+:testBoth
+This is executed first during the execution phase.
+This is executed last during the execution phase.
+BUILD SUCCESSFUL in 0s
+2 actionable tasks: 2 executed
+
+经常会在build.gradle中看到这样一段
+```java
+afterEvaluate { project ->
+    logger.info("=========afterEvaluate==============")
+    project.tasks.each { task ->
+        if (task.name == "test"||task.name.contains("lint")){
+            task.enabled = false // 有些不必要的确实可以剔除掉
+        }
+//        task.enabled = false 这么干的话全部任务都不会执行
+       println("-------------${task.name}----")
+    }
+}
+```
+
+afterEvaluate发生在Configuration之后，实际上也就是在project配置完成后，开始执行所有task前，对外提供一个closure，其实beforeEvaluate也有。
+
+**immediately invoked after a task is added to a project** 在Task被添加到project的时候执行closure
+```java
+tasks.whenTaskAdded { task ->
+    task.ext.srcDir = 'src/main/java'
+}
+
+task a
+
+println "source dir is ${a.srcDir}"
+```
+
+project evaluate有可能成功，也会失败。但无论成功还是失败，下面的notification都会触发
+```java
+gradle.afterProject {project, projectState ->
+    if (projectState.failure) {
+        println "Evaluation of $project FAILED"
+    } else {
+        println "Evaluation of $project succeeded"
+    }
+}
+```
+
+在gradle的plugin中实现也有类似的
+PluginImpl.groovy
+```java
+public class PluginImpl implements Plugin<Project> {
+
+   void apply(Project project) {
+     project.gradle.addProjectEvaluationListener() // 和在build.gradle中afterEvaluate差不多
+     project.getGradle().taskGraph.addTaskExecutionGraphListener() //在执行前
+   }
+}
+```
+
+Task execution graph ready(	graphPopulated,This method is called when the TaskExecutionGraph has been populated, and before any tasks are executed.)在任何task执行前被执行
+
+Task execution(You can receive a notification immediately before and after any task is executed.)
+(TaskExecutionListener,在task执行前和执行后)
+```java
+project.gradle.addListener(new TaskExecutionListener() {
+          @Override
+          void beforeExecute(Task task) {
+
+          }
+
+          @Override
+          void afterExecute(Task task, TaskState taskState) {
+
+          }
+      })
+```
+而在build.gradle中是这样的写法
+```java
+task ok
+
+task broken(dependsOn: ok) {
+    doLast {
+        throw new RuntimeException('broken')
+    }
+}
+
+gradle.taskGraph.beforeTask { Task task ->
+    println "executing $task ..."
+}
+
+gradle.taskGraph.afterTask { Task task, TaskState state ->
+    if (state.failure) {
+        println "FAILED"
+    }
+    else {
+        println "done"
+    }
+}
+```
+
+## 4. How to create gradle Plugin
 1. add to your buidl script // 不可复用
 2. 创建BuildSrc文件夹 //依旧不可复用
 3. 创建一个Standalone Project //可复用
 
-
-project.extensions.create("makeChannel", MakeChannelParams)
+```java
 public class GreetingPlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
@@ -335,10 +476,14 @@ public class GreetingPlugin implements Plugin<Project> {
           .doLast(task -> System.out.println("Hello Gradle!"));
     }
 }
+```
+
+
 
 
 
 [official gradle docs 是最好的学习资料](https://guides.gradle.org/creating-new-gradle-builds/)
 [custom_plugins](https://docs.gradle.org/current/userguide/custom_plugins.html)
+[Build Script Basics](https://docs.gradle.org/current/userguide/tutorial_using_tasks.html#configure-by-dag)
 [关于Android Gradle你需要知道这些（4）](https://juejin.im/post/5a756f11f265da4e7c185bc5)
 [Gradle插件学习笔记（四)](https://juejin.im/post/5a767c7cf265da4e9c6300a1#heading-5)

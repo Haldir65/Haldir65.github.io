@@ -22,7 +22,8 @@ Activity作为一个天然的交互核心，能够以一个容器的身份（继
 
 
 Hook(使用Invokcation handler，将一个接口的调用原本的实现包揽下来，把原来的结果占为己有，同时添加一些自己要做的事情)[修改getSystemService，添加自定义功能](http://weishu.me/2016/02/16/understand-plugin-framework-binder-hook/)
-Hook掉AMS,在startActivity里面添加一些私货
+Hook掉AMS,在startActivity里面添加一些私货。
+getSystemService最终会追溯到SystemServiceRegistry.java。这里面用static block的方式初始化了各种service的cache.
 
 ### 1.1 ActivityThread做了很多事
 onSaveInstance是从ActivityThread的callCallActivityOnSaveInstanceState方法dispatch下来的。

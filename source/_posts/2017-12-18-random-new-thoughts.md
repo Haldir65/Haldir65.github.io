@@ -26,7 +26,6 @@ top : 1
 - [scheme 这东西算跨客户端平台的](https://sspai.com/post/31500)，比如在 App 中调起支付宝(用的是 alipayqr://)。其实就是一个系统内跨应用调用。[用法](http://blog.csdn.net/qq_23547831/article/details/51685310)
 - 前后端同构
 - XSS 攻击
-- [写 groovy 用 intelij 就可以了](https://www.jetbrains.com/help/idea/getting-started-with-groovy.html) > how to
 - [ ] websocket nodejs
 - [ ] intelij 点击run 实际调用的command line 是什么。。。（--javapath的写法）
 - [ ] install nginx , jenkin ci, deploying nginx in docker(Http Load Balaning with Docker and nginx)(https://www.digitalocean.com/community/tutorials/how-to-configure-nginx-with-ssl-as-a-reverse-proxy-for-jenkins)
@@ -36,7 +35,6 @@ top : 1
 - [ ] [lightbox一个很好看的js图片查看库](http://lokeshdhakar.com/projects/lightbox2/)
 - [ ] [nio stuff](https://juejin.im/post/59fffdb76fb9a0450a66bd58)
 - [ ] [仿门户网站js相册](https://www.js-css.cn/a/jscode/album/2014/0915/1319.html)， [js相册2](https://www.js-css.cn/a/jscode/album/2014/0914/1318.html)
-- [ ] [觉得gradle难学？先看一些简短的吧](https://github.com/JLLK/gradle-android-maindexlist-plugin)，还有，不一定要在ide里面写啊，vs code 也可以啊，直接命令行开搞
 - [ ] [八大排序算法的python实现](http://python.jobbole.com/82270/)
 - [ ] [如何编写 jQuery 插件](https://gist.github.com/quexer/3619237)
 - [ ] 用正则检测或者解析json(jQuery源码里有)
@@ -54,8 +52,8 @@ top : 1
 * 单个网卡最多65535个端口，c10K
 * oAuth2原理，其实流程上和很多客户端的微信登陆，新浪微博登陆很像的
 * 在Android手机上尝试用一个unix domain socket用于localhost进程间ipc(其实就是保证端口号一致，给网络权限就好了)
-*
-
+* 写 groovy 用intelij全家桶就可以了，groovy的[语法](https://www.tutorialspoint.com/groovy/groovy_closures.htm)其实没什么，主要是了解编译的流程和基本原理，这个需要看[official doc](https://docs.gradle.org/current/userguide/build_lifecycle.html#sec:build_phases)
+* [开发gradle plugin优化MultiDex](https://github.com/JLLK/gradle-android-maindexlist-plugin)。长远来看，5.0以后的手机越来越多，MultiDex也不值得过于关注。
 
 
 

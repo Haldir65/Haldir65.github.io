@@ -10,6 +10,7 @@ tags: [android,tools]
 
 
 [Android Source code](https://android-review.googlesource.com)，能够实时看到提交信息
+[androidxref，一个比较好的查看源码的网站](http://androidxref.com/7.1.2_r36/xref/frameworks/base/core/java/android/widget/)
 [From View to Pixel](https://www.youtube.com/watch?v=CMzCccqE_R0)讲了ViewRootImpl,SurfaceFlinger这些东西
 [一个很长的关于显示原理的文章](https://juejin.im/post/5a1e8d5ef265da431280ae19)，基本上什么都讲了
 
