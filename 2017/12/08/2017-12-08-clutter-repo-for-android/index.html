@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100734648.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-03-11T15:09:39.319Z">
+<meta property="og:updated_time" content="2018-03-12T11:00:39.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android知识集合[三]">
 <meta name="twitter:description" content="之前的文章快装不下了，所以另外开一篇文章专门放Android相关的杂乱的知识点。">
@@ -202,7 +202,7 @@ ga('send', 'pageview');
     <div class="article-entry" itemprop="articleBody">
       
         <p>之前的文章快装不下了，所以另外开一篇文章专门放Android相关的杂乱的知识点。<br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100734648.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
-<p><a href="https://android-review.googlesource.com">Android Source code</a>，能够实时看到提交信息<br><a href="https://www.youtube.com/watch?v=CMzCccqE_R0">From View to Pixel</a>讲了ViewRootImpl,SurfaceFlinger这些东西<br><a href="https://juejin.im/post/5a1e8d5ef265da431280ae19">一个很长的关于显示原理的文章</a>，基本上什么都讲了</p>
+<p><a href="https://android-review.googlesource.com">Android Source code</a>，能够实时看到提交信息<br><a href="http://androidxref.com/7.1.2_r36/xref/frameworks/base/core/java/android/widget/">androidxref，一个比较好的查看源码的网站</a><br><a href="https://www.youtube.com/watch?v=CMzCccqE_R0">From View to Pixel</a>讲了ViewRootImpl,SurfaceFlinger这些东西<br><a href="https://juejin.im/post/5a1e8d5ef265da431280ae19">一个很长的关于显示原理的文章</a>，基本上什么都讲了</p>
 <h3 id="1-基本上所有的Android-System-Event都是从ActivityThread中发起的"><a href="#1-基本上所有的Android-System-Event都是从ActivityThread中发起的" class="headerlink" title="1.基本上所有的Android System Event都是从ActivityThread中发起的"></a>1.基本上所有的Android System Event都是从ActivityThread中发起的</h3><p>onDetachedFromWindow是从ActivityThread的handleDestoryActivity传下来的，走到windowManager.removeViewImediate,然后ViewRootImpl.doDie,然后ViewRootImpl.dispatchDetachedFromWindow，然后DecoreView.dispatchDetachedFromWindow，然后一个个child传下去。所有的View走完了之后，DecorView在onDetachedFromWindow中以Window.Callback的方式顺手通知了Activity的onDetachedFromWindow。其实打个断点看的话就快一点。</p>
 <h3 id="2-onSaveInstance对于有id的View，系统会自动帮忙存一点东西"><a href="#2-onSaveInstance对于有id的View，系统会自动帮忙存一点东西" class="headerlink" title="2. onSaveInstance对于有id的View，系统会自动帮忙存一点东西"></a>2. onSaveInstance对于有id的View，系统会自动帮忙存一点东西</h3><p>当然onSaveInstance也是从ActivityThread里面传递下来的。还有就是onCreate(Bundle)和onRestroreSaveInstanceState(Bundle)里面的bundle是同一个object。romain Guy说最初onSaveInstance和onRestroreSaveInstanceState本来叫onIcy(冻结)和onThaw（解冻），确实很形象。<br>其实这个到现在还有一些痕迹:<br>ViewGroup.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">dispatchFreezeSelfOnly</span><span class="params">(SparseArray&lt;Parcelable&gt; container)</span> </span>&#123;</span><br><span class="line">     <span class="keyword">super</span>.dispatchSaveInstanceState(container);</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">dispatchThawSelfOnly</span><span class="params">(SparseArray&lt;Parcelable&gt; container)</span> </span>&#123;</span><br><span class="line">     <span class="keyword">super</span>.dispatchRestoreInstanceState(container);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></p>
 <h3 id="3-android-asset-atlas"><a href="#3-android-asset-atlas" class="headerlink" title="3.android asset atlas"></a>3.android asset atlas</h3><p>就是为了节省asset耗费的内存，将一些系统公用的资源作为一个服务先跑起来，所有app的process共用这部分资源。</p>
@@ -578,10 +578,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
@@ -603,6 +599,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">
