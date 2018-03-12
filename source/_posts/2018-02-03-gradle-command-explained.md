@@ -444,6 +444,9 @@ project.gradle.addListener(new TaskExecutionListener() {
 task ok
 
 task broken(dependsOn: ok) {
+    group 'Welcome' // 这个是task的一个属性
+    description 'Produces a greeting' // 这个是在project中输入gradle tasks之后输出的任务列表中每一项后面的描述信息
+
     doLast {
         throw new RuntimeException('broken')
     }
@@ -464,6 +467,7 @@ gradle.taskGraph.afterTask { Task task, TaskState state ->
 ```
 
 ## 4. How to create gradle Plugin
+[整体的过程和这里面说的差不多](https://github.com/helen-x/gradle-plugin-demo)
 1. add to your buidl script // 不可复用
 2. 创建BuildSrc文件夹 //依旧不可复用
 3. 创建一个Standalone Project //可复用
@@ -477,11 +481,13 @@ public class GreetingPlugin implements Plugin<Project> {
     }
 }
 ```
+[Tinker的gradle plugin实现，非常有参考意义](https://github.com/Tencent/tinker/blob/master/tinker-build/tinker-patch-gradle-plugin/src/main/groovy/com/tencent/tinker/build/gradle/TinkerPatchPlugin.groovy)
+和java libraray提交到jcenter不同，gradle需要提交到[Gradle Plugin Portal](https://guides.gradle.org/publishing-plugins-to-gradle-plugin-portal/)，没错，一个完全不一样的网站
 
 
 
 
-
+[比较复杂的gradle knowledge](https://github.com/adwiv/android-fat-aar)
 [official gradle docs 是最好的学习资料](https://guides.gradle.org/creating-new-gradle-builds/)
 [custom_plugins](https://docs.gradle.org/current/userguide/custom_plugins.html)
 [Build Script Basics](https://docs.gradle.org/current/userguide/tutorial_using_tasks.html#configure-by-dag)
