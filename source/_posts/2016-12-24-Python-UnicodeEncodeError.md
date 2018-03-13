@@ -183,6 +183,9 @@ Chrome自带开发者工具，可以查看每一个request的header，cookies等
 ### 5.2 UnicodeEncodeError: 'ascii' codec can't encode characters in position
 
 
+就中文来说
+> GB18030 》 GBK 》 GB2312
+
 ```
 # how to invoke this error
 b = "this is english within ascii range".encode('ascii')  # totally fine
@@ -251,7 +254,7 @@ str.encode('ascii')，unicode字符超出了ascii的范围，无法decode成bina
  how to upgrade installed packages?
 
 > pip install --upgrade setuptools
-> 
+>
 
 迭代一个字典，并打印出key,vaule
 ``` python

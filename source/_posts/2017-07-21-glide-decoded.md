@@ -700,6 +700,8 @@ onResourceReady最终会走到GenericRequest的onResourceReady方法里
 
 - 1.Glide加载Gif的原理在GifDecoder的 public synchronized Bitmap getNextFrame()方法里，Gif本质上是一帧帧的Frame数据，Glide将这些数据包装到GifFrame这个类中，每次想要获得下一帧的时候，就从bitmapPool中obtain Bitmap,同时从Frame中提取必要信息填充bitmap.
 Gif的显示是在GifDrawable的draw方法里面通过frameLoader.getCurrentFrame()获得当前帧的bitmap。
+[android.graphics.Movie](https://developer.android.com/reference/android/graphics/Movie.html)也能加载gif图片。只是Movie里面都是些native方法，glide的GifHeaderParser.java中的readContents方法里面用java方法实现了对gif帧的读取。
+从GifDecoder.read这个方法开始读就好了
 
 
 - 2.GlideDrawableImageViewTarget中有这么一段注释：

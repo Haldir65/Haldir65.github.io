@@ -11,6 +11,7 @@ tags:
 Gradle的编译流程分为三步[build_lifecycle](https://docs.gradle.org/current/userguide/build_lifecycle.html)
 Initialization -> Configuration -> Execution
 执行的单位叫做[Task](https://docs.gradle.org/current/userguide/more_about_tasks.html)
+[Gradle作为一个program，可以为编译环境设置的参数很多](https://docs.gradle.org/current/userguide/build_environment.html)
 
 > Android dependency 'com.android.support:support-v4' has different version for the compile (21.0.3) and runtime (26.1.0) classpath. You should manually set the same version via DependencyResolution
 
@@ -19,6 +20,7 @@ Initialization -> Configuration -> Execution
 //前面这个:app只是代表app这个project的
 gradle tasks --all ## 查看当前project的所有tasks
 gradle taskA taskB ##多个task是可以同时执行的
+gradle --status  ## 查看当前操作系统中还有那些Daemon可以用
 
 afterEvaluate是属于project的属性(也可以在allProject中加)
 
@@ -483,7 +485,6 @@ public class GreetingPlugin implements Plugin<Project> {
 ```
 [Tinker的gradle plugin实现，非常有参考意义](https://github.com/Tencent/tinker/blob/master/tinker-build/tinker-patch-gradle-plugin/src/main/groovy/com/tencent/tinker/build/gradle/TinkerPatchPlugin.groovy)
 和java libraray提交到jcenter不同，gradle需要提交到[Gradle Plugin Portal](https://guides.gradle.org/publishing-plugins-to-gradle-plugin-portal/)，没错，一个完全不一样的网站
-
 
 
 

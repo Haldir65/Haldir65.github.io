@@ -513,3 +513,9 @@ LogUtil.w(TAG, String.valueOf(toMB(runtime.totalMemory()))); //14.13MB
 > ODEX 文件是 Dalvik 将 DEX 文件中可执行文件——class.dex——文件解压出来后，存储在本地后生成的。因为 Android 系统无法直接运行 APK 文件，需要将其解压后找到 class.dex 文件后才可以运行，因此在安装时就将其取出放在本地，可以提高应用启动速度。除了这个原因，其实在将 class.dex 转换成 ODEX 文件过程中，还根据当前系统进行了优化（直接复制到其他系统不一定可以运行），文件大小会减少，ODEX 文件比 DEX 文件更难反编译，这也在一定程度上提高了安全性，因此在一些系统预装或系统级应用大多采用了 ODEX 优化。
 一般 ODEX 不直接运行，在 Dalvik 运行 ODEX 时，需要通过 JIT 进行优化，提高运行效率。JIT 是一种在运行时同步将字节码转化成机器码的过程，Dalvik 直接运行转化后的机器码，这会导致部分的内存和时间开销，但是整体来说，在某些情况下是会提高系统性能的。（有些动态编译器，可能根据经验或尝试编译，优化这一过程，可能运行次数越多，优化效果越好）
 OAT 文件是 ART 运行的文件，是一种二进制可运行文件，包含 DEX 文件和编译出的本地机器指令文件，其文件格式类似于网络数据报文，包含文件头和文件体，文件头的 oatdata、oatexec 和 oatlastword 字段分别描述 DEX 文件位置和本地机器指令的起止位置。因为 OAT 文件包含 DEX 文件，因此比 ODEX 文件占用空间更大，由于其在安装时经过了 ART 的处理，ART 加载 OAT 文件后不需要经过处理就可以直接运行，它没有了从字节码装换成机器码的过程，因此运行速度更快。可以理解为 JIT 从运行时才解析提前到了安装时解析，安装变慢，运行变快。
+
+### 29.Android的动画分为Animation和Animator实现
+[android 动画原理](Animation).
+ObjectAnimator和ValueAnimator这些东西要记得在页面销毁的时候去cancel或者end。end会通知一声onAnimationUpdate，cancel不会。所以不要在onAnimationUpdate里面调用end -> onAnimationUpdate里面调用end -> onAnimationUpdate里面调用end -> onA....
+> Fatal Exception: java.lang.StackOverflowError
+at android.animation.ValueAnimator.getOrCreateAnimationHandler(ValueAnimator.java:1332)
