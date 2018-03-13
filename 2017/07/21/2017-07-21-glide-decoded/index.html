@@ -17,7 +17,7 @@
 <meta property="og:description" content="glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&amp;gt;  CacheDispatch  —&amp;gt; NetworkDispatcher  —-&amp;gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/a11f41e0b1df95212c71920b3959cd72.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-03-12T14:53:58.567Z">
+<meta property="og:updated_time" content="2018-03-13T10:48:54.011Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从glide源码到图片加载框架设计思路">
 <meta name="twitter:description" content="glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&amp;gt;  CacheDispatch  —&amp;gt; NetworkDispatcher  —-&amp;gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是">
@@ -283,7 +283,7 @@ ga('send', 'pageview');
 <p>onResourceReady最终会走到GenericRequest的onResourceReady方法里<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">private void onResourceReady(Resource&lt;?&gt; resource, R result) &#123;</span><br><span class="line"></span><br><span class="line">      if (requestListener == null || !requestListener.onResourceReady(result, model, target, loadedFromMemoryCache,</span><br><span class="line">              isFirstResource)) &#123;</span><br><span class="line">          GlideAnimation&lt;R&gt; animation = animationFactory.build(loadedFromMemoryCache, isFirstResource);</span><br><span class="line">          target.onResourceReady(result, animation); //注意这句话就可以了</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
 <p>最终会调到ImageViewTarget,AppWidgetTarget等Target（持有Request和View,View可能没有），这时候，直接调用ImageView.setImagBitmap等方法就可以了。<br>图片设置完毕。</p>
 <h3 id="5-Glide除了普通的加载方法，还能用什么比较有意思的玩法"><a href="#5-Glide除了普通的加载方法，还能用什么比较有意思的玩法" class="headerlink" title="5. Glide除了普通的加载方法，还能用什么比较有意思的玩法"></a>5. Glide除了普通的加载方法，还能用什么比较有意思的玩法</h3><ul>
-<li>1.Glide加载Gif的原理在GifDecoder的 public synchronized Bitmap getNextFrame()方法里，Gif本质上是一帧帧的Frame数据，Glide将这些数据包装到GifFrame这个类中，每次想要获得下一帧的时候，就从bitmapPool中obtain Bitmap,同时从Frame中提取必要信息填充bitmap.<br>Gif的显示是在GifDrawable的draw方法里面通过frameLoader.getCurrentFrame()获得当前帧的bitmap。</li>
+<li>1.Glide加载Gif的原理在GifDecoder的 public synchronized Bitmap getNextFrame()方法里，Gif本质上是一帧帧的Frame数据，Glide将这些数据包装到GifFrame这个类中，每次想要获得下一帧的时候，就从bitmapPool中obtain Bitmap,同时从Frame中提取必要信息填充bitmap.<br>Gif的显示是在GifDrawable的draw方法里面通过frameLoader.getCurrentFrame()获得当前帧的bitmap。<br><a href="https://developer.android.com/reference/android/graphics/Movie.html">android.graphics.Movie</a>也能加载gif图片。只是Movie里面都是些native方法，glide的GifHeaderParser.java中的readContents方法里面用java方法实现了对gif帧的读取。<br>从GifDecoder.read这个方法开始读就好了</li>
 </ul>
 <ul>
 <li><p>2.GlideDrawableImageViewTarget中有这么一段注释：</p>
@@ -571,10 +571,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">android</a>
               </li>
              
@@ -588,6 +584,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -627,11 +627,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -659,15 +659,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">前端</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
               <li class="article-tag-list-item">
