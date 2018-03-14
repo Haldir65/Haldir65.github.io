@@ -45,6 +45,7 @@ $ vim ~/.bash_profile
 export PATH=$HOME/buck/bin:$PATH
 $ source ~/.bash_profile ## 立刻生效
 ```
+顺便说下widnows下怎么看环境变量： echo %path%
 
 
 ### 3. alias设置

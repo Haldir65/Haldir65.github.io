@@ -191,7 +191,7 @@ cd .. && rm -rf libsodium-${Libsodiumr_ver}.tar.gz && rm -rf libsodium-${Libsodi
 
 ## 3. ubuntu自带的防火墙叫做ufw，用起来也很简单
 
-## 10.跑分
+## 4.跑分
 
 [VPS 跑分软件](https://github.com/Teddysun/across)
 git clone 下来
@@ -350,13 +350,17 @@ Softlayer, HongKong, CN         119.81.130.170          35.2MB/s
 
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600)
 
-### 关于 docker
+### 5. 跑java？
+算了吧，简单读个文本文件print出来cpu就飙到50%。
 
-youtube 上有人在 Digital Ocean 的 vps 上安装 docker，主要作用就是将一个复杂的操作系统打包成一个下载即用的容器。进入容器中，可以像在实际的操作系统中一样运行指令。所以虚拟化的机器随时可以使用其他操作系统。
 
 
 ===================================================================================================
 ### Dnsmasq vps自建DNS服务器
+
+### 5. 关于 docker
+
+youtube 上有人在 Digital Ocean 的 vps 上安装 docker，主要作用就是将一个复杂的操作系统打包成一个下载即用的容器。进入容器中，可以像在实际的操作系统中一样运行指令。所以虚拟化的机器随时可以使用其他操作系统。
 
 
 ### 参考

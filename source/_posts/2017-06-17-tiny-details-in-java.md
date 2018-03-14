@@ -1117,7 +1117,200 @@ private native void writeBytes(byte b[], int off, int len, boolean append)
 private native void close0() throws IOException;
 ```
 
-### 42. 反射为什么慢，慢成什么样了
+### 42. Using java from command line interface
+平时都被IDE宠坏了，习惯了用Intelij Idea跑java 程序，如果用命令行呢？
+
+java -h 会告诉我们可以通过java command传递的参数。
+看了下Intelij Idea点击run的时候做了什么:
+
+首先是一闪而过的compiling.....(其实就是跑javac了)，然后在console里面开始输出："java.exe的绝对路径" "-javaagent:xxx.jar" -Dfile.encoding=UTF-8 -classpath "/jre/lib/A.jar;/jre/lib/B.jar;.....;/target/classes(这个是ide在当前项目目录下创建的一个文件夹，里面按照包名结构放了对应的class文件);C:/users/administrator/.m2/repository/com.xxx.xxx.jar;......" com.example.sample
+
+java - h说
+>    -D<名称>=<值> 设置系统属性
+-javaagent:<jarpath>[=<选项>] 加载 Java 编程语言代理, 请参阅 java.lang.instrument
+-classpath <目录和 zip/jar 文件的类搜索路径>用 ; 分隔的目录, JAR 档案和 ZIP 档案列表, 用于搜索类文件。
+
+记住,javac只是一个utlity that comes with JDK
+
+错误: 找不到或无法加载主类
+两种正确的方案是：
+1. java文件中不写packagename!不写packagename!不写packagename!
+```java
+public class Demo {
+    public static void main(String[] args) {
+        System.out.println("Hello there");
+    }
+}
+```
+然后命令行
+javac Demo.java -> java Demo -> Hello there
+
+2. java文件写上packageName
+
+```java
+package com.me.example;
+
+public class Demo2 {
+    public static void main(String[] args) {
+        System.out.println("Hello there");
+    }
+}
+```
+
+<del>然后javac Demo2.java -> java Demo2 -> 错误: 找不到或无法加载主类 com.me.example.Demo2</del>
+应该javac Demo2.java -> 把生成的Demo2.class粘贴到当前目录下新建的一个com/me/example文件夹下 -> java/com/me/example/Demo2 -> Hello there
+
+3. 非要把java文件写在src/com/me/example文件夹下？好啊
+```java
+package com.me.example;
+
+public class Demo3 {
+    public static void main(String[] args) {
+        System.out.println("Hello there");
+    }
+}
+```
+在src/com/me.example文件夹下敲命令：
+javac Demo3 -> 把生成的Demo3.class粘贴到src/com/me/example/com/me/example文件夹下 -> java com/me/example/Demo3
+
+4. java文件还放在src/com/me/example文件夹下，不加packageName总能行了吧
+```java
+public class Demo4 {
+    public static void main(String[] args) {
+        System.out.println("Hello there");
+    }
+}
+```
+javac Demo4.java   -> java Demo4.class -> "Hello there"
+最终的结构是每一个A.java文件旁边都跟着一个A.class文件
+
+
+[命令行里写java代码](http://www.sergiy.ca/how-to-compile-and-launch-java-code-from-command-line/)这篇文章告诉我们，没有IDE也能写java代码。亲测，用vs code写代码也不算差。文章的大致内容如下:
+假定当前项目目录结构如下:
+> /bin ##用于存储安装生成的.class文件
+ /lib ## 用于放第三方jar文件
+  /Okio.jar
+ /src ## 用于存放开发写的java文件
+    /com
+      /example
+        /Application.java
+
+```java
+package com.example;
+
+import java.io.*;
+import okio.BufferedSource;
+import okio.Okio;
+
+public class Application {
+    public static void main(String[] args) {
+        print("Hello there");
+        File info = new File("info.txt");
+        FileReader reader = null;
+        BufferedReader bufferedReader = null;
+        try {
+            BufferedSource source = null;
+            source = Okio.buffer(Okio.source(info));
+            // bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(info), "UTF-8"));
+            String line = "";
+            while ((line = source.readUtf8Line()) != null) {
+                // print(new String(line.getBytes("GBK"), "UTF-8"));
+                print(line);
+            }
+        } catch (Exception e) {
+            //TODO: handle exception
+            e.printStackTrace();
+        }
+    }
+
+    static void print(String out) {
+        System.out.println(out);
+    }
+}
+```
+注意上面的java文件第一行是有package name声明的。
+首先cd到根目录下
+> javac -d bin -sourcepath src -cp lib/Okio.jar;lib/gson.jar src/com/example/Application.java
+
+-d的意思是destination, sourcepath就是源码路径 ， -cp其实和-classpath一样
+
+bin目录下就会生成com/example/Application.class文件，这中间的文件层级也生成好了。
+还是在根目录下
+> java -cp bin;lib/Okio.jar com.example.Application
+
+运行的时候要带上classpath,不然会出现classnotFound
+需要注意的是代码中引用的文件路径指的是你当前所在的路径，所以，想要避免FileNotFound的话，需要在当前项目的根目录下放一个"info.txt"文件。其实站在一个command的角度来看，这也正常，外部并未特意声明工作路径，所以jvm运行class文件时就是在当前的目录下进行的。
+
+Some Notes About Classpath，关于classpath的说明。
+很多网上的教程都说去自己电脑的环境变量改CLASSPATH这个值，想看下当前是什么样的话 echo %CLASSPATH%
+javac编译器在编Application.java这个文件的时候，遇到了com.example.Util这个class，这个文件在哪？根据java命名规则，这个class应该在../com/example/这个文件夹下面。那么这个路径从哪里开始，就是让javac把哪个绝对路径当做根路径？
+三种方式:
+>If no --classpath parameter is passed, CLASSPATH environment variable is used
+If CLASSPATH environment variable is not found, current folder (".") is used by default
+If --classpath is explicitly set as a command line parameter, it overrides all other values
+
+> java -cp bin;lib/Okio.jar com.example.Application
+
+运行的时候需要带上bin这个classpath的原因是设定了classpath就会覆盖掉其他设定，所以要把我们自己的java文件打出来的class文件也加到classpath。还有要注意的是，unix系统上classpath之间是用:分割的，windows上是用;分割的
+
+
+### 43 . java读文件也要注意编码问题(FileReader读取文件里文乱码问题)
+```java
+import java.io.*;
+
+public class Sample {
+    public static void main(String[] args) {
+        print("Hello there");
+        File info = new File("info.txt");
+        FileReader reader = null;
+        BufferedReader bufferedReader = null;
+        try {
+            reader = new FileReader(info);
+            bufferedReader = new BufferedReader(reader);
+            // bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(info), "UTF-8"));
+            String line = "";
+            while ((line = bufferedReader.readLine()) != null) {
+                print(new String(line.getBytes("GBK"), "UTF-8")); //这样输出大部分正确，但是带了一些乱码，显示成问号
+                // print(line); 改用utf-8构造函数的InputStreamReader之后，直接print出来就丝毫不差了
+            }
+        } catch (Exception e) {
+            //TODO: handle exception
+            e.printStackTrace();
+        }
+    }
+
+    static void print(String out) {
+        System.out.println(out);
+    }
+}
+```
+原理的话，文件读入时是按OS的默认字符集即GBK解码的，windows上默认是GBK(中文的win10)，String.getBytes("GBK")就是把按照GBK编码的内容还原成二进制数据，再用UTF-8去new String，照说没问题，结果大部分汉字显示出来，但是部分汉字后面跟着问号。
+原因的话，FileReader继承了InputStreamReader，没有实现InputStreamReader的带charset的构造函数。
+FileReader属于字符流，是读取字符文件的便捷类。其继承自InputStreamReader，后者是将字节流转换为字符流的的桥梁，即将字节信息转换为字符信息。实际上， FileReader在类内部实现过程中也是利用了InputStreamReader完成字节流到字符流的转化，只不过转化时采用的字符集为系统默认的字符集。
+如果文件保存时的编码设定为UTF-8， 那么在中文操作系统使用 FileReader时就会发生乱码，因为中文操作系统平台的默认字符集为GBK。
+解决该问题的办法是，放弃使用FileReader，改用InputStreamReader，在获取InputStreamReader对象时，显示指定合适的字符集。
+从源码来看，FileReader的read方法直接调用了InputStreamReader的read方法，在没有传编码进来的情况下，FileReader(InputStreamReader)直接用操作系统默认编码(GBK)去解码一个UTF-8的文件，当然会有损失。
+[The constructors of FileReader always use the platform default encoding which is generally a bad idea.](https://stackoverflow.com/questions/696626/java-filereader-encoding-issue)。
+
+或者，在notpadPLus中新建一个txt文件，编码字符集->中文->GB2312(simplified)。这样这个文件本身就是GB2312编码的，那个FileReader用GBK去解码，自然不会存在损失，拿着解码后的二进制流给System.out去打印肯定没问题。所以，照说一个文本文件(编码是针对字符来说的，二进制文件是解码之后的东西)，想看编码格式的话，用Notepad++就好了。windows下建议使用utf-8不带BOM格式。很有意思的是我在vs code里面查看这个GB2312的文本文件，全是乱码，给当成utf-8处理了。。。。
+
+
+### 44 . 主函数的参数
+顺便提一下，主函数里面的args是可以用的
+```java
+public static void main(String[] args){
+                          System.out.println("args[0] is"+args[0]);
+                          System.out.println("args[1] is"+args[1]);
+                          System.out.println("args[2] is"+args[2]);
+                }
+```
+### 45. 打jar包(命令行还是ide)
+> jar -cvf HelloWorld.jar HelloWorld.class   #将HelloWorld.class文件打入jar包
+
+[intelij idea打jar包更简单](http://blog.csdn.net/xuemengrui12/article/details/74984731)
+
+
+### 46. 反射为什么慢，慢成什么样了
 
 ## 参考
 - [Jake Wharton and Jesse Wilson - Death, Taxes, and HTTP](https://www.youtube.com/watch?v=6uroXz5l7Gk)

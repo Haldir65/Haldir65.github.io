@@ -271,7 +271,7 @@ tv.setTextColor(Color.rgb(255, 255, 255));
 
 BitMap.config.ALPAH_8 ：只存储透明度，不存储颜色信息
 
-BitMap.config.ARGB_4444(Deprecated) ：Each pixel is stored on 2 bytes. (节省了一般)
+BitMap.config.ARGB_4444(Deprecated) ：Each pixel is stored on 2 bytes. (节省了一半)
 
 BitMap.config.ARGB_8888 : Each pixel is stored on 4 bytes. Each channel (RGB and alpha for translucency) is stored with 8 bits of precision (256 possible values.) This configuration is very flexible and offers the best quality. It should be used whenever possible.这也就是上面提到的一个像素三个小像素外加一个透明度的算法。
 
@@ -349,13 +349,14 @@ public final class Bitmap {
     }
   }
 
-  public void encodeToFile(File file) throws IOException {
+  public void encodeToFile(File file) throws IOException
     try (BufferedSink sink = Okio.buffer(Okio.sink(file))) {
       encode(sink);
     }
+
   }
-}
 ```
+
 这里没有考虑压缩算法。这里面还有Big Ending和Small Ending的处理。
 Big Ending： 拿32bit ，一次读8bit，从左到右
 Little Ending: 拿32bit ,一次读8bit，从右到左读
@@ -452,6 +453,15 @@ private static void writeInt(byte[] buffer, int offset, int value) {
 }
 ```
 一个int占据4个字节，没问题。
+
+有一个一维整型数组int[]data保存的是一张宽为width，高为height的图片像素值信息。请写一个算法，将该图片所有的白色不透明(0xffffffff)像素点的透明度调整为50%。
+```java
+final int size = data.length;
+for(int i = 0; i< size; i++){
+     if(data[i] == 0xffffffff)
+            data[i] = 0x80ffffff; // ARGB_8888 一个像素占据4个bytes，A(alpha)R(red)G(green)B(blue)。所以只要改alpha就好了
+}
+```
 
 
 ## 总结

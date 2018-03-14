@@ -907,6 +907,11 @@ $ sudo journalctl --since yesterday
 ## [shell script tutorial](https://www.youtube.com/watch?v=hwrnmQumtPw)
 fdisk -l ## show a list of hard drives that are attached to your computer, fdisk就是硬盘分区命令
 
+## 21. 关于命令行中标点符号的使用
+在unix系统上参数的分隔符是" :  "
+在windows系统上分割符是"  ;  "
+还有就是forward slash和back slash了
+
 
 ### 参考
 
