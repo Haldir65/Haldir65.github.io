@@ -53,6 +53,9 @@ github上已经star了四百多个项目，应该复习下了。
 [Activity启动流程](http://blog.csdn.net/qq_23547831/article/details/51224992)
 //这个博主写的一系列底层分析都比较清楚
 
+图片出自[搜狐](http://www.sohu.com/a/130814934_675634)
+![](http://odzl05jxx.bkt.clouddn.com/image/jpg/android-processs.jpg)
+
 ### 新版本适配，新特性
 [Android 7.0的适配](http://haldir65.github.io/2016/10/08/android-7-0-new-features/)
 
@@ -72,12 +75,8 @@ github上已经star了四百多个项目，应该复习下了。
 [Java线程池的一些点](http://haldir65.github.io/2017/04/30/2017-04-30-concurrency-and-beyond/)
 [使用AnnotationProcessor自动生成代码](http://haldir65.github.io/2016/12/31/2016-12-31-Eliminating-BoilPlate-AnnotationProcessor/)
 [翻译了一个印度口音的关于jvm架构的视频](http://haldir65.github.io/2017/05/24/2017-05-24-jvm-architecture/)
-- [一个Java Object到底占用多少内存(from java code to java heap)](http://haldir65.github.io/2017/07/23/2017-07-23-from-java-code-to-java-heap/)
-- [LruCache的原理](http://haldir65.github.io/2017/07/23/2017-07-23-lru-cache-and-more/)
-
-
-
-
+[一个Java Object到底占用多少内存(from java code to java heap)](http://haldir65.github.io/2017/07/23/2017-07-23-from-java-code-to-java-heap/)
+[LruCache的原理](http://haldir65.github.io/2017/07/23/2017-07-23-lru-cache-and-more/)
 
 ## 工具书
 [git常用操作手册](http://haldir65.github.io/2016/09/27/git-manual/)
@@ -164,7 +163,7 @@ Android相关
 - [ ] armeabiv,arm64-v8a等问题[Android 设备的CPU类型(通常称为”ABIs”)](https://zhuanlan.zhihu.com/p/23102158)
 - [ ] Romain Guy提到了android asset atlas，顺带看下[ZygotoInit](http://blog.csdn.net/luoshengyang/article/details/45831269)
 - [ ] Zygote进程启动流程
-- [ ] SystemServer进程启动流程
+- [X] SystemServer进程启动流程
 - [ ] Launcher启动流程
 - [Android 应用点击图标到Activity界面显示的过程分析](https://juejin.im/entry/5a0d02086fb9a045263b2387)
 - [Android面试题汇总](https://juejin.im/entry/59dd75cd51882578d5037626)
@@ -191,17 +190,17 @@ Linux相关
 
 Gradle相关
 - [ ]写一些DSL吧[Old Driver](https://github.com/Ccixyj/JBusDriver)
-- [ ] 狗日的Gradle下载的cache都放在C盘了，问题是C盘哪里，能删吗，C盘快不够用了
+- [X] 狗日的Gradle下载的cache都放在C盘了，问题是C盘哪里，能删吗，C盘快不够用了
 
 
 Python
 - [ ] sending  mail via Flask
-- [ ] bootstrap integration
+- [X] bootstrap integration
 
 
 
 数据库相关
-- [ ] MySql从入门到删库跑路
+- [X] MySql从入门到删库跑路
 - [ ] Realm的优点
 
 C语言从入门到放弃
