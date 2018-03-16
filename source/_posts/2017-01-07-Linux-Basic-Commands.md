@@ -48,6 +48,8 @@ tags: [置顶,linux,tools]
 - > ls // 显示当前目录下内容
 # ls -halt is for human readable, show hidden, print details, sort by date
 
+ls –l –R(或-lR) src > list.txt  ##列出文件列表
+
 - > mkdir //新建目录
 - > rmdir //删除目录,如果目录不为空，
 - >使用 rm -r //递归删除

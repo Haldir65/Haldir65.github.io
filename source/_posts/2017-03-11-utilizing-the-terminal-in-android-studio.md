@@ -519,3 +519,6 @@ OAT 文件是 ART 运行的文件，是一种二进制可运行文件，包含 D
 ObjectAnimator和ValueAnimator这些东西要记得在页面销毁的时候去cancel或者end。end会通知一声onAnimationUpdate，cancel不会。所以不要在onAnimationUpdate里面调用end -> onAnimationUpdate里面调用end -> onAnimationUpdate里面调用end -> onA....
 > Fatal Exception: java.lang.StackOverflowError
 at android.animation.ValueAnimator.getOrCreateAnimationHandler(ValueAnimator.java:1332)
+
+### 30. 在api24之前，WifiManager存在leak
+> On versions prior to Android N (24), initializing the WifiManager via Context#getSystemService can cause a memory leak if the context is not the application context

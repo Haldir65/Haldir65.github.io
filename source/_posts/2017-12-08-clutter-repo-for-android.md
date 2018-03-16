@@ -75,6 +75,9 @@ public static void main(String[] args) {
 > 这里面可以放多个字符串XXXX,XXX前面加上一个百分号和数字，代表顺序
 百分号的d和百分号的s可以混着XXX用的，比如这个100数字什么的，第三个是带百分号的数字100%这个由于需要显示百分号，所以加上两个百分号
 
+[%d represents an integer; you want to use %f for a double.  ](https://stackoverflow.com/questions/3693079/problem-with-system-out-printf-command-in-java)
+据猜测d代表decimal而不是double
+
 ### 9.我记得Chet Haase说过Lollipop及以上的Button默认是有一个elevation的
 记得Chet在一次演讲中说到Appcompat在5.0以上默认使用material Theme, Button的默认elevation好像是3dp。日常开发中也经常会看见button和设置elevation=0的button相比确实有些阴影。在Button的构造函数里面打了断点，在setElevation也打了断点，最后发现是在View创建之后Choregrapher在doFrame的时候run了一个Animation，在这个animation中设置了一个6px的elevation(2dp，原来Chet记错了)。
 至于这个2dp是那来的呢：

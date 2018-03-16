@@ -80,6 +80,13 @@ git config --global http.proxy socks5://127.0.0.1:1080
 git config --global https.proxy socks5://127.0.0.1:1080
 ```
 
+取消设置
+```shell
+git config --global --unset http.proxy
+
+git config --global --unset https.proxy
+```
+
 对指定url设置代理
 ###
 git config --global http.<要设置代理的URL>.proxy socks5://127.0.0.1:1080
