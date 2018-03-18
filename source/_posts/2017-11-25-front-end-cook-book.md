@@ -301,6 +301,39 @@ $(function() {
 });
 ```
 
+防范XSS攻击的手段中提到了，对于用户的输入，需要有条件的进行转换
+比如说
+```
+< 变成 &lt;
+> 变成 &gt;
+& 变成  变成&quot;
+```
+就像这样
+```java
+private static String htmlEncode(char c) {
+    switch(c) {
+       case '&':
+           return "&amp;";
+       case '<':
+           return "&lt;";
+       case '>':
+           return "&gt;";
+       case '"':
+           return "&quot;";
+       case ' ':
+           return "&nbsp;";
+       default:
+           return c + "";
+    }
+}
+```
+经过编码转换之后
+```
+<script>window.location.href=”http://www.baidu.com”;</script> ## 就变成了
+&lt;script&gt;window.location.href=&quot;http://www.baidu.com&quot;&lt;/script&gt;
+```
+
+
 
 
 

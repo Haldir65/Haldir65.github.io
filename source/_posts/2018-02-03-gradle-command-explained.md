@@ -189,7 +189,7 @@ JFrog 是软件管理和分发的领先通用解决方案JFrog 是软件管理�
 >  maven { url "https://jitpack.io" }   // 比如说jitpack仓库
 
 正儿八经的上传到jcenter的方式：
-1. 在最外层build.gradle中添加
+一.在最外层build.gradle中添加
 > classpath 'com.github.dcendents:android-maven-gradle-plugin:1.3'   //
   classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
 
@@ -223,7 +223,7 @@ allprojects {
 android-maven-gradle-plugin插件是用来打包Maven所需文件的。
 gradle-bintray-plugin插件是用来将生成的Maven所需文件上传到Bintray的。
 
-2. 在library module的build.gradle中添加
+二.在library module的build.gradle中添加
 ```config
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
@@ -306,7 +306,7 @@ javadoc { //jav doc采用utf-8编码否则会报“GBK的不可映射字符”�
 }
 ```
 
-3. 在local.properities中添加
+三.在local.properities中添加
 >bintray.user=your bintray username
 bintray.apikey=your apikey
 
@@ -361,7 +361,7 @@ task testBoth {
 }
 ```
 输出
-> > gradle test testBoth
+>  gradle test testBoth
 This is executed during the initialization phase.
 This is executed during the configuration phase.
 This is also executed during the configuration phase.
@@ -484,7 +484,7 @@ public class GreetingPlugin implements Plugin<Project> {
 }
 ```
 [Tinker的gradle plugin实现，非常有参考意义](https://github.com/Tencent/tinker/blob/master/tinker-build/tinker-patch-gradle-plugin/src/main/groovy/com/tencent/tinker/build/gradle/TinkerPatchPlugin.groovy)
-和java libraray提交到jcenter不同，gradle需要提交到[Gradle Plugin Portal](https://guides.gradle.org/publishing-plugins-to-gradle-plugin-portal/)，没错，一个完全不一样的网站
+和java libraray提交到jcenter不同，gradle需要提交到[Gradle Plugin Portal](https://guides.gradle.org/publishing-plugins-to-gradle-plugin-portal/)。没错，一个完全不一样的网站
 
 
 

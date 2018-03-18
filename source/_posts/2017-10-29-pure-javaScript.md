@@ -824,7 +824,14 @@ Number,String,Boolean,Object,Function,Undefined和Null
 
 js中是存在一些全局属性和全局函数的
 比如Infinity(代表正的无穷大),NaN(指某个值是不是数字)
-全局的函数比如decodeURI(),escape(),eval(),parseInt(),parseFloat()
+全局的函数比如decodeURI(),escape(),eval(),parseInt(),parseFloat()，这些方法不属于任何对象
+
+这两个函数都接受String作为参数
+```js
+parseInt("10");  //返回 10，官方文档说返回的是integer(也就是Number了)
+parseFloat("10.33") // 返回10.33
+```
+
 ===================================================
 9. 交互事件的捕获，拦截，消费（冒泡）
 ```javaScript

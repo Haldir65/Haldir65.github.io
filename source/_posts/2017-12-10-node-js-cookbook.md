@@ -26,6 +26,11 @@ npm的configuration非常方便设置,首先是[设置proxy](https://stackoverfl
 > npm config list ##列出当前所有的设置
 > npm config get stuff ##比如说registry等等
 
+也有用淘宝cnpm的做法:
+> $ npm install -g cnpm --registry=https://registry.npm.taobao.org
+$ npm config set registry https://registry.npm.taobao.org
+$ cnpm install [name]  ## 这样就能安装了
+
 
 [whats-the-difference-between-dependencies-devdependencies-and-peerdependencies](https://stackoverflow.com/questions/18875674/whats-the-difference-between-dependencies-devdependencies-and-peerdependencies)
 npm有个dependencies的概念，此外还有dev-dependencies的概念，主要看package.json这个文件
@@ -302,6 +307,27 @@ node --inspect-brk app.js ##在第一行就给我停下来
 在chrome的地址栏输入 about:inspect , open dedicated DevTools for Node，点一下就会出现一个小窗口
 或者f12，会出现一个绿色的node的图标，点一下和上面那个open dedicated DevTools for Node是一样的
 [Debugging in 2017 with Node.js](https://www.youtube.com/watch?v=Xb_0awoShR8)
+
+## process.env.NODE_ENV
+```js
+if (process.env.NODE_ENV === 'production' ) {
+  //
+}else {
+  //
+}
+
+// windows上可以这么设置
+set NODE_ENV=dev
+//直接写在js里面也行
+process.env.NODE_ENV = 'production';
+```
+写在package.json的script里面也是可以的。
+```json
+"scripts": {
+  "start": "set NODE_ENV=dev && node app.js"
+ }
+```
+
 
 =============================================================================
 开发环境用nodemon，生产环境用pm2(PM2的优胜之处在于当你要将app需要多核处理的时候，PM2内部集成的负载均衡可以让你很容易的去指定运行多少个实例。)
