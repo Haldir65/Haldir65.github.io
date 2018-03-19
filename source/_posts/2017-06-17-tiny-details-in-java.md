@@ -1310,7 +1310,62 @@ public static void main(String[] args){
 [intelij idea打jar包更简单](http://blog.csdn.net/xuemengrui12/article/details/74984731)
 
 
-### 46. 反射为什么慢，慢成什么样了
+### 46. DateFormats are not thread-safe，多线程下不安全
+[stackoverFlow上有人说DateFormat本身不是线程安全的](https://stackoverflow.com/questions/2409657/call-to-method-of-static-java-text-dateformat-not-advisable)，简单来说就是多条线程调用DateFormat的format方法，得到的String结果 **有可能** 是错的。
+```java
+public class Test{
+    private SimpleDateFormat dateFormat ;
+    public static void main(String[] args) {
+        SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd");
+        Date today = new Date();
+        Date tomorrow = new Date(today.getTime()+1000*60*60*24);
+        System.out.println(today); // 今天是2010-01-11
+        System.out.println(tomorrow); // 明天是2010-01-11
+        Thread thread1 = new Thread(new Thread1(dateFormat,today));
+        thread1.start();
+        Thread thread2 = new Thread(new Thread2(dateFormat,tomorrow));
+        thread2.start();
+    }
+
+}
+class Thread1 implements Runnable{
+    private SimpleDateFormat dateFormat;
+    private Date date;
+    public Thread1(SimpleDateFormat dateFormat,Date date){
+        this.dateFormat = dateFormat;
+        this.date = date;
+    }
+    public void run() {
+        for(;;){// 一直循环到出问题为止吧。
+            String strDate = dateFormat.format(date);
+            // 如果不等于2018-03-19，证明出现线程安全问题了！！！！
+            if(!"2018-03-19".equals(strDate)){
+                System.err.println("format 出来的 today="+strDate);
+                System.exit(-1);
+            }
+        }
+    }
+}
+class Thread2 implements Runnable{
+    private SimpleDateFormat dateFormat;
+    private Date date;
+    public Thread2(SimpleDateFormat dateFormat,Date date){
+        this.dateFormat = dateFormat;
+        this.date = date;
+    }
+    public void run() {
+        for(;;){
+            String strDate = dateFormat.format(date);
+            if(!"2018-03-20".equals(strDate)){
+                System.err.println("format 出来的 tomorrow="+strDate);
+                System.exit(-1);
+            }
+        }
+    }
+}
+```
+
+### 47. 反射为什么慢，慢成什么样了
 
 ## 参考
 - [Jake Wharton and Jesse Wilson - Death, Taxes, and HTTP](https://www.youtube.com/watch?v=6uroXz5l7Gk)

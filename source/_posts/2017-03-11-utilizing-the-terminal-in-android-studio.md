@@ -522,3 +522,20 @@ at android.animation.ValueAnimator.getOrCreateAnimationHandler(ValueAnimator.jav
 
 ### 30. 在api24之前，WifiManager存在leak
 > On versions prior to Android N (24), initializing the WifiManager via Context#getSystemService can cause a memory leak if the context is not the application context
+
+### 31. Android手机显示的电量是从哪读取的？
+batterystats.bin不是用来做电池校正的。
+2012年1月13日，DianneHackborn在G+上给出了答案：
+```
+Today's myth debunking:
+
+"The battery indicator in the status/notification bar is a reflection of the batterystats.bin file in the data/system/ directory."
+
+No, it does not.
+```
+这个文件只是用来显示“设置”里面App耗电量的,across reboot。
+[深入浅出Android App耗电量统计](http://www.cnblogs.com/hyddd/p/4402621.html)这篇文章指出，实际读取的文件位置由OEM厂商决定，[官方文档](https://source.android.com/devices/tech/power/#power-values)
+> device///frameworks/base/core/res/res/xml/power_profile.xml 这个文件
+
+其实这一段adb命令就可以了
+> adb shell dumpsys batterystats
