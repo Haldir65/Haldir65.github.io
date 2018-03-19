@@ -17,7 +17,7 @@
 <meta property="og:description" content="这周终于把Google I/O 2016的Android App在Device上跑起来了，顺便尝试多多使用命令行进行编译或者安装。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/device-2017-03-11-222239.png?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-03-18T14:55:54.031Z">
+<meta property="og:updated_time" content="2018-03-19T10:43:00.379Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用IDE内置的Terminal">
 <meta name="twitter:description" content="这周终于把Google I/O 2016的Android App在Device上跑起来了，顺便尝试多多使用命令行进行编译或者安装。">
@@ -305,6 +305,15 @@ ga('send', 'pageview');
 </blockquote>
 <h3 id="30-在api24之前，WifiManager存在leak"><a href="#30-在api24之前，WifiManager存在leak" class="headerlink" title="30. 在api24之前，WifiManager存在leak"></a>30. 在api24之前，WifiManager存在leak</h3><blockquote>
 <p>On versions prior to Android N (24), initializing the WifiManager via Context#getSystemService can cause a memory leak if the context is not the application context</p>
+</blockquote>
+<h3 id="31-Android手机显示的电量是从哪读取的？"><a href="#31-Android手机显示的电量是从哪读取的？" class="headerlink" title="31. Android手机显示的电量是从哪读取的？"></a>31. Android手机显示的电量是从哪读取的？</h3><p>batterystats.bin不是用来做电池校正的。<br>2012年1月13日，DianneHackborn在G+上给出了答案：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Today&apos;s myth debunking:</span><br><span class="line"></span><br><span class="line">&quot;The battery indicator in the status/notification bar is a reflection of the batterystats.bin file in the data/system/ directory.&quot;</span><br><span class="line"></span><br><span class="line">No, it does not.</span><br></pre></td></tr></table></figure></p>
+<p>这个文件只是用来显示“设置”里面App耗电量的,across reboot。<br><a href="http://www.cnblogs.com/hyddd/p/4402621.html">深入浅出Android App耗电量统计</a>这篇文章指出，实际读取的文件位置由OEM厂商决定，<a href="https://source.android.com/devices/tech/power/#power-values">官方文档</a></p>
+<blockquote>
+<p>device///frameworks/base/core/res/res/xml/power_profile.xml 这个文件</p>
+</blockquote>
+<p>其实这一段adb命令就可以了</p>
+<blockquote>
+<p>adb shell dumpsys batterystats</p>
 </blockquote>
 
       
