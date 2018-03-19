@@ -17,7 +17,7 @@
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/10013-1109230P20693.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/merge_sort.png">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/selectionsort.jpg">
-<meta property="og:updated_time" content="2018-03-19T10:43:00.387Z">
+<meta property="og:updated_time" content="2018-03-19T15:27:02.429Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="数据结构之-算法手册">
 <meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/10013-1109230P20693.jpg?imageView2/2/w/600">
@@ -219,7 +219,7 @@ ga('send', 'pageview');
 <h3 id="1-7-TimSort"><a href="#1-7-TimSort" class="headerlink" title="1.7 TimSort"></a>1.7 TimSort</h3><p>java的Collections.sort的算法，<br><a href="(https://www.youtube.com/watch?v=bvnmbRo7a1Y">Comparison Method Violates Its General Contract!</a>)</p>
 <h2 id="2-其他算法"><a href="#2-其他算法" class="headerlink" title="2. 其他算法"></a>2. 其他算法</h2><p><a href="https://juejin.im/post/5a224e1551882535c56cb940">有环链表的判断问题</a>。时间复杂度和空间复杂度的最优解是创建两根迭代速度不一样的指针</p>
 <p>下面的代码来自<a href="http://blog.csdn.net/jq_ak47/article/details/52739651">csdn</a><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LinkLoop</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">hasLoop</span><span class="params">(Node n)</span></span>&#123;</span><br><span class="line">        <span class="comment">//定义两个指针tmp1,tmp2</span></span><br><span class="line">        Node tmp1 = n;</span><br><span class="line">        Node tmp2 = n.next;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(tmp2!=<span class="keyword">null</span>)&#123;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">int</span> d1 = tmp1.val;</span><br><span class="line">            <span class="keyword">int</span> d2 = tmp2.val;</span><br><span class="line">            <span class="keyword">if</span>(d1 == d2)<span class="keyword">return</span> <span class="keyword">true</span>;<span class="comment">//当两个指针重逢时，说明存在环，否则不存在。</span></span><br><span class="line">            tmp1 = tmp1.next;  <span class="comment">//每次迭代时，指针1走一步，指针2走两步</span></span><br><span class="line">            tmp2 = tmp2.next.next;</span><br><span class="line">            <span class="keyword">if</span>(tmp2 == <span class="keyword">null</span>)<span class="keyword">return</span> <span class="keyword">false</span>;<span class="comment">//不存在环时，退出</span></span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>; <span class="comment">//如果tmp2为null，说明元素只有一个，也可以说明是存在环</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//方法2：将每次走过的节点保存到hash表中，如果节点在hash表中，则表示存在环</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">hasLoop2</span><span class="params">(Node n)</span></span>&#123;</span><br><span class="line">        Node temp1 = n;</span><br><span class="line">        HashMap&lt;Node,Node&gt; ns = <span class="keyword">new</span> HashMap&lt;Node,Node&gt;();</span><br><span class="line">        <span class="keyword">while</span>(n!=<span class="keyword">null</span>)&#123;</span><br><span class="line">            <span class="keyword">if</span>(ns.get(temp1)!=<span class="keyword">null</span>)<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            <span class="keyword">else</span> ns.put(temp1, temp1);</span><br><span class="line">            temp1 = temp1.next;</span><br><span class="line">            <span class="keyword">if</span>(temp1 == <span class="keyword">null</span>)<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Node n1 = <span class="keyword">new</span> Node(<span class="number">1</span>);</span><br><span class="line">        Node n2 = <span class="keyword">new</span> Node(<span class="number">2</span>);</span><br><span class="line">        Node n3 = <span class="keyword">new</span> Node(<span class="number">3</span>);</span><br><span class="line">        Node n4 = <span class="keyword">new</span> Node(<span class="number">4</span>);</span><br><span class="line">        Node n5 = <span class="keyword">new</span> Node(<span class="number">5</span>);</span><br><span class="line"></span><br><span class="line">        n1.next = n2;</span><br><span class="line">        n2.next = n3;</span><br><span class="line">        n3.next = n4;</span><br><span class="line">        n4.next = n5;</span><br><span class="line">        n5.next = n1;  <span class="comment">//构造一个带环的链表,去除此句表示不带环</span></span><br><span class="line"></span><br><span class="line">        System.out.println(hasLoop(n1));</span><br><span class="line">        System.out.println(hasLoop2(n1));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">给定两单链表A、B，只给出两头指针。请问：</span><br><span class="line"></span><br><span class="line">1、如何判断两单链表（无环）是否相交？</span><br><span class="line"></span><br><span class="line">有两种可取的办法：</span><br><span class="line"></span><br><span class="line">（1）人为构环，将链表A的尾节点指向链表B，再判断是否构环成功？从链表B的头指针往下遍历，如果能够回到B，则说明相交</span><br><span class="line"></span><br><span class="line">（2）判断两链表最后一个节点是否相同，如果相交，则尾节点肯定是同一节点</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">2、如何判断两单链表（不知是否有环）相交？</span><br><span class="line"></span><br><span class="line">先判断是否有环，判断是否有环可以使用追逐办法，设置两个指针，一个走一步，一个走两步，如果能相遇则说明存在环</span><br><span class="line"></span><br><span class="line">（1）两个都没环：回到问题1</span><br><span class="line"></span><br><span class="line">（2）一个有环，一个没环：不用判断了，肯定两链表不相交</span><br><span class="line"></span><br><span class="line">（3）两个都有环：判断链表A的碰撞点是否出现在链表B的环中，如果在，则相交。（相交时，环必定是两链表共有的）</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">给定两单链表A、B，只给出两头指针。请问：</span><br><span class="line"></span><br><span class="line">1、如何判断两单链表（无环）是否相交？</span><br><span class="line"></span><br><span class="line">有两种可取的办法：</span><br><span class="line"></span><br><span class="line">（1）人为构环，将链表A的尾节点指向链表B，再判断是否构环成功？从链表B的头指针往下遍历，如果能够回到B，则说明相交</span><br><span class="line"></span><br><span class="line">（2）判断两链表最后一个节点是否相同，如果相交，则尾节点肯定是同一节点</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">2、如何判断两单链表（不知是否有环）相交？</span><br><span class="line"></span><br><span class="line">先判断是否有环，判断是否有环可以使用追逐办法，设置两个指针，一个走一步，一个走两步，如果能相遇则说明存在环</span><br><span class="line"></span><br><span class="line">（1）两个都没环：回到问题1</span><br><span class="line"></span><br><span class="line">（2）一个有环，一个没环：不用判断了，肯定两链表不相交</span><br><span class="line"></span><br><span class="line">（3）两个都有环：判断链表A的碰撞点是否出现在链表B的环中，如果在，则相交。（相交时，环必定是两链表共有的）</span><br><span class="line"></span><br><span class="line">3. 最小栈的实现</span><br><span class="line">需要两个栈，A和B，B用于存储A中当前min的index，B中由上而下依次是A的最小，第二小，第三小。。。所以万一A中的最小被pop掉了，直接拿B顶上的元素，始终是最小的。时间复杂度是O(1)，空间复杂度最坏是O(N)</span><br><span class="line"></span><br><span class="line">4.</span><br></pre></td></tr></table></figure>
 <h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="https://juejin.im/post/59cc55b95188250b4007539b">Java关于数据结构的实现：树</a></p>
 
       
@@ -490,19 +490,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
+                <a href="javascript:void(0)" class="js-tag color4">adb</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -530,6 +526,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
@@ -554,15 +554,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">前端</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
               <li class="article-tag-list-item">
