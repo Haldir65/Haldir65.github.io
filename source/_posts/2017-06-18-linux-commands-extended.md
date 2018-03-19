@@ -442,7 +442,10 @@ dropbox的网盘空间不用感觉有点浪费了，一个将本地文件上传�
 ### 26. fuser显示当前文件正在被哪些进程使用
 fuser -m -u redis-server
 
-### 27. Nano文本编辑器
+### 27. 一些看上去比较玄的操作
+```shell
+bash <(curl -s https://codecov.io/bash) ##重定向还有这么玩的
+```
 
 
 

@@ -42,6 +42,9 @@ subprojects {
 [All com.android.support libraries must use the exact same version [duplicate]
 ](https://stackoverflow.com/questions/42374151/all-com-android-support-libraries-must-use-the-exact-same-version-specification)
 
+关于gradlew只是一层gradle的wrapper，找到这么一段话:
+**The Gradle Wrapper is the preferred way of starting a Gradle build. It consists of a batch script for Windows and a shell script for OS X and Linux. These scripts allow you to run a Gradle build without requiring that Gradle be installed on your system. This used to be something added to your build file, but it’s been folded into Gradle, so there is no longer any need. Instead, you simply use the following command.**
+> $ gradle wrapper --gradle-version 2.13
 
 >./gradlew -v 版本号
 ./gradlew clean 清除app目录下的build文件夹

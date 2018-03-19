@@ -389,27 +389,13 @@ public class Test {
 - 抓包查看
 
 
-
-
-
 ### 9.Ajax和jQuery发起POST请求的时候设置的Content-Type对于服务器很重要
 [AJAX POST请求中参数以form data和request payload形式在servlet中的获取方式](http://blog.csdn.net/mhmyqn/article/details/25561535)
 > 最近在看书时才真正搞明白，服务器为什么会对表单提交和文件上传做特殊处理，因为表单提交数据是名值对的方式，且Content-Type为application/x-www-form-urlencoded，而文件上传服务器需要特殊处理，普通的post请求（Content-Type不是application/x-www-form-urlencoded）数据格式不固定，不一定是名值对的方式，所以服务器无法知道具体的处理方式，所以只能通过获取原始数据流的方式来进行解析。
 jquery在执行post请求时，会设置Content-Type为application/x-www-form-urlencoded，所以服务器能够正确解析，而使用原生ajax请求时，如果不显示的设置Content-Type，那么默认是text/plain，这时服务器就不知道怎么解析数据了，所以才只能通过获取原始数据流的方式来进行解析请求数据。
 
-===========================trash here=====================================
-经常说的网速 bps (bits per second)，所以跟byte比起来，要除以8。1024kbps的带宽就意味着每秒传递的数据大小为1024/8=128KB。
-1024s就是128MB（这下清楚了）
 
-
-[css sprites在http2的环境下并不完全无效](https://stackoverflow.com/questions/32160790/does-using-image-sprites-make-sense-in-http-2)
-
-一些优化
-[TTFB] TTFB（Time To First Byte），客户端发出请求到收到响应的第一个字节所花费的时间。一般浏览器里面都能看到，这也是服务端可以优化的指标。
-
-GZip压缩文本还可以，图片就没必要开压缩了，因为图片本身就高度压缩了，再压只是浪费CPU。
-
-网络协议，架构，规范，spdy,http2,url规范.
+### 10 .七层网络模型
 OSI七层网络体系结构 ： 物理层(IEEE 802.2)、数据链路层(ARP,RARP)、网络层(ip,icmp)、传输层(tcp,udp)、表示层、会话层(SSL,TLS)、应用层(HTTP,FTP,SMTP,POP3).
 这里面Socket比较特殊，Socket是一组编程接口（API）。介于传输层和应用层，向应用层提供统一的编程接口。应用层不必了解TCP/IP协议细节。直接通过对Socket接口函数的调用完成数据在IP网络的传输。
 
@@ -422,10 +408,6 @@ Network Dtetermine best route for data
 Data link NICS's(Network interface cards) checking for errors(比如switches)
 Physical Cabel / fiber optic cable / electronic signals
 
-
-
-HLS直播流慢(延迟高)是因为基于HTTP，(http live streaming，苹果提出的)
-如果要低延迟还得rmtp
 
 应用层面的Http，SMTP,FTP,POP,TLS/SSL,IMAP
 
@@ -463,7 +445,28 @@ firefox > nginx [ACK] 好的,知道了
 作者：eechen
 链接：https://www.zhihu.com/question/67772889/answer/257170215
 来源：知乎
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
+===========================trash here=====================================
+经常说的网速 bps (bits per second)，所以跟byte比起来，要除以8。1024kbps的带宽就意味着每秒传递的数据大小为1024/8=128KB。
+1024s就是128MB（这下清楚了）
+
+
+[css sprites在http2的环境下并不完全无效](https://stackoverflow.com/questions/32160790/does-using-image-sprites-make-sense-in-http-2)
+
+一些优化
+[TTFB] TTFB（Time To First Byte），客户端发出请求到收到响应的第一个字节所花费的时间。一般浏览器里面都能看到，这也是服务端可以优化的指标。
+
+GZip压缩文本还可以，图片就没必要开压缩了，因为图片本身就高度压缩了，再压只是浪费CPU。
+
+网络协议，架构，规范，spdy,http2,url规范.
+
+
+
+HLS直播流慢(延迟高)是因为基于HTTP，(http live streaming，苹果提出的)
+如果要低延迟还得rmtp
+
+
+
 
 
 ### 开启浏览器内支持webp[关于WebP接入方案](https://www.xuanfengge.com/webp-access-scheme.html)
@@ -594,6 +597,11 @@ wireshark在windows下也能抓包，首先安装，安装好之后如果没有�
 长连接心跳间隔必须要小于NAT超时时间(aging-time)，如果超过aging-time不做心跳，TCP长连接链路就会中断，Server就无法发送Push给手机，只能等到客户端下次心跳失败后，重建连接才能取到消息。
 
 TCP长连接本质上不需要心跳包来维持，因为无论客户端还是服务器都不知道两者之间的额通道是否断开了。心跳包一个主要的作用就是防止NAT超时的。
+
+
+
+ARP（Address Resolution Protocol）地址解析协议。谈中间人攻击(man in the middle attack)的时候会讲到ARP欺骗。其实就是局域网内，任一主机可以宣称自己拥有某个IP，并让发出ARP请求的客户端接受自己的MAC地址，傻乎乎的更新ARP缓存，下次，该客户端发出的请求就全部被交给这个中间人主机了。
+
 ===============================
 
 
