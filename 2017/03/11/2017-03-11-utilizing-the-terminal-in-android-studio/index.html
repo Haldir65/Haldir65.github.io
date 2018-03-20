@@ -17,7 +17,7 @@
 <meta property="og:description" content="这周终于把Google I/O 2016的Android App在Device上跑起来了，顺便尝试多多使用命令行进行编译或者安装。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/device-2017-03-11-222239.png?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-03-19T15:27:02.425Z">
+<meta property="og:updated_time" content="2018-03-20T10:27:26.658Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用IDE内置的Terminal">
 <meta name="twitter:description" content="这周终于把Google I/O 2016的Android App在Device上跑起来了，顺便尝试多多使用命令行进行编译或者安装。">
@@ -224,12 +224,15 @@ ga('send', 'pageview');
 </blockquote>
 <h2 id="1-Systrace用于跟踪一段方法执行过程中的影响"><a href="#1-Systrace用于跟踪一段方法执行过程中的影响" class="headerlink" title="1. Systrace用于跟踪一段方法执行过程中的影响"></a>1. Systrace用于跟踪一段方法执行过程中的影响</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    Trace.beginSection(TAG);</span><br><span class="line">    <span class="comment">// do stuff</span></span><br><span class="line">    &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">     Trace.endSection();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 <p>计算一段方法到底花了多长时间，当然还是要在Android device monitor里面begin trace，注意要勾选<strong>Enable Application Traces from XXXX</strong>，选中自己的包名就好了。一开始可能不是特别好找，只要在html中ctrl+f找到了自己写的TAG，慢慢来应该能找到的。</p>
-<h2 id="2-FileObserver"><a href="#2-FileObserver" class="headerlink" title="2. FileObserver"></a>2. FileObserver</h2><p><a href="https://developer.android.com/reference/android/os/FileObserver.html">FileObserver</a>可以监控设备上文件的更改，删除，读取。<br>底层原理是使用了linux内核的inotify机制。</p>
+<h2 id="2-FileObserver"><a href="#2-FileObserver" class="headerlink" title="2. FileObserver"></a>2. FileObserver</h2><p><a href="https://developer.android.com/reference/android/os/FileObserver.html">FileObserver</a>可以监控设备上文件的更改，删除，读取。<br>底层原理是使用了linux内核的inotify机制。<br>但<a href="https://www.jianshu.com/p/f3c74063a8e4">简书上有人说</a></p>
+<blockquote>
+<p>android fileobserver 可以对文件系统的文件夹进行监听，但不能监听子目录。<br>要监听子目录必须递归遍历所有的文件夹对其添加监听。<br>fileobserver 在 Android 4.0 和 5.0 中是好用的，但在 Android 6.0 中有 bug 监听不能工作。</p>
+</blockquote>
 <h2 id="3-Environment-getXXX长什么样"><a href="#3-Environment-getXXX长什么样" class="headerlink" title="3. Environment.getXXX长什么样"></a>3. Environment.getXXX长什么样</h2><p>私有文件应该放在哪里，公开的文件适合放在哪里，tmp文件可以放在哪里。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Log.i(<span class="string">"codecraeer"</span>, <span class="string">"getFilesDir = "</span> + getFilesDir());</span><br><span class="line">Log.i(<span class="string">"codecraeer"</span>, <span class="string">"getExternalFilesDir = "</span> + getExternalFilesDir(<span class="string">"exter_test"</span>).getAbsolutePath());</span><br><span class="line">Log.i(<span class="string">"codecraeer"</span>, <span class="string">"getDownloadCacheDirectory = "</span> + Environment.getDownloadCacheDirectory().getAbsolutePath());</span><br><span class="line">Log.i(<span class="string">"codecraeer"</span>, <span class="string">"getDataDirectory = "</span> + Environment.getDataDirectory().getAbsolutePath());</span><br><span class="line">Log.i(<span class="string">"codecraeer"</span>, <span class="string">"getExternalStorageDirectory = "</span> + Environment.getExternalStorageDirectory().getAbsolutePath());</span><br><span class="line">Log.i(<span class="string">"codecraeer"</span>, <span class="string">"getExternalStoragePublicDirectory = "</span> + Environment.getExternalStoragePublicDirectory(<span class="string">"pub_test"</span>));</span><br></pre></td></tr></table></figure></p>
 <h2 id="4-对象池-Object-Pool"><a href="#4-对象池-Object-Pool" class="headerlink" title="4.对象池(Object Pool)"></a>4.对象池(Object Pool)</h2><p>这个看一下Glide里面的BitmapPool就好了<br>LruBitmapPool.java<br>pool的大小是MemorySizeCalculator算出来的，考虑了App可以使用的最大内存和屏幕分辨率像素对应容量这两个因素。<br>对象池主要关注put和get这两个方法。<br>Glide中的LruBitmapPool.java中有一段很有意思的注释<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> Bitmap <span class="title">get</span><span class="params">(<span class="keyword">int</span> width, <span class="keyword">int</span> height, Bitmap.Config config)</span> </span>&#123;</span><br><span class="line">       Bitmap result = getDirty(width, height, config);</span><br><span class="line">       <span class="keyword">if</span> (result != <span class="keyword">null</span>) &#123;</span><br><span class="line">           <span class="comment">// Bitmaps in the pool contain random data that in some cases must be cleared for an image to be rendered</span></span><br><span class="line">           <span class="comment">// correctly. we shouldn't force all consumers to independently erase the contents individually, so we do so</span></span><br><span class="line">           <span class="comment">// here. See issue #131.</span></span><br><span class="line">           result.eraseColor(Color.TRANSPARENT);</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="keyword">return</span> result;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
 <p>就是说，从回收池里面取出来的Bitmap可能存储了一些脏数据，在复用之前要清除下旧数据。</p>
 <blockquote>
-<p>另外，MotionEvent,Message以及Okio里面的Segment都是可以被recycle和obtain的可回收再利用对象。Andorid Bitmap后期支持了inBitmap，也是类似于回收再利用的概念。<br>Bitmap有点不同，虽然内存中的表现形式只是二维byte数组。但在支持inBitmap之前，并不是每一个Bitmap都可以被直接回收用于存储下一个Bitmap.</p>
+<p>另外，MotionEvent,Message,VelocityTracker以及Okio里面的Segment都是可以被recycle和obtain的可回收再利用对象。Andorid Bitmap后期支持了inBitmap，也是类似于回收再利用的概念。<br>Bitmap有点不同，虽然内存中的表现形式只是二维byte数组。但在支持inBitmap之前，并不是每一个Bitmap都可以被直接回收用于存储下一个Bitmap.</p>
 </blockquote>
 <p><a href="https://developer.android.com/reference/android/support/v4/util/Pools.html">V4包里提供了简单的实现</a></p>
 <h2 id="5-MediaScanner是一个和有趣的可以扫描多媒体文件的类"><a href="#5-MediaScanner是一个和有趣的可以扫描多媒体文件的类" class="headerlink" title="5.MediaScanner是一个和有趣的可以扫描多媒体文件的类"></a>5.MediaScanner是一个和有趣的可以扫描多媒体文件的类</h2><p><a href="http://droidyue.com/blog/2014/07/12/scan-media-files-in-android-chinese-edition/">技术小黑屋</a></p>
@@ -591,15 +594,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -627,10 +634,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
@@ -655,15 +658,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">前端</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
               <li class="article-tag-list-item">
