@@ -286,6 +286,8 @@ Bitmap.Config RGB_565： Each pixel is stored on 2 bytes and only the RGB channe
 > 根据懂c++人的分析，通过调用jni的CallObjectMethod来调用gVimRuntime的gVMRuntime_newNonMovableArray方法来创建一个数组，这个数组类型和长度分别用gByte_class和size表示。CallObjectMethod函数返回一个jbyteArray，此时，在Java层已经创建了一个长度为size的byte数组。
 
 也就符合official document中说的 **the pixel data is stored on the Dalvik heap along with the associated bitmap.** 说法了。我的理解是，庞大的像素数据是放在java层的，因为是直接gVimRuntime进行调用gVMRuntime_newNonMovableArray来创建的，并不会对开发者暴露这个数组的直接引用(直接乱改也不好吧)，而是使用bitmap这个对象进行间接操作。
+[官方文档](https://developer.android.com/topic/performance/graphics/manage-memory.html#recycle)其实也更新了:
+> From Android 3.0 (API level 11) through Android 7.1 (API level 25), the pixel data is stored on the Dalvik heap along with the associated bitmap. In Android 8.0 (API level 26), and higher, the bitmap pixel data is stored in the native heap.
 
 
 

@@ -24,7 +24,6 @@ top : 1
 - [ ] form表单可以跨域一个是历史原因要保持兼容性
 - [ ] 通过file input上传图片，原生ajax以及Ajax，自己搭建上传服务器[大概能猜到暴风影音的局域网传输实现了](https://zhuanlan.zhihu.com/p/24513281?refer=flask)
 - [ ] [lightbox一个很好看的js图片查看库](http://lokeshdhakar.com/projects/lightbox2/)
-- [ ] [nio stuff](https://juejin.im/post/59fffdb76fb9a0450a66bd58)
 - [ ] [仿门户网站js相册](https://www.js-css.cn/a/jscode/album/2014/0915/1319.html)， [js相册2](https://www.js-css.cn/a/jscode/album/2014/0914/1318.html)
 - [ ] [八大排序算法的python实现](http://python.jobbole.com/82270/)
 - [ ] [如何编写 jQuery 插件](https://gist.github.com/quexer/3619237)
@@ -51,11 +50,6 @@ top : 1
 * [如何调试 Android 打包流程？](http://www.wangyuwei.me/)，一个remote的事
 * [一个用于优化 png 图片的 gradle 插件](https://github.com/chenenyu/img-optimizer-gradle-plugin)，用来看 groovy 语法挺好的。以及 [How to write gradle plugin](http://yuanfentiank789.github.io/2017/09/20/%E5%9C%A8AndroidStudio%E4%B8%AD%E8%87%AA%E5%AE%9A%E4%B9%89Gradle%E6%8F%92%E4%BB%B6/)
 * XSS 攻击,DOM based和Stored XSS,基本上就是不要相信用户的输入，除了合法输入以外一律过滤掉
-*
-
-
-
-
 
 ### Good For Nothing
 - [ ] 用GDB调试程序
@@ -70,3 +64,4 @@ top : 1
 - Android进程的[加载流程](https://juejin.im/post/5a646211f265da3e3f4cc997)
 - 前后端同构
 - install nginx , jenkin ci, deploying nginx in docker(Http Load Balaning with Docker and nginx)(https://www.digitalocean.com/community/tutorials/how-to-configure-nginx-with-ssl-as-a-reverse-proxy-for-jenkins)
+- [nio stuff](https://juejin.im/post/59fffdb76fb9a0450a66bd58)

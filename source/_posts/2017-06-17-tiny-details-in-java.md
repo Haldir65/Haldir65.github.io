@@ -1364,6 +1364,7 @@ class Thread2 implements Runnable{
     }
 }
 ```
+一般来说的解决方案是用ThreadLocal，每条线程都保留一份备份，就不会出问题了
 
 ### 47. 反射为什么慢，慢成什么样了
 

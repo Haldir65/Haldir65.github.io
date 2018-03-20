@@ -57,6 +57,11 @@ try {
 ## 2. FileObserver
 [FileObserver](https://developer.android.com/reference/android/os/FileObserver.html)可以监控设备上文件的更改，删除，读取。
 底层原理是使用了linux内核的inotify机制。
+但[简书上有人说](https://www.jianshu.com/p/f3c74063a8e4)
+> android fileobserver 可以对文件系统的文件夹进行监听，但不能监听子目录。
+要监听子目录必须递归遍历所有的文件夹对其添加监听。
+fileobserver 在 Android 4.0 和 5.0 中是好用的，但在 Android 6.0 中有 bug 监听不能工作。
+
 
 ## 3. Environment.getXXX长什么样
 私有文件应该放在哪里，公开的文件适合放在哪里，tmp文件可以放在哪里。
@@ -93,7 +98,7 @@ Glide中的LruBitmapPool.java中有一段很有意思的注释
 ```
 就是说，从回收池里面取出来的Bitmap可能存储了一些脏数据，在复用之前要清除下旧数据。
 
-> 另外，MotionEvent,Message以及Okio里面的Segment都是可以被recycle和obtain的可回收再利用对象。Andorid Bitmap后期支持了inBitmap，也是类似于回收再利用的概念。
+> 另外，MotionEvent,Message,VelocityTracker以及Okio里面的Segment都是可以被recycle和obtain的可回收再利用对象。Andorid Bitmap后期支持了inBitmap，也是类似于回收再利用的概念。
 Bitmap有点不同，虽然内存中的表现形式只是二维byte数组。但在支持inBitmap之前，并不是每一个Bitmap都可以被直接回收用于存储下一个Bitmap.
 
 [V4包里提供了简单的实现](https://developer.android.com/reference/android/support/v4/util/Pools.html)

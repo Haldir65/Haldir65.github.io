@@ -623,7 +623,7 @@ private fun screenShotLong(){
 ### 28. 分析一点ViewPager的源码
 
 首先是快速滑动的时候为了性能只是挪了bitmap，这比调用layout要快得多。
-ViewPager.jav
+ViewPager.java
 ```java
 private void setScrollingCacheEnabled(boolean enabled) {
        if (mScrollingCacheEnabled != enabled) {
@@ -843,6 +843,8 @@ String apkPath = applicationInfo.sourceDir;
 return apkPath;
 ```
 在Android Studio 3.0后，直接在Device Explorer中查看data/app/com.example.appname，发现里面有个base.apk文件。几乎就是把原有的apk文件复制了一份。
+
+
 
 
 =============================================================================

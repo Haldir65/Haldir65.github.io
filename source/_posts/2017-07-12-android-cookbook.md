@@ -146,7 +146,7 @@ Android相关
     - [X] Dialog
     - [X] ImageView(onMeasure主要是尊重drawable的aspect ratio)[setImageResource前后图片大小不一致会有些问题](https://www.jianshu.com/p/bebe0029be57)
     - [ ] TextView(super complicated)
-    - [ ] ScrollView(不到2000行)
+    - [X] ScrollView(不到2000行，滑动是在onTouchEvent里面修改mScrollY实现的，而mScrollY会在View的draw里面去translate一下canvas，所以ScrollView就是这么滑动的)
     - [ ] NestedScrollView
     - [ ] ListView原理,加载优化
     - [ ] RecyclerView（这货最早的时候9K行，现在好像1.2W行。prefetcher什么的，滑动过程中不去加载图片，参考我写的Glide笔记）

@@ -115,6 +115,7 @@ h2为什么快，Multiplexing，多路复用允许同时通过单一的 HTTP/2 �
 - [HTTP 2.0: why and how by Simone Bordet](https://www.youtube.com/watch?v=UVwI1K0M7P0)
 - [HTTP1.1中的一些优化策略失效](https://www.youtube.com/watch?v=yURLTwZ3ehk)
 - [ O'Reilly HTTP/2](https://hpbn.co/http2/)
+- [Flow control](https://juejin.im/post/598ba1d06fb9a03c4d6464ab)
 
 <!-- ## 1. WireShark+tcpdump抓包
 
