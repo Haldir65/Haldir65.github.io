@@ -17,7 +17,7 @@
 <meta property="og:description" content="主要讲一下在java中实现多线程断点续传的原理,主要讲断点下载的原理。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/4b52d8db2e9d86b95c730af1db127a81.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-03-22T10:40:59.508Z">
+<meta property="og:updated_time" content="2018-03-22T15:03:00.243Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="多线程断点续传原理及实现">
 <meta name="twitter:description" content="主要讲一下在java中实现多线程断点续传的原理,主要讲断点下载的原理。">
@@ -205,7 +205,12 @@ ga('send', 'pageview');
 <ul>
 <li>conn.setRequestProperty(“Range”, “bytes=” + 500 + “-“ + 1000);</li>
 </ul>
-<p>也就是告诉服务器上次下载到的位置，本地写文件可以使用RandomAccessFile。本地需要记录下上次中断后停下来的位置。可以用db记录，也可以用sp记录。</p>
+<p>也就是告诉服务器上次下载到的位置，本地写文件可以使用RandomAccessFile。本地需要记录下上次中断后停下来的位置。可以用db记录，也可以用sp记录。<br>实践中肯定要发两次请求，第一次是为了读content-Length，确定每一份下载任务需要下载多少bytes。<br>第二步，就是根据线程数量，总数除以线程数，用一个线程池(或者直接开多条线程)去执行这么多份任务。每一份任务的请求都要带上上面那个Range的Header。</p>
+<p><a href="http://www.cnblogs.com/Creator/p/5490929.html">HTTP文件断点续传的原理</a><br>其实要注意的是，断点续传，下次开始下载前，需要根据ETag判断下服务器上的这个文件是否更改过了，如果改过了</p>
+<blockquote>
+<p> httpURLConnection.getHeaderField(“ETag”);<br> httpURLConnection.getHeaderField(“ETag”); //这是从零开始下载的时候获取Etag，本地保存</p>
+<p>httpURLConnection.setRequestProperty(“If-None-Match”, “b428eab9654aa7c87091e”); // 下载恢复之后，重新发请求，如果后返回一个304的状态码，那么可以继续执行。如果发生了更改，那么需要使用新的资源重新下载。</p>
+</blockquote>
 <p>这里面的难点在于多线程同步问题，高效率锁。还得要使用ArrayBlockingQueue。</p>
 <h2 id="1-获取要下载的内容的contentLength"><a href="#1-获取要下载的内容的contentLength" class="headerlink" title="1. 获取要下载的内容的contentLength"></a>1. 获取要下载的内容的contentLength</h2><p>HttpUrlConnection有一个connection.getContentLength()方法，用于获取内容大小(bytes)</p>
 <h2 id="2-大文件上传避免oom"><a href="#2-大文件上传避免oom" class="headerlink" title="2. 大文件上传避免oom"></a>2. 大文件上传避免oom</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Caused by java.lang.OutOfMemoryError: Failed to allocate a <span class="number">65548</span> <span class="keyword">byte</span> allocation with <span class="number">32012</span> free bytes and <span class="number">31</span>KB until OOM</span><br><span class="line">at com.android.okio.Segment.&lt;init&gt;(Segment.java:<span class="number">37</span>)</span><br><span class="line">at com.android.okio.SegmentPool.take(SegmentPool.java:<span class="number">48</span>)</span><br><span class="line">at com.android.okio.OkBuffer.writableSegment(OkBuffer.java:<span class="number">511</span>)</span><br><span class="line">at com.android.okio.OkBuffer.write(OkBuffer.java:<span class="number">424</span>)</span><br><span class="line">at com.android.okio.OkBuffer.clone(OkBuffer.java:<span class="number">740</span>)</span><br><span class="line">at com.android.okhttp.internal.http.RetryableSink.writeToSocket(RetryableSink.java:<span class="number">77</span>)</span><br><span class="line">at com.android.okhttp.internal.http.HttpConnection.writeRequestBody(HttpConnection.java:<span class="number">263</span>)</span><br><span class="line">at com.android.okhttp.internal.http.HttpTransport.writeRequestBody(HttpTransport.java:<span class="number">84</span>)</span><br><span class="line">at com.android.okhttp.internal.http.HttpEngine.readResponse(HttpEngine.java:<span class="number">790</span>)</span><br><span class="line">at com.android.okhttp.internal.http.HttpURLConnectionImpl.execute(HttpURLConnectionImpl.java:<span class="number">405</span>)</span><br><span class="line">at com.android.okhttp.internal.http.HttpURLConnectionImpl.getResponse(HttpURLConnectionImpl.java:<span class="number">349</span>)</span><br><span class="line">at com.android.okhttp.internal.http.HttpURLConnectionImpl.getResponseCode(HttpURLConnectionImpl.java:<span class="number">517</span>)</span><br><span class="line">at com.android.okhttp.internal.http.DelegatingHttpsURLConnection.getResponseCode(DelegatingHttpsURLConnection.java:<span class="number">105</span>)</span><br></pre></td></tr></table></figure>
