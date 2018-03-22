@@ -1006,6 +1006,22 @@ public static boolean checkFile(String aPath, Context context) {
 }
 ```
 
+## 33. TextView原生支持一些比较好玩的属性
+[Advanced Android TextView](https://www.youtube.com/watch?v=q2GtM1_RmMw)
+比方说
+```java
+Bitmap bitmap = BitmapFactory.
+            decodeResource(getResource(),R.drawable_cheetah_title);
+Shader shader = new BitmapShader(
+  bitmap,
+  Shader.TileMode.REPEAT,
+  Shader.TileMode.REPEAT);
+textView.getPaint().setShader(shader);
+)            
+```
+TextView渲染html文档的时候可以自定义一个tagHandler
+显示数学上的带有分子和分母的分数，可以使用<afrc>标签
+TextView里面有一个Layout.Alignment的属性，然后创建一个AlignMentSpan，可以用来实现类似于聊天的文字左对齐，右对齐，只用一个TextView
 
 =============================================================================
 

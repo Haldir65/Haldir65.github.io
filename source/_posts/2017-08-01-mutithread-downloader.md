@@ -14,6 +14,16 @@ tags: [java]
 - conn.setRequestProperty("Range", "bytes=" + 500 + "-" + 1000);
 
 也就是告诉服务器上次下载到的位置，本地写文件可以使用RandomAccessFile。本地需要记录下上次中断后停下来的位置。可以用db记录，也可以用sp记录。
+实践中肯定要发两次请求，第一次是为了读content-Length，确定每一份下载任务需要下载多少bytes。
+第二步，就是根据线程数量，总数除以线程数，用一个线程池(或者直接开多条线程)去执行这么多份任务。每一份任务的请求都要带上上面那个Range的Header。
+
+
+[HTTP文件断点续传的原理](http://www.cnblogs.com/Creator/p/5490929.html)
+其实要注意的是，断点续传，下次开始下载前，需要根据ETag判断下服务器上的这个文件是否更改过了，如果改过了
+>  httpURLConnection.getHeaderField("ETag");
+>  httpURLConnection.getHeaderField("ETag"); //这是从零开始下载的时候获取Etag，本地保存
+>
+> httpURLConnection.setRequestProperty(“If-None-Match”, "b428eab9654aa7c87091e"); // 下载恢复之后，重新发请求，如果后返回一个304的状态码，那么可以继续执行。如果发生了更改，那么需要使用新的资源重新下载。
 
 
 这里面的难点在于多线程同步问题，高效率锁。还得要使用ArrayBlockingQueue。

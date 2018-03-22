@@ -79,6 +79,8 @@ wiki上的[http名词解释](https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6
 503 Service Unavailable 服务器由于维护或者负载过重未能应答。例如，Servlet可能在数据库连接池已满的情况下返回503。服务器返回503时可以提供一个Retry-After头。就是服务器扛不住了的意思
 504 Gateway Timeout 由作为代理或网关的服务器使用，表示不能及时地从远程服务器获得应答。（HTTP 1.1新）
 
+[http状态码451](https://juejin.im/entry/5770d05a2e958a0078f1d730)，由于法律上的原因不能显示网页内容
+
 ## 3. Header相关的
 首先看下请求百度首页的request和response
 
@@ -364,6 +366,11 @@ TCP 连接两端好比两个人，这两个人之间保持通信往来（建立 
 ### 5.6 TLS,SSL
 https = Hyper Text Transfer Protocol over Secure Socket Layer 。是以安全为目标的http通道，简单讲是HTTP的安全办，即http下假如SSL层，HTTPS安全的基础是SSL。
 https是可能被劫持的，只要导入了一个不知名的根证书
+
+
+### 5.7 什么叫 Pipeline 管线化
+ HTTP1.0 不支持管线化，同一个连接处理请求的顺序是逐个应答模式，处理一个请求就需要耗费一个 TTL，也就是客户端到服务器的往返时间，处理 N 个请求就是 N 个 TTL 时长。当页面的请求非常多时，页面加载速度就会非常缓慢。
+ 从 HTTP1.1 开始要求服务器支持管线化，可以同时将多个请求发送到服务器，然后逐个读取响应。这个管线化和 Redis 的管线化原理是一样的，响应的顺序必须和请求的顺序保持一致。
 
 
 ## 6. WebSocket、SPDY、Http2
