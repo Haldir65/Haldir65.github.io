@@ -657,6 +657,20 @@ OkHttp拦截器里面能不能把请求取消掉? 结论几乎是否
 }
 ```
 
+### cancel ongoing request
+[Cancelling async request by tag](https://github.com/square/okhttp/issues/2205)
+```java
+public void cancel(OkHttpClient client, Object tag) {
+   for (Call call : client.dispatcher().queuedCalls()) {
+     if (tag.equals(call.request().tag())) call.cancel();
+   }
+   for (Call call : client.dispatcher().runningCalls()) {
+     if (tag.equals(call.request().tag())) call.cancel();
+   }
+ }
+```
+瞅了下call.cancel的实现，其实是对RealCall里面的成员变量RetryAndFollowUpInterceptor调用了cancel方法
+
 ## 5. 参考
 - [Paisy](https://blog.piasy.com/2016/07/11/Understand-OkHttp/)
 - [Frodo系列](http://frodoking.github.io/2015/03/12/android-okhttp/)

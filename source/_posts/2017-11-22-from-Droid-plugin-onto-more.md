@@ -171,6 +171,10 @@ signingConfigs {
 > 传统的进程间通信方式有管道，消息队列，共享内存等，其中管道，消息队列采用存储-转发方式，即数据先从发送方缓存区拷贝到内核开辟的缓存区中，然后再从内核缓存区拷贝到接收方缓存区，至少有两次拷贝过程。共享内存虽然无需拷贝，但控制复杂，难以使用。socket作为一款通用接口，其传输效率低，开销大，主要用在跨网络的进程间通信和本机上进程间的低速通信。Binder通过内存映射的方式，使数据只需要在内存进行一次读写过程。
 内存映射，简而言之就是将用户空间的一段内存区域映射到内核空间，映射成功后，用户对这段内存区域的修改可以直接反映到内核空间，相反，内核空间对这段区域的修改也直接反映用户空间。那么对于内核空间<—->用户空间两者之间需要大量数据传输等操作的话效率是非常高的。
 
+## sharedPreference其实是支持跨进程的，只是谷歌不推荐，建议使用ContentProvider这种
+> Context.MODE_MULTI_PROCESS
+This constant was deprecated in API level 23. MODE_MULTI_PROCESS does not work reliably in some versions of Android, and furthermore does not provide any mechanism for reconciling concurrent modifications across processes. Applications should not attempt to use it. Instead, they should use an explicit cross-process data management approach such as ContentProvider.
+
 
 [听说你Binder机制学的不错，来面试下这几个问题](https://www.jianshu.com/p/adaa1a39a274)
 

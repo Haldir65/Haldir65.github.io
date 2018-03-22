@@ -225,5 +225,5 @@ StringBuffer sb = new StringBuffer("My String")。//算下用了多少内存
 - [boolean数组中一个值占用1bit](http://www.jianshu.com/p/2f663dc820d0)
 - [不同jdk版本String做的优化](http://www.yunweipai.com/archives/1092.html)
 - [对象头里面的lock是怎么用的](http://www.cnblogs.com/xrq730/p/6928133.html)
-- [Android里面的一个View大概0.5kb](https://academy.realm.io/posts/360-andev-2017-romain-guy-chet-haase-android-performance/)
+- [Android里面的一个View大概0.5kb](https://academy.realm.io/posts/360-andev-2017-romain-guy-chet-haase-android-performance/)Android studio3.0中使用Memory profiler -> dunp java heap -> check Retained Size (能够看到每个View的大小，一个Toolbar大概在18kb)
 - [stuart mark也提到了文件头大小](https://www.youtube.com/watch?v=ogRVWXuuAU4)

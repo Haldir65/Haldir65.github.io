@@ -203,6 +203,22 @@ ANR的日志放在/data/anr/traces.txt里面
 ./adb pull path_to_file location_to_save就能搞出来了
 
 
+> $ adb shell ps | grep bbk ## 在一台步步高手机上
+u0_a24    11843 730   1808812 61012 SyS_epoll_ 0000000000 S com.bbk.appstore
+system    13140 730   1773144 51608 SyS_epoll_ 0000000000 S com.bbk.facewake
+u0_a80    13464 730   1772072 46280 SyS_epoll_ 0000000000 S com.bbk.calendar
+
+> $ adb shell cat /proc/11843/oom_adj
+/system/bin/sh: cat: /proc/11843/oom_adj: Permission denied
+
+[LowMemory Killer实现](http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2013/0724/1482.html)
+搜索关键字(oom_adj)
+
+
+
+
+
+
 
 ### 参考:
 - [张明云的博客](http://zmywly8866.github.io/2015/01/24/all-adb-command.html)

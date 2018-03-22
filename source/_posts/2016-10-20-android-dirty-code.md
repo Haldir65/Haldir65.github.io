@@ -31,7 +31,7 @@ Android对后台应用是有一个权重区分的，最直观的就是查看最�
 
 ### 2. startForeground一定会在系统状态栏显示一个通知，真的吗?
 ```java
-void startForeground (int id, 
+void startForeground (int id,
                 Notification notification)
 ```
 我找到了G+上的Chris Banes的一篇[post](https://plus.google.com/+AndroidDevelopers/posts/NEPWzPwSruR)，这其中明确指出
@@ -142,10 +142,11 @@ B service startForeground(processId,notification)
 
 ![](http://odzl05jxx.bkt.clouddn.com/blamingtheuser-big.png?imageView2/2/w/600)
 
+## updates
+[【腾讯Bugly干货分享】Android 进程保活招式大全](https://segmentfault.com/a/1190000006251859)
+
 
 
 ### Reference
 - [支付宝后台不死的黑科技](http://zhoujianghua.com/2015/07/28/black_technology_in_alipay/)
 - [Android的startForeground前台Service如何去掉通知显示](http://blog.csdn.net/wxx614817/article/details/50669420)
-
-

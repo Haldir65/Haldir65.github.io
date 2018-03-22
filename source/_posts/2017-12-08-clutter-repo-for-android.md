@@ -37,6 +37,7 @@ protected void dispatchFreezeSelfOnly(SparseArray<Parcelable> container) {
 就是为了节省asset耗费的内存，将一些系统公用的资源作为一个服务先跑起来，所有app的process共用这部分资源。
 
 ### 4. ZygoteInit
+[这篇文章](http://www.10tiao.com/html/599/201703/2651434963/1.html)讲到了从Launcher点击icon到起一个app的过程，Launcher所在进程通过IPC走startActivity请求位于system_server进程的ActivityManagerService,后者通过socket(Zygote进程跑起来之后就一直在循环等待请求)请求Zygote fork出一个app的进程，接着通知system_server去走Binder IPC去scheduleStartActivity(后面就都是App所在进程了)。
 
 
 ### 5. Michael Bailey每年的演讲都很精彩
@@ -336,6 +337,7 @@ mylayout.xml
 
 ### 19. LocalBroadCastManager<del>好像</del>确实是基于handler实现的
 App内部全局拥有一个LocalBroadCastManager实例，内部持有一个handler，对外暴露功能sendBroadcast。就是往handler里丢一个message MSG_EXEC_PENDING_BROADCASTS，处理这个message就是executePendingBroadcasts。所以默认是在下一个message中处理的。如果想在当前message中就处理掉，还有一个sendBroadcastSync方法，但这会把当前持有的所有待处理消息全部flush掉。sendBroadcast，unregisterReceiver，registerReceiver内部用了synchronize，所以是线程安全的。
+[stackoverflow上也有人指出LocalBrodcatManager不支持ipc](https://stackoverflow.com/questions/38751320/android-unable-to-receive-local-broadcast-in-my-activity-from-service).BroadcastReceiver倒是可以的，ContentProvider也是官方支持ipc的组件
 
 ### 20. ViewPager为什么没有那些attrs的可以写在xml里面的属性
  Adam Powell在15年的Android Dev summit上说过：this is pre aar gradle age, if we were to do it today , we definitely would add。
@@ -845,9 +847,170 @@ return apkPath;
 在Android Studio 3.0后，直接在Device Explorer中查看data/app/com.example.appname，发现里面有个base.apk文件。几乎就是把原有的apk文件复制了一份。
 
 
+### 31. 老版本的WebView是存在内存泄露的
+[参考](https://www.jianshu.com/p/eada9b652d99)
+
+### 32. App升级或者安装之前是要做一些检查的
+[这篇文章详尽描述了需要做的一些方案](http://blog.csdn.net/sk719887916/article/details/52233112)
+可能被劫持的地方有三处： 升级api(就是返回下载链接的接口)，下载api(就是那个cdn), 安装过程(调用packageManager之前)
+
+- 升级接口必须https，避免返回恶意地址
+- 检查file的md5和服务器response中的md5是否一致
+- 还要对下载的文件进行包名和签名验证，防止Apk被恶意植入木马
+
+```java
+// 升级接口返回下载地址之后
+UpgradeModel  aResult = xxxx;//解析服务器返回的后数据
+
+if (aResult != null && aResult.getData() != null ) {
+      String url = aResult.getData().getDownUrl();
+      if (url == null || !TextUtils.equals(url, "the_domian_that_i_own")) {
+        // 如果不是自己掌握的域名，不下载
+      }
+}
+
+// 判断下载下来的文件的md5和升级接口描述的md5是否一致
+File file = DownUtils.getFile(url);
+        // 监测是否要重新下载
+ if (file.exists() &&   TextUtils.equals(aResult.getData().getHashCode(), EncryptUtils.Md5File(file))) {
+  && TextUtils.equals(aResult.getData().getKey(), DownLoadModel.getData()..getKey())
+  // 如果符合，就去安装 不符合重新下载 删除恶意文件
+}
+
+
+// 下面这些代码来自上述文章
+public static void installApK(Context context, final String path, final String name ) {
+
+    if (!SafetyUtils.checkFile(path + name, context)) {
+        return;
+    }
+
+    if (!SafetyUtils.checkPagakgeName(context, path + name)) {
+        Toast.makeText(context, "升级包被恶意软件篡改 请重新升级下载安装", Toast.LENGTH_SHORT ).show();
+        DLUtils.deleteFile(path + name);
+        ((Activity)context).finish();
+        return;
+    }
+
+    switch (SafetyUtils.checkPagakgeSign(context, path + name)) {
+
+        case SafetyUtils.SUCCESS:
+            DLUtils.openFile(path + name, context);
+            break;
+
+        case SafetyUtils.SIGNATURES_INVALIDATE:
+
+            Toast.makeText(context, "升级包安全校验失败 请重新升级", Toast.LENGTH_SHORT ).show();
+            ((Activity)context).finish();
+
+            break;
+
+        case SafetyUtils.VERIFY_SIGNATURES_FAIL:
+
+            Toast.makeText(context, "升级包为盗版应用 请重新升级", Toast.LENGTH_SHORT ).show();
+            ((Activity)context).finish();
+            break;
+
+        default:
+            break;
+    }
+
+}
+
+
+/**
+* 安全校验
+* Created by LIUYONGKUI on 2016-04-21.
+*/
+public class SafetyUtils {
+
+    /** install sucess */
+    protected static final int SUCCESS = 0;
+    /** SIGNATURES_INVALIDATE */
+    protected static final int SIGNATURES_INVALIDATE = 3;
+    /** SIGNATURES_NOT_SAME */
+    protected static final int VERIFY_SIGNATURES_FAIL = 4;
+    /** is needcheck */
+    private static final boolean NEED_VERIFY_CERT = true;
+
+/**
+ * checkPagakgeSigns.
+ */
+public static int checkPagakgeSign(Context context, String srcPluginFile) {
+
+    PackageInfo PackageInfo = context.getPackageManager().getPackageArchiveInfo(srcPluginFile, 0);
+    //Signature[] pluginSignatures = PackageInfo.signatures;
+    Signature[] pluginSignatures = PackageParser.collectCertificates(srcPluginFile, false);
+    boolean isDebugable = (0 != (context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE));
+    if (pluginSignatures == null) {
+        PaLog.e("签名验证失败", srcPluginFile);
+        new File(srcPluginFile).delete();
+        return SIGNATURES_INVALIDATE;
+    } else if (NEED_VERIFY_CERT && !isDebugable) {
+        //可选步骤，验证APK证书是否和现在程序证书相同。
+        Signature[] mainSignatures = null;
+        try {
+            PackageInfo pkgInfo = context.getPackageManager().getPackageInfo(
+                    context.getPackageName(), PackageManager.GET_SIGNATURES);
+            mainSignatures = pkgInfo.signatures;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        if (!PackageParser.isSignaturesSame(mainSignatures, pluginSignatures)) {
+            PaLog.e("升级包证书和旧版本证书不一致", srcPluginFile);
+            new File(srcPluginFile).delete();
+            return VERIFY_SIGNATURES_FAIL;
+        }
+    }
+    return SUCCESS;
+}
+
+/**
+ * checkPagakgeName
+ * @param context
+ * @param srcNewFile
+ * @return
+ */
+public static boolean checkPagakgeName (Context context, String srcNewFile) {
+    PackageInfo packageInfo = context.getPackageManager().getPackageArchiveInfo(srcNewFile, PackageManager.GET_ACTIVITIES);
+
+    if (packageInfo != null) {
+
+       return TextUtils.equals(context.getPackageName(), packageInfo.packageName);
+    }
+
+    return false;
+}
+
+/**
+ * checkFile
+ *
+ * @param aPath
+ *            文件路径
+ * @param context
+ *            context
+ */
+public static boolean checkFile(String aPath, Context context) {
+    File aFile = new File(aPath);
+    if (aFile == null || !aFile.exists()) {
+        Toast.makeText(context, "安装包已被恶意软件删除", Toast.LENGTH_SHORT).show();
+        return false;
+    }
+    if  (context == null)  {
+         Toast.makeText(context, "安装包异常", Toast.LENGTH_SHORT).show();
+        return false;
+     }
+
+     return true;
+ }
+}
+```
 
 
 =============================================================================
+
+有些地方会对Apk进行二次打包，加固就是防着这个的。
+
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600)
 
 

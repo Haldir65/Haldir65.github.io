@@ -321,7 +321,7 @@ Session就是维护会话的。
 
 ### 5.1长连接的实现原理
 - 轮询
-- 心跳
+- 维护长连接的心跳(心跳的目的很简单：通过定期的数据包，对抗NAT超时)
 - Tcp长连接
 
 
@@ -337,6 +337,12 @@ Http长连接不如说tcp长连接,Tcp是可以不断开的，http连接服务�
 打个比喻，TCP Keep Alive 是这样的：
 TCP 连接两端好比两个人，这两个人之间保持通信往来（建立 TCP 连接）。如果他俩经常通信（经常发送 TCP 数据），那这个 TCP 连接自然是建立着的。但如果两人只是偶尔通信。那么，其中一个人（或两人同时）想知道对方是否还在，就会定期发送一份邮件（Keep Alive 探测包），这个邮件没有实质内容，只是问对方是否还在，如果对方收到，就会回复说还在（对这个探测包的 ACK 回应）。
 需要注意的是，keep alive 技术只是 TCP 技术中的一个可选项。因为不当的配置可能会引起诸如一个正在被使用的 TCP 连接被提前关闭这样的问题，所以默认是关闭的
+
+短连接： 每个连接的建立都是需要资源消耗和时间消耗.短连接都是连接建立后，client向server发送消息，server回应client，一次读写完成。连接的任意一方都可以关闭连接，一般是client主动关闭。前端网页一般用短连接，一个网页会发很多请求，如果这些全部作为长连接保留下来，服务器扛不住。这也就突出了短连接的好处，管理方便。
+
+长连接：区别于短连接的是，完成一次读写后，后续的读写操作都继续使用这个连接。存在的问题是，如果一直保持着连接，服务器可能被拖垮，这时候可以限制单用户的最大连接数。长连接一般用于操作频繁，点对点的通讯，且连接数不能太多的情况。因为没有了耗时的三次握手及断开，适用于比较及时的应用场景。例如，与数据库的连接用长连接，短连接频繁的操作会造成Socket错误，并且频繁的Socket创建也是对操作系统资源的浪费。
+
+
 
 
 ### 5.2 keep-Alive和WebSocket的区别
@@ -356,6 +362,8 @@ TCP 连接两端好比两个人，这两个人之间保持通信往来（建立 
 [解释](https://www.zhihu.com/question/20474326)
 
 ### 5.6 TLS,SSL
+https = Hyper Text Transfer Protocol over Secure Socket Layer 。是以安全为目标的http通道，简单讲是HTTP的安全办，即http下假如SSL层，HTTPS安全的基础是SSL。
+https是可能被劫持的，只要导入了一个不知名的根证书
 
 
 ## 6. WebSocket、SPDY、Http2
@@ -380,6 +388,16 @@ public class Test {
     }  
 }  
 ```
+
+运营商劫持有两种：DNS劫持(这个都懂)和数据劫持(在返回的内容中强行插入广告等其他内容，这种一般是对http下手)
+客户端反DNS劫持的手段(ip直连)： [遭遇DNS劫持](https://github.com/cheyiliu/All-in-One/wiki/%E9%81%AD%E9%81%87DNS%E5%8A%AB%E6%8C%81)
+> IP直连，httpdns的原理非常简单，主要有两步：A、客户端直接访问HttpDNS接口(直接用ip地址访问)，获取业务在域名配置管理系统上配置的访问延迟最优的IP。（基于容灾考虑，还是保留次选使用运营商LocalDNS解析域名的方式）B、客户端向获取到的IP后就向直接往此IP发送业务协议请求。以Http请求为例，通过在header中指定host字段，向HttpDNS返回的IP发送标准的Http请求即可。
+https，注意https是解决链路劫持的方案，并无法解决DNS劫持的问题。https安全但性能稍差
+
+WebView中反运营商DNS劫持的手段
+
+
+[今日头条、小米、腾讯等六公司联合抵制流量劫持 已有多项证据直接指向某些机构](http://finance.sina.com.cn/stock/t/2015-12-25/doc-ifxmxxst0459707.shtml)
 
 ### 8.Fiddler抓包
 - 手机和电脑连接同一个wifi
@@ -411,13 +429,15 @@ OSI七层网络体系结构 ： 物理层(IEEE 802.2)、数据链路层(ARP,RARP
 这里面Socket比较特殊，Socket是一组编程接口（API）。介于传输层和应用层，向应用层提供统一的编程接口。应用层不必了解TCP/IP协议细节。直接通过对Socket接口函数的调用完成数据在IP网络的传输。
 
 **OSI Model**
->application firefox/chrome/email
-Presentation OS / letters$numbers -> ASCII
-Session Conversation between computers
-Transport Packets are delived reliably(比如发送顺序和接受顺序一致)
-Network Dtetermine best route for data
-Data link NICS's(Network interface cards) checking for errors(比如switches)
-Physical Cabel / fiber optic cable / electronic signals
+> 7 - application /  firefox/chrome/email/HTTP
+6 - Presentation OS / letters$numbers -> ASCII
+5 - Session / Conversation between computers
+4 - Transport / Packets are delived reliably(比如发送顺序和接受顺序一致)
+3 - Network / Dtetermine best route for data
+2 - Data link / NICS's(Network interface cards) checking for errors(比如switches)
+1 - Physical Cabel / fiber optic cable / electronic signals
+
+[论https位于osi的第几个层级](https://security.stackexchange.com/questions/19681/where-does-ssl-encryption-take-place)The SSL protocol is implemented as a transparent wrapper around the HTTP protocol. In terms of the OSI model, it's a bit of a grey area. It is usually implemented in the application layer, but strictly speaking is in the session layer.
 
 Modem(调制解调器)：
 调制解调器是一种计算机硬件，它能把计算机的数字信号翻译成可沿普通电话线传送的模拟信号，而这些模拟信号又可被线路另一端的另一个调制解调器接收，并译成计算机可懂的语言。这一简单过程完成了两台计算机间的通信(电流变化-> 无线电 这个过程叫做调制，无线电引起电磁场变化从而产生电流变化，这个过程叫做解调)。电信办宽带经常送的光猫的学名叫做
@@ -471,6 +491,7 @@ firefox > nginx [ACK] 好的,知道了
 
 [单个网卡最多65535个端口](https://www.google.com/search?q=%E5%8D%95%E4%B8%AA%E7%BD%91%E5%8D%A1%E6%9C%80%E5%A4%9A65535%E4%B8%AA%E7%AB%AF%E5%8F%A3)
 2的16次方 = 65536。 2的32次方 = 4GB（大致是32位系统不能识别4G以上内存的原因）
+[wiki上对于tcp的解释](https://en.wikipedia.org/wiki/Transmission_Control_Protocol)描述了一个数据包的结构中，前两个byte(16个bit，2的16次方)用于存储source port，第16-31个byte存储destination port(依旧是2个bytes，2的16次方)。这也就是65536个端口限制的由来。
 
 [短网址(short URL)系统的原理及其实现](https://segmentfault.com/a/1190000012088345)
 >301 是永久重定向，302 是临时重定向。短地址一经生成就不会变化，所以用 301 是符合 http 语义的。同时对服务器压力也会有一定减少。
