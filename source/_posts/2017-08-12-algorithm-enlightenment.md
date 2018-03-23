@@ -285,7 +285,7 @@ public class LinkLoop {
 
 
 
-```
+
 给定两单链表A、B，只给出两头指针。请问：
 
 1、如何判断两单链表（无环）是否相交？
@@ -308,11 +308,41 @@ public class LinkLoop {
 
 （3）两个都有环：判断链表A的碰撞点是否出现在链表B的环中，如果在，则相交。（相交时，环必定是两链表共有的）
 
-3. 最小栈的实现
+3.最小栈的实现
 需要两个栈，A和B，B用于存储A中当前min的index，B中由上而下依次是A的最小，第二小，第三小。。。所以万一A中的最小被pop掉了，直接拿B顶上的元素，始终是最小的。时间复杂度是O(1)，空间复杂度最坏是O(N)
 
-4.
+4.在O(1)时间复杂度删除链表节点
+```python
+class Solution:  
+    # @param node: the node in the list should be deleted  
+    # @return: nothing  
+    def deleteNode(self, node):  
+        temp = node.next  
+        node.val = temp.val  
+        node.next = temp.next  
+        # write your code here  
 ```
+
+5. 堆排序的实现
+堆排序，时间复杂度O(nlogn),任何时刻都只需要常数个额外的元素空间存储临时数据。
+堆的定义
+
+　　n个元素的序列{k1，k2，…,kn}当且仅当满足下列关系之一时，称之为堆。
+
+　　情形1：ki <= k2i 且ki <= k2i+1 （最小化堆或小顶堆）
+
+　　情形2：ki >= k2i 且ki >= k2i+1 （最大化堆或大顶堆）
+
+　　其中i=1,2,…,n/2向下取整;
+堆可以看成是完全二叉树，完全二叉树中所有非终端结点的值均不大于（或不小于）其左、右孩子结点的值。
+排序通常用最大堆，构造优先队列通常用最小堆。最大堆(大顶堆)和最小堆实现基本一样，只要修改维护堆性质的函数即可。
+[Java实现---堆排序 Heap Sort](http://www.cnblogs.com/jycboy/p/5689728.html)
+
+堆排序方法对记录数较少的文件并不值得提倡，但对n较大的文件还是很有效的。因为其运行时间主要耗费在建初始堆和调整建新堆时进行的反复“筛选”上。
+
+6. 合并排序
+
+
 
 ### 参考
 [Java关于数据结构的实现：树](https://juejin.im/post/59cc55b95188250b4007539b)
