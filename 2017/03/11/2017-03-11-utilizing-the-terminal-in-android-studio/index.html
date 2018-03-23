@@ -17,7 +17,7 @@
 <meta property="og:description" content="这周终于把Google I/O 2016的Android App在Device上跑起来了，顺便尝试多多使用命令行进行编译或者安装。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/device-2017-03-11-222239.png?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-03-23T00:18:55.031Z">
+<meta property="og:updated_time" content="2018-03-23T10:37:04.237Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用IDE内置的Terminal">
 <meta name="twitter:description" content="这周终于把Google I/O 2016的Android App在Device上跑起来了，顺便尝试多多使用命令行进行编译或者安装。">
@@ -318,6 +318,11 @@ ga('send', 'pageview');
 <blockquote>
 <p>adb shell dumpsys batterystats</p>
 </blockquote>
+<h3 id="32-多进程SharedPreference读写使用ContentProvider就好了"><a href="#32-多进程SharedPreference读写使用ContentProvider就好了" class="headerlink" title="32. 多进程SharedPreference读写使用ContentProvider就好了"></a>32. 多进程SharedPreference读写使用ContentProvider就好了</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> SharedPreferences <span class="title">getSharedPreferences</span><span class="params">(String name, @PreferencesMode <span class="keyword">int</span> mode)</span></span>;</span><br><span class="line"><span class="comment">//默认传进来的是MODE_PRIVATE，</span></span><br><span class="line"><span class="comment">// MODE_MULTI_PROCESS 其实不能保证</span></span><br></pre></td></tr></table></figure>
+<p>所以一般的做法是利用ContentProvider去IPC。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">getContentResolver().getType()  <span class="comment">//客户端发起请求</span></span><br><span class="line"></span><br><span class="line">provider的getType方法中返回对应的String，一次IPC来回</span><br></pre></td></tr></table></figure></p>
+<p>打断点发现provider进程会走到execTransact -&gt; onTransact -&gt; query方法。这期间client被挂起，远程方法返回之后client方法继续执行。客户端发送请求后，会被挂起，所以如果长时间不返回，当前线程会一直阻塞，所以要在子线程发送异步请求。<br>写contentProvider的套路基本就是<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String AUTHORITY = <span class="string">"com.me.book.provider"</span>; <span class="comment">// 与AndroidManifest保持一致</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Uri BOOK_CONTENT_URI = Uri.parse(<span class="string">"content://"</span> + AUTHORITY + <span class="string">"/book"</span>);</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Uri USER_CONTENT_URI = Uri.parse(<span class="string">"content://"</span> + AUTHORITY + <span class="string">"/user"</span>);</span><br></pre></td></tr></table></figure></p>
+<p>数据库的位置是放在/data/data/com.packagename.applicationName/databases里<br>/data/data/com.packagename.applicationName/这个文件夹里一共四个文件夹，cache, code_cache(dex), files,databases</p>
+<h3 id="33-Activity的生命周期一直是一个很重要的话题"><a href="#33-Activity的生命周期一直是一个很重要的话题" class="headerlink" title="33. Activity的生命周期一直是一个很重要的话题"></a>33. Activity的生命周期一直是一个很重要的话题</h3><p>A start B forResult , B回来之后A被系统干掉了怎么办？<br>回来的时候A已经不是原来的A，所以要在onSaveInstance和onRestoreInstance中维护数据</p>
 
       
 
@@ -610,19 +615,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">linux</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">linux</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">tools</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -670,11 +675,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
+                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -682,7 +691,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -698,11 +707,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+                <a href="javascript:void(0)" class="js-tag color2">databinding</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">service</a>
+                <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -710,11 +719,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">databinding</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
+                <a href="javascript:void(0)" class="js-tag color3">service</a>
               </li>
             
             <div class="clearfix"></div>
