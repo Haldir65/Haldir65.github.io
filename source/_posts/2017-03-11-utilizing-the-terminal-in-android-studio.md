@@ -544,3 +544,30 @@ No, it does not.
 
 其实这一段adb命令就可以了
 > adb shell dumpsys batterystats
+
+
+### 32. 多进程SharedPreference读写使用ContentProvider就好了
+```java
+public abstract SharedPreferences getSharedPreferences(String name, @PreferencesMode int mode);
+//默认传进来的是MODE_PRIVATE，
+// MODE_MULTI_PROCESS 其实不能保证
+```
+所以一般的做法是利用ContentProvider去IPC。
+```java
+getContentResolver().getType()  //客户端发起请求
+
+provider的getType方法中返回对应的String，一次IPC来回
+```
+打断点发现provider进程会走到execTransact -> onTransact -> query方法。这期间client被挂起，远程方法返回之后client方法继续执行。客户端发送请求后，会被挂起，所以如果长时间不返回，当前线程会一直阻塞，所以要在子线程发送异步请求。
+写contentProvider的套路基本就是
+```java
+    public static final String AUTHORITY = "com.me.book.provider"; // 与AndroidManifest保持一致
+    public static final Uri BOOK_CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/book");
+    public static final Uri USER_CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/user");
+```
+数据库的位置是放在/data/data/com.packagename.applicationName/databases里
+/data/data/com.packagename.applicationName/这个文件夹里一共四个文件夹，cache, code_cache(dex), files,databases
+
+### 33. Activity的生命周期一直是一个很重要的话题
+A start B forResult , B回来之后A被系统干掉了怎么办？
+回来的时候A已经不是原来的A，所以要在onSaveInstance和onRestoreInstance中维护数据
