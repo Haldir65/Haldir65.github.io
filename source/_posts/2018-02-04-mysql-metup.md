@@ -333,6 +333,21 @@ public class JDBCtest {
 python的版本[python-mysql](http://www.runoob.com/python/python-mysql.html)
 
 
+## 更新
+SQLite支持事务，这就以外这需要在并发环境下，保持事务的ACID特性。Sqlite的锁实现基于文件锁，对于Linux系统，文件锁主要包含协同锁和强制锁。
+
+
+[sqlite不支持删除column,确定无疑](https://stackoverflow.com/questions/8442147/how-to-delete-or-add-column-in-sqlite)
+SQLite supports a limited subset of ALTER TABLE. The ALTER TABLE command in SQLite allows the user to rename a table or to add a new column to an existing table. It is not possible to rename a column, remove a column, or add or remove constraints from a table.
+It is not possible to rename a column, remove a column, or add or remove constraints from a table。//更改约束也不行
+
+alter table record drop column name;  //报错
+
+//一种周转的方法
+create table temp as select recordId, customer, place, time from record where 1 = 2;  //复制record的表结构，不包含内容
+drop table record;  
+alter table temp rename to record;  
+
 ### Another choice
 
 [mariadb](https://mariadb.org/)

@@ -177,13 +177,32 @@ Cache-Control:private, no-cache, no-cache=Set-Cookie, no-store, proxy-revalidate
 
 而浏览器的前进后退，默认会从缓存里读取，完全不发请求。
 
+缓存的优先级是：
+1. 先看缓存是否过期
+2. 发送Etag(如果有的话，服务器决策时304还是200)，发送If-None-Match
+3. 如果有Last-Modified的话，发送If-Modified-Since。
+4. 上述都失效的话，就当是全新的请求
+
 - Connection:keep-alive  http1.1 默认为keep-alive
 http 1.0需要手动设置。原理就是服务器保持客户端到服务器的连接持续有效，避免了重新建立连接的开销(tcp三次握手)。这种情况下，客户端不能根据读取到EOF(-1)来判断传输完毕。有两种解决方案：对于静态文件，客户端和服务器能够知道其大小，使用content-length，根据这个判断数据是否已经接收完成；对于动态页面，不可能预先知道内容大小。可以使用Transfer-Encoding:chunked的模式进行传输。基本上就是服务器把文件分成几块，一块一块的发送过去。[参考](https://www.byvoid.com/zhs/blog/http-keep-alive-header)
 
 - Content-Type  代表文件类型。request只有POST请求中会有，Response中也会有。
 POST里面的Content-type有两种:
-Content-type: application/x-www-form-urlencoded;charset:UTF-8 //缺省值，表示提交表单
-multipart/form-data //上传文件时用这种，既可以发送文本数据，也支持二进制上传。上面那个CharSet只是为了告诉服务器用的是哪种编码
+一： Content-type: application/x-www-form-urlencoded;charset:UTF-8 //缺省值，表示提交表单。只能传键值对。
+比如
+>tel=13637829200&password=123456
+
+二： multipart/form-data //上传文件时用这种，既可以发送文本数据，也支持二进制上传。上面那个CharSet只是为了告诉服务器用的是哪种编码，能传二进制。
+比方说
+```text
+------WebKitFormBoundaryw0ZREBdOiJbbwuAg
+Content-Disposition: form-data; name="uploads[]"; filename="278a516893f31a16feee.jpg"
+Content-Type: image/jpeg
+
+
+------WebKitFormBoundaryw0ZREBdOiJbbwuAg--
+```
+
 响应头中的Content-Type示例： Content-Type:image/gif或者Content-Type: text/html;charset=utf-8 [参考](http://www.runoob.com/http/http-content-type.html)
 
 - Date:Sun, 23 Jul 2017 07:39:47 GMT 这就是当前的GMT时间
@@ -627,6 +646,89 @@ wikipedia上说 **MAC地址共48位（6个字节），以十六进制表示。�
 NAT映射(把192.168.1.xx转换成外部ip和port的方案)
 
 TCP长连接本质上不需要心跳包来维持，因为无论客户端还是服务器都不知道两者之间的额通道是否断开了。心跳包一个主要的作用就是防止NAT超时的。
+
+## 用java实现一个httpClient怎么样?
+```java
+public class HttpSocketClient {
+
+    private Socket mSocket;
+
+    public static void main(String[] args) {
+        HttpSocketClient client = new HttpSocketClient();
+        try {
+            client.sendGet("www.baidu.com",80,"/");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public HttpSocketClient() {
+        this.mSocket = new Socket();
+
+    }
+
+    /** 在百度服务器面前，这就是一个正常的浏览器
+     * @param host
+     * @param port
+     * @param path
+     * @throws IOException
+     */
+    void sendGet(String host, int port, String path) throws IOException {
+        SocketAddress dest = new InetSocketAddress(host, port);
+        mSocket.connect(dest);
+        OutputStreamWriter streamWriter = new OutputStreamWriter(mSocket.getOutputStream());
+        BufferedWriter bufferedWriter = new BufferedWriter(streamWriter);
+
+        bufferedWriter.write("GET " + path + " HTTP/1.1\r\n");
+        bufferedWriter.write("Host: " + host + "\r\n");
+        bufferedWriter.write("Connection: " + "keep-alive" + "\r\n");
+        bufferedWriter.write("User-Agent: " + "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36" + "\r\n");
+        bufferedWriter.write("Accept: " + "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8" + "\r\n");
+        bufferedWriter.write("Accept-Language: " + "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7" + "\r\n");
+        bufferedWriter.write("\r\n");
+        bufferedWriter.flush(); //flush一下很重要，等于说已经写完了
+
+
+        BufferedInputStream stream = new BufferedInputStream(mSocket.getInputStream());
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));
+        String line = null;
+        while ((line = bufferedReader.readLine())!=null) {
+            System.out.println(line);
+        }
+        bufferedReader.close();
+        bufferedWriter.close();
+        mSocket.close();
+    }
+
+}
+```
+输出
+```
+HTTP/1.1 302 Moved Temporarily
+Date: Sat, 24 Mar 2018 06:44:20 GMT
+Content-Type: text/html
+Content-Length: 225
+Connection: Keep-Alive
+Set-Cookie: BAIDUID=259D5F393E329E8E44651C589037C093:FG=1; expires=Thu, 31-Dec-37 23:55:55 GMT; max-age=2147483647; path=/; domain=.baidu.com
+Set-Cookie: BIDUPSID=259D5F393E329E8E44651C589037C093; expires=Thu, 31-Dec-37 23:55:55 GMT; max-age=2147483647; path=/; domain=.baidu.com
+Set-Cookie: PSTM=1521873860; expires=Thu, 31-Dec-37 23:55:55 GMT; max-age=2147483647; path=/; domain=.baidu.com
+Set-Cookie: BD_LAST_QID=10107339987852007720; path=/; Max-Age=1
+P3P: CP=" OTI DSP COR IVA OUR IND COM "
+Location: https://www.baidu.com/
+Server: BWS/1.1
+X-UA-Compatible: IE=Edge,chrome=1
+
+<html>
+<head><title>302 Found</title></head>
+<body bgcolor="white">
+<center><h1>302 Found</h1></center>
+<hr><center>65d90fa34a5e777be72b3e20c859c335f9198cc2
+Time : Thu Mar 15 16:20:59 CST 2018</center>
+</body>
+</html>
+```
+当然因为访问的是http，302是临时重定向，注意上面返回了Location字段，所以是符合规范的
 ===============================
 
 

@@ -808,19 +808,24 @@ ctrl +b + , 重命名当前窗口
 修改 ~/.tmux.conf 文件，如果没有就创建一个
 
 # 每次都要按ctrl+b实在是太麻烦，改成ctrl+a吧，因为a距离ctrl近一点。下面三行就改好了
-set-option -g prefix C-a
+
+
+>set-option -g prefix C-a
 UNBIND-KEY C-a
 bind key C a send prefix
 
+
+
 tmux有一个很重要的概念- session
- tmux list-sessions // 列出当前所有sessions
- tmux ls // 列出当前所有sessions
- ctrl+b + $ //可以重命名session
- 如果从一个terminal中开了一个tmux session，然后直接右上角关闭terminal，在其他的terminal中就能看到这个session不是attached的状态
+
+> tmux list-sessions // 列出当前所有sessions
+tmux ls // 列出当前所有sessions
+ctrl+b + $ //可以重命名session
+如果从一个terminal中开了一个tmux session，然后直接右上角关闭terminal，在其他的terminal中就能看到这个session不是attached的状态
 如果不想用点击右上角叉号的方式退出session，可以使用ctrl +B +d //disconnect from current session.这样就不用关闭整个terminal了
- tmux attach -t vim-dev //假设vim-dev是一个session的名字
- 一个好玩的现象是，如果开两个terminal，连接到同一个session，任何在一个session的操作都会在另一个session的terminal中显示，就像远程协助一样。
- ctrl +b + ( //切换到前一个session
+tmux attach -t vim-dev //假设vim-dev是一个session的名字
+一个好玩的现象是，如果开两个terminal，连接到同一个session，任何在一个session的操作都会在另一个session的terminal中显示，就像远程协助一样。
+ctrl +b + ( //切换到前一个session
 ctrl +b + ) //切换到下一个session
 
 ### 20. 使用systemd管理程序
@@ -859,6 +864,7 @@ systemctl cat sshd.service ## 查看一个服务的配置文件
 /etc/systemd/system，自定义服务配置管理目录（存放自定义应用注册类服务和第三方服务类配置）：/usr/lib/systemd/system/
 
 自定义.service配置文件，实现开机自启(开机执行一个sh脚本)的步骤
+
 1. 创建一个start-script.service文件(权限改成754),大致内容如下
 
 > [Unit]

@@ -497,3 +497,4 @@ public class GreetingPlugin implements Plugin<Project> {
 [Build Script Basics](https://docs.gradle.org/current/userguide/tutorial_using_tasks.html#configure-by-dag)
 [关于Android Gradle你需要知道这些（4）](https://juejin.im/post/5a756f11f265da4e7c185bc5)
 [Gradle插件学习笔记（四)](https://juejin.im/post/5a767c7cf265da4e9c6300a1#heading-5)
+[Android Gradle Plugin  source Code](https://android.googlesource.com/platform/tools/build/+/tools_r22/gradle/src/main/groovy/com/android/build/gradle/BasePlugin.groovy)

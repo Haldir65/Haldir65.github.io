@@ -512,6 +512,10 @@ LogUtil.w(TAG, String.valueOf(toMB(runtime.totalMemory()))); //14.13MB
 ```
 大概也就几十个MB的样子，确实不是很多。多进程下，等于平白多了几十MB的内存，对于缓解性能压力还是有好处的。
 
+[大概什么时候就应该开一个多进程呢](https://stackoverflow.com/questions/4658511/android-how-to-decide-whether-to-run-a-service-in-a-separate-process)
+子进程挂了，主进程照样能跑，亲测会出现这样的log
+>  JavaBinder: *** Uncaught remote exception!  (Exceptions are not yet supported across processes.)
+
 ### 28. 关于Android APK 安装过程
 以下内容来自[Android APK 安装过程详解](http://blog.csdn.net/zhaokaiqiang1992/article/details/72863932)
 首先APK 的本质是一个 Zip 压缩包，只是后缀被修改为 apk，其中打包了源代码编译出的 class.dex、一些图片视频资源文件和一些 Native 库文件。APK 文件与 Zip 文件最大的一个不同是 APK 包含签名信息，用于保证安装包安全不被修改。

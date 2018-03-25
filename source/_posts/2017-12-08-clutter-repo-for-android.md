@@ -1023,6 +1023,181 @@ TextView渲染html文档的时候可以自定义一个tagHandler
 显示数学上的带有分子和分母的分数，可以使用<afrc>标签
 TextView里面有一个Layout.Alignment的属性，然后创建一个AlignMentSpan，可以用来实现类似于聊天的文字左对齐，右对齐，只用一个TextView
 
+## 34. ContentProvider的一些点
+可以自定义权限，在manifest里面写
+URI有固定格式：
+
+分析URI：content://com.ljq.provider.personprovider/person/10/name，其中content://是Scheme，com.ljq.provider.personprovider表示主机名或者authorities，person/10/name表示路径，此URI要操作person表中id为10的name字段。
+
+自定义权限
+```xml
+<permission android:name="me.pengtao.READ" android:protectionLevel="normal"/>
+
+<provider
+    android:authorities="me.pengtao.contentprovidertest"
+    android:name=".provider.TestProvider"
+    android:readPermission="me.pengtao.READ"
+    android:exported="true">
+</provider>
+
+<!-- 在第三方app中就可以声明： -->
+<uses-permission android:name="me.pengtao.READ"/>
+```
+另外说一句，ContentProvider是在App启动的时候就创建的，比Application的onCreate还要早
+
+## 35. android:multiprocess="true"
+Activity可以在Manifest中声明这个属性，provider也可以声明这个属性。这个意思就是说，这个activity或者provider在A进程被拉起，那就创建一个A进程的Activity实例。在B进程被拉起，就创建一个B进程的Activity实例。在那个进程被打开就创建一个跑在哪个进程的实例
+>If the app runs in multiple processes, this attribute determines whether multiple instances of the content provder are created. If true, each of the app's processes has its own content provider object. If false, the app's processes share only one content provider object. The default value is false.
+Setting this flag to true may improve performance by reducing the overhead of interprocess communication, but it also increases the memory footprint of each process.
+
+## 36. 两个App之间共享数据
+ 两个应用的ShareUserId相同，则共享对方的data目录下的文件，包括SharePreference, file, lib等文件。例如，在ShareUserId相同的情况下，读取另一个应用的SharePreference文件。
+
+ ```xml
+ //第一个应用程序为的menifest文件代码如下：  
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"  
+package="com.mythou.serviceID"  
+android:sharedUserId="com.mythou.share"  
+>  
+//第二个应用程序的menifest文件代码如下：  
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"  
+package="com.mythou.clientID"  
+android:sharedUserId="com.mythou.share"  
+>  
+```
+读取的时候这么读
+```java
+try {  
+     Context ct=this.createPackageContext ("com.mythou.serviceID", Context.CONTEXT_IGNORE_SECURITY);  
+     SharedPreferences sp = ct.getSharedPreferences("appInfo", MODE_PRIVATE);  
+     String str2 = sp.getString("appname", "service");  
+     Log.d("test", "share preference-->" + str2);  
+} catch (NameNotFoundException e) {  
+     // TODO Auto-generated catch block  
+     e.printStackTrace();  
+}   
+```
+
+## 37. ActivityAlias就跟Alias一样
+```xml
+<activity android:name="com.mytest.StartupActivity"  
+    android:exported="true">  
+</activity>  
+
+<!-- Solution for upgrading issue -->  
+<activity-alias android:name="com.mytest.HomeActivity"  
+    android:targetActivity="com.mytest.StartupActivity"  
+    android:exported="true"  
+    android:enabled="true">  
+    <intent-filter>  
+        <action android:name="android.intent.action.MAIN" />  
+        <category android:name="android.intent.category.LAUNCHER" />  
+    </intent-filter>  
+</activity-alias>  
+```
+
+## 38. 自定义一个scheme也很简单
+比如说App打电话就是:
+```java
+//电话号码  
+String phoneNum = phoneNumEdit.getText().toString().trim();  
+//打电话  
+Intent callIntent = new Intent(Intent.ACTION_CALL);  
+callIntent.setData(Uri.parse("tel:"+phoneNum));  
+startActivity(callIntent);  
+
+
+Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);  
+startActivityForResult(takePhotoIntent, REQUEST_TAKE_PHOTO);  
+
+// 系统相机进程的数据还能通过onActivityResult返回，跨进程了
+@Override  
+protected void onActivityResult(int requestCode, int resultCode, Intent data) {  
+
+    //如果去拍照请求返回  
+    if (requestCode == REQUEST_TAKE_PHOTO) {  
+
+        //如果结果返回成功  
+        if (resultCode == RESULT_OK) {  
+
+            Bitmap bmp = (Bitmap) data.getExtras().get("data");  
+            takeResultImg.setImageBitmap(bmp);  
+        }  
+    }  
+    super.onActivityResult(requestCode, resultCode, data);  
+}  
+```
+
+```xml
+<activity android:name="com.sarnasea.interprocess.ShareActivity">  
+    <intent-filter>  
+        <action android:name="com.sarnasea.interprocess.MYACTION"/>  
+        <data android:scheme="message"/>  
+        <category android:name="android.intent.category.DEFAULT"/>  
+    </intent-filter>  
+</activity>  
+```
+
+
+```java
+//  在ShareActivity获得其他应用程序传递过来的数据  （完全可以多进程）
+Uri data = getIntent().getData();  
+if (data != null) {  
+
+    //获得Host,也就是message://后面的主体内容  
+    String host = data.getHost();  
+    Toast.makeText(this, host, Toast.LENGTH_SHORT).show();  
+}  
+
+Bundle bundle = getIntent().getExtras();  
+if(bundle != null){  
+
+    //获得其他应用程序调用该Activity时传递过来的Extras数据  
+    String value = bundle.getString("value");  
+    Toast.makeText(this, value, Toast.LENGTH_SHORT).show();  
+}
+
+
+
+// 外部启动这个Activity的方法
+Intent intent = new Intent();  
+intent.setAction("com.sarnasea.interprocess.MYACTION");   
+intent.setData(Uri.parse("message://Hello World!"));  
+intent.putExtra("value", "yanglu");  
+startActivity(intent);  
+
+
+//这个Activty还可以从另一个进程返回数据
+Intent data = new Intent();  
+// 设置要返回的数据  
+data.putExtra("result", "关闭Activity时返回的数据");  
+// 设置返回码和Intent对象  
+setResult(Activity.RESULT_OK, data);  
+// 关闭Activity  
+finish();    
+```
+
+## 39. Intent的底层实现是共享内存
+两个Activity之间Intent传递数据的时候，Intent中的数据已经经历了两轮序列化和反序列化，当然是不同的对象
+熟悉AIDL的同学都很清楚，AIDL跨进程通信支持的数据类型是：
+
+>Java 的原生类型，如int,boolean,long,float…
+String 和CharSequence
+List 和 Map ,List和Map 对象的元素必须是AIDL支持的数据类型
+AIDL 自动生成的接口 需要导入(import)
+实现android.os.Parcelable 接口的类. 需要导入(import)。
+这里并不包括Serializable类型。
+于是去看了源码，发现是Parcel自己对Serializable类型的对象做了兼容，可以直接写入其中。
+public class Intent implements Parcelable, Cloneable
+
+[Intent传递数据底层分析](https://blog.csdn.net/javine/article/details/56836454)
+
+Parcelable是Android为我们提供的序列化的接口,Parcelable相对于Serializable的使用相对复杂一些,但Parcelable的效率相对Serializable也高很多,这一直是Google工程师引以为傲的,有时间的可以看一下Parcelable和Serializable的效率对比 Parcelable vs Serializable 号称快10倍的效率
+
+Parcelable的底层使用了 **Parcel** 机制， Parcel机制会将序列化的数据写入到一个共享内存中，其他进程通过Parcel从共享内存中读出字节流，然后反序列化后使用。这就是Intent或Bundle能够在activity或者在binder中跨进程通信的原理。
+
+
+
 =============================================================================
 
 有些地方会对Apk进行二次打包，加固就是防着这个的。

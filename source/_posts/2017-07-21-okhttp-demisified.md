@@ -43,6 +43,8 @@ public abstract class InputStream implements Closeable{
 
 BufferedInputStream和BufferedOutputStream就是提供了这样的缓冲策略，其内部默认分配了一个默认大小的字节数组，或者在read方法中传入一个字节数组，每次一个byte一个byte的读，然后将读出来的内容写进outPutStream。读到-1就是文件终止(EOF)。具体原理可以参考IBM的[深入分析 Java I/O 的工作机制](https://www.ibm.com/developerworks/cn/java/j-lo-javaio/index.html)。
 那么问题来了，buffer[]作为一个字节数组，其容量是恒定的。假设我们想要一次性读取特别多的数据怎么办。例如http的response header一般长这样,然而实际上在无线电传播的过程中，每一行的后面都跟了一个换行符'\r\n',而且无线电传播的时候其实根本没有换行的概念，就是一个字节跟着一个字节。假如服务器自己定义了特别长的header字段，inputstream读到这里的时候，事先预设的字节数组(没法改了)装不下，一种简单粗暴的方式是尝试扩容，这就意味着要把数据从原始数组copy到新的数组，丢掉旧的数组，把指针指向新的数组(一个是allocate数组，一个是arrayCopy，这俩都造成了性能损耗),当然jdk肯定不是这么干的。
+BufferedInputStream是用来做提供了缓存的效果，DataInputStream提供了读取基本数据类型的功能(比方说4个bytes当成一个int)，InputStreamReader的read方法需要提供一个char[]，然后外部拿着这个char[]去生成一个String.
+
 ```
 HTTP/1.1 200 OK
 Bdpagetype: 1
@@ -168,6 +170,15 @@ public BufferedInputStream(InputStream in, int size) {
 
 
 BufferedInputStream要求外部调用者带着一个固定大小的byte数组来取数据，难免会有人传进来一个特别小的数组，这样永远不可能读取超过这个数组大小长度的某一行。
+
+读写这种事情操作起来总是从一个近似无限大的数据源  一点一点地取出来 存在一个内存中一个临时的地方， 然后再讲这部分数据交给其他接收方。 这就要求所有的读写都要准备进行多次读写，每次读到一个中转站中。在java io中这个中转站的大小是固定的，okio中这个中转站是一个个的Segment连接起来的。
+java io中各种decorater流之间的包装带来了System.arrayCopy
+```java
+new DataInputStream(new BufferedInputStream(new FileInputStream("")));
+```
+比如这样的代码，DataInputStream的read方法实际上传了一个byte[]，调用了BufferedInputStream的read方法，后者再将数据从自身arrayCopy到byte[]中。在Okio中，不存在这样的copy,
+Buffer的定义是"A collection of bytes in memory."，与数组不同，Buffer之间传递数据的方式是挪指针。
+
 
 BufferedSource在读取Socket数据时，一边从socket里面拿一个Segment大小的数据，然后调用readInt,readLong等方法返回int,long(同时从segment头部清空数据)。如果读到segment最后发现剩下的byte不能组成一个int，就会从segment pool中借一个segment，并从socket中读取数据塞满，把第一个segment剩下的一点byte和第二个segment的头部一点拼成一个int。以BufferSource的readInt为例:
 ```java

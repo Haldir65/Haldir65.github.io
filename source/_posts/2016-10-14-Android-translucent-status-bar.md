@@ -239,6 +239,17 @@ private void showSystemUI() {
 }
 ```
 
+一旦使用了windowTranslucentSystemBar，你的Activity的Window中将不再拥有statusBarView和NavigationBarView(这也就是为什么api文档上说setStatusBarColor不能在设置了translucentFlag的前提下使用)
+fitSystemWindows在大部分View中的实现都是加了一个padding
+
+Chris Banes推荐的的获取statusBar的高度的方法
+```js
+myView.setOnApplyWindowInsetsListener { View, inset, ->
+  val statusBarSize = insets.systemWindowInsetTop
+  return insets 
+}
+```
+
 
 ### Reference
 1. [Android-transulcent-status-bar总结](http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2016/0330/4104.html)

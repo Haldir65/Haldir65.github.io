@@ -221,7 +221,7 @@ T和Y的一一对应其实是在Glide的构造函数里面写好的：
 上面其实就是创建了一个DrawableTypeRequest，泛型是File ，构造函数一层层往上调用，DrawableRequestBuilder这一层调用了crossFade方法，即默认会有一个crossFade的效果，默认用的是DrawableCrossFadeFactory。注意这里把属于RequestManager的RequestTracker也传进来了。
 - Glide.with(context).load(XX)到目前为止只是返回了一个DrawableTypeRequest<ModelType> 的实例。(还在主线程)
 
-## 2.3 小节
+## 2.3 小结
 Glide.with返回一个RequestManger，每个Activity只会有一个RequestManager
 load方法返回了一个DrawableTypeRequest<T>，这个T可能是File,String,Interger等。
 到目前为止还只是构建一个Request。
@@ -447,7 +447,7 @@ Engine.java
             }
             return null;
         }
-
+        // 为什么在已经有了Cache这一层缓存之后，还要设置一个ActiveResources缓存。是因为loadFromCache里面调用了LinkedHashMap的remove方法，所以这种马上要用的资源当然要cache在另一份缓存里
         EngineResource<?> active = loadFromActiveResources(key, isMemoryCacheable);
         if (active != null) {
             cb.onResourceReady(active);

@@ -9,11 +9,11 @@ tags: [tools,algorithm]
 <!--more-->
 
 
-## 1. 各种Search的原理及java代码实现
+## 1. 各种排序的原理及java代码实现
 java.utils.Arrays这个类中有各种经典的实现，直接对照着学就好了。
 
 
-### 1.1 BinarySearch
+### 1.1 BinarySearch[这个不是sort，但还是放第一了]
 二分法查找，前提是数组中元素全部按照顺序(从小到大或者从大到小)排列好了。Android中SparseArray中用到了binarySearch
 
 android.support.v4.util.ContainerHelpers
@@ -76,6 +76,13 @@ def bubble_sort(lists):
             if lists[i] > lists[j]:
                 lists[i], lists[j] = lists[j], lists[i]
     return lists
+```
+
+其实任何语言都应该有这种不用第三个值去swap两个int的方法
+```java
+x = x + y;  // x now becomes 15
+ y = x - y;  // y becomes 10
+ x = x - y;  // x becomes 5
 ```
 
 the worst case scenario ：array完全倒序 o(n^2)
@@ -220,6 +227,36 @@ public class MySelectionSort {
 一种比较快速的排序方法
 [视频](https://www.youtube.com/watch?v=aQiWF4E8flQ)
 选中数组最后一个元素，称之为pivot。然后从左到右找，把所有小于pivot的元素挪到左边。然后把pivot挪到刚才那个元素右边，一直重复下去。
+```java
+public static void quickSort(int[] data,int low,int high) {
+    if (low < high) {
+        int povit = partition(data, low, high);
+        quickSort(data, low, povit - 1);
+        quickSort(data, povit + 1, high);
+    }
+
+}
+
+public static int partition(int[] arr,int low , int high){
+    int pivot = arr[low];
+    while (low < high) {
+        while (low<high&&arr[high]>=pivot)
+        {
+            --high;
+        }
+        arr[low] = arr[high];
+        while (low<high&&arr[low]<=pivot)
+        {
+            ++low;
+        }
+        arr[high] = arr[low];
+    }
+    arr[low] = pivot;
+    return low;
+}
+```
+这是好不容易看懂的快速排序java实现，感受下手写快排
+
 
 ### 1.7 TimSort
 java的Collections.sort的算法，
@@ -340,7 +377,9 @@ class Solution:
 
 堆排序方法对记录数较少的文件并不值得提倡，但对n较大的文件还是很有效的。因为其运行时间主要耗费在建初始堆和调整建新堆时进行的反复“筛选”上。
 
-6. 合并排序
+任意一位置i上元素，其左儿子为2i+1上，右儿子在2i+2上。
+
+
 
 
 

@@ -247,6 +247,8 @@ git submodule update --init ## 比如说shadowsocks工程
 
 我也是才发现，windows下的git bash集成了openssh，curl，好用的不行
 
+git branch -r 有时候不显示所有的remote branch，亲测，remove掉origin，重新添加然后fetch就好了
+
 
 ## Reference
 -[git reset和revert](http://yijiebuyi.com/blog/8f985d539566d0bf3b804df6be4e0c90.html)
