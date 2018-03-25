@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/bamboo-buds-wallpaper-53859567dd31a.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/fork_you_git.jpg">
-<meta property="og:updated_time" content="2018-03-23T10:37:04.237Z">
+<meta property="og:updated_time" content="2018-03-25T15:26:11.898Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="linux基本命令介绍">
 <meta name="twitter:description" content="一些常用的linux基本命令,仅作为参考。   nohup node server.js &amp;gt; /dev/null 2&amp;gt;&amp;amp;1 &amp;amp;">
@@ -318,8 +318,13 @@ ga('send', 'pageview');
 <h3 id="18-ubuntu-desktop预设的desktop-environment叫做unity"><a href="#18-ubuntu-desktop预设的desktop-environment叫做unity" class="headerlink" title="18.ubuntu desktop预设的desktop environment叫做unity"></a>18.ubuntu desktop预设的desktop environment叫做unity</h3><p>比较常见的linux desktop 还有gnome,KDE ,plasma,Ma tei, cinnamon.</p>
 <h3 id="19-tmux使用"><a href="#19-tmux使用" class="headerlink" title="19.tmux使用"></a>19.tmux使用</h3><p>tmux是多窗口神器，再也不用傻乎乎的去开screen了，远程server也能用。<br><a href="https://tmuxcheatsheet.com/">tmuxcheatsheet</a>tmux创建的窗口叫做pane，关闭的方式有exit和ctrl+b x<br>ctrl+B // prefix,基本上就是让tmux开始接收后面的指令<br>ctrl + b + “ //纵向排列<br>ctrl + b + %  //横向排列<br>ctrl + b + z //zoom到这个pane,再按下ctrl+b +z 使当前pane退出全屏<br>ctrl + b + c //创建一个新窗口<br>ctrl + b +p //previous窗口 n就是next窗口<br>ctrl + b 2 //跳到第2个窗口<br>ctrl +b + &amp; 干掉当前窗口<br>ctrl +b + , 重命名当前窗口</p>
 <p>接下来看如何修改配置<br>修改 ~/.tmux.conf 文件，如果没有就创建一个</p>
-<h1 id="每次都要按ctrl-b实在是太麻烦，改成ctrl-a吧，因为a距离ctrl近一点。下面三行就改好了"><a href="#每次都要按ctrl-b实在是太麻烦，改成ctrl-a吧，因为a距离ctrl近一点。下面三行就改好了" class="headerlink" title="每次都要按ctrl+b实在是太麻烦，改成ctrl+a吧，因为a距离ctrl近一点。下面三行就改好了"></a>每次都要按ctrl+b实在是太麻烦，改成ctrl+a吧，因为a距离ctrl近一点。下面三行就改好了</h1><p>set-option -g prefix C-a<br>UNBIND-KEY C-a<br>bind key C a send prefix</p>
-<p>tmux有一个很重要的概念- session<br> tmux list-sessions // 列出当前所有sessions<br> tmux ls // 列出当前所有sessions<br> ctrl+b + $ //可以重命名session<br> 如果从一个terminal中开了一个tmux session，然后直接右上角关闭terminal，在其他的terminal中就能看到这个session不是attached的状态<br>如果不想用点击右上角叉号的方式退出session，可以使用ctrl +B +d //disconnect from current session.这样就不用关闭整个terminal了<br> tmux attach -t vim-dev //假设vim-dev是一个session的名字<br> 一个好玩的现象是，如果开两个terminal，连接到同一个session，任何在一个session的操作都会在另一个session的terminal中显示，就像远程协助一样。<br> ctrl +b + ( //切换到前一个session<br>ctrl +b + ) //切换到下一个session</p>
+<h1 id="每次都要按ctrl-b实在是太麻烦，改成ctrl-a吧，因为a距离ctrl近一点。下面三行就改好了"><a href="#每次都要按ctrl-b实在是太麻烦，改成ctrl-a吧，因为a距离ctrl近一点。下面三行就改好了" class="headerlink" title="每次都要按ctrl+b实在是太麻烦，改成ctrl+a吧，因为a距离ctrl近一点。下面三行就改好了"></a>每次都要按ctrl+b实在是太麻烦，改成ctrl+a吧，因为a距离ctrl近一点。下面三行就改好了</h1><blockquote>
+<p>set-option -g prefix C-a<br>UNBIND-KEY C-a<br>bind key C a send prefix</p>
+</blockquote>
+<p>tmux有一个很重要的概念- session</p>
+<blockquote>
+<p>tmux list-sessions // 列出当前所有sessions<br>tmux ls // 列出当前所有sessions<br>ctrl+b + $ //可以重命名session<br>如果从一个terminal中开了一个tmux session，然后直接右上角关闭terminal，在其他的terminal中就能看到这个session不是attached的状态<br>如果不想用点击右上角叉号的方式退出session，可以使用ctrl +B +d //disconnect from current session.这样就不用关闭整个terminal了<br>tmux attach -t vim-dev //假设vim-dev是一个session的名字<br>一个好玩的现象是，如果开两个terminal，连接到同一个session，任何在一个session的操作都会在另一个session的terminal中显示，就像远程协助一样。<br>ctrl +b + ( //切换到前一个session<br>ctrl +b + ) //切换到下一个session</p>
+</blockquote>
 <h3 id="20-使用systemd管理程序"><a href="#20-使用systemd管理程序" class="headerlink" title="20. 使用systemd管理程序"></a>20. 使用systemd管理程序</h3><p>Systemctl是一个systemd工具，主要负责控制systemd系统和服务管理器。systemd中一项服务称为unit<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl start application ## 比方说nginx</span><br><span class="line">sudo systemctl status nginx ## 看下状态</span><br><span class="line">sudo systemctl restart application.service</span><br><span class="line">sudo systemctl reload application.service</span><br><span class="line">sudo systemctl reload-or-restart application.service</span><br><span class="line"></span><br><span class="line">sudo systemctl enable application.service ##开机启动</span><br><span class="line"><span class="meta">#</span># 开机启动的原理是往/lib/systemd/system或者/etc/systemd/system这个目录下创建了类似于nginx.service的symbolic link。</span><br><span class="line"><span class="meta">#</span># 指向在这个文件夹下创建的xxx.target.wants文件</span><br><span class="line"></span><br><span class="line">sudo systemctl disable application.service ## 禁止开机启动</span><br><span class="line"><span class="meta">#</span># 这句话就是取消了symbolic link</span><br><span class="line"></span><br><span class="line">sudo systemctl is-active nginx.service ## 看下在不在跑</span><br><span class="line">active</span><br><span class="line">systemctl is-enabled application.service</span><br><span class="line">systemctl is-failed application.service</span><br><span class="line"></span><br><span class="line">systemctl list-units --all ## 所有systemd加载（或者尝试过加载）的程序</span><br><span class="line">systemctl list-units --all --state=inactive ## 只看active的</span><br><span class="line"></span><br><span class="line">systemctl list-unit-files ## 和list-units不一样，这里还包括了systemd为尝试过parse的配置</span><br><span class="line"></span><br><span class="line">sudo systemctl halt ## 挂起</span><br><span class="line">sudo systemctl poweroff ## 关机</span><br><span class="line">sudo systemctl reboot ## 重启 其实sudo reboot也是指向/bin/systemctl的软链接</span><br><span class="line"></span><br><span class="line">systemctl cat sshd.service ## 查看一个服务的配置文件</span><br></pre></td></tr></table></figure></p>
 <p>系统基本service服务配置目录（此目录勿动，一般情况下只放系统核心基础服务配置，否存放应用注册类服务配置）：<br>/etc/systemd/system，自定义服务配置管理目录（存放自定义应用注册类服务和第三方服务类配置）：/usr/lib/systemd/system/</p>
 <p>自定义.service配置文件，实现开机自启(开机执行一个sh脚本)的步骤</p>
@@ -669,19 +674,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">linux</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">tools</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">
