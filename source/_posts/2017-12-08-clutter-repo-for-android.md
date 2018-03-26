@@ -360,7 +360,7 @@ measureVertical()
         }
 ```
 
-### 22. gradlw文件的作用
+### 22. gradle wrapper文件的作用
 [understanding-the-gradle-wrapper](https://medium.com/@bherbst/understanding-the-gradle-wrapper-a62f35662ab7)
 进一个新目录
 > gradle wrapper 命令会生成如下目录

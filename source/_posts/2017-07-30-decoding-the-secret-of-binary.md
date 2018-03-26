@@ -144,7 +144,7 @@ String s = "一些包含Emoji的文字"
 for(int i =0 ,size = s.length();i<size;){
     int c = s.codePointAt(i);
     System.out.println("The Caharacter at %d is '%c'%n",i,c);
-    i+=Cahracter.charCount(c);//正确识别char数量
+    i+=Character.charCount(c);//正确识别char数量
 }
 ```
 汉字用UTF-8编码的话，有些还是会超出两个字节的，比如“𠮷”，[wiki](https://zh.wiktionary.org/zh-hans/%F0%A0%AE%B7)给这货的解释。十进制是134071，已经超出两个字节(65536)了。

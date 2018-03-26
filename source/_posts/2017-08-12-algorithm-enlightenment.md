@@ -379,6 +379,56 @@ class Solution:
 
 任意一位置i上元素，其左儿子为2i+1上，右儿子在2i+2上。
 
+我碰到过的算法题(还是面试官手下留情的)：
+1. 两个整形数组，请使用你能够想到的最优算法，实现求交集的操作
+2. 二维数组环形打印
+
+
+3. 给定一个n*m矩阵，求从左上角到右下角总共存在多少条路径，每次只能向右走或者向下走。
+[递归和动态规划](https://blog.csdn.net/shangqing1123/article/details/47360615)
+
+首先给出计算总的可能路径的方法
+```java
+public static int uniquePaths(int m, int n){  
+ 2              if(m==0 || n==0) return 0;  
+ 3              if(m ==1 || n==1) return 1;  
+ 4               
+ 5             int[][] dp = new int[m][n];  
+ 6               
+ 7             //只有一行时，到终点每个格子只有一种走法  
+ 8             for (int i=0; i<n; i++)  
+ 9                 dp[0][i] = 1;  
+10               
+11             // 只有一列时，到终点每个格子只有一种走法
+12             for (int i=0; i<m; i++)  
+13                 dp[i][0] = 1;  
+14               
+15             // for each body node, number of path = paths from top + paths from left  
+16             for (int i=1; i<m; i++){  
+17                 for (int j=1; j<n; j++){  
+18                     dp[i][j] = dp[i-1][j] + dp[i][j-1];  
+19                 }  
+20             }  
+21             return dp[m-1][n-1];  
+22         }
+```
+
+解法二：数学中的组合问题，因为从左上角到右下角，总共需要走n+m-2步，左上角和右下角的元素不考虑在内，我们每次都可以选择向下走，向下走总共需要m-1步，所以在n+m-2步中选择m-1步，这是典型的排列组合问题。
+
+```c
+int uniquePaths(int m, int n)
+{
+	int N = n + m - 2;
+	int K = n - 1;
+	double res = 1.0;
+	for (int i = 1; i <= n - 1; ++i)
+	{
+		res = res * (N - K + i) / i;
+	}
+	return (int)res;
+}
+```
+
 
 
 
