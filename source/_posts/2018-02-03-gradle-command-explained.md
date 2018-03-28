@@ -171,6 +171,18 @@ Android Studio中点击run之后，执行了这些tasks
 
 [简书上有人总结了](https://www.jianshu.com/p/cc88488e5163)
 
+Gradle的Flavor能否配置sourceset?
+在sourceSets中可以设置不同flavor各自的java.srcDirs和res.srcDirs
+
+Product flavors
+一个product flavor定义了从项目中构建了一个应用的自定义版本。一个单一的项目可以同时定义多个不同的flavor来改变应用的输出。
+Build Type  + Product Flavor = Build Variant（构建类型+定制产品=构建变种版本）
+这句话的意思就是，BuildTypes有n种，product flavor有m种，最终可能的组合有m*n种
+[Gradle Plugin User Guide](http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Build-Variants)
+
+
+
+[美团外卖Android平台化架构演进实践](https://tech.meituan.com/meituan_food_delivery_android_architecture_evolution.html)
 
 
 [gradle 4.4之后Clock 被Deprecated的方案是自己创建一个groovy文件](https://github.com/HujiangTechnology/gradle_plugin_android_aspectjx/pull/75/files#diff-a5277607f48bf80ac7edd5dbafa307ae)

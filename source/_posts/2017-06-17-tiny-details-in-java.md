@@ -1366,7 +1366,43 @@ class Thread2 implements Runnable{
 ```
 一般来说的解决方案是用ThreadLocal，每条线程都保留一份备份，就不会出问题了
 
-### 47. 反射为什么慢，慢成什么样了
+
+### 47. equals()方法被override时，hashCode()也要被override
+现象就是如果两个业务上应该相同的object
+```java
+public class EqualsTest {
+    public static void main(String[] args) {
+        Employee e1 = new Employee();
+        Employee e2 = new Employee();
+
+        e1.setId(100);
+        e2.setId(100);
+        //Prints false in console
+        System.out.println(e1.equals(e2)); //如果业务上要求具有相同id的用户视为同一个用户，需要复写equals
+
+        Set<Employee> employees = new HashSet<Employee>();
+       employees.add(e1);
+       employees.add(e2);
+       //Prints two objects
+       System.out.println(employees); //但此时只应该打印出一个object，因为二者在业务上应该视为同一个对象处理，也就违反了HashSet不能存储重复元素的原则。
+    }
+}
+
+//在HashMap的getNode方法
+
+do {
+    if (e.hash == hash &&
+        ((k = e.key) == key || (key != null && key.equals(k))))
+        return e;
+    } while ((e = e.next) != null);
+//优先根据hashCode去获取    
+```
+HashMap 底层采用一个 Entry[] 数组来保存所有的 key-value 对，当需要存储一个 Entry 对象时，会根据hash算法来决定其在数组中的存储位置，在根据equals方法决定其在该数组位置上的链表中的存储位置；当需要取出一个Entry时，也会根据hash算法找到其在数组中的存储位置，再根据equals方法从该位置上的链表中取出该Entry。
+
+**那么复写了hashCode之后，一定要复写equals方法吗。**
+
+
+### 48. 反射为什么慢，慢成什么样了
 
 ## 参考
 - [Jake Wharton and Jesse Wilson - Death, Taxes, and HTTP](https://www.youtube.com/watch?v=6uroXz5l7Gk)
