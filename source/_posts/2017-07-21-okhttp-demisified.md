@@ -682,6 +682,11 @@ public void cancel(OkHttpClient client, Object tag) {
 ```
 瞅了下call.cancel的实现，其实是对RealCall里面的成员变量RetryAndFollowUpInterceptor调用了cancel方法
 
+### 设计模式
+当一个网络请求发出时,需要经过应用层->传输层->网络层->连接层->物理层
+收到响应后正好反过来,物理层->连接层->网络层->传输层->应用层
+在请求经过各层时,由每层轮流处理.每层都可以对请求或响应进行处理.并可以中断链接,以自身为终点返回响应
+
 ## 5. 参考
 - [Paisy](https://blog.piasy.com/2016/07/11/Understand-OkHttp/)
 - [Frodo系列](http://frodoking.github.io/2015/03/12/android-okhttp/)

@@ -575,3 +575,57 @@ provider的getType方法中返回对应的String，一次IPC来回
 ### 33. Activity的生命周期一直是一个很重要的话题
 A start B forResult , B回来之后A被系统干掉了怎么办？
 回来的时候A已经不是原来的A，所以要在onSaveInstance和onRestoreInstance中维护数据
+
+### 34. 集成微信登录，微信如何和App通信的？
+WXEntryActivity一般是这样的:
+```java
+public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
+    private IWXAPI api;
+
+    @Override
+   public void onCreate(Bundle savedInstanceState) {
+       super.onCreate(savedInstanceState);
+       api = WXAPIFactory.createWXAPI(this, mWXAppKey);
+       api.handleIntent(getIntent(), this);
+   }
+
+   @Override
+  public void onResp(BaseResp resp) {
+     switch (resp.errCode) {
+       case BaseResp.ErrCode.ERR_OK:
+       break;
+     }
+  }
+}
+
+
+// api.handleIntent(getIntent(), this); 这里面的实现如下：
+public final boolean handleIntent(Intent var1, IWXAPIEventHandler var2) {
+       try {
+           int var16 = var1.getIntExtra("_wxapi_command_type", 0); //这里其实已经跑在当前App的进程了
+           switch(var16) {
+           case 1:
+               Resp var23 = new Resp(var1.getExtras());
+               var2.onResp(var23); // 直接调用WXEntryActivity中的onResp方法
+               return true;
+           case 2:
+               com.tencent.mm.opensdk.modelmsg.SendMessageToWX.Resp var22 = new com.tencent.mm.opensdk.modelmsg.SendMessageToWX.Resp(var1.getExtras());
+               var2.onResp(var22);
+               return true;
+          // ......
+        }  
+      }    
+    }    
+```
+再结合xml中的exported = true ;
+```xml
+<activity
+         android:name=".wxapi.WXEntryActivity"
+         android:exported="true"
+         android:launchMode="singleTop"
+         android:theme="@android:style/Theme.Translucent" />
+```
+猜测是通过Intent直接设置component发送请求，传递数据，很正规的实现
+
+### 35. 多进程虚拟机都是单独的
+Android为每个应用都分配了一个独立的虚拟机(VM)，确切说是为每个进程都分配了一个独立的虚拟机，不同的虚拟机在内存分配上有不同的地址空间，这样在不同的虚拟机(即进程)中访问同一个类的对象时就会产生多份副本，而这些副本之间也是相互独立，互不影响的。
