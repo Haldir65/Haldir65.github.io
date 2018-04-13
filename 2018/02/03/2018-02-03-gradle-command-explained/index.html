@@ -14,7 +14,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/street lights dark night car city.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-03-29T05:36:32.315Z">
+<meta property="og:updated_time" content="2018-04-13T07:19:47.819Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="gradle command记事本">
 <meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/street lights dark night car city.jpg?imageView2/2/w/600">
@@ -279,7 +279,7 @@ ga('send', 'pageview');
 <p> gradle test testBoth<br>This is executed during the initialization phase.<br>This is executed during the configuration phase.<br>This is also executed during the configuration phase.<br>This is executed during the configuration phase as well.<br>:test<br>This is executed during the execution phase.<br>:testBoth<br>This is executed first during the execution phase.<br>This is executed last during the execution phase.<br>BUILD SUCCESSFUL in 0s<br>2 actionable tasks: 2 executed</p>
 </blockquote>
 <p>经常会在build.gradle中看到这样一段<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">afterEvaluate &#123; project -&gt;</span><br><span class="line">    logger.info(<span class="string">"=========afterEvaluate=============="</span>)</span><br><span class="line">    project.tasks.each &#123; task -&gt;</span><br><span class="line">        <span class="keyword">if</span> (task.name == <span class="string">"test"</span>||task.name.contains(<span class="string">"lint"</span>))&#123;</span><br><span class="line">            task.enabled = <span class="keyword">false</span> <span class="comment">// 有些不必要的确实可以剔除掉</span></span><br><span class="line">        &#125;</span><br><span class="line"><span class="comment">//        task.enabled = false 这么干的话全部任务都不会执行</span></span><br><span class="line">       println(<span class="string">"-------------$&#123;task.name&#125;----"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>afterEvaluate发生在Configuration之后，实际上也就是在project配置完成后，开始执行所有task前，对外提供一个closure，其实beforeEvaluate也有。</p>
+<p>closure就是一对花括号包着的东西<br>afterEvaluate发生在Configuration之后，实际上也就是在project配置完成后，开始执行所有task前，对外提供一个closure，其实beforeEvaluate也有。</p>
 <p><strong>immediately invoked after a task is added to a project</strong> 在Task被添加到project的时候执行closure<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">tasks.whenTaskAdded &#123; task -&gt;</span><br><span class="line">    task.ext.srcDir = <span class="string">'src/main/java'</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">task a</span><br><span class="line"></span><br><span class="line">println <span class="string">"source dir is $&#123;a.srcDir&#125;"</span></span><br></pre></td></tr></table></figure></p>
 <p>project evaluate有可能成功，也会失败。但无论成功还是失败，下面的notification都会触发<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">gradle.afterProject &#123;project, projectState -&gt;</span><br><span class="line">    <span class="keyword">if</span> (projectState.failure) &#123;</span><br><span class="line">        println <span class="string">"Evaluation of $project FAILED"</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        println <span class="string">"Evaluation of $project succeeded"</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>在gradle的plugin中实现也有类似的<br>PluginImpl.groovy<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PluginImpl</span> <span class="keyword">implements</span> <span class="title">Plugin</span>&lt;<span class="title">Project</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="keyword">void</span> <span class="title">apply</span><span class="params">(Project project)</span> </span>&#123;</span><br><span class="line">     project.gradle.addProjectEvaluationListener() <span class="comment">// 和在build.gradle中afterEvaluate差不多</span></span><br><span class="line">     project.getGradle().taskGraph.addTaskExecutionGraphListener() <span class="comment">//在执行前</span></span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
@@ -293,6 +293,7 @@ ga('send', 'pageview');
 <li>创建一个Standalone Project //可复用</li>
 </ol>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GreetingPlugin</span> <span class="keyword">implements</span> <span class="title">Plugin</span>&lt;<span class="title">Project</span>&gt; </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">apply</span><span class="params">(Project project)</span> </span>&#123;</span><br><span class="line">        project.task(<span class="string">"hello"</span>)</span><br><span class="line">          .doLast(task -&gt; System.out.println(<span class="string">"Hello Gradle!"</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><a href="https://www.jianshu.com/p/f43d48abfbf3">使用Transform Api在class变成dex之前对class进行字节码修改</a><br>本质上是在merge{ProductFlavor}{BuildType}Assets Task之后，transformClassesWithDexFor{ProductFlavor}{BuildType} Transform 之前,插入一个transformClassesWith{YourTransformName}For{ProductFlavor}{BuildType} Transform</p>
 <p><a href="https://github.com/Tencent/tinker/blob/master/tinker-build/tinker-patch-gradle-plugin/src/main/groovy/com/tencent/tinker/build/gradle/TinkerPatchPlugin.groovy">Tinker的gradle plugin实现，非常有参考意义</a><br>和java libraray提交到jcenter不同，gradle需要提交到<a href="https://guides.gradle.org/publishing-plugins-to-gradle-plugin-portal/">Gradle Plugin Portal</a>。没错，一个完全不一样的网站</p>
 <p><a href="https://github.com/adwiv/android-fat-aar">比较复杂的gradle knowledge</a><br><a href="https://guides.gradle.org/creating-new-gradle-builds/">official gradle docs 是最好的学习资料</a><br><a href="https://docs.gradle.org/current/userguide/custom_plugins.html">custom_plugins</a><br><a href="https://docs.gradle.org/current/userguide/tutorial_using_tasks.html#configure-by-dag">Build Script Basics</a><br><a href="https://juejin.im/post/5a756f11f265da4e7c185bc5">关于Android Gradle你需要知道这些（4）</a><br><a href="https://juejin.im/post/5a767c7cf265da4e9c6300a1#heading-5">Gradle插件学习笔记（四)</a><br><a href="https://android.googlesource.com/platform/tools/build/+/tools_r22/gradle/src/main/groovy/com/android/build/gradle/BasePlugin.groovy">Android Gradle Plugin  source Code</a></p>
 
@@ -533,6 +534,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Window</a>
               </li>
              
@@ -541,7 +546,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -554,10 +563,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -574,10 +579,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -629,11 +630,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
+                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -645,15 +642,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">databinding</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -665,11 +666,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">databinding</a>
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
             
             <div class="clearfix"></div>

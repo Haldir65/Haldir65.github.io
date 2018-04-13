@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/b9ae1189145b4a4d9dfe4d0b89a21b47.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/ed541bc1ed61ead0bf6ea8233ef01c0a.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-03-29T05:36:32.307Z">
+<meta property="og:updated_time" content="2018-04-13T07:19:47.815Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="网络通信手册">
 <meta name="twitter:description" content="网络相关的查找手册">
@@ -436,7 +436,9 @@ ga('send', 'pageview');
 <p>TCP长连接本质上不需要心跳包来维持，因为无论客户端还是服务器都不知道两者之间的额通道是否断开了。心跳包一个主要的作用就是防止NAT超时的。</p>
 <h2 id="用java实现一个httpClient怎么样"><a href="#用java实现一个httpClient怎么样" class="headerlink" title="用java实现一个httpClient怎么样?"></a>用java实现一个httpClient怎么样?</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HttpSocketClient</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Socket mSocket;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        HttpSocketClient client = <span class="keyword">new</span> HttpSocketClient();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            client.sendGet(<span class="string">"www.baidu.com"</span>,<span class="number">80</span>,<span class="string">"/"</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">HttpSocketClient</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.mSocket = <span class="keyword">new</span> Socket();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/** 在百度服务器面前，这就是一个正常的浏览器</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> host</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> port</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> path</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> IOException</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">sendGet</span><span class="params">(String host, <span class="keyword">int</span> port, String path)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        SocketAddress dest = <span class="keyword">new</span> InetSocketAddress(host, port);</span><br><span class="line">        mSocket.connect(dest);</span><br><span class="line">        OutputStreamWriter streamWriter = <span class="keyword">new</span> OutputStreamWriter(mSocket.getOutputStream());</span><br><span class="line">        BufferedWriter bufferedWriter = <span class="keyword">new</span> BufferedWriter(streamWriter);</span><br><span class="line"></span><br><span class="line">        bufferedWriter.write(<span class="string">"GET "</span> + path + <span class="string">" HTTP/1.1\r\n"</span>);</span><br><span class="line">        bufferedWriter.write(<span class="string">"Host: "</span> + host + <span class="string">"\r\n"</span>);</span><br><span class="line">        bufferedWriter.write(<span class="string">"Connection: "</span> + <span class="string">"keep-alive"</span> + <span class="string">"\r\n"</span>);</span><br><span class="line">        bufferedWriter.write(<span class="string">"User-Agent: "</span> + <span class="string">"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36"</span> + <span class="string">"\r\n"</span>);</span><br><span class="line">        bufferedWriter.write(<span class="string">"Accept: "</span> + <span class="string">"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"</span> + <span class="string">"\r\n"</span>);</span><br><span class="line">        bufferedWriter.write(<span class="string">"Accept-Language: "</span> + <span class="string">"zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7"</span> + <span class="string">"\r\n"</span>);</span><br><span class="line">        bufferedWriter.write(<span class="string">"\r\n"</span>);</span><br><span class="line">        bufferedWriter.flush(); <span class="comment">//flush一下很重要，等于说已经写完了</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        BufferedInputStream stream = <span class="keyword">new</span> BufferedInputStream(mSocket.getInputStream());</span><br><span class="line">        BufferedReader bufferedReader = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(stream));</span><br><span class="line">        String line = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">while</span> ((line = bufferedReader.readLine())!=<span class="keyword">null</span>) &#123;</span><br><span class="line">            System.out.println(line);</span><br><span class="line">        &#125;</span><br><span class="line">        bufferedReader.close();</span><br><span class="line">        bufferedWriter.close();</span><br><span class="line">        mSocket.close();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>输出<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 302 Moved Temporarily</span><br><span class="line">Date: Sat, 24 Mar 2018 06:44:20 GMT</span><br><span class="line">Content-Type: text/html</span><br><span class="line">Content-Length: 225</span><br><span class="line">Connection: Keep-Alive</span><br><span class="line">Set-Cookie: BAIDUID=259D5F393E329E8E44651C589037C093:FG=1; expires=Thu, 31-Dec-37 23:55:55 GMT; max-age=2147483647; path=/; domain=.baidu.com</span><br><span class="line">Set-Cookie: BIDUPSID=259D5F393E329E8E44651C589037C093; expires=Thu, 31-Dec-37 23:55:55 GMT; max-age=2147483647; path=/; domain=.baidu.com</span><br><span class="line">Set-Cookie: PSTM=1521873860; expires=Thu, 31-Dec-37 23:55:55 GMT; max-age=2147483647; path=/; domain=.baidu.com</span><br><span class="line">Set-Cookie: BD_LAST_QID=10107339987852007720; path=/; Max-Age=1</span><br><span class="line">P3P: CP=&quot; OTI DSP COR IVA OUR IND COM &quot;</span><br><span class="line">Location: https://www.baidu.com/</span><br><span class="line">Server: BWS/1.1</span><br><span class="line">X-UA-Compatible: IE=Edge,chrome=1</span><br><span class="line"></span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;&lt;title&gt;302 Found&lt;/title&gt;&lt;/head&gt;</span><br><span class="line">&lt;body bgcolor=&quot;white&quot;&gt;</span><br><span class="line">&lt;center&gt;&lt;h1&gt;302 Found&lt;/h1&gt;&lt;/center&gt;</span><br><span class="line">&lt;hr&gt;&lt;center&gt;65d90fa34a5e777be72b3e20c859c335f9198cc2</span><br><span class="line">Time : Thu Mar 15 16:20:59 CST 2018&lt;/center&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure></p>
-<h1 id="当然因为访问的是http，302是临时重定向，注意上面返回了Location字段，所以是符合规范的"><a href="#当然因为访问的是http，302是临时重定向，注意上面返回了Location字段，所以是符合规范的" class="headerlink" title="当然因为访问的是http，302是临时重定向，注意上面返回了Location字段，所以是符合规范的"></a>当然因为访问的是http，302是临时重定向，注意上面返回了Location字段，所以是符合规范的</h1><p>m38u就是很多ts文件的目录</p>
+<p>当然因为访问的是http，302是临时重定向，注意上面返回了Location字段，所以是符合规范的</p>
+<p>===============================</p>
+<p>m38u就是很多ts文件的目录</p>
 
       
 
@@ -690,6 +692,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Window</a>
               </li>
              
@@ -698,7 +704,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -711,10 +721,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -731,10 +737,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -786,11 +788,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
+                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -802,15 +800,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">databinding</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -822,11 +824,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">databinding</a>
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
             
             <div class="clearfix"></div>

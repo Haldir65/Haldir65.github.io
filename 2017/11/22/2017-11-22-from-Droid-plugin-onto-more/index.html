@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery15111006999.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery2a2241cc5c1278cf7a28f15f91dbbb7f.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-03-29T05:36:32.311Z">
+<meta property="og:updated_time" content="2018-04-13T07:19:47.819Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从DroidPlugin谈插件化开发">
 <meta name="twitter:description" content="关于360团队出开源的DroidPlugin的一些记录 过程中发现了关于插件化，Hook系统方法的操作，摘录下来。">
@@ -241,7 +241,6 @@ ga('send', 'pageview');
 <h3 id="3-3-当前比较合适的方案是使用美团的walle"><a href="#3-3-当前比较合适的方案是使用美团的walle" class="headerlink" title="3.3 当前比较合适的方案是使用美团的walle"></a>3.3 当前比较合适的方案是使用美团的walle</h3><p><a href="https://www.jianshu.com/p/e4ed249e4cab">Signature Scheme v2的出现让目前美团的walle成为公开已知的多渠道打包的最好选择</a><br><a href="https://github.com/mcxiaoke/packer-ng-plugin">还有一个开源的gradle plugin据说也支持V2签名模式</a></p>
 <p><a href="https://www.jianshu.com/p/0ba717f7385f">美团的walle接入指南</a>,原理都在<a href="https://tech.meituan.com/android-apk-v2-signature-scheme.html">新一代开源Android渠道包生成工具Walle</a></p>
 <p><a href="http://www.dss886.com/2017/11/21/01/">有人给出了Android多渠道打包的进化史，很有意思</a></p>
-<p>=-============================-============================-============================-=========================</p>
 <p><a href="https://www.zhihu.com/question/39440766">为什么 Android 要采用 Binder 作为 IPC 机制？</a></p>
 <blockquote>
 <p>传统的进程间通信方式有管道，消息队列，共享内存等，其中管道，消息队列采用存储-转发方式，即数据先从发送方缓存区拷贝到内核开辟的缓存区中，然后再从内核缓存区拷贝到接收方缓存区，至少有两次拷贝过程。共享内存虽然无需拷贝，但控制复杂，难以使用。socket作为一款通用接口，其传输效率低，开销大，主要用在跨网络的进程间通信和本机上进程间的低速通信。Binder通过内存映射的方式，使数据只需要在内存进行一次读写过程。<br>内存映射，简而言之就是将用户空间的一段内存区域映射到内核空间，映射成功后，用户对这段内存区域的修改可以直接反映到内核空间，相反，内核空间对这段区域的修改也直接反映用户空间。那么对于内核空间&lt;—-&gt;用户空间两者之间需要大量数据传输等操作的话效率是非常高的。</p>
@@ -283,6 +282,9 @@ ga('send', 'pageview');
 <li>进Activity，点击那个loadPath的按钮，就是去刚才adb push的路径去加载这个patch（当然生产环境应该是搭建https服务了）。</li>
 </ol>
 </blockquote>
+<p><a href="https://github.com/wequick/small/wiki/Android-dynamic-register-activities">插件化开发small解释了动态注册activity的原理</a>:<br>app所在进程startActivity会通过Instrumentation的execStartActivity方法向system_server进程的activityManagerService发起请求，在这里要将插件activity的名称换成之前写在manifest中的名称。system_server完成启动Activity会回调到Instrumentation的newActivity方法，在这里可以将manifest中的名称还原成插件的activity名称。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">ActivityThread thread = currentActivityThread();</span><br><span class="line">Instrumentation base = thread.<span class="meta">@mInstrumentation</span>;</span><br><span class="line">Instrumentation wrapper = <span class="keyword">new</span> InstrumentationWrapper(base);</span><br><span class="line">thread.<span class="meta">@mInstrumentation</span> = wrapper;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">InstrumentationWrapper</span> <span class="keyword">extends</span> <span class="title">Instrumentation</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ActivityResult <span class="title">execStartActivity</span><span class="params">(..., Intent intent, ...)</span> </span>&#123;</span><br><span class="line">        fakeToStub(intent); <span class="comment">//这里在intent里面放个className就好了</span></span><br><span class="line">        base.execStartActivity(args);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Activity <span class="title">newActivity</span><span class="params">(ClassLoader cl, String className, Intent intent)</span> </span>&#123;</span><br><span class="line">        className = restoreToReal(intent, className); <span class="comment">//这里从intent中读取className就好了</span></span><br><span class="line">        <span class="keyword">return</span> base.newActivity(cl, className, intent);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><a href="https://www.jianshu.com/p/107aaf054140">sharedUid</a>通过Shared User id,拥有同一个User id的多个APK可以配置成运行在同一个进程中.所以默认就是可以互相访问任意数据。</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://github.com/tiann/understand-plugin-framework">分析DroidPlugin，深入理解插件化框架</a><br><a href="http://www.wjdiankong.cn/">逆向大全</a><br><a href="https://tech.meituan.com/android_anti_hooking.html">Android Hook技术防范漫谈</a><br><a href="https://zhuanlan.zhihu.com/p/34346219">爱奇艺组件化探索之原理篇</a><br><a href="http://atlas.taobao.org/docs/principle-intro/Runtime_principle.html">Atlas容器框架</a></p>
 
       
@@ -537,6 +539,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Window</a>
               </li>
              
@@ -545,7 +551,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -558,10 +568,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -578,10 +584,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -633,11 +635,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
+                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -649,15 +647,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">databinding</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -669,11 +671,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">databinding</a>
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
             
             <div class="clearfix"></div>
