@@ -348,6 +348,11 @@ create table temp as select recordId, customer, place, time from record where 1 
 drop table record;  
 alter table temp rename to record;  
 
+// Sqlite的优化手段
+1. beginTransaction
+2. DB.compileStatement("DELETE FROM users WHERE first_name = ?")//节省了每次parse sql语句的开销
+3. [sqlite一次插入多条记录的优化方法](https://www.jianshu.com/p/faa5e852b76b)，使用union
+
 ### Another choice
 
 [mariadb](https://mariadb.org/)

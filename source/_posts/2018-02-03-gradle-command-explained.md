@@ -402,7 +402,7 @@ afterEvaluate { project ->
     }
 }
 ```
-
+closure就是一对花括号包着的东西
 afterEvaluate发生在Configuration之后，实际上也就是在project配置完成后，开始执行所有task前，对外提供一个closure，其实beforeEvaluate也有。
 
 **immediately invoked after a task is added to a project** 在Task被添加到project的时候执行closure
@@ -498,6 +498,13 @@ public class GreetingPlugin implements Plugin<Project> {
     }
 }
 ```
+
+[使用Transform Api在class变成dex之前对class进行字节码修改](https://www.jianshu.com/p/f43d48abfbf3)
+本质上是在merge{ProductFlavor}{BuildType}Assets Task之后，transformClassesWithDexFor{ProductFlavor}{BuildType} Transform 之前,插入一个transformClassesWith{YourTransformName}For{ProductFlavor}{BuildType} Transform
+
+
+
+
 [Tinker的gradle plugin实现，非常有参考意义](https://github.com/Tencent/tinker/blob/master/tinker-build/tinker-patch-gradle-plugin/src/main/groovy/com/tencent/tinker/build/gradle/TinkerPatchPlugin.groovy)
 和java libraray提交到jcenter不同，gradle需要提交到[Gradle Plugin Portal](https://guides.gradle.org/publishing-plugins-to-gradle-plugin-portal/)。没错，一个完全不一样的网站
 

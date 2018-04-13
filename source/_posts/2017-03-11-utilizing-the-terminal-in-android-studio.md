@@ -523,6 +523,41 @@ LogUtil.w(TAG, String.valueOf(toMB(runtime.totalMemory()))); //14.13MB
 一般 ODEX 不直接运行，在 Dalvik 运行 ODEX 时，需要通过 JIT 进行优化，提高运行效率。JIT 是一种在运行时同步将字节码转化成机器码的过程，Dalvik 直接运行转化后的机器码，这会导致部分的内存和时间开销，但是整体来说，在某些情况下是会提高系统性能的。（有些动态编译器，可能根据经验或尝试编译，优化这一过程，可能运行次数越多，优化效果越好）
 OAT 文件是 ART 运行的文件，是一种二进制可运行文件，包含 DEX 文件和编译出的本地机器指令文件，其文件格式类似于网络数据报文，包含文件头和文件体，文件头的 oatdata、oatexec 和 oatlastword 字段分别描述 DEX 文件位置和本地机器指令的起止位置。因为 OAT 文件包含 DEX 文件，因此比 ODEX 文件占用空间更大，由于其在安装时经过了 ART 的处理，ART 加载 OAT 文件后不需要经过处理就可以直接运行，它没有了从字节码装换成机器码的过程，因此运行速度更快。可以理解为 JIT 从运行时才解析提前到了安装时解析，安装变慢，运行变快。
 
+再仔细一点挖掘的话，找到这样一篇[文章](https://blog.csdn.net/zhiyuan263287/article/details/21033309)
+```java
+private boolean connect() {  
+    if (mSocket != null) {  
+        return true;  
+    }  
+    Slog.i(TAG, "connecting...");  
+    try {  
+        mSocket = new LocalSocket();  
+
+        LocalSocketAddress address = new LocalSocketAddress("installd",  
+                LocalSocketAddress.Namespace.RESERVED);  
+
+        mSocket.connect(address);  
+
+        mIn = mSocket.getInputStream();  
+        mOut = mSocket.getOutputStream();  
+    } catch (IOException ex) {  
+        disconnect();  
+        return false;  
+    }  
+    return true;  
+}  
+```
+显然是通过socket通信的，应用程序的安装与卸载并非PackageManagerService来完成，而是通过PackageManagerService来访问installd服务来执行程序包的安装与卸载的。
+
+installd是通过init.rc在系统启动时就开始运行的服务，installd进程是用c写的，这里面也是写了一个循环在跑的server:
+```c
+for (;;) {  
+  s = accept(lsocket, &addr, &alen);  
+}
+```
+
+
+
 ### 29.Android的动画分为Animation和Animator实现
 [android 动画原理](Animation).
 ObjectAnimator和ValueAnimator这些东西要记得在页面销毁的时候去cancel或者end。end会通知一声onAnimationUpdate，cancel不会。所以不要在onAnimationUpdate里面调用end -> onAnimationUpdate里面调用end -> onAnimationUpdate里面调用end -> onA....
@@ -629,3 +664,35 @@ public final boolean handleIntent(Intent var1, IWXAPIEventHandler var2) {
 
 ### 35. 多进程虚拟机都是单独的
 Android为每个应用都分配了一个独立的虚拟机(VM)，确切说是为每个进程都分配了一个独立的虚拟机，不同的虚拟机在内存分配上有不同的地址空间，这样在不同的虚拟机(即进程)中访问同一个类的对象时就会产生多份副本，而这些副本之间也是相互独立，互不影响的。
+
+### 36. Parcelable 与 Serializable 区别
+Serializable的设计初衷是为了序列化对象到本地文件、数据库、网络流、RMI以便数据传输，当然这种传输可以是程序内的也可以是两个程序间的。而Android的Parcelable的设计初衷是由于Serializable效率过低，消耗大，而android中数据传递主要是在内存环境中（内存属于android中的稀有资源），因此Parcelable的出现为了满足数据在内存中低开销而且高效地传递问题。
+Parcelable的性能比Serializable好，在内存开销方面较小，所以Android应用程序在内存间数据传输时推荐使用Parcelable，如activity间传输数据和AIDL数据传递，而Serializable将数据持久化的操作方便，因此在将对象序列化到存储设置中或将对象序列化后通过网络传输时建议选择Serializable（Parcelable也是可以，只不过实现和操作过程过于麻烦并且为了防止android版本不同而导致Parcelable可能不同的情况，因此在序列化到存储设备或者网络传输方面还是尽量选择Serializable接口）。
+ 无论是Parcelable还是Serializable，执行反序列操作后的对象都是新创建的，与原来的对象并不相同，只不过内容一样罢了。
+[详细介绍Android中Parcelable的原理和使用方法](https://blog.csdn.net/justin_1107/article/details/72903006)
+Parcelable基本上是将对象映射成一个Parcel对象，提供了两者之间转换的函数，Parcel对象可以被写进共享内存。跨进程直接使用。
+Serializable在恢复一个Object的时候是去使用ObjecInputStream的readObject方法，这里面调用了newInstance方法，反射，性能当然会差一点。
+
+> 3.Parcelable与Serializable的性能比较
+首先Parcelable的性能要强于Serializable的原因我需要简单的阐述一下
+  1）. 在内存的使用中,前者在性能方面要强于后者
+  2）. 后者在序列化操作的时候会产生大量的临时变量,(原因是使用了反射机制)从而导致GC的频繁调用,因此在性能上会稍微逊色
+  3）. Parcelable是以Ibinder作为信息载体的.在内存上的开销比较小,因此在内存之间进行数据传递的时候,Android推荐使用Parcelable,既然是内存方面比价有优势,那么自然就要优先选择.
+  4）. 在读写数据的时候,Parcelable是在内存中直接进行读写,而Serializable是通过使用IO流的形式将数据读写入在硬盘上.
+  但是：虽然Parcelable的性能要强于Serializable,但是仍然有特殊的情况需要使用Serializable,而不去使用Parcelable,因为Parcelable无法将数据进行持久化,因此在将数据保存在磁盘的时候,仍然需要使用后者,因为前者无法很好的将数据进行持久化.(原因是在不同的Android版本当中,Parcelable可能会不同,因此数据的持久化方面仍然是使用Serializable)
+
+###  37.WebView的statusCode的获取
+[来自stackoverFlow](https://stackoverflow.com/questions/45659618/http-status-code-webview-android-webviewclient?rq=1)
+```java
+@TargetApi(Build.VERSION_CODES.M)
+  @Override
+  public void onReceivedError(WebView view, WebResourceRequest req, WebResourceError rerr) {
+      onReceivedError(view, rerr.getErrorCode(), rerr.getDescription().toString(), req.getUrl().toString());
+  }
+
+  @SuppressWarnings("deprecation")
+  public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+      if (errorCode == -14) // -14 is error for file not found, like 404.
+          view.loadUrl("http://youriphost");
+  }
+```

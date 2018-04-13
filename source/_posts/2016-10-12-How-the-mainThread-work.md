@@ -325,6 +325,28 @@ PostDelayed最终会调用到enqueMessage方法，看一下:
 >管道是Linux系统中的一种进程间通信机制，具体可以参考前面一篇文章Android学习启动篇推荐的一本书《Linux内核源代码情景分析》中的第6章--传统的Uinx进程间通信。简单来说，管道就是一个文件，在管道的两端，分别是两个打开文件文件描述符，这两个打开文件描述符都是对应同一个文件，其中一个是用来读的，别一个是用来写的，一般的使用方式就是，一个线程通过读文件描述符中来读管道的内容，当管道没有内容时，这个线程就会进入等待状态，而另外一个线程通过写文件描述符来向管道中写入内容，写入内容的时候，如果另一端正有线程正在等待管道中的内容，那么这个线程就会被唤醒。这个等待和唤醒的操作是如何进行的呢，这就要借助Linux系统中的epoll机制了。 Linux系统中的epoll机制为处理大批量句柄而作了改进的poll，是Linux下多路复用IO接口select/poll的增强版本，它能显著减少程序在大量并发连接中只有少量活跃的情况下的系统CPU利用率。但是这里我们其实只需要监控的IO接口只有mWakeReadPipeFd一个，即前面我们所创建的管道的读端，为什么还需要用到epoll呢？有点用牛刀来杀鸡的味道。其实不然，这个Looper类是非常强大的，它除了监控内部所创建的管道接口之外，还提供了addFd接口供外界面调用，外界可以通过这个接口把自己想要监控的IO事件一并加入到这个Looper对象中去，当所有这些被监控的IO接口上面有事件发生时，就会唤醒相应的线程来处理，不过这里我们只关心刚才所创建的管道的IO事件的发生。
 
 
+有一个开发者永远不应该主动调用的方法：
+纵观整个Android系统，Lopper的这个方法只在两处被调用。
+```java
+/**
+ * Initialize the current thread as a looper, marking it as an
+ * application's main looper. The main looper for your application
+ * is created by the Android environment, so you should never need
+ * to call this function yourself.  See also: {@link #prepare()}
+ */
+public static void prepareMainLooper() {
+        prepare(false);
+        synchronized (Looper.class) {
+            if (sMainLooper != null) {
+                throw new IllegalStateException("The main Looper has already been prepared.");
+            }
+            sMainLooper = myLooper();
+        }
+    }
+```
+android.app.ActivityThread中和com.android.server.SystemServer中分别调用了这个方法，言下之意systemServer虽然跑在app_process进程中，但其实也还是有一个looper的循环模型的。
+
+
 
 ### Reference
 1. [Handler.postDelayed()是如何精确延迟指定时间的](http://www.dss886.com/android/2016/08/17/17-18)

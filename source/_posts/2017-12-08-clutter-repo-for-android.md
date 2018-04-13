@@ -580,6 +580,17 @@ mWebView.getSettings().setJavaScriptEnabled(true) //这只是enable js
 mWebView.setWebViewClient(WebViewClient()) //没有这句LayoutInflater调用newInstance的时候就崩了
 mWebView.loadUrl("https://www.baidu.com")
 ```
+
+对于Android调用JS代码的方法有2种：
+[Android：你要的WebView与 JS 交互方式 都在这里了(https://blog.csdn.net/carson_ho/article/details/64904691)
+1. 通过WebView的loadUrl（）
+2. 通过WebView的evaluateJavascript（） // 4.4以上可用，效率高一点
+
+对于JS调用Android代码的方法有3种：
+1. 通过WebView的addJavascriptInterface（）进行对象映射
+2. 通过 WebViewClient 的shouldOverrideUrlLoading ()方法回调拦截 url
+3. 通过 WebChromeClient 的onJsAlert()、onJsConfirm()、onJsPrompt（）方法回调拦截JS对话框alert()、confirm()、prompt（） 消息
+
 然后是WebView的截屏
 ```java
 private fun screenShot() {
@@ -849,6 +860,16 @@ return apkPath;
 
 ### 31. 老版本的WebView是存在内存泄露的
 [参考](https://www.jianshu.com/p/eada9b652d99)
+大致上就是主动调用了WebView.destory方法，原本在onDetachedFromWindow中系统的一些资源释放就没有走到，
+作者给出了这样的解决方案
+```java
+ViewParent parent = mWebView.getParent();
+    if (parent != null) {
+        ((ViewGroup) parent).removeView(mWebView);// 这里面会调用到 view.dispatchDetachedFromWindow();
+    }
+    mWebView.destroy();    
+```
+[webView的sourceCode](https://android.googlesource.com/platform/external/chromium_org/+/lollipop-release/android_webview/java/src/org/chromium/android_webview/AwContents.java)
 
 ### 32. App升级或者安装之前是要做一些检查的
 [这篇文章详尽描述了需要做的一些方案](http://blog.csdn.net/sk719887916/article/details/52233112)
@@ -1195,6 +1216,11 @@ public class Intent implements Parcelable, Cloneable
 Parcelable是Android为我们提供的序列化的接口,Parcelable相对于Serializable的使用相对复杂一些,但Parcelable的效率相对Serializable也高很多,这一直是Google工程师引以为傲的,有时间的可以看一下Parcelable和Serializable的效率对比 Parcelable vs Serializable 号称快10倍的效率
 
 Parcelable的底层使用了 **Parcel** 机制， Parcel机制会将序列化的数据写入到一个共享内存中，其他进程通过Parcel从共享内存中读出字节流，然后反序列化后使用。这就是Intent或Bundle能够在activity或者在binder中跨进程通信的原理。
+
+## 40. BlockCanary的原理就是在每一个Message执行前计时，结束后停止计时，看下时间有没有超过阈值。
+[BlockCanary](https://github.com/markzhai/AndroidPerformanceMonitor)值得一提的是，这里面考虑到了系统给当前进程分配的CPU时间段
+具体就是
+> cat /proc/pid/stat ## 如果系统分配的cpu时间不够，那么卡顿也是难免的
 
 
 

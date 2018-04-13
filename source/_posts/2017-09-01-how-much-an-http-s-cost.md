@@ -108,6 +108,16 @@ h2为什么快，Multiplexing，多路复用允许同时通过单一的 HTTP/2 �
 所以本地记录的下载到的文件的速度要比运营商报告的实际带宽小一点，当然这只是一部分原因。
 
 
+看看一个TCP包除了数据之外还塞了写哪些bookKeeping的东西[当···时发生了什么](https://github.com/skyline75489/what-happens-when-zh_CN/blob/master/README)
+使用套接字
+当浏览器得到了目标服务器的 IP 地址，以及 URL 中给出来端口号（http 协议默认端口号是 80， https 默认端口号是 443），它会调用系统库函数 socket ，请求一个 TCP流套接字，对应的参数是 AF_INET/AF_INET6 和 SOCK_STREAM 。
+
+这个请求首先被交给传输层，在传输层请求被封装成 TCP segment。目标端口会被加入头部，源端口会在系统内核的动态端口范围内选取（Linux下是ip_local_port_range)
+TCP segment 被送往网络层，网络层会在其中再加入一个 IP 头部，里面包含了目标服务器的IP地址以及本机的IP地址，把它封装成一个IP packet。
+这个 TCP packet 接下来会进入链路层，链路层会在封包中加入 frame 头部，里面包含了本地内置网卡的MAC地址以及网关（本地路由器）的 MAC 地址。像前面说的一样，如果内核不知道网关的 MAC 地址，它必须进行 ARP 广播来查询其地址。
+到了现在，TCP 封包已经准备好了，可以使用下面的方式进行传输：
+
+
 ## 参考
 - [what-of-traffic-is-network-overhead-on-top-of-http-s-requests](https://stackoverflow.com/questions/3613989/what-of-traffic-is-network-overhead-on-top-of-http-s-requests)
 - [Hadi Hariri — HTTP/2 – What do I need to know?](https://www.youtube.com/watch?v=F5smqpbz2sU)

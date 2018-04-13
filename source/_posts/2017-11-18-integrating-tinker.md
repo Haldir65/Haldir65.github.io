@@ -174,9 +174,26 @@ bspatch old.apk new2.apk old-to-new.patch
 Q: patch进程是如何和业务进程交互的
 A： tinker-android/tinker-android-lib/src/main/AndroidManifest.xml中明确指明了打补丁是在一个youpackagename:patch的进程中去操作的。这样做也是为了减少对于主业务的影响。跨进程交互并没有写aidl，其实只是起了一个IntentService通知主业务进程。
 
+Q: 关于CLASS_ISPREVERIFIED这个关键词
+A：dexElements数组更换之后就完事了？其实还差一个类的校验。这里不是说classLaoder的校验（这个好像有五个步骤），[这篇文章](https://yq.aliyun.com/articles/70321)提到了
+
+**在apk安装的时候系统会将dex文件优化成odex文件，在优化的过程中会涉及一个预校验的过程
+如果一个类的static方法，private方法，override方法以及构造函数中引用了其他类，而且这些类都属于同一个dex文件，此时该类就会被打上CLASS_ISPREVERIFIED
+如果在运行时被打上CLASS_ISPREVERIFIED的类引用了其他dex的类，就会报错
+所以MainActivity的onCreate()方法中引用另一个dex的类就会出现上文中的问题
+正常的分包方案会保证相关类被打入同一个dex文件
+想要使得patch可以被正常加载，就必须保证类不会被打上CLASS_ISPREVERIFIED标记。而要实现这个目的就必须要在分完包后的class中植入对其他dex文件中类的引用。
+如果A类引用了C类，C类在其他Dex中，那么就可以避免A类被打上标记。只要在static方法，构造方法，private方法，Override方法中直接饮用了其他dex中的类，这个类就不会被打上CLASS_ISPREVERIFIED的标记。
+要在已经编译完成后的类中植入对其他类的引用，就需要操作字节码，惯用的方案是插桩。常见的工具有javaassist，asm等。**
+
+所以QQ空间给出的方案是在所有class的构造函数中添加一行println(C.class)方法，直接引用另一个dex包中的类。这个添加的过程用javaAssist这种操作字节码的方式就可以简单实现
+[ Android热补丁动态修复技术](https://blog.csdn.net/u010386612/article/details/51192421)这一系列文章介绍了使用gradle api对编译过程进行hook，实现自动化补丁操作的过程
 
 
-=======================================================================
+
+
+
+
 好的学习资料
 [Tinker学习计划(2)-Tinker的原理一](https://www.jianshu.com/p/7034c3fec6c8)
 [Android 基于gradle插件实现多渠道打包](https://www.jianshu.com/p/23ea8e332dcd)

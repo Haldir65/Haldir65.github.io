@@ -1,7 +1,7 @@
 ---
 title: 使用AnnotationProcessor自动生成代码
 date: 2016-12-31 22:42:15
-categories: blog 
+categories: blog
 tags: [android,annotation]
 ---
 
@@ -97,7 +97,7 @@ public class PojoStringProcessor extends AbstractProcessor {
 
 ```
 几个重要的方法解释下：
-- roundEnv: apt分两步：1. apt发现被注解的代码，提供给我们写的processor，后者生成新的java代码(apt还未处理这部分新代码)。
+1. roundEnv: apt分两步：1. apt发现被注解的代码，提供给我们写的processor，后者生成新的java代码(apt还未处理这部分新代码)。
 2. apt发现新代码，提供给我们的Processor，不生成新代码。完成processing。（后面提供给编译）
 
 
@@ -110,10 +110,10 @@ com.example.annotation.BuilderProcessor// class包名
 ```java
 app/build.gradle
 
-dependencies{
-	compile project(': annotation')
+dependencies {
+  compile project(': annotation')
 
-	apt project (':processor')
+  apt project (':processor')
 }
 //apt 表示processor中的方法不会带到distributed apk中,方法数不用担心了
 //https://bitbucket.org/hvisser/android-apt
@@ -131,16 +131,15 @@ dependencies{
 假设想生成的代码是这样的
 ```java
 public final class UserBuilder{
-	
-	private String userName;
 
-	public UserBuilder username(String username){
-		this.username = username;
-		returen this;
-	}
+private String userName;
+
+public UserBuilder username(String username){
+    this.username = username;
+    returen this;
+  }
 
 }
-
 ```
 - 生成变量
 ![](http://odzl05jxx.bkt.clouddn.com/apt_field.JPG)
@@ -176,13 +175,16 @@ meta_data
 
 
 ### 4. 注意的地方
-dnot't put annotation processors in a compile configuration, use the Android Apt plugin。 
+dnot't put annotation processors in a compile configuration, use the Android Apt plugin。
 
 if you using jack, jack has support for annotation processors.
 
 if it's only a java, could use the Gradle Apt Plugin
 
 我们写的processor不会带到生成的apk中，但生成的代码会。这也正是想要的目的。
+
+## updates
+[Instagram的json parser也是使用了annotationProcessor在编译期生成代码](https://github.com/Instagram/ig-json-parser) 很多gson这样的解析器都使用了大量的反射，所以相比手写的构造函数要慢很多。
 
 
 ### ref

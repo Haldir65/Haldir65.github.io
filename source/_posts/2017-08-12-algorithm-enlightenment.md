@@ -257,6 +257,32 @@ public static int partition(int[] arr,int low , int high){
 ```
 这是好不容易看懂的快速排序java实现，感受下手写快排
 
+另一种使用递归的方式
+```java
+public static void main(String[] args) {
+       int[] array = {1, 4, 2, 45, 6, 4, 2, 4, 7, 10, 24, 12, 14, 17, 10, 9, 4};
+       QuickSort(array, 0, array.length-1);
+       Utils.printEach(array);
+   }
+
+   private static void QuickSort(int[] arr, int start, int end) {
+       if (start < end) {
+           int key = arr[start];
+           int i = start, j;
+           for (j = start+1;j<=end;j++) {
+               if (arr[j] < key) {
+                   Utils.swap(arr, j, i + 1);
+                   i++;
+               }
+           }
+           arr[start] = arr[i];
+           arr[i] = key;
+           QuickSort(arr, start, i - 1);
+           QuickSort(arr, i+1, end);
+       }
+   }
+```
+
 
 ### 1.7 TimSort
 java的Collections.sort的算法，

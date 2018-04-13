@@ -162,8 +162,6 @@ signingConfigs {
 
 [有人给出了Android多渠道打包的进化史，很有意思](http://www.dss886.com/2017/11/21/01/)
 
-=-============================-============================-============================-=========================
-
 
 [为什么 Android 要采用 Binder 作为 IPC 机制？](https://www.zhihu.com/question/39440766)
 
@@ -194,10 +192,6 @@ Xposed的原理与Multidex及动态加载问题
 
 [在Android中执行shell指令](https://github.com/jaredrummler/AndroidShell)
 [滴滴的virtualApp](https://github.com/didi/VirtualAPK)。 目前看来就是用android.content.pm.PackageParse去解析一个apk文件，封装成一个LoadedPlugin对象（Cache下来），后续调用apk中描述的功能进行操作。所以应该还是在host的进程中跑的。由此联系到[PackageInstaller 原理简述](http://www.cnblogs.com/myitm/archive/2012/05/17/2506635.html)
-
-
-
-
 
 
 -  多渠道的话这样的命令要跑多次
@@ -263,6 +257,32 @@ gradlew clean assembleReleaseChannels -PchannelList=huawei,xiaomi // 小米跟�
 > 5. 开始打补丁包.在gradle中注释掉apply plugin: 'robust'，开启apply plugin: 'auto-patch-plugin'。把app/build/outputs/mappings/mapping.txt文件和app/build/outputs/robust/methodsMap.robust这两个文件粘贴到app/robust文件夹中。重新打release包：gradlew clean assembleRelease --stacktrace。报错是正常的。
 > 6. 在app/build/outputs/robust文件夹中找到patch.jar文件。 adb push app/build/outputs/robust/patch.jar /sdcard/robust/patch.jar
 > 7. 进Activity，点击那个loadPath的按钮，就是去刚才adb push的路径去加载这个patch（当然生产环境应该是搭建https服务了）。
+
+
+[插件化开发small解释了动态注册activity的原理](https://github.com/wequick/small/wiki/Android-dynamic-register-activities):
+app所在进程startActivity会通过Instrumentation的execStartActivity方法向system_server进程的activityManagerService发起请求，在这里要将插件activity的名称换成之前写在manifest中的名称。system_server完成启动Activity会回调到Instrumentation的newActivity方法，在这里可以将manifest中的名称还原成插件的activity名称。
+
+```java
+ActivityThread thread = currentActivityThread();
+Instrumentation base = thread.@mInstrumentation;
+Instrumentation wrapper = new InstrumentationWrapper(base);
+thread.@mInstrumentation = wrapper;
+
+class InstrumentationWrapper extends Instrumentation {
+    public ActivityResult execStartActivity(..., Intent intent, ...) {
+        fakeToStub(intent); //这里在intent里面放个className就好了
+        base.execStartActivity(args);
+    }
+
+    @Override
+    public Activity newActivity(ClassLoader cl, String className, Intent intent) {
+        className = restoreToReal(intent, className); //这里从intent中读取className就好了
+        return base.newActivity(cl, className, intent);
+    }
+}
+```
+
+[sharedUid](https://www.jianshu.com/p/107aaf054140)通过Shared User id,拥有同一个User id的多个APK可以配置成运行在同一个进程中.所以默认就是可以互相访问任意数据。
 
 
 
