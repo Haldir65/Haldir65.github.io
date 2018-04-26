@@ -17,13 +17,14 @@
 <meta property="og:description" content="This is gonna be nasty…… TL;DR">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/d653491fb55bec754b8471aa6a3f6eed.jpg?imageView2/2/w/600">
+<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/ParameterHandlers.JPG">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/different_end_point.JPG">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/different_end_point_teh_right_way.JPG">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/creating%20two%20convertors.JPG">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/different_response.JPG">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/delegaet_converters.JPG">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/always_observe_on_mian_thread.JPG">
-<meta property="og:updated_time" content="2018-04-13T07:19:47.811Z">
+<meta property="og:updated_time" content="2018-04-26T10:23:11.374Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Retrofit源码阅读笔记">
 <meta name="twitter:description" content="This is gonna be nasty…… TL;DR">
@@ -215,8 +216,35 @@ ga('send', 'pageview');
 </blockquote>
 <h3 id="1-2-第一个方法以及ServiceMethod的创建"><a href="#1-2-第一个方法以及ServiceMethod的创建" class="headerlink" title="1.2 第一个方法以及ServiceMethod的创建"></a>1.2 第一个方法以及ServiceMethod的创建</h3><p>loadServiceMethod(Method)会查找invoke的时候会查找methodCache中有没有这个方法，没有的话调用Builder方法创建一个ServiceMethod实例并放入cahce。看一看这个Builder的构造函数 ，基本上就是把Builder中的参数引用赋值给ServiceMethod实例。</p>
 <p>result = new ServiceMethod.Builder(this, method).build();<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Builder</span><span class="params">(Retrofit retrofit, Method method)</span> </span>&#123;</span><br><span class="line">     <span class="keyword">this</span>.retrofit = retrofit; <span class="comment">//client创建retrofit时可以设定一些属性</span></span><br><span class="line">     <span class="keyword">this</span>.method = method;</span><br><span class="line">     <span class="keyword">this</span>.methodAnnotations = method.getAnnotations();</span><br><span class="line">     <span class="keyword">this</span>.parameterTypes = method.getGenericParameterTypes();</span><br><span class="line">     <span class="keyword">this</span>.parameterAnnotationsArray = method.getParameterAnnotations();</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">根据ServiceMethod的变量名基本上能够猜到各自的用处，比如httpMethod（GET、POST）,</span><br><span class="line">contentType（MimeType）</span><br><span class="line"> <span class="function"><span class="keyword">public</span> ServiceMethod <span class="title">build</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 1.创建callAdapter,调用retrofit对象设定的callAdapter,例如RxjavAdapter,注意这里面的实现是便利retrofit对象的adapterFactories，找到一个就返回。找不到的话会丢出来一个IllegalArgumentException</span></span><br><span class="line">      callAdapter = createCallAdapter();</span><br><span class="line">       <span class="comment">//callAdapter的作用 就是将retrofit.Call的Call转成一个T。例如上面就是把Call&lt;List&lt;Contributor&gt;&gt;转成一个List&lt;Contributor&gt;，这个过程是上面提到的最重要的三个方法中的第三部 adapt（okHttpCall）。可以认为是拿着一个已经创建好的okHttp的Call去做事情，在适当的时候将网络返回结果转成用户事先定义好的respose类型。</span></span><br><span class="line">        <span class="comment">//这一步返回一个java.lang.reflect.Type ，就个class的基本作用家就是根据泛型来确定response的class。</span></span><br><span class="line">      responseType = callAdapter.responseType();</span><br><span class="line">        <span class="comment">//2.创建用于respnse和Request的converter。</span></span><br><span class="line">      responseConverter = createResponseConverter();</span><br><span class="line">      <span class="keyword">for</span> (Annotation annotation : methodAnnotations) &#123;</span><br><span class="line">        parseMethodAnnotation(annotation); <span class="comment">//这里面就是把@GET变成"GET"这个String，表示当前方法是一个GET请求</span></span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">int</span> parameterCount = parameterAnnotationsArray.length;</span><br><span class="line">      <span class="comment">//3.创建ParameterHandler</span></span><br><span class="line">      parameterHandlers = <span class="keyword">new</span> ParameterHandler&lt;?&gt;[parameterCount];</span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">int</span> p = <span class="number">0</span>; p &lt; parameterCount; p++) &#123;</span><br><span class="line">        Type parameterType = parameterTypes[p];</span><br><span class="line">        Annotation[] parameterAnnotations = parameterAnnotationsArray[p];</span><br><span class="line">        <span class="keyword">if</span> (parameterAnnotations == <span class="keyword">null</span>) &#123;</span><br><span class="line">          <span class="keyword">throw</span> parameterError(p, <span class="string">"No Retrofit annotation found."</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        parameterHandlers[p] = parseParameter(p, parameterType, parameterAnnotations);</span><br><span class="line">        <span class="comment">//关键看这个方法</span></span><br><span class="line">         <span class="keyword">private</span> ParameterHandler&lt;?&gt; parseParameter(<span class="keyword">int</span> p, Type parameterType, Annotation[] annotations)</span><br><span class="line">         第一个参数表示当前的数组index</span><br><span class="line">         第二个参数表示想要的Response类型</span><br><span class="line">         第三个参数表示该方法上的注解，就是@那些东西</span><br><span class="line">         接下来就是调用 <span class="keyword">private</span> ParameterHandler&lt;?&gt; parseParameterAnnotation(</span><br><span class="line">        <span class="keyword">int</span> p, Type type, Annotation[] annotations, Annotation annotation)方法来判断各种Http方法，这一段代码有<span class="number">300</span>多行。。。。看完有助于掌握Http协议。</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> ServiceMethod&lt;&gt;(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>关键是这三个方法，Buider在这个过程中完成了一些变量的赋值<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>. createCallAdapter  ---&gt;  retrofit.callAdapter(returnType, annotations); 从adapterFactories(显然可以有多个)中遍历，找到了一个就返回。已经实现的的有三种**策略**，DefaultCallAdapterFactory、ExecutorCallAdapterFactory和RxjavaCallAdapterFactory。显然用户可以在创建retrofit实例的过程中install自己的callAdapter实现。</span><br><span class="line">再次强调这个CallAdater的作用，就是将Retrofit的Call adpt成对应的Response <span class="class"><span class="keyword">class</span>的实例。</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class">2. <span class="title">createResponseConverter</span> ---&gt;  <span class="title">retrofit</span>.<span class="title">responseBodyConverter</span>(<span class="title">responseType</span>, <span class="title">annotations</span>)</span>;</span><br><span class="line">Retrofit2.Converter&lt;F, T&gt; (from和To，我猜的)</span><br><span class="line"></span><br><span class="line">Convert objects to and from their representation in HTTP. Instances are created by &#123;<span class="meta">@linkplain</span></span><br><span class="line"> * Factory a factory&#125; which is &#123;@linkplain Retrofit.Builder#addConverterFactory(Factory) installed&#125;</span><br><span class="line"> * into the &#123;<span class="meta">@link</span> Retrofit&#125; instance.</span><br><span class="line"></span><br><span class="line">从retrofit对象的converterFactories（可以有多个，原因在于server有时候会返回json，有时候会返回protocolBuffer，有时候返回xml，response回来的时候会一个个问，这一点jake Wharton多次提到过）中遍历，找到一个就返回。确切的说，是找到一个能够处理的。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="number">3</span>. 创建parameterHandlers</span><br><span class="line">应该可以猜到，这一步就是把用户定义的注解转换成发起网络请求时需要带上的参数</span><br><span class="line"><span class="keyword">private</span> ParameterHandler&lt;?&gt; parseParameterAnnotation(</span><br><span class="line">        <span class="keyword">int</span> p, Type type, Annotation[] annotations, Annotation annotation)方法随便展开一点，关注第三个参数和第四个参数</span><br><span class="line"></span><br><span class="line">例如        </span><br><span class="line"> <span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">GitHub</span> </span>&#123;</span><br><span class="line">    <span class="meta">@GET</span>(<span class="string">"/repos/&#123;owner&#125;/&#123;repo&#125;/contributors"</span>)</span><br><span class="line">    Call&lt;List&lt;Contributor&gt;&gt; contributors(</span><br><span class="line">        <span class="meta">@Path</span>(<span class="string">"owner"</span>) String owner,</span><br><span class="line">        <span class="meta">@Path</span>(<span class="string">"repo"</span>) String repo);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">ServiceMethod走到这一步，annotations就表示 <span class="meta">@Path</span>(<span class="string">"owner"</span>) String owner。注意这里的<span class="meta">@PATH</span>是注解类，可以把它当成一个wrapper，这里面就调用了path.value()。</span><br><span class="line"></span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (annotation <span class="keyword">instanceof</span> Path) &#123;</span><br><span class="line">        Path path = (Path) annotation;</span><br><span class="line">        String name = path.value(); <span class="comment">// 调用该方法时传入的String</span></span><br><span class="line">        validatePathName(p, name);</span><br><span class="line">        Converter&lt;?, String&gt; converter = retrofit.stringConverter(type, annotations);  </span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ParameterHandler.Path&lt;&gt;(name, converter, path.encoded());</span><br><span class="line">      &#125;</span><br><span class="line">ParameterHandler.Path&lt;&gt;在ParameterHandler这个类里面，看一下结构![](http:<span class="comment">//odzl05jxx.bkt.clouddn.com/ParameterHandlers.JPG)</span></span><br><span class="line">Path这个class中关键的方法apply:</span><br><span class="line"> <span class="meta">@Override</span> <span class="function"><span class="keyword">void</span> <span class="title">apply</span><span class="params">(RequestBuilder builder, @Nullable T value)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">      builder.addPathParam(name, valueConverter.convert(value), encoded);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">再往下走：</span><br><span class="line">    relativeUrl = relativeUrl.replace(<span class="string">"&#123;"</span> + name + <span class="string">"&#125;"</span>, canonicalizeForPath(value, encoded));</span><br><span class="line">apply这个方法会在构建Request时由RequestBilder调用，以上面的实例为例子，name就是<span class="string">"owner"</span> ,value就是调用该方法时传进来的值，其实就只是Stirng.replace()方法。</span><br><span class="line">到这里，Buidler已经完成了</span><br><span class="line">- 准备callAdapter，</span><br><span class="line">- createResponseConverter</span><br><span class="line">- 和填充parameterHandlers数组的任务</span><br><span class="line">直接<span class="keyword">new</span>一个ServiceMethod出来就好了</span><br><span class="line"></span><br><span class="line">ServiceMethod(Builder&lt;T&gt; builder) &#123;</span><br><span class="line">    <span class="keyword">this</span>.callFactory = builder.retrofit.callFactory();  <span class="comment">// okhttp3.Call.Factory</span></span><br><span class="line">    <span class="keyword">this</span>.callAdapter = builder.callAdapter; <span class="comment">//</span></span><br><span class="line">    <span class="keyword">this</span>.baseUrl = builder.retrofit.baseUrl(); <span class="comment">//这个就是</span></span><br><span class="line">    <span class="keyword">this</span>.responseConverter = builder.responseConverter; <span class="comment">// GsonConverter</span></span><br><span class="line">    <span class="keyword">this</span>.httpMethod = builder.httpMethod; <span class="comment">//@GET</span></span><br><span class="line">    <span class="keyword">this</span>.relativeUrl = builder.relativeUrl; <span class="comment">//@Path</span></span><br><span class="line">    <span class="keyword">this</span>.headers = builder.headers; <span class="comment">//@Header</span></span><br><span class="line">    <span class="keyword">this</span>.contentType = builder.contentType;  <span class="comment">//application/json这种</span></span><br><span class="line">    <span class="keyword">this</span>.hasBody = builder.hasBody;</span><br><span class="line">    <span class="keyword">this</span>.isFormEncoded = builder.isFormEncoded;</span><br><span class="line">    <span class="keyword">this</span>.isMultipart = builder.isMultipart;</span><br><span class="line">    <span class="keyword">this</span>.parameterHandlers = builder.parameterHandlers;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">上面最重要的三个方法讲完了第一个。</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">根据ServiceMethod的变量名基本上能够猜到各自的用处，比如httpMethod（GET、POST）,</span><br><span class="line">contentType（MimeType）</span><br><span class="line"> <span class="function"><span class="keyword">public</span> ServiceMethod <span class="title">build</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 1.创建callAdapter,调用retrofit对象设定的callAdapter,例如RxjavAdapter,注意这里面的实现是便利retrofit对象的adapterFactories，找到一个就返回。找不到的话会丢出来一个IllegalArgumentException</span></span><br><span class="line">      callAdapter = createCallAdapter();</span><br><span class="line">       <span class="comment">//callAdapter的作用 就是将retrofit.Call的Call转成一个T。例如上面就是把Call&lt;List&lt;Contributor&gt;&gt;转成一个List&lt;Contributor&gt;，这个过程是上面提到的最重要的三个方法中的第三部 adapt（okHttpCall）。可以认为是拿着一个已经创建好的okHttp的Call去做事情，在适当的时候将网络返回结果转成用户事先定义好的respose类型。</span></span><br><span class="line">        <span class="comment">//这一步返回一个java.lang.reflect.Type ，就个class的基本作用家就是根据泛型来确定response的class。</span></span><br><span class="line">      responseType = callAdapter.responseType();</span><br><span class="line">        <span class="comment">//2.创建用于response和Request的converter。</span></span><br><span class="line">      responseConverter = createResponseConverter();</span><br><span class="line">      <span class="keyword">for</span> (Annotation annotation : methodAnnotations) &#123;</span><br><span class="line">        parseMethodAnnotation(annotation); <span class="comment">//这里面就是把@GET变成"GET"这个String，表示当前方法是一个GET请求</span></span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">int</span> parameterCount = parameterAnnotationsArray.length;</span><br><span class="line">      <span class="comment">//3.创建ParameterHandler</span></span><br><span class="line">      parameterHandlers = <span class="keyword">new</span> ParameterHandler&lt;?&gt;[parameterCount];</span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">int</span> p = <span class="number">0</span>; p &lt; parameterCount; p++) &#123;</span><br><span class="line">        Type parameterType = parameterTypes[p];</span><br><span class="line">        Annotation[] parameterAnnotations = parameterAnnotationsArray[p];</span><br><span class="line">        <span class="keyword">if</span> (parameterAnnotations == <span class="keyword">null</span>) &#123;</span><br><span class="line">          <span class="keyword">throw</span> parameterError(p, <span class="string">"No Retrofit annotation found."</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        parameterHandlers[p] = parseParameter(p, parameterType, parameterAnnotations);</span><br><span class="line">        <span class="comment">//关键看这个方法</span></span><br><span class="line">         <span class="keyword">private</span> ParameterHandler&lt;?&gt; parseParameter(<span class="keyword">int</span> p, Type parameterType, Annotation[] annotations)</span><br><span class="line">         第一个参数表示当前的数组index</span><br><span class="line">         第二个参数表示想要的Response类型</span><br><span class="line">         第三个参数表示该方法上的注解，就是@那些东西</span><br><span class="line">         接下来就是调用 <span class="keyword">private</span> ParameterHandler&lt;?&gt; parseParameterAnnotation(</span><br><span class="line">        <span class="keyword">int</span> p, Type type, Annotation[] annotations, Annotation annotation)方法来判断各种Http方法，这一段代码有<span class="number">300</span>多行。。。。看完有助于掌握Http协议。</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> ServiceMethod&lt;&gt;(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>关键是这三个方法，Buider在这个过程中完成了一些变量的赋值</p>
+<ol>
+<li><p>createCallAdapter  —&gt;  retrofit.callAdapter(returnType, annotations); 从adapterFactories(显然可以有多个)中遍历，找到了一个就返回。已经实现的的有三种<strong>策略</strong>，DefaultCallAdapterFactory、ExecutorCallAdapterFactory和RxjavaCallAdapterFactory。显然用户可以在创建retrofit实例的过程中install自己的callAdapter实现。<br>再次强调这个CallAdapter的作用，就是将Retrofit的Call adapt成对应的Response class的实例。</p>
+</li>
+<li><p>createResponseConverter —&gt;  retrofit.responseBodyConverter(responseType, annotations);<br>Retrofit2.Converter<F, T> (from和To，我猜的)</p>
+</li>
+</ol>
+<p>Convert objects to and from their representation in HTTP. Instances are created by {@linkplain</p>
+<ul>
+<li>Factory a factory} which is {@linkplain Retrofit.Builder#addConverterFactory(Factory) installed}</li>
+<li>into the {@link Retrofit} instance.</li>
+</ul>
+<p>从retrofit对象的converterFactories（可以有多个，原因在于server有时候会返回json，有时候会返回protocolBuffer，有时候返回xml，response回来的时候会一个个问，这一点jake Wharton多次提到过）中遍历，找到一个就返回。确切的说，是找到一个能够处理的。</p>
+<ol>
+<li>创建parameterHandlers<br>应该可以猜到，这一步就是把用户定义的注解转换成发起网络请求时需要带上的参数<br>private ParameterHandler&lt;?&gt; parseParameterAnnotation(<pre><code>int p, Type type, Annotation[] annotations, Annotation annotation)方法随便展开一点，关注第三个参数和第四个参数
+</code></pre></li>
+</ol>
+<p>例如<br> public interface GitHub {<br>    @GET(“/repos/{owner}/{repo}/contributors”)<br>    Call&lt;List<Contributor>&gt; contributors(<br>        @Path(“owner”) String owner,<br>        @Path(“repo”) String repo);<br>  }</p>
+<p>ServiceMethod走到这一步，annotations就表示 @Path(“owner”) String owner。注意这里的@PATH是注解类，可以把它当成一个wrapper，这里面就调用了path.value()。</p>
+<p>else if (annotation instanceof Path) {<br>        Path path = (Path) annotation;<br>        String name = path.value(); // 调用该方法时传入的String<br>        validatePathName(p, name);<br>        Converter&lt;?, String&gt; converter = retrofit.stringConverter(type, annotations);<br>        return new ParameterHandler.Path&lt;&gt;(name, converter, path.encoded());<br>      }<br>ParameterHandler.Path&lt;&gt;在ParameterHandler这个类里面，看一下结构<img src="http://odzl05jxx.bkt.clouddn.com/ParameterHandlers.JPG" alt=""><br>Path这个class中关键的方法apply:<br> @Override void apply(RequestBuilder builder, @Nullable T value) throws IOException {<br>      builder.addPathParam(name, valueConverter.convert(value), encoded);<br>    }</p>
+<p>再往下走：<br>    relativeUrl = relativeUrl.replace(“{“ + name + “}”, canonicalizeForPath(value, encoded));<br>apply这个方法会在构建Request时由RequestBilder调用，以上面的实例为例子，name就是”owner” ,value就是调用该方法时传进来的值，其实就只是Stirng.replace()方法。<br>到这里，Buidler已经完成了</p>
+<ul>
+<li>准备callAdapter，</li>
+<li>createResponseConverter</li>
+<li>和填充parameterHandlers数组的任务<br>直接new一个ServiceMethod出来就好了</li>
+</ul>
+<p>ServiceMethod(Builder<T> builder) {<br>    this.callFactory = builder.retrofit.callFactory();  // okhttp3.Call.Factory<br>    this.callAdapter = builder.callAdapter; //<br>    this.baseUrl = builder.retrofit.baseUrl(); //这个就是<br>    this.responseConverter = builder.responseConverter; // GsonConverter<br>    this.httpMethod = builder.httpMethod; //@GET<br>    this.relativeUrl = builder.relativeUrl; //@Path<br>    this.headers = builder.headers; //@Header<br>    this.contentType = builder.contentType;  //application/json这种<br>    this.hasBody = builder.hasBody;<br>    this.isFormEncoded = builder.isFormEncoded;<br>    this.isMultipart = builder.isMultipart;<br>    this.parameterHandlers = builder.parameterHandlers;<br>  }</p>
+<p>上面最重要的三个方法讲完了第一个。  </p>
 <h3 id="1-3-第二个方法和OkHttpCall"><a href="#1-3-第二个方法和OkHttpCall" class="headerlink" title="1.3 第二个方法和OkHttpCall"></a>1.3 第二个方法和OkHttpCall</h3><p>第二个方法:<br> OkHttpCall<Object> okHttpCall = new OkHttpCall&lt;&gt;(serviceMethod, args);</p>
 <p>OkHttpCall的成员变量：<br>okhttp3.Call rawCall //用于发起请求<br>ServiceMethod<T, ?> serviceMethod;  //这就是刚才实例化的serviceMethod对象<br>这个类相对简单，主要看execute方法</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span> <span class="function"><span class="keyword">public</span> Response&lt;T&gt; <span class="title">execute</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">   okhttp3.Call call;</span><br><span class="line">   <span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;</span><br><span class="line">     <span class="keyword">if</span> (executed) <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Already executed."</span>);</span><br><span class="line">     executed = <span class="keyword">true</span>;</span><br><span class="line">     call = rawCall;</span><br><span class="line">     <span class="keyword">if</span> (call == <span class="keyword">null</span>) &#123;</span><br><span class="line">       <span class="keyword">try</span> &#123;</span><br><span class="line">         call = rawCall = createRawCall();</span><br><span class="line">       &#125; <span class="keyword">catch</span> (IOException | RuntimeException e) &#123;</span><br><span class="line">       &#125;</span><br><span class="line">     &#125;</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">return</span> parseResponse(call.execute()); <span class="comment">//建立连接，发起请求，解析response都在这里了（都在一条线程上）。execute是okHttp的方法。</span></span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
@@ -231,7 +259,7 @@ ga('send', 'pageview');
 <p>CallAdapter&lt;?, ?&gt; adapter = adapterFactories.get(i).get(returnType, annotations, this)；</p>
 </blockquote>
 <p>找到之后就返回，默认的实现有DefaultCallAdapterFactory和ExecutorCallAdapterFactory以及RxjavaCallAdapterFactory。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">在DefaultCallAdapterFactory中的处理方式是</span><br><span class="line"></span><br><span class="line"> <span class="keyword">return</span> <span class="keyword">new</span> CallAdapter&lt;Call&lt;?&gt;&gt;() &#123;</span><br><span class="line">      <span class="meta">@Override</span> <span class="function"><span class="keyword">public</span> Type <span class="title">responseType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> responseType;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="meta">@Override</span> <span class="keyword">public</span> &lt;R&gt; <span class="function">Call&lt;R&gt; <span class="title">adapt</span><span class="params">(Call&lt;R&gt; call)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> call;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">ExecutorCallAdapterFactory的处理方式是</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"> <span class="keyword">return</span> <span class="keyword">new</span> CallAdapter&lt;Object, Call&lt;?&gt;&gt;() &#123;</span><br><span class="line">      <span class="meta">@Override</span> <span class="function"><span class="keyword">public</span> Type <span class="title">responseType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> responseType;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="meta">@Override</span> <span class="function"><span class="keyword">public</span> Call&lt;Object&gt; <span class="title">adapt</span><span class="params">(Call&lt;Object&gt; call)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ExecutorCallbackCall&lt;&gt;(callbackExecutor, call);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 在DefaultCallAdapterFactory中的处理方式是</span></span><br><span class="line"></span><br><span class="line"> <span class="keyword">return</span> <span class="keyword">new</span> CallAdapter&lt;Call&lt;?&gt;&gt;() &#123;</span><br><span class="line">      <span class="meta">@Override</span> <span class="function"><span class="keyword">public</span> Type <span class="title">responseType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> responseType;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="meta">@Override</span> <span class="keyword">public</span> &lt;R&gt; <span class="function">Call&lt;R&gt; <span class="title">adapt</span><span class="params">(Call&lt;R&gt; call)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> call;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// ExecutorCallAdapterFactory的处理方式是</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"> <span class="keyword">return</span> <span class="keyword">new</span> CallAdapter&lt;Object, Call&lt;?&gt;&gt;() &#123;</span><br><span class="line">      <span class="meta">@Override</span> <span class="function"><span class="keyword">public</span> Type <span class="title">responseType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> responseType;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="meta">@Override</span> <span class="function"><span class="keyword">public</span> Call&lt;Object&gt; <span class="title">adapt</span><span class="params">(Call&lt;Object&gt; call)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ExecutorCallbackCall&lt;&gt;(callbackExecutor, call);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;;</span><br></pre></td></tr></table></figure>
 <p>其实就是将callback丢到一个线程池callbackExecutor中，这个线程池可以通过Retrofit创建的时候配置，简单来说就是response会在这个线程池中回调。</p>
 <p> RxjavaCallAdapterFactory的做法是<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"> <span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> CallAdapter&lt;?&gt; get(Type returnType, Annotation[] annotations, Retrofit retrofit) &#123;</span><br><span class="line">    Class&lt;?&gt; rawType = getRawType(returnType);</span><br><span class="line">    String canonicalName = rawType.getCanonicalName();</span><br><span class="line">    <span class="keyword">boolean</span> isSingle = <span class="string">"rx.Single"</span>.equals(canonicalName); <span class="comment">//直接看包名。。。。。</span></span><br><span class="line">    <span class="keyword">boolean</span> isCompletable = <span class="string">"rx.Completable"</span>.equals(canonicalName);</span><br><span class="line">    <span class="keyword">if</span> (rawType != Observable.class &amp;&amp; !isSingle &amp;&amp; !isCompletable) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (!isCompletable &amp;&amp; !(returnType <span class="keyword">instanceof</span> ParameterizedType)) &#123;</span><br><span class="line">      String name = isSingle ? <span class="string">"Single"</span> : <span class="string">"Observable"</span>;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(name + <span class="string">" return type must be parameterized"</span></span><br><span class="line">          + <span class="string">" as "</span> + name + <span class="string">"&lt;Foo&gt; or "</span> + name + <span class="string">"&lt;? extends Foo&gt;"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (isCompletable) &#123;</span><br><span class="line">      <span class="comment">// Add Completable-converter wrapper from a separate class. This defers classloading such that</span></span><br><span class="line">      <span class="comment">// regular Observable operation can be leveraged without relying on this unstable RxJava API.</span></span><br><span class="line">      <span class="comment">// Note that this has to be done separately since Completable doesn't have a parametrized</span></span><br><span class="line">      <span class="comment">// type.</span></span><br><span class="line">      <span class="keyword">return</span> CompletableHelper.createCallAdapter(scheduler);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    CallAdapter&lt;Observable&lt;?&gt;&gt; callAdapter = getCallAdapter(returnType, scheduler);</span><br><span class="line">    <span class="keyword">if</span> (isSingle) &#123;</span><br><span class="line">      <span class="comment">// Add Single-converter wrapper from a separate class. This defers classloading such that</span></span><br><span class="line">      <span class="comment">// regular Observable operation can be leveraged without relying on this unstable RxJava API.</span></span><br><span class="line">      <span class="keyword">return</span> SingleHelper.makeSingle(callAdapter);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> callAdapter;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <h3 id="1-5-使用Retrofit的best-practices"><a href="#1-5-使用Retrofit的best-practices" class="headerlink" title="1.5 使用Retrofit的best practices"></a>1.5 使用Retrofit的best practices</h3><p>到这里，retrofit的工作流程就通过三个方法讲完了，接下来根据jake wharton的talk <a href="https://www.youtube.com/watch?v=t34AQlblSeE">making retrofit work for you</a>来讲几个best practice。</p>
@@ -504,11 +532,63 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">android</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">linux</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">tools</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">前端</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">transition</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">databinding</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">service</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -528,31 +608,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">adb</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">linux</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -560,19 +620,43 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
+                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -588,67 +672,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">前端</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">nginx</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">transition</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">databinding</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">service</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
             
             <div class="clearfix"></div>

@@ -23,7 +23,7 @@
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/snapshot20161020124442.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/snapshot20161020124836.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/snapshot20161020143554.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-04-13T07:19:47.807Z">
+<meta property="og:updated_time" content="2018-04-26T10:23:11.370Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用RecyclerView的Animation">
 <meta name="twitter:description" content="From the talkRecyclerView Animations and Behind the ScenesYigit Biyar &amp;amp; Chet Haaseon Anroid Dev Summit 2015 1. RecyclerView架构RecyclerView is Flexible , Pluggable and Customizeable内部很多功能都交给了各个组件去完成">
@@ -280,7 +280,7 @@ ga('send', 'pageview');
 <li>canReuseViewHolder的作用:<br>例如notifyItemChanged(position)后，只是某个位置的viewHolder发生了信息改变，那就没有必要创建一个新的ViewHolder，直接提供原有的ViewHolder，提升性能。</li>
 </ul>
 <h3 id="3-常见错误"><a href="#3-常见错误" class="headerlink" title="3. 常见错误"></a>3. 常见错误</h3><ol>
-<li><p>mAdapter.notifyItemMoved(1,5)<br>不会调用onBindViewHolder，不会invalidate </p>
+<li><p>mAdapter.notifyItemMoved(1,5)<br>不会调用onBindViewHolder，不会invalidate</p>
 </li>
 <li><p>不要在onBindViewHolder中添加onClickListener(以匿名内部类的方式,这会使得position变成final),想象一下，mAdapter.notifyItemMoved(1,5)调用后不会调用onBindViewHolder，这使得点击pos 1时实际传递给listener的是pos 5。</p>
 </li>
@@ -316,17 +316,19 @@ ga('send', 'pageview');
 <p>只需调用上述方法即可实现列表Item更新及Adapter的notify。DiffUtil的callback有四个方法需要复写，另外有一个方法用于单个Item的部分payload更新。在<a href="https://medium.com/@iammert/using-diffutil-in-android-recyclerview-bdca8e4fbb00#.rbtzmmtbg">medium</a>上找到一个现成的，直接借用了。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyDiffCallback</span> <span class="keyword">extends</span> <span class="title">DiffUtil</span>.<span class="title">Callback</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    List&lt;Person&gt; oldPersons;</span><br><span class="line">    List&lt;Person&gt; newPersons;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyDiffCallback</span><span class="params">(List&lt;Person&gt; newPersons, List&lt;Person&gt; oldPersons)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.newPersons = newPersons;</span><br><span class="line">        <span class="keyword">this</span>.oldPersons = oldPersons;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getOldListSize</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> oldPersons.size();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getNewListSize</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> newPersons.size();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">areItemsTheSame</span><span class="params">(<span class="keyword">int</span> oldItemPosition, <span class="keyword">int</span> newItemPosition)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> oldPersons.get(oldItemPosition).id == newPersons.get(newItemPosition).id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">areContentsTheSame</span><span class="params">(<span class="keyword">int</span> oldItemPosition, <span class="keyword">int</span> newItemPosition)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> oldPersons.get(oldItemPosition).equals(newPersons.get(newItemPosition));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Nullable</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">getChangePayload</span><span class="params">(<span class="keyword">int</span> oldItemPosition, <span class="keyword">int</span> newItemPosition)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//you can return particular field for changed item.//这里的object会被带到onBindViewHolder中</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">super</span>.getChangePayload(oldItemPosition, newItemPosition);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>这些方法会帮助完成remove和add等方法。</p>
 <ul>
-<li><p>viewHolder的生命周期</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">onCreate</span><br><span class="line">onBindViewHolder(获取video资源)</span><br><span class="line">onViewAttachedToWindow(可以在这里开始播放视频)</span><br><span class="line">onViewDetachedFromWindow(可以在这里停止播放视频，随时有可能重新被直接attach，这过程中不会调用onBind方法)</span><br><span class="line">onRecycled(可以在这里释放Video资源或者释放Bitmap引用，这之后再使用该ViewHolder需要调用onBind方法)</span><br></pre></td></tr></table></figure>
-</li>
+<li>viewHolder的生命周期</li>
+</ul>
+<p>onCreate<br>onBindViewHolder(获取video资源)<br>onViewAttachedToWindow(可以在这里开始播放视频)<br>onViewDetachedFromWindow(可以在这里停止播放视频，随时有可能重新被直接attach，这过程中不会调用onBind方法)<br>onRecycled(可以在这里释放Video资源或者释放Bitmap引用，这之后再使用该ViewHolder需要调用onBind方法)</p>
+<ul>
 <li><p>recyclerView的一些defer操作对于日常开发的帮助<br>recyclerView会将一些pending操作defer到next frame。eg:</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">recyclerView.scrollToPosition(<span class="number">15</span>);</span><br><span class="line"><span class="keyword">int</span> x = layoutManager.getFirstVisiblePosition()<span class="comment">//此时x并不等于15，因为下一帧并未开始。真正的执行scroll操作需要等到nextFrame执行后才能生效，具体一点的话，就是下一个执行layout的message的callback还未被执行。</span></span><br><span class="line">又例如，在onCreate中调用</span><br><span class="line">```java</span><br><span class="line">recyclerView.scrollToPosition(<span class="number">15</span>)</span><br><span class="line"><span class="comment">//在netWorkCallback中调用setAdapter，这时recyclerView会利用pending的15 position。原因在于recyclerView会判断如果layoutManager和adapter是否为null，如果都为null。skip layout。</span></span><br><span class="line"></span><br><span class="line">- 在getItemViewType中返回R.layout.itemLayout的好处。</span><br><span class="line">在onCreateViewHolder(ViewGroup viewParent,<span class="keyword">int</span> ViewType)&#123;</span><br><span class="line">    View itemView = inflate.inflate(ViewType,parent,<span class="keyword">false</span>);</span><br><span class="line">    <span class="keyword">return</span> XXXHolder(itemView);<span class="comment">//aapt可以确保R.layout.xxxx是unique的。</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">recyclerView.scrollToPosition(<span class="number">15</span>);</span><br><span class="line"><span class="keyword">int</span> x = layoutManager.getFirstVisiblePosition();<span class="comment">//此时x并不等于15，因为下一帧并未开始。真正的执行scroll操作需要等到nextFrame执行后才能生效，具体一点的话，就是下一个执行layout的message的callback还未被执行。</span></span><br><span class="line"><span class="comment">// 又例如，在onCreate中调用</span></span><br><span class="line">recyclerView.scrollToPosition(<span class="number">15</span>);</span><br><span class="line"><span class="comment">//在netWorkCallback中调用setAdapter，这时recyclerView会利用pending的15 position。原因在于recyclerView会判断如果layoutManager和adapter是否为null，如果都为null。skip layout。</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// - 在getItemViewType中返回R.layout.itemLayout的好处。</span></span><br><span class="line">onCreateViewHolder(ViewGroup viewParent,<span class="keyword">int</span> ViewType) &#123;</span><br><span class="line">    View itemView = inflate.inflate(ViewType,parent,<span class="keyword">false</span>);</span><br><span class="line">    <span class="keyword">return</span> XXXHolder(itemView);<span class="comment">//aapt可以确保R.layout.xxxx是unique的。</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>ClickListener的实现<br>在onCreateViewHolder中传一个callback，不要在onBindViewHolder中传，不要把onBindViewHolder中的position变为final的。getAdapterPositon可能为NO_POSITION(-1)，因为RecyclerView的UI更新会被defer到next Frame，在下一帧更新被执行前，用户可能已经点击了item，这时的position就有可能是-1(这种情况发生在点击后删除了所有的item数据，这时获得的position就类似于list的indexAt，当然是-1。).</p>
 </li>
 <li><p>LayoutManager只知道LayoutPosition，并不知道AdapterPosition<br>Items在Adapter的数据集中的顺序可能会随时变更，但recyclerView可能并不会调用onBindViewHolder方法，这也就是onBindViewHolder中的position并不可靠的原因。因为viewHolder本身是backed by Item的，而viewHolder的getAdapterPosition能够正确地反应Item在数据集中的顺序。</p>
 </li>
 </ul>
+<h2 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h2><p>RecylerView的缓存提供了viewCacheExtension这个接口，开发者可以自定义一层View的缓存</p>
 <h3 id="4-一些参考资料"><a href="#4-一些参考资料" class="headerlink" title="4 . 一些参考资料"></a>4 . 一些参考资料</h3><ul>
 <li><a href="https://www.youtube.com/watch?v=imsr8NrIAMs">RecyclerView Animations and Behind the Scenes (Android Dev Summit 2015)</a></li>
 <li><a href="https://github.com/wasabeef/recyclerview-animators">ItemAnimator模板</a></li>
@@ -589,11 +591,63 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">android</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">linux</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">tools</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">前端</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">transition</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">databinding</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">service</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -613,31 +667,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">adb</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">linux</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -645,19 +679,43 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
+                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -673,67 +731,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">前端</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">nginx</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">transition</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">databinding</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">service</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
             
             <div class="clearfix"></div>
