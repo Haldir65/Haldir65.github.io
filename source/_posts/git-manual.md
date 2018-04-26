@@ -38,7 +38,10 @@ The --set-upstream flag is deprecated and will be removed. Consider using --trac
 Branch master set up to track remote branch master from origin.
 ```
 
-<!--more-->
+直接拿下面这段就行了
+**如果已经clone下来，想要在本地创建一个和远程分支对应的local分支。**
+> git branch --track dev origin/dev && git chekout dev
+
 
 ## 3. git处理大小写字母的问题
 

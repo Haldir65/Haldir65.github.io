@@ -73,7 +73,7 @@ contentType（MimeType）
        //callAdapter的作用 就是将retrofit.Call的Call转成一个T。例如上面就是把Call<List<Contributor>>转成一个List<Contributor>，这个过程是上面提到的最重要的三个方法中的第三部 adapt（okHttpCall）。可以认为是拿着一个已经创建好的okHttp的Call去做事情，在适当的时候将网络返回结果转成用户事先定义好的respose类型。
         //这一步返回一个java.lang.reflect.Type ，就个class的基本作用家就是根据泛型来确定response的class。
       responseType = callAdapter.responseType();
-        //2.创建用于respnse和Request的converter。
+        //2.创建用于response和Request的converter。
       responseConverter = createResponseConverter();
       for (Annotation annotation : methodAnnotations) {
         parseMethodAnnotation(annotation); //这里面就是把@GET变成"GET"这个String，表示当前方法是一个GET请求
@@ -103,9 +103,9 @@ contentType（MimeType）
 
 
 关键是这三个方法，Buider在这个过程中完成了一些变量的赋值
-```java
+
 1. createCallAdapter  --->  retrofit.callAdapter(returnType, annotations); 从adapterFactories(显然可以有多个)中遍历，找到了一个就返回。已经实现的的有三种**策略**，DefaultCallAdapterFactory、ExecutorCallAdapterFactory和RxjavaCallAdapterFactory。显然用户可以在创建retrofit实例的过程中install自己的callAdapter实现。
-再次强调这个CallAdater的作用，就是将Retrofit的Call adpt成对应的Response class的实例。
+再次强调这个CallAdapter的作用，就是将Retrofit的Call adapt成对应的Response class的实例。
 
 2. createResponseConverter --->  retrofit.responseBodyConverter(responseType, annotations);
 Retrofit2.Converter<F, T> (from和To，我猜的)
@@ -171,7 +171,7 @@ ServiceMethod(Builder<T> builder) {
   }
 
 上面最重要的三个方法讲完了第一个。  
-```
+
 
 
 ### 1.3 第二个方法和OkHttpCall
@@ -266,7 +266,7 @@ return serviceMethod.callAdapter.adapt(okHttpCall); //这个return需要的是Ob
 找到之后就返回，默认的实现有DefaultCallAdapterFactory和ExecutorCallAdapterFactory以及RxjavaCallAdapterFactory。
 
 ```java
-在DefaultCallAdapterFactory中的处理方式是
+// 在DefaultCallAdapterFactory中的处理方式是
 
  return new CallAdapter<Call<?>>() {
       @Override public Type responseType() {
@@ -279,7 +279,7 @@ return serviceMethod.callAdapter.adapt(okHttpCall); //这个return需要的是Ob
     };
 
 
-ExecutorCallAdapterFactory的处理方式是
+// ExecutorCallAdapterFactory的处理方式是
 
 
  return new CallAdapter<Object, Call<?>>() {

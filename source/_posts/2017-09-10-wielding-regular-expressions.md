@@ -48,7 +48,7 @@ nginx的config文件中也要写正则
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100729187.jpg?imageView2/2/w/600)
 
 
-![](http://odzl05jxx.bkt.clouddn.com/image/jpglight-and-shadow-2411321_960_720.jpg?imageView2/2/w/600)
+
 
 
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery151110074347.jpg?imageView2/2/w/600)

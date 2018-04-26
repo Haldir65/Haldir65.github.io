@@ -44,3 +44,12 @@ try {
       /* ignore */
   }
 ```
+
+## 2.ContentProvider的onCreate要早于Application的onCreate发生
+比如ArchitectureComponent中的lifeCycle就是这么干的，写了个dummpy的contentProvider，在provider的onCreate中去loadLibrary.
+
+## 3. 看到一个关于apk反编译和重新打包的帖子，非常好用
+[Android apk反编译及重新打包流程](https://www.jianshu.com/p/792a08d5452c)，关键词apktool。
+但是，360加固之后的apk是不能用dex2jar查看java代码的。
+
+### 4.从base.apk谈到apk安装的过程

@@ -404,7 +404,7 @@ ViewGroup.java，删掉一些无关的代码
              // so this view group continues to intercept touches.
              intercepted = true;
          }
-         //从这里也能看出来，onInterceptTouchEvent的调用时机是第一次ACTION_DOWN。以及在已经有愿意在dispatchTouchEvent里面返回true的child的前提下，所有的后续动作。所以这个父ViewGroup随时可以从子View前拦截Event
+         //从这里也能看出来，onInterceptTouchEvent的调用时机是第一次ACTION_DOWN。以及在已经有愿意在dispatchTouchEvent里面返回true的child的前提下，所有的后续动作。所以这个父ViewGroup随时可以从子View前拦截Event，或者说在一个gesture中，在已经有View child站出来说愿意承担的前提下，父ViewGroup随时可以在onInterceptXXX中拦截下来
 
         //3. 遍历child的for循环开始
        for (int i = childrenCount - 1; i >= 0; i--) {

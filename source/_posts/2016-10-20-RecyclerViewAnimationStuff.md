@@ -5,7 +5,7 @@ categories: blog
 tags: [android,RecyclerView]
 ---
 
-From the talk 
+From the talk
 RecyclerView Animations and Behind the Scenes
 Yigit Biyar & Chet Haase
 on Anroid Dev Summit 2015
@@ -142,7 +142,7 @@ animateChange()//实际的动画添加位置
 
 ### 3. 常见错误
 1. mAdapter.notifyItemMoved(1,5)
-不会调用onBindViewHolder，不会invalidate 
+不会调用onBindViewHolder，不会invalidate
 
 2. 不要在onBindViewHolder中添加onClickListener(以匿名内部类的方式,这会使得position变成final),想象一下，mAdapter.notifyItemMoved(1,5)调用后不会调用onBindViewHolder，这使得点击pos 1时实际传递给listener的是pos 5。
 
@@ -171,7 +171,7 @@ imageView requestLayout
 
 itemView requestLayout
 
-recyclerView requestLayout 
+recyclerView requestLayout
 ```
 而recyclerView的requestLayout方法会在next Frame重新position所有的child(very expensive!)为此，recyclerView提供了一个setHasFixedSize方法，设置为true表明recyclerView自身不会因为childView的变化而resize，这样recyclerVeiw就不会调用requestLayout方法(如果去看RecyclerView的源码，可以看到mEatRequestLayout这个变量，也就是避免重复调用requestLayout造成性能损耗。)，不会造成所有的childView都被重新测量一遍。在ImageView(2011年之后的版本)中，setImageDrawable方法大致长这样：
 ```java
@@ -200,7 +200,7 @@ SortedList<Item> mSortedList = new SortedList<Item>(Item.class,
 使用方式十分简单，后面的数据更新操作包括notifyDataChange都被处理好了。
 onNetwokCallback(List<News> news){
     mSortedList.addAll(news);
-} 
+}
 ```
 对于未发生变化的Item，将直接跳过，实现了最优化的列表数据更新。
 
@@ -254,26 +254,25 @@ public class MyDiffCallback extends DiffUtil.Callback{
 这些方法会帮助完成remove和add等方法。
 
 - viewHolder的生命周期
-```java
+
 onCreate
 onBindViewHolder(获取video资源)
 onViewAttachedToWindow(可以在这里开始播放视频)
 onViewDetachedFromWindow(可以在这里停止播放视频，随时有可能重新被直接attach，这过程中不会调用onBind方法)
 onRecycled(可以在这里释放Video资源或者释放Bitmap引用，这之后再使用该ViewHolder需要调用onBind方法)
-```
+
 
 - recyclerView的一些defer操作对于日常开发的帮助
 recyclerView会将一些pending操作defer到next frame。eg:
 ```java
 recyclerView.scrollToPosition(15);
-int x = layoutManager.getFirstVisiblePosition()//此时x并不等于15，因为下一帧并未开始。真正的执行scroll操作需要等到nextFrame执行后才能生效，具体一点的话，就是下一个执行layout的message的callback还未被执行。
-又例如，在onCreate中调用
-```java
-recyclerView.scrollToPosition(15)
+int x = layoutManager.getFirstVisiblePosition();//此时x并不等于15，因为下一帧并未开始。真正的执行scroll操作需要等到nextFrame执行后才能生效，具体一点的话，就是下一个执行layout的message的callback还未被执行。
+// 又例如，在onCreate中调用
+recyclerView.scrollToPosition(15);
 //在netWorkCallback中调用setAdapter，这时recyclerView会利用pending的15 position。原因在于recyclerView会判断如果layoutManager和adapter是否为null，如果都为null。skip layout。
 
-- 在getItemViewType中返回R.layout.itemLayout的好处。
-在onCreateViewHolder(ViewGroup viewParent,int ViewType){
+// - 在getItemViewType中返回R.layout.itemLayout的好处。
+onCreateViewHolder(ViewGroup viewParent,int ViewType) {
     View itemView = inflate.inflate(ViewType,parent,false);
     return XXXHolder(itemView);//aapt可以确保R.layout.xxxx是unique的。
 }
@@ -287,7 +286,8 @@ Items在Adapter的数据集中的顺序可能会随时变更，但recyclerView�
 
 
 
-
+## 更新
+RecylerView的缓存提供了viewCacheExtension这个接口，开发者可以自定义一层View的缓存
 
 ### 4 . 一些参考资料
 - [RecyclerView Animations and Behind the Scenes (Android Dev Summit 2015)](https://www.youtube.com/watch?v=imsr8NrIAMs)
