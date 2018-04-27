@@ -42,28 +42,27 @@ interface Disposable{
 
 
 interface Subscriber<T>{
-  void onNext(T t)
-  void onComplete();;
+  void onNext(T t);
+  void onComplete();
   void onError(Throwable t);
   void onSubscribe(Subscription s);
 }
 
 interface Subscription{
-  void cancel() //用于取消订阅，释放资源
-  void request(long r) //请求更多的数据，即BackPressure开始体现的地方
+  void cancel(); //用于取消订阅，释放资源
+  void request(long r) ;//请求更多的数据，即BackPressure开始体现的地方
 }
 ```
 两者的区别在于最后一个方法，以Disposable为例，当你开始subscribe一个数据源的时，就类似于创建了一个Resurce，而Resource是往往需要在用完之后及时释放。无论是Observable还是Flowable,这个onSubscribe方法会在订阅后立即被调用，这个方法里的Disposable可以保留下来，在必要时候用于释放资源。如Activity的onDestroy中cancel network request.
 
 
 ### 2.2 数据源的对应类
-1. Single(订阅一个Single，要么获得仅一个返回值，要么出现异常返回Error)
+**Single** (订阅一个Single，要么获得仅一个返回值，要么出现异常返回Error)
 ```java
 public abstract class Single<T> implements SingleSource<T> {}
-
 ```
 
-2. Completeable(订阅一个completeable，要么成功，不返回值，要么出现异常返回error，就像一个reactive runnale，一个可以执行的command，并不返回结果)
+**Completeable** (订阅一个completeable，要么成功，不返回值，要么出现异常返回error，就像一个reactive runnale，一个可以执行的command，并不返回结果)
 ```java
 public abstract class Completable implements CompletableSource {}
 ```
@@ -75,7 +74,7 @@ Completeable writeFile(Stirng data){}
 ```
 
 
-3. Maybe(有可能返回值，有可能不返回，也有可能异常，即optional)
+**Maybe** (有可能返回值，有可能不返回，也有可能异常，即optional)
 ```java
 public abstract class Maybe<T> implements MaybeSource<T> {}
 ```
@@ -88,7 +87,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {}
 
 比较推荐的方法有两种
 
-### 1. fromCallable
+### 一. fromCallable
 ```java
 Observable.fromCallable(new Callable<String>(){
 
@@ -117,10 +116,9 @@ Maybe.fromRunnable(() -> "ignore")
 
 Completeable.fromAction(() -> "Hey jude")
 Completeable.fromRunnable(() -> "ignore")
-
 ```
 
-### 2. create(Rxjava 1中不推荐使用该方法，Rxjava2中建议使用)
+### 二. create(Rxjava 1中不推荐使用该方法，Rxjava2中建议使用)
 ```java
 Observable.create(new ObservableOnSubscribe<String>()){
       @override
@@ -132,7 +130,7 @@ Observable.create(new ObservableOnSubscribe<String>()){
 }
 ```
 
-//一个Observable可以有多个subscriber。一个被观察者可以有多个观察者，被观察者的onNext调用，观察者的onNext也会被调用
+**一个Observable可以有多个subscriber。一个被观察者可以有多个观察者，被观察者的onNext调用，观察者的onNext也会被调用**
 
 lambda更简洁
 ```java
@@ -148,7 +146,7 @@ Observable.create(e ->{
    call.enqueue(new Callback()){
 
     @Override
-    public void   onResponse(Response r) throws IOException{
+    public void  onResponse(Response r) throws IOException{
       e.onNext(r.body().toString());
       e.onComplete();
     }
@@ -180,10 +178,8 @@ Observable.create(e ->{
 
 // 点击按钮发送事件，取消订阅时避免leak View
 
-和fromCallable一样，create方法也适用于所有五种data source
-
+// 和fromCallable一样，create方法也适用于所有五种data source
 ```
-
 
 
 ## 3. 如何订阅（接收）这些数据
@@ -241,9 +237,9 @@ Observable.just("Hello").subscribe(new DisposableObserver<String>() {
                 });
 
 
-  可以持有DisposableObserver，在停止订阅的时候调用observer.dispose方法，切断流。
-  或者这样
-  Disposable disposable =   Observable.just("Hello").subscribeWith(new DisposableObserver<String>() {
+  // 可以持有DisposableObserver，在停止订阅的时候调用observer.dispose方法，切断流。
+  // 或者这样
+  Disposable disposable =  Observable.just("Hello").subscribeWith(new DisposableObserver<String>() {
                     @Override
                     public void onNext(String value) {
                     }
@@ -257,16 +253,10 @@ Observable.just("Hello").subscribe(new DisposableObserver<String>() {
                     }
                 });
 
-   subscribeWith返回一个Disposable，subscribe是一个没有返回值的函数    
-
-  偷懒一点的话，通常把这些返回的订阅加入到一个CompositeDisposable,在onDestroy的时候统一取消订阅即可  
-
-  Observable、Single、Completeable、Maybe以及Flowable都支持subscribewith。
-
-
+  //  subscribeWith返回一个Disposable，subscribe是一个没有返回值的函数    
+  // 偷懒一点的话，通常把这些返回的订阅加入到一个CompositeDisposable,在onDestroy的时候统一取消订阅即可  
+  // Observable、Single、Completeable、Maybe以及Flowable都支持subscribewith。
 ```
-
-
 
 
 ## 4. 数据源和接受者建立联系
@@ -328,10 +318,10 @@ Observable.fromCallable(new Callable<List<String>>() {
             }
         });
 
-执行顺序：（括号内数字表示线程id）
-doOnsubscribe(1) -> onSubscribe(1) -> call(276) ->doOnNext(1)->onNext(1) -> doAfterNext(1) ->doOnComplete(1)->onComplete(1)
-所以基本上可以认为doOnXXX= doBeforeXXX,线程都是一样的。估计是为了打日志用的，或者说用于切片。
-像极了OkHttp的interecpter或是gradle的task。
+// 执行顺序：（括号内数字表示线程id）
+// doOnsubscribe(1) -> onSubscribe(1) -> call(276) ->doOnNext(1)->onNext(1) -> doAfterNext(1) ->doOnComplete(1)->onComplete(1)
+// 所以基本上可以认为doOnXXX= doBeforeXXX,线程都是一样的。估计是为了打日志用的，或者说用于切片。
+// 像极了OkHttp的interecpter或是gradle的task。
 
 ```
 
@@ -364,7 +354,7 @@ Flowable -> ignoreElements() ->Completable
 
 
 ### updates: 复制一些实例
-merge():
+**merge():**
 ```java
 // 用于存放最终展示的数据
         String result = "数据源来自 = " ;
@@ -411,7 +401,7 @@ merge():
                     }
                 });
 ```
-zip()，比如要同时拉两个接口
+**zip()** ，比如要同时拉两个接口
 ```java
 public class MainActivity extends AppCompatActivity {
 

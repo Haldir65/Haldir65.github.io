@@ -66,5 +66,5 @@ top : 1
 - [curl的几种常见用法](http://www.codebelief.com/article/2017/05/linux-command-line-curl-usage/)
 - Android进程的[加载流程](https://juejin.im/post/5a646211f265da3e3f4cc997)
 - 前后端同构
-- install nginx , jenkin ci, deploying nginx in docker(Http Load Balaning with Docker and nginx)(https://www.digitalocean.com/community/tutorials/how-to-configure-nginx-with-ssl-as-a-reverse-proxy-for-jenkins)
+- [install nginx , jenkin ci, deploying nginx in docker(Http Load Balaning with Docker and nginx)](https://www.digitalocean.com/community/tutorials/how-to-configure-nginx-with-ssl-as-a-reverse-proxy-for-jenkins)
 - [nio stuff](https://juejin.im/post/59fffdb76fb9a0450a66bd58)

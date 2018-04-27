@@ -52,7 +52,10 @@ try {
 [Android apk反编译及重新打包流程](https://www.jianshu.com/p/792a08d5452c)，关键词apktool。
 但是，360加固之后的apk是不能用dex2jar查看java代码的。
 
-## 4.从base.apk谈到apk安装的过程
+
+### 4.从base.apk谈到apk安装的过程
+[APK安装过程](https://www.jianshu.com/p/ae45af3c3098)。
+之前无意间在FileExplorer中看到了base.apk这个文件，由此展开apk安装过程的研究。
 
 ## 5.关于模块化和项目重构
 很多关于Android甚至java项目的重构的文章都会最终提到两条：

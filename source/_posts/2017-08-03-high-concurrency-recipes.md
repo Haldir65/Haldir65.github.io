@@ -9,6 +9,9 @@ tags: [java,tools,concurrency]
 
 > The difference between “concurrent” and “parallel” execution
 [Good to know](https://stackoverflow.com/questions/1897993/what-is-the-difference-between-concurrent-programming-and-parallel-programming)
+构造函数也不是线程安全的(因为指令重排)
+
+
 
 ## 1. 可重入锁的概念
 可重入锁，也叫做递归锁，指的是同一线程 外层函数获得锁之后 ，内层递归函数仍然有获取该锁的代码，但不受影响。
@@ -19,8 +22,8 @@ tags: [java,tools,concurrency]
 
 比方说
 >lock.lock()
-      lock.lock()
-      lock.unlock()
+    ---  lock.lock()
+    ---  lock.unlock()
 lock.unlock()
 
 ReentrantLock和synchronized都是可重入锁
@@ -107,7 +110,7 @@ private static void prepare(boolean quitAllowed) {
 
 
 所以避免leak的话，记得调用ThreadLocal.remove
-每一条线程调用ThreadLocal的set方法时都只能改变属于自己（线程）的值，调用get的时候也只能读到自己曾经设置的值。在多条线程面前，一个ThreadLocal类似于一个银行，每条线程只能保存或者更改读取自己的保险柜里的东西，保险柜钥匙即Thread自身。
+每一条线程调用ThreadLocal的set方法时都只能改变属于自己（线程）的值，调用get的时候也只能读到自己曾经设置的值。在多条线程面前，一个ThreadLocal本身并不是容器，因为数据实际上放在了Thread的一个map里面，每条线程只能保存或者更改读取自己的保险柜里的东西，保险柜钥匙即ThreadLocal自身。
 
 ## 3. Fork/join since java 7
 有些任务是可以分块的。[work-stealing的实现](http://ifeve.com/java7-fork-join-and-closure/)
@@ -152,11 +155,7 @@ Object lock = new Object() ;则需要7行操作码。
 ```
 
 ## 9. CountdownLatch和CyclicBarrier
-
-作者：天然鱼
-链接：http://www.jianshu.com/p/cef6243cdfd9
-來源：简书
-
+分别举一个例子
 ```java
 public class CountDownLatchTest {
 
@@ -238,6 +237,7 @@ public class CyclicBarrierDemo {
 
 
 ## 10.指令重排不是说说而已
+ 在多线程的场景下，无逻辑相关的代码写的前后顺序并无意义，原因是编译器会进行指令重排。
 为什么说指令重排序会影响 items 的可见性呢？创建一个对象要分为三个步骤：
 
 ```
@@ -270,15 +270,18 @@ Sleep是Thread对象的静态方法，sleep并不释放锁，也不要求持有�
 Thread.yield方法是让当前线程从执行状态变成就绪状态（就是和大家一起抢）
 
 synchronized关键字一般有三种用法
-- 实例同步方法
+
+**一、实例同步方法**
 synchronized用于修饰实例方法（非静态方法）时，执行该方法需要获得的是该类实例对象的内置锁（同一个类的不同实例拥有不同的内置锁）。如果多个实例方法都被synchronized修饰，则当多个线程调用同一实例的不同同步方法（或者同一方法）时，需要竞争锁。但当调用的是不同实例的方法时，并不需要竞争锁。
 也正是如此，一个同步方法被调用时，就等于独占了当前实例的锁，其他线程无法调用当前实例的其他同步方法。所以不是很推荐使用同步方法。
-
-- 静态同步方法
+**二、静态同步方法**
 synchronized用于修饰静态方法时，执行该方法需要获得的是该类的class对象的内置锁（一个类只有唯一一个class对象）。调用同一个类的不同静态同步方法时会产生锁竞争。
-- 同步代码块
+**三、同步代码块**
 synchronized用于修饰代码块时，进入同步代码块需要获得synchronized关键字后面括号内的对象（可以是实例对象也可以是class对象）的内置锁。
 
+java io为什么慢，有一个原因是InputStream的read方法和OutputStream的write方法都是加了synchronized的。而Okio里面synchronized方法我没找到，另外，真的想要io性能的话，用nio。
+
+同步一个对象的前提是各方都同意使用同一把锁作为调用方法的前提，单方面加锁并不限制不尊重锁机制的使用者。两条线程分别去取两个互不相干的锁，这里面当然不存在阻塞问题。
 
 ## 13. CAS操作是有操作系统提供了硬件级别的原子操作的。  
 CAS属于乐观的一种，假如比较之后发现OK那最好，假如不成功还允许继续尝试。jdk中使用的是UnSafe这个类，这个类属于“后门”，开发者可以使用这个类直接操控HotSpot jvm内存和线程。被广泛应用于juc包中。
@@ -297,11 +300,9 @@ A a = (A) unsafe.allocateInstance(aClass);
 BlockingQueue提供了四种应对策略来处理这种资源不能被立即satisfy的场景
 
 | 空值     | 抛出异常     |   返回一个特殊值 | 阻塞 | 调用者提供一个超时 |
-| :-------------: | :------------- |:------------- |:------------- |:------------- |
+| :------------- | :------------- |:------------- |:------------- |:------------- |
 | 插入     | add(e)      | offer(e) | put(e)  | put(e, time ,timeUnit) |
-| :------------- | :------------- |:------------- |:------------- |:------------- |
 | 移除     | remove()     | poll() | take()  | poll(time,timeUnit) |
-| :------------- | :------------- |:------------- |:------------- |:------------- |
 | 检查     | element()  | peek()  | 不可用 | 不可用 |
 
 文档上说： Usage example, based on a typical producer-consumer scenario. Note that a BlockingQueue can safely be used with multiple producers and multiple consumers.（BlockingQueue能够安全的用于多个生产者消费者的场景，就是说这个容器已经帮外部处理好了生产和消费并发的同步问题，其实就是加锁）
@@ -314,25 +315,18 @@ ArrayBlockingQueue的入列核心方法是enqueue，而这个方法的调用是�
 LinkedBlockingQueue是Exexutors中使用的创建线程池的静态方法中使用的参数，显然更推荐使用。主要用的是两个方法，
 put方法在队列满的时候会阻塞直到有队列成员被消费，take方法在队列空的时候会阻塞，直到有队列成员被放进来。官方文档提到了， **LinkedBlockingQueue的吞吐量通常要高于基于数组的队列，但在大多数并发应用程序中，其可预知的性能要低一些** ， 内部的lock只能是unfair的。
 
-
-在线程池(ThreadPoolExecutor)中，获取任务使用的是queue的poll方法，添加任务使用的是queue的offer方法。
-
+在线程池(ThreadPoolExecutor)中，获取任务使用的是queue的**poll**方法，添加任务使用的是queue的**offer**方法。
 
 
 ## 15. AtomicXXX只是将value写成volatile，这样get就安全了，set的话直接交给Unsafe了
 volatile并不是Atomic操作，例如，A线程对volatile变量进行写操作(实际上是读和写操作)，B线程可能在这两个操作之间进行了写操作；例如用volatile修饰count变量那么 count++ 操作就不是原子性的。而AtomicInteger类提供的atomic方法可以让这种操作具有原子性如getAndIncrement()方法会原子性的进行增量操作把当前值加一,因为AtomicInteger的getAndIncrement方法就是简单的调用了Unsafe的getAndAddInt。
 
+## 16. 读多写少的场景下的同步
+ CopyOnWriteArrayList和Collections.synchronizedList相比。在高并发前提下，前者读的性能更好，后者写的性能更好（前者的写性能极差）。[CopyOnWriteArrayList与Collections.synchronizedList的性能对比](http://blog.csdn.net/yangzl2008/article/details/39456817)。CopyOnWriteArrayList适合做缓存。
+ **ReentrantReadWriteLock** 用于针对读多写少的场景进行优化。（获得读锁后，其它线程可获得读锁而不能获取写锁
+ 获得写锁后，其它线程既不能获得读锁也不能获得写锁）
 
 
-------------------------------mere trash-------------------------------------------------
-1. 构造函数也不是线程安全的(因为指令重排)
-2. 同步一个对象的前提是各方都同意使用同一把锁作为调用方法的前提，单方面加锁并不限制不尊重锁机制的使用者。
-3. 在多线程的场景下，无逻辑相关的代码写的前后顺序并无意义，原因是编译器会进行指令重排。
-
-5. CopyOnWriteArrayList和Collections.synchronizedList相比。在高并发前提下，前者读的性能更好，后者写的性能更好（前者的写性能极差）。[CopyOnWriteArrayList与Collections.synchronizedList的性能对比](http://blog.csdn.net/yangzl2008/article/details/39456817)。CopyOnWriteArrayList适合做缓存。
-6. java io为什么慢，有一个原因是InputStream的read方法和OutputStream的write方法都是加了synchronized的。而Okio里面synchronized方法我没找到，另外，真的想要io性能的话，用nio。
-7. ReentrantReadWriteLock用于针对读多写少的场景进行优化。（获得读锁后，其它线程可获得读锁而不能获取写锁
-获得写锁后，其它线程既不能获得读锁也不能获得写锁）
 
 
 ## 参考
@@ -341,3 +335,4 @@ volatile并不是Atomic操作，例如，A线程对volatile变量进行写操作
 - [一级缓存，时钟周期](http://www.cnblogs.com/xrq730/p/7048693.html)volatile硬件层面的实现原理
 - [StampedLock in Java](https://netjs.blogspot.ca/2016/08/stampedlock-in-java.html)
 - [Java 8 StampedLocks vs. ReadWriteLocks and Synchronized](http://blog.takipi.com/java-8-stampedlocks-vs-readwritelocks-and-synchronized/)
+- [死磕java系列](http://cmsblogs.com/?p=2122)
