@@ -259,6 +259,14 @@ cache:
 cahe也就意味着后续，所有对于themes文件夹中的_config.yml文件的修改都不会生效。这也就是我一遍遍尝试更改theme文件夹中_config文件不生效的原因。
 所以要么去掉cache ，要么自己写bash script一行行的改。
 
+## 12. markdown写表格
+直接在atom下面敲table，就会自动提示出来的
+| Header One     | Header Two     |
+| :------------- | :------------- |
+| Item One       | Item Two       |
+
+中间的虚线左边的冒号表示下面的单元格左对齐，冒号放右边就右对齐，左右都放一个就表示居中
+
 ### 参考
 
 * [Hexo 博文置顶技巧](http://yanhuili.github.io/2016/11/21/hexo%E5%8D%9A%E6%96%87%E7%BD%AE%E9%A1%B6%E6%8A%80%E5%B7%A7/)

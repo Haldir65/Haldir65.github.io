@@ -52,4 +52,47 @@ try {
 [Android apk反编译及重新打包流程](https://www.jianshu.com/p/792a08d5452c)，关键词apktool。
 但是，360加固之后的apk是不能用dex2jar查看java代码的。
 
-### 4.从base.apk谈到apk安装的过程
+## 4.从base.apk谈到apk安装的过程
+
+## 5.关于模块化和项目重构
+很多关于Android甚至java项目的重构的文章都会最终提到两条：
+面向接口编程 -> 依赖注入(IOC)
+然后跟上一大堆专业分析和没什么用的废话。
+这俩在java的领域翻译过来就是：
+在A模块中用Dagger2生成B模块中定义的interface的impl实例。
+<del>其实不用Dagger2也行，就是每次在B模块的生命周期开始时准备一个HashMap<interfaceClass,ImplClass>这样的一大堆键值对，然后在A模块中根据想要的interface class去找impl class，用反射去创建，生产环境肯定不能这么干。</del>
+在Dagger2中大致是这么干的：
+
+先声明好B模块对外提供的接口，以下这俩都在另一个module中，A module通过gradle引用了B模块
+```java
+public interface Store {
+    String sell();
+}
+
+public class StoreImpl implements Store {
+    @Override
+    public String sell() {
+        return "Dummy products";
+    }
+}
+```
+B模块中再提供Component和provide的module
+```java
+@Component(modules = StoreModule.class)
+public interface StoreComponent {
+    Store eject();
+}
+
+@Module
+public class StoreModule {
+    @Provides
+    Store provideStore() {
+        return new StoreImpl();
+    }
+}
+```
+
+A模块中最终使用的方式应该是
+```java
+ Store store = DaggerStoreComponent.builder().build().eject();
+```
