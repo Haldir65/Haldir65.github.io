@@ -503,6 +503,23 @@ public class GreetingPlugin implements Plugin<Project> {
 本质上是在merge{ProductFlavor}{BuildType}Assets Task之后，transformClassesWithDexFor{ProductFlavor}{BuildType} Transform 之前,插入一个transformClassesWith{YourTransformName}For{ProductFlavor}{BuildType} Transform
 
 
+## 5. update
+[待查看](https://github.com/myjoybar/Android-Router/blob/master/route.sh)
+```js
+preBuild << {
+    String cmd = "sh inrouter/maker/route.sh " + project.getName()
+    def cmdResult = cmd.execute().text.trim()
+    println cmdResult
+}
+```
+
+```shell
+#echo "Start make"
+#javac -encoding utf-8 ./inrouter/maker/java/com/me/obo/maker/utils/*.java ./inrouter/maker/java/com/me/obo/maker/*.java -d inrouter/maker/class/  -cp inrouter/maker/libs/javapoet-1.9.0.jar
+#java -Djava.ext.dirs=inrouter/maker/libs -classpath inrouter/maker/class com.me.obo.maker.CodeMaker $1 $2
+#echo "End make"
+```
+
 
 
 [Tinker的gradle plugin实现，非常有参考意义](https://github.com/Tencent/tinker/blob/master/tinker-build/tinker-patch-gradle-plugin/src/main/groovy/com/tencent/tinker/build/gradle/TinkerPatchPlugin.groovy)

@@ -19,7 +19,7 @@ Kotlin是Jetbrain公司推出的面向jvm的语言，编译后的bytecode和java
        print(args[i])
     }
 }
-
+```
 
 自定义函数
 
@@ -31,7 +31,7 @@ Kotlin是Jetbrain公司推出的面向jvm的语言，编译后的bytecode和java
     return 0
 }
 
- ```
+
 
  支持lambda
  fun maps(list: List<String>) {
@@ -39,6 +39,13 @@ Kotlin是Jetbrain公司推出的面向jvm的语言，编译后的bytecode和java
             .sortedBy { it }
             .map(String::toUpperCase)
             .forEach(::print)
+}
+
+对于函数有新的认识了
+
+public fun isOdd(number: Int) = number % 2 != 0 // 函数也可以用一个等式来表达了
+public fun isOdd2(number: Int) :Boolean { //这种就啰嗦点
+    return number % 2 != 0
 }
  ```
 
@@ -55,7 +62,7 @@ for ((index, value) in quoteParts.withIndex()) {
 }
 
 //和java定义的List interface不一样，Kotlin定义的interface默认是没有add,remove这些修改性质的方法的。
-
+// 比如说有一个int，想凑到String + int中，不需要String.format了，kotlin给String加上了一个format的ententsion Function，更简单的方式是直接加上美元符号引用即可。感觉和es6很像。
 
 
 // List<out T>这种集合默认只提供了只读的方法，比如get ,size。想要更改内容需要使用MutableList接口提供的方法
@@ -92,7 +99,7 @@ button.setOnClickListener( { v-> System.out.print(v.id)})
 ```
 如果有多个方法，语法就显得[啰嗦的多](https://stackoverflow.com/questions/37672023/how-to-create-an-instance-of-anonymous-interface-in-kotlin)
 
-```
+```java
 val handler = object : DisposableObserver<Bitmap>() {
         override fun onError(e: Throwable) {
            LogUtil.d("e")
@@ -107,6 +114,23 @@ val handler = object : DisposableObserver<Bitmap>() {
         }
     }
 ```
+
+提到lambda，可以认为就是一个要执行的规则
+```
+fun logExecution1(func: () -> String){
+        Log.d("tag","before method call")
+        func()
+        Log.d("tag","after method call")
+    }
+
+logExecution1({
+           val result = "name"
+           result
+       })
+```     
+在high order function的领域里，这就算传入了一个返回值为String的函数，用lambda的话，返回值就不用写return了。好像使用高阶函数，只能这么写lambda.lambda的函数的写法相当邪乎，用两个分号包起来，里面一行行的写，最后也不用写返回值
+
+
 ### 4. 没有new关键字了
 ```
 class somClass{
@@ -147,6 +171,8 @@ var stringRepresentation: String
     }
 
 ```
+
+对于不希望生成getter和setter的filed，使用@jvmFiled的注解标识即可
 
 ### 6. 具有更好语义的typealis
 ```
@@ -265,6 +291,8 @@ Controller.checkType(10) // -> This is Some Integer Number
 //在另一个class中调用Controller.Companion.checkType(18) //和static方法一样，如果方法是private的话，外部也访问不了
 ```
 
+所以比如说像Constants这样的东西，也要丢到companion object中了
+
 ### 13. class cast
 ```
 val modifiableMap :MutableMap<String,String> = unmodifiableMap as MutableMap<String, String> //使用as关键字
@@ -323,7 +351,7 @@ val result ="Hello World".let {
 println(result)
 输出
 "Hello World"
-520
+520 //这个时候的result就已经是520了
 
 // 如果不为Null的话，执行下面这一段代码块
 val value = ...
@@ -332,6 +360,16 @@ value?.let {
     ... // execute this block if not null
 }
 ```
+
+apply的用法
+val name =  "myName".apply {
+      toUpperCase()
+   }
+print(name) //出来的还是myName，也就是说apply里面的东西不会对值产生影响
+
+
+
+
 
 ### 17. with关键字用于同时调用一个Instance 的多个method
 ```
@@ -359,8 +397,24 @@ stream.buffered().reader().use { reader ->
 }
 ```
 
+### 18. class还是File
+新建一个class和新建一个File有什么区别，File里面可以写多个class，每个class都是类似于java中static inner class，互相之间是不能引用到的。
+内部类不是像Java那样写在里面就能引用到外部类了，kotlin写在里面的class默认是引用不到外面class的field和方法的，需要给内部class加上inner关键词。
+
+java里面写习惯了.class对象，在kotlin中得这么写:
+```java
+retrofit.create(ApiStores.class) //java写法
+
+retrofit.create(ApiStores::class.java) // kotlin写法
+```
+
+init函数和constructor是有区别的
+[What are the Kotlin class initialisation semantics?
+](https://stackoverflow.com/questions/33688821/what-are-the-kotlin-class-initialisation-semantics).简单来说，init函数
+
 
 [stackoverflow](https://stackoverflow.com/questions/45267041/not-enough-information-to-infer-parameter-t-with-kotlin-and-android)
+init代码块不是构造函数，同时，init的执行效果要看写在哪一行了，如果在Init中引用了一个propertity，这个属性要是在Init之前就初始化了那倒还好，要是在后面,那么在init调用的时候看到的就是null.
 
 ### ref
 

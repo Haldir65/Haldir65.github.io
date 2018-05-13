@@ -99,3 +99,19 @@ A模块中最终使用的方式应该是
 ```java
  Store store = DaggerStoreComponent.builder().build().eject();
 ```
+
+## 6.写sqlite语句的时候总是容易出小错误
+```sql
+//错误写法
+CREATE TABLE IF NOT EXISTS table_one ( _id INTEGER PRIMARY KEY AUTOINCREMENT, studentName TEXT,studentNick TEXT)
+INSERT OR IGNORE INTO table_one (studentName,studentNick) VALUES ( name1,nick1)
+//  SQLiteException: no such column: name1 (code 1) 报错
+
+//正确写法
+CREATE TABLE IF NOT EXISTS table_one ( _id INTEGER PRIMARY KEY AUTOINCREMENT, studentName TEXT,studentNick TEXT)
+INSERT OR IGNORE INTO table_one (studentName,studentNick) VALUES ( 'name1','nick1')
+```
+唯一的区别就在于name1和nick1这俩用 **单引号单引号单引号** 包起来了。
+
+## 7. Webview的坑的总结
+[WebView的那些坑](http://iluhcm.com/2017/12/10/design-an-elegant-and-powerful-android-webview-part-one/)

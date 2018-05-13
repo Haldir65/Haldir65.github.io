@@ -794,6 +794,36 @@ Glide.with(itemView.getContext())
 外部调用者需要传入资源(url,File,res，etc)，及ImageView实例(我们也就有了Context)。在onPreDraw之后获得View的尺寸（这一点至关重要）。根据资源地址生成唯一的key，在bitmap pool中查找，然后在内存缓存(lru)中查找。如果还未找到的话提交DiskCache查找请求请求到DiskCache查找线程池，如果未找到提交请求到资源获取线程池(网络，文件，或者Res)，数据获取完成后cahe到disk并提交到主线程。多线程同步和生命周期追踪是难点。
 
 
+## update
+Glide 4.0之后提供了更高的可定制度，
+[如何为Glide设定OkHttpClinent](https://stackoverflow.com/questions/37208043/how-to-set-okhttpclient-for-glide)
+```java
+ @GlideModule
+    private class CustomGlideModule extends AppGlideModule {
+
+       @Override
+       public void registerComponents(Context context, Glide glide, Registry registry) {
+           OkHttpClient client = new OkHttpClient.Builder()
+                   .readTimeout(15, TimeUnit.SECONDS)
+                   .connectTimeout(15, TimeUnit.SECONDS)
+                   .build();
+
+       OkHttpUrlLoader.Factory factory = new OkHttpUrlLoader.Factory(client);
+
+           glide.getRegistry().replace(GlideUrl.class, InputStream.class, factory);
+       }
+   }
+```
+
+```java
+compile "com.squareup.okhttp3:okhttp:3.8.1"
+compile 'com.github.bumptech.glide:glide:4.0.0'
+compile ('com.github.bumptech.glide:okhttp3-integration:4.0.0'){
+    exclude group: 'glide-parent'
+}
+```
+Glide 4.0的加载顺序是在DecodeJob的runGenerator再到startNext再到loadData。
+看了下，本地缓存文件是使用ByteBufferFileLoader（就是用java nio去读取文件）的
 
 
 

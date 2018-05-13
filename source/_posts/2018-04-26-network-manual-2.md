@@ -179,3 +179,23 @@ tcp发包的时候，如果一个包过大，会拆成两个包发(分包)。如
 
 另外，http协议是通过添加换行符“ /r/n”这种形式来解决上述问题的
 参考[TCP粘包，拆包及解决方法](https://blog.csdn.net/Scythe666/article/details/51996268)
+
+## 4. java这边socket的inputStream的read方法是会堵塞的
+[就是read方法一直不返回](https://blog.csdn.net/cauchyweierstrass/article/details/49552053)，Socket只是一座桥梁，并不像本地文件一样，所以无法知道对方是否把话说完了。只有一方调用socket的close方法时才会发送EOF结束符，另一方的read = -1 才能成立，否则read方法就堵塞在那里。
+InputStream有一个available()方法：
+an estimate of the number of bytes that can be read (or skipped
+over) from this input stream without blocking or  0 when it reaches the end of the input stream.
+oves) 。不要把这个方法中的返回值当做这个流中所有可能数据的总和(多数情况下这种猜测是错误的)。
+
+tcp的backlog变量
+
+建立TCP连接时需要发送同步SYN报文，然后等待确认报文SYN+ACK，最后再发送确认报文ACK。
+
+**如果应用层不能及时接受已被TCP接受的连接，这些连接可能占满整个连接队列，新的连接请求可能不被响应而会超时。如果一个连接请求SYN发送后，一段时间后没有收到确认SYN+ACK，TCP会重传这个连接请求SYN两次，每次重传的时间间隔加倍，在规定的时间内仍没有收到SYN+ACK，TCP将放弃这个连接请求，连接建立就超时了。**
+
+[JAVA Socket超时浅析](https://blog.csdn.net/sureyonder/article/details/5633647)
+
+BufferedWriter的主要原理是内部保留了一个char[]的数组，每次外部调用write的时候，不是直接写到underlying 的output中，而是system.arrayCopy到自己的char[]数组中，等发现char[]数组填满了，才去flushBuffer，就是把所有缓存的内容一次性写到底层的outputStream中。因为outputStream是一个字节一个字节去写的，每次写都要调用io操作，而io操作是很耗费资源的。所以bufferedWriter一次性写大量的数据，能够有效减少io次数，提高性能。
+
+
+[以TCP/IP协议为例，如何通过wireshark抓包分析？](https://zhuanlan.zhihu.com/p/36414915)

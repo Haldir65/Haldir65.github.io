@@ -120,19 +120,22 @@ Convert objects to and from their representation in HTTP. Instances are created 
 
 3. 创建parameterHandlers
 应该可以猜到，这一步就是把用户定义的注解转换成发起网络请求时需要带上的参数
-private ParameterHandler<?> parseParameterAnnotation(
-        int p, Type type, Annotation[] annotations, Annotation annotation)方法随便展开一点，关注第三个参数和第四个参数
+> private ParameterHandler<?> parseParameterAnnotation(int p, Type type, Annotation[] annotations, Annotation annotation)
 
-例如        
+这个方法随便展开一点，关注第三个参数和第四个参数
+
+例如       
+```java 
  public interface GitHub {
     @GET("/repos/{owner}/{repo}/contributors")
     Call<List<Contributor>> contributors(
         @Path("owner") String owner,
         @Path("repo") String repo);
   }
+```  
 
 ServiceMethod走到这一步，annotations就表示 @Path("owner") String owner。注意这里的@PATH是注解类，可以把它当成一个wrapper，这里面就调用了path.value()。
-
+```java
 else if (annotation instanceof Path) {
         Path path = (Path) annotation;
         String name = path.value(); // 调用该方法时传入的String
@@ -140,14 +143,18 @@ else if (annotation instanceof Path) {
         Converter<?, String> converter = retrofit.stringConverter(type, annotations);  
         return new ParameterHandler.Path<>(name, converter, path.encoded());
       }
+```      
 ParameterHandler.Path<>在ParameterHandler这个类里面，看一下结构![](http://odzl05jxx.bkt.clouddn.com/ParameterHandlers.JPG)
 Path这个class中关键的方法apply:
+```java
  @Override void apply(RequestBuilder builder, @Nullable T value) throws IOException {
       builder.addPathParam(name, valueConverter.convert(value), encoded);
     }
-
+```
 再往下走：
-    relativeUrl = relativeUrl.replace("{" + name + "}", canonicalizeForPath(value, encoded));
+```java
+relativeUrl = relativeUrl.replace("{" + name + "}", canonicalizeForPath(value, encoded));
+```
 apply这个方法会在构建Request时由RequestBilder调用，以上面的实例为例子，name就是"owner" ,value就是调用该方法时传进来的值，其实就只是Stirng.replace()方法。
 到这里，Buidler已经完成了
 - 准备callAdapter，
@@ -155,6 +162,7 @@ apply这个方法会在构建Request时由RequestBilder调用，以上面的实�
 - 和填充parameterHandlers数组的任务
 直接new一个ServiceMethod出来就好了
 
+```java
 ServiceMethod(Builder<T> builder) {
     this.callFactory = builder.retrofit.callFactory();  // okhttp3.Call.Factory
     this.callAdapter = builder.callAdapter; //
@@ -169,6 +177,7 @@ ServiceMethod(Builder<T> builder) {
     this.isMultipart = builder.isMultipart;
     this.parameterHandlers = builder.parameterHandlers;
   }
+```
 
 上面最重要的三个方法讲完了第一个。  
 
@@ -350,10 +359,9 @@ shallow copy
 ```java
 OkHttpClient client = new OkHttpClient();
 
-OkHttpClient clientFoo = client.newBuilder().addInterceptor(new FooInterceptor()).build()
+OkHttpClient clientFoo = client.newBuilder().addInterceptor(new FooInterceptor()).build();
 
-OkHttpClient clientBar = client.newBuilder().readTimeOut(20,SECONDS)
-.writeTimeOut(20,SECONDS).build()
+OkHttpClient clientBar = client.newBuilder().readTimeOut(20,SECONDS).writeTimeOut(20,SECONDS).build();
 ```
 
 #### 1.5.3 有的接口需要认证（加Header），有的不需要（比如登录，忘记密码）
@@ -454,7 +462,12 @@ public Retrofit build() {
 }
 ```
 
+根据[jake Wharton在stackoverFlow上的回答](https://stackoverflow.com/questions/21652461/retrofit-callback-on-main-thread),Retrofit parse byte to Object的过程是发生在子线程的。
 
+
+
+## update
+[根据stackoverFlow上的解释，对于queryParameters，一些optional的参数直接传null就可以了](https://stackoverflow.com/questions/37016261/retrofit-optional-and-required-fields) 这段从源码上还没有来得及看清楚。
 
 
 ### 2. OkHttp
