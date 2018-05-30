@@ -278,6 +278,16 @@ BitMap.config.ARGB_8888 : Each pixel is stored on 4 bytes. Each channel (RGB and
 Bitmap.Config RGB_565： Each pixel is stored on 2 bytes and only the RGB channels are encoded。(能这么省是因为这里面用5bit表示red，6bit表示green，5bit表示blue，这个划分似乎是UI行业的标准，用了一些近似算法。所以经常看到有人拿着两张ARGB_8888和RGB_565的图片来比较，然后批判RGB_565颜色不准)。RBG_565本来就不是冲着颜色准确去的。其实还有RBG_232这种更加不准确的。
 
 日常开发都是用的ARGB_8888,一个像素要用4bytes内存，所以bitmap真的非常耗内存。
+[公式在cpp源码中](https://mp.weixin.qq.com/s?__biz=MzA3NTYzODYzMg==&mid=403263974&idx=1&sn=b0315addbc47f3c38e65d9c633a12cd6&scene=21#wechat_redirect)
+```cpp
+if (willScale && decodeMode != SkImageDecoder::kDecodeBounds_Mode) {
+    scaledWidth = int(scaledWidth * scale + 0.5f);
+    scaledHeight = int(scaledHeight * scale + 0.5f);
+}
+```
+最终的大小就是
+> scaledWidth*scaledHeight*4
+
 [一篇研究bitmap存储位置的文章，讲到cpp层](https://kotlintc.com/articles/3875?fr=sidebar)。
 根据[Dianne Hackborn的解释](https://stackoverflow.com/questions/4576909/understanding-canvas-and-surface-concepts/4577249#4577249)
 > A Bitmap is just an interface to some pixel data. The pixels may be allocated by Bitmap itself when you are directly creating one, or it may be pointing to pixels it doesn't own such as what internally happens to hook a Canvas up to a Surface for drawing. (A Bitmap is created and pointed to the current drawing buffer of the Surface.)

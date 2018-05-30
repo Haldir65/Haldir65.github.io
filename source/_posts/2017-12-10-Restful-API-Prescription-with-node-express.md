@@ -9,7 +9,7 @@ tags: [前端]
 
 
 ## 1. 安装
-> yarn add express
+> yarn add express body-parser
 
 mongoose安装
 
@@ -26,12 +26,12 @@ MiddleWare(中间件)的概念：
 
 ### Request
 
-get请求的参数怎么拿
-get的参数本身都是写在url里面的
+get请求的参数怎么拿，get的参数本身都是写在url里面的
 
 比如
+> GET /student/getById/27 这样一个get请求
+
 ```js
-GET /student/getById/27
 app.get('/getById/:age',functin(req,res){
     res.send(req.prarms.age);
 })
@@ -48,7 +48,7 @@ Postman-Token: 79c6d9a1-de8d-3b0b-8d3d-0ed6e1910f69
 name=Josn&age=12
 ```
 
-
+POST请求中的body数据从req.body中拿就好了
 ```js
 req.params   //  Object ，Json.String = {}
 req.body    //  {name:'Josn',age:'12'}  //这个是post里面发送的body数据
@@ -57,7 +57,7 @@ req.query  // {"age","10"}  // 显然这是url里面的query
 
 
 ## 3. Serving static files
-照说serving static file这种事应该交给nginx来做，express只是提供了一种选择。
+照说serving static file这种事应该交给nginx类似的反向代理来做，express只是提供了一种选择。
 ```javaScript
 app.use(express.static(path.join(__dirname,'public')))
 ```

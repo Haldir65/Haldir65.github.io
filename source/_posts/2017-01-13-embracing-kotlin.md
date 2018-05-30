@@ -413,6 +413,12 @@ init函数和constructor是有区别的
 ](https://stackoverflow.com/questions/33688821/what-are-the-kotlin-class-initialisation-semantics).简单来说，init函数
 
 
+## 19. ? extends T怎么写
+var lst = ArrayList<Class<out Number>>()
+lst.add(Noun_Class::class.java)
+
+
+
 [stackoverflow](https://stackoverflow.com/questions/45267041/not-enough-information-to-infer-parameter-t-with-kotlin-and-android)
 init代码块不是构造函数，同时，init的执行效果要看写在哪一行了，如果在Init中引用了一个propertity，这个属性要是在Init之前就初始化了那倒还好，要是在后面,那么在init调用的时候看到的就是null.
 

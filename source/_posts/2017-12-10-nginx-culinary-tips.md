@@ -69,16 +69,14 @@ sudo systemctl enable nginx
 ## 3. 常用目录和文件(直接从DigitalOcean复制过来了)
 
 - /var/www/html ## 就是放默认首页的地方（原因是 /etc/nginx/sites-enabled/default这里面设置的）
->
-/etc/nginx: The Nginx configuration directory. All of the Nginx configuration files reside here.
+> /etc/nginx: The Nginx configuration directory. All of the Nginx configuration files reside here.
 /etc/nginx/nginx.conf: The main Nginx configuration file. This can be modified to make changes to the Nginx global configuration.
 /etc/nginx/sites-available/: The directory where per-site "server blocks" can be stored. Nginx will not use the configuration files found in this directory unless they are linked to the sites-enabled directory (see below). Typically, all server block configuration is done in this directory, and then enabled by linking to the other directory.
 /etc/nginx/sites-enabled/: The directory where enabled per-site "server blocks" are stored. Typically, these are created by linking to configuration files found in the sites-available directory.
 /etc/nginx/snippets: This directory contains configuration fragments that can be included elsewhere in the Nginx configuration. Potentially repeatable configuration segments are good candidates for refactoring into snippets.
 
 访问日志都在这里
->
-/var/log/nginx/access.log: Every request to your web server is recorded in this log file unless Nginx is configured to do otherwise.
+>/var/log/nginx/access.log: Every request to your web server is recorded in this log file unless Nginx is configured to do otherwise.
 /var/log/nginx/error.log: Any Nginx errors will be recorded in this log.
 
 
@@ -156,11 +154,13 @@ http {
 ```
 
 比如想要通过81端口访问，加上这么一行
+```
 server {
     listen       81;
     server_name  example.org  www.example.org;
     root         /var/www/html/
 }
+```
 
 Checking nginx config file syntax
 > nginx -t -c conf/nginx.conf
@@ -220,17 +220,19 @@ location /static/ {
 
 [那alias标签和root标签到底有哪些区别呢？](http://blog.51cto.com/nolinux/1317109)
 1、alias后跟的指定目录是准确的,并且末尾必须加“/”，否则找不到文件
-
+```
 location /c/ {
       alias /a/
 }
-如果访问站点http://location/c访问的就是/a/目录下的站点信息。
+```
+如果访问站点http://location/c ，访问的就是/a/目录下的站点信息。
 2、root后跟的指定目录是上级目录，并且该上级目录下要含有和location后指定名称的同名目录才行，末尾“/”加不加无所谓。
-
+```
 location /c/ {
       root /a/
 }
-如果访问站点http://location/c访问的就是/a/c目录下的站点信息。
+```
+如果访问站点http://location/c，访问的就是/a/c目录下的站点信息。
 3、一般情况下，在location /中配置root，在location /other中配置alias是一个好习惯。
 
 在windows平台下这么写
@@ -420,7 +422,8 @@ http_image_filter_module（图片裁剪模块）
 /etc/nginx/nginx.conf文件添加
 ```config
 location /image {
-		   alias "/imgdirectory/";  ## 这样直接输入 yourip/image/imgname.jpeg就能返回原始图片
+		   alias "/imgdirectory/"; 
+            ## 这样直接输入 yourip/image/imgname.jpeg就能返回原始图片
 }
 location ~* (.*\.(jpg|jpeg|gif|png))!(.*)!(.*)$ {  ## 这个是匹配全站图片资源
         		set $width      $3;  
@@ -439,16 +442,12 @@ location ~* /imgs/.*\.(jpg|jpeg|gif|png|jpeg)$ {
 ```config
 ## 比如匹配全站所有的结尾图片
 location ~* \.(jpg|gif|png)$ {
-
                image_filter resize 500 500;
-
        }
 
 ### 匹配某个目录所有图片       
 location ~* /image/.*\.(jpg|gif|png)$ {
-
             image_filter resize 500 500;
-
     }
 ```
 更多直接google吧。
@@ -668,11 +667,12 @@ server {
 > access_log /srv/www/example.com/logs/access.log;
 
 ### 关闭日志也是可以的，不过请不要随便这么做
-/etc/nginx/nginx.conf
+> /etc/nginx/nginx.conf
 access_log off;
 
 ### 接下来是location
-/etc/nginx/sites-available/example.com
+> /etc/nginx/sites-available/example.com
+
 ```config
 location / { }  
 location /images/ { }
@@ -723,7 +723,7 @@ Make sure each file and folder under a domain will match at least one location d
 add_header not working on ubuntu server?
 
 ### 防盗链
-之间做爬虫的时候，request的header中不添加refer就会返回一张 固定的图片。
+之前做爬虫的时候，request的header中不添加refer就会返回一张 固定的图片。
 这个功能nginx也行
 ```
 location ~* \.(gif|jpg|swf)$ {

@@ -244,14 +244,43 @@ eg: echo类似于print
 ```
 
 ```shell
-#!/bin/bash
+#!/bin/bashbash
 echo "hello there"
 foo="Hello"
 foo="$foo World"  ## 拼接一个现成的string到另一个string的尾部，用冒号跟美元符号就好了
 echo $foo
 echo "Number of files in this directory: `ls | wc -l`"  ## 但是将ls | wc -l的输出作为一个String拼接到一个string中，用单引号
 echo "all the files under the directory `ls  /usr/*/g* | head -n3`"
+
 ```
+
+一个把文件夹（/public/imgs）下所有文件重命名为img-x.jpg的shell脚本
+```shell
+#!/bin/bash
+FORMAT_JPG="jpg"
+FORMAT_JPEG="jpeg"
+index=1
+dir=$(eval pwd)/public/imgs
+ALLIMGES=$(ls $dir | grep  ".$FORMAT_JPEG\|.$FORMAT_JPG")
+for file in $ALLIMGES
+        do
+        name=img-${index}.jpg
+        echo renaming $dir/$file to  $dir/$name
+        mv $dir/$file $dir/$name
+        ((index++))
+        # name=$(ls $file | cut -d. -f1)
+        # mv $dir/public/imgs/$file ${name}.$suffix
+        done
+echo "renaming $index image files =====> x.jpg done!"
+```
+同时grep多种文件的时候，比如又想要jpg又想要jpeg的话，grep 要加上反斜杠，或者下面这三种
+```
+grep "aaa\|bbb"
+grep -E "aaa|bbb"
+grep -E aaa\|bbb
+```
+
+
 
 
 ### 4. 用户和用户组的问题
