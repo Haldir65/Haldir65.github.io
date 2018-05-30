@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/01f691dea62d22e138481a353fbb6228.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/ascii-Table.jpg">
-<meta property="og:updated_time" content="2018-05-17T14:59:24.167Z">
+<meta property="og:updated_time" content="2018-05-30T14:51:20.711Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="二进制编码总结">
 <meta name="twitter:description" content="OkHttp作者Jesse Wilson在2016 Droidcon NYC上作了一篇关于编码的演讲，十分有趣。对于了解计算机基础非常有用，结合着写一些关于这方面的笔记。">
@@ -283,7 +283,12 @@ ga('send', 'pageview');
 <p>BitMap.config.ARGB_4444(Deprecated) ：Each pixel is stored on 2 bytes. (节省了一半)</p>
 <p>BitMap.config.ARGB_8888 : Each pixel is stored on 4 bytes. Each channel (RGB and alpha for translucency) is stored with 8 bits of precision (256 possible values.) This configuration is very flexible and offers the best quality. It should be used whenever possible.这也就是上面提到的一个像素三个小像素外加一个透明度的算法。</p>
 <p>Bitmap.Config RGB_565： Each pixel is stored on 2 bytes and only the RGB channels are encoded。(能这么省是因为这里面用5bit表示red，6bit表示green，5bit表示blue，这个划分似乎是UI行业的标准，用了一些近似算法。所以经常看到有人拿着两张ARGB_8888和RGB_565的图片来比较，然后批判RGB_565颜色不准)。RBG_565本来就不是冲着颜色准确去的。其实还有RBG_232这种更加不准确的。</p>
-<p>日常开发都是用的ARGB_8888,一个像素要用4bytes内存，所以bitmap真的非常耗内存。<br><a href="https://kotlintc.com/articles/3875?fr=sidebar">一篇研究bitmap存储位置的文章，讲到cpp层</a>。<br>根据<a href="https://stackoverflow.com/questions/4576909/understanding-canvas-and-surface-concepts/4577249#4577249">Dianne Hackborn的解释</a></p>
+<p>日常开发都是用的ARGB_8888,一个像素要用4bytes内存，所以bitmap真的非常耗内存。<br><a href="https://mp.weixin.qq.com/s?__biz=MzA3NTYzODYzMg==&amp;mid=403263974&amp;idx=1&amp;sn=b0315addbc47f3c38e65d9c633a12cd6&amp;scene=21#wechat_redirect">公式在cpp源码中</a><br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (willScale &amp;&amp; decodeMode != SkImageDecoder::kDecodeBounds_Mode) &#123;</span><br><span class="line">    scaledWidth = <span class="keyword">int</span>(scaledWidth * scale + <span class="number">0.5f</span>);</span><br><span class="line">    scaledHeight = <span class="keyword">int</span>(scaledHeight * scale + <span class="number">0.5f</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>最终的大小就是</p>
+<blockquote>
+<p>scaledWidth<em>scaledHeight</em>4</p>
+</blockquote>
+<p><a href="https://kotlintc.com/articles/3875?fr=sidebar">一篇研究bitmap存储位置的文章，讲到cpp层</a>。<br>根据<a href="https://stackoverflow.com/questions/4576909/understanding-canvas-and-surface-concepts/4577249#4577249">Dianne Hackborn的解释</a></p>
 <blockquote>
 <p>A Bitmap is just an interface to some pixel data. The pixels may be allocated by Bitmap itself when you are directly creating one, or it may be pointing to pixels it doesn’t own such as what internally happens to hook a Canvas up to a Surface for drawing. (A Bitmap is created and pointed to the current drawing buffer of the Surface.)</p>
 </blockquote>
