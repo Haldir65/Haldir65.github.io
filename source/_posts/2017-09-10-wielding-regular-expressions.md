@@ -28,6 +28,8 @@ nginx的config文件中也要写正则
 第一个正斜杠和最后一个正斜杠表示正则的开始和结束，反斜杠表示后面那个点就当做一个文字的点来处理，$代表以css结束
 ***We need more Pictures***
 
+> ^表示开头，$表示结尾 ## django的url中是这样的
+
 一般情况下不要乱用正则
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/bee-getting-the-pollen-wallpaper-538358eb5d5a3.jpg?imageView2/2/w/600)
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery151110067848.jpg?imageView2/2/w/600)

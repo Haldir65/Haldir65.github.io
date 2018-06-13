@@ -115,3 +115,5 @@ INSERT OR IGNORE INTO table_one (studentName,studentNick) VALUES ( 'name1','nick
 
 ## 7. Webview的坑的总结
 [WebView的那些坑](http://iluhcm.com/2017/12/10/design-an-elegant-and-powerful-android-webview-part-one/)
+
+## 8.BitmapRegionDecoder不要随便用，到处是坑，主要问题和jpg图片的colorSpace有关，动不动就爆出IOException

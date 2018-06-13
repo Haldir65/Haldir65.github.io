@@ -526,8 +526,8 @@ http {
 }
 ```
 导向策略有多种：
-1. Round-robin (默认) 1, 2 , 1, 2 ,1 ....如此反复
-2. least_conn 连接数最少的优先（如果有weight，加权选择）
+1.Round-robin (默认) 1, 2 , 1, 2 ,1 ....如此反复
+2.least_conn 连接数最少的优先（如果有weight，加权选择）
 ```config
 upstream backend {
     least_conn;

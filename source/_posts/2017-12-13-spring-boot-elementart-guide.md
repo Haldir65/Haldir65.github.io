@@ -35,5 +35,13 @@ server
 
 以Okio为例，maven的搜索网站是<p>https://search.maven.org/remote_content?g=com.squareup.okio&a=okio&v=LATEST</p>，实际下发的域名是<p>https://repo1.maven.org/maven2/com/squareup/okio/okio/1.14.0/okio-1.14.0.jar</p>。用wget看，是302重定向了。
 
-[2小时学会SpringBoot](https://www.youtube.com/playlist?list=PLO5e_-yXpYLDcuEz8BlB_J_hQpzI-ZM4Y)
+
+
+
+补充一些tomcat和servlet的知识
+tomcat是web container,servlet是处理业务逻辑的。
+servlet继承自HttpServlet,里面有doGet和doPost方法。
+servlet和请求的url的对应关系写在web.xml中。
+
+
 [accessing-data-mysql](https://spring.io/guides/gs/accessing-data-mysql/)
