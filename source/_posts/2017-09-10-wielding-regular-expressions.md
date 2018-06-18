@@ -47,7 +47,7 @@ nginx的config文件中也要写正则
 
 
 
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100729187.jpg?imageView2/2/w/600)
+
 
 
 
@@ -59,8 +59,8 @@ nginx的config文件中也要写正则
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/sceneryd15ddf2ba4fb7b5f4e51dfa6cb74cb70.jpg?imageView2/2/w/600)
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/strawberry-festival.jpg?imageView2/2/w/600)
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/food%20truck%20hotdog%20night%20city.jpg?imageView2/2/w/600)
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/food%20salad%20instagram%20hunger%20city%20life.jpg?imageView2/2/w/600)
 
+![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100729187.jpg?imageView2/2/w/600)
 
 
 

@@ -105,8 +105,8 @@ ssserver -c /etc/shadowsocks.json -d stop
 sudo ssserver -c /etc/shadowsocks.json --user username -d start - 不要总是用root用户做事，adduser来做，给sudo权限即可
 ```
 
- nohup /net-speeder/net-speeder/net_speeder eth0 "tcp src port 15674" > /dev/null 2>&1 &
- nohup /net-speeder/net-speeder/net_speeder eth0 "tcp src port 23636" > /dev/null 2>&1 &
+ nohup /net-speeder/net-speeder/net_speeder eth0 "tcp src port 12345" > /dev/null 2>&1 &
+
 
 ### 2.2 SSR 以及一些衍生的软件
 
