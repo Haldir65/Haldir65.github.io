@@ -289,6 +289,47 @@ Items在Adapter的数据集中的顺序可能会随时变更，但recyclerView�
 ## 更新
 RecylerView的缓存提供了viewCacheExtension这个接口，开发者可以自定义一层View的缓存
 
+
+RecyclerView 26.1.0源码摘取部分分析
+打断点发现，在scrollBy的过程中通过layoutChunk方法一直走到Recycler.tryGetViewHolderForPositionByDeadline
+
+1. tryGetViewHolderForPositionByDeadline方法用于获取一个viewHolder
+// 0) If there is a changed scrap, try to find from there
+ holder = getChangedScrapViewForPosition(position);
+// 1) Find by position from scrap/hidden list/cache
+ holder = getScrapOrHiddenOrCachedHolderForPosition(position, dryRun);
+// 2) Find from scrap/cache via stable ids, if exists
+if (mAdapter.hasStableIds()) {
+    holder = getScrapOrCachedViewForId(mAdapter.getItemId(offsetPosition), type, dryRun);
+}
+//这中间还有一个
+ final View view = mViewCacheExtension.getViewForPositionAndType(this, position, type);
+
+// fallback to pool
+holder = getRecycledViewPool().getRecycledView(type);
+
+//last resort
+holder = mAdapter.createViewHolder(RecyclerView.this, type);
+
+以上即为获取holder的优先顺序，获取到holder之后就是bindViewHolder了
+
+回收过程
+在LinearLayoutManager的scrollBy -> fill ->recycleByLayoutState ->recycleViewsFromStart(遍历children,确保移除不可见的child)
+处置view的逻辑在recycleViewHolderInternal中
+首先是尝试mCachedViews（ ArrayList<ViewHolder>，默认最大mViewCacheMax = 2，实际debug中是3）
+```java
+// Retire oldest cached view
+int cachedViewSize = mCachedViews.size();
+if (cachedViewSize >= mViewCacheMax && cachedViewSize > 0) {
+    recycleCachedViewAt(0); // 将list中第一个viewHolder踢到Pool ->这里面调用了addViewHolderToRecycledViewPool
+    cachedViewSize--;
+}
+// 这之后将新来的这个holder加到list的尾部，现在看来就是3
+//接下来应该是从recyclerViewPool中根据对应的类型找到合适的ScrapHeap，添加进去。目前看来，pool就是根据不同的viewType维持了不同的ArrayList<ViewHolder>,
+```
+
+view被recycle的时候是否可以去移除对应的View中ImageView的drawable?
+
 ### 4 . 一些参考资料
 - [RecyclerView Animations and Behind the Scenes (Android Dev Summit 2015)](https://www.youtube.com/watch?v=imsr8NrIAMs)
 - [ItemAnimator模板](https://github.com/wasabeef/recyclerview-animators)

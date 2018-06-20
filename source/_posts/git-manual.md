@@ -111,7 +111,18 @@ git commit --amend
 git reset --hard HEAD //本地仓库文件修改也会消失
 git reset --soft HEAD //本地文件修改不会消失，类似于回到git add 之前的状态(把绿色的改成红色)
 git reset --hard HEAD~3 //最近的三次提交全部撤销
+git reset --soft HEAD~ //把最近一次本地提交撤销，上次提交的文件修改还在，等于变成红色的状态
 ```
+
+[如何撤销最近一次本地提交](https://stackoverflow.com/questions/927358/how-to-undo-the-most-recent-commits-in-git)
+```
+$ git commit -m "Something terribly misguided"             # (1)
+$ git reset HEAD~                                          # (2)
+<< edit files as necessary >>                              # (3)
+$ git add ...                                              # (4)
+$ git commit -c ORIG_HEAD                                  # (5)
+```
+ORIG_HEAD意思是把上一次的commit message带上，同时提供一个editor供修改
 
 ### revert
 ```git
