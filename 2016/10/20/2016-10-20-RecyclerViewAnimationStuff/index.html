@@ -23,7 +23,7 @@
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/snapshot20161020124442.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/snapshot20161020124836.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/snapshot20161020143554.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-06-18T14:58:24.714Z">
+<meta property="og:updated_time" content="2018-06-20T11:50:29.594Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用RecyclerView的Animation">
 <meta name="twitter:description" content="From the talkRecyclerView Animations and Behind the ScenesYigit Biyar &amp;amp; Chet Haaseon Anroid Dev Summit 2015 1. RecyclerView架构RecyclerView is Flexible , Pluggable and Customizeable内部很多功能都交给了各个组件去完成">
@@ -329,6 +329,15 @@ ga('send', 'pageview');
 </li>
 </ul>
 <h2 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h2><p>RecylerView的缓存提供了viewCacheExtension这个接口，开发者可以自定义一层View的缓存</p>
+<p>RecyclerView 26.1.0源码摘取部分分析<br>打断点发现，在scrollBy的过程中通过layoutChunk方法一直走到Recycler.tryGetViewHolderForPositionByDeadline</p>
+<ol>
+<li>tryGetViewHolderForPositionByDeadline方法用于获取一个viewHolder<br>// 0) If there is a changed scrap, try to find from there<br>holder = getChangedScrapViewForPosition(position);<br>// 1) Find by position from scrap/hidden list/cache<br>holder = getScrapOrHiddenOrCachedHolderForPosition(position, dryRun);<br>// 2) Find from scrap/cache via stable ids, if exists<br>if (mAdapter.hasStableIds()) {<br> holder = getScrapOrCachedViewForId(mAdapter.getItemId(offsetPosition), type, dryRun);<br>}<br>//这中间还有一个<br>final View view = mViewCacheExtension.getViewForPositionAndType(this, position, type);</li>
+</ol>
+<p>// fallback to pool<br>holder = getRecycledViewPool().getRecycledView(type);</p>
+<p>//last resort<br>holder = mAdapter.createViewHolder(RecyclerView.this, type);</p>
+<p>以上即为获取holder的优先顺序，获取到holder之后就是bindViewHolder了</p>
+<p>回收过程<br>在LinearLayoutManager的scrollBy -&gt; fill -&gt;recycleByLayoutState -&gt;recycleViewsFromStart(遍历children,确保移除不可见的child)<br>处置view的逻辑在recycleViewHolderInternal中<br>首先是尝试mCachedViews（ ArrayList<ViewHolder>，默认最大mViewCacheMax = 2，实际debug中是3）<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Retire oldest cached view</span></span><br><span class="line"><span class="keyword">int</span> cachedViewSize = mCachedViews.size();</span><br><span class="line"><span class="keyword">if</span> (cachedViewSize &gt;= mViewCacheMax &amp;&amp; cachedViewSize &gt; <span class="number">0</span>) &#123;</span><br><span class="line">    recycleCachedViewAt(<span class="number">0</span>); <span class="comment">// 将list中第一个viewHolder踢到Pool -&gt;这里面调用了addViewHolderToRecycledViewPool</span></span><br><span class="line">    cachedViewSize--;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 这之后将新来的这个holder加到list的尾部，现在看来就是3</span></span><br><span class="line"><span class="comment">//接下来应该是从recyclerViewPool中根据对应的类型找到合适的ScrapHeap，添加进去。目前看来，pool就是根据不同的viewType维持了不同的ArrayList&lt;ViewHolder&gt;,</span></span><br></pre></td></tr></table></figure></p>
+<p>view被recycle的时候是否可以去移除对应的View中ImageView的drawable?</p>
 <h3 id="4-一些参考资料"><a href="#4-一些参考资料" class="headerlink" title="4 . 一些参考资料"></a>4 . 一些参考资料</h3><ul>
 <li><a href="https://www.youtube.com/watch?v=imsr8NrIAMs">RecyclerView Animations and Behind the Scenes (Android Dev Summit 2015)</a></li>
 <li><a href="https://github.com/wasabeef/recyclerview-animators">ItemAnimator模板</a></li>
@@ -667,10 +676,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
@@ -715,11 +720,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
               </li>
              
               <li class="article-tag-list-item">
