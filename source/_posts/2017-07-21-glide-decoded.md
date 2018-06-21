@@ -824,6 +824,16 @@ compile ('com.github.bumptech.glide:okhttp3-integration:4.0.0'){
 ```
 Glide 4.0的加载顺序是在DecodeJob的runGenerator再到startNext再到loadData。
 看了下，本地缓存文件是使用ByteBufferFileLoader（就是用java nio去读取文件）的
+加载cache的顺序还是memory hit > diskcache > remote cache 。后面两个都放在glide-disk-cache-thread上做。
+在DecodeJob的onResourceDecoded方法中，有这么一个判断
+```java
+if (dataSource != DataSource.RESOURCE_DISK_CACHE) {
+      appliedTransformation = decodeHelper.getTransformation(resourceSubClass);
+      transformed = appliedTransformation.transform(glideContext, decoded, width, height);
+    }
+```
+也即DiskCacheStrategy.RESOURCE以及DiskCacheStrategy.ALL这种类型的缓存策略在第一次load完decode完之后。下次从disk中加载的时候直接无视transform。
+还有，从一个file中decode出bitmap的方法是从Downsampler.decodeStream这个方法里面调用BitmapFactory.decodeStream方法来做的
 
 
 

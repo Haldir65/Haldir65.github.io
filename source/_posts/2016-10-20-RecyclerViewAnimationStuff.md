@@ -330,6 +330,12 @@ if (cachedViewSize >= mViewCacheMax && cachedViewSize > 0) {
 
 view被recycle的时候是否可以去移除对应的View中ImageView的drawable?
 
+package private的变量是否就不能访问到？
+比如V7包里的RecyclerView，里面的Recycler是package-private权限。
+于是新建一个package android.support.v7.widget这样的包。
+接下来在这个包里面的class就能直接访问RecyclerView中的package-private权限的成员变量了。
+亲测可行。
+
 ### 4 . 一些参考资料
 - [RecyclerView Animations and Behind the Scenes (Android Dev Summit 2015)](https://www.youtube.com/watch?v=imsr8NrIAMs)
 - [ItemAnimator模板](https://github.com/wasabeef/recyclerview-animators)

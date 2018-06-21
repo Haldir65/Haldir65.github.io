@@ -36,6 +36,7 @@ top : 1
 - [ ] [libmp3lame移植到Android](https://www.jianshu.com/p/534741f5151c),跟jni有关了
 - [ ]一直不会maven是在是太丢人了
 - [ ] 网易云音乐API
+- [ ] nodejs rpc
 
 ### 已完成
 * 用 express 转接一个知乎 Api，添加 Access-control-allow-origin,或许还可以用 redis 缓存数据结果（一个就好）由此想到一篇文章"How to use Pythonto build a restful Web Service".只不过用的是 Tornado
