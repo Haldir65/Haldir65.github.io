@@ -17,7 +17,7 @@
 <meta property="og:description" content="glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&amp;gt;  CacheDispatch  —&amp;gt; NetworkDispatcher  —-&amp;gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/a11f41e0b1df95212c71920b3959cd72.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-06-20T11:50:29.598Z">
+<meta property="og:updated_time" content="2018-06-21T11:32:13.664Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从glide源码到图片加载框架设计思路">
 <meta name="twitter:description" content="glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&amp;gt;  CacheDispatch  —&amp;gt; NetworkDispatcher  —-&amp;gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是">
@@ -329,7 +329,8 @@ ga('send', 'pageview');
 <p>外部调用者需要传入资源(url,File,res，etc)，及ImageView实例(我们也就有了Context)。在onPreDraw之后获得View的尺寸（这一点至关重要）。根据资源地址生成唯一的key，在bitmap pool中查找，然后在内存缓存(lru)中查找。如果还未找到的话提交DiskCache查找请求请求到DiskCache查找线程池，如果未找到提交请求到资源获取线程池(网络，文件，或者Res)，数据获取完成后cahe到disk并提交到主线程。多线程同步和生命周期追踪是难点。</p>
 <h2 id="update"><a href="#update" class="headerlink" title="update"></a>update</h2><p>Glide 4.0之后提供了更高的可定制度，<br><a href="https://stackoverflow.com/questions/37208043/how-to-set-okhttpclient-for-glide">如何为Glide设定OkHttpClinent</a><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@GlideModule</span></span><br><span class="line">   <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">CustomGlideModule</span> <span class="keyword">extends</span> <span class="title">AppGlideModule</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">      <span class="meta">@Override</span></span><br><span class="line">      <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">registerComponents</span><span class="params">(Context context, Glide glide, Registry registry)</span> </span>&#123;</span><br><span class="line">          OkHttpClient client = <span class="keyword">new</span> OkHttpClient.Builder()</span><br><span class="line">                  .readTimeout(<span class="number">15</span>, TimeUnit.SECONDS)</span><br><span class="line">                  .connectTimeout(<span class="number">15</span>, TimeUnit.SECONDS)</span><br><span class="line">                  .build();</span><br><span class="line"></span><br><span class="line">      OkHttpUrlLoader.Factory factory = <span class="keyword">new</span> OkHttpUrlLoader.Factory(client);</span><br><span class="line"></span><br><span class="line">          glide.getRegistry().replace(GlideUrl.class, InputStream.class, factory);</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">compile <span class="string">"com.squareup.okhttp3:okhttp:3.8.1"</span></span><br><span class="line">compile <span class="string">'com.github.bumptech.glide:glide:4.0.0'</span></span><br><span class="line">compile (<span class="string">'com.github.bumptech.glide:okhttp3-integration:4.0.0'</span>)&#123;</span><br><span class="line">    exclude group: <span class="string">'glide-parent'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>Glide 4.0的加载顺序是在DecodeJob的runGenerator再到startNext再到loadData。<br>看了下，本地缓存文件是使用ByteBufferFileLoader（就是用java nio去读取文件）的</p>
+<p>Glide 4.0的加载顺序是在DecodeJob的runGenerator再到startNext再到loadData。<br>看了下，本地缓存文件是使用ByteBufferFileLoader（就是用java nio去读取文件）的<br>加载cache的顺序还是memory hit &gt; diskcache &gt; remote cache 。后面两个都放在glide-disk-cache-thread上做。<br>在DecodeJob的onResourceDecoded方法中，有这么一个判断<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (dataSource != DataSource.RESOURCE_DISK_CACHE) &#123;</span><br><span class="line">      appliedTransformation = decodeHelper.getTransformation(resourceSubClass);</span><br><span class="line">      transformed = appliedTransformation.transform(glideContext, decoded, width, height);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>也即DiskCacheStrategy.RESOURCE以及DiskCacheStrategy.ALL这种类型的缓存策略在第一次load完decode完之后。下次从disk中加载的时候直接无视transform。<br>还有，从一个file中decode出bitmap的方法是从Downsampler.decodeStream这个方法里面调用BitmapFactory.decodeStream方法来做的</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="http://frodoking.github.io/2015/10/10/android-glide/">Android Glide源码解析</a></li>
 </ul>
@@ -694,15 +695,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
               </li>
              
               <li class="article-tag-list-item">
