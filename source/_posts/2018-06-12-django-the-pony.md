@@ -119,9 +119,65 @@ python manage.py plus_shell
 
 [drf官方文档](http://www.django-rest-framework.org/)
 
-在ubuntu服务器上搭配nginx部署django应用
+[在ubuntu服务器上搭配nginx部署django应用](https://www.digitalocean.com/community/tutorials/how-to-deploy-python-wsgi-applications-using-uwsgi-web-server-with-nginx)
 创建一个myconf.ini文件
 > uwsgi --ini myconf.ini
 
 
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/food%20salad%20instagram%20hunger%20city%20life.jpg?imageView2/2/w/600)
+
+还有，多数时候会热更新，但比如我更改了PaginationClass，还是得重新runserver才能获得理想的结果
+
+[目前DRF不支持通过一个Post请求创建一个list of nested objects](https://stackoverflow.com/questions/23153040/django-rest-framework-create-objects-passed-as-a-list-attribute-of-nested-obje)
+
+自定义接口返回格式
+ListCreateAPIView中override create方法
+```python
+def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid(raise_exception=False):
+            return Response({"Fail": "blablal", status=status.HTTP_400_BAD_REQUEST)
+
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response({"Success": "msb blablabla"}, status=status.HTTP_201_CREATED, headers=headers)
+```
+
+post和get请求都变得非常轻松
+```python
+class CountryView(APIView):
+
+    def get(self, request, format=None):
+        snippets = County.objects.all()
+        serializer = CountySimpleSerilizer(snippets, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        serializer = CountySimpleSerilizer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return responses.JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
+        return responses.JsonResponse(data={"name","bad post request"}, status=status.HTTP_400_BAD_REQUEST)
+```
+
+
+> python manage.py dbshell ##用于在命令行中直接查看数据库
+> .help 查看在这个shell中可以用的一些操作
+> .tables  查看当前创建的所有的表 这个不要加分号
+> DROP TABLE appname_model; 删表 这个要加分号
+
+注意，删了表之后，还得把对应的migrations中的文件删掉，否则migrate无效
+
+
+pk其实就是primary_key的意思
+```python
+Object.objects.get(id=1)
+Object.objects.get(pk=1)
+
+## 看清楚了，是两个下划线
+User.objects.filter(pk__in=[1,2,3])
+User.objects.filter(pk__gt=10)  
+User.objects.filter(pk__lt=10)  
+```
+
+[nested relations](http://www.django-rest-framework.org/api-guide/relations/)

@@ -328,6 +328,18 @@ Session就是维护会话的。
 另外一种做法是可以尝试将Session的过期时间设置的长一点，比如一年，下次访问网站的时候就能实现自动登录了。
 更好一点的是是本地绝不保存用户敏感信息，登录生成一个有过期时间的的cookie或者token返回给客户端，下次打开浏览器判断下过期时间就好了。另外，现在浏览器大多带有记住密码的功能，这个锅还是丢给浏览器(用户)好了。
 
+关于Token
+[django jwt直接把token放在header里](https://chrisbartos.com/articles/how-to-implement-token-authentication-with-django-rest-framework/)。其实token也就是放在header中的一个key-value
+```
+GET /polls/api/questions/1 HTTP/1.1
+Host: localhost:8000
+Content-Type: application/json
+Authorization: Token 93138ba960dfb4ef2eef6b907718ae04400f606a
+Cache-Control: no-cache
+Postman-Token: ddc99b57-f703-4d05-abbe-c0123d4f5fed
+```
+注意这个Authorization,后面的value是Token***加上一个空格*** 再加上一长段加密字符串。每一次请求需要认证的接口都得把这个token带上。所以在postman里面调试的话，每次请求都得手动加上这样一个HEADER。postman里面有authentication的选项，但好像都不是这种（目测bearerToken有点像）。所以得手动加上。
+
 论Token为什么要[放在内存里](https://segmentfault.com/a/1190000013010835)
 > 为了解决在操作过程不能让用户感到 Token 失效这个问题，有一种方案是在服务器端保存 Token 状态，用户每次操作都会自动刷新（推迟） Token 的过期时间——Session 就是采用这种策略来保持用户登录状态的。然而仍然存在这样一个问题，在前后端分离、单页 App 这些情况下，每秒种可能发起很多次请求，每次都去刷新过期时间会产生非常大的代价。如果 Token 的过期时间被持久化到数据库或文件，代价就更大了。所以通常为了提升效率，减少消耗，会把 Token 的过期时保存在缓存或者内存中。
 
