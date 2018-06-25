@@ -126,7 +126,31 @@ Bitmap类的构造方法都是私有的，所以开发者不能直接new出一�
 Android对于进程的管理是非常复杂的。简单的说，Android系统的进程分为几个级别，系统会在内存不足的情况下杀死一些低优先级的进程，以提供给其它进程充足的内存空间。在实际项目开发过程中，有的开发者会在退出程序的时候使用Process.killProcess(Process.myPid())的方式将自己的进程杀死，但是有的应用仅仅会使用调用Activity.finish()方法的方式关闭掉所有的Activity。
 
 
+## 10. 原来layer_list还可以这么用啊
+给一个View加边框，只在左边，上面和下面三条边上加边框，用layer_list就可以了
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- 连框颜色值 -->
+    <item>
+        <shape>
+            <solid android:color="@color/md_blue_700" />
+        </shape>
+    </item>
+    <!-- 主体背景颜色值 -->
+    <!-- 此处定义只有上下两边有边框 高度为1像素-->
+    <item
+    android:bottom="10dp"
+    android:left="10dp"
+    android:top="10dp">
+    <!--边框里面背景颜色 白色-->
+    <shape>
+        <solid android:color="#ffffff" />
+    </shape>
+    </item>
+</layer-list>
+```
 
 
 [gradle build scan](https://gradle.com/build-scans)

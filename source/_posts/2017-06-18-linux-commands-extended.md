@@ -163,6 +163,8 @@ tar -cvf log.tar log2012.log 仅打包，不压缩！
 tar -zcvf log.tar.gz log2012.log 打包后，以 gzip 压缩
 tar -jcvf log.tar.bz2 log2012.log 打包后，以 bzip2 压缩
 ```
+[常用的tar命令就那么几个](https://www.jb51.net/LINUXjishu/43356.html)
+tar -cvf all.tar.gz 和 tar -xf all.tar.gz这俩其实就够用了
 
 对照手册来看：
 -c //小写的c，--create，表示创建新的备份文件

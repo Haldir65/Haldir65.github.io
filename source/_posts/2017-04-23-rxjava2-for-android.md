@@ -475,6 +475,11 @@ Reactive programming allow us to model it in the proper way: asynchronously. Emb
 [Error handling in RxJava](http://blog.danlew.net/2015/12/08/error-handling-in-rxjava/)
 
 
+Rxjava2中的Subscriber是遵循reactive stream这个项目中的规范的，后者提供了backpressure支持
+observable(事实上是observableSource)  -> observer 
+Flowable(publisher接口)  ->  Subscriber
+[what-is-the-difference-between-an-observer-and-a-subscriber](https://stackoverflow.com/questions/27664221/what-is-the-difference-between-an-observer-and-a-subscriber)
+
 
 ### Reference
 

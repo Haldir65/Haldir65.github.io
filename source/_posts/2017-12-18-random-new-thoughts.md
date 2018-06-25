@@ -38,6 +38,14 @@ top : 1
 - [ ] 网易云音乐API
 - [ ] nodejs rpc
 
+
+-熟悉 Java 开发，对 Java 内存回收机制、Jvm 调优有一定理解； 
+-熟练使用 Spring,Spring MVC,Mybatis 等 Web 框架 
+-熟练使用 MySQL,了解 HBase,Redis 等 NoSQL 数据库 
+-熟悉 Linux 操作系统； 
+-了解或用过分布式服务框架，如 Dubbo、zookeeper、springcloud 等；
+
+
 ### 已完成
 * 用 express 转接一个知乎 Api，添加 Access-control-allow-origin,或许还可以用 redis 缓存数据结果（一个就好）由此想到一篇文章"How to use Pythonto build a restful Web Service".只不过用的是 Tornado
 * git hook (github travis 持续集成，git push 会触发服务器的一系列操作)
