@@ -267,6 +267,8 @@ cahe也就意味着后续，所有对于themes文件夹中的_config.yml文件�
 
 中间的虚线左边的冒号表示下面的单元格左对齐，冒号放右边就右对齐，左右都放一个就表示居中
 
+
+vscode的返回上一个文件快捷键是ctrl + -
 ### 参考
 
 * [Hexo 博文置顶技巧](http://yanhuili.github.io/2016/11/21/hexo%E5%8D%9A%E6%96%87%E7%BD%AE%E9%A1%B6%E6%8A%80%E5%B7%A7/)

@@ -798,6 +798,32 @@ if (mState.isPreLayout() && holder.isBound()) {
     bound = tryBindViewHolderByDeadline(holder, offsetPosition, position, deadlineNs);// 这是唯一的onBindViewHolder会被调用到的地方
 }
 ```
+ 
+ mAttachedScrap是一个ArrayList<ViewHolder>，在RecyclerView的dispatchLayoutStep2中会走到，LayoutManager的onLayoutChildren中会调用
+ detachAndScrapAttachedViews(recycler)这个方法，其实就是将当前RecyclerView的所有child从后往前添加到这个mAttachedScrap中。
+ onLayoutChildren继续走，调用到fill ->layoutChunk -> addView ->addViewInt -> unScrap -> unScrapView（这个时候就从mAttachedScrap中移除掉刚才加进去的viewHolder）
+到这里viewHolder的itemView.getParent = null(而视觉上这个View是明明存在的)
+
+在unScrapView之后，调用
+> mChildHelper.attachViewToParent(child, index, child.getLayoutParams(), false)
+
+就是重新调用recyclerView.attachViewToParent()方法，这是一个ViewGroup的方法，这里面调用了addInArray方法。
+而attachViewToParent方法会触发requestLayout，在RecyclerView的requestLayout方法中
+```java
+ @Override
+    public void requestLayout() {
+        if (mEatRequestLayout == 0 && !mLayoutFrozen) {
+            super.requestLayout();//多数情况下，attachViewToParent不会触发这个方法
+        } else {
+            mLayoutRequestEaten = true;
+        }
+    }
+```
+
+
+从命名来看，这里存放的是没有被滑出屏幕的View,也就是当前屏幕上正显示着的View。debug来看，也确实如此。
+
+
 所以直接在tryGetViewHolderForPositionByDeadline中打断点，发现：
 >1. 龟速拖动RecylerView的时候，Holder是在getScrapOrHiddenOrCachedHolderForPosition中从mCachedViews中找到的
 2. 大概率情况下，从mCachedViews中获取到的viewHolder不会走到上面tryBindViewHolderByDeadline里面，也就是可以直接拿来用的那种。而从viewPool中回收得到的viewHolder都会走onBindViewHolder方法。（不是很确定，打断点几乎都是这种情况）.这么说吧，mCacheViews中拿出来的viewHolder是不需要bind的,recyclerPool里面拿出来的viewHolder是需要重新bind的。
@@ -805,6 +831,7 @@ if (mState.isPreLayout() && holder.isBound()) {
 4. mCachedViews和recyclerPool中的view.getParent都为Null。
 5. onViewDetachedFromWindow时只不过才刚刚加入mCachedViews，onViewRecycled才是view被移动到pool中了(这个时候剔除view的一些资源是完全OK（比如setImageDrawable(null)，比如videoPlayer stop）的，因为下次重新取出来的时候反正又要重新bind一遍).
 6. RecylerView的缓存提供了viewCacheExtension这个接口，开发者可以自定义一层View的缓存
+7. 准确来讲，缓存一共有四层，mAttachedScrap,mCachedViews,viewCacheExtension还有recyclerPool
 
 
 

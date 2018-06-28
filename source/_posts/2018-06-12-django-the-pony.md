@@ -180,4 +180,72 @@ User.objects.filter(pk__gt=10)
 User.objects.filter(pk__lt=10)  
 ```
 
+[querySet里面有一个_set](https://stackoverflow.com/questions/42080864/set-in-django-for-a-queryset)
+在moderl中没有声明related_name的情况下，需要通过_set来反向查找model
+>For example, if Product had a many-to-many relationship with User, named purchase, you might want to write a view like this:
+
+```python
+class PurchasedProductsList(generics.ListAPIView):
+    """
+    Return a list of all the products that the authenticated
+    user has ever purchased, with optional filtering.
+    """
+    model = Product
+    serializer_class = ProductSerializer
+    filter_class = ProductFilter
+
+    def get_queryset(self):
+        user = self.request.user
+        return user.purchase_set.all()
+```
+
+
+filter_backend是定义在GenericAPIView中的，所以要使用这个属性得用GenericAPIView
+
+
 [nested relations](http://www.django-rest-framework.org/api-guide/relations/)
+
+json web token authentication
+> pip install djangorestframework-jwt
+
+
+```python
+##settings.py
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',  # 加入此行
+    ),
+}
+
+## urls.py
+urlpatterns = [
+	...
+    # url(r'api-auth-token/', authtoken_views.obtain_auth_token),  # drf自带的token认证
+    url(r'login/', jwt_authtoken_views.obtain_jwt_token),       # 加此行，jwt认证
+]
+```
+
+然后通过post请求127.0.0.1/login/,body中添加username和password
+得到这样的response 
+```json
+{
+  "token": "someweirdwords---------"
+}
+```
+下次请求的时候带上这个Header就好了
+```json
+"Authorization": "JWT someweirdwords---------"
+```
+
+通过manage.py创建user的方式：
+```
+user@host> manage.py shell
+>>> from django.contrib.auth.models import User
+>>> user=User.objects.create_user('John', password='password123')
+>>> user.is_superuser=False
+>>> user.is_staff=False
+>>> user.save()
+```

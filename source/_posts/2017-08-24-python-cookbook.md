@@ -47,6 +47,20 @@ print('Finishing up')
 - from werkzeug.utils import secure_filename
 只是因为这个文件的包的位置挪了，import只能用绝对路径
 
+在class中调用parent class的方法
+```py
+class Grandparent(object):
+    def my_method(self):
+        print "Grandparent"
 
+class Parent(Grandparent):
+    def my_method(self):
+        print "Parent"
+
+class Child(Parent):
+    def my_method(self):
+        print "Hello Grandparent"
+        super(Parent, self).my_method()
+```
 
 ![](http://odzl05jxx.bkt.clouddn.com/79a65f1911c81d736be0704904de8ea1.jpg?imageView2/2/w/600)
