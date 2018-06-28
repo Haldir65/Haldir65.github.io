@@ -23,7 +23,7 @@
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/snapshot20161020124442.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/snapshot20161020124836.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/snapshot20161020143554.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-06-27T10:58:51.967Z">
+<meta property="og:updated_time" content="2018-06-28T11:43:03.867Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用RecyclerView的Animation">
 <meta name="twitter:description" content="From the talkRecyclerView Animations and Behind the ScenesYigit Biyar &amp;amp; Chet Haaseon Anroid Dev Summit 2015 1. RecyclerView架构RecyclerView is Flexible , Pluggable and Customizeable内部很多功能都交给了各个组件去完成">
@@ -362,6 +362,13 @@ ga('send', 'pageview');
 <p>以上即为获取holder的优先顺序，获取到holder之后就是bindViewHolder了</p>
 <p>接下来看获得到holder之后，无论是从mCachedViews还是recyclerpool中获得的holder，下面决定是否需要绑定</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">boolean</span> bound = <span class="keyword">false</span>;</span><br><span class="line"><span class="keyword">if</span> (mState.isPreLayout() &amp;&amp; holder.isBound()) &#123;</span><br><span class="line">    <span class="comment">//如果已经调用过BindViewHolder方法，就不再去onBindViewHolder了。而是直接将这个viewholder的itemView返回给getViewPosition函数</span></span><br><span class="line">    <span class="comment">// do not update unless we absolutely have to.</span></span><br><span class="line">    holder.mPreLayoutPosition = position;</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (!holder.isBound() || holder.needsUpdate() || holder.isInvalid()) &#123;</span><br><span class="line">    <span class="keyword">if</span> (DEBUG &amp;&amp; holder.isRemoved()) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Removed holder should be bound and it should"</span></span><br><span class="line">                + <span class="string">" come here only in pre-layout. Holder: "</span> + holder</span><br><span class="line">                + exceptionLabel());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> offsetPosition = mAdapterHelper.findPositionOffset(position);</span><br><span class="line">    bound = tryBindViewHolderByDeadline(holder, offsetPosition, position, deadlineNs);<span class="comment">// 这是唯一的onBindViewHolder会被调用到的地方</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> mAttachedScrap是一个ArrayList<ViewHolder>，在RecyclerView的dispatchLayoutStep2中会走到，LayoutManager的onLayoutChildren中会调用<br> detachAndScrapAttachedViews(recycler)这个方法，其实就是将当前RecyclerView的所有child从后往前添加到这个mAttachedScrap中。<br> onLayoutChildren继续走，调用到fill -&gt;layoutChunk -&gt; addView -&gt;addViewInt -&gt; unScrap -&gt; unScrapView（这个时候就从mAttachedScrap中移除掉刚才加进去的viewHolder）<br>到这里viewHolder的itemView.getParent = null(而视觉上这个View是明明存在的)</p>
+<p>在unScrapView之后，调用</p>
+<blockquote>
+<p>mChildHelper.attachViewToParent(child, index, child.getLayoutParams(), false)</p>
+</blockquote>
+<p>就是重新调用recyclerView.attachViewToParent()方法，这是一个ViewGroup的方法，这里面调用了addInArray方法。<br>而attachViewToParent方法会触发requestLayout，在RecyclerView的requestLayout方法中<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">requestLayout</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       <span class="keyword">if</span> (mEatRequestLayout == <span class="number">0</span> &amp;&amp; !mLayoutFrozen) &#123;</span><br><span class="line">           <span class="keyword">super</span>.requestLayout();<span class="comment">//多数情况下，attachViewToParent不会触发这个方法</span></span><br><span class="line">       &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">           mLayoutRequestEaten = <span class="keyword">true</span>;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>从命名来看，这里存放的是没有被滑出屏幕的View,也就是当前屏幕上正显示着的View。debug来看，也确实如此。</p>
 <p>所以直接在tryGetViewHolderForPositionByDeadline中打断点，发现：</p>
 <blockquote>
 <ol>
@@ -371,6 +378,7 @@ ga('send', 'pageview');
 <li>mCachedViews和recyclerPool中的view.getParent都为Null。</li>
 <li>onViewDetachedFromWindow时只不过才刚刚加入mCachedViews，onViewRecycled才是view被移动到pool中了(这个时候剔除view的一些资源是完全OK（比如setImageDrawable(null)，比如videoPlayer stop）的，因为下次重新取出来的时候反正又要重新bind一遍).</li>
 <li>RecylerView的缓存提供了viewCacheExtension这个接口，开发者可以自定义一层View的缓存</li>
+<li>准确来讲，缓存一共有四层，mAttachedScrap,mCachedViews,viewCacheExtension还有recyclerPool</li>
 </ol>
 </blockquote>
 <p>package private的变量是否就不能访问到？<br>比如V7包里的RecyclerView，里面的Recycler是package-private权限。<br>于是新建一个package android.support.v7.widget这样的包。<br>接下来在这个包里面的class就能直接访问RecyclerView中的package-private权限的成员变量了。<br>亲测可行。</p>
@@ -680,10 +688,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">django</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
@@ -745,6 +749,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">django</a>
               </li>
              
               <li class="article-tag-list-item">

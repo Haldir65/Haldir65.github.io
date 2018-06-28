@@ -16,7 +16,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/djangopony-slide.png?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/food%20salad%20instagram%20hunger%20city%20life.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-06-27T10:58:51.979Z">
+<meta property="og:updated_time" content="2018-06-28T11:43:03.879Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="django学习记录">
 <meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/djangopony-slide.png?imageView2/2/w/600">
@@ -246,7 +246,21 @@ ga('send', 'pageview');
 </blockquote>
 <p>注意，删了表之后，还得把对应的migrations中的文件删掉，否则migrate无效</p>
 <p>pk其实就是primary_key的意思<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Object.objects.get(id=<span class="number">1</span>)</span><br><span class="line">Object.objects.get(pk=<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">## 看清楚了，是两个下划线</span></span><br><span class="line">User.objects.filter(pk__in=[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>])</span><br><span class="line">User.objects.filter(pk__gt=<span class="number">10</span>)  </span><br><span class="line">User.objects.filter(pk__lt=<span class="number">10</span>)</span><br></pre></td></tr></table></figure></p>
+<p><a href="https://stackoverflow.com/questions/42080864/set-in-django-for-a-queryset">querySet里面有一个_set</a><br>在moderl中没有声明related_name的情况下，需要通过_set来反向查找model</p>
+<blockquote>
+<p>For example, if Product had a many-to-many relationship with User, named purchase, you might want to write a view like this:</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PurchasedProductsList</span><span class="params">(generics.ListAPIView)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    Return a list of all the products that the authenticated</span></span><br><span class="line"><span class="string">    user has ever purchased, with optional filtering.</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    model = Product</span><br><span class="line">    serializer_class = ProductSerializer</span><br><span class="line">    filter_class = ProductFilter</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_queryset</span><span class="params">(self)</span>:</span></span><br><span class="line">        user = self.request.user</span><br><span class="line">        <span class="keyword">return</span> user.purchase_set.all()</span><br></pre></td></tr></table></figure>
+<p>filter_backend是定义在GenericAPIView中的，所以要使用这个属性得用GenericAPIView</p>
 <p><a href="http://www.django-rest-framework.org/api-guide/relations/">nested relations</a></p>
+<p>json web token authentication</p>
+<blockquote>
+<p>pip install djangorestframework-jwt</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">##settings.py</span></span><br><span class="line">REST_FRAMEWORK = &#123;</span><br><span class="line">    <span class="string">'DEFAULT_AUTHENTICATION_CLASSES'</span>: (</span><br><span class="line">        <span class="string">'rest_framework.authentication.BasicAuthentication'</span>,</span><br><span class="line">        <span class="string">'rest_framework.authentication.SessionAuthentication'</span>,</span><br><span class="line">        <span class="comment"># 'rest_framework.authentication.TokenAuthentication',</span></span><br><span class="line">        <span class="string">'rest_framework_jwt.authentication.JSONWebTokenAuthentication'</span>,  <span class="comment"># 加入此行</span></span><br><span class="line">    ),</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">## urls.py</span></span><br><span class="line">urlpatterns = [</span><br><span class="line">true...</span><br><span class="line">    <span class="comment"># url(r'api-auth-token/', authtoken_views.obtain_auth_token),  # drf自带的token认证</span></span><br><span class="line">    url(<span class="string">r'login/'</span>, jwt_authtoken_views.obtain_jwt_token),       <span class="comment"># 加此行，jwt认证</span></span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>然后通过post请求127.0.0.1/login/,body中添加username和password<br>得到这样的response<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"token"</span>: <span class="string">"someweirdwords---------"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>下次请求的时候带上这个Header就好了<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">"Authorization": "JWT someweirdwords---------"</span><br></pre></td></tr></table></figure></p>
+<p>通过manage.py创建user的方式：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">user@host&gt; manage.py shell</span><br><span class="line">&gt;&gt;&gt; from django.contrib.auth.models import User</span><br><span class="line">&gt;&gt;&gt; user=User.objects.create_user(&apos;John&apos;, password=&apos;password123&apos;)</span><br><span class="line">&gt;&gt;&gt; user.is_superuser=False</span><br><span class="line">&gt;&gt;&gt; user.is_staff=False</span><br><span class="line">&gt;&gt;&gt; user.save()</span><br></pre></td></tr></table></figure></p>
 
       
 
@@ -536,10 +550,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">django</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
@@ -601,6 +611,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">django</a>
               </li>
              
               <li class="article-tag-list-item">
