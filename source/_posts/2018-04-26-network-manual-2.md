@@ -204,3 +204,9 @@ BufferedWriter的主要原理是内部保留了一个char[]的数组，每次外
 [使用Nginx代理ws为wss协议](http://chown-jane-y.coding.me/2017/07/21/%E4%BD%BF%E7%94%A8Nginx%E4%BB%A3%E7%90%86ws%E4%B8%BAwss%E5%8D%8F%E8%AE%AE/)
 
 [CRSF](https://zh.wikipedia.org/wiki/%E8%B7%A8%E7%AB%99%E8%AF%B7%E6%B1%82%E4%BC%AA%E9%80%A0)
+
+[Content Security Policy 入门教程](http://www.ruanyifeng.com/blog/2016/09/csp.html)
+两种方式设置csp白名单，一种是服务器在response的header中添加'Content-Security-Policy'这个header，另一种是在html中写meta标签
+```html
+<meta http-equiv="Content-Security-Policy" content="script-src 'self'; object-src 'none'; style-src cdn.example.org third-party.org; child-src https:">
+```

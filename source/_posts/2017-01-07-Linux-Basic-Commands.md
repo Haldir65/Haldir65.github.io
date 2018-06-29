@@ -219,8 +219,6 @@ echo '$var1 eq $var2'
 else
 echo '$var1 not eq $var2'
 fi //else后面必须加fi
-
-
        if list then
            do something here
        elif list then
@@ -280,8 +278,17 @@ grep -E "aaa|bbb"
 grep -E aaa\|bbb
 ```
 
+想要在bash中设置一个variable为一个命令的输出
+```shell
+#!/bin/bash
+OUTPUT="$(ls -1)"  ## 注意，这里等于号前后不能有空格
+echo "${OUTPUT}"
 
 
+#!/bin/bash
+java_stuff="$(which java)"
+${java_stuff} --version
+```
 
 ### 4. 用户和用户组的问题
 ```shell
@@ -393,7 +400,24 @@ $ ls -l | grep "^d"
 $ ls -l * | grep "^-" | wc -|   //"^-"表示不列出目录或链接，只展示目录；wc是数行数
 $ ls -l | grep "^d" //只列出目录
 ```
+我想知道java这个程序在哪里，同时把结果弄到剪切板上
+在mac上可以这么干,使用pbcopy命令
+```
+cat ~/.bashrc | pbcopy
+## 剪切板内容： /usr/bin/java
+```
 
+那么在linux上呢？
+```
+which java | ???
+```
+然而linux并未自带这个功能。
+[pipe output to clipboardwin](https://stackoverflow.com/questions/5130968/how-can-i-copy-the-output-of-a-command-directly-into-my-clipboard?noredirect=1&lq=1)
+```
+sudo apt-get install xclip
+cat file | xclip  ## 复制
+xclip -o ## 粘贴
+```
 
 ### 7. 硬件相关的命令
 查看硬盘存储空间:

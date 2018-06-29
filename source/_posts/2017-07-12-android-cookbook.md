@@ -137,7 +137,7 @@ Android相关
 - [ ] WebView JS交互，WebView存在的[漏洞](http://www.jianshu.com/p/9f7e9ab8d2fa),通过反射可看可能存在的[安全问题](https://my.oschina.net/fengheju/blog/673629)以及[C代码](http://blog.csdn.net/xueerfei008/article/details/26750659)
 - [ ] Media相关，视频播放etc，相机，滤镜等.[Demo](https://github.com/w1123440793/VideoListDemo)
 - [X] FFMpeg，[IjkPlayer](http://www.jianshu.com/p/a4eea7ea4664)，[弹幕](https://github.com/Bilibili/DanmakuFlameMaster)
-- [ ] using protobuf on android
+- [X] using protobuf on android
 - [ ] UI Toolkit源码解析(android.widget包下面的)
     - [X] ViewPager的原理，作者Adam Powell
     - [ ] View的源码, View的绘制原理(往displayList那边靠)

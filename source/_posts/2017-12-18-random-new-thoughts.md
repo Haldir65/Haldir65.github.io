@@ -64,7 +64,7 @@ top : 1
 * [一个用于优化 png 图片的 gradle 插件](https://github.com/chenenyu/img-optimizer-gradle-plugin)，用来看 groovy 语法挺好的。以及 [How to write gradle plugin](http://yuanfentiank789.github.io/2017/09/20/%E5%9C%A8AndroidStudio%E4%B8%AD%E8%87%AA%E5%AE%9A%E4%B9%89Gradle%E6%8F%92%E4%BB%B6/)
 * XSS 攻击,DOM based和Stored XSS,基本上就是不要相信用户的输入，除了合法输入以外一律过滤掉
 - [其实就是socket io] websocket nodejs，局限性就是前后台都得用socket.io的库。前端是浏览器的话还好，app的话java,Android都有对应的实现
-
+- [使用Spring boot后台提供protobuf接口实现客户端通信] 不要使用protobf-gradle-plugin了。直接写脚本用protoc去生成文件，指定生成文件的路径要和proto里面写的包名对的上。另外就是客户端和server端依赖的protobuf版本以及protoc工具的版本得一致，比如都是3.5。还有就是protoc的语法，什么import的比较烦。
 
 ### Good For Nothing
 - [ ] 用GDB调试程序

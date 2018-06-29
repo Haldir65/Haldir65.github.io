@@ -249,3 +249,9 @@ user@host> manage.py shell
 >>> user.is_staff=False
 >>> user.save()
 ```
+
+用jwt去请求需要authentication的接口时，header里面得带上一个
+```
+Authorization: Token 登录.接口.返回的token
+```
+注意Token这个单词后面有一个空格

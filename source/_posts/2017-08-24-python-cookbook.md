@@ -63,4 +63,34 @@ class Child(Parent):
         super(Parent, self).my_method()
 ```
 
+## 3. Error Handling
+try except是可以拿到exception的原因的
+```python
+try:
+    1 + '1'
+    f = open('该文档不存在')
+    print(f.read())
+    f.close()
+except OSError as reason:
+    print('文件出错了T_T')
+    print('出错原因是%s'%str(reason))
+except TypeError as reason:
+    print('求和出错了T_T')
+    print('出错原因是%s'%str(reason))
+```
+
 ![](http://odzl05jxx.bkt.clouddn.com/79a65f1911c81d736be0704904de8ea1.jpg?imageView2/2/w/600)
+
+
+时间的函数有datetime和time包
+datetime在windows上和在mac上有表现不一致的现象[python-time-formatting-different-in-windows](https://stackoverflow.com/questions/10807164/python-time-formatting-different-in-windows)
+亲测下来,
+```python
+from datetime import datetime
+dt = datetime.now()
+expire_time = dt.strftime('%s') ## 亲测，mac上没问题,windows上会崩,把s改成S就不会在windows上崩了。
+## 后来干脆改成这样
+expire = int(round(dt.timestamp()))
+```
+
+[下划线的意义很多种](https://dbader.org/blog/meaning-of-underscores-in-python)
