@@ -449,6 +449,21 @@ fuser -m -u redis-server
 bash <(curl -s https://codecov.io/bash) ##重定向还有这么玩的
 ```
 
+### 28.htop怎么看
+process state
+图片[出处](https://codeahoy.com/2017/01/20/hhtop-explained-visually/)
+![](http://odzl05jxx.bkt.clouddn.com/image/jpg/htop-top.png)
+![](http://odzl05jxx.bkt.clouddn.com/image/jpg/htop-bottom.png)
+> PROCESS STATE CODES
+   R  running or runnable (on run queue)
+   D  uninterruptible sleep (usually IO)
+   S  interruptible sleep (waiting for an event to complete)
+   Z  defunct/zombie, terminated but not reaped by its parent
+   T  stopped, either by a job control signal or because
+      it is being traced
+   [...]
+
+一般都是S比较多，Z属于Zombie进程，直接干掉   
 
 
 

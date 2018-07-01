@@ -28,22 +28,15 @@ top : 1
 - [ ] [如何编写 jQuery 插件](https://gist.github.com/quexer/3619237)
 - [ ] 用正则检测或者解析json(jQuery源码里有)
 - [ ]javascript中new FileReader()，以及canvas api,以及[js进行图片缩放和裁剪](https://juejin.im/post/5a98c5c26fb9a028d82b34ee)
-- [ ] Django部署个人网站(Gunicorn，Nginx)
 - [ ] Redux和Flux很像
 - [ ] URL Encoding,就是那个在网址里把字符转成百分号加上UTF-8的[找到了阮一峰老师的解释](http://www.ruanyifeng.com/blog/2010/02/url_encoding.html)
 - [ ] [和网页类似，Activity也有一个referer的概念](https://blog.csdn.net/u013553529/article/details/53856800)，用于判断当前页面是由谁发起请求的
 - [ ] [一个展示如何在宿主App中提取一个apk文件并加载代码和资源](https://www.jianshu.com/p/a4ab102fa4ac)
 - [ ] [libmp3lame移植到Android](https://www.jianshu.com/p/534741f5151c),跟jni有关了
-- [ ]一直不会maven是在是太丢人了
-- [ ] 网易云音乐API
 - [ ] nodejs rpc
 
 
--熟悉 Java 开发，对 Java 内存回收机制、Jvm 调优有一定理解； 
--熟练使用 Spring,Spring MVC,Mybatis 等 Web 框架 
--熟练使用 MySQL,了解 HBase,Redis 等 NoSQL 数据库 
--熟悉 Linux 操作系统； 
--了解或用过分布式服务框架，如 Dubbo、zookeeper、springcloud 等；
+
 
 
 ### 已完成
@@ -64,6 +57,7 @@ top : 1
 * [一个用于优化 png 图片的 gradle 插件](https://github.com/chenenyu/img-optimizer-gradle-plugin)，用来看 groovy 语法挺好的。以及 [How to write gradle plugin](http://yuanfentiank789.github.io/2017/09/20/%E5%9C%A8AndroidStudio%E4%B8%AD%E8%87%AA%E5%AE%9A%E4%B9%89Gradle%E6%8F%92%E4%BB%B6/)
 * XSS 攻击,DOM based和Stored XSS,基本上就是不要相信用户的输入，除了合法输入以外一律过滤掉
 - [其实就是socket io] websocket nodejs，局限性就是前后台都得用socket.io的库。前端是浏览器的话还好，app的话java,Android都有对应的实现
+- [X]一直不会maven是在是太丢人了[看文档就行了](https://maven.apache.org/guides/getting-started/index.html#How_do_I_make_my_first_Maven_project)，其他的[教程](https://www.tutorialspoint.com/maven/maven_build_life_cycle.htm)也不错
 - [使用Spring boot后台提供protobuf接口实现客户端通信] 不要使用protobf-gradle-plugin了。直接写脚本用protoc去生成文件，指定生成文件的路径要和proto里面写的包名对的上。另外就是客户端和server端依赖的protobuf版本以及protoc工具的版本得一致，比如都是3.5。还有就是protoc的语法，什么import的比较烦。
 
 ### Good For Nothing
@@ -80,3 +74,8 @@ top : 1
 - 前后端同构
 - [install nginx , jenkin ci, deploying nginx in docker(Http Load Balaning with Docker and nginx)](https://www.digitalocean.com/community/tutorials/how-to-configure-nginx-with-ssl-as-a-reverse-proxy-for-jenkins)
 - [nio stuff](https://juejin.im/post/59fffdb76fb9a0450a66bd58)
+- [ ] 网易云音乐API
+- [X] Django部署个人网站(Gunicorn，Nginx)。django写template就不是前后端分离了
+
+
+[jsonplaceholder](https://jsonplaceholder.typicode.com/)懒得自己写api的话就用这个吧

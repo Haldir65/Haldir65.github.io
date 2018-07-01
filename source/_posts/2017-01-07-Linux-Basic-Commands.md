@@ -640,6 +640,7 @@ lsof -i:80
 netstat -anp|grep pid
 lsof //list opened files
 ## 查看端口占用
+[lsof命令还是很强大的](http://www.cnblogs.com/peida/archive/2013/02/26/2932972.html)
 
 ## 杀进程（如果进程不属于当前用户，要sudo）
 ## 杀进程，慎用。

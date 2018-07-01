@@ -1401,6 +1401,14 @@ HashMap 底层采用一个 Entry[] 数组来保存所有的 key-value 对，当�
 
 **那么复写了hashCode之后，一定要复写equals方法吗。**
 
+### 48. maven的一些东西
+maven官网提供的通过命令行创建一个maven项目的方法
+```
+mvn -B archetype:generate -DarchetypeGroupId=org.apache.maven.archetypes -DgroupId=com.mycompany.app -DartifactId=my-app
+
+mvn compile ##开始编译
+```
+[maven getting started是很友好的教程](https://maven.apache.org/guides/getting-started/index.html#How_do_I_make_my_first_Maven_project)
 
 ### 48. 反射为什么慢，慢成什么样了
 

@@ -126,8 +126,6 @@ http {
          proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
          proxy_set_header Via    "nginx";
         }
-
-
     }
 }
 
@@ -451,7 +449,7 @@ location ~* /image/.*\.(jpg|gif|png)$ {
     }
 ```
 更多直接google吧。
-
+关于这个var/www目录，按照惯例，这个目录里面就应该放example.com,anothersite.com,myblog.com,...这种根据一个个site名来放置资源和html文件。一个文件夹里放一个site相关的资源，当然这只是惯例。
 
 ### 添加黑名单
 ```shell
@@ -499,6 +497,8 @@ server {
 
 In the following example, NGINX serves a default GIF file if the file requested by the client doesn’t exist. When the client requests (for example) http://www.domain.com/images/image1.gif, NGINX first looks for image1.gif in the local directory specified by the root or alias directive that applies to the location (not shown in the snippet). If image1.gif doesn’t exist, NGINX looks for image1.gif/, and if that doesn’t exist, it redirects to /images/default.gif. That value exactly matches the second location directive, so processing stops and NGINX serves that file and marks it to be cached for 30 seconds.
 ```config
+try_files $uri $uri/ =404; ## 这么写的话，碰到找不到的，浏览器直接返回一个丑到爆的ngix默认404页面。
+
 location /images/ {
     try_files $uri $uri/ /images/default.gif;
 }
@@ -537,6 +537,7 @@ upstream backend {
 ```
 3. ip_hash (一个ip只会导向固定的一个server，这个适合做ab test)
 这些是主要的策略
+
 
 
 
@@ -605,6 +606,13 @@ http {
   }
 ```
 
+关于sites-enabled和sites-available这两个文件夹。一般都是把真正的.conf文件写在sites-available里面，然后在sites-enable通过symbolic link去链接到sites-available中的文件。这样，万一哪天突然打算关掉某个website，直接删掉那个symbolic link就行了，但真正的配置文件不会被删掉
+```shell
+sudo ln -s /etc/nginx/sites-available/example.com /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/test.com /etc/nginx/sites-enabled/
+```
+这个也算作规范吧
+
 http这个directive下一层就是server了,一般来说，一个虚拟域名(virtual domain)就对应着一个server块。
 
 **接下来的东西就不要写在/etc/nginx/nginx.conf文件里了,这里应该是一个domian写一个.conf文件**
@@ -621,7 +629,7 @@ server {
 
 
         root /usr/share/nginx/html;
-        index index.html index.htm;
+        index index.html index.htm; ##有Index.html直接返回，没有的话尝试index.htm文件
 
         # Make site accessible from http://localhost/ ## localhost其实就是127.0.0.1，这是写在/etc/hosts里面的
         server_name localhost; ## 这可以使得一个ip地址支持多个domian( This allows multiple domains to be served from a single IP address.)
@@ -661,6 +669,35 @@ server {
 }
 ```
 
+关于server_name这个参数，nginx网站上在[how nginx process requests中是这么说的](http://nginx.org/en/docs/http/request_processing.html)
+```
+server {
+    listen      80;
+    server_name example.org www.example.org;
+    ...
+}
+
+server {
+    listen      80;
+    server_name example.net www.example.net;
+    ...
+}
+
+server {
+    listen      80;
+    server_name example.com www.example.com;
+    ...
+}
+```
+server_name对应客户端发来的request中的HOST这个header，一个个去匹配，没有的话就默认用第一个。当然我非要第二个作为默认的也是可以的，加一个default_server就行了
+```
+server {
+    listen      80 default_server;
+    server_name example.net www.example.net;
+    ...
+}
+```
+
 
 ### access_log是跟着server走的，毕竟你不希望两台不相干的服务器的访问日志搅和在一起
 /etc/nginx/sites-available/example.com文件中写入这么一行
@@ -686,7 +723,17 @@ Request: http://example.com/planet/blog/ or http://example.com/planet/blog/about
 这俩请求会走到location /planet/blog/ { }而不是location /planet/ { } */
 
 location ~ IndexPage\.php$ { }
-location ~ ^/BlogPlanet(/|/index\.php)$ { } ## 美元符号代表以此结束，反斜杠代表转义字符
+location ~ ^/BlogPlanet(/|/index\.php)$ { } ## 向上箭头表示以此开始，美元符号代表以此结束，反斜杠代表转义字符，波浪号表示这是一个正则，大小写敏感!
+
+
+所有的jpg和png？
+location ~^ \.(jpg|png)$ { }
+
+
+想要大小写不敏感？
+location ~* \.(pl|cgi|perl|prl)$ { }
+location ~* \.(md|mdwn|txt|mkdn)$ { }
+上面这俩表示所有.pl,.PL,.Pl,pL...各种各样的大小写都照单全收
 
 前面这个~符号代表后面跟着的是一个正则表达式（nginx uses Perl Compatible Regular Expressions (PCRE).）但这里还是大小写敏感的正则表达式
 
@@ -697,7 +744,7 @@ location ~* \.(md|mdwn|txt|mkdn)$ { }
 
 location ^~ /images/IndexPage/ { }
 location ^~ /blog/BlogPlanet/ { }
-这个^~符号表示告诉nginx，如果找到了匹配，就用这了。意思就是说 /images/IndexPage/info 也会直接用这个了，就算后面有更佳匹配location  /images/IndexPage/info { }也不管
+这个^~符号表示告诉nginx，如果找到了匹配，就不再往下找了。意思就是说 /images/IndexPage/info 也会直接用这个了，就算后面有更佳匹配location  /images/IndexPage/info { }也不管
 
 location = / { }
 注意这个中间的等号，意思是访问只有url是http://example.com/的时候才匹配 ，而 http://example.com/index.html 就不会匹配

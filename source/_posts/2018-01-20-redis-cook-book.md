@@ -8,10 +8,16 @@ tags:
 <!--more-->
 
 redis速度相当快
-[The Redis project does not officially support Windows. However, the Microsoft Open Tech group develops and maintains this Windows port targeting Win64. ](https://github.com/MicrosoftArchive/redis)
-直接从release page下载msi文件，安装下去很方便的
 
-### start server and client
+在ubuntu上安装
+> sudo apt-get install redis-server
+
+[也有自己下源码编译的](https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-redis-on-ubuntu-16-04)
+
+[The Redis project does not officially support Windows. However, the Microsoft Open Tech group develops and maintains this Windows port targeting Win64. ](https://github.com/MicrosoftArchive/redis)
+直接从release page下载msi文件，安装下去很方便的。默认的端口是6379。
+
+### start server and client(windows下cd 到redis安装的位置，默认在C：Porgram Files/Redis里面)
  > redis-server  redis.windows.conf  
  > 双击打开 redis-cli.exe ## start client
 
@@ -47,6 +53,16 @@ noeviction -> 不移除任何可以，只是返回一个写错误
 
 
 ## 针对各种数据进行CURD操作
+
+最简单的SET和GET举个例子
+```shell
+>>SET realname "John Smith" ##亲测，这个realname的key加不加引号没啥关系，value也是加不加引号没关系.SET命令直接无视双引号
+>>OK
+
+>> GET realname
+"John Smith"
+```
+
 
 **String**
 ```shell
@@ -318,6 +334,7 @@ var house = {
 
 ### Redis Cluster(集群)
 
+[论述Redis和Memcached的差异-博客-云栖社区-阿里云](https://www.zhihu.com/question/19645807)
 
 
 
@@ -328,3 +345,4 @@ var house = {
 [Redis 高级特性与性能调优](http://www.ttlsa.com/redis/redis-advanced-features-and-performance-tuning/)
 [大部分语句转载自](http://www.dnsdizhi.com/post-219.html)
 [关于pipelining的解释](http://shift-alt-ctrl.iteye.com/blog/1863790)
+

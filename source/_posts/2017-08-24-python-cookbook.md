@@ -39,6 +39,19 @@ print('Finishing up')
 ### 2.7 [小Web](http://www.jianshu.com/p/f9d668490bc6)
 
 
+dict的创建方法[参考](https://www.linuxzen.com/python-you-ya-de-cao-zuo-zi-dian.html)
+```python
+>>> info = {"name" : 'cold'}
+>>> info = dict(name = 'cold')       # 更优雅,注意这里的key不需要带双引号了
+```
+
+操作数据库的话，在python文件里面写sql语句也行。sqlite3还是官方自带包，mysql要装个包。但是实际开发中应该大多数都使用orm框架，很少会自己去写sql语句吧.
+
+orm(object relation mapping)框架： sqlalchemy
+> pip install sqlalchemy
+
+[python cheetsheet](https://www.pythonsheets.com/notes/python-sqlalchemy.html)
+
 
 
 

@@ -373,7 +373,28 @@ new Vue({  // eslint-disable-line no-new
  Vuex是负责全局状态管理的，[参考](http://whutzkj.space/2017/10/24/vuex/#more)
  组件间[通信](https://juejin.im/post/59ec95006fb9a0451c398b1a)的方式
 
+```js
+'use strict';
 
+new Promise(function () {});
+```
+use strict是什么意思？
+
+在正常模式中，如果一个变量没有声明就赋值，默认是全局变量。严格模式禁止这种用法，全局变量必须显式声明。
+```python
+"use strict";
+
+　　v = 1; // 报错，v未声明
+
+　　for(i = 0; i < 2; i++) { // 报错，i未声明
+　　}
+```
+意思大概就是
+```js
+"use strict";
+x = 3.14;                // 报错 (x 未定义)但正常不会报错的
+```
+不允许删除变量或对象。不允许删除函数。不允许变量重名:。。。。总之感觉跟lint有点像
 
 
 

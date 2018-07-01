@@ -353,6 +353,10 @@ alter table temp rename to record;
 2. DB.compileStatement("DELETE FROM users WHERE first_name = ?")//节省了每次parse sql语句的开销
 3. [sqlite一次插入多条记录的优化方法](https://www.jianshu.com/p/faa5e852b76b)，使用union
 
+
+观察到一个现象，在编辑数据库，数据库打开的情况下，test.db所在的文件夹下面同时生成了一个test.db.journal文件，一旦关闭数据库连接，这个文件就没了。
+
+
 ### Another choice
 
 [mariadb](https://mariadb.org/)

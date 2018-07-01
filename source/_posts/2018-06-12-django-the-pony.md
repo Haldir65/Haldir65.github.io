@@ -180,6 +180,257 @@ User.objects.filter(pk__gt=10)
 User.objects.filter(pk__lt=10)  
 ```
 
+[nested relations](http://www.django-rest-framework.org/api-guide/relations/)
+
+```
+{
+    "detail": "Method \"GET\" not allowed."
+}
+```
+随便继承一个APIView，只写了post方法，使用GET方法就会得到这个response
+
+urlPatterns的一些东西
+[如果url中有空格的话就直接换成%20](https://stackoverflow.com/questions/3675368/django-url-pattern-for-20)
+urls.py里面写的主要是一堆正则表达式
+```python
+urlpatterns = [
+    url(r'^profiles/(?P<username>[\w\ ]+)/?$', ProfileRetrieveAPIView.as_view()),
+    url(r'^profiles/(?P<username>\w+)/follow/?$', 
+        ProfileFollowAPIView.as_view()),
+]
+```
+第一行的意思是访问 /profiles/你想要查找的userName 这个链接就会交给后面这个View
+
+lookup_field和lookup_url_kwarg都是定义在GenericApiView这个Class上的
+```python
+class GenericAPIView(views.APIView):
+    """
+    Base class for all other generic views.
+    """
+    queryset = None
+    serializer_class = None
+
+    # If you want to use object lookups other than pk, set 'lookup_field'.
+    # For more complex lookup requirements override `get_object()`.
+    lookup_field = 'pk'
+    lookup_url_kwarg = None
+
+    # The filter backend classes to use for queryset filtering
+    filter_backends = api_settings.DEFAULT_FILTER_BACKENDS
+
+    # The style to use for queryset pagination.
+    pagination_class = api_settings.DEFAULT_PAGINATION_CLASS
+```
+
+rest-framework的文档是这么说的
+> lookup_field - The model field that should be used to for performing object lookup of individual model instances. Defaults to 'pk'. Note that when using hyperlinked APIs you'll need to ensure that both the API views and the serializer classes set the lookup fields if you need to use a custom value.
+lookup_url_kwarg - The URL keyword argument that should be used for object lookup. The URL conf should include a keyword argument corresponding to this value. If unset this defaults to using the same value as lookup_field
+
+简言之，就是lookup_field就是把url里面传进来的参数当做model的什么field来查，比如model是Customer，primarykey是customername，默认的lookup_field就是这个主键。客户端的url需要传上来一个customername，然后就会根据这个customername去Customer.objects.filter(customername="xxx")去找。如果定义lookup_field为customer_age，就会把客户端传上来的参数当做一个customer_age去查找,Customer.objects.filter(customer_age="xxx")
+
+
+关于这个继承关系，CreateAPIView，ListAPIView，RetrieveAPIView，DestroyAPIView这些全都是继承了GenericAPIView，并各自继承了mixin，扩展出post,get,post,delete等方法。
+
+mixins.ListModelMixin，定义了一个list方法，返回一个queryset列表，对应GET方法
+mixins.CreateModelMixin，定义了一个create方法，创建一个实例，对应POST请求
+mixins.RetrieveModelMixin，定义了一个retrieve方法，对应GET请求
+mixins.UpdateModelMixin，定义一个update方法，对应PUT/PATCH请求
+
+
+```python
+##在models的Filed中定义一个
+createdAt = serializers.SerializerMethodField(method_name='get_created_at') ##意味着这个field要调用一个自定义的方法去获取
+updatedAt = serializers.SerializerMethodField(method_name='get_updated_at')
+
+
+##filed还有一个source的概念: The name of the attribute that will be used to populate the field.  默认是这个field的name，比如可以定义为model的一个方法，也可以定义为一个model的field
+
+
+##serializer里面可以自定义model中不存在的field
+customField = RelatedField(many=True, required=False, source='tags') ## 这个tags是存在的，customField是不存在这个model中的
+##这样做就很有意思了，因为从数据库里查出来的object可能就那么点信息，客户端希望后台在response中添加一些原本不存在于数据库model中的信息。就可以在某个已有变量的基础上扩展新的response 数据
+
+
+## 这里的insatnce是Serializer的model的实例
+def get_created_at(self, instance):
+    return instance.created_at.isoformat()
+
+```
+
+[在serializer层面为model添加field](https://stackoverflow.com/questions/13471083/how-to-extend-model-on-serializer-level-with-django-rest-framework)。这里面要注意field还有read-only和write-only等区别   
+关于slugFiled
+>from django.utils.text import 
+Well, if we give a string like ‘The new article title’ to slugify(), it returns ‘the-new-article-title’. Simple.
+
+slugField主要是为了让url好看点
+>Slugs are created mostly for the purpose of creating a nice, clean URL.
+Say for example, you have a site of user-generated posts, such as stackoverflow or quora.
+A user starts a post that has a title.
+Each post creates a separate web page based on the title.
+Now if a user asks the question, "How do you slugify text in Python"
+If a URL is created for this question, as is, with the spaces in them, the browser will insert %20 in place of each space. Therefore, the URL will be, How%20do%20you%20slugify%20text%20in%20Python
+This will work, but it looks extremely ugly and isn't very human readable.
+So instead of having spaces in a URL, a slugified text is created that contains no spaces. Instead of spaces there are "-" instead. Therefore, the URL will be, How-do-you-slugify-text-in-Python
+This looks much cleaner and is much more human readable.
+
+
+drf 的authorization默认需要是这样的:
+>Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b
+Note: If you want to use a different keyword in the header, such as Bearer, simply subclass TokenAuthentication and set the keyword class variable.
+If successfully authenticated, TokenAuthentication provides the following credentials.
+request.user will be a Django User instance.
+request.auth will be a rest_framework.authtoken.models.Token instance.
+
+
+
+jwt的logout或者踢人怎么做
+[首先Token是放在内存里而不是db里的，另外要踢人的话，手动给这个user生成一个新的token](https://stackoverflow.com/questions/40604877/how-to-delete-a-django-jwt-token)
+搞清楚，踢人是服务器这边做(创建个新的Token或者让原有Token无效)，logout是客户端那边做(删除客户端本地存储的Token)。
+在html里面删掉Token可以这么干
+```html
+<script>
+document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/";
+location.href="/accounts/auth/";
+</script>
+```
+对，就是简单的把token置空就行了
+
+代码里认证的地方取的Header是，但客户端传的是Authorization。估计这是wsgi协议相关的，记得Nginx好像也有这样的设定。
+WWW-Authenticate: Token
+
+
+从[django urlconf中抄来这些代码](https://docs.djangoproject.com/en/2.0/topics/http/urls/)
+```python
+from django.urls import path, re_path
+
+from . import views
+from django.urls import path
+
+from . import views
+
+urlpatterns = [
+    path('articles/2003/', views.special_case_2003),
+    path('articles/<int:year>/', views.year_archive),
+    path('articles/<int:year>/<int:month>/', views.month_archive),
+    path('articles/<int:year>/<int:month>/<slug:slug>/', views.article_detail),
+]
+
+##底下这个和上面的差不多，底下用的是re_path，使用正则，年份只能四位，传给view的参数类型始终是str。还是有点小区别
+
+urlpatterns = [
+    path('articles/2003/', views.special_case_2003),
+    re_path(r'^articles/(?P<year>[0-9]{4})/$', views.year_archive),
+    re_path(r'^articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/$', views.month_archive),
+    re_path(r'^articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/(?P<slug>[\w-]+)/$', views.article_detail),
+]
+```
+
+关于performance的issue，参考[这里](http://ses4j.github.io/2015/11/23/optimizing-slow-django-rest-framework-performance/)
+```python
+class CustomerSerializer(serializers.ModelSerializer):
+    # This can kill performance!
+    order_descriptions = serializers.StringRelatedField(many=True) 
+    # So can this, same exact problem...
+    orders = OrderSerializer(many=True, read_only=True) # This can kill performance!
+```
+
+>The code inside DRF that populates either CustomerSerializer does this:
+Fetch all customers. (Requires a round-trip to the database.)
+For the first returned customer, fetch their orders. (Requires another round-trip to the database.)
+For the second returned customer, fetch its orders. (Requires another round-trip to the database.)
+For the third returned customer, fetch its orders. (Requires another round-trip to the database.)
+For the fourth returned customer, fetch its orders. (Requires another round-trip to the database.)
+For the fifth returned customer, fetch its orders. (Requires another round-trip to the database.)
+For the sixth returned customer, fetch its orders. (Requires another round-trip to the database.)
+... you get the idea. Lets hope you don't have too many customers!
+
+所以要是有50个customer，就要执行50次查询，加上第一次获取所有Customer的数据库query。
+
+优化后的代码只需要走2次数据库
+```python
+queryset = queryset.prefetch_related('orders') ##干两件事，一个是获取所有user，一个是获取这些user的orer集合，一共就两次sql执行
+```
+其实这些东西在[Django official document](https://docs.djangoproject.com/en/dev/ref/models/querysets/#django.db.models.query.QuerySet.select_related)里面都提到过。
+
+另外的优化就是用redis了,比如说[Caching in Django With Redis](https://realpython.com/caching-in-django-with-redis/)
+
+>pip install django-redis 
+
+```python
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': '127.0.0.1:6379',
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    },
+}
+
+## python manage.py shell 开一个shell，记得先把redis的server跑起来
+from django.core.cache import cache #引入缓存模块
+cache.set('k', '12314', 30*60)      #写入key为k，值为12314的缓存，有效期30分钟
+cache.has_key('k') #判断key为k是否存在
+cache.get('k')     #获取key为k的缓存
+```
+一切OK的话说明可以用了
+
+view.py
+```python
+from rest_framework.views import APIView
+from rest_framework import status
+from rest_framework.response import Response
+from .serializers import CourseSerializer
+from .models import Course
+from django.core.cache import cache
+import time
+
+def get_data_from_db(criteria_name):
+    course = Course.objects.get(criteria=criteria_name)
+    return course
+
+
+def get_readed_cache(criteria_name):
+    #判断键是否存在
+    key = '_key_course_query_criteria_'+criteria_name
+    if cache.has_key(key):
+        data = cache.get(key)
+        print('cache hit')
+    else:
+        #不存在，则获取数据，并写入缓存
+        data = get_data_from_db(criteria_name)
+ 
+        #写入缓存
+        cache.set(key, data, 3600-int(time.time() % 3600))
+        print('sorry , no cache')
+    return data
+
+# Create your views here.
+
+class CourseApiView(APIView):
+
+    def post(self,request,format=None):
+        serializer = CourseSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        return Response(data={"msg":"invalid data"},status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request, *args, **kwargs):
+        critia = request.query_params.get('criteria',None)
+        if critia:
+            cached_data = get_readed_cache(critia)
+            course = cached_data
+            if course:
+                serializer = CourseSerializer(course)
+                return Response(serializer.data,status=status.HTTP_200_OK)    
+        return Response("not found",status=status.HTTP_404_NOT_FOUND)          
+```
+
+
+[drf默认的admin pannel可以自定义样式和功能](https://books.agiliq.com/projects/django-admin-cookbook/en/latest/change_text.html)
+[这人的博客不错](https://simpleisbetterthancomplex.com/tutorial/2016/08/01/how-to-upload-files-with-django.html)
+
 [querySet里面有一个_set](https://stackoverflow.com/questions/42080864/set-in-django-for-a-queryset)
 在moderl中没有声明related_name的情况下，需要通过_set来反向查找model
 >For example, if Product had a many-to-many relationship with User, named purchase, you might want to write a view like this:
@@ -254,4 +505,9 @@ user@host> manage.py shell
 ```
 Authorization: Token 登录.接口.返回的token
 ```
+<<<<<<< Updated upstream
 注意Token这个单词后面有一个空格
+=======
+注意Token这个单词后面有一个空格
+>>>>>>> 303fca33d8ee40d10b7a3e0088758adfc94a813e
+>>>>>>> Stashed changes
