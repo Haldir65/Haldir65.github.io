@@ -295,7 +295,7 @@ location.href="/accounts/auth/";
 ```
 对，就是简单的把token置空就行了
 
-代码里认证的地方取的Header是，但客户端传的是Authorization。估计这是wsgi协议相关的，记得Nginx好像也有这样的设定。
+代码里认证的地方取的Header是WWW-Authenticate XXX，但客户端传的是Authorization。估计这是wsgi协议[文档在这里](http://wsgi.readthedocs.io/en/latest/specifications/simple_authentication.html)相关的，记得Nginx好像也有这样的设定。
 WWW-Authenticate: Token
 
 
@@ -505,9 +505,7 @@ user@host> manage.py shell
 ```
 Authorization: Token 登录.接口.返回的token
 ```
-<<<<<<< Updated upstream
+
+
 注意Token这个单词后面有一个空格
-=======
-注意Token这个单词后面有一个空格
->>>>>>> 303fca33d8ee40d10b7a3e0088758adfc94a813e
->>>>>>> Stashed changes
+

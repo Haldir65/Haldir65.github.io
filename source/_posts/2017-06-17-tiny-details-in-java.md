@@ -1410,7 +1410,60 @@ mvn compile ##开始编译
 ```
 [maven getting started是很友好的教程](https://maven.apache.org/guides/getting-started/index.html#How_do_I_make_my_first_Maven_project)
 
-### 48. 反射为什么慢，慢成什么样了
+
+### 49. WeakHashmap还是LeakHashmap
+```html
+An entry in a <tt>WeakHashMap</tt> will automatically be removed when
+* its key is no longer in ordinary use.  More precisely, the presence of a
+* mapping for a given key will not prevent the key from being discarded by the
+* garbage collector, that is, made finalizable, finalized, and then reclaimed.
+* When a key has been discarded its entry is effectively removed from the map,
+* so this class behaves somewhat differently from other <tt>Map</tt>
+* implementations.
+```
+weakHashmap中的Entry长这样：
+```java
+ private static class Entry<K,V> extends WeakReference<Object> implements Map.Entry<K,V> {
+        V value;
+        final int hash;
+        Entry<K,V> next;
+
+        /**
+         * Creates new entry.
+         */
+        Entry(Object key, V value,
+              ReferenceQueue<Object> queue,
+              int hash, Entry<K,V> next) {
+            super(key, queue); //就是把key作为weakReference包装起来了
+            this.value = value;
+            this.hash  = hash;
+            this.next  = next;
+        }
+
+        }
+```
+多数的说法都是weakHashMap持有key的弱引用，value的强引用
+[关于string作为key和常量池的问题](https://dzone.com/articles/the-interesting-leak)
+这里面还谈到了
+```java
+String a = "a"+"b";
+//反编译后发现这样的代码会直接被编译器优化成
+String a = "ab";
+
+String b = new String("Something");//new String()方法搞出来的String是不会放到常量池的
+
+String c = b.intern(); //这么干就把Something这个String丢到常量池去了，永远不会被GC
+
+```
+
+[Brian Goetz写过一篇关于WeakHashmap的文章](https://www.ibm.com/developerworks/library/j-jtp11225/index.html)
+
+
+=========================================
+### 50. 反射为什么慢，慢成什么样了
+class的生命周期
+
+
 
 ## 参考
 - [Jake Wharton and Jesse Wilson - Death, Taxes, and HTTP](https://www.youtube.com/watch?v=6uroXz5l7Gk)

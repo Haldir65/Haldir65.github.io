@@ -87,6 +87,8 @@ SHOW TABLES;
 ## create table
 CREATE TABLE potluck (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,name VARCHAR(20),food VARCHAR(30),confirmed CHAR(1),signup_date DATE);
 
+
+
 ## show everyting
 SELECT * FROM potluck;
 SELECT user_id FROM potluck;
@@ -95,6 +97,9 @@ SELECT  FROM potluck; // 这么写sql 语法有误，必须声明想要选出那
 
 ## how does potluck look like?
 DESCRIBE potluck;
+
+##我想看看当初这表的建表语句长什么样？
+show create table potluck;
 
 ## ADD STUFF
 INSERT INTO `potluck` (`id`,`name`,`food`,`confirmed`,`signup_date`) VALUES (NULL, "John", "Casserole","Y", '2012-04-11');
@@ -116,8 +121,11 @@ Comparison operators（比较大小的）
 Logical operators （逻辑运算符） AND， ANY, BETWEEN,EXISTS,LIKE,OR ,IS NULL ,IS NOT NULL, UNIQUE
 Operators used to negate conditions
 
-挑几个不容易理解的
+挑几个不容易理解的，下面这个叫做子查询
 SELECT * FROM user WHERE EXISTS (SELECT * FROM todo WHERE user_id = 1) ;
+
+
+
 ## UNIQUE是用在创建表或者改表结构的:
 CREATE TABLE Persons
 (
@@ -174,6 +182,108 @@ DELETE from potluck  where name='Sandy';
 TRUNCATE TABLE  table_name; //将这张表的内容全部抹掉
 DROP TABLE table_name; //删除这个数据库
 ```
+
+## 跨表查询
+现实生活中经常要从多个数据表中读取数据，关键字JOIN
+根据ForeignKey去查询：
+```sql
+## 主表
+create table department(
+            id int primary key auto_increment,
+            name varchar(20) not null,
+            description varchar(100)
+);
+
+## 从表，外键是在从表中创建，从而找到与主表之间的联系
+create table employee(
+            id int primary key auto_increment,
+            name varchar(10) not null,
+            gender varchar(2) not null,
+            salary float(10,2),
+            age int(2),
+            gmr int,
+            dept_id int
+);
+
+## 外键可以在建表的时候加，也可以在建表完成之后加
+ALTER TABLE employee ADD FOREIGN KEY(dept_id) REFERENCES department(id); 
+
+
+[ON DELETE {RESTRICT | CASCADE | SET NULL | NO ACTION}]
+
+[ON UPDATE {RESTRICT | CASCADE | SET NULL | NO ACTION} 
+
+## 写django的时候就会注意到CASCADE（级联）这个单词，如果主表的记录删掉，则从表中相关联的记录都将被删掉。
+RESTRICT(限制)：如果你想删除的那个主表，它的下面有对应从表的记录，此主表将无法删除。（这个好像是默认规则）
+SET NULL：将外键设置为空。
+NO ACTION：什么都不做。
+
+```
+以上，每个员工有一个dep_id的Foreign_key，对应department表中的id.
+删除外键
+>alter table emp drop foreign key 外键名;
+
+开始联表查询，区分inner join ,left join, right join
+```sql
+##下面这俩一样的
+##inner join，只列出匹配的记录
+select e.name,d.name from employee e inner join department d on e.dept_id=d.id; ##inner可以不写，默认是inner
+select e.name,d.name from employee e,department d where e.dept_id=d.id; 
+
+## left join 左连接即以左表为基准，显示坐标所有的行，右表与左表关联的数据会显示，不关联的则不显示。
+select table a left join table b on a.id = b.ta_id;
+
+## right join 右表列出全部，左表只列出匹配的记录。
+
+## 自连接(据说非常重要)，下面这句查询出员工姓名及其leader的姓名，是的，sql语句里面赋值都是行的。这种带点号的还真像object oriented promramming
+select e1.name 员工, e2.name 领导 from employee e1 left join employee e2 on e1.leader=e2.id;
+## 等于说根据表名虚拟出两张表
+## 查询所有leader的姓名
+select e2.name 领导 from employee e1 left join employee e2 on e1.leader=e2.id;
+```
+
+以上还只是两张表连在一起查，现实中还有n张表连在一起查，下面这个是三张表一起查
+>select table a left join table b(left join table c on b.id = c.tb_id) on a.id = b_ta.id
+
+再加的话就是多张表在一起查，其实就是一层层的sql嵌套，写的时候从外层往里面写，一层层left join。
+## 这个子查询是查找月薪最高的员工的名字
+SELECT name,salary from employee where salary=(select max(salary) from employee);
+
+## 查询每个部门的平均月薪
+select avg(salary),dept_id from employee where dept_id is not null group by depy_id;
+
+
+## AUTO_INCREMENT
+在sqlite3中是[这么](https://stackoverflow.com/questions/26652393/how-to-correctly-set-auto-increment-fo-a-column-in-sqlite-using-python)干的
+下面的python sqlalchemy语句是亲测通过的
+```python
+from sqlalchemy import create_engine
+
+db_uri = "sqlite:///db.sqlite"
+engine = create_engine(db_uri)
+
+# DBAPI - PEP249
+# create table
+engine.execute('CREATE TABLE IF NOT EXISTS "EX1" ('
+               'id INTEGER PRIMARY KEY AUTOINCREMENT,'
+               'name VARCHAR);')
+# insert a raw
+engine.execute('INSERT INTO "EX1" '
+               '( name) '
+               'VALUES ("raw1")')
+
+# select *
+result = engine.execute('SELECT * FROM '
+                        '"EX1"')
+for _r in result:
+   print(_r)
+
+# delete *
+# engine.execute('DELETE from "EX1" where id=1;')
+result = engine.execute('SELECT * FROM "EX1"')
+print(result.fetchall())
+```
+auto increment只要在insert的时候直接忽略掉自增的字段就好了，否则会报unique constraint failed
 
 ### 支持的数据类型
 signed or unsigned.(有符号或者无符号的)
@@ -241,6 +351,9 @@ sql建索引主要是为了查找的时候能够跟翻字典一样快。一般�
 ```sql
 CREATE INDEX salary_index ON COMPANY(salary); // 创建索引
 SELECT * FROM COMPANY INDEXED BY salary_index WHERE salary > 5000; //创建好了之后就要根据index来查了
+
+适合建索引的列是出现在WHERE子句中的列，或者join子句(on语句)中指定的列，就是说那些被当做条件的东西应该作为索引。
+索引不要搞得太多，建立索引和维护索引都比较耗时。update,delete,insert都要维护索引
 ```
 
 
@@ -356,6 +469,11 @@ alter table temp rename to record;
 
 观察到一个现象，在编辑数据库，数据库打开的情况下，test.db所在的文件夹下面同时生成了一个test.db.journal文件，一旦关闭数据库连接，这个文件就没了。
 
+
+你的数据库用什么存储引擎？区别是？
+答案：常见的有MyISAM和InnoDB。
+MyISAM：不支持外键约束。不支持事务。对数据大批量导入时，它会边插入数据边建索引，所以为了提高执行效率，应该先禁用索引，在完全导入后再开启索引。
+InnoDB：支持外键约束，支持事务。对索引都是单独处理的，无需引用索引。
 
 ### Another choice
 

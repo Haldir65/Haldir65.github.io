@@ -13,6 +13,9 @@ redis速度相当快
 > sudo apt-get install redis-server
 
 [也有自己下源码编译的](https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-redis-on-ubuntu-16-04)
+mac上就是下载一个tar.gz，然后自己make，网上教程都很多的
+
+
 
 [The Redis project does not officially support Windows. However, the Microsoft Open Tech group develops and maintains this Windows port targeting Win64. ](https://github.com/MicrosoftArchive/redis)
 直接从release page下载msi文件，安装下去很方便的。默认的端口是6379。
@@ -20,6 +23,12 @@ redis速度相当快
 ### start server and client(windows下cd 到redis安装的位置，默认在C：Porgram Files/Redis里面)
  > redis-server  redis.windows.conf  
  > 双击打开 redis-cli.exe ## start client
+
+在mac下运行server:
+>redis-server ## 起服务端
+>redis-cli ## 起客户端
+>redis-cli ping ## 看下服务端有没有起来
+>redis-cli shutdown ## 关闭客户端
 
  和数据库类似，不同业务的数据需要存贮在不同的数据库中，redis提供了client端的切换数据库的语法
  > select 1 ## 每个数据库之间的key不冲突

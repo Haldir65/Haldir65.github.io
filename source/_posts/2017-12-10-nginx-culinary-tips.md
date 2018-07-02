@@ -99,6 +99,10 @@ events {
 http {
     include       /etc/nginx/mime.types;
 
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                  '$status $body_bytes_sent "$http_referer" '
+                  '"$http_user_agent" "$http_x_forwarded_for"'; ##这个log format是可以自定义log格式的
+
     access_log  /var/log/nginx/access.log;
 
     sendfile        on;
@@ -780,6 +784,16 @@ location ~* \.(gif|jpg|swf)$ {
     }
 }
 ```
+nginx预设的变量[variable]非常多(http://nginx.org/en/docs/http/ngx_http_core_module.html#var_remote_addr)
+>remote_addr 客户端的ip地址
+remote_port 客户端的port
+request_method GET或者POST
+request_uri ## 包含请求参数的原始URI，不包含主机名，如：”/foo/bar.php?arg=baz”。不能修改。
+scheme ## http或者https
+server_addr ## 服务器地址
+server_name
+server_port
+
 
 
 ### 参考

@@ -106,4 +106,86 @@ expire_time = dt.strftime('%s') ## 亲测，mac上没问题,windows上会崩,把
 expire = int(round(dt.timestamp()))
 ```
 
+自带的Log使用
+```python
+import logging
+
+logging.warning('this is awesome')
+```
+
 [下划线的意义很多种](https://dbader.org/blog/meaning-of-underscores-in-python)
+这其中就包含了magic_method，直接看吧
+```python
+    ## 一般__init__是写一个class时经常用到的方法，但其实还有一个__new__的方法
+    ## 当调用x = SomeClass()的时候，__init__并不是第一个被调用的方法，实际上还有一个
+    ## __new__方法，__new__方法是用来创建类病返回这个类的实例，而__init__只是拿着传入的参数来初始化这个实例 http://python.jobbole.com/88367/
+    ##在对象生命周期调用结束时，__del__ 方法会被调用，可以在这里释放资源
+  class MyDict(object):
+    def __init__(self):
+        print'call fun __init__'
+        self.item = {}
+
+    def __getitem__(self,key):
+        print'call fun __getItem__'
+        return self.item.get(key)
+
+    def __setitem__(self,key,value):
+
+        print'call fun __setItem__'
+
+        self.item[key] =value
+
+    def __delitem__(self,key):
+        print'cal fun __delitem__'
+        del self.item[key]
+
+    def __len__(self):
+        returnlen(self.item)
+```
+上面这些主要是创建类似于dict或者映射的类，可以像操作字典一样进行使用
+```python
+myDict = MyDict()
+myDict[2] = 'ch' ##会调用到__setitem__方法
+del myDict[2] ##会调用到__delitem方法，其实也等于对外提供了一个钩子
+
+__getattr__(self, name)：
+    ## python不支持私有变量，但其实可以在这里去拦截
+    ## 定义当用户试图获取一个不存在的属性时的行为。这适用于对普通拼写错误的获取和重定向，对获取一些不建议的属性时候给出警告(如果你愿意你也可以计算并且给出一个值)或者处理一个 AttributeError 。只有当调用不存在的属性的时候会被返回。
+    pass
+
+##__getattribute__定义了你的属性被访问时的行为，相比较，__getattr__只有该属性不存在时才会起作用。因此，在支持__getattribute__的Python版本,调用__getattr__前必定会调用 __getattribute__。__getattribute__同样要避免”无限递归”的错误。需要提醒的是，最好不要尝试去实现__getattribute__,因为很少见到这种做法，而且很容易出bug。
+
+#  错误用法，因为会导致无限递归
+def __setattr__(self, name, value):
+    self.name = value
+    # 每当属性被赋值的时候(如self.name = value)， ``__setattr__()`` 会被调用，这样就造成了递归调用。
+    # 这意味这会调用 ``self.__setattr__('name', value)`` ，每次方法会调用自己。这样会造成程序崩溃。
+ 
+#  正确用法
+def __setattr__(self, name, value):
+    self.__dict__[name] = value  # 给类中的属性名分配值
+    ## __dict__是 A dictionary or other mapping object used to store an object’s (writable) attributes.
+    # 定制特有属性    
+```
+
+关于__dict__：
+```python
+def func():
+    pass
+func.temp = 1 ## in python , everything is an object,everything !
+
+print func.__dict__
+
+class TempClass(object):
+    a = 1
+    def tempFunction(self):
+        pass
+
+print TempClass.__dict__
+```
+>{'temp': 1}
+>{'a': 1, '__module__': '__main__', 'tempFunction': <function tempFunction at 0x7f77951a95f0>, '__dict__': <attribute '__dict__' of 'TempClass' objects>, '__weakref__': <attribute '__weakref__' of 'TempClass' objects>, '__doc__': None}
+
+[底层应该是和descriptor相关](http://hbprotoss.github.io/posts/python-descriptor.html)
+[以及__dict__.__dict__](https://stackoverflow.com/questions/4877290/what-is-the-dict-dict-attribute-of-a-python-class)
+还有__slots__

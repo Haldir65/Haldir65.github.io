@@ -18,6 +18,19 @@ tags: [java]
 第二步，就是根据线程数量，总数除以线程数，用一个线程池(或者直接开多条线程)去执行这么多份任务。每一份任务的请求都要带上上面那个Range的Header。
 
 
+nginx里面可能要设置一下,当然前提是下载服务本身支持range请求
+```conf
+proxy_cache_key $host&uri&is_args&args$http_range;
+proxy_set_header Range $http_range;
+proxy_set_header If-Range $http_if_range;
+proxy_cache_valid 200 206; 
+```
+proxy_set_header就是Nginx在将请求传递给server的时候添加一些header，可以是文本，变量或者是二者的组合
+可能还涉及到一些[proxy_cache](https://blog.csdn.net/dengjiexian123/article/details/53386586)模块的原理
+
+另外这种情况下的http response header应该是206 Partial Requests,印象中网易云音乐网页端听歌的媒体文件是partial request
+
+
 [HTTP文件断点续传的原理](http://www.cnblogs.com/Creator/p/5490929.html)
 其实要注意的是，断点续传，下次开始下载前，需要根据ETag判断下服务器上的这个文件是否更改过了，如果改过了
 >  httpURLConnection.getHeaderField("ETag");
