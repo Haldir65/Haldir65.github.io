@@ -17,7 +17,7 @@
 <meta property="og:description" content="主要讲一下在java中实现多线程断点续传的原理,主要讲断点下载的原理。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/4b52d8db2e9d86b95c730af1db127a81.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-07-01T14:32:07.253Z">
+<meta property="og:updated_time" content="2018-07-02T11:17:32.250Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="多线程断点续传原理及实现">
 <meta name="twitter:description" content="主要讲一下在java中实现多线程断点续传的原理,主要讲断点下载的原理。">
@@ -206,6 +206,9 @@ ga('send', 'pageview');
 <li>conn.setRequestProperty(“Range”, “bytes=” + 500 + “-“ + 1000);</li>
 </ul>
 <p>也就是告诉服务器上次下载到的位置，本地写文件可以使用RandomAccessFile。本地需要记录下上次中断后停下来的位置。可以用db记录，也可以用sp记录。<br>实践中肯定要发两次请求，第一次是为了读content-Length，确定每一份下载任务需要下载多少bytes。<br>第二步，就是根据线程数量，总数除以线程数，用一个线程池(或者直接开多条线程)去执行这么多份任务。每一份任务的请求都要带上上面那个Range的Header。</p>
+<p>nginx里面可能要设置一下,当然前提是下载服务本身支持range请求<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">proxy_cache_key $host&amp;uri&amp;is_args&amp;args$http_range;</span><br><span class="line">proxy_set_header Range $http_range;</span><br><span class="line">proxy_set_header If-Range $http_if_range;</span><br><span class="line">proxy_cache_valid 200 206;</span><br></pre></td></tr></table></figure></p>
+<p>proxy_set_header就是Nginx在将请求传递给server的时候添加一些header，可以是文本，变量或者是二者的组合<br>可能还涉及到一些<a href="https://blog.csdn.net/dengjiexian123/article/details/53386586">proxy_cache</a>模块的原理</p>
+<p>另外这种情况下的http response header应该是206 Partial Requests,印象中网易云音乐网页端听歌的媒体文件是partial request</p>
 <p><a href="http://www.cnblogs.com/Creator/p/5490929.html">HTTP文件断点续传的原理</a><br>其实要注意的是，断点续传，下次开始下载前，需要根据ETag判断下服务器上的这个文件是否更改过了，如果改过了</p>
 <blockquote>
 <p> httpURLConnection.getHeaderField(“ETag”);<br> httpURLConnection.getHeaderField(“ETag”); //这是从零开始下载的时候获取Etag，本地保存</p>
