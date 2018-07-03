@@ -254,7 +254,6 @@ str.encode('ascii')，unicode字符超出了ascii的范围，无法decode成bina
  how to upgrade installed packages?
 
 > pip install --upgrade setuptools
->
 
 迭代一个字典，并打印出key,vaule
 ``` python

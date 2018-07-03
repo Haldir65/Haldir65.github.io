@@ -234,6 +234,13 @@ ios设备发出来的长这样: Mozilla/5.0 (iPhone; CPU iPhone OS 8_0 like Mac 
 
 Header其实就是个字典，比较麻烦的就是Cache-Control了，这个还要结合If-None-Match，Etag来看。需要用的时候再看应该也不迟。
 
+Vary比较有意思：
+server端每次接收到一个请求，会根据request的一些特定属性来确认之前有没有别的客户请求过同样的资源，要是有的话，直接返回就好了。而这个判定是否请求的同一个资源的标准就是Vary(上一次Response中会返回{Vary:Accept-Encoding,Vary:"SomeCustomHeaerKey"})，vary可以写多个。从百度的Response来看，一般这个值设定为Accept-Encoding就好了。
+经常使用Vary: Accept-Encoding的一个原因是，有些客户端不支持gzip。Accept-Encoding一般长这样：
+>Accept-Encoding:gzip,deflate,sdch
+所以缓存服务器要是把gzip的资源发给了不支持gzip的客户端，那就是错误了。增加 Vary: Accept-Encoding 响应头，上游服务明确告知缓存服务器按照 Accept-Encoding 字段的内容，分别缓存不同的版本；nginx里面加上这一条就好了：gzip_vary on;[mozilla对于Vary这个header的描述是这样的，这个属于content-negotiation的一部分](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Vary).
+所以这个Header是后端服务器写给缓存服务器看的，顺带暴露在客户端里面了.关于content-negotation，无非两种，服务端列出多项选择（这份资源可用版本的列表），返回Http300(multiple choices)这个header，让前端自己去选。另一种就是后台根据前段发来的request中的一些信息做出选择（server-driven negotiation，主要看Accept，Accept-Charset,Accept-Encoding,Accept-Language这些东西）。所以常常会看到请求中**Accept-Language: zh-CN,zh;q=0.9** 这个q表示有多少的权限，所以这个比重应该是参与了content-negotiation的计算。
+
 
 [WikI上比较完整](https://zh.wikipedia.org/wiki/HTTP%E5%A4%B4%E5%AD%97%E6%AE%B5)
 
@@ -320,6 +327,11 @@ javax.servlet.http.HttpServletRequest.getSession() 将会返回当前request相�
 
 Session就是维护会话的。
 
+因为sessionid一般是保存在cookie里面的，而且对应的cookie的key多半是session_id这样（百度首页的叫做BIDUPSID），这就出现了很多从cookie里面拿session_id去伪造身份的xss劫持session。（其实做法很简单：就是一段js去拿document.cookie，然后ajax偷偷上传这个session_id）：
+防范的手段也很常见了：
+1.过滤用户输入，防止xss漏洞
+2.设置session_id这个cookie为http_only
+
 [session在express js中是这么维护的](http://wiki.jikexueyuan.com/project/node-lessons/cookie-session.html)
 > 这意思就是说，当你浏览一个网页时，服务端随机产生一个 1024 比特长的字符串，然后存在你 cookie 中的 connect.sid 字段中。当你下次访问时，cookie 会带有这个字符串，然后浏览器就知道你是上次访问过的某某某，然后从服务器的存储中取出上次记录在你身上的数据。由于字符串是随机产生的，而且位数足够多，所以也不担心有人能够伪造。伪造成功的概率比坐在家里编程时被邻居家的狗突然闯入并咬死的几率还低。
 
@@ -344,6 +356,10 @@ Postman-Token: ddc99b57-f703-4d05-abbe-c0123d4f5fed
 > 为了解决在操作过程不能让用户感到 Token 失效这个问题，有一种方案是在服务器端保存 Token 状态，用户每次操作都会自动刷新（推迟） Token 的过期时间——Session 就是采用这种策略来保持用户登录状态的。然而仍然存在这样一个问题，在前后端分离、单页 App 这些情况下，每秒种可能发起很多次请求，每次都去刷新过期时间会产生非常大的代价。如果 Token 的过期时间被持久化到数据库或文件，代价就更大了。所以通常为了提升效率，减少消耗，会把 Token 的过期时保存在缓存或者内存中。
 
 这篇文章顺便提到了如果在Token过期的时候去实现重刷Token的操作，首先客户端**绝对不会**存账户密码这种敏感信息。第一次登录成功后，后台返回token(有一定时长有效期)和一个refreshToken(如果前面的token失效了，直接拿着这个去请求后台给个新的Token)。所以客户端基本上就是在onError里面判断如果是Token失效的话，拿着refreshToken去重新获取Token。
+
+token的话，一般是和用户一一对应的， 放在http的header里也行，放在cookie里面也行（不大好，CSRF漏洞），放在post请求的body里面也行。
+
+[session和简单的token本质上都是一串加密的字符串](https://segmentfault.com/q/1010000008903882)，只不过session一般放cookie里面，浏览器对这个支持比较好，android和ios一般不会一直维护一个webview专门用来存session_id，所以用token比较合适。[v2上有人讨论session和token的区别](https://www.v2ex.com/t/148426)。但要是说oAuth Token，这还是比session复杂得多的。
 
 
 
@@ -558,8 +574,13 @@ tcp dump + wireShark抓包
 [详细教程](http://www.trinea.cn/android/tcpdump_wireshark/)
 
 
-httpOnly：浏览器不允许脚本操作 document.cookie 去更改 cookie
-
+httpOnly：浏览器里面用js去调用document.cookie这个api时就不会拿到这个被设置了httponly的cookie了
+```
+Set-Cookie: =[; =]
+[; expires=][; domain=]
+[; path=][; secure][; HttpOnly]
+```
+HttpOnly就是在设置cookie时接受这样一个参数，一旦被设置，在浏览器的document对象中就看不到cookie了,主要是为了避免（cross-site scripting）XSS attack
 
 [cookie 和 session参考](http://wiki.jikexueyuan.com/project/node-lessons/cookie-session.html)
 ### 签名(signedCookies)
@@ -744,6 +765,13 @@ Time : Thu Mar 15 16:20:59 CST 2018</center>
 
 
 ===============================
+服务器返回的Sst-Cookie可以像上面一样有很多个。
+Set-Cookie: BAIDUID=259D5F393E329E8E44651C589037C093:FG=1; expires=Thu, 31-Dec-37 23:55:55 GMT; max-age=2147483647; path=/; domain=.baidu.com
+基本上格式就是： 
+> SOMEKEY=SOMEVALUE; expires=某个日期; path="某个路径"; domian="某个主站"
+
+expires,path,domain这些东西都是规范，下一次请求是，只有当这个cookie的domian和path匹配的上才会发送这个Cookie。
+
 
 
 

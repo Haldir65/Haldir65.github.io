@@ -155,6 +155,18 @@ Android对于进程的管理是非常复杂的。简单的说，Android系统的
 </layer-list>
 ```
 
+### 11.proguard可以把log干掉
+```config
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int i(...);
+    public static int w(...);
+    public static int d(...);
+    public static int e(...);
+}
+```
+
 
 [gradle build scan](https://gradle.com/build-scans)
 [把一些本地libiary打包成aar能够显著加快编译]

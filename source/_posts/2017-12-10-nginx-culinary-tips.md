@@ -508,7 +508,14 @@ location /images/ {
 }
 
 location = /images/default.gif {
-    expires 30s;
+    expires 30s; ## expire这个就是跟缓存相关的
+    expires 1d;
+    expires 24h;
+}
+
+location ~ \.(htm|html|gif|jpg|jpeg|png|bmp|ico|css|js|txt)$ {
+    root /opt/webapp;
+    expires 24h; ## 这样直接根据后缀设定缓存也行啊，
 }
 ```
 
@@ -518,13 +525,17 @@ Load balancing across multiple application instances is a commonly used techniqu
 http {
     upstream backend {
         server backend1.example.com weight=5;
-        server backend2.example.com;
-        server 192.0.0.1 backup;
+        server backend2.example.com down; #服务标记为离线，不再使用
+        server 192.0.0.1 backup; ## 备份服务器，其他全部宕机了才启用
     }
     server {
         location / {
             proxy_pass http://backend; ## 所有的访问http://backend的流量都被导向上面的三个服务器
             ## proxy_pass只是其中一种，还有fastcgi_pass, memcached_pass, uwsgi_pass, scgi_pass
+            proxy_set_header X-Real-IP $remote_addr; #把client的真实ip而不是nginx机器的ip传给后端服务
+            proxy_set_header Host $http_host; #把client请求中header里面的HOST传给后端服务
+            ## $host不带端口 $http_host带端口
+            proxy_pass_header    Server; ## 这个其实可以更改Response中返回的Server的值，意思就是让Nginx不要插手Server这个KEY，当然还得上游server设置好header
         }
     }
 }
@@ -794,6 +805,41 @@ server_addr ## 服务器地址
 server_name
 server_port
 
+
+根据[官方文档](http://nginx.org/en/docs/http/ngx_http_proxy_module.html)，反向代理的时候，只有这俩Header是默认带上的
+```
+proxy_set_header Host       $proxy_host;
+proxy_set_header Connection close;
+```
+如果客户端发出的请求的HEADER中有HOST这个字段时，那么$host和$http_host都是一样的
+那要是没有呢？
+> However, if this field is not present in a client request header then nothing will be passed. In such a case it is better to use the $host variable - its value equals the server name in the “Host” request header field or the primary server name if this field is not present:
+proxy_set_header Host       $host;
+
+个人猜测$host应该代表了server_name这个header
+
+
+>If caching is enabled, the header fields “If-Modified-Since”, “If-Unmodified-Since”, “If-None-Match”, “If-Match”, “Range”, and “If-Range” from the original request are not passed to the proxied server.
+
+如果开启了缓存，那么这些跟缓存相关的Header都不会传递给上游服务
+
+
+如果客户端发出的请求中的HEADER里面的field是一个空字符串。那么这filed不会被传递给上游
+
+修改Nginx的response中的server字段，这种方式可以隐藏当前使用的nginx的版本号
+在server这个section中添加
+>server_tokens off;
+
+这样返回的response中就 变成了Server:nginx
+```
+proxy_set_header X-Powered-By "";
+# or
+proxy_hide_header X-Powered-By;
+# or
+more_clear_headers Server; ##直接移除Server这个header
+```
+========================================================================================================================
+nginx怎么清除缓存
 
 
 ### 参考
