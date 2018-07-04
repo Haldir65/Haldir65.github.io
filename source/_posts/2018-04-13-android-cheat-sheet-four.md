@@ -167,6 +167,28 @@ Android对于进程的管理是非常复杂的。简单的说，Android系统的
 }
 ```
 
+### 12.国产Rom的权限问题是在是头疼
+以5.1的rom为例
+```java
+if(ContextCompat.checkSelfPermission(activity,Manifest.permission.Camera)== PackageManager.PERMISSION_GRANTED):
+    Camera c = Camera.open();// 还是null
+```
+类似的问题衍生出了[国产手机5.0,6.0权限适配框架](https://github.com/jokermonn/permissions4m)
+找到了启动魅族权限管理的Activity的代码
+```java
+final String N_MANAGER_OUT_CLS = "com.meizu.safe.permission.PermissionMainActivity"; 
+final String L_MANAGER_OUT_CLS = "com.meizu.safe.SecurityMainActivity"; // 5.1上叫做这个名字
+final String PKG = "com.meizu.safe";
+Activity activity = (Activity) context;
+Intent intent = new Intent();
+intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+intent.putExtra("package", activity.getPackageName());
+ComponentName comp = new ComponentName(PKG, L_MANAGER_OUT_CLS);
+intent.setComponent(comp);
+activity.startActivity(intent);
+```
+
+
 
 [gradle build scan](https://gradle.com/build-scans)
 [把一些本地libiary打包成aar能够显著加快编译]

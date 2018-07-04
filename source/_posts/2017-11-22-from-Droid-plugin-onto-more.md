@@ -177,6 +177,7 @@ This constant was deprecated in API level 23. MODE_MULTI_PROCESS does not work r
 [听说你Binder机制学的不错，来面试下这几个问题](https://www.jianshu.com/p/adaa1a39a274)
 
 Client发起IPC请求，是阻塞的吗？
+这个要看了，反正startActivity和finish这种都不是
 
 adb getEvent sendEvent
 input tap x y

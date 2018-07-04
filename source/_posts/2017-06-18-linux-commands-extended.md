@@ -221,6 +221,11 @@ cat -n rsyslog.conf # 显示行号，报错的时候方便处理
 随便写两个：
 - curl -o home.html http://www.baidu.com  #把百度首页抓下来，写到home.html中
 - curl -d "user=nick&password=12345" http://www.xxx.com/login.jsp # 提交表单，发起POST请求
+- [curl的几种常见用法](http://www.codebelief.com/article/2017/05/linux-command-line-curl-usage/)
+
+下面是一个简单的通过CURL提交POST请求的方式
+> curl "https://jsonplaceholder.typicode.com/psts" -X POST -d '{"userId":10,"title":"sometitle2","body":"somebody2"}'
+
 记得http statusCode 302是重定向什么 ：
 - curl -v mail.qq.com
 输出：
@@ -408,10 +413,6 @@ drwxrwxrwt   9 root   root     4096 Feb  4 08:05 tmp ## contain temporary data,�
 drwxr-xr-x  11 root   root     4096 Dec 10 01:04 usr ##这里面有bin man sbin等目录，存放user program and other data(并不是user，而是universal system resources)
 drwxr-xr-x  14 root   root     4096 Dec 10 22:21 var ## 全称variable，存放variable data where system must be able to write during operation(就是log)
 
-
-
-
-
 /usr：系统级的目录，可以理解为C:/Windows/，/usr/lib理解为C:/Windows/System32。
 /usr/local：用户级的程序目录，可以理解为C:/Progrem Files/。用户自己编译的软件默认会安装到这个目录下。
 /opt：用户级的程序目录，可以理解为D:/Software，opt有可选的意思，这里可以用于放置第三方大型软件（或游戏），当你不需要时，直接rm -rf掉即可。在硬盘容量不够时，也可将/opt单独挂载到其他磁盘上使用。
@@ -541,8 +542,30 @@ sudo sh -c "sync; echo 3 > /proc/sys/vm/drop_caches" ## 就是用sh执行一个c
 sudo bash -c "echo 'vm.swappiness =15' >> /etc/sysctl.conf" ## -c表示让bash执行一个命令， swappiness默认值是60，意思是系统在用掉了60%的内存后就将开始启用swap
 ```
 
+nmap可以用来扫描某台远程主机上open的port[直接看nmap cheetsheet好了](https://hackertarget.com/nmap-cheatsheet-a-quick-reference-guide/)
+> nmap -p 1-100 192.168.1.1 ## 扫描1-100的port，非常慢
 
 linux的swap文件需要经常读写，这对于ssd来说是一个需要注意的地方
+
+[bash下的一些快捷键](https://stackoverflow.com/questions/12334526/on-bash-command-line-how-to-delete-all-letters-before-cursor)
+```
+Ctrl-u - Cut everything before the cursor // 清除光标之前所有文字
+Ctrl-k  Cut everything after the cursor //删除光标后面的所有文字
+
+Ctrl-a  Move cursor to beginning of line //光标挪到最前面
+Ctrl-e  Move cursor to end of line // 挪到最右侧
+
+Ctrl-b  Move cursor back one word //这个是一个字一个字的挪，不识别空格
+Ctrl-f  Move cursor forward one word//这个是一个字一个字的挪，不识别空格
+
+alt + → 一个单词一个单词的往右挪，往左挪自然就是向左箭头了。
+
+Ctrl-w  Cut the last word
+Ctrl-y  Paste the last thing to be cut
+Ctrl-_  Undo
+
+```
+
 
 unix domain socket用于ipc
 

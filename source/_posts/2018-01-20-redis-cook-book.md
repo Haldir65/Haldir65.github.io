@@ -30,6 +30,13 @@ mac上就是下载一个tar.gz，然后自己make，网上教程都很多的
 >redis-cli ping ## 看下服务端有没有起来
 >redis-cli shutdown ## 关闭客户端
 
+开了要会关闭
+<!-- redis-cli
+127.0.0.1:6379> shutdown
+(error) ERR Errors trying to SHUTDOWN. Check logs.
+127.0.0.1:6379> shutdown NOSAVE
+not connected> -->
+
  和数据库类似，不同业务的数据需要存贮在不同的数据库中，redis提供了client端的切换数据库的语法
  > select 1 ## 每个数据库之间的key不冲突
 
@@ -345,7 +352,7 @@ var house = {
 
 [论述Redis和Memcached的差异-博客-云栖社区-阿里云](https://www.zhihu.com/question/19645807)
 
-
+Redis:Failed opening .rdb for saving: Permission denied
 
 
 ## 参考

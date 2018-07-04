@@ -691,6 +691,10 @@ more /etc/*release
 ### 这个也行
 lsb_release -a
 ```
+直接通过ssh服务登录
+> ssh username@you.ip.address -p 22 ## 会提示输入密码的
+
+
 
 [编码的修改](https://perlgeek.de/en/article/set-up-a-clean-utf8-environment)
 更改locale为utf-8(ubuntu)
@@ -961,9 +965,25 @@ systemctl带来的一个好处是可以直接使用journalctl命令查看**所�
 $ sudo journalctl
 # 查看系统本次启动的日志
 $ sudo journalctl -b
+$ sudo journalctl -n 20 //查看20行
 $ sudo journalctl --since yesterday
 ## 还有很多，能够知道系统启动时发生了什么
 ```
+[只是想要通过systemd去启动一个开机脚本的话](http://azyet.github.io/2016/03/17/simple-sytemd-upstart-script/)
+```
+[Unit]
+Description=run shell script
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/yourscript
+
+[Install]
+WantedBy=multi-user.target
+```
+然后可以看一下你这个task的状态
+> sudo systemctl status 上面这个文件的名字.service
+> sudo systemctl start 上面这个文件的名字.service ## 手动去启动也是可以的
 
 ==================================================================================
 ## [shell script tutorial](https://www.youtube.com/watch?v=hwrnmQumtPw)

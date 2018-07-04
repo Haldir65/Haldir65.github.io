@@ -1459,8 +1459,103 @@ String c = b.intern(); //这么干就把Something这个String丢到常量池去�
 [Brian Goetz写过一篇关于WeakHashmap的文章](https://www.ibm.com/developerworks/library/j-jtp11225/index.html)
 
 
+### 50. 使用ByteBuffer进行文件io操作
+这个其实要看使用场景，比方说文件大小
+```java
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+ 
+ // 小文件直接读完
+public class ReadFileWithFileSizeBuffer
+{
+    public static void main(String args[])
+    {
+        try
+        {
+            RandomAccessFile aFile = new RandomAccessFile(
+                            "test.txt","r");
+            FileChannel inChannel = aFile.getChannel();
+            long fileSize = inChannel.size();
+            ByteBuffer buffer = ByteBuffer.allocate((int) fileSize);
+            inChannel.read(buffer);
+            //buffer.rewind();
+            buffer.flip();
+            for (int i = 0; i < fileSize; i++)
+            {
+                System.out.print((char) buffer.get());
+            }
+            inChannel.close();
+            aFile.close();
+        }
+        catch (IOException exc)
+        {
+            System.out.println(exc);
+            System.exit(1);
+        }
+    }
+}
+
+
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+ 
+ // 读取大文件
+public class ReadFileWithFixedSizeBuffer
+{
+    public static void main(String[] args) throws IOException
+    {
+        RandomAccessFile aFile = new RandomAccessFile
+                ("test.txt", "r");
+        FileChannel inChannel = aFile.getChannel();
+        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        while(inChannel.read(buffer) > 0)
+        {
+            buffer.flip();
+            for (int i = 0; i < buffer.limit(); i++)
+            {
+                System.out.print((char) buffer.get());
+            }
+            buffer.clear(); // do something with the data and clear/compact it.
+        }
+        inChannel.close();
+        aFile.close();
+    }
+}
+
+//更快的复制文件
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+ 
+public class ReadFileWithMappedByteBuffer
+{
+    public static void main(String[] args) throws IOException
+    {
+        RandomAccessFile aFile = new RandomAccessFile
+                ("test.txt", "r");
+        FileChannel inChannel = aFile.getChannel();
+        MappedByteBuffer buffer = inChannel.map(FileChannel.MapMode.READ_ONLY, 0, inChannel.size());
+        buffer.load(); 
+        for (int i = 0; i < buffer.limit(); i++)
+        {
+            System.out.print((char) buffer.get());
+        }
+        buffer.clear(); // do something with the data and clear/compact it.
+        inChannel.close();
+        aFile.close();
+    }
+}
+
+```
+
+
 =========================================
-### 50. 反射为什么慢，慢成什么样了
+反射为什么慢，慢成什么样了
 class的生命周期
 
 
