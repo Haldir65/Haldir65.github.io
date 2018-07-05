@@ -1550,9 +1550,12 @@ public class ReadFileWithMappedByteBuffer
         aFile.close();
     }
 }
-
 ```
 
+### 51. Class.forName...
+在App启动的时候在另外一个线程里面提前去加载这个class，能够加快速度吗？
+
+todo a pratical cheetsheet on java reflection
 
 =========================================
 反射为什么慢，慢成什么样了

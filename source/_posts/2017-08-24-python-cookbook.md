@@ -361,6 +361,17 @@ def main():
     fakeattr = getattr(ex,"no_existing_attr",None) ## 还可以设置一个找不到的时候的默认值
 ```
 
+
+```python
+class Post(db.Model):
+    title = db.Column(db.String(80), nullable=False)
+ def __repr__(self):
+        return '<Post %r>' % self.title
+```
+
+__repr__()就是在print的时候打印出的内容，和django里面model的__str__方法差不多
+
+
 isinstance和type的区别,isinstance要好一点
 ```python
 class A:

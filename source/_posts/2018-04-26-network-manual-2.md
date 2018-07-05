@@ -210,3 +210,5 @@ BufferedWriter的主要原理是内部保留了一个char[]的数组，每次外
 ```html
 <meta http-equiv="Content-Security-Policy" content="script-src 'self'; object-src 'none'; style-src cdn.example.org third-party.org; child-src https:">
 ```
+
+[域名解析之dig,host,nslookup命令](http://luodw.cc/2015/12/27/dns03/)

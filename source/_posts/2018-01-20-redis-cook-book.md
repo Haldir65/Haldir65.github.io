@@ -352,7 +352,8 @@ var house = {
 
 [论述Redis和Memcached的差异-博客-云栖社区-阿里云](https://www.zhihu.com/question/19645807)
 
-Redis:Failed opening .rdb for saving: Permission denied
+
+redis-server.service: Failed to run 'start-pre' task: No such file or directory
 
 
 ## 参考

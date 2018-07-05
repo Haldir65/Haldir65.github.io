@@ -149,6 +149,7 @@ P：在当前光标处上面粘贴内容。
 - > nl： 显示的时候，随便输出行号！
 - > more： 一页一页的显示档案内容
 - > less 与 more 类似，但是比 more 更好的是，他可以[pg dn][pg up]翻页！对less显示出的内容中可以使用 /'字符' 输入需要查找的字符或者字符串并高亮显示，而more 不具备(亲测很好用)
+- > less +F ##和tail -f差不多，这个➕要有的，搭配ctrl+c ,shift-f ,q
 - > head： 查看头几行
 - > tail： 查看尾几行
 
@@ -188,6 +189,13 @@ grep stringtofind filename //在指定的文本文件中查找指定的字符串
 whereis ls //查看ls命令所执行的是哪个文件及其位置(查看系统文件所在路径)
 
 ```
+快捷键
+sudo !! - re-run previous command with 'sudo' prepended ##敲命令忘记加sudo了，直接sudo!!，把上一个命令加上sudo执行一遍
+ctrl-k, ctrl-u, ctrl-w, ctrl-y - cutting and pasting text in the command line
+use 'less +F' to view logfiles, instead of 'tail' (ctrl-c, shift-f, q to quit)
+ctrl-x-e - continue editing your current shell line in a text editor (uses $EDITOR)
+alt-. - paste previous command's argument (useful for running multiple commands on the same resource)
+
 
 ### 3. linux下shell脚本语句的语法
 linux大小写敏感
@@ -284,10 +292,29 @@ grep -E aaa\|bbb
 OUTPUT="$(ls -1)"  ## 注意，这里等于号前后不能有空格
 echo "${OUTPUT}"
 
+##那如果就是平时在terminal里面随便敲敲呢，下面这些亲测无误
+echo "$(ls -al | wc)"
+"$(which java)" -h
+## 比如说我想把java的路径填充到一段命令中间
+echo "$(which java)"/something
+>> /usr/bin/java/something
 
 #!/bin/bash
 java_stuff="$(which java)"
 ${java_stuff} --version
+```
+
+
+经常会在别人的bash脚本最前面看到一行 [set-e](http://www.ruanyifeng.com/blog/2017/11/bash-set.html)：在阮一峰老师的博客中找到了解释
+```
+#!/usr/bin/env bash
+set -e ## 这个set -e的原因，因为bash一般对错误容忍度比较高，一行命令出了错还能往下走，可是实际生产中，我们希望出了错就此打住。在文件前面写这个就行了
+
+## 总比下面这些这么写好吧
+command || exit 1 
+command || { echo "command failed"; exit 1; }
+
+set -eo pipefail ##set -e对于管道无效，这么写就连管道的错误都拦下来了
 ```
 
 ### 4. 用户和用户组的问题
@@ -887,7 +914,7 @@ ctrl +b + ( //切换到前一个session
 ctrl +b + ) //切换到下一个session
 
 ### 20. 使用systemd管理程序
-Systemctl是一个systemd工具，主要负责控制systemd系统和服务管理器。systemd中一项服务称为unit
+Systemctl是一个systemd工具，主要负责控制systemd系统和服务管理器。systemd中一项服务称为unit[Linux开机启动管理---systemd使用](https://blog.csdn.net/qq562029186/article/details/67639676)
 ```shell
 sudo systemctl start application ## 比方说nginx
 sudo systemctl status nginx ## 看下状态
@@ -898,6 +925,12 @@ sudo systemctl reload-or-restart application.service
 sudo systemctl enable application.service ##开机启动
 ## 开机启动的原理是往/lib/systemd/system或者/etc/systemd/system这个目录下创建了类似于nginx.service的symbolic link。
 ## 指向在这个文件夹下创建的xxx.target.wants文件
+
+记得修改了.service文件要reload一下systemd
+># 重新加载配置文件
+$ sudo systemctl daemon-reload
+# 重启相关服务
+$ sudo systemctl restart foobar
 
 sudo systemctl disable application.service ## 禁止开机启动
 ## 这句话就是取消了symbolic link

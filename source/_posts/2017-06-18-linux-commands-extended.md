@@ -22,10 +22,35 @@ apache,mysql
 没事不要手贱升级软件
 > apt-get -u upgrade //就像这样，stable挺好的
 
-### 2. 环境变量怎么改
+### 2. 环境变量怎么改(这个有临时改和永久生效两种)
+
+临时改（下次登录失效这种）
+export PATH=$PATH:/home/directory/to/the/folder
+echo $PATH ## 看下改好没
+
+export FLASK_DEBUG=1
+$FLASK_DEBUG
+>> 1
+
+
+永久生效（谨慎为之）
+修改/etc/profile文件：（对所有用户都生效）
+export PATH="$PATH:/home/directory/to/the/folder"
+
+修改~/.bashrc文件： （对当前用户有效）
+export PATH="$PATH:/home/directory/to/the/folder"
+
+
+这个有效一般都需要重新注销系统才能生效
+
+set可以查看当前用户本地shell设置的所有变量，用unset可以取消变量:
+> set
+unset $SOME_PROGRAM 
+
+
 平时在shell中输入sudo XXX ,系统是如何知道怎么执行这条指令的呢。首先，可以查看which XXX ，用于查找某项指令对应的文件的位置。而像sudo这种都放在PATH位置，系统会在几个关键位置查找sudo命令。用户本身完全可以创建一个叫做sudo的文件chmod+X ，然后运行这个sudo。
 ```
-查看PATH : echo $PATH
+查看PATH : echo $PATH 
 /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games (注意，系统是按照这个顺序找的，如果在第一个目录下找到一个叫sudo的东西，就会直接执行了，所以这里是有潜在的危险的)
 看下哪个命令对应的位置在哪里
 which XXXk
@@ -224,7 +249,10 @@ cat -n rsyslog.conf # 显示行号，报错的时候方便处理
 - [curl的几种常见用法](http://www.codebelief.com/article/2017/05/linux-command-line-curl-usage/)
 
 下面是一个简单的通过CURL提交POST请求的方式
+-X是指定HTTP method，默认是GET
+
 > curl "https://jsonplaceholder.typicode.com/psts" -X POST -d '{"userId":10,"title":"sometitle2","body":"somebody2"}'
+
 
 记得http statusCode 302是重定向什么 ：
 - curl -v mail.qq.com
@@ -529,6 +557,10 @@ sudo ln -s /full/path/to/your/file /usr/local/bin/name_of_new_command
 想要可执行的话，记得给权限。chmod +x /full/path/to/your/file
 当然，想要移除这个软链接的话.
 sudo rm -rf /usr/local/bin/name_of_new_command
+
+关于硬链接和软连接
+-s 就是软链接。不加-s就是硬链接。
+修改硬链接和软链接的内容都会同步到源文件，软链接和硬链接删掉了都不会影响源文件。有一个区别就是删掉源文件时，硬链接保有了源文件的内容。 软链接就broken了。
 
 visudo //via sudo 这是一个控制用户权限的文件，比如说希望给特定用户一部分usdo特权，比如只给安装软件的权利，编辑这个文件就可以
 为什么不要总以root权限做事:
