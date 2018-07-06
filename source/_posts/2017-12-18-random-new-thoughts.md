@@ -35,6 +35,7 @@ top : 1
 - [ ] [libmp3lame移植到Android](https://www.jianshu.com/p/534741f5151c),跟jni有关了
 - [ ] nodejs rpc
 - [ ]indexed DB,浏览器端数据库，[content-disposition](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)
+- [ ] classloader和class的生命周期
 
 
 

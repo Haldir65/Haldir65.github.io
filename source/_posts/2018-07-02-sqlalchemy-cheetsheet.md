@@ -5,7 +5,11 @@ tags: [python]
 ---
 
 > pip install SQLAlchemy
+
+![](http://odzl05jxx.bkt.clouddn.com/image/jpg/side_walk_tree.jpg?imageView2/2/w/600)
+
 <!--more-->
+
 
 ```python
 from sqlalchemy import create_engine
