@@ -36,8 +36,8 @@ top : 1
 - [ ] nodejs rpc
 - [ ]indexed DB,浏览器端数据库，[content-disposition](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)
 - [ ] classloader和class的生命周期
-
-
+- [ ] Docker[Configure automated builds from GitHub](https://docs.docker.com/docker-hub/github/#github-service-hooks)docker要邮箱注册的
+- [ ] [在bash脚本中获取当前脚本所在路径](https://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within?rq=1)
 
 
 
@@ -61,6 +61,8 @@ top : 1
 - [其实就是socket io] websocket nodejs，局限性就是前后台都得用socket.io的库。前端是浏览器的话还好，app的话java,Android都有对应的实现
 - [X]一直不会maven是在是太丢人了[看文档就行了](https://maven.apache.org/guides/getting-started/index.html#How_do_I_make_my_first_Maven_project)，其他的[教程](https://www.tutorialspoint.com/maven/maven_build_life_cycle.htm)也不错
 - [使用Spring boot后台提供protobuf接口实现客户端通信] 不要使用protobf-gradle-plugin了。直接写脚本用protoc去生成文件，指定生成文件的路径要和proto里面写的包名对的上。另外就是客户端和server端依赖的protobuf版本以及protoc工具的版本得一致，比如都是3.5。还有就是protoc的语法，什么import的比较烦。
+- [X] 使用jinja2生成文件。[一个比较好玩的代码生成器](https://github.com/guokr/swagger-py-codegen)
+
 
 ### Good For Nothing
 - [ ] 用GDB调试程序

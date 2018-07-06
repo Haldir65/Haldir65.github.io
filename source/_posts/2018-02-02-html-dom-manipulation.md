@@ -115,3 +115,5 @@ navigator里面常用的还有platform,userAgent等
 随便在chrome里面试了下
 navigator.appName ==> Netscape
 navigator.platform ==> win32
+
+[在浏览器里操作cookie可以用原生api自己去操作string，但推荐使用成熟的库](https://github.com/js-cookie/js-cookie)

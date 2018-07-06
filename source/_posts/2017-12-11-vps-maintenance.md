@@ -155,6 +155,9 @@ sudo add-apt-repository ppa:max-c-lv/shadowsocks-libev -y
 sudo apt-get update
 sudo apt install shadowsocks-libev
 
+apt-get install --only-upgrade <packagename> ## 只更新这一个程序
+apt list --upgradable ## 看一下哪些程序可以更新
+
 # Edit the configuration file
 sudo vi /etc/shadowsocks-libev/config.json ## 这里记得把server address改成实际的ip
 

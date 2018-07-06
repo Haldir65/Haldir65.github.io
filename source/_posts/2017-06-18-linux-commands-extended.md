@@ -537,12 +537,27 @@ ubuntu上使用sudo xxx ，输入密码后，下次sudo就不会再次要求密�
 
 sfpt cindy@192.168.0.2  ##以cindy的身份登录这台机器
 
-## bash的窗口在等待输入的时候一般张这样:
+## bash的窗口在等待输入的时候一般长这样:
 john@server ~ $
 john表示当前用户名称
 sever表示当前主机名称
 ~表示当前所在目录
 $表示没有特殊权限，就是说不是root previledge的意思
+
+
+bash和sh的区别
+> #!/bin/bash ## 一个井号加上一个感叹号在计算机领域叫做shebang.很多shell脚本的第一行都有：
+#!/bin/bash 一定是bash，万一没装bash会报错,还有些系统的bash装载/usr/pkg/bin或者/usr/local/bin里面
+或者是
+#!/bin/sh 就会使用当前操作系统上的sh,不一定是bash.比如debian上sh是dash的symbolic link
+比较可靠的方式是
+#!/usr/bin/env bash 用的是$PATH
+
+## file -h /bin/sh 这个命令用于查看文件
+/bin/sh: symbolic link to dash
+
+Because sh is a specification, not an implementation, /bin/sh is a symlink (or a hard link) to an actual implementation on most POSIX systems.(sh是POSIX标准规定的一套协议，并非实现.sh的实现有很多种，zsh,dash,bash等等。但在很多系统上，sh是bash的symbolic link).相比起来,bash的功能要比sh强大不少。Plain sh is a very minimalistic programming language.
+
 
 ### 下面这三个要跟ctrl+z一起用
 bg ##看之前按ctrl+z退到后台的程序

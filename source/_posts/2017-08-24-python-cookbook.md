@@ -401,10 +401,22 @@ True
 'int' ##isinstance这后面的第二个参数就是这么来的
 ```
 
+try except是可以catch住import error的
+```python
+try:
+    from _foo import *
+except ImportError:
+    raise ImportError('<any message you want here>')
+```
+
 很多开源库都提供了setup.py的安装方式：
 ```git
 $ git clone https://github.com/user/foo  
 $ cd foo
 $ python setup.py install
 ```
+
+> pip freeze | xargs pip uninstall -y ## 在venv下，删除所有安装的pip包
+
+
 [如何制作setup.py](https://stackoverflow.com/questions/1471994/what-is-setup-py)

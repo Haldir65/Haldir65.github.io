@@ -241,6 +241,9 @@ server端每次接收到一个请求，会根据request的一些特定属性来�
 所以缓存服务器要是把gzip的资源发给了不支持gzip的客户端，那就是错误了。增加 Vary: Accept-Encoding 响应头，上游服务明确告知缓存服务器按照 Accept-Encoding 字段的内容，分别缓存不同的版本；nginx里面加上这一条就好了：gzip_vary on;[mozilla对于Vary这个header的描述是这样的，这个属于content-negotiation的一部分](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Vary).
 所以这个Header是后端服务器写给缓存服务器看的，顺带暴露在客户端里面了.关于content-negotation，无非两种，服务端列出多项选择（这份资源可用版本的列表），返回Http300(multiple choices)这个header，让前端自己去选。另一种就是后台根据前段发来的request中的一些信息做出选择（server-driven negotiation，主要看Accept，Accept-Charset,Accept-Encoding,Accept-Language这些东西）。所以常常会看到请求中**Accept-Language: zh-CN,zh;q=0.9** 这个q表示有多少的权限，所以这个比重应该是参与了content-negotiation的计算。
 
+[Vary:Origin和CORS的关系](https://zhuanlan.zhihu.com/p/38972475)
+CORS请求会带上Origin请求头，用来向别人的网站表明自己是谁。Vary: Origin可以让同一个URL请求根据ORIGIN这个请求头返回不同的缓存版本。
+实践中，如果Access-Control-Allow-Origin的响应头不是写成了*号的话，就应该加上Vary: Origin，以此避免不同的Origin获得的缓存版本错乱。
 
 [WikI上比较完整](https://zh.wikipedia.org/wiki/HTTP%E5%A4%B4%E5%AD%97%E6%AE%B5)
 
