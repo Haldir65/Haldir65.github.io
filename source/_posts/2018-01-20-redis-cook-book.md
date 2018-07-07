@@ -9,11 +9,14 @@ tags:
 
 redis速度相当快
 
-在ubuntu上安装
+在ubuntu上安装,不要用这种方式
 > sudo apt-get install redis-server
+
+[how-to-install-redis-on-ubuntu-16-04](https://askubuntu.com/questions/868848/how-to-install-redis-on-ubuntu-16-04)
 
 [也有自己下源码编译的](https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-redis-on-ubuntu-16-04)
 mac上就是下载一个tar.gz，然后自己make，网上教程都很多的
+
 
 
 

@@ -43,6 +43,9 @@ Z defunct ("zombie") process, terminated but not reaped by its parent.
 只安装security update
 > sudo unattended-upgrades -d ## 加上-d和verbose的意思差不多
 
+有些软件不是经常用就禁止开机启动吧
+> sudo systemctl disable mysql ##因为这事redis老是装不上
+
 ### 2.1 装 ss
 
 > 下载 shadowsocks 源码编译

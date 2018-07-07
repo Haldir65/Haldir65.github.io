@@ -40,6 +40,7 @@ export PATH="$PATH:/home/directory/to/the/folder"
 修改~/.bashrc文件： （对当前用户有效）
 export PATH="$PATH:/home/directory/to/the/folder"
 
+注： 在windows下export要换成set,echo $XXX 要换成echo %XXX%
 
 这个有效一般都需要重新注销系统才能生效
 
@@ -612,6 +613,19 @@ Ctrl-y  Paste the last thing to be cut
 Ctrl-_  Undo
 
 ```
+
+[supervisor](https://www.digitalocean.com/community/tutorials/how-to-install-and-manage-supervisor-on-ubuntu-and-debian-vps)可以用于管理一些程序的运行，挂了负责自动拉起来。很简单的，就是装一个软件，写一个conf。
+
+
+apt-get的数据库放在 /var/lib/dpkg/info
+```
+dpkg: warning: files list file for package `x' missing; assuming package has no files currently installed
+
+##出现上面的错误，这两条命令修复
+sudo rm -f /var/lib/dpkg/info/format
+sudo dpkg --configure -a
+```
+
 
 
 unix domain socket用于ipc

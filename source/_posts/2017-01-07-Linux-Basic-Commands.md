@@ -46,6 +46,7 @@ tags: [置顶,linux,tools]
 - > cd /  返回根目录
 - > pwd // 显示当前目录
 - > ls // 显示当前目录下内容
+- > ll = ls -al ## 这时候发现有些文件名后面跟着一个星号，这说明这个文件是可执行的
 # ls -halt is for human readable, show hidden, print details, sort by date
 
 ls –l –R(或-lR) src > list.txt  ##列出文件列表
@@ -183,6 +184,11 @@ tail还有一个好处，可以实时查看文件内容，比如文件正在更�
 ```shell
 find / -name filename  //在根目录下查找文件
 find /etc -name filename //在etc目录下查找文件
+
+## 下面这个就是找到了并且删除
+sudo find / -name .DS_Store -delete
+sudo find / -name ".DS_Store"  -exec rm {} \;
+
 
 grep stringtofind filename //在指定的文本文件中查找指定的字符串
 
@@ -517,9 +523,9 @@ zip –q –r -v video.zip . #加上一个-v主要是为了能够实时查看输
 ### （1）移除式卸载：
 apt-get remove softname1 softname2 …; （移除软件包，当包尾部有+时，意为安装）
 ### （2）清除式卸载 ：
-apt-get --purge remove softname1 softname2...;(同时清除配置)
+apt-get --purge remove softname1 softname2...;(同时清除配置，删干净)
 ### 清除式卸载：
-apt-get purge sofname1 softname2...;(同上，也清除配置文件)
+apt-get purge softname1 softname2...;(同上，也清除配置文件)
 
 ### （1）移除式卸载：
 dpkg -r pkg1 pkg2 ...;
@@ -926,7 +932,8 @@ sudo systemctl enable application.service ##开机启动
 ## 开机启动的原理是往/lib/systemd/system或者/etc/systemd/system这个目录下创建了类似于nginx.service的symbolic link。
 ## 指向在这个文件夹下创建的xxx.target.wants文件
 
-记得修改了.service文件要reload一下systemd
+**记得修改了.service文件要reload一下systemd**
+
 ># 重新加载配置文件
 $ sudo systemctl daemon-reload
 # 重启相关服务

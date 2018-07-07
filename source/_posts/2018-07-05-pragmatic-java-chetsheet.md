@@ -132,7 +132,7 @@ mo: 2
 private int age
 
 
-> 获得一个class中所有的方法(拿不到private的和构造函数，父类的wait,notfy这些反而能够拿到),getMethod只能拿到public的方法，getDeclaredMethod基本上是什么类型的都能拿到
+> 获得一个class中所有的方法(拿不到private的和构造函数，父类的wait,notfy这些反而能够拿到),getMethod只能拿到public的方法，getDeclaredMethod基本上是什么类型的都能拿到(getDeclaredMethods，有个s)
 ```java
     public void getAllMethods(){
         try {

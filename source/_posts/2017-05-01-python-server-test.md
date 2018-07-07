@@ -52,47 +52,26 @@ if __name__ == "__main__":
 ```
 
 
-### 2 .sys.args[]的使用
-cmd中
-> python
-
-Python 3.6.1 (v3.6.1:69c0db5, Mar 21 2017, 17:54:52) [MSC v.1900 32 bit (Intel)] on win32
-Type "help", "copyright", "credits" or "license" for more information.
-
-退出方式 ctrl+Z
-
-切换到脚本所在目录 ,例如test.py
-
-```python
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-import sys
-
-# sys.argv接收参数，第一个参数是文件名，第二个参数开始是用户输入的参数，以空格隔开
-# cmd到该文件位置
-
-def run1():
-    print('I\'m action1')
 
 
-def run2():
-    print('I\'m action2')
 
+### Documenting your api like a boss
 
-if 2 > len(sys.argv):
-    print('none')
-else:
-    action1 = sys.argv[0]
-    action2 = sys.argv[1]
-    <!-- if 'run1' == action1:
-        run1()
-    if 'run2' == action2:
-        run2() -->
+> pip install flasgger
+[使用swaggi这个库，写一个yml文件就能自动生成api文档了](http://brunorocha.org/python/flask/flasgger-api-playground-with-flask-and-swagger-ui.html) swagger似乎并不只限于python，也有用于SpringBoot中的java package.yml文件怎么写参考[这个库](https://github.com/rochacbruno/flasgger)的doc
+swagger ui和OpenAPI Specification有关，大概是用于制作api doc的一套标准[swagger-ui](https://github.com/swagger-api/swagger-ui)
+[flask apispec](https://github.com/jmcarp/flask-apispec)
+[flask-rest-plus](http://michal.karzynski.pl/blog/2016/06/19/building-beautiful-restful-apis-using-flask-swagger-ui-flask-restplus/)
 
-    print(action1)
-    print(action2)    
+[flask realworld app](https://github.com/gothinkster/flask-realworld-example-app)
+中需要修改的几点：
 
+requirements/prod.txt
 ```
-
-输入 python test.py run1
-输出 test.py 'run1'
+-flask_apispec==0.3.2
++flask_apispec==0.7.0
+```
+接下来就是这几条命令
+>flask db migrate
+flask db upgrade    
+flask run --with-threads

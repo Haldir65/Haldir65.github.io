@@ -36,7 +36,7 @@ top : 1
 - [ ] nodejs rpc
 - [ ]indexed DB,浏览器端数据库，[content-disposition](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)
 - [ ] classloader和class的生命周期
-- [ ] Docker[Configure automated builds from GitHub](https://docs.docker.com/docker-hub/github/#github-service-hooks)docker要邮箱注册的
+
 - [ ] [在bash脚本中获取当前脚本所在路径](https://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within?rq=1)
 
 
@@ -79,6 +79,7 @@ top : 1
 - [nio stuff](https://juejin.im/post/59fffdb76fb9a0450a66bd58)
 - [ ] 网易云音乐API
 - [X] Django部署个人网站(Gunicorn，Nginx)。django写template就不是前后端分离了
+- [ ] Docker[intro-to-docker-building-android-app](https://medium.com/@elye.project/intro-to-docker-building-android-app-cb7fb1b97602) 这篇文章其实是两件事，一个是Build docker image(docker build xxxx),另一个是run (docker run xxx)
 
 
 [jsonplaceholder](https://jsonplaceholder.typicode.com/)懒得自己写api的话就用这个吧
