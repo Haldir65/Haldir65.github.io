@@ -466,6 +466,7 @@ $ python setup.py install
 
 
 ### json这个库
+obj -> string 用dumps，string -> obj用json.loads(string) 。 还有就是json标准语法是不允许单引号的。
 json.dumps()这个函数，对于自定义的class类型，需要提供一个default参数
 ```python
 class User(db.Model):
@@ -511,5 +512,31 @@ def all_users():
 这个对于多数class有效
 > print(json.dumps(s, default=lambda obj: obj.__dict__))
 
+
+python的json.dumps方法默认会输出成这种格式"\u2535a\u35a2\u89bd"。
+json.dumps({'text':"你好"},ensure_ascii=False,indent=2)
+
+
+很多python开源项目根目录下面有一个setup.cfg和setup.py文件
+
+
+
+跨进程同步
+```python
+from multiprocessing import Process, Lock
+
+def f(l, i):
+    l.acquire()
+    try:
+        print('hello world', i)
+    finally:
+        l.release()
+
+if __name__ == '__main__':
+    lock = Lock()
+
+    for num in range(10):
+        Process(target=f, args=(lock, num)).start() ##这个args是一个tuple，表示这个process运行的方法的参数
+```
 
 [如何制作setup.py](https://stackoverflow.com/questions/1471994/what-is-setup-py)

@@ -1009,6 +1009,9 @@ $ sudo journalctl -n 20 //查看20行
 $ sudo journalctl --since yesterday
 ## 还有很多，能够知道系统启动时发生了什么
 ```
+
+systemd出错了debug简直要命，一种方式是，less +F /var/log/syslog
+
 [只是想要通过systemd去启动一个开机脚本的话](http://azyet.github.io/2016/03/17/simple-sytemd-upstart-script/)
 ```
 [Unit]

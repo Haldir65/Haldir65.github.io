@@ -30,13 +30,11 @@ top : 1
 - [ ]javascript中new FileReader()，以及canvas api,以及[js进行图片缩放和裁剪](https://juejin.im/post/5a98c5c26fb9a028d82b34ee)
 - [ ] Redux和Flux很像
 - [ ] URL Encoding,就是那个在网址里把字符转成百分号加上UTF-8的[找到了阮一峰老师的解释](http://www.ruanyifeng.com/blog/2010/02/url_encoding.html)
-- [ ] [和网页类似，Activity也有一个referer的概念](https://blog.csdn.net/u013553529/article/details/53856800)，用于判断当前页面是由谁发起请求的
 - [ ] [一个展示如何在宿主App中提取一个apk文件并加载代码和资源](https://www.jianshu.com/p/a4ab102fa4ac)
 - [ ] [libmp3lame移植到Android](https://www.jianshu.com/p/534741f5151c),跟jni有关了
 - [ ] nodejs rpc
 - [ ]indexed DB,浏览器端数据库，[content-disposition](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)
 - [ ] classloader和class的生命周期
-
 - [ ] [在bash脚本中获取当前脚本所在路径](https://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within?rq=1)
 
 
@@ -80,6 +78,6 @@ top : 1
 - [ ] 网易云音乐API
 - [X] Django部署个人网站(Gunicorn，Nginx)。django写template就不是前后端分离了
 - [ ] Docker[intro-to-docker-building-android-app](https://medium.com/@elye.project/intro-to-docker-building-android-app-cb7fb1b97602) 这篇文章其实是两件事，一个是Build docker image(docker build xxxx),另一个是run (docker run xxx)
-
+- [ ] [和网页类似，Activity也有一个referer的概念](https://blog.csdn.net/u013553529/article/details/53856800)，用于判断当前页面是由谁发起请求的
 
 [jsonplaceholder](https://jsonplaceholder.typicode.com/)懒得自己写api的话就用这个吧

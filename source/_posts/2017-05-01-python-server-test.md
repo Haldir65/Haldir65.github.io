@@ -61,7 +61,7 @@ if __name__ == "__main__":
 [使用swaggi这个库，写一个yml文件就能自动生成api文档了](http://brunorocha.org/python/flask/flasgger-api-playground-with-flask-and-swagger-ui.html) swagger似乎并不只限于python，也有用于SpringBoot中的java package.yml文件怎么写参考[这个库](https://github.com/rochacbruno/flasgger)的doc
 swagger ui和OpenAPI Specification有关，大概是用于制作api doc的一套标准[swagger-ui](https://github.com/swagger-api/swagger-ui)
 [flask apispec](https://github.com/jmcarp/flask-apispec)
-[flask-rest-plus](http://michal.karzynski.pl/blog/2016/06/19/building-beautiful-restful-apis-using-flask-swagger-ui-flask-restplus/)
+[flask-rest-plus documenting with swagger](http://michal.karzynski.pl/blog/2016/06/19/building-beautiful-restful-apis-using-flask-swagger-ui-flask-restplus/)
 
 [flask realworld app](https://github.com/gothinkster/flask-realworld-example-app)
 中需要修改的几点：

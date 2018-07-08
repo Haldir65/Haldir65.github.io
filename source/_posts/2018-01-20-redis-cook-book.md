@@ -9,7 +9,12 @@ tags:
 
 redis速度相当快
 
-在ubuntu上安装,不要用这种方式
+在ubuntu上安装，偷懒就直接用这种方式吧，比自己下载源码编译快，还连systemd脚本都写好了。当然缺点就是/etc/apt/source.list文件里面的源太老的缘故。[据说apt-get最多就能装上3.2的redis了，ubuntu更新最新软件最新版本也不会那么快](https://medium.com/@jonbaldie/how-to-install-redis-4-x-manually-on-an-older-linux-kernel-b18133df0fd3)
+> sudo add-apt-repository ppa:chris-lea/redis-server
+sudo apt-get update
+sudo apt-get install redis-server
+
+
 > sudo apt-get install redis-server
 
 [how-to-install-redis-on-ubuntu-16-04](https://askubuntu.com/questions/868848/how-to-install-redis-on-ubuntu-16-04)
@@ -39,6 +44,15 @@ mac上就是下载一个tar.gz，然后自己make，网上教程都很多的
 (error) ERR Errors trying to SHUTDOWN. Check logs.
 127.0.0.1:6379> shutdown NOSAVE
 not connected> -->
+
+
+禁止任何remote访问 
+># To make it automatically start with Linux
+sudo systemctl enable redis_6379
+# To block all remote traffic to Redis except for local and one IP address (e.g. your web server)
+iptables -A INPUT -p tcp --dport 6379 -s 127.0.0.1 -j ACCEPT
+iptables -A INPUT -p tcp --dport 6379 -s X.X.X.X -j ACCEPT
+iptables -A INPUT -p tcp --dport 6379 -j DROP
 
  和数据库类似，不同业务的数据需要存贮在不同的数据库中，redis提供了client端的切换数据库的语法
  > select 1 ## 每个数据库之间的key不冲突
@@ -352,6 +366,8 @@ var house = {
 =================================================================================
 
 ### Redis Cluster(集群)
+[Redis集群需要版本3.0以上，另外起多个实例就是复制/usr/local/redis-server等文件多遍](http://www.cnblogs.com/mafly/p/redis_cluster.html)
+因为特别吃内存，小内存vps上不要乱搞
 
 [论述Redis和Memcached的差异-博客-云栖社区-阿里云](https://www.zhihu.com/question/19645807)
 

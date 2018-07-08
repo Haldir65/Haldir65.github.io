@@ -185,6 +185,8 @@ if  __name__ == '__main__':
     app.run(debug=True)
 ```
 
+[Flask和FlaskSqlAlCheMy的curd教程很简单](https://www.codementor.io/garethdwyer/building-a-crud-application-with-flask-and-sqlalchemy-dm3wv7yu2)
+
 ### 2. The Django Way
 Django是**web framework**，不是**WebServer**
 

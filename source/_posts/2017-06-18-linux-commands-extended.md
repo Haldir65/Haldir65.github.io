@@ -21,6 +21,8 @@ tags:
 apache,mysql
 没事不要手贱升级软件
 > apt-get -u upgrade //就像这样，stable挺好的
+sudo apt update
+sudo apt full-upgrade ## 更新所有软件
 
 ### 2. 环境变量怎么改(这个有临时改和永久生效两种)
 
@@ -121,6 +123,8 @@ find / -size +100M：列出所有大于100M的文件，亲测。靠着这个找�
 先df -h看/boot分区使用情况；
 然后 dpkg --get-selections|grep linux-image ;
 查看当前使用的内核 uname -a ;
+> lsb_release -a 
+
 清理不用的内核 sudo apt-get purge linux-image-3.13.0-24-generic （注意，不要删正在使用的内核）
 删除不要的内核文件
 首先看下
@@ -252,7 +256,13 @@ cat -n rsyslog.conf # 显示行号，报错的时候方便处理
 下面是一个简单的通过CURL提交POST请求的方式
 -X是指定HTTP method，默认是GET
 
-> curl "https://jsonplaceholder.typicode.com/psts" -X POST -d '{"userId":10,"title":"sometitle2","body":"somebody2"}'
+>  curl --header "Content-Type: application/json" --request POST --data '{"userId":10,"title":"sometitle2","body":"somebody2"}' https://jsonplaceholder.typicode.com/posts
+## 下面这个是简写
+curl --header "Content-Type: application/json" -X POST -d '{"userId":10,"title":"sometitle2","body":"somebody2"}' https://jsonplaceholder.typicode.com/posts
+## json规范不允许单引号
+curl --header "Content-Type: application/json" -X POST -d '{"userId":10,"title":"sometitle2","body":"somebody2","hobby":[{"name":"bob","age":10},{"name":"sam","age":20}]}' http://127.0.0.1:5000/
+ 
+
 
 
 记得http statusCode 302是重定向什么 ：

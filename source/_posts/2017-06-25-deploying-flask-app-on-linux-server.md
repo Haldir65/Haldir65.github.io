@@ -1,5 +1,5 @@
 ---
-title: 在ubuntu服务器上部署web app
+title: 在ubuntu服务器上部署wsgi application
 date: 2017-06-25 22:46:23
 categories: blog
 tags: [python]
@@ -10,11 +10,16 @@ tags: [python]
 
 ## 1. virtualenv install
 
-```bash
+```shell
 sudo pip install virtualenv
 sudo virtualenv venv
 source venv/bin/activate
 sudo pip install Flask
+
+## virtualenv指定python版本
+virtualenv TEST --python=python2.7
+virtualenv -p"$(which python3.6)" TEST ##linux这个也行
+mkvirtualenv --python=`which python3` <env_name> ## 这个居然也行
 
 
 # sudo python __init__.py
@@ -30,24 +35,26 @@ cd env /Scripts
 activate.bat # 此时光标变成(env) >.
 退出很简单deactivate.bat即可
 
+mac和linux平台下
+source ./env/bin/activate
 ```
 
 
-## 2. install apache2 , mysql-server... on ubuntu
-    重启apache2服务 service apache2 restart
+## 2. flask+nginx+wsgi
+[Digital Ocean总有很多实用的教程](https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-uwsgi-and-nginx-on-ubuntu-16-04),跟这个这里面的教程去部署flask app多半会碰到nginx 502。原因是生成的.sock文件的权限不对，所以在ini文件里面加上
+
+> chmod-socket = 666
+
+在venv里面不要用pip3，用pip
+
+uwsgi协议的app跑起来之后是没有办法直接通过http去请求的，要让nginx转发一下。生成的.sock文件就是用来和nginx通信的。
+这时候的在浏览器里面访问的port就是nginx决定的了。
 
 
 
-## 3. Deploying node app on ubuntu(backgroud)
-三种方法
+## 3. Deploying node app on linux server
 
-> 1.  nohup node /home/zhoujie/ops/app.js & ## nohup就是不挂起的意思( no hang up)。 ignoring input and appending output to nohup.out // 输出被写入当前目录下的nohup.out文件中
-> 2. screen ## 新开一个screen
-> 3. pm2
-npm install -g pm2
-pm2 start app.js
 
-[Configure Nginx as a web server and reverse proxy for Nodejs application on AWS Ubuntu 16.04 server](https://medium.com/@utkarsh_verma/configure-nginx-as-a-web-server-and-reverse-proxy-for-nodejs-application-on-aws-ubuntu-16-04-server-872922e21d38)
 
 
 

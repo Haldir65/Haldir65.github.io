@@ -146,6 +146,16 @@ app.get("/user",function (req,res,next) {
 另一种选择，graphQl是和restful功能类似的模式
 
 
+在linux server上使用pm2 deploy node project
+> 1.  nohup node /home/zhoujie/ops/app.js & ## nohup就是不挂起的意思( no hang up)。 ignoring input and appending output to nohup.out // 输出被写入当前目录下的nohup.out文件中
+> 2. screen ## 新开一个screen
+> 3. pm2
+npm install -g pm2
+pm2 start app.js
+
+[Configure Nginx as a web server and reverse proxy for Nodejs application on AWS Ubuntu 16.04 server](https://medium.com/@utkarsh_verma/configure-nginx-as-a-web-server-and-reverse-proxy-for-nodejs-application-on-aws-ubuntu-16-04-server-872922e21d38)
+
+
 
 
 

@@ -444,7 +444,20 @@ public class JDBCtest {
 }
 ```
 python的版本[python-mysql](http://www.runoob.com/python/python-mysql.html)
+> python3不再支持mysqldb 请用pymysql和mysql.connector
 
+```python
+import pymysql 
+conn = pymysql.connect(host=’127.0.0.1’, port=3306, user=’root’, passwd=’test’, 
+db=’mysql’) 
+cur = conn.cursor() 
+cur.execute(“SELECT * FROM user”) 
+for r in cur.fetchall(): 
+print(r) 
+#cur.close() 
+conn.close()
+
+```
 
 ## 更新
 SQLite支持事务，这就以外这需要在并发环境下，保持事务的ACID特性。Sqlite的锁实现基于文件锁，对于Linux系统，文件锁主要包含协同锁和强制锁。
