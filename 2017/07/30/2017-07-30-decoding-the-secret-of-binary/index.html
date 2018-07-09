@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/01f691dea62d22e138481a353fbb6228.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/ascii-Table.jpg">
-<meta property="og:updated_time" content="2018-07-08T14:16:44.334Z">
+<meta property="og:updated_time" content="2018-07-09T11:31:19.846Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="二进制编码总结">
 <meta name="twitter:description" content="OkHttp作者Jesse Wilson在2016 Droidcon NYC上作了一篇关于编码的演讲，十分有趣。对于了解计算机基础非常有用，结合着写一些关于这方面的笔记。">
@@ -241,10 +241,30 @@ ga('send', 'pageview');
 <p>8 bit = 1 Byte (为什么是8，据说60年代是6)，8bit能够表达的范围也就是2^8 = 0-256.<br>1967年，ASCII码诞生，即American Standard Code for Information Interchange，即将Byte转成文字的一张表。ASCII只用了7个bits，原因是当时硬件很贵。所以就能够表示128个字符。随便找了下这张表<br><img src="http://odzl05jxx.bkt.clouddn.com/ascii-Table.jpg" alt=""></p>
 <p>例如0表示NULL, 65表示A(大写),93表示标点符号”]”。<br>举例：单词Donut的每一个字母对应的ASCII分别是：<br>十进制 ：68  111 110 117 116<br>二进制: 01000100 01101111 01101110 01110101 01110100<br>所以这么发送出去，接收者就知道是Donut了</p>
 <h3 id="3-2-可是128个字符不足以表示世界上所有的文字"><a href="#3-2-可是128个字符不足以表示世界上所有的文字" class="headerlink" title="3.2 可是128个字符不足以表示世界上所有的文字"></a>3.2 可是128个字符不足以表示世界上所有的文字</h3><ul>
-<li><p>Charset  字符集<br>1991年出现Unicode，用于表示所有的字符，所有语言的每一个字符都能有一个唯一的id（数字）。为了能够表达这么大的一个范围，所以得多用点内存，于是UTF-16(16-bit Unicode Transformation Format)出现了，每一个字符都得用2bytes来表示。至于这张表的范围,2^16 = 65536(好熟悉的数字)，这也就是java的char类型的来源，char的定义就是<strong>16位Unicode字符</strong>。<br>这样做有一个显然的缺陷。<br>Unicode是ASCII的超集，D在ASCII中只要 01000100，在Unicode中却要在前面补上毫无意义的8个0，浪费了空间。</p>
+<li><p>Charset  字符集<br>1991年出现Unicode，用于表示所有的字符，所有语言的每一个字符都能有一个唯一的id（数字）。为了能够表达这么大的一个范围，所以得多用点内存，于是UTF-16(16-bit Unicode Transformation Format)出现了，每一个字符都得用2bytes来表示。至于这张表的范围,2^16 = 65536(好熟悉的数字)，这也就是java的char类型的来源，char的定义就是<strong>16位Unicode字符</strong>。<br>这样做有一个显然的缺陷。<br>Unicode是ASCII的超集，D在ASCII中只要 01000100，在Unicode中却要在前面补上毫无意义的8个0，浪费了空间。（一般情况下，ASCII编码是1个字节，而Unicode编码通常是2个字节）</p>
 </li>
-<li><p>UTF-16最大范围65536</p>
+<li><p>Unicode的不同版本和平面（wiki上说2018年最新版的unicode已经收纳了15万个字符）<br>Unicode目前普遍采用的是UCS-2，用两个字节表示一个字符，那么最多能表示2的16次方，也就是65536个字了。（15万个字符怎么来的：65536个放在U+0000到U+FFFF，剩下的字符都放在辅助平面（缩写SMP），码点范围从U+010000一直到U+10FFFF。）</p>
+<blockquote>
+<p>Unicode只有一个字符集，中、日、韩的三种文字占用了Unicode中0x3000到0x9FFF的部分<br>Unicode目前普遍采用的是UCS-2,它用两个字节来编码一个字符, 比如汉字”经”的编码是0x7ECF,注意字符编码一般用十六进制来 表示,为了与十进制区分,十六进制以0x开头,0x7ECF转换成十进制 就是32463,UCS-2用两个字节来编码字符,两个字节就是16位二进制, 2的16次方等于65536,所以UCS-2最多能编码65536个字符。 编码从0到127的字符与ASCII编码的字符一样,比如字母”a”的Unicode 编码是0x0061,十进制是97,而”a”的ASCII编码是0x61,十进制也是97, 对于汉字的编码,事实上Unicode对汉字支持不怎么好,这也是没办法的, 简体和繁体总共有六七万个汉字,而UCS-2最多能表示65536个,才六万 多个,所以Unicode只能排除一些几乎不用的汉字,好在常用的简体汉字 也不过七千多个,为了能表示所有汉字,Unicode也有UCS-4规范,就是用 4个字节来编码字符,不过现在普遍采用的还是UCS-2，只用两个字节来 编码</p>
+</blockquote>
 </li>
+</ul>
+<p>在wiki里面是这么写的:</p>
+<blockquote>
+<p>在表示一个Unicode的字符时，通常会用“U+”然后紧接着一组<strong>十六进制</strong>的数字来表示这一个字符。在基本多文种平面（英文：Basic Multilingual Plane，简写BMP。又称为“零号平面”、plane 0）里的所有字符，要用四个数字（即两个char,16bit ,例如U+4AE0，共支持六万多个字符）；在零号平面以外的字符则需要使用五个或六个数字。</p>
+</blockquote>
+<p>所以一个正儿八经的Unicode 的写法是<br>U+4AE0</p>
+<p>春节这俩字，查表<br>U+6625 U+8282</p>
+<p>浏览器里涉及编码的函数有三个:<br>escape(废弃，不要用)<br>encodeURI() //输出utf-8格式，并在每个字节前加上%<br>encodeURIComponent() //对uri的组成部分进行编码，同时在每个字节前面加上%，但是一些encodeURI不编码的字符，比如“/:#”，encodeURIComponent也编码了,encodeURIComponent不管页面编码是什么，统一返回utf-8</p>
+<p>实测如下（春节的对应unicode字符集是0x6625 0x8282，用utf-8表示的话应该是）</p>
+<blockquote>
+<p>escape(“春节”)<br>“%u6625%u8282” //和上面查表的结果一致，这里面的数字是16进制<br>encodeURI(“春节”)<br>“%E6%98%A5%E8%8A%82” //也是16进制<br>encodeURIComponent(‘春节’)<br>“%E6%98%A5%E8%8A%82”</p>
+</blockquote>
+<p>许多在线utf-8转换网站粘贴进去的效果是这样的<br>春节 -&gt; utf-8<br>&#x6625;&#x8282;  ##感觉这还只是unicode啊，</p>
+<h2 id="这个奇怪的-amp-x表示后面跟着的是16进制。「-amp-」开头的后接十进制数字，以「-amp-x」开头的后接十六进制数字"><a href="#这个奇怪的-amp-x表示后面跟着的是16进制。「-amp-」开头的后接十进制数字，以「-amp-x」开头的后接十六进制数字" class="headerlink" title="这个奇怪的&amp;#x表示后面跟着的是16进制。「&amp;#」开头的后接十进制数字，以「&amp;#x」开头的后接十六进制数字"></a>这个奇怪的&amp;#x表示后面跟着的是16进制。「&amp;#」开头的后接十进制数字，以「&amp;#x」开头的后接十六进制数字</h2><p>python3中测试<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'春节'</span>.encode(<span class="string">'utf-8'</span>)</span><br><span class="line"><span class="string">b'\xe6\x98\xa5\xe8\x8a\x82'</span> <span class="comment">##和上面那个encodeURIComponent的方法的结果是不是一样一样的。</span></span><br><span class="line"></span><br><span class="line"><span class="string">b'\xe6\x98\xa5\xe8\x8a\x82'</span>.decode(<span class="string">'utf-8'</span>)</span><br><span class="line"><span class="string">'春节'</span></span><br><span class="line"></span><br><span class="line"><span class="string">b'\u6625\u8282'</span>.decode(<span class="string">'unicode-escape'</span>)</span><br></pre></td></tr></table></figure></p>
+<p>python3里面这些\x和\u是这样的<br>在bytes中，无法显示为ASCII字符的字节，用\x##显示,\u是unicode的转义字符，就是说这后面跟的都是字符的十六进制的unicode表示形式。<br>Python对bytes类型的数据用带b前缀的单引号或双引号表示：x = b’ABC’</p>
+<p>下面的方法可以获得汉字的unicode值和utf-8编码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">##utf-8编码</span><br><span class="line">&gt;&gt;&gt; u&apos;春节&apos;.encode(&apos;utf-8&apos;) ## unicode转utf-8，解码就是decode了</span><br><span class="line">&apos;\xe6\x98\xa5\xe8\x8a\x82&apos;</span><br><span class="line">## unicode字符码</span><br><span class="line">&gt;&gt;&gt; u&apos;春节&apos;</span><br><span class="line">u&apos;\u6625\u8282&apos; ## 春节的Unicode就是U+6625 U+8282 </span><br><span class="line">`</span><br></pre></td></tr></table></figure></p>
+<ul>
 <li>但还是没法表示一些特殊字符，例如Emoji,Dount Emoji的id是127,849。原因是90年代的设计者没有想到今天会出这么多emoji。解决办法是”surrogate pairs”。下面解释：<br>java的String其实不过是一个char Array的wrapper，如果在ide里面看的话，String里面的char[]每个数字都代表这个位置的Unicode id。所以经常在IDE里debu看到String里面有char[],1=”67”；2=“79”。。。这种东西，其实也就是这个String（字符串）中对应位置的字符的unicode码。对于Emoji，会用两个char来表示。如何确定相邻的两个字符应该用来表示一个Emoji而是两个独立的字符？<br>去看Emoji的Unicode表的话，这四个byte连在一起一般长这样：</li>
 <li>\xF0\x9F\x98\x81</li>
 <li>\xF0\x9F\x98\x82</li>
@@ -255,7 +275,7 @@ ga('send', 'pageview');
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">String s = &quot;一些包含Emoji的文字&quot;</span><br><span class="line">for(int i =0 ,size = s.length();i&lt;size;i++)&#123;</span><br><span class="line">    char c = s.charAt(i);</span><br><span class="line">    System.out.println(&quot;The Caharacter at %d is &apos;%c&apos;%n&quot;,i,c);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>正确的做法是:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">String s = &quot;一些包含Emoji的文字&quot;</span><br><span class="line">for(int i =0 ,size = s.length();i&lt;size;)&#123;</span><br><span class="line">    int c = s.codePointAt(i);</span><br><span class="line">    System.out.println(&quot;The Caharacter at %d is &apos;%c&apos;%n&quot;,i,c);</span><br><span class="line">    i+=Character.charCount(c);//正确识别char数量</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>汉字用UTF-8编码的话，有些还是会超出两个字节的，比如“𠮷”，<a href="https://zh.wiktionary.org/zh-hans/%F0%A0%AE%B7">wiki</a>给这货的解释。十进制是134071，已经超出两个字节(65536)了。<br>转成十六进制的话就是“F0 A0 AE B7”，utf-8本身就是可变长度的编码format，所以这货占了4个字节也正常。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">String w = <span class="string">"\uD842\uDFB7"</span>; <span class="comment">//这个“\u”是ide自己加上去的，注意和上面的十六进制不一样，是因为utf-8前面要加一些0,1什么的</span></span><br><span class="line">      System.out.println(String.valueOf(hex));  <span class="comment">// 134071</span></span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>,size = w.length(); i &lt;size;) &#123;</span><br><span class="line">          <span class="keyword">int</span> c = w.codePointAt(i);</span><br><span class="line">          System.out.println(String.format(<span class="string">"The character at %d is %c  "</span>, i, c)); <span class="comment">//成功打印出这个汉字</span></span><br><span class="line">          i += Character.charCount(c);</span><br><span class="line">      &#125;</span><br></pre></td></tr></table></figure></p>
-<h3 id="3-3-UTF-8出现"><a href="#3-3-UTF-8出现" class="headerlink" title="3.3 UTF-8出现"></a>3.3 UTF-8出现</h3><p>8-bit Unicode Transformation Format于1998年出现，之前提到了2个byte表示一个字符实在太浪费了，utf-8的做法是将每个字符所需要的长度变成可变的。</p>
+<h3 id="3-3-UTF-8出现"><a href="#3-3-UTF-8出现" class="headerlink" title="3.3 UTF-8出现"></a>3.3 UTF-8出现</h3><p>8-bit Unicode Transformation Format于1998年出现，之前提到了2个byte表示一个字符实在太浪费了，utf-8的做法是将每个字符所需要的长度变成可变的。<a href="https://zh.wikipedia.org/wiki/UTF-8">WIKI上UTF-8的描述</a></p>
 <ul>
 <li>多数字符只用1byte，有些用到2,3个byte，Donut的Emoji用4bytes.</li>
 </ul>

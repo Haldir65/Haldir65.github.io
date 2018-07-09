@@ -17,7 +17,7 @@
 <meta property="og:description" content="每一个领域都有些不知道该放哪的零碎的点，这里开辟一个新的地方，作为前端杂乱知识的汇总。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/coffee art life nature living drip dark bw.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-07-08T14:16:44.334Z">
+<meta property="og:updated_time" content="2018-07-09T11:31:19.850Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="前端速查手册">
 <meta name="twitter:description" content="每一个领域都有些不知道该放哪的零碎的点，这里开辟一个新的地方，作为前端杂乱知识的汇总。">
@@ -217,6 +217,22 @@ ga('send', 'pageview');
 </blockquote>
 <p>对于POST请求，如果Request中明确设置了:<br>&gt;<br>xhr.setRequestHeader(“Content-type”,”application/x-www-form-urlencoded”);</p>
 <p>后台会认为这是一个提交表单的请求，body就应该设置为’’<br><a href="https://stackoverflow.com/questions/10494574/what-is-the-difference-between-form-data-and-request-payload">What is the difference between form data and request payload?</a></p>
+<p>网页表单提交数据中包含+号的时候，加号直接变成空格<br>java这边URLDecoder去decode一个未编码的带加号的string的时候，“+”直接变成了空格。而encode的时候，空格被编码成了+号，+号变成了%2b。</p>
+<blockquote>
+<p>常规的表单提交content-type有两种：application/x-www-form-urlencoded和multipart/form-data,如果表单提交时不设置任何类型，默认以第一种方式提交数据；第二种属于带附件的表单提交，当表单中有附件时，必须设置表单的enctype为multipart/form-data.<br>例如 JQuery的 Ajax，Content-Type 默认值为application/x-www-form-urlencoded;charset=utf-8。</p>
+</blockquote>
+<p>Content-Type:application/x-www-form-urlencoded; charset=UTF-8这句话其实就是告诉ajax，在post的时候去把data用utf-8编码一遍（把“+”变成了”%2b”）。所以，如果默认写一个程序去post一个未经编码的带加号的string的话，服务器这边接收到的string中,”+”就变成了空格（因为后台是会用UrlDecoder去decode的，从源码来看，碰到了“+”直接换成了空格)</p>
+<h3 id="url中带”-”号的问题陈年老坑之-URL-Encoding"><a href="#url中带”-”号的问题陈年老坑之-URL-Encoding" class="headerlink" title="url中带”+”号的问题陈年老坑之 URL Encoding"></a>url中带”+”号的问题<a href="https://blog.jamespan.me/2015/05/17/url-encoding">陈年老坑之 URL Encoding</a></h3><blockquote>
+<p>在正常的编码解码流程中，编码的时候先把加号替换为 %2B，然后把空格替换为加号；解码的时候先把加号替换为空格，再把 %2B 替换为加号，天衣无缝。<br>假如我在一个经过编码的 URI 中直接添加加号，然后直接被拿去解码，加号就会妥妥的被替换成空格了。</p>
+</blockquote>
+<p>我就碰到过那种后台传下来的url中包含’+’，然后用URLDecoder去decode一遍（这时候加号已经被替换成空格了），再去用正则match的时候，发现根本匹配不上这个url.</p>
+<p>由此想到url中出现汉字的情况，因为网络传输只能是0101这种，那么就可以用utf-8将汉字的unicode形式传输出去，后台再去根据商定好的encode format去解码。（所以java的URLDecoder的decode方法接受两个参数，一个是裸的文本,http本来就是text based，这没办法，第二个是encoding）。只要两端商定了同一种编码格式，那就能正常的通信。</p>
+<blockquote>
+<p>Ajax中文乱码</p>
+</blockquote>
+<p>前端传参出现汉字的情况有两种，一种是汉字出现在URL中的一部分，另一种是汉字出现在GET请求的queryParameters里面。其实想想也对，http请求是一行一行写text的,第一行是path，后面才是queryParameters</p>
+<p>ajax发送请求<a href="https://yanhaijing.com/web/2014/12/20/web-charset/">Web编码总结</a>如果不指定CharSet,似乎会看页面编码,就是这个<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">"Content-Type"</span> <span class="attr">content</span>=<span class="string">"text/html; charset=UTF-8"</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>这里面还涉及到一个用get和post请求那个比较合适的问题，GET请求浏览器会帮忙encode，但是，有的浏览器(IE)是用系统自带编码格式（windows中文版本上是GB2312)去encode的，如果使用POST,开发者可以自定义数据编码格式（自己调用encodeURIComponent把所有的data都utf-8加密一遍）</p>
 <h3 id="跨域是一个比较大的知识点"><a href="#跨域是一个比较大的知识点" class="headerlink" title="跨域是一个比较大的知识点"></a>跨域是一个比较大的知识点</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">about:1 Failed to load http://api.douban.com/v2/movie/top250: Response to preflight request doesn&apos;t pass access control check: No &apos;Access-Control-Allow-Origin&apos; header is present on the requested resource. Origin &apos;http://localhost:8080&apos; is therefore not allowed access.</span><br></pre></td></tr></table></figure>
 <p>查了好久，原因是CORS(Control of Shared Resources)，通过ajax发起另一个domian(port)资源的请求默认是不安全的。主要是在js里面代码请求另一个网站(只要不满足host和port完全相同就不是同一个网站)，默认是被<a href="http://www.ruanyifeng.com/blog/2016/04/cors.html">禁止</a>的。chrome里面查看network的话，发现这条request确实发出去了，request header里面多了一个</p>
 <blockquote>
