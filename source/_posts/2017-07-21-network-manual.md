@@ -26,6 +26,8 @@ parameters（参数）这是用于指定特殊参数的可选项。
 query(查询) 一般GET请求可以在这里面查找。可选，用于给动态网页（如使用CGI、ISAPI、PHP/JSP/ASP/ASP。NET等技术制作的网页）传递参数，可有多个参数，用“&”符号隔开，每个参数的名和值用“=”符号隔开。
 fragment（信息片断）字符串，用于指定网络资源中的片断。例如一个网页中有多个名词解释，可使用fragment直接定位到某一名词解释。
 
+[Data URI scheme](https://en.wikipedia.org/wiki/Data_URI_scheme)
+
 
 ### 1.1 Http的GET请求的url长度是有限制的(服务器和浏览器都限制了)
 Http1.1协议中并没有做这个限制，但通信的两端，服务器(Nginx和Tomcat)和客户端(浏览器厂商)都做了限制。[参考](https://cnbin.github.io/blog/2016/02/20/httpxie-yi-zhong-de-ge-chong-chang-du-xian-zhi-zong-jie/)

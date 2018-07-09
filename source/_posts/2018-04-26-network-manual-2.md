@@ -211,4 +211,22 @@ BufferedWriter的主要原理是内部保留了一个char[]的数组，每次外
 <meta http-equiv="Content-Security-Policy" content="script-src 'self'; object-src 'none'; style-src cdn.example.org third-party.org; child-src https:">
 ```
 
+
+[http请求是一行一行的文字，contentType only affects the body/document.you can use any ISO-8859-1 characters in the header.](https://stackoverflow.com/questions/19562501/ajax-what-is-the-default-character-encoding-for-http-header-values)。ISO-8859-1不支持中文，所以header里面的东西不能写中文。
+body和path里面随意了
+
+//网页上传excel表格的header
+Content-Disposition: form-data; name="files[]" filename="sample.xls"
+Content-Type: application/vnd.ms-excel
+
+html里面上传文件一般是ajax对象send一个FormData出去，
+也有Base64编码一遍然后在[服务端base64解码的](http://www.nickdesteffen.com/blog/file-uploading-over-ajax-using-html5)。主要是html5标准中添加了新的FileReader接口，可以读取客户端文件内容，所以很多开发就调用FileReader的readAsDataURL方法去将文件的内容变成[DATA URL形式的字符串](https://en.wikipedia.org/wiki/Data_URI_scheme)
+不过这么干还是有缺点的
+>1. Data URL形式的图片不会被浏览器缓存，这意味着每次访问这样页面时都被下载一次，
+   但可通过在css文件的background-image样式规则使用Data URI Scheme，使其随css文件一同被浏览器缓存起来）。
+2. Base64编码的数据体积通常是原数据的体积4/3，
+   也就是Data URL形式的图片会比二进制格式的图片体积大1/3。
+3. 移动端性能比较低。
+
+
 [域名解析之dig,host,nslookup命令](http://luodw.cc/2015/12/27/dns03/)

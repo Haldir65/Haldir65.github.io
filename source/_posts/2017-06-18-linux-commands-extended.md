@@ -570,6 +570,7 @@ bash和sh的区别
 Because sh is a specification, not an implementation, /bin/sh is a symlink (or a hard link) to an actual implementation on most POSIX systems.(sh是POSIX标准规定的一套协议，并非实现.sh的实现有很多种，zsh,dash,bash等等。但在很多系统上，sh是bash的symbolic link).相比起来,bash的功能要比sh强大不少。Plain sh is a very minimalistic programming language.
 
 
+
 ### 下面这三个要跟ctrl+z一起用
 bg ##看之前按ctrl+z退到后台的程序
 jobs ##查看当前在跑的程序
@@ -635,6 +636,9 @@ dpkg: warning: files list file for package `x' missing; assuming package has no 
 sudo rm -f /var/lib/dpkg/info/format
 sudo dpkg --configure -a
 ```
+
+
+> windows的换行符是 \r\l，linux的是 \l，mac的是 \r
 
 
 

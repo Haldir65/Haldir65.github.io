@@ -56,6 +56,34 @@ xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 后台会认为这是一个提交表单的请求，body就应该设置为''
 [What is the difference between form data and request payload?](https://stackoverflow.com/questions/10494574/what-is-the-difference-between-form-data-and-request-payload)
 
+网页表单提交数据中包含+号的时候，加号直接变成空格
+java这边URLDecoder去decode一个未编码的带加号的string的时候，“+”直接变成了空格。而encode的时候，空格被编码成了+号，+号变成了%2b。
+> 常规的表单提交content-type有两种：application/x-www-form-urlencoded和multipart/form-data,如果表单提交时不设置任何类型，默认以第一种方式提交数据；第二种属于带附件的表单提交，当表单中有附件时，必须设置表单的enctype为multipart/form-data.
+例如 JQuery的 Ajax，Content-Type 默认值为application/x-www-form-urlencoded;charset=utf-8。
+
+Content-Type:application/x-www-form-urlencoded; charset=UTF-8这句话其实就是告诉ajax，在post的时候去把data用utf-8编码一遍（把“+”变成了"%2b"）。所以，如果默认写一个程序去post一个未经编码的带加号的string的话，服务器这边接收到的string中,"+"就变成了空格（因为后台是会用UrlDecoder去decode的，从源码来看，碰到了“+”直接换成了空格)
+
+### url中带"+"号的问题[陈年老坑之 URL Encoding](https://blog.jamespan.me/2015/05/17/url-encoding)
+> 在正常的编码解码流程中，编码的时候先把加号替换为 %2B，然后把空格替换为加号；解码的时候先把加号替换为空格，再把 %2B 替换为加号，天衣无缝。
+假如我在一个经过编码的 URI 中直接添加加号，然后直接被拿去解码，加号就会妥妥的被替换成空格了。
+
+我就碰到过那种后台传下来的url中包含'+'，然后用URLDecoder去decode一遍（这时候加号已经被替换成空格了），再去用正则match的时候，发现根本匹配不上这个url.
+
+
+由此想到url中出现汉字的情况，因为网络传输只能是0101这种，那么就可以用utf-8将汉字的unicode形式传输出去，后台再去根据商定好的encode format去解码。（所以java的URLDecoder的decode方法接受两个参数，一个是裸的文本,http本来就是text based，这没办法，第二个是encoding）。只要两端商定了同一种编码格式，那就能正常的通信。
+
+> Ajax中文乱码
+
+前端传参出现汉字的情况有两种，一种是汉字出现在URL中的一部分，另一种是汉字出现在GET请求的queryParameters里面。其实想想也对，http请求是一行一行写text的,第一行是path，后面才是queryParameters
+
+ajax发送请求[Web编码总结](https://yanhaijing.com/web/2014/12/20/web-charset/)如果不指定CharSet,似乎会看页面编码,就是这个
+```html
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+```
+这里面还涉及到一个用get和post请求那个比较合适的问题，GET请求浏览器会帮忙encode，但是，有的浏览器(IE)是用系统自带编码格式（windows中文版本上是GB2312)去encode的，如果使用POST,开发者可以自定义数据编码格式（自己调用encodeURIComponent把所有的data都utf-8加密一遍）
+
+
+
 ### 跨域是一个比较大的知识点
 ```
 about:1 Failed to load http://api.douban.com/v2/movie/top250: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource. Origin 'http://localhost:8080' is therefore not allowed access.

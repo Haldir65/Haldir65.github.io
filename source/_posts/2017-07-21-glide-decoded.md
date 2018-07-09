@@ -535,6 +535,25 @@ Engine先去Cache里面查找，找到了直接调用ResourceCallback(GenericReq
 所以缓存的大小综合考虑了屏幕分辨率和内存大小。只要屏幕像素不是特别高，一般都会走到第一步。
 
 
+```java
+//setTag会崩的代码源头在ViewTarget里面,其实在into方法里面会调用到这里，主要是为了去检查previous
+ @Override
+  @Nullable
+  public Request getRequest() {
+    Object tag = getTag();
+    Request request = null;
+    if (tag != null) {
+      if (tag instanceof Request) {
+        request = (Request) tag;
+      } else {
+        throw new IllegalArgumentException(
+            "You must not call setTag() on a view Glide is targeting");
+      }
+    }
+    return request;
+  }
+```
+
 ### 小结
 - ViewTarget里面有一个 T extends View，可见Glide不只适用于ImageView。
 - BaseTarget里带了一个private Request，其子类可以通过getRequest获得。

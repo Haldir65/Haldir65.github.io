@@ -114,9 +114,64 @@ java7 开始 ，可以直接在代码里写二进制数，例如：
 - Charset  字符集
 1991年出现Unicode，用于表示所有的字符，所有语言的每一个字符都能有一个唯一的id（数字）。为了能够表达这么大的一个范围，所以得多用点内存，于是UTF-16(16-bit Unicode Transformation Format)出现了，每一个字符都得用2bytes来表示。至于这张表的范围,2^16 = 65536(好熟悉的数字)，这也就是java的char类型的来源，char的定义就是**16位Unicode字符**。
 这样做有一个显然的缺陷。
-Unicode是ASCII的超集，D在ASCII中只要 01000100，在Unicode中却要在前面补上毫无意义的8个0，浪费了空间。
+Unicode是ASCII的超集，D在ASCII中只要 01000100，在Unicode中却要在前面补上毫无意义的8个0，浪费了空间。（一般情况下，ASCII编码是1个字节，而Unicode编码通常是2个字节）
 
-- UTF-16最大范围65536
+- Unicode的不同版本和平面（wiki上说2018年最新版的unicode已经收纳了15万个字符）
+Unicode目前普遍采用的是UCS-2，用两个字节表示一个字符，那么最多能表示2的16次方，也就是65536个字了。（15万个字符怎么来的：65536个放在U+0000到U+FFFF，剩下的字符都放在辅助平面（缩写SMP），码点范围从U+010000一直到U+10FFFF。）
+> Unicode只有一个字符集，中、日、韩的三种文字占用了Unicode中0x3000到0x9FFF的部分  
+  Unicode目前普遍采用的是UCS-2,它用两个字节来编码一个字符, 比如汉字"经"的编码是0x7ECF,注意字符编码一般用十六进制来 表示,为了与十进制区分,十六进制以0x开头,0x7ECF转换成十进制 就是32463,UCS-2用两个字节来编码字符,两个字节就是16位二进制, 2的16次方等于65536,所以UCS-2最多能编码65536个字符。 编码从0到127的字符与ASCII编码的字符一样,比如字母"a"的Unicode 编码是0x0061,十进制是97,而"a"的ASCII编码是0x61,十进制也是97, 对于汉字的编码,事实上Unicode对汉字支持不怎么好,这也是没办法的, 简体和繁体总共有六七万个汉字,而UCS-2最多能表示65536个,才六万 多个,所以Unicode只能排除一些几乎不用的汉字,好在常用的简体汉字 也不过七千多个,为了能表示所有汉字,Unicode也有UCS-4规范,就是用 4个字节来编码字符,不过现在普遍采用的还是UCS-2，只用两个字节来 编码
+
+在wiki里面是这么写的:
+> 在表示一个Unicode的字符时，通常会用“U+”然后紧接着一组**十六进制**的数字来表示这一个字符。在基本多文种平面（英文：Basic Multilingual Plane，简写BMP。又称为“零号平面”、plane 0）里的所有字符，要用四个数字（即两个char,16bit ,例如U+4AE0，共支持六万多个字符）；在零号平面以外的字符则需要使用五个或六个数字。
+
+所以一个正儿八经的Unicode 的写法是
+U+4AE0
+
+春节这俩字，查表
+U+6625 U+8282
+
+浏览器里涉及编码的函数有三个:
+escape(废弃，不要用)
+encodeURI() //输出utf-8格式，并在每个字节前加上%
+encodeURIComponent() //对uri的组成部分进行编码，同时在每个字节前面加上%，但是一些encodeURI不编码的字符，比如“/:#”，encodeURIComponent也编码了,encodeURIComponent不管页面编码是什么，统一返回utf-8
+
+实测如下（春节的对应unicode字符集是0x6625 0x8282，用utf-8表示的话应该是）
+>escape("春节")
+"%u6625%u8282" //和上面查表的结果一致，这里面的数字是16进制
+encodeURI("春节")
+"%E6%98%A5%E8%8A%82" //也是16进制
+encodeURIComponent('春节') 
+"%E6%98%A5%E8%8A%82"
+
+许多在线utf-8转换网站粘贴进去的效果是这样的
+春节 -> utf-8
+&#x6625;&#x8282;  ##感觉这还只是unicode啊，
+## 这个奇怪的&#x表示后面跟着的是16进制。「&#」开头的后接十进制数字，以「&#x」开头的后接十六进制数字
+
+python3中测试
+```python
+'春节'.encode('utf-8')
+b'\xe6\x98\xa5\xe8\x8a\x82' ##和上面那个encodeURIComponent的方法的结果是不是一样一样的。
+
+b'\xe6\x98\xa5\xe8\x8a\x82'.decode('utf-8')
+'春节'
+
+b'\u6625\u8282'.decode('unicode-escape')
+```
+python3里面这些\x和\u是这样的
+在bytes中，无法显示为ASCII字符的字节，用\x##显示,\u是unicode的转义字符，就是说这后面跟的都是字符的十六进制的unicode表示形式。
+Python对bytes类型的数据用带b前缀的单引号或双引号表示：x = b'ABC'
+
+下面的方法可以获得汉字的unicode值和utf-8编码
+```
+##utf-8编码
+>>> u'春节'.encode('utf-8') ## unicode转utf-8，解码就是decode了
+'\xe6\x98\xa5\xe8\x8a\x82'
+## unicode字符码
+>>> u'春节'
+u'\u6625\u8282' ## 春节的Unicode就是U+6625 U+8282 
+````
+
 - 但还是没法表示一些特殊字符，例如Emoji,Dount Emoji的id是127,849。原因是90年代的设计者没有想到今天会出这么多emoji。解决办法是"surrogate pairs"。下面解释：
 java的String其实不过是一个char Array的wrapper，如果在ide里面看的话，String里面的char[]每个数字都代表这个位置的Unicode id。所以经常在IDE里debu看到String里面有char[],1="67"；2=“79”。。。这种东西，其实也就是这个String（字符串）中对应位置的字符的unicode码。对于Emoji，会用两个char来表示。如何确定相邻的两个字符应该用来表示一个Emoji而是两个独立的字符？
 去看Emoji的Unicode表的话，这四个byte连在一起一般长这样：
@@ -161,7 +216,7 @@ String w = "\uD842\uDFB7"; //这个“\u”是ide自己加上去的，注意和�
 
 
 ### 3.3 UTF-8出现
-8-bit Unicode Transformation Format于1998年出现，之前提到了2个byte表示一个字符实在太浪费了，utf-8的做法是将每个字符所需要的长度变成可变的。
+8-bit Unicode Transformation Format于1998年出现，之前提到了2个byte表示一个字符实在太浪费了，utf-8的做法是将每个字符所需要的长度变成可变的。[WIKI上UTF-8的描述](https://zh.wikipedia.org/wiki/UTF-8)
 - 多数字符只用1byte，有些用到2,3个byte，Donut的Emoji用4bytes.
 
 <=7个bit的（ASCII）： 0XXXXXX (我用X表示可以被填充的空间)

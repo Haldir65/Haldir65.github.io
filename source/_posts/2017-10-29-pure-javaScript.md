@@ -1163,8 +1163,39 @@ var hello = 'Hello, ';
 console.log(hello.concat('Kevin', '. Have a nice day.'));
 ```
 
-FileReader是什么
+XMLHttpRequest Level 2添加了一个新的接口FormData.利用FormData对象,我们可以通过JavaScript用一些键值对来模拟一系列表单控件,我们还可以使用XMLHttpRequest的send()方法来异步的提交这个"表单".比起普通的ajax,使用FormData的最大优点就是我们可以异步上传一个二进制文件.
 
+
+
+[FileReader api](https://developer.mozilla.org/en-US/docs/Web/API/FileReader)
+```html
+<head>
+    <meta charset="UTF-8">
+</head>
+
+<form onsubmit="return false;">
+    <input type="hidden" name="file_base64" id="file_base64">
+    <input type="file" id="fileup">
+    <input type="submit" value="submit" onclick="$.post('./uploader.php', $(this).parent().serialize());">
+</form>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+    $("#fileup").change(function(){
+        var v = $(this).val();
+        var reader = new FileReader();
+        reader.readAsDataURL(this.files[0]);
+        reader.onload = function(e){
+            console.log(e.target.result);
+            $('#file_base64').val(e.target.result);
+        };
+    });
+});
+</script>
+```
+
+indexed db api
 
 
 
