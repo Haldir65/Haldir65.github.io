@@ -651,7 +651,7 @@ OkHttp总量过于庞大，很多方面，包括spdy,webSocket,RouterDatabase,DN
 
 ## update
 OkHttp拦截器里面能不能把请求取消掉? 结论几乎是否
-[](https://stackoverflow.com/questions/37540616/do-we-have-any-possibility-to-stop-request-in-okhttp-interceptor)
+[do-we-have-any-possibility-to-stop-request-in-okhttp-interceptor](https://stackoverflow.com/questions/37540616/do-we-have-any-possibility-to-stop-request-in-okhttp-interceptor)
 随便挑一个interceptor出来,上游传递下来的chain只能获取到Request，看了下,request并没有一个cancel的方法。真要cancel的话，得去OkHttpClient那边去cancel，这里并不能获得。就算你全局获得一个Client，这里还得返回一个Response。看了下proceed方法，如果返回null的话，会主动抛一个空指针出来的。
 ```java
 @Override public Response intercept(Chain chain) throws IOException {

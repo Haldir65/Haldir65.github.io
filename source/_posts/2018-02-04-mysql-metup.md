@@ -488,7 +488,11 @@ alter table temp rename to record;
 MyISAM：不支持外键约束。不支持事务。对数据大批量导入时，它会边插入数据边建索引，所以为了提高执行效率，应该先禁用索引，在完全导入后再开启索引。
 InnoDB：支持外键约束，支持事务。对索引都是单独处理的，无需引用索引。
 
+
+
+[联表一对多查询](https://www.thatyou.cn/flask%E4%BD%BF%E7%94%A8flask-sqlalchemy%E6%93%8D%E4%BD%9Cmysql%E6%95%B0%E6%8D%AE%E5%BA%93%EF%BC%88%E4%B8%89%EF%BC%89-%E8%81%94%E8%A1%A8%E4%B8%80%E5%AF%B9%E5%A4%9A%E6%9F%A5%E8%AF%A2/)
+[联表多对多查询](https://www.thatyou.cn/flask%E4%BD%BF%E7%94%A8flask-sqlalchemy%E6%93%8D%E4%BD%9Cmysql%E6%95%B0%E6%8D%AE%E5%BA%93%EF%BC%88%E5%9B%9B%EF%BC%89-%E8%81%94%E8%A1%A8%E5%A4%9A%E5%AF%B9%E5%A4%9A%E6%9F%A5%E8%AF%A2/)
 ### Another choice
 
-[mariadb](https://mariadb.org/)
+[mariadb](https://mariadb.org/) MariaDb是在oracle收购mysql之后，社区fork的一个mysql版本，除了packagename不一样以外，操作都差不多。
 PostgreSQL

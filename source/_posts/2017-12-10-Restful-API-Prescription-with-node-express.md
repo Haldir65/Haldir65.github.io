@@ -146,6 +146,7 @@ app.get("/user",function (req,res,next) {
 另一种选择，graphQl是和restful功能类似的模式
 
 
+## Deploying node app on linux server
 在linux server上使用pm2 deploy node project
 > 1.  nohup node /home/zhoujie/ops/app.js & ## nohup就是不挂起的意思( no hang up)。 ignoring input and appending output to nohup.out // 输出被写入当前目录下的nohup.out文件中
 > 2. screen ## 新开一个screen

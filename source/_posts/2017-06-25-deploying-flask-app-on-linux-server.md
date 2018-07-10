@@ -47,8 +47,9 @@ source ./env/bin/activate
 
 在venv里面不要用pip3，用pip
 
-uwsgi协议的app跑起来之后是没有办法直接通过http去请求的，要让nginx转发一下。生成的.sock文件就是用来和nginx通信的。
+wsgi协议的app跑起来之后是没有办法直接通过http去请求的，要让nginx转发一下。生成的.sock文件就是用来和nginx通信的。
 这时候的在浏览器里面访问的port就是nginx决定的了。
+[wsgi的文档应该在pep-333里面](https://www.python.org/dev/peps/pep-3333/)
 
 
 ## 3. flask的一大堆extensions
@@ -114,7 +115,7 @@ if __name__ == '__main__':
 [mysql](https://www.thatyou.cn/flask%E4%BD%BF%E7%94%A8flask-sqlalchemy%E6%93%8D%E4%BD%9Cmysql%E6%95%B0%E6%8D%AE%E5%BA%93%EF%BC%88%E5%9B%9B%EF%BC%89-%E8%81%94%E8%A1%A8%E5%A4%9A%E5%AF%B9%E5%A4%9A%E6%9F%A5%E8%AF%A2/)
 
 
-## 3. Deploying node app on linux server
+
 
 
 
