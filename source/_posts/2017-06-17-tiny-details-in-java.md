@@ -116,8 +116,8 @@ OkHttp 3.3.0 [issue](https://github.com/square/okhttp/issues/2394)
  Builder(Retrofit retrofit, Method method) {
       this.retrofit = retrofit;
       this.method = method;
-      this.methodAnnotations = method.getAnnotations();
-      this.parameterTypes = method.getGenericParameterTypes();
+      this.methodAnnotations = method.getAnnotations();// 返回的是一个Annotation[]数组
+      this.parameterTypes = method.getGenericParameterTypes();// 比如HashMap的put方法，这个方法返回一个Type[2]，分别是'K','V'
       this.parameterAnnotationsArray = method.getParameterAnnotations();
     }
 ```

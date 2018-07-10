@@ -52,21 +52,21 @@ Android应用是如何启动的?
 Looper.java是一个普通的class，其大致作用就是**为当前Thread维持一个message loop**，默认情况下一个Thread并没有一个Looper，要想添加一个，需要在该线程中调用Looper.prepare()，然后调用Looper.loop()方法即可让消息循环一直持续下去。大部分和message Loop的交互都是通过Handler这个类来进行的。例如
 ```java
 class LooperThread extends Thread {
-  *      public Handler mHandler;
-  *
-  *      public void run() {
-  *          Looper.prepare();
-  *
-  *          mHandler = new Handler() {
-  *              public void handleMessage(Message msg) {
-  *                  // 在这里处理消息
-  *              }
-  *          };
-  *
-  *          Looper.loop();
+       public Handler mHandler;
+  
+       public void run() {
+           Looper.prepare();
+
+           mHandler = new Handler() {
+               public void handleMessage(Message msg) {
+                   // 在这里处理消息
+                }
+            };
+  
+            Looper.loop();
     		//这里面发送消息
-  *      }
-  *  }
+        }
+    }
 ```
 Looper持有一个MessageQueue(消息队列)成员变量，消息循环时，Looper就不断地从消息队列中拿出消息进行处理。
 下面来看Looper.loop()方法里所做的事：
@@ -90,7 +90,7 @@ Looper持有一个MessageQueue(消息队列)成员变量，消息循环时，Loo
             try {
                 msg.target.dispatchMessage(msg);
             } finally {
-               ....省略
+               //....省略
             }
         }
     }

@@ -412,8 +412,62 @@ some kind of echo
                 + Arrays.asList(parameterTypes)
                 + " not found in " + instance.getClass());
     }
-
 ```
+
+和反射相关的类应该还有Type，关于Type，最有名的就是从一个泛型类中获取泛型里面T的class对象。但这是有条件的。需要泛型定义在一个父类上，子类对象在初始化的时候确定一个T,后面就可以通过这个子类对象的实例来获得刚才这个T的class.
+```java
+ Class<?> classType = Integer.TYPE; //这其实是一个class
+
+ // 从泛型class中获取T的类型
+public void someMethod(){
+    HashMap<String,Integer> map = new HashMap<String, Integer>(){};
+    Type mySuperclass = map.getClass().getGenericSuperclass();
+    Type type = ((ParameterizedType)mySuperclass).getActualTypeArguments()[0];
+    Type type2 = ((ParameterizedType)mySuperclass).getActualTypeArguments()[1];
+    System.out.println(mySuperclass);// java.util.HashMap<java.lang.String, java.lang.Integer>
+    System.out.println(type+" "+type2); //class java.lang.String class java.lang.Integer
+}
+
+public void someMethod2(){
+    HashMap<String,Integer> map = new HashMap<>(); // 类型擦除
+    Type mySuperclass = map.getClass().getGenericSuperclass();
+    Type type = ((ParameterizedType)mySuperclass).getActualTypeArguments()[0];
+    Type type2 = ((ParameterizedType)mySuperclass).getActualTypeArguments()[1];
+    System.out.println(mySuperclass); // java.util.AbstractMap<K, V>
+    System.out.println(type+" "+type2); //K V
+}
+
+
+// 或者
+
+public static abstract class Foo<T> {
+    //content
+}
+
+public static class FooChild extends Foo<String> {
+    //content
+}
+
+public static Type[] getParameterizedTypes(Object object) {
+    Type superclassType = object.getClass().getGenericSuperclass();
+    if (!ParameterizedType.class.isAssignableFrom(superclassType.getClass())) {
+        return null;
+    }
+    return ((ParameterizedType)superclassType).getActualTypeArguments();
+}
+
+public static void main(String[] args) {
+        Foo foo = new FooChild();
+        Type[] types=  getParameterizedTypes(foo);
+        System.out.println(types[0] == String.class); // true ,Type是一个接口，实现类只有Class
+    }
+```
+看下来都是需要一个支持泛型的父类，然后子类继承这个父类并指定泛型中的T是哪个class，外部就可以拿着这个父类的指针(指向填充了T类型的子类的Object)调用getGenericSuperclass方法再转成ParameterizedType去调用getActualTypeArguments方法了。
+
+这里面涉及到的类和接口包括:
+ParameterizedType,TypeVariable,GenericArrayType,WildcardType（这四个全部是接口）等
+[Type详解](http://loveshisong.cn/%E7%BC%96%E7%A8%8B%E6%8A%80%E6%9C%AF/2016-02-16-Type%E8%AF%A6%E8%A7%A3.html)
+由于类型擦除，class对象中并不能保有编译前的类的信息，引入Type似乎是为了迎合反射的需要。
 
 
 
