@@ -28,8 +28,7 @@ top : 1
 - [ ] [如何编写 jQuery 插件](https://gist.github.com/quexer/3619237)
 - [ ] 用正则检测或者解析json(jQuery源码里有)
 - [ ]javascript中new FileReader()，以及canvas api,以及[js进行图片缩放和裁剪](https://juejin.im/post/5a98c5c26fb9a028d82b34ee)
-- [ ] Redux和Flux很像
-- [ ] URL Encoding,就是那个在网址里把字符转成百分号加上UTF-8的[找到了阮一峰老师的解释](http://www.ruanyifeng.com/blog/2010/02/url_encoding.html)
+- [ ] Redux和Flux很像,react context api
 - [ ] [一个展示如何在宿主App中提取一个apk文件并加载代码和资源](https://www.jianshu.com/p/a4ab102fa4ac)
 - [ ] [libmp3lame移植到Android](https://www.jianshu.com/p/534741f5151c),跟jni有关了
 - [ ] nodejs rpc
@@ -60,6 +59,7 @@ top : 1
 - [X]一直不会maven是在是太丢人了[看文档就行了](https://maven.apache.org/guides/getting-started/index.html#How_do_I_make_my_first_Maven_project)，其他的[教程](https://www.tutorialspoint.com/maven/maven_build_life_cycle.htm)也不错
 - [使用Spring boot后台提供protobuf接口实现客户端通信] 不要使用protobf-gradle-plugin了。直接写脚本用protoc去生成文件，指定生成文件的路径要和proto里面写的包名对的上。另外就是客户端和server端依赖的protobuf版本以及protoc工具的版本得一致，比如都是3.5。还有就是protoc的语法，什么import的比较烦。
 - [X] 使用jinja2生成文件。[一个比较好玩的代码生成器](https://github.com/guokr/swagger-py-codegen)
+- [X] URL Encoding,就是那个在网址里把字符转成百分号加上UTF-8的[找到了阮一峰老师的解释](http://www.ruanyifeng.com/blog/2010/02/url_encoding.html)
 
 
 ### Good For Nothing

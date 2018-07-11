@@ -684,7 +684,8 @@ server {
 }
 ```
 
-关于server_name这个参数，nginx网站上在[how nginx process requests中是这么说的](http://nginx.org/en/docs/http/request_processing.html)
+关于server_name这个参数，nginx网站上在[how nginx process requests中是这么说的](http://nginx.org/en/docs/http/request_processing.html) 一个.conf文件里这么写是没有问题的.还有这个server_name写成domain name或者ip address都是可以的.
+
 ```
 server {
     listen      80;
@@ -712,6 +713,24 @@ server {
     ...
 }
 ```
+[这个server_name是如何从request中提取出来的](https://serverfault.com/questions/834467/nginx-server-host-header-server-name)
+比方说你在浏览器里敲了" http://myserver/ ",浏览器就会去请求DNS server来确定这个domian对应的ip address。随后"myserver"这几个字会被写进HTTP 请求“Host: myserver”。
+这是生产环境正常的逻辑。
+如果开发过程中的话，想要修改这个Host似乎改hosts可以实现
+sudo vim /etc/hosts
+```
+192.168.122.245 nagios.monitor.com
+192.168.122.245 localhost
+192.168.122.245 www.netdatamonitor.com  netdatamonitor.com
+127.0.0.1       www.baidu.com
+# The following lines are desirable for IPv6 capable hosts
+::1     ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+```
+这样自己在浏览器中敲www.baidu.com，本地nginx config文件中server_name 为baidu.com的也能响应了。
 
 
 ### access_log是跟着server走的，毕竟你不希望两台不相干的服务器的访问日志搅和在一起
@@ -775,6 +794,11 @@ Make sure each file and folder under a domain will match at least one location d
 >While nginx’s configuration parser is technically capable of reading nested location blocks, this is neither recommended nor supported. ## 不建议写这种location一层套一层的
 
 
+- [ ] nginx搭建rmtp推流后台[搭建nginx-rtmp直播服务器，ffmpeg模拟推流](http://cxuef.github.io/linux/%E3%80%90%E7%BD%AE%E9%A1%B6%E3%80%91%E6%90%AD%E5%BB%BAnginx-rtmp%E7%9B%B4%E6%92%AD%E6%9C%8D%E5%8A%A1%E5%99%A8%EF%BC%8Cffmpeg%E6%A8%A1%E6%8B%9F%E6%8E%A8%E6%B5%81/)
+
+[默认用apt-get安装的nginx是不带rtmp module的，所以需要自己下载源码编译](https://github.com/arut/nginx-rtmp-module/wiki/Getting-started-with-nginx-rtmp)
+谈到rtmp就不免扯到ffmpeg，在小型vps上还是算了吧。
+[hls的安装方法](https://www.dreamvps.com/tutorials/hls-and-nginx-on-ubuntu/)
 
 
 

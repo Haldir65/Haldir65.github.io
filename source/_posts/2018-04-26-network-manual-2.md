@@ -230,3 +230,20 @@ html里面上传文件一般是ajax对象send一个FormData出去，
 
 
 [域名解析之dig,host,nslookup命令](http://luodw.cc/2015/12/27/dns03/)
+
+[详细的http-content-type表格](http://www.runoob.com/http/http-content-type.html)
+关于content-type,找到一篇[介绍](http://homeway.me/2015/07/19/understand-http-about-content-type/)
+关于Http header常用字段[理解Http Header](http://zq210wl.github.io/2014/12/30/html-http-header-analysis/)
+Http底层TCP ,ACK 等等需要tcpcump结合wireShark抓包
+
+>下面是几个常见的Content-Type:
+1.text/html
+2.text/plain
+3.text/css
+4.text/javascript
+5.application/x-www-form-urlencoded
+6.multipart/form-data
+7.application/json
+8.application/xml
+…
+前面几个都很好理解，都是html，css，javascript的文件类型，后面四个是POST的发包方式。

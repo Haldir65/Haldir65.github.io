@@ -72,6 +72,14 @@ requirements/prod.txt
 +flask_apispec==0.7.0
 ```
 接下来就是这几条命令
->flask db migrate
+>flask db migrate 
 flask db upgrade    
 flask run --with-threads
+
+curl其实也能实现和postman一样的效果
+```
+curl -X POST -d '{"email":"user3@gmail.com","username":"user3","password":"useronepwd"}' --header "Content-Type:application/json" "http://127.0.0.1:3333/login"
+
+curl -X GET -d  --header "Content-Type:application/json" --heade "Authorization:JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MzEzMDMxMTQsImlhdCI6MTUzMTMwMzA4NCwiaXNzIjoia2VuIiwiZGF0YSI6eyJpZCI6MiwibG9naW5fdGltZSI6MTUzMTMwMzA4NH19.04xDT6H2qoKzXpMZygFDIf8kpo4ksEl8J_mzvotgOoA" "http://127.0.0.1:3333/user"
+```
+当然实际开发中还是图形化界面最方便

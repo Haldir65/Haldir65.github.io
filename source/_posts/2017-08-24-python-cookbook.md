@@ -221,6 +221,13 @@ datetime.datetime(2018, 7, 3, 11, 36, 53, 58164)
 ## 然而datetime包下面还有一个
 >>> datetime.time
 <class 'datetime.time'>
+
+
+>>> from datetime import datetime
+print(datetime.now())
+2018-07-11 17:47:01.109458
+>>> print(datetime.utcnow())
+2018-07-11 09:47:09.212414
 ```
 
 
@@ -540,3 +547,8 @@ if __name__ == '__main__':
 ```
 
 [如何制作setup.py](https://stackoverflow.com/questions/1471994/what-is-setup-py)
+
+[成员变量，类变量(直接通过类名去访问)等问题]参考廖雪峰的**实例属性和类属性**。实例属性(包括方法)通过实例对象去访问，class属性通过类名访问。相同名称的实例属性将屏蔽掉类属性，但是当你删除实例属性后，再使用相同的名称，访问到的将是类属性。
+原理是[访问限制](https://www.liaoxuefeng.com/wiki/001374738125095c955c1e6d8bb493182103fac9270762a000/001386820042500060e2921830a4adf94fb31bcea8d6f5c000)
+
+臭名昭著的import的问题

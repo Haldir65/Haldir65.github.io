@@ -330,12 +330,20 @@ SELECT  unix_timestamp(); // 1518249025
 select unix_timestamp('2008-08-08');  // 1218124800
 select unix_timestamp(CURDATE());   //1518192000
 
-// insert一行的时候自动设置插入的时间戳，当然简单了
+// insert一行的时候自动设置插入的时间戳，当然简单了.
 Create Table Student
 (
   Name varchar(50),
   DateOfAddmission datetime default CURRENT_TIMESTAMP
 );
+
+/*下面这个也是行的，CURRENT_TIMESTAMP是一个关键字*/
+CREATE TABLE foo (
+    creation_time      DATETIME DEFAULT   CURRENT_TIMESTAMP,
+    modification_time  DATETIME ON UPDATE CURRENT_TIMESTAMP
+)
+
+modification_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ```
 
 ### 建索引(Advanced sql)
@@ -496,3 +504,48 @@ InnoDB：支持外键约束，支持事务。对索引都是单独处理的，�
 
 [mariadb](https://mariadb.org/) MariaDb是在oracle收购mysql之后，社区fork的一个mysql版本，除了packagename不一样以外，操作都差不多。
 PostgreSQL
+
+
+建表语句:
+```sql
+DROP TABLE IF EXISTS `user`;
+CREATE TABLE `user` (
+  `user_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `user_name` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `user_password` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `user_nickname` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT '',
+  `user_email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  PRIMARY KEY (`user_id`),
+  KEY `user_name` (`user_name`),
+
+
+CREATE TABLE `news` (`news_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,`news_author` int(6) NOT NULL DEFAULT '0',`news_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,`news_content` longtext COLLATE utf8mb4_unicode_ci NOT NULL,`news_title` text COLLATE utf8mb4_unicode_ci NOT NULL,`news_excerpt` text COLLATE utf8mb4_unicode_ci NOT NULL,`news_status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'publish',`news_modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,`news_category` int(4) NOT NULL,PRIMARY KEY (`news_id`), KEY `type_status_date` (`news_status`,`news_date`,`news_id`),KEY `post_author` (`news_author`)) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+mysql> describe user;
++---------------+---------------------+------+-----+---------+----------------+
+| Field         | Type                | Null | Key | Default | Extra          |
++---------------+---------------------+------+-----+---------+----------------+
+| user_id       | bigint(20) unsigned | NO   | PRI | NULL    | auto_increment |
+| user_name     | varchar(60)         | NO   | MUL |         |                |
+| user_password | varchar(30)         | NO   |     |         |                |
+| user_nickname | varchar(50)         | YES  |     |         |                |
+| user_email    | varchar(100)        | NO   | MUL |         |                |
++---------------+---------------------+------+-----+---------+----------------+
+5 rows in set (0.00 sec)
+
+mysql> describe news;
++---------------+---------------------+------+-----+-------------------+----------------+
+| Field         | Type                | Null | Key | Default           | Extra          |
++---------------+---------------------+------+-----+-------------------+----------------+
+| news_id       | bigint(20) unsigned | NO   | PRI | NULL              | auto_increment |
+| news_author   | int(6)              | NO   | MUL | 0                 |                |
+| news_date     | datetime            | NO   |     | CURRENT_TIMESTAMP |                |
+| news_content  | longtext            | NO   |     | NULL              |                |
+| news_title    | text                | NO   |     | NULL              |                |
+| news_excerpt  | text                | NO   |     | NULL              |                |
+| news_status   | varchar(20)         | NO   | MUL | publish           |                |
+| news_modified | datetime            | NO   |     | CURRENT_TIMESTAMP |                |
+| news_category | int(4)              | NO   |     | NULL              |                |
++---------------+---------------------+------+-----+-------------------+----------------+
+9 rows in set (0.00 sec)

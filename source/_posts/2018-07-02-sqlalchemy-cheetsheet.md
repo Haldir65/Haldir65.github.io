@@ -13,12 +13,24 @@ tags: [python]
 
 ```python
 from sqlalchemy import create_engine
+## 想用sqlite?
 engine = create_engine('sqlite:///foo.db', echo=True) ## 会在当前目录下生成一个foo.db文件，这个True表示程序运行的时候会打印出生成的sql语句。
 
+## 想用mysql?
 engine = create_engine('mysql+mysqlconnector://%s:%s@localhost:3306/%s?charset=utf8' % (config.DB_USER_NAME,config.DB_PASS_WORD,config.DB_NAME)) ## mysql也是支持的
 
-engine = create_engine("postgresql://scott:tiger@localhost/test") ## postgresql也是可以的
+## postgresql也是可以的
+engine = create_engine("postgresql://scott:tiger@localhost/test") 
 ```
+创建db的时候注意,sqlite因为是直接写文件，所以要把db的路径写清楚了。如果贸然写一个'sqlite:///db.sqlite3'，可能会出现no such table
+config.py文件里面
+```python
+import os
+
+project_dir = os.path.dirname(os.path.abspath(__file__))
+SQLALCHEMY_DATABASE_URI = "sqlite:///{}".format(os.path.join(project_dir, "backend.db"))
+```
+
 
 数据库创建了，开始<del>建表</del>设计表
 
@@ -39,7 +51,8 @@ if not engine.dialect.has_table(engine, Variable_tableName):  # If table don't e
 ```
 
 
-和Flask一起用[代码出处](https://www.thatyou.cn/flask%E4%BD%BF%E7%94%A8flask-sqlalchemy%E6%93%8D%E4%BD%9Cmysql%E6%95%B0%E6%8D%AE%E5%BA%93%EF%BC%88%E4%BA%8C%EF%BC%89-%E5%8D%95%E8%A1%A8%E6%9F%A5%E8%AF%A2/)
+Flask比较好的地方是可以和SQLAlechemy紧密结合
+Flask一起用[代码出处](https://www.thatyou.cn/flask%E4%BD%BF%E7%94%A8flask-sqlalchemy%E6%93%8D%E4%BD%9Cmysql%E6%95%B0%E6%8D%AE%E5%BA%93%EF%BC%88%E4%BA%8C%EF%BC%89-%E5%8D%95%E8%A1%A8%E6%9F%A5%E8%AF%A2/)
 ```python
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, jsonify, request
@@ -146,6 +159,9 @@ if __name__ == '__main__':
     app.run(debug=True)
 ```
 
+
+sclalchemy的model的tablename默认是会根据model的name生成小写的tablename:
+> For instance the table name is automatically set for you unless overridden. It’s derived from the class name converted to lowercase and with “CamelCase” converted to “camel_case”. To override the table name, set the __tablename__ class attribute.
 
 
 

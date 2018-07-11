@@ -134,22 +134,7 @@ def get_image():
 所有的静态文件必须放在当前目录下的static目录中，里面可以再创建image，css,404.html等文件
 另外，如果要调试接口的话，用Postman吧，比Fiddler简单点
 返回response的时候一定要指明mime-type，或者content-type
-text/html、text/css、application/json什么的，[详细的http-content-type表格](http://www.runoob.com/http/http-content-type.html)
-关于content-type,找到一篇[介绍](http://homeway.me/2015/07/19/understand-http-about-content-type/)
-关于Http header常用字段[理解Http Header](http://zq210wl.github.io/2014/12/30/html-http-header-analysis/)
-Http底层TCP ,ACK 等等需要tcpcump结合wireShark抓包
-
->下面是几个常见的Content-Type:
-1.text/html
-2.text/plain
-3.text/css
-4.text/javascript
-5.application/x-www-form-urlencoded
-6.multipart/form-data
-7.application/json
-8.application/xml
-…
-前面几个都很好理解，都是html，css，javascript的文件类型，后面四个是POST的发包方式。
+text/html、text/css、application/json什么的，
 
 ### 1.2 Flask BluePrints
 
@@ -187,9 +172,35 @@ if  __name__ == '__main__':
 
 [Flask和FlaskSqlAlCheMy的curd教程很简单](https://www.codementor.io/garethdwyer/building-a-crud-application-with-flask-and-sqlalchemy-dm3wv7yu2)
 
+以sqlite为例，db.sqlite文件的位置要注意(最好需要指定db文件的路径)
+```python
+import os
+project_dir = os.path.dirname(os.path.abspath(__file__))
+database_file = "sqlite:///{}".format(os.path.join(project_dir, "bookdatabase.db"))
+```
+
+flask从request post中提取data:
+```python
+##It is simply as follows
+##For URL Query parameter, use request.args
+search = request.args.get("search")
+page = request.args.get("page")
+##For Form input, use request.form
+email = request.form.get('email')
+password = request.form.get('password')
+##For data type application/json, use request.data
+# data in string format and you have to parse into dictionary
+data = request.data
+dataDict = json.loads(data)
+```
+
+flask的jsonify会将中文变成unicode返回，解决方式
+> app.config['JSON_AS_ASCII'] = False
+
+flask的config对象继承于字典，并且可以像修改字典一样修改它:
+
 ### 2. The Django Way
 Django是**web framework**，不是**WebServer**
-
 
 
 ## 3. Using Tornado

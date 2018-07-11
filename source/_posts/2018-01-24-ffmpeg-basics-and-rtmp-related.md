@@ -30,6 +30,8 @@ ffmpeg -i input.mp4 -aspect 16:9 output.mp4 ## 更改长宽比
 需要知道的是，***视频转码是很费性能的***，消耗的时间也比较长。
 
 
+[ffmpeg c语言写一个video player](https://github.com/mpenkov/ffmpeg-tutorial)
+
 ## 参考
 
 [nginx搭建rtmp推流服务](https://www.jianshu.com/p/fc64102d6162)

@@ -321,7 +321,7 @@ Softlayer, HongKong, CN         119.81.130.170          8.84MB/s
 ----------------------------------------------------------------------
 ```
 
-### DigitalOcean Sinapore (ip adress lokks like Russian)
+### DigitalOcean Sinapore (ip address lokks like Russian)
 
 ```
 ----------------------------------------------------------------------
