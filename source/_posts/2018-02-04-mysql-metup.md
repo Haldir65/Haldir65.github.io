@@ -155,7 +155,7 @@ SELECT * FROM [user] WHERE u_name LIKE '[^张李王]三'; 将找出不姓“张�
 SELECT * FROM CUSTOMERS ORDER BY NAME DESC; //就是把查出来的结果排序，按照名称的ASIC顺序倒序排列
 
 ## groupBy
-GROUP BY的顺序在orderBy前面，意思就是把相同结果的整合成一行
+GROUP BY的顺序在orderBy前面(groupby要写在orderby前面)，意思就是把相同结果的整合成一行
 基本的语法是
 SELECT column_one FROM table_name WHERE
   column_two = "" AND ...
@@ -182,6 +182,14 @@ DELETE from potluck  where name='Sandy';
 TRUNCATE TABLE  table_name; //将这张表的内容全部抹掉
 DROP TABLE table_name; //删除这个数据库
 ```
+
+一些实用的例子：
+## 单列数据分组统计
+SELECT id,name,SUM(price) AS title,date FROM tb_price GROUP BY pid ORDER BY title DESC;
+## 多列数据分组统计
+SELECT id,name,SUM(price*num) AS sumprice  FROM tb_price GROUP BY pid ORDER BY sumprice DESC;
+## 多表分组统计
+SELECT a.name,AVG(a.price),b.name,AVG(b.price) FROM tb_demo058 AS a,tb_demo058_1 AS b WHERE a.id=b.id GROUP BY b.type;
 
 ## 跨表查询
 现实生活中经常要从多个数据表中读取数据，关键字JOIN
@@ -388,7 +396,9 @@ ROLLBACK TO SAVEPOINT_NAME;
 
 
 ## language support
-[using mysql in node js](https://github.com/mysqljs/mysql)
+### java
+
+
 java的版本[accessing-data-mysql](https://spring.io/guides/gs/accessing-data-mysql/)
 ```java
 package com.vae.jdbc;
@@ -400,8 +410,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class JDBCtest {
-
-
     //数据库连接地址
     public final static String URL = "jdbc:mysql://localhost:3306/JDBCdb";
     //用户名
@@ -411,7 +419,6 @@ public class JDBCtest {
     //驱动类
     public final static String DRIVER = "com.mysql.jdbc.Driver";
 
-
     public static void main(String[] args) {
         // TODO Auto-generated method stub
         //insert(p);
@@ -419,7 +426,6 @@ public class JDBCtest {
         //delete(3);
         insertAndQuery();
     }
-
 
     //方法：使用PreparedStatement插入数据、更新数据
     public static void insertAndQuery(){
@@ -451,6 +457,9 @@ public class JDBCtest {
 
 }
 ```
+[Spring里面用的是jpa](https://spring.io/guides/gs/accessing-data-jpa/)
+
+
 python的版本[python-mysql](http://www.runoob.com/python/python-mysql.html)
 > python3不再支持mysqldb 请用pymysql和mysql.connector
 
@@ -461,11 +470,15 @@ db=’mysql’)
 cur = conn.cursor() 
 cur.execute(“SELECT * FROM user”) 
 for r in cur.fetchall(): 
-print(r) 
+    print(r) 
 #cur.close() 
 conn.close()
-
 ```
+实际开发中都用的orm框架,sqlAlchemy
+
+### nodejs
+[using mysql in node js](https://github.com/mysqljs/mysql)
+
 
 ## 更新
 SQLite支持事务，这就以外这需要在并发环境下，保持事务的ACID特性。Sqlite的锁实现基于文件锁，对于Linux系统，文件锁主要包含协同锁和强制锁。
@@ -549,3 +562,23 @@ mysql> describe news;
 | news_category | int(4)              | NO   |     | NULL              |                |
 +---------------+---------------------+------+-----+-------------------+----------------+
 9 rows in set (0.00 sec)
+
+[spring官方给的手把手教程很详细](https://spring.io/guides/gs/accessing-data-mysql/)
+乐观锁(需要自己实现或者使用orm框架)和悲观锁(数据库自带).
+悲观锁包括共享锁和排他锁:
+共享锁: 在执行sql语句屁股后面加上lock in share mode
+排他锁：在执行sql语句屁股后面加上for update
+
+举个例子：
+```sql
+begin; ##开启一个实务，不commit
+SELECT * from city where id = "1"  lock in share mode;
+
+update  city set name="666" where id ="1"; ##会error的
+```
+
+另外还有行锁，表锁
+行锁： SELECT * from city where id = "1"  lock in share mode; 
+AUTO_INCREMENT有时候不会从1开始
+
+[todo 建表，实查](http://www.runoob.com/sql/sql-groupby.html)

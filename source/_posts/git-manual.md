@@ -165,7 +165,7 @@ git checkout myTag //打tag的好处就在于埋下一个里程碑，你随时�
 git tag -d myTag //删除这个tag也很简单
 git tag -a myTag adjksdas31231//假如当前head不在想打的位置，找到想打的位置的log，照着打就好
 git push origin -tags //将本地所有标签一次性提交到git服务器
-git ls-remote --tags //查看远程仓库所有的tags
+git ls-remote --tags origin //查看远程仓库所有的tags
 ```
 
 ## 9. pull和rebase的区别

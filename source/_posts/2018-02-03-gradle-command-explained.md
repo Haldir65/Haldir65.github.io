@@ -68,7 +68,6 @@ Using this dependency configuration instead of api or compile can result in sign
 //所以如果想要把自己的某项依赖暴露出去，让依赖自己的mudule也能用到这项依赖，就要用api了
 但是api和之前的compile是一样的，所以编译速度比implementation慢很多。
 
-
 看到一份关于android build tasks解释的[非常好的文章](https://www.diycode.cc/topics/683)
 ```
 mergeDebugResources任务的作用是解压所有的aar包输出到app/build/intermediates/exploded-aar，并且把所有的资源文件合并到app/build/intermediates/res/merged/debug目录里
@@ -525,6 +524,8 @@ preBuild << {
 [Tinker的gradle plugin实现，非常有参考意义](https://github.com/Tencent/tinker/blob/master/tinker-build/tinker-patch-gradle-plugin/src/main/groovy/com/tencent/tinker/build/gradle/TinkerPatchPlugin.groovy)
 和java libraray提交到jcenter不同，gradle需要提交到[Gradle Plugin Portal](https://guides.gradle.org/publishing-plugins-to-gradle-plugin-portal/)。没错，一个完全不一样的网站
 
+[明明已经把所有的包都改成implementation了，编译器还是报error](https://stackoverflow.com/questions/47300679/configuration-compile-in-is-deprecated-but-all-configurations-are-implementa)
+> ./gradlew :app:dependencies --configuration compile ##这条命令可以查询当前app中还有哪条依赖在用compile
 
 
 [比较复杂的gradle knowledge](https://github.com/adwiv/android-fat-aar)

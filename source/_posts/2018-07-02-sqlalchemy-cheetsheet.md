@@ -164,6 +164,8 @@ sclalchemy的model的tablename默认是会根据model的name生成小写的table
 > For instance the table name is automatically set for you unless overridden. It’s derived from the class name converted to lowercase and with “CamelCase” converted to “camel_case”. To override the table name, set the __tablename__ class attribute.
 
 
+sqlalchemy这种orm也是需要加锁的
+
 
 
 ## 参考

@@ -367,7 +367,7 @@ Softlayer, HongKong, CN         119.81.130.170          35.2MB/s
 
 ### 5. 关于 docker
 
-youtube 上有人在 Digital Ocean 的 vps 上安装 docker，主要作用就是将一个复杂的操作系统打包成一个下载即用的容器。进入容器中，可以像在实际的操作系统中一样运行指令。所以虚拟化的机器随时可以使用其他操作系统。
+youtube 上有人在 Digital Ocean 的 vps 上安装 docker，主要作用就是将一个复杂的操作系统打包成一个下载即用的容器。进入容器中，可以像在实际的操作系统中一样运行指令。所以虚拟化的机器随时可以使用其他操作系统。[how-to-install-and-use-docker-on-ubuntu-16-04](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-16-04)
 
 
 ### 参考

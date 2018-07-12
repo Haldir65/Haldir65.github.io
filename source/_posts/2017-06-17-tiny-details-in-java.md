@@ -1364,6 +1364,8 @@ public static void main(String[] args){
 ```
 ### 45. 打jar包(命令行还是ide)
 > jar -cvf HelloWorld.jar HelloWorld.class   #将HelloWorld.class文件打入jar包
+> jar cvf xxx.jar ./ 打当前所有的class
+> jar cvfm xxx.jar ./META-INF/MANIFEST.MF ./ ##修改jar包，使用原有的manifest文件
 
 [intelij idea打jar包更简单](http://blog.csdn.net/xuemengrui12/article/details/74984731)
 
