@@ -18,6 +18,11 @@ engine = create_engine('sqlite:///foo.db', echo=True) ## 会在当前目录下�
 
 ## 想用mysql?
 engine = create_engine('mysql+mysqlconnector://%s:%s@localhost:3306/%s?charset=utf8' % (config.DB_USER_NAME,config.DB_PASS_WORD,config.DB_NAME)) ## mysql也是支持的
+这里有一个坑：
+## mysql://username:password@server/db  python3下面不能这么写，虽然flask-sqlalchemy教程上是这么教人的
+## mysql+pymysql://username:password@server/db  应该这么写，还有pip install PyMySQL
+
+
 
 ## postgresql也是可以的
 engine = create_engine("postgresql://scott:tiger@localhost/test") 

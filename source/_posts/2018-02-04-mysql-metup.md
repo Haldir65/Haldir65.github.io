@@ -581,4 +581,6 @@ update  city set name="666" where id ="1"; ##会error的
 行锁： SELECT * from city where id = "1"  lock in share mode; 
 AUTO_INCREMENT有时候不会从1开始
 
+mysql查看连接数
+生产环境Mysql吃内存特别厉害的解决途径
 [todo 建表，实查](http://www.runoob.com/sql/sql-groupby.html)
