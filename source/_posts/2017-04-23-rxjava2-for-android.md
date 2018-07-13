@@ -480,6 +480,11 @@ observable(事实上是observableSource)  -> observer
 Flowable(publisher接口)  ->  Subscriber
 [what-is-the-difference-between-an-observer-and-a-subscriber](https://stackoverflow.com/questions/27664221/what-is-the-difference-between-an-observer-and-a-subscriber)
 
+java还有这种写法
+```java
+PublishSubject.<T>create()
+```
+
 
 ### Reference
 

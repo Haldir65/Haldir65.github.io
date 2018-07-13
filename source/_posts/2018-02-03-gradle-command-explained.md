@@ -527,6 +527,10 @@ preBuild << {
 [明明已经把所有的包都改成implementation了，编译器还是报error](https://stackoverflow.com/questions/47300679/configuration-compile-in-is-deprecated-but-all-configurations-are-implementa)
 > ./gradlew :app:dependencies --configuration compile ##这条命令可以查询当前app中还有哪条依赖在用compile
 
+在setting.gradle中这么写也是可以的
+> include ':library1'
+project(':library1').projectDir = new File('../StickyListHeader/library1')
+
 
 [比较复杂的gradle knowledge](https://github.com/adwiv/android-fat-aar)
 [official gradle docs 是最好的学习资料](https://guides.gradle.org/creating-new-gradle-builds/)
