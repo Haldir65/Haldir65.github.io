@@ -137,6 +137,9 @@ def get_image():
 text/html、text/css、application/json什么的，
 
 ### 1.2 Flask BluePrints
+正常的工程都会希望将业务处理逻辑写在不同的module里面，在flask里面这种思想的实现方式是[BluePrint](http://flask.pocoo.org/docs/1.0/blueprints/#blueprints)。
+
+[how-to-divide-flask-app-into-multiple-py-files](https://stackoverflow.com/questions/11994325/how-to-divide-flask-app-into-multiple-py-files)
 
 ### 1.3 Flask + gevent 提高web 框架的性能
 [docs](http://flask.pocoo.org/docs/0.12/deploying/wsgi-standalone/)

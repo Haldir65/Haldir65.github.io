@@ -243,7 +243,7 @@ XMLHttpRequest缩写是(XHR)
 - can be used with other protocols than http
 - Can work with data other than XML(Json ,plain text)
 
-有很多的Library能干ajax一样的事情:
+有很多的<del>Library</del>能干ajax一样的事情:
 jQuery,Axios,Superagent,Fetch API,Prototype,Node HTTP
 
 ajax的onload只会在onreadystatechange==4的时候才会触发

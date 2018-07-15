@@ -247,3 +247,6 @@ Http底层TCP ,ACK 等等需要tcpcump结合wireShark抓包
 8.application/xml
 …
 前面几个都很好理解，都是html，css，javascript的文件类型，后面四个是POST的发包方式。
+
+[非官方的mime-type大全](https://www.sitepoint.com/mime-types-complete-list/)
+[MDN上收录的mime-type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Complete_list_of_MIME_types)

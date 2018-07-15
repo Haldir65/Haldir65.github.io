@@ -83,3 +83,6 @@ curl -X POST -d '{"email":"user3@gmail.com","username":"user3","password":"usero
 curl -X GET -d  --header "Content-Type:application/json" --heade "Authorization:JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MzEzMDMxMTQsImlhdCI6MTUzMTMwMzA4NCwiaXNzIjoia2VuIiwiZGF0YSI6eyJpZCI6MiwibG9naW5fdGltZSI6MTUzMTMwMzA4NH19.04xDT6H2qoKzXpMZygFDIf8kpo4ksEl8J_mzvotgOoA" "http://127.0.0.1:3333/user"
 ```
 当然实际开发中还是图形化界面最方便
+
+
+flask设置status code似乎只需要在return后面加上一个200这样的code就可以了

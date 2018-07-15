@@ -469,7 +469,8 @@ $ python setup.py install
 ```
 
 > pip freeze | xargs pip uninstall -y ## 在venv下，删除所有安装的pip包
-
+pip freeze > requirements.txt ## 生成requirements.txt十分简单
+pip insatll -r requirements.txt 安装依赖也十分简单
 
 
 ### json这个库
@@ -551,4 +552,22 @@ if __name__ == '__main__':
 [成员变量，类变量(直接通过类名去访问)等问题]参考廖雪峰的**实例属性和类属性**。实例属性(包括方法)通过实例对象去访问，class属性通过类名访问。相同名称的实例属性将屏蔽掉类属性，但是当你删除实例属性后，再使用相同的名称，访问到的将是类属性。
 原理是[访问限制](https://www.liaoxuefeng.com/wiki/001374738125095c955c1e6d8bb493182103fac9270762a000/001386820042500060e2921830a4adf94fb31bcea8d6f5c000)
 
-臭名昭著的import的问题
+臭名昭著的import的问题(circular import)
+> attempted relative import beyond top-level package
+
+[导包包括三种，导入下级目录，导入上级目录，导入同级目录中文件](https://www.jianshu.com/p/eee3befb8994)
+> python在import包的时候是查找同级目录及sys.path(python环境下)的文件。
+第一种只要确保下级目录中有__init__.py就好了
+第二种： from ..当前文件名 import 主目录文件。会报ValueError: attempted relative import beyond top-level package因为python认为这是主目录不能再向上了。所以直接from upperfile import variable_in_upper.不需要相对路径..了。因为程序运行起点是在主目录，只要在主目录下找到了就行。
+第三种： from 目录名.文件名 import something
+
+
+python 里面有一个eval()函数，和js里面的eval()函数几乎是一样的功能，都是把一段字符串当做一个语句来执行
+python里面获取系统环境变量:
+
+>SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL','postgresql://localhost/example')
+
+坑：
+vps上SQLALCHEMY_DATABASE_URI=mysql+pymysql://username:password@localhost/dbname 是连不上的，就算ssh里面也不行，localhost改成127.0.0.1也没用
+改成
+mysql+pymysql://username:password@you.real.ip.adress/dbname这样就可以了

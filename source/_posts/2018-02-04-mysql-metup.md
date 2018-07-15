@@ -103,7 +103,7 @@ show create table potluck;
 
 ## ADD STUFF
 INSERT INTO `potluck` (`id`,`name`,`food`,`confirmed`,`signup_date`) VALUES (NULL, "John", "Casserole","Y", '2012-04-11');
-### 亲测，在heidisql中这么输入也能insert一行,所以这些冒号也不是必须的
+### 亲测，在heidisql中这么输入也能insert一行,所以这些冒号也不是必须的。注意这里不是"单引号'"号而是"`"（tab键上面那个）
 INSERT INTO user (user_id,login,password,email,date_added,date_modified) VALUES (1,"firstlogin","dumbpasws","sample@email.com",'2012-03-09','2018-01-09');
 
 ## update stuff
@@ -180,6 +180,7 @@ DELETE from potluck  where name='Sandy';
 
 ## 从删库到跑路
 TRUNCATE TABLE  table_name; //将这张表的内容全部抹掉
+##  error: Cannot truncate a table referenced in a foreign key constraint(有时候会碰到这种错误，这也是约束的一种体现)
 DROP TABLE table_name; //删除这个数据库
 ```
 

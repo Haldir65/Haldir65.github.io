@@ -83,11 +83,17 @@ urlpatterns = [
 首先是virtualenv
 pip install mysql-connector-python  mysql-connector-python
 
-在ununtu上使用uwsgi和nginx运行django application
+[在ununtu上使用uwsgi和nginx运行django application](https://www.digitalocean.com/community/tutorials/how-to-deploy-python-wsgi-applications-using-uwsgi-web-server-with-nginx)
+
+uwsgi.conf文件里面需要注意的有这么一条
+[uwsgi]
+module = somefile:app ## 当前目录下有一个somefile.py文件，里面有一个app = Flask(__name__)
+
+
 
 requirements.txt的生成和使用
 当然都要在virtualenv中了
-> (venv) $ pip freeze >requirements.txt # 创建
+> (venv) $ pip freeze > requirements.txt # 创建
 > (venv) $ pip install -r requirements.txt ##使用
 
 

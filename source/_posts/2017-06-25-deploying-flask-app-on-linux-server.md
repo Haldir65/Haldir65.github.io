@@ -111,6 +111,26 @@ if __name__ == '__main__':
 
 ```
 
+Flask设置cookie:
+```python
+from flask import Flask,make_response,request
+app = Flask(__name__)
+
+@app.router('/setcookie')
+def setcookie():
+    resp = make_response('Setting cookies')
+    resp.set_cookie('framework','flask')
+    return resp
+
+@app.route('/getcookie')
+def getcookie():
+    framework = request.cookies.get('framework')
+    return 'The frame work stored in cookie is '+framework
+
+if __name__ == "__main__":
+    app.run(debug=True)
+```
+
 ## flask操作数据库
 [mysql](https://www.thatyou.cn/flask%E4%BD%BF%E7%94%A8flask-sqlalchemy%E6%93%8D%E4%BD%9Cmysql%E6%95%B0%E6%8D%AE%E5%BA%93%EF%BC%88%E5%9B%9B%EF%BC%89-%E8%81%94%E8%A1%A8%E5%A4%9A%E5%AF%B9%E5%A4%9A%E6%9F%A5%E8%AF%A2/)
 
