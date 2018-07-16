@@ -275,3 +275,4 @@ vscode的返回上一个文件快捷键是ctrl + -
 * [SublimeText 快捷键](http://www.daqianduan.com/4820.html)
 * [MarkDown 语法学起来很快的](http://itmyhome.com/markdown/article/syntax/emphasis.html)
 * [travis 自动部署](https://blessing.studio/deploy-hexo-blog-automatically-with-travis-ci/)
+* [Legacy GitHub Services to GitHub Apps Migration Guide 2018年10月1号之后不再支持 Legacy GitHub Service](https://docs.travis-ci.com/user/legacy-services-to-github-apps-migration-guide/)

@@ -457,6 +457,7 @@ xclip -o ## 粘贴
 ```shell
 df -h //h的意思是human-readable
 du -sh //查看当前directory的大小
+du -sh * //du --summary --human-readable * 查看当前目录下所有文件和子目录的总大小
 du -h //查看当前目录下各个子目录分别的大小
 dh -h img// 查看img目录下文件及文件夹的大小
 dh -h img/1.jpg //查看指定文件的大小

@@ -644,6 +644,11 @@ sudo dpkg --configure -a
 
 unix domain socket用于ipc
 
+有时候cd进一个权限不够的目录会出现Permission Denied
+>sudo su
+cd directory
+直接转成root就好了
+
 [装java](https://www.digitalocean.com/community/tutorials/how-to-install-java-with-apt-get-on-ubuntu-16-04)
 [装Jenkins](https://www.digitalocean.com/community/tutorials/how-to-install-jenkins-on-ubuntu-16-04)
 Could not find or load main class的问题

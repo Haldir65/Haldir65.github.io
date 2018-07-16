@@ -263,7 +263,9 @@ Host github.com-jexchan
 	IdentityFile ~/.ssh/id_rsa_jexchan
 似乎这样就行了，就可以用git@xxxx去clone并且push了（记得在github账户的setting里面把.pub文件里面的内容粘贴进去）
 
-
+[Error: Permission denied (publickey)的解决方案](https://help.github.com/articles/error-permission-denied-publickey/)
+ssh -vT git@github.com ## 会输出详细的信息
+[multiple github account](https://stackoverflow.com/questions/3225862/multiple-github-accounts-ssh-config)
 
 ## 16. 空目录推送到远端
 常常在node项目中看到一个static文件夹，里面只有一个.gitkeep文件，这个文件的意思是，就算这个目录是空的，也得推送到远端。

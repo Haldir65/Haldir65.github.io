@@ -172,6 +172,8 @@ nginx -s stop // force stop on windows
 ### 4.2 限制日志文件的大小
 根据上面的config文件，默认的访问日志是在/var/log/nginx/access.log这个文件里面。限制这个文件的大小的方法：
 [serverfault](https://serverfault.com/questions/427144/how-to-limit-nginx-access-log-file-size-and-compress)
+
+[访问日志的设置，以及图形化统计](http://www.ttlsa.com/linux/the-nginx-log-configuration/)。其实还可以结合awk做文本统计
 ```
 /etc/logrotate.d/nginx
 /var/log/nginx/access_log {
