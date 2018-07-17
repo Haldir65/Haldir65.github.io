@@ -17,7 +17,7 @@
 <meta property="og:description" content="使用 hexo 写博客以来，记录下来的问题越来越多。只希望下次再碰到同样的问题时，不要再去浪费时间去查找。如果想要给自己的 blog 一个值得置顶的文章的话，我觉得一篇记录使用 hexo 过程中的一些解决问题的方法的文章是再合适不过的了。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/40164340_40164340_1414330224938_mthumb.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-07-16T11:14:46.376Z">
+<meta property="og:updated_time" content="2018-07-17T11:09:12.225Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hexo部署个人博客记录">
 <meta name="twitter:description" content="使用 hexo 写博客以来，记录下来的问题越来越多。只希望下次再碰到同样的问题时，不要再去浪费时间去查找。如果想要给自己的 blog 一个值得置顶的文章的话，我觉得一篇记录使用 hexo 过程中的一些解决问题的方法的文章是再合适不过的了。">
@@ -260,6 +260,18 @@ ga('send', 'pageview');
 <li><a href="https://blessing.studio/deploy-hexo-blog-automatically-with-travis-ci/">travis 自动部署</a></li>
 <li><a href="https://docs.travis-ci.com/user/legacy-services-to-github-apps-migration-guide/">Legacy GitHub Services to GitHub Apps Migration Guide 2018年10月1号之后不再支持 Legacy GitHub Service</a></li>
 </ul>
+<p><a href="https://github.com/travis-ci/travis.rb/issues/437">travis ci加密文件无法在travis以外的地方解密，因为key,value都存在travis的数据库了</a></p>
+<p><a href="https://github.com/travis-ci/travis-ci/issues/9668">travis加密文件后用openssl解密出现iv undefined的错误</a></p>
+<p>iv undefined</p>
+<blockquote>
+<p>travis env list<br>encrypted_476ad15a8e52_key=[secure]<br>encrypted_476ad15a8e52_iv=[secure]<br>明明是存在的</p>
+</blockquote>
+<p>在linux 里面运行travis endpoint<br>果然是 API endpoint: <a href="https://api.travis-ci.org/">https://api.travis-ci.org/</a><br>而新的endpoint应该是 <a href="https://api.travis-ci.com/">https://api.travis-ci.com/</a><br>于是travis encrypt-file –help</p>
+<blockquote>
+<p>–pro  short-cut for –api-endpoint ‘<a href="https://api.travis-ci.com/">https://api.travis-ci.com/</a>‘<br>–org short-cut for –api-endpoint ‘<a href="https://api.travis-ci.org/">https://api.travis-ci.org/</a>‘</p>
+</blockquote>
+<p>所以<br>travis encrypt-file super_secret.txt 应该改成<br>travis encrypt-file super_secret.txt –pro</p>
+<p>因为默认的$encrypted_476ad15a8e52_key其实已经存储在travis-ci.org上了<br>所以在travis-ci.com上的项目当然找不到</p>
 
       
 
