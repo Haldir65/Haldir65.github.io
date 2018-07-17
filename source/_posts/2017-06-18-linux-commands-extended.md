@@ -605,6 +605,7 @@ nmap可以用来扫描某台远程主机上open的port[直接看nmap cheetsheet�
 > nmap -p 1-100 192.168.1.1 ## 扫描1-100的port，非常慢
 
 linux的swap文件需要经常读写，这对于ssd来说是一个需要注意的地方
+[digital ocean在添加swap教程的最前面就写了不建议ssd用户添加swap,因为会费ssd](https://www.digitalocean.com/community/tutorials/how-to-add-swap-space-on-ubuntu-16-04)
 
 [bash下的一些快捷键](https://stackoverflow.com/questions/12334526/on-bash-command-line-how-to-delete-all-letters-before-cursor)
 ```

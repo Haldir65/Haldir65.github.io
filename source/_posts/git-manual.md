@@ -237,35 +237,52 @@ git push --force
 > ssh-keygen ## 这个基本上在网上都能找到，可以传参数，生成的文件名，密码什么的
 > cat ~/.ssh/id_rsa.pub | clip ## 中间的管道是把内容搞到剪切板上，clip是windows上的命令
 > ## 去粘贴吧
+
+[一台电脑上存储两个github账号的ssh的方式]()
+> $ cd ~/.ssh
+$ ssh-keygen -t rsa -C "your_email@associated_with_githubPersonal.com"
+# save it as id_rsa_personal when prompted
+$ ssh-keygen -t rsa -C "your_email@associated_with_githubWork.com"
+# save it as id_rsa_work when prompted
+
+由此创建四个文件：
+id_rsa_personal
+id_rsa_personal.pub
+id_rsa_work
+id_rsa_work.pub
+
+touch config
+config文件里面
+># githubPersonal
+Host personal
+   HostName github.com
+   User git
+   IdentityFile ~/.ssh/id_rsa_personal
+
+# githubWork
+Host work
+   HostName github.com
+   User git
+   IdentityFile ~/.ssh/id_rsa_work
+
+ssh-add -D
 一台电脑上同时要添加github和gitlab的权限，或者一台电脑上要同时添加两个github账户的权限
 > ssh-keygen -t rsa -C "your_email@youremail.com"
-由此创建两个文件：
-~/.ssh/id_rsa_activehacker
-~/.ssh/id_rsa_jexchan
-关键是下面两个命令
-$ ssh-add ~/.ssh/id_rsa_activehacker
-$ ssh-add ~/.ssh/id_rsa_jexchan
 
-接下来
-$ cd ~/.ssh/
-$ touch config
-$ subl -a config
-#activehacker account
-Host github.com-activehacker
-	HostName github.com
-	User git
-	IdentityFile ~/.ssh/id_rsa_activehacker
+$ ssh-add id_rsa_personal
+$ ssh-add id_rsa_work
 
-#jexchan account
-Host github.com-jexchan
-	HostName github.com
-	User git
-	IdentityFile ~/.ssh/id_rsa_jexchan
+ssh-add -l
+ssh -Tv personal
+ssh -Tv work
 似乎这样就行了，就可以用git@xxxx去clone并且push了（记得在github账户的setting里面把.pub文件里面的内容粘贴进去）
 
 [Error: Permission denied (publickey)的解决方案](https://help.github.com/articles/error-permission-denied-publickey/)
 ssh -vT git@github.com ## 会输出详细的信息
 [multiple github account](https://stackoverflow.com/questions/3225862/multiple-github-accounts-ssh-config)
+[Digital ocean关于.ssh/config文件的解释非常好](https://www.digitalocean.com/community/tutorials/how-to-configure-custom-connection-options-for-your-ssh-client)
+
+[详细的关于如何用ssh管理多个github账户的教程](http://mherman.org/blog/2013/09/16/managing-multiple-github-accounts/)
 
 ## 16. 空目录推送到远端
 常常在node项目中看到一个static文件夹，里面只有一个.gitkeep文件，这个文件的意思是，就算这个目录是空的，也得推送到远端。

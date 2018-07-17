@@ -276,3 +276,28 @@ vscode的返回上一个文件快捷键是ctrl + -
 * [MarkDown 语法学起来很快的](http://itmyhome.com/markdown/article/syntax/emphasis.html)
 * [travis 自动部署](https://blessing.studio/deploy-hexo-blog-automatically-with-travis-ci/)
 * [Legacy GitHub Services to GitHub Apps Migration Guide 2018年10月1号之后不再支持 Legacy GitHub Service](https://docs.travis-ci.com/user/legacy-services-to-github-apps-migration-guide/)
+
+[travis ci加密文件无法在travis以外的地方解密，因为key,value都存在travis的数据库了](https://github.com/travis-ci/travis.rb/issues/437)
+
+[travis加密文件后用openssl解密出现iv undefined的错误](https://github.com/travis-ci/travis-ci/issues/9668)
+
+iv undefined
+
+> travis env list 
+encrypted_476ad15a8e52_key=[secure]
+encrypted_476ad15a8e52_iv=[secure]
+明明是存在的
+
+在linux 里面运行travis endpoint
+果然是 API endpoint: https://api.travis-ci.org/
+而新的endpoint应该是 https://api.travis-ci.com/
+于是travis encrypt-file --help
+> --pro  short-cut for --api-endpoint 'https://api.travis-ci.com/'
+--org short-cut for --api-endpoint 'https://api.travis-ci.org/'
+
+所以
+travis encrypt-file super_secret.txt 应该改成
+travis encrypt-file super_secret.txt --pro
+
+因为默认的$encrypted_476ad15a8e52_key其实已经存储在travis-ci.org上了
+所以在travis-ci.com上的项目当然找不到
