@@ -1,5 +1,5 @@
 ---
-title: 2108-07-03-celery-cheetsheet
+title: celery-cheetsheet
 date: 2018-07-03 08:43:41
 tags:
 ---

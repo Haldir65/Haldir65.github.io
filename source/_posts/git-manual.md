@@ -229,31 +229,31 @@ git push --force
 ```
 
 ## 14.既然是shell环境，那当然可以写bash 脚本
-- git add . && git commit -m "stuff" && git push
-一部搞定，前提是每一步都得成功，原理就是bash脚本的&&和||操作符。
+> git add . && git commit -m "stuff" && git push
+### 一部搞定，前提是每一步都得成功，原理就是bash脚本的&&和||操作符。
 
 ## 15. git-error-please-make-sure-you-have-the-correct-access-rights-and-the-reposito
 总会有不小心的时候把本地的sshkey干掉了，解决方法就是本地生成sshkey，然后粘贴到你的github或者gitlab网站上
 > ssh-keygen ## 这个基本上在网上都能找到，可以传参数，生成的文件名，密码什么的
 > cat ~/.ssh/id_rsa.pub | clip ## 中间的管道是把内容搞到剪切板上，clip是windows上的命令
-> ## 去粘贴吧
+> 去粘贴吧
 
 [一台电脑上存储两个github账号的ssh的方式]()
 > $ cd ~/.ssh
 $ ssh-keygen -t rsa -C "your_email@associated_with_githubPersonal.com"
-# save it as id_rsa_personal when prompted
-$ ssh-keygen -t rsa -C "your_email@associated_with_githubWork.com"
-# save it as id_rsa_work when prompted
+### save it as id_rsa_personal when prompted
+> $ ssh-keygen -t rsa -C "your_email@associated_with_githubWork.com"
+### save it as id_rsa_work when prompted
 
 由此创建四个文件：
 id_rsa_personal
-id_rsa_personal.pub
+id_rsa_personal.pub ## 这里面的内容是要粘到github账户setting里面的
 id_rsa_work
 id_rsa_work.pub
 
-touch config
-config文件里面
-># githubPersonal
+touch config，添加如下内容
+```config
+#githubPersonal
 Host personal
    HostName github.com
    User git
@@ -264,14 +264,12 @@ Host work
    HostName github.com
    User git
    IdentityFile ~/.ssh/id_rsa_work
-
+```
 ssh-add -D
 一台电脑上同时要添加github和gitlab的权限，或者一台电脑上要同时添加两个github账户的权限
 > ssh-keygen -t rsa -C "your_email@youremail.com"
-
 $ ssh-add id_rsa_personal
 $ ssh-add id_rsa_work
-
 ssh-add -l
 ssh -Tv personal
 ssh -Tv work
