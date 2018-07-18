@@ -515,3 +515,5 @@ Authorization: Token 登录.接口.返回的token
 
 注意Token这个单词后面有一个空格
 
+[caching django with redis](https://realpython.com/caching-in-django-with-redis/)
+
