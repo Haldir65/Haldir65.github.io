@@ -301,3 +301,5 @@ travis encrypt-file super_secret.txt --pro
 
 因为默认的$encrypted_476ad15a8e52_key其实已经存储在travis-ci.org上了
 所以在travis-ci.com上的项目当然找不到
+
+[自动部署的另一个实例](https://github.com/openwrtio/openwrtio.github.io/blob/mkdocs/.travis.yml)

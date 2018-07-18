@@ -41,6 +41,14 @@ def handle_post():
     print('uid is %s ,name is %s ' % (uid, name))
     return '200 Ok, or whatever you like'  
 
+从request中获得json数据
+@app.route('/api/add_message/<uuid>', methods=['GET', 'POST'])
+def add_message(uuid):
+    content = request.get_json(silent=True)
+    print content
+    return uuid   
+前提是客户端发来的request中包含'Content-Type' == 'application/json'的header    
+
 if __name__ == '__main__':
     app.run(port=12345, debug=True) #设置为True后，会自动检测到服务端代码更改并reload，出错了也会给client返回实际的错误堆栈， 生产环境不要打开Debug 。
 

@@ -265,6 +265,11 @@ Host work
    User git
    IdentityFile ~/.ssh/id_rsa_work
 ```
+另外,确保只有owner有读写权限chmod 600 ~/.ssh/config
+
+error:Could not open a connection to your authentication agent.
+> ssh-agent bash
+
 ssh-add -D
 一台电脑上同时要添加github和gitlab的权限，或者一台电脑上要同时添加两个github账户的权限
 > ssh-keygen -t rsa -C "your_email@youremail.com"
@@ -274,6 +279,12 @@ ssh-add -l
 ssh -Tv personal
 ssh -Tv work
 似乎这样就行了，就可以用git@xxxx去clone并且push了（记得在github账户的setting里面把.pub文件里面的内容粘贴进去）
+
+[如何避免每次都得输入ssh-add id_rsaxxx的现象](https://stackoverflow.com/questions/3466626/add-private-key-permanently-with-ssh-add-on-ubuntu)
+
+然后每次clone的时候，不能用
+> git clone git@github.com:gothinkster/node-express-realworld-example-app.git
+> git clone git@personal:gothinkster/node-express-realworld-example-app.git ### 改成这样就好啦
 
 [Error: Permission denied (publickey)的解决方案](https://help.github.com/articles/error-permission-denied-publickey/)
 ssh -vT git@github.com ## 会输出详细的信息
@@ -307,6 +318,13 @@ git submodule update --init ## 比如说shadowsocks工程
 
 git branch -r 有时候不显示所有的remote branch，亲测，remove掉origin，重新添加然后fetch就好了
 
+git 统计commiter人数
+> git log --pretty='%aN' | sort -u | wc -l
+git log --oneline | wc -l ### 提交总数统计
+git log --pretty='%aN' | sort | uniq -c | sort -k1 -n -r | head -n 5 ###查看仓库提交者排名前 5
+
+查看最近一次commit都改了什么
+> git diff HEAD~1 HEAD
 
 ## Reference
 -[git reset和revert](http://yijiebuyi.com/blog/8f985d539566d0bf3b804df6be4e0c90.html)

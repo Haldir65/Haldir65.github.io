@@ -36,7 +36,9 @@ server
 以Okio为例，maven的搜索网站是<p>https://search.maven.org/remote_content?g=com.squareup.okio&a=okio&v=LATEST</p>，实际下发的域名是<p>https://repo1.maven.org/maven2/com/squareup/okio/okio/1.14.0/okio-1.14.0.jar</p>。用wget看，是302重定向了。
 
 
+[在ubuntu下使用nginx部署Spring boot application](https://www.linode.com/docs/development/java/how-to-deploy-spring-boot-applications-nginx-ubuntu-16-04/)
 
+[example app](https://github.com/gothinkster/spring-boot-realworld-example-app)
 
 补充一些tomcat和servlet的知识
 tomcat是web container,servlet是处理业务逻辑的。
