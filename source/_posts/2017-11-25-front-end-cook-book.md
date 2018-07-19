@@ -68,6 +68,7 @@ Content-Type:application/x-www-form-urlencoded; charset=UTF-8这句话其实就�
 假如我在一个经过编码的 URI 中直接添加加号，然后直接被拿去解码，加号就会妥妥的被替换成空格了。
 
 我就碰到过那种后台传下来的url中包含'+'，然后用URLDecoder去decode一遍（这时候加号已经被替换成空格了），再去用正则match的时候，发现根本匹配不上这个url.
+[那么如何判断一个string是否被encode过？](https://stackoverflow.com/questions/19650431/detect-whether-javasscript-string-has-been-encoded-using-encodeuricomponent)
 
 
 由此想到url中出现汉字的情况，因为网络传输只能是0101这种，那么就可以用utf-8将汉字的unicode形式传输出去，后台再去根据商定好的encode format去解码。（所以java的URLDecoder的decode方法接受两个参数，一个是裸的文本,http本来就是text based，这没办法，第二个是encoding）。只要两端商定了同一种编码格式，那就能正常的通信。

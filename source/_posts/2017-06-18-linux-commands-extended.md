@@ -255,6 +255,8 @@ cat -n rsyslog.conf # 显示行号，报错的时候方便处理
 - curl -o home.html http://www.baidu.com  #把百度首页抓下来，写到home.html中
 - curl -d "user=nick&password=12345" http://www.xxx.com/login.jsp # 提交表单，发起POST请求
 - [curl的几种常见用法](http://www.codebelief.com/article/2017/05/linux-command-line-curl-usage/)
+- curl -i -H "Accept: application/json" "https://jsonplaceholder.typicode.com/posts" ## -i 表示include，就是说把header包含在response中
+- 要是只需要header的话
 
 下面是一个简单的通过CURL提交POST请求的方式
 -X是指定HTTP method，默认是GET

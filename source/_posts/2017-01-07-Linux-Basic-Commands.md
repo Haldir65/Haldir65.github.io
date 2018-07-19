@@ -600,9 +600,14 @@ netstat -ie ##比较友好的方式展示当前各个端口的流量，就是显
 netstat -nlpt ##获取进程名、进程号以及用户 ID
 netstat -s ##可以打印出网络统计数据，包括某个协议下的收发包数量。
 netstat -ct ## c:持续输出
+netstat -tn ##
 
 ## 使用watch命令监视active状态的连接，实时显示网络流量
 watch -d -n0 "netstat -atnp | grep ESTA"
+
+## 列出当前所有连接到本机的远程ip地址并排序
+netstat -tn 2>/dev/null | grep :80 | awk '{print $5}' | cut -d: -f1 | sort | uniq -c | sort -nr | head
+
 ```
 
 
@@ -636,6 +641,7 @@ nohup node server.js > /dev/null 2>&1 &
 3. 2>&1 means: stderr also goes to the stdout (which is already redirected to /dev/null). You may replace &1 with a file path to keep a log of errors, e.g.: 2>/tmp/myLog
 4. & at the end means: run this command as a background task.
 ```
+其实用supervisor也可以
 
 
 ```

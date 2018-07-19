@@ -283,6 +283,8 @@ network, disk ,database, io , dic, list ,etc
 class object orientated  
 
 
+[如何使用全局变量, global variables are dangerous](https://stackoverflow.com/questions/423379/using-global-variables-in-a-function)
+
 
 
 ### Reference

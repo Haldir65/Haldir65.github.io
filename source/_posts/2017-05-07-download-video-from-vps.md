@@ -37,7 +37,7 @@ sudo chmod a+rx /usr/local/bin/youtube-dl
 
 谁也不想要后面的乱码
 ```shell
-youtube-dl -o '%(title)s.%(ext)s' https://www.youtube.com/watch?v=rimXGaUdaLg
+youtube-dl -o '%(title)s.%(ext)s' https://www.youtube.com/watch?v=rimXGaUdaLg ##其实就是一个模板了，分别是title和文件的extension
 ```
 youtube-dl的可扩展性好很多
 

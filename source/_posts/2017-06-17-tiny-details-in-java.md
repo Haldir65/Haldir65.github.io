@@ -108,8 +108,36 @@ OkHttp 3.3.0 [issue](https://github.com/square/okhttp/issues/2394)
         value[3]='_';   //修改a所指向的值
 
   这样a,b,c 的值都改掉了      
-
   ```
+```java
+  void internSample(){
+        String str1 = "Go to hell";
+        String str2 = str1.intern();
+        System.out.println(str1==str2);
+        System.out.println("before modification str1 =  "+str1);
+        System.out.println("before modification str2 =  "+str2);
+        try {
+            Field f = String.class.getDeclaredField("value");
+            f.setAccessible(true);
+            f.set(str2,"Dump ass".toCharArray());
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        System.out.println("after modification str1 = "+ str1);
+        System.out.println("after modification str2 = "+ str2);
+    }
+```
+输出：
+> true
+before modification str1 =  Go to hell
+before modification str2 =  Go to hell
+after modification str1 = Dump ass
+after modification str2 = Dump ass
+
+Process finished with exit code 0
+
 
 ## 5. 注解
 ```java
@@ -486,7 +514,14 @@ public class Test {
 @HotSpotIntrinsicCandidate
    public native int hashCode();//是一个native方法
 ```
-[默认返回内存中的地址](https://stackoverflow.com/questions/2237720/what-is-an-objects-hash-code-if-hashcode-is-not-overridden)，
+[默认返回内存中的地址](https://stackoverflow.com/questions/2237720/what-is-an-objects-hash-code-if-hashcode-is-not-overridden)
+[其实也不能真当做是内存地址](https://stackoverflow.com/questions/1961146/memory-address-of-variables-in-java)
+> System.identityHashCode()方法返回的内容是vm 的implementation detail（亦即不同vm之间的实现方式可能不同），虽然多数时候这个值是object的initial memory address。但vm随时可能把这个object挪走，所以Getting the memory addresses of variables is meaningless within Java。
+
+System.identityHashCode返回的形式是1360875712这样的十进制的int，需要转成2进制Integer.toBinaryString
+
+
+
 
 ### 31. 接口里面放一个接口这种事情也不是没干过
 android.content.DialogInterface.java
@@ -1366,6 +1401,10 @@ public static void main(String[] args){
 > jar -cvf HelloWorld.jar HelloWorld.class   #将HelloWorld.class文件打入jar包
 > jar cvf xxx.jar ./ 打当前所有的class
 > jar cvfm xxx.jar ./META-INF/MANIFEST.MF ./ ##修改jar包，使用原有的manifest文件
+
+[创建一个jar包可以使用命令行，也可以使用maven](https://dzone.com/articles/java-8-how-to-create-executable-fatjar-without-ide)
+如果想要让这个jar文件变成可执行的，需要添加一个Manifest.txt文件,在里面包含Main-Class内容
+[stackoverflow的解释]](https://stackoverflow.com/questions/4597866/java-creating-jar-file)
 
 [intelij idea打jar包更简单](http://blog.csdn.net/xuemengrui12/article/details/74984731)
 
