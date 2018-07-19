@@ -180,6 +180,9 @@ awk '/[0-8]/ { print }' test.txt // 包含0-8任一数字的
 awk '/^[0-8]/ { print }' test.txt // 以0-8任一数字开头的
 awk '/[0-8]$/ { print }' test.txt //以0-8任一数字结尾的
 
+
+sudo last | awk '{ print $(NF-7)}' //我想看倒数第7列的数据
+
 和管道结合的：
 grep -i test test.txt | awk '/[0-9]/ { print }'
 -i表示case insensitive,大小写都算.然后找出其中包含数字的。

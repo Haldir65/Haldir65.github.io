@@ -462,6 +462,7 @@ location ~* /image/.*\.(jpg|gif|png)$ {
 ##获取各个IP访问次数
 
 awk '{print $1}' nginx.access.log |sort |uniq -c|sort -n
+sudo last | awk '{ print $(NF-7)}' | sort | uniq -c | sort -n //统计登录ip次数
 
 ## 新建一个黑名单文件 blacklist.conf ,放在 nginx/conf下面。
 
