@@ -280,7 +280,8 @@ ssh -Tv personal
 ssh -Tv work
 似乎这样就行了，就可以用git@xxxx去clone并且push了（记得在github账户的setting里面把.pub文件里面的内容粘贴进去）
 
-[如何避免每次都得输入ssh-add id_rsaxxx的现象](https://stackoverflow.com/questions/3466626/add-private-key-permanently-with-ssh-add-on-ubuntu)
+[如何避免每次都得输入ssh-add id_rsaxxx的现象](https://stackoverflow.com/questions/3466626/add-private-key-permanently-with-ssh-add-on-ubuntu) 
+手动将clone下来的Git仓库的origin改成下面这种是可以的
 
 然后每次clone的时候，不能用
 > git clone git@github.com:gothinkster/node-express-realworld-example-app.git

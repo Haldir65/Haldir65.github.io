@@ -329,6 +329,8 @@ $(function() {
 
 });
 ```
+来看看xss一般的手段
+> <img src="#" onerror="alert(/xss/)" />
 
 防范XSS攻击的手段中提到了，对于用户的输入，需要有条件的进行转换
 比如说
@@ -362,8 +364,7 @@ private static String htmlEncode(char c) {
 &lt;script&gt;window.location.href=&quot;http://www.baidu.com&quot;&lt;/script&gt;
 ```
 
-来看看xss一般的手段
-> <img src="#" onerror="alert(/xss/)" />
+
 
 [cms(content management sustem)参考](https://github.com/ximolang/QuillCMS)
 

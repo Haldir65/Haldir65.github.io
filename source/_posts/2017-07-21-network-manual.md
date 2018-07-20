@@ -256,6 +256,24 @@ CORS请求会带上Origin请求头，用来向别人的网站表明自己是谁�
 [浏览器对于缓存的实际处理](http://www.jianshu.com/p/fd00f0d02f5f)，是否过期由Cache-Control标识的max-age和Expires判断。Cache-Control的优先级较高。[From Chrome](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=zh-cn)
 简单来说就是先看客户端是否Expire，然后去服务器看下Etag,最后看Last-Modified那个。
 
+[一个response里面出现多个相同的key的header是符合标准的](https://stackoverflow.com/questions/4371328/are-duplicate-http-response-headers-acceptable)
+
+[实际的例子](https://docs.oracle.com/javase/tutorial/deployment/jar/basicsindex.html)
+```
+X-Akamai-Session-Info: name=ADVPF_PREFETCHABLE_TRACE; value=docs.oracle.com: TDCOUPLED ANY
+X-Akamai-Session-Info: name=ENABLE_SD_POC; value=yes
+X-Akamai-Session-Info: name=NL_22357_ORACLEDEVELOPERIPBLOCKL_NAME; value=Oracle Developer IP Block List
+X-Akamai-Session-Info: name=AKA_PM_NETSTORAGE_ROOT; value=/319188
+X-Akamai-Session-Info: name=AKA_PM_SR_NODE_ID; value=0
+X-Akamai-Session-Info: name=FASTTCP_RENO_FALLBACK_DISABLE_OPTOUT; value=on
+X-Akamai-Session-Info: name=ADVPF_PREFETCHABLE_CATEGORY; value=TDCOUPLED_ANY
+X-Akamai-Session-Info: name=PMUSER_COUNTRY_CODE; value=CN; full_location_id=country_code
+X-Akamai-Session-Info: name=NL_23268_ORACLESHOPIPBLOCKLIST_NAME; value=Oracle Shop IP Block List
+```
+实际的效应等同于将所有的values filed用逗号分隔之后串在一起丢在一个header后面。
+
+from wiki page: Akamai是一家总部位于美国马萨诸塞州剑桥市的内容分发网络和云服务提供商，是世界上最大的分布式计算平台之一，承担了全球15-30%的网络流量。
+
 
 补上一个http statuscode = 302的实际例子吧，今晚看腾讯新闻的时候抓到的
 ```

@@ -250,6 +250,8 @@ Http底层TCP ,ACK 等等需要tcpcump结合wireShark抓包
 
 [非官方的mime-type大全](https://www.sitepoint.com/mime-types-complete-list/)
 [MDN上收录的mime-type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Complete_list_of_MIME_types)
+[X-Content-Type-Options:nosniff](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Optionshttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options).就是说服务器返回的Response中如果包含这个header的话，script和styleSheet元素会拒绝错误的MIME类型的响应。主要是为了防止给予MIME类型的混淆攻击
+
 
 > npm install -g loadtest ##一个node的压力测试的web client
 loadtest -n 100 -k  http://localhost:8000/api/somebackend

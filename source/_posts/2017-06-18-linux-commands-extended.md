@@ -266,6 +266,15 @@ cat -n rsyslog.conf # 显示行号，报错的时候方便处理
 curl --header "Content-Type: application/json" -X POST -d '{"userId":10,"title":"sometitle2","body":"somebody2"}' https://jsonplaceholder.typicode.com/posts
 ## json规范不允许单引号
 curl --header "Content-Type: application/json" -X POST -d '{"userId":10,"title":"sometitle2","body":"somebody2","hobby":[{"name":"bob","age":10},{"name":"sam","age":20}]}' http://127.0.0.1:5000/
+### curl show raw response
+curl -iv --raw https://www.google.com/ (#i是include header，v是verbose)
+
+甚至还有直接一行行写html报文的：
+```
+echo 'GET / HTTP/1.1
+Host: baidu.com
+' | openssl s_client -quiet -connect baidu.com:443 2>/dev/null
+```
  
 
 

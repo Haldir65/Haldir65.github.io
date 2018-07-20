@@ -303,3 +303,9 @@ travis encrypt-file super_secret.txt --pro
 所以在travis-ci.com上的项目当然找不到
 
 [自动部署的另一个实例](https://github.com/openwrtio/openwrtio.github.io/blob/mkdocs/.travis.yml)
+
+[hexo s 本地预览样式加载失败](Refused to execute script from 'http://localhost:4000/slider.e37972.js' because its MIME type ('text/html') is not executable, and strict MIME type checking is enabled.)
+
+hexo server的意思是类似于express的serve static功能，[默认只处理public文件下的文件，所以如果本地运行hexo s 出现404的话，直接copy到public文件夹下就可以了](https://hexo.io/zh-cn/docs/server.html)注意hexo clear会删掉public文件夹
+
+[Refused to Execute Script From Because Its MIME Type (Text/plain) Is Not Executable, and Strict MIME Type Checking Is Enabled]这句话的意思

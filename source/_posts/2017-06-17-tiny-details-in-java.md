@@ -1253,7 +1253,7 @@ public class Demo2 {
 <del>然后javac Demo2.java -> java Demo2 -> 错误: 找不到或无法加载主类 com.me.example.Demo2</del>
 应该javac Demo2.java -> 把生成的Demo2.class粘贴到当前目录下新建的一个com/me/example文件夹下 -> java/com/me/example/Demo2 -> Hello there
 
-3. 非要把java文件写在src/com/me/example文件夹下？好啊
+3. 非要把带packagename的java文件写在src/com/me/example文件夹下？好啊
 ```java
 package com.me.example;
 
@@ -1405,6 +1405,44 @@ public static void main(String[] args){
 [创建一个jar包可以使用命令行，也可以使用maven](https://dzone.com/articles/java-8-how-to-create-executable-fatjar-without-ide)
 如果想要让这个jar文件变成可执行的，需要添加一个Manifest.txt文件,在里面包含Main-Class内容
 [stackoverflow的解释]](https://stackoverflow.com/questions/4597866/java-creating-jar-file)
+
+[创建一个可执行的jar包](https://www.javatpoint.com/how-to-make-an-executable-jar-file-in-java)
+First.java
+```java
+import javax.swing.*;    
+public class First{    
+First(){    
+JFrame f=new JFrame();    
+                    
+JButton b=new JButton("click");    
+b.setBounds(130,100,100, 40);    
+        
+f.add(b);    
+            
+f.setSize(300,400);    
+f.setLayout(null);    
+f.setVisible(true);    
+            
+f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);    
+}    
+public static void main(String[] args) {    
+    new First();    
+}    
+}    
+```
+
+myfile.mf
+> Main-Class: First
+
+注意在className后面必须有一个换行（In mf file, new line is must after the class name.）
+
+>javac First.java
+jar -cvmf myfile.mf myjar.jar First.class
+java -jar myjar.jar ## 即可运行
+
+
+
+
 
 [intelij idea打jar包更简单](http://blog.csdn.net/xuemengrui12/article/details/74984731)
 
