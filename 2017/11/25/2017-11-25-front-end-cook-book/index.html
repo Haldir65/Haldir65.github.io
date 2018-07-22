@@ -17,7 +17,7 @@
 <meta property="og:description" content="每一个领域都有些不知道该放哪的零碎的点，这里开辟一个新的地方，作为前端杂乱知识的汇总。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/coffee art life nature living drip dark bw.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-07-20T11:12:54.128Z">
+<meta property="og:updated_time" content="2018-07-22T15:19:06.475Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="前端速查手册">
 <meta name="twitter:description" content="每一个领域都有些不知道该放哪的零碎的点，这里开辟一个新的地方，作为前端杂乱知识的汇总。">
@@ -236,19 +236,18 @@ ga('send', 'pageview');
 <h3 id="跨域是一个比较大的知识点"><a href="#跨域是一个比较大的知识点" class="headerlink" title="跨域是一个比较大的知识点"></a>跨域是一个比较大的知识点</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">about:1 Failed to load http://api.douban.com/v2/movie/top250: Response to preflight request doesn&apos;t pass access control check: No &apos;Access-Control-Allow-Origin&apos; header is present on the requested resource. Origin &apos;http://localhost:8080&apos; is therefore not allowed access.</span><br></pre></td></tr></table></figure>
 <p>查了好久，原因是CORS(Control of Shared Resources)，通过ajax发起另一个domian(port)资源的请求默认是不安全的。主要是在js里面代码请求另一个网站(只要不满足host和port完全相同就不是同一个网站)，默认是被<a href="http://www.ruanyifeng.com/blog/2016/04/cors.html">禁止</a>的。chrome里面查看network的话，发现这条request确实发出去了，request header里面多了一个</p>
 <blockquote>
-<p>Origin:<a href="http://localhost:8080">http://localhost:8080</a><br>显然这不是axios设置的，在看到这条header后，如果’/movie/top250’这个资源文件没有设置’Access-Control-Allow-Origin: <a href="http://localhost:8080&#39;的话，浏览器就算拿到了服务器的回复也不会允许被开发者获取。这是CORS做出的策略，也是前端开发常提到的跨域问题。">http://localhost:8080&#39;的话，浏览器就算拿到了服务器的回复也不会允许被开发者获取。这是CORS做出的策略，也是前端开发常提到的跨域问题。</a><br>解决方法：<br>1.和服务器商量好CORS<br>2.使用jsonp(跨域请求并不限制带src属性的tag，比如script img这些)</p>
-<ol>
-<li>使用iframe跨域</li>
-</ol>
+<p>Origin:<a href="http://localhost:8080">http://localhost:8080</a><br>显然这不是axios设置的，在看到这条header后，如果’/movie/top250’这个资源文件没有设置’Access-Control-Allow-Origin: <a href="http://localhost:8080&#39;的话，浏览器就算拿到了服务器的回复也不会允许被开发者获取。这是CORS做出的策略，也是前端开发常提到的跨域问题。">http://localhost:8080&#39;的话，浏览器就算拿到了服务器的回复也不会允许被开发者获取。这是CORS做出的策略，也是前端开发常提到的跨域问题。</a></p>
 </blockquote>
+<p>解决方法：<br>1.和服务器商量好CORS<br>2.使用jsonp(跨域请求并不限制带src属性的tag，比如script img这些)<br>3.使用iframe跨域</p>
 <p>CORS还是比较重要的东西，<a href="http://www.ruanyifeng.com/blog/2016/04/cors.html">详解</a>，据说会发两次请求,且只支持GET请求。<br><a href="http://www.ruanyifeng.com/blog/2016/04/cors.html">cors的概念</a></p>
 <blockquote>
 <p>search “原生javaScript跨域”、’jsonp跨域请求豆瓣250’</p>
 </blockquote>
-<p><a href="http://www.jianshu.com/p/1f32c9a96064">jsonp跨域获取豆瓣250接口</a>，豆瓣能支持jsonp是因为豆瓣服务器响应了</p>
+<p><a href="http://www.jianshu.com/p/1f32c9a96064">jsonp跨域获取豆瓣250接口</a><br>豆瓣能支持jsonp是因为豆瓣服务器响应了</p>
 <blockquote>
-<p><a href="http://api.douban.com/v2/movie/top250?callback=anything这个query,这个anything是我们自己网页里面script里面定义的方法，豆瓣会返回一个">http://api.douban.com/v2/movie/top250?callback=anything这个query,这个anything是我们自己网页里面script里面定义的方法，豆瓣会返回一个</a>: anything({json})的数据回来，直接调用anything方法<br>json【JavaScript Object Notation】<br><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS">MDN上的corz</a></p>
+<p><a href="http://api.douban.com/v2/movie/top250?callback=anything这个query,这个anything是我们自己网页里面script里面定义的方法，豆瓣会返回一个">http://api.douban.com/v2/movie/top250?callback=anything这个query,这个anything是我们自己网页里面script里面定义的方法，豆瓣会返回一个</a>: anything({json})的数据回来，直接调用anything方法</p>
 </blockquote>
+<p>json【JavaScript Object Notation】<br><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS">MDN上的corz</a></p>
 <p>将网页设置为允许 XMLHttpRequest 跨域访问<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">"Access-Control-Allow-Origin"</span> <span class="attr">content</span>=<span class="string">"*"</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">"Access-Control-Allow-Origin"</span> <span class="attr">content</span>=<span class="string">"http://www.1688hot.com:80"</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
 <p>跨域的方法有很多，iframe是一种，iframe是在一个网页中展示另一个url页面资源的方式<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">id</span>=<span class="string">"video"</span> <span class="attr">width</span>=<span class="string">"420"</span> <span class="attr">height</span>=<span class="string">"315"</span> <span class="attr">src</span>=<span class="string">"https://www.baidu.com"</span> <span class="attr">frameborder</span>=<span class="string">"0"</span> <span class="attr">allowfullscreen</span>&gt;</span><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
 <p>然后在localhost起一个服务器预览，就能在页面中正常展示百度首页。</p>

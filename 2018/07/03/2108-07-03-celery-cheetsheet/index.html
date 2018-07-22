@@ -16,7 +16,7 @@
 <meta property="og:description" content="“There are only two hard things in Computer Science: cache invalidation and naming things.”— Phil Karlton">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/Celery_picture.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-07-20T11:12:54.132Z">
+<meta property="og:updated_time" content="2018-07-22T15:19:06.479Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="celery-cheetsheet">
 <meta name="twitter:description" content="“There are only two hard things in Computer Science: cache invalidation and naming things.”— Phil Karlton">
@@ -199,20 +199,14 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/Celery_picture.jpg?imageView2/2/w/600" alt=""></p>
-<blockquote>
-<p>“There are only two hard things in Computer Science: cache invalidation and naming things.”<br>— Phil Karlton<br><a id="more"></a></p>
+        <blockquote>
+<p>“There are only two hard things in Computer Science: cache invalidation and naming things.”<br>— Phil Karlton</p>
 </blockquote>
+<p><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/Celery_picture.jpg?imageView2/2/w/600" alt=""></p>
+<a id="more"></a>
 <p>因为需要使用Redis，在ubuntu上安装redis可以用apt-get，也能自己下载源码去make（前提是内存充足，内存不足的话make test会失败）。所以我干脆关掉了几个比较耗内存的进程，最后直接用apt-get装上了。</p>
 <p>下面这几步就算最简单的celery入门了<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> celery <span class="keyword">import</span> Celery</span><br><span class="line"></span><br><span class="line">app = Celery(<span class="string">'tasks'</span>, broker=<span class="string">'redis://localhost:6379/0'</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.task</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span><span class="params">(x, y)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> x + y</span><br></pre></td></tr></table></figure></p>
-<p>celery -A tasks worker –loglevel=info</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>from tasks import add<br>add.delay(4, 4)</p>
-</blockquote>
-</blockquote>
-</blockquote>
+<p>celery -A tasks worker –loglevel=info<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; from tasks import add</span><br><span class="line">&gt;&gt;&gt; add.delay(4, 4)</span><br></pre></td></tr></table></figure></p>
 <p>注意，windows上celery4不完全支持<br><a href="https://stackoverflow.com/questions/45744992/celery-raises-valueerror-not-enough-values-to-unpack">celery-raises-valueerror-not-enough-values-to-unpack</a></p>
 <p>基本的项目结构<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">proj/__init__.py</span><br><span class="line">    /celery.py</span><br><span class="line">    /tasks.py</span><br></pre></td></tr></table></figure></p>
 <p>proj/celery.py<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> __future__ <span class="keyword">import</span> absolute_import, unicode_literals</span><br><span class="line"><span class="keyword">from</span> celery <span class="keyword">import</span> Celery</span><br><span class="line"></span><br><span class="line">app = Celery(<span class="string">'proj'</span>,</span><br><span class="line">             broker=<span class="string">'amqp://'</span>,</span><br><span class="line">             backend=<span class="string">'amqp://'</span>,</span><br><span class="line">             include=[<span class="string">'proj.tasks'</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># Optional configuration, see the application user guide.</span></span><br><span class="line">app.conf.update(</span><br><span class="line">    result_expires=<span class="number">3600</span>,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app.start()</span><br></pre></td></tr></table></figure></p>
