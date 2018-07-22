@@ -63,7 +63,7 @@ GET请求最后跟不跟斜杠"/"无所谓，但是POST请求最后面得跟"/"(
 ## 2. http请求本质上是发送了一堆字符给服务器
 另外,domain(域名)是指www.wikipedia.org这种，DNS会把它转成一个ip地址
 而在http请求的header中经常或看到
-Host: www.baidu.com\r\n 这样的一行，其实这是[Http头字段](https://zh.wikipedia.org/wiki/HTTP%E5%A4%B4%E5%AD%97%E6%AE%B5)的标准请求字段，总之就是标准。这个Host指的是服务器的域名，就是domian。
+Host: www.baidu.com\r\n 这样的一行，其实这是[Http头字段](https://zh.wikipedia.org/wiki/HTTP%E5%A4%B4%E5%AD%97%E6%AE%B5)的标准请求字段，总之就是标准。这个Host指的是服务器的域名，就是domain。
 wiki上的[http名词解释](https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6%9C%AC%E4%BC%A0%E8%BE%93%E5%8D%8F%E8%AE%AE)
 
 ### 2.1 statusCode有些常用的还是要记住的：
@@ -218,7 +218,7 @@ Content-Type: image/jpeg
 
 - Expires:Mon, 01 Jan 1990 00:00:00 GMT    过期时间，这里应该是永不过期
 
-- HOST 服务器的域名(domian)或者ip地址
+- HOST 服务器的域名(domain)或者ip地址
 Host: www.baidu.com
 
 - If-Modified-Since:Fri, 24 Feb 2017 12:37:22 GMT 这个跟缓存有关
@@ -451,7 +451,7 @@ HTTP/2（超文本传输协议第2版，最初命名为HTTP 2.0），简称为h2
 SPDY也就是HTTP/2的前身，一种开放的网络传输协议，由Google开发，用来发送网页内容。基于传输控制协议（TCP）的应用层协议
 
 
-### 7. DNS(Domian Name System)
+### 7. DNS(domain Name System)
 通过java代码调用DNS的方式
 ```java
 public class Test {  
@@ -793,9 +793,9 @@ Time : Thu Mar 15 16:20:59 CST 2018</center>
 服务器返回的Sst-Cookie可以像上面一样有很多个。
 Set-Cookie: BAIDUID=259D5F393E329E8E44651C589037C093:FG=1; expires=Thu, 31-Dec-37 23:55:55 GMT; max-age=2147483647; path=/; domain=.baidu.com
 基本上格式就是： 
-> SOMEKEY=SOMEVALUE; expires=某个日期; path="某个路径"; domian="某个主站"
+> SOMEKEY=SOMEVALUE; expires=某个日期; path="某个路径"; domain="某个主站"
 
-expires,path,domain这些东西都是规范，下一次请求是，只有当这个cookie的domian和path匹配的上才会发送这个Cookie。
+expires,path,domain这些东西都是规范，下一次请求是，只有当这个cookie的domain和path匹配的上才会发送这个Cookie。
 
 
 

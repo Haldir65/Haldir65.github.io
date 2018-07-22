@@ -639,7 +639,7 @@ sudo ln -s /etc/nginx/sites-available/test.com /etc/nginx/sites-enabled/
 
 http这个directive下一层就是server了,一般来说，一个虚拟域名(virtual domain)就对应着一个server块。
 
-**接下来的东西就不要写在/etc/nginx/nginx.conf文件里了,这里应该是一个domian写一个.conf文件**
+**接下来的东西就不要写在/etc/nginx/nginx.conf文件里了,这里应该是一个domain写一个.conf文件**
 /etc/nginx/sites-available/default
 ```server
 server {
@@ -656,7 +656,7 @@ server {
         index index.html index.htm; ##有Index.html直接返回，没有的话尝试index.htm文件
 
         # Make site accessible from http://localhost/ ## localhost其实就是127.0.0.1，这是写在/etc/hosts里面的
-        server_name localhost; ## 这可以使得一个ip地址支持多个domian( This allows multiple domains to be served from a single IP address.)
+        server_name localhost; ## 这可以使得一个ip地址支持多个domain( This allows multiple domains to be served from a single IP address.)
 
         ### 这时的文件名应该叫/etc/nginx/sites-available/example.com
         server_name   example.com www.example.com; ##  example.com www.example.com都支持,example.com就支持旗下所有子域名。www.example.com, foo.example.com，等等
@@ -723,7 +723,7 @@ server {
 }
 ```
 [这个server_name是如何从request中提取出来的](https://serverfault.com/questions/834467/nginx-server-host-header-server-name)
-比方说你在浏览器里敲了" http://myserver/ ",浏览器就会去请求DNS server来确定这个domian对应的ip address。随后"myserver"这几个字会被写进HTTP 请求“Host: myserver”。
+比方说你在浏览器里敲了" http://myserver/ ",浏览器就会去请求DNS server来确定这个domain对应的ip address。随后"myserver"这几个字会被写进HTTP 请求“Host: myserver”。
 这是生产环境正常的逻辑。
 如果开发过程中的话，想要修改这个Host似乎改hosts可以实现
 sudo vim /etc/hosts
@@ -799,7 +799,7 @@ Directives are processed in the following order:（搜索url匹配的顺序如�
 3： All location directives with regular expressions (~ and ~* ) are processed.正则表达式搜索开始
 4： 如果上述都没找到，If no regular expressions match, the most specific literal string match is used.
 
-Make sure each file and folder under a domain will match at least one location directive.写配置的时候请确保某个domian下的所有文件都能至少被一条规则匹配上
+Make sure each file and folder under a domain will match at least one location directive.写配置的时候请确保某个domain下的所有文件都能至少被一条规则匹配上
 >While nginx’s configuration parser is technically capable of reading nested location blocks, this is neither recommended nor supported. ## 不建议写这种location一层套一层的
 
 

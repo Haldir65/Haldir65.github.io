@@ -889,7 +889,7 @@ UpgradeModel  aResult = xxxx;//解析服务器返回的后数据
 
 if (aResult != null && aResult.getData() != null ) {
       String url = aResult.getData().getDownUrl();
-      if (url == null || !TextUtils.equals(url, "the_domian_that_i_own")) {
+      if (url == null || !TextUtils.equals(url, "the_domain_that_i_own")) {
         // 如果不是自己掌握的域名，不下载
       }
 }

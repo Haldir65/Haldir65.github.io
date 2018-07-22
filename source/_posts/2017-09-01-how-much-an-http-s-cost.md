@@ -42,7 +42,7 @@ Flow Control的存在是有道理，但却使得每一条连接都得从很小�
 1. Sigle connection (/index.html；style.css全都放在一个连接里面)
 2. Pipelining  (一次性请求index.html以及style.css，这些东西全都放在一个请求里面)。这种方式的问题叫做 Head-of-line Blocking,由于tcp是可靠的协议，所以必须得等第一个请求的response回来，后续的请求才能执行。所以很多浏览器后来都放弃了对这种技术的支持。
 3. 于是人们开始一次性发出多个tcp请求。客户端能同时向一个host(不同host之间不影响)发起的请求最多6(不同浏览器数量不同)到8个。这么干的原因一方面是客户端自我保护，另一方面也是为了保护服务器不至于崩溃。具体在知乎上有[讨论](https://www.zhihu.com/question/19997004)
-所以我们经常看到知乎把api数据放在zhihu.com上，图片放在zhimg.com,统计放在zhstatic.com上。有时候还会有pic2.zhimg.com，pic3.zhimg.com。。。等等这些，还不是为了加快网页加载速度。(这就叫Domian Sharding)，这么干也有坏处，More DNS lookups。找dns花的时间多了。
+所以我们经常看到知乎把api数据放在zhihu.com上，图片放在zhimg.com,统计放在zhstatic.com上。有时候还会有pic2.zhimg.com，pic3.zhimg.com。。。等等这些，还不是为了加快网页加载速度。(这就叫domain Sharding)，这么干也有坏处，More DNS lookups。找dns花的时间多了。
 4. Inline resources
  直接把图片放在html里面传回来，这造成缓存失效。还有编码的问题
 5. Concatenating and Spriting resources
