@@ -118,6 +118,8 @@ du --max-depth=1 -h # 查看当前路径下所有文件/文件夹的大小
 du -k --max-depth=2 | sort -rn # 加上排序
 find / -name core -print -exec rm -rf {} \; //分号也要，亲测
 find / -size +100M：列出所有大于100M的文件，亲测。靠着这个找到了shadowsocks的日志文件,170MB
+上面这个命令是不能列出文件大小的，还想要查看文件大小的话
+find / -type f -size +50M -exec du -h {} \; | sort -n
 
 删除/boot分区不需要的内核
 先df -h看/boot分区使用情况；
@@ -663,6 +665,9 @@ unix domain socket用于ipc
 >sudo su
 cd directory
 直接转成root就好了
+
+nano直接跳到文本最后一行的方法是：
+> Ctrl + _ 然后Ctrl +V
 
 [装java](https://www.digitalocean.com/community/tutorials/how-to-install-java-with-apt-get-on-ubuntu-16-04)
 [装Jenkins](https://www.digitalocean.com/community/tutorials/how-to-install-jenkins-on-ubuntu-16-04)

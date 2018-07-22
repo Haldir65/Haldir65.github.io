@@ -230,13 +230,14 @@ class News(mydb.Model):
 ```
 
 开始建表吧，直接在shell里面搞要快很多
+```
 >>> python 
 from app import app ## 这个app是一个Flask实例
 from database import db
 from models import News,User,Newscate
 app.app_context().push() ## 这句话是必须的[context](http://flask-sqlalchemy.pocoo.org/2.3/contexts/)
 db.create_all() 
-
+```
 如果只要创建一张表的话可以这么干
 Model.__table__.create(session.bind)
 
@@ -273,6 +274,8 @@ CREATE TABLE t_news (
 )
 ```
 生成表之后，开始插入数据，还是在shell里面，快一点
+
+```
 >>  User.query.all() 
 [] ##数据为空
 >>> robin = User(user_name="Tim",user_password="secret",user_nickname="tim_nick",user_email="lenon@gmail.com")
@@ -293,8 +296,11 @@ FROM t_user
 WHERE t_user.user_id = %(param_1)s
 2018-07-15 10:26:58,359 INFO sqlalchemy.engine.base.Engine {'param_1': 1}
 >>> 1 ##这回就有了
+```
+
 
 因为news依赖两个Foreign key，user和newcate，且都不为空，所以在创建News之前得先创建Newscate
+````
 >>> breaking_news = Newscate(cate_name="beaking_news",cate_title="breaking News")
 >>> breaking_news
 <Newscate 'beaking_news'>
@@ -314,19 +320,23 @@ WHERE t_user.user_id = %(param_1)s
 2018-07-15 10:42:11,135 INFO sqlalchemy.engine.base.Engine INSERT INTO t_news (news_date, news_content, news_title, news_excerpt, news_status, news_modified, news_category, news_author) VALUES (%(news_date)s, %(news_content)s, %(news_title)s, %(news_excerpt)s, %(news_status)s, %(news_modified)s, %(news_category)s, %(news_author)s)
 2018-07-15 10:42:11,136 INFO sqlalchemy.engine.base.Engine {'news_date': datetime.datetime(2018, 7, 15, 2, 41, 50, 454505), 'news_content': 'content of news item one', 'news_title': 'title of news item one', 'news_excerpt': 'excerpt of news item one', 'news_status': 'normal', 'news_modified': datetime.datetime(2018, 7, 15, 10, 41, 50, 454505), 'news_category': 2, 'news_author': 1}
 2018-07-15 10:42:11,141 INFO sqlalchemy.engine.base.Engine COMMIT
+```
 查下数据库，News也插入成功
 
 后面开始在gui界面中往数据库里面插入一些数据，准备好假数据之后要db.session.commit()一下才会在sqlalchemy这边同步一下。(session好像也没有什么类似于sync的api)
 
 开始查询：
 ### 根据一个Newsid去查找这篇news的user
+
+```
 >>> News.query.all()[0].news_author 
 1 ##正常啊，这里存储的就是user的id,但是我们想要User，还记得上面建表的时候那个"backref"嘛，写的是backref='user'
 >>> News.query.all()[0].user
 <User 'tim_nick'>
-
+```
 
 ## 查询所有发表过News的User（就是user.newses不为空List）
+```
 >>> User.query.filter(func.length(User.newses) > 0).all()
 [<User 'tim_nick'>, <User 'bounty hounter'>, <User 'sally williams'>, <User 'john doe'>]显然不正确
 
@@ -340,19 +350,22 @@ FROM t_user, t_news
 WHERE t_user.user_id = t_news.news_author
 2018-07-15 11:09:17,585 INFO sqlalchemy.engine.base.Engine {}
 [<User 'tim_nick'>]
+```
 
 ## 查询一个user发布过的所有news
+```
 >>> News.query.filter(News.news_author==1).all()
 2018-07-15 11:29:42,306 INFO sqlalchemy.engine.base.Engine SELECT t_news.news_id AS t_news_news_id, t_news.news_date AS t_news_news_date, t_news.news_content AS t_news_news_content, t_news.news_title AS t_news_news_title, t_news.news_excerpt AS t_news_news_excerpt, t_news.news_status AS t_news_news_status, t_news.news_modified AS t_news_news_modified, t_news.news_category AS t_news_news_category, t_news.news_author AS t_news_news_author
 FROM t_news
 WHERE t_news.news_author = %(news_author_1)s
 2018-07-15 11:29:42,306 INFO sqlalchemy.engine.base.Engine {'news_author_1': 1}
 [<News 'title of news item one'>, <News 'title of news item two'>]
-
+```
 
 
 
 ### 到这里一共有三张表，那么join这种联表查询也是ok的
+```
 >>> result = db.session.query(News.news_id, News.news_author, News.news_date, News.news_title, News.news_content, News.news_excerpt, News.news_status, News.news_modified, Newscate.cate_name, Newscate.cate_title, User.user_name, User.user_nickname).filter_by(news_id=1).join(Newscate, News.news_category == Newscate.cate_id).join(User, News.news_author == User.user_id).first()
 2018-07-15 14:08:27,487 INFO sqlalchemy.engine.base.Engine SELECT t_news.news_id AS t_news_news_id, t_news.news_author AS t_news_news_author, t_news.news_date AS t_news_news_date, t_news.news_title AS t_news_news_title, t_news.news_content AS t_news_news_content, t_news.news_excerpt AS t_news_news_excerpt, t_news.news_status AS t_news_news_status, t_news.news_modified AS t_news_news_modified, t_newscat.cate_name AS t_newscat_cate_name, t_newscat.cate_title AS t_newscat_cate_title, t_user.user_name AS t_user_user_name, t_user.user_nickname AS t_user_user_nickname
 FROM t_news INNER JOIN t_newscat ON t_news.news_category = t_newscat.cate_id INNER JOIN t_user ON t_news.news_author = t_user.user_id
@@ -363,9 +376,10 @@ WHERE t_news.news_id = %(news_id_1)s
 这里得到的是一个<class 'sqlalchemy.util._collections.result'>对象
 >>> result.cate_name ## 可以这么访问数据
 'economy'
-
+```
 
 ###查找所有用gmail注册的用户
+```
 >>>>>> db.session.query(User.user_name).filter(User.user_email.like("gmail")).all()
 2018-07-15 13:50:56,237 INFO sqlalchemy.engine.base.Engine SELECT t_user.user_name AS t_user_user_name
 FROM t_user
@@ -395,6 +409,7 @@ offset超出了实际数据的总量如何？
 
 除了标准的limit方法以外，下面这个paginate方法返回了一个pagination object
 >>> db.session.query(User.user_name).filter(User.user_email.like("%gmail%")).paginate(2,1,False).items
+```
 
 [MYSQL分页limit速度太慢优化方法](https://www.jianshu.com/p/7d1b6db64a8f)
 

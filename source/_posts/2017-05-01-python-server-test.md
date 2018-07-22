@@ -76,6 +76,10 @@ requirements/prod.txt
 flask db upgrade    
 flask run --with-threads
 
+windows下也能跑起来
+需要pip install pymysql
+
+
 curl其实也能实现和postman一样的效果
 ```
 curl -X POST -d '{"email":"user3@gmail.com","username":"user3","password":"useronepwd"}' --header "Content-Type:application/json" "http://127.0.0.1:3333/login"

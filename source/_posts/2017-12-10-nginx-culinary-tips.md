@@ -79,6 +79,12 @@ sudo systemctl enable nginx
 >/var/log/nginx/access.log: Every request to your web server is recorded in this log file unless Nginx is configured to do otherwise.
 /var/log/nginx/error.log: Any Nginx errors will be recorded in this log.
 
+在debian系上，[默认的根目录在这个位置](https://stackoverflow.com/questions/10674867/nginx-default-public-www-location)
+> /usr/share/nginx
+/usr/share/nginx/html ##最近的版本挪到这里了
+ 用nginx -V 查看那个--prefix=“实际使用的路径”
+
+
 
 ## 4.配置文件
 ### 4.1 不想用80端口怎么办(比如跟apache冲突了)
@@ -867,6 +873,13 @@ more_clear_headers Server; ##直接移除Server这个header
 ```
 ========================================================================================================================
 nginx怎么清除缓存
+
+实际操作中遇到过的问题
+在sites-avaliable中写了这么一个default.conf文件
+server_name 瞎写了一个
+接着后sites-avaliable中又添加了一个b.conf文件，
+server_name写的是vps的实际ip。
+这下所有的请求都被匹配到b.conf文件上了，浏览器里访问静态资源全部都是404。解决办法就是把default.conf文件中瞎写的server_name写成实际的ip地址或者自己买的domain name。
 
 
 ### 参考

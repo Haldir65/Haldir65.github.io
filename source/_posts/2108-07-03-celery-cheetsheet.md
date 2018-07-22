@@ -4,9 +4,11 @@ date: 2018-07-03 08:43:41
 tags:
 ---
 
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/Celery_picture.jpg?imageView2/2/w/600)
 >“There are only two hard things in Computer Science: cache invalidation and naming things.”
 — Phil Karlton
+
+![](http://odzl05jxx.bkt.clouddn.com/image/jpg/Celery_picture.jpg?imageView2/2/w/600)
+
 <!--more-->
 
 因为需要使用Redis，在ubuntu上安装redis可以用apt-get，也能自己下载源码去make（前提是内存充足，内存不足的话make test会失败）。所以我干脆关掉了几个比较耗内存的进程，最后直接用apt-get装上了。
@@ -23,10 +25,10 @@ def add(x, y):
 ```
 
 celery -A tasks worker --loglevel=info
-
+```
 >>> from tasks import add
 >>> add.delay(4, 4)
-
+```
 注意，windows上celery4不完全支持
 [celery-raises-valueerror-not-enough-values-to-unpack](https://stackoverflow.com/questions/45744992/celery-raises-valueerror-not-enough-values-to-unpack)
 

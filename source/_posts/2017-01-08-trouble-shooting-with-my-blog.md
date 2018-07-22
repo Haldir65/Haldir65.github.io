@@ -269,13 +269,9 @@ cahe也就意味着后续，所有对于themes文件夹中的_config.yml文件�
 
 
 vscode的返回上一个文件快捷键是ctrl + -
-### 参考
 
-* [Hexo 博文置顶技巧](http://yanhuili.github.io/2016/11/21/hexo%E5%8D%9A%E6%96%87%E7%BD%AE%E9%A1%B6%E6%8A%80%E5%B7%A7/)
-* [SublimeText 快捷键](http://www.daqianduan.com/4820.html)
-* [MarkDown 语法学起来很快的](http://itmyhome.com/markdown/article/syntax/emphasis.html)
-* [travis 自动部署](https://blessing.studio/deploy-hexo-blog-automatically-with-travis-ci/)
-* [Legacy GitHub Services to GitHub Apps Migration Guide 2018年10月1号之后不再支持 Legacy GitHub Service](https://docs.travis-ci.com/user/legacy-services-to-github-apps-migration-guide/)
+
+## 13 . travis ci自动部署的一些问题
 
 [travis ci加密文件无法在travis以外的地方解密，因为key,value都存在travis的数据库了](https://github.com/travis-ci/travis.rb/issues/437)
 
@@ -296,7 +292,7 @@ encrypted_476ad15a8e52_iv=[secure]
 --org short-cut for --api-endpoint 'https://api.travis-ci.org/'
 
 所以
-travis encrypt-file super_secret.txt 应该改成
+>travis encrypt-file super_secret.txt 应该改成
 travis encrypt-file super_secret.txt --pro
 
 因为默认的$encrypted_476ad15a8e52_key其实已经存储在travis-ci.org上了
@@ -304,8 +300,20 @@ travis encrypt-file super_secret.txt --pro
 
 [自动部署的另一个实例](https://github.com/openwrtio/openwrtio.github.io/blob/mkdocs/.travis.yml)
 
+
+## 14. hexo server本地预览出现的问题
 [hexo s 本地预览样式加载失败](Refused to execute script from 'http://localhost:4000/slider.e37972.js' because its MIME type ('text/html') is not executable, and strict MIME type checking is enabled.)
 
 hexo server的意思是类似于express的serve static功能，[默认只处理public文件下的文件，所以如果本地运行hexo s 出现404的话，直接copy到public文件夹下就可以了](https://hexo.io/zh-cn/docs/server.html)注意hexo clear会删掉public文件夹
 
 [Refused to Execute Script From Because Its MIME Type (Text/plain) Is Not Executable, and Strict MIME Type Checking Is Enabled]这句话的意思
+
+### 参考
+
+* [Hexo 博文置顶技巧](http://yanhuili.github.io/2016/11/21/hexo%E5%8D%9A%E6%96%87%E7%BD%AE%E9%A1%B6%E6%8A%80%E5%B7%A7/)
+* [SublimeText 快捷键](http://www.daqianduan.com/4820.html)
+* [MarkDown 语法学起来很快的](http://itmyhome.com/markdown/article/syntax/emphasis.html)
+* [travis 自动部署](https://blessing.studio/deploy-hexo-blog-automatically-with-travis-ci/)
+* [Legacy GitHub Services to GitHub Apps Migration Guide 2018年10月1号之后不再支持 Legacy GitHub Service](https://docs.travis-ci.com/user/legacy-services-to-github-apps-migration-guide/)
+
+

@@ -51,6 +51,8 @@ wsgi协议的app跑起来之后是没有办法直接通过http去请求的，要
 这时候的在浏览器里面访问的port就是nginx决定的了。
 [wsgi的文档应该在pep-333里面](https://www.python.org/dev/peps/pep-3333/)
 
+另外，通过uwsgi跑起来的托管在Ngixn上的app如果server端报错的话，可以sudo systemctl status yourservicefilename 去查看具体的报错原因，比起本地开发还是麻烦了一点点
+
 
 ## 3. flask的一大堆extensions
 ### flask-jwt(似乎已经很久没人维护了))
@@ -131,12 +133,23 @@ if __name__ == "__main__":
     app.run(debug=True)
 ```
 
+设置header比如cors这种也可以
+```python 
+@app.route("/")
+def home():
+    resp = flask.Response("Foo bar baz")
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
+```
+> curl -i http://127.0.0.1:5000/your/endpoint 即可(i表示include)
+
 ## flask操作数据库
 [mysql](https://www.thatyou.cn/flask%E4%BD%BF%E7%94%A8flask-sqlalchemy%E6%93%8D%E4%BD%9Cmysql%E6%95%B0%E6%8D%AE%E5%BA%93%EF%BC%88%E5%9B%9B%EF%BC%89-%E8%81%94%E8%A1%A8%E5%A4%9A%E5%AF%B9%E5%A4%9A%E6%9F%A5%E8%AF%A2/)
 
 
 
-
+在windows下设置环境变量要用set:
+> (env) λ set FLASK_APP=C:\code\realworld\flask-realworld-example-app\autoapp.py
 
 
 

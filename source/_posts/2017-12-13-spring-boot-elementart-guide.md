@@ -46,6 +46,7 @@ servlet继承自HttpServlet,里面有doGet和doPost方法。
 servlet和请求的url的对应关系写在web.xml中。
 
 [下面是从一片关于如何使用命令行生成并运行jar的文章中摘抄的](https://medium.com/nycdev/java-get-started-with-apache-maven-a71f4f907cb3)
+```
 |____src
 | |____main
 | | |____java
@@ -54,8 +55,13 @@ servlet和请求的url的对应关系写在web.xml中。
 | | |____resources
 | |____test
 |____target
+```
 > Above you created the recommended directory structure for a Java application. Java source files are saved in the ‘./src/main/java’ folder, the folder ‘./src/main/resources’ is added to the class-path to include resources like properties files to your Java application, test files are saved in ‘./src/test’, compiled class files are saved to ‘./target/classes’, and jar archives are saved to the ‘./target’ folder.
 
-如上就是一般土建的java application的目录结构。‘./src/main/java’ folder放的是java代码，‘./src/main/resources’是用来存放属性之类的文件的（被添加到classpath），test文件存放在‘./src/test’文件夹中，生成的class文件放在‘./target/classes’文件夹中，‘./target’文件夹中放的是jar文件
+如上就是一般推荐的java application的目录结构。
+./src/main/java’ folder放的是java代码，
+‘./src/main/resources’是用来存放属性之类的文件的（被添加到classpath），
+test文件存放在‘./src/test’文件夹中，生成的class文件放在‘./target/classes’文件夹中，
+‘./target’文件夹中放的是jar文件
 
 [accessing-data-mysql](https://spring.io/guides/gs/accessing-data-mysql/)

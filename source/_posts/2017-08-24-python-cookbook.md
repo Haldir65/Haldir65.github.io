@@ -567,6 +567,17 @@ python里面获取系统环境变量:
 
 >SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL','postgresql://localhost/example')
 
+在python里面是可以拿到环境变量的
+比方说set FLASK_DEBUFG=1，实际上运行期间就是根据这个函数去找了。
+flask-helpers.py文件
+```python
+def get_debug_flag(default=None):
+    val = os.environ.get('FLASK_DEBUG')
+    if not val:
+        return default
+    return val not in ('0', 'false', 'no')
+```
+
 坑：
 vps上SQLALCHEMY_DATABASE_URI=mysql+pymysql://username:password@localhost/dbname 是连不上的，就算ssh里面也不行，localhost改成127.0.0.1也没用
 改成

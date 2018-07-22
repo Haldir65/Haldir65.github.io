@@ -69,6 +69,9 @@ urlhtml = urlopen(req)
 
 ### 3. pip install XXXX
 安装package的方式 pip install xxxx....
+很多包会建议你来一个
+pip install -U XXX
+这个U的意思是upgrade if alreay install
 ** if not working**
 ![](http://odzl05jxx.bkt.clouddn.com/Googling%20the%20Error%20Message.jpg?imageView2/2/w/500)
 
@@ -289,7 +292,6 @@ class object orientated
 
 ### Reference
 - [廖雪峰的官方网站](http://www.liaoxuefeng.com/)
-- [use python and mongoDb as backend](https://zhuanlan.zhihu.com/p/20488077?columnSlug=kotandroid)
 - [静觅](http://cuiqingcai.com/category/technique/python)
 - [unicodeencodeerror-ascii-codec-cant-encode-character](https://stackoverflow.com/questions/9942594/unicodeencodeerror-ascii-codec-cant-encode-character-u-xa0-in-position-20?rq=1)
 - [Droidcon NYC 2016 - Decoding the Secrets of Binary Data](https://www.youtube.com/watch?v=T_p22jMZSrk)

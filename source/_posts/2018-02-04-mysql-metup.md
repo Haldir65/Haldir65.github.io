@@ -585,3 +585,16 @@ AUTO_INCREMENT有时候不会从1开始
 mysql查看连接数
 生产环境Mysql吃内存特别厉害的解决途径
 [todo 建表，实查](http://www.runoob.com/sql/sql-groupby.html)
+
+mysql存储中文数据有什么要注意的嘛
+
+primary key是两个key的组合也是可以的
+mysql> CREATE TABLE score( student_id INT UNSIGNED NOT NULL, event_id INT UNSIGNED NOT NULL, score INT NOT NULL, PRIMARY KEY(event_id, student_id));
+
+[pragmatic copy paste cheet sheet](http://www.newthinktank.com/2014/08/mysql-video-tutorial/)
+
+
+ > SELECT last_name,first_name,state FROM students WHERE first_name LIKE 'D%' OR last_name LIKE '%n' GROUP BY state;
+ERROR 1055 (42000): Expression #1 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'Banana.students.last_name' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
+改成
+>  SELECT last_name,first_name,state FROM students WHERE first_name LIKE 'D%' OR last_name LIKE '%n' GROUP BY last_name,first_name,state;

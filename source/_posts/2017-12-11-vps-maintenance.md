@@ -199,6 +199,7 @@ cd .. && rm -rf libsodium-${Libsodiumr_ver}.tar.gz && rm -rf libsodium-${Libsodi
 现在就可以去config.json文件中将加密方式改成: chacha20 了，重启下ss即可
 
 ## 3. ubuntu自带的防火墙叫做ufw，用起来也很简单
+[digital ocean的ufw教程](https://www.digitalocean.com/community/tutorials/ufw-essentials-common-firewall-rules-and-commands)
 
 ## 4.跑分
 
@@ -359,11 +360,11 @@ Softlayer, HongKong, CN         119.81.130.170          35.2MB/s
 
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600)
 
-### 5. 跑java？
+###  跑java？
 算了吧，简单读个文本文件print出来cpu就飙到50%。
 
 
-### Dnsmasq vps自建DNS服务器
+
 
 ### 5. 关于 docker
 
@@ -388,6 +389,8 @@ docker build -t packsdkandroiddocker.image -f ./scripts/PackSdkDockerfile .
 docker会在/var/lib/docker文件夹里吃掉大量空间，释放空间的话
 > docker system prune -a
 
+
+### Dnsmasq vps自建DNS服务器
 
 ### 参考
 
