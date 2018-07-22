@@ -17,7 +17,7 @@
 <meta property="og:description" content="http建立在tcp,ip基础上，tcp协议的可靠性意味着每次http请求都会分解为多次ip请求。很多出于book keeping的东西占用了实际发送数据的相当一部分，具体占用多少。由此顺便展开到http和tcp的基本关系。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/Cg-4V1Kg7NCIMLH-AAwW6gNGe9cAAOB4AFTanwADBcC664.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-07-22T15:19:06.475Z">
+<meta property="og:updated_time" content="2018-07-22T15:21:59.283Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="http2笔记">
 <meta name="twitter:description" content="http建立在tcp,ip基础上，tcp协议的可靠性意味着每次http请求都会分解为多次ip请求。很多出于book keeping的东西占用了实际发送数据的相当一部分，具体占用多少。由此顺便展开到http和tcp的基本关系。">
@@ -219,7 +219,7 @@ ga('send', 'pageview');
 <h3 id="1-6-一些前人总结的优化技巧"><a href="#1-6-一些前人总结的优化技巧" class="headerlink" title="1.6 一些前人总结的优化技巧"></a>1.6 一些前人总结的优化技巧</h3><ol>
 <li>Sigle connection (/index.html；style.css全都放在一个连接里面)</li>
 <li>Pipelining  (一次性请求index.html以及style.css，这些东西全都放在一个请求里面)。这种方式的问题叫做 Head-of-line Blocking,由于tcp是可靠的协议，所以必须得等第一个请求的response回来，后续的请求才能执行。所以很多浏览器后来都放弃了对这种技术的支持。</li>
-<li>于是人们开始一次性发出多个tcp请求。客户端能同时向一个host(不同host之间不影响)发起的请求最多6(不同浏览器数量不同)到8个。这么干的原因一方面是客户端自我保护，另一方面也是为了保护服务器不至于崩溃。具体在知乎上有<a href="https://www.zhihu.com/question/19997004">讨论</a><br>所以我们经常看到知乎把api数据放在zhihu.com上，图片放在zhimg.com,统计放在zhstatic.com上。有时候还会有pic2.zhimg.com，pic3.zhimg.com。。。等等这些，还不是为了加快网页加载速度。(这就叫Domian Sharding)，这么干也有坏处，More DNS lookups。找dns花的时间多了。</li>
+<li>于是人们开始一次性发出多个tcp请求。客户端能同时向一个host(不同host之间不影响)发起的请求最多6(不同浏览器数量不同)到8个。这么干的原因一方面是客户端自我保护，另一方面也是为了保护服务器不至于崩溃。具体在知乎上有<a href="https://www.zhihu.com/question/19997004">讨论</a><br>所以我们经常看到知乎把api数据放在zhihu.com上，图片放在zhimg.com,统计放在zhstatic.com上。有时候还会有pic2.zhimg.com，pic3.zhimg.com。。。等等这些，还不是为了加快网页加载速度。(这就叫domain Sharding)，这么干也有坏处，More DNS lookups。找dns花的时间多了。</li>
 <li>Inline resources<br>直接把图片放在html里面传回来，这造成缓存失效。还有编码的问题</li>
 <li>Concatenating and Spriting resources<br>Concatenating是把所有的js文件塞在一个大的js里面返回，这也造成缓存失效，处理缓慢等问题。<br>Spriting是把一大堆图片放在一整张图片里面，通过复杂的css选择其中的图片。</li>
 </ol>
