@@ -408,6 +408,7 @@ $chmod g+w blogs        对组用户给文件blogs增加可写权限
 chmod a+x a.txt
 #其余自行发挥
 chmod a-x a.txt  #删除所有用户的可执行权限
+chmod o-w ##从owner手中收回write权限
 
 chmod 755 filename  
 751应该是读/写/执行

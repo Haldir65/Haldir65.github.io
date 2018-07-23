@@ -82,6 +82,12 @@ var studentSchema = mongoose.Schema({
     age: Number
 });
 ```
+
+
+[在linux上安装mongodb-server会占用200多MB的磁盘空间，原因是db使用了journal file，但这种journal 要区别于实际的文件，并未写入实际的文件存储](https://stackoverflow.com/questions/19533019/is-it-safe-to-delete-the-journal-file-of-mongodb)
+具体的文件名字好像叫WiredTigerLog什么的
+是这么找出来的
+sudo find / -size +10M  -exec du -h {} \; | sort -n
 ===========================================================================
 // todo validate request data, error handling.
 

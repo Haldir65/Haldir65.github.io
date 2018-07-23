@@ -249,6 +249,13 @@ server端每次接收到一个请求，会根据request的一些特定属性来�
 CORS请求会带上Origin请求头，用来向别人的网站表明自己是谁。Vary: Origin可以让同一个URL请求根据ORIGIN这个请求头返回不同的缓存版本。
 实践中，如果Access-Control-Allow-Origin的响应头不是写成了*号的话，就应该加上Vary: Origin，以此避免不同的Origin获得的缓存版本错乱。
 
+[strict-transport-security](https://developer.mozilla.org/zh-CN/docs/Security/HTTP_Strict_Transport_Security)
+strict-transport-security: max-age=31536000
+```
+max-age=<expire-time>
+设置在浏览器收到这个请求后的<expire-time>秒的时间内凡是访问这个域名下的请求都使用HTTPS请求。
+```
+
 [WikI上比较完整](https://zh.wikipedia.org/wiki/HTTP%E5%A4%B4%E5%AD%97%E6%AE%B5)
 
 **Transfer-Encoding: chunked 有时候要传输的Content-Length实在太大，服务器计算长度需要开很大的Buffer，干脆把文件分块传输。**

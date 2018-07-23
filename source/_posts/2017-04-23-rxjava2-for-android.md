@@ -485,6 +485,55 @@ java还有这种写法
 PublishSubject.<T>create()
 ```
 
+Flowable中默认的bufferSize是128，这个是在源码中定义的:
+Flowable.bufferSize()方法默认返回的就是128
+
+MissingBackpressureException和BufferOverFlowException应该是不一样的
+
+在相同的一条线程中，是不存在背压的问题的，不同线程之间的消费者和生产者之间可能产生背压问题。
+就算消费者线程中不写Thread.sleep()也是有可能出现MissingBackPressureException。
+
+Flowable这种直接遵循上游响应下游request请求才发送数据
+```
+     var sp5:Subscription?= null
+
+        btn5.setOnClickListener {
+            Flowable.create<String>({emitter ->
+                for(i in 0..1000){
+                    emitter.onNext(i.toString())
+                    LogUtil.e(TAG,"send down message $i")
+                }
+                emitter.onComplete()
+            },BackpressureStrategy.BUFFER)
+                    .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(object :FlowableSubscriber<String>{
+                        override fun onComplete() {
+                            LogUtil.e(TAG,"OnComplete called ")
+                        }
+
+                        override fun onSubscribe(s: Subscription) {
+                            sp5 = s
+                            sp5?.request(1)
+                        }
+
+                        override fun onNext(t: String?) {
+                            LogUtil.e(TAG,"receive message $t")
+                            Thread.sleep(100)
+                            sp5?.request(1)
+
+                        }
+
+                        override fun onError(t: Throwable?) {
+                            LogUtil.e(TAG,t?.message)
+                        }
+
+                    })
+        }
+```
+
+Flowable.fromPublisher()方法接受一个Publisher参数，但是但是但是
+> Note that even though Publisher appears to be a functional interface, it is not recommended to implement it through a lambda as the specification requires state management that is not achievable with a stateless lambda.
+
 
 ### Reference
 

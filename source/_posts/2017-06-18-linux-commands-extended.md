@@ -318,16 +318,61 @@ http 302的意思也就说明qq邮箱已经把http重定向到别的地方的
 tee命令能够吧程序的输出输出到stdo,同时还能将输出写进文件(-a 表示append，否则就是覆盖)
 
 ### 18.  missing argument to \`-exec'
+find和exec命令结合起来能够实现指定（或者不指定）文件中查找特定字符的效果
+比方说在sqlalchemy项目中，查找当前目录下所有的py文件，在里面扫描SQLALCHEMY_DATABASE_URI的值
+>sudo find . -name "*.py" -exec grep "SQLALCHEMY_DATABASE_URI" {} \;
+sudo find . -name "*.py" | xargs grep "SQLALCHEMY_DATABASE_URI"
+grep SQLALCHEMY_DATABASE_URI . -R
+
+上面这仨都是ok的 ,第一种不会把对应的文件名列出来，第二种和第三种会把文件名列出来。第三种的-R当然是递归(recursive)的意思
+
 ```shell
 find /u03 -name server.xml -exec grep '9080' {}\;
 find . -type f -exec ls -l {} \; ## exec执行删除之前最好先打印出来，避免删错了
 find . -type f -mtime +14 -exec rm {} \;
+find /etc -name "passwd*" -exec grep "root" {} \;
 ```
+另外
+> {} + 和 {} \; 这两种写法是有区别的[what-is-meaning-of-in-finds-exec-command(https://unix.stackexchange.com/questions/195939/what-is-meaning-of-in-finds-exec-command)
+
+
 exec是和find一起使用的，分号是要执行的命令的终止标志，前面得加上斜杠。
 简单来说，就是把exec前面的结果执行某项操作，语法上，大括号不能少，反斜杠不能少，分号不能少
 感觉exec和find 命令的xargs差不多
+find命令要结合着exec和xargs命令一起来看
 [xargs命令](http://www.cnblogs.com/peida/archive/2012/11/15/2770888.html)
 [exec命令](http://www.cnblogs.com/peida/archive/2012/11/14/2769248.html)
+可以认为就是把find出来的所有结果填充到exec的大括号里面,因为平时实际从一个文件中查找字符的方式就是
+grep "SQLALCHEMY_DATABASE_URI" somefilename
+这也造成了使用exec经常出现语出错误，find命令把匹配到的文件传递给xargs命令，而xargs命令每次只获取一部分文件而不是全部，不像-exec选项那样。xargs是分批处理参数并传递给后续的命令。
+
+xargs和grep一起用有时候会出现no such file or directory的错误
+[why-does-grep-print-out-no-such-file-or-directory](https://stackoverflow.com/questions/44217298/why-does-grep-print-out-no-such-file-or-directory)
+> find . -type f -print0 | xargs -0  fgrep "SQLALCHEMY_DATABASE_URI"
+
+xargs的一些用法
+find . -name "*.log" | xargs -i mv {} test4
+find . -name "*.log" | xargs -p -i mv {} .. ## -p会提示用户是否要执行后续操作
+
+find / -type ## 这个-type表示类型，f是普通文件,d是目录,c是字符设备文件,p是管道文件,l是符号链接文件
+
+要想让系统高负荷运行，就从根目录开始查找所有的文件。  
+find / -name "*" -print  
+如果想在当前目录查找文件名以一个个小写字母开头，最后是4到9加上.log结束的文件：  
+find . -name "[a-z]*[4-9].log" -print
+
+find还可以根据文件权限来查找
+find . -perm 755 -print ## 比如查找当前755权限的文件
+find还可以忽略指定目录
+-prune参数
+还可以按照修改时间或者访问时间等来查找文件
+sudo find / -size +10M -mtime -2 -exec du -h {} \; ## 查看最近两天修改的文件中那些大小超过了10M，并且列出来
+sudo find / -name "*.log" -size +10k -mtime -2 -exec du -h {} \; | sort -n ## 把最近两天内修改的.log文件（超过10K的）按照文件大小从大到小排列出来
+atime = accesstime(文件被read或者执行的时间)
+ctime = changetime(文件状态改变时间，比如被chmod就算)
+mtime = modify time，指的是文件内容被修改的时间
+这些时间都能通过sta命令查看  
+
 
 ### 19. sort命令
 sort命令排序什么的
@@ -654,7 +699,6 @@ sudo rm -f /var/lib/dpkg/info/format
 sudo dpkg --configure -a
 ```
 
-
 > windows的换行符是 \r\l，linux的是 \l，mac的是 \r
 
 
@@ -671,7 +715,11 @@ nano直接跳到文本最后一行的方法是：
 
 [装java](https://www.digitalocean.com/community/tutorials/how-to-install-java-with-apt-get-on-ubuntu-16-04)
 [装Jenkins](https://www.digitalocean.com/community/tutorials/how-to-install-jenkins-on-ubuntu-16-04)
-Could not find or load main class的问题
+<del>Could not find or load main class的问题</del>
+
+
+🎧 
+
 
 ## 参考
 - [每天一个Linux命令](http://www.cnblogs.com/peida/archive/2012/12/05/2803591.html)

@@ -50,9 +50,17 @@ public fun isOdd2(number: Int) :Boolean { //这种就啰嗦点
  ```
 
 
-
-
 ### 2. 集合相关
+常用的迭代一个range的方式
+```
+for (i in 1..3) {
+    println(i) //这个打印出来是1，2，3
+}
+
+for (i in 6 downTo 0 step 2) {
+    println(i)
+} //这个打印出来是6 4 2 0
+```
 
 ```
 //带index的迭代一个集合的方式
