@@ -253,14 +253,23 @@ Http底层TCP ,ACK 等等需要tcpcump结合wireShark抓包
 [X-Content-Type-Options:nosniff](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Optionshttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options).就是说服务器返回的Response中如果包含这个header的话，script和styleSheet元素会拒绝错误的MIME类型的响应。主要是为了防止给予MIME类型的混淆攻击
 
 
-> npm install -g loadtest ##一个node的压力测试的web client
-loadtest -n 100 -k  http://localhost:8000/api/somebackend # -n表示发送100次 -k 表示keep-alive
-loadtest -c 10 --rps 200 http://mysite.com/  # -c表示client，创建10个client ， --rsp表示每秒的请求数量
-loadtest -k -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8' -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36"  --rps 1 https://www.baidu.com/
-注意： 这种短期创建大量外网连接的行为会对路由器造成一定压力。。。。
 
 Referrer Policy: unsafe-url
 [unsafe-url](https://imququ.com/post/referrer-policy.html)
 后台在response中返回一个302，并在response header中添加header:location。直接把前端网页重定向到新的位置
 
 
+## 服务器压测工具
+参考[DigitalOcean的文章]](https://www.digitalocean.com/community/tutorials/an-introduction-to-load-testing)
+
+> npm install -g loadtest ##一个node的压力测试的web client
+loadtest -n 100 -k  http://localhost:8000/api/somebackend # -n表示发送100次 -k 表示keep-alive
+loadtest -c 10 --rps 200 http://mysite.com/  # -c表示client，创建10个client ， --rsp表示每秒的请求数量
+loadtest -k -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8' -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36"  --rps 1 https://www.baidu.com/
+注意： 这种短期创建大量外网连接的行为会对路由器造成一定压力。。。。
+
+
+ab(ApacheBench) - a simple ,single-threaded command line tool for benchemarking an HTTP server.
+因为是单线程的，所以并不能利用多核cpu的优势对server施加充分的负载。一般这么用
+> ab -n 1000 -c 100 http://example.com/
+ab -n <num_requests> -c <concurrency> <addr>:<port><path>

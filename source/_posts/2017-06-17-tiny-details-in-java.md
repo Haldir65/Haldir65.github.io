@@ -1695,7 +1695,7 @@ public class ReadFileWithMappedByteBuffer
 todo a pratical cheetsheet on java reflection
 
 =========================================
-反射为什么慢，慢成什么样了
+[反射为什么慢，慢成什么样了](https://github.com/hehonghui/android-tech-frontier/blob/master/issue-45/%E4%BD%BF%E7%94%A8%E5%8F%8D%E5%B0%84%E5%88%B0%E5%BA%95%E4%BC%9A%E5%AF%B9%E6%80%A7%E8%83%BD%E9%80%A0%E6%88%90%E5%A4%9A%E5%A4%A7%E5%BD%B1%E5%93%8D%EF%BC%9F.md)
 class的生命周期
 
 

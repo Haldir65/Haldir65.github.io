@@ -192,7 +192,7 @@ Linux相关
 
 Gradle相关
 - [ ]写一些DSL吧[Old Driver](https://github.com/Ccixyj/JBusDriver)
-- [X] 狗日的Gradle下载的cache都放在C盘了，问题是C盘哪里，能删吗，C盘快不够用了
+- [X] Gradle下载的cache都放在C盘了，问题是C盘哪里，能删吗，C盘快不够用了
 
 
 Python

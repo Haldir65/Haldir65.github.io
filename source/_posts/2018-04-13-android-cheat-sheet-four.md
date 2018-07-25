@@ -188,6 +188,142 @@ intent.setComponent(comp);
 activity.startActivity(intent);
 ```
 
+### 13. Canvas.clipPath会出现锯齿的问题以及可能的解决方案
+a Navive implementation of CircleImageView would look something like this:
+xml里面宽高都写成200dp，方便一点。
+```java
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Path;
+import android.graphics.RectF;
+import android.support.v7.widget.AppCompatImageView;
+import android.util.AttributeSet;
+
+public class RoundCornerImageView1 extends AppCompatImageView {
+    float[] radiusArray = new float[8];
+
+    public RoundCornerImageView1(Context context) {
+        super(context);
+        init();
+    }
+
+    public RoundCornerImageView1(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init();
+    }
+
+    public RoundCornerImageView1(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init();
+    }
+
+    private void init() {
+        setScaleType(ScaleType.CENTER_CROP);
+    }
+
+    public void setRadius(float leftTop, float rightTop, float rightBottom, float leftBottom) {
+        radiusArray[0] = leftTop;
+        radiusArray[1] = leftTop;
+        radiusArray[2] = rightTop;
+        radiusArray[3] = rightTop;
+        radiusArray[4] = rightBottom;
+        radiusArray[5] = rightBottom;
+        radiusArray[6] = leftBottom;
+        radiusArray[7] = leftBottom;
+        invalidate();
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        Path path = new Path();
+        int width = getWidth();
+        int height = getHeight();
+        setRadius(width/2,width/2,height/2,height/2);
+        path.addRoundRect(new RectF(0, 0, width,height), radiusArray, Path.Direction.CW);
+        canvas.clipPath(path);
+        super.onDraw(canvas);
+    }
+}
+```
+不出意外的话，在真机上运行会出现圆形边角有锯齿的问题。google一下clipPath锯齿就会发现类似的[issue](https://www.cnblogs.com/everhad/p/6161083.html)，framework只是对skia library的一层很薄的包装。
+
+[早先版本的系统画圆弧似乎不是特别准](https://github.com/hehonghui/android-tech-frontier/blob/aa6f125b1a3801820e697f5ac6246b4827acd5a5/issue-45/Android%E5%9C%86%E5%BC%A7%E6%95%B4%E5%AE%B9%E4%B9%8B%E8%B0%9C.md)
+
+多数时候对这种问题的解决方式是使用PorterDuff.SRCIN的方式，用canvas saveLayer(貌似layer是一种栈的结构)的方式在其他的layer中去画bitmap。最后顶层的layer全部pop掉之后会合并到initial的layer上，类似于在顶层的layer中合成这张bitmap。
+canvas.saveLayer(0, 0, w, h, null, Canvas.ALL_SAVE_FLAG); // 大致就在这里,layer似乎可以理解成photoShop里面的图层的概念
+```java
+public class RoundCornerImageView2 extends AppCompatImageView {
+    // 四个角的x,y半径
+    private float[] radiusArray = { 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f };
+    private Paint bitmapPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+    private Bitmap makeRoundRectFrame(int w, int h) {
+        Bitmap bm = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(bm);
+        Path path = new Path();
+        setRadius(w/2,w/2,h/2,h/2);
+        path.addRoundRect(new RectF(0, 0, w, h), radiusArray, Path.Direction.CW);
+        Paint bitmapPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        bitmapPaint.setColor(Color.GREEN); // 颜色随意，不要有透明度。
+        c.drawPath(path, bitmapPaint);
+        return bm;
+    }
+    public RoundCornerImageView2(Context context) {
+        super(context);
+        init();
+    }
+    public RoundCornerImageView2(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init();
+    }
+    public RoundCornerImageView2(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init();
+    }
+    private void init() {
+//        setLayerType(LAYER_TYPE_SOFTWARE, null); // Xfermode 需要禁用硬件加速
+        setScaleType(ScaleType.CENTER_CROP);
+    }
+
+    public void setRadius(float leftTop, float rightTop, float rightBottom, float leftBottom) {
+        radiusArray[0] = leftTop;
+        radiusArray[1] = leftTop;
+        radiusArray[2] = rightTop;
+        radiusArray[3] = rightTop;
+        radiusArray[4] = rightBottom;
+        radiusArray[5] = rightBottom;
+        radiusArray[6] = leftBottom;
+        radiusArray[7] = leftBottom;
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+
+        final int w = getWidth();
+        final int h = getHeight();
+        Bitmap bitmapOriginal = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(bitmapOriginal);
+        super.onDraw(c);
+
+        Bitmap bitmapFrame = makeRoundRectFrame(w, h);
+
+        int sc = canvas.saveLayer(0, 0, w, h, null);
+
+        canvas.drawBitmap(bitmapFrame, 0, 0, bitmapPaint); //先画一个圆形的框框条条出来
+// 利用Xfermode取交集（利用bitmapFrame作为画框来裁剪bitmapOriginal）
+        bitmapPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN)); //后续的画图操作，只有交集的部分才会显示在最终的canvas上
+        canvas.drawBitmap(bitmapOriginal, 0, 0, bitmapPaint);
+
+        bitmapPaint.setXfermode(null);
+        canvas.restoreToCount(sc);
+    }
+}
+```
+这种方式一般称为离屏缓冲
+
+
+TextView有时候会出现提前换行的问题
+
 
 
 [gradle build scan](https://gradle.com/build-scans)

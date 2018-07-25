@@ -390,7 +390,11 @@ docker会在/var/lib/docker文件夹里吃掉大量空间，释放空间的话
 > docker system prune -a
 
 
+关于ubuntu添加ppa
+[debian系的package management方式](https://www.digitalocean.com/community/tutorials/ubuntu-and-debian-package-management-essentials)
+
 ### Dnsmasq vps自建DNS服务器
+[tips onserver optimization](https://www.digitalocean.com/community/tags/server-optimization?type=tutorials)
 
 ### 参考
 

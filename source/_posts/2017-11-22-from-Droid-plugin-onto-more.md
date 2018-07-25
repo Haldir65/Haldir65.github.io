@@ -285,6 +285,8 @@ class InstrumentationWrapper extends Instrumentation {
 
 [sharedUid](https://www.jianshu.com/p/107aaf054140)通过Shared User id,拥有同一个User id的多个APK可以配置成运行在同一个进程中.所以默认就是可以互相访问任意数据。
 
+在windows平台上，gradle下载的缓存文件位置在哪里？
+
 
 
 

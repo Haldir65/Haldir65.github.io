@@ -31,7 +31,7 @@ top : 1
 - [ ] Redux和Flux很像,react context api
 - [ ] [一个展示如何在宿主App中提取一个apk文件并加载代码和资源](https://www.jianshu.com/p/a4ab102fa4ac)
 - [ ] [libmp3lame移植到Android](https://www.jianshu.com/p/534741f5151c),跟jni有关了
-- [ ] nodejs rpc
+- [ ] nodejs ,go ,protobuf rpc
 - [ ] [indexed DB](http://www.ruanyifeng.com/blog/2018/07/indexeddb.html),浏览器端数据库，[content-disposition](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)
 - [ ] classloader和class的生命周期
 - [ ] [在bash脚本中获取当前脚本所在路径](https://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within?rq=1)
