@@ -17,7 +17,7 @@
 <meta property="og:description" content="OkHttp通过ConnectionPool做到tcp连接复用（在Timeout内）,所以并不是每个http都去建立一个tcp连接自定义通讯协议，使用java socket实现客户端和服务端。需要注意的是分包问题和黏包问题">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpglight-and-shadow-2411321_960_720.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-07-23T11:22:19.197Z">
+<meta property="og:updated_time" content="2018-07-25T10:43:27.663Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="网络通信手册-2">
 <meta name="twitter:description" content="OkHttp通过ConnectionPool做到tcp连接复用（在Timeout内）,所以并不是每个http都去建立一个tcp连接自定义通讯协议，使用java socket实现客户端和服务端。需要注意的是分包问题和黏包问题">
@@ -260,10 +260,15 @@ ga('send', 'pageview');
 <p>下面是几个常见的Content-Type:<br>1.text/html<br>2.text/plain<br>3.text/css<br>4.text/javascript<br>5.application/x-www-form-urlencoded<br>6.multipart/form-data<br>7.application/json<br>8.application/xml<br>…<br>前面几个都很好理解，都是html，css，javascript的文件类型，后面四个是POST的发包方式。</p>
 </blockquote>
 <p><a href="https://www.sitepoint.com/mime-types-complete-list/">非官方的mime-type大全</a><br><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Complete_list_of_MIME_types">MDN上收录的mime-type</a><br><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Optionshttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options">X-Content-Type-Options:nosniff</a>.就是说服务器返回的Response中如果包含这个header的话，script和styleSheet元素会拒绝错误的MIME类型的响应。主要是为了防止给予MIME类型的混淆攻击</p>
+<p>Referrer Policy: unsafe-url<br><a href="https://imququ.com/post/referrer-policy.html">unsafe-url</a><br>后台在response中返回一个302，并在response header中添加header:location。直接把前端网页重定向到新的位置</p>
+<h2 id="服务器压测工具"><a href="#服务器压测工具" class="headerlink" title="服务器压测工具"></a>服务器压测工具</h2><p>参考<a href="https://www.digitalocean.com/community/tutorials/an-introduction-to-load-testing">DigitalOcean的文章]</a></p>
 <blockquote>
 <p>npm install -g loadtest ##一个node的压力测试的web client<br>loadtest -n 100 -k  <a href="http://localhost:8000/api/somebackend">http://localhost:8000/api/somebackend</a> # -n表示发送100次 -k 表示keep-alive<br>loadtest -c 10 –rps 200 <a href="http://mysite.com/">http://mysite.com/</a>  # -c表示client，创建10个client ， –rsp表示每秒的请求数量<br>loadtest -k -H ‘Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,<em>/</em>;q=0.8’ -H “User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36”  –rps 1 <a href="https://www.baidu.com/">https://www.baidu.com/</a><br>注意： 这种短期创建大量外网连接的行为会对路由器造成一定压力。。。。</p>
 </blockquote>
-<p>Referrer Policy: unsafe-url<br><a href="https://imququ.com/post/referrer-policy.html">unsafe-url</a><br>后台在response中返回一个302，并在response header中添加header:location。直接把前端网页重定向到新的位置</p>
+<p>ab(ApacheBench) - a simple ,single-threaded command line tool for benchemarking an HTTP server.<br>因为是单线程的，所以并不能利用多核cpu的优势对server施加充分的负载。一般这么用</p>
+<blockquote>
+<p>ab -n 1000 -c 100 <a href="http://example.com/">http://example.com/</a><br>ab -n <num_requests> -c <concurrency> <addr>:<port><path></p>
+</blockquote>
 
       
 
