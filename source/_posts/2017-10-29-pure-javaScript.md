@@ -1201,6 +1201,7 @@ indexed db api
 html里面有一些奇怪的符号
 " &amp; " 在html里面等同于"&"
 [ampersand](https://stackoverflow.com/questions/9084237/what-is-amp-used-for)
+冒号(")会变成"  &quot;   "这种
 
 ### 参考
 [5 分钟彻底明白 JSONP](https://tonghuashuo.github.io/blog/jsonp.html)

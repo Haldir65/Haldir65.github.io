@@ -76,6 +76,7 @@ cons[3] (java.lang.String)
 
 
 > 实例化一个object，假设有很多个构造函数的话
+
 ```java
     public void createViaReflection(){
         String className = "com.me.reflection._001_basic.MyObject";
@@ -99,8 +100,9 @@ cons[3] (java.lang.String)
 ```
 > MyObject{name='passing value via constructor is ok -ish', age=0}
 
-
 > 获取一个class中所有的Fileds（private的也能拿到）
+
+
 ```java
     public void getAllFields(){
         try {
@@ -131,8 +133,8 @@ age
 mo: 2
 private int age
 
-
 > 获得一个class中所有的方法(拿不到private的和构造函数，父类的wait,notfy这些反而能够拿到),getMethod只能拿到public的方法，getDeclaredMethod基本上是什么类型的都能拿到(getDeclaredMethods，有个s)
+
 ```java
     public void getAllMethods(){
         try {
@@ -200,7 +202,7 @@ ReturnType: void
 Modifier.toString: public final native void  notifyAll ()
 
 
-> 拿到方法（Method对象之后就要invoke了），不管是private还是public的
+拿到方法（Method对象之后就要invoke了），不管是private还是public的
 ```java
 // 假设我们的class有这么两个方法,也是可以区分开来的
 public void echo(String name){
@@ -239,12 +241,12 @@ public void echo(){
         }
     }
 ```
->hello method without parameters
+hello method without parameters
 this is params from reflection
 some kind of echo 
 
-
 >用反射给class的某个field赋值
+
 ```java
 
     public void setFiledWithReflection(){

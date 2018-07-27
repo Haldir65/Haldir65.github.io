@@ -110,4 +110,6 @@ babel : "babel"
 
 =======================================================================================================
 todo : webpack boilerplate
+
+[请手写一个webpack4.0配置](http://web.jobbole.com/94944/)
 underscore javaScript library

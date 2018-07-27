@@ -145,7 +145,7 @@ B service startForeground(processId,notification)
 ## updates
 [【腾讯Bugly干货分享】Android 进程保活招式大全](https://segmentfault.com/a/1190000006251859)
 
-
+CommonsWare表示[ Services are natural singletons ](https://stackoverflow.com/questions/2518238/does-startservice-create-a-new-service-instance-or-using-the-existing-one)，Service都是单例
 
 ### Reference
 - [支付宝后台不死的黑科技](http://zhoujianghua.com/2015/07/28/black_technology_in_alipay/)

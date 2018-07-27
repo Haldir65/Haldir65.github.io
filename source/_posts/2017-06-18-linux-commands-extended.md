@@ -134,6 +134,10 @@ find / -type f -size +50M -exec du -h {} \; | sort -n
 dpkg --get-selections|grep linux //查找所有的文件，有image的就是内核文件
 sudo apt-get remove 内核文件名 （例如：linux-image-4.4.0-92-generic）
 
+sudo dpkg --get-selections | awk '$2 !~ /^install/' 查找那些状态是deinstall的内核，然后用这样的方式purge掉
+sudo dpkg -P linux-image-3.5.0-51-generic
+
+
 /var/log/btmp 这个文件是记录错误登录的日志，如果开放22端口的话，用不了多久这个文件就会变得很大
 系统 /var/log 下面的文件：btmp, wtmp, utmp 等都是二进制文件，是不可以使用 tail 命令来读取的，[这样会导致终端出错](https://blog.lmlphp.com/archives/212/Modify_sshd_config_file_configuration_to_prevent_the_Linux_var_log_btmp_file_content_size_is_too_large)。一般使用 last 系列命令来读取，如 last, lastb, lastlog。
 
@@ -188,6 +192,9 @@ sudo last | awk '{ print $(NF-7)}' //我想看倒数第7列的数据
 和管道结合的：
 grep -i test test.txt | awk '/[0-9]/ { print }'
 -i表示case insensitive,大小写都算.然后找出其中包含数字的。
+
+想要找出系统内所有大小超出10MB的，合计一下这些大文件一共占用了多少MB的空间
+sudo find / -size +10M -exec du -h {} \; | awk '{ s+=$1  } END { print s}'
 
 
 
@@ -568,7 +575,6 @@ process state
 
 
 
-
 Mere trash
 ===============================================================================
 [LINUX下的21个特殊符号](http://blog.51cto.com/litaotao/1187983)
@@ -576,9 +582,6 @@ Mere trash
 [gdb调试器,debug用的](http://blog.jobbole.com/112547/)
 [chsh命令](http://man.linuxde.net/chsh)
 
-```shell
-youtube-dl -o '%(title)s.%(ext)s' https://www.youtube.com/watch?v=rimXGaUdaLg
-```
 文件描述符限制
 
 ls -al = l -al（可以少敲一个字母,其实是alias）

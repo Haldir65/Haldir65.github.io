@@ -65,3 +65,4 @@ test文件存放在‘./src/test’文件夹中，生成的class文件放在‘.
 ‘./target’文件夹中放的是jar文件
 
 [accessing-data-mysql](https://spring.io/guides/gs/accessing-data-mysql/)
+[在application.properties文件中可以写的一些配置](https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html)

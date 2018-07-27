@@ -582,3 +582,34 @@ def get_debug_flag(default=None):
 vps上SQLALCHEMY_DATABASE_URI=mysql+pymysql://username:password@localhost/dbname 是连不上的，就算ssh里面也不行，localhost改成127.0.0.1也没用
 改成
 mysql+pymysql://username:password@you.real.ip.adress/dbname这样就可以了
+
+### Exceptions处理
+比如从一个字典里用不存在的key去获取值：
+```python
+d = {"name":"Sam","age":10}
+d['name']  Sam
+d['age']  10
+d['name2']  KeyError: 'name2' ###所以只有这种使用类似下标获取的方式会报错
+d.get('name2') None
+d.get('name2',"default") "default"
+```
+在flask中，从request对象中获取GET方法的queryParameters的时候，文档上就推荐使用这种
+searchword = request.args.get('key', '')或者catch KeyError的方式去避免用户输入的url中不存在queryKey。第一种方式当然不会报错，第二种方式是可能报错的。
+KeyError是操作字典的时候会出现的错误。
+
+对于list，因为list获取元素的方式是根据index,所以可能出现IndexError
+```python
+l = [x*x for x in range(1,10)]
+l[0]  ## 1
+l[2] ## 9
+l[20] ## IndexError: list index out of range
+```
+
+对于tuple，也是差不多的
+```python
+t = (1,3,5,7,9)
+t[0] ## 1
+t[100] ## IndexError:tuple index out of range
+```
+
+

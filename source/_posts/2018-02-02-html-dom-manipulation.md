@@ -117,3 +117,20 @@ navigator.appName ==> Netscape
 navigator.platform ==> win32
 
 [在浏览器里操作cookie可以用原生api自己去操作string，但推荐使用成熟的库](https://github.com/js-cookie/js-cookie)
+
+
+文件上传一般使用file tag就可以了
+这种是单文件的
+```html
+<form action="" method=post enctype=multipart/form-data>
+      <input type=file name=file>
+      <input type=submit value=Upload>
+</form>
+```
+```html
+<form action="/upload" method="post">
+选择图片：<input type="file" name="img" multiple="multiple" />
+<input type="submit" />
+</form>
+<p>请尝试在浏览文件时选取一个以上的文件。</p>
+```

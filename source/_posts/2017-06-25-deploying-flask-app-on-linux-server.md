@@ -8,7 +8,7 @@ tags: [python]
 ![](http://odzl05jxx.bkt.clouddn.com/ChMkJ1fAMmKIIFpWAA_5Us41gQkAAUv1QE2Pp8AD_lq599.jpg?imageView2/2/w/600)
 <!--more-->
 
-## 1. virtualenv install
+## 1. virtualenv 好习惯
 
 ```shell
 sudo pip install virtualenv
@@ -17,10 +17,9 @@ source venv/bin/activate
 sudo pip install Flask
 
 ## virtualenv指定python版本
-virtualenv TEST --python=python2.7
+virtualenv env --python=python2.7
 virtualenv -p"$(which python3.6)" TEST ##linux这个也行
 mkvirtualenv --python=`which python3` <env_name> ## 这个居然也行
-
 
 # sudo python __init__.py
 sudo /var/www/FlaskApp/FlaskApp/venv/bin/python2 __init__.py
@@ -55,6 +54,8 @@ wsgi协议的app跑起来之后是没有办法直接通过http去请求的，要
 
 
 ## 3. flask的一大堆extensions
+官方列举出的[Extensions](http://flask.pocoo.org/extensions/)有很多
+
 ### flask-jwt(似乎已经很久没人维护了))
 ```python
 from flask import Flask

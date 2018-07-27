@@ -66,6 +66,11 @@ you-get还提供了windows版本 下载youtube视频只需要
 
 
 
+```shell
+youtube-dl -o '%(title)s.%(ext)s' https://www.youtube.com/watch?v=rimXGaUdaLg
+```
+
+
 [参考](https://doub.io/dbrj-1/)
 [百度云盘同步的方法](http://www.typemylife.com/use-vps-download-videos-from-youtube-upload-to-baidu-cloud/)
 [讨论](https://www.v2ex.com/t/189034)

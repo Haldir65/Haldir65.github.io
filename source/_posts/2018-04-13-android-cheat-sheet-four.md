@@ -324,6 +324,8 @@ public class RoundCornerImageView2 extends AppCompatImageView {
 
 TextView有时候会出现提前换行的问题
 
+[Instagram是如何提升TextView渲染性能的(http://codethink.me/2015/04/23/improving-comment-rendering-on-android/),关键字TextLayoutCache
+
 
 
 [gradle build scan](https://gradle.com/build-scans)

@@ -21,7 +21,6 @@ top : 1
 - [scheme 这东西算跨客户端平台的](https://sspai.com/post/31500)，比如在 App 中调起支付宝(用的是 alipayqr://)。其实就是一个系统内跨应用调用。[用法](http://blog.csdn.net/qq_23547831/article/details/51685310)
 - [ ] Paul Irish from google
 - [ ] form表单可以跨域一个是历史原因要保持兼容性
-- [ ] 通过file input上传图片，原生ajax以及Ajax，自己搭建上传服务器[大概能猜到暴风影音的局域网传输实现了](https://zhuanlan.zhihu.com/p/24513281?refer=flask)
 - [ ] [lightbox一个很好看的js图片查看库](http://lokeshdhakar.com/projects/lightbox2/)
 - [ ] [仿门户网站js相册](https://www.js-css.cn/a/jscode/album/2014/0915/1319.html)， [js相册2](https://www.js-css.cn/a/jscode/album/2014/0914/1318.html)
 - [ ] [八大排序算法的python实现](http://python.jobbole.com/82270/)
@@ -36,6 +35,7 @@ top : 1
 - [ ] classloader和class的生命周期
 - [ ] [在bash脚本中获取当前脚本所在路径](https://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within?rq=1)
 - [ ] [如何写makefile](https://seisman.github.io/how-to-write-makefile/introduction.html)
+- [ ][Android.mk以及Application.mk文件怎么写,java调用c,c调用java的demo实现](https://developer.android.com/ndk/guides/android_mk?hl=zh-cn)
 
 
 ### 已完成
@@ -60,6 +60,7 @@ top : 1
 - [使用Spring boot后台提供protobuf接口实现客户端通信] 不要使用protobf-gradle-plugin了。直接写脚本用protoc去生成文件，指定生成文件的路径要和proto里面写的包名对的上。另外就是客户端和server端依赖的protobuf版本以及protoc工具的版本得一致，比如都是3.5。还有就是protoc的语法，什么import的比较烦。
 - [X] 使用jinja2生成文件。[一个比较好玩的代码生成器](https://github.com/guokr/swagger-py-codegen)
 - [X] URL Encoding,就是那个在网址里把字符转成百分号加上UTF-8的[找到了阮一峰老师的解释](http://www.ruanyifeng.com/blog/2010/02/url_encoding.html)
+- [X] 通过file input上传图片，原生ajax以及Ajax，自己搭建上传服务器[大概能猜到暴风影音的局域网传输实现了](https://zhuanlan.zhihu.com/p/24513281?refer=flask)用flask的话自己搭建好后台最简单了，最多再使用flask-wtf和flask-upload规范操作
 
 
 ### Good For Nothing

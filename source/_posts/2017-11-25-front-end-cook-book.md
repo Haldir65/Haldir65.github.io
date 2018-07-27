@@ -368,6 +368,7 @@ private static String htmlEncode(char c) {
 <script>window.location.href=”http://www.baidu.com”;</script> ## 就变成了
 &lt;script&gt;window.location.href=&quot;http://www.baidu.com&quot;&lt;/script&gt;
 ```
+python flask里面类似的函数叫做escape.
 
 
 

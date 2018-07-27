@@ -10,6 +10,7 @@ tags: [python]
 
 ## 1. The Flask Way
 PyCharm最好装Professional的，方便很多，可以ssh到linux远程服务器,直接[远程开发](http://blog.csdn.net/zhaihaifei/article/details/53691873)，调试。除了连接有点慢，别的都好。windows环境下很多库都跑不起来。
+还是用mac或者直接linux desktop
 
 ### 1.1 Basics
 > Flask is a very simple, but extremely flexible framework Flask使用Decorator对请求进行处理
@@ -24,104 +25,66 @@ from flask import request
 from flask import jsonify
 from flask import send_file
 
-# create the flask object
+### create the flask object
 app = Flask(__name__)
 
-# 处理GET请求像这样就可以了
 
-@app.route('/', methods=['GET'])
-def handle_get():
-    return 'haha ,this is http status code 200'
+### 对于GET请求，获得query参数的方式
+> http://127.0.0.1:12345/_search_user?user=111&date=190
 
-#处理POST请求，从request中拿东西，返回response
+@app.route('/_search_user', methods=['GET'])
+def query_user_profile():
+    try:
+        user = request.args.get('user','')
+        date = request.args.get('date','')
+        print(user) ## 111
+        print(date) ## 190
+        return 'every Thing Ok'
+    except KeyError as e:
+        return "missing required key"
+
+### 处理POST请求，从request中拿东西，返回response
 @app.route('/', methods=['POST'])
 def handle_post():
     uid = request.form['uid'] # requets.form是一个list，从里面获取想表单的参数
     name = request.form['name']
     print('uid is %s ,name is %s ' % (uid, name))
-    return '200 Ok, or whatever you like'  
+    return '200 Ok, or whatever you like'
 
 从request中获得json数据
 @app.route('/api/add_message/<uuid>', methods=['GET', 'POST'])
 def add_message(uuid):
-    content = request.get_json(silent=True)
+    content = request.get_json(silent=True) 
+##前提是客户端发来的request中包含'Content-Type' == 'application/json'的header    
     print content
     return uuid   
-前提是客户端发来的request中包含'Content-Type' == 'application/json'的header    
 
 if __name__ == '__main__':
     app.run(port=12345, debug=True) #设置为True后，会自动检测到服务端代码更改并reload，出错了也会给client返回实际的错误堆栈， 生产环境不要打开Debug 。
 
-# 对于GET请求，获得query参数的方式
-http://127.0.0.1:12345/_search_user?user=111&date=190
 
-@app.route('/_search_user', methods=['GET'])
-def query_user_profile():
-    user = request.args.get('user')
-    date = request.args.get('date')
-    print(user)
-    print(date)
-    return 'every Thing Ok'
+from flask import request
+##读取cookie
+@app.route('/')
+def index():
+    username = request.cookies.get('username')
+    # use cookies.get(key) instead of cookies[key] to not get a
+    # KeyError if the cookie is missing.
 
- 输出
- 111
- 190   
+from flask import make_response
+##设置cookie
+@app.route('/')
+def index():
+    resp = make_response(render_template(...))
+    resp.set_cookie('username', 'the username')
+    return resp
 
- #返回json，作为API
-@app.route('/_get_current_user', methods=['GET'])
-def get_current_user():
-    return jsonify(
-        username='Admin',
-        email='Bob@gmail.com',
-        age=18
-    )    
-
-{
-    username: 'Admin';
-    email: 'Bob@gamil.com';
-    age: 18
-}
-
-#返回复杂一点的json，或者json数组
-@app.route('/_get_user_list', methods=['GET'])
-def get_user_list():
-    user_list = create_user_list()
-    return Response(json.dumps(user_list), mimetype='application/json')
-
-
-#生成数据
-def create_user_list():
-    alice = {'name': 'alice', 'age': 16, 'sex': 'female'}
-    tom = {'name': 'tom', 'age': 23, 'sex': 'male'}
-    josh = {'name': 'josh', 'age': 20, 'sex': 'male'}
-    bill = {'name': 'bill', 'age': 19, 'sex': 'male'}
-    li = [alice, tom, josh, bill]
-    return li
-
-
-# 在Postman中就能获得这样的result
-[
-    {
-        "name": "alice",
-        "age": 16,
-        "sex": "female"
-    },
-    {
-        "name": "tom",
-        "age": 23,
-        "sex": "male"
-    },
-    {
-        "name": "josh",
-        "age": 20,
-        "sex": "male"
-    },
-    {
-        "name": "bill",
-        "age": 19,
-        "sex": "male"
-    }
-]
+### 设置header
+@app.errorhandler(404)
+def not_found(error):
+    resp = make_response(render_template('error.html'), 404)
+    resp.headers['X-Something'] = 'A value'
+    return resp
 
 # hosting static file，image,css,etc
 # 提供图片什么的
@@ -130,7 +93,6 @@ def create_user_list():
 def get_image():
     filename = 'static/image/b1.jpg'
     fullpath = os.path.join(os.path.curdir, filename)
-    print(filename, fullpath)
     return send_file(fullpath, mimetype='image/jpeg')
 ```
 

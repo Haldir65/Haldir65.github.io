@@ -544,6 +544,7 @@ dpkg -r tcl8.4
 参考[Ubuntu 中软件的安装、卸载以及查看的方法总结](http://qiuye.iteye.com/blog/461394)
 
 关于apt-get
+
 ```shell
 apt-cache search # ------(package 搜索包)就是看下符合这个名称的在repository中包有哪些
 apt-cache show #------(package 获取包的相关信息，如说明、大小、版本等)
@@ -554,8 +555,8 @@ apt-get remove #-----(package 删除包)
 apt-get remove --purge # ------(package 删除包，包括删除配置文件等)
 apt-get autoremove --purge # ----(package 删除包及其依赖的软件包+配置文件等（只对6.10有效，强烈推荐）)
 apt-get update #------更新源
-apt-get upgrade #------更新已安装的包
-apt-get dist-upgrade # ---------升级系统
+apt-get upgrade #------更新已安装的包，不会移除任何包
+apt-get dist-upgrade # --------- 更新包，但如果有些已安装的包被被标记为需要移除的话，会移除包
 apt-get dselect-upgrade #------使用 dselect 升级
 apt-cache depends #-------(package 了解使用依赖)
 apt-cache rdepends # ------(package 了解某个具体的依赖,当是查看该包被哪些包依赖吧...)
@@ -617,7 +618,7 @@ ifconfig ## 查看机器上的网卡
 en01 ##Ethernet
 ##注意 RX bytes(接收到的数据)和TX bytes(发送出去的数据)后面的数字
 
-sudo curl ifconfig.me ## 需要sudo，查看本机的外网地址，有点慢
+curl ipinfo.io/ip ## 查看本机的外网地址
 
 ip address show //类似的命令，据说多数distribution打算用ip替代ipconfig
 ip addr show //和上面一样
