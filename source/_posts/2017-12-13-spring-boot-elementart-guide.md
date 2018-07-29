@@ -64,5 +64,8 @@ servlet和请求的url的对应关系写在web.xml中。
 test文件存放在‘./src/test’文件夹中，生成的class文件放在‘./target/classes’文件夹中，
 ‘./target’文件夹中放的是jar文件
 
+
+[oracle文档中指出manifest文件最后一行要加上一个换行](https://docs.oracle.com/javase/tutorial/deployment/jar/build.html)The manifest must end with a new line or carriage return. The last line will not be parsed properly if it does not end with a new line or carriage return.
+
 [accessing-data-mysql](https://spring.io/guides/gs/accessing-data-mysql/)
 [在application.properties文件中可以写的一些配置](https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html)

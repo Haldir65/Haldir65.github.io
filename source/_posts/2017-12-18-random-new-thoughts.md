@@ -11,7 +11,7 @@ top : 1
 <!--more-->
 
 - [个人分享--web 前端学习资源分享](https://juejin.im/post/5a0c1956f265da430a501f51)
-- [WPA 所代表的 Web 开发应是未来](https://huangxuan.me/2017/02/09/nextgen-web-pwa/)
+- [WPA 所代表的 Web 开发应是未来](https://huangxuan.me/2017/02/09/nextgen-web-pwa/)据说Electron要被PWA干掉
 - [js 循环闭包的解决方法](https://segmentfault.com/a/1190000003818163)
 - 动态类型一时爽，代码重构火葬场
 - Promise 链式调用与终止，异常处理
@@ -35,8 +35,7 @@ top : 1
 - [ ] classloader和class的生命周期
 - [ ] [在bash脚本中获取当前脚本所在路径](https://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within?rq=1)
 - [ ] [如何写makefile](https://seisman.github.io/how-to-write-makefile/introduction.html)
-- [ ][Android.mk以及Application.mk文件怎么写,java调用c,c调用java的demo实现](https://developer.android.com/ndk/guides/android_mk?hl=zh-cn)
-
+- [] how to view a file (text or binary) in binary format
 
 ### 已完成
 * 用 express 转接一个知乎 Api，添加 Access-control-allow-origin,或许还可以用 redis 缓存数据结果（一个就好）由此想到一篇文章"How to use Pythonto build a restful Web Service".只不过用的是 Tornado

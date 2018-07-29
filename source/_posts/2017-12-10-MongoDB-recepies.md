@@ -16,6 +16,7 @@ MongoDB默认装到C盘的program files文件夹里面,需要一个data文件夹
 [official on installation](https://docs.mongodb.com/v3.4/tutorial/install-mongodb-on-windows/)
 这个文件夹不一定要在c盘，可以放f盘，比如"f://mongndb//data"
 //这样启动server时记得把--dbpath传一下
+默认安装的时候dbpath被设置为了"c://data//db"，所以可能需要创建这个目录
 
 ## establish connection
 ```shell

@@ -322,6 +322,28 @@ public class RoundCornerImageView2 extends AppCompatImageView {
 这种方式一般称为离屏缓冲
 
 
+### 14. jni使用
+[一般使用javah生成header文件](https://blog.csdn.net/baidu_34045013/article/details/78994516)
+
+
+多数教程都是写一个
+gradle.properties添加一句android.useDeprecatedNdk=true
+随着studio版本升级，还是不得不升级到使用cmake的方式。
+
+Android Studio中集成c或者cpp代码照着这个官方的[教程](https://developer.android.com/studio/projects/add-native-code)抄就行了。其实也就是写一个CMakeLists.txt，然后在studio里面右键app模块, Link C++ Project with Gradle。照着来就是了。
+
+先写好java的native方法，然后cd到src/main/java路径
+javah -d jni com.your.package.name.classyoujustWroteWithnativeMethod
+
+把生成的header文件剪切到和main/Java文件夹平级的jni文件夹中，再去写c的实现。
+
+移植mp3lame到Android平台照着[这里](https://www.jianshu.com/p/065bfe6d3ec2)操作就行了。
+这篇博客使用的是lame-3.99.5，注意下载对应的版本。
+[cmake的一些知识点](http://cfanr.cn/2017/08/26/Android-NDK-dev-CMake-s-usage/)
+cmake生成的.so文件在"\app\build\intermediates\cmake\debug\obj\arm64-v8a"这个路径下
+
+
+
 TextView有时候会出现提前换行的问题
 
 [Instagram是如何提升TextView渲染性能的(http://codethink.me/2015/04/23/improving-comment-rendering-on-android/),关键字TextLayoutCache
