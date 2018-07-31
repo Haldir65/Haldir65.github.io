@@ -15,7 +15,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/street lights dark night car city bw.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/toast_transact.JPG">
-<meta property="og:updated_time" content="2018-07-29T14:30:44.468Z">
+<meta property="og:updated_time" content="2018-07-31T11:47:54.361Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android手册-4">
 <meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/street lights dark night car city bw.jpg?imageView2/2/w/600">
@@ -230,9 +230,20 @@ ga('send', 'pageview');
 <p>先写好java的native方法，然后cd到src/main/java路径<br>javah -d jni com.your.package.name.classyoujustWroteWithnativeMethod</p>
 <p>把生成的header文件剪切到和main/Java文件夹平级的jni文件夹中，再去写c的实现。</p>
 <p>移植mp3lame到Android平台照着<a href="https://www.jianshu.com/p/065bfe6d3ec2">这里</a>操作就行了。<br>这篇博客使用的是lame-3.99.5，注意下载对应的版本。<br><a href="http://cfanr.cn/2017/08/26/Android-NDK-dev-CMake-s-usage/">cmake的一些知识点</a><br>cmake生成的.so文件在”\app\build\intermediates\cmake\debug\obj\arm64-v8a”这个路径下</p>
+<ol>
+<li>关于Spannable String的问题<br>Medium上有关于使用span的文章 <a href="https://medium.com/google-developers/spantastic-text-styling-with-spans-17b0c16b4568">Spantastic text styling with Spans</a> 其实有SpannableString(mutable),SpannableStringBuilder还有SpannedString(immutable)。<br>Just reading and not setting the text nor the spans? -&gt; SpannedString(文字和style都改不了)<br>Setting the text and the spans? -&gt; SpannableStringBuilder(文字和Style都能改)<br>Setting a small number of spans (&lt;~10)? -&gt; SpannableString(文字不能改，Style能改)<br>Setting a larger number of spans (&gt;~10) -&gt; SpannableStringBuilder</li>
+</ol>
+<p><a href="https://stackoverflow.com/questions/17546955/android-spanned-spannedstring-spannable-spannablestring-and-charsequence">stackoverflow上甚至有Glide作者的讨论</a><br>从源码来看,SpannedString和SpannableString几乎是一样的，后者继承了一个Spannable的接口，由此对外暴露了父类(SpannableStringInternal)的setSpan和removeSpan方法。</p>
+<blockquote>
+<p>Use a SpannedString when your text has style but you don’t need to change either the text or the style after it is created. (似乎平时也应该这样使用，但从源码来看，两者几乎没有性能上的区别。真正的性能差异要取决于实际的use case)<br>Use a SpannableString when your text doesn’t need to be changed but the styling does.<br>Use a SpannableStringBuilder when you will need to update the text and its style.</p>
+</blockquote>
+<p>SPAN_EXCLUSIVE_EXCLUSIVE，SPAN_EXCLUSIVE_INCLUSIVE这些东西的意思是针对新的文字插入之后的行为来说的。<br>SPAN_EXCLUSIVE_INCLUSIVE就是说新的文字插入之后，之前设置的span将自动扩增并应用到这段新的文字上。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">spannable.setSpan(</span><br><span class="line">     ForegroundColorSpan(Color.RED), </span><br><span class="line">     <span class="comment">/* start index */</span> <span class="number">8</span>, <span class="comment">/* end index */</span> <span class="number">12</span>, </span><br><span class="line">     Spannable.SPAN_EXCLUSIVE_INCLUSIVE)</span><br><span class="line">spannable.insert(<span class="number">12</span>, “(&amp; fon)”) <span class="comment">//注意SpannableStringBuilder的这个insert方法是可以指定insert的位置的</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">val spannable = SpannableString(“Text is spantastic!”)</span><br><span class="line">spannable.setSpan(</span><br><span class="line">     ForegroundColorSpan(Color.RED), </span><br><span class="line">     <span class="number">8</span>, <span class="number">12</span>, </span><br><span class="line">     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)</span><br><span class="line">spannable.setSpan(</span><br><span class="line">     StyleSpan(BOLD), </span><br><span class="line">     <span class="number">8</span>, spannable.length, </span><br><span class="line">     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE) <span class="comment">//一段文字可以同时应用多个Spannable样式</span></span><br></pre></td></tr></table></figure></p>
+<p>Framework自带的spans可以分为两类：一种是改变文字外观的（Appearance affecting span），另一种是改变文字大小的(Metric affecting span)。</p>
+<p>文章里还提到了可以使用TextView.setText(Spannable, BufferType.SPANNABLE)方法，如果后续需要修改文字的span样式的话，可以getText，获得的是之前设置的span，这时候再去对这个span进行操作（不要再setText回去了），这对提升性能有帮助（text的measure和layout都是耗性能的操作）。但注意，如果是使用了RelativeSizeSpan的话，因为更改了TextView的大小，这必然会触发重新measure和layout，上述的优化似乎也就没有必要了。</p>
+<p>自定义Span的话：<br>Affecting text at the character level -&gt; CharacterStyle<br>Affecting text at the paragraph level -&gt; ParagraphStyle<br>Affecting text appearance -&gt; UpdateAppearance<br>Affecting text metrics -&gt; UpdateLayout</p>
+<p><a href="https://gradle.com/build-scans">gradle build scan</a><br>[把一些本地libiary打包成aar能够显著加快编译]</p>
 <p>TextView有时候会出现提前换行的问题</p>
 <p>[Instagram是如何提升TextView渲染性能的(<a href="http://codethink.me/2015/04/23/improving-comment-rendering-on-android/),关键字TextLayoutCache">http://codethink.me/2015/04/23/improving-comment-rendering-on-android/),关键字TextLayoutCache</a></p>
-<p><a href="https://gradle.com/build-scans">gradle build scan</a><br>[把一些本地libiary打包成aar能够显著加快编译]</p>
 
       
 

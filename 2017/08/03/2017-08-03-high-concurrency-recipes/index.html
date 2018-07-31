@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/blog/be3c80a11edfd0fdb75d098550ed2c8e.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-07-29T14:30:44.464Z">
+<meta property="og:updated_time" content="2018-07-31T11:47:54.353Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="高并发实践手册">
 <meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/image/blog/be3c80a11edfd0fdb75d098550ed2c8e.jpg?imageView2/2/w/600">
@@ -295,6 +295,7 @@ ga('send', 'pageview');
 <p>在线程池(ThreadPoolExecutor)中，获取任务使用的是queue的<strong>poll</strong>方法，添加任务使用的是queue的<strong>offer</strong>方法。</p>
 <h2 id="15-AtomicXXX只是将value写成volatile，这样get就安全了，set的话直接交给Unsafe了"><a href="#15-AtomicXXX只是将value写成volatile，这样get就安全了，set的话直接交给Unsafe了" class="headerlink" title="15. AtomicXXX只是将value写成volatile，这样get就安全了，set的话直接交给Unsafe了"></a>15. AtomicXXX只是将value写成volatile，这样get就安全了，set的话直接交给Unsafe了</h2><p>volatile并不是Atomic操作，例如，A线程对volatile变量进行写操作(实际上是读和写操作)，B线程可能在这两个操作之间进行了写操作；例如用volatile修饰count变量那么 count++ 操作就不是原子性的。而AtomicInteger类提供的atomic方法可以让这种操作具有原子性如getAndIncrement()方法会原子性的进行增量操作把当前值加一,因为AtomicInteger的getAndIncrement方法就是简单的调用了Unsafe的getAndAddInt。</p>
 <h2 id="16-读多写少的场景下的同步"><a href="#16-读多写少的场景下的同步" class="headerlink" title="16. 读多写少的场景下的同步"></a>16. 读多写少的场景下的同步</h2><p> CopyOnWriteArrayList和Collections.synchronizedList相比。在高并发前提下，前者读的性能更好，后者写的性能更好（前者的写性能极差）。<a href="http://blog.csdn.net/yangzl2008/article/details/39456817">CopyOnWriteArrayList与Collections.synchronizedList的性能对比</a>。CopyOnWriteArrayList适合做缓存。<br> <strong>ReentrantReadWriteLock</strong> 用于针对读多写少的场景进行优化。（获得读锁后，其它线程可获得读锁而不能获取写锁<br> 获得写锁后，其它线程既不能获得读锁也不能获得写锁）</p>
+<p>java 无锁状态、偏向锁、轻量级锁和重量级锁</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="http://blog.csdn.net/fw0124/article/details/6672522">看起来 ReentrantLock 无论在哪方面都比 synchronized 好</a></li>
 <li><a href="https://www.youtube.com/watch?v=yS0Nc-L1Uuk">Jesse Wilson - Coordinating Space and Time</a></li>

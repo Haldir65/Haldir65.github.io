@@ -17,7 +17,7 @@
 <meta property="og:description" content="C语言实用指南，暂时不涉及cpp内容">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/pretty-orange-mushroom-wallpaper-5386b0c8c3459.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-07-29T14:30:44.468Z">
+<meta property="og:updated_time" content="2018-07-31T11:47:54.361Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="C语言学习手册">
 <meta name="twitter:description" content="C语言实用指南，暂时不涉及cpp内容">
@@ -211,7 +211,7 @@ ga('send', 'pageview');
 <p>static libiray(compile time已完成link，而dynamic library需要在runtime完成link)</p>
 <p>查看archive文件中的内容<br>ar -tv libmylib.a</p>
 <p>nm somebinaryfile ## 查看动态和静态库中的符号表</p>
-<p>ls /usr/lib ## 文件夹中又各种lib,包括so文件和.a文件</p>
+<p>ls /usr/lib ## 文件夹中又各种lib,包括so文件和.a文件<br>ls /usr/include # 这里也有一大堆头文件</p>
 <p>clang wacky.c -L. -lwacky -o wacky ## -L. 表示在当前目录下查找后面的libwacky.so或者libwacky.a文件。所以完全可以link 系统中存在的(/usr/lib目录中)的library并compile到program中</p>
 <p>Makefile for bundling static library（每一个chunk叫做recepie）<br>不能用空格，需要用Tab<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">default: wacky</span><br><span class="line"></span><br><span class="line">wacky: libwacky.a  wacky.c</span><br><span class="line">        clang wacky.c -L. -lwacky -o wacky</span><br><span class="line"></span><br><span class="line">libwacky.a: wacky_math.o</span><br><span class="line">        ar -rcv $@ $^</span><br></pre></td></tr></table></figure></p>
 <h3 id="dynamic-library"><a href="#dynamic-library" class="headerlink" title="dynamic library"></a>dynamic library</h3><p>wacky_math.o: wacky_math.c wacky_math.h<br>        clang -c -fPIC wacky_math.c -o $@</p>
@@ -221,6 +221,7 @@ ga('send', 'pageview');
 <p>make wacky 也是可以的，可以指定编译target</p>
 <p>###<br><a href="https://www.youtube.com/watch?v=GExnnTaBELk">C Programming: Makefiles</a></p>
 <p>编译过程可以传一些flag(无论是gcc还是clang都是一样的)<br>preprocessor -E  ##handle #include define<br>compiler -S ##translate C to assembly(生成.s文件)<br>assembler -c ## translate assembly to object file(.o，文件是针对特定cpu,platform的,.o文件是不可执行的)<br>linker bring together object file to produce executable</p>
+<p><a href="https://mooc.guokr.com/note/13202/">编译时发生了什么</a></p>
 <p>如果没有-E -S或者-c的话，就goes all the way down to executable<br>-O 是指定最终生成的executable的名称的</p>
 <p>在c program中使用其他的library以及如何编译生成可执行文件</p>
 <p>make clean</p>
@@ -228,10 +229,14 @@ ga('send', 'pageview');
 <p>因为手动rm可能写成<br>rm -f * .o 中间多一个空格</p>
 <p><a href="https://www.tutorialspoint.com/makefile/makefile_example.htm">make file examples</a></p>
 <p>经常会看到项目里面的安装指南包括./configure make..<br>GNU的AUTOCONF和AUTOMAKE</p>
+<p>./config &amp;&amp; make &amp;&amp; sudo make install || exit 1</p>
 <p>如何生成一个auto build file<br><a href="https://stackoverflow.com/questions/10999549/how-do-i-create-a-configure-script">auto build configure file</a></p>
 <p><a href="http://hahaya.github.io/build-libevent/">Linux下安装、配置libevent</a><br><a href="http://hahaya.github.io/hello-in-libevent/">使用libevent输出Hello</a></p>
 <p>todo read the manual page for gcc(clang) to see all the available command line arguments</p>
-
+<p>如何使用C语言库<br><a href="https://blog.csdn.net/yanxiangtianji/article/details/20474155">以mysql的c库为例</a><br>如果库在 usr/include/ 目录下，那么就用 #include &lt; *.h &gt;。这个目录下面放的都是些头文件</p>
+<p>如果库在当前目录下，就用　#include “mylib.h”</p>
+<p>gcc -v可以查看compile gcc时预设的链接静态库的搜索路径</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">默认情况下， GCC在链接时优先使用动态链接库，只有当动态链接库不存在时才考虑使用静态链接库，如果需要的话可以在编译时加上-static选项，强制使用静态链接库。</span><br><span class="line">静态库链接时搜索路径顺序：</span><br><span class="line"></span><br><span class="line">1. ld会去找GCC命令中的参数-L</span><br><span class="line">2. 再找gcc的环境变量LIBRARY_PATH</span><br><span class="line">3. 再找内定目录 /lib /usr/lib /usr/local/lib 这是当初compile gcc时写在程序内的</span><br><span class="line"></span><br><span class="line">动态链接时、执行时搜索路径顺序:</span><br><span class="line"></span><br><span class="line">1. 编译目标代码时指定的动态库搜索路径</span><br><span class="line">2. 环境变量LD_LIBRARY_PATH指定的动态库搜索路径</span><br><span class="line">3. 配置文件/etc/ld.so.conf中指定的动态库搜索路径</span><br><span class="line">4. 默认的动态库搜索路径/lib</span><br><span class="line">5. 默认的动态库搜索路径/usr/lib</span><br><span class="line"></span><br><span class="line">有关环境变量：</span><br><span class="line">LIBRARY_PATH环境变量：指定程序静态链接库文件搜索路径</span><br><span class="line">LD_LIBRARY_PATH环境变量：指定程序动态链接库文件搜索路径</span><br></pre></td></tr></table></figure>
       
 
       
