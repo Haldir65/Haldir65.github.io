@@ -39,6 +39,7 @@ nm somebinaryfile ## 查看动态和静态库中的符号表
 
 
 ls /usr/lib ## 文件夹中又各种lib,包括so文件和.a文件
+ls /usr/include # 这里也有一大堆头文件
 
 clang wacky.c -L. -lwacky -o wacky ## -L. 表示在当前目录下查找后面的libwacky.so或者libwacky.a文件。所以完全可以link 系统中存在的(/usr/lib目录中)的library并compile到program中
 
@@ -82,6 +83,8 @@ compiler -S ##translate C to assembly(生成.s文件)
 assembler -c ## translate assembly to object file(.o，文件是针对特定cpu,platform的,.o文件是不可执行的)
 linker bring together object file to produce executable
 
+[编译时发生了什么](https://mooc.guokr.com/note/13202/)
+
 如果没有-E -S或者-c的话，就goes all the way down to executable
 -O 是指定最终生成的executable的名称的
 
@@ -102,6 +105,8 @@ rm -f * .o 中间多一个空格
 经常会看到项目里面的安装指南包括./configure make..
 GNU的AUTOCONF和AUTOMAKE
 
+./config && make && sudo make install || exit 1
+
 如何生成一个auto build file
 [auto build configure file](https://stackoverflow.com/questions/10999549/how-do-i-create-a-configure-script)
 
@@ -110,3 +115,32 @@ GNU的AUTOCONF和AUTOMAKE
 
 
 todo read the manual page for gcc(clang) to see all the available command line arguments
+
+如何使用C语言库
+[以mysql的c库为例](https://blog.csdn.net/yanxiangtianji/article/details/20474155)
+如果库在 usr/include/ 目录下，那么就用 #include < *.h >。这个目录下面放的都是些头文件
+
+如果库在当前目录下，就用　#include "mylib.h"
+
+gcc -v可以查看compile gcc时预设的链接静态库的搜索路径
+
+```
+默认情况下， GCC在链接时优先使用动态链接库，只有当动态链接库不存在时才考虑使用静态链接库，如果需要的话可以在编译时加上-static选项，强制使用静态链接库。
+静态库链接时搜索路径顺序：
+
+1. ld会去找GCC命令中的参数-L
+2. 再找gcc的环境变量LIBRARY_PATH
+3. 再找内定目录 /lib /usr/lib /usr/local/lib 这是当初compile gcc时写在程序内的
+
+动态链接时、执行时搜索路径顺序:
+
+1. 编译目标代码时指定的动态库搜索路径
+2. 环境变量LD_LIBRARY_PATH指定的动态库搜索路径
+3. 配置文件/etc/ld.so.conf中指定的动态库搜索路径
+4. 默认的动态库搜索路径/lib
+5. 默认的动态库搜索路径/usr/lib
+
+有关环境变量：
+LIBRARY_PATH环境变量：指定程序静态链接库文件搜索路径
+LD_LIBRARY_PATH环境变量：指定程序动态链接库文件搜索路径
+```

@@ -342,14 +342,59 @@ javah -d jni com.your.package.name.classyoujustWroteWithnativeMethod
 [cmake的一些知识点](http://cfanr.cn/2017/08/26/Android-NDK-dev-CMake-s-usage/)
 cmake生成的.so文件在"\app\build\intermediates\cmake\debug\obj\arm64-v8a"这个路径下
 
+15. 关于Spannable String的问题
+Medium上有关于使用span的文章 [Spantastic text styling with Spans](https://medium.com/google-developers/spantastic-text-styling-with-spans-17b0c16b4568) 其实有SpannableString(mutable),SpannableStringBuilder还有SpannedString(immutable)。
+Just reading and not setting the text nor the spans? -> SpannedString(文字和style都改不了)
+Setting the text and the spans? -> SpannableStringBuilder(文字和Style都能改)
+Setting a small number of spans (<~10)? -> SpannableString(文字不能改，Style能改)
+Setting a larger number of spans (>~10) -> SpannableStringBuilder
+
+[stackoverflow上甚至有Glide作者的讨论](https://stackoverflow.com/questions/17546955/android-spanned-spannedstring-spannable-spannablestring-and-charsequence)
+从源码来看,SpannedString和SpannableString几乎是一样的，后者继承了一个Spannable的接口，由此对外暴露了父类(SpannableStringInternal)的setSpan和removeSpan方法。
+> Use a SpannedString when your text has style but you don't need to change either the text or the style after it is created. (似乎平时也应该这样使用，但从源码来看，两者几乎没有性能上的区别。真正的性能差异要取决于实际的use case)
+> Use a SpannableString when your text doesn't need to be changed but the styling does.
+> Use a SpannableStringBuilder when you will need to update the text and its style.
+
+SPAN_EXCLUSIVE_EXCLUSIVE，SPAN_EXCLUSIVE_INCLUSIVE这些东西的意思是针对新的文字插入之后的行为来说的。
+SPAN_EXCLUSIVE_INCLUSIVE就是说新的文字插入之后，之前设置的span将自动扩增并应用到这段新的文字上。
+```java
+spannable.setSpan(
+     ForegroundColorSpan(Color.RED), 
+     /* start index */ 8, /* end index */ 12, 
+     Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
+spannable.insert(12, “(& fon)”) //注意SpannableStringBuilder的这个insert方法是可以指定insert的位置的
 
 
-TextView有时候会出现提前换行的问题
+val spannable = SpannableString(“Text is spantastic!”)
+spannable.setSpan(
+     ForegroundColorSpan(Color.RED), 
+     8, 12, 
+     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+spannable.setSpan(
+     StyleSpan(BOLD), 
+     8, spannable.length, 
+     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE) //一段文字可以同时应用多个Spannable样式
+```
 
-[Instagram是如何提升TextView渲染性能的(http://codethink.me/2015/04/23/improving-comment-rendering-on-android/),关键字TextLayoutCache
+Framework自带的spans可以分为两类：一种是改变文字外观的（Appearance affecting span），另一种是改变文字大小的(Metric affecting span)。
+
+文章里还提到了可以使用TextView.setText(Spannable, BufferType.SPANNABLE)方法，如果后续需要修改文字的span样式的话，可以getText，获得的是之前设置的span，这时候再去对这个span进行操作（不要再setText回去了），这对提升性能有帮助（text的measure和layout都是耗性能的操作）。但注意，如果是使用了RelativeSizeSpan的话，因为更改了TextView的大小，这必然会触发重新measure和layout，上述的优化似乎也就没有必要了。
+
+自定义Span的话：
+Affecting text at the character level -> CharacterStyle
+Affecting text at the paragraph level -> ParagraphStyle
+Affecting text appearance -> UpdateAppearance
+Affecting text metrics -> UpdateLayout
+
+
+
 
 
 
 [gradle build scan](https://gradle.com/build-scans)
 [把一些本地libiary打包成aar能够显著加快编译]
+
+TextView有时候会出现提前换行的问题
+
+[Instagram是如何提升TextView渲染性能的(http://codethink.me/2015/04/23/improving-comment-rendering-on-android/),关键字TextLayoutCache
 

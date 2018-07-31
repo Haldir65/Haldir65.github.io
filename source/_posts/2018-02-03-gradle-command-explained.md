@@ -532,6 +532,15 @@ preBuild << {
 project(':library1').projectDir = new File('../StickyListHeader/library1')
 
 
+buildScript中gradle library的搜索顺序。比如自己添加了一个
+```
+maven {
+            url 'https://maven.google.com/'
+            name 'Google'
+        }
+```
+像这样的repository
+
 [比较复杂的gradle knowledge](https://github.com/adwiv/android-fat-aar)
 [official gradle docs 是最好的学习资料](https://guides.gradle.org/creating-new-gradle-builds/)
 [custom_plugins](https://docs.gradle.org/current/userguide/custom_plugins.html)

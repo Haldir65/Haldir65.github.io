@@ -35,7 +35,11 @@ top : 1
 - [ ] classloader和class的生命周期
 - [ ] [在bash脚本中获取当前脚本所在路径](https://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within?rq=1)
 - [ ] [如何写makefile](https://seisman.github.io/how-to-write-makefile/introduction.html)
-- [] how to view a file (text or binary) in binary format
+- [ ]一致性哈希原理
+- [ ] [使用redis实现低粒度的分布式锁](http://afghl.github.io/2018/06/17/distributed-lock-and-granarity.html)
+
+
+
 
 ### 已完成
 * 用 express 转接一个知乎 Api，添加 Access-control-allow-origin,或许还可以用 redis 缓存数据结果（一个就好）由此想到一篇文章"How to use Pythonto build a restful Web Service".只不过用的是 Tornado
@@ -61,6 +65,7 @@ top : 1
 - [X] URL Encoding,就是那个在网址里把字符转成百分号加上UTF-8的[找到了阮一峰老师的解释](http://www.ruanyifeng.com/blog/2010/02/url_encoding.html)
 - [X] 通过file input上传图片，原生ajax以及Ajax，自己搭建上传服务器[大概能猜到暴风影音的局域网传输实现了](https://zhuanlan.zhihu.com/p/24513281?refer=flask)用flask的话自己搭建好后台最简单了，最多再使用flask-wtf和flask-upload规范操作
 
+OpenType® is a cross-platform font file format developed jointly by Adobe and Microsoft.
 
 ### Good For Nothing
 - [ ] 用GDB调试程序

@@ -327,7 +327,7 @@ volatile并不是Atomic操作，例如，A线程对volatile变量进行写操作
  获得写锁后，其它线程既不能获得读锁也不能获得写锁）
 
 
-
+java 无锁状态、偏向锁、轻量级锁和重量级锁
 
 ## 参考
 - [看起来 ReentrantLock 无论在哪方面都比 synchronized 好](http://blog.csdn.net/fw0124/article/details/6672522)

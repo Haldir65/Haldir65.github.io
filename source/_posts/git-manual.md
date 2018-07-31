@@ -327,6 +327,23 @@ git log --pretty='%aN' | sort | uniq -c | sort -k1 -n -r | head -n 5 ###查看�
 查看最近一次commit都改了什么
 > git diff HEAD~1 HEAD
 
+git log
+[](https://www.atlassian.com/git/tutorials/git-logAdvanced git log)
+> git log --pretty=format:"%cn committed %h on %cd"
+git log --oneline
+git log --stat ## 显示出每一次commit的，以及每一次commit都改了哪些文件
+git log -v ##这个更啰嗦 ## 比stat多出了每次更改之后修改的文件内容
+git log --graph --oneline --decorate
+git log --pretty=format:"%cn committed %h on %cd" | awk '{ print $8}' | sort -n ##结合awk可以看到最晚几点commit，比如凌晨1点还在commit的.[format里面的参数在man git log page可以找到](https://mirrors.edge.kernel.org/pub/software/scm/git/docs/git-log.html#_pretty_formats)
+git log --after="2014-7-1" --before="2014-7-4" ## 还可以查看某个日期之间提交的东西
+git log --author="John"
+git log --author="John\|Mary" ## John或者Mary的
+git log --grep="JRA-224:" ## 从commit message里面查找
+git log -- foo.py bar.py ## 查看跟这几个文件相关的操作记录
+git log -S"Hello, World!" ##这个等于查找git log -p里面哪一次提交添加了“Hello, World！”这句话
+git log --no-merges
+git log --merges
+
 ## Reference
 -[git reset和revert](http://yijiebuyi.com/blog/8f985d539566d0bf3b804df6be4e0c90.html)
 -[git recipes](https://github.com/geeeeeeeeek/git-recipes)

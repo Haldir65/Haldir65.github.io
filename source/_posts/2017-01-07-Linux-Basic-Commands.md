@@ -159,7 +159,13 @@ P：在当前光标处上面粘贴内容。
 - > tail - 3 filename //只查看倒数后三行
 - > tail -n 3 filename //和上面是一样的
 
-- > xxd -b fileName // 看binaryFile不能用cat
+看binaryFile不能用cat
+how to view a file (text or binary) in binary format
+xxd -b fileName //binary 
+xxd file // hex format
+od -xc //binary format
+hd file // symboloc link to hexdump
+
 
 - > od： 通常使用od命令查看特殊格式的文件内容。通过指定该命令的不同选项可以以十进制、八进制、十六进制和ASCII码来显示文件。
 d 十进制
