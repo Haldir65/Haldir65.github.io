@@ -387,6 +387,10 @@ Affecting text appearance -> UpdateAppearance
 Affecting text metrics -> UpdateLayout
 
 
+asset文件夹里面的东西是无法用File的形式去获取的
+android.os.FileUriExposedException: file://assets/dist/index.js exposed beyond app through Intent.getData()
+at android.os.StrictMode.onFileUriExposed(StrictMode.java:1816)
+
 
 
 

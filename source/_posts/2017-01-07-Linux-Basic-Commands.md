@@ -587,6 +587,8 @@ dpkg -r 卸载软件包.不是完全的卸载,它的配置文件还存在.
 dpkg -P 全部卸载(但是还是不能解决软件包的依赖性的问题)
 dpkg -reconfigure 重新配置
 
+apt list --upgradable ## 看一下哪些程序可以更新
+
 
 install snap package(通常通过apt-get install软件时候会顺带将该软件所需要的依赖也安装下来，下次装一个其他软件的时候如果有类似的依赖，就直接用了。而snap package本身就bundle了所需的依赖)。这个概念还比较新，仅限于ubuntu,debian也没有。
 ```
@@ -717,6 +719,8 @@ proc
 ### 11 .常用配置
  ***查看登陆失败日志***
 > grep "Failed password for root" /var/log/auth.log | awk '{print $11}' | sort | uniq -c | sort -nr | more
+
+//其实就是去一个文件里面查看第一列的内容，然后uniq并且sort一下
 
 防范措施
 修改登陆端口号

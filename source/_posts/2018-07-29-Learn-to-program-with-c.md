@@ -107,6 +107,14 @@ GNU的AUTOCONF和AUTOMAKE
 
 ./config && make && sudo make install || exit 1
 
+比如说awk的安装过程是这样的
+wget http://ftp.gnu.org/gnu/gawk/gawk-4.1.1.tar.xz
+tar xvf gawk-4.1.1.tar.xz
+cd gawk-4.1.1 && ./configure
+make
+make check
+sudo make install
+
 如何生成一个auto build file
 [auto build configure file](https://stackoverflow.com/questions/10999549/how-do-i-create-a-configure-script)
 
