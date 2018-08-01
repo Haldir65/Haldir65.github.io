@@ -19,7 +19,7 @@
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/ChMkJ1gq00WIXw_GAA47r_8gjqgAAXxJAH8qOMADjvH566.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/htop-top.png">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/htop-bottom.png">
-<meta property="og:updated_time" content="2018-07-31T11:47:54.349Z">
+<meta property="og:updated_time" content="2018-08-01T11:10:45.143Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="linux常用命令扩展">
 <meta name="twitter:description" content="一些linux的常用命令，linux环境下运行server ,bash的语法">
@@ -270,7 +270,7 @@ ga('send', 'pageview');
 <li>awk ‘{print $0}’ /etc/passwd # 和cat差不多，显示文本内容<br>查看恶意IP试图登录次数：</li>
 <li>lastb | awk ‘{ print $3 }’ | sort | uniq -c | sort -n  ## 亲测可用,看上去挺吓人的</li>
 </ul>
-<p>awk怎么用<a href="https://www.youtube.com/watch?v=az6vd0tGhJI">Using Linux AWK Utility</a>，一个没有废话的教程，非常好。</p>
+<p>awk怎么用<a href="https://www.youtube.com/watch?v=az6vd0tGhJI">Using Linux AWK Utility</a>，一个没有废话的教程，非常好。<br><a href="ftp://ftp.gnu.org/old-gnu/Manuals/gawk-3.0.3/html_chapter/gawk_5.html">官方的古老的awk教程</a></p>
 <blockquote>
 <p>drwxr-xr-x  3 root root    4096 Mar 14  2017 ufw<br>-rw-r–r–  1 root root     338 Nov 18  2014 updatedb.conf<br>drwxr-xr-x  3 root root    4096 Aug 30 03:53 update-manager<br>drwxr-xr-x  2 root root    4096 Aug 30 03:53 update-motd.d<br>drwxr-xr-x  2 root root    4096 Mar 14  2017 update-notifier<br>drwxr-xr-x  2 root root    4096 Mar 14  2017 vim<br>drwxr-xr-x  3 root root    4096 Mar 14  2017 vmware-tools<br>lrwxrwxrwx  1 root root      23 Mar 14  2017 vtrgb -&gt; /etc/alternatives/vtrgb<br>-rw-r–r–  1 root root    4942 Jun 14  2016 wgetrc<br>drwxr-xr-x  5 root root    4096 Mar 14  2017 X11<br>drwxr-xr-x  3 root root    4096 Mar 14  2017 xdg<br>drwxr-xr-x  2 root root    4096 Mar 14  2017 xml<br>-rw-r–r–  1 root root     477 Jul 19  2015 zsh_command_not_found</p>
 </blockquote>
@@ -278,6 +278,9 @@ ga('send', 'pageview');
 <p>sudo last | awk ‘{ print $(NF-7)}’ //我想看倒数第7列的数据</p>
 <p>和管道结合的：<br>grep -i test test.txt | awk ‘/[0-9]/ { print }’<br>-i表示case insensitive,大小写都算.然后找出其中包含数字的。</p>
 <p>想要找出系统内所有大小超出10MB的，合计一下这些大文件一共占用了多少MB的空间<br>sudo find / -size +10M -exec du -h {} \; | awk ‘{ s+=$1  } END { print s}’</p>
+<p>awk -F ‘“‘ xxxxx ### 以双引号为分隔符的</p>
+<p><a href="https://likegeeks.com/awk-command/">30个实用的awk命令</a></p>
+<p>awk正则<br>awk ‘$1 ~ /J/‘ inventory-shipped  ## 有大写字母J的话就打印出来<br>awk ‘$1 !~ /J/‘ inventory-shipped  ##排除所有包含J的内容</p>
 <h3 id="7-tar命令"><a href="#7-tar命令" class="headerlink" title="7.tar命令"></a>7.tar命令</h3><p>主要是跟压缩和解压文件有关的,<a href="http://man.linuxde.net/tar">参考</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">tar -cvf log.tar log2012.log 仅打包，不压缩！</span><br><span class="line">tar -zcvf log.tar.gz log2012.log 打包后，以 gzip 压缩</span><br><span class="line">tar -jcvf log.tar.bz2 log2012.log 打包后，以 bzip2 压缩</span><br></pre></td></tr></table></figure></p>
 <p><a href="https://www.jb51.net/LINUXjishu/43356.html">常用的tar命令就那么几个</a><br>tar -cvf all.tar.gz 和 tar -xf all.tar.gz这俩其实就够用了</p>
 <p>对照手册来看：<br>-c //小写的c，–create，表示创建新的备份文件<br>-v //verbose,显示进度什么的<br>-f 指定备份文件<br>-z –gzip，通过gzip压缩或者解压文件</p>
