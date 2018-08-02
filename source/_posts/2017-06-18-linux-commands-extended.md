@@ -172,7 +172,7 @@ lrwxrwxrwx  1 root root      23 Mar 14  2017 vtrgb -> /etc/alternatives/vtrgb
 drwxr-xr-x  5 root root    4096 Mar 14  2017 X11
 drwxr-xr-x  3 root root    4096 Mar 14  2017 xdg
 drwxr-xr-x  2 root root    4096 Mar 14  2017 xml
--rw-r--r--  1 root root     477 Jul 19  2015 zsh_command_not_found
+
 
 假设你面对一个这样的文件test.txt
 print 每一行 :  awk '{ print }' test.txt
@@ -742,6 +742,16 @@ nano直接跳到文本最后一行的方法是：
 
 
 🎧 
+
+熟悉了bash之后，再来看zsh，似乎更加轻松
+看一下我当前使用的是哪种sh: echo $SHELL
+linux上目测没有默认安装zsh。
+[安装完zsh一定要装上这个的，on-my-zsh](https://github.com/robbyrussell/oh-my-zsh)
+[zsh有一个plugin的概念，这个是自动提示的插件](https://github.com/zsh-users/zsh-autosuggestions)
+[zsh的主题个人偏好Dracula](https://draculatheme.com/)
+[agnoster是另一款很多人都装上的主题](https://github.com/agnoster/agnoster-zsh-theme)，主题这种东西看个人喜好了。
+
+
 
 
 ## 参考

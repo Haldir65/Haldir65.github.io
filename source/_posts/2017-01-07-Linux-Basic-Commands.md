@@ -297,6 +297,7 @@ grep "aaa\|bbb"
 grep -E "aaa|bbb"
 grep -E aaa\|bbb
 ```
+[how to grep](https://www.cyberciti.biz/faq/howto-use-grep-command-in-linux-unix/)
 
 想要在bash中设置一个variable为一个命令的输出
 ```shell

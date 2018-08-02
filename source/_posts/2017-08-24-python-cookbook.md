@@ -612,4 +612,6 @@ t[0] ## 1
 t[100] ## IndexError:tuple index out of range
 ```
 
+python property()函数 
+
 

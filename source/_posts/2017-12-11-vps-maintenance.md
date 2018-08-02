@@ -108,7 +108,7 @@ ssserver -c /etc/shadowsocks.json -d stop
 sudo ssserver -c /etc/shadowsocks.json --user username -d start - 不要总是用root用户做事，adduser来做，给sudo权限即可
 ```
 
- nohup /net-speeder/net-speeder/net_speeder eth0 "tcp src port 12345" > /dev/null 2>&1 &
+nohup /net-speeder/net-speeder/net_speeder eth0 "tcp src port 12345" > /dev/null 2>&1 &
 
 
 ### 2.2 SSR 以及一些衍生的软件
@@ -197,6 +197,11 @@ ldconfig
 cd .. && rm -rf libsodium-${Libsodiumr_ver}.tar.gz && rm -rf libsodium-${Libsodiumr_ver}
 ```
 现在就可以去config.json文件中将加密方式改成: chacha20 了，重启下ss即可
+
+### 2.5 查看日志
+日志文件的位置在/var/log/shadowsocks.log 
+下面这条命令用于查看访问了哪些网站
+cat  shadowsocks.log | awk '{ print $5}' |grep -o '^[^:]*' | sort | uniq -c | sort -n
 
 ## 3. ubuntu自带的防火墙叫做ufw，用起来也很简单
 [digital ocean的ufw教程](https://www.digitalocean.com/community/tutorials/ufw-essentials-common-firewall-rules-and-commands)
