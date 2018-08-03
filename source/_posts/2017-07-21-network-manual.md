@@ -475,12 +475,22 @@ public class Test {
 }  
 ```
 
-运营商劫持有两种：DNS劫持(这个都懂)和数据劫持(在返回的内容中强行插入广告等其他内容，这种一般是对http下手)
+运营商劫持有两种：DNS劫持(这个都懂)和数据劫持(在返回的内容中强行插入广告等其他内容，这种一般是对http下手)。 (
+360、腾讯、小米、今日头条等公司联名抵制运营商流量劫持)
 客户端反DNS劫持的手段(ip直连)： [遭遇DNS劫持](https://github.com/cheyiliu/All-in-One/wiki/%E9%81%AD%E9%81%87DNS%E5%8A%AB%E6%8C%81)
 > IP直连，httpdns的原理非常简单，主要有两步：A、客户端直接访问HttpDNS接口(直接用ip地址访问)，获取业务在域名配置管理系统上配置的访问延迟最优的IP。（基于容灾考虑，还是保留次选使用运营商LocalDNS解析域名的方式）B、客户端向获取到的IP后就向直接往此IP发送业务协议请求。以Http请求为例，通过在header中指定host字段，向HttpDNS返回的IP发送标准的Http请求即可。
 https，注意https是解决链路劫持的方案，并无法解决DNS劫持的问题。https安全但性能稍差
 
 WebView中反运营商DNS劫持的手段
+[生产环境使用腾讯云的httpdns得了](https://github.com/tencentyun/httpdns-android-sdk),腾讯云的网站上也挂出了一个dns解析的[入口](https://cloud.tencent.com/product/hd)
+
+至于原理嘛：在腾讯云的httpdns的jar文件解压之后找到一个MSDKDnsResolver文件，里面有几个很显眼的ip:
+182.254.116.117
+182.254.16.100
+找一下这个ip: 广东省深圳市 深圳市腾讯计算机系统有限公司电信节点(BGP)， ip直连无疑了。
+腾讯云的文档上还指出WebViewClient有一个方法shouldInterceptRequest可以在webview里面使用
+
+
 
 
 [今日头条、小米、腾讯等六公司联合抵制流量劫持 已有多项证据直接指向某些机构](http://finance.sina.com.cn/stock/t/2015-12-25/doc-ifxmxxst0459707.shtml)

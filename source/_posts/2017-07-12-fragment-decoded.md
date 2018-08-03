@@ -567,6 +567,9 @@ public void onBackPressed() {
 怎么说呢，fragmentManager.isStateSaved()对外暴露mStateSaved还是挺开明的。
 3. [Jake Wharton建议不要用fragment的addtoBackStack](https://www.reddit.com/r/androiddev/comments/7hq00q/why_does_jake_wharton_recommend_one_activity_for/)，这是Reddit上的讨论，最后Jake本人出来选择了最佳解读(Nailed it)
 
+4. 这种在Activity中持有mFragment,或者在Adapter中持有mFragments的做法是**有可能**出错的
+亲身遇到过这种事，在Activity中持有了mFragments[]，在特定的时段（可能stateSave已经调用过了），再去debug查看，发现mFragments中的所有fragment都处于一种被detach的状态(所有的boolean被设置为false，所有的field被设置为null)。正确的做法是在此时通过getSupportFragmentManager去getFragments。得到一个list，这里面存着被重新创建的fragment的实例。因故此时外部持有的fragment实例已经是无效的实例了。
+
 
 
 ## Reference

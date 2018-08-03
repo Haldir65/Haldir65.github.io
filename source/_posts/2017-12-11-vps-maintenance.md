@@ -203,6 +203,9 @@ cd .. && rm -rf libsodium-${Libsodiumr_ver}.tar.gz && rm -rf libsodium-${Libsodi
 下面这条命令用于查看访问了哪些网站
 cat  shadowsocks.log | awk '{ print $5}' |grep -o '^[^:]*' | sort | uniq -c | sort -n
 
+查看尝试连接本服务器的客户端
+cat shadowsocks.log | awk '{ print $NF }'| grep -o '^[^:]*' | sort | uniq -c | sort -n
+
 ## 3. ubuntu自带的防火墙叫做ufw，用起来也很简单
 [digital ocean的ufw教程](https://www.digitalocean.com/community/tutorials/ufw-essentials-common-firewall-rules-and-commands)
 
