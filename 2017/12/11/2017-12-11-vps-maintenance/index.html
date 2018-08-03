@@ -16,7 +16,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100756208.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-08-02T11:30:21.877Z">
+<meta property="og:updated_time" content="2018-08-03T11:16:09.572Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="VPS维护的日常">
 <meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100756208.jpg?imageView2/2/w/600">
@@ -268,6 +268,7 @@ ga('send', 'pageview');
 <h2 id="2-4-安装libsodium"><a href="#2-4-安装libsodium" class="headerlink" title="2.4 安装libsodium"></a>2.4 安装libsodium</h2><p>转自<a href="https://doub.io/ss-jc51/">逗比</a><br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span># debian系列</span><br><span class="line">apt-get update</span><br><span class="line"><span class="meta">#</span># 安装 编译所需组件包：</span><br><span class="line">apt-get install -y build-essential</span><br><span class="line"><span class="meta">#</span>## 获取 libsodium最新版本：</span><br><span class="line">Libsodiumr_ver=$(wget -qO- "https://github.com/jedisct1/libsodium/tags"|grep "/jedisct1/libsodium/releases/tag/"|head -1|sed -r 's/.*tag\/(.+)\"&gt;.*/\1/') &amp;&amp; echo "$&#123;Libsodiumr_ver&#125;"</span><br><span class="line"><span class="meta">#</span># 下载最新 libsodium版本编译文件：</span><br><span class="line">wget --no-check-certificate -N "https://github.com/jedisct1/libsodium/releases/download/$&#123;Libsodiumr_ver&#125;/libsodium-$&#123;Libsodiumr_ver&#125;.tar.gz"</span><br><span class="line">tar -xzf libsodium-$&#123;Libsodiumr_ver&#125;.tar.gz &amp;&amp; cd libsodium-$&#123;Libsodiumr_ver&#125;</span><br><span class="line">./configure --disable-maintainer-mode &amp;&amp; make -j2 &amp;&amp; make install ## 这段最好sudo 去做</span><br><span class="line">ldconfig</span><br><span class="line"><span class="meta">#</span># 删掉之前下载的文件</span><br><span class="line">cd .. &amp;&amp; rm -rf libsodium-$&#123;Libsodiumr_ver&#125;.tar.gz &amp;&amp; rm -rf libsodium-$&#123;Libsodiumr_ver&#125;</span><br></pre></td></tr></table></figure></p>
 <p>现在就可以去config.json文件中将加密方式改成: chacha20 了，重启下ss即可</p>
 <h3 id="2-5-查看日志"><a href="#2-5-查看日志" class="headerlink" title="2.5 查看日志"></a>2.5 查看日志</h3><p>日志文件的位置在/var/log/shadowsocks.log<br>下面这条命令用于查看访问了哪些网站<br>cat  shadowsocks.log | awk ‘{ print $5}’ |grep -o ‘^[^:]*’ | sort | uniq -c | sort -n</p>
+<p>查看尝试连接本服务器的客户端<br>cat shadowsocks.log | awk ‘{ print $NF }’| grep -o ‘^[^:]*’ | sort | uniq -c | sort -n</p>
 <h2 id="3-ubuntu自带的防火墙叫做ufw，用起来也很简单"><a href="#3-ubuntu自带的防火墙叫做ufw，用起来也很简单" class="headerlink" title="3. ubuntu自带的防火墙叫做ufw，用起来也很简单"></a>3. ubuntu自带的防火墙叫做ufw，用起来也很简单</h2><p><a href="https://www.digitalocean.com/community/tutorials/ufw-essentials-common-firewall-rules-and-commands">digital ocean的ufw教程</a></p>
 <h2 id="4-跑分"><a href="#4-跑分" class="headerlink" title="4.跑分"></a>4.跑分</h2><p><a href="https://github.com/Teddysun/across">VPS 跑分软件</a><br>git clone 下来</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cd across</span><br><span class="line">wget -qO- bench.sh | bash ###（亲测可用，也可以自己看Readme）</span><br><span class="line"><span class="meta">#</span>## 或者</span><br><span class="line">curl -Lso- bench.sh | bash</span><br></pre></td></tr></table></figure>
@@ -607,14 +608,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Window</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
@@ -656,6 +649,14 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Window</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
               </li>
              
               <li class="article-tag-list-item">

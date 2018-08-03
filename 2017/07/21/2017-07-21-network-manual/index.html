@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/b9ae1189145b4a4d9dfe4d0b89a21b47.jpg?imageView2/2/w/600">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/ed541bc1ed61ead0bf6ea8233ef01c0a.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-08-02T11:30:21.873Z">
+<meta property="og:updated_time" content="2018-08-03T11:16:09.568Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="网络通信手册">
 <meta name="twitter:description" content="网络相关的查找手册">
@@ -366,11 +366,12 @@ ga('send', 'pageview');
 <h3 id="5-7-什么叫-Pipeline-管线化"><a href="#5-7-什么叫-Pipeline-管线化" class="headerlink" title="5.7 什么叫 Pipeline 管线化"></a>5.7 什么叫 Pipeline 管线化</h3><p> HTTP1.0 不支持管线化，同一个连接处理请求的顺序是逐个应答模式，处理一个请求就需要耗费一个 TTL，也就是客户端到服务器的往返时间，处理 N 个请求就是 N 个 TTL 时长。当页面的请求非常多时，页面加载速度就会非常缓慢。<br> 从 HTTP1.1 开始要求服务器支持管线化，可以同时将多个请求发送到服务器，然后逐个读取响应。这个管线化和 Redis 的管线化原理是一样的，响应的顺序必须和请求的顺序保持一致。</p>
 <h2 id="6-WebSocket、SPDY、Http2"><a href="#6-WebSocket、SPDY、Http2" class="headerlink" title="6. WebSocket、SPDY、Http2"></a>6. WebSocket、SPDY、Http2</h2><p>WebSocket一种在单个TCP 连接上进行全双工通讯的协议。<br>HTTP/2（超文本传输协议第2版，最初命名为HTTP 2.0），简称为h2（基于TLS/1.2或以上版本的加密连接）或h2c（非加密连接），是HTTP协议的的第二个主要版本<br>SPDY也就是HTTP/2的前身，一种开放的网络传输协议，由Google开发，用来发送网页内容。基于传输控制协议（TCP）的应用层协议</p>
 <h3 id="7-DNS-domain-Name-System"><a href="#7-DNS-domain-Name-System" class="headerlink" title="7. DNS(domain Name System)"></a>7. DNS(domain Name System)</h3><p>通过java代码调用DNS的方式<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> UnknownHostException </span>&#123;  </span><br><span class="line">        <span class="comment">//获取本机IP地址  </span></span><br><span class="line">        System.out.println(InetAddress.getLocalHost().getHostAddress());  </span><br><span class="line">        <span class="comment">//获取www.baidu.com的地址  </span></span><br><span class="line">        System.out.println(InetAddress.getByName(<span class="string">"www.baidu.com"</span>));  </span><br><span class="line">        <span class="comment">//获取www.baidu.com的真实IP地址  </span></span><br><span class="line">        System.out.println(InetAddress.getByName(<span class="string">"www.baidu.com"</span>).getHostAddress());  </span><br><span class="line">        <span class="comment">//获取配置在HOST中的域名IP地址  </span></span><br><span class="line">        System.out.println(InetAddress.getByName(<span class="string">"TEST"</span>).getHostAddress());  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>运营商劫持有两种：DNS劫持(这个都懂)和数据劫持(在返回的内容中强行插入广告等其他内容，这种一般是对http下手)<br>客户端反DNS劫持的手段(ip直连)： <a href="https://github.com/cheyiliu/All-in-One/wiki/%E9%81%AD%E9%81%87DNS%E5%8A%AB%E6%8C%81">遭遇DNS劫持</a></p>
+<p>运营商劫持有两种：DNS劫持(这个都懂)和数据劫持(在返回的内容中强行插入广告等其他内容，这种一般是对http下手)。 (<br>360、腾讯、小米、今日头条等公司联名抵制运营商流量劫持)<br>客户端反DNS劫持的手段(ip直连)： <a href="https://github.com/cheyiliu/All-in-One/wiki/%E9%81%AD%E9%81%87DNS%E5%8A%AB%E6%8C%81">遭遇DNS劫持</a></p>
 <blockquote>
 <p>IP直连，httpdns的原理非常简单，主要有两步：A、客户端直接访问HttpDNS接口(直接用ip地址访问)，获取业务在域名配置管理系统上配置的访问延迟最优的IP。（基于容灾考虑，还是保留次选使用运营商LocalDNS解析域名的方式）B、客户端向获取到的IP后就向直接往此IP发送业务协议请求。以Http请求为例，通过在header中指定host字段，向HttpDNS返回的IP发送标准的Http请求即可。<br>https，注意https是解决链路劫持的方案，并无法解决DNS劫持的问题。https安全但性能稍差</p>
 </blockquote>
-<p>WebView中反运营商DNS劫持的手段</p>
+<p>WebView中反运营商DNS劫持的手段<br><a href="https://github.com/tencentyun/httpdns-android-sdk">生产环境使用腾讯云的httpdns得了</a>,腾讯云的网站上也挂出了一个dns解析的<a href="https://cloud.tencent.com/product/hd">入口</a></p>
+<p>至于原理嘛：在腾讯云的httpdns的jar文件解压之后找到一个MSDKDnsResolver文件，里面有几个很显眼的ip:<br>182.254.116.117<br>182.254.16.100<br>找一下这个ip: 广东省深圳市 深圳市腾讯计算机系统有限公司电信节点(BGP)， ip直连无疑了。<br>腾讯云的文档上还指出WebViewClient有一个方法shouldInterceptRequest可以在webview里面使用</p>
 <p><a href="http://finance.sina.com.cn/stock/t/2015-12-25/doc-ifxmxxst0459707.shtml">今日头条、小米、腾讯等六公司联合抵制流量劫持 已有多项证据直接指向某些机构</a></p>
 <h3 id="8-Fiddler抓包"><a href="#8-Fiddler抓包" class="headerlink" title="8.Fiddler抓包"></a>8.Fiddler抓包</h3><ul>
 <li>手机和电脑连接同一个wifi</li>
@@ -774,14 +775,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Window</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
@@ -823,6 +816,14 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Window</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
               </li>
              
               <li class="article-tag-list-item">
