@@ -6,7 +6,7 @@ tags: [C]
 
 
 C语言实用指南，暂时不涉及cpp内容
-![](http://odzl05jxx.bkt.clouddn.com/pretty-orange-mushroom-wallpaper-5386b0c8c3459.jpg?imageView2/2/w/600)
+![](http://haldir66.ga/static/imgs/pretty-orange-mushroom-wallpaper-5386b0c8c3459.jpg)
 <!--more-->
 
 gcc ,clang,llvm的历史

@@ -56,7 +56,7 @@ Native Heap是在分配了java maximum Heap大小之后剩下的大小(jvm占用
 
 ### 3.3 数据类型大小
 基本数据类型大小很简单，其实也不简单。这张图是从ibm网站上截下来的
-![](http://odzl05jxx.bkt.clouddn.com/official_java_primitive_type_size_table.JPG)
+![](http://odzl05jxx.bkt.clouddn.com/official_java_primitive_type_size_table.jpg)
 注意一个boolean在数组中只占用一个字节，单独使用占用4个字节。
 原理[参考](http://www.jianshu.com/p/2f663dc820d0)
 

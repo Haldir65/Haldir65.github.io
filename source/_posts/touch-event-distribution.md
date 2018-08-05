@@ -5,7 +5,7 @@ categories: blog
 tags: [android]
 ---
 
-![](http://odzl05jxx.bkt.clouddn.com/dispatch_touch_event_video.JPG)
+![](http://odzl05jxx.bkt.clouddn.com/dispatch_touch_event_video.jpg)
 
 图1 默认情况下事件传递的路径
 

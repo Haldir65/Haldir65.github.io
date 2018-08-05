@@ -7,7 +7,7 @@ tags:
 ---
 
 网络相关的查找手册
-![](http://odzl05jxx.bkt.clouddn.com/b9ae1189145b4a4d9dfe4d0b89a21b47.jpg?imageView2/2/w/600)
+![](http://haldir66.ga/static/imgs/b9ae1189145b4a4d9dfe4d0b89a21b47.jpg)
 <!--more-->
 
 

@@ -433,12 +433,12 @@ http_image_filter_module（图片裁剪模块）
 ```config
 location /image {
 		   alias "/imgdirectory/"; 
-            ## 这样直接输入 yourip/image/imgname.jpeg就能返回原始图片
+            ## 这样直接输入 yourip/image/imgname.jpg就能返回原始图片
 }
 location ~* (.*\.(jpg|jpeg|gif|png))!(.*)!(.*)$ {  ## 这个是匹配全站图片资源
         		set $width      $3;  
         		set $height     $4;  
-        		rewrite "(.*\.(jpg|jpeg|gif|png))(.*)$" $1;  ## 这样输入 yourip/image/imgname.jpeg!200!200就能返回200*200的图片
+        		rewrite "(.*\.(jpg|jpeg|gif|png))(.*)$" $1;  ## 这样输入 yourip/image/imgname.jpg!200!200就能返回200*200的图片
 }  
 
 location ~* /imgs/.*\.(jpg|jpeg|gif|png|jpeg)$ {  
@@ -919,6 +919,9 @@ if ($request_uri ~* "[+|(%20)]select[+|(%20)]") {
 ```
 所以根据requesturl来判断就得用上if了
 [redirect-of-all-the-urls](https://serverfault.com/questions/837598/redirect-of-all-the-urls-that-contain-1-word-in-specific-but-that-do-not-contai)
+
+
+[自定义404,5XX的页面也是挺好玩的](https://www.digitalocean.com/community/tutorials/how-to-configure-nginx-to-use-custom-error-pages-on-ubuntu-14-04)
 
 ### 参考
 - [nginx Configurations](https://wizardforcel.gitbooks.io/nginx-doc/content/Text/6.1_nginx_windows.html)

@@ -31,8 +31,8 @@ nginx的config文件中也要写正则
 > ^表示开头，$表示结尾 ## django的url中是这样的
 
 一般情况下不要乱用正则
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/bee-getting-the-pollen-wallpaper-538358eb5d5a3.jpg?imageView2/2/w/600)
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery151110067848.jpg?imageView2/2/w/600)
+![](http://haldir66.ga/static/imgs/bee-getting-the-pollen-wallpaper-538358eb5d5a3.jpg)
+![](http://haldir66.ga/static/imgs/scenery151110067848.jpg)
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100718415.jpg?imageView2/2/w/600)
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/fresh-sparkle-dew-drops-on-red-flower-wallpaper-53861cf580909.jpg?imageView2/2/w/600)
 
@@ -66,10 +66,10 @@ nginx的config文件中也要写正则
 
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/1102533137-5.jpg?imageView2/2/w/600)
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/1102533911-1.jpg?imageView2/2/w/600)
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/20120103214255_nTsVt.jpg?imageView2/2/w/600)
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/apic5964_sc115.com.jpg?imageView2/2/w/600)
+![](http://haldir66.ga/static/imgs/20120103214255_nTsVt.jpg)
+![](http://odzl05jxx.bkt.clouddn.com/image/jpg/apic5964_sc115.jpg?imageView2/2/w/600)
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/apic6283_sc115.com.jpg?imageView2/2/w/600)
-![](http://odzl05jxx.bkt.clouddn.com/849c18412f8e7a0b18df09f6f87e6516.jpg?imageView2/2/w/600)
+![](http://haldir66.ga/static/imgs/849c18412f8e7a0b18df09f6f87e6516.jpg)
 
 
 ![](http://odzl05jxx.bkt.clouddn.com/image/jpg/timg.jpg?imageView2/2/w/600)

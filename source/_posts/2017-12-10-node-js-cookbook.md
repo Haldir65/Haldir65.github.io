@@ -5,7 +5,7 @@ tags: [前端]
 ---
 
 npm run start
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100694324.jpg?imageView2/2/w/600)
+![](http://haldir66.ga/static/imgs/scenery1511100694324.jpg)
 <!--more-->
 
 
@@ -335,3 +335,5 @@ process.env.NODE_ENV = 'production';
 
 node里面就不要用Ajax了，推荐axios，原生自带也有https。
 而node中的一些module也不能用于浏览器端，比如fs这种属于偏Low level的api
+
+[node js api](https://nodejs.org/api/documentation.html)

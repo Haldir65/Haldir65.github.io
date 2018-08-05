@@ -5,7 +5,7 @@ tags: [tools]
 ---
 
 http建立在tcp,ip基础上，tcp协议的可靠性意味着每次http请求都会分解为多次ip请求。很多出于book keeping的东西占用了实际发送数据的相当一部分，具体占用多少。由此顺便展开到http和tcp的基本关系。
-![](http://odzl05jxx.bkt.clouddn.com/Cg-4V1Kg7NCIMLH-AAwW6gNGe9cAAOB4AFTanwADBcC664.jpg?imageView2/2/w/600)
+![](http://haldir66.ga/static/imgs/Cg-4V1Kg7NCIMLH-AAwW6gNGe9cAAOB4AFTanwADBcC664.jpg)
 <!--more-->
 
 大部分基于Hadi在2016年的[演讲](https://www.youtube.com/watch?v=F5smqpbz2sU)

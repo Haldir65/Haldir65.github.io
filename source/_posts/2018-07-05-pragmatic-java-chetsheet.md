@@ -4,7 +4,7 @@ date: 2018-07-05 23:05:52
 tags: [java]
 ---
 
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/20160720094529840.jpg?imageView2/2/w/600)
+![](http://haldir66.ga/static/imgs/20160720094529840.jpg)
 <!--more-->
 
 ## 反射

@@ -4,7 +4,7 @@ date: 2017-12-10 16:20:16
 tags: [前端]
 ---
 
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/sceneryc7fd99f667c9d98a583a174872d58d13.jpg?imageView2/2/w/600)
+![](http://haldir66.ga/static/imgs/sceneryc7fd99f667c9d98a583a174872d58d13.jpg)
 <!--more-->
 
 
@@ -12,8 +12,6 @@ tags: [前端]
 > yarn add express body-parser
 
 mongoose安装
-
-
 
 
 ## 2. 配置
@@ -157,7 +155,7 @@ pm2 start app.js
 [Configure Nginx as a web server and reverse proxy for Nodejs application on AWS Ubuntu 16.04 server](https://medium.com/@utkarsh_verma/configure-nginx-as-a-web-server-and-reverse-proxy-for-nodejs-application-on-aws-ubuntu-16-04-server-872922e21d38)
 
 
-
+[real world express backend server](https://github.com/gothinkster/node-express-realworld-example-app)
 [用swagger ui写后端api文档，极度简单](https://www.cnblogs.com/zzsdream/p/6895893.html)
 
 ## 参考

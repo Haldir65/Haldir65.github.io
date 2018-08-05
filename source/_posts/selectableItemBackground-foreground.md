@@ -11,7 +11,7 @@ tags: [foreground,android]
 > android:background="?android:attr/selectableItemBackground"
 
 这个xml属性最早是我学着写recyclerVeiw的item xml的时候接触到的，简单来说就是，在API 21及以上，用户点击这个itemView时候会出现一个Ripple效果
-非常好看，而在API 21以下则会表现为MonoChrome的类似按压色的效果![](https://cloud.githubusercontent.com/assets/12274855/18787855/2a6d93f2-81d7-11e6-8026-58cdbd8583d4.JPG) </br> 
+非常好看，而在API 21以下则会表现为MonoChrome的类似按压色的效果![](https://cloud.githubusercontent.com/assets/12274855/18787855/2a6d93f2-81d7-11e6-8026-58cdbd8583d4.jpg) </br> 
 而这个点击时的水波纹颜色也是可以Customize的
 ```
 <item name="android:colorControlHighlight">@color/my_ripple_color</item>
@@ -46,7 +46,7 @@ android:foreground在API 23之前只对FrameLayout有效(CardView继承自FrameL
 
 - 关于foreground 
  之前看google io2016时，[Chris Banes](https://github.com/chrisbanes)给了这样的解释。
- ![](https://cloud.githubusercontent.com/assets/12274855/18787841/1d0b2d82-81d7-11e6-916e-b4113772c3a2.JPG),
+ ![](https://cloud.githubusercontent.com/assets/12274855/18787841/1d0b2d82-81d7-11e6-916e-b4113772c3a2.jpg),
 android:foreground在API 1 的FrameLayout中就有了，但直到API 23才将这个属性添加到View中。
 所以，换成API 23的手机上面那段代码foreground也是可以出现Ripple的,至于23之前为什么foreground无效，并不清楚为什么
 

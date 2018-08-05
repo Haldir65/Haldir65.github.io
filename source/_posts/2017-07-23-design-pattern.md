@@ -3,7 +3,7 @@ date: 2017-07-23 19:03:51
 tags: [java,designpattern,tools]
 ---
 
-![](http://odzl05jxx.bkt.clouddn.com/509bdb071f9e7040823049e3db56e7c1.jpeg?imageView2/2/w/600)
+![](http://www.haldir66.ga/static/imgs/509bdb071f9e7040823049e3db56e7c1.jpg)
 一般来讲设计模式有23种，这里根据菜鸟教程上的关于设计模式的总结看下来的一些读书笔记，估计要写很久。
 <!--more-->
 
