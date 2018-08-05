@@ -16,13 +16,13 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="android:foreground=”?android:attr/selectableItemBackground”  或是  android:background=”?android:attr/selectableItemBackground”  这个xml属性最早是我学着写recyclerVeiw的item xml的时候接触到的，简单来说就是，在API 21及以上，用户点击这个itemVi">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://cloud.githubusercontent.com/assets/12274855/18787855/2a6d93f2-81d7-11e6-8026-58cdbd8583d4.JPG">
-<meta property="og:image" content="https://cloud.githubusercontent.com/assets/12274855/18787841/1d0b2d82-81d7-11e6-916e-b4113772c3a2.JPG">
-<meta property="og:updated_time" content="2018-08-03T11:16:09.572Z">
+<meta property="og:image" content="https://cloud.githubusercontent.com/assets/12274855/18787855/2a6d93f2-81d7-11e6-8026-58cdbd8583d4.jpg">
+<meta property="og:image" content="https://cloud.githubusercontent.com/assets/12274855/18787841/1d0b2d82-81d7-11e6-916e-b4113772c3a2.jpg">
+<meta property="og:updated_time" content="2018-08-05T15:06:26.399Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="android使用selectableItemBackground的一些坑">
 <meta name="twitter:description" content="android:foreground=”?android:attr/selectableItemBackground”  或是  android:background=”?android:attr/selectableItemBackground”  这个xml属性最早是我学着写recyclerVeiw的item xml的时候接触到的，简单来说就是，在API 21及以上，用户点击这个itemVi">
-<meta name="twitter:image" content="https://cloud.githubusercontent.com/assets/12274855/18787855/2a6d93f2-81d7-11e6-8026-58cdbd8583d4.JPG">
+<meta name="twitter:image" content="https://cloud.githubusercontent.com/assets/12274855/18787855/2a6d93f2-81d7-11e6-8026-58cdbd8583d4.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -208,7 +208,7 @@ ga('send', 'pageview');
 <blockquote>
 <p>android:background=”?android:attr/selectableItemBackground”</p>
 </blockquote>
-<p>这个xml属性最早是我学着写recyclerVeiw的item xml的时候接触到的，简单来说就是，在API 21及以上，用户点击这个itemView时候会出现一个Ripple效果<br>非常好看，而在API 21以下则会表现为MonoChrome的类似按压色的效果<img src="https://cloud.githubusercontent.com/assets/12274855/18787855/2a6d93f2-81d7-11e6-8026-58cdbd8583d4.JPG" alt=""> </br><br>而这个点击时的水波纹颜色也是可以Customize的<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;item name=&quot;android:colorControlHighlight&quot;&gt;@color/my_ripple_color&lt;/item&gt;</span><br></pre></td></tr></table></figure></p>
+<p>这个xml属性最早是我学着写recyclerVeiw的item xml的时候接触到的，简单来说就是，在API 21及以上，用户点击这个itemView时候会出现一个Ripple效果<br>非常好看，而在API 21以下则会表现为MonoChrome的类似按压色的效果<img src="https://cloud.githubusercontent.com/assets/12274855/18787855/2a6d93f2-81d7-11e6-8026-58cdbd8583d4.jpg" alt=""> </br><br>而这个点击时的水波纹颜色也是可以Customize的<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;item name=&quot;android:colorControlHighlight&quot;&gt;@color/my_ripple_color&lt;/item&gt;</span><br></pre></td></tr></table></figure></p>
 <p>//这个要写在自己的Activity的Theme(style-v21)里，注意，当前Activity的Theme必须继承自Appcompat!!<br>于是，我写了这样的xml<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">LinearLayout</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:id</span>=<span class="string">"@+id/item_root"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_height</span>=<span class="string">"?android:attr/listPreferredItemHeight"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:orientation</span>=<span class="string">"vertical"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:gravity</span>=<span class="string">"center"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:onClick</span>=<span class="string">"@&#123;(view) -&gt; callback.onClick(view,data)&#125;"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:elevation</span>=<span class="string">"2dp"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:background</span>=<span class="string">"@color/md_amber_200"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:foreground</span>=<span class="string">"?android:attr/selectableItemBackground"</span></span></span><br><span class="line"><span class="tag">        /&gt;</span></span><br></pre></td></tr></table></figure></p>
 <p>然而，点击之后并没有出现水波纹(模拟器 API 21)，换成CardView或是将foreground改为background之后才有效。查了很多博客，最后得出结论:<br>android:foreground在API 23之前只对FrameLayout有效(CardView继承自FrameLayout当然有效)。<br><a id="more"></a></p>
 <p>##所以正确的做法是</p>
@@ -221,7 +221,7 @@ ga('send', 'pageview');
 </blockquote>
 <p>或者使用FrameLayout。</p>
 <ul>
-<li><p>关于foreground<br>之前看google io2016时，<a href="https://github.com/chrisbanes">Chris Banes</a>给了这样的解释。<br><img src="https://cloud.githubusercontent.com/assets/12274855/18787841/1d0b2d82-81d7-11e6-916e-b4113772c3a2.JPG" alt="">,<br>android:foreground在API 1 的FrameLayout中就有了，但直到API 23才将这个属性添加到View中。<br>所以，换成API 23的手机上面那段代码foreground也是可以出现Ripple的,至于23之前为什么foreground无效，并不清楚为什么</p>
+<li><p>关于foreground<br>之前看google io2016时，<a href="https://github.com/chrisbanes">Chris Banes</a>给了这样的解释。<br><img src="https://cloud.githubusercontent.com/assets/12274855/18787841/1d0b2d82-81d7-11e6-916e-b4113772c3a2.jpg" alt="">,<br>android:foreground在API 1 的FrameLayout中就有了，但直到API 23才将这个属性添加到View中。<br>所以，换成API 23的手机上面那段代码foreground也是可以出现Ripple的,至于23之前为什么foreground无效，并不清楚为什么</p>
 </li>
 <li><p>首先是一种简单的模拟这种视觉效果的尝试：<a href="http://effmx.com/articles/ru-he-chuang-jian-jian-rong-de-foreground-drawable-selectorshi-xian-layoutdian-ji-xiao-guo/">如何创建兼容的Forefround drawable selector</a> 这篇文章提到了:</p>
 <blockquote>
@@ -588,6 +588,14 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Window</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
@@ -629,14 +637,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">foreground</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Window</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
               </li>
              
               <li class="article-tag-list-item">

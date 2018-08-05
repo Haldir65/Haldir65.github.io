@@ -17,7 +17,7 @@
 <meta property="og:description" content="linode的docs里面是这么介绍的  nginx is a lightweight, high performance web server designed to deliver large amounts of static content quickly with efficient use of system resources. nginx’s strong point is its">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery151110073841.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-08-03T11:16:09.572Z">
+<meta property="og:updated_time" content="2018-08-05T15:06:26.399Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Nginx使用记录">
 <meta name="twitter:description" content="linode的docs里面是这么介绍的  nginx is a lightweight, high performance web server designed to deliver large amounts of static content quickly with efficient use of system resources. nginx’s strong point is its">
@@ -290,7 +290,7 @@ ga('send', 'pageview');
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">location /foo.php &#123;</span><br><span class="line">    deny all; //直接让这个接口不响应</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">location / &#123;</span><br><span class="line">    if ($http_user_agent ~* foo|bar) &#123;</span><br><span class="line">        return 403;  //User-Agent中有foo或者bar的时候直接forbidden</span><br><span class="line">    &#125;</span><br><span class="line">    # ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// NGINX Plus提供的</span><br><span class="line">// An NGINX or NGINX Plus instance can usually handle many more simultaneous connections than the backend servers it is load balancing.</span><br><span class="line">//作为代理，nginx能够接受的连接数要远超其代理的后台服务</span><br><span class="line">upstream website &#123;</span><br><span class="line">    server 192.168.100.1:80 max_conns=200;</span><br><span class="line">    server 192.168.100.2:80 max_conns=200;</span><br><span class="line">    queue 10 timeout=30s;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h3 id="5-2-Nginx模块"><a href="#5-2-Nginx模块" class="headerlink" title="5.2 Nginx模块"></a>5.2 Nginx模块</h3><p>http_image_filter_module（图片裁剪模块）<br>首先查看是否已安装http_image_filter_module模块</p>
 <blockquote>
-<p>nginx -V<br>/etc/nginx/nginx.conf文件添加<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">location /image &#123;</span><br><span class="line">truetrue   alias &quot;/imgdirectory/&quot;; </span><br><span class="line">            ## 这样直接输入 yourip/image/imgname.jpeg就能返回原始图片</span><br><span class="line">&#125;</span><br><span class="line">location ~* (.*\.(jpg|jpeg|gif|png))!(.*)!(.*)$ &#123;  ## 这个是匹配全站图片资源</span><br><span class="line">        		set $width      $3;  </span><br><span class="line">        		set $height     $4;  </span><br><span class="line">        		rewrite &quot;(.*\.(jpg|jpeg|gif|png))(.*)$&quot; $1;  ## 这样输入 yourip/image/imgname.jpeg!200!200就能返回200*200的图片</span><br><span class="line">&#125;  </span><br><span class="line"></span><br><span class="line">location ~* /imgs/.*\.(jpg|jpeg|gif|png|jpeg)$ &#123;  </span><br><span class="line">truetruetrueroot &quot;/var/www/&quot;;</span><br><span class="line">  		image_filter resize $width $height;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>nginx -V<br>/etc/nginx/nginx.conf文件添加<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">location /image &#123;</span><br><span class="line">truetrue   alias &quot;/imgdirectory/&quot;; </span><br><span class="line">            ## 这样直接输入 yourip/image/imgname.jpg就能返回原始图片</span><br><span class="line">&#125;</span><br><span class="line">location ~* (.*\.(jpg|jpeg|gif|png))!(.*)!(.*)$ &#123;  ## 这个是匹配全站图片资源</span><br><span class="line">        		set $width      $3;  </span><br><span class="line">        		set $height     $4;  </span><br><span class="line">        		rewrite &quot;(.*\.(jpg|jpeg|gif|png))(.*)$&quot; $1;  ## 这样输入 yourip/image/imgname.jpg!200!200就能返回200*200的图片</span><br><span class="line">&#125;  </span><br><span class="line"></span><br><span class="line">location ~* /imgs/.*\.(jpg|jpeg|gif|png|jpeg)$ &#123;  </span><br><span class="line">truetruetrueroot &quot;/var/www/&quot;;</span><br><span class="line">  		image_filter resize $width $height;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 </blockquote>
 <p>亲测上述可行，python也有类似库<a href="https://github.com/thumbor/thumbor">thumbor</a></p>
 <p>关于正则匹配：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">## 比如匹配全站所有的结尾图片</span><br><span class="line">location ~* \.(jpg|gif|png)$ &#123;</span><br><span class="line">               image_filter resize 500 500;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">### 匹配某个目录所有图片       </span><br><span class="line">location ~* /image/.*\.(jpg|gif|png)$ &#123;</span><br><span class="line">            image_filter resize 500 500;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
@@ -385,6 +385,7 @@ ga('send', 'pageview');
 <p><a href="https://serverfault.com/questions/879329/why-does-nginx-select-a-location-block-with-a-non-matching-regex">然而nginx是没法在配置文件里面去match上一个queryParameter的</a></p>
 <p>有一个专门的说法叫做nginx 防止注入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if ($request_uri ~* &quot;[+|(%20)]select[+|(%20)]&quot;) &#123;</span><br><span class="line">    return 404;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>所以根据requesturl来判断就得用上if了<br><a href="https://serverfault.com/questions/837598/redirect-of-all-the-urls-that-contain-1-word-in-specific-but-that-do-not-contai">redirect-of-all-the-urls</a></p>
+<p><a href="https://www.digitalocean.com/community/tutorials/how-to-configure-nginx-to-use-custom-error-pages-on-ubuntu-14-04">自定义404,5XX的页面也是挺好玩的</a></p>
 <h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
 <li><a href="https://wizardforcel.gitbooks.io/nginx-doc/content/Text/6.1_nginx_windows.html">nginx Configurations</a></li>
 <li><a href="https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-16-04">How To Install Nginx on Ubuntu 16.04</a></li>
@@ -709,6 +710,14 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Window</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
@@ -750,14 +759,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">foreground</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Window</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
               </li>
              
               <li class="article-tag-list-item">
