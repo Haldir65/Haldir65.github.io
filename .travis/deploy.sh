@@ -47,16 +47,22 @@ cp -TRv ./ ~/Haldir65/Haldir65.github.io
 
 cd ~/Haldir65/Haldir65.github.io
 
-git status
-git add .
-# git commit -m "Site updated on: `date +"%Y-%m-%d %H:%M:%S"`"
-git commit -m "${msg}"
-git status
-echo "end of commit"
+##git status
 
-git push origin master
+if [ -z "$(git status --porcelain)" ]; then 
+  # Working directory clean
+    echo "Working directory clean"
+else 
+    echo "something has changed"
+    git add .
+    # git commit -m "Site updated on: `date +"%Y-%m-%d %H:%M:%S"`"
+    git commit -m "${msg}"
+    git status
+    git push origin master
+    echo "end of push"
+fi
 
-echo "end of push"
+
 
 # # 同时 push 一份到自己的服务器上
 # git remote add vps git@prinzeugen.net:hexo.git
