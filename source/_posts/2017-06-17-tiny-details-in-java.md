@@ -7,7 +7,7 @@ tags: [java]
 >
 >
 
-![landscape](http://odzl05jxx.bkt.clouddn.com/34a7d57ccabb18c69d085247cf009b22.jpg?imageView2/2/w/600)
+![landscape](http://www.haldir66.ga/static/imgs/34a7d57ccabb18c69d085247cf009b22.jpg)
 
 <!--more-->
 

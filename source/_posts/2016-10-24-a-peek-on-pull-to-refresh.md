@@ -8,7 +8,7 @@ tags: [置顶]
 ---
  最早开始接触安卓的时候就知道有Chris Banes的[Pull-To-Refresh](https://github.com/chrisbanes/Android-PullToRefresh)，当时这个库已经被标记被Deprecated了，后来出于寻找替代品的目的找到了秋百万的[android-Ultra-pull-toRefresh](https://github.com/liaohuqiu/android-Ultra-Pull-To-Refresh)，直接
 
- ![fork](http://odzl05jxx.bkt.clouddn.com/687474703a2f2f692e696d6775722e636f6d2f4766746846417a2e706e67.png)
+ ![fork](http://www.haldir66.ga/static/imgs/687474703a2f2f692e696d6775722e636f6d2f4766746846417a2e706e67.png)
 
  当时甚至没有能力把一个Demo跑起来。之后的项目中，直接使用swipeRefreshLayout了。现在回头看，终于觉得可以尝试着分析一遍整个下拉刷新的过程。本文只针对[android-Ultra-pulltoRefresh](https://github.com/liaohuqiu/android-Ultra-Pull-To-Refresh)部分源码进行分析。拆一个轮子可能只需要花一天时间，但能够从无到有构思出这个框架，将项目搭建起来并且坚持长期维护真的是一件需要很强毅力的事情，向为开源社区贡献优秀代码的秋百万和众多做出贡献的开发者致敬。
  <!--more-->

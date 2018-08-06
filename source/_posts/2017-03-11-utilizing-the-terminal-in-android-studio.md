@@ -6,7 +6,7 @@ tags: [android]
 ---
 
 
-![io](http://odzl05jxx.bkt.clouddn.com/device-2017-03-11-222239.png?imageView2/2/w/600)
+![io](http://www.haldir66.ga/static/imgs/device-2017-03-11-222239.png)
 这周终于把Google I/O 2016的Android App在Device上跑起来了，顺便尝试多多使用命令行进行编译或者安装。
 
 <!-- more -->

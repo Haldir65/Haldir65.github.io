@@ -5,7 +5,7 @@ tags: [android,热修复]
 ---
 
 关于Android Application集成Tinker的一次记录。
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/single-yellow-beauty-flower-on-the-fence-wallpaper-56801fde208df.jpg?imageView2/2/w/600)
+![](http://www.haldir66.ga/static/imgs/single-yellow-beauty-flower-on-the-fence-wallpaper-56801fde208df.jpg)
 <!--more-->
 
 ## 1. 首先从官方Demo项目开始

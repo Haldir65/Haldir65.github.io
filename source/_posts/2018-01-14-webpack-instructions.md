@@ -4,7 +4,7 @@ date: 2018-01-14 22:56:46
 tags: [前端]
 ---
 
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/hot coffee city life winter.jpg?imageView2/2/w/600)
+![](http://www.haldir66.ga/static/imgs/hot%20coffee%20city%20life%20winter.jpg)
 <!--more-->
 
 

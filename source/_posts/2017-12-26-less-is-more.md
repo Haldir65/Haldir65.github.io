@@ -5,7 +5,7 @@ tags: [前端]
 ---
 
 css预处理语言简介
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/bokeh street lights city art blue.jpg?imageView2/2/w/600)
+![](http://www.haldir66.ga/static/imgs/bokeh%20street%20lights%20city%20art%20blue.jpg)
 <!--more-->
 
 

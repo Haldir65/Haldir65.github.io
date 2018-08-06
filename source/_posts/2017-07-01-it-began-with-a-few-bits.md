@@ -8,7 +8,7 @@ tags:
 ---
 
 ### This is gonna be nasty...... TL;DR
-![](http://odzl05jxx.bkt.clouddn.com/d653491fb55bec754b8471aa6a3f6eed.jpg?imageView2/2/w/600)
+![](http://www.haldir66.ga/static/imgs/d653491fb55bec754b8471aa6a3f6eed.jpg)
 
 <!--more-->
 

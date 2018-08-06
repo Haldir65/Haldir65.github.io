@@ -5,7 +5,7 @@ tags: [android,java,tools]
 ---
 
 A Cookbook shall look like a collection of Recipes, or an index page from where dinner are made. And it keeps you sane.
-![](http://odzl05jxx.bkt.clouddn.com/Cg-4zFVJ0xGITwm_AA688WRj8n8AAXZ9wGMpd0ADr0J195.jpg?imageView2/2/w/600)
+![](http://www.haldir66.ga/static/imgs/Cg-4zFVJ0xGITwm_AA688WRj8n8AAXZ9wGMpd0ADr0J195.jpg)
 <!--more-->
 
 

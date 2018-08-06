@@ -366,7 +366,7 @@ Softlayer, HongKong, CN         119.81.130.170          35.2MB/s
 ----------------------------------------------------------------------
 ```
 
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100809920.jpg?imageView2/2/w/600)
+![](http://www.haldir66.ga/static/imgs/scenery1511100809920.jpg)
 
 ###  跑java？
 算了吧，简单读个文本文件print出来cpu就飙到50%。

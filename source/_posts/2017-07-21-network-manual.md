@@ -429,7 +429,7 @@ TCP 连接两端好比两个人，这两个人之间保持通信往来（建立 
 ### 5.2 keep-Alive和WebSocket的区别
 
 
-![](http://odzl05jxx.bkt.clouddn.com/ed541bc1ed61ead0bf6ea8233ef01c0a.jpg?imageView2/2/w/600)
+![](http://www.haldir66.ga/static/imgs/ed541bc1ed61ead0bf6ea8233ef01c0a.jpg)
 
 
 ### 5.3 http2可以实现推送了

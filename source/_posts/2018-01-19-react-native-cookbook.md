@@ -4,7 +4,7 @@ date: 2018-01-19 22:28:34
 tags: [前端]
 ---
 
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/iu kpop star music sony.jpg?imageView2/2/w/600)
+![](http://www.haldir66.ga/static/imgs/iu%20kpop%20star%20music%20sony.jpg)
 
 <!--more-->
 

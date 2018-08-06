@@ -5,7 +5,7 @@ tags: [python,django]
 ---
 
 
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/djangopony-slide.png?imageView2/2/w/600)
+![](http://www.haldir66.ga/static/imgs/djangopony-slide.png)
 
 
 
@@ -130,7 +130,7 @@ python manage.py plus_shell
 > uwsgi --ini myconf.ini
 
 
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/food%20salad%20instagram%20hunger%20city%20life.jpg?imageView2/2/w/600)
+![](http://www.haldir66.ga/static/imgs/food-salad-instagram-hunger-city-life.jpg)
 
 还有，多数时候会热更新，但比如我更改了PaginationClass，还是得重新runserver才能获得理想的结果
 

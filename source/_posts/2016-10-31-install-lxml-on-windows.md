@@ -5,7 +5,7 @@ categories: blog
 tags: [python]
 ---
 
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/Carla Ossa in strapless gown.jpg?imageView2/2/w/600)
+![](http://www.haldir66.ga/static/imgs/Carla Ossa in strapless gown.jpg)
  <!--more-->
 
 前几天尝试使用一个简单的微博爬虫进行操作，导包的时候遇到lxml缺失的问题，找了好久最终在百度知道上找到个能用的，(⊙﹏⊙)b。

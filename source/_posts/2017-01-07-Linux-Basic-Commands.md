@@ -9,7 +9,7 @@ tags: [置顶,linux,tools]
 >  nohup node server.js > /dev/null 2>&1 &
 
 
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/bamboo-buds-wallpaper-53859567dd31a.jpg?imageView2/2/w/600)
+![](http://www.haldir66.ga/static/imgs/bamboo-buds-wallpaper-53859567dd31a.jpg)
 
  <!--more-->
 
@@ -1060,7 +1060,7 @@ fdisk -l ## show a list of hard drives that are attached to your computer, fdisk
 
 ### 参考
 
-- ![](http://odzl05jxx.bkt.clouddn.com/fork_you_git.jpg)
+- ![](http://www.haldir66.ga/static/imgs/fork_you_git.jpg)
 - [工具参考](http://linuxtools-rst.readthedocs.io/zh_CN/latest/tool/sar.html)
 - [文件大小查看命令](https://my.oschina.net/liting/blog/392051)
 - [文件压缩命令](http://blog.sina.com.cn/s/blog_7479f7990100zwkp.html)

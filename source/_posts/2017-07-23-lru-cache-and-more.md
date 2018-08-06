@@ -6,7 +6,7 @@ tags: [android]
 
 LruCache在android3.1中加入，即android.util.LruCache，主要是作为一种合理的缓存策略的实现，用于替代原来的SoftReference。v4包提供了static version的实现，即android.support.v4.util.LruCache。
 此外，还有DiskLruCache对应磁盘缓存，在OkHttp和Glide等开源项目中都有，可直接复制过来，改下包名直接用。这些类本质上都是对于Least Recently Used算法的实现。稍微看了下网上的博客，LruCache实际上就是利用了LinkedHashmap的accessorder来实现末位淘汰的。v4包里的LinkedHashmap就是java.util里面的,platform里的LinkedHashmap添加了一些方法。
-![](http://odzl05jxx.bkt.clouddn.com/e73669d80265feff2adcb227b7113f2d.jpg?imageView2/2/w/600)
+![](http://www.haldir66.ga/static/imgs/e73669d80265feff2adcb227b7113f2d.jpg)
 <!--more-->
 
 

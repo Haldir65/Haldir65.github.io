@@ -580,8 +580,8 @@ bash <(curl -s https://codecov.io/bash) ##重定向还有这么玩的
 ### 28.htop怎么看
 process state
 图片[出处](https://codeahoy.com/2017/01/20/hhtop-explained-visually/)
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/htop-top.png)
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/htop-bottom.png)
+![](http://www.haldir66.ga/static/imgs/htop-top.png)
+![](http://www.haldir66.ga/static/imgs/htop-bottom.png)
 > PROCESS STATE CODES
    R  running or runnable (on run queue)
    D  uninterruptible sleep (usually IO)

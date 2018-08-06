@@ -8,7 +8,7 @@ tags: [python]
 
 ### 人生苦短，Python是岸
 
-![implementing dumb features](http://odzl05jxx.bkt.clouddn.com/46ee54dd915d71da90e435703d4568fb.jpg?imageView2/2/w/600)
+![implementing dumb features](http://www.haldir66.ga/static/imgs/46ee54dd915d71da90e435703d4568fb.jpg)
 
 <!-- more -->
 ### 1. Python的一些缺点
@@ -73,7 +73,7 @@ urlhtml = urlopen(req)
 pip install -U XXX
 这个U的意思是upgrade if alreay install
 ** if not working**
-![](http://odzl05jxx.bkt.clouddn.com/Googling%20the%20Error%20Message.jpg?imageView2/2/w/500)
+![](http://www.haldir66.ga/static/imgs/Googling-the-Error-Message.jpg)
 
 
 ### 4. List、tuple、dict、set以及基本的数据类型

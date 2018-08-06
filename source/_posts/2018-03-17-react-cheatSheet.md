@@ -4,7 +4,7 @@ date: 2018-03-17 23:56:45
 tags: [前端]
 ---
 
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/food%20knife%20green%20kitchen%20city%20life.jpg?imageView2/2/w/600)
+![](http://www.haldir66.ga/static/imgs/food-knife-green-kitchen-city-life.jpg)
 介绍React语法及一些Redux的使用方法
 <!--more-->
 

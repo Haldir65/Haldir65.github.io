@@ -5,7 +5,7 @@ tags: [前端]
 ---
 
 HTML Document操作手册
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/2138000245bee1e3cc14.jpg?imageView2/2/w/600)
+![](http://www.haldir66.ga/static/imgs/2138000245bee1e3cc14.jpg)
 
 <!--more-->
 使用javaScript操作dom的记录

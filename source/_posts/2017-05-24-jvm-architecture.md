@@ -6,7 +6,7 @@ tags: [jvm]
 ---
 
 关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下
-![](http://odzl05jxx.bkt.clouddn.com/high_way_scene.jpg?imageView2/2/w/600)
+![](http://www.haldir66.ga/static/imgs/high_way_scene.jpg)
 <!--more-->
 
 ## 1.从MyApp.java文件开始
@@ -87,7 +87,7 @@ Native method stacks 是由java stack中的方法调用native方法创建的，�
 
 
 ## 6. Execution Engine的任务
-![](http://odzl05jxx.bkt.clouddn.com/starry_sky.jpg?imageView2/2/w/500)
+![](http://www.haldir66.ga/static/imgs/starry_sky.jpg)
 	- Interpreter 将byte code 翻译成机器指令并执行(根据指令去调用Native方法，在windows上jre/bin/文件夹中一大堆的dll就是windows平台提供的Native库，在linux上是.so文件)
 
 	- JIT Compiler  just in time compiler（如果有某项byte code instruction被多次调用，这些byte code不会每次都被inteprete，JIT will hold on to that system level target machine code for future usage,which is fast）

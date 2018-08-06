@@ -5,7 +5,7 @@ tags:
 ---
 
 ffmpeg安装手记
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/water foot cold dark river.jpg?imageView2/2/w/600)
+![](http://www.haldir66.ga/static/imgs/water foot cold dark river.jpg)
 <!--more-->
 
 

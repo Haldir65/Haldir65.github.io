@@ -473,5 +473,5 @@ ParameterizedType,TypeVariable,GenericArrayType,WildcardType（这四个全部�
 
 
 
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/1279081126453.jpg?imageView2/2/w/600)
+![](http://www.haldir66.ga/static/imgs/1279081126453.jpg)
 
