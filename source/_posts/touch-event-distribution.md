@@ -5,7 +5,7 @@ categories: blog
 tags: [android]
 ---
 
-![](http://odzl05jxx.bkt.clouddn.com/dispatch_touch_event_video.jpg)
+![](http://www.haldir66.ga/static/imgs/dispatch_touch_event_video.jpg)
 
 图1 默认情况下事件传递的路径
 
@@ -41,11 +41,11 @@ tags: [android]
   - return false: 对于dispatchTouchEvent，返回false表明不再向下分发，ACTION_DOWN发送到上一层ViewGroup(Activity)的OnTouchEvent；对于onInterceptTouchEvent,返回false表明该ViewGroup不打算拦截，继续下发，对于onTouchEvent，返回false，事件继续上传至上一层级ViewGroup的OnTouchEvent 。
   - return super : 完成整个传递链，就像图1中展示的一样。
 
-![](http://odzl05jxx.bkt.clouddn.com/touch_event_1.png)
+![](http://www.haldir66.ga/static/imgs/touch_event_1.png)
 
 图2 来自[图解安卓事件分发机制](http://www.jianshu.com/p/e99b5e8bd67b)  完美地解释了事件分发各个流程中返回值对于事件传递的影响。
 
-![](http://odzl05jxx.bkt.clouddn.com/touch_event_2.png)
+![](http://www.haldir66.ga/static/imgs/touch_event_2.png)
 
 图3 来自[图解安卓事件分发机制](http://www.jianshu.com/p/e99b5e8bd67b)
 

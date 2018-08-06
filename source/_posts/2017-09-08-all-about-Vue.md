@@ -6,7 +6,7 @@ tags: [javaScript,Vue,前端]
 
 Vue Js学习笔记
 
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery1511100775410.jpg?imageView2/2/w/600)
+![](http://www.haldir66.ga/static/imgs/scenery1511100775410.jpg)
 
 <!--more-->
 
@@ -373,8 +373,8 @@ new Vue({  // eslint-disable-line no-new
  Vuex是负责全局状态管理的，[参考](http://whutzkj.space/2017/10/24/vuex/#more)
  组件间[通信](https://juejin.im/post/59ec95006fb9a0451c398b1a)的方式
 
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/1102531047-2.jpg?imageView2/2/w/600)
-![](http://odzl05jxx.bkt.clouddn.com/VueJsLogo.jpg)
+![](http://www.haldir66.ga/static/imgs/1102531047-2.jpg)
+![](http://www.haldir66.ga/static/imgs/VueJsLogo.jpg)
 
 ## 参考
 1. [Vue JS 2 Tutorial](https://www.youtube.com/watch?v=5LYrN_cAJoA&list=PL4cUxeGkcC9gQcYgjhBoeQH7wiAyZNrYa)

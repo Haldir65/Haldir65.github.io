@@ -343,6 +343,7 @@ git log -- foo.py bar.py ## 查看跟这几个文件相关的操作记录
 git log -S"Hello, World!" ##这个等于查找git log -p里面哪一次提交添加了“Hello, World！”这句话
 git log --no-merges
 git log --merges
+git log --pretty=format:"%h%x09%an%x09%ad%x09%s" //非常简明的一行显示
 
 ## Reference
 -[git reset和revert](http://yijiebuyi.com/blog/8f985d539566d0bf3b804df6be4e0c90.html)

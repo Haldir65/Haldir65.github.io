@@ -6,7 +6,7 @@ tags: [python,tools]
 
 ## 苦海无涯，Python是岸
 
-![](http://odzl05jxx.bkt.clouddn.com/image/jpg/essay-with-programming-lang.jpg)
+![](http://www.haldir66.ga/static/imgs/essay-with-programming-lang.jpg)
 
 
 <!--more-->
@@ -137,7 +137,7 @@ except TypeError as reason:
     print('出错原因是%s'%str(reason))
 ```
 
-![](http://odzl05jxx.bkt.clouddn.com/79a65f1911c81d736be0704904de8ea1.jpg?imageView2/2/w/600)
+![](http://www.haldir66.ga/static/imgs/79a65f1911c81d736be0704904de8ea1.jpg)
 
 
 时间的函数有datetime和time包
@@ -614,4 +614,17 @@ t[100] ## IndexError:tuple index out of range
 
 python property()函数 
 
+### 图片处理
+pip install Pillow
+随手抄来一个pillow缩放图片的使用方法
+```python
+from PIL import Image
+
+basewidth = 300
+img = Image.open('somepic.jpg')
+wpercent = (basewidth/float(img.size[0]))
+hsize = int((float(img.size[1])*float(wpercent)))
+img = img.resize((basewidth,hsize), Image.ANTIALIAS)
+img.save('sompic.jpg') 
+```
 

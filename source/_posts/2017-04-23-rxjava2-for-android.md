@@ -220,7 +220,7 @@ Flowable -> subscribe -> Subscription
 
 ### 3.2 onSubscribe怎么用
 通常不直接用这两种base class，因为第四个方法不知道怎么用嘛。
-![](http://odzl05jxx.bkt.clouddn.com/4dab298b9f7ce29c43f9d8eaf686e02f.jpg?imageView2/2/w/600)
+![](http://www.haldir66.ga/static/imgs/4dab298b9f7ce29c43f9d8eaf686e02f.jpg)
 ```java
 Observable.just("Hello").subscribe(new DisposableObserver<String>() {
                     @Override
@@ -336,8 +336,8 @@ Observable<String> yelling = greeting.map(s ->s.toUppercase())
 Observable.subscribeOn(Schedulers.io()) //
 ```
 subscribeOn决定了task在哪条线程上运行，操作符的顺序很重要
-![Wrong](http://odzl05jxx.bkt.clouddn.com/reading%20network%20response%20on%20main%20thread.jpg?imageView2/2/w/600)
-![Ok](http://odzl05jxx.bkt.clouddn.com/observing%20on%20ui%20thred.jpg?imageView2/2/w/600)
+![Wrong](http://www.haldir66.ga/static/imgs/reading_network_response_on_main_thread.jpg)
+![Ok](http://www.haldir66.ga/static/imgs/observing_on_ui_thread.jpg)
 
 
 流之间的转换

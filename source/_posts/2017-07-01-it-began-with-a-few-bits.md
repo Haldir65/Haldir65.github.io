@@ -144,7 +144,7 @@ else if (annotation instanceof Path) {
         return new ParameterHandler.Path<>(name, converter, path.encoded());
       }
 ```      
-ParameterHandler.Path<>在ParameterHandler这个类里面，看一下结构![](http://odzl05jxx.bkt.clouddn.com/ParameterHandlers.jpg)
+ParameterHandler.Path<>在ParameterHandler这个类里面，看一下结构![](http://www.haldir66.ga/static/imgs/ParameterHandlers.jpg)
 Path这个class中关键的方法apply:
 ```java
  @Override void apply(RequestBuilder builder, @Nullable T value) throws IOException {
@@ -348,10 +348,10 @@ return serviceMethod.callAdapter.adapt(okHttpCall); //这个return需要的是Ob
 #### 1.5.1 end point 不一样怎么办
 默认情况下，如果不指定client,每一次都会创建一个新的OkHttpClient，这样做就丧失了disk caching,connection pooling等优势。
 
-![endpoint](http://odzl05jxx.bkt.clouddn.com/different_end_point.jpg)    
+![endpoint](http://www.haldir66.ga/static/imgs/different_end_point.jpg)    
 
 所以需要提取出一个OkHttpClient,解决方式很简单
-![](http://odzl05jxx.bkt.clouddn.com/different_end_point_teh_right_way.jpg)
+![](http://www.haldir66.ga/static/imgs/different_end_point_the_right_way.jpg)
 
 #### 1.5.2 不要创建多个HttpClient
 
@@ -378,12 +378,12 @@ Call<User> login(@Body LoginRequest request)
 #### 1.5.4 Converters将byte变成java对象，底层的解析器不要创建多个
 
 addConverterFactory，和之前的创建两个httpclient一样，人们也很容易创建两个解析器。解决方法也很实在，提取出来公用即可。
-![](http://odzl05jxx.bkt.clouddn.com/creating%20two%20convertors.jpg)
+![](http://www.haldir66.ga/static/imgs/creating_two_converters.jpg)
 
 
 #### 1.5.5 addConverterFactory可以调用多次
 假如一个接口返回json，一个接口返回proto。不要试图创建多个retrofit实例。这样就可以了
-![](http://odzl05jxx.bkt.clouddn.com/different_response.jpg)
+![](http://www.haldir66.ga/static/imgs/different_response.jpg)
 
 底层的原理是这样的。
 User是Proto,Friend是Json。 Proto都extends一个protoType class，所以只要看下是否 instanceof proto就可以了。这一切都是在serviceMethod创建过程中判断的。这里顺序很重要。由于gson基本能够序列化一切，所以gson总是会认为自己可以成功。所以要把protoConverter放在前面。
@@ -423,14 +423,14 @@ class XmlOrJsonConverterFactroy extend Converter.Factory{
 
 #### 1.5.6 服务器返回的数据中包括一些metaData
 使用delegate的方式去除这些metadata，只获取想要的response实体对象
-![](http://odzl05jxx.bkt.clouddn.com/delegaet_converters.jpg)
+![](http://www.haldir66.ga/static/imgs/delegate_converters.jpg)
 但这些metaData是有用的。。怎么处理
 可以在convert中集中处理自定义错误码。
 
 #### 1.5.7 和Rxjava配合使用
 CallAdapterFactory和ConverterFactory类似，也可以自定义，所以这样可以直接将所有的Observable返回到主线程
 
-![](http://odzl05jxx.bkt.clouddn.com/always_observe_on_mian_thread.jpg)
+![](http://www.haldir66.ga/static/imgs/always_observe_on_mian_thread.jpg)
 
 
 所以，Retrofit就是将HttpClient、Converter和CallAdapter这三样职能结合起来，又提供了足够的定制化。

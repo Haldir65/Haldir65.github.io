@@ -512,6 +512,9 @@ $$ 当前进程的进程号（PID）
 $! 后台运行的最后一个进程的进程号（PID）
 ```
 
+linux下查看环境变量命令：
+export
+
 ### 24.  Linux软件安装目录惯例
 转载自[](http://blog.csdn.net/aqxin/article/details/48324377)。
 一般特定文件夹里放什么东西是有惯例的。
@@ -742,6 +745,8 @@ nano直接跳到文本最后一行的方法是：
 
 
 🎧 
+
+~/.vimrc文件修改之后是不需要source的，下次重新启动一个vim的时候vim会直接去读这个文件
 
 熟悉了bash之后，再来看zsh，似乎更加轻松
 看一下我当前使用的是哪种sh: echo $SHELL
