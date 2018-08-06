@@ -16,13 +16,13 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="关于360团队出开源的DroidPlugin的一些记录 过程中发现了关于插件化，Hook系统方法的操作，摘录下来。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery15111006999.jpg?imageView2/2/w/600">
-<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery2a2241cc5c1278cf7a28f15f91dbbb7f.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-08-06T06:28:05.091Z">
+<meta property="og:image" content="http://www.haldir66.ga/static/imgs/scenery15111006999.jpg">
+<meta property="og:image" content="http://www.haldir66.ga/static/imgs/scenery2a2241cc5c1278cf7a28f15f91dbbb7f.jpg">
+<meta property="og:updated_time" content="2018-08-06T10:50:00.242Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从DroidPlugin谈插件化开发">
 <meta name="twitter:description" content="关于360团队出开源的DroidPlugin的一些记录 过程中发现了关于插件化，Hook系统方法的操作，摘录下来。">
-<meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery15111006999.jpg?imageView2/2/w/600">
+<meta name="twitter:image" content="http://www.haldir66.ga/static/imgs/scenery15111006999.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -201,14 +201,14 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>关于360团队出开源的<a href="https://github.com/DroidPluginTeam/DroidPlugin">DroidPlugin</a>的一些记录<br><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery15111006999.jpg?imageView2/2/w/600" alt=""></p>
+        <p>关于360团队出开源的<a href="https://github.com/DroidPluginTeam/DroidPlugin">DroidPlugin</a>的一些记录<br><img src="http://www.haldir66.ga/static/imgs/scenery15111006999.jpg" alt=""></p>
 <p>过程中发现了关于插件化，Hook系统方法的操作，摘录下来。<br><a id="more"></a></p>
 <h2 id="1-从Context的本质说起"><a href="#1-从Context的本质说起" class="headerlink" title="1. 从Context的本质说起"></a>1. 从Context的本质说起</h2><p>其实也简单，就是ContextImpl，一个各种资源的容器。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Activity extends ContextThemeWrapper</span><br><span class="line">ContextThemeWrapper extends ContextWrapper</span><br><span class="line">ContextWrapper extends Context</span><br></pre></td></tr></table></figure></p>
 <p>Activity作为一个天然的交互核心，能够以一个容器的身份（继承而来）轻易获取这些外部资源，也使得基于UI页面的开发变得简单。<br>如果对于ActivityThread有所了解的话，就知道Activity的生命周期都是在这个类中完成的<br>简单来说在ContextImpl中createActivityContext方法中使用new的方式创建了一个ContextImpl，整个流程就是ActivityThread在创建一个Activity后，给它不断赋值的过程。ContextImpl只是一个各种资源的容器（比如Resource,Display,PackageInfo,构造函数里面塞了一些，创建出来之后还给一些变量赋了值）。</p>
 <p>Hook(使用Invokcation handler，将一个接口的调用原本的实现包揽下来，把原来的结果占为己有，同时添加一些自己要做的事情)<a href="http://weishu.me/2016/02/16/understand-plugin-framework-binder-hook/">修改getSystemService，添加自定义功能</a><br>Hook掉AMS,在startActivity里面添加一些私货。<br>getSystemService最终会追溯到SystemServiceRegistry.java。这里面用static block的方式初始化了各种service的cache.</p>
 <h3 id="1-1-ActivityThread做了很多事"><a href="#1-1-ActivityThread做了很多事" class="headerlink" title="1.1 ActivityThread做了很多事"></a>1.1 ActivityThread做了很多事</h3><p>onSaveInstance是从ActivityThread的callCallActivityOnSaveInstanceState方法dispatch下来的。</p>
 <h2 id="2-Hook作为插件化的切入点给了开发者篡改系统api实现的通道"><a href="#2-Hook作为插件化的切入点给了开发者篡改系统api实现的通道" class="headerlink" title="2. Hook作为插件化的切入点给了开发者篡改系统api实现的通道"></a>2. Hook作为插件化的切入点给了开发者篡改系统api实现的通道</h2><p><a href="http://weishu.me/2016/02/16/understand-plugin-framework-binder-hook/">比如Hook掉剪切板SystemService</a>,<br><a href="http://weishu.me/2016/03/07/understand-plugin-framework-ams-pms-hook/">比如在ActivityManagerService调用IPC操作时添加私货</a></p>
-<p><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/scenery2a2241cc5c1278cf7a28f15f91dbbb7f.jpg?imageView2/2/w/600" alt=""></p>
+<p><img src="http://www.haldir66.ga/static/imgs/scenery2a2241cc5c1278cf7a28f15f91dbbb7f.jpg" alt=""></p>
 <h2 id="3-Android多渠道打包的实现"><a href="#3-Android多渠道打包的实现" class="headerlink" title="3. Android多渠道打包的实现"></a>3. Android多渠道打包的实现</h2><h3 id="3-1-历史上曾经有效的方式，原始方法"><a href="#3-1-历史上曾经有效的方式，原始方法" class="headerlink" title="3.1 历史上曾经有效的方式，原始方法"></a>3.1 历史上曾经有效的方式，原始方法</h3><p>关于gradlew<br>打包release之前，先Build -&gt; Generate Singed apk 创建一个新的keystore , 密码记住，keystore文件保存好。<br>关于打包: 根据<a href="https://www.jianshu.com/p/4f2990cf53bf">Android 多渠道打包梳理</a><br>Gradle UMeng 多渠道打包</p>
 <ul>
 <li><p>Android.manifest文件添加</p>
