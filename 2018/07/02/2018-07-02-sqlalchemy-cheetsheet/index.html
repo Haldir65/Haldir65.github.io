@@ -16,12 +16,12 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="pip install SQLAlchemy">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/side_walk_tree.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-08-05T15:06:26.399Z">
+<meta property="og:image" content="http://www.haldir66.ga/static/imgs/side_walk_tree.jpg">
+<meta property="og:updated_time" content="2018-08-06T05:07:45.684Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="sqlalchemy速查手册">
 <meta name="twitter:description" content="pip install SQLAlchemy">
-<meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/image/jpg/side_walk_tree.jpg?imageView2/2/w/600">
+<meta name="twitter:image" content="http://www.haldir66.ga/static/imgs/side_walk_tree.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -203,7 +203,7 @@ ga('send', 'pageview');
         <blockquote>
 <p>pip install SQLAlchemy</p>
 </blockquote>
-<p><img src="http://odzl05jxx.bkt.clouddn.com/image/jpg/side_walk_tree.jpg?imageView2/2/w/600" alt=""></p>
+<p><img src="http://www.haldir66.ga/static/imgs/side_walk_tree.jpg" alt=""></p>
 <a id="more"></a>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sqlalchemy <span class="keyword">import</span> create_engine</span><br><span class="line"><span class="comment">## 想用sqlite?</span></span><br><span class="line">engine = create_engine(<span class="string">'sqlite:///foo.db'</span>, echo=<span class="keyword">True</span>) <span class="comment">## 会在当前目录下生成一个foo.db文件，这个True表示程序运行的时候会打印出生成的sql语句。</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## 想用mysql?</span></span><br><span class="line">engine = create_engine(<span class="string">'mysql+mysqlconnector://%s:%s@localhost:3306/%s?charset=utf8'</span> % (config.DB_USER_NAME,config.DB_PASS_WORD,config.DB_NAME)) <span class="comment">## mysql也是支持的</span></span><br><span class="line">这里有一个坑：</span><br><span class="line"><span class="comment">## mysql://username:password@server/db  python3下面不能这么写，虽然flask-sqlalchemy教程上是这么教人的</span></span><br><span class="line"><span class="comment">## mysql+pymysql://username:password@server/db  应该这么写，还有pip install PyMySQL</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">## postgresql也是可以的</span></span><br><span class="line">engine = create_engine(<span class="string">"postgresql://scott:tiger@localhost/test"</span>)</span><br></pre></td></tr></table></figure>
 <p>创建db的时候注意,sqlite因为是直接写文件，所以要把db的路径写清楚了。如果贸然写一个’sqlite:///db.sqlite3’，可能会出现no such table<br>config.py文件里面<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">project_dir = os.path.dirname(os.path.abspath(__file__))</span><br><span class="line">SQLALCHEMY_DATABASE_URI = <span class="string">"sqlite:///&#123;&#125;"</span>.format(os.path.join(project_dir, <span class="string">"backend.db"</span>))</span><br></pre></td></tr></table></figure></p>

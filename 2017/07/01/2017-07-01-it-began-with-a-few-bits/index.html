@@ -16,18 +16,18 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="This is gonna be nasty…… TL;DR">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/d653491fb55bec754b8471aa6a3f6eed.jpg?imageView2/2/w/600">
+<meta property="og:image" content="http://www.haldir66.ga/static/imgs/d653491fb55bec754b8471aa6a3f6eed.jpg">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/different_end_point.jpg">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/different_end_point_teh_right_way.jpg">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/creating%20two%20convertors.jpg">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/different_response.jpg">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/delegaet_converters.jpg">
 <meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/always_observe_on_mian_thread.jpg">
-<meta property="og:updated_time" content="2018-08-05T15:06:26.391Z">
+<meta property="og:updated_time" content="2018-08-06T05:07:45.680Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Retrofit源码阅读笔记">
 <meta name="twitter:description" content="This is gonna be nasty…… TL;DR">
-<meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/d653491fb55bec754b8471aa6a3f6eed.jpg?imageView2/2/w/600">
+<meta name="twitter:image" content="http://www.haldir66.ga/static/imgs/d653491fb55bec754b8471aa6a3f6eed.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -206,7 +206,7 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="This-is-gonna-be-nasty……-TL-DR"><a href="#This-is-gonna-be-nasty……-TL-DR" class="headerlink" title="This is gonna be nasty…… TL;DR"></a>This is gonna be nasty…… TL;DR</h3><p><img src="http://odzl05jxx.bkt.clouddn.com/d653491fb55bec754b8471aa6a3f6eed.jpg?imageView2/2/w/600" alt=""></p>
+        <h3 id="This-is-gonna-be-nasty……-TL-DR"><a href="#This-is-gonna-be-nasty……-TL-DR" class="headerlink" title="This is gonna be nasty…… TL;DR"></a>This is gonna be nasty…… TL;DR</h3><p><img src="http://www.haldir66.ga/static/imgs/d653491fb55bec754b8471aa6a3f6eed.jpg" alt=""></p>
 <a id="more"></a>
 <h3 id="1-Retrofit"><a href="#1-Retrofit" class="headerlink" title="1. Retrofit"></a>1. Retrofit</h3><h4 id="1-1-使用方法"><a href="#1-1-使用方法" class="headerlink" title="1.1 使用方法"></a>1.1 使用方法</h4><p>Retrofit本身并不局限于Android平台，java应用也可以用来和服务器沟通。<br>Retrofit一般的用法看上去很简单<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">GitHub</span> </span>&#123;</span><br><span class="line">    <span class="meta">@GET</span>(<span class="string">"/repos/&#123;owner&#125;/&#123;repo&#125;/contributors"</span>)</span><br><span class="line">    Call&lt;List&lt;Contributor&gt;&gt; contributors(</span><br><span class="line">        <span class="meta">@Path</span>(<span class="string">"owner"</span>) String owner,</span><br><span class="line">        <span class="meta">@Path</span>(<span class="string">"repo"</span>) String repo);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">Retrofit retrofit = <span class="keyword">new</span> Retrofit.Builder()</span><br><span class="line">        .baseUrl(API_URL)   <span class="comment">// end_point</span></span><br><span class="line">        .addConverterFactory(GsonConverterFactory.create())</span><br><span class="line">        .build();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Create an instance of our GitHub API interface.</span></span><br><span class="line">    GitHub github = retrofit.create(GitHub.class);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Create a call instance for looking up Retrofit contributors.</span></span><br><span class="line">    Call&lt;List&lt;Contributor&gt;&gt; call = github.contributors(<span class="string">"square"</span>, <span class="string">"retrofit"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Fetch and print a list of the contributors to the library.</span></span><br><span class="line">    List&lt;Contributor&gt; contributors = call.execute().body();</span><br><span class="line">    <span class="keyword">for</span> (Contributor contributor : contributors) &#123;</span><br><span class="line">      System.out.println(contributor.login + <span class="string">" ("</span> + contributor.contributions + <span class="string">")"</span>);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
 <p>关键来看这段 retroft.create ,重点都在这里面。关键的代码就在这三行里面了</p>
