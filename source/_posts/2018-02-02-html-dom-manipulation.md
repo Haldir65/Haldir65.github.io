@@ -134,3 +134,23 @@ navigator.platform ==> win32
 </form>
 <p>请尝试在浏览文件时选取一个以上的文件。</p>
 ```
+
+html中有data标签[文档](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes)
+```html
+<article
+  id="electriccars"
+  data-columns="3"
+  data-index-number="12314"
+  data-parent="cars">
+...
+</article>
+```
+
+js里面可以这样去获取对应的值
+```js
+var article = document.getElementById('electriccars');
+ 
+article.dataset.columns // "3"
+article.dataset.indexNumber // "12314" 注意dash被替换成了CamelCase
+article.dataset.parent // "cars"
+```
