@@ -16,12 +16,12 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&amp;gt;  CacheDispatch  —&amp;gt; NetworkDispatcher  —-&amp;gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://odzl05jxx.bkt.clouddn.com/a11f41e0b1df95212c71920b3959cd72.jpg?imageView2/2/w/600">
-<meta property="og:updated_time" content="2018-08-05T15:06:26.395Z">
+<meta property="og:image" content="http://www.haldir66.ga/static/imgs/a11f41e0b1df95212c71920b3959cd72.jpg">
+<meta property="og:updated_time" content="2018-08-06T05:07:45.680Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从glide源码到图片加载框架设计思路">
 <meta name="twitter:description" content="glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&amp;gt;  CacheDispatch  —&amp;gt; NetworkDispatcher  —-&amp;gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是">
-<meta name="twitter:image" content="http://odzl05jxx.bkt.clouddn.com/a11f41e0b1df95212c71920b3959cd72.jpg?imageView2/2/w/600">
+<meta name="twitter:image" content="http://www.haldir66.ga/static/imgs/a11f41e0b1df95212c71920b3959cd72.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -201,7 +201,7 @@ ga('send', 'pageview');
     <div class="article-entry" itemprop="articleBody">
       
         <p>glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&gt;  CacheDispatch  —&gt; NetworkDispatcher  —-&gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是能够独立设计出一套类似的框架了。</p>
-<p><img src="http://odzl05jxx.bkt.clouddn.com/a11f41e0b1df95212c71920b3959cd72.jpg?imageView2/2/w/600" alt=""><br><a id="more"></a></p>
+<p><img src="http://www.haldir66.ga/static/imgs/a11f41e0b1df95212c71920b3959cd72.jpg" alt=""><br><a id="more"></a></p>
 <h2 id="1-使用入门"><a href="#1-使用入门" class="headerlink" title="1. 使用入门"></a>1. 使用入门</h2><p>印象中最早接触Glide是在cheesequare中，顿时发现，原来加载图片可以这么简单，之后的开发过程中总会对Glide有所偏倚。接近两年之后再来过一遍源码，希望能够回答那个“如果让你来设计一个图片加载框架，你会怎么设计？”的问题。<br>使用方式很简单</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Glide.with(activity)</span><br><span class="line">              .load(R.drawable.image_id)</span><br><span class="line">              .into(mImageView);</span><br></pre></td></tr></table></figure>
 <p>来看这里面做了什么：</p>
