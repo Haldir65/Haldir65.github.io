@@ -168,7 +168,7 @@ binding.toolbar.setLayoutParams(params);
 实际操作可能还要判断非空什么的，但大致意思如此
 看起来像这样
 5.1图片展开:  
-  ![5.1模拟器，图片展开](http://www.haldir66.ga/static/imgs/statusbar_5.0_expanded.png)  
+![5.1模拟器，图片展开](http://www.haldir66.ga/static/imgs/statusbar_5.0_expanded.png)  
 
 5.1图片收起:  
   ![5.1模拟器，图片收起](http://www.haldir66.ga/static/imgs/statusbar_5.0_collapsed.png)  

@@ -20,7 +20,7 @@ sudo chmod a+rx /usr/local/bin/youtube-dl
 
 为了方便管理，首先在/根目录下面创建一个文件夹并切换到该目录下
 > mkdir youtube   
-
+aria2 面板
 
 以一个普通的[视频链接](https://www.youtube.com/watch?v=7PtDrv5AUmA)为例
 直接使用
@@ -51,6 +51,13 @@ youtube-dl还有一些命令行参数可以设置
 这样会列出所有的可供下载的分辨率选项，每个选项前面带有一个序号，选择特定分辨率的选项下载只需要
 > youtube-dl -f 13 https://www.youtube.com/watch?v=7PtDrv5AUmA
 
+[Download Youtube Videos With Youtube-dl](https://blog.programster.org/download-youtube-videos-with-youtube-dl)
+
+其实还可以使用external downloader
+使用aria2的分段和多线程下载功能可以加快文件的下载速度，对于下载大文件时特别有用。-x 分段下载，-s 多线程下载
+aria2c -s 2 -x 2 http://xx.com/xx
+
+todo： [aria2 面板](https://github.com/ziahamza/webui-aria2)
 
 ### 2.从vps的硬盘上把下载好的视频拖下来
 VPS下载视频的速度很快，但从vps到国内的速度就很慢了。

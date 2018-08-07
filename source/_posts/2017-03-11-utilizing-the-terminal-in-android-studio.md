@@ -607,6 +607,9 @@ provider的getType方法中返回对应的String，一次IPC来回
 数据库的位置是放在/data/data/com.packagename.applicationName/databases里
 /data/data/com.packagename.applicationName/这个文件夹里一共四个文件夹，cache, code_cache(dex), files,databases
 
+好像7.0之后sharedPreference的存储的位置挪到了
+“/data/data/应用程序包/shared_prefs”这里
+
 ### 33. Activity的生命周期一直是一个很重要的话题
 A start B forResult , B回来之后A被系统干掉了怎么办？
 回来的时候A已经不是原来的A，所以要在onSaveInstance和onRestoreInstance中维护数据

