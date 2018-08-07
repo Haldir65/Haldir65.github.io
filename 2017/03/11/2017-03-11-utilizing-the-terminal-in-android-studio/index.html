@@ -17,7 +17,7 @@
 <meta property="og:description" content="这周终于把Google I/O 2016的Android App在Device上跑起来了，顺便尝试多多使用命令行进行编译或者安装。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://www.haldir66.ga/static/imgs/device-2017-03-11-222239.png">
-<meta property="og:updated_time" content="2018-08-06T10:50:00.234Z">
+<meta property="og:updated_time" content="2018-08-07T11:20:20.105Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用IDE内置的Terminal">
 <meta name="twitter:description" content="这周终于把Google I/O 2016的Android App在Device上跑起来了，顺便尝试多多使用命令行进行编译或者安装。">
@@ -329,6 +329,7 @@ ga('send', 'pageview');
 <p>所以一般的做法是利用ContentProvider去IPC。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">getContentResolver().getType()  <span class="comment">//客户端发起请求</span></span><br><span class="line"></span><br><span class="line">provider的getType方法中返回对应的String，一次IPC来回</span><br></pre></td></tr></table></figure></p>
 <p>打断点发现provider进程会走到execTransact -&gt; onTransact -&gt; query方法。这期间client被挂起，远程方法返回之后client方法继续执行。客户端发送请求后，会被挂起，所以如果长时间不返回，当前线程会一直阻塞，所以要在子线程发送异步请求。<br>写contentProvider的套路基本就是<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String AUTHORITY = <span class="string">"com.me.book.provider"</span>; <span class="comment">// 与AndroidManifest保持一致</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Uri BOOK_CONTENT_URI = Uri.parse(<span class="string">"content://"</span> + AUTHORITY + <span class="string">"/book"</span>);</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Uri USER_CONTENT_URI = Uri.parse(<span class="string">"content://"</span> + AUTHORITY + <span class="string">"/user"</span>);</span><br></pre></td></tr></table></figure></p>
 <p>数据库的位置是放在/data/data/com.packagename.applicationName/databases里<br>/data/data/com.packagename.applicationName/这个文件夹里一共四个文件夹，cache, code_cache(dex), files,databases</p>
+<p>好像7.0之后sharedPreference的存储的位置挪到了<br>“/data/data/应用程序包/shared_prefs”这里</p>
 <h3 id="33-Activity的生命周期一直是一个很重要的话题"><a href="#33-Activity的生命周期一直是一个很重要的话题" class="headerlink" title="33. Activity的生命周期一直是一个很重要的话题"></a>33. Activity的生命周期一直是一个很重要的话题</h3><p>A start B forResult , B回来之后A被系统干掉了怎么办？<br>回来的时候A已经不是原来的A，所以要在onSaveInstance和onRestoreInstance中维护数据</p>
 <h3 id="34-集成微信登录，微信如何和App通信的？"><a href="#34-集成微信登录，微信如何和App通信的？" class="headerlink" title="34. 集成微信登录，微信如何和App通信的？"></a>34. 集成微信登录，微信如何和App通信的？</h3><p>WXEntryActivity一般是这样的:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WXEntryActivity</span> <span class="keyword">extends</span> <span class="title">Activity</span> <span class="keyword">implements</span> <span class="title">IWXAPIEventHandler</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> IWXAPI api;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">       api = WXAPIFactory.createWXAPI(<span class="keyword">this</span>, mWXAppKey);</span><br><span class="line">       api.handleIntent(getIntent(), <span class="keyword">this</span>);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onResp</span><span class="params">(BaseResp resp)</span> </span>&#123;</span><br><span class="line">     <span class="keyword">switch</span> (resp.errCode) &#123;</span><br><span class="line">       <span class="keyword">case</span> BaseResp.ErrCode.ERR_OK:</span><br><span class="line">       <span class="keyword">break</span>;</span><br><span class="line">     &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// api.handleIntent(getIntent(), this); 这里面的实现如下：</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">handleIntent</span><span class="params">(Intent var1, IWXAPIEventHandler var2)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">try</span> &#123;</span><br><span class="line">           <span class="keyword">int</span> var16 = var1.getIntExtra(<span class="string">"_wxapi_command_type"</span>, <span class="number">0</span>); <span class="comment">//这里其实已经跑在当前App的进程了</span></span><br><span class="line">           <span class="keyword">switch</span>(var16) &#123;</span><br><span class="line">           <span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">               Resp var23 = <span class="keyword">new</span> Resp(var1.getExtras());</span><br><span class="line">               var2.onResp(var23); <span class="comment">// 直接调用WXEntryActivity中的onResp方法</span></span><br><span class="line">               <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">           <span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">               com.tencent.mm.opensdk.modelmsg.SendMessageToWX.Resp var22 = <span class="keyword">new</span> com.tencent.mm.opensdk.modelmsg.SendMessageToWX.Resp(var1.getExtras());</span><br><span class="line">               var2.onResp(var22);</span><br><span class="line">               <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">          <span class="comment">// ......</span></span><br><span class="line">        &#125;  </span><br><span class="line">      &#125;    </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
 <p>再结合xml中的exported = true ;<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">activity</span></span></span><br><span class="line"><span class="tag">         <span class="attr">android:name</span>=<span class="string">".wxapi.WXEntryActivity"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">android:exported</span>=<span class="string">"true"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">android:launchMode</span>=<span class="string">"singleTop"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">android:theme</span>=<span class="string">"@android:style/Theme.Translucent"</span> /&gt;</span></span><br></pre></td></tr></table></figure></p>
@@ -635,26 +636,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">transition</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">databinding</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">service</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
               </li>
              
@@ -703,15 +684,23 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+                <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+                <a href="javascript:void(0)" class="js-tag color2">databinding</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">service</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -735,7 +724,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">django</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
               </li>
              
               <li class="article-tag-list-item">

