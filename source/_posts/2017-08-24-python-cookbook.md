@@ -628,3 +628,7 @@ img = img.resize((basewidth,hsize), Image.ANTIALIAS)
 img.save('sompic.jpg') 
 ```
 
+[一个支持python3的生成binary可执行文件的package](http://www.pyinstaller.org/)
+
+
+

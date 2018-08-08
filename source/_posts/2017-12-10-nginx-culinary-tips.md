@@ -16,6 +16,8 @@ tags: [nginx,tools]
 安装教程，google 'installing nginx on ubuntu'
 基本上就是把DigitalOcean写的这些复制粘贴过来
 
+当然apt get 默认的源可能有些老，所以如果追求最新版本的话，可以[添加ppa](https://launchpad.net/~nginx/+archive/ubuntu/stable)
+
 
 ```shell
 sudo apt-get update
@@ -946,6 +948,9 @@ if ($request_uri ~* "[+|(%20)]select[+|(%20)]") {
 
 nginx查看当前连接数
 > netstat -n | awk '/^tcp/ {++S[$NF]} END {for(a in S) print a,S[a]}'
+
+[nginx上传模块—nginx upload module](http://www.ttlsa.com/nginx/nginx-modules-upload-module/)
+至于upload，还是直接proxy_pass给一个localhost的http服务吧
 
 ### 参考
 - [nginx Configurations](https://wizardforcel.gitbooks.io/nginx-doc/content/Text/6.1_nginx_windows.html)

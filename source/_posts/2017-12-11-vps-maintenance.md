@@ -107,6 +107,7 @@ ssserver -c /etc/shadowsocks.json -d stop
 ### 在/etc/rc.local中加入
 sudo ssserver -c /etc/shadowsocks.json --user username -d start - 不要总是用root用户做事，adduser来做，给sudo权限即可
 ```
+如果使用systemd来管理的话，就不要使用 -d参数，因为需要root权限，此时应该将ssserver的生命周期管理交给systemd
 
 nohup /net-speeder/net-speeder/net_speeder eth0 "tcp src port 12345" > /dev/null 2>&1 &
 

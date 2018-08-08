@@ -598,3 +598,5 @@ mysql> CREATE TABLE score( student_id INT UNSIGNED NOT NULL, event_id INT UNSIGN
 ERROR 1055 (42000): Expression #1 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'Banana.students.last_name' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
 改成
 >  SELECT last_name,first_name,state FROM students WHERE first_name LIKE 'D%' OR last_name LIKE '%n' GROUP BY last_name,first_name,state;
+
+启用mysql缓存降低cpu的使用率

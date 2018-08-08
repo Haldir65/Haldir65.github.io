@@ -273,3 +273,5 @@ ab(ApacheBench) - a simple ,single-threaded command line tool for benchemarking 
 因为是单线程的，所以并不能利用多核cpu的优势对server施加充分的负载。一般这么用
 > ab -n 1000 -c 100 http://example.com/
 ab -n <num_requests> -c <concurrency> <addr>:<port><path>
+
+[how-to-use-traceroute-and-mtr-to-diagnose-network-issues](https://www.digitalocean.com/community/tutorials/how-to-use-traceroute-and-mtr-to-diagnose-network-issues)

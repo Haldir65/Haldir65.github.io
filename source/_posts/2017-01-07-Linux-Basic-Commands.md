@@ -1027,7 +1027,9 @@ $ sudo journalctl
 $ sudo journalctl -b
 $ sudo journalctl -n 20 //查看20行
 $ sudo journalctl --since yesterday
+sudo journalctl -u yourservice //不带后面的.service
 ## 还有很多，能够知道系统启动时发生了什么
+sudo journalctl --disk-usage //看下当前journalctl占用了多少磁盘容量
 ```
 
 systemd出错了debug简直要命，一种方式是，less +F /var/log/syslog
