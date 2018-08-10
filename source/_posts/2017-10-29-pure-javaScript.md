@@ -1203,5 +1203,47 @@ html里面有一些奇怪的符号
 [ampersand](https://stackoverflow.com/questions/9084237/what-is-amp-used-for)
 冒号(")会变成"  &quot;   "这种
 
+TextUtils.java
+```java
+ /**
+     * Html-encode the string.
+     * @param s the string to be encoded
+     * @return the encoded string
+     */
+    public static String htmlEncode(String s) {
+        StringBuilder sb = new StringBuilder();
+        char c;
+        for (int i = 0; i < s.length(); i++) {
+            c = s.charAt(i);
+            switch (c) {
+            case '<':
+                sb.append("&lt;"); //$NON-NLS-1$
+                break;
+            case '>':
+                sb.append("&gt;"); //$NON-NLS-1$
+                break;
+            case '&':
+                sb.append("&amp;"); //$NON-NLS-1$
+                break;
+            case '\'':
+                //http://www.w3.org/TR/xhtml1
+                // The named character reference &apos; (the apostrophe, U+0027) was introduced in
+                // XML 1.0 but does not appear in HTML. Authors should therefore use &#39; instead
+                // of &apos; to work as expected in HTML 4 user agents.
+                sb.append("&#39;"); //$NON-NLS-1$
+                break;
+            case '"':
+                sb.append("&quot;"); //$NON-NLS-1$
+                break;
+            default:
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+```
+
 ### 参考
 [5 分钟彻底明白 JSONP](https://tonghuashuo.github.io/blog/jsonp.html)
