@@ -18,6 +18,8 @@ gcc ,clang,llvm的历史
 
 
 ## Makefile怎么写
+[几个简单的makefile实例](http://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/)
+
 [C Programming: Makefiles](https://www.youtube.com/watch?v=GExnnTaBELk)
 
 
@@ -152,6 +154,51 @@ gcc -v可以查看compile gcc时预设的链接静态库的搜索路径
 LIBRARY_PATH环境变量：指定程序静态链接库文件搜索路径
 LD_LIBRARY_PATH环境变量：指定程序动态链接库文件搜索路径
 
+创建文件这边
+mkdir并不会自动创建上层目录，所以就有了这样的方法
+```c
+#include<sys/stat.h>
+#include<sys/types.h>
+mkdir("head",0777);
+mkdir("head/follow".0777);
+mkdir("head/follow/end",0777);
+```
+
+或者自己写函数
+```c
+void mkdirs(char *muldir) 
+{
+    int i,len;
+    char str[512];    
+    strncpy(str, muldir, 512);
+    len=strlen(str);
+    for( i=0; i<len; i++ )
+    {
+        if( str[i]=='/' )
+        {
+            str[i] = '\0';
+            if( access(str,0)!=0 ) // access函数判断是否有存取文件的权限
+            {
+                mkdir( str, 0777 );
+            }
+            str[i]='/';
+        }
+    }
+    if( len>0 && access(str,0)!=0 )
+    {
+        mkdir( str, 0777 );
+    }
+    return;
+}
+```
+
+c语言就是这样，好多功能都得自己实现
+>c 语言有它的设计哲学，就是那著名的“Keep It Simple, Stupid”，语言本身仅仅实现最为基本的功能，然后标准库也仅仅带有最为基本的内存管理（更高效一点的内存池都必须要自己实现）、IO、断言等基本功能。 
+
+社区提供了一些比较优秀的通用功能库
+[1] http://developer.gnome.org/glib/stable/ 
+[2] http://www.gnu.org/software/gnulib/ 
+[3] http://apr.apache.org/
 
 [automatic directory creation in make](http://ismail.badawi.io/blog/2017/03/28/automatic-directory-creation-in-make/)
 ```

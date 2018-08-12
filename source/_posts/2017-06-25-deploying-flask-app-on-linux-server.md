@@ -109,7 +109,7 @@ if __name__ == '__main__':
 ##}
 
 ##访问需要认证的接口
-## curl -X GET http://127.0.0.1:5000/protected --header "Content-Type:apon" --header "Authorization: JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MzEyMTg0NTUsImlhdCI6MTUzMTIxODE1NSwibmJmIjoxNTMxMjE4MTU1LCJpZGVudGl0eSI6MX0.TPfb5Xwthbwnnf5P1LNB0o-CKiSis8VH0Db6JEotc9A"
+## curl -X GET http://127.0.0.1:5000/protected --header "Content-Type:application/json" --header "Authorization: JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MzEyMTg0NTUsImlhdCI6MTUzMTIxODE1NSwibmJmIjoxNTMxMjE4MTU1LCJpZGVudGl0eSI6MX0.TPfb5Xwthbwnnf5P1LNB0o-CKiSis8VH0Db6JEotc9A"
 ## User(id='1')
 
 ```
