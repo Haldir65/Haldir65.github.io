@@ -1203,5 +1203,9 @@ html里面有一些奇怪的符号
 [ampersand](https://stackoverflow.com/questions/9084237/what-is-amp-used-for)
 冒号(")会变成"  &quot;   "这种
 
+web api有一些用的不多的东西:
+File,Blob,ArrayBuffer
+createObjectURL方法
+
 ### 参考
 [5 分钟彻底明白 JSONP](https://tonghuashuo.github.io/blog/jsonp.html)

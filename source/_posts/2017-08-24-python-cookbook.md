@@ -630,5 +630,9 @@ img.save('sompic.jpg')
 
 [一个支持python3的生成binary可执行文件的package](http://www.pyinstaller.org/)
 
-
-
+[根据python module search Path](https://realpython.com/python-modules-packages/)
+的解释,整体的搜索顺序是这样的
+1.The directory from which the input script was run or the current directory if the interpreter is being run interactively
+2.The list of directories contained in the PYTHONPATH environment variable, if it is set. (The format for PYTHONPATH is OS-dependent but should mimic the PATH environment variable
+3.An installation-dependent list of directories configured at the time Python is installed
+[vim and python](https://realpython.com/vim-and-python-a-match-made-in-heaven/)

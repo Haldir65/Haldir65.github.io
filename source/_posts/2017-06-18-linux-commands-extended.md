@@ -763,7 +763,7 @@ linux上目测没有默认安装zsh。
 [zsh的主题个人偏好Dracula](https://draculatheme.com/)
 [agnoster是另一款很多人都装上的主题](https://github.com/agnoster/agnoster-zsh-theme)，主题这种东西看个人喜好了。
 
-
+[如果在国内使用的话，使用清华大学开源站的镜像的速度会快一点](https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/)
 
 
 ## 参考

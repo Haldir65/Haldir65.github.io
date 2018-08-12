@@ -401,4 +401,6 @@ at android.os.StrictMode.onFileUriExposed(StrictMode.java:1816)
 TextView有时候会出现提前换行的问题
 
 [Instagram是如何提升TextView渲染性能的(http://codethink.me/2015/04/23/improving-comment-rendering-on-android/),关键字TextLayoutCache
-
+[compile ffmpeg for android](https://zhuanlan.zhihu.com/p/40921043)
+需要修改B0 -> b0 ，linux平台或者mac平台可用
+[compile ffmpeg for android](https://yesimroy.gitbooks.io/android-note/content/compile_ffmpeg_for_android.html)

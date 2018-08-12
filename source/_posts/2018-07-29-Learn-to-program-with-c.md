@@ -151,4 +151,7 @@ gcc -v可以查看compile gcc时预设的链接静态库的搜索路径
 有关环境变量：
 LIBRARY_PATH环境变量：指定程序静态链接库文件搜索路径
 LD_LIBRARY_PATH环境变量：指定程序动态链接库文件搜索路径
+
+
+[automatic directory creation in make](http://ismail.badawi.io/blog/2017/03/28/automatic-directory-creation-in-make/)
 ```
