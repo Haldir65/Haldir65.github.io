@@ -1030,6 +1030,8 @@ $ sudo journalctl --since yesterday
 sudo journalctl -u yourservice //不带后面的.service
 ## 还有很多，能够知道系统启动时发生了什么
 sudo journalctl --disk-usage //看下当前journalctl占用了多少磁盘容量
+journalctl --vacuum-time=2d //只保留过去两天的日志
+journalctl --vacuum-size=500M //只保留最多500MB的日志  https://unix.stackexchange.com/questions/139513/how-to-clear-journalctl
 ```
 
 systemd出错了debug简直要命，一种方式是，less +F /var/log/syslog

@@ -154,4 +154,10 @@ LD_LIBRARY_PATH环境变量：指定程序动态链接库文件搜索路径
 
 
 [automatic directory creation in make](http://ismail.badawi.io/blog/2017/03/28/automatic-directory-creation-in-make/)
+
 ```
+[C的基本数据类型还是很多的](https://zh.cppreference.com/w/cpp/language/types) 居然还有unsigned long long int 这种别扭的东西。
+
+
+scanf方法存在内存溢出的可能性，微软提出了scanf_s函数，需要提供最多允许读取的长度，超出该长度的字符一律忽略掉。
+[汇编语言](http://www.ruanyifeng.com/blog/2018/01/assembly-language-primer.html)

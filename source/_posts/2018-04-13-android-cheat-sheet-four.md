@@ -404,3 +404,7 @@ TextView有时候会出现提前换行的问题
 [compile ffmpeg for android](https://zhuanlan.zhihu.com/p/40921043)
 需要修改B0 -> b0 ，linux平台或者mac平台可用
 [compile ffmpeg for android](https://yesimroy.gitbooks.io/android-note/content/compile_ffmpeg_for_android.html)
+
+Andorid平台上默认的isLoggable的允许的LogLevel是info，也就是说，log.d和log.v是不会显示的。[wht are log-d and log-v not printing](https://stackoverflow.com/questions/28434901/why-are-log-d-and-log-v-not-printing)
+当然这也要看手机厂商设置，魅族手机就是设置为info级别及以上了。这话2016年有人提醒过我。
+

@@ -907,6 +907,9 @@ System.out.println(b.setScale(5,BigDecimal.ROUND_HALF_UP).doubleValue());
 
 [Floating point precision error](https://www.quora.com/In-Python-why-does-8-5-8-4-give-0-099999999999999964)这种事几乎所有语言都有
 
+type -casting java中从double强转float，从long强转int是怎么实现的
+
+
 ### 36.调jvm参数
 先看怎么get:
 在Intelij里面，写一个helloworld程序，看下console的输出，然后复制出来。中间加上这么一行：
