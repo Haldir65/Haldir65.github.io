@@ -743,7 +743,7 @@ iife的例子:
 ```js
 (function () {console.log('this is invoked!')})();
 
-// iife的好处是只对外提供必要功能，内部成员不用暴露给外部。 Javascript模块的基本写法
+// iife的好处是只对外提供必要功能，内部成员不用暴露给外部(这在模块化里面就很重要了，作为一个module，一些内部的private method不希望对外公开，就可以用iife写，同时这也避免了polluting global nameSpace)。 Javascript模块的基本写法
 var module1 = (function(){
 
 　　　　var _count = 0;
@@ -785,7 +785,7 @@ var module1 = ( function (mod){
 　　})(window.module1 || {});
 ```
 [Javascript模块化编程（一）：模块的写法](http://www.ruanyifeng.com/blog/2012/10/javascript_module.html)
-
+[iife的一篇翻译的文章](http://web.jobbole.com/82520/)
 
 Paul Irish的视频中提到了jQuery的Source中用到了这种做法。
 
@@ -1250,6 +1250,9 @@ TextUtils.java
     /**
 ```
 
+触控事件对象中包含了事件的坐标，这个有event.x,event.pageX,event.clientX等等
+
 
 ### 参考
 [5 分钟彻底明白 JSONP](https://tonghuashuo.github.io/blog/jsonp.html)
+[javaScript algorithms](https://github.com/trekhleb/javascript-algorithms)

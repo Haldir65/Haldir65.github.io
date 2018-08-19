@@ -221,7 +221,7 @@ tar -cvf all.tar.gz 和 tar -xf all.tar.gz这俩其实就够用了
 对照手册来看：
 -c //小写的c，--create，表示创建新的备份文件
 -v //verbose,显示进度什么的
--f 指定备份文件
+-f 指定要操作的archive文件
 -z --gzip，通过gzip压缩或者解压文件
 
 ### 8.定时任务怎么写(crontab)
@@ -286,6 +286,8 @@ wc filename ##默认显示出来的三列分别是行数，字数，字节数
 - [curl的几种常见用法](http://www.codebelief.com/article/2017/05/linux-command-line-curl-usage/)
 - curl -i -H "Accept: application/json" "https://jsonplaceholder.typicode.com/posts" ## -i 表示include，就是说把header包含在response中
 - 要是只需要header的话
+curl -s -I -X POST http://www.google.com //只需要header就行了
+
 
 下面是一个简单的通过CURL提交POST请求的方式
 -X是指定HTTP method，默认是GET

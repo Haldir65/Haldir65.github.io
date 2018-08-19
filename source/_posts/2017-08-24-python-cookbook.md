@@ -344,24 +344,24 @@ class RevealAccess(object):
     def __set__(self, obj, val):
         print 'Updating' , self.name
         self.val = val
-```
 
->>> class MyClass(object):
+class MyClass(object):
     x = RevealAccess(10, 'var "x"')
     y = 5
 
->>> m = MyClass() ##个人感觉这个descriptor是把原始的value包装了一层，在get和set的时候去拦截一下
+m = MyClass() ##个人感觉这个descriptor是把原始的value包装了一层，在get和set的时候去拦截一下
 ## 这么说吧，就是调用到descriptorinstance的时候，会走到这个class的__get__方法
->>> m.x
+m.x
 Retrieving var "x"
 10
->>> m.x = 20
+ m.x = 20
 Updating var "x"
->>> m.x
+m.x
 Retrieving var "x"
 20
->>> m.y
+m.y
 5
+```
 
 这个RevealAccess的对象就是一个descriptor，其作用就是在存取变量的时候做了一个hook。访问属性m.x就是调用__get__方法，设置属性值就是调用__set__方法。还可以有一个__delete__方法，在del m.x时被调用。
 

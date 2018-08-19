@@ -96,6 +96,9 @@ ls  > lsoutput.txt #用于将输出的结果写入一个新的文本文件中
 cat > newfile // 所以重定向也能用于创建新的文件
 echo 'hey man' # 类似于print
 echo 'hello' > log.txt #把这句话写入到文本中 ，覆盖其原有内容
+
+printf "hello world\n" //linux里面这样也是可以输出的，几乎就和c语言语法一致了
+
 >> 表示追加，不覆盖,append
 
 ###重定向输入 <

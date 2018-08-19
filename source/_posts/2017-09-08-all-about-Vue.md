@@ -387,3 +387,6 @@ new Vue({  // eslint-disable-line no-new
 8. [css教程](https://www.w3cschool.cn/css/css-padding.html)
 9. [widgets](https://medium.com/the-web-tub/improve-ux-with-swiping-tab-bar-using-onsen-ui-for-vue-4c7d0e5171f0)
 10. [2018 我所了解的 Vue 知识大全（一）](https://juejin.im/post/5a4b78226fb9a0451a76c1a1)
+
+
+[用vue写一个calculator的小demo](https://www.youtube.com/watch?v=m1_ih43p24s)

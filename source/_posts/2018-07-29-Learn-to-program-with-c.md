@@ -208,3 +208,17 @@ c语言就是这样，好多功能都得自己实现
 
 scanf方法存在内存溢出的可能性，微软提出了scanf_s函数，需要提供最多允许读取的长度，超出该长度的字符一律忽略掉。
 [汇编语言](http://www.ruanyifeng.com/blog/2018/01/assembly-language-primer.html)
+
+[windows平台使用visual studio创建C项目](https://www.youtube.com/watch?v=Slgwyta-JkA)
+File -> new Project ->Windows DeskTop Wizard -> 选中Empty Project -> 取消选中Precompile Header
+然后右侧，source File,右键，new item。创建main.c(任意名字.c都是行的),然后写主函数。
+运行的话，点上面的local windows debugger是可以的，但是会一闪而过。按下ctrl +F5，会出现console。
+
+visual studio中断点的step into是f11，step out of 是shift + f11 .step over是f10
+
+evaluate expression在右下角的immediate window中输入表达式即可
+
+visual studio中debug的时候有时候会出现Cannot find or open the PDB file
+[intel说这种事不是error](https://software.intel.com/en-us/articles/visual-studio-debugger-cannot-find-or-open-the-pdb-file)。所以就不要去管好了。
+
+在C语言中没有泛型。故采用void 指针来实现泛型的效果。

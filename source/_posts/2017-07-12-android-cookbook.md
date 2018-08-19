@@ -173,7 +173,7 @@ Android相关
 - [X] [SurfaceView，TextureView从入门到解析](https://cloud.tencent.com/developer/article/1034235)
 - [ ] LeakCanary的原理就是registerActivityLifecycleCallbacks,在onDestory的时候，检查有没有该释放没有释放的东西，具体的Pierre-Yves Ricau在[Droidcon NYC 2015 - Detect all memory leaks with LeakCanary!](https://www.youtube.com/watch?v=mU1VcKx8Wzw) 都说过了。
 - [ ] [Android watchdog](http://gityuan.com/2016/06/21/watchdog/)
-
+- [ ]加上一个支持多进程的SharedPreference Manager吧，差点忘了。
 
 > Studio里面看源码，find usage没有的话，find in path , choose android sdk
 

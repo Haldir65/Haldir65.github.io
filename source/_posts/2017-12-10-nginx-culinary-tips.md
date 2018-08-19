@@ -952,6 +952,18 @@ nginx查看当前连接数
 [nginx上传模块—nginx upload module](http://www.ttlsa.com/nginx/nginx-modules-upload-module/)
 至于upload，还是直接proxy_pass给一个localhost的http服务吧
 
+[nginx添加认证页面](http://www.ttlsa.com/nginx/nginx-basic-http-authentication/)
+
+```
+# printf "username:$(openssl passwd -crypt 123456)\n" >>conf/htpasswd
+# cat conf/htpasswd 
+ttlsa:xyJkVhXGAZ8tM
+```
+
+[ELK全家桶实现nginx访问日志可视化](https://logz.io/blog/nginx-access-log-monitoring-dashboard/)，似乎要装java。
+
+关于ngixn返回的response的header中Content-Type，在nginx的config目录下能找到一个mime.types文件。里面指定了哪些文件后缀对应哪些mimetype。比如.mp3文件就返回audio/mpeg这种。
+
 ### 参考
 - [nginx Configurations](https://wizardforcel.gitbooks.io/nginx-doc/content/Text/6.1_nginx_windows.html)
 - [How To Install Nginx on Ubuntu 16.04](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-16-04)
