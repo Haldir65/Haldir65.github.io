@@ -39,7 +39,7 @@ top : 1
 - [ ] [使用redis实现低粒度的分布式锁](http://afghl.github.io/2018/06/17/distributed-lock-and-granarity.html)
 - [ ][Vim cheet sheet](https://vim.rtorr.com/)
 - [ ][LOGSTASH+ELASTICSEARCH+KIBANA处理NGINX访问日志](http://www.wklken.me/posts/2015/04/26/elk-for-nginx-log.html)ELK全家桶
-
+- [ ] [python c extension](https://www.tutorialspoint.com/python/python_further_extensions.htm)
 
 
 ### 已完成

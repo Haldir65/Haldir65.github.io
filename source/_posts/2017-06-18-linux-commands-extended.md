@@ -767,6 +767,7 @@ linux上目测没有默认安装zsh。
 
 [如果在国内使用的话，使用清华大学开源站的镜像的速度会快一点](https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/)
 
+grep -ni "python" * //在当前目录下查找所有包含"python"字符串的文件，并且显示出行号。
 
 ## 参考
 - [每天一个Linux命令](http://www.cnblogs.com/peida/archive/2012/12/05/2803591.html)
