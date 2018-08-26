@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://www.haldir66.ga/static/imgs/bamboo-buds-wallpaper-53859567dd31a.jpg">
 <meta property="og:image" content="http://www.haldir66.ga/static/imgs/fork_you_git.jpg">
-<meta property="og:updated_time" content="2018-08-25T00:47:42.291Z">
+<meta property="og:updated_time" content="2018-08-26T14:32:46.648Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="linux基本命令介绍">
 <meta name="twitter:description" content="一些常用的linux基本命令,仅作为参考。   nohup node server.js &amp;gt; /dev/null 2&amp;gt;&amp;amp;1 &amp;amp;">
@@ -330,7 +330,7 @@ ga('send', 'pageview');
 </blockquote>
 <p>简单来说就是fiddle只抓http(s)层的packet,wireShark抓的是tcp(udp)层的。 wireShark &gt; fiddler(Charles 也差不多，只抓http层的)</p>
 <p>基本的流程是：首先在linux上生成dump.pcap文件，然后在wireShark中打开(对了要先去wireshark官网下windows的安装文件，注意不要装上全家桶就是了)；</p>
-<p><a href="https://my.oschina.net/xianggao/blog/678644">聊聊tcpdump与Wireshark抓包分析</a><br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">sudo tcpdump -i "venet0:0"  //tcpdump需要sudo权限</span><br><span class="line">sudo tcpdump -c 10 //count</span><br><span class="line">sudo tcpdump -c -A  //Asicii码形式展示出来每个package</span><br><span class="line">sudo tcpdump -c 5 -i wlo1 // 监听某一个网卡</span><br><span class="line">sudo tcpdump -c 5 -i wlo1 port 22// 监听某一个网卡某一个端口</span><br><span class="line">sudo tcpdump -i eth0 -w dump.pcap -v //w表示要保存的文件的位置</span><br><span class="line">// 注意运行上述指令的时候，会显示Got 18 这种提示，意味着已经抓到了多少个包，这个数其实也是随着时间流逝一直增长的。</span><br><span class="line">ctrl+c停止抓包，会生成一个dump.pcap文件(不要尝试着去cat 或者less，是一个binary 文件，会崩的)。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">tcpdump version 4.5.1</span><br><span class="line">libpcap version 1.5.3</span><br><span class="line">Usage: tcpdump [-aAbdDefhHIJKlLnNOpqRStuUvxX] [ -B size ] [ -c count ]</span><br><span class="line">                [ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]</span><br><span class="line">                [ -i interface ] [ -j tstamptype ] [ -M secret ]</span><br><span class="line">                [ -P in|out|inout ]</span><br><span class="line">                [ -r file ] [ -s snaplen ] [ -T type ] [ -V file ] [ -w file ]</span><br><span class="line">                [ -W filecount ] [ -y datalinktype ] [ -z command ]</span><br><span class="line">                [ -Z user ] [ expression ]</span><br></pre></td></tr></table></figure></p>
+<p><a href="https://my.oschina.net/xianggao/blog/678644">聊聊tcpdump与Wireshark抓包分析</a><br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">sudo tcpdump -i "venet0:0"  //tcpdump需要sudo权限</span><br><span class="line">sudo tcpdump -c 10 //count</span><br><span class="line">sudo tcpdump -c -A  //Asicii码形式展示出来每个package</span><br><span class="line">sudo tcpdump -c 5 -i wlo1 // 监听某一个网卡</span><br><span class="line">sudo tcpdump -c 5 -i wlo1 port 22// 监听某一个网卡某一个端口</span><br><span class="line">sudo tcpdump -i eth0 -w dump.pcap -v //w表示要保存的文件的位置</span><br><span class="line">// 注意运行上述指令的时候，会显示Got 18 这种提示，意味着已经抓到了多少个包，这个数其实也是随着时间流逝一直增长的。</span><br><span class="line">ctrl+c停止抓包，会生成一个dump.pcap文件(不要尝试着去cat 或者less，是一个binary 文件，会崩的)。</span><br><span class="line"></span><br><span class="line">tmux开两个窗口，就是在curl百度的时候抓包</span><br><span class="line">tcpdump -nn -t host www.baidu.com</span><br><span class="line">curl -I www.baidu.com</span><br><span class="line"></span><br><span class="line">tcpdump version 4.5.1</span><br><span class="line">libpcap version 1.5.3</span><br><span class="line">Usage: tcpdump [-aAbdDefhHIJKlLnNOpqRStuUvxX] [ -B size ] [ -c count ]</span><br><span class="line">                [ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]</span><br><span class="line">                [ -i interface ] [ -j tstamptype ] [ -M secret ]</span><br><span class="line">                [ -P in|out|inout ]</span><br><span class="line">                [ -r file ] [ -s snaplen ] [ -T type ] [ -V file ] [ -w file ]</span><br><span class="line">                [ -W filecount ] [ -y datalinktype ] [ -z command ]</span><br><span class="line">                [ -Z user ] [ expression ]</span><br></pre></td></tr></table></figure></p>
 <h3 id="18-ubuntu-desktop预设的desktop-environment叫做unity"><a href="#18-ubuntu-desktop预设的desktop-environment叫做unity" class="headerlink" title="18.ubuntu desktop预设的desktop environment叫做unity"></a>18.ubuntu desktop预设的desktop environment叫做unity</h3><p>比较常见的linux desktop 还有gnome,KDE ,plasma,Ma tei, cinnamon.</p>
 <h3 id="19-tmux使用"><a href="#19-tmux使用" class="headerlink" title="19.tmux使用"></a>19.tmux使用</h3><p>tmux是多窗口神器，再也不用傻乎乎的去开screen了，远程server也能用。<br><a href="https://tmuxcheatsheet.com/">tmuxcheatsheet</a>tmux创建的窗口叫做pane，关闭的方式有exit和ctrl+b x<br>ctrl+B // prefix,基本上就是让tmux开始接收后面的指令<br>ctrl + b + “ //纵向排列<br>ctrl + b + %  //横向排列<br>ctrl + b + z //zoom到这个pane,再按下ctrl+b +z 使当前pane退出全屏<br>ctrl + b + c //创建一个新窗口<br>ctrl + b +p //previous窗口 n就是next窗口<br>ctrl + b 2 //跳到第2个窗口<br>ctrl +b + &amp; 干掉当前窗口<br>ctrl +b + , 重命名当前窗口</p>
 <p>接下来看如何修改配置<br>修改 ~/.tmux.conf 文件，如果没有就创建一个</p>
@@ -700,10 +700,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
@@ -765,6 +761,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">
