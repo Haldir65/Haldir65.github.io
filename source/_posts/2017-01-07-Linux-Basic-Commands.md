@@ -890,6 +890,9 @@ sudo tcpdump -i eth0 -w dump.pcap -v //w表示要保存的文件的位置
 // 注意运行上述指令的时候，会显示Got 18 这种提示，意味着已经抓到了多少个包，这个数其实也是随着时间流逝一直增长的。
 ctrl+c停止抓包，会生成一个dump.pcap文件(不要尝试着去cat 或者less，是一个binary 文件，会崩的)。
 
+tmux开两个窗口，就是在curl百度的时候抓包
+tcpdump -nn -t host www.baidu.com
+curl -I www.baidu.com
 
 tcpdump version 4.5.1
 libpcap version 1.5.3

@@ -545,6 +545,10 @@ HLS直播流慢(延迟高)是因为基于HTTP，(http live streaming，苹果提
 
 应用层面的Http，SMTP,FTP,POP,TLS/SSL,IMAP
 
+tcp和udp的全名是：
+Transmission Control Protocol (TCP)
+User Datagram Protocol (UDP)
+
 tcp三次握手，四次挥手
 在UDP中，每次发送数据报时，需要附带上本机的socket描述符和接收端的socket描述符。而由于TCP是基于连接的协议，在通信的socket对之间需要在通信之前建立连接，因此会有建立连接这一耗时存在于TCP协议的socket编程。
 
@@ -576,10 +580,8 @@ firefox > nginx [ACK] 好的,知道了
 
 几个报文的标识的解释:SYN: synchronization(同步)ACK: acknowledgement(确认:告知已收到)FIN: finish(结束)
 
-作者：eechen
 链接：https://www.zhihu.com/question/67772889/answer/257170215
-来源：知乎
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
 
 
 ### 开启浏览器内支持webp[关于WebP接入方案](https://www.xuanfengge.com/webp-access-scheme.html)
@@ -595,6 +597,8 @@ firefox > nginx [ACK] 好的,知道了
 
 [Android微信智能心跳方案](https://mp.weixin.qq.com/s?__biz=MzAwNDY1ODY2OQ==&mid=207243549&idx=1&sn=4ebe4beb8123f1b5ab58810ac8bc5994)
 [为什么基于TCP的应用需要心跳包（TCP keep-alive原理分析）](http://hengyunabc.github.io/why-we-need-heartbeat/)
+
+Socket分为Internet Socket(学名叫做Berkeley or BSD sockets)和Unix domian Socket，前者是用于网络通信的，后者是用于同一个host上不同Process间通信的
 
 
 ipv6 ping6

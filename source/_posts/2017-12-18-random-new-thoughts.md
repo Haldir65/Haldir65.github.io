@@ -14,7 +14,6 @@ top : 1
 - [WPA 所代表的 Web 开发应是未来](https://huangxuan.me/2017/02/09/nextgen-web-pwa/)据说Electron要被PWA干掉
 - [js 循环闭包的解决方法](https://segmentfault.com/a/1190000003818163)
 - 动态类型一时爽，代码重构火葬场
-- Promise 链式调用与终止，异常处理
 - iview，elementUi
 - [embeed video with iframe](https://css-tricks.com/NetMag/FluidWidthVideo/Article-FluidWidthVideo.php)[AC2016腾讯前端技术大会 1 1 1 H5直播那些事](https://www.youtube.com/watch?v=g3F7Imjcd4k)
 - [ ] flex,grid
@@ -65,6 +64,7 @@ top : 1
 - [X] 使用jinja2生成文件。[一个比较好玩的代码生成器](https://github.com/guokr/swagger-py-codegen)
 - [X] URL Encoding,就是那个在网址里把字符转成百分号加上UTF-8的[找到了阮一峰老师的解释](http://www.ruanyifeng.com/blog/2010/02/url_encoding.html)
 - [X] 通过file input上传图片，原生ajax以及Ajax，自己搭建上传服务器[大概能猜到暴风影音的局域网传输实现了](https://zhuanlan.zhihu.com/p/24513281?refer=flask)用flask的话自己搭建好后台最简单了，最多再使用flask-wtf和flask-upload规范操作
+- [X]Promise 链式调用与终止，异常处理(只是一个工具而已)
 
 
 ### Good For Nothing

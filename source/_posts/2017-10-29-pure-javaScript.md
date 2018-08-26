@@ -256,34 +256,6 @@ MDN文档上说ajax的readyState有五种：
 
 xhr.onProgress的readyState是3，这个时候显示加载进入条就可以了。
 
-```javaScript
-var getJSON = function(url) {
-  var promise = new Promise(function(resolve, reject){
-    var client = new XMLHttpRequest();
-    client.open("GET", url,true);
-    client.onreadystatechange = handler;
-    client.responseType = "json";
-    client.setRequestHeader("Accept", "application/json");
-    client.send();
-
-    function handler() {
-      if (this.status === 200) {
-        resolve(this.response);
-      } else {
-        reject(new Error(this.statusText));
-      }
-    };
-  });
-
-  return promise;
-};
-
-getJSON("/posts.json").then(function(json) {
-  console.log('Contents: ' + json);
-}, function(error) {
-  console.error('出错了', error);
-});
-```
 
 表单的操作
 ```html
@@ -478,37 +450,83 @@ ajax的open第三个参数表示是异步还是同步，一般都得异步。由
 
 
 ES6提供了Promise，能够将事情简化。
-
+xhr用Promise包装一下是这样的：
 ```js
 //promise(ES6) is a placeholder for something that will happen in the future
-function get(url){
-        return new Promise(function(resolve,reject){
-            var http = new XMLHttpRequest();
-            http.open('GET',url,true);
-            http.onload = function(){
-                if(http.status==200){
-                    resolve(JSON.parse(http.response));
-                }else{
-                    reject(http.statusText);
+function getViaPromise(url) {
+    var promise = new Promise((resolve ,reject) => {
+        let client = new XMLHttpRequest();
+        client.open('GET',url,true);
+        client.onreadystatechange = () => {
+           if(client.readyState === 4 ) {
+               if(client.status === 200 ){
+                   resolve(client.responseText);
+                  //  console.log("response of GET Arrived");
+               } else {
+                   var reason = { code : client.status, response: client.resonse };
+                   reject(reason);
+               }
+           }
+        };
+        client.send()
+    });
+    return promise;
+}
+
+
+function postViaPromise(url ,data) {
+    return new Promise((resolve,reject) => {
+        let client = new XMLHttpRequest();
+        client.open("POST", url ,true);
+        client.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+        client.onreadystatechange = () => {
+            if (client.readyState === 4) {
+                if(client.status >=200  && client.status <=400 ){
+                    resolve(client.responseText);
+                    // console.log("response of POST Arrived");
+                } else {
+                    let reason = { 'code': client.status, "response": client.response}
+                    reject(reason);
                 }
             }
-            http.onerror = function () {
-                reject(http.statusText)
-            }
-            http.send();
-        });
+        }
+        client.send();
+    });
+}
 
-        var promise = get('data/tweets.json');
-        promise.then(function (tweets) {
-            console.log(tweets);
-            return get('data/friends.json')
-        }).then(function name(friends) {
-           console.log(friends);
-        }).
-        catch(function(error){
-            console.log(error);
-        })
-    };
+//使用的时候：
+//可以把两个promise合并在一起，等到两个都执行完毕再去做一些操作
+let p1 =  getViaPromise("https://jsonplaceholder.typicode.com/posts");
+let data =   {
+  "userId": 1,
+  "id": 2,
+  "title": "dumb post",
+  "body": "this is some dumb post , dont care"
+}     
+let p2 = postViaPromise("https://jsonplaceholder.typicode.com/posts",data);
+
+Promise.all([p1,p2]).then(values => {
+  console.log(values);
+});
+
+//也可以在一个完成之后再去执行另外一个
+let data =   {
+  "userId": 1,
+  "id": 2,
+  "title": "dumb post",
+  "body": "this is some dumb post , dont care"
+};
+let p1 =  getViaPromise("https://jsonplaceholder.typicode.com/posts");
+let p2 = postViaPromise("https://jsonplaceholder.typicode.com/posts",data);
+p1.then( data => {
+  console.log(`data of Promise1 is ${data}` );
+  return p2;
+}
+).then(data => {
+  console.log(`data of promise2 is ${data}`);
+}).catch(err => {
+  console.log(err);
+});
 ```
 
 更加有效的方式是使用generator，还不是很了解

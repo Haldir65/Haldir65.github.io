@@ -202,7 +202,6 @@ c语言就是这样，好多功能都得自己实现
 
 [automatic directory creation in make](http://ismail.badawi.io/blog/2017/03/28/automatic-directory-creation-in-make/)
 
-```
 [C的基本数据类型还是很多的](https://zh.cppreference.com/w/cpp/language/types) 居然还有unsigned long long int 这种别扭的东西。
 
 
@@ -222,3 +221,71 @@ visual studio中debug的时候有时候会出现Cannot find or open the PDB file
 [intel说这种事不是error](https://software.intel.com/en-us/articles/visual-studio-debugger-cannot-find-or-open-the-pdb-file)。所以就不要去管好了。
 
 在C语言中没有泛型。故采用void 指针来实现泛型的效果。
+
+这段会core dump的
+
+```c
+char *s1 = "hello"; //获得了一个指向字符串常量的指针
+*s1 = 'hey'; //尝试修改常量，会segmentfault
+
+//这段也会core dump
+char* s1 = "hello";
+s1 += 1;
+printf("content %s\n",*s1);//崩在这里
+printf("content %s\n",s1);//改成这样就好了
+```
+
+linux环境下c语言socket编程
+实现类似curl的功能
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h> 
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <unistd.h>
+ int main(int argc, char *argv[]){ 
+    if(argc!=2){
+      printf("error usage %s ipn",argv[0]); 
+      return 1;
+    } 
+    int sockfd;
+    int len; 
+    struct sockaddr_in address; 
+    int result; 
+    char httpstring[100]; 
+    sprintf(httpstring,"GET / HTTP/1.1rn"
+          "Host: %srn"
+          "Connection: Closernrn",argv[1]); 
+    char ch; 
+    sockfd = socket(AF_INET, SOCK_STREAM, 0); 
+    address.sin_family = AF_INET; 
+    address.sin_addr.s_addr = inet_addr(argv[1]); 
+    address.sin_port = htons(80); 
+    len = sizeof(address);
+    result = connect(sockfd,(struct sockaddr *)&address,len); 
+    if(result == -1){ 
+       perror("oops: client"); 
+       return 1; 
+    }
+    write(sockfd,httpstring,strlen(httpstring)); 
+    while(read(sockfd,&ch,1)){ 
+      printf("%c", ch); 
+    } 
+    close(sockfd); 
+    printf("n"); 
+    return 0; 
+ } 
+```
+
+sudo ./req 42.121.252.58
+[快速学习C语言三: 开发环境, VIM配置, TCP基础，Linux开发基础，Socket开发基础](https://www.cnblogs.com/onlytiancai/p/3855721.html)
+
+
+todo
+file related api
+time related api
+socket related api[source code of curl](https://github.com/curl/curl)
+third party libiary
