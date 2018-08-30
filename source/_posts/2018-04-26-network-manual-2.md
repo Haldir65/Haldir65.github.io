@@ -230,6 +230,12 @@ html里面上传文件一般是ajax对象send一个FormData出去，
 
 
 [域名解析之dig,host,nslookup命令](http://luodw.cc/2015/12/27/dns03/)
+好用的命令
+> dig +trace baidu.com
+nslookup -vc google.com 8.8.8.8 // -vc是指强制走tcp查询dns
+nslookup -d www.163.com //显示ttl
+nslookup -> set debug -> www.163.com //这三条走完是一样的，类似于交互模式
+[dig挖出DNS的秘密](http://blogread.cn/it/article.php?id=5711)
 
 [详细的http-content-type表格](http://www.runoob.com/http/http-content-type.html)
 关于content-type,找到一篇[介绍](http://homeway.me/2015/07/19/understand-http-about-content-type/)

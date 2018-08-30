@@ -348,3 +348,4 @@ git log --pretty=format:"%h%x09%an%x09%ad%x09%s" //非常简明的一行显示
 ## Reference
 -[git reset和revert](http://yijiebuyi.com/blog/8f985d539566d0bf3b804df6be4e0c90.html)
 -[git recipes](https://github.com/geeeeeeeeek/git-recipes)
+-[git merge --no-ff](http://hungyuhei.github.io/2012/08/07/better-git-commit-graph-using-pull---rebase-and-merge---no-ff.html)

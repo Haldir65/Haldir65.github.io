@@ -381,3 +381,5 @@ python flask里面类似的函数叫做escape.
 - [一个腾讯前端的博客](https://www.xuanfengge.com/page-back-does-not-cache.html)
 - [Webpack Crash Course](https://www.youtube.com/watch?v=lziuNMk_8eQ)
 - [Use Babel & Webpack To Compile ES2015 - ES2017](https://www.youtube.com/watch?v=iWUR04B42Hc)
+
+[rel="dns-prefetch"](https://developer.mozilla.org/zh-CN/docs/Controlling_DNS_prefetching)

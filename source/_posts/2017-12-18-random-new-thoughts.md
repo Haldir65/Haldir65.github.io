@@ -39,6 +39,10 @@ top : 1
 - [ ][Vim cheet sheet](https://vim.rtorr.com/)
 - [ ][LOGSTASH+ELASTICSEARCH+KIBANA处理NGINX访问日志](http://www.wklken.me/posts/2015/04/26/elk-for-nginx-log.html)ELK全家桶
 - [ ] [python c extension](https://www.tutorialspoint.com/python/python_further_extensions.htm)
+- [ ][deploying owncloud using docker](https://blog.securem.eu/serverside/2015/08/25/setting-up-owncloud-server-in-a-docker-container/)
+
+[owncloud官方的配合docker安装教程](https://doc.owncloud.org/server/10.0/admin_manual/installation/docker/)
+
 
 
 ### 已完成
