@@ -5,7 +5,7 @@ categories: blog
 tags: [python]
 ---
 
-![](http://www.haldir66.ga/static/imgs/ChMkJ1fAMmKIIFpWAA_5Us41gQkAAUv1QE2Pp8AD_lq599.jpg)
+![](https://www.haldir66.ga/static/imgs/ChMkJ1fAMmKIIFpWAA_5Us41gQkAAUv1QE2Pp8AD_lq599.jpg)
 <!--more-->
 
 ## 1. virtualenv 好习惯

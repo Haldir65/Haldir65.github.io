@@ -6,7 +6,7 @@ tags: [android,annotation]
 ---
 
 
-![](http://www.haldir66.ga/static/imgs/apt_01.jpg)
+![](https://www.haldir66.ga/static/imgs/apt_01.jpg)
 记得Romain Guy在一次DroidCon上曾说过:
 
 > As I understand, modern java development are all about wrting annaotation Processors and not wrting code anymore...
@@ -142,34 +142,34 @@ public UserBuilder username(String username){
 }
 ```
 - 生成变量
-![](http://www.haldir66.ga/static/imgs/apt_field.jpg)
+![](https://www.haldir66.ga/static/imgs/apt_field.jpg)
 
 - 生成方法
-![](http://www.haldir66.ga/static/imgs/apt_methods.jpg)
+![](https://www.haldir66.ga/static/imgs/apt_methods.jpg)
 
 - 生成class:
-![](http://www.haldir66.ga/static/imgs/apt_class.jpg)
+![](https://www.haldir66.ga/static/imgs/apt_class.jpg)
 
 直接截图了
 - 主要步骤
-![](http://www.haldir66.ga/static/imgs/apt_process_steps.jpg)
+![](https://www.haldir66.ga/static/imgs/apt_process_steps.jpg)
 
 meta_data
-![](http://www.haldir66.ga/static/imgs/apt_process_meta_data.jpg)
+![](https://www.haldir66.ga/static/imgs/apt_process_meta_data.jpg)
 
 - 生成private field和public setter:
 > FiledSpec username = FiledSpec.builder(String.class,"username",Modifier.PRIVATE).build();
-![](http://www.haldir66.ga/static/imgs/apt_process_fields.jpg)
+![](https://www.haldir66.ga/static/imgs/apt_process_fields.jpg)
 
 
 - 生成build method
-![](http://www.haldir66.ga/static/imgs/apt_process_build_method.jpg)
+![](https://www.haldir66.ga/static/imgs/apt_process_build_method.jpg)
 
 - 生成builder
-![](http://www.haldir66.ga/static/imgs/apt_process_create_builder.jpg)
+![](https://www.haldir66.ga/static/imgs/apt_process_create_builder.jpg)
 
 - 写java文件：
-![](http://www.haldir66.ga/static/imgs/apt_process_write_java_file.jpg)
+![](https://www.haldir66.ga/static/imgs/apt_process_write_java_file.jpg)
 
 
 

@@ -4,7 +4,7 @@ date: 2018-02-03 14:46:09
 tags:
 ---
 
-![](http://www.haldir66.ga/static/imgs/street lights dark night car city.jpg)
+![](https://www.haldir66.ga/static/imgs/street lights dark night car city.jpg)
 <!--more-->
 
 [Gradle](https://gradle.org/)插件开发，官方推荐的具备first class supprot 的IDE包括Android Studio和Intelij Idea等。

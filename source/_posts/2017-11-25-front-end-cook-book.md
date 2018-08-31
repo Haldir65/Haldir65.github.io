@@ -5,7 +5,7 @@ tags: [前端]
 ---
 
 每一个领域都有些不知道该放哪的零碎的点，这里开辟一个新的地方，作为前端杂乱知识的汇总。
-![](http://www.haldir66.ga/static/imgs/coffee art life nature living drip dark bw.jpg)
+![](https://www.haldir66.ga/static/imgs/coffee art life nature living drip dark bw.jpg)
 
 <!--more-->
 
@@ -300,8 +300,8 @@ minimap,emmet,file icons，atom liveserver,atom beautify
 
 =======================================================================================
 atom中输入vue,会自动提示生成vue模板,输入re会生成react Boilplate。前提是在js,vue,html文件中。
-![](http://www.haldir66.ga/static/imgs/Cute_and_sexy_asian_girl_in_purple_strapless_gown.jpg)
-![](http://www.haldir66.ga/static/imgs/IMG_0766.jpg)
+![](https://www.haldir66.ga/static/imgs/Cute_and_sexy_asian_girl_in_purple_strapless_gown.jpg)
+![](https://www.haldir66.ga/static/imgs/IMG_0766.jpg)
 
 把vscode 加入command line，将'C:\\Program Files (x86)\\Microsoft VS Code\\bin'添加到windows的环境变量中即可。cmd里输入code即可打开当前目录。
 

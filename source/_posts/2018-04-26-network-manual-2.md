@@ -6,7 +6,7 @@ tags: [tools]
 
 OkHttp通过ConnectionPool做到tcp连接复用（在Timeout内）,所以并不是每个http都去建立一个tcp连接
 自定义通讯协议，使用java socket实现客户端和服务端。需要注意的是分包问题和黏包问题
-![](http://www.haldir66.ga/static/imgs/jpglight-and-shadow-2411321_960_720.jpg)
+![](https://www.haldir66.ga/static/imgs/jpglight-and-shadow-2411321_960_720.jpg)
 <!--more-->
 
 ## 1. http请求中tcp连接的复用(深入okHttp 3.9.1的connectionPool以及引用计数)

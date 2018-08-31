@@ -3,7 +3,7 @@ title: MongoDB手册
 date: 2017-12-10 16:13:54
 tags:
 ---
-![](http://www.haldir66.ga/static/imgs/scenery1511100794441.jpg)
+![](https://www.haldir66.ga/static/imgs/scenery1511100794441.jpg)
 <!--more-->
 
 

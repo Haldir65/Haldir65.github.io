@@ -6,7 +6,7 @@ tags: [python]
 
 > pip install SQLAlchemy
 
-![](http://www.haldir66.ga/static/imgs/side_walk_tree.jpg)
+![](https://www.haldir66.ga/static/imgs/side_walk_tree.jpg)
 
 <!--more-->
 

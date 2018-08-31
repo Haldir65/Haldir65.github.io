@@ -5,7 +5,7 @@ categories: blog
 tags: [python]
 ---
 
-![Kitty](http://www.haldir66.ga/static/imgs/c6dd030bf8cc75628fce3aec8216ba52.jpg)
+![Kitty](https://www.haldir66.ga/static/imgs/c6dd030bf8cc75628fce3aec8216ba52.jpg)
 关于如何使用Python搭建后台的方法很多，这里列举出一些实例。<!--more-->
 
 ## 1. The Flask Way

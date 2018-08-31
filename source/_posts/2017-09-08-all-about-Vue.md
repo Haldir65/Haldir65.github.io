@@ -6,7 +6,7 @@ tags: [javaScript,Vue,前端]
 
 Vue Js学习笔记
 
-![](http://www.haldir66.ga/static/imgs/scenery1511100775410.jpg)
+![](https://www.haldir66.ga/static/imgs/scenery1511100775410.jpg)
 
 <!--more-->
 
@@ -34,13 +34,6 @@ npm 设置淘宝镜像
 
 然后把dist文件夹中的静态文件推送到正式服务器
 在本地起nginx，设置好config,port,location什么的，然后把dist文件夹下所有东西复制到ngix config的目录下。
-
-```
-error_page   500 502 503 504  /50x.html;
-location = /50x.html {
-    root   html;
-}
-```
 然后直接在浏览器里面localhost打开查看，这是生产环境的大致描述，实际过程中代码还需要经历开发机器，编译机器，测试机器，cdn机器等等环节。
 
 
@@ -373,8 +366,8 @@ new Vue({  // eslint-disable-line no-new
  Vuex是负责全局状态管理的，[参考](http://whutzkj.space/2017/10/24/vuex/#more)
  组件间[通信](https://juejin.im/post/59ec95006fb9a0451c398b1a)的方式
 
-![](http://www.haldir66.ga/static/imgs/1102531047-2.jpg)
-![](http://www.haldir66.ga/static/imgs/VueJsLogo.jpg)
+![](https://www.haldir66.ga/static/imgs/1102531047-2.jpg)
+![](https://www.haldir66.ga/static/imgs/VueJsLogo.jpg)
 
 ## 参考
 1. [Vue JS 2 Tutorial](https://www.youtube.com/watch?v=5LYrN_cAJoA&list=PL4cUxeGkcC9gQcYgjhBoeQH7wiAyZNrYa)

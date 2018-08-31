@@ -5,7 +5,7 @@ tags: [javaScript,前端]
 ---
 
 Vanilla JS其实就是原生javascript了。论运行速度，在Vanilla JS面前，所有的js library都要慢很多。
-![](http://www.haldir66.ga/static/imgs/scenery04e31f5513d62958957b4caa1d944ae4.jpg)
+![](https://www.haldir66.ga/static/imgs/scenery04e31f5513d62958957b4caa1d944ae4.jpg)
 
 <!--more-->
 
@@ -24,7 +24,7 @@ Vanilla JS其实就是原生javascript了。论运行速度，在Vanilla JS面�
 
 ## 1. 一些作为一门语言基本的操作都有
 
-![](http://www.haldir66.ga/static/imgs/scenery151110078544.jpg)
+![](https://www.haldir66.ga/static/imgs/scenery151110078544.jpg)
 
 ### 1.1 比如说module（就是import，export这种，虽然是ES6才补上的）
  <del>js中好像没有像java中那种javaBean的特殊的数据类型的存在。</del>其实也不需要，js并不是一种用class来model real world object的语言。
@@ -233,7 +233,7 @@ past.getDate
 past.getDate()
 9
 ```
-![](http://www.haldir66.ga/static/imgs/magnolia_1920x1440.jpg)
+![](https://www.haldir66.ga/static/imgs/magnolia_1920x1440.jpg)
 
 网络请求，Ajax(Asynchronous javaScript & xml)请求的套路也有(AJAX命名上就是异步的)
 XMLHttpRequest缩写是(XHR)

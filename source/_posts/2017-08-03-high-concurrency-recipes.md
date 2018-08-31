@@ -4,7 +4,7 @@ date: 2017-08-03 21:04:28
 tags: [java,tools,concurrency]
 ---
 
-![](http://www.haldir66.ga/static/imgs/be3c80a11edfd0fdb75d098550ed2c8e.jpg)
+![](https://www.haldir66.ga/static/imgs/be3c80a11edfd0fdb75d098550ed2c8e.jpg)
 <!--more-->
 
 > The difference between “concurrent” and “parallel” execution

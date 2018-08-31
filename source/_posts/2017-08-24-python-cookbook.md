@@ -6,7 +6,7 @@ tags: [python,tools]
 
 ## 苦海无涯，Python是岸
 
-![](http://www.haldir66.ga/static/imgs/essay-with-programming-lang.jpg)
+![](https://www.haldir66.ga/static/imgs/essay-with-programming-lang.jpg)
 
 
 <!--more-->
@@ -137,7 +137,7 @@ except TypeError as reason:
     print('出错原因是%s'%str(reason))
 ```
 
-![](http://www.haldir66.ga/static/imgs/79a65f1911c81d736be0704904de8ea1.jpg)
+![](https://www.haldir66.ga/static/imgs/79a65f1911c81d736be0704904de8ea1.jpg)
 
 
 时间的函数有datetime和time包

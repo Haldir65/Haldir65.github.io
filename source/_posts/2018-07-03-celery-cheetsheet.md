@@ -7,7 +7,7 @@ tags:
 >“There are only two hard things in Computer Science: cache invalidation and naming things.”
 — Phil Karlton
 
-![](http://www.haldir66.ga/static/imgs/Celery_picture.jpg)
+![](https://www.haldir66.ga/static/imgs/Celery_picture.jpg)
 
 <!--more-->
 

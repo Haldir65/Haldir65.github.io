@@ -10,7 +10,7 @@ Okio -> OkHttp -> Picaso  -> Retrofit
 Okio版本 1.13.0
 OkHttp版本 3.8.0
 
-![](http://www.haldir66.ga/static/imgs/6da83b3b20094b044a320d1e89dfcd00.jpg)
+![](https://www.haldir66.ga/static/imgs/6da83b3b20094b044a320d1e89dfcd00.jpg)
 <!--more-->
 
 ## 1. Okio与java io相比的优势
@@ -212,7 +212,7 @@ BufferedSource在读取Socket数据时，一边从socket里面拿一个Segment�
 ## 2. OkHttp的解析
 
 ### 2.1 使用介绍
-先上一张图![](http://www.haldir66.ga/static/imgs/okHttp_chain.jpg)。这是最简单的直接用OkHttpClient请求[百度首页](http://www.baidu.com)的堆栈调用情况。在没有做任何手动配置的情况下，至少发现了五个Interceptor:
+先上一张图![](https://www.haldir66.ga/static/imgs/okHttp_chain.jpg)。这是最简单的直接用OkHttpClient请求[百度首页](http://www.baidu.com)的堆栈调用情况。在没有做任何手动配置的情况下，至少发现了五个Interceptor:
 
  RetryAndFollowUpInterceptor
  BridgeInterceptor

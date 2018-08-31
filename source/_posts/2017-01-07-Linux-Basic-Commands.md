@@ -9,7 +9,7 @@ tags: [置顶,linux,tools]
 >  nohup node server.js > /dev/null 2>&1 &
 
 
-![](http://www.haldir66.ga/static/imgs/bamboo-buds-wallpaper-53859567dd31a.jpg)
+![](https://www.haldir66.ga/static/imgs/bamboo-buds-wallpaper-53859567dd31a.jpg)
 
  <!--more-->
 
@@ -693,8 +693,12 @@ lsof -i:80
 #查看某个进程占了哪些端口
 netstat -anp|grep pid
 lsof //list opened files
+##看下mysql用了哪些文件
+lsof -c mysql
 ## 查看端口占用
 [lsof命令还是很强大的](http://www.cnblogs.com/peida/archive/2013/02/26/2932972.html)
+
+
 
 ## 杀进程（如果进程不属于当前用户，要sudo）
 ## 杀进程，慎用。
@@ -1070,7 +1074,7 @@ fdisk -l ## show a list of hard drives that are attached to your computer, fdisk
 
 ### 参考
 
-- ![](http://www.haldir66.ga/static/imgs/fork_you_git.jpg)
+- ![](https://www.haldir66.ga/static/imgs/fork_you_git.jpg)
 - [工具参考](http://linuxtools-rst.readthedocs.io/zh_CN/latest/tool/sar.html)
 - [文件大小查看命令](https://my.oschina.net/liting/blog/392051)
 - [文件压缩命令](http://blog.sina.com.cn/s/blog_7479f7990100zwkp.html)

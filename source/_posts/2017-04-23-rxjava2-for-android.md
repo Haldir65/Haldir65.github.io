@@ -6,7 +6,7 @@ tags: [rxjava2,android]
 ---
 
 本文多数内容来自Jake Wharton的演讲，配合一些个人的感受，作为今后使用Rxjava2的一些参考。
-![](http://www.haldir66.ga/static/imgs/f21a6a245edfe0b19804be5b3df24a3d.jpg)
+![](https://www.haldir66.ga/static/imgs/f21a6a245edfe0b19804be5b3df24a3d.jpg)
 <!--more-->
 
 
@@ -22,7 +22,7 @@ source of data
 listener of data
 methods for modifying data
 ```
-![](http://www.haldir66.ga/static/imgs/stream_compose.jpg)
+![](https://www.haldir66.ga/static/imgs/stream_compose.jpg)
 
 ### 2.1 数据源的种类
 Observable<T> 和Flowable<T>，区别在于后者支持BackPressure，后者不支持BackPressure.
@@ -80,10 +80,10 @@ public abstract class Maybe<T> implements MaybeSource<T> {}
 ```
 以上三种数据源都有static方法生成：
 例如
-![from iterable](http://www.haldir66.ga/static/imgs/creating_source_from_iterable.jpg)
+![from iterable](https://www.haldir66.ga/static/imgs/creating_source_from_iterable.jpg)
 
 
-![fromjust](http://www.haldir66.ga/static/imgs/creating_source_from_just.jpg)
+![fromjust](https://www.haldir66.ga/static/imgs/creating_source_from_just.jpg)
 
 比较推荐的方法有两种
 
@@ -220,7 +220,7 @@ Flowable -> subscribe -> Subscription
 
 ### 3.2 onSubscribe怎么用
 通常不直接用这两种base class，因为第四个方法不知道怎么用嘛。
-![](http://www.haldir66.ga/static/imgs/4dab298b9f7ce29c43f9d8eaf686e02f.jpg)
+![](https://www.haldir66.ga/static/imgs/4dab298b9f7ce29c43f9d8eaf686e02f.jpg)
 ```java
 Observable.just("Hello").subscribe(new DisposableObserver<String>() {
                     @Override
@@ -336,8 +336,8 @@ Observable<String> yelling = greeting.map(s ->s.toUppercase())
 Observable.subscribeOn(Schedulers.io()) //
 ```
 subscribeOn决定了task在哪条线程上运行，操作符的顺序很重要
-![Wrong](http://www.haldir66.ga/static/imgs/reading_network_response_on_main_thread.jpg)
-![Ok](http://www.haldir66.ga/static/imgs/observing_on_ui_thread.jpg)
+![Wrong](https://www.haldir66.ga/static/imgs/reading_network_response_on_main_thread.jpg)
+![Ok](https://www.haldir66.ga/static/imgs/observing_on_ui_thread.jpg)
 
 
 流之间的转换

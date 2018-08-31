@@ -82,7 +82,7 @@ wiki上的[http名词解释](https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6
 502 Bad Gateway 服务器作为网关或者代理时，为了完成请求访问下一个服务器，但该服务器返回了非法的应答。
 503 Service Unavailable 服务器由于维护或者负载过重未能应答。例如，Servlet可能在数据库连接池已满的情况下返回503。服务器返回503时可以提供一个Retry-After头。就是服务器扛不住了的意思
 504 Gateway Timeout 由作为代理或网关的服务器使用，表示不能及时地从远程服务器获得应答。（HTTP 1.1新）
-
+[RFC在这里](https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.6)
 [http状态码451](https://juejin.im/entry/5770d05a2e958a0078f1d730)，由于法律上的原因不能显示网页内容
 
 ## 3. Header相关的
@@ -429,7 +429,7 @@ TCP 连接两端好比两个人，这两个人之间保持通信往来（建立 
 ### 5.2 keep-Alive和WebSocket的区别
 
 
-![](http://www.haldir66.ga/static/imgs/ed541bc1ed61ead0bf6ea8233ef01c0a.jpg)
+![](https://www.haldir66.ga/static/imgs/ed541bc1ed61ead0bf6ea8233ef01c0a.jpg)
 
 
 ### 5.3 http2可以实现推送了

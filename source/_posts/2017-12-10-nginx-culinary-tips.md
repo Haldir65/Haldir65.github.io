@@ -7,7 +7,7 @@ tags: [nginx,tools]
 [linode的docs里面是这么介绍的](https://linode.com/docs/web-servers/nginx/how-to-configure-nginx/)
 >nginx is a lightweight, high performance web server designed to deliver large amounts of static content quickly with efficient use of system resources. nginx’s strong point is its ability to efficiently serve static content, like plain HTML and media files. Some consider it a less than ideal server for dynamic content.
 
-![](http://www.haldir66.ga/static/imgs/scenery151110073841.jpg)
+![](https://www.haldir66.ga/static/imgs/scenery151110073841.jpg)
 <!--more-->
 
 
@@ -815,9 +815,10 @@ Make sure each file and folder under a domain will match at least one location d
 谈到rtmp就不免扯到ffmpeg，在小型vps上还是算了吧。
 [hls的安装方法](https://www.dreamvps.com/tutorials/hls-and-nginx-on-ubuntu/)
 
+只允许某些http method用limit_except这个directive就可以了
+[limit_except](http://nginx.org/en/docs/http/ngx_http_core_module.html#limit_except)
 
-
-
+HTTP规范要求405的code需要在返回的response中添加一个Allow的header说明哪些方法是被允许的
 
 ==========================================================================================================================
 
@@ -963,6 +964,9 @@ ttlsa:xyJkVhXGAZ8tM
 [ELK全家桶实现nginx访问日志可视化](https://logz.io/blog/nginx-access-log-monitoring-dashboard/)，似乎要装java。
 
 关于ngixn返回的response的header中Content-Type，在nginx的config目录下能找到一个mime.types文件。里面指定了哪些文件后缀对应哪些mimetype。比如.mp3文件就返回audio/mpeg这种。
+
+
+[Install Let's Encrypt to Create SSL Certificates](https://www.linode.com/docs/security/ssl/install-lets-encrypt-to-create-ssl-certificates/)
 
 ### 参考
 - [nginx Configurations](https://wizardforcel.gitbooks.io/nginx-doc/content/Text/6.1_nginx_windows.html)
