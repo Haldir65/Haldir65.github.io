@@ -967,6 +967,30 @@ ttlsa:xyJkVhXGAZ8tM
 
 
 [Install Let's Encrypt to Create SSL Certificates](https://www.linode.com/docs/security/ssl/install-lets-encrypt-to-create-ssl-certificates/)
+linode的教程非常实用，基本上就是这几条：
+注意，该过程需要请求网络，所以事先把nginx关掉，保证80和443端口都是没人在用的
+```shell
+sudo git clone https://github.com/letsencrypt/letsencrypt /opt/letsencrypt
+cd /opt/letsencrypt
+sudo -H ./letsencrypt-auto certonly --standalone -d example.com -d www.example.com ##多一个二级域名就要多一个-d,就是说得一个个的写，不支持*.example.com这种
+sudo ls /etc/letsencrypt/live ##一切顺利的话，生成的证书都在这里了
+./certbot-auto certificates ##看下我当前都有哪些证书
+
+## 接下来是自动续期环节
+sudo -H ./letsencrypt-auto certonly --standalone --renew-by-default -d example.com -d www.example.com ##就是多了renew-by-default这个参数，因为这个免费证书默认是三个月的有效期。
+```
+
+强制http导向https的方法也很多
+```
+server {
+    listen 80 default_server;
+
+    server_name _;
+
+    return 301 https://$host$request_uri;
+}
+```
+
 
 ### 参考
 - [nginx Configurations](https://wizardforcel.gitbooks.io/nginx-doc/content/Text/6.1_nginx_windows.html)
