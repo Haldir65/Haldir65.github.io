@@ -49,10 +49,10 @@ nginx的config文件中也要写正则
 ![](https://www.haldir66.ga/static/imgs/scenery1511100729187.jpg)
 ![](https://www.haldir66.ga/static/imgs/1102533137-5.jpg)
 ![](https://www.haldir66.ga/static/imgs/1102533911-1.jpg)
-![](http://haldir66.ga/static/imgs/20120103214255_nTsVt.jpg)
+![](https://haldir66.ga/static/imgs/20120103214255_nTsVt.jpg)
 ![](https://www.haldir66.ga/static/imgs/apic5964_sc115.jpg)
 ![](https://www.haldir66.ga/static/imgs/apic6283_sc115.jpg)
-![](http://haldir66.ga/static/imgs/849c18412f8e7a0b18df09f6f87e6516.jpg)
+![](https://haldir66.ga/static/imgs/849c18412f8e7a0b18df09f6f87e6516.jpg)
 
 ![](https://www.haldir66.ga/static/imgs/timg.jpg)
 
