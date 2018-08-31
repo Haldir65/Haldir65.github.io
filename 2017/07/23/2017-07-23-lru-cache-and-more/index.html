@@ -16,12 +16,12 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="LruCache在android3.1中加入，即android.util.LruCache，主要是作为一种合理的缓存策略的实现，用于替代原来的SoftReference。v4包提供了static version的实现，即android.support.v4.util.LruCache。此外，还有DiskLruCache对应磁盘缓存，在OkHttp和Glide等开源项目中都有，可直接复制过来，改下包">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://www.haldir66.ga/static/imgs/e73669d80265feff2adcb227b7113f2d.jpg">
-<meta property="og:updated_time" content="2018-08-30T11:15:43.512Z">
+<meta property="og:image" content="https://www.haldir66.ga/static/imgs/e73669d80265feff2adcb227b7113f2d.jpg">
+<meta property="og:updated_time" content="2018-08-31T07:03:58.082Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="LruCache阅读笔记">
 <meta name="twitter:description" content="LruCache在android3.1中加入，即android.util.LruCache，主要是作为一种合理的缓存策略的实现，用于替代原来的SoftReference。v4包提供了static version的实现，即android.support.v4.util.LruCache。此外，还有DiskLruCache对应磁盘缓存，在OkHttp和Glide等开源项目中都有，可直接复制过来，改下包">
-<meta name="twitter:image" content="http://www.haldir66.ga/static/imgs/e73669d80265feff2adcb227b7113f2d.jpg">
+<meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/e73669d80265feff2adcb227b7113f2d.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -200,7 +200,7 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>LruCache在android3.1中加入，即android.util.LruCache，主要是作为一种合理的缓存策略的实现，用于替代原来的SoftReference。v4包提供了static version的实现，即android.support.v4.util.LruCache。<br>此外，还有DiskLruCache对应磁盘缓存，在OkHttp和Glide等开源项目中都有，可直接复制过来，改下包名直接用。这些类本质上都是对于Least Recently Used算法的实现。稍微看了下网上的博客，LruCache实际上就是利用了LinkedHashmap的accessorder来实现末位淘汰的。v4包里的LinkedHashmap就是java.util里面的,platform里的LinkedHashmap添加了一些方法。<br><img src="http://www.haldir66.ga/static/imgs/e73669d80265feff2adcb227b7113f2d.jpg" alt=""><br><a id="more"></a></p>
+        <p>LruCache在android3.1中加入，即android.util.LruCache，主要是作为一种合理的缓存策略的实现，用于替代原来的SoftReference。v4包提供了static version的实现，即android.support.v4.util.LruCache。<br>此外，还有DiskLruCache对应磁盘缓存，在OkHttp和Glide等开源项目中都有，可直接复制过来，改下包名直接用。这些类本质上都是对于Least Recently Used算法的实现。稍微看了下网上的博客，LruCache实际上就是利用了LinkedHashmap的accessorder来实现末位淘汰的。v4包里的LinkedHashmap就是java.util里面的,platform里的LinkedHashmap添加了一些方法。<br><img src="https://www.haldir66.ga/static/imgs/e73669d80265feff2adcb227b7113f2d.jpg" alt=""><br><a id="more"></a></p>
 <h2 id="1-使用入门"><a href="#1-使用入门" class="headerlink" title="1. 使用入门"></a>1. 使用入门</h2><p>这是最简单的一个用于缓存图片Bitmap的cache的算法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> maxMemory = (<span class="keyword">int</span>) (Runtime.getRuntime().totalMemory()/<span class="number">1024</span>);</span><br><span class="line">        <span class="keyword">int</span> cacheSize = maxMemory/<span class="number">8</span>;</span><br><span class="line">        mMemoryCache = <span class="keyword">new</span> LruCache&lt;String,Bitmap&gt;(cacheSize)&#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">protected</span> <span class="keyword">int</span> <span class="title">sizeOf</span><span class="params">(String key, Bitmap value)</span> </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> value.getRowBytes()*value.getHeight()/<span class="number">1024</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br></pre></td></tr></table></figure></p>
 <p>这个sizeOf函数必须复写，用于计算单个元素大小，主要为了确保缓存不超出最大容量。</p>
 <h2 id="2-简单介绍"><a href="#2-简单介绍" class="headerlink" title="2.简单介绍"></a>2.简单介绍</h2><p>LruCache是线程安全的，在内部的 get、put、remove 包括 trimToSize 都是安全的（因为都上锁了）</p>

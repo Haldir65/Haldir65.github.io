@@ -14,12 +14,12 @@
 <meta property="og:url" content="https://haldir65.github.io/2018/06/12/2018-06-12-django-the-pony/index.html">
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://www.haldir66.ga/static/imgs/djangopony-slide.png">
-<meta property="og:image" content="http://www.haldir66.ga/static/imgs/food-salad-instagram-hunger-city-life.jpg">
-<meta property="og:updated_time" content="2018-08-30T11:15:43.520Z">
+<meta property="og:image" content="https://www.haldir66.ga/static/imgs/djangopony-slide.png">
+<meta property="og:image" content="https://www.haldir66.ga/static/imgs/food-salad-instagram-hunger-city-life.jpg">
+<meta property="og:updated_time" content="2018-08-31T07:03:58.090Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="django学习记录">
-<meta name="twitter:image" content="http://www.haldir66.ga/static/imgs/djangopony-slide.png">
+<meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/djangopony-slide.png">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -198,7 +198,7 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p><img src="http://www.haldir66.ga/static/imgs/djangopony-slide.png" alt=""></p>
+        <p><img src="https://www.haldir66.ga/static/imgs/djangopony-slide.png" alt=""></p>
 <a id="more"></a>
 <p>首先是几个常用命令<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">virtualenv --no-site-packages venv <span class="comment">## virtualenv好习惯</span></span><br><span class="line">source venv/bin/activate <span class="comment">## windows下应该是Scripts/activate.bat这个文件</span></span><br><span class="line">deactivate <span class="comment">## 退出</span></span><br><span class="line"></span><br><span class="line">python manage.py mkemigrations app1 app2</span><br><span class="line">python manage.py migrate</span><br><span class="line">python manage.py runserver</span><br><span class="line"></span><br><span class="line">django-admin startproject  mysite <span class="comment">## 创建项目</span></span><br><span class="line">django-admin startapp  app1 <span class="comment">## 创建app</span></span><br><span class="line"></span><br><span class="line">python manage.py runserver <span class="comment">## 本地运行，默认8000端口</span></span><br><span class="line">python manage.py runserver <span class="number">8080</span>  <span class="comment">## 端口也可以自己决定</span></span><br><span class="line"></span><br><span class="line">python manage.py migrate <span class="comment">##创建了新的model，数据库需要建表</span></span><br><span class="line">python manage.py createsuperuser <span class="comment">## 创建admin</span></span><br></pre></td></tr></table></figure></p>
 <p>需要注意的是，runserver命令多数情况下能够实现自动reload，比如修改了一个py文件。但如果是创建了一个新的文件，还是需要重新跑一遍的</p>
@@ -237,7 +237,7 @@ ga('send', 'pageview');
 <blockquote>
 <p>uwsgi –ini myconf.ini</p>
 </blockquote>
-<p><img src="http://www.haldir66.ga/static/imgs/food-salad-instagram-hunger-city-life.jpg" alt=""></p>
+<p><img src="https://www.haldir66.ga/static/imgs/food-salad-instagram-hunger-city-life.jpg" alt=""></p>
 <p>还有，多数时候会热更新，但比如我更改了PaginationClass，还是得重新runserver才能获得理想的结果</p>
 <p><a href="https://stackoverflow.com/questions/23153040/django-rest-framework-create-objects-passed-as-a-list-attribute-of-nested-obje">目前DRF不支持通过一个Post请求创建一个list of nested objects</a></p>
 <p>自定义接口返回格式<br>ListCreateAPIView中override create方法<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">create</span><span class="params">(self, request, *args, **kwargs)</span>:</span></span><br><span class="line">        serializer = self.get_serializer(data=request.data)</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> serializer.is_valid(raise_exception=<span class="keyword">False</span>):</span><br><span class="line">            <span class="keyword">return</span> Response(&#123;<span class="string">"Fail"</span>: <span class="string">"blablal"</span>, status=status.HTTP_400_BAD_REQUEST)</span><br><span class="line"></span><br><span class="line">        self.perform_create(serializer)</span><br><span class="line">        headers = self.get_success_headers(serializer.data)</span><br><span class="line">        <span class="keyword">return</span> Response(&#123;<span class="string">"Success"</span>: <span class="string">"msb blablabla"</span>&#125;, status=status.HTTP_201_CREATED, headers=headers)</span><br></pre></td></tr></table></figure></p>
