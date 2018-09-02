@@ -311,6 +311,13 @@ hexo server的意思是类似于express的serve static功能，[默认只处理p
 
 [Refused to Execute Script From Because Its MIME Type (Text/plain) Is Not Executable, and Strict MIME Type Checking Is Enabled]这句话的意思
 
+## 15. yilia的主题里面badjs report的问题
+yilia的主题里面有一个badjs的report，去掉的方法：
+cd 到themes/yilia里面,rm -rf source/ , 然后把source-src里面的report.js里面的东西删掉。yarn install ,yarn dist ,然后回到上层目录。hexo clean , hexo g就可以了。
+其实看下里面，就是一个webpack的配置，自己重新编译一下就好了。编译后会在source里面重新生成需要的js文件。
+奇怪的是在windows上编译失败，在linux上编译失败，在mac上终于成功了。
+
+
 ### 参考
 
 * [Hexo 博文置顶技巧](http://yanhuili.github.io/2016/11/21/hexo%E5%8D%9A%E6%96%87%E7%BD%AE%E9%A1%B6%E6%8A%80%E5%B7%A7/)
