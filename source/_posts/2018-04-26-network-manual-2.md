@@ -281,3 +281,5 @@ ab(ApacheBench) - a simple ,single-threaded command line tool for benchemarking 
 ab -n <num_requests> -c <concurrency> <addr>:<port><path>
 
 [how-to-use-traceroute-and-mtr-to-diagnose-network-issues](https://www.digitalocean.com/community/tutorials/how-to-use-traceroute-and-mtr-to-diagnose-network-issues)
+
+[.well-known的意思](https://serverfault.com/questions/795467/for-what-is-the-well-known-folder)，其实就跟robot.txt差不多。一种为了能够在客户端发起请求(但此时并不清楚url空间的允许策略，贸然访问万一侵权了呢)获得一些有用的信息。于是RFC就提出来搞一个专门的.well-known的path，这下面的位置都是广而周知的，大家都知道是特定的用途的。

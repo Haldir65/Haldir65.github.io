@@ -173,6 +173,8 @@ pull = fetch +merge ，会生成新的提交
 
 > Merge好在它是一个安全的操作。现有的分支不会被更改，避免了rebase潜在的缺点
 
+git pull --rebase = git pull -r
+
 ## 10. rebase和cherry-pick
 rebase不会生成新的提交，而且会使得项目提交历史呈现出完美的线性。但注意[不要在公共的分支上使用](https://github.com/geeeeeeeeek/git-recipes/wiki/5.1-%E4%BB%A3%E7%A0%81%E5%90%88%E5%B9%B6%EF%BC%9AMerge%E3%80%81Rebase%E7%9A%84%E9%80%89%E6%8B%A9)
 
@@ -346,6 +348,7 @@ git log --merges
 git log --pretty=format:"%h%x09%an%x09%ad%x09%s" //非常简明的一行显示
 
 ## Reference
--[git reset和revert](http://yijiebuyi.com/blog/8f985d539566d0bf3b804df6be4e0c90.html)
--[git recipes](https://github.com/geeeeeeeeek/git-recipes)
--[git merge --no-ff](http://hungyuhei.github.io/2012/08/07/better-git-commit-graph-using-pull---rebase-and-merge---no-ff.html)
+- [git reset和revert](http://yijiebuyi.com/blog/8f985d539566d0bf3b804df6be4e0c90.html)
+- [git recipes](https://github.com/geeeeeeeeek/git-recipes)
+- [git merge --no-ff](http://hungyuhei.github.io/2012/08/07/better-git-commit-graph-using-pull---rebase-and-merge---no-ff.html)
+- [advanced git techniques](https://realpython.com/advanced-git-for-pythonistas/)
