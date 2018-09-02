@@ -398,6 +398,8 @@ docker build -t packsdkandroiddocker.image -f ./scripts/PackSdkDockerfile .
 docker会在/var/lib/docker文件夹里吃掉大量空间，释放空间的话
 > docker system prune -a
 
+[使用textmate在vscode中编辑远程linux server中的文件](https://medium.com/@prtdomingo/editing-files-in-your-linux-virtual-machine-made-a-lot-easier-with-remote-vscode-6bb98d0639a4)
+
 
 关于ubuntu添加ppa
 [debian系的package management方式](https://www.digitalocean.com/community/tutorials/ubuntu-and-debian-package-management-essentials).

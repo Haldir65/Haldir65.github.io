@@ -152,6 +152,48 @@ def home():
 在windows下设置环境变量要用set:
 > (env) λ set FLASK_APP=C:\code\realworld\flask-realworld-example-app\autoapp.py
 
+后台开发环境中经常会出现500错误，这种后台app挂了的情况一般暴露给前端的响应都是一个特定的结构。实现方式的话：
+[在flask中catch 500 error](https://stackoverflow.com/questions/14993318/catching-a-500-server-error-in-flask)
+```python
+from flask import Flask ,url_for,render_template,request,abort
+from  werkzeug.debug import get_current_traceback
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    try:
+        raise Exception("Can't connect to database")
+    except Exception,e:
+        track= get_current_traceback(skip=1, show_hidden_frames=True,
+            ignore_system_exceptions=False)
+        track.log()
+        abort(500)
+    return "index"
+
+@app.route('/url')
+def my_method():
+    try:
+        call_method_that_raises_exception()
+    except Exception as e:
+	    render_template("500.html", error = str(e))
+
+@app.errorhandler(500)
+def internal_server_error(error):
+    app.logger.error('Server Error: %s', (error))
+    return render_template('500.htm'), 500
+
+@app.errorhandler(Exception)
+def unhandled_exception(e):
+    app.logger.error('Unhandled Exception: %s', (e))
+    return render_template('500.htm'), 500
+
+if __name__== "__main__":
+    app.run(debug=True)
+```
+事实上，4XX的error是会走到用户注册的errorhandler中的，但是在debug模式下，不会走到5XX的errorhandler下面。
+所以生产环境下首先确保debug关闭，然后所有的错误都会走到5xx的errorhandler下面
+
+
 
 
 
