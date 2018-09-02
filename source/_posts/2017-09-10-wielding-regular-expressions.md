@@ -45,7 +45,6 @@ nginx的config文件中也要写正则
 ![](https://www.haldir66.ga/static/imgs/sceneryd15ddf2ba4fb7b5f4e51dfa6cb74cb70.jpg)
 
 ![](https://www.haldir66.ga/static/imgs/strawberry-festival.jpg)
-![](https://www.haldir66.ga/static/imgs/food_truck_hotdog_night_city.jpg)
 ![](https://www.haldir66.ga/static/imgs/scenery1511100729187.jpg)
 ![](https://www.haldir66.ga/static/imgs/1102533137-5.jpg)
 ![](https://www.haldir66.ga/static/imgs/1102533911-1.jpg)
