@@ -17,7 +17,7 @@
 <meta property="og:description" content="记录一下常用git的命令，作为日常使用的参考手册">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/f787b2e8d757dc83b782bcd6d4c9f523.jpg">
-<meta property="og:updated_time" content="2018-08-31T11:10:30.286Z">
+<meta property="og:updated_time" content="2018-09-02T02:35:43.203Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="git常用操作手册">
 <meta name="twitter:description" content="记录一下常用git的命令，作为日常使用的参考手册">
@@ -243,6 +243,7 @@ ga('send', 'pageview');
 <blockquote>
 <p>Merge好在它是一个安全的操作。现有的分支不会被更改，避免了rebase潜在的缺点</p>
 </blockquote>
+<p>git pull –rebase = git pull -r</p>
 <h2 id="10-rebase和cherry-pick"><a href="#10-rebase和cherry-pick" class="headerlink" title="10. rebase和cherry-pick"></a>10. rebase和cherry-pick</h2><p>rebase不会生成新的提交，而且会使得项目提交历史呈现出完美的线性。但注意<a href="https://github.com/geeeeeeeeek/git-recipes/wiki/5.1-%E4%BB%A3%E7%A0%81%E5%90%88%E5%B9%B6%EF%BC%9AMerge%E3%80%81Rebase%E7%9A%84%E9%80%89%E6%8B%A9">不要在公共的分支上使用</a></p>
 <h2 id="11-gitignore文件写法"><a href="#11-gitignore文件写法" class="headerlink" title="11. gitignore文件写法"></a>11. gitignore文件写法</h2><p>参考<a href="https://github.com/suzeyu1992/repo/tree/master/project/git">repo</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"># 忽略所有以 .c结尾的文件</span><br><span class="line">*.c</span><br><span class="line"></span><br><span class="line"># 但是 stream.c 会被git追踪</span><br><span class="line">!stream.c</span><br><span class="line"></span><br><span class="line"># 只忽略当前文件夹下的TODO文件, 不包括其他文件夹下的TODO例如: subdir/TODO</span><br><span class="line">/TODO</span><br><span class="line"></span><br><span class="line"># 忽略所有在build文件夹下的文件</span><br><span class="line">build/</span><br><span class="line"></span><br><span class="line"># 忽略 doc/notes.txt, 但不包括多层下.txt例如: doc/server/arch.txt</span><br><span class="line">doc/*.txt</span><br><span class="line"></span><br><span class="line"># 忽略所有在doc目录下的.pdf文件</span><br><span class="line">doc/**/*.pdf</span><br><span class="line"></span><br><span class="line"># 让ignore文件立即生效的方法（如果不该上传到服务器的东西已经上传了，本次提交会把这些不该上传的东西从服务器删掉）</span><br><span class="line">git rm -r --cached .</span><br><span class="line">git add .</span><br><span class="line">git commit -m &quot;.gitignore is now working&quot;</span><br></pre></td></tr></table></figure></p>
 <h2 id="12-git-stash"><a href="#12-git-stash" class="headerlink" title="12. git stash"></a>12. git stash</h2><p>常用命令<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">git stash  //保存下来，压进一个栈，基本上就是先进后出了</span><br><span class="line">git stash pop //推出一个栈</span><br><span class="line"></span><br><span class="line">git stash save -a &quot;message to add&quot; // 添加一次stash，打上标记</span><br><span class="line"></span><br><span class="line">git stash list  //展示当前仓库所有的被stash的变更以及对应的id，记得这个不是跟着branch走的</span><br><span class="line">git stash drop stah@&#123;id&#125; // 从stash的List中删除指定的某一次stash</span><br><span class="line">git stash apply &lt;stash@&#123;id&#125;&gt; //应用某一次的stash</span><br><span class="line"></span><br><span class="line">git stash clear// 一次性删除stash List中所有的item</span><br></pre></td></tr></table></figure></p>
@@ -301,7 +302,12 @@ ga('send', 'pageview');
 <blockquote>
 <p>git log –pretty=format:”%cn committed %h on %cd”<br>git log –oneline<br>git log –stat ## 显示出每一次commit的，以及每一次commit都改了哪些文件<br>git log -v ##这个更啰嗦 ## 比stat多出了每次更改之后修改的文件内容<br>git log –graph –oneline –decorate<br>git log –pretty=format:”%cn committed %h on %cd” | awk ‘{ print $8}’ | sort -n ##结合awk可以看到最晚几点commit，比如凌晨1点还在commit的.<a href="https://mirrors.edge.kernel.org/pub/software/scm/git/docs/git-log.html#_pretty_formats">format里面的参数在man git log page可以找到</a><br>git log –after=”2014-7-1” –before=”2014-7-4” ## 还可以查看某个日期之间提交的东西<br>git log –author=”John”<br>git log –author=”John|Mary” ## John或者Mary的<br>git log –grep=”JRA-224:” ## 从commit message里面查找<br>git log – foo.py bar.py ## 查看跟这几个文件相关的操作记录<br>git log -S”Hello, World!” ##这个等于查找git log -p里面哪一次提交添加了“Hello, World！”这句话<br>git log –no-merges<br>git log –merges<br>git log –pretty=format:”%h%x09%an%x09%ad%x09%s” //非常简明的一行显示</p>
 </blockquote>
-<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p>-<a href="http://yijiebuyi.com/blog/8f985d539566d0bf3b804df6be4e0c90.html">git reset和revert</a><br>-<a href="https://github.com/geeeeeeeeek/git-recipes">git recipes</a><br>-<a href="http://hungyuhei.github.io/2012/08/07/better-git-commit-graph-using-pull---rebase-and-merge---no-ff.html">git merge –no-ff</a></p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
+<li><a href="http://yijiebuyi.com/blog/8f985d539566d0bf3b804df6be4e0c90.html">git reset和revert</a></li>
+<li><a href="https://github.com/geeeeeeeeek/git-recipes">git recipes</a></li>
+<li><a href="http://hungyuhei.github.io/2012/08/07/better-git-commit-graph-using-pull---rebase-and-merge---no-ff.html">git merge –no-ff</a></li>
+<li><a href="https://realpython.com/advanced-git-for-pythonistas/">advanced git techniques</a></li>
+</ul>
 
       
 
@@ -602,6 +608,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
@@ -663,10 +673,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">插件化</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">

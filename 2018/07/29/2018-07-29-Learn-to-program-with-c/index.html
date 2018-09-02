@@ -17,7 +17,7 @@
 <meta property="og:description" content="C语言实用指南，暂时不涉及cpp内容">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/pretty-orange-mushroom-wallpaper-5386b0c8c3459.jpg">
-<meta property="og:updated_time" content="2018-08-31T11:10:30.286Z">
+<meta property="og:updated_time" content="2018-09-02T02:35:43.203Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="C语言学习手册">
 <meta name="twitter:description" content="C语言实用指南，暂时不涉及cpp内容">
@@ -255,9 +255,7 @@ ga('send', 'pageview');
 <p>在C语言中没有泛型。故采用void 指针来实现泛型的效果。</p>
 <p>这段会core dump的</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span> *s1 = <span class="string">"hello"</span>; <span class="comment">//获得了一个指向字符串常量的指针</span></span><br><span class="line">*s1 = 'hey'; //尝试修改常量，会segmentfault</span><br><span class="line"></span><br><span class="line"><span class="comment">//这段也会core dump</span></span><br><span class="line"><span class="keyword">char</span>* s1 = <span class="string">"hello"</span>;</span><br><span class="line">s1 += <span class="number">1</span>;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"content %s\n"</span>,*s1);<span class="comment">//崩在这里</span></span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"content %s\n"</span>,s1);<span class="comment">//改成这样就好了</span></span><br></pre></td></tr></table></figure>
-<p>linux环境下c语言socket编程<br>实现类似curl的功能<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt; </span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;arpa/inet.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;netinet/in.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"> <span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span>&#123; </span><br><span class="line">    <span class="keyword">if</span>(argc!=<span class="number">2</span>)&#123;</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">"error usage %s ipn"</span>,argv[<span class="number">0</span>]); </span><br><span class="line">      <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">int</span> sockfd;</span><br><span class="line">    <span class="keyword">int</span> len; </span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">address</span>;</span> </span><br><span class="line">    <span class="keyword">int</span> result; </span><br><span class="line">    <span class="keyword">char</span> httpstring[<span class="number">100</span>]; </span><br><span class="line">    <span class="built_in">sprintf</span>(httpstring,<span class="string">"GET / HTTP/1.1rn"</span></span><br><span class="line">          <span class="string">"Host: %srn"</span></span><br><span class="line">          <span class="string">"Connection: Closernrn"</span>,argv[<span class="number">1</span>]); </span><br><span class="line">    <span class="keyword">char</span> ch; </span><br><span class="line">    sockfd = socket(AF_INET, SOCK_STREAM, <span class="number">0</span>); </span><br><span class="line">    address.sin_family = AF_INET; </span><br><span class="line">    address.sin_addr.s_addr = inet_addr(argv[<span class="number">1</span>]); </span><br><span class="line">    address.sin_port = htons(<span class="number">80</span>); </span><br><span class="line">    len = <span class="keyword">sizeof</span>(address);</span><br><span class="line">    result = connect(sockfd,(struct sockaddr *)&amp;address,len); </span><br><span class="line">    <span class="keyword">if</span>(result == <span class="number">-1</span>)&#123; </span><br><span class="line">       perror(<span class="string">"oops: client"</span>); </span><br><span class="line">       <span class="keyword">return</span> <span class="number">1</span>; </span><br><span class="line">    &#125;</span><br><span class="line">    write(sockfd,httpstring,<span class="built_in">strlen</span>(httpstring)); </span><br><span class="line">    <span class="keyword">while</span>(read(sockfd,&amp;ch,<span class="number">1</span>))&#123; </span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">"%c"</span>, ch); </span><br><span class="line">    &#125; </span><br><span class="line">    close(sockfd); </span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"n"</span>); </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>; </span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></p>
-<p>sudo ./req 42.121.252.58<br><a href="https://www.cnblogs.com/onlytiancai/p/3855721.html">快速学习C语言三: 开发环境, VIM配置, TCP基础，Linux开发基础，Socket开发基础</a></p>
-<p>todo<br>file related api<br>time related api<br>socket related api<a href="https://github.com/curl/curl">source code of curl</a><br>third party libiary[libpcap and libnet]</p>
+<p>socket related api<a href="https://github.com/curl/curl">source code of curl</a> http报文最后是两个(\r\n)<br>third party libiary</p>
 
       
 
@@ -362,11 +360,11 @@ ga('send', 'pageview');
   
 <nav id="article-nav">
   
-    <a href="/2046/12/18/2017-12-18-random-new-thoughts/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2018/08/26/2018-08-26-vim-the-editor/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          即刻备忘录
+          Vim常用命令指南
         
       </div>
     </a>
@@ -543,6 +541,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
@@ -604,10 +606,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">插件化</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">
