@@ -17,7 +17,7 @@
 <meta property="og:description" content="LruCache在android3.1中加入，即android.util.LruCache，主要是作为一种合理的缓存策略的实现，用于替代原来的SoftReference。v4包提供了static version的实现，即android.support.v4.util.LruCache。此外，还有DiskLruCache对应磁盘缓存，在OkHttp和Glide等开源项目中都有，可直接复制过来，改下包">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/e73669d80265feff2adcb227b7113f2d.jpg">
-<meta property="og:updated_time" content="2018-09-02T14:33:37.624Z">
+<meta property="og:updated_time" content="2018-09-07T10:53:07.729Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="LruCache阅读笔记">
 <meta name="twitter:description" content="LruCache在android3.1中加入，即android.util.LruCache，主要是作为一种合理的缓存策略的实现，用于替代原来的SoftReference。v4包提供了static version的实现，即android.support.v4.util.LruCache。此外，还有DiskLruCache对应磁盘缓存，在OkHttp和Glide等开源项目中都有，可直接复制过来，改下包">
@@ -204,13 +204,14 @@ ga('send', 'pageview');
 <h2 id="1-使用入门"><a href="#1-使用入门" class="headerlink" title="1. 使用入门"></a>1. 使用入门</h2><p>这是最简单的一个用于缓存图片Bitmap的cache的算法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> maxMemory = (<span class="keyword">int</span>) (Runtime.getRuntime().totalMemory()/<span class="number">1024</span>);</span><br><span class="line">        <span class="keyword">int</span> cacheSize = maxMemory/<span class="number">8</span>;</span><br><span class="line">        mMemoryCache = <span class="keyword">new</span> LruCache&lt;String,Bitmap&gt;(cacheSize)&#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">protected</span> <span class="keyword">int</span> <span class="title">sizeOf</span><span class="params">(String key, Bitmap value)</span> </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> value.getRowBytes()*value.getHeight()/<span class="number">1024</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br></pre></td></tr></table></figure></p>
 <p>这个sizeOf函数必须复写，用于计算单个元素大小，主要为了确保缓存不超出最大容量。</p>
 <h2 id="2-简单介绍"><a href="#2-简单介绍" class="headerlink" title="2.简单介绍"></a>2.简单介绍</h2><p>LruCache是线程安全的，在内部的 get、put、remove 包括 trimToSize 都是安全的（因为都上锁了）</p>
-<h2 id="简书作者写的比较好"><a href="#简书作者写的比较好" class="headerlink" title="简书作者写的比较好"></a>简书作者写的比较好</h2><p>这种链表最好结合着<a href="http://www.jianshu.com/p/1182237a1940">图</a>来看</p>
+<h2 id="简书作者写的比较好"><a href="#简书作者写的比较好" class="headerlink" title="简书作者写的比较好"></a>简书作者写的比较好</h2><p>这种链表最好结合着图来看</p>
 <p>HashMap只是一个HashMap.Node的数组，因为Hash Collision产生链表（单向，通过Node.next实现）<br>LinkedHashMap extends HashMap。 基本元素是LinkedHashMap.Entry(extends HashMap.Node，继承不过是添加了before和after的Entry)，由此在HashMap的基础上再构造了一个<strong>双向循环链表</strong>。</p>
 <p>LinkedHashMap继承HashMap之后主要Override了几个HashMap预留的回调函数。<br>afterNodeAccess(把最近用过的元素挪到双向链表的尾部),afterNodeInsertion，afterNodeRemoval等<br>也就是说，每次CRUD操作都会把最近使用过的元素挪到最上面(不一定准确，大致这个意思)，而且这项操作只不过是挪一下指针，并不费事</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="http://www.jianshu.com/p/b49a111147ee">彻底解析Android缓存机制——LruCache</a></li>
 <li><a href="http://www.jianshu.com/p/bdbfdfd0641b">Android源码解析——LruCache</a></li>
 <li><a href="https://github.com/LittleFriendsGroup/AndroidSdkSourceAnalysis/blob/master/article/LruCache%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90.md">LruCache 源码解析</a></li>
+<li><a href="https://mp.weixin.qq.com/s/FSOxXx-3LwQZu7NHOm9HRg">LRU 缓存实现( Java )</a></li>
 </ul>
 
       
