@@ -28,7 +28,7 @@ int maxMemory = (int) (Runtime.getRuntime().totalMemory()/1024);
 LruCache是线程安全的，在内部的 get、put、remove 包括 trimToSize 都是安全的（因为都上锁了）
 
 ## 简书作者写的比较好
-这种链表最好结合着[图](http://www.jianshu.com/p/1182237a1940)来看
+这种链表最好结合着图来看
 
 HashMap只是一个HashMap.Node的数组，因为Hash Collision产生链表（单向，通过Node.next实现）
 LinkedHashMap extends HashMap。 基本元素是LinkedHashMap.Entry(extends HashMap.Node，继承不过是添加了before和after的Entry)，由此在HashMap的基础上再构造了一个**双向循环链表**。
@@ -41,3 +41,4 @@ afterNodeAccess(把最近用过的元素挪到双向链表的尾部),afterNodeIn
 - [彻底解析Android缓存机制——LruCache](http://www.jianshu.com/p/b49a111147ee)
 - [Android源码解析——LruCache](http://www.jianshu.com/p/bdbfdfd0641b)
 - [LruCache 源码解析](https://github.com/LittleFriendsGroup/AndroidSdkSourceAnalysis/blob/master/article/LruCache%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90.md)
+- [LRU 缓存实现( Java )](https://mp.weixin.qq.com/s/FSOxXx-3LwQZu7NHOm9HRg)

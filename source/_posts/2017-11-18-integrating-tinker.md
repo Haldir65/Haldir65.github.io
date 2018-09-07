@@ -225,14 +225,14 @@ A：dexElements数组更换之后就完事了？其实还差一个类的校验�
 关于Tinker-Patch这个外包给第三方的服务，纯属好奇就去看了下url到底长什么样。在[TinkerClientAPI](https://github.com/TinkerPatch/tinkerpatch-sdk/blob/master/tinkerpatch-sdk/src/main/java/com/tencent/tinker/server/client/TinkerClientAPI.java)里面有这么一段，其实跟Tinker本身庞大的架构比起来，已经算不上什么了。
 ```java
 Uri.Builder urlBuilder = Uri.parse(this.host).buildUpon(); // "http://q.tinkerpatch.com"
-        if (clientAPI.debug) {
-            urlBuilder.appendPath("dev");
-        }
-        final String url = urlBuilder.appendPath(this.appKey)
-            .appendPath(this.appVersion)
-            .appendQueryParameter("d", versionUtils.id())
-            .appendQueryParameter("v", String.valueOf(System.currentTimeMillis()))
-            .build().toString();
+if (clientAPI.debug) {
+    urlBuilder.appendPath("dev");
+}
+final String url = urlBuilder.appendPath(this.appKey)
+.appendPath(this.appVersion)
+.appendQueryParameter("d", versionUtils.id())
+.appendQueryParameter("v", String.valueOf(System.currentTimeMillis()))
+.build().toString();
 ```
 除此之外，为了能够在测试环境验证补丁，还提供了一个[小工具](https://github.com/TinkerPatch/tinkerpatch-debug-tool)
 

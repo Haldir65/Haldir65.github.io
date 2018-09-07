@@ -392,7 +392,8 @@ android.os.FileUriExposedException: file://assets/dist/index.js exposed beyond a
 at android.os.StrictMode.onFileUriExposed(StrictMode.java:1816)
 
 
-
+### 15. setClipToOutline(v21)
+[圆角矩形的实现多了一种选择](https://stackoverflow.com/questions/16161448/how-to-make-layout-with-rounded-corners)
 
 
 [gradle build scan](https://gradle.com/build-scans)

@@ -5,6 +5,7 @@ tags: [android]
 ---
 
 glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request --->  CacheDispatch  ---> NetworkDispatcher  ---->  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是能够独立设计出一套类似的框架了。
+写这篇文章时，Glide的版本是3.8
 
 
 ![](https://www.haldir66.ga/static/imgs/a11f41e0b1df95212c71920b3959cd72.jpg)
@@ -815,7 +816,7 @@ Glide.with(itemView.getContext())
 
 ## update
 Glide 4.0之后提供了更高的可定制度，
-[如何为Glide设定OkHttpClinent](https://stackoverflow.com/questions/37208043/how-to-set-okhttpclient-for-glide)
+[如何为Glide设定OkHttpClient](https://stackoverflow.com/questions/37208043/how-to-set-okhttpclient-for-glide)
 ```java
  @GlideModule
     private class CustomGlideModule extends AppGlideModule {
