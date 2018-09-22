@@ -791,6 +791,16 @@ ItemInfo addNewItem(int position, int index) {
  }
 ```
 
+viewPager的layoutParams是不认margin的，所以加左右margin得这样
+>viewPager.pageMargin =  gap
+viewPager.clipToPadding = false
+viewPager.setPadding(gap,0,gap,0)
+
+还有PagerAdapter的getItemPosition这个方法，返回值限于POSITION_UNCHANGED，POSITION_NONE或者object的newPosition(很多时候都忘记写)
+[fragment-state-pager-adapter](https://billynyh.github.io/blog/2014/03/02/fragment-state-pager-adapter/)
+[ViewPager 与 PagerAdapter 刷新那点事](https://www.zybuluo.com/zhuhf/note/783633)
+
+
 在AbsListView中，setScrollingCacheEnabled这个方法也存在，同样是调用的child的drawingCacheEnabled
 [Romain Guy的博客提到了ListView默认开启，但他忘记了GridView默认开启](http://www.curious-creature.com/2008/12/22/why-is-my-list-black-an-android-optimization/)
 

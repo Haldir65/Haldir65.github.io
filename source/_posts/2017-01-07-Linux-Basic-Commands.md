@@ -51,6 +51,8 @@ tags: [置顶,linux,tools]
 
 ls –l –R(或-lR) src > list.txt  ##列出文件列表
 
+ll -trh ## 按照modify time倒序排列（-t sort by modification time，-r reverse order while sorting）
+
 - > mkdir //新建目录
 - > rmdir //删除目录,如果目录不为空，
 - >使用 rm -r //递归删除

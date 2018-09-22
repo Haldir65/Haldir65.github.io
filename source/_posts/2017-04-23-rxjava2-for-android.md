@@ -336,7 +336,10 @@ Observable<String> yelling = greeting.map(s ->s.toUppercase())
 Observable.subscribeOn(Schedulers.io()) //
 ```
 subscribeOn决定了task在哪条线程上运行，操作符的顺序很重要
+**this is wrong**
 ![Wrong](https://www.haldir66.ga/static/imgs/reading_network_response_on_main_thread.jpg)
+
+**this is right**
 ![Ok](https://www.haldir66.ga/static/imgs/observing_on_ui_thread.jpg)
 
 

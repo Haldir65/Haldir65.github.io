@@ -399,7 +399,12 @@ at android.os.StrictMode.onFileUriExposed(StrictMode.java:1816)
 [gradle build scan](https://gradle.com/build-scans)
 [把一些本地libiary打包成aar能够显著加快编译]
 
-TextView有时候会出现提前换行的问题
+
+[AAPT2会生成一堆.flat文件](https://fucknmb.com/2017/10/31/aapt2%E8%B5%84%E6%BA%90compile%E8%BF%87%E7%A8%8B/)
+
+**全角半角对汉字没有影响**
+TextView有时候会出现提前换行的问题,这事据说跟全角半角有关（全角状态下字母、数字符号等都会占两个字节的位置，也就是一个汉字那么宽，半角状态下，字母数字符号一般会占一个字节，也就是半个汉字的位置，全角半角对汉字没有影响。）
+一个直观的表现是全角的情况下你发现冒号，分号这些东西都变得比较宽。（;；MＭ）也就是所谓的中文标点符号 .对了，全角的情况下字母，数字也会变宽一点（本质上是占用两个字符）
 
 [Instagram是如何提升TextView渲染性能的(http://codethink.me/2015/04/23/improving-comment-rendering-on-android/),关键字TextLayoutCache
 [compile ffmpeg for android](https://zhuanlan.zhihu.com/p/40921043)
