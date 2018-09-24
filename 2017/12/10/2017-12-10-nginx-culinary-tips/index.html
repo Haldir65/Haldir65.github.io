@@ -17,7 +17,7 @@
 <meta property="og:description" content="linode的docs里面是这么介绍的  nginx is a lightweight, high performance web server designed to deliver large amounts of static content quickly with efficient use of system resources. nginx’s strong point is its">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery151110073841.jpg">
-<meta property="og:updated_time" content="2018-09-24T11:28:35.597Z">
+<meta property="og:updated_time" content="2018-09-24T14:14:42.238Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Nginx使用记录">
 <meta name="twitter:description" content="linode的docs里面是这么介绍的  nginx is a lightweight, high performance web server designed to deliver large amounts of static content quickly with efficient use of system resources. nginx’s strong point is its">
@@ -401,6 +401,16 @@ ga('send', 'pageview');
 <p>关于ngixn返回的response的header中Content-Type，在nginx的config目录下能找到一个mime.types文件。里面指定了哪些文件后缀对应哪些mimetype。比如.mp3文件就返回audio/mpeg这种。</p>
 <p><a href="https://www.linode.com/docs/security/ssl/install-lets-encrypt-to-create-ssl-certificates/">Install Let’s Encrypt to Create SSL Certificates</a><br>linode的教程非常实用，基本上就是这几条：<br>注意，该过程需要请求网络，所以事先把nginx关掉，保证80和443端口都是没人在用的<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sudo git clone https://github.com/letsencrypt/letsencrypt /opt/letsencrypt</span><br><span class="line">cd /opt/letsencrypt</span><br><span class="line">sudo -H ./letsencrypt-auto certonly --standalone -d example.com -d www.example.com ##多一个二级域名就要多一个-d,就是说得一个个的写，不支持*.example.com这种</span><br><span class="line">sudo ls /etc/letsencrypt/live ##一切顺利的话，生成的证书都在这里了</span><br><span class="line">./certbot-auto certificates ##看下我当前都有哪些证书</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 接下来是自动续期环节</span></span></span><br><span class="line">sudo -H ./letsencrypt-auto certonly --standalone --renew-by-default -d example.com -d www.example.com ##就是多了renew-by-default这个参数，因为这个免费证书默认是三个月的有效期。</span><br></pre></td></tr></table></figure></p>
 <p>强制http导向https的方法也很多<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen 80 default_server;</span><br><span class="line"></span><br><span class="line">    server_name _;</span><br><span class="line"></span><br><span class="line">    return 301 https://$host$request_uri;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>防止cc攻击：<br>nginx http配置：</p>
+<pre><code>#请求数量控制，每秒20个
+limit_req_zone $binary_remote_addr zone=one:10m rate=20r/s;
+#并发限制30个
+limit_conn_zone $binary_remote_addr zone=addr:10m;
+
+server块配置
+limit_req zone=one burst=5;
+limit_conn addr 30;
+</code></pre><p><a href="https://marskid.net/2018/02/04/nginx-deny-web-scanner/">还可以把这种网络扫描的程序导入到受限的服务中</a></p>
 <h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
 <li><a href="https://wizardforcel.gitbooks.io/nginx-doc/content/Text/6.1_nginx_windows.html">nginx Configurations</a></li>
 <li><a href="https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-16-04">How To Install Nginx on Ubuntu 16.04</a></li>
@@ -762,6 +772,10 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
@@ -798,15 +812,11 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">nginx</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
               </li>
             
             <div class="clearfix"></div>
