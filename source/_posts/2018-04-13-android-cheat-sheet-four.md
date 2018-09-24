@@ -1,7 +1,7 @@
 ---
-title: Android手册-4
+title: Android知识集合[四]
 date: 2018-04-13 13:53:52
-tags:
+tags: [android]
 ---
 
 
@@ -394,6 +394,10 @@ at android.os.StrictMode.onFileUriExposed(StrictMode.java:1816)
 
 ### 15. setClipToOutline(v21)
 [圆角矩形的实现多了一种选择](https://stackoverflow.com/questions/16161448/how-to-make-layout-with-rounded-corners)
+
+
+
+
 
 
 [gradle build scan](https://gradle.com/build-scans)

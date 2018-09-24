@@ -991,6 +991,19 @@ server {
 }
 ```
 
+防止cc攻击：
+nginx http配置：
+    #请求数量控制，每秒20个
+    limit_req_zone $binary_remote_addr zone=one:10m rate=20r/s;
+    #并发限制30个
+    limit_conn_zone $binary_remote_addr zone=addr:10m;
+
+    server块配置
+    limit_req zone=one burst=5;
+    limit_conn addr 30;
+
+[还可以把这种网络扫描的程序导入到受限的服务中](https://marskid.net/2018/02/04/nginx-deny-web-scanner/)
+
 
 ### 参考
 - [nginx Configurations](https://wizardforcel.gitbooks.io/nginx-doc/content/Text/6.1_nginx_windows.html)

@@ -32,6 +32,9 @@ ffmpeg -i input.mp4 -aspect 16:9 output.mp4 ## 更改长宽比
 
 [ffmpeg c语言写一个video player](https://github.com/mpenkov/ffmpeg-tutorial)
 
+
+[ffmpeg的node js 包装](https://github.com/fluent-ffmpeg/node-fluent-ffmpeg)
+
 ## 参考
 
 [nginx搭建rtmp推流服务](https://www.jianshu.com/p/fc64102d6162)

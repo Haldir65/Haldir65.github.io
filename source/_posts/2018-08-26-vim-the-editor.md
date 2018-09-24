@@ -1,7 +1,7 @@
 ---
 title: Vim常用命令指南
 date: 2018-08-26 22:49:00
-tags:
+tags: [linux]
 ---
 
 ![](https://www.haldir66.ga/static/imgs/food_truck_hotdog_night_city.jpg)

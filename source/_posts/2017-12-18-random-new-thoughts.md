@@ -39,6 +39,7 @@ top : 1
 - [ ][Vim cheet sheet](https://vim.rtorr.com/)
 - [ ][LOGSTASH+ELASTICSEARCH+KIBANA处理NGINX访问日志](http://www.wklken.me/posts/2015/04/26/elk-for-nginx-log.html)ELK全家桶
 - [ ] [python c extension](https://www.tutorialspoint.com/python/python_further_extensions.htm)
+- [ ] autoWired, autovalue这些java 的library
 
 
 
