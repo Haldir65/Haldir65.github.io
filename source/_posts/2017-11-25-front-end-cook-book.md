@@ -9,6 +9,10 @@ tags: [前端]
 
 <!--more-->
 
+SPA(Single Page Application)单页应用（没有SEO,首屏时间比较长，因为一进去要把所有的js之类的东西都加载完，使用过程中比较流畅）
+
+Common js是node js的库遵守的,export import是es2015的东西,AMD(Asynchronous Module Definition)在common js的基础上加了一个带回调的require(用于浏览器)
+
 # 常用网站
 [cssmatic](https://www.cssmatic.com/box-shadow),一个可以用拖拽的方式生成css代码的神奇的网站
 [不仅仅是font,还有很好的icon](http://fontawesome.io/)
@@ -216,6 +220,11 @@ loaders {
 
 ## Vue Related
 [better-scroll](https://github.com/ustbhuangyi/better-scroll) 滴滴的员工写的
+
+## handlebars,ejs,jade
+模板（和python那边的jinja模板一个意思）
+
+## less,sass,stylus(css预处理器)
 
 ## jQuery Related
 jQuery是一个Dom Manipulate Library
