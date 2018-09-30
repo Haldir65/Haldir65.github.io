@@ -207,6 +207,16 @@ cat  shadowsocks.log | awk '{ print $5}' |grep -o '^[^:]*' | sort | uniq -c | so
 查看尝试连接本服务器的客户端
 cat shadowsocks.log | awk '{ print $NF }'| grep -o '^[^:]*' | sort | uniq -c | sort -n
 
+### 2.6 simple-obfs
+sudo apt-get install simple-obfs
+/etc/shadowsocks-libev/config.json文件中添加
+```
+"plugin":"obfs-server",
+"plugin_opts": "obfs=tls;obfs-host=www.bing.com",
+"fast_open":true,
+"reuse_port":true
+```
+
 ## 3. ubuntu自带的防火墙叫做ufw，用起来也很简单
 [digital ocean的ufw教程](https://www.digitalocean.com/community/tutorials/ufw-essentials-common-firewall-rules-and-commands)
 
