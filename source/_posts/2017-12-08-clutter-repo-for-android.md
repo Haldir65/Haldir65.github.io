@@ -363,7 +363,7 @@ measureVertical()
     └─wrapper
 这里提到了一些点：gradlew.bat是给windows平台用的，gradlew是给unix平台用的。
 gradle/wrapper/gradle-wrapper.jar 里面装的是Gradle Wrapper的代码
-gradlew就是一个调用gradle命令的脚本，内部会根据gradle-wrapper.properties里面的distributionUrl下载对应版本的gradle distribution zip文件并解压缩，并只会使用该版本的gralde进行编译
+gradlew就是一个调用gradle命令的脚本，内部会根据gradle-wrapper.properties里面的distributionUrl下载对应版本的gradle distribution zip文件并解压缩，并只会使用该版本的gradle进行编译
 
 [gradlew就是帮忙安装好gradle然后调用gradle](https://stackoverflow.com/questions/39627231/difference-between-using-gradlew-and-gradle)
 其实看一下gradlew文件里面的注释:

@@ -15,7 +15,7 @@ Initialization -> Configuration -> Execution
 
 > Android dependency 'com.android.support:support-v4' has different version for the compile (21.0.3) and runtime (26.1.0) classpath. You should manually set the same version via DependencyResolution
 
-一些常用的gralde的command 如下
+一些常用的gradle的command 如下
 > gradlew :app:dependencies --configuration releaseCompileClasspath
 //前面这个:app只是代表app这个project的
 gradle tasks --all ## 查看当前project的所有tasks

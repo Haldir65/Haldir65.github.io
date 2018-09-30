@@ -40,6 +40,9 @@ top : 1
 - [ ][LOGSTASH+ELASTICSEARCH+KIBANA处理NGINX访问日志](http://www.wklken.me/posts/2015/04/26/elk-for-nginx-log.html)ELK全家桶
 - [ ] [python c extension](https://www.tutorialspoint.com/python/python_further_extensions.htm)
 - [ ] autoWired, autovalue这些java 的library
+- [ ] when it comes to design , how do we translate px, pt, em  into sp,dp and others(设计方面的，各种单位之间的转换)?
+- [nio stuff](https://juejin.im/post/59fffdb76fb9a0450a66bd58)
+CompletableFuture and other java apis
 
 
 
@@ -82,7 +85,6 @@ top : 1
 - Android进程的[加载流程](https://juejin.im/post/5a646211f265da3e3f4cc997)
 - 前后端同构
 - [install nginx , jenkin ci, deploying nginx in docker(Http Load Balaning with Docker and nginx)](https://www.digitalocean.com/community/tutorials/how-to-configure-nginx-with-ssl-as-a-reverse-proxy-for-jenkins)
-- [nio stuff](https://juejin.im/post/59fffdb76fb9a0450a66bd58)
 - [ ] 网易云音乐API
 - [X] Django部署个人网站(Gunicorn，Nginx)。django写template就不是前后端分离了
 - [ ] Docker[intro-to-docker-building-android-app](https://medium.com/@elye.project/intro-to-docker-building-android-app-cb7fb1b97602) 这篇文章其实是两件事，一个是Build docker image(docker build xxxx),另一个是run (docker run xxx)

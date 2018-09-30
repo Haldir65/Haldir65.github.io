@@ -501,13 +501,18 @@ public class Test {
     }
 
     public static void main(String[] args) {
-        Long value = null;
+        Long value = null; //因为null不能被Boxing，所以崩了
         // ...
         test(value);
     }
 }
 ```
 其实重点在于看javap -c 生成的字节码
+
+[ternary operator也会造成npe](https://stackoverflow.com/questions/25996591/java-ternary-operator-npe-autoboxing-string)
+> This is happening because the type return by a ternary operator is the type of the first returned value. In this case, that's the primitive value false. So Java is trying to take the primitive boolean returned by the ternary operator, then use autoboxing to convert it to a wrapper Boolean. But then you return a null from the ternary operator. And then when Java tries to autobox it, it throws an NPE because null can't be autoboxed. You should either use wrapper Booleans as the values in the ternary operator, or restructure this using if statements.
+
+简单来讲，ternary operator返回值的类型是第一个return值的类型(在这里就是boolean)，但返回一个Null的话，null并不能被autoBoxing，所以崩了。
 
 ### 30. 假如没有override hashCode方法，那么deug里面看到的是什么？
 ```java
@@ -1708,3 +1713,5 @@ class的生命周期
 ## 参考
 - [Jake Wharton and Jesse Wilson - Death, Taxes, and HTTP](https://www.youtube.com/watch?v=6uroXz5l7Gk)
 - [Android Tech Talk: HTTP In A Hostile World](https://www.youtube.com/watch?v=tfD2uYjzXFo)
+- [netty里面使用jvm inline提升运行效率的一个issue](http://normanmaurer.me/blog/2014/05/15/Inline-all-the-Things/) 博客内容非常深入
+
