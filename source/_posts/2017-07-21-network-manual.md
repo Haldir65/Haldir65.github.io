@@ -809,7 +809,6 @@ Time : Thu Mar 15 16:20:59 CST 2018</center>
 ```
 当然因为访问的是http，302是临时重定向，注意上面返回了Location字段，所以是符合规范的
 
-
 ===============================
 服务器返回的Sst-Cookie可以像上面一样有很多个。
 Set-Cookie: BAIDUID=259D5F393E329E8E44651C589037C093:FG=1; expires=Thu, 31-Dec-37 23:55:55 GMT; max-age=2147483647; path=/; domain=.baidu.com
@@ -819,10 +818,16 @@ Set-Cookie: BAIDUID=259D5F393E329E8E44651C589037C093:FG=1; expires=Thu, 31-Dec-3
 expires,path,domain这些东西都是规范，下一次请求是，只有当这个cookie的domain和path匹配的上才会发送这个Cookie。
 
 
+至少在linux和mac环境下，mac地址是可以改的。
+>ifconfig eth0 down
+ifconfig eth0 hw ether xx:xx:xx:xx:xx:xx
+ifconfig eth0 up
+
 
 
 m3u8就是很多ts文件的目录
 [【腾讯bugly干货分享】HTML 5 视频直播一站式扫盲](https://juejin.im/entry/5779fa798ac24700534921b5)
 .m3u8 文件，其实就是以 UTF-8 编码的 m3u 文件，这个文件本身不能播放，只是存放了播放信息的文本文件：
+就是说把一个视频切割成很多个TS分片文件。这里面还能牵扯到防盗链等问题。
 
 [Linux下TCP延迟确认(Delayed Ack)机制导致的时延问题分析](https://cloud.tencent.com/developer/article/1004356) TCP Nagle算法&&延迟确认机制(微软更新KB328890)

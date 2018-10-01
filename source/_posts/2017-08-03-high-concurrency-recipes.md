@@ -329,6 +329,9 @@ volatile并不是Atomic操作，例如，A线程对volatile变量进行写操作
 
 java 无锁状态、偏向锁、轻量级锁和重量级锁
 
+## 17. CompletableFuture等java 8 的api
+[AtomicLongFieldUpdater](http://normanmaurer.me/blog/2013/10/28/Lesser-known-concurrent-classes-Part-1/)比AtomicLong更加省内存的方式
+
 ## 参考
 - [看起来 ReentrantLock 无论在哪方面都比 synchronized 好](http://blog.csdn.net/fw0124/article/details/6672522)
 - [Jesse Wilson - Coordinating Space and Time](https://www.youtube.com/watch?v=yS0Nc-L1Uuk)

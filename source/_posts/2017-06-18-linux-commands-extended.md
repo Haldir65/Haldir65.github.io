@@ -492,6 +492,9 @@ else
     echo "非root用户！"  
 fi
 ```
+
+
+
 变量分为用户自定义的和环境变量（其实就是系统预设的）,有些区别
 > 用户自定义变量只在当前的shell中生效，环境变量在当前shell和这个shell的所有子shell中生效。
 环境变量是全局变量，用户自定义变量是局部变量。
@@ -768,6 +771,8 @@ linux上目测没有默认安装zsh。
 [如果在国内使用的话，使用清华大学开源站的镜像的速度会快一点](https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/)
 
 grep -ni "python" * //在当前目录下查找所有包含"python"字符串的文件，并且显示出行号。
+
+ctrl +r 可以在history中查找,ctrl + j 把选中的内容剪切到剪切板
 
 ## 参考
 - [每天一个Linux命令](http://www.cnblogs.com/peida/archive/2012/12/05/2803591.html)

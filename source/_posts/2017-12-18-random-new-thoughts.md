@@ -31,20 +31,30 @@ top : 1
 - [ ] [libmp3lame移植到Android](https://www.jianshu.com/p/534741f5151c),跟jni有关了
 - [ ] nodejs ,go ,protobuf rpc
 - [ ] [indexed DB](http://www.ruanyifeng.com/blog/2018/07/indexeddb.html),浏览器端数据库，[content-disposition](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)
-- [ ] classloader和class的生命周期
 - [ ] [在bash脚本中获取当前脚本所在路径](https://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within?rq=1)
 - [ ] [如何写makefile](https://seisman.github.io/how-to-write-makefile/introduction.html)
 - [ ]一致性哈希原理
 - [ ] [使用redis实现低粒度的分布式锁](http://afghl.github.io/2018/06/17/distributed-lock-and-granarity.html)
 - [ ][Vim cheet sheet](https://vim.rtorr.com/)
 - [ ][LOGSTASH+ELASTICSEARCH+KIBANA处理NGINX访问日志](http://www.wklken.me/posts/2015/04/26/elk-for-nginx-log.html)ELK全家桶
+
+
 - [ ] [python c extension](https://www.tutorialspoint.com/python/python_further_extensions.htm)
+- [ ] Coordinator behavior以及scroll原理，完善blog
+- [ ][狗日的viewPager原理](https://billynyh.github.io/blog/2014/03/02/fragment-state-pager-adapter/)
+- [ ]Exoplayer and the MediaCodec api
+- [ ] [简直碉堡了的博客](http://normanmaurer.me/blog/2013/11/09/The-hidden-performance-costs-of-instantiating-Throwables/)以及jvm 的inline等优化
 - [ ] autoWired, autovalue这些java 的library
+- [ ] instagram好像通过注解的方式自己写了一个json解析器
+- [ ] Android 应用接入bugly热修复，上线之后就不用背锅了（有兴趣看看sevenZip.jar）
 - [ ] when it comes to design , how do we translate px, pt, em  into sp,dp and others(设计方面的，各种单位之间的转换)?
 - [nio stuff](https://juejin.im/post/59fffdb76fb9a0450a66bd58)
-CompletableFuture and other java apis
-
-
+- [ ]Linux下TCP延迟确认机制
+- [ ] classloader和class的生命周期
+- [ ]c语言写数据结构,c语言的仓库维护
+- [ ]python dunder class复习
+- [ ]ffmpeg 的js wrapper
+- [ ]打扫，清理博客内容
 
 
 ### 已完成

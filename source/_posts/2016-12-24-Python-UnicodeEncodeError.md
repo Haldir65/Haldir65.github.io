@@ -288,6 +288,8 @@ class object orientated
 
 [如何使用全局变量, global variables are dangerous](https://stackoverflow.com/questions/423379/using-global-variables-in-a-function)
 
+[selenium教程](https://realpython.com/modern-web-automation-with-python-and-selenium/)
+[深复制和浅复制的区别](https://realpython.com/copying-python-objects/)
 
 
 ### Reference

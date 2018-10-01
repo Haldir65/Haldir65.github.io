@@ -92,3 +92,4 @@ curl -X GET -d  --header "Content-Type:application/json" --heade "Authorization:
 flask设置status code似乎只需要在return后面加上一个200这样的code就可以了
 
 [How Do Python Coroutines Work?](https://www.youtube.com/watch?v=7sCu4gEjH5I)
+[关于python的socket api，这里有一篇介绍](https://realpython.com/python-sockets/)

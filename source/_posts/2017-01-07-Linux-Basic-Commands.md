@@ -44,12 +44,13 @@ tags: [置顶,linux,tools]
 ```shell
 - > cd //进入目录
 - > cd /  返回根目录
-- > pwd // 显示当前目录
+- > pwd // 显示当前目录 (print working directory)
 - > ls // 显示当前目录下内容
 - > ll = ls -al ## 这时候发现有些文件名后面跟着一个星号，这说明这个文件是可执行的
 # ls -halt is for human readable, show hidden, print details, sort by date
 
 ls –l –R(或-lR) src > list.txt  ##列出文件列表
+cd - //回到你刚才的目录
 
 ll -trh ## 按照modify time倒序排列（-t sort by modification time，-r reverse order while sorting）
 
@@ -68,7 +69,6 @@ rename是实际意义上的重命名命令，但rename接受三个参数
 - > touch filename //创建文件，后缀在linux下没意义
 另外,touch 命令主要是用来改文件的时间戳的
 - > touch -t 201707081238.34 file.txt //把这个文件的时间戳改成2017年XXX。。。
-
 ```
 
 
@@ -87,8 +87,6 @@ rename是实际意义上的重命名命令，但rename接受三个参数
 - > mv d1 ../../
 ```
 
-
-
 ### 重定向
 
 ```shell
@@ -100,6 +98,8 @@ echo 'hey man' # 类似于print
 echo 'hello' > log.txt #把这句话写入到文本中 ，覆盖其原有内容
 
 printf "hello world\n" //linux里面这样也是可以输出的，几乎就和c语言语法一致了
+
+echo $((2+2)) ##shell里面也是能够进行加减乘除的，需要两个parentheses.当然这里只能处理小数,2.3直接向上变成3
 
 >> 表示追加，不覆盖,append
 
