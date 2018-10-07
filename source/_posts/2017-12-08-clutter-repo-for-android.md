@@ -733,29 +733,85 @@ ItemInfo addNewItem(int position, int index) {
       }
       return ii;
   }
+  
 
+// notifyDataSetChange最终走到了这里，关键在于getItemPosition这个方法的实现
+   void dataSetChanged() {
+        // This method only gets called if our observer is attached, so mAdapter is non-null.
 
-// notifyDataSetChange的不过是调用了这个方法
-  void dataSetChanged() {
-         // This method only gets called if our observer is attached, so mAdapter is non-null.
-
-         final int adapterCount = mAdapter.getCount();
-         mExpectedAdapterCount = adapterCount;
-         boolean needPopulate = mItems.size() < mOffscreenPageLimit * 2 + 1
-                 && mItems.size() < adapterCount; // mOffscreenPageLimit默认是1
+        final int adapterCount = mAdapter.getCount();
+        mExpectedAdapterCount = adapterCount;
+        boolean needPopulate = mItems.size() < mOffscreenPageLimit * 2 + 1
+                && mItems.size() < adapterCount; // mOffscreenPageLimit默认是1
         // 比如原来的数量只有2，或者添加了新的数据，都需要重走一遍layout
+        int newCurrItem = mCurItem;
 
-         boolean isUpdating = false;
-         for (int i = 0; i < mItems.size(); i++) {
-             if (ii.position != newPos) {
-                 needPopulate = true; //多数不会走到这里
-             }
-         }
-         if (needPopulate) {
-             requestLayout();
-         }
-     }
+        boolean isUpdating = false;
+        for (int i = 0; i < mItems.size(); i++) {
+            final ItemInfo ii = mItems.get(i);
+            final int newPos = mAdapter.getItemPosition(ii.object);
+
+            if (newPos == PagerAdapter.POSITION_UNCHANGED) {
+                continue; //这也就是adapter中getItemPosition发挥作用的地方，ViewPager更新了数据，如果不去复写这个方法，下面的destoryItem就无法走到(比如说删除了一个数据就没法删掉这个fragment)
+            }
+           
+        
+            if (newPos == PagerAdapter.POSITION_NONE) {
+                mItems.remove(i);
+                i--;
+
+                if (!isUpdating) {
+                    mAdapter.startUpdate(this);
+                    isUpdating = true;
+                }
+
+                mAdapter.destroyItem(this, ii.position, ii.object);
+                needPopulate = true;
+
+                if (mCurItem == ii.position) {
+                    // Keep the current item in the valid range
+                    newCurrItem = Math.max(0, Math.min(mCurItem, adapterCount - 1));
+                    needPopulate = true;
+                }
+                continue;
+            }
+
+            if (ii.position != newPos) {
+                if (ii.position == mCurItem) {
+                    // Our current item changed position. Follow it.
+                    newCurrItem = newPos;
+                }
+
+                ii.position = newPos;
+                needPopulate = true;
+            }
+        }
+
+        if (isUpdating) {
+            mAdapter.finishUpdate(this); //这里无论是FragmentPagerAdapter还是FragmentStatePagerAdapter都只是调用了transaction.commitNowAllowingStateLoss
+        }
+
+        Collections.sort(mItems, COMPARATOR);
+
+        if (needPopulate) {
+            // Reset our known page widths; populate will recompute them.
+            final int childCount = getChildCount();
+            for (int i = 0; i < childCount; i++) {
+                final View child = getChildAt(i);
+                final LayoutParams lp = (LayoutParams) child.getLayoutParams();
+                if (!lp.isDecor) {
+                    lp.widthFactor = 0.f;
+                }
+            }
+
+            setCurrentItemInternal(newCurrItem, false, true);
+            requestLayout();
+        }
+    }
+
 ```
+
+
 
 最后是关于ViewPager的预加载问题
 ```java
@@ -799,6 +855,91 @@ viewPager.setPadding(gap,0,gap,0)
 还有PagerAdapter的getItemPosition这个方法，返回值限于POSITION_UNCHANGED，POSITION_NONE或者object的newPosition(很多时候都忘记写)
 [fragment-state-pager-adapter](https://billynyh.github.io/blog/2014/03/02/fragment-state-pager-adapter/)
 [ViewPager 与 PagerAdapter 刷新那点事](https://www.zybuluo.com/zhuhf/note/783633)
+[aosp的issue中关于viewPager的讨论](https://issuetracker.google.com/issues/36956111)
+
+ // 那么newPos可不可以返回POSITION_UNCHANGED和POSITION_NONE以外的东西呢？
+return object's new position index from [0, {@link #getCount()}), {@link #POSITION_UNCHANGED} if the object's position has not changed,or {@link #POSITION_NONE} if the item is no longer present.
+从方法的注释来看当然是可以的。从代码来看，如果getItemPosition返回的int值不是POSITION_UNCHANGED和POSITION_NONE的话，会把返回的值当做新的值来使用，同时needPopulate为true（也就是会调用requestLayout方法）
+最简单的例子是返回
+myFragments.indexOf(`object`)
+
+亲测，adapter继承FragmentPagerAdapter，比方说adapter中有一个List<Fragment>，如果想要替换第0个和第1个的位置（这种不属于结构性替换），这样就可以了
+val list = adapter1.myFragments
+Collections.swap(list,0,1)
+adapter1.notifyDataSetChanged() // 这里走完了并不会调用任何scrollToItem方法，所以还是需要有下面的setCurrentItem
+pager1.setCurrentItem(0,false) //这里只是避免动画
+
+在adapter中这两个方法要保持一致性
+ override fun getItemId(position: Int): Long {
+    return (myFragments[position] as PagerFragment).hashCode().toLong() //这里只需要返回一个足够表明独一无二身份的东西就好了,hashCode足以
+}
+
+override fun getItemPosition(`object`: Any): Int {
+//如果是两个数据之间调换了的话
+return myFragments.indexOf(`object`)
+}
+所以POSITION_NONE只是确保adapter的destoryItem方法会走到所有旧的fragment
+上述做法适用于FragmentPagerAdapter以及FragmentStatePagerAdapter
+这里还不得不提到FragmentPagerAdapter和FragmentStatePagerAdapter的区别
+
+```java
+// FragmentPagerAdapter的
+public Object instantiateItem(ViewGroup container, int position) {
+    final long itemId = getItemId(position); // 这个方法默认返回了position，但事实上可以如果后续更新了某一个position的fragment，还是会使用之前的fragment,而不是走到getItem的重新创建item。个人觉得可以返回一个position+lastUpdateTimeStamp这样的String。也就能完成FragmentPagerAdapter的刷新问题了
+    // Do we already have this fragment?
+    String name = makeFragmentName(container.getId(), itemId);
+    Fragment fragment = mFragmentManager.findFragmentByTag(name);
+    if (fragment != null) {
+    if (DEBUG) Log.v(TAG, "Attaching item #" + itemId + ": f=" + fragment);
+    mCurTransaction.attach(fragment);
+    } else {
+    fragment = getItem(position);
+    if (DEBUG) Log.v(TAG, "Adding item #" + itemId + ": f=" + fragment);
+    mCurTransaction.add(container.getId(), fragment,
+            makeFragmentName(container.getId(), itemId));
+    }
+}
+
+// FragmentStatePagerAdapter的
+@Override
+public Object instantiateItem(ViewGroup container, int position) {
+    // If we already have this item instantiated, there is nothing
+    // to do.  This can happen when we are restoring the entire pager
+    // from its saved state, where the fragment manager has already
+    // taken care of restoring the fragments we previously had instantiated.
+    if (mFragments.size() > position) {
+        Fragment f = mFragments.get(position);
+        if (f != null) {
+            return f;
+        }
+    }
+
+    if (mCurTransaction == null) {
+        mCurTransaction = mFragmentManager.beginTransaction();
+    }
+
+    Fragment fragment = getItem(position);
+    if (DEBUG) Log.v(TAG, "Adding item #" + position + ": f=" + fragment);
+    if (mSavedState.size() > position) {
+        Fragment.SavedState fss = mSavedState.get(position);
+        if (fss != null) {
+            fragment.setInitialSavedState(fss);
+        }
+    }
+    while (mFragments.size() <= position) {
+        mFragments.add(null);
+    }
+    fragment.setMenuVisibility(false);
+    fragment.setUserVisibleHint(false);
+    mFragments.set(position, fragment);
+    mCurTransaction.add(container.getId(), fragment);
+
+    return fragment;
+}
+
+
+
+```
 
 
 在AbsListView中，setScrollingCacheEnabled这个方法也存在，同样是调用的child的drawingCacheEnabled

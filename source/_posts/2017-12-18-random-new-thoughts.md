@@ -41,12 +41,12 @@ top : 1
 
 - [ ] [python c extension](https://www.tutorialspoint.com/python/python_further_extensions.htm)
 - [ ] Coordinator behavior以及scroll原理，完善blog
-- [ ][狗日的viewPager原理](https://billynyh.github.io/blog/2014/03/02/fragment-state-pager-adapter/)
 - [ ]Exoplayer and the MediaCodec api
 - [ ] [简直碉堡了的博客](http://normanmaurer.me/blog/2013/11/09/The-hidden-performance-costs-of-instantiating-Throwables/)以及jvm 的inline等优化
 - [ ] autoWired, autovalue这些java 的library
 - [ ] instagram好像通过注解的方式自己写了一个json解析器
 - [ ] Android 应用接入bugly热修复，上线之后就不用背锅了（有兴趣看看sevenZip.jar）
+- [ ] mqtt接入实践
 - [ ] when it comes to design , how do we translate px, pt, em  into sp,dp and others(设计方面的，各种单位之间的转换)?
 - [nio stuff](https://juejin.im/post/59fffdb76fb9a0450a66bd58)
 - [ ]Linux下TCP延迟确认机制
