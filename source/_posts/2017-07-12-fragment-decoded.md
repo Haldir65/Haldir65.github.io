@@ -568,7 +568,38 @@ public void onBackPressed() {
 3. [Jake Wharton建议不要用fragment的addtoBackStack](https://www.reddit.com/r/androiddev/comments/7hq00q/why_does_jake_wharton_recommend_one_activity_for/)，这是Reddit上的讨论，最后Jake本人出来选择了最佳解读(Nailed it)
 
 4. 这种在Activity中持有mFragment,或者在Adapter中持有mFragments的做法是**有可能**出错的
-亲身遇到过这种事，在Activity中持有了mFragments[]，在特定的时段（可能stateSave已经调用过了），再去debug查看，发现mFragments中的所有fragment都处于一种被detach的状态(所有的boolean被设置为false，所有的field被设置为null)。正确的做法是在此时通过getSupportFragmentManager去getFragments。得到一个list，这里面存着被重新创建的fragment的实例。因故此时外部持有的fragment实例已经是无效的实例了。
+亲身遇到过这种事，在Activity中持有了mFragments[]，在特定的时段（可能stateSave已经调用过了），再去debug查看，发现mFragments中的所有fragment都处于一种被detach的状态(所有的boolean被设置为false，所有的field被设置为null)。
+这件事的原因是在onSaveInstance和onRestoreInstance之间发生的。复现前提条件是viewPager.setOffScreenLimit设置的比较大,比如mDatas.size()-1
+具体来说就是：
+Fragment在onRestoreInstance之后都是通过反射重新恢复的，而在FragmentStatePagerAdapter中有这么一段，
+```java
+    @Override
+    public void restoreState(Parcelable state, ClassLoader loader) {
+        if (state != null) {
+            Iterable<String> keys = bundle.keySet();
+            for (String key: keys) {
+                if (key.startsWith("f")) {
+                    int index = Integer.parseInt(key.substring(1));
+                    Fragment f = mFragmentManager.getFragment(bundle, key);
+                    if (f != null) {
+                        while (mFragments.size() <= index) {
+                            mFragments.add(null);
+                        }
+                        f.setMenuVisibility(false);
+                        mFragments.set(index, f);
+                    } else {
+                        Log.w(TAG, "Bad fragment at key " + key);
+                    }
+                }
+            }
+        }
+    }
+```
+这个mFragments是FragmentStatePagerAdapter的私有成员变量，在恢复状态之后，将不再使用开发者的mAdapter中持有的fragments，直接使用恢复状态过来的fragments（这个要看ViewPager的populate方法了，offscreenLimit比较大的时候就不会调用adapter的instantiateItem）。此时，UI上显示的将不再是mAdapter中的东西。这件事本质上还是开发者自己没处理好saveState这件事。
+
+<del>正确的做法是在此时通过getSupportFragmentManager去getFragments(不知道这个是不是open api)。得到一个list，这里面存着被重新创建的fragment的实例。因故此时外部持有的fragment实例已经是无效的实例了。</del>
+解决方式：
+看见FragmentStatePagerAdapter的restoreState是怎么找到当前UI中显示的Fragment的了吧，直接复制粘贴，mAdapter复写restoreState方法，在这里面照着Fragment f = mFragmentManager.getFragment(bundle, key)一个个找到当前UI上显示的Fragment，一个个填充到mAdapter中的list里面。（或许有更优雅的实现，这里只是一种亲测可行的方式）
 
 
 

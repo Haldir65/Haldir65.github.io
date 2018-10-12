@@ -1073,6 +1073,10 @@ fdisk -l ## show a list of hard drives that are attached to your computer, fdisk
 在windows系统上分割符是"  ;  "
 还有就是forward slash和back slash了
 
+nl (类似于cat，只是展示文本的时候带上行号),fold(限定每一行最多多少个字符，超过了自动换行)
+
+
+curl ipinfo.io/ip 用于获取本机外部ip地址
 
 ### 参考
 

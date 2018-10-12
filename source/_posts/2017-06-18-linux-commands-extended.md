@@ -218,6 +218,9 @@ tar -jcvf log.tar.bz2 log2012.log 打包后，以 bzip2 压缩
 [常用的tar命令就那么几个](https://www.jb51.net/LINUXjishu/43356.html)
 tar -cvf all.tar.gz 和 tar -xf all.tar.gz这俩其实就够用了
 
+//其实解压缩应该是这样的就好了
+alias untar='tar -zxvf '
+
 对照手册来看：
 -c //小写的c，--create，表示创建新的备份文件
 -v //verbose,显示进度什么的
@@ -763,6 +766,14 @@ rm $HISTFILE
 熟悉了bash之后，再来看zsh，似乎更加轻松
 看一下我当前使用的是哪种sh: echo $SHELL
 linux上目测没有默认安装zsh。
+
+linux上.pid文件是用于记录当前进程运行信息的
+cat /var/run/nginx.pid 
+435
+看下ps -a | grep nginx 是不是也是435的pid
+
+
+
 [安装完zsh一定要装上这个的，on-my-zsh](https://github.com/robbyrussell/oh-my-zsh)
 [zsh有一个plugin的概念，这个是自动提示的插件](https://github.com/zsh-users/zsh-autosuggestions)
 [zsh的主题个人偏好Dracula](https://draculatheme.com/)

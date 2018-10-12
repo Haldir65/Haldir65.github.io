@@ -1005,6 +1005,9 @@ nginx http配置：
 [还可以把这种网络扫描的程序导入到受限的服务中](https://marskid.net/2018/02/04/nginx-deny-web-scanner/)
 
 
+在ubuntu18.04上，logrotate似乎默认已经被安装过了，所以，每天/var/log/nginx里面的文件都会被gzip一遍
+
+
 ### 参考
 - [nginx Configurations](https://wizardforcel.gitbooks.io/nginx-doc/content/Text/6.1_nginx_windows.html)
 - [How To Install Nginx on Ubuntu 16.04](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-16-04)

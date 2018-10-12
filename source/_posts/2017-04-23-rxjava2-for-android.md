@@ -538,6 +538,9 @@ Flowable.fromPublisher()方法接受一个Publisher参数，但是但是但是
 > Note that even though Publisher appears to be a functional interface, it is not recommended to implement it through a lambda as the specification requires state management that is not achievable with a stateless lambda.
 
 
+## todo
+[知道线程调度是怎么实现的吗](https://blog.piasy.com/AdvancedRxJava/2016/08/26/schedulers-3/)
+
 ### Reference
 
 -- [GOTO 2016 • Exploring RxJava 2 for Android • Jake Wharton - YouTube](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=6&cad=rja&uact=8&ved=0ahUKEwjlvrfg8bnTAhUI0mMKHcXZC1MQtwIITDAF&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DhtIXKI5gOQU&usg=AFQjCNEYczqXGkjYXOUbovtP1CxDPARcXA&sig2=gmLYEd2cVOhI7C2WjOHr9g)

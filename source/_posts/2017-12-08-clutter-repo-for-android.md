@@ -936,9 +936,6 @@ public Object instantiateItem(ViewGroup container, int position) {
 
     return fragment;
 }
-
-
-
 ```
 
 

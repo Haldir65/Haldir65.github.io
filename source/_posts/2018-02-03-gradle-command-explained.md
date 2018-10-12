@@ -541,6 +541,32 @@ maven {
 ```
 像这样的repository
 
+
+信不信由你，build.gradle文件有时候是从上往下读的。
+```js
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+            shrinkResources true
+        }
+
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+    }
+
+// signingConfigs写在下面是不认的，把这个signingConfigs挪到上面就行了。这跟多数语言的函数声明要写在引用前头是一样的。
+    signingConfigs {
+        release {
+           // ...
+        }
+    }
+```
+
 [比较复杂的gradle knowledge](https://github.com/adwiv/android-fat-aar)
 [official gradle docs 是最好的学习资料](https://guides.gradle.org/creating-new-gradle-builds/)
 [custom_plugins](https://docs.gradle.org/current/userguide/custom_plugins.html)
