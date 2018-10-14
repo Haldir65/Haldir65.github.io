@@ -1275,3 +1275,7 @@ TextUtils.java
 [5 分钟彻底明白 JSONP](https://tonghuashuo.github.io/blog/jsonp.html)
 [javaScript algorithms](https://github.com/trekhleb/javascript-algorithms)
 
+两个关于asynchronous javaScript的视频，一个解释了Event Loop的感念，另一个讲到了Promise基于microTask的原理。
+[菲利普·罗伯茨：到底什么是Event Loop呢？ | 欧洲 JSConf 2014](https://www.youtube.com/watch?v=8aGhZQkoFbQ)
+[Asynchrony: Under the Hood - Shelley Vohr - JSConf EU 2018](https://www.youtube.com/watch?v=SrNQS8J67zc)
+

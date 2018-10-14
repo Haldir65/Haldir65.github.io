@@ -342,6 +342,8 @@ javah -d jni com.your.package.name.classyoujustWroteWithnativeMethod
 [cmake的一些知识点](http://cfanr.cn/2017/08/26/Android-NDK-dev-CMake-s-usage/)
 cmake生成的.so文件在"\app\build\intermediates\cmake\debug\obj\arm64-v8a"这个路径下
 
+java调用c语言性能还好,c语言调用java的性能就比较差了
+
 15. 关于Spannable String的问题
 Medium上有关于使用span的文章 [Spantastic text styling with Spans](https://medium.com/google-developers/spantastic-text-styling-with-spans-17b0c16b4568) 其实有SpannableString(mutable),SpannableStringBuilder还有SpannedString(immutable)。
 Just reading and not setting the text nor the spans? -> SpannedString(文字和style都改不了)

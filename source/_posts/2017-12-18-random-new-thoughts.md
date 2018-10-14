@@ -42,10 +42,9 @@ top : 1
 - [ ] [python c extension](https://www.tutorialspoint.com/python/python_further_extensions.htm)
 - [ ] Coordinator behavior以及scroll原理，完善blog
 - [ ]Exoplayer and the MediaCodec api
-- [ ] [简直碉堡了的博客](http://normanmaurer.me/blog/2013/11/09/The-hidden-performance-costs-of-instantiating-Throwables/)以及jvm 的inline等优化
+
 - [ ] autoWired, autovalue这些java 的library
 - [ ] instagram好像通过注解的方式自己写了一个json解析器
-- [ ] Android 应用接入bugly热修复，上线之后就不用背锅了（有兴趣看看sevenZip.jar）
 - [ ] mqtt接入实践
 - [ ] when it comes to design , how do we translate px, pt, em  into sp,dp and others(设计方面的，各种单位之间的转换)?
 - [nio stuff](https://juejin.im/post/59fffdb76fb9a0450a66bd58)
@@ -81,6 +80,8 @@ top : 1
 - [X] URL Encoding,就是那个在网址里把字符转成百分号加上UTF-8的[找到了阮一峰老师的解释](http://www.ruanyifeng.com/blog/2010/02/url_encoding.html)
 - [X] 通过file input上传图片，原生ajax以及Ajax，自己搭建上传服务器[大概能猜到暴风影音的局域网传输实现了](https://zhuanlan.zhihu.com/p/24513281?refer=flask)用flask的话自己搭建好后台最简单了，最多再使用flask-wtf和flask-upload规范操作
 - [X]Promise 链式调用与终止，异常处理(只是一个工具而已)
+- [X] Android 应用接入bugly热修复，上线之后就不用背锅了（有兴趣看看sevenZip.jar，暂时没看）
+- [X] [简直碉堡了的博客](http://normanmaurer.me/blog/2013/11/09/The-hidden-performance-costs-of-instantiating-Throwables/)以及jvm 的inline等优化
 
 
 ### Good For Nothing
