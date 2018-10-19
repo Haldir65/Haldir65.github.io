@@ -303,3 +303,8 @@ nc -ul 1080 // 会卡在这里，等待新的消息到达1080端口
 nc -u x.x.x.x 1080 //也会卡在这里，不过可以输入文字，按下回车，服务器这边就能收到消息了
 
 wget --spider www.baidu.com //wget还有一个spider模式
+
+
+美团的技术博客还不错
+[前端安全系列之二：如何防止CSRF攻击？](https://tech.meituan.com/fe_security_csrf.html)
+

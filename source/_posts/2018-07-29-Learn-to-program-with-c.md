@@ -205,10 +205,6 @@ int main()
 ```
 g++ -o main main.cpp test.a //就没有问题了
 
-
-
-
-
 ## static library和shared(dynamic) library(关于.so和.a文件)
 library是在C程序编译的最后一步被link的，有两种链接方式：static和dynamic.
 static library通常运行速度要比shared libiary要快一点（因为一些常用的object已经被打进可执行文件了）

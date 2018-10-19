@@ -36,11 +36,12 @@ MongoDB默认装到C盘的program files文件夹里面,需要一个data文件夹
 [支持多种语言环境调用mongodb api](https://docs.mongodb.com/ecosystem/drivers/)
 
 
-语法：
+语法(不像mysql后面要跟一个;分号,mongo shell并不要求)：
 >  
 ```ruby
 use mydb ## 创建一个名mydb的数据库
 db.createCollection("students") ## 创建一个students的collections(类似于sql的table)
+show databases ##显示当前系统中所有db
 show collections  ## 显示当前数据库中的所有collections
 db.students.insert({name: 'Json',age: 22,title:['teacher','professor','versatile']}) ## 往数据库里添加一条数据
 db.students.find().pretty() // 显示students的collection中的所有元素，pretty只是好看点

@@ -1,5 +1,5 @@
 ---
-title: 2017-07-12-scrapy-notes
+title: Scrappy框架学习笔记
 date: 2017-07-12 08:37:55
 tags: [python]
 ---

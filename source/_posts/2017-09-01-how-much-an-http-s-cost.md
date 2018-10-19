@@ -50,6 +50,7 @@ Concatenating是把所有的js文件塞在一个大的js里面返回，这也造
 Spriting是把一大堆图片放在一整张图片里面，通过复杂的css选择其中的图片。
 
 
+![http pipe line 以及multiplex](https://www.haldir66.ga/static/imgs/http_pipeline_and_multiplexing.webp) 管道和多路复用
 
 ## 2. http2的开始
 Http有点像一种谈话式的协议，但tcp并不是。http并没有什么错,慢就慢在tcp

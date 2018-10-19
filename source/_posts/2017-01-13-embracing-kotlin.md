@@ -21,6 +21,7 @@ Kotlin是Jetbrain公司推出的面向jvm的语言，编译后的bytecode和java
 }
 ```
 
+
 自定义函数
 
  ```
@@ -425,6 +426,9 @@ init函数和constructor是有区别的
 var lst = ArrayList<Class<out Number>>()
 lst.add(Noun_Class::class.java)
 
+
+
+[class的主构造函数中是不能包含任何code逻辑的](https://stackoverflow.com/questions/44276277/constructors-in-kotlin)
 
 
 [stackoverflow](https://stackoverflow.com/questions/45267041/not-enough-information-to-infer-parameter-t-with-kotlin-and-android)

@@ -32,6 +32,8 @@ nginx的config文件中也要写正则
 
 一般情况下不要乱用正则
 ![](https://www.haldir66.ga/static/imgs/bee-getting-the-pollen-wallpaper-538358eb5d5a3.jpg)
+
+![](https://haldir66.ga/static/imgs/ship_docking_along_side_bay.jpg)
 ![](https://www.haldir66.ga/static/imgs/scenery151110067848.jpg)
 ![](https://www.haldir66.ga/static/imgs/scenery1511100718415.jpg)
 ![](https://www.haldir66.ga/static/imgs/fresh-sparkle-dew-drops-on-red-flower-wallpaper-53861cf580909.jpg)
@@ -63,5 +65,8 @@ nginx的config文件中也要写正则
 ![](https://www.haldir66.ga/static/imgs/ripe-grapes-macro-wallpaper-1920x1080-538350f32e183.jpg)
 ![](https://www.haldir66.ga/static/imgs/yellow-autumn-leaves-wallpaper-537f1e4672a31.jpg)
 
+![](https://www.haldir66.ga/static/imgs/green_forset_alongside_river_2.jpg)
+
+![](https://haldir66.ga/static/imgs/starry-night-van-gogh.jpg)
 ### 参考
 - [DFA和NFA](http://www.importnew.com/26560.html)

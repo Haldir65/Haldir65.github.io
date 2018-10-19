@@ -38,23 +38,18 @@ top : 1
 - [ ][Vim cheet sheet](https://vim.rtorr.com/)
 - [ ][LOGSTASH+ELASTICSEARCH+KIBANA处理NGINX访问日志](http://www.wklken.me/posts/2015/04/26/elk-for-nginx-log.html)ELK全家桶
 
-
 - [ ] [python c extension](https://www.tutorialspoint.com/python/python_further_extensions.htm)
 - [ ] Coordinator behavior以及scroll原理，完善blog
 - [ ]Exoplayer and the MediaCodec api
-
 - [ ] autoWired, autovalue这些java 的library
 - [ ] instagram好像通过注解的方式自己写了一个json解析器
 - [ ] mqtt接入实践
 - [ ] when it comes to design , how do we translate px, pt, em  into sp,dp and others(设计方面的，各种单位之间的转换)?
-- [nio stuff](https://juejin.im/post/59fffdb76fb9a0450a66bd58)
+- [nio stuff](https://juejin.im/post/59fffdb76fb9a0450a66bd58) 还是netty好
 - [ ]Linux下TCP延迟确认机制
 - [ ] classloader和class的生命周期
-- [ ]c语言写数据结构,c语言的仓库维护
 - [ ]python dunder class复习
 - [ ]ffmpeg 的js wrapper
-- [ ]打扫，清理博客内容
-
 
 ### 已完成
 * 用 express 转接一个知乎 Api，添加 Access-control-allow-origin,或许还可以用 redis 缓存数据结果（一个就好）由此想到一篇文章"How to use Pythonto build a restful Web Service".只不过用的是 Tornado
@@ -103,5 +98,7 @@ top : 1
 OpenType® is a cross-platform font file format developed jointly by Adobe and Microsoft.
 - [ ][deploying owncloud using docker](https://blog.securem.eu/serverside/2015/08/25/setting-up-owncloud-server-in-a-docker-container/)
 - [owncloud官方的配合docker安装教程](https://doc.owncloud.org/server/10.0/admin_manual/installation/docker/)网盘这种东西看个人喜好了
+- [ ]CloudFlare cdn解析以及DNS防护  
+
 
 [jsonplaceholder](https://jsonplaceholder.typicode.com/)懒得自己写api的话就用这个吧

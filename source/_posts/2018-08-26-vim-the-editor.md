@@ -30,10 +30,11 @@ alt-. - paste previous command's argument (useful for running multiple commands 
 
 接下来是vim常用的一些
 ### 首先是command mode下的
+```
     k
 h       l
     j
-
+```
 挪到屏幕头部: H 挪到文件头部是gg
 挪动光标到屏幕底部: L 挪到文件底部是G
 

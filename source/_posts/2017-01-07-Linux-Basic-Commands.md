@@ -516,6 +516,8 @@ who /var/log/wtmp
 ```
 zip –q –r -v video.zip . #加上一个-v主要是为了能够实时查看输出
 ```
+顺便说一下，tar打出来的.tar包在windows下是不认的，需要装7-zip之类的软件。zip打出来的包windows下是认的。
+
 文件传输（linux ->windows）： 一般使用putty ssh到Linux主机，想要把Linux上的文件弄到Windows中，需要使用pscp工具。下载好pscp.exe后，放到c:/windows/system32下面。打开cmd。输入命令
 ```shell
  pscp -r root@202.123.123.123:"/root/fileonServer.mp4" d:/whateveriwantonmyPc.mp4  
