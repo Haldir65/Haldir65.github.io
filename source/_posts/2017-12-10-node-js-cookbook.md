@@ -327,7 +327,20 @@ process.env.NODE_ENV = 'production';
   "start": "set NODE_ENV=dev && node app.js"
  }
 ```
+```
+For Mac/Linux users, you can simply type:
 
+export MONGOLAB_URI="mongodb://username:password@ds01316.mlab.com:1316/food"
+
+For Windows users:
+
+SET MONGOLAB_URI=mongodb://username:password@ds01316.mlab.com:1316/food
+
+After setting the Environment variables you need to call the Environment Variable into your code. You can do it by typing this
+
+var url = process.env.MONGOLAB_URI;
+```
+process.env.XXX只是环境变量而已
 
 =============================================================================
 开发环境用nodemon，生产环境用pm2(PM2的优胜之处在于当你要将app需要多核处理的时候，PM2内部集成的负载均衡可以让你很容易的去指定运行多少个实例。)

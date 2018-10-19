@@ -480,6 +480,13 @@ message Person {
 8. 大小端的[应用](http://blog.csdn.net/ce123_zhouwei/article/details/6971544)
 9. windows记事本会强行给utf-8加上bom，主要是为了兼容旧版本系统。BOM就是（“FE FF”）这么几个二进制，notepad++需要装插件才能看二进制，比较好的解释看[这篇](http://blog.csdn.net/u010999240/article/details/71836108).直接用InputStream往文件里写byte数组，接着读出来，编码不对就报错。
 10. 很多人都有用记事本编辑代码出错的经历，所以尽量不要用windows下的记事本编辑代码。notepad++默认保存为utf-8不带bom格式，所以编辑文件没什么问题。
+11. 只有读取的时候，才必须区分字节序，其他情况都不用考虑。
+字节序指的是多字节的数据在***内存***中的存放顺序
+在一个32位的CPU中“字长”为32个bit，也就是4个byte。在这样的CPU中，总是以4字节对齐的方式来读取或写入内存，那么同样这4个字节的数据是以什么顺序保存在内存中的呢？例如，现在我们要向内存地址为a的地方写入数据0x0A0B0C0D，那么这4个字节分别落在哪个地址的内存上呢？这就涉及到字节序的问题了。
+网络字节序：TCP/IP各层协议将字节序定义为 Big Endian，因此TCP/IP协议中使用的字节序是大端序。
+主机字节序：整数在内存中存储的顺序，现在 Little Endian 比较普遍。（不同的 CPU 有不同的字节序）
+C/C++语言编写的程序里数据存储顺序是跟编译平台所在的CPU相关的，而现在比较普遍的 x86 处理器是 Little Endian
+JAVA编写的程序则唯一采用 Big Endian 方式来存储数据
 
 ```
  一般操作系统都是小端，而通讯协议是大端的。
@@ -487,6 +494,12 @@ message Person {
 Big Endian : PowerPC、IBM、Sun
 Little Endian : x86、DEC
 ARM既可以工作在大端模式，也可以工作在小端模式。
+查看当前操作系统的字节序
+```python
+python3 -c 'import sys; print(repr(sys.byteorder))'
+```
+mac和linux上都输出了
+'little'
 
 4.2 常见文件的字节序
 Adobe PS – Big Endian

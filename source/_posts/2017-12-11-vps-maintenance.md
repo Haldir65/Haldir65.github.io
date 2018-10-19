@@ -387,6 +387,8 @@ Softlayer, HongKong, CN         119.81.130.170          35.2MB/s
 
 ### 5. 关于 docker
 
+docker image 是snapshot, 而container是docker image的运行实例
+
 youtube 上有人在 Digital Ocean 的 vps 上安装 docker，主要作用就是将一个复杂的操作系统打包成一个下载即用的容器。进入容器中，可以像在实际的操作系统中一样运行指令。所以虚拟化的机器随时可以使用其他操作系统。[how-to-install-and-use-docker-on-ubuntu-16-04](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-16-04)
 [用docker host一个node js app](https://nodejs.org/en/docs/guides/nodejs-docker-webapp/)。实测下来image大小在600MB左右，内存占用200MB左右。
 
@@ -402,11 +404,14 @@ exit
 ##这两条命令用于自己在本地打一个docker image
 docker build -t <your username>/node-web-app .
 docker build -t packsdkandroiddocker.image -f ./scripts/PackSdkDockerfile .
-
+## 注意你修改了Dockerfile之后要重新跑一遍docker build -t <your username>/node-web-app .
+[每次修改之后重新打image](https://stackoverflow.com/questions/18804124/docker-updating-image-along-when-dockerfile-changes)
 
 
 docker会在/var/lib/docker文件夹里吃掉大量空间，释放空间的话
 > docker system prune -a
+
+[用docker运行一个node mongodb应用](https://medium.com/@kahana.hagai/docker-compose-with-node-js-and-mongodb-dbdadab5ce0a)
 
 [使用textmate在vscode中编辑远程linux server中的文件](https://medium.com/@prtdomingo/editing-files-in-your-linux-virtual-machine-made-a-lot-easier-with-remote-vscode-6bb98d0639a4)
 
