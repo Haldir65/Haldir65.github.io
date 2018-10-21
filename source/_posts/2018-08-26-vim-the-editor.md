@@ -79,3 +79,4 @@ gg=G //这其实是三个命令,gg是到达文档开始,=是要求缩进，G是�
 
 [vim cheat sheet](https://vim.rtorr.com/)
 [youtube上一个比较好的关于vim的视频](https://www.youtube.com/watch?v=Nim4_f5QUxA)
+[练上一年再来总结的vim使用技巧](http://www.pchou.info/linux/2016/11/10/vim-skill.html)

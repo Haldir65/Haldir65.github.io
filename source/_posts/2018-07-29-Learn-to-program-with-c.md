@@ -508,3 +508,6 @@ c语言中不同头文件中的方法名或者外部变量是不能重名的（�
 [c语言const关键字](https://www.jianshu.com/p/46926f2ffef0)有的时候是说指针指向的对象不能动，有的时候说的是指针指向的值不能动
 
 size_t 和int差不多，估摸着是跨平台的一种表示。
+
+
+autoconf和automake的使用教程

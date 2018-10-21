@@ -9,6 +9,18 @@ tags: [tools]
 收集几种语言中使用socket实现httpServer和httpClient的主要步骤
 <!--more-->
 
+OSI七层网络体系结构 ： 物理层(IEEE 802.2)、数据链路层(ARP,RARP)、网络层(ip,icmp)、传输层(tcp,udp)、表示层、会话层(SSL,TLS)、应用层(HTTP,FTP,SMTP,POP3).
+这里面Socket比较特殊，Socket是一组编程接口（API）。介于传输层和应用层，向应用层提供统一的编程接口。应用层不必了解TCP/IP协议细节,直接通过对Socket接口函数的调用完成数据在IP网络的传输。SOCKET 算不上是个协议，应该是应用层与传输层间的一个抽象层，是个编程接口。
+
+tcp包结构是不包含ip地址的，只有source port(2个byte)和destination port(65536这么来的)的. ip address是ip层的工作。
+
+[HTTP 1.1的RFC非常长](https://tools.ietf.org/html/rfc7230)
+
+> 在 OSI 的七层协议中，第二层（数据链路层）的数据叫「Frame」，第三层（网络层）上的数据叫「Packet」，第四层（传输层）的数据叫「Segment」。(在wireShark的抓包结果就是这么展示的)
+
+[tcp包结构，udp的也有](https://jerryc8080.gitbooks.io/understand-tcp-and-udp/chapter1.html)
+
+
 ## java
 用java实现一个httpclient怎么样?
 ```java
@@ -92,6 +104,7 @@ Time : Thu Mar 15 16:20:59 CST 2018</center>
 ```
 当然因为访问的是http，302是临时重定向（另外，几乎没见过谁返回301的，301的结果会被浏览器缓存），注意上面返回了Location字段，所以是符合规范的
 
+server这边普遍用的是netty，正好netty的官网上也有相关的教程，后面再补上
 
 
 ## Python
@@ -170,7 +183,39 @@ while True:
 对了，浏览器默认会请求favicon，所以在服务器这边看到了另一个请求
 > b'GET /favicon.ico HTTP/1.1\r\nHost: localhost:18004\r\nConnection: keep-alive\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36\r\nDNT: 1\r\nAccept: image/webp,image/apng,image/*,*/*;q=0.8\r\nReferer: http://localhost:18004/index.html\r\nAccept-Encoding: gzip, deflate, br\r\nAccept-Language: zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7\r\nCookie: _ga=GA1.1.dsadsa.dsadas; _gid=GA1.1.dsadsa.dsadasda\r\n\r\n'
 
+平时用的都是[requests](https://github.com/requests/requests/)这个库,不过自己写也还是很简单
+```python
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+# 导入socket库:
+import socket
+
+# 创建一个socket:
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# 建立连接:
+s.connect(('www.sina.com.cn', 80))
+s.send(b'GET / HTTP/1.1\r\nHost: www.sina.com.cn\r\nConnection: close\r\n\r\n')
+# 接收数据:
+buffer = []
+while True:
+    # 每次最多接收1k字节:
+    d = s.recv(1024)
+    if d:
+        buffer.append(d)
+    else:
+        break
+data = b''.join(buffer)
+
+s.close()
+header, html = data.split(b'\r\n\r\n', 1)
+print(header.decode('utf-8'))
+# 把接收的数据写入文件:
+with open('sina.html', 'wb') as f:
+    f.write(html)
+```
+
 上述代码，server和client都不能很好的处理并发或者利用多进程
+
 [高阶版](https://realpython.com/python-sockets/)
 
 
@@ -178,12 +223,7 @@ while True:
 C语言的应该最接近底层,C语言实现HTTP的GET和POST请求
 [似乎有很多现成的例子可以直接拿来抄](http://pminkov.github.io/blog/socket-programming-in-linux.html)
 
-tcp包结构是不包含ip地址的，只有source port(2个byte)和destination port(65536这么来的)的. ip address是ip层的工作。
 
-> 在 OSI 的七层协议中，第二层（数据链路层）的数据叫「Frame」，第三层（网络层）上的数据叫「Packet」，第四层（传输层）的数据叫「Segment」。(在wireShark的抓包结果就是这么展示的)
-
-[tcp包结构](https://jerryc8080.gitbooks.io/understand-tcp-and-udp/chapter1.html)
-udp的也有
 
 
 一个简单的httpServer.c(unix环境下运行)
@@ -400,8 +440,15 @@ int get_ip_by_domain(const char *domain, char *ip)
 使用方式:
 > ./bin/client www.baidu.com ##这时候，在百度服务器看来，这个程序和普通的浏览器没有区别。试了下主流的网站，都没有什么问题。优酷返回了一大串奇怪的字符串，看了下，应该是content-encoding: gzip了，所以在终端里面看上去乱七八糟的。
 
-上面这段会卡在read里面，因为读到最后一个字节的时候，客户端并不知道是没有更多数据还是网络不好。需要在每一次读完之后去找那个"\r\n\r\n"的结束标志。
-·
+上面这段会卡在read里面，因为读到最后一个字节的时候，客户端并不知道是没有更多数据还是网络不好堵住了。需要在每一次读完之后去找那个"\r\n\r\n"的结束标志。
+
+
+网络通信显然还要注意一个字节序的问题，简单来讲,java是大端的,c++是跟着平台走的且多数为小端
+[c++的服务器和java的客户端之间的通信](https://blog.csdn.net/windshg/article/details/12956107)
+
+> C/C++语言编写的程序里数据存储顺序是跟编译平台所在的CPU相关的，而现在比较普遍的 x86 处理器是 Little Endian
+JAVA编写的程序则唯一采用 Big Endian 方式来存储数据
+
 htons();//将short类型的值从主机字节序转换为网络字节序(上面就是把端口号转化一下)
 inet_addr();//将IP地址字符串转换为long类型的网络字节序（接受一个字符串，返回一个long）
 gethostbyname();//获得与该域名对应的IP地址
@@ -420,22 +467,26 @@ write函数将buf中的nbytes字节内容写入文件描述符fd.成功时返回
 如果错误为EINTR表示在写的时候出现了中断错误.
 如果为EPIPE表示网络连接出现了问题(对方已经关闭了连接).
 
-
 除了read和write之外
 还有
 int recv(int sockfd,void *buf,int len,int flags)
 int send(int sockfd,void *buf,int len,int flags)
 这两个函数，功能差不多，只是多了第四个参数
 
-## todo
-**socket还有阻塞，超时，tcp缓冲等问题值得研究**
-
 - 简单版本的参考
 [使用Linux c语言编写简单的web服务器](http://www.cleey.com/blog/single/id/789.html)
 [socket http文件下载器c语言实现](http://www.voidcn.com/article/p-xieequox-bat.html)
 
-
 - 高阶版本的参考
 [高阶一点，处理并发的](https://www.geeksforgeeks.org/socket-programming-in-cc-handling-multiple-clients-on-server-without-multi-threading/)
 [多线程的server和client源码](https://github.com/pminkov/webserver)
+
+
+## todo
+**socket还有阻塞，超时，tcp缓冲等问题值得研究，Linux下TCP延迟确认机制**
+
+**还有实现websocket协议的，实现sock5协议的**
+
+- js并不支持对操作系统socket的直接控制，可能是安全因素(websocket倒是有，不过那是另外一回事了)。
+
 

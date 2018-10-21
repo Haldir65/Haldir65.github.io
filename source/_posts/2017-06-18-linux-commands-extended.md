@@ -785,6 +785,10 @@ grep -ni "python" * //在当前目录下查找所有包含"python"字符串的�
 
 ctrl +r 可以在history中查找,ctrl + j 把选中的内容剪切到剪切板
 
+不用装tree这个软件也行
+> which tree
+tree: aliased to find . -print | sed -e 's;[^/]*/;|____;g;s;____|; |;g'
+
 ## 参考
 - [每天一个Linux命令](http://www.cnblogs.com/peida/archive/2012/12/05/2803591.html)
 - [Linux命令大全](http://man.linuxde.net/xargs)

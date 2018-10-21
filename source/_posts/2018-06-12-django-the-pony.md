@@ -289,7 +289,7 @@ request.auth will be a rest_framework.authtoken.models.Token instance.
 
 
 
-jwt的logout或者踢人怎么做
+### jwt的logout或者踢人怎么做
 [首先Token是放在内存里而不是db里的，另外要踢人的话，手动给这个user生成一个新的token](https://stackoverflow.com/questions/40604877/how-to-delete-a-django-jwt-token)
 搞清楚，踢人是服务器这边做(创建个新的Token或者让原有Token无效)，logout是客户端那边做(删除客户端本地存储的Token)。
 在html里面删掉Token可以这么干

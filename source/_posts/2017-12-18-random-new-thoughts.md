@@ -57,7 +57,7 @@ top : 1
 * 基于前后端分离的理念，后台只负责提供数据，render page 的任务应该交给前端。（所以用 express-handlebars 写页面的方式写着很累）
 * 集成 travis-ci，记得 after-success script 的结果并不会影响 build 的结果（即，after-success 执行脚本发生了错误，在日志里有输出 error，但实际显示的 build result 仍为 success），还有 travis 的输出 log 需要默认是折叠的，要展开才能看清楚，但在 afterSuccess 里面的指令的输出一定是有的。
 * 随便放一个文件到/usr/bin/就可以直接调用这个文件名来起这个命令了吗？（实际操作只需要建立一个symbolic link就好了）
-* 单个网卡最多65535个端口，c10K。[65536其实不是操作系统限制的，而是tcp协议就只给port留了2个bytes给source port，只留了2个bytes给destination port](https://www.zhihu.com/question/66553828)
+* 单个网卡最多65535个端口，c10K。[65536其实不是操作系统限制的，而是tcp协议就只给port留了2个bytes给source port，只留了2个bytes给destination port](https://www.zhihu.com/question/66553828)端口号写在tcp包里，ip地址不是，ip地址是ip层的事情
 * oAuth2原理，其实流程上和很多客户端的微信登陆，新浪微博登陆很像的
 * 在Android手机上尝试用一个unix domain socket用于localhost进程间ipc(其实就是保证端口号一致，给网络权限就好了)
 * 写 groovy 用intelij全家桶就可以了，groovy的[语法](https://www.tutorialspoint.com/groovy/groovy_closures.htm)其实没什么，主要是了解编译的流程和基本原理，这个需要看[official doc](https://docs.gradle.org/current/userguide/build_lifecycle.html#sec:build_phases)

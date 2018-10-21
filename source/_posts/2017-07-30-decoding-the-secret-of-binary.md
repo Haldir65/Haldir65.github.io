@@ -498,6 +498,10 @@ ARM既可以工作在大端模式，也可以工作在小端模式。
 ```python
 python3 -c 'import sys; print(repr(sys.byteorder))'
 ```
+
+```java
+System.out.println(ByteOrder.nativeOrder());
+```
 mac和linux上都输出了
 'little'
 
@@ -522,6 +526,52 @@ ntohl()：network to host long，将long类型数据从网络字节序转换为�
 inet_addr() 函数可以完成这种转换。inet_addr() 除了将字符串转换为32位整数，同时还进行网络字节序转换。
 
 为 sockaddr_in 成员赋值时需要显式地将主机字节序转换为网络字节序，而通过 write()/send() 发送数据时TCP协议会自动转换为网络字节序（大端），不需要再调用相应的函数。
+
+C/C++语言编写的程序里数据存储顺序是跟编译平台所在的CPU相关的，而JAVA编写的程序则唯一采用big endian方式来存储数据。试想，如果你用C/C++语言在x86平台下编写的程序跟别人的JAVA程序互通时会产生什么结果？就拿上面的 0x12345678来说，你的程序传递给别人的一个数据，将指向0x12345678的指针传给了JAVA程序，由于JAVA采取big endian方式存储数据，很自然的它会将你的数据翻译为0x78563412。
+因此，在你的C程序传给JAVA程序之前有必要进行字节序的转换工作。 
+
+大小端转化的算法在java这边是这样的[参考](https://blog.csdn.net/windshg/article/details/12956107)
+```java
+public static byte[] toLH(int n) {  
+  byte[] b = new byte[4];  
+  b[0] = (byte) (n & 0xff);  
+  b[1] = (byte) (n >> 8 & 0xff);  
+  b[2] = (byte) (n >> 16 & 0xff);  
+  b[3] = (byte) (n >> 24 & 0xff);  
+  return b;  
+}   
+/** 
+  * 将int转为高字节在前，低字节在后的byte数组 
+  * @param n int 
+  * @return byte[] 
+  */  
+public static byte[] toHH(int n) {  
+  byte[] b = new byte[4];  
+  b[3] = (byte) (n & 0xff);  
+  b[2] = (byte) (n >> 8 & 0xff);  
+  b[1] = (byte) (n >> 16 & 0xff);  
+  b[0] = (byte) (n >> 24 & 0xff);  
+  return b;  
+} 
+
+public static String bytesToString(byte[] b) {  
+  StringBuffer result = new StringBuffer("");  
+  int length = b.length;  
+  for (int i=0; i<length; i++) {  
+    result.append((char)(b & 0xff));  
+  }  
+  return result.toString();  
+}   
+/** 
+  * 将字符串转换为byte数组 
+  * @param s String 
+  * @return byte[] 
+  */  
+public static byte[] stringToBytes(String s) {  
+  return s.getBytes();  
+}
+```
+
 
 4.2 常见文件的字节序
 Adobe PS – Big Endian
