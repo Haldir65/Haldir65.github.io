@@ -700,6 +700,13 @@ lsof //list opened files
 ##看下mysql用了哪些文件
 lsof -c mysql
 ## 查看端口占用
+sudo lsof -iTCP ##只显示TCP端口
+sudo lsof -iUDP ## 只显示UDP端口
+
+sudo lsof -iTCP -sTCP:LISTEN ## 查看所有处于listen状态的
+sudo lsof -iTCP -sTCP:ESTABLISHED ## ESTABLISHED状态的
+
+
 [lsof命令还是很强大的](http://www.cnblogs.com/peida/archive/2013/02/26/2932972.html)
 
 

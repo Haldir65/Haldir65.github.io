@@ -747,6 +747,16 @@ m3u8就是很多ts文件的目录
 .m3u8 文件，其实就是以 UTF-8 编码的 m3u 文件，这个文件本身不能播放，只是存放了播放信息的文本文件：
 就是说把一个视频切割成很多个TS分片文件。这里面还能牵扯到防盗链等问题。
 
+[exoplayer的作者在medium上的一篇文章解释了dash在直播协议中的优点](https://medium.com/google-exoplayer/test-8b62d50362ef)
+翻译一下
+- adaptive streaming over HTTP的协议有三种，
+ HTTP Live Streaming (HLS), 
+ SmoothStreaming 
+ Dynamic Adaptive Streaming over HTTP (DASH)
+ HLS是最流行的
+
+ 这三种直播协议都将视频文件切割成很多个小的chunks，同时允许client在不同的画质之间切换。DASH and SmoothStreaming with fMP4 都要求不同画质之间的chunk boundaries对齐，所以客户端在不同画质之间切换的时候就不需要下载那些重叠的部分了，但HLS不是这样的。尤其是在用户从网速快切换到网速差的情况下，体验更差。
+
 [Linux下TCP延迟确认(Delayed Ack)机制导致的时延问题分析](https://cloud.tencent.com/developer/article/1004356) TCP Nagle算法&&延迟确认机制(微软更新KB328890)
 
 [301和302的区别看上去不大，但平时几乎看不到301的原因就在于301的结果会被浏览器缓存，下回访问这个url浏览器都不会发出网络请求](https://realpython.com/django-redirects/)，所以本着不要做绝的原则，绝大多数人都不会返回301

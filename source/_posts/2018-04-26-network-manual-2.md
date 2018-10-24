@@ -308,3 +308,11 @@ wget --spider www.baidu.com //wget还有一个spider模式
 美团的技术博客还不错
 [前端安全系列之二：如何防止CSRF攻击？](https://tech.meituan.com/fe_security_csrf.html)
 
+[https的url是加密的吗？](https://stackoverflow.com/questions/499591/are-https-urls-encrypted)是的，
+所以你可以把账户密码写在url后面发出去，这样是安全的，外界无法截获你的隐私信息.
+但着实不应该这样做，
+在浏览器地址栏和浏览器历史记录里面都留下了账户密码。可能会在http的referer里面带上你的url和隐私信息
+但是第一次client hello的时候host还是会明文写在包里,后面的query Parameters由于跟client hello无关，所以是加密的.
+[Server Name Indication](https://en.wikipedia.org/wiki/Server_Name_Indication)
+SNI breaks the 'host' part of SSL encryption of URLs. You can test this yourself with wireshark. There is a selector for SNI
+

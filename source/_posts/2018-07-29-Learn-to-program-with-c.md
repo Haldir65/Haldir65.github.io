@@ -313,13 +313,13 @@ Linux gcc链接规则：
 
 一般情况链接的时候我们采用-L的方式指定查找路径, 调用动态链接库的时候采用LD_LIBRARY_PATH的方式指定链接路径
 
+在C中，NULL表示的是指向0的指针
+#define NULL    0
 
+string.h 标准库中定义了空指针，NULL(数值0)
+在C/C++中，当要给一个字符串添加结束标志时，都应该用‘\0’而不是NULL或0
 
-
-
-
-
-
+‘\0’是一个“空字符”常量，它表示一个字符串的结束，它的ASCII码值为0。注意它与空格' '（ASCII码值为32）及'0'（ASCII码值为48）不一样的。
 
 
 
@@ -329,7 +329,6 @@ gcc ,clang,llvm的历史
 
 
 .so文件其实是shared object的缩写
-
 
 ## Makefile怎么写
 [几个简单的makefile实例](http://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/)

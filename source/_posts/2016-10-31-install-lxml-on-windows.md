@@ -15,19 +15,13 @@ tags: [python]
 2. pip 环境变量配置
 
 ### 2. 开始
-1. cmd 命令行敲入
-> pip install wheel
-
-2. 准备lxml安装文件
-   下载[地址](https://pypi.python.org/pypi/lxml/3.4.2)
-   我的是win10 64位，选择 lxml-3.4.2-cp27-none-win_amd54.xhl
-
-3. 下载完成后放到 c:\python27\文件夹下
-4. 命令行敲入
-> pip install c:\python27\lxml...(刚才的文件名)
-
-5. 最后会提示
-> successfully installeed lxml-3.4.2
+- cmd 命令行敲入
+- pip install wheel
+-  准备lxml安装文件,下载[地址](https://pypi.python.org/pypi/lxml/3.4.2),我的是win10 64位，选择 lxml-3.4.2-cp27-none-win_amd54.xhl
+- 下载完成后放到 c:\python27\文件夹下
+- 命令行敲入
+- pip install c:\python27\lxml...(刚才的文件名)
+- 最后会提示 successfully installeed lxml-3.4.2
 
 这时候关闭pycharm project，重新打开就可以看到导入成功了。
 
@@ -40,5 +34,5 @@ win10的64位系统只需要安装 lxml‑4.1.1‑cp36‑cp36m‑win32.whl ,
 如果安装lxml‑4.1.1‑cp36‑cp36m‑win_amd64.whl的话，可能会提示[filename-whl-is-not-supported-wheel-on-this-platform](https://stackoverflow.com/questions/28568070/filename-whl-is-not-supported-wheel-on-this-platform)，是因为安装的python是32位的。
 
 
-### ref
+### Ref
 - [百度有时候也是挺管用的](http://jingyan.baidu.com/article/cbcede07177b8702f40b4df9.html)
