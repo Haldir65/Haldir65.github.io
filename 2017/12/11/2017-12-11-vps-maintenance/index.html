@@ -16,7 +16,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/scenery1511100756208.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery1511100809920.jpg">
-<meta property="og:updated_time" content="2018-10-24T11:25:20.936Z">
+<meta property="og:updated_time" content="2018-10-25T11:02:36.266Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="VPS维护的日常">
 <meta name="twitter:image" content="https://haldir66.ga/static/imgs/scenery1511100756208.jpg">
@@ -250,6 +250,8 @@ ga('send', 'pageview');
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ssserver -c /etc/shadowsocks/config.json # 前台运行</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>## 后台运行和停止</span><br><span class="line">ssserver -c /etc/shadowsocks.json -d start</span><br><span class="line">ssserver -c /etc/shadowsocks.json -d stop</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>##  加入开机启动</span><br><span class="line"><span class="meta">#</span>## 在/etc/rc.local中加入</span><br><span class="line">sudo ssserver -c /etc/shadowsocks.json --user username -d start - 不要总是用root用户做事，adduser来做，给sudo权限即可</span><br></pre></td></tr></table></figure>
 <p>如果使用systemd来管理的话，就不要使用 -d参数，因为需要root权限，此时应该将ssserver的生命周期管理交给systemd</p>
 <p>nohup /net-speeder/net-speeder/net_speeder eth0 “tcp src port 12345” &gt; /dev/null 2&gt;&amp;1 &amp;</p>
+<p>慎用！！一不小心会把自己的ip加到iptable黑名单里面<br>//防止暴力扫描ss端口<br><a href="https://github.com/shadowsocks/shadowsocks/wiki/Ban-Brute-Force-Crackers">nohup tail -F /var/log/shadowsocks.log | python autoban.py &gt;log 2&gt;log &amp;</a></p>
+<p>其实就是找“can not parse header when handling connection from”这句话，超过次数的加到iptable的ban rule里面，可以看下哪些ip被拉黑了<br>iptables -L -n ## 查看已添加的iptables规则</p>
 <h3 id="2-2-SSR-以及一些衍生的软件"><a href="#2-2-SSR-以及一些衍生的软件" class="headerlink" title="2.2 SSR 以及一些衍生的软件"></a>2.2 SSR 以及一些衍生的软件</h3><p><a href="https://github.com/breakwa11/shadowsocks-rss/wiki">ShadowsocksR</a>启动后台运行命令</p>
 <blockquote>
 <p>python server.py -p 443 -k password -m aes-256-cfb -O auth_sha1_v4 -o http_simple -d start</p>
@@ -302,6 +304,15 @@ ga('send', 'pageview');
 </blockquote>
 <h3 id="Dnsmasq-vps自建DNS服务器"><a href="#Dnsmasq-vps自建DNS服务器" class="headerlink" title="Dnsmasq vps自建DNS服务器"></a>Dnsmasq vps自建DNS服务器</h3><p><a href="https://www.digitalocean.com/community/tags/server-optimization?type=tutorials">tips onserver optimization</a></p>
 <h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="https://www.vpser.net/opt/vps-add-swap.html">vps 优化</a></p>
+<blockquote>
+<p>egrep -e “via tcp:xxx.xxx.xxx:[0-9]{5}$” -o client_debug.log | sed “s/via tcp:xxx.xxx.xxx://g” | sort | uniq -c | sort -k 1 -nr<br><a href="https://github.com/v2ray/v2ray-core/issues/574">egrep 和sed 命令的使用</a></p>
+</blockquote>
+<p>egrep 的使用（偏向正则表达式方面）<br>cat stuff.log</p>
+<blockquote>
+<p>2018/9/15 01:52:26 udp:123.123.123.123:35021 accepted tcp:api-dash.ins.io:443<br>2018/9/15 01:52:27 udp:123.123.123.123:29932 accepted tcp:www.google-analytics.com:443<br>2018/9/15 01:52:28 udp:123.123.123.123:35283 accepted tcp:notifications.google.com:443<br>2018/9/15 01:52:29 udp:123.123.123.123:29932 accepted tcp:fonts.gstatic.com:443</p>
+</blockquote>
+<p>sudo egrep “udp:123.123.123.123:[0-9]{5}” -o stuff.log<br>udp:123.123.123.123:35021<br>udp:123.123.123.123:29932<br>udp:123.123.123.123:35283<br>udp:123.123.123.123:29932</p>
+<p>中括号的意思是0-9之间的任一数字，花括号包起来的5表示重复5次，也就是五位数的意思了</p>
 
       
 
