@@ -305,6 +305,8 @@ nc -u x.x.x.x 1080 //也会卡在这里，不过可以输入文字，按下回�
 wget --spider www.baidu.com //wget还有一个spider模式
 
 
+[udp的MTU参数](http://yangtai.xunlei.com/?p=1326&cpage=6)
+
 美团的技术博客还不错
 [前端安全系列之二：如何防止CSRF攻击？](https://tech.meituan.com/fe_security_csrf.html)
 

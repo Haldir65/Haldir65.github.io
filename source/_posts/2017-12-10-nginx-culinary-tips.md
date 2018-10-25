@@ -1008,6 +1008,8 @@ nginx http配置：
 在ubuntu18.04上，logrotate似乎默认已经被安装过了，所以，每天/var/log/nginx里面的文件都会被gzip一遍
 
 
+[用failtoban降低被攻击概率](https://www.digitalocean.com/community/tutorials/how-to-protect-an-nginx-server-with-fail2ban-on-ubuntu-14-04)
+
 ### 参考
 - [nginx Configurations](https://wizardforcel.gitbooks.io/nginx-doc/content/Text/6.1_nginx_windows.html)
 - [How To Install Nginx on Ubuntu 16.04](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-16-04)

@@ -111,6 +111,12 @@ sudo ssserver -c /etc/shadowsocks.json --user username -d start - 不要总是�
 
 nohup /net-speeder/net-speeder/net_speeder eth0 "tcp src port 12345" > /dev/null 2>&1 &
 
+慎用！！一不小心会把自己的ip加到iptable黑名单里面
+//防止暴力扫描ss端口
+[nohup tail -F /var/log/shadowsocks.log | python autoban.py >log 2>log &](https://github.com/shadowsocks/shadowsocks/wiki/Ban-Brute-Force-Crackers)
+
+其实就是找“can not parse header when handling connection from”这句话，超过次数的加到iptable的ban rule里面，可以看下哪些ip被拉黑了
+iptables -L -n ## 查看已添加的iptables规则
 
 ### 2.2 SSR 以及一些衍生的软件
 
@@ -431,3 +437,23 @@ ppa(personal package archives)
 ### 参考
 
 [vps 优化](https://www.vpser.net/opt/vps-add-swap.html)
+
+> egrep -e "via tcp:xxx.xxx.xxx:[0-9]{5}$" -o client_debug.log | sed "s/via tcp:xxx.xxx.xxx://g" | sort | uniq -c | sort -k 1 -nr
+[egrep 和sed 命令的使用](https://github.com/v2ray/v2ray-core/issues/574)
+
+
+egrep 的使用（偏向正则表达式方面）
+cat stuff.log
+> 2018/9/15 01:52:26 udp:123.123.123.123:35021 accepted tcp:api-dash.ins.io:443
+2018/9/15 01:52:27 udp:123.123.123.123:29932 accepted tcp:www.google-analytics.com:443
+2018/9/15 01:52:28 udp:123.123.123.123:35283 accepted tcp:notifications.google.com:443
+2018/9/15 01:52:29 udp:123.123.123.123:29932 accepted tcp:fonts.gstatic.com:443
+
+sudo egrep "udp:123.123.123.123:[0-9]{5}" -o stuff.log
+udp:123.123.123.123:35021
+udp:123.123.123.123:29932
+udp:123.123.123.123:35283
+udp:123.123.123.123:29932
+
+中括号的意思是0-9之间的任一数字，花括号包起来的5表示重复5次，也就是五位数的意思了
+

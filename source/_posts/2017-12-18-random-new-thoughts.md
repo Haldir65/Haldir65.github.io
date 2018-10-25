@@ -51,6 +51,8 @@ top : 1
 - [ ]python dunder class复习
 - [ ]ffmpeg 的js wrapper
 - [ ] learning how textView works is painful yet necessary
+- [ ][分词器](https://lxneng.com/posts/201)
+
 
 ### 已完成
 * 用 express 转接一个知乎 Api，添加 Access-control-allow-origin,或许还可以用 redis 缓存数据结果（一个就好）由此想到一篇文章"How to use Pythonto build a restful Web Service".只不过用的是 Tornado

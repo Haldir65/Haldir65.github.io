@@ -7,6 +7,8 @@ tags: [linux]
 ![](https://www.haldir66.ga/static/imgs/food_truck_hotdog_night_city.jpg)
 <!--more-->
 
+很多人都会有一个vimrc文件备份在github上，应该是挺高频的操作
+
 首先是一些加快terminal 中操作的命令，跟vim没什么关系
 
 在bash中，几个比较方便的快捷键(zsh可能不一样)
@@ -80,3 +82,4 @@ gg=G //这其实是三个命令,gg是到达文档开始,=是要求缩进，G是�
 [vim cheat sheet](https://vim.rtorr.com/)
 [youtube上一个比较好的关于vim的视频](https://www.youtube.com/watch?v=Nim4_f5QUxA)
 [练上一年再来总结的vim使用技巧](http://www.pchou.info/linux/2016/11/10/vim-skill.html)
+

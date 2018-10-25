@@ -487,6 +487,33 @@ int send(int sockfd,void *buf,int len,int flags)
 
 **还有实现websocket协议的，实现sock5协议的**
 
+见过的一个websocket的请求长这样
+GET wss://nexus-websocket-b.xxx.io/pubsub/xxx?X-Nexus-New-Client=true&X-Nexus-Version=0.4.53 HTTP/1.1
+Host: nexus-websocket-b.xxx.io
+Connection: Upgrade
+Pragma: no-cache
+Cache-Control: no-cache
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3538.77 Safari/537.36
+Upgrade: websocket
+Origin: https://app.xxx.io
+Sec-WebSocket-Version: 13
+Accept-Encoding: gzip, deflate, br
+Accept-Language: zh-CN,zh;q=0.9
+Sec-WebSocket-Key: xaxsasdasdas==
+Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+
+Response长这样
+HTTP/1.1 101 Switching Protocols
+Date: Thu, 25 Oct 2018 06:07:10 GMT
+Connection: upgrade
+Upgrade: websocket
+Sec-WebSocket-Accept: sasasasaD/tA=
+
+这样也就完成了protocol upgrade的过程
+
+
+
+
 - js并不支持对操作系统socket的直接控制，可能是安全因素(websocket倒是有，不过那是另外一回事了)。
 
 

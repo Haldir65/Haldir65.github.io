@@ -68,6 +68,7 @@ h2传输的是Binary Frame，这里面包括HEADER FRAME和DATA FRAME, request�
 client发起一个请求，header里面包括(Upgrade:2c),一切OK的话，服务器返回一个status code 101(switching Protocol)。
 在response header里面返回一个Upgrade: h2c。
 
+
 ### 2.3 TLS ,SSL
 用于两点间传输binary数据
 TLS(Transport Layer Security),SSL(Secure Sockets Layer)
