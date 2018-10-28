@@ -445,13 +445,6 @@ gcc -v可以查看compile gcc时预设的链接静态库的搜索路径
 从项目结构来看,curl,ffmpeg这些都是一个文件夹里面放了所有的.h和.c文件。似乎没有其他语言的package的观念。我试了下，在Makefile里面带上文件夹的相对路径还是可以的。
 
 
-c语言就是这样，好多功能都得自己实现
->c 语言有它的设计哲学，就是那著名的“Keep It Simple, Stupid”，语言本身仅仅实现最为基本的功能，然后标准库也仅仅带有最为基本的内存管理（更高效一点的内存池都必须要自己实现）、IO、断言等基本功能。 
-
-社区提供了一些比较优秀的通用功能库
-[1] http://developer.gnome.org/glib/stable/ 
-[2] http://www.gnu.org/software/gnulib/ 
-[3] http://apr.apache.org/
 
 [automatic directory creation in make](http://ismail.badawi.io/blog/2017/03/28/automatic-directory-creation-in-make/)
 
@@ -510,3 +503,23 @@ size_t 和int差不多，估摸着是跨平台的一种表示。
 
 
 autoconf和automake的使用教程
+
+[string in c](https://dev-notes.eu/2018/08/strings-in-c/)
+char *name = "Bob"; //name指向的位置不能修改了，但是name可以指向别的东西
+name[1] = 'e'; //这么干是不行的，编译是能通过，但运行期会造成undefined behavior，大概率是segment fault
+
+// 下面这种用数组形式声明的是可以随便改的
+char name[] = "Alice";
+name[3] = 'n';
+name[4] = 'a';
+
+
+### 最后
+c语言就是这样，好多功能都得自己实现
+>c 语言有它的设计哲学，就是那著名的“Keep It Simple, Stupid”，语言本身仅仅实现最为基本的功能，然后标准库也仅仅带有最为基本的内存管理（更高效一点的内存池都必须要自己实现）、IO、断言等基本功能。 
+
+社区提供了一些比较优秀的通用功能库
+[1] http://developer.gnome.org/glib/stable/ 
+[2] http://www.gnu.org/software/gnulib/ 
+[3] http://apr.apache.org/
+

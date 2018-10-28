@@ -184,13 +184,37 @@ java的String其实不过是一个char Array的wrapper，如果在ide里面看�
 所以，要认识到char本身还是不足以表示所有的字符
 这样的代码要是拿来打印Emoji，只会讲原本4byte的Emoji拆成2个char，所以就在console里面看到一些乱码。
 
-```
+```java
 String s = "一些包含Emoji的文字"
 for(int i =0 ,size = s.length();i<size;i++){
     char c = s.charAt(i);
-    System.out.println("The Caharacter at %d is '%c'%n",i,c);
+    System.out.println("The Character at %d is '%c'%n",i,c);
 }
+```
 
+[处理emoji的正则，主要是python](https://segmentfault.com/a/1190000007594620)
+提供了一个扫描出emoji的正则
+```python
+def test_emoji():
+    try:
+        # Wide UCS-4 build
+        myre = re.compile(u'['
+            u'\U0001F300-\U0001F64F'
+            u'\U0001F680-\U0001F6FF'
+            u'\u2600-\u2B55]+',
+            re.UNICODE)
+    except re.error:
+        # Narrow UCS-2 build
+        myre = re.compile(u'('
+            u'\ud83c[\udf00-\udfff]|'
+            u'\ud83d[\udc00-\ude4f\ude80-\udeff]|'
+            u'[\u2600-\u2B55])+',
+            re.UNICODE)
+
+    sss = u'I have a dog \U0001f436 . You have a cat \U0001f431 ! I smile \U0001f601 to you!'
+    print(sss)
+    print(myre.sub('[Emoji]', sss))  # 替换字符串中的Emoji
+    print(myre.findall(sss))         # 找出字符串中的Emoji
 ```
 
 正确的做法是:
@@ -223,6 +247,12 @@ String w = "\uD842\uDFB7"; //这个“\u”是ide自己加上去的，注意和�
 <=11个bit  ：110XXXXX 10XXXXXX (第一个byte以110开头，后面以10开头)
 <=16个bit :  1110XXXX 10XXXXXX 10XXXXXX (第一个byte以1110开头，后面跟两个10开头的bytes)
 <=21个bit :  11110XXX 10XXXXXX 10XXXXXX 10XXXXXX (第一个byte以11110开头，后面跟三个10开头的bytes)
+
+00000000 -- 0000007F: 	0xxxxxxx
+00000080 -- 000007FF: 	110xxxxx 10xxxxxx
+00000800 -- 0000FFFF: 	1110xxxx 10xxxxxx 10xxxxxx
+00010000 -- 001FFFFF: 	11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+
 
 现在来看看网上那些常用的中文转UTF-8工具怎么用，随便找一个找一个站长之家
 输入“美” ，对应的utf-8编码是"&#x7F8E"，转Unicode是"\u7f8e"
@@ -572,6 +602,47 @@ public static byte[] stringToBytes(String s) {
 }
 ```
 
+c语言的转换[参考](https://www.cnblogs.com/luxiaoxun/archive/2012/09/05/2671697.html)
+htonl() htons() 从主机字节顺序转换成网络字节顺序
+ntohl() ntohs() 从网络字节顺序转换为主机字节顺序
+用c语言检查当前平台大小端
+```c
+{
+  int i = 1;   
+    char *p = (char *)&i;   
+    if(*p == 1)     
+          printf("Little Endian"); 
+    else
+          printf("Big Endian");
+}
+```
+如果是big endian的话，内存里面的存法是 ox00 ox00 ox00 ox01
+如果是little endian的话，内存里存的是 ox01 ox00 ox00 ox00
+
+union的存放顺序是所有成员都从低地址开始存放，利用该特性就可以轻松地获得了CPU对内存采用Little-endian还是Big-endian模式读写。
+```c
+/*return 1: little-endian, return 0: big-endian*/
+int checkCPUendian()
+{
+  union
+  {
+    unsigned int a;
+    unsigned char b; 
+  }c;
+  c.a = 1;
+  return (c.b == 1); 
+}
+```
+实现同样的功能，来看看Linux 操作系统中相关的源代码是怎么做的：
+```c
+static union { char c[4]; unsigned long mylong; } endian_test = {{ 'l', '?', '?', 'b' } };
+
+#define ENDIANNESS ((char)endian_test.mylong)
+```
+Linux 的内核作者们仅仅用一个union 变量和一个简单的宏定义就实现了一大段代码同样的功能！（如果ENDIANNESS=’l’表示系统为little endian，为’b’表示big endian）
+
+如果只是字节流，不需要转换（因为网络的字节序都是大端，应用程序层读到的都是大端）。一般是ip地址，端口号码，传输一些整型数的参数，才需要做转换，字节流不需要。如果头部记录了大小的，那么这个记录了大小的整型数需要转换
+
 
 4.2 常见文件的字节序
 Adobe PS – Big Endian
@@ -628,3 +699,4 @@ for(int i = 0; i< size; i++){
 ## 参考
 - [Jesse Wilson | Decoding the Secrets of Binary Data ](https://www.youtube.com/watch?v=T_p22jMZSrk)
 - [深入分析 Java 中的中文编码问题](https://www.ibm.com/developerworks/cn/java/j-lo-chinesecoding/index.html)IBM出品
+- [emoji complete list](http://www.unicode.org/emoji/charts/full-emoji-list.html)

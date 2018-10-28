@@ -1,7 +1,7 @@
 ---
 title: celery-cheetsheet
 date: 2018-07-03 08:43:41
-tags:
+tags: [python]
 ---
 
 >“There are only two hard things in Computer Science: cache invalidation and naming things.”

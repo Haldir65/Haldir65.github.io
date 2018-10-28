@@ -10,6 +10,7 @@ top : 1
 
 <!--more-->
 
+### 期待能够完成的
 - [个人分享--web 前端学习资源分享](https://juejin.im/post/5a0c1956f265da430a501f51)
 - [WPA 所代表的 Web 开发应是未来](https://huangxuan.me/2017/02/09/nextgen-web-pwa/)据说Electron要被PWA干掉
 - [js 循环闭包的解决方法](https://segmentfault.com/a/1190000003818163)
@@ -32,24 +33,21 @@ top : 1
 - [ ] nodejs ,go ,protobuf rpc
 - [ ] [indexed DB](http://www.ruanyifeng.com/blog/2018/07/indexeddb.html),浏览器端数据库，[content-disposition](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)
 - [ ] [在bash脚本中获取当前脚本所在路径](https://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within?rq=1)
-- [ ] [如何写makefile](https://seisman.github.io/how-to-write-makefile/introduction.html)
 - [ ]一致性哈希原理
 - [ ] [使用redis实现低粒度的分布式锁](http://afghl.github.io/2018/06/17/distributed-lock-and-granarity.html)
 - [ ][Vim cheet sheet](https://vim.rtorr.com/)
 - [ ][LOGSTASH+ELASTICSEARCH+KIBANA处理NGINX访问日志](http://www.wklken.me/posts/2015/04/26/elk-for-nginx-log.html)ELK全家桶
-
-- [ ] [python c extension](https://www.tutorialspoint.com/python/python_further_extensions.htm)
 - [ ] Coordinator behavior以及scroll原理，完善blog
 - [ ]Exoplayer and the MediaCodec api[building-a-video-player-app-in-android](https://medium.com/androiddevelopers/building-a-video-player-app-in-android-part-3-5-19543ea9d416)
 - [ ] autoWired, autovalue这些java 的library
 - [ ] instagram好像通过注解的方式自己写了一个json解析器
 - [ ] mqtt接入实践
 - [ ] when it comes to design , how do we translate px, pt, em  into sp,dp and others(设计方面的，各种单位之间的转换)?
-- [nio stuff](https://juejin.im/post/59fffdb76fb9a0450a66bd58) 还是netty好
-- [ ]Linux下TCP延迟确认机制
+- [nio](https://juejin.im/post/59fffdb76fb9a0450a66bd58) 还是netty好
+- [ ] Linux下TCP延迟确认机制
 - [ ] classloader和class的生命周期
-- [ ]python dunder class复习
-- [ ]ffmpeg 的js wrapper
+- [ ] python dunder class复习
+- [ ] ffmpeg 的js wrapper
 - [ ] learning how textView works is painful yet necessary
 - [ ][分词器](https://lxneng.com/posts/201)
 
@@ -80,6 +78,7 @@ top : 1
 - [X]Promise 链式调用与终止，异常处理(只是一个工具而已)
 - [X] Android 应用接入bugly热修复，上线之后就不用背锅了（有兴趣看看sevenZip.jar，暂时没看）
 - [X] [简直碉堡了的博客](http://normanmaurer.me/blog/2013/11/09/The-hidden-performance-costs-of-instantiating-Throwables/)以及jvm 的inline等优化
+- [ ] [如何写makefile](https://seisman.github.io/how-to-write-makefile/introduction.html)其实[这个更加friendly](http://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/)
 
 
 ### Good For Nothing
@@ -101,7 +100,11 @@ top : 1
 OpenType® is a cross-platform font file format developed jointly by Adobe and Microsoft.
 - [ ][deploying owncloud using docker](https://blog.securem.eu/serverside/2015/08/25/setting-up-owncloud-server-in-a-docker-container/)
 - [owncloud官方的配合docker安装教程](https://doc.owncloud.org/server/10.0/admin_manual/installation/docker/)网盘这种东西看个人喜好了
-- [ ]CloudFlare cdn解析以及DNS防护  
+- [ ]CloudFlare cdn解析以及DNS防护 
+- [ ] [python c extension](https://www.tutorialspoint.com/python/python_further_extensions.htm) 
 
 
-[jsonplaceholder](https://jsonplaceholder.typicode.com/)懒得自己写api的话就用这个吧
+[jsonplaceholder](https://jsonplaceholder.typicode.com/)懒得自己写api的话
+就用这个吧
+
+

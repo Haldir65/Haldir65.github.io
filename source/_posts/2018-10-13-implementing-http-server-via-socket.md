@@ -482,8 +482,7 @@ int send(int sockfd,void *buf,int len,int flags)
 [多线程的server和client源码](https://github.com/pminkov/webserver)
 
 
-## todo
-**socket还有阻塞，超时，tcp缓冲等问题值得研究，Linux下TCP延迟确认机制**
+
 
 **还有实现websocket协议的，实现sock5协议的**
 
@@ -516,4 +515,117 @@ Sec-WebSocket-Accept: sasasasaD/tA=
 
 - js并不支持对操作系统socket的直接控制，可能是安全因素(websocket倒是有，不过那是另外一回事了)。
 
+#include <unistd.h>
 
+ssize_t read(int fd, void *buf, size_t count);
+read这个函数返回的是读取的byte数，(On success, the number of bytes read is returned (zero indicates end of file), and the file position is advanced by this number;On error, -1 is returned, and errno is set appropriately.  In this case, it is left unspecified whether the file position (if any) changes.)
+
+如果read的时候一直统计当前总的read到的bytes数，应该是要比content-length长不少的。
+[那么一个字符到底多少个byte呢](https://stackoverflow.com/questions/4850241/how-many-bits-in-a-character)
+首先要明白，read出来的东西是byte(是被utf-8编码过的)。几乎所有的语言在接收到之后都要重新解码一下，所以在这里decode一下，用c语言decode怎么弄？
+
+- It depends what is the character and what encoding it is in:
+
+- An ASCII character in 8-bit ASCII encoding is 8 bits (1 byte), though it can fit in 7 bits.
+
+- An ISO-8895-1 character in ISO-8859-1 encoding is 8 bits (1 byte).
+
+- A Unicode character in UTF-8 encoding is between 8 bits (1 byte) and 32 bits (4 bytes).
+
+- A Unicode character in UTF-16 encoding is between 16 (2 bytes) and 32 bits (4 bytes), though most of the common characters take 16 bits. This is the encoding used by Windows internally.
+
+- A Unicode character in UTF-32 encoding is always 32 bits (4 bytes).
+
+- An ASCII character in UTF-8 is 8 bits (1 byte), and in UTF-16 - 16 bits.
+
+- The additional (non-ASCII) characters in ISO-8895-1 (0xA0-0xFF) would take 16 bits in UTF-8 and UTF-16.
+
+
+[what-is-the-default-encoding-for-c-strings](https://stackoverflow.com/questions/3996026/what-is-the-default-encoding-for-c-strings) 结论就是c语言的标准并没有规定用什么encoding    
+> A c string is pretty much just a sequence of bytes. That means, that it does not have a well-defined encoding, it could be ASCII, UTF8 or anything else, for that matter. Because most operating systems understand ASCII by default, and source code is mostly written with ASCII encoding, so the data you will find in a simple (char*) will very often be ASCII as well. Nonetheless, there is no guarantee that what you get out of a (char*) will be UTF8 or even KOI8.
+
+[java用utf-8,c用了ascii](https://stackoverflow.com/questions/45893641/output-difference-in-c-implementation-of-java-code)
+
+ 用上面的c语言的server发出这样一个字符串
+ "你好啊\r\n"
+
+//在python的socket client这边接收到了
+ b'\xe4'
+ b'\xbd'
+ b'\xa0'
+ b'\xe5'
+ b'\xa5'
+ b'\xbd'
+ b'\xe5'
+ b'\x95'
+ b'\x8a'
+ '\r'
+ '\n'
+
+ //在console里面还能够正常的打印出“你好啊”这三个字（包括换行也做了）
+
+ut-8是变长的
+Unicode符号范围        | UTF-8编码方式
+(十六进制)             | （二进制）
+----------------------+---------------------------------------------
+      0 <--> 0x7f     | 0xxxxxxx
+   0x80 <--> 0x7FF    | 110xxxxx 10xxxxxx
+  0x800 <--> 0xFFFF   | 1110xxxx 10xxxxxx 10xxxxxx
+0x10000 <--> 0x10FFFF | 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+
+
+//来看这三个字的unicode码
+你 -> u4f60 -----> 转换成二进制就是 0100 1111 0110 0000(位于上表的第三行，也就是三个字节) 把0100 1111 0110 0000塞进1110xxxx 10xxxxxx 10xxxxxx的xxx里面
+得到11100100 10111101 10100000（E4 BD A0）
+好 -> u597d -----> 同上，不再赘述
+啊 -> u554a -----> 同上，不再赘述
+
+在浏览器console里面输入
+encodeURI('你好啊')
+"%E4%BD%A0%E5%A5%BD%E5%95%8A" //是不是和python那边收到的东西很像
+
+所以，c语言这边关键函数
+send(sock_client,"你好啊",len,0);
+看上去是发送了6个字节(每个汉字unicode两个字节)，实际上send调用下层在发送出去的时候回把这个6个字节的数据分散在9个字节长度的utf-8 byte array上。
+可以认为发送6个字节，耗费9个字节的流量(如果发送的全部是ascii字符就不会这么浪费了，但其实utf-8已经很节省了)
+结论就是utf-8 encode的工作是底层locale做的，跟application无关。
+
+
+//[libc只是当作以0结尾的字符串原封不动地write给内核，识别汉字的工作是由终端的驱动程序做的。](http://docs.linuxtone.org/ebooks/C&CPP/c/apas03.html)也就是基于当前的locale
+```c
+#include <stdio.h>
+
+int main(void)
+{
+	printf("你好\n");
+	return 0;
+}
+```
+上述程序源文件是以UTF-8编码存储的：
+```
+$ od -tc nihao.c 
+0000000   #   i   n   c   l   u   d   e       <   s   t   d   i   o   .
+0000020   h   >  \n  \n   i   n   t       m   a   i   n   (   v   o   i
+0000040   d   )  \n   {  \n  \t   p   r   i   n   t   f   (   " 344 275
+0000060 240 345 245 275   \   n   "   )   ;  \n  \t   r   e   t   u   r
+0000100   n       0   ;  \n   }  \n
+0000107
+```
+> 其中八进制的344 375 240（十六进制e4 bd a0）就是“你”的UTF-8编码，八进制的345 245 275（十六进制e5 a5 bd）就是“好”。把它编译成目标文件，"你好\n"这个字符串就成了这样一串字节：e4 bd a0 e5 a5 bd 0a 00，汉字在其中仍然是UTF-8编码的，一个汉字占3个字节，这种字符在C语言中称为多字节字符（Multibyte Character）。运行这个程序相当于把这一串字节write到当前终端的设备文件。如果当前终端的驱动程序能够识别UTF-8编码就能打印出汉字，如果当前终端的驱动程序不能识别UTF-8编码（比如一般的字符终端）就打印不出汉字。也就是说，像这种程序，识别汉字的工作既不是由C编译器做的也不是由libc做的，C编译器原封不动地把源文件中的UTF-8编码复制到目标文件中，libc只是当作以0结尾的字符串原封不动地write给内核，识别汉字的工作是由终端的驱动程序做的。
+
+
+
+
+[Unicode in C and C++: What You Can Do About It Today](https://www.cprogramming.com/tutorial/unicode.html)
+
+
+
+
+##不知道为什么,百度首页的response中没有content-length字段
+read from socket , and write it to local file ,how about that?
+
+
+
+
+## todo
+**socket还有阻塞，超时，tcp缓冲等问题值得研究，Linux下TCP延迟确认机制**

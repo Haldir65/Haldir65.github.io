@@ -636,3 +636,5 @@ img.save('sompic.jpg')
 2.The list of directories contained in the PYTHONPATH environment variable, if it is set. (The format for PYTHONPATH is OS-dependent but should mimic the PATH environment variable
 3.An installation-dependent list of directories configured at the time Python is installed
 [vim and python](https://realpython.com/vim-and-python-a-match-made-in-heaven/)
+
+[James Bennett - A Bit about Bytes: Understanding Python Bytecode - PyCon 2018](https://www.youtube.com/watch?v=cSSpnq362Bk)主要是dis模块

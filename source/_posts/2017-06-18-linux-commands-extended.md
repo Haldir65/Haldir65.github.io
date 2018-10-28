@@ -231,15 +231,8 @@ alias untar='tar -zxvf '
 已经有网站把各种常用的[example](https://crontab.guru/every-6-hours)写出来了，直接照抄就是
 后面跟上需要的命令，例如重启就是 /sbin/reboot
 
-### 9. 查找相关(grep,find)
-在文件中查找字符串，不区分大小写
-- grep -i "sometext" filenname
-在一个文件夹里面的所有文件中递归查找含有特定字符串的文件
-- grep -r "sometext" *
 
-[Linux 中 grep 命令的 12 个实践例子](http://blog.jobbole.com/112580/)
-
-find
+### 9.find
 根据文件名查找文件
 ```
 - find -name *.config  #在当前目录下查找

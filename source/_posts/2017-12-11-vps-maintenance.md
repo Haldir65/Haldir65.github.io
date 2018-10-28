@@ -223,7 +223,7 @@ sudo apt-get install simple-obfs
 "reuse_port":true
 ```
 
-## 3. ubuntu自带的防火墙叫做ufw，用起来也很简单
+## 3. ubuntu自带的防火墙叫做ufw(Uncomplicated Firewall)，用起来也很简单
 [digital ocean的ufw教程](https://www.digitalocean.com/community/tutorials/ufw-essentials-common-firewall-rules-and-commands)
 
 ## 4.跑分
@@ -456,4 +456,32 @@ udp:123.123.123.123:35283
 udp:123.123.123.123:29932
 
 中括号的意思是0-9之间的任一数字，花括号包起来的5表示重复5次，也就是五位数的意思了
+
+
+## 6. fail2ban的使用
+[照着digitalocean上的教程配置就行了](https://www.digitalocean.com/community/tutorials/how-to-protect-an-nginx-server-with-fail2ban-on-ubuntu-14-04)
+
+本质上都是某个ip触犯了某条规则，就被iptable添加到drop里面。所以对于发起请求的人来说，看到的是connection refused。
+对于服务器这边，nginx的日志里都没有。因为ip包还没有到nginx就被拦住了。
+日志在/var/log/fail2ban.log这里
+iptables -nL
+sudo service fail2ban restart ##重启一下让规则生效
+sudo fail2ban-client status ## 看下我都添加了哪些规则
+sudo iptables -S ##看下fail2ban都添加了哪些iptable规则
+sudo fail2ban-client status nginx-http-auth ##看看撞上这个规则的ip有哪些ip
+sudo fail2ban-client set nginx-http-auth unbanip 111.111.111.111 ##把这条规则放出小黑屋
+
+
+sudo fail2ban-client reload ## Reloads Fail2ban’s configuration files.在restart之前先用这个测试一下配置文件是否写错了
+sudo fail2ban-client start ##Starts the Fail2ban server and jails.
+sudo fail2ban-client status ##Will show the status of the server, and enable jails.
+sudo fail2ban-client status nginx-http-auth ## 哪些ip被这个规则ban了
+
+##还可以手动测试正则是否符合
+fail2ban-regex 'string' 'regex' //上面的jail也是用了filter.d里面的正则
+
+[fail2ban防止ddos](https://bitmingw.com/2017/05/22/nginx-fail2ban-survive-ddos-attack/)
+
+[fail2ban保护shadowsocks](http://blog.zedyeung.com/2018/08/14/Ubuntu-18-04-set-up-Shadowsocks-server-with-fail2ban/)
+
 

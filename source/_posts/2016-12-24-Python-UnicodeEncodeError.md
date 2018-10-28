@@ -274,6 +274,8 @@ virtualenv的好处是不会干扰机器上已安装的package，有些包现在
 <!-- install mongoDb(better performance than sql) -->
 <!-- install pip -->
 
+[Kenneth Reitz - Pipenv: The Future of Python Dependency Management - PyCon 2018](https://www.youtube.com/watch?v=GBQAKldqgZs) PipEnv取代virtualenv
+
 
 ### 8.在linux环境中运行Python及调用系统API
 [计算当前系统磁盘空间占用率](http://dragonball.blog.51cto.com/1459915/1413369)
