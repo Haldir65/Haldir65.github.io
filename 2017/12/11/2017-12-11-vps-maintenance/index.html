@@ -16,7 +16,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/scenery1511100756208.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery1511100809920.jpg">
-<meta property="og:updated_time" content="2018-10-25T11:02:36.266Z">
+<meta property="og:updated_time" content="2018-10-28T15:07:01.983Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="VPS维护的日常">
 <meta name="twitter:image" content="https://haldir66.ga/static/imgs/scenery1511100756208.jpg">
@@ -273,7 +273,7 @@ ga('send', 'pageview');
 <h3 id="2-5-查看日志"><a href="#2-5-查看日志" class="headerlink" title="2.5 查看日志"></a>2.5 查看日志</h3><p>日志文件的位置在/var/log/shadowsocks.log<br>下面这条命令用于查看访问了哪些网站<br>cat  shadowsocks.log | awk ‘{ print $5}’ |grep -o ‘^[^:]*’ | sort | uniq -c | sort -n</p>
 <p>查看尝试连接本服务器的客户端<br>cat shadowsocks.log | awk ‘{ print $NF }’| grep -o ‘^[^:]*’ | sort | uniq -c | sort -n</p>
 <h3 id="2-6-simple-obfs"><a href="#2-6-simple-obfs" class="headerlink" title="2.6 simple-obfs"></a>2.6 simple-obfs</h3><p>sudo apt-get install simple-obfs<br>/etc/shadowsocks-libev/config.json文件中添加<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&quot;plugin&quot;:&quot;obfs-server&quot;,</span><br><span class="line">&quot;plugin_opts&quot;: &quot;obfs=tls;obfs-host=www.bing.com&quot;,</span><br><span class="line">&quot;fast_open&quot;:true,</span><br><span class="line">&quot;reuse_port&quot;:true</span><br></pre></td></tr></table></figure></p>
-<h2 id="3-ubuntu自带的防火墙叫做ufw，用起来也很简单"><a href="#3-ubuntu自带的防火墙叫做ufw，用起来也很简单" class="headerlink" title="3. ubuntu自带的防火墙叫做ufw，用起来也很简单"></a>3. ubuntu自带的防火墙叫做ufw，用起来也很简单</h2><p><a href="https://www.digitalocean.com/community/tutorials/ufw-essentials-common-firewall-rules-and-commands">digital ocean的ufw教程</a></p>
+<h2 id="3-ubuntu自带的防火墙叫做ufw-Uncomplicated-Firewall-，用起来也很简单"><a href="#3-ubuntu自带的防火墙叫做ufw-Uncomplicated-Firewall-，用起来也很简单" class="headerlink" title="3. ubuntu自带的防火墙叫做ufw(Uncomplicated Firewall)，用起来也很简单"></a>3. ubuntu自带的防火墙叫做ufw(Uncomplicated Firewall)，用起来也很简单</h2><p><a href="https://www.digitalocean.com/community/tutorials/ufw-essentials-common-firewall-rules-and-commands">digital ocean的ufw教程</a></p>
 <h2 id="4-跑分"><a href="#4-跑分" class="headerlink" title="4.跑分"></a>4.跑分</h2><p><a href="https://github.com/Teddysun/across">VPS 跑分软件</a><br>git clone 下来</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cd across</span><br><span class="line">wget -qO- bench.sh | bash ###（亲测可用，也可以自己看Readme）</span><br><span class="line"><span class="meta">#</span>## 或者</span><br><span class="line">curl -Lso- bench.sh | bash</span><br></pre></td></tr></table></figure>
 <p>下面是一些自己试过的</p>
@@ -313,6 +313,12 @@ ga('send', 'pageview');
 </blockquote>
 <p>sudo egrep “udp:123.123.123.123:[0-9]{5}” -o stuff.log<br>udp:123.123.123.123:35021<br>udp:123.123.123.123:29932<br>udp:123.123.123.123:35283<br>udp:123.123.123.123:29932</p>
 <p>中括号的意思是0-9之间的任一数字，花括号包起来的5表示重复5次，也就是五位数的意思了</p>
+<h2 id="6-fail2ban的使用"><a href="#6-fail2ban的使用" class="headerlink" title="6. fail2ban的使用"></a>6. fail2ban的使用</h2><p><a href="https://www.digitalocean.com/community/tutorials/how-to-protect-an-nginx-server-with-fail2ban-on-ubuntu-14-04">照着digitalocean上的教程配置就行了</a></p>
+<p>本质上都是某个ip触犯了某条规则，就被iptable添加到drop里面。所以对于发起请求的人来说，看到的是connection refused。<br>对于服务器这边，nginx的日志里都没有。因为ip包还没有到nginx就被拦住了。<br>日志在/var/log/fail2ban.log这里<br>iptables -nL<br>sudo service fail2ban restart ##重启一下让规则生效<br>sudo fail2ban-client status ## 看下我都添加了哪些规则<br>sudo iptables -S ##看下fail2ban都添加了哪些iptable规则<br>sudo fail2ban-client status nginx-http-auth ##看看撞上这个规则的ip有哪些ip<br>sudo fail2ban-client set nginx-http-auth unbanip 111.111.111.111 ##把这条规则放出小黑屋</p>
+<p>sudo fail2ban-client reload ## Reloads Fail2ban’s configuration files.在restart之前先用这个测试一下配置文件是否写错了<br>sudo fail2ban-client start ##Starts the Fail2ban server and jails.<br>sudo fail2ban-client status ##Will show the status of the server, and enable jails.<br>sudo fail2ban-client status nginx-http-auth ## 哪些ip被这个规则ban了</p>
+<p>##还可以手动测试正则是否符合<br>fail2ban-regex ‘string’ ‘regex’ //上面的jail也是用了filter.d里面的正则</p>
+<p><a href="https://bitmingw.com/2017/05/22/nginx-fail2ban-survive-ddos-attack/">fail2ban防止ddos</a></p>
+<p><a href="http://blog.zedyeung.com/2018/08/14/Ubuntu-18-04-set-up-Shadowsocks-server-with-fail2ban/">fail2ban保护shadowsocks</a></p>
 
       
 

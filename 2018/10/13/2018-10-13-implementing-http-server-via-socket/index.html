@@ -17,7 +17,7 @@
 <meta property="og:description" content="收集几种语言中使用socket实现httpServer和httpClient的主要步骤">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/sun_rise_dim_grass.jpg">
-<meta property="og:updated_time" content="2018-10-25T11:02:36.270Z">
+<meta property="og:updated_time" content="2018-10-28T15:07:01.983Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从Socket入手实现http协议">
 <meta name="twitter:description" content="收集几种语言中使用socket实现httpServer和httpClient的主要步骤">
@@ -251,7 +251,6 @@ ga('send', 'pageview');
 <li><p>高阶版本的参考<br><a href="https://www.geeksforgeeks.org/socket-programming-in-cc-handling-multiple-clients-on-server-without-multi-threading/">高阶一点，处理并发的</a><br><a href="https://github.com/pminkov/webserver">多线程的server和client源码</a></p>
 </li>
 </ul>
-<h2 id="todo"><a href="#todo" class="headerlink" title="todo"></a>todo</h2><p><strong>socket还有阻塞，超时，tcp缓冲等问题值得研究，Linux下TCP延迟确认机制</strong></p>
 <p><strong>还有实现websocket协议的，实现sock5协议的</strong></p>
 <p>见过的一个websocket的请求长这样<br>GET wss://nexus-websocket-b.xxx.io/pubsub/xxx?X-Nexus-New-Client=true&amp;X-Nexus-Version=0.4.53 HTTP/1.1<br>Host: nexus-websocket-b.xxx.io<br>Connection: Upgrade<br>Pragma: no-cache<br>Cache-Control: no-cache<br>User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3538.77 Safari/537.36<br>Upgrade: websocket<br>Origin: <a href="https://app.xxx.io">https://app.xxx.io</a><br>Sec-WebSocket-Version: 13<br>Accept-Encoding: gzip, deflate, br<br>Accept-Language: zh-CN,zh;q=0.9<br>Sec-WebSocket-Key: xaxsasdasdas==<br>Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits</p>
 <p>Response长这样<br>HTTP/1.1 101 Switching Protocols<br>Date: Thu, 25 Oct 2018 06:07:10 GMT<br>Connection: upgrade<br>Upgrade: websocket<br>Sec-WebSocket-Accept: sasasasaD/tA=</p>
@@ -259,6 +258,47 @@ ga('send', 'pageview');
 <ul>
 <li>js并不支持对操作系统socket的直接控制，可能是安全因素(websocket倒是有，不过那是另外一回事了)。</li>
 </ul>
+<p>#include <unistd.h></p>
+<p>ssize_t read(int fd, void *buf, size_t count);<br>read这个函数返回的是读取的byte数，(On success, the number of bytes read is returned (zero indicates end of file), and the file position is advanced by this number;On error, -1 is returned, and errno is set appropriately.  In this case, it is left unspecified whether the file position (if any) changes.)</p>
+<p>如果read的时候一直统计当前总的read到的bytes数，应该是要比content-length长不少的。<br><a href="https://stackoverflow.com/questions/4850241/how-many-bits-in-a-character">那么一个字符到底多少个byte呢</a><br>首先要明白，read出来的东西是byte(是被utf-8编码过的)。几乎所有的语言在接收到之后都要重新解码一下，所以在这里decode一下，用c语言decode怎么弄？</p>
+<ul>
+<li><p>It depends what is the character and what encoding it is in:</p>
+</li>
+<li><p>An ASCII character in 8-bit ASCII encoding is 8 bits (1 byte), though it can fit in 7 bits.</p>
+</li>
+<li><p>An ISO-8895-1 character in ISO-8859-1 encoding is 8 bits (1 byte).</p>
+</li>
+<li><p>A Unicode character in UTF-8 encoding is between 8 bits (1 byte) and 32 bits (4 bytes).</p>
+</li>
+<li><p>A Unicode character in UTF-16 encoding is between 16 (2 bytes) and 32 bits (4 bytes), though most of the common characters take 16 bits. This is the encoding used by Windows internally.</p>
+</li>
+<li><p>A Unicode character in UTF-32 encoding is always 32 bits (4 bytes).</p>
+</li>
+<li><p>An ASCII character in UTF-8 is 8 bits (1 byte), and in UTF-16 - 16 bits.</p>
+</li>
+<li><p>The additional (non-ASCII) characters in ISO-8895-1 (0xA0-0xFF) would take 16 bits in UTF-8 and UTF-16.</p>
+</li>
+</ul>
+<p><a href="https://stackoverflow.com/questions/3996026/what-is-the-default-encoding-for-c-strings">what-is-the-default-encoding-for-c-strings</a> 结论就是c语言的标准并没有规定用什么encoding    </p>
+<blockquote>
+<p>A c string is pretty much just a sequence of bytes. That means, that it does not have a well-defined encoding, it could be ASCII, UTF8 or anything else, for that matter. Because most operating systems understand ASCII by default, and source code is mostly written with ASCII encoding, so the data you will find in a simple (char<em>) will very often be ASCII as well. Nonetheless, there is no guarantee that what you get out of a (char</em>) will be UTF8 or even KOI8.</p>
+</blockquote>
+<p><a href="https://stackoverflow.com/questions/45893641/output-difference-in-c-implementation-of-java-code">java用utf-8,c用了ascii</a></p>
+<p> 用上面的c语言的server发出这样一个字符串<br> “你好啊\r\n”</p>
+<p>//在python的socket client这边接收到了<br> b’\xe4’<br> b’\xbd’<br> b’\xa0’<br> b’\xe5’<br> b’\xa5’<br> b’\xbd’<br> b’\xe5’<br> b’\x95’<br> b’\x8a’<br> ‘\r’<br> ‘\n’</p>
+<p> //在console里面还能够正常的打印出“你好啊”这三个字（包括换行也做了）</p>
+<p>ut-8是变长的<br>Unicode符号范围        | UTF-8编码方式<br>(十六进制)             | （二进制）<br>———————-+———————————————<br>      0 &lt;–&gt; 0x7f     | 0xxxxxxx<br>   0x80 &lt;–&gt; 0x7FF    | 110xxxxx 10xxxxxx<br>  0x800 &lt;–&gt; 0xFFFF   | 1110xxxx 10xxxxxx 10xxxxxx<br>0x10000 &lt;–&gt; 0x10FFFF | 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx</p>
+<p>//来看这三个字的unicode码<br>你 -&gt; u4f60 —–&gt; 转换成二进制就是 0100 1111 0110 0000(位于上表的第三行，也就是三个字节) 把0100 1111 0110 0000塞进1110xxxx 10xxxxxx 10xxxxxx的xxx里面<br>得到11100100 10111101 10100000（E4 BD A0）<br>好 -&gt; u597d —–&gt; 同上，不再赘述<br>啊 -&gt; u554a —–&gt; 同上，不再赘述</p>
+<p>在浏览器console里面输入<br>encodeURI(‘你好啊’)<br>“%E4%BD%A0%E5%A5%BD%E5%95%8A” //是不是和python那边收到的东西很像</p>
+<p>所以，c语言这边关键函数<br>send(sock_client,”你好啊”,len,0);<br>看上去是发送了6个字节(每个汉字unicode两个字节)，实际上send调用下层在发送出去的时候回把这个6个字节的数据分散在9个字节长度的utf-8 byte array上。<br>可以认为发送6个字节，耗费9个字节的流量(如果发送的全部是ascii字符就不会这么浪费了，但其实utf-8已经很节省了)<br>结论就是utf-8 encode的工作是底层locale做的，跟application无关。</p>
+<p>//<a href="http://docs.linuxtone.org/ebooks/C&amp;CPP/c/apas03.html">libc只是当作以0结尾的字符串原封不动地write给内核，识别汉字的工作是由终端的驱动程序做的。</a>也就是基于当前的locale<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">true<span class="built_in">printf</span>(<span class="string">"你好\n"</span>);</span><br><span class="line">true<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上述程序源文件是以UTF-8编码存储的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ od -tc nihao.c </span><br><span class="line">0000000   #   i   n   c   l   u   d   e       &lt;   s   t   d   i   o   .</span><br><span class="line">0000020   h   &gt;  \n  \n   i   n   t       m   a   i   n   (   v   o   i</span><br><span class="line">0000040   d   )  \n   &#123;  \n  \t   p   r   i   n   t   f   (   &quot; 344 275</span><br><span class="line">0000060 240 345 245 275   \   n   &quot;   )   ;  \n  \t   r   e   t   u   r</span><br><span class="line">0000100   n       0   ;  \n   &#125;  \n</span><br><span class="line">0000107</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>其中八进制的344 375 240（十六进制e4 bd a0）就是“你”的UTF-8编码，八进制的345 245 275（十六进制e5 a5 bd）就是“好”。把它编译成目标文件，”你好\n”这个字符串就成了这样一串字节：e4 bd a0 e5 a5 bd 0a 00，汉字在其中仍然是UTF-8编码的，一个汉字占3个字节，这种字符在C语言中称为多字节字符（Multibyte Character）。运行这个程序相当于把这一串字节write到当前终端的设备文件。如果当前终端的驱动程序能够识别UTF-8编码就能打印出汉字，如果当前终端的驱动程序不能识别UTF-8编码（比如一般的字符终端）就打印不出汉字。也就是说，像这种程序，识别汉字的工作既不是由C编译器做的也不是由libc做的，C编译器原封不动地把源文件中的UTF-8编码复制到目标文件中，libc只是当作以0结尾的字符串原封不动地write给内核，识别汉字的工作是由终端的驱动程序做的。</p>
+</blockquote>
+<p><a href="https://www.cprogramming.com/tutorial/unicode.html">Unicode in C and C++: What You Can Do About It Today</a></p>
+<p>##不知道为什么,百度首页的response中没有content-length字段<br>read from socket , and write it to local file ,how about that?</p>
+<h2 id="todo"><a href="#todo" class="headerlink" title="todo"></a>todo</h2><p><strong>socket还有阻塞，超时，tcp缓冲等问题值得研究，Linux下TCP延迟确认机制</strong></p>
 
       
 
