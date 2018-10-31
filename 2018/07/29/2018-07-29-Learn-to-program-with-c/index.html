@@ -17,7 +17,7 @@
 <meta property="og:description" content="C语言实用指南，暂时不涉及cpp内容">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/pretty-orange-mushroom-wallpaper-5386b0c8c3459.jpg">
-<meta property="og:updated_time" content="2018-10-28T15:07:01.983Z">
+<meta property="og:updated_time" content="2018-10-31T12:04:24.904Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="C语言学习手册">
 <meta name="twitter:description" content="C语言实用指南，暂时不涉及cpp内容">
@@ -323,8 +323,9 @@ main.cpp:(.text+0x7): undefined reference to</code>test()’<br>collect2: ld ret
 <p><a href="https://renenyffenegger.ch/notes/development/languages/C-C-plus-plus/GCC/create-libraries/index">dlopen和soname</a><br><a href="https://www.jianshu.com/p/46926f2ffef0">c语言const关键字</a>有的时候是说指针指向的对象不能动，有的时候说的是指针指向的值不能动</p>
 <p>size_t 和int差不多，估摸着是跨平台的一种表示。</p>
 <p>autoconf和automake的使用教程</p>
-<p><a href="https://dev-notes.eu/2018/08/strings-in-c/">string in c</a><br>char *name = “Bob”; //name指向的位置不能修改了，但是name可以指向别的东西<br>name[1] = ‘e’; //这么干是不行的，编译是能通过，但运行期会造成undefined behavior，大概率是segment fault</p>
-<p>// 下面这种用数组形式声明的是可以随便改的<br>char name[] = “Alice”;<br>name[3] = ‘n’;<br>name[4] = ‘a’;</p>
+<p><a href="https://dev-notes.eu/2018/08/strings-in-c/">string in c</a><br>char *name = “Bob”; //name指向的位置不能修改了，但是name可以指向别的东西.<br>// the value is stored in a read-only section in the binary file and cannot be modified<br>name[1] = ‘e’; //这么干是不行的，编译是能通过，但运行期会造成undefined behavior，大概率是segment fault</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">You can also define a <span class="built_in">string</span> as a pointer to a <span class="keyword">char</span>, initialised by a <span class="built_in">string</span> literal. In <span class="keyword">this</span> <span class="keyword">case</span>, <span class="built_in">string</span> literals are stored in a read only section of memory <span class="keyword">and</span> are effectively constant. For example:</span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> *name = <span class="string">"Bob"</span></span><br><span class="line">In <span class="keyword">this</span> <span class="keyword">case</span>, the value is stored in a read-only section in the binary file <span class="keyword">and</span> cannot be modified. If you compile to an assembly file (use the -S compiler option in gcc), you can see the <span class="built_in">string</span> literals in the .rodata section. In <span class="keyword">this</span> context, rodata means “read-only data”.</span><br><span class="line"></span><br><span class="line"><span class="comment">/* main.s */</span></span><br><span class="line">.file	<span class="string">"main.c"</span></span><br><span class="line">.section	.rodata</span><br><span class="line">.LC0:</span><br><span class="line">.<span class="built_in">string</span>	<span class="string">"Bob"</span></span><br></pre></td></tr></table></figure>
+<p>// 下面这种用数组形式声明的是可以随便改的<br>char name[] = “Alice”; //存在stack上，随便改<br>name[3] = ‘n’;<br>name[4] = ‘a’;</p>
 <h3 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h3><p>c语言就是这样，好多功能都得自己实现</p>
 <blockquote>
 <p>c 语言有它的设计哲学，就是那著名的“Keep It Simple, Stupid”，语言本身仅仅实现最为基本的功能，然后标准库也仅仅带有最为基本的内存管理（更高效一点的内存池都必须要自己实现）、IO、断言等基本功能。 </p>
@@ -709,6 +710,10 @@ main.cpp:(.text+0x7): undefined reference to</code>test()’<br>collect2: ld ret
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">django</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">sql</a>
               </li>
              
               <li class="article-tag-list-item">
