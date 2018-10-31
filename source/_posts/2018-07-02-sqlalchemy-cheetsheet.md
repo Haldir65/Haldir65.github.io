@@ -1,7 +1,7 @@
 ---
 title: sqlalchemy速查手册
 date: 2018-07-02 21:12:31
-tags: [python]
+tags: [python,sql]
 ---
 
 > pip install SQLAlchemy

@@ -694,9 +694,12 @@ for(int i = 0; i< size; i++){
 4. hexadecimal简化了写无数个01的过程，日常开发尽量写0xffffff这种形式。两个十六进制数字的组合通常代表一个byte的范围。
 5. 根据阮一峰的[介绍](http://www.ruanyifeng.com/blog/2014/12/unicode.html)，目前，Unicode的最新版本是7.0版，一共收入了109449个符号，其中的中日韩文字为74500个。可以近似认为，全世界现有的符号当中，三分之二以上来自东亚文字。
 
+java内存中字符的存储方式是utf-16，因为简单啊，不用像utf-8那样麻烦
+UTF-16 表示字符非常方便，每两个字节表示一个字符，这个在字符串操作时就大大简化了操作，这也是 Java 以 UTF-16 作为内存的字符存储格式的一个很重要的原因。 这也是为什么 java字符占用两个字节的原因。
 
+而在c语言中，一个字符(char)只需要1个字节
 
 ## 参考
 - [Jesse Wilson | Decoding the Secrets of Binary Data ](https://www.youtube.com/watch?v=T_p22jMZSrk)
-- [深入分析 Java 中的中文编码问题](https://www.ibm.com/developerworks/cn/java/j-lo-chinesecoding/index.html)IBM出品
+- [深入分析 Java 中的中文编码问题](https://www.ibm.com/developerworks/cn/java/j-lo-chinesecoding/index.html)IBM出品,非常好
 - [emoji complete list](http://www.unicode.org/emoji/charts/full-emoji-list.html)

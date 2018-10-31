@@ -377,7 +377,7 @@ redis-server.service: Failed to run 'start-pre' task: No such file or directory
 
 ## 参考
 [redis official docs](https://redis.io/commands/hlen)
-[Redis supports 5 types of data types] (https://www.tutorialspoint.com/redis/redis_data_types.htm)
+[Redis supports 5 types of data types](https://www.tutorialspoint.com/redis/redis_data_types.htm)
 [Redis 高级特性与性能调优](http://www.ttlsa.com/redis/redis-advanced-features-and-performance-tuning/)
 [大部分语句转载自](http://www.dnsdizhi.com/post-219.html)
 [关于pipelining的解释](http://shift-alt-ctrl.iteye.com/blog/1863790)

@@ -505,11 +505,25 @@ size_t 和int差不多，估摸着是跨平台的一种表示。
 autoconf和automake的使用教程
 
 [string in c](https://dev-notes.eu/2018/08/strings-in-c/)
-char *name = "Bob"; //name指向的位置不能修改了，但是name可以指向别的东西
+char *name = "Bob"; //name指向的位置不能修改了，但是name可以指向别的东西.
+// the value is stored in a read-only section in the binary file and cannot be modified
 name[1] = 'e'; //这么干是不行的，编译是能通过，但运行期会造成undefined behavior，大概率是segment fault
 
+```c
+You can also define a string as a pointer to a char, initialised by a string literal. In this case, string literals are stored in a read only section of memory and are effectively constant. For example:
+
+char *name = "Bob"
+In this case, the value is stored in a read-only section in the binary file and cannot be modified. If you compile to an assembly file (use the -S compiler option in gcc), you can see the string literals in the .rodata section. In this context, rodata means “read-only data”.
+
+/* main.s */
+.file	"main.c"
+.section	.rodata
+.LC0:
+.string	"Bob"
+```
+
 // 下面这种用数组形式声明的是可以随便改的
-char name[] = "Alice";
+char name[] = "Alice"; //存在stack上，随便改
 name[3] = 'n';
 name[4] = 'a';
 

@@ -484,4 +484,15 @@ fail2ban-regex 'string' 'regex' //上面的jail也是用了filter.d里面的正�
 
 [fail2ban保护shadowsocks](http://blog.zedyeung.com/2018/08/14/Ubuntu-18-04-set-up-Shadowsocks-server-with-fail2ban/)
 
+[fail2ban-regex](https://www.the-art-of-web.com/system/fail2ban-filters/)
+> # fail2ban-regex <logfile> <failregex> <ignoreregex>
+# fail2ban-regex /var/log/auth.log /etc/fail2ban/filter.d/sshd.conf --print-all-matched
+--print-all-missed
+--print-all-ignored
+
+sudo fail2ban-regex /var/log/nginx/access.log /etc/fail2ban/filter.d/nginx-x00.conf --print-all-matched
+
+匹配成功
+|  139.162.184.185 - - [29/Oct/2018:20:02:19 -0400] "\x15\x03\x03\x00\x02\x01\x00" 400 166 "-" "-"
+
 

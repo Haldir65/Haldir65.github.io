@@ -1,7 +1,7 @@
 ---
 title: mysql填坑记录
 date: 2018-02-04 21:37:37
-tags:
+tags: [sql]
 ---
 
 ![](https://www.haldir66.ga/static/imgs/fuchsia-973x547.jpg)

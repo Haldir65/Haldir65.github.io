@@ -318,3 +318,133 @@ wget --spider www.baidu.com //wget还有一个spider模式
 [Server Name Indication](https://en.wikipedia.org/wiki/Server_Name_Indication)
 SNI breaks the 'host' part of SSL encryption of URLs. You can test this yourself with wireshark. There is a selector for SNI
 
+// http post请求，设置content-type = Application/json，body里面放一个int或者long，实际传输的是string还是long?(猜测是string，因为要走utf-8之类的encoding过一遍，因为http是text-based协议)
+这事是有区别的，比如要post出去一个"6"，
+字符串6的ascii码是
+二进制：0011 0110
+十进制：54	
+十六进制：36
+**只需要一个字节**
+
+int 类型数字6 在java里是4个字节，
+在c语言里是2个或者四个字节。
+那么这个数字再大一点呢
+字符串66666666需要八个字节
+
+
+int 类型数字66666666 在java里是4个字节，
+在c语言里是2个或者四个字节。
+**需要四个字节**
+
+整体来讲，JSON 是文本的格式，整数和浮点数应该更占空间而且更费时。
+这就涉及到json和protobuff等二级制协议的比对了，从上面来看，如果你的内容是整数或者浮点数比较多的话，一大长串的数字用string的话就得花上很多内存，但是用int或者float的话可能四个字节就搞定了。所以这事没法绝对的说
+
+都知道传输的都是byte数组，猜测传的类型是文字形式的。因为读取的时候多数是utf-8形式的，没办法特意指出这块byte是int还是string的一部分
+
+post一个json出去的时候
+```
+{"name":"john"}
+//事实上在byte层面是发送了这么些byte
+123 {
+34 "
+110 n
+97 a
+109 m
+101 e
+34 "
+58 :
+34 "
+106 j
+111 0
+104 h
+110 n
+34 "
+125 }
+```
+这些标点符号都发送出去了，也就是占用的.
+
+[四种常见的POST提交数据方式](https://imququ.com/post/four-ways-to-post-data-in-http.html)
+
+application/x-www-form-urlencoded
+multipart/form-data
+application/json
+text/xml
+
+application/json的post请求的长这样
+```
+POST / HTTP/1.1
+Host: www.baidu.com
+User-Agent: ...
+Content-Length:27
+Cookie: session=fsdaf;aaa=dfasf;......
+
+{"input1":"xxx","input2":"oo加密过的xxxxo","remember":false}
+```
+
+application/x-www-form-urlencoded(浏览器的原生 form 表单)的post请求的长这样
+```
+POST / HTTP/1.1
+Host: www.baidu.com
+User-Agent: ...
+Content-Length:27
+Cookie: session=fsdaf;aaa=dfasf;......
+
+name=user&password=password
+```
+
+multipart/form-data:(表单格式的)这一种是表单格式的，数据类型如下
+```
+POST / HTTP/1.1
+Host: www.baidu.com
+User-Agent: ...
+Content-Length:27
+Cookie: session=fsdaf;aaa=dfasf;......
+
+------WebKitFormBoundaryrGKCBY7qhFd3TrwA
+
+Content-Disposition: form-data; name="text"
+
+title
+
+------WebKitFormBoundaryrGKCBY7qhFd3TrwA
+
+Content-Disposition: form-data; name="file"; filename="chrome.png"
+
+Content-Type: image/png
+
+PNG ... content of chrome.png ...
+
+------WebKitFormBoundaryrGKCBY7qhFd3TrwA--
+```
+
+text/xml:这种直接传的xml的post请求的长这样
+```
+POST / HTTP/1.1
+Host: www.baidu.com
+User-Agent: ...
+Content-Length:27
+Cookie: session=fsdaf;aaa=dfasf;......
+
+<!--?xml version="1.0"?-->
+
+<methodcall>
+
+<methodname>examples.getStateName</methodname>
+
+<params>
+
+<param>
+
+<value><i4>41</i4></value>
+
+</params>
+
+</methodcall>
+```
+
+```
+data%3D%7B%22name%22%3A%22john%22%2C%22age%22%2C20%2C%22time%22%2C6%7D
+```
+这种东西通常是懒得看的，
+需要转码一下，粘贴到[这个里面去就行了](http://tool.oschina.net/encode?type=4)，或者自己encodeURIComponent一下就好
+

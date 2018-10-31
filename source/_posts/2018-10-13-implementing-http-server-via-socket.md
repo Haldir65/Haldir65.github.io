@@ -337,7 +337,7 @@ char* joinString(char *s1, char *s2)
 {
     char *result = malloc(strlen(s1)+strlen(s2)+1);//+1 for the zero-terminator
     //in real code you would check for errors in malloc here
-	if (result == NULL) exit (1);
+    if (result == NULL) exit (1);
  
     strcpy(result, s1);
     strcat(result, s2);
@@ -549,7 +549,37 @@ read这个函数返回的是读取的byte数，(On success, the number of bytes 
  用上面的c语言的server发出这样一个字符串
  "你好啊\r\n"
 
+ python的client每次读取一个字节,然后打印出0101这样的形式
+ ```python
+ while True:
+    # 每次最多接收1个字节:
+    d = s.recv(1)
+    t = ''
+    for x in d:
+        t+= format(ord(x),'b')
+        print(t)
+    if d:
+        buffer.append(d)
+    else:
+        break
+data = b''.join(buffer)
+print(data);
+```
+
+
+
 //在python的socket client这边接收到了
+11100100
+10111101
+10100000
+11100101
+10100101
+10111101
+11100101
+10010101
+10001010
+
+
  b'\xe4'
  b'\xbd'
  b'\xa0'
@@ -561,6 +591,10 @@ read这个函数返回的是读取的byte数，(On success, the number of bytes 
  b'\x8a'
  '\r'
  '\n'
+ 因为tcp是有序的，所以发送端的字节以什么顺序排列的，接受端就是受到完全一样顺序排列的字节。这里因为客户端是一个字节一个字节的读取，正好cpu也是Little endian(Intelx86 cpu全是)。
+
+
+
 
  //在console里面还能够正常的打印出“你好啊”这三个字（包括换行也做了）
 
@@ -588,7 +622,9 @@ encodeURI('你好啊')
 send(sock_client,"你好啊",len,0);
 看上去是发送了6个字节(每个汉字unicode两个字节)，实际上send调用下层在发送出去的时候回把这个6个字节的数据分散在9个字节长度的utf-8 byte array上。
 可以认为发送6个字节，耗费9个字节的流量(如果发送的全部是ascii字符就不会这么浪费了，但其实utf-8已经很节省了)
-结论就是utf-8 encode的工作是底层locale做的，跟application无关。
+
+
+**结论就是utf-8 encode的工作是底层根据locale做的，跟application无关。**
 
 
 //[libc只是当作以0结尾的字符串原封不动地write给内核，识别汉字的工作是由终端的驱动程序做的。](http://docs.linuxtone.org/ebooks/C&CPP/c/apas03.html)也就是基于当前的locale
@@ -597,8 +633,8 @@ send(sock_client,"你好啊",len,0);
 
 int main(void)
 {
-	printf("你好\n");
-	return 0;
+    printf("你好\n");
+    return 0;
 }
 ```
 上述程序源文件是以UTF-8编码存储的：
@@ -612,9 +648,6 @@ $ od -tc nihao.c
 0000107
 ```
 > 其中八进制的344 375 240（十六进制e4 bd a0）就是“你”的UTF-8编码，八进制的345 245 275（十六进制e5 a5 bd）就是“好”。把它编译成目标文件，"你好\n"这个字符串就成了这样一串字节：e4 bd a0 e5 a5 bd 0a 00，汉字在其中仍然是UTF-8编码的，一个汉字占3个字节，这种字符在C语言中称为多字节字符（Multibyte Character）。运行这个程序相当于把这一串字节write到当前终端的设备文件。如果当前终端的驱动程序能够识别UTF-8编码就能打印出汉字，如果当前终端的驱动程序不能识别UTF-8编码（比如一般的字符终端）就打印不出汉字。也就是说，像这种程序，识别汉字的工作既不是由C编译器做的也不是由libc做的，C编译器原封不动地把源文件中的UTF-8编码复制到目标文件中，libc只是当作以0结尾的字符串原封不动地write给内核，识别汉字的工作是由终端的驱动程序做的。
-
-
-
 
 [Unicode in C and C++: What You Can Do About It Today](https://www.cprogramming.com/tutorial/unicode.html)
 
