@@ -496,6 +496,9 @@ message Person {
 以 optional string email = 3 为例，ProtocolBuffer定义了一个length mode（enum,int32,int64是000,fixed64是001，String,message是010），拿一个byte出来，先把后面三位填上010，即XXXXX010，然后把3在前面，即00011010，一共只用了一个byte就把String email这句话表示出来了。即protobuffer只需一个byte就能表示key,同样的key，json要12byte（utf-8下一个字母一个byte）。value也是一样，转成hex的形式。
 印象中http2也是用数字来表示header key的，类似的节省数据的道理。
 
+json是有rfc规范[rfc4627](https://www.ietf.org/rfc/rfc4627.txt)的
+> JSON text SHALL be encoded in Unicode. The default encoding is UTF-8.
+
 
 ## 8. 补充
 ### 8.1 Big-ending和Little-endian这名字其实跟文学作品有关
@@ -701,5 +704,5 @@ UTF-16 表示字符非常方便，每两个字节表示一个字符，这个在�
 
 ## 参考
 - [Jesse Wilson | Decoding the Secrets of Binary Data ](https://www.youtube.com/watch?v=T_p22jMZSrk)
-- [深入分析 Java 中的中文编码问题](https://www.ibm.com/developerworks/cn/java/j-lo-chinesecoding/index.html)IBM出品,非常好
+- [深入分析 Java 中的中文编码问题](https://www.ibm.com/developerworks/cn/java/j-lo-chinesecoding/index.html)IBM出品,非常好，甚至告诉你什么情况下会出现哪种奇怪的显示符号
 - [emoji complete list](http://www.unicode.org/emoji/charts/full-emoji-list.html)

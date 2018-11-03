@@ -14,3 +14,5 @@ tags:
 [死磕java](http://cmsblogs.com/?cat=189)
 [技术小黑屋](https://droidyue.com/)
 [Jerry Qu 专注 WEB 端开发](https://imququ.com/)
+
+[非常非常全的关于python socket编程的文章，文章本身也很长](https://realpython.com/python-sockets/)

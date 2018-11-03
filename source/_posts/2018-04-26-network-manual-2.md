@@ -157,7 +157,7 @@ google的protoBuffer最重要的两个方法writeTo(object转成byte数组)和pa
 
 ## 3. tcp的分包和粘包问题
 
-tcp发包的时候，如果一个包过大，会拆成两个包发(分包)。如果太小，发送方会攒着和下一个包一起发（粘包）。作为接收方并不知道收到的包是一个完整的包还是被拆分的还是由两个包合并而来。
+tcp发包的时候，如果一个包过大，会拆成两个包发(分包)。如果太小，发送方会攒着和下一个包一起发（粘包），tcp为了提高效率(使用Nagle算法)会缓冲N个包后再一起发出去。作为接收方并不知道收到的包是一个完整的包还是被拆分的还是由两个包合并而来。
 
 可能发生分包和粘包的原因包括：
 1、要发送的数据大于TCP发送缓冲区剩余空间大小，将会发生拆包。
@@ -447,4 +447,7 @@ data%3D%7B%22name%22%3A%22john%22%2C%22age%22%2C20%2C%22time%22%2C6%7D
 ```
 这种东西通常是懒得看的，
 需要转码一下，粘贴到[这个里面去就行了](http://tool.oschina.net/encode?type=4)，或者自己encodeURIComponent一下就好
+其实是: data={"name":"john","age",20,"time",6}
 
+[出处](https://borninsummer.com/2015/10/27/about-using-json-in-http-body/)
+> HTTP 为超文本传输协议，整个的 HTTP 报文，如果按编程语言里面的类型来分的话，就是一大段字符串。值得注意的是，不像 JSON，application/x-www-form-urlencoded 的方式对复杂类型（例如数组）的处理，并没有严格的标准。有的接口使用 key[]=a&key[]=b 来表示数组 key: ['a', 'b']，（这也是最常见的，jQuery、superagent等客户端会如此编码），有的库则将数组编码为：key=a&key=b，有的则是携带下标进行编码：key[0]=a&key[1]=b……十分混乱。所以如果是数组且数组的每一项为简单基本类型，而且非要用 application/x-www-form-urlencoded 进行序列化，那么不如用英文逗号分隔的字符串来表示。如果是嵌套对象……那么还是尽早使用 JSON 吧。

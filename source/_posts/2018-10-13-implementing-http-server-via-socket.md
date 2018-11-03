@@ -453,7 +453,7 @@ htons();//将short类型的值从主机字节序转换为网络字节序(上面�
 inet_addr();//将IP地址字符串转换为long类型的网络字节序（接受一个字符串，返回一个long）
 gethostbyname();//获得与该域名对应的IP地址
 inet_ntoa();//将long类型的网络字节序转换成IP地址字符串
-
+//这些转换字节序的函数是必须的，因为ip地址，端口这些东西不是应用层处理，而是由路由器这些东西去处理的，后者遵照网络标准使用的是big-endian，所以必须转换字节序。
 
 读函数read
 ssize_t read(int fd,void *buf,size_t nbyte)
@@ -566,8 +566,6 @@ data = b''.join(buffer)
 print(data);
 ```
 
-
-
 //在python的socket client这边接收到了
 11100100
 10111101
@@ -591,8 +589,7 @@ print(data);
  b'\x8a'
  '\r'
  '\n'
- 因为tcp是有序的，所以发送端的字节以什么顺序排列的，接受端就是受到完全一样顺序排列的字节。这里因为客户端是一个字节一个字节的读取，正好cpu也是Little endian(Intelx86 cpu全是)。
-
+ 因为tcp是有序的，所以发送端的字节以什么顺序排列的，接受端就是受到完全一样顺序排列的字节。这里因为网络传输是以字节为单位的。而sizeof(char) = 1 ，但是sizeof(int) = 4, 以上都还只是text-based content，字节序这回事只跟多字节类型的数据有关的比如int,short,long这类数字类型有关，所以基于文本传输的协议当然不存在字节序问题(当然content-length这种数字还是要注意一下的)。
 
 
 

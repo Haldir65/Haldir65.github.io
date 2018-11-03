@@ -120,6 +120,7 @@ find / -name core -print -exec rm -rf {} \; //分号也要，亲测
 find / -size +100M：列出所有大于100M的文件，亲测。靠着这个找到了shadowsocks的日志文件,170MB
 上面这个命令是不能列出文件大小的，还想要查看文件大小的话
 find / -type f -size +50M -exec du -h {} \; | sort -n
+find . -mindepth 1 -maxdepth 1 -printf '%f\n' //打印出当前目录下所有文件，基本上就是一个ls命令了
 
 删除/boot分区不需要的内核
 先df -h看/boot分区使用情况；

@@ -9,16 +9,46 @@ C语言实用指南，暂时不涉及cpp内容
 ![](https://haldir66.ga/static/imgs/pretty-orange-mushroom-wallpaper-5386b0c8c3459.jpg)
 <!--more-->
 
+## 先从最常用的字符串说起吧
+[string in c](https://dev-notes.eu/2018/08/strings-in-c/)
+char *name = "Bob"; //name指向的位置不能修改了，但是name可以指向别的东西.
+// the value is stored in a read-only section in the binary file and cannot be modified
+name[1] = 'e'; //这么干是不行的，编译是能通过，但运行期会造成undefined behavior，大概率是segment fault
+
+```c
+You can also define a string as a pointer to a char, initialised by a string literal. In this case, string literals are stored in a read only section of memory and are effectively constant. For example:
+
+char *name = "Bob"
+In this case, the value is stored in a read-only section in the binary file and cannot be modified. If you compile to an assembly file (use the -S compiler option in gcc), you can see the string literals in the .rodata section. In this context, rodata means “read-only data”.
+
+/* main.s */
+.file	"main.c"
+.section	.rodata
+.LC0:
+.string	"Bob"
+```
+
+// 下面这种用数组形式声明的是可以随便改的
+char name[] = "Alice"; //存在stack上，随便改
+name[3] = 'n';
+name[4] = 'a';
+
+在C中，NULL表示的是指向0的指针
+#define NULL    0
+
+string.h 标准库中定义了空指针，NULL(数值0)
+在C/C++中，当要给一个字符串添加结束标志时，都应该用‘\0’而不是NULL或0
+
+‘\0’是一个“空字符”常量，它表示一个字符串的结束，它的ASCII码值为0。注意它与空格' '（ASCII码值为32）及'0'（ASCII码值为48）不一样的。
 
 
-
-## 首先是编译链接过程的一些注意事项：
+## 编译链接过程的一些注意事项：
 编译过程可以传一些flag(无论是gcc还是clang都是一样的)
 preprocessor -E  ##handle #include define
 compiler -S ##translate C to assembly(生成.s文件)
 assembler -c ## translate assembly to object file(.o，文件是针对特定cpu,platform的,.o文件是不可执行的)
 linker bring together object file to produce executable
-[编译时发生了什么](https://mooc.guokr.com/note/13202/)
+
 如果没有-E -S或者-c的话，就goes all the way down to executable
 -O 是指定最终生成的executable的名称的
 
@@ -313,14 +343,6 @@ Linux gcc链接规则：
 
 一般情况链接的时候我们采用-L的方式指定查找路径, 调用动态链接库的时候采用LD_LIBRARY_PATH的方式指定链接路径
 
-在C中，NULL表示的是指向0的指针
-#define NULL    0
-
-string.h 标准库中定义了空指针，NULL(数值0)
-在C/C++中，当要给一个字符串添加结束标志时，都应该用‘\0’而不是NULL或0
-
-‘\0’是一个“空字符”常量，它表示一个字符串的结束，它的ASCII码值为0。注意它与空格' '（ASCII码值为32）及'0'（ASCII码值为48）不一样的。
-
 
 
 gcc ,clang,llvm的历史
@@ -504,28 +526,7 @@ size_t 和int差不多，估摸着是跨平台的一种表示。
 
 autoconf和automake的使用教程
 
-[string in c](https://dev-notes.eu/2018/08/strings-in-c/)
-char *name = "Bob"; //name指向的位置不能修改了，但是name可以指向别的东西.
-// the value is stored in a read-only section in the binary file and cannot be modified
-name[1] = 'e'; //这么干是不行的，编译是能通过，但运行期会造成undefined behavior，大概率是segment fault
 
-```c
-You can also define a string as a pointer to a char, initialised by a string literal. In this case, string literals are stored in a read only section of memory and are effectively constant. For example:
-
-char *name = "Bob"
-In this case, the value is stored in a read-only section in the binary file and cannot be modified. If you compile to an assembly file (use the -S compiler option in gcc), you can see the string literals in the .rodata section. In this context, rodata means “read-only data”.
-
-/* main.s */
-.file	"main.c"
-.section	.rodata
-.LC0:
-.string	"Bob"
-```
-
-// 下面这种用数组形式声明的是可以随便改的
-char name[] = "Alice"; //存在stack上，随便改
-name[3] = 'n';
-name[4] = 'a';
 
 
 ### 最后

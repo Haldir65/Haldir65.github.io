@@ -15,3 +15,4 @@ allocating stuff is no big deal , garbage collecting it is.
 
 
 [Netty - One Framework to rule them all by Norman Maurer](https://www.youtube.com/watch?v=DKJ0w30M0vg)
+[netty best practices with norman maurer](https://www.youtube.com/watch?v=_GRIyCMNGGI)

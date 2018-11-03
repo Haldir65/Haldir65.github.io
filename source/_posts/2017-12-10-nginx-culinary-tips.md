@@ -1001,6 +1001,22 @@ nginx http配置：
     server块配置
     limit_req zone=one burst=5;
     limit_conn addr 30;
+    
+
+正常的请求log应该长这样
+111.111.111.111 - - [01/Nov/2017:01:30:30 -0400] "GET /favicon.ico HTTP/2.0" 200 3769 "https://www.baidu.com/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36"    
+
+不正常的请求log长成这样
+117.111.27.194 - - [01/Nov/2017:02:43:06 -0400] "GET / HTTP/1.1" 301 178 "-" "-" ##server-name和user-agent都没有
+
+```
+server {
+  listen 80 default_server;
+  server_name _; //这种可以匹配server-name为空的请求
+  return 404;
+  access_log off;
+}
+```
 
 [还可以把这种网络扫描的程序导入到受限的服务中](https://marskid.net/2018/02/04/nginx-deny-web-scanner/)
 

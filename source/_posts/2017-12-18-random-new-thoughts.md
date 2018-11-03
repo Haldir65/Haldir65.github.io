@@ -18,7 +18,6 @@ top : 1
 - iview，elementUi
 - [embeed video with iframe](https://css-tricks.com/NetMag/FluidWidthVideo/Article-FluidWidthVideo.php)[AC2016腾讯前端技术大会 1 1 1 H5直播那些事](https://www.youtube.com/watch?v=g3F7Imjcd4k)
 - [ ] flex,grid
-- [scheme 这东西算跨客户端平台的](https://sspai.com/post/31500)，比如在 App 中调起支付宝(用的是 alipayqr://)。其实就是一个系统内跨应用调用。[用法](http://blog.csdn.net/qq_23547831/article/details/51685310)
 - [ ] Paul Irish from google
 - [ ] form表单可以跨域一个是历史原因要保持兼容性
 - [ ] [lightbox一个很好看的js图片查看库](http://lokeshdhakar.com/projects/lightbox2/)
@@ -29,7 +28,6 @@ top : 1
 - [ ] JavaScript中new FileReader()，以及canvas api,以及[js进行图片缩放和裁剪](https://juejin.im/post/5a98c5c26fb9a028d82b34ee)
 - [ ] Redux和Flux很像,react context api
 - [ ] [一个展示如何在宿主App中提取一个apk文件并加载代码和资源](https://www.jianshu.com/p/a4ab102fa4ac)
-- [ ] [libmp3lame移植到Android](https://www.jianshu.com/p/534741f5151c),跟jni有关了
 - [ ] nodejs ,go ,protobuf rpc
 - [ ] [indexed DB](http://www.ruanyifeng.com/blog/2018/07/indexeddb.html),浏览器端数据库，[content-disposition](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)
 - [ ] [在bash脚本中获取当前脚本所在路径](https://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within?rq=1)
@@ -50,7 +48,24 @@ top : 1
 - [ ] ffmpeg 的js wrapper
 - [ ] learning how textView works is painful yet necessary
 - [ ][分词器](https://lxneng.com/posts/201)
-
+- [ ]rxjava是如何切换线程的以及源码解析
+- [ ]logstash接管软件日志
+- [ ]shadowsocks-android源码
+- [ ]a new article on open-gl intro
+- [ ]render-script utility
+- [ ]tcp-proxy实用教程
+- [ ]wireshark及手机抓包实践
+- [ ]linux环境下多进程通讯方式
+- [ ]python gui编程
+- [ ]js 的async await
+- [ ]kotlin的coroutine
+- [ ]python 的asyncio
+- [ ]宇宙第一ide熟悉使用
+- [ ]js的闭包等面试常谈
+- [ ]java的aspectJ教程
+- [ ]c语言的libevent使用教程
+- [ ]code generator(代码生成器)
+- [ ]play around with xposed
 
 ### 已完成
 * 用 express 转接一个知乎 Api，添加 Access-control-allow-origin,或许还可以用 redis 缓存数据结果（一个就好）由此想到一篇文章"How to use Pythonto build a restful Web Service".只不过用的是 Tornado
@@ -79,6 +94,12 @@ top : 1
 - [X] Android 应用接入bugly热修复，上线之后就不用背锅了（有兴趣看看sevenZip.jar，暂时没看）
 - [X] [简直碉堡了的博客](http://normanmaurer.me/blog/2013/11/09/The-hidden-performance-costs-of-instantiating-Throwables/)以及jvm 的inline等优化
 - [ ] [如何写makefile](https://seisman.github.io/how-to-write-makefile/introduction.html)其实[这个更加friendly](http://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/)
+- [X] [libmp3lame移植到Android](https://www.jianshu.com/p/534741f5151c),该教程针对的lame版本是3.99.5
+- [scheme 这东西算跨客户端平台的](https://sspai.com/post/31500)，比如在 App 中调起支付宝(用的是 alipayqr://)。其实就是一个系统内跨应用调用。[用法](http://blog.csdn.net/qq_23547831/article/details/51685310)
+这个主要是ios app之间通信的协议，以及快速跳转某个app某个页面的功能实现，还有x-callback-URL这样类似的协议。不过有了3d-touch之后，很多app都能长按图标进入页面，所以url scheme这个功能只能说是不复往日辉煌了
+- [X]linux的sed命令(文本替换比较常用)
+
+
 
 
 ### Good For Nothing
