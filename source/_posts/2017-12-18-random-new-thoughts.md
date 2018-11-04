@@ -41,7 +41,6 @@ top : 1
 - [ ] instagram好像通过注解的方式自己写了一个json解析器
 - [ ] mqtt接入实践
 - [ ] when it comes to design , how do we translate px, pt, em  into sp,dp and others(设计方面的，各种单位之间的转换)?
-- [nio](https://juejin.im/post/59fffdb76fb9a0450a66bd58) 还是netty好
 - [ ] Linux下TCP延迟确认机制
 - [ ] classloader和class的生命周期
 - [ ] python dunder class复习
@@ -55,17 +54,17 @@ top : 1
 - [ ]render-script utility
 - [ ]tcp-proxy实用教程
 - [ ]wireshark及手机抓包实践
+- [ ]play around with xposed
 - [ ]linux环境下多进程通讯方式
 - [ ]python gui编程
-- [ ]js 的async await
 - [ ]kotlin的coroutine
-- [ ]python 的asyncio
 - [ ]宇宙第一ide熟悉使用
 - [ ]js的闭包等面试常谈
 - [ ]java的aspectJ教程
-- [ ]c语言的libevent使用教程
+- [ ]c语言的[libevent使用教程](https://yq.aliyun.com/articles/413601)
 - [ ]code generator(代码生成器)
-- [ ]play around with xposed
+- [ ]python 的asyncio
+
 
 ### 已完成
 * 用 express 转接一个知乎 Api，添加 Access-control-allow-origin,或许还可以用 redis 缓存数据结果（一个就好）由此想到一篇文章"How to use Pythonto build a restful Web Service".只不过用的是 Tornado
@@ -98,6 +97,9 @@ top : 1
 - [scheme 这东西算跨客户端平台的](https://sspai.com/post/31500)，比如在 App 中调起支付宝(用的是 alipayqr://)。其实就是一个系统内跨应用调用。[用法](http://blog.csdn.net/qq_23547831/article/details/51685310)
 这个主要是ios app之间通信的协议，以及快速跳转某个app某个页面的功能实现，还有x-callback-URL这样类似的协议。不过有了3d-touch之后，很多app都能长按图标进入页面，所以url scheme这个功能只能说是不复往日辉煌了
 - [X]linux的sed命令(文本替换比较常用)
+- [nio](https://juejin.im/post/59fffdb76fb9a0450a66bd58) 还是netty好
+- [X]js 的async await,就是一个async修饰一个method，里面随便写await
+
 
 
 

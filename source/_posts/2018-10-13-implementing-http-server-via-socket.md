@@ -104,7 +104,8 @@ Time : Thu Mar 15 16:20:59 CST 2018</center>
 ```
 当然因为访问的是http，302是临时重定向（另外，几乎没见过谁返回301的，301的结果会被浏览器缓存），注意上面返回了Location字段，所以是符合规范的
 
-server这边普遍用的是netty，正好netty的官网上也有相关的教程，后面再补上
+server这边普遍用的是netty，正好netty的官网上也有相关的教程.
+[netty的example非常多，http2,cors,upload等等都有](https://netty.io/4.1/xref/overview-summary.html)
 
 
 ## Python

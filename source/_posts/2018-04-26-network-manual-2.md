@@ -451,3 +451,8 @@ data%3D%7B%22name%22%3A%22john%22%2C%22age%22%2C20%2C%22time%22%2C6%7D
 
 [出处](https://borninsummer.com/2015/10/27/about-using-json-in-http-body/)
 > HTTP 为超文本传输协议，整个的 HTTP 报文，如果按编程语言里面的类型来分的话，就是一大段字符串。值得注意的是，不像 JSON，application/x-www-form-urlencoded 的方式对复杂类型（例如数组）的处理，并没有严格的标准。有的接口使用 key[]=a&key[]=b 来表示数组 key: ['a', 'b']，（这也是最常见的，jQuery、superagent等客户端会如此编码），有的库则将数组编码为：key=a&key=b，有的则是携带下标进行编码：key[0]=a&key[1]=b……十分混乱。所以如果是数组且数组的每一项为简单基本类型，而且非要用 application/x-www-form-urlencoded 进行序列化，那么不如用英文逗号分隔的字符串来表示。如果是嵌套对象……那么还是尽早使用 JSON 吧。
+
+jwt事实上就是服务器颁发给客户端一个加密后（只有server才能解密）的字符串，客户端每次请求的时候就在header里面带上这个字符串。[sessionless-authentication-withe-jwts](https://blog.usejournal.com/sessionless-authentication-withe-jwts-with-node-express-passport-js-69b059e4b22c)
+> If an attacker somehow manages to steal a user’s JWT, then there’s unfortunately not much that can really be done. To minimize damages, you should design your application to require reauthentication before performing any high profile transaction such as a purchase or the changing of a password. And your JWTs should also have an expiration date. That way a compromised JWT will only work for so long.
+
+但是如果有人把这个header搞到，就能向服务器声称自己是该用户。服务器是只认这个jwt字符串不认人的，碰到这种情况其实也没什么解决办法，最多把jwt的有效期设置的短一点。
