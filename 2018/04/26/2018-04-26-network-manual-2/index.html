@@ -17,7 +17,7 @@
 <meta property="og:description" content="OkHttp通过ConnectionPool做到tcp连接复用（在Timeout内）,所以并不是每个http都去建立一个tcp连接自定义通讯协议，使用java socket实现客户端和服务端。需要注意的是分包问题和黏包问题">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/jpglight-and-shadow-2411321_960_720.jpg">
-<meta property="og:updated_time" content="2018-10-31T12:04:24.900Z">
+<meta property="og:updated_time" content="2018-11-04T14:19:35.639Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="网络通信手册-2">
 <meta name="twitter:description" content="OkHttp通过ConnectionPool做到tcp连接复用（在Timeout内）,所以并不是每个http都去建立一个tcp连接自定义通讯协议，使用java socket实现客户端和服务端。需要注意的是分包问题和黏包问题">
@@ -223,7 +223,7 @@ ga('send', 'pageview');
 <p>协议版本<br>数据类型（数据类协议，数据ack类协议，心跳类协议，心跳ack类协议）<br>数据长度(这很重要)<br>消息id<br>扩展字段</p>
 </blockquote>
 <p>协议版本要做到向后兼容，基本上只添加数据实体不删除数据实体就可以了<br>数据类型必需的三个要素是：<br><strong>长度，版本号，数据类型</strong> (比方说0表示业务数据，1表示数据ack,2表示心跳，3表示心跳ack)。<br>扩展字段类似于extra，可以用json或者别的什么去实现。</p>
-<h2 id="3-tcp的分包和粘包问题"><a href="#3-tcp的分包和粘包问题" class="headerlink" title="3. tcp的分包和粘包问题"></a>3. tcp的分包和粘包问题</h2><p>tcp发包的时候，如果一个包过大，会拆成两个包发(分包)。如果太小，发送方会攒着和下一个包一起发（粘包）。作为接收方并不知道收到的包是一个完整的包还是被拆分的还是由两个包合并而来。</p>
+<h2 id="3-tcp的分包和粘包问题"><a href="#3-tcp的分包和粘包问题" class="headerlink" title="3. tcp的分包和粘包问题"></a>3. tcp的分包和粘包问题</h2><p>tcp发包的时候，如果一个包过大，会拆成两个包发(分包)。如果太小，发送方会攒着和下一个包一起发（粘包），tcp为了提高效率(使用Nagle算法)会缓冲N个包后再一起发出去。作为接收方并不知道收到的包是一个完整的包还是被拆分的还是由两个包合并而来。</p>
 <p>可能发生分包和粘包的原因包括：<br>1、要发送的数据大于TCP发送缓冲区剩余空间大小，将会发生拆包。</p>
 <p>2、待发送数据大于MSS（最大报文长度），TCP在传输前将进行拆包。</p>
 <p>3、要发送的数据小于TCP发送缓冲区的大小，TCP将多次写入缓冲区的数据一次发送出去，将会发生粘包。</p>
@@ -300,7 +300,16 @@ ga('send', 'pageview');
 <p>multipart/form-data:(表单格式的)这一种是表单格式的，数据类型如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">POST / HTTP/1.1</span><br><span class="line">Host: www.baidu.com</span><br><span class="line">User-Agent: ...</span><br><span class="line">Content-Length:27</span><br><span class="line">Cookie: session=fsdaf;aaa=dfasf;......</span><br><span class="line"></span><br><span class="line">------WebKitFormBoundaryrGKCBY7qhFd3TrwA</span><br><span class="line"></span><br><span class="line">Content-Disposition: form-data; name=&quot;text&quot;</span><br><span class="line"></span><br><span class="line">title</span><br><span class="line"></span><br><span class="line">------WebKitFormBoundaryrGKCBY7qhFd3TrwA</span><br><span class="line"></span><br><span class="line">Content-Disposition: form-data; name=&quot;file&quot;; filename=&quot;chrome.png&quot;</span><br><span class="line"></span><br><span class="line">Content-Type: image/png</span><br><span class="line"></span><br><span class="line">PNG ... content of chrome.png ...</span><br><span class="line"></span><br><span class="line">------WebKitFormBoundaryrGKCBY7qhFd3TrwA--</span><br></pre></td></tr></table></figure></p>
 <p>text/xml:这种直接传的xml的post请求的长这样<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">POST / HTTP/1.1</span><br><span class="line">Host: www.baidu.com</span><br><span class="line">User-Agent: ...</span><br><span class="line">Content-Length:27</span><br><span class="line">Cookie: session=fsdaf;aaa=dfasf;......</span><br><span class="line"></span><br><span class="line">&lt;!--?xml version=&quot;1.0&quot;?--&gt;</span><br><span class="line"></span><br><span class="line">&lt;methodcall&gt;</span><br><span class="line"></span><br><span class="line">&lt;methodname&gt;examples.getStateName&lt;/methodname&gt;</span><br><span class="line"></span><br><span class="line">&lt;params&gt;</span><br><span class="line"></span><br><span class="line">&lt;param&gt;</span><br><span class="line"></span><br><span class="line">&lt;value&gt;&lt;i4&gt;41&lt;/i4&gt;&lt;/value&gt;</span><br><span class="line"></span><br><span class="line">&lt;/params&gt;</span><br><span class="line"></span><br><span class="line">&lt;/methodcall&gt;</span><br></pre></td></tr></table></figure></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">data%3D%7B%22name%22%3A%22john%22%2C%22age%22%2C20%2C%22time%22%2C6%7D</span><br></pre></td></tr></table></figure>
-<p>这种东西通常是懒得看的，<br>需要转码一下，粘贴到<a href="http://tool.oschina.net/encode?type=4">这个里面去就行了</a>，或者自己encodeURIComponent一下就好</p>
+<p>这种东西通常是懒得看的，<br>需要转码一下，粘贴到<a href="http://tool.oschina.net/encode?type=4">这个里面去就行了</a>，或者自己encodeURIComponent一下就好<br>其实是: data={“name”:”john”,”age”,20,”time”,6}</p>
+<p><a href="https://borninsummer.com/2015/10/27/about-using-json-in-http-body/">出处</a></p>
+<blockquote>
+<p>HTTP 为超文本传输协议，整个的 HTTP 报文，如果按编程语言里面的类型来分的话，就是一大段字符串。值得注意的是，不像 JSON，application/x-www-form-urlencoded 的方式对复杂类型（例如数组）的处理，并没有严格的标准。有的接口使用 key[]=a&amp;key[]=b 来表示数组 key: [‘a’, ‘b’]，（这也是最常见的，jQuery、superagent等客户端会如此编码），有的库则将数组编码为：key=a&amp;key=b，有的则是携带下标进行编码：key[0]=a&amp;key[1]=b……十分混乱。所以如果是数组且数组的每一项为简单基本类型，而且非要用 application/x-www-form-urlencoded 进行序列化，那么不如用英文逗号分隔的字符串来表示。如果是嵌套对象……那么还是尽早使用 JSON 吧。</p>
+</blockquote>
+<p>jwt事实上就是服务器颁发给客户端一个加密后（只有server才能解密）的字符串，客户端每次请求的时候就在header里面带上这个字符串。<a href="https://blog.usejournal.com/sessionless-authentication-withe-jwts-with-node-express-passport-js-69b059e4b22c">sessionless-authentication-withe-jwts</a></p>
+<blockquote>
+<p>If an attacker somehow manages to steal a user’s JWT, then there’s unfortunately not much that can really be done. To minimize damages, you should design your application to require reauthentication before performing any high profile transaction such as a purchase or the changing of a password. And your JWTs should also have an expiration date. That way a compromised JWT will only work for so long.</p>
+</blockquote>
+<p>但是如果有人把这个header搞到，就能向服务器声称自己是该用户。服务器是只认这个jwt字符串不认人的，碰到这种情况其实也没什么解决办法，最多把jwt的有效期设置的短一点。</p>
 
       
 
@@ -647,6 +656,10 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
@@ -684,10 +697,6 @@ ga('send', 'pageview');
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">sql</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">

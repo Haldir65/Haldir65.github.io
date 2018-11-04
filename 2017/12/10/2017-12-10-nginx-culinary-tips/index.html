@@ -17,7 +17,7 @@
 <meta property="og:description" content="linode的docs里面是这么介绍的  nginx is a lightweight, high performance web server designed to deliver large amounts of static content quickly with efficient use of system resources. nginx’s strong point is its">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery151110073841.jpg">
-<meta property="og:updated_time" content="2018-10-31T12:04:24.900Z">
+<meta property="og:updated_time" content="2018-11-04T14:19:35.639Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Nginx使用记录">
 <meta name="twitter:description" content="linode的docs里面是这么介绍的  nginx is a lightweight, high performance web server designed to deliver large amounts of static content quickly with efficient use of system resources. nginx’s strong point is its">
@@ -410,7 +410,10 @@ limit_conn_zone $binary_remote_addr zone=addr:10m;
 server块配置
 limit_req zone=one burst=5;
 limit_conn addr 30;
-</code></pre><p><a href="https://marskid.net/2018/02/04/nginx-deny-web-scanner/">还可以把这种网络扫描的程序导入到受限的服务中</a></p>
+</code></pre><p>正常的请求log应该长这样<br>111.111.111.111 - - [01/Nov/2017:01:30:30 -0400] “GET /favicon.ico HTTP/2.0” 200 3769 “<a href="https://www.baidu.com/">https://www.baidu.com/</a>“ “Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36”    </p>
+<p>不正常的请求log长成这样<br>117.111.27.194 - - [01/Nov/2017:02:43:06 -0400] “GET / HTTP/1.1” 301 178 “-“ “-“ ##server-name和user-agent都没有</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">  listen 80 default_server;</span><br><span class="line">  server_name _; //这种可以匹配server-name为空的请求</span><br><span class="line">  return 404;</span><br><span class="line">  access_log off;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><a href="https://marskid.net/2018/02/04/nginx-deny-web-scanner/">还可以把这种网络扫描的程序导入到受限的服务中</a></p>
 <p>在ubuntu18.04上，logrotate似乎默认已经被安装过了，所以，每天/var/log/nginx里面的文件都会被gzip一遍</p>
 <p><a href="https://www.digitalocean.com/community/tutorials/how-to-protect-an-nginx-server-with-fail2ban-on-ubuntu-14-04">用failtoban降低被攻击概率</a></p>
 <h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
@@ -774,6 +777,10 @@ limit_conn addr 30;
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
@@ -811,10 +818,6 @@ limit_conn addr 30;
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">sql</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">

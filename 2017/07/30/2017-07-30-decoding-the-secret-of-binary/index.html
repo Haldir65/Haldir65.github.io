@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/01f691dea62d22e138481a353fbb6228.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/ascii-Table.jpg">
-<meta property="og:updated_time" content="2018-10-31T12:04:24.896Z">
+<meta property="og:updated_time" content="2018-11-04T14:19:35.635Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="二进制编码总结">
 <meta name="twitter:description" content="OkHttp作者Jesse Wilson在2016 Droidcon NYC上作了一篇关于编码的演讲，十分有趣。对于了解计算机基础非常有用，结合着写一些关于这方面的笔记。">
@@ -329,6 +329,10 @@ ga('send', 'pageview');
 <p>来看protocolBuffer，protocolBuffer一般长这样，每一个field都有一个独一无二的tag.</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">message Person &#123;</span><br><span class="line">  required string name = 1;</span><br><span class="line">  required int32 id = 2;</span><br><span class="line">  optional string email = 3;</span><br><span class="line"></span><br><span class="line">  enum PhoneType &#123;</span><br><span class="line">    MOBILE = 0;</span><br><span class="line">    HOME = 1;</span><br><span class="line">    WORK = 2;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  message PhoneNumber &#123;</span><br><span class="line">    required string number = 1;</span><br><span class="line">    optional PhoneType type = 2 [default = HOME];</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  repeated PhoneNumber phone = 4;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>以 optional string email = 3 为例，ProtocolBuffer定义了一个length mode（enum,int32,int64是000,fixed64是001，String,message是010），拿一个byte出来，先把后面三位填上010，即XXXXX010，然后把3在前面，即00011010，一共只用了一个byte就把String email这句话表示出来了。即protobuffer只需一个byte就能表示key,同样的key，json要12byte（utf-8下一个字母一个byte）。value也是一样，转成hex的形式。<br>印象中http2也是用数字来表示header key的，类似的节省数据的道理。</p>
+<p>json是有rfc规范<a href="https://www.ietf.org/rfc/rfc4627.txt">rfc4627</a>的</p>
+<blockquote>
+<p>JSON text SHALL be encoded in Unicode. The default encoding is UTF-8.</p>
+</blockquote>
 <h2 id="8-补充"><a href="#8-补充" class="headerlink" title="8. 补充"></a>8. 补充</h2><h3 id="8-1-Big-ending和Little-endian这名字其实跟文学作品有关"><a href="#8-1-Big-ending和Little-endian这名字其实跟文学作品有关" class="headerlink" title="8.1 Big-ending和Little-endian这名字其实跟文学作品有关"></a>8.1 Big-ending和Little-endian这名字其实跟文学作品有关</h3><ol>
 <li>Notepad++可以右下角可以看到当前文件的编码方式，utf-8 dom跟微软有关，<a href="http://www.cnblogs.com/findumars/p/3620078.html">最好不要用</a>.</li>
 <li>Python前面写的”# -<em>- coding: utf-8 -</em>-“跟这事有关,”#!/usr/bin/python”是用来说明脚本语言是python的</li>
@@ -377,7 +381,7 @@ ga('send', 'pageview');
 <p>而在c语言中，一个字符(char)只需要1个字节</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="https://www.youtube.com/watch?v=T_p22jMZSrk">Jesse Wilson | Decoding the Secrets of Binary Data </a></li>
-<li><a href="https://www.ibm.com/developerworks/cn/java/j-lo-chinesecoding/index.html">深入分析 Java 中的中文编码问题</a>IBM出品,非常好</li>
+<li><a href="https://www.ibm.com/developerworks/cn/java/j-lo-chinesecoding/index.html">深入分析 Java 中的中文编码问题</a>IBM出品,非常好，甚至告诉你什么情况下会出现哪种奇怪的显示符号</li>
 <li><a href="http://www.unicode.org/emoji/charts/full-emoji-list.html">emoji complete list</a></li>
 </ul>
 
@@ -730,6 +734,10 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
@@ -767,10 +775,6 @@ ga('send', 'pageview');
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">sql</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">

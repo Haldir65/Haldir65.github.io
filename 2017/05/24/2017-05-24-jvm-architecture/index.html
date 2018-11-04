@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/high_way_scene.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/starry_sky.jpg">
-<meta property="og:updated_time" content="2018-10-31T12:04:24.892Z">
+<meta property="og:updated_time" content="2018-11-04T14:19:35.631Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="jvm架构概述">
 <meta name="twitter:description" content="关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下">
@@ -239,6 +239,9 @@ verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的s
 - Hotspot profiler(it helps the JIT Compiler analysise the frequently used byte codess)
 - GC (a lengthy talk)
 </code></pre><p>调用Native Method Interface(JNI) -&gt; Native method libraries（.dll,.so etc）</p>
+<p><a href="https://blog.csdn.net/SudaDays/article/details/81006483">java中new一个对象的时候发生了什么</a><br>首先，讨论该类没有显式的继承任何类的情况。此时，JVM会检查是否已经加载了这个类，如果没有加载，就会加载该类，一个类只会被加载一次。加载该类的时候会按顺序初始化静态变量，并执行静态语句块，静态函数要被调用才会执行。假如静态变量或静态代码块初始化了一个类的话，会再次执行上面的过程。加载完类之后，开始生成对象，会按照顺序初始化成员变量，基本类型被初始化为0，引用类型被初始化为NULL，然后执行构造器。</p>
+<p>下面讨论该类显式继承了一个类的情况，被继承的类没有再显式的继承。JVM会先检查父类是否被加载，如果未加载，则加载该类，并会初始化静态变量并执行静态代码块。然后检查子类，若未加载则同上。当所用到的类加载完后，开始初始化父类，先初始化成员变量，然后执行构造器。子类顺序相同。</p>
+<p>总结，JVM会从被继承的最顶层类加载，依次初始化每个类的静态成员变量，执行静态代码块。再从被继承的最顶层类依次初始化成员变量，调用构造器。</p>
 <h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="https://www.youtube.com/watch?v=ZBJ0u9MaKtM">JVM ( java virtual machine) architecture - tutorial</a><br><a href="http://www.cnblogs.com/zhguang/p/3257367.html">Java系列笔记(3) - Java 内存区域和GC机制</a></p>
 
       
@@ -597,6 +600,10 @@ verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的s
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
@@ -634,10 +641,6 @@ verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的s
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">sql</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">
