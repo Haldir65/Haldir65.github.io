@@ -467,57 +467,7 @@ iptables -A FORWARD -j REJECT
 **注意还需要将上述规则添加到开机启动中**，还有使用iptables屏蔽来自[某个国家的IP](https://www.vpser.net/security/iptables-block-countries-ip.html)的教程
 
 
-### 23. 变量($其实就是美元符号了)
-变量调用符号($)
-```shell
-LI=date
-$LI ##
-# Tue Dec  5 04:06:18 EST 2017
-
-# 所以经常会有这样的脚本
-# Check if user is root
-if [ $(id -u) != "0" ]; then
-    echo " Not the root user! Try using sudo Command ! "
-    exit 1
-fi
-echo "Pass the test! You are the root user!"
-
-## 亲测下面这种可用户
-if [ `whoami` = "root" ];then  
-    echo "root用户！"  
-else  
-    echo "非root用户！"  
-fi
-```
-
-
-
-变量分为用户自定义的和环境变量（其实就是系统预设的）,有些区别
-> 用户自定义变量只在当前的shell中生效，环境变量在当前shell和这个shell的所有子shell中生效。
-环境变量是全局变量，用户自定义变量是局部变量。
-对系统生效的环境变量名和变量作用是固定的。
-
-### 常用的环境变量
-> HOSTNAME：主机名
-SHELL：当前的shell
-TREM：终端环境
-HISTSIZE：历史命令条数
-SSH_CLIENT：当前操作环境是用ssh链接的，这里记录客户端的ip
-SSH_TTY：ssh连接的终端是pts/1
-USER:当前登录的用户
-
-```shell
-echo $HOSTNAME
-## unbutu
-$? 最后一次执行的命令的返回状态。如果这个变量的值为0，证明上一个命令正确执行；如果这个变量的值非0（具体是哪个数，由命令自己决定），则证明上一个命令执行不正确了。
-$$ 当前进程的进程号（PID）
-$! 后台运行的最后一个进程的进程号（PID）
-```
-
-linux下查看环境变量命令：
-export
-
-### 24.  Linux软件安装目录惯例
+### 23.  Linux软件安装目录惯例
 转载自[](http://blog.csdn.net/aqxin/article/details/48324377)。
 一般特定文件夹里放什么东西是有惯例的。
 cd到根目录下长这样
@@ -567,22 +517,22 @@ youtube-dl的安装途径就是下一个软件下来，然后chmod给权限，�
 /usr/local: 本地安装的程序和其他东西在/usr/local下
 一份比较全面的[Linux 下各文件夹的结构说明及用途介绍](http://blog.jobbole.com/113519/)
 
-### 25. 一个往dropBox上传文件的Script
+### 24. 一个往dropBox上传文件的Script
 dropbox的网盘空间不用感觉有点浪费了，一个将本地文件上传到dropBox的脚本[Dropbox-Uploader](https://github.com/andreafabrizi/Dropbox-Uploader)
 亲测可用，也不是一个需要启动时跑起来的程序，就是一个给参数就上传的脚本。
 ```shell
 ./dropbox_uploader.sh upload /localFileOrDir /dropBoxFileOrDir
 ```
 
-### 26. fuser显示当前文件正在被哪些进程使用
+### 25. fuser显示当前文件正在被哪些进程使用
 fuser -m -u redis-server
 
-### 27. 一些看上去比较玄的操作
+### 26. 一些看上去比较玄的操作
 ```shell
 bash <(curl -s https://codecov.io/bash) ##重定向还有这么玩的
 ```
 
-### 28.htop怎么看
+### 27.htop怎么看
 process state
 图片[出处](https://codeahoy.com/2017/01/20/hhtop-explained-visually/)
 ![](https://www.haldir66.ga/static/imgs/htop-top.png)
@@ -602,8 +552,7 @@ process state
 
 Mere trash
 ===============================================================================
-[LINUX下的21个特殊符号](http://blog.51cto.com/litaotao/1187983)
-[Shell学习笔记](https://notes.wanghao.work/2015-06-02-Shell%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html)
+
 [gdb调试器,debug用的](http://blog.jobbole.com/112547/)
 [chsh命令](http://man.linuxde.net/chsh)
 

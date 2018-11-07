@@ -109,7 +109,6 @@ e的意思是extended regular expressions（Extended regular expressions include
 
 
 ![](https://www.haldir66.ga/static/imgs/macro-of-yellow-narcisa-flower-wallpaper-53834d45b40a1.jpg)
-![](https://www.haldir66.ga/static/imgs/nature-grass-wet-plants-high-resolution-wallpaper-573f2c6413708.jpg)
 
 ![](https://www.haldir66.ga/static/imgs/yellow-autumn-leaves-wallpaper-537f1e4672a31.jpg)
 

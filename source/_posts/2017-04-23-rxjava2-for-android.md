@@ -497,7 +497,7 @@ MissingBackpressureException和BufferOverFlowException应该是不一样的
 就算消费者线程中不写Thread.sleep()也是有可能出现MissingBackPressureException。
 
 Flowable这种直接遵循上游响应下游request请求才发送数据
-```
+```js
      var sp5:Subscription?= null
 
         btn5.setOnClickListener {
@@ -546,3 +546,4 @@ Flowable.fromPublisher()方法接受一个Publisher参数，但是但是但是
 -- [GOTO 2016 • Exploring RxJava 2 for Android • Jake Wharton - YouTube](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=6&cad=rja&uact=8&ved=0ahUKEwjlvrfg8bnTAhUI0mMKHcXZC1MQtwIITDAF&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DhtIXKI5gOQU&usg=AFQjCNEYczqXGkjYXOUbovtP1CxDPARcXA&sig2=gmLYEd2cVOhI7C2WjOHr9g)
 -- [掘金](https://juejin.im/entry/5a025b3b51882561a3265bb7)
 -- [使用concat从数据库，内存，网络三层中获取数据](http://www.jianshu.com/p/6f3b6b934787)
+-- [RxJava 教程第四部分：并发 之数据流发射太快如何办](http://blog.chengyunfeng.com/?p=981)

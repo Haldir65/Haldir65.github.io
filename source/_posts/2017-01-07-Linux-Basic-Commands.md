@@ -218,7 +218,6 @@ alt-. - paste previous command's argument (useful for running multiple commands 
 
 
 
-
 ### 4. 用户和用户组的问题
 ```shell
 id userName // 查看当前用户的信息，比如是不是sudo之类的

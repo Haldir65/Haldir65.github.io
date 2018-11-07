@@ -5,11 +5,32 @@ tags: [linux,tools]
 
 ---
 
+linux下shell脚本语句的语法
+，脚本以[Shebang](https://en.wikipedia.org/wiki/Shebang_(Unix))开始
+> #!/bin/sh
+
+
 ![](https://www.haldir66.ga/static/imgs/timg.jpg)
 <!--more-->
 
+
 ### linux下shell脚本语句的语法
 linux大小写敏感
+
+
+eg: echo类似于print
+```shell
+##例：myvar=“Hi there！”
+
+    echo $myvar  ## Hi there！
+
+    echo "$myvar"  ## Hi there!
+
+    echo ' $myvar' ## $myvar
+
+    echo \$myvar ## $myvar
+```
+
 eg:
 ```shell
 #!/bin/sh
@@ -47,18 +68,6 @@ fi //else后面必须加fi
        fi  
 ```
 
-eg: echo类似于print
-```shell
-##例：myvar=“Hi there！”
-
-    echo $myvar  ## Hi there！
-
-    echo "$myvar"  ## Hi there!
-
-    echo ' $myvar' ## $myvar
-
-    echo \$myvar ## $myvar
-```
 
 ```shell
 #!/bin/bashbash
@@ -129,3 +138,71 @@ command || { echo "command failed"; exit 1; }
 set -eo pipefail ##set -e对于管道无效，这么写就连管道的错误都拦下来了
 ```
 
+$ set -e
+
+这行代码之后的任何代码，如果返回一个非0的值，那么整个脚本立即退出，官方的说明是为了防止错误出现滚雪球的现象
+
+$ set -o pipefail
+
+原文解释如下：
+
+If set, the return value of a pipeline is the value of the last (rightmost) command to exit with a non-zero status,or zero if all commands in the pipeline exit successfully. This option is disabled by default.
+
+可理解为：
+
+告诉 bash 返回从右到左第一个以非0状态退出的管道命令的返回值，如果所有命令都成功执行时才返回0
+
+
+### 23. 变量($其实就是美元符号了)
+变量调用符号($)
+```shell
+LI=date
+$LI ##
+# Tue Dec  5 04:06:18 EST 2017
+
+# 所以经常会有这样的脚本
+# Check if user is root
+if [ $(id -u) != "0" ]; then
+    echo " Not the root user! Try using sudo Command ! "
+    exit 1
+fi
+echo "Pass the test! You are the root user!"
+
+## 亲测下面这种可用户
+if [ `whoami` = "root" ];then  
+    echo "root用户！"  
+else  
+    echo "非root用户！"  
+fi
+```
+
+
+
+变量分为用户自定义的和环境变量（其实就是系统预设的）,有些区别
+> 用户自定义变量只在当前的shell中生效，环境变量在当前shell和这个shell的所有子shell中生效。
+环境变量是全局变量，用户自定义变量是局部变量。
+对系统生效的环境变量名和变量作用是固定的。
+
+### 常用的环境变量
+> HOSTNAME：主机名
+SHELL：当前的shell
+TREM：终端环境
+HISTSIZE：历史命令条数
+SSH_CLIENT：当前操作环境是用ssh链接的，这里记录客户端的ip
+SSH_TTY：ssh连接的终端是pts/1
+USER:当前登录的用户
+
+```shell
+echo $HOSTNAME
+## unbutu
+$? 最后一次执行的命令的返回状态。如果这个变量的值为0，证明上一个命令正确执行；如果这个变量的值非0（具体是哪个数，由命令自己决定），则证明上一个命令执行不正确了。
+$$ 当前进程的进程号（PID）
+$! 后台运行的最后一个进程的进程号（PID）
+```
+
+linux下查看环境变量命令：
+export
+
+
+[LINUX下的21个特殊符号](http://blog.51cto.com/litaotao/1187983)
+[Shell学习笔记](https://notes.wanghao.work/2015-06-02-Shell%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html)
