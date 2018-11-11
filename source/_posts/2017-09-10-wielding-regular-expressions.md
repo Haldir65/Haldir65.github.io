@@ -92,9 +92,7 @@ e的意思是extended regular expressions（Extended regular expressions include
 ![](https://www.haldir66.ga/static/imgs/scenery151110074347.jpg)
 
 
-
 ![](https://www.haldir66.ga/static/imgs/strawberry-festival.jpg)
-![](https://www.haldir66.ga/static/imgs/1102533137-5.jpg)
 ![](https://www.haldir66.ga/static/imgs/1102533911-1.jpg)
 ![](https://haldir66.ga/static/imgs/20120103214255_nTsVt.jpg)
 ![](https://www.haldir66.ga/static/imgs/apic5964_sc115.jpg)

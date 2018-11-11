@@ -96,7 +96,7 @@ linux 内核版本查看：
 
 ss 命令
 
-```shell
+```bash
 ssserver -c /etc/shadowsocks/config.json # 前台运行
 
 ### 后台运行和停止
@@ -130,7 +130,7 @@ apt-get install libpcap0.8-dev
 
 > venetX，OpenVZ 架构
 
-```shell
+```bash
 cd net-speeder-master/
 sh build.sh -DCOOKED
 
@@ -159,7 +159,7 @@ sh build.sh
 
 参考 github[官方教程](https://github.com/shadowsocks/shadowsocks-libev)安装
 
-```shell
+```bash
 sudo apt-get install software-properties-common -y
 sudo add-apt-repository ppa:max-c-lv/shadowsocks-libev -y
 sudo apt-get update
@@ -188,7 +188,7 @@ sudo ss-server -c /etc/shadowsocks-libev/config.json -u ## 开启udp转发  nets
 
 ## 2.4 安装libsodium
 转自[逗比](https://doub.io/ss-jc51/)
-```shell
+```bash
 ## debian系列
 apt-get update
 ## 安装 编译所需组件包：
@@ -231,7 +231,7 @@ sudo apt-get install simple-obfs
 [VPS 跑分软件](https://github.com/Teddysun/across)
 git clone 下来
 
-```shell
+```bash
 cd across
 wget -qO- bench.sh | bash ###（亲测可用，也可以自己看Readme）
 ### 或者

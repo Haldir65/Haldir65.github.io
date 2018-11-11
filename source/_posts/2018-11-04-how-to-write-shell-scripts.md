@@ -19,7 +19,7 @@ linux大小写敏感
 
 
 eg: echo类似于print
-```shell
+```bash
 ##例：myvar=“Hi there！”
 
     echo $myvar  ## Hi there！
@@ -32,7 +32,7 @@ eg: echo类似于print
 ```
 
 eg:
-```shell
+```bash
 #!/bin/sh
 myPath="/var/log/httpd/"
 myFile="/var /log/httpd/access.log"
@@ -69,7 +69,7 @@ fi //else后面必须加fi
 ```
 
 
-```shell
+```bash
 #!/bin/bashbash
 echo "hello there"
 foo="Hello"
@@ -81,7 +81,7 @@ echo "all the files under the directory `ls  /usr/*/g* | head -n3`"
 ```
 
 一个把文件夹（/public/imgs）下所有文件重命名为img-x.jpg的shell脚本
-```shell
+```bash
 #!/bin/bash
 FORMAT_JPG="jpg"
 FORMAT_JPEG="jpeg"
@@ -108,7 +108,7 @@ grep -E aaa\|bbb
 [how to grep](https://www.cyberciti.biz/faq/howto-use-grep-command-in-linux-unix/)
 
 想要在bash中设置一个variable为一个命令的输出
-```shell
+```bash
 #!/bin/bash
 OUTPUT="$(ls -1)"  ## 注意，这里等于号前后不能有空格
 echo "${OUTPUT}"
@@ -153,9 +153,9 @@ If set, the return value of a pipeline is the value of the last (rightmost) comm
 告诉 bash 返回从右到左第一个以非0状态退出的管道命令的返回值，如果所有命令都成功执行时才返回0
 
 
-### 23. 变量($其实就是美元符号了)
+### 变量($其实就是美元符号了)
 变量调用符号($)
-```shell
+```bash
 LI=date
 $LI ##
 # Tue Dec  5 04:06:18 EST 2017
@@ -168,7 +168,7 @@ if [ $(id -u) != "0" ]; then
 fi
 echo "Pass the test! You are the root user!"
 
-## 亲测下面这种可用户
+## 亲测下面这种可用
 if [ `whoami` = "root" ];then  
     echo "root用户！"  
 else  
@@ -192,7 +192,7 @@ SSH_CLIENT：当前操作环境是用ssh链接的，这里记录客户端的ip
 SSH_TTY：ssh连接的终端是pts/1
 USER:当前登录的用户
 
-```shell
+```bash
 echo $HOSTNAME
 ## unbutu
 $? 最后一次执行的命令的返回状态。如果这个变量的值为0，证明上一个命令正确执行；如果这个变量的值非0（具体是哪个数，由命令自己决定），则证明上一个命令执行不正确了。

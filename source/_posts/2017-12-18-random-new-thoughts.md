@@ -29,7 +29,8 @@ top : 1
 - [ ] Redux和Flux很像,react context api
 - [ ] [一个展示如何在宿主App中提取一个apk文件并加载代码和资源](https://www.jianshu.com/p/a4ab102fa4ac)
 - [ ] nodejs ,go ,protobuf rpc
-- [ ] [indexed DB](http://www.ruanyifeng.com/blog/2018/07/indexeddb.html),浏览器端数据库，[content-disposition](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)
+- [ ] [indexed DB](http://www.ruanyifeng.com/blog/2018/07/indexeddb.html),浏览器端数据库，
+- [ ][content-disposition](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)
 - [ ] [在bash脚本中获取当前脚本所在路径](https://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within?rq=1)
 - [ ]一致性哈希原理
 - [ ] [使用redis实现低粒度的分布式锁](http://afghl.github.io/2018/06/17/distributed-lock-and-granarity.html)
@@ -41,7 +42,6 @@ top : 1
 - [ ] instagram好像通过注解的方式自己写了一个json解析器
 - [ ] mqtt接入实践
 - [ ] when it comes to design , how do we translate px, pt, em  into sp,dp and others(设计方面的，各种单位之间的转换)?
-- [ ] Linux下TCP延迟确认机制
 - [ ] classloader和class的生命周期
 - [ ] python dunder class复习
 - [ ] ffmpeg 的js wrapper
@@ -52,9 +52,9 @@ top : 1
 - [ ]shadowsocks-android源码
 - [ ]a new article on open-gl intro
 - [ ]render-script utility
-- [ ]tcp-proxy实用教程
 - [ ]play around with xposed
-- [ ]linux环境下多进程通讯方式
+- [ ]tcp-proxy实用教程
+- [ ]linux环境下多进程通讯方式(管道，共享内存，信号,unix domian socket)
 - [ ]python gui编程
 - [ ]kotlin的coroutine
 - [ ]宇宙第一ide熟悉使用
@@ -98,9 +98,7 @@ top : 1
 - [X]linux的sed命令(文本替换比较常用)
 - [nio](https://juejin.im/post/59fffdb76fb9a0450a66bd58) 还是netty好
 - [X]js 的async await,就是一个async修饰一个method，里面随便写await
-- [X]wireshark及手机抓包实践
-
-
+- [X] Linux下TCP延迟确认机制
 
 
 ### Good For Nothing

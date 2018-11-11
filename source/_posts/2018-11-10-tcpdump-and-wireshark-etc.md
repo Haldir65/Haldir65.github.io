@@ -6,14 +6,14 @@ tags: [tools]
 
 
 ![](https://www.haldir66.ga/static/imgs/osi-model.png)
+[wireshark expression cheetsheet](http://packetlife.net/media/library/13/Wireshark_Display_Filters.pdf)
+[tcpdump cheet](http://packetlife.net/media/library/12/tcpdump.pdf)
 wireshark能抓tcp,arp,http,dns,udp,icmp,dhcp...
 
 <!--more-->
 
-
 先从wireshark说起，在win10上安装wireshark需要顺带装上winpacp，不过现在的安装包默认都会提示去安装，所以也都很简单
 tcpdump在Linux上比较容易安装，类似于wireshark的command line tool
-
 
 ### wireshark的filter
 现在wireshark的filter都会自动提示了，所以基本上随手敲几个就行了
@@ -29,7 +29,7 @@ ip.addr //既包含src也包含dst
 udp ||http // udp或者http的包
 frame.len <=128 //显示所有体积小于128个字节的包
 
-[wireshark expression cheetsheet](http://packetlife.net/media/library/13/Wireshark_Display_Filters.pdf)
+
 
 //如果一开始就只对特定协议感兴趣
 capture -> filters 里面可以选择只抓某些协议的包。因为默认是什么都抓，这样会少很多
@@ -58,7 +58,7 @@ Statistics -> packet length //查看所有的packet length（多数时候包的�
 net mask(255.255.0.0) 192.168.1/16。
 
 
-选中一个tcp包，查看Internet Protocol Version4 ..(这里就是第三层,network层了)。
+### 选中一个tcp包，查看Internet Protocol Version4 ..(这里就是第三层,network层了)。
 ![](https://haldir66.ga/static/imgs/wire_shark_internet_protocol_version4.png)
 从上到下依次是 
 version: 4
@@ -73,7 +73,7 @@ Fragment offset：0 (假如被切成两个了，这里就表示当前这个包�
 
 有一个Time to live:128 (就是说这个包最多走128hop，就是最多经手128个router就丢掉)
 
-再看第四层（Transport layer），也就是tcp,udp这类了。
+### 再看第四层（Transport layer），也就是tcp,udp这类了。
 还是上面这个包
 ![](https://haldir66.ga/static/imgs/wire_shark_capture_transmission_control_protocol.png)
 从上到下依次是
@@ -86,14 +86,34 @@ Flags(urg:urgent,push:push,rst:reset,sin&fin(finished))这张图里面写的是A
 window size value: 2053(这个是tcp receiver buffer，单位是byte，这个数值变来变去的)
 checksum(检查数据完整)
 
-说一说handshake
+## 说一说handshake
 tcp packets始于一个handshake
 检查端口，发送一个sequence number(随机的),客户端会发送一个syn packet到接受方。接受方会返回一个syn ack packet,接下来客户端发送一个ack packet。上述步骤每一次sequence number都会+1
+![](https://haldir66.ga/static/imgs/wireshark_tcp_handshake.png)
+```
+1. Client 发送 SYN 包（seq: x），告诉 Server：我要建立连接；Client 进入SYN-SENT状态；
+2. Server 收到 SYN 包后，发送 SYN+ACK 包（seq: y; ack: x+1），告诉它：好的；Server 进入SYN-RCVD状态；
+3. Client 收到 SYN+ACK 包后，发现 ack=x+1，于是进入ESTABLISHED状态，同时发送 ACK 包（seq: x+1; ack: y+1）给 Server；Server 发现 ack=y+1，于是也进入ESTABLISHED状态；
+接下来就是互相发送数据、接收数据了……
+```
 
-tcp teardown(四次挥手告别)
+### tcp teardown(四次挥手告别)
 host发送给destination一个fin acknowledge packet
 destination发挥一个ack packet和一个fin ack packet
 host再发送一个ack(这些都可以从flags里面看到)
+![](https://haldir66.ga/static/imgs/wireshark_tcp_wave.png)
+```
+注意，可以是连接的任意一方主动 close，这里假设 Client 主动关闭连接：
+
+1. Client 发送 FIN 包，告诉 Server：我已经没有数据要发送了；Client 进入FIN-WAIT-1状态；
+2. Server 收到 FIN 包后，回复 ACK 包，告诉 Client：好的，不过你需要再等会，我可能还有数据要发送；Server 进入CLOSE-WAIT状态；而 Client 收到 ACK 包后，继续等待 Server 做好准备， Client 进入FIN-WAIT-2状态；
+3. Server 准备完毕后，发送 FIN 包，告诉 Client：我也没有什么要发送了，准备关闭连接吧；Server 进入LAST-ACK状态；
+4. Client 收到 FIN 包后，知道 Server 准备完毕了，于是给它回复 ACK 包，告诉它我知道了，于是进入TIME-WAIT状态；而 Server 收到 ACK 包后，即进入CLOSED状态；Client 等待 2MSL 时间后，没有再次收到 Server 的 FIN 包，于是确认 Server 收到了 ACK 包并且已关闭，于是 Client 也进入CLOSED状态；
+```
+MSL即报文最大生存时间，RFC793 中规定 MSL 为 2 分钟，但这完全是从工程上来考虑，对于现在的网络，MSL=2分钟可能太长了一些。实际应用中常用的是 30 秒、1 分钟、2 分钟等；可以修改/etc/sysctl.conf内核参数，来缩短TIME_WAIT的时间，避免不必要的资源浪费。
+
+所以整个tcp传输的过程看起来像这样
+![](https://haldir66.ga/static/imgs/wireshark_tcp_handwave.jpg)
 
 有时候会看到rest，意味着连接突然中断了（tcp会断掉这个sequence的所有packet，把flags里面的reset设置为1）
 
@@ -150,7 +170,7 @@ duplicate ack，这通常出现在receiver收到了out of order packet。
 即sliding window mechanism，原理是调整retransmission的速度（根据dst的recive window），因为dst那边是有一个tcp buffer space的，万一这个buffer溢出，就会造成丢包
 wireshark中，在transmission control protocol下面，有一个window size.
 比方说，src发送了一个isn =1的packet，window size = 8760。dst返回一个ack number = 2921的ack,同时window size变成5840.
-这么来来回回，这个window迟早被小号玩，tcp zero window（正常情况下dst的应用层能够读走这部分数据，但是如果接收方读取速度跟不上的话，会发送一个ack包，告诉src发送慢一点,src接收到了之后，就会一直发keep-alive packet(非常小的包，66byte).如果dst那边还没处理好的话，会一直返回Tcp Zero window 的ack，这样往返数次，直到）
+这么来来回回，这个window迟早被小号玩，tcp zero window（正常情况下dst的应用层能够读走这部分数据，但是如果接收方读取速度跟不上的话，会发送一个ack包，告诉src发送慢一点,src接收到了之后，就会一直发keep-alive packet(非常小的包，66byte).如果dst那边还没处理好的话，会一直返回Tcp Zero window 的ack，这样往返数次）
 在wireshark里面,tcp zero window的ack包里面会显示window size value: 0
 
 ### high latency
@@ -159,7 +179,6 @@ network baseline(正常的延迟是多少，比如国内到美国一般150ms以�
 
 
 ## tcpdump
-[tcpdump cheet](http://packetlife.net/media/library/12/tcpdump.pdf)
 安装
 >sudo apt-get install tcpdump
 
@@ -187,6 +206,7 @@ sudo tcpdump -A -i 2 | egrep -i 'pass=|pwd=|password=|username=' --color=auto --
 [ARP欺骗](https://segmentfault.com/a/1190000009562333) arp cache poisoning attack
 [常用的端口号](http://packetlife.net/media/library/23/common_ports.pdf)
 [各种可能的pcap文件](https://github.com/chrissanders/packets)
+[本文大量文字图片来自](https://www.zfl9.com/c-socket.html)
 
 
 

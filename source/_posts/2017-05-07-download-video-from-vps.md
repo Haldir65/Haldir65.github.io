@@ -36,7 +36,7 @@ aria2 面板
 > mv ./-yj74P_BY1zI.mp4 porn.video #. 表示当前目录
 
 谁也不想要后面的乱码
-```shell
+```bash
 youtube-dl -o '%(title)s.%(ext)s' https://www.youtube.com/watch?v=rimXGaUdaLg ##其实就是一个模板了，分别是title和文件的extension
 ```
 youtube-dl的可扩展性好很多
@@ -73,7 +73,7 @@ you-get还提供了windows版本 下载youtube视频只需要
 
 
 
-```shell
+```bash
 youtube-dl -o '%(title)s.%(ext)s' https://www.youtube.com/watch?v=rimXGaUdaLg
 ```
 

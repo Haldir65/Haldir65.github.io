@@ -456,9 +456,3 @@ jwt事实上就是服务器颁发给客户端一个加密后（只有server才�
 > If an attacker somehow manages to steal a user’s JWT, then there’s unfortunately not much that can really be done. To minimize damages, you should design your application to require reauthentication before performing any high profile transaction such as a purchase or the changing of a password. And your JWTs should also have an expiration date. That way a compromised JWT will only work for so long.
 
 但是如果有人把这个header搞到，就能向服务器声称自己是该用户。服务器是只认这个jwt字符串不认人的，碰到这种情况其实也没什么解决办法，最多把jwt的有效期设置的短一点。
-
-
-[Nagle和Delayed ACK优化算法合用导致的死锁问题](http://taozj.net/201808/nagle-and-delayed-ack.html)
-启示就是应用层进行开发的时候不要零零散散的发数据，尽量攒成一个大一点的包再发出去。不要让系统层去做这件事。
-
-Nagle’s Algorithm 和 Delayed ACK 一起用会造成网速慢

@@ -41,7 +41,7 @@ tags: [置顶,linux,tools]
 
 ### 1. 文件操作常用命令
 
-```shell
+```bash
 - > cd //进入目录
 - > cd /  返回根目录
 - > pwd // 显示当前目录 (print working directory)
@@ -74,7 +74,7 @@ rename是实际意义上的重命名命令，但rename接受三个参数
 
 
 复制粘贴：
-```shell
+```bash
 - > cp a b //把a复制一份，命名为b
 
 - > cp d1 d2 // 这样是不行的，复制目录需要加上-r ，即
@@ -89,7 +89,7 @@ rename是实际意义上的重命名命令，但rename接受三个参数
 
 ### 重定向
 
-```shell
+```bash
 重定向输出 >
 ls  > lsoutput.txt #用于将输出的结果写入一个新的文本文件中
 
@@ -116,7 +116,7 @@ zip –q –r video.zip .  # .代表当前目录
 ```
 
 ### 2. Vi文本编辑器
-```shell
+```bash
 - > vi 3.txt // 如果有则编辑，没有则直接创建
 ## 跳到文件开头处
 [[
@@ -145,7 +145,7 @@ P：在当前光标处上面粘贴内容。
 在编辑模式下,输入 'dd'删除一行 ，输入'dw'删除一个词
 输入'o'插入一行。。。。。。
 
-```shell
+```bash
 - > more filename//查看文件内容(一页一页的显示档案内容)
 
 - > less filename// 也是查看(less 与 more 类似，但是比 more 更好的是，他可以[pg dn][pg up]翻页！)
@@ -192,7 +192,7 @@ tail还有一个好处，可以实时查看文件内容，比如文件正在更�
 
 更多命令如 find 、 whereis 、 Li(Link)
 查找：
-```shell
+```bash
 find / -name filename  //在根目录下查找文件
 find /etc -name filename //在etc目录下查找文件
 
@@ -219,7 +219,7 @@ alt-. - paste previous command's argument (useful for running multiple commands 
 
 
 ### 4. 用户和用户组的问题
-```shell
+```bash
 id userName // 查看当前用户的信息，比如是不是sudo之类的
 
 useradd user //添加用户，(-g 指定用户所在用户组)/home目录下会多一个user的目录，作为该用户的主目录
@@ -273,7 +273,7 @@ r(read权限)w(写权限)-(无权限)x(执行权限)
 user,user group还有other
 
 更改文件权限命令: chmod(个人测下来要加sudo才行)
-```shell
+```bash
 sudo chmod +x filename //加上可执行权限，所有用户都加上了
 sudo chmod u+x filename //给当前用户加上可执行权限
 u：用户
@@ -281,7 +281,7 @@ g：组
 o：其它用户
 a：所有用户
 
-```shell
+```bash
 $chmod a+x main         对所有用户给文件main增加可执行权限
 $chmod g+w blogs        对组用户给文件blogs增加可写权限
 ```
@@ -323,7 +323,7 @@ chown -R Jane /foldername # 把flodername文件夹的所有者改为Jane， -R �
 ### 6. 管道
 将一个命令的输出传送给另一个命令，作为另一个命令的输入
 eg: 中间那条竖线叫做管道连接符
-```shell
+```bash
 $ cat /etc/passwd | grep usernametofind
 $ ls -l | grep "^d"
 $ ls -l * | grep "^-" | wc -|   //"^-"表示不列出目录或链接，只展示目录；wc是数行数
@@ -350,7 +350,7 @@ xclip -o ## 粘贴
 
 ### 7. 硬件相关的命令
 查看硬盘存储空间:
-```shell
+```bash
 df -h //h的意思是human-readable
 du -sh //查看当前directory的大小
 du -sh * //du --summary --human-readable * 查看当前目录下所有文件和子目录的总大小
@@ -374,7 +374,7 @@ free -h # human readable
 ```
 
 添加或修改
-```shell
+```bash
 Port 22 (ssh默认端口修改)
 PermitRootLogin without-Password no
 AllowUsers userName
@@ -387,7 +387,7 @@ service ssh restart
 搞定
 
 看下成功登录历史
-```shell
+```bash
 - last | less | sort -rn
 
 ### who 命令更好，是指wtmp文件创建以来的登录记录
@@ -402,12 +402,12 @@ zip –q –r -v video.zip . #加上一个-v主要是为了能够实时查看输
 顺便说一下，tar打出来的.tar包在windows下是不认的，需要装7-zip之类的软件。zip打出来的包windows下是认的。
 
 文件传输（linux ->windows）： 一般使用putty ssh到Linux主机，想要把Linux上的文件弄到Windows中，需要使用pscp工具。下载好pscp.exe后，放到c:/windows/system32下面。打开cmd。输入命令
-```shell
+```bash
  pscp -r root@202.123.123.123:"/root/fileonServer.mp4" d:/whateveriwantonmyPc.mp4  
 ```
  ，确认后输入root密码就好了。我主要是用来下载视频的。
 有时候会出现Connection Refused Error。
-```shell
+```bash
 > netstat -anp | grep sshd
 ```
 
@@ -418,7 +418,7 @@ zip –q –r -v video.zip . #加上一个-v主要是为了能够实时查看输
 ### 8. 软件的安装，卸载(dpkg命令，不要只会apt-get)
  在debian下，你可以使用dpkg(Debian package system)来安装和卸载软件包。
  还是那句话，没事不要手贱升级软件
-```shell
+```bash
 ### （1）移除式卸载：
 apt-get remove softname1 softname2 …; （移除软件包，当包尾部有+时，意为安装）
 ### （2）清除式卸载 ：
@@ -442,7 +442,7 @@ dpkg -r tcl8.4
 
 关于apt-get
 
-```shell
+```bash
 apt-cache search # ------(package 搜索包)就是看下符合这个名称的在repository中包有哪些
 apt-cache show #------(package 获取包的相关信息，如说明、大小、版本等)
 apt-get install # ------(package 安装包)
@@ -491,7 +491,7 @@ tcpdump结合wireshark可实现完整的网络抓包，这个放在下面写。
 
 
 
-```shell
+```bash
 netstat
 netstat -i ## 查看某个网络接口发出和接收了多少byte的数据
 netstat -ta ##当前active的网络连接  t: tcp a: all u: udp p:process
@@ -512,7 +512,7 @@ netstat -tn 2>/dev/null | grep :80 | awk '{print $5}' | cut -d: -f1 | sort | uni
 ```
 
 
-```shell
+```bash
 ifconfig ## 查看机器上的网卡
 en01 ##Ethernet
 ##注意 RX bytes(接收到的数据)和TX bytes(发送出去的数据)后面的数字
@@ -571,7 +571,7 @@ ps | grep 类似于 pgrep XXX //查找某个进程
 *实时监控，1秒刷新一次*
 watch -n 1 ps -aux --sort=-pmem,-pcpu
 ```
-```shell
+```bash
 #列出所有端口的占用情况
 netstat -anp
 lsof -i # 这个也行
@@ -640,7 +640,7 @@ service sshd restart
 service ssh restart
 ```
 查看系统release版本
-```shell
+```bash
 more /etc/*release
 ### 这个也行
 lsb_release -a
@@ -652,7 +652,7 @@ lsb_release -a
 
 [编码的修改](https://perlgeek.de/en/article/set-up-a-clean-utf8-environment)
 更改locale为utf-8(ubuntu)
-```shell
+```bash
 vi ~/.bashrc
 
 # add these lines
@@ -667,7 +667,7 @@ sudo dpkg-reconfigure locales
 ### 12. sed命令
 sed 是一种在线编辑器，***它一次处理一行内容***。处理时，把当前处理的行存储在临时缓冲区中，称为“模式空间”（pattern space），接着用sed命令处理缓冲区中的内容，处理完成后，把缓冲区的内容送往屏幕。接着处理下一行，这样不断重复，直到文件末尾。文件内容并没有 改变，除非你使用重定向存储输出。
 本身是不会更改文件内容的。
-```shell
+```bash
 ##把一段字符串插入文件的第四行和第五行之间，默认是送到了标准输出，加一个重定向更改了文件内容
 sed -e 4a\/"this will be append to the 5th line" sample.txt >> sample.txt ## 注意这个斜杠是为了语法高亮加的
 
@@ -690,7 +690,7 @@ Chain OUTPUT (policy ACCEPT) ## 允许发出这台电脑
 target     prot opt source               destination
 ```
 
-```shell
+```bash
 iptables -P FORWARD DROP ## 把forward 一律改为drop
 iptables -A INPUT -s  192.168.1.3  ## A是append s是source，拒绝接受192.168.1.3的访问，就是黑名单了
 iptables -A INPUT -s  192.168.0.0/24 -p tcp --destination-port 25 -j DROP  ## block all devices on this network ,  p是protocol,SMTP一般是25端口
@@ -717,7 +717,7 @@ iptables -Z
 > screen -r // 重新进刚才的screen
 
 ### 15. ipv6 howto
-```shell
+```bash
 ## 首先在开启ipv6的机器上确认是否开启了ipv6
 ifconfig ## 看下是否有ipv6 address
 netstat -tuln ## 看下当前连接中是否有ipv6 addr
@@ -735,7 +735,7 @@ inet6 addr: fe80::xxxx:xxxx:xxxx:xxxx/64 Scope:Link
 [oracle page](https://docs.oracle.com/cd/E56344_01/html/E54075/netcat-1.html)
 netcat是网络工具中的瑞士军刀，它能通过TCP和UDP在网络中读写数据。netcat所做的就是在两台电脑之间建立链接并返回两个数据流。
 netcat = nc
-```shell
+```bash
 nc -z -v -n 172.31.100.7 21-100  ##用来扫描这台机器上开放的端口，用来识别漏洞
 z 参数告诉netcat使用0 IO,连接成功后立即关闭连接， 不进行数据交换
 v 参数指使用冗余选项 verbose
@@ -778,7 +778,7 @@ The benefit of WireShark is that it could possibly show you errors in levels bel
 
 
 [聊聊tcpdump与Wireshark抓包分析](https://my.oschina.net/xianggao/blog/678644)
-```shell
+```bash
 sudo tcpdump -i "venet0:0"  //tcpdump需要sudo权限
 sudo tcpdump -c 10 //count
 sudo tcpdump -c -A  //Asicii码形式展示出来每个package
@@ -845,7 +845,7 @@ ctrl +b + ) //切换到下一个session
 
 ### 20. 使用systemd管理程序
 Systemctl是一个systemd工具，主要负责控制systemd系统和服务管理器。systemd中一项服务称为unit[Linux开机启动管理---systemd使用](https://blog.csdn.net/qq562029186/article/details/67639676)
-```shell
+```bash
 sudo systemctl start application ## 比方说nginx
 sudo systemctl status nginx ## 看下状态
 sudo systemctl restart application.service
@@ -924,7 +924,7 @@ systemctl enable start-script.service
 搞定,如果service文件不会写的话，看下/lib/systemd/system/nginx.service就好了
 
 systemctl带来的一个好处是可以直接使用journalctl命令查看**所有**Unit的启动日志(内核日志和应用日志)。日志的配置文件是/etc/systemd/journald.conf
-```shell
+```bash
 ## 查看所有日志（默认情况下 ，只保存本次启动的日志）
 $ sudo journalctl
 # 查看系统本次启动的日志

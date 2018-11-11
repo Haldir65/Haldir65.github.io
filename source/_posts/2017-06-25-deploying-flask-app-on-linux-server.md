@@ -10,7 +10,7 @@ tags: [python]
 
 ## 1. virtualenv 好习惯
 
-```shell
+```bash
 sudo pip install virtualenv
 sudo virtualenv venv
 source venv/bin/activate

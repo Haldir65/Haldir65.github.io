@@ -67,7 +67,7 @@ PATH=$PATH:/etc/apache/bin  #只对本次会话有效
 或者  PATH=$PATH:/etc/apache/bin #在~./bashrc或者~./profile里面添加这句话
 ```
 比如把facebook 的buck添加到环境变量：
-```shell
+```bash
 $ cd ~
 $ vim ~/.bash_profile
 export PATH=$HOME/buck/bin:$PATH
@@ -79,7 +79,7 @@ $ source ~/.bash_profile ## 立刻生效
 ### 3. alias设置
 查看已经设置过的alias：  alias或者 alias -p
 vi 中输入 /XXX 可以搜索
-```shell
+```bash
 vi ~/.bashrc  ## 这个是对当前用户生效的
 /etc/bashrc 写到文件这里面是对所有用户生效
 alias yourcommand='ls -alr' ##添加这一行，原来的命令也照样用
@@ -91,7 +91,7 @@ source ~/.bashrc ## source命令其实就是执行一个脚本
 > touch ~/.bash_aliases  ## unbuntu建议把所有的alias写到一个 ~/.bash_aliases文件里。保存之后,source ~/.bash_aliases。立即生效
 
 据说alias是可以传参数的，不过加上> /dev/null 2>&1 & 就不行了。所以还是写个script算了。
-```shell
+```bash
 #!/bin/bash
 kwrite $1 > /dev/null 2>&1 &
 ```
@@ -352,7 +352,7 @@ grep SQLALCHEMY_DATABASE_URI . -R
 
 上面这仨都是ok的 ,第一种不会把对应的文件名列出来，第二种和第三种会把文件名列出来。第三种的-R当然是递归(recursive)的意思
 
-```shell
+```bash
 find /u03 -name server.xml -exec grep '9080' {}\;
 find . -type f -exec ls -l {} \; ## exec执行删除之前最好先打印出来，避免删错了
 find . -type f -mtime +14 -exec rm {} \;
@@ -440,7 +440,7 @@ putty登录窗口左侧有一个loggin-auth，进去选择自己windows上刚才
 ### 22.iptables命令
 用防火墙屏蔽掉指定ip
 
-```shell
+```bash
 iptables -L -n ## 查看已添加的iptables规则
 清除已有iptables规则
 iptables -F
@@ -520,7 +520,7 @@ youtube-dl的安装途径就是下一个软件下来，然后chmod给权限，�
 ### 24. 一个往dropBox上传文件的Script
 dropbox的网盘空间不用感觉有点浪费了，一个将本地文件上传到dropBox的脚本[Dropbox-Uploader](https://github.com/andreafabrizi/Dropbox-Uploader)
 亲测可用，也不是一个需要启动时跑起来的程序，就是一个给参数就上传的脚本。
-```shell
+```bash
 ./dropbox_uploader.sh upload /localFileOrDir /dropBoxFileOrDir
 ```
 
@@ -528,7 +528,7 @@ dropbox的网盘空间不用感觉有点浪费了，一个将本地文件上传�
 fuser -m -u redis-server
 
 ### 26. 一些看上去比较玄的操作
-```shell
+```bash
 bash <(curl -s https://codecov.io/bash) ##重定向还有这么玩的
 ```
 
@@ -561,7 +561,7 @@ Mere trash
 ls -al = l -al（可以少敲一个字母,其实是alias）
 
 small tricks
-```shell
+```bash
 cat > filename.txt
 then start typing your text content
 ctrl +d to finish

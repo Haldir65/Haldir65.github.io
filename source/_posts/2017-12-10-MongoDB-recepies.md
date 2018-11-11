@@ -19,7 +19,7 @@ MongoDB默认装到C盘的program files文件夹里面,需要一个data文件夹
 默认安装的时候dbpath被设置为了"c://data//db"，所以可能需要创建这个目录
 
 ## establish connection
-```shell
+```bash
 // start db server
 "C:\Program Files\MongoDB\Server\3.4\bin\mongod.exe" --dbpath d:\test\mongodb\data
 // open another shell window to connect to server

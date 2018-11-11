@@ -84,7 +84,7 @@ git config --global https.proxy socks5://127.0.0.1:1080
 ```
 
 取消设置
-```shell
+```bash
 git config --global --unset http.proxy
 
 git config --global --unset https.proxy

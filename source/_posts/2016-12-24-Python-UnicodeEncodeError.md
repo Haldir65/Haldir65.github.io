@@ -287,11 +287,15 @@ basic grammars
 network, disk ,database, io , dic, list ,etc
 class object orientated  
 
+### 9.  __future__模块是为了在2.7中使用3的功能
+```python
+from __future__ import division
 
-[如何使用全局变量, global variables are dangerous](https://stackoverflow.com/questions/423379/using-global-variables-in-a-function)
-
-[selenium教程](https://realpython.com/modern-web-automation-with-python-and-selenium/)
-[深复制和浅复制的区别](https://realpython.com/copying-python-objects/)
+print '10 / 3 =', 10 / 3
+print '10.0 / 3 =', 10.0 / 3
+print '10 // 3 =', 10 // 3
+```
+直接在2.7中使用3的除法（2.7中的除法是10/3=3，3中的除法是10/3=3.33333...）
 
 
 ### Reference
@@ -302,3 +306,6 @@ class object orientated
 - [Jake Wharton and Jesse Wilson - Death, Taxes, and HTTP](https://www.youtube.com/watch?v=6uroXz5l7Gk)
 - [Droidcon Montreal Jake Wharton - A Few Ok Libraries](https://www.youtube.com/watch?v=WvyScM_S88c)
 - [Jesse Wilson - Coordinating Space and Time](https://www.youtube.com/watch?v=yS0Nc-L1Uuk)
+[selenium教程](https://realpython.com/modern-web-automation-with-python-and-selenium/)
+[深复制和浅复制的区别](https://realpython.com/copying-python-objects/)
+[如何使用全局变量, global variables are dangerous](https://stackoverflow.com/questions/423379/using-global-variables-in-a-function)

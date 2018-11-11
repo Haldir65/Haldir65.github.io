@@ -88,7 +88,7 @@ noeviction -> 不移除任何可以，只是返回一个写错误
 ## 针对各种数据进行CURD操作
 
 最简单的SET和GET举个例子
-```shell
+```bash
 >>SET realname "John Smith" ##亲测，这个realname的key加不加引号没啥关系，value也是加不加引号没关系.SET命令直接无视双引号
 >>OK
 
@@ -98,7 +98,7 @@ noeviction -> 不移除任何可以，只是返回一个写错误
 
 
 **String**
-```shell
+```bash
 set(key, value)：给数据库中名称为key的string赋予值value
 get(key)：返回数据库中名称为key的string的value
 getset(key, value)：给名称为key的string赋予上一次的value
@@ -121,7 +121,7 @@ A Redis hash is a collection of key value pairs. Redis Hashes are maps between s
 
 Hashes用于代表object
 
-```shell
+```bash
 ## 添加操作
 ## set
 redis> HMSET myhash field1 "Hello" field2 "World"
@@ -163,7 +163,7 @@ HKEYS myhash
 Redis Lists are simply lists of strings, sorted by insertion order. You can add elements to a Redis List on the head or on the tail.
 
 
-```shell
+```bash
 redis 127.0.0.1:6379> lpush tutoriallist redis
 (integer) 1
 redis 127.0.0.1:6379> lpush tutoriallist mongodb
@@ -196,7 +196,7 @@ rpoplpush(srckey, dstkey)：返回并删除名称为srckey的list的尾元素，
 
 **SET**
 
-```shell
+```bash
 sadd(key, member)：向名称为key的set中添加元素member
 srem(key, member) ：删除名称为key的set中的元素member
 spop(key) ：随机返回并删除名称为key的set中一个元素
@@ -218,7 +218,7 @@ srandmember(key) ：随机返回名称为key的set的一个元素
 ## 一些特性的指令
 
 ### 持久化
-```shell
+```bash
 save：将数据同步保存到磁盘
 bgsave：将数据异步保存到磁盘
 lastsave：返回上次成功将数据保存到磁盘的Unix时戳
@@ -229,7 +229,7 @@ shundown：将数据同步保存到磁盘，然后关闭服务
 expireat
 
 ### 对Value的操作
-```shell
+```bash
 KEYS * 列出所有的key
 exists(key)：确认一个key是否存在
 del(key)：删除一个key
@@ -247,7 +247,7 @@ flushall：删除所有数据库中的所有key
 ```
 
 ### SubScribe和Publish
-```shell
+```bash
 redis 127.0.0.1:6379> SUBSCRIBE redisChat  
 Reading messages... (press Ctrl-C to quit)
 1) "subscribe"
