@@ -8,24 +8,27 @@
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>tcpdump和wireshark使用手册 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="wireshark能抓tcp,arp,http,dns,udp,icmp,dhcp…">
+  <meta name="description" content="wireshark expression cheetsheettcpdump cheetwireshark能抓tcp,arp,http,dns,udp,icmp,dhcp…">
 <meta name="keywords" content="tools">
 <meta property="og:type" content="article">
 <meta property="og:title" content="tcpdump和wireshark使用手册">
 <meta property="og:url" content="https://haldir65.github.io/2018/11/10/2018-11-10-tcpdump-and-wireshark-etc/index.html">
 <meta property="og:site_name" content="Haldir的博客">
-<meta property="og:description" content="wireshark能抓tcp,arp,http,dns,udp,icmp,dhcp…">
+<meta property="og:description" content="wireshark expression cheetsheettcpdump cheetwireshark能抓tcp,arp,http,dns,udp,icmp,dhcp…">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/osi-model.png">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/wire_shark_internet_protocol_version4.png">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/wire_shark_capture_transmission_control_protocol.png">
+<meta property="og:image" content="https://haldir66.ga/static/imgs/wireshark_tcp_handshake.png">
+<meta property="og:image" content="https://haldir66.ga/static/imgs/wireshark_tcp_wave.png">
+<meta property="og:image" content="https://haldir66.ga/static/imgs/wireshark_tcp_handwave.jpg">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/dns_query_round_trip.png">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/dns_query_request_detail.png">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/dns_query_response_detail.png">
-<meta property="og:updated_time" content="2018-11-11T08:38:04.858Z">
+<meta property="og:updated_time" content="2018-11-11T14:39:25.686Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="tcpdump和wireshark使用手册">
-<meta name="twitter:description" content="wireshark能抓tcp,arp,http,dns,udp,icmp,dhcp…">
+<meta name="twitter:description" content="wireshark expression cheetsheettcpdump cheetwireshark能抓tcp,arp,http,dns,udp,icmp,dhcp…">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/osi-model.png">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
@@ -205,12 +208,11 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p><img src="https://www.haldir66.ga/static/imgs/osi-model.png" alt=""><br>wireshark能抓tcp,arp,http,dns,udp,icmp,dhcp…</p>
+        <p><img src="https://www.haldir66.ga/static/imgs/osi-model.png" alt=""><br><a href="http://packetlife.net/media/library/13/Wireshark_Display_Filters.pdf">wireshark expression cheetsheet</a><br><a href="http://packetlife.net/media/library/12/tcpdump.pdf">tcpdump cheet</a><br>wireshark能抓tcp,arp,http,dns,udp,icmp,dhcp…</p>
 <a id="more"></a>
 <p>先从wireshark说起，在win10上安装wireshark需要顺带装上winpacp，不过现在的安装包默认都会提示去安装，所以也都很简单<br>tcpdump在Linux上比较容易安装，类似于wireshark的command line tool</p>
 <h3 id="wireshark的filter"><a href="#wireshark的filter" class="headerlink" title="wireshark的filter"></a>wireshark的filter</h3><p>现在wireshark的filter都会自动提示了，所以基本上随手敲几个就行了</p>
 <p>http ##只看http的<br>http.request<br>tcp.dstport == 443 ## 只看https的<br>tcp.port == 113 ## 不管是source还是destination，只要是port 113的都筛出来(113是一个特殊的端口 Identification Protocol, Ident)<br>udp.port== 53 ## 筛选出所有的dns查询<br>ip.addr eq 192.168.1.3 and ip.addr eq 192.168.1.1 //假设本机ip是192.168.1.3并且路由器是192.168.1.1的话，这个可以筛选出所有的ipv4包<br>ip.src == 192.168.1.3 &amp;&amp; tcp.port == 80 //两个命令串联起来也是可以的<br>ip.addr //既包含src也包含dst<br>udp ||http // udp或者http的包<br>frame.len &lt;=128 //显示所有体积小于128个字节的包</p>
-<p><a href="http://packetlife.net/media/library/13/Wireshark_Display_Filters.pdf">wireshark expression cheetsheet</a></p>
 <p>//如果一开始就只对特定协议感兴趣<br>capture -&gt; filters 里面可以选择只抓某些协议的包。因为默认是什么都抓，这样会少很多</p>
 <h3 id="一些有用的操作"><a href="#一些有用的操作" class="headerlink" title="一些有用的操作"></a>一些有用的操作</h3><p>选中一个column，右键 -&gt; follow -&gt;tcpstream ，可以查看这个packet的来回信息。（如果是http的话，request和response都给出来了）<br>菜单栏上的Statistics -&gt; conversatitons （查看所有的会话）<br>wireshark的结果可以save成.cap文件，下次可以打开<br>菜单栏上的Statistics -&gt; protocol Hierarchy(查看所有的协议)<br>菜单栏view -&gt; coloring rule（直接将特定的协议变成特定颜色的背景，方便识别）<br>view -&gt; time displayformat(格式化packet的时间显示成便于识别的时间，因为默认的显示单位是毫秒)<br>Statistics -&gt; endpoints // 查看所有连接过的ip</p>
 <p>Statistics -&gt; packet length //查看所有的packet length（多数时候包的大小在40-79和1280-2559这个区间里面，没有小于40的，因为最少得40个字节）</p>
@@ -221,11 +223,13 @@ ga('send', 'pageview');
 </ul>
 <p><a href="https://en.wikipedia.org/wiki/Address_Resolution_Protocol">arp包结构</a></p>
 <p>一个ipv4地址需要32个bit表示,192.168.1.1这种写法叫做base10<br>一般情况下，192.168这俩一般表示的是network address, .1.1这俩一般表示的是Host address(physical computer)<br>net mask(255.255.0.0) 192.168.1/16。</p>
-<p>选中一个tcp包，查看Internet Protocol Version4 ..(这里就是第三层,network层了)。<br><img src="https://haldir66.ga/static/imgs/wire_shark_internet_protocol_version4.png" alt=""><br>从上到下依次是<br>version: 4<br>Header length 20bytes<br>Differentiated Services Filed(不懂)<br>Total Length(这个是包含了)<br>Identification(类似于id)<br>Flags : 0x4000, Dont’t fragment(这个牵涉到mtu,maximum transmission unit size, 这个数值在ethernet上是1500bytes。假如一个包大小超过这个数，切成两个,也就是fragment.这个Flags里面可以看到More fragment: not set （0），意思就是说这个包没有被切成两个。有两种情况下这个标志设为0，一是没有分包，而是这个包恰好是最后一个)<br>Fragment offset：0 (假如被切成两个了，这里就表示当前这个包是被切完之后的第一个还是第二个，就当是index吧)。<br>这个包是访问google时留下的</p>
+<h3 id="选中一个tcp包，查看Internet-Protocol-Version4-这里就是第三层-network层了-。"><a href="#选中一个tcp包，查看Internet-Protocol-Version4-这里就是第三层-network层了-。" class="headerlink" title="选中一个tcp包，查看Internet Protocol Version4 ..(这里就是第三层,network层了)。"></a>选中一个tcp包，查看Internet Protocol Version4 ..(这里就是第三层,network层了)。</h3><p><img src="https://haldir66.ga/static/imgs/wire_shark_internet_protocol_version4.png" alt=""><br>从上到下依次是<br>version: 4<br>Header length 20bytes<br>Differentiated Services Filed(不懂)<br>Total Length(这个是包含了)<br>Identification(类似于id)<br>Flags : 0x4000, Dont’t fragment(这个牵涉到mtu,maximum transmission unit size, 这个数值在ethernet上是1500bytes。假如一个包大小超过这个数，切成两个,也就是fragment.这个Flags里面可以看到More fragment: not set （0），意思就是说这个包没有被切成两个。有两种情况下这个标志设为0，一是没有分包，而是这个包恰好是最后一个)<br>Fragment offset：0 (假如被切成两个了，这里就表示当前这个包是被切完之后的第一个还是第二个，就当是index吧)。<br>这个包是访问google时留下的</p>
 <p>有一个Time to live:128 (就是说这个包最多走128hop，就是最多经手128个router就丢掉)</p>
-<p>再看第四层（Transport layer），也就是tcp,udp这类了。<br>还是上面这个包<br><img src="https://haldir66.ga/static/imgs/wire_shark_capture_transmission_control_protocol.png" alt=""><br>从上到下依次是<br>Source Port<br>Destination Port :443 //https无疑<br>stream index: 4<br>sequence number 496 //确保数据没有丢失<br>Acknowledgement number : 4043 //下一个包的sequence number<br>Flags(urg:urgent,push:push,rst:reset,sin&amp;fin(finished))这张图里面写的是Acknowledgment(显然是ack包)<br>window size value: 2053(这个是tcp receiver buffer，单位是byte，这个数值变来变去的)<br>checksum(检查数据完整)</p>
-<p>说一说handshake<br>tcp packets始于一个handshake<br>检查端口，发送一个sequence number(随机的),客户端会发送一个syn packet到接受方。接受方会返回一个syn ack packet,接下来客户端发送一个ack packet。上述步骤每一次sequence number都会+1</p>
-<p>tcp teardown(四次挥手告别)<br>host发送给destination一个fin acknowledge packet<br>destination发挥一个ack packet和一个fin ack packet<br>host再发送一个ack(这些都可以从flags里面看到)</p>
+<h3 id="再看第四层（Transport-layer），也就是tcp-udp这类了。"><a href="#再看第四层（Transport-layer），也就是tcp-udp这类了。" class="headerlink" title="再看第四层（Transport layer），也就是tcp,udp这类了。"></a>再看第四层（Transport layer），也就是tcp,udp这类了。</h3><p>还是上面这个包<br><img src="https://haldir66.ga/static/imgs/wire_shark_capture_transmission_control_protocol.png" alt=""><br>从上到下依次是<br>Source Port<br>Destination Port :443 //https无疑<br>stream index: 4<br>sequence number 496 //确保数据没有丢失<br>Acknowledgement number : 4043 //下一个包的sequence number<br>Flags(urg:urgent,push:push,rst:reset,sin&amp;fin(finished))这张图里面写的是Acknowledgment(显然是ack包)<br>window size value: 2053(这个是tcp receiver buffer，单位是byte，这个数值变来变去的)<br>checksum(检查数据完整)</p>
+<h2 id="说一说handshake"><a href="#说一说handshake" class="headerlink" title="说一说handshake"></a>说一说handshake</h2><p>tcp packets始于一个handshake<br>检查端口，发送一个sequence number(随机的),客户端会发送一个syn packet到接受方。接受方会返回一个syn ack packet,接下来客户端发送一个ack packet。上述步骤每一次sequence number都会+1<br><img src="https://haldir66.ga/static/imgs/wireshark_tcp_handshake.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. Client 发送 SYN 包（seq: x），告诉 Server：我要建立连接；Client 进入SYN-SENT状态；</span><br><span class="line">2. Server 收到 SYN 包后，发送 SYN+ACK 包（seq: y; ack: x+1），告诉它：好的；Server 进入SYN-RCVD状态；</span><br><span class="line">3. Client 收到 SYN+ACK 包后，发现 ack=x+1，于是进入ESTABLISHED状态，同时发送 ACK 包（seq: x+1; ack: y+1）给 Server；Server 发现 ack=y+1，于是也进入ESTABLISHED状态；</span><br><span class="line">接下来就是互相发送数据、接收数据了……</span><br></pre></td></tr></table></figure></p>
+<h3 id="tcp-teardown-四次挥手告别"><a href="#tcp-teardown-四次挥手告别" class="headerlink" title="tcp teardown(四次挥手告别)"></a>tcp teardown(四次挥手告别)</h3><p>host发送给destination一个fin acknowledge packet<br>destination发挥一个ack packet和一个fin ack packet<br>host再发送一个ack(这些都可以从flags里面看到)<br><img src="https://haldir66.ga/static/imgs/wireshark_tcp_wave.png" alt=""><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">注意，可以是连接的任意一方主动 close，这里假设 Client 主动关闭连接：</span><br><span class="line"></span><br><span class="line">1. Client 发送 FIN 包，告诉 Server：我已经没有数据要发送了；Client 进入FIN-WAIT-1状态；</span><br><span class="line">2. Server 收到 FIN 包后，回复 ACK 包，告诉 Client：好的，不过你需要再等会，我可能还有数据要发送；Server 进入CLOSE-WAIT状态；而 Client 收到 ACK 包后，继续等待 Server 做好准备， Client 进入FIN-WAIT-2状态；</span><br><span class="line">3. Server 准备完毕后，发送 FIN 包，告诉 Client：我也没有什么要发送了，准备关闭连接吧；Server 进入LAST-ACK状态；</span><br><span class="line">4. Client 收到 FIN 包后，知道 Server 准备完毕了，于是给它回复 ACK 包，告诉它我知道了，于是进入TIME-WAIT状态；而 Server 收到 ACK 包后，即进入CLOSED状态；Client 等待 2MSL 时间后，没有再次收到 Server 的 FIN 包，于是确认 Server 收到了 ACK 包并且已关闭，于是 Client 也进入CLOSED状态；</span><br></pre></td></tr></table></figure></p>
+<p>MSL即报文最大生存时间，RFC793 中规定 MSL 为 2 分钟，但这完全是从工程上来考虑，对于现在的网络，MSL=2分钟可能太长了一些。实际应用中常用的是 30 秒、1 分钟、2 分钟等；可以修改/etc/sysctl.conf内核参数，来缩短TIME_WAIT的时间，避免不必要的资源浪费。</p>
+<p>所以整个tcp传输的过程看起来像这样<br><img src="https://haldir66.ga/static/imgs/wireshark_tcp_handwave.jpg" alt=""></p>
 <p>有时候会看到rest，意味着连接突然中断了（tcp会断掉这个sequence的所有packet，把flags里面的reset设置为1）</p>
 <h3 id="DHCP-Dynamic-Host-Configuration-Protocol-这个位于第7层"><a href="#DHCP-Dynamic-Host-Configuration-Protocol-这个位于第7层" class="headerlink" title="DHCP (Dynamic Host Configuration Protocol)这个位于第7层"></a>DHCP (Dynamic Host Configuration Protocol)这个位于第7层</h3><h3 id="DNS包结构"><a href="#DNS包结构" class="headerlink" title="DNS包结构"></a>DNS包结构</h3><p>DNS走的是udp的53端口，发出去的请求的dst.port=53，收到的response的src.port = 53.<br>在局域网内,dst就是路由ip(192.168.1.1)</p>
 <p>访问tmall主页<br><img src="https://haldir66.ga/static/imgs/dns_query_round_trip.png" alt=""><br>一来一回的</p>
@@ -237,16 +241,16 @@ ga('send', 'pageview');
 <h3 id="tcp-duplicates"><a href="#tcp-duplicates" class="headerlink" title="tcp  duplicates"></a>tcp  duplicates</h3><p>duplicate ack，这通常出现在receiver收到了out of order packet。<br>所有的tcp连接都有一个isn( initial sequence number)，就是初始序列号了。后续的packet会在这个数字的基础上,data payload传递了多少，这个数就加多少。比方说src这边的isn是1000，发送了200bytes的数据，那么我收到的ack应该是1200.</p>
 <p>上述是一切正常的情况，但是假如src这边的isn是1000，发出去200bytes，dst那边返回1200的sequence number的ack。此时，src这边出了问题，发出去一个1400的packet，dst那边就会认为，你这不对，重来一遍（发回一个1200的ack，一直尝试3次，直到src终于反应过来发出1200的包，这个正确的包叫做fast retransmission）。<br>在wireshark里面，dst发回来的重复的ack会显示为tcp dup ack。src最后一次正确的packet显示为tcp fast retransmission</p>
 <p>所以一旦出现了skip isn的情况，要么dst发回dup ack，要么src发出fast retransmission</p>
-<h3 id="tcp-flow-control"><a href="#tcp-flow-control" class="headerlink" title="tcp flow control"></a>tcp flow control</h3><p>即sliding window mechanism，原理是调整retransmission的速度（根据dst的recive window），因为dst那边是有一个tcp buffer space的，万一这个buffer溢出，就会造成丢包<br>wireshark中，在transmission control protocol下面，有一个window size.<br>比方说，src发送了一个isn =1的packet，window size = 8760。dst返回一个ack number = 2921的ack,同时window size变成5840.<br>这么来来回回，这个window迟早被小号玩，tcp zero window（正常情况下dst的应用层能够读走这部分数据，但是如果接收方读取速度跟不上的话，会发送一个ack包，告诉src发送慢一点,src接收到了之后，就会一直发keep-alive packet(非常小的包，66byte).如果dst那边还没处理好的话，会一直返回Tcp Zero window 的ack，这样往返数次，直到）<br>在wireshark里面,tcp zero window的ack包里面会显示window size value: 0</p>
+<h3 id="tcp-flow-control"><a href="#tcp-flow-control" class="headerlink" title="tcp flow control"></a>tcp flow control</h3><p>即sliding window mechanism，原理是调整retransmission的速度（根据dst的recive window），因为dst那边是有一个tcp buffer space的，万一这个buffer溢出，就会造成丢包<br>wireshark中，在transmission control protocol下面，有一个window size.<br>比方说，src发送了一个isn =1的packet，window size = 8760。dst返回一个ack number = 2921的ack,同时window size变成5840.<br>这么来来回回，这个window迟早被小号玩，tcp zero window（正常情况下dst的应用层能够读走这部分数据，但是如果接收方读取速度跟不上的话，会发送一个ack包，告诉src发送慢一点,src接收到了之后，就会一直发keep-alive packet(非常小的包，66byte).如果dst那边还没处理好的话，会一直返回Tcp Zero window 的ack，这样往返数次）<br>在wireshark里面,tcp zero window的ack包里面会显示window size value: 0</p>
 <h3 id="high-latency"><a href="#high-latency" class="headerlink" title="high latency"></a>high latency</h3><p>这个主要的标志是time这一栏超过1秒，延迟的原因很多。可以分析是去程慢还是返程慢。也有可能是服务器处理很慢。<br>network baseline(正常的延迟是多少，比如国内到美国一般150ms以上是起码的，这是物理决定的)</p>
-<h2 id="tcpdump"><a href="#tcpdump" class="headerlink" title="tcpdump"></a>tcpdump</h2><p><a href="http://packetlife.net/media/library/12/tcpdump.pdf">tcpdump cheet</a><br>安装</p>
+<h2 id="tcpdump"><a href="#tcpdump" class="headerlink" title="tcpdump"></a>tcpdump</h2><p>安装</p>
 <blockquote>
 <p>sudo apt-get install tcpdump</p>
 </blockquote>
 <p>使用<br>sudo tcpdump -i wlan0 ##i的意思是指定某个网络接口，输出非常多<br>sudo tcpdump -D ##哪些接口可用<br>sudo tcpdump -i 2 ##只看-D显示的第二个设备<br>sudo tcpdump -v -A ## A的意思是ASCII，至少内容容易辨识<br>sudo tcpdump -i 2 -c 4 ##只抓4个包<br>sudo tcpdump -i 2 -c -4 -n arp ##只抓arp的包,n的意思是supress host name,也能用来指定协议<br>sudo tcpdump -i 2 -c -4 -n tcp ##只抓4个tcp<br>sudo tcpdump -i 2 -c -4 -n icmp ##只抓4个icmp<br>sudo tcpdump -i 2 -c -4 src 192.168.1.1 ##指定src</p>
 <p>sudo tcpdump -i 2 -c -4 -w filename.pcap ##保存到文件,这个文件用tcpdump打开也是可以的<br>sudo tcpdump -r  filename.pcap ##读取这个文件</p>
 <p>可以和egrep一起用<br>sudo tcpdump -A -i 2 | egrep -i ‘pass=|pwd=|password=|username=’ –color=auto –line-buffered<br>//比方说抓到了md5过的密码，随便找个解密网站，就能解出来了</p>
-<p><a href="https://segmentfault.com/a/1190000009562333">ARP欺骗</a> arp cache poisoning attack<br><a href="http://packetlife.net/media/library/23/common_ports.pdf">常用的端口号</a><br><a href="https://github.com/chrissanders/packets">各种可能的pcap文件</a></p>
+<p><a href="https://segmentfault.com/a/1190000009562333">ARP欺骗</a> arp cache poisoning attack<br><a href="http://packetlife.net/media/library/23/common_ports.pdf">常用的端口号</a><br><a href="https://github.com/chrissanders/packets">各种可能的pcap文件</a><br><a href="https://www.zfl9.com/c-socket.html">本文大量文字图片来自</a></p>
 
       
 
@@ -351,18 +355,18 @@ ga('send', 'pageview');
   
 <nav id="article-nav">
   
-    <a href="/2046/12/18/2017-12-18-random-new-thoughts/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2018/11/11/2018-11-11-python-gil-and-what-you-can-do-about-it/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          即刻备忘录
+          python中多进程、多线程以及GIL记录
         
       </div>
     </a>
   
   
     <a href="/2018/11/06/2018-11-06-nagel-algorithm-and-delay-ack/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">nagel-algorithm-and-delay-ack</div>
+      <div class="article-nav-title">tcp-nagel-algorithm-and-delay-ack</div>
       <i class="icon-circle-right"></i>
     </a>
   
