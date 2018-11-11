@@ -53,7 +53,6 @@ top : 1
 - [ ]a new article on open-gl intro
 - [ ]render-script utility
 - [ ]tcp-proxy实用教程
-- [ ]wireshark及手机抓包实践
 - [ ]play around with xposed
 - [ ]linux环境下多进程通讯方式
 - [ ]python gui编程
@@ -99,7 +98,7 @@ top : 1
 - [X]linux的sed命令(文本替换比较常用)
 - [nio](https://juejin.im/post/59fffdb76fb9a0450a66bd58) 还是netty好
 - [X]js 的async await,就是一个async修饰一个method，里面随便写await
-
+- [X]wireshark及手机抓包实践
 
 
 

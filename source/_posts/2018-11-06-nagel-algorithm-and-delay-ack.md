@@ -1,5 +1,5 @@
 ---
-title: 2018-11-06-nagel-algorithm-and-delay-ack
+title: nagel-algorithm-and-delay-ack
 date: 2018-11-06 13:25:55
 tags:
 ---
