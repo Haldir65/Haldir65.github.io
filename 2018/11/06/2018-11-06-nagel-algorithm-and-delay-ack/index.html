@@ -16,7 +16,7 @@
 <meta property="og:description" content="Nagle’s Algorithm 和 Delayed ACK 一起用在特定场景下可能会造成网速不必要的延迟傳送 TCP 封包的時候， TCP header 占 20 bytes， IPv4 header 占 20 bytes，若傳送的資料太小， TCP/IPv4 headers 造成的 overhead (40bytes) 並不划算。想像傳送資料只有 1 byte，卻要另外傳 40 bytes">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/nature-grass-wet-plants-high-resolution-wallpaper-573f2c6413708.jpg">
-<meta property="og:updated_time" content="2018-11-11T14:39:25.686Z">
+<meta property="og:updated_time" content="2018-11-17T07:52:44.225Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="tcp-nagel-algorithm-and-delay-ack">
 <meta name="twitter:description" content="Nagle’s Algorithm 和 Delayed ACK 一起用在特定场景下可能会造成网速不必要的延迟傳送 TCP 封包的時候， TCP header 占 20 bytes， IPv4 header 占 20 bytes，若傳送的資料太小， TCP/IPv4 headers 造成的 overhead (40bytes) 並不划算。想像傳送資料只有 1 byte，卻要另外傳 40 bytes">
@@ -218,6 +218,7 @@ ga('send', 'pageview');
 <p>server 送完 header 後，因為 client 沒有回 ACK (delayed ACK)，server 也不會送 body (應用層覺得它已經送出了，但 kernel 還沒送)。<br>client 過了 200ms，送出收到 header 的 ACK。<br>server 收到 ACK 後，送出 body。<br>於是 client 多等了 200ms 才收到完整的 response。</p>
 <h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>启示就是应用层进行开发的时候不要零零散散的发数据，尽量攒成一个大一点的包再发出去。不要让系统层去做这件事。</p>
 <p>TCP_NODELAY 是可以关闭Nagle算法的</p>
+<p>todo<br>window congestion<br>超时重传<br>阻塞，超时，<br>tcp缓冲</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://taozj.net/201808/nagle-and-delayed-ack.html">Nagle和Delayed ACK优化算法合用导致的死锁问题</a><br><a href="https://medium.com/fcamels-notes/nagles-algorithm-%E5%92%8C-delayed-ack-%E4%BB%A5%E5%8F%8A-minshall-%E7%9A%84%E5%8A%A0%E5%BC%B7%E7%89%88-8fadcb84d96f">Nagle’s Algorithm 和 Delayed ACK 以及 Minshall 的加強版</a><br><a href="https://cloud.tencent.com/developer/article/1004431">再说TCP神奇的40ms</a></p>
 
       
