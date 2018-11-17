@@ -63,7 +63,8 @@ top : 1
 - [ ]c语言的[libevent使用教程](https://yq.aliyun.com/articles/413601)
 - [ ]code generator(代码生成器)
 - [ ]python 的asyncio
-
+- [ ] [Paging Technique : Memory management in Operating System](https://www.youtube.com/watch?v=0Rf5Jc61ArM)
+- [ ] [block size vs page size](http://forums.justlinux.com/showthread.php?3261-Block-size-vs-page-size)
 
 ### 已完成
 * 用 express 转接一个知乎 Api，添加 Access-control-allow-origin,或许还可以用 redis 缓存数据结果（一个就好）由此想到一篇文章"How to use Pythonto build a restful Web Service".只不过用的是 Tornado

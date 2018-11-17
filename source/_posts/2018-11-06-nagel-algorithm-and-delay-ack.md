@@ -86,6 +86,13 @@ server 收到 ACK 後，送出 body。
 TCP_NODELAY 是可以关闭Nagle算法的
 
 
+todo
+window congestion
+超时重传
+阻塞，超时，
+tcp缓冲
+
+
 
 ## 参考
 [Nagle和Delayed ACK优化算法合用导致的死锁问题](http://taozj.net/201808/nagle-and-delayed-ack.html)

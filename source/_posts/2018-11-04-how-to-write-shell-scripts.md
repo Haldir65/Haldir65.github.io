@@ -206,3 +206,4 @@ export
 
 [LINUX下的21个特殊符号](http://blog.51cto.com/litaotao/1187983)
 [Shell学习笔记](https://notes.wanghao.work/2015-06-02-Shell%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html)
+[how to use variables in shell scripts](https://www.youtube.com/watch?v=Lu-xzWajbFo)

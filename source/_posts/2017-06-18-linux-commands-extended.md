@@ -198,6 +198,9 @@ grep -i test test.txt | awk '/[0-9]/ { print }'
 想要找出系统内所有大小超出10MB的，合计一下这些大文件一共占用了多少MB的空间
 sudo find / -size +10M -exec du -h {} \; | awk '{ s+=$1  } END { print s}'
 
+awk里面还能for循环
+sudo netstat -a | awk '/^tcp/ {++S[$NF]} END {for(a in S) print a, S[a]}'
+
 awk -F '"' xxxxx ### 以双引号为分隔符的
 
 [30个实用的awk命令](https://likegeeks.com/awk-command/)

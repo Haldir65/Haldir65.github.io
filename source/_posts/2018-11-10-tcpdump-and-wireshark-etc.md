@@ -206,7 +206,7 @@ sudo tcpdump -A -i 2 | egrep -i 'pass=|pwd=|password=|username=' --color=auto --
 [ARP欺骗](https://segmentfault.com/a/1190000009562333) arp cache poisoning attack
 [常用的端口号](http://packetlife.net/media/library/23/common_ports.pdf)
 [各种可能的pcap文件](https://github.com/chrissanders/packets)
-[本文大量文字图片来自](https://www.zfl9.com/c-socket.html)
+[本文大量文字图片出处](https://www.zfl9.com/c-socket.html)
 
 
 

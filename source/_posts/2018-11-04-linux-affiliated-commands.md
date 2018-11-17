@@ -55,7 +55,7 @@ sed 's/SINGING/saying/i' annoying.txt ##希望大小写不敏感
 sed 's/^.*at/REPLACED/' annoying.txt ##从每一行的开头到"at"
 sed 's/^.*at/(&)/' annoying.txt ## 把那些会匹配上的文字用括号包起来
 
-[intermediate traning](https://www.digitalocean.com/community/tutorials/intermediate-sed-manipulating-streams-of-text-in-a-linux-environment)
+[intermediate training](https://www.digitalocean.com/community/tutorials/intermediate-sed-manipulating-streams-of-text-in-a-linux-environment)
 
 linux下查看一个文件的时间戳
 > stat test

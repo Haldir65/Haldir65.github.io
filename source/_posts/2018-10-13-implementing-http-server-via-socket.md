@@ -650,13 +650,10 @@ $ od -tc nihao.c
 [Unicode in C and C++: What You Can Do About It Today](https://www.cprogramming.com/tutorial/unicode.html)
 
 
-
-
 ##不知道为什么,百度首页的response中没有content-length字段
 read from socket , and write it to local file ,how about that?
 
 
 
-
 ## todo
-**socket还有阻塞，超时，tcp缓冲等问题值得研究，Linux下TCP延迟确认机制**
+** [sock5协议的解释](https://github.com/gwuhaolin/lightsocks)

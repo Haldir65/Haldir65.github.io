@@ -215,6 +215,25 @@ u0_a80    13464 730   1772072 46280 SyS_epoll_ 0000000000 S com.bbk.calendar
 搜索关键字(oom_adj)
 
 
+adb su进terminal
+找一台root了的手机
+adb shell 
+su
+//好了，现在可以进root模式了
+pm list packages
+pm clear PACKAGE //删掉/data/data/package里面的东西
+//启用/禁用app或者组件,需要su执行
+pm enable [--user USER_ID] PACKAGE_OR_COMPONENT
+pm disable [--user USER_ID] PACKAGE_OR_COMPONENT
+pm reset //重置所有应用的权限
+
+这里面就有很多可以做的了
+
+am stack list
+am start -n com.huxiu/com.huxiu.ui.activity.SplashActivity //命令行启动某应用
+am start -n com.android.browser/com.android.browser.BrowserActivity //命令行开浏览器
+
+
 
 
 
