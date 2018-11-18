@@ -50,7 +50,7 @@ top : 1
 - [ ]rxjava是如何切换线程的以及源码解析
 - [ ]logstash接管软件日志
 - [ ]shadowsocks-android源码
-- [ ]a new article on open-gl intro
+- [ ]a new article on open-gl intro(on going)
 - [ ]render-script utility
 - [ ]play around with xposed
 - [ ]tcp-proxy实用教程
@@ -61,7 +61,7 @@ top : 1
 - [ ]js的闭包等面试常谈
 - [ ]java的aspectJ教程
 - [ ]code generator(代码生成器)
-- [ ]python 的asyncio
+- [ ]python 的asyncio(in progress)
 - [ ] [Paging Technique : Memory management in Operating System](https://www.youtube.com/watch?v=0Rf5Jc61ArM)
 - [ ] [block size vs page size](http://forums.justlinux.com/showthread.php?3261-Block-size-vs-page-size)
 

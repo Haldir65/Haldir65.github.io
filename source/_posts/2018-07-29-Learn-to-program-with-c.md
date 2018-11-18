@@ -336,6 +336,11 @@ ls -al /usr/lib | grep libevent
 ls -al /usr/local/lib | grep libevent
 试一下就行了
 
+printf("Error: %d (%s)\n", errno, strerror(errno))
+
+
+[Useful CMake Examples](https://github.com/ttroy50/cmake-examples)
+
 
 ### 最后
 c语言就是这样，好多功能都得自己实现

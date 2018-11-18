@@ -16,7 +16,7 @@ You should use multiprocessing (if your machine has multiple cores)
 
 
 Python Global Interpreter Lock(GIL)
-所有的python bytecode在执行前都需要获得interpreter的lock。
+所有的python bytecode在执行前都需要获得interpreter的lock,one vm thread at a time。
 GIL的出现似乎是历史原因（为了方便的直接使用当时现有的c extension）。而没有在python3中被移除的原因是因为这会造成单线程的程序在python3中跑的反而比python2中慢。
 
 因为GIL的存在，python中的线程并不能实现cpu的并发运行(同时只能有一条线程在运行)。但对于I/O intensive的任务来说，cpu都在等待I/O操作完成，所以爬虫这类操作使用多线程是合适的。
@@ -207,9 +207,76 @@ print(len(mylist))
 print(mylist)
 ```
 
+更加Pythonic的方式是使用asyncio
+
+## Asyncio
+优点包括
+- base on futures
+- Faster than threads
+- Massive I/O concurrency
+
+```python
+async def fetch_url(url):
+        return await aiohttp.request('GET' , url) ## you get the future, the function is not executed immediatedly
+
+async def fetch_two(url_a,url_b):
+        future_a = fetch_url(url_a)
+        future_b = fetch_url(url_b)
+        a ,b = await asyncio.gather(future_a, future_b)  ## 一旦开始await这个future,这个coroutine才会被加入event loop
+        return a, b
+```
+上述代码虽然还是在同一个进程中运行，还受到GIL制约，但是由于是I/O操作，所以也没什么问题。只是在process返回的结果是，就会受到GIL的影响了。（实际操作中你会发现coroutine还没执行就timeout了）
+也就是说，I/O操作用asyncio，数据处理使用multi-processing，这是最好的情况。
+由于coroutine和multi-processing是两个相对独立的模块，所以需要自己把两者结合起来。用多进程进行数据处理，每个进程中各自有独立的coroutine在运行。
+[John Reese - Thinking Outside the GIL with AsyncIO and Multiprocessing - PyCon 2018](https://www.youtube.com/watch?v=0kXaLh8Fz3k)
+```python
+async def run_loop(tx, rx):
+        ... ## real work here 
+        limit = 10
+        pending = set()
+        while True:
+                while len(pending) < limit:
+                        task = tx.get_nowait()
+                        fn ,args, kwargs = task
+                        pending.add(fn(args,kwargs))
+                done, pending = await asyncio.wait(pending, ..)        
+                for future in done:
+                        rx.put_nowait(await future)
+
+def bootstrap(tx, rx):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_untile_complete(run_loop(tx, rx))
+
+def main():        
+        p = multiprocessing.Process(target = bootstrap, args = (tx, rx))
+        p.start()
+```
+
+实际操作可能看起来像这样
+```python
+async def fetch_url(url):
+        return await aiohttp.request('GET' , url) 
+
+def fetch_all(urls):
+       tx, rx = Queue(), Queue()
+       Process(
+               target=bootstrap,
+               args=(tx,rx)
+       ).start()
+       for url in urls:
+           task = fetch_url,(url,), {}
+           tx.put_nowait(task)
+```
+
+已经开源 pip install aiomultiprocess
+[aioprocessing](https://github.com/dano/aioprocessing)
+
+## 牵涉到一些celery的点
+todo
+
+
+## 参考
 [多进程还可以牵涉到进程池的概念](https://codewithoutrules.com/2018/09/04/python-multiprocessing/)
-牵涉到一些celery的点
-
-
 [What is the Python Global Interpreter Lock (GIL)?](https://realpython.com/python-gil/)
 [multiprocessing-vs-multithreading-in-python-what-you-need-to-know](https://timber.io/blog/multiprocessing-vs-multithreading-in-python-what-you-need-to-know/)

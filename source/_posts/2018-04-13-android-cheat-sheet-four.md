@@ -336,6 +336,7 @@ Android Studio中集成c或者cpp代码照着这个官方的[教程](https://dev
 javah -d jni com.your.package.name.classyoujustWroteWithnativeMethod
 
 把生成的header文件剪切到和main/Java文件夹平级的jni文件夹中，再去写c的实现。
+注意的一小点是： printf是不会打印到logcat里面的，需要使用android/log.h头文件里面的东西
 
 移植mp3lame到Android平台照着[这里](https://www.jianshu.com/p/065bfe6d3ec2)操作就行了。
 这篇博客使用的是lame-3.99.5，注意下载对应的版本。

@@ -41,3 +41,4 @@ ffmpeg -i input.mp4 -aspect 16:9 output.mp4 ## 更改长宽比
 
 todo 
 opencv
+view video using ffmplayer
