@@ -60,7 +60,6 @@ top : 1
 - [ ]宇宙第一ide熟悉使用
 - [ ]js的闭包等面试常谈
 - [ ]java的aspectJ教程
-- [ ]c语言的[libevent使用教程](https://yq.aliyun.com/articles/413601)
 - [ ]code generator(代码生成器)
 - [ ]python 的asyncio
 - [ ] [Paging Technique : Memory management in Operating System](https://www.youtube.com/watch?v=0Rf5Jc61ArM)
@@ -100,6 +99,8 @@ top : 1
 - [nio](https://juejin.im/post/59fffdb76fb9a0450a66bd58) 还是netty好
 - [X]js 的async await,就是一个async修饰一个method，里面随便写await
 - [X] Linux下TCP延迟确认机制
+- [X]c语言的[libevent使用教程](https://yq.aliyun.com/articles/413601) eventloop，添加回调，大致的流程就是这样
+
 
 
 ### Good For Nothing
