@@ -13,6 +13,10 @@ ByteBuff是reference counted的，netty的作者说：
 java给人一种不需要清理garbage的illusion
 allocating stuff is no big deal , garbage collecting it is.
 
+
+selectors
+
+
 [netty的example非常多，http2,cors,upload等等都有](https://netty.io/4.1/xref/overview-summary.html)
 
 

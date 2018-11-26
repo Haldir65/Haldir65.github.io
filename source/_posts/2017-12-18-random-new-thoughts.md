@@ -38,9 +38,8 @@ top : 1
 - [ ][LOGSTASH+ELASTICSEARCH+KIBANA处理NGINX访问日志](http://www.wklken.me/posts/2015/04/26/elk-for-nginx-log.html)ELK全家桶
 - [ ] Coordinator behavior以及scroll原理，完善blog
 - [ ]Exoplayer and the MediaCodec api[building-a-video-player-app-in-android](https://medium.com/androiddevelopers/building-a-video-player-app-in-android-part-3-5-19543ea9d416)
-- [ ] autoWired, autovalue这些java 的library
-- [ ] instagram好像通过注解的方式自己写了一个json解析器
-- [ ] mqtt接入实践
+- [ ] instagram好像通过注解的方式自己写了一个json解析器[ig-json-parser](https://github.com/Instagram/ig-json-parser)
+- [ ] mqtt接入实践[mqtt是建立在tcp基础上的应用层协议](https://github.com/mcxiaoke/mqtt)，[netty](https://github.com/netty/netty)也做了实现
 - [ ] when it comes to design , how do we translate px, pt, em  into sp,dp and others(设计方面的，各种单位之间的转换)?
 - [ ] classloader和class的生命周期
 - [ ] python dunder class复习
@@ -60,6 +59,7 @@ top : 1
 - [ ]宇宙第一ide熟悉使用
 - [ ]js的闭包等面试常谈
 - [ ]java的aspectJ教程
+- [ ] autoWired, autovalue这些java 的library
 - [ ]code generator(代码生成器)
 - [ ]python 的asyncio(in progress)
 - [ ] [Paging Technique : Memory management in Operating System](https://www.youtube.com/watch?v=0Rf5Jc61ArM)

@@ -1,5 +1,5 @@
 ---
-title: 2018-11-15-opengl-related-topics
+title: opengl学习笔记
 date: 2018-11-15 22:53:55
 tags:
 ---

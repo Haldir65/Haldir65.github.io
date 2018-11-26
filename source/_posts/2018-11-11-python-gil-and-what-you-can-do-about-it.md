@@ -211,7 +211,7 @@ print(mylist)
 
 ## Asyncio
 优点包括
-- base on futures
+- Based on futures
 - Faster than threads
 - Massive I/O concurrency
 
