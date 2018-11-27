@@ -16,7 +16,7 @@
 <meta property="og:description" content="Nagle’s Algorithm 和 Delayed ACK 一起用在特定场景下可能会造成网速不必要的延迟傳送 TCP 封包的時候， TCP header 占 20 bytes， IPv4 header 占 20 bytes，若傳送的資料太小， TCP/IPv4 headers 造成的 overhead (40bytes) 並不划算。想像傳送資料只有 1 byte，卻要另外傳 40 bytes">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/nature-grass-wet-plants-high-resolution-wallpaper-573f2c6413708.jpg">
-<meta property="og:updated_time" content="2018-11-26T02:24:19.358Z">
+<meta property="og:updated_time" content="2018-11-27T11:35:47.677Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="tcp-nagel-algorithm-and-delay-ack">
 <meta name="twitter:description" content="Nagle’s Algorithm 和 Delayed ACK 一起用在特定场景下可能会造成网速不必要的延迟傳送 TCP 封包的時候， TCP header 占 20 bytes， IPv4 header 占 20 bytes，若傳送的資料太小， TCP/IPv4 headers 造成的 overhead (40bytes) 並不划算。想像傳送資料只有 1 byte，卻要另外傳 40 bytes">
@@ -208,7 +208,7 @@ ga('send', 'pageview');
 <p>想象一下，同时丢出去一大堆只有50个字节的包还是会造成带宽的浪费，还不如攒在一起发出去。</p>
 <p>在Nagle算法中参数MSS(maximum segment size，IPv4默认值是576-20-20 = 536)<br><a href="https://en.wikipedia.org/wiki/Maximum_segment_size">Maximum_segment_size在wiki上还有专门的介绍</a></p>
 <p>一些关键词：</p>
-<p>acnowledged: TCP 傳送封包時會帶有流水號 ，起始值隨機，後面每傳 1 byte 就 +1。對方收到後會回傳 ACK 封包，帶有最後收到 byte 的數字。比方說收到 100 bytes，再收到 200 bytes，只要 ACK「起始值+300」即可。</p>
+<p>acknowledged: TCP 傳送封包時會帶有流水號 ，起始值隨機，後面每傳 1 byte 就 +1。對方收到後會回傳 ACK 封包，帶有最後收到 byte 的數字。比方說收到 100 bytes，再收到 200 bytes，只要 ACK「起始值+300」即可。</p>
 <p>sliding window: 允許傳送 unacked bytes 的最大值，確保在網路不佳的情況下，傳送端不會傳送過多封包加重擁塞。sliding window 的最大值是 2¹⁶ = 64 (KB)</p>
 <h3 id="Delay-ACK"><a href="#Delay-ACK" class="headerlink" title="Delay ACK"></a>Delay ACK</h3><p>ACK 也是小封包，為了避免產生太多小封包，所以接收端不會每次收到封包都立即發 ACK，如果之後剛好需要送資料 ，順便帶上 ACK去可以省去小封包。實例: telnet server 會回傳使用者剛打的字，順便送 ACK 就可以省去小封包。</p>
 <p>Linux的实现在 <a href="https://github.com/torvalds/linux/blob/master/net/ipv4/tcp_input.c#L5066">__tcp_ack_snd_check</a>这个方法</p>
@@ -491,6 +491,14 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
@@ -539,10 +547,6 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
@@ -552,10 +556,6 @@ ga('send', 'pageview');
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">插件化</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">

@@ -17,7 +17,7 @@
 <meta property="og:description" content="C语言实用指南，暂时不涉及cpp内容">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/pretty-orange-mushroom-wallpaper-5386b0c8c3459.jpg">
-<meta property="og:updated_time" content="2018-11-26T02:24:19.358Z">
+<meta property="og:updated_time" content="2018-11-27T11:35:47.677Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="C语言学习手册">
 <meta name="twitter:description" content="C语言实用指南，暂时不涉及cpp内容">
@@ -201,7 +201,8 @@ ga('send', 'pageview');
     <div class="article-entry" itemprop="articleBody">
       
         <p>C语言实用指南，暂时不涉及cpp内容<br><img src="https://haldir66.ga/static/imgs/pretty-orange-mushroom-wallpaper-5386b0c8c3459.jpg" alt=""><br><a id="more"></a></p>
-<h2 id="1-基本数据类型"><a href="#1-基本数据类型" class="headerlink" title="1.基本数据类型"></a>1.基本数据类型</h2><p><a href="https://zh.cppreference.com/w/cpp/language/types">C的基本数据类型还是很多的</a> 居然还有unsigned long long int 这种别扭的东西。</p>
+<h2 id="1-基本数据类型"><a href="#1-基本数据类型" class="headerlink" title="1.基本数据类型"></a>1.基本数据类型</h2><p><a href="https://zh.cppreference.com/w/cpp/language/types">C的基本数据类型还是很多的</a> 居然还有unsigned long long int 这种别扭的东西。<br>size_t 和int差不多，估摸着是跨平台的一种表示。</p>
+<p>scanf方法存在内存溢出的可能性，微软提出了scanf_s函数，需要提供最多允许读取的长度，超出该长度的字符一律忽略掉。<br><a href="http://www.ruanyifeng.com/blog/2018/01/assembly-language-primer.html">汇编语言</a></p>
 <p><a href="https://dev-notes.eu/2018/08/strings-in-c/">string in c</a><br>char *name = “Bob”; //name指向的位置不能修改了，但是name可以指向别的东西.<br>// the value is stored in a read-only section in the binary file and cannot be modified<br>name[1] = ‘e’; //这么干是不行的，编译是能通过，但运行期会造成undefined behavior，大概率是segment fault</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">You can also define a <span class="built_in">string</span> as a pointer to a <span class="keyword">char</span>, initialised by a <span class="built_in">string</span> literal. In <span class="keyword">this</span> <span class="keyword">case</span>, <span class="built_in">string</span> literals are stored in a read only section of memory <span class="keyword">and</span> are effectively constant. For example:</span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> *name = <span class="string">"Bob"</span></span><br><span class="line">In <span class="keyword">this</span> <span class="keyword">case</span>, the value is stored in a read-only section in the binary file <span class="keyword">and</span> cannot be modified. If you compile to an assembly file (use the -S compiler option in gcc), you can see the <span class="built_in">string</span> literals in the .rodata section. In <span class="keyword">this</span> context, rodata means “read-only data”.</span><br><span class="line"></span><br><span class="line"><span class="comment">/* main.s */</span></span><br><span class="line">.file	<span class="string">"main.c"</span></span><br><span class="line">.section	.rodata</span><br><span class="line">.LC0:</span><br><span class="line">.<span class="built_in">string</span>	<span class="string">"Bob"</span></span><br></pre></td></tr></table></figure>
 <p>// 下面这种用数组形式声明的是可以随便改的<br>char name[] = “Alice”; //存在stack上，随便改<br>name[3] = ‘n’;<br>name[4] = ‘a’;</p>
@@ -238,14 +239,13 @@ ga('send', 'pageview');
 <p>这才像样嘛</p>
 <h3 id="4-linking"><a href="#4-linking" class="headerlink" title="4. linking"></a>4. linking</h3><p>链接是编译的最后一步，这一步编译器将所有的机器码文件(也就是.o文件)合成可执行文件。不需要传什么flag,直接gcc hello_world.c就可以了<br>默认生成的文件名叫做a.out,可以使用-o参数指定生成的文件名。然后./a.out就可以执行了</p>
 <h2 id="3-gcc-clang-llvm的历史"><a href="#3-gcc-clang-llvm的历史" class="headerlink" title="3. gcc ,clang,llvm的历史"></a>3. gcc ,clang,llvm的历史</h2><p>.so文件其实是shared object的缩写</p>
-<h2 id="Makefile怎么写"><a href="#Makefile怎么写" class="headerlink" title="Makefile怎么写"></a>Makefile怎么写</h2><p><a href="http://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/">几个简单的makefile实例</a></p>
+<h2 id="4-Makefile怎么写"><a href="#4-Makefile怎么写" class="headerlink" title="4. Makefile怎么写"></a>4. Makefile怎么写</h2><p><a href="http://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/">几个简单的makefile实例</a></p>
 <p>// 比方说写了三个文件,main.c,test.c,test.h。这是最简单的例子<br>main: main.c<br>    gcc -o main main.c test.c //ok,没问题了 </p>
-<p><a href="https://www.youtube.com/watch?v=GExnnTaBELk">C Programming: Makefiles</a></p>
-<p>make file automatic rule</p>
-<p><a href="https://www.geeksforgeeks.org/static-vs-dynamic-libraries/">static and dynamic libraries</a></p>
+<p><a href="https://www.youtube.com/watch?v=GExnnTaBELk">C Programming: Makefiles</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">make clean</span><br><span class="line"></span><br><span class="line">clean:</span><br><span class="line">    rm -f *.o program_name</span><br></pre></td></tr></table></figure></p>
+<p>因为手动rm可能写成<br>rm -f * .o ##中间多一个空格</p>
+<h2 id="5-静态库和动态库的区别及使用"><a href="#5-静态库和动态库的区别及使用" class="headerlink" title="5. 静态库和动态库的区别及使用"></a>5. 静态库和动态库的区别及使用</h2><p><a href="https://www.geeksforgeeks.org/static-vs-dynamic-libraries/">static and dynamic libraries</a></p>
 <p>static library把依赖的library都打包进去了，体积更大<br>dynamic libvrary只是写了依赖的library的名称，运行时需要去操作系统中去找，会慢一些</p>
-<p>static libiray(compile time已完成link，而dynamic library需要在runtime完成link)</p>
-<p>查看archive文件中的内容<br>ar -tv libmylib.a</p>
+<h3 id="static-libiray-compile-time已完成link，而dynamic-library需要在runtime完成link"><a href="#static-libiray-compile-time已完成link，而dynamic-library需要在runtime完成link" class="headerlink" title="static libiray(compile time已完成link，而dynamic library需要在runtime完成link)"></a>static libiray(compile time已完成link，而dynamic library需要在runtime完成link)</h3><p>查看archive文件中的内容<br>ar -tv libmylib.a</p>
 <p>nm somebinaryfile ## 查看动态和静态库中的符号表</p>
 <p>ls /usr/lib ## 文件夹中又各种lib,包括so文件和.a文件<br>ls /usr/include # 这里也有一大堆头文件</p>
 <p>clang wacky.c -L. -lwacky -o wacky ## -L. 表示在当前目录下查找后面的libwacky.so或者libwacky.a文件。所以完全可以link 系统中存在的(/usr/lib目录中)的library并compile到program中</p>
@@ -255,35 +255,15 @@ ga('send', 'pageview');
 <p>man ldpath ##  so文件查找目录<br>export LD_LIBRARY_PATH=. ## 添加当前目录为查找路径</p>
 <p>//一般so文件都在/usr/lib或者/usr/local/lib文件夹下面<br>locate sodium.so</p>
 <p>make wacky 也是可以的，可以指定编译target</p>
-<p>在c program中使用其他的library以及如何编译生成可执行文件</p>
-<p>make clean</p>
-<p>clean:<br>    rm -f *.o program_name</p>
-<p>因为手动rm可能写成<br>rm -f * .o 中间多一个空格</p>
-<p><a href="https://www.tutorialspoint.com/makefile/makefile_example.htm">make file examples</a></p>
-<p>经常会看到项目里面的安装指南包括./configure make..<br>GNU的AUTOCONF和AUTOMAKE</p>
-<p>./config &amp;&amp; make &amp;&amp; sudo make install || exit 1</p>
-<p>比如说awk的安装过程是这样的<br>wget <a href="http://ftp.gnu.org/gnu/gawk/gawk-4.1.1.tar.xz">http://ftp.gnu.org/gnu/gawk/gawk-4.1.1.tar.xz</a><br>tar xvf gawk-4.1.1.tar.xz<br>cd gawk-4.1.1 &amp;&amp; ./configure<br>make<br>make check<br>sudo make install</p>
-<p>如何生成一个auto build file<br><a href="https://stackoverflow.com/questions/10999549/how-do-i-create-a-configure-script">auto build configure file</a><br><a href="http://hahaya.github.io/build-libevent/">Linux下安装、配置libevent</a><br><a href="http://hahaya.github.io/hello-in-libevent/">使用libevent输出Hello</a></p>
-<p>如何使用C语言第三方库<br><a href="https://blog.csdn.net/yanxiangtianji/article/details/20474155">以mysql的c库为例</a><br>如果库在 usr/include/ 目录下，那么就用 #include &lt; *.h &gt;。这个目录下面放的都是些头文件</p>
-<p>如果库在当前目录下，就用　#include “mylib.h”</p>
-<p>gcc -v可以查看compile gcc时预设的链接静态库的搜索路径</p>
-<p>默认情况下， GCC在链接时优先使用动态链接库，只有当动态链接库不存在时才考虑使用静态链接库，如果需要的话可以在编译时加上-static选项，强制使用静态链接库。</p>
+<p>还有一种动态查找第三方库的方法<br><a href="https://renenyffenegger.ch/notes/development/languages/C-C-plus-plus/GCC/create-libraries/index">dlopen和soname</a></p>
+<h2 id="6-如何使用第三方库"><a href="#6-如何使用第三方库" class="headerlink" title="6. 如何使用第三方库"></a>6. 如何使用第三方库</h2><p>在c program中使用其他的library以及如何编译生成可执行文件</p>
+<p><a href="https://blog.csdn.net/yanxiangtianji/article/details/20474155">以mysql的c库为例</a><br>如果库在 usr/include/ 目录下，那么就用 #include &lt; *.h &gt;。这个目录下面放的都是些头文件<br>如果库在当前目录下，就用　#include “mylib.h”<br>gcc -v可以查看compile gcc时预设的链接静态库的搜索路径<br>默认情况下， GCC在链接时优先使用动态链接库，只有当动态链接库不存在时才考虑使用静态链接库，如果需要的话可以在编译时加上-static选项，强制使用静态链接库。</p>
 <p>从项目结构来看,curl,ffmpeg这些都是一个文件夹里面放了所有的.h和.c文件。似乎没有其他语言的package的观念。我试了下，在Makefile里面带上文件夹的相对路径还是可以的。</p>
-<p><a href="http://ismail.badawi.io/blog/2017/03/28/automatic-directory-creation-in-make/">automatic directory creation in make</a></p>
-<p>scanf方法存在内存溢出的可能性，微软提出了scanf_s函数，需要提供最多允许读取的长度，超出该长度的字符一律忽略掉。<br><a href="http://www.ruanyifeng.com/blog/2018/01/assembly-language-primer.html">汇编语言</a></p>
-<p><a href="https://www.youtube.com/watch?v=Slgwyta-JkA">windows平台使用visual studio创建C项目</a><br>File -&gt; new Project -&gt;Windows DeskTop Wizard -&gt; 选中Empty Project -&gt; 取消选中Precompile Header<br>然后右侧，source File,右键，new item。创建main.c(任意名字.c都是行的),然后写主函数。<br>运行的话，点上面的local windows debugger是可以的，但是会一闪而过。按下ctrl +F5，会出现console。</p>
+<h2 id="7-visual-studio等工具使用"><a href="#7-visual-studio等工具使用" class="headerlink" title="7. visual studio等工具使用"></a>7. visual studio等工具使用</h2><p><a href="https://www.youtube.com/watch?v=Slgwyta-JkA">windows平台使用visual studio创建C项目</a><br>File -&gt; new Project -&gt;Windows DeskTop Wizard -&gt; 选中Empty Project -&gt; 取消选中Precompile Header<br>然后右侧，source File,右键，new item。创建main.c(任意名字.c都是行的),然后写主函数。<br>运行的话，点上面的local windows debugger是可以的，但是会一闪而过。按下ctrl +F5，会出现console。</p>
 <p>visual studio中断点的step into是f11，step out of 是shift + f11 .step over是f10</p>
 <p>evaluate expression在右下角的immediate window中输入表达式即可</p>
 <p>visual studio中debug的时候有时候会出现Cannot find or open the PDB file<br><a href="https://software.intel.com/en-us/articles/visual-studio-debugger-cannot-find-or-open-the-pdb-file">intel说这种事不是error</a>。所以就不要去管好了。</p>
-<p>在C语言中没有泛型。故采用void 指针来实现泛型的效果。</p>
-<p>这段会core dump的</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span> *s1 = <span class="string">"hello"</span>; ##获得了一个指向字符串常量的指针</span><br><span class="line">*s1 = 'hey'; ##尝试修改常量，会segmentfault</span><br><span class="line">##这段也会core dump</span><br><span class="line"><span class="keyword">char</span>* s1 = <span class="string">"hello"</span>;</span><br><span class="line">s1 += <span class="number">1</span>;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"content %s\n"</span>,*s1);##崩在这里</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"content %s\n"</span>,s1);##改成这样就好了</span><br></pre></td></tr></table></figure>
-<p>preprocessor的套路一般是这样的<br>awesomeFunction.h<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> AWESOME_FUNCTION</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> AWESOME_FUNCTION</span></span><br><span class="line"></span><br><span class="line">## 实际的函数声明</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span> <span class="comment">//AWESOME_FUNCTION</span></span></span><br></pre></td></tr></table></figure></p>
-<p>c语言中不同头文件中的方法名或者外部变量是不能重名的（所以给方法起名字的时候要注意下），除非使用static关键字（只在该源文件内可以使用）  静态变量存放在全局数据区，不是在堆栈上，所以不存在堆栈溢出的问题。生命周期是整个程序的运行期。（static变量只在当前文件中可以使用，一旦退出当前文件的调用，就不可用，但如果运行期间又调用了该文件，那么static变量的值就会是刚才退出的时候的值，而不是default值）<br>设计和调用访问动态全局变量、静态全局变量、静态局部变量的函数时，需要考虑重入问题。<br><a href="https://segmentfault.com/q/1010000002512553/a-1020000002512728">函数名冲突的问题也可以用一个struct封起来</a></p>
-<p><a href="https://renenyffenegger.ch/notes/development/languages/C-C-plus-plus/GCC/create-libraries/index">dlopen和soname</a><br><a href="https://www.jianshu.com/p/46926f2ffef0">c语言const关键字</a>有的时候是说指针指向的对象不能动，有的时候说的是指针指向的值不能动</p>
-<p>size_t 和int差不多，估摸着是跨平台的一种表示。</p>
-<p><a href="https://mirkokiefer.com/cmake-by-example-f95eb47d45b1">cmake的教程，非常好</a></p>
-<p>autoconf和automake的使用教程</p>
+<p><a href="http://hahaya.github.io/build-libevent/">Linux下安装、配置libevent</a><br><a href="http://hahaya.github.io/hello-in-libevent/">使用libevent输出Hello</a></p>
 <p>unix下安装libevent的教程</p>
 <ol>
 <li>在官网上下载对应版本的包 </li>
@@ -300,12 +280,21 @@ ga('send', 'pageview');
 </blockquote>
 <p>照说一般这种library都是装在/usr/lib 或 /usr/local/lib 下的<br>ls -al /usr/lib | grep libevent<br>ls -al /usr/local/lib | grep libevent<br>试一下就行了</p>
 <p>printf(“Error: %d (%s)\n”, errno, strerror(errno))</p>
-<p><a href="https://github.com/ttroy50/cmake-examples">Useful CMake Examples</a></p>
+<h3 id="autoconf等工具的使用教程"><a href="#autoconf等工具的使用教程" class="headerlink" title="autoconf等工具的使用教程"></a>autoconf等工具的使用教程</h3><p>经常会看到项目里面的安装指南包括./configure make..<br>GNU的AUTOCONF和AUTOMAKE</p>
+<p>./config &amp;&amp; make &amp;&amp; sudo make install || exit 1</p>
+<p>比如说awk的安装过程是这样的<br>wget <a href="http://ftp.gnu.org/gnu/gawk/gawk-4.1.1.tar.xz">http://ftp.gnu.org/gnu/gawk/gawk-4.1.1.tar.xz</a><br>tar xvf gawk-4.1.1.tar.xz<br>cd gawk-4.1.1 &amp;&amp; ./configure<br>make<br>make check<br>sudo make install</p>
+<p>如何生成一个auto build file<br><a href="https://stackoverflow.com/questions/10999549/how-do-i-create-a-configure-script">auto build configure file</a></p>
+<p>autoconf和automake的使用教程</p>
+<h2 id="8-语法"><a href="#8-语法" class="headerlink" title="8. 语法"></a>8. 语法</h2><h3 id="指针"><a href="#指针" class="headerlink" title="指针"></a>指针</h3><p>在C语言中没有泛型。故采用void 指针来实现泛型的效果。</p>
+<p>这段会core dump的<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span> *s1 = <span class="string">"hello"</span>; ##获得了一个指向字符串常量的指针</span><br><span class="line">*s1 = 'hey'; ##编译期会警告：implicit conversion from 'int' to 'char' changes value from 6841721 to 121 [-Wconstant-conversion]。运行期会出现会 出现[1]    5972 bus error 。  改成s1 = 'hey'; 就好了</span><br><span class="line">##这段也会core dump</span><br><span class="line"><span class="keyword">char</span>* s1 = <span class="string">"hello"</span>;</span><br><span class="line">s1 += <span class="number">1</span>;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"content %s\n"</span>,*s1);##崩在这里</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"content %s\n"</span>,s1);##改成这样就好了</span><br></pre></td></tr></table></figure></p>
+<h3 id="static关键字"><a href="#static关键字" class="headerlink" title="static关键字"></a>static关键字</h3><p>c语言中不同头文件中的方法名或者外部变量是不能重名的（所以给方法起名字的时候要注意下），除非使用static关键字（只在该源文件内可以使用）  静态变量存放在全局数据区，不是在堆栈上，所以不存在堆栈溢出的问题。生命周期是整个程序的运行期。（static变量只在当前文件中可以使用，一旦退出当前文件的调用，就不可用，但如果运行期间又调用了该文件，那么static变量的值就会是刚才退出的时候的值，而不是default值）<br>设计和调用访问动态全局变量、静态全局变量、静态局部变量的函数时，需要考虑重入问题。<br><a href="https://segmentfault.com/q/1010000002512553/a-1020000002512728">函数名冲突的问题也可以用一个struct封起来</a><br><a href="https://www.jianshu.com/p/46926f2ffef0">c语言const关键字</a>有的时候是说指针指向的对象不能动，有的时候说的是指针指向的值不能动</p>
+<h3 id="c语言中的未定义行为-比如说数组越界"><a href="#c语言中的未定义行为-比如说数组越界" class="headerlink" title="c语言中的未定义行为(比如说数组越界)"></a>c语言中的未定义行为(比如说数组越界)</h3><h3 id="宏"><a href="#宏" class="headerlink" title="宏"></a>宏</h3><p>preprocessor的套路一般是这样的<br>awesomeFunction.h<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> AWESOME_FUNCTION</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> AWESOME_FUNCTION</span></span><br><span class="line"></span><br><span class="line">## 实际的函数声明</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span> <span class="comment">//AWESOME_FUNCTION</span></span></span><br></pre></td></tr></table></figure></p>
 <h3 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h3><p>c语言就是这样，好多功能都得自己实现</p>
 <blockquote>
 <p>c 语言有它的设计哲学，就是那著名的“Keep It Simple, Stupid”，语言本身仅仅实现最为基本的功能，然后标准库也仅仅带有最为基本的内存管理（更高效一点的内存池都必须要自己实现）、IO、断言等基本功能。 </p>
 </blockquote>
 <p>社区提供了一些比较优秀的通用功能库<br>[1] <a href="http://developer.gnome.org/glib/stable/">http://developer.gnome.org/glib/stable/</a><br>[2] <a href="http://www.gnu.org/software/gnulib/">http://www.gnu.org/software/gnulib/</a><br>[3] <a href="http://apr.apache.org/">http://apr.apache.org/</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://ismail.badawi.io/blog/2017/03/28/automatic-directory-creation-in-make/">automatic directory creation in make</a></p>
 
       
 
@@ -592,6 +581,14 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
@@ -640,10 +637,6 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
@@ -653,10 +646,6 @@ ga('send', 'pageview');
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">插件化</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">
