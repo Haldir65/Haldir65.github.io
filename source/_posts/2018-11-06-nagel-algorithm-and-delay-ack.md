@@ -55,7 +55,7 @@ end if
 
 一些关键词：
 
-acnowledged: TCP 傳送封包時會帶有流水號 ，起始值隨機，後面每傳 1 byte 就 +1。對方收到後會回傳 ACK 封包，帶有最後收到 byte 的數字。比方說收到 100 bytes，再收到 200 bytes，只要 ACK「起始值+300」即可。
+acknowledged: TCP 傳送封包時會帶有流水號 ，起始值隨機，後面每傳 1 byte 就 +1。對方收到後會回傳 ACK 封包，帶有最後收到 byte 的數字。比方說收到 100 bytes，再收到 200 bytes，只要 ACK「起始值+300」即可。
 
 sliding window: 允許傳送 unacked bytes 的最大值，確保在網路不佳的情況下，傳送端不會傳送過多封包加重擁塞。sliding window 的最大值是 2¹⁶ = 64 (KB)
 

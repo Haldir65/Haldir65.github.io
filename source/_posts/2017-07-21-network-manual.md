@@ -66,7 +66,7 @@ GET请求最后跟不跟斜杠"/"无所谓，但是POST请求最后面得跟"/"(
 Host: www.baidu.com\r\n 这样的一行，其实这是[Http头字段](https://zh.wikipedia.org/wiki/HTTP%E5%A4%B4%E5%AD%97%E6%AE%B5)的标准请求字段，总之就是标准。这个Host指的是服务器的域名，就是domain。
 wiki上的[http名词解释](https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6%9C%AC%E4%BC%A0%E8%BE%93%E5%8D%8F%E8%AE%AE)
 
-### 2.1 statusCode有些常用的还是要记住的：
+### 2.1 http statuscode有些常用的还是要记住的：
 [比较好的一个表格](http://www.cnblogs.com/mayingbao/archive/2007/11/30/978530.html)
 > 101 Switching Protocols (注意WebSocket)
 200 一切正常，对GET和POST请求的应答文档跟在后面。
@@ -84,6 +84,7 @@ wiki上的[http名词解释](https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6
 504 Gateway Timeout 由作为代理或网关的服务器使用，表示不能及时地从远程服务器获得应答。（HTTP 1.1新）
 [RFC在这里](https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.6)
 [http状态码451](https://juejin.im/entry/5770d05a2e958a0078f1d730)，由于法律上的原因不能显示网页内容
+[http状态码429 too many requests]
 
 ## 3. Header相关的
 首先看下请求百度首页的request和response

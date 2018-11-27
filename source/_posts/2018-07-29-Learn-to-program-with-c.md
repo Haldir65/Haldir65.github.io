@@ -12,6 +12,12 @@ C语言实用指南，暂时不涉及cpp内容
 ## 1.基本数据类型
 
 [C的基本数据类型还是很多的](https://zh.cppreference.com/w/cpp/language/types) 居然还有unsigned long long int 这种别扭的东西。
+size_t 和int差不多，估摸着是跨平台的一种表示。
+
+
+scanf方法存在内存溢出的可能性，微软提出了scanf_s函数，需要提供最多允许读取的长度，超出该长度的字符一律忽略掉。
+[汇编语言](http://www.ruanyifeng.com/blog/2018/01/assembly-language-primer.html)
+
 
 [string in c](https://dev-notes.eu/2018/08/strings-in-c/)
 char *name = "Bob"; //name指向的位置不能修改了，但是name可以指向别的东西.
@@ -147,7 +153,7 @@ example
 
 .so文件其实是shared object的缩写
 
-## Makefile怎么写
+## 4. Makefile怎么写
 [几个简单的makefile实例](http://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/)
 
 // 比方说写了三个文件,main.c,test.c,test.h。这是最简单的例子
@@ -155,18 +161,23 @@ main: main.c
     gcc -o main main.c test.c //ok,没问题了 
 
 [C Programming: Makefiles](https://www.youtube.com/watch?v=GExnnTaBELk)
+```
+make clean
 
+clean:
+    rm -f *.o program_name
+```
+因为手动rm可能写成
+rm -f * .o ##中间多一个空格
 
-make file automatic rule
-
-
+## 5. 静态库和动态库的区别及使用
 [static and dynamic libraries](https://www.geeksforgeeks.org/static-vs-dynamic-libraries/)
 
 static library把依赖的library都打包进去了，体积更大
 dynamic libvrary只是写了依赖的library的名称，运行时需要去操作系统中去找，会慢一些
 
 
-static libiray(compile time已完成link，而dynamic library需要在runtime完成link)
+### static libiray(compile time已完成link，而dynamic library需要在runtime完成link)
 
 查看archive文件中的内容
 ar -tv libmylib.a
@@ -204,65 +215,23 @@ export LD_LIBRARY_PATH=. ## 添加当前目录为查找路径
 //一般so文件都在/usr/lib或者/usr/local/lib文件夹下面
 locate sodium.so
 
-
 make wacky 也是可以的，可以指定编译target
 
+还有一种动态查找第三方库的方法
+[dlopen和soname](https://renenyffenegger.ch/notes/development/languages/C-C-plus-plus/GCC/create-libraries/index)
 
+## 6. 如何使用第三方库
 在c program中使用其他的library以及如何编译生成可执行文件
 
-make clean
-
-clean:
-    rm -f *.o program_name
-
-因为手动rm可能写成
-rm -f * .o 中间多一个空格
-
-[make file examples](https://www.tutorialspoint.com/makefile/makefile_example.htm)
-
-
-经常会看到项目里面的安装指南包括./configure make..
-GNU的AUTOCONF和AUTOMAKE
-
-./config && make && sudo make install || exit 1
-
-比如说awk的安装过程是这样的
-wget http://ftp.gnu.org/gnu/gawk/gawk-4.1.1.tar.xz
-tar xvf gawk-4.1.1.tar.xz
-cd gawk-4.1.1 && ./configure
-make
-make check
-sudo make install
-
-如何生成一个auto build file
-[auto build configure file](https://stackoverflow.com/questions/10999549/how-do-i-create-a-configure-script)
-[Linux下安装、配置libevent](http://hahaya.github.io/build-libevent/)
-[使用libevent输出Hello](http://hahaya.github.io/hello-in-libevent/)
-
-如何使用C语言第三方库
 [以mysql的c库为例](https://blog.csdn.net/yanxiangtianji/article/details/20474155)
 如果库在 usr/include/ 目录下，那么就用 #include < *.h >。这个目录下面放的都是些头文件
-
 如果库在当前目录下，就用　#include "mylib.h"
-
 gcc -v可以查看compile gcc时预设的链接静态库的搜索路径
-
-
 默认情况下， GCC在链接时优先使用动态链接库，只有当动态链接库不存在时才考虑使用静态链接库，如果需要的话可以在编译时加上-static选项，强制使用静态链接库。
-
 
 从项目结构来看,curl,ffmpeg这些都是一个文件夹里面放了所有的.h和.c文件。似乎没有其他语言的package的观念。我试了下，在Makefile里面带上文件夹的相对路径还是可以的。
 
-
-
-[automatic directory creation in make](http://ismail.badawi.io/blog/2017/03/28/automatic-directory-creation-in-make/)
-
-
-
-
-scanf方法存在内存溢出的可能性，微软提出了scanf_s函数，需要提供最多允许读取的长度，超出该长度的字符一律忽略掉。
-[汇编语言](http://www.ruanyifeng.com/blog/2018/01/assembly-language-primer.html)
-
+## 7. visual studio等工具使用
 [windows平台使用visual studio创建C项目](https://www.youtube.com/watch?v=Slgwyta-JkA)
 File -> new Project ->Windows DeskTop Wizard -> 选中Empty Project -> 取消选中Precompile Header
 然后右侧，source File,右键，new item。创建main.c(任意名字.c都是行的),然后写主函数。
@@ -275,48 +244,8 @@ evaluate expression在右下角的immediate window中输入表达式即可
 visual studio中debug的时候有时候会出现Cannot find or open the PDB file
 [intel说这种事不是error](https://software.intel.com/en-us/articles/visual-studio-debugger-cannot-find-or-open-the-pdb-file)。所以就不要去管好了。
 
-在C语言中没有泛型。故采用void 指针来实现泛型的效果。
-
-这段会core dump的
-
-```c
-char *s1 = "hello"; ##获得了一个指向字符串常量的指针
-*s1 = 'hey'; ##尝试修改常量，会segmentfault
-##这段也会core dump
-char* s1 = "hello";
-s1 += 1;
-printf("content %s\n",*s1);##崩在这里
-printf("content %s\n",s1);##改成这样就好了
-```
-
-preprocessor的套路一般是这样的
-awesomeFunction.h
-```C
-#ifndef AWESOME_FUNCTION
-#define AWESOME_FUNCTION
-
-## 实际的函数声明
-
-#endif //AWESOME_FUNCTION
-```
-
-
-
-
-c语言中不同头文件中的方法名或者外部变量是不能重名的（所以给方法起名字的时候要注意下），除非使用static关键字（只在该源文件内可以使用）  静态变量存放在全局数据区，不是在堆栈上，所以不存在堆栈溢出的问题。生命周期是整个程序的运行期。（static变量只在当前文件中可以使用，一旦退出当前文件的调用，就不可用，但如果运行期间又调用了该文件，那么static变量的值就会是刚才退出的时候的值，而不是default值）
-设计和调用访问动态全局变量、静态全局变量、静态局部变量的函数时，需要考虑重入问题。
-[函数名冲突的问题也可以用一个struct封起来](https://segmentfault.com/q/1010000002512553/a-1020000002512728)
-
-
-[dlopen和soname](https://renenyffenegger.ch/notes/development/languages/C-C-plus-plus/GCC/create-libraries/index)
-[c语言const关键字](https://www.jianshu.com/p/46926f2ffef0)有的时候是说指针指向的对象不能动，有的时候说的是指针指向的值不能动
-
-size_t 和int差不多，估摸着是跨平台的一种表示。
-
-
-[cmake的教程，非常好](https://mirkokiefer.com/cmake-by-example-f95eb47d45b1)
-
-autoconf和automake的使用教程
+[Linux下安装、配置libevent](http://hahaya.github.io/build-libevent/)
+[使用libevent输出Hello](http://hahaya.github.io/hello-in-libevent/)
 
 unix下安装libevent的教程
 1. 在官网上下载对应版本的包 
@@ -339,8 +268,60 @@ ls -al /usr/local/lib | grep libevent
 printf("Error: %d (%s)\n", errno, strerror(errno))
 
 
-[Useful CMake Examples](https://github.com/ttroy50/cmake-examples)
+### autoconf等工具的使用教程
+经常会看到项目里面的安装指南包括./configure make..
+GNU的AUTOCONF和AUTOMAKE
 
+./config && make && sudo make install || exit 1
+
+比如说awk的安装过程是这样的
+wget http://ftp.gnu.org/gnu/gawk/gawk-4.1.1.tar.xz
+tar xvf gawk-4.1.1.tar.xz
+cd gawk-4.1.1 && ./configure
+make
+make check
+sudo make install
+
+如何生成一个auto build file
+[auto build configure file](https://stackoverflow.com/questions/10999549/how-do-i-create-a-configure-script)
+
+autoconf和automake的使用教程
+
+
+## 8. 语法
+### 指针
+在C语言中没有泛型。故采用void 指针来实现泛型的效果。
+
+这段会core dump的
+```c
+char *s1 = "hello"; ##获得了一个指向字符串常量的指针
+*s1 = 'hey'; ##编译期会警告：implicit conversion from 'int' to 'char' changes value from 6841721 to 121 [-Wconstant-conversion]。运行期会出现会 出现[1]    5972 bus error 。  改成s1 = 'hey'; 就好了
+##这段也会core dump
+char* s1 = "hello";
+s1 += 1;
+printf("content %s\n",*s1);##崩在这里
+printf("content %s\n",s1);##改成这样就好了
+```
+
+### static关键字
+c语言中不同头文件中的方法名或者外部变量是不能重名的（所以给方法起名字的时候要注意下），除非使用static关键字（只在该源文件内可以使用）  静态变量存放在全局数据区，不是在堆栈上，所以不存在堆栈溢出的问题。生命周期是整个程序的运行期。（static变量只在当前文件中可以使用，一旦退出当前文件的调用，就不可用，但如果运行期间又调用了该文件，那么static变量的值就会是刚才退出的时候的值，而不是default值）
+设计和调用访问动态全局变量、静态全局变量、静态局部变量的函数时，需要考虑重入问题。
+[函数名冲突的问题也可以用一个struct封起来](https://segmentfault.com/q/1010000002512553/a-1020000002512728)
+[c语言const关键字](https://www.jianshu.com/p/46926f2ffef0)有的时候是说指针指向的对象不能动，有的时候说的是指针指向的值不能动
+
+### c语言中的未定义行为(比如说数组越界)
+
+### 宏
+preprocessor的套路一般是这样的
+awesomeFunction.h
+```C
+#ifndef AWESOME_FUNCTION
+#define AWESOME_FUNCTION
+
+## 实际的函数声明
+
+#endif //AWESOME_FUNCTION
+```
 
 ### 最后
 c语言就是这样，好多功能都得自己实现
@@ -350,4 +331,8 @@ c语言就是这样，好多功能都得自己实现
 [1] http://developer.gnome.org/glib/stable/ 
 [2] http://www.gnu.org/software/gnulib/ 
 [3] http://apr.apache.org/
+
+
+## 参考
+[automatic directory creation in make](http://ismail.badawi.io/blog/2017/03/28/automatic-directory-creation-in-make/)
 

@@ -505,3 +505,5 @@ void Java_com_example_core_audio_NativeRecorder_encodeFile(JNIEnv *env,
 	fclose(output_file);
 }
 ```
+
+[textview的高度](https://stackoverflow.com/questions/27631736/meaning-of-top-ascent-baseline-descent-bottom-and-leading-in-androids-font)

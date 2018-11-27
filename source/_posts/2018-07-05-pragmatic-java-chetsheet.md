@@ -472,6 +472,7 @@ ParameterizedType,TypeVariable,GenericArrayType,WildcardType（这四个全部�
 由于类型擦除，class对象中并不能保有编译前的类的信息，引入Type似乎是为了迎合反射的需要。
 
 
+todo
 反编译java代码的基本套路
 
 

@@ -24,13 +24,9 @@ top : 1
 - [ ] [仿门户网站js相册](https://www.js-css.cn/a/jscode/album/2014/0915/1319.html)， [js相册2](https://www.js-css.cn/a/jscode/album/2014/0914/1318.html)
 - [ ] [八大排序算法的python实现](http://python.jobbole.com/82270/)
 - [ ] [如何编写 jQuery 插件](https://gist.github.com/quexer/3619237)
-- [ ] 用正则检测或者解析json(jQuery源码里有)
-- [ ] JavaScript中new FileReader()，以及canvas api,以及[js进行图片缩放和裁剪](https://juejin.im/post/5a98c5c26fb9a028d82b34ee)
 - [ ] Redux和Flux很像,react context api
 - [ ] [一个展示如何在宿主App中提取一个apk文件并加载代码和资源](https://www.jianshu.com/p/a4ab102fa4ac)
 - [ ] nodejs ,go ,protobuf rpc
-- [ ] [indexed DB](http://www.ruanyifeng.com/blog/2018/07/indexeddb.html),浏览器端数据库，
-- [ ][content-disposition](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)
 - [ ] [在bash脚本中获取当前脚本所在路径](https://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within?rq=1)
 - [ ]一致性哈希原理
 - [ ] [使用redis实现低粒度的分布式锁](http://afghl.github.io/2018/06/17/distributed-lock-and-granarity.html)
@@ -39,31 +35,39 @@ top : 1
 - [ ] Coordinator behavior以及scroll原理，完善blog
 - [ ]Exoplayer and the MediaCodec api[building-a-video-player-app-in-android](https://medium.com/androiddevelopers/building-a-video-player-app-in-android-part-3-5-19543ea9d416)
 - [ ] instagram好像通过注解的方式自己写了一个json解析器[ig-json-parser](https://github.com/Instagram/ig-json-parser)
-- [ ] mqtt接入实践[mqtt是建立在tcp基础上的应用层协议](https://github.com/mcxiaoke/mqtt)，[netty](https://github.com/netty/netty)也做了实现
 - [ ] when it comes to design , how do we translate px, pt, em  into sp,dp and others(设计方面的，各种单位之间的转换)?
-- [ ] classloader和class的生命周期
 - [ ] python dunder class复习
-- [ ] ffmpeg 的js wrapper
-- [ ] learning how textView works is painful yet necessary
 - [ ][分词器](https://lxneng.com/posts/201)
-- [ ]rxjava是如何切换线程的以及源码解析
-- [ ]logstash接管软件日志
-- [ ]shadowsocks-android源码
-- [ ]a new article on open-gl intro(on going)
-- [ ]render-script utility
-- [ ]play around with xposed
-- [ ]tcp-proxy实用教程
-- [ ]linux环境下多进程通讯方式(管道，共享内存，信号,unix domian socket)
-- [ ]python gui编程
-- [ ]kotlin的coroutine
-- [ ]宇宙第一ide熟悉使用
-- [ ]js的闭包等面试常谈
-- [ ]java的aspectJ教程
-- [ ] autoWired, autovalue这些java 的library
-- [ ]code generator(代码生成器)
-- [ ]python 的asyncio(in progress)
+- [ ] classloader和class的生命周期
+- [ ] learning how textView works is painful yet necessary
+- [ ] rxjava是如何切换线程的以及源码解析
+- [ ] shadowsocks-android源码
+- [ ] chromium net移植到Android平台[cronet是最简单的方式](https://github.com/GoogleChromeLabs/cronet-sample)
+- [ ] linux环境下多进程通讯方式(管道，共享内存，信号,unix domian socket)
+- [ ] mqtt接入实践[mqtt是建立在tcp基础上的应用层协议](https://github.com/mcxiaoke/mqtt)，[netty](https://github.com/netty/netty)也做了实现
+- [ ] logstash接管软件日志
 - [ ] [Paging Technique : Memory management in Operating System](https://www.youtube.com/watch?v=0Rf5Jc61ArM)
 - [ ] [block size vs page size](http://forums.justlinux.com/showthread.php?3261-Block-size-vs-page-size)
+- [ ] render-script utility
+- [ ] ffmpeg 的js wrapper
+- [ ] play around with xposed
+- [ ] tcp-proxy实用教程
+- [ ] python gui编程
+- [ ] kotlin的coroutine[production-ready]
+- [ ] 宇宙第一ide熟悉使用
+- [ ] js的闭包等面试常谈
+- [ ] java的aspectJ教程
+- [ ] autoWired, autovalue这些java 的library
+- [ ] code generator(代码生成器)
+- [ ] python 的asyncio(in progress)
+- [ ] [indexed DB](http://www.ruanyifeng.com/blog/2018/07/indexeddb.html),浏览器端数据库，
+- [ ][content-disposition](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)
+- [ ] a new article on open-gl intro(on going)
+- [ ] JavaScript中new FileReader()，以及canvas api,以及[js进行图片缩放和裁剪](https://juejin.im/post/5a98c5c26fb9a028d82b34ee)
+- [ ] 用正则检测或者解析json(jQuery源码里有)
+
+
+
 
 ### 已完成
 * 用 express 转接一个知乎 Api，添加 Access-control-allow-origin,或许还可以用 redis 缓存数据结果（一个就好）由此想到一篇文章"How to use Pythonto build a restful Web Service".只不过用的是 Tornado
