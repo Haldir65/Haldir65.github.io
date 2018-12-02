@@ -46,8 +46,6 @@ top : 1
 - [ ] linux环境下多进程通讯方式(管道，共享内存，信号,unix domian socket)
 - [ ] mqtt接入实践[mqtt是建立在tcp基础上的应用层协议](https://github.com/mcxiaoke/mqtt)，[netty](https://github.com/netty/netty)也做了实现
 - [ ] logstash接管软件日志
-- [ ] [Paging Technique : Memory management in Operating System](https://www.youtube.com/watch?v=0Rf5Jc61ArM)
-- [ ] [block size vs page size](http://forums.justlinux.com/showthread.php?3261-Block-size-vs-page-size)
 - [ ] render-script utility
 - [ ] ffmpeg 的js wrapper
 - [ ] play around with xposed
@@ -59,12 +57,12 @@ top : 1
 - [ ] java的aspectJ教程
 - [ ] autoWired, autovalue这些java 的library
 - [ ] code generator(代码生成器)
-- [ ] python 的asyncio(in progress)
-- [ ] [indexed DB](http://www.ruanyifeng.com/blog/2018/07/indexeddb.html),浏览器端数据库，
 - [ ][content-disposition](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)
-- [ ] a new article on open-gl intro(on going)
 - [ ] JavaScript中new FileReader()，以及canvas api,以及[js进行图片缩放和裁剪](https://juejin.im/post/5a98c5c26fb9a028d82b34ee)
 - [ ] 用正则检测或者解析json(jQuery源码里有)
+- [ ] a new article on open-gl intro(on going)
+- [ ] python 的asyncio(in progress)
+- [ ] awk，正则表达式这些也算一门编程语言
 
 
 
@@ -104,6 +102,8 @@ top : 1
 - [X]js 的async await,就是一个async修饰一个method，里面随便写await
 - [X] Linux下TCP延迟确认机制
 - [X]c语言的[libevent使用教程](https://yq.aliyun.com/articles/413601) eventloop，添加回调，大致的流程就是这样
+- [X] [indexed DB](http://www.ruanyifeng.com/blog/2018/07/indexeddb.html),浏览器端数据库，还是用第三方库好
+- [X] [block size vs page size](http://forums.justlinux.com/showthread.php?3261-Block-size-vs-page-size) Page是内存相关，block是硬盘相关的
 
 
 

@@ -100,7 +100,7 @@ ss 命令
 ssserver -c /etc/shadowsocks/config.json # 前台运行
 
 ### 后台运行和停止
-ssserver -c /etc/shadowsocks.json -d start
+ssserver -c /etc/shadowsocks.json -d start -q ##加上-q是quiet的意思，only show warning and error
 ssserver -c /etc/shadowsocks.json -d stop
 
 ###  加入开机启动

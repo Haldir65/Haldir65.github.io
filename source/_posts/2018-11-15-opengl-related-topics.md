@@ -5,7 +5,11 @@ tags:
 ---
 
 topics relating opengl stuff
+![](https://www.haldir66.ga/static/imgs/scenery151110074347.jpg)
+
 <!--more-->
+首先，[不要学旧的版本](https://medium.com/@wrongway4you/opengl-learning-in-2018-d556d96d7e7)。
+It is much better to start from the “modern” OpenGL versions: Learn OpenGL >3.0.
 
 opengl device support on android
 
