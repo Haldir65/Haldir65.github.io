@@ -8,19 +8,19 @@
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>cmake实用手册 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="cmake学习笔记">
+  <meta name="description" content="当我们敲下cmake命令的时候，cmake会在当前目录下找CMakeLists.txt这个文件，找不到会报错的">
 <meta name="keywords" content="linux,C">
 <meta property="og:type" content="article">
 <meta property="og:title" content="cmake实用手册">
 <meta property="og:url" content="https://haldir65.github.io/2018/11/26/2018-11-26-cmake-intro/index.html">
 <meta property="og:site_name" content="Haldir的博客">
-<meta property="og:description" content="cmake学习笔记">
+<meta property="og:description" content="当我们敲下cmake命令的时候，cmake会在当前目录下找CMakeLists.txt这个文件，找不到会报错的">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/fresh-sparkle-dew-drops-on-red-flower-wallpaper-53861cf580909.jpg">
-<meta property="og:updated_time" content="2018-11-27T11:35:47.677Z">
+<meta property="og:updated_time" content="2018-12-02T14:41:28.281Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="cmake实用手册">
-<meta name="twitter:description" content="cmake学习笔记">
+<meta name="twitter:description" content="当我们敲下cmake命令的时候，cmake会在当前目录下找CMakeLists.txt这个文件，找不到会报错的">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/fresh-sparkle-dew-drops-on-red-flower-wallpaper-53861cf580909.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
@@ -200,8 +200,72 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>cmake学习笔记<br><img src="https://www.haldir66.ga/static/imgs/fresh-sparkle-dew-drops-on-red-flower-wallpaper-53861cf580909.jpg" alt=""><br><a id="more"></a></p>
-<p><a href="https://mirkokiefer.com/cmake-by-example-f95eb47d45b1">cmake的教程，非常好</a><br><a href="https://github.com/ttroy50/cmake-examples">Useful CMake Examples</a></p>
+        <p>当我们敲下cmake命令的时候，cmake会在当前目录下找CMakeLists.txt这个文件，找不到会报错的</p>
+<p><img src="https://www.haldir66.ga/static/imgs/fresh-sparkle-dew-drops-on-red-flower-wallpaper-53861cf580909.jpg" alt=""><br><a id="more"></a></p>
+<p>下面就是最简单的一个CMakeLists.txt的例子，project(hello_cmake)是一个函数，该函数生成了PROJECT_NAME这个变量，所以下面直接用了。add_executable（）第一个参数是要生成的可执行文件的名字，第二个参数(其实可以包括所有编译需要的源文件)</p>
+<blockquote>
+<p>cmake_minimum_required(VERSION 3.5)<br>project (hello_cmake)<br>add_executable(${PROJECT_NAME} main.cpp)</p>
+</blockquote>
+<p>这个更简单</p>
+<blockquote>
+<p>cmake_minimum_required(VERSION 2.8)<br>project(app_project)<br>add_executable(myapp main.c)<br>install(TARGETS myapp DESTINATION bin)</p>
+</blockquote>
+<p>生成Makefile<br>mkdir _build &amp;&amp; cd _build &amp;&amp; cmake .. -DCMAKE_INSTALL_PREFIX=../_install<br>生成的Makefile拿来用:<br>make &amp;&amp; make install<br>省的手写Makefile了</p>
+<p>cmake支持In-Place Build和Out-of-Source Build。前者是直接在当前文件夹（CMAKE_BINARY_DIR）中生成一大堆文件（太乱了），后者则是在一个指定的文件夹中生成文件。<br>Out-of-source build其实很简单<br>mkdir build &amp;&amp; cd build/ &amp;&amp; cmake .. (在build文件夹中会生成一个Makefile)<br>make &amp;&amp; ./hello_cmake </p>
+<p>一堆内置的变量供参考</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Info</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CMAKE_SOURCE_DIR</td>
+<td>The root source directory</td>
+</tr>
+<tr>
+<td>CMAKE_CURRENT_SOURCE_DIR</td>
+<td>The current source directory if using sub-projects and directories.</td>
+</tr>
+<tr>
+<td>PROJECT_SOURCE_DIR</td>
+<td>The source directory of the current cmake project.</td>
+</tr>
+<tr>
+<td>CMAKE_BINARY_DIR</td>
+<td>The root binary / build directory. This is the directory where you ran the cmake command.</td>
+</tr>
+<tr>
+<td>CMAKE_CURRENT_BINARY_DIR</td>
+<td>The build directory you are currently in.</td>
+</tr>
+<tr>
+<td>PROJECT_BINARY_DIR</td>
+<td>The build directory for the current project.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="header文件的处理"><a href="#header文件的处理" class="headerlink" title="header文件的处理"></a>header文件的处理</h3><p>可以指定多个源文件</p>
+<blockquote>
+<p>set(SOURCES<br>    src/Hello.cpp<br>    src/main.cpp<br>)<br>add_executable(${PROJECT_NAME} ${SOURCES})<br>//或者直接把src文件夹下面的所有.cpp文件加入进来<br>file(GLOB SOURCES “src/*.cpp”)</p>
+</blockquote>
+<h3 id="对于include文件夹"><a href="#对于include文件夹" class="headerlink" title="对于include文件夹"></a>对于include文件夹</h3><blockquote>
+<p>target_include_directories(target<br>    PRIVATE<br>        ${PROJECT_SOURCE_DIR}/include<br>)<br>这样编译器就会在编译参数上加上-I/directory/path这种东西</p>
+</blockquote>
+<h3 id="static-library的处理"><a href="#static-library的处理" class="headerlink" title="static library的处理"></a>static library的处理</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">cmake_minimum_required(VERSION 3.5)</span><br><span class="line"></span><br><span class="line">project(hello_library)</span><br><span class="line"></span><br><span class="line">############################################################</span><br><span class="line"># Create a library</span><br><span class="line">############################################################</span><br><span class="line"></span><br><span class="line">#Generate the static library from the library sources</span><br><span class="line">add_library(hello_library STATIC </span><br><span class="line">    src/Hello.cpp //创建一个libhello_library.a 的static library</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">target_include_directories(hello_library</span><br><span class="line">    PUBLIC </span><br><span class="line">        $&#123;PROJECT_SOURCE_DIR&#125;/include</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">############################################################</span><br><span class="line"># Create an executable</span><br><span class="line">############################################################</span><br><span class="line"></span><br><span class="line"># Add an executable with the above sources</span><br><span class="line">add_executable(hello_binary </span><br><span class="line">    src/main.cpp</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"># link the new hello_library target with the hello_binary target</span><br><span class="line">target_link_libraries( hello_binary</span><br><span class="line">    PRIVATE </span><br><span class="line">        hello_library</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<h3 id="shared-library的处理"><a href="#shared-library的处理" class="headerlink" title="shared library的处理"></a>shared library的处理</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">cmake_minimum_required(VERSION 3.5)</span><br><span class="line"></span><br><span class="line">project(hello_library)</span><br><span class="line"></span><br><span class="line">############################################################</span><br><span class="line"># Create a library</span><br><span class="line">############################################################</span><br><span class="line"></span><br><span class="line">#Generate the shared library from the library sources</span><br><span class="line">add_library(hello_library SHARED </span><br><span class="line">    src/Hello.cpp  // 用传入该函数的文件创建一个 libhello_library.so Library</span><br><span class="line">)</span><br><span class="line">add_library(hello::library ALIAS hello_library)</span><br><span class="line"></span><br><span class="line">target_include_directories(hello_library //hello_library需要这个include directory</span><br><span class="line">    PUBLIC </span><br><span class="line">        $&#123;PROJECT_SOURCE_DIR&#125;/include  </span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">############################################################</span><br><span class="line"># Create an executable</span><br><span class="line">############################################################</span><br><span class="line"></span><br><span class="line"># Add an executable with the above sources</span><br><span class="line">add_executable(hello_binary</span><br><span class="line">    src/main.cpp</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"># link the new hello_library target with the hello_binary target</span><br><span class="line">target_link_libraries( hello_binary // 接下来就是Link了，这里使用了上面的一个alias</span><br><span class="line">    PRIVATE </span><br><span class="line">        hello::library</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<h3 id="接下来是make-install-将生成的可执行文件安装到系统中，似乎就是复制到-usr-bin里面"><a href="#接下来是make-install-将生成的可执行文件安装到系统中，似乎就是复制到-usr-bin里面" class="headerlink" title="接下来是make install (将生成的可执行文件安装到系统中，似乎就是复制到/usr/bin里面)"></a>接下来是make install (将生成的可执行文件安装到系统中，似乎就是复制到/usr/bin里面)</h3><p>默认情况下cmake会把生成的可执行文件安装到系统中，我们可以指定安装到特定的位置<br>cmake .. -DCMAKE_INSTALL_PREFIX=/install/location</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">install (TARGETS cmake_examples_inst_bin</span><br><span class="line">    DESTINATION bin)</span><br><span class="line">// target cmake_examples_inst_bin target to the destination $&#123;CMAKE_INSTALL_PREFIX&#125;/bin</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">install (TARGETS cmake_examples_inst</span><br><span class="line">    LIBRARY DESTINATION lib) </span><br><span class="line">//install the shared library generated from the target cmake_examples_inst target to the destination $&#123;CMAKE_INSTALL_PREFIX&#125;/lib</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>$ ls /usr/local/bin/<br>cmake_examples_inst_bin</p>
+<p>$ ls /usr/local/lib<br>libcmake_examples_inst.so</p>
+<p>$ ls /usr/local/etc/<br>cmake-examples.conf</p>
+<p>$ LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib cmake_examples_inst_bin<br>Hello Install! //把生成的bin文件复制到/sur/local/bin目录下，再修改LDPATH,就能去/usr/locallib这个目录去找生成的library了</p>
+</blockquote>
+<p>[todo]Autotools and Make教程</p>
+<p><a href="https://mirkokiefer.com/cmake-by-example-f95eb47d45b1">cmake的教程，非常好</a><br><a href="https://github.com/ttroy50/cmake-examples">Useful CMake Examples</a>本文来自这里的实例</p>
 
       
 
@@ -460,11 +524,11 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">linux</a>
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+                <a href="javascript:void(0)" class="js-tag color1">linux</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -552,15 +616,15 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
