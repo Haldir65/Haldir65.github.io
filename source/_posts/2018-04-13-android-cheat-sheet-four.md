@@ -506,4 +506,6 @@ void Java_com_example_core_audio_NativeRecorder_encodeFile(JNIEnv *env,
 }
 ```
 
-[textview的高度](https://stackoverflow.com/questions/27631736/meaning-of-top-ascent-baseline-descent-bottom-and-leading-in-androids-font)
+### 17. Android平台上native的crash其实是可以catch的
+Chromium 的Breakpad是目前 Native 崩溃捕获中最成熟的方案
+

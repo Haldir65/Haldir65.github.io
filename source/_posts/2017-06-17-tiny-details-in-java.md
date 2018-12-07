@@ -509,7 +509,7 @@ public class Test {
 ```
 其实重点在于看javap -c 生成的字节码
 
-[ternary operator也会造成npe](https://stackoverflow.com/questions/25996591/java-ternary-operator-npe-autoboxing-string)
+[ternary operator也会造成npe]三目运算符会隐式转型(https://stackoverflow.com/questions/25996591/java-ternary-operator-npe-autoboxing-string)
 > This is happening because the type return by a ternary operator is the type of the first returned value. In this case, that's the primitive value false. So Java is trying to take the primitive boolean returned by the ternary operator, then use autoboxing to convert it to a wrapper Boolean. But then you return a null from the ternary operator. And then when Java tries to autobox it, it throws an NPE because null can't be autoboxed. You should either use wrapper Booleans as the values in the ternary operator, or restructure this using if statements.
 
 简单来讲，ternary operator返回值的类型是第一个return值的类型(在这里就是boolean)，但返回一个Null的话，null并不能被autoBoxing，所以崩了。

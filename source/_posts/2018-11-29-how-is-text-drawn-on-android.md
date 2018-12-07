@@ -26,10 +26,8 @@ Layout有BoringLayout(一行文字),StaticLayout(多行文字)和DynamicLayout(�
 在某些版本的Android上，TextView碰到中英文夹杂的时候，会出现提前换行(普遍的看法是Layout这个类里面处理全角符号的时候算错了)
 
 
-
-
-
-
+## 参考
+[Textview的高度ascent,descent这些的详细解说](https://stackoverflow.com/questions/27631736/meaning-of-top-ascent-baseline-descent-bottom-and-leading-in-androids-font)
 [TextView预渲染研究](http://ragnraok.github.io/textview-pre-render-research.html)
 [instagram的文章](https://instagram-engineering.com/improving-comment-rendering-on-android-a77d5db3d82e)
 [Best practices for text on Android (Google I/O '18)](https://www.youtube.com/watch?v=x-FcOX6ErdI)

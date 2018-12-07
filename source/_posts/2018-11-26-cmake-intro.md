@@ -168,7 +168,19 @@ cmake-examples.conf
 Hello Install! //把生成的bin文件复制到/sur/local/bin目录下，再修改LDPATH,就能去/usr/locallib这个目录去找生成的library了
 
 
-[todo]Autotools and Make教程
+## Autotools and Make教程
+GNU Autotools 一般指的是3个 GNU 工具包：Autoconf，Automake 和 Libtool (本文先介绍前两个工具，Libtool留到今后介绍)
+它们能解决什么问题，要先从 GNU 开源软件的 Build 系统说起。一般来说。GNU 软件的安装过程都是：
 
+解压源代码包
+./configure
+make
+make install
+这个过程中， 需要有一个 configure 脚本，同时也需要一个 Makefile 文件。
+
+而 Autoconf 和 Automake 就是一套自动生成 configure 脚本和 Makefile 文件的工具。
+
+## 
 [cmake的教程，非常好](https://mirkokiefer.com/cmake-by-example-f95eb47d45b1)
 [Useful CMake Examples](https://github.com/ttroy50/cmake-examples)本文来自这里的实例
+[autotools教程](http://www.lugod.org/presentations/autotools/presentation/autotools.pdf)

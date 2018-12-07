@@ -20,4 +20,8 @@ opengl device support on android
 
 OpenGL ES is a variant of OpenGL’s specifications for embedded system. 
 
+
+## 
 [opengles guide on android](https://developer.android.com/guide/topics/graphics/opengl)
+
+[real sample](https://github.com/doggycoder/AndroidOpenGLDemo)

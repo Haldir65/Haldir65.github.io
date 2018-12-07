@@ -62,7 +62,7 @@ top : 1
 - [ ] 用正则检测或者解析json(jQuery源码里有)
 - [ ] a new article on open-gl intro(on going)
 - [ ] python 的asyncio(in progress)
-- [ ] awk，正则表达式这些也算一门编程语言
+- [ ] awk，正则表达式还有数据库这些也算一门编程语言
 
 
 
