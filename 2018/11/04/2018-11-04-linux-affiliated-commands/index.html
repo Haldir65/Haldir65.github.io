@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/green_forset_alongside_river_2.jpg">
-<meta property="og:updated_time" content="2018-12-07T15:26:48.432Z">
+<meta property="og:updated_time" content="2018-12-09T13:31:57.279Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="linux常用命令(三)">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/green_forset_alongside_river_2.jpg">
@@ -216,6 +216,12 @@ ga('send', 'pageview');
 <blockquote>
 <p>stat test</p>
 </blockquote>
+<p>c语言下对应的函数在sys/stat.h头文件中<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">stat</span> <span class="title">filestat</span>;</span></span><br><span class="line">    stat(<span class="string">"/etc/sysctl.conf"</span>, &amp;filestat);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"size: %ld bytes, uid: %d, gid: %d, mode: %#o\n"</span>, filestat.st_size, filestat.st_uid, filestat.st_gid, filestat.st_mode);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>windows的换行符是 \r\l，linux的是 \l，mac的是 \r<br>从根本上讲，二进制文件和文本文件在磁盘中没有区别，都是以二进制的形式存储<br>二进制和文本模式的区别在于对换行符和一些非可见字符的转化上，如非必要，是使用二进制读取会比较安全一些</p>
+</blockquote>
+<p>因为 Windows 和 Linux 中的换行符不一致，前者使用CRLF(即\r\n)表示换行，后者则使用LF(即\n)表示换行<br>而C语言本身使用LF(即\n)表示换行，所以在文本模式下，需要转换格式(如Windows)，但是在 Linux 下，文本模式和二进制模式就没有什么区别</p>
+<p>另外，以文本方式打开时，遇到结束符CTRLZ(0x1A)就认为文件已经结束<br>所以，若使用文本方式打开二进制文件，就很容易出现文件读不完整，或內容不对的错误<br>即使是用文本方式打开文本文件，也要谨慎使用，比如复制文件，就不应该使用文本方式</p>
 
       
 
@@ -513,10 +519,6 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
               </li>
              
@@ -578,6 +580,10 @@ ga('send', 'pageview');
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">

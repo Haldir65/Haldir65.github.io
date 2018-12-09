@@ -8,13 +8,14 @@
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>tcp和udp包结构分析 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="article">
+  <meta name="keywords" content="linux,tools">
+<meta property="og:type" content="article">
 <meta property="og:title" content="tcp和udp包结构分析">
 <meta property="og:url" content="https://haldir65.github.io/2018/12/03/2018-12-03-packet-structure-of-tcp-and-udp/index.html">
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/AlanTuringNotebook_EN-AU7743633207_1920x1080.jpg">
-<meta property="og:updated_time" content="2018-12-07T15:26:48.432Z">
+<meta property="og:updated_time" content="2018-12-09T13:31:57.279Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="tcp和udp包结构分析">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/AlanTuringNotebook_EN-AU7743633207_1920x1080.jpg">
@@ -197,6 +198,29 @@ ga('send', 'pageview');
     <div class="article-entry" itemprop="articleBody">
       
         <p><img src="https://www.haldir66.ga/static/imgs/AlanTuringNotebook_EN-AU7743633207_1920x1080.jpg" alt=""><br><a id="more"></a></p>
+<blockquote>
+<p>多数内容来自<a href="https://jerryc8080.gitbooks.io/understand-tcp-and-udp/chapter2.html">TCP 报文结构</a><br>同一台机器上的两个进程，可以通过管道，共享内存，信号量，消息队列等方式进行通信。通信的一个基本前提是每个进程都有唯一的标识，在同一台机器上，使用pid就可以了。两台不同的计算机之间通信，可以使用<strong>ip地址 + 协议 +协议端口号</strong> 来标识网络中的唯一进程。<br>tcp用16位端口号来标识一个端口，也就是两个bytes(65536就这么来的)。</p>
+</blockquote>
+<p>什么是报文？<br>例如一个 100kb 的 HTML 文档需要传送到另外一台计算机，并不会整个文档直接传送过去，可能会切割成几个部分，比如四个分别为 25kb 的数据段。<br>而每个数据段再加上一个 TCP 首部，就组成了 TCP 报文。<br>一共四个 TCP 报文，发送到另外一个端。<br>另外一端收到数据包，然后再剔除 TCP 首部，组装起来。<br>等到四个数据包都收到了，就能还原出来一个完整的 HTML 文档了。<br>在 OSI 的七层协议中，第二层（数据链路层）的数据叫「Frame」，第三层（网络层）上的数据叫「Packet」，第四层（传输层）的数据叫「Segment」。<br>TCP 报文 (Segment)，包括首部和数据部分。</p>
+<p>TCP 报文段首部的前20个字节是固定的，后面有 4N 字节是根据需要而增加的。<br>TCP 的首部包括以下内容：</p>
+<ul>
+<li>源端口 source port</li>
+<li>目的端口 destination port</li>
+<li>序号 sequence number</li>
+<li>确认号 acknowledgment number</li>
+<li>数据偏移 offset</li>
+<li>保留 reserved</li>
+<li>标志位 tcp flags</li>
+<li>窗口大小 window size</li>
+<li>检验和 checksum</li>
+<li>紧急指针 urgent pointer</li>
+<li>选项 tcp options</li>
+</ul>
+<h3 id="连接建立过程"><a href="#连接建立过程" class="headerlink" title="连接建立过程"></a>连接建立过程</h3><p>TCP 连接的建立采用客户服务器方式，主动发起连接建立的一方叫客户端（Client），被动等待连接建立的一方叫服务器（Server）。<br>最初的时候，两端都处于 CLOSED 的状态，然后服务器打开了 TCP 服务，进入 LISTEN 状态，监听特定端口，等待客户端的 TCP 请求。<br>第一次握手： 客户端主动打开连接，发送 TCP 报文，进行第一次握手，然后进入 SYN_SEND 状态，等待服务器发回确认报文。<br>这时首部的同步位 SYN = 1，同时初始化一个序号 Sequence Number = J。<br>TCP 规定，SYN 报文段不能携带数据，但会消耗一个序号。<br>第二次握手： 服务器收到了 SYN 报文，如果同意建立连接，则向客户端发送一个确认报文，然后服务器进入 SYN_RCVD 状态。<br>这时首部的 SYN = 1，ACK = 1，而确认号 Acknowledgemt Number = J + 1，同时也为自己初始化一个序号 Sequence Number = K。<br>这个报文同样不携带数据。<br>第三次握手：<br>客户端收到了服务器发过来的确认报文，还要向服务器给出确认，然后进入 ESTABLISHED 状态。<br>这时首部的 SYN 不再置为 1，而 ACK = 1，确认号 Acknowledgemt Number = K + 1，序号 Sequence Number = J + 1。<br>第三次握手，一般会携带真正需要传输的数据，当服务器收到该数据报文的时候，就会同样进入 ESTABLISHED 状态。 此时，TCP 连接已经建立。<br>对于建立连接的三次握手，主要目的是初始化序号 Sequence Number，并且通信的双方都需要告知对方自己的初始化序号，所以这个过程也叫 SYN。<br>这个序号要作为以后的数据通信的序号，以保证应用层接收到的数据不会因为网络上的传输问题而乱序，因为TCP 会用这个序号来拼接数据。</p>
+<h3 id="TCP-Flood-攻击"><a href="#TCP-Flood-攻击" class="headerlink" title="TCP Flood 攻击"></a>TCP Flood 攻击</h3><p>知道了 TCP 建立一个连接，需要进行三次握手。<br>但如果你开始思考「三次握手的必要性」的时候，就会知道，其实网络是很复杂的，一个信息在途中丢失的可能性是有的。<br>如果数据丢失了，那么，就需要重新发送，这时候就要知道数据是否真的送达了。<br>这就是三次握手的必要性。<br>但是再向深一层思考，你给我发信息，我收到了，我回复，因为我是君子。<br>如果是小人，你给我发信息，我就算收到了，我也不回复，你就一直等我着我的回复。<br>那么很多小人都这样做，你就要一直记住你在等待着小人1号、小人2号、小人3号……直到你的脑容量爆棚，烧坏脑袋。<br>黑客就是利用这样的设计缺陷，实施 TCP Flood 攻击，属于 DDOS 攻击的一种。</p>
+<h3 id="四次挥手，释放连接"><a href="#四次挥手，释放连接" class="headerlink" title="四次挥手，释放连接"></a>四次挥手，释放连接</h3><p>TCP 有一个特别的概念叫做半关闭，这个概念是说，TCP 的连接是全双工（可以同时发送和接收）的连接，因此在关闭连接的时候，必须关闭传送和接收两个方向上的连接。<br>客户端给服务器发送一个携带 FIN 的 TCP 结束报文段，然后服务器返回给客户端一个 确认报文段，同时发送一个 结束报文段，当客户端回复一个 确认报文段 之后，连接就结束了。<br>释放连接过程<br>在结束之前，通信双方都是处于 ESTABLISHED 状态，然后其中一方主动断开连接。<br>下面假如客户端先主动断开连接。<br>第一次挥手：<br>客户端向服务器发送结束报文段，然后进入 FIN_WAIT_1 状态。<br>此报文段 FIN = 1， Sequence Number = M。<br>第二次挥手：<br>服务端收到客户端的结束报文段，然后发送确认报文段，进入 CLOSE_WAIT 状态。<br>此报文段 ACK = 1， Sequence Number = M + 1。<br>客户端收到该报文，会进入 FIN_WAIT_2 状态。<br>第三次挥手：<br>同时服务端向客户端发送结束报文段，然后进入 LAST_ACK 状态。<br>此报文段 FIN = 1，Sequence Number = N。<br>第四次挥手：<br>客户端收到服务端的结束报文段，然后发送确认报文段，进入 TIME_WAIT 状态，经过 2MSL 之后，自动进入 CLOSED 状态。<br>此报文段 ACK = 1, Sequence Number = N + 1。<br>服务端收到该报文之后，进入 CLOSED 状态。<br>关于 TIME_WAIT 过渡到 CLOSED 状态说明：<br>从 TIME_WAIT 进入 CLOSED 需要经过 2MSL，其中 MSL 就叫做 最长报文段寿命（Maxinum Segment Lifetime），根据 RFC 793 建议该值这是为 2 分钟，也就是说需要经过 4 分钟，才进入 CLOSED 状态。</p>
+<h3 id="可靠性交付的实现"><a href="#可靠性交付的实现" class="headerlink" title="可靠性交付的实现"></a>可靠性交付的实现</h3><p>滑动窗口<br>超时重传<br>流量控制<br>拥塞控制</p>
+<p>##TBD</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://jerryc8080.gitbooks.io/understand-tcp-and-udp/">TCP 报文结构</a><br><a href="https://www.google.com/search?q=tcp%E5%8C%85%E7%BB%93%E6%9E%84">tcp包结构</a></p>
 
       
@@ -227,6 +251,21 @@ ga('send', 'pageview');
     <div class="article-info article-info-index">
       
       
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">linux</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">tools</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
       
 
       
@@ -291,11 +330,11 @@ ga('send', 'pageview');
   
 <nav id="article-nav">
   
-    <a href="/2046/12/18/2017-12-18-random-new-thoughts/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2018/12/06/2018-12-06-select-poll-epoll/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          即刻备忘录
+          select、poll、epoll学习笔记
         
       </div>
     </a>
@@ -469,10 +508,6 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
               </li>
              
@@ -534,6 +569,10 @@ ga('send', 'pageview');
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">

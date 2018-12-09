@@ -17,7 +17,7 @@
 <meta property="og:description" content="C语言实用指南，暂时不涉及cpp内容">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/pretty-orange-mushroom-wallpaper-5386b0c8c3459.jpg">
-<meta property="og:updated_time" content="2018-12-07T15:26:48.432Z">
+<meta property="og:updated_time" content="2018-12-09T13:31:57.279Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="C语言学习手册">
 <meta name="twitter:description" content="C语言实用指南，暂时不涉及cpp内容">
@@ -202,7 +202,60 @@ ga('send', 'pageview');
       
         <p>C语言实用指南，暂时不涉及cpp内容<br><img src="https://haldir66.ga/static/imgs/pretty-orange-mushroom-wallpaper-5386b0c8c3459.jpg" alt=""><br><a id="more"></a></p>
 <h2 id="1-基本数据类型"><a href="#1-基本数据类型" class="headerlink" title="1.基本数据类型"></a>1.基本数据类型</h2><p><a href="https://zh.cppreference.com/w/cpp/language/types">C的基本数据类型还是很多的</a> 居然还有unsigned long long int 这种别扭的东西。<br>size_t 和int差不多，估摸着是跨平台的一种表示。</p>
+<table>
+<thead>
+<tr>
+<th>描述</th>
+<th>数据类型</th>
+<th>sizeof(64位linux下)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>字符</td>
+<td>char</td>
+<td>1</td>
+</tr>
+<tr>
+<td>短整数</td>
+<td>short</td>
+<td>2</td>
+</tr>
+<tr>
+<td>整数</td>
+<td>int</td>
+<td>3</td>
+</tr>
+<tr>
+<td>长整数</td>
+<td>long</td>
+<td>8</td>
+</tr>
+<tr>
+<td>单精度浮点数</td>
+<td>float</td>
+<td>4</td>
+</tr>
+<tr>
+<td>双精度浮点数</td>
+<td>double</td>
+<td>8</td>
+</tr>
+<tr>
+<td>无类型</td>
+<td>void</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
 <p>scanf方法存在内存溢出的可能性，微软提出了scanf_s函数，需要提供最多允许读取的长度，超出该长度的字符一律忽略掉。<br><a href="http://www.ruanyifeng.com/blog/2018/01/assembly-language-primer.html">汇编语言</a></p>
+<p>NULL 值<br>NULL在stdio.h实际上是#define NULL ((void *) 0)，而在 C++ 中则直接被定义为了 0，#define NULL 0。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">float</span> a = <span class="number">1.0f</span>;</span><br><span class="line"><span class="keyword">double</span> b = <span class="number">1.0</span>d;</span><br><span class="line"><span class="keyword">long</span> <span class="keyword">double</span> ld = <span class="number">1.0l</span>;  <span class="comment">//长浮点数</span></span><br><span class="line"><span class="comment">// 如果不指定后缀f，则默认为double型</span></span><br></pre></td></tr></table></figure>
+<p>无符号数</p>
+<blockquote>
+<p>char short int long默认都是有符号的，首位用来存储符号位。<br>如果不需要使用负数，则可以使用无符号数，只要在前面加上unsigned即可。<br>如unsigned char unsigned short、unsigned int、unsigned long，其中unsigned int可以简写为unsigned。</p>
+</blockquote>
+<p>bool(boolean)不是一种基本数据类型，在c99及以后可以用是因为”it’s still not a keyword. It’s a macro declared in <stdbool.h>.”<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;stdbool.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">bool</span> x = <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">if</span>(x)</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"Boolean works in 'C'. \n"</span>);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"Boolean doesn't work in 'C'. \n"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p><a href="https://dev-notes.eu/2018/08/strings-in-c/">string in c</a><br>char *name = “Bob”; //name指向的位置不能修改了，但是name可以指向别的东西.<br>// the value is stored in a read-only section in the binary file and cannot be modified<br>name[1] = ‘e’; //这么干是不行的，编译是能通过，但运行期会造成undefined behavior，大概率是segment fault</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">You can also define a <span class="built_in">string</span> as a pointer to a <span class="keyword">char</span>, initialised by a <span class="built_in">string</span> literal. In <span class="keyword">this</span> <span class="keyword">case</span>, <span class="built_in">string</span> literals are stored in a read only section of memory <span class="keyword">and</span> are effectively constant. For example:</span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> *name = <span class="string">"Bob"</span></span><br><span class="line">In <span class="keyword">this</span> <span class="keyword">case</span>, the value is stored in a read-only section in the binary file <span class="keyword">and</span> cannot be modified. If you compile to an assembly file (use the -S compiler option in gcc), you can see the <span class="built_in">string</span> literals in the .rodata section. In <span class="keyword">this</span> context, rodata means “read-only data”.</span><br><span class="line"></span><br><span class="line"><span class="comment">/* main.s */</span></span><br><span class="line">.file	<span class="string">"main.c"</span></span><br><span class="line">.section	.rodata</span><br><span class="line">.LC0:</span><br><span class="line">.<span class="built_in">string</span>	<span class="string">"Bob"</span></span><br></pre></td></tr></table></figure>
 <p>// 下面这种用数组形式声明的是可以随便改的<br>char name[] = “Alice”; //存在stack上，随便改<br>name[3] = ‘n’;<br>name[4] = ‘a’;</p>
@@ -238,10 +291,10 @@ ga('send', 'pageview');
 </ul>
 <p>这才像样嘛</p>
 <h3 id="4-linking"><a href="#4-linking" class="headerlink" title="4. linking"></a>4. linking</h3><p>链接是编译的最后一步，这一步编译器将所有的机器码文件(也就是.o文件)合成可执行文件。不需要传什么flag,直接gcc hello_world.c就可以了<br>默认生成的文件名叫做a.out,可以使用-o参数指定生成的文件名。然后./a.out就可以执行了</p>
-<h2 id="3-gcc-clang-llvm的历史"><a href="#3-gcc-clang-llvm的历史" class="headerlink" title="3. gcc ,clang,llvm的历史"></a>3. gcc ,clang,llvm的历史</h2><p>.so文件其实是shared object的缩写</p>
+<p>.so文件其实是shared object的缩写</p>
 <h2 id="4-Makefile怎么写"><a href="#4-Makefile怎么写" class="headerlink" title="4. Makefile怎么写"></a>4. Makefile怎么写</h2><p><a href="http://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/">几个简单的makefile实例</a></p>
 <p>// 比方说写了三个文件,main.c,test.c,test.h。这是最简单的例子<br>main: main.c<br>    gcc -o main main.c test.c //ok,没问题了 </p>
-<p><a href="https://www.youtube.com/watch?v=GExnnTaBELk">C Programming: Makefiles</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">make clean</span><br><span class="line"></span><br><span class="line">clean:</span><br><span class="line">    rm -f *.o program_name</span><br></pre></td></tr></table></figure></p>
+<p>gcc -std=c11 -o outputfile sourcefile.c //指定使用c11(似乎目前c99有点老了)，Makefile里面加上CFLAGS = -Wall -std=c99就可以了<br><a href="https://www.youtube.com/watch?v=GExnnTaBELk">C Programming: Makefiles</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">make clean</span><br><span class="line"></span><br><span class="line">clean:</span><br><span class="line">    rm -f *.o program_name</span><br></pre></td></tr></table></figure></p>
 <p>因为手动rm可能写成<br>rm -f * .o ##中间多一个空格</p>
 <h2 id="5-静态库和动态库的区别及使用"><a href="#5-静态库和动态库的区别及使用" class="headerlink" title="5. 静态库和动态库的区别及使用"></a>5. 静态库和动态库的区别及使用</h2><p><a href="https://www.geeksforgeeks.org/static-vs-dynamic-libraries/">static and dynamic libraries</a></p>
 <p>static library把依赖的library都打包进去了，体积更大<br>dynamic libvrary只是写了依赖的library的名称，运行时需要去操作系统中去找，会慢一些</p>
@@ -289,12 +342,27 @@ ga('send', 'pageview');
 <p>这段会core dump的<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span> *s1 = <span class="string">"hello"</span>; ##获得了一个指向字符串常量的指针</span><br><span class="line">*s1 = 'hey'; ##编译期会警告：implicit conversion from 'int' to 'char' changes value from 6841721 to 121 [-Wconstant-conversion]。运行期会出现会 出现[1]    5972 bus error 。  改成s1 = 'hey'; 就好了</span><br><span class="line">##这段也会core dump</span><br><span class="line"><span class="keyword">char</span>* s1 = <span class="string">"hello"</span>;</span><br><span class="line">s1 += <span class="number">1</span>;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"content %s\n"</span>,*s1);##崩在这里</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"content %s\n"</span>,s1);##改成这样就好了</span><br></pre></td></tr></table></figure></p>
 <h3 id="static关键字"><a href="#static关键字" class="headerlink" title="static关键字"></a>static关键字</h3><p>c语言中不同头文件中的方法名或者外部变量是不能重名的（所以给方法起名字的时候要注意下），除非使用static关键字（只在该源文件内可以使用）  静态变量存放在全局数据区，不是在堆栈上，所以不存在堆栈溢出的问题。生命周期是整个程序的运行期。（static变量只在当前文件中可以使用，一旦退出当前文件的调用，就不可用，但如果运行期间又调用了该文件，那么static变量的值就会是刚才退出的时候的值，而不是default值）<br>设计和调用访问动态全局变量、静态全局变量、静态局部变量的函数时，需要考虑重入问题。<br><a href="https://segmentfault.com/q/1010000002512553/a-1020000002512728">函数名冲突的问题也可以用一个struct封起来</a><br><a href="https://www.jianshu.com/p/46926f2ffef0">c语言const关键字</a>有的时候是说指针指向的对象不能动，有的时候说的是指针指向的值不能动</p>
 <h3 id="c语言中的未定义行为-比如说数组越界"><a href="#c语言中的未定义行为-比如说数组越界" class="headerlink" title="c语言中的未定义行为(比如说数组越界)"></a>c语言中的未定义行为(比如说数组越界)</h3><h3 id="宏"><a href="#宏" class="headerlink" title="宏"></a>宏</h3><p>preprocessor的套路一般是这样的<br>awesomeFunction.h<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> AWESOME_FUNCTION</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> AWESOME_FUNCTION</span></span><br><span class="line"></span><br><span class="line">## 实际的函数声明</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span> <span class="comment">//AWESOME_FUNCTION</span></span></span><br></pre></td></tr></table></figure></p>
-<h3 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h3><p>c语言就是这样，好多功能都得自己实现</p>
+<h3 id="宏出现的缘由"><a href="#宏出现的缘由" class="headerlink" title="宏出现的缘由"></a>宏出现的缘由</h3><p>c/c++是编译语言，做不到“一次编译到处运行”，这里的“到处”指的是不同编译器或不同系统<br>因为程序的大多数功能都需要调用编译器提供的库函数，使用操作系统提供的系统资源和API等，这些在不同编译器或不同系统上都是不同的<br>所以一般的方法是通过预编译宏来处理这一类需求，在不同的系统上使用不同的宏来编译同一个文件里不同版本的代码，来做到“一次编写到处编译”</p>
+<p>看到有人在segmentfault说了这样一段总结，很以为然<br>对于编程语言，基本上是这样进化的：</p>
+<ol>
+<li><p>先用机器语言写出汇编器，然后就可以用汇编语言编程了，然后再用汇编语言编写汇编器。</p>
+</li>
+<li><p>先用汇编语言写出 C 编译器，然后就可以用 C 语言编程了，然后再用 C 语言来写 C 编译器。</p>
+</li>
+<li><p>有了 C 编译器与 C 语言，就可以在这个基础上再编写高级语言的编译器或解释器或虚拟机了。</p>
+</li>
+<li><p>非 C 系语言，进化过程同上。</p>
+</li>
+</ol>
+<p>至于操作系统，先用汇编语言写一个操作系统。Ken Thompson 干过这样的事，他用汇编语言以及他自创的一种解释性语言——B 语言写出来 unix 第一版，是在一台内存只有 8KB 的废弃的计算机上写出来的。然后 Dennis Ritchie 发明了 C 语言，然后 Ken 与 Dennis 又用 C 语言在一台更好的计算机——16 位机器上将 unix 重写了一遍。</p>
+<p>至于 Windows 系统，MS 先是买了 QDOS，然后又在 QDOS 里引入了一些 Unix 的元素，然后比尔·盖茨靠着这个买来的系统赚了一大笔钱，然后就在 DOS 系统上开发了 windows 3.1，windows 95 ……</p>
+<p>tbd </p>
+<h2 id="3-gcc-clang-llvm的历史"><a href="#3-gcc-clang-llvm的历史" class="headerlink" title="3. gcc ,clang,llvm的历史"></a>3. gcc ,clang,llvm的历史</h2><h3 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h3><p>c语言就是这样，好多功能都得自己实现</p>
 <blockquote>
 <p>c 语言有它的设计哲学，就是那著名的“Keep It Simple, Stupid”，语言本身仅仅实现最为基本的功能，然后标准库也仅仅带有最为基本的内存管理（更高效一点的内存池都必须要自己实现）、IO、断言等基本功能。 </p>
 </blockquote>
 <p>社区提供了一些比较优秀的通用功能库<br>[1] <a href="http://developer.gnome.org/glib/stable/">http://developer.gnome.org/glib/stable/</a><br>[2] <a href="http://www.gnu.org/software/gnulib/">http://www.gnu.org/software/gnulib/</a><br>[3] <a href="http://apr.apache.org/">http://apr.apache.org/</a></p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://ismail.badawi.io/blog/2017/03/28/automatic-directory-creation-in-make/">automatic directory creation in make</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://ismail.badawi.io/blog/2017/03/28/automatic-directory-creation-in-make/">automatic directory creation in make</a><br><a href="https://www.zfl9.com/">本文的参考</a></p>
 
       
 
@@ -581,10 +649,6 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
               </li>
              
@@ -646,6 +710,10 @@ ga('send', 'pageview');
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">
