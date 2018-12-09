@@ -679,7 +679,7 @@ sudo rm -f /var/lib/dpkg/info/format
 sudo dpkg --configure -a
 ```
 
-> windows的换行符是 \r\l，linux的是 \l，mac的是 \r
+
 
 
 

@@ -54,7 +54,7 @@ top : 1
 - [ ] kotlin的coroutine[production-ready]
 - [ ] 宇宙第一ide熟悉使用
 - [ ] js的闭包等面试常谈
-- [ ] java的aspectJ教程
+- [ ] java的aspectJ教程，Spring AOP 与AspectJ 实现原理上并不完全一致，但功能上是相似的
 - [ ] autoWired, autovalue这些java 的library
 - [ ] code generator(代码生成器)
 - [ ][content-disposition](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)

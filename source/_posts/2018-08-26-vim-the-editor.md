@@ -36,8 +36,8 @@ alt-. - paste previous command's argument (useful for running multiple commands 
 h       l
     j
 ```
-挪到屏幕头部: H 挪到文件头部是gg
-挪动光标到屏幕底部: L 挪到文件底部是G
+挪到文件开头: H 挪到文件头部是gg
+挪到文件最后: L 挪到文件底部是G
 
 走到第5行： 5G
 
@@ -55,6 +55,8 @@ h       l
 
 撤销刚才的操作(undo): u
 
+走到当前行的末尾: $
+走到当前行的开头: 0
 
 
 
@@ -66,16 +68,27 @@ visual mode
 按一个/（斜杠就可以了），好像按n时往下查找下一个匹配结果
 
 
-
-
-格式化整个文件
-gg=G //这其实是三个命令,gg是到达文档开始,=是要求缩进，G是到达文档最后一行
+VIM格式化代码：
+格式化全文指令 gg=G //这其实是三个命令,gg是到达文档开始,=是要求缩进，G是到达文档最后一行
+自动缩进当前行指令　　==
+格式化当前光标接下来的8行　　8=
+格式化选定的行　　v 选中需要格式化的代码段 =
 
 
 [vim cheat sheet](https://vim.rtorr.com/)
 [youtube上一个比较好的关于vim的视频](https://www.youtube.com/watch?v=Nim4_f5QUxA)
 [练上一年再来总结的vim使用技巧](http://www.pchou.info/linux/2016/11/10/vim-skill.html)
 
-很多人都会有一个vimrc文件备份在github上，那么vimrc是什么，该怎么写
+很多人都会有一个vimrc文件备份在github上，那么vimrc其实就是对于vim这个编辑器的配置文件
+全局的vimrc文件在/etc/vim/vimrc 这个位置，针对单个用户还是在~/.vimrc这个文件里面改
+
+```
+set number "显示行号，这个注释只要左边的冒号就行了
+syntax on “自动语法高亮 
+set shiftwidth=4 “默认缩进4个空格 
+set softtabstop=4 “使用tab时 tab空格数 
+set tabstop=4 “tab 代表4个空格 
+set expandtab “使用空格替换tab
+```
 
 

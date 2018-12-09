@@ -60,6 +60,31 @@ sed 's/^.*at/(&)/' annoying.txt ## 把那些会匹配上的文字用括号包起
 linux下查看一个文件的时间戳
 > stat test
 
+c语言下对应的函数在sys/stat.h头文件中
+```c
+#include <stdio.h>
+#include <sys/stat.h>
+
+int main(void){
+    struct stat filestat;
+    stat("/etc/sysctl.conf", &filestat);
+    printf("size: %ld bytes, uid: %d, gid: %d, mode: %#o\n", filestat.st_size, filestat.st_uid, filestat.st_gid, filestat.st_mode);
+    return 0;
+}
+```
+
+
+> windows的换行符是 \r\l，linux的是 \l，mac的是 \r
+从根本上讲，二进制文件和文本文件在磁盘中没有区别，都是以二进制的形式存储
+二进制和文本模式的区别在于对换行符和一些非可见字符的转化上，如非必要，是使用二进制读取会比较安全一些
+
+因为 Windows 和 Linux 中的换行符不一致，前者使用CRLF(即\r\n)表示换行，后者则使用LF(即\n)表示换行
+而C语言本身使用LF(即\n)表示换行，所以在文本模式下，需要转换格式(如Windows)，但是在 Linux 下，文本模式和二进制模式就没有什么区别
+
+另外，以文本方式打开时，遇到结束符CTRLZ(0x1A)就认为文件已经结束
+所以，若使用文本方式打开二进制文件，就很容易出现文件读不完整，或內容不对的错误
+即使是用文本方式打开文本文件，也要谨慎使用，比如复制文件，就不应该使用文本方式
+
 
 
 

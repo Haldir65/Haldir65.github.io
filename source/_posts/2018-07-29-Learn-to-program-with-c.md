@@ -15,8 +15,49 @@ C语言实用指南，暂时不涉及cpp内容
 size_t 和int差不多，估摸着是跨平台的一种表示。
 
 
+| 描述 | 数据类型 | sizeof(64位linux下) |
+| ------ | ------ | ------ |
+| 字符 | char | 1 |
+| 短整数 | short | 2 |
+| 整数 | int | 3 |
+| 长整数 | long | 8 |
+| 单精度浮点数 | float | 4 |
+| 双精度浮点数 | double | 8 |
+| 无类型 | void | 1 |
+
+
 scanf方法存在内存溢出的可能性，微软提出了scanf_s函数，需要提供最多允许读取的长度，超出该长度的字符一律忽略掉。
 [汇编语言](http://www.ruanyifeng.com/blog/2018/01/assembly-language-primer.html)
+
+
+NULL 值
+NULL在stdio.h实际上是#define NULL ((void *) 0)，而在 C++ 中则直接被定义为了 0，#define NULL 0。
+
+```c
+float a = 1.0f;
+double b = 1.0d;
+long double ld = 1.0l;  //长浮点数
+// 如果不指定后缀f，则默认为double型
+```
+
+无符号数
+> char short int long默认都是有符号的，首位用来存储符号位。
+如果不需要使用负数，则可以使用无符号数，只要在前面加上unsigned即可。
+如unsigned char unsigned short、unsigned int、unsigned long，其中unsigned int可以简写为unsigned。
+
+
+bool(boolean)不是一种基本数据类型，在c99及以后可以用是因为"it's still not a keyword. It's a macro declared in <stdbool.h>."
+```c
+#include<stdio.h>
+#include<stdbool.h>
+void main(){
+    bool x = true;
+    if(x)
+        printf("Boolean works in 'C'. \n");
+    else
+        printf("Boolean doesn't work in 'C'. \n");
+}
+```
 
 
 [string in c](https://dev-notes.eu/2018/08/strings-in-c/)
@@ -147,8 +188,6 @@ example
 默认生成的文件名叫做a.out,可以使用-o参数指定生成的文件名。然后./a.out就可以执行了
 
 
-## 3. gcc ,clang,llvm的历史
-
 
 
 .so文件其实是shared object的缩写
@@ -160,6 +199,7 @@ example
 main: main.c
     gcc -o main main.c test.c //ok,没问题了 
 
+gcc -std=c11 -o outputfile sourcefile.c //指定使用c11(似乎目前c99有点老了)，Makefile里面加上CFLAGS = -Wall -std=c99就可以了
 [C Programming: Makefiles](https://www.youtube.com/watch?v=GExnnTaBELk)
 ```
 make clean
@@ -323,6 +363,33 @@ awesomeFunction.h
 #endif //AWESOME_FUNCTION
 ```
 
+
+### 宏出现的缘由
+c/c++是编译语言，做不到“一次编译到处运行”，这里的“到处”指的是不同编译器或不同系统
+因为程序的大多数功能都需要调用编译器提供的库函数，使用操作系统提供的系统资源和API等，这些在不同编译器或不同系统上都是不同的
+所以一般的方法是通过预编译宏来处理这一类需求，在不同的系统上使用不同的宏来编译同一个文件里不同版本的代码，来做到“一次编写到处编译”
+
+看到有人在segmentfault说了这样一段总结，很以为然
+对于编程语言，基本上是这样进化的：
+
+1. 先用机器语言写出汇编器，然后就可以用汇编语言编程了，然后再用汇编语言编写汇编器。
+
+2. 先用汇编语言写出 C 编译器，然后就可以用 C 语言编程了，然后再用 C 语言来写 C 编译器。
+
+3. 有了 C 编译器与 C 语言，就可以在这个基础上再编写高级语言的编译器或解释器或虚拟机了。
+
+4. 非 C 系语言，进化过程同上。
+
+至于操作系统，先用汇编语言写一个操作系统。Ken Thompson 干过这样的事，他用汇编语言以及他自创的一种解释性语言——B 语言写出来 unix 第一版，是在一台内存只有 8KB 的废弃的计算机上写出来的。然后 Dennis Ritchie 发明了 C 语言，然后 Ken 与 Dennis 又用 C 语言在一台更好的计算机——16 位机器上将 unix 重写了一遍。
+
+至于 Windows 系统，MS 先是买了 QDOS，然后又在 QDOS 里引入了一些 Unix 的元素，然后比尔·盖茨靠着这个买来的系统赚了一大笔钱，然后就在 DOS 系统上开发了 windows 3.1，windows 95 ……
+
+
+
+tbd 
+## 3. gcc ,clang,llvm的历史
+
+
 ### 最后
 c语言就是这样，好多功能都得自己实现
 >c 语言有它的设计哲学，就是那著名的“Keep It Simple, Stupid”，语言本身仅仅实现最为基本的功能，然后标准库也仅仅带有最为基本的内存管理（更高效一点的内存池都必须要自己实现）、IO、断言等基本功能。 
@@ -333,6 +400,9 @@ c语言就是这样，好多功能都得自己实现
 [3] http://apr.apache.org/
 
 
+
+
 ## 参考
 [automatic directory creation in make](http://ismail.badawi.io/blog/2017/03/28/automatic-directory-creation-in-make/)
+[本文的参考](https://www.zfl9.com/)
 

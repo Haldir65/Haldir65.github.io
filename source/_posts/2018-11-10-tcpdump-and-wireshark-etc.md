@@ -1,7 +1,7 @@
 ---
 title: tcpdump和wireshark使用手册
 date: 2018-11-10 20:57:53
-tags: [tools]
+tags: [linux,tools]
 ---
 
 

@@ -272,6 +272,11 @@ def fetch_all(urls):
 已经开源 pip install aiomultiprocess
 [aioprocessing](https://github.com/dano/aioprocessing)
 
+
+## 关于协程
+首先，因为协程是一种能暂停的函数，那么它暂停是为了什么？一般是等待某个事件，比如说某个连接建立了；某个 socket 接收到数据了；某个计时器归零了等。而这些事件应用程序只能通过轮询的方式得知是否完成，**但是操作系统（所有现代的操作系统）可以提供一些中断的方式通知应用程序，如 select, epoll, kqueue 等等**。
+[understand-python-asyncio](https://lotabout.me/2017/understand-python-asyncio/)
+
 ## 牵涉到一些celery的点
 todo
 
