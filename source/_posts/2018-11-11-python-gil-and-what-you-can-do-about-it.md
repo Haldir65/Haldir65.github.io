@@ -285,3 +285,6 @@ todo
 [多进程还可以牵涉到进程池的概念](https://codewithoutrules.com/2018/09/04/python-multiprocessing/)
 [What is the Python Global Interpreter Lock (GIL)?](https://realpython.com/python-gil/)
 [multiprocessing-vs-multithreading-in-python-what-you-need-to-know](https://timber.io/blog/multiprocessing-vs-multithreading-in-python-what-you-need-to-know/)
+[A. Jesse Jiryu Davis](https://emptysqua.re/blog/links-for-how-python-coroutines-work/)
+[How Do Python Coroutines Work](https://www.youtube.com/watch?v=7sCu4gEjH5I)
+[A Jesse Jiryu Davis Grok the GIL Write Fast And Thread Safe Python PyCon 2017](https://www.youtube.com/watch?v=7SSYhuk5hmc) the only thing two threads cann't do in once in Python is run python

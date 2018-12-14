@@ -1557,6 +1557,23 @@ mvn compile ##开始编译
 ```
 [maven getting started是很友好的教程](https://maven.apache.org/guides/getting-started/index.html#How_do_I_make_my_first_Maven_project)
 
+看完这俩再不会就是蠢
+[jetbrain在youtube上的教程](https://www.youtube.com/watch?v=pt3uB0sd5kY)
+[Creating a new Maven project in IntelliJ IDEA](https://www.packtpub.com/mapt/book/application_development/9781785286124/2/ch02lvl1sec24/creating-a-new-maven-project-in-intellij-idea)
+
+create from archetype可以选择org.apache.maven.archetypes:maven-archetype-quickstart(真的只有一个hello world)
+[如果是spring的话，直接用这个网站更加方便](https://start.spring.io/)
+
+
+intelij idea里面默认的maven源有https://repo.maven.apache.org/maven2
+和http://download.java.net/maven/1
+这俩网站国内似乎被墙，最好[加代理](https://stackoverflow.com/questions/1784132/intellij-community-cant-use-http-proxy-for-maven/26483623#26483623) 就是在.m2/settings.xml中指定本地proxy。如果你的代理够快的话，修改pom.xml的同时，应该能够很快的开始下载新的依赖
+
+打开项目后，在Intellij 右侧有个Maven projects，点开后，有个Lifecycle，再点开，可以看到clean , validate, compile, ….，右击clean，选中Run ‘project[clean]’，这里的project是我们的项目实际的名字。
+如果下载失败了的话，可以选择clean，然后就会开始自己重新下载
+
+GroupId类似于你的包名，ArtifictId类似于你的applicationName
+
 
 ### 49. WeakHashmap还是LeakHashmap
 ```html

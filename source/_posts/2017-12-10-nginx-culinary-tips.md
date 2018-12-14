@@ -1023,6 +1023,10 @@ server {
 
 在ubuntu18.04上，logrotate似乎默认已经被安装过了，所以，每天/var/log/nginx里面的文件都会被gzip一遍
 
+有时候会在error.log里面看到这样的话：
+accept4() failed (24: Too many open files)
+cat /proc/sys/fs/file-max ##这个值是跟系统内存相关的
+
 
 [用failtoban降低被攻击概率](https://www.digitalocean.com/community/tutorials/how-to-protect-an-nginx-server-with-fail2ban-on-ubuntu-14-04)
 

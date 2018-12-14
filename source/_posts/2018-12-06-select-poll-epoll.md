@@ -21,3 +21,4 @@ select，poll，epoll都是IO多路复用的机制。I/O多路复用就通过一
 [Linux IO模式及 select、poll、epoll详解](https://segmentfault.com/a/1190000003063859)
 [epoll浅析以及nio中的Selector](https://my.oschina.net/hosee/blog/730598)
 [大话 Select、Poll、Epoll](https://cloud.tencent.com/developer/article/1005481)
+[There is no Windows equivalent to epoll/kqueue , but there is Overlapped IO](https://news.ycombinator.com/item?id=8526264) 简单说就是windows在这方面设计的更优秀，只是开发者并未买账

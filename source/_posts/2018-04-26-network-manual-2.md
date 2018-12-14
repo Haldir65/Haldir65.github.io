@@ -456,3 +456,56 @@ jwt事实上就是服务器颁发给客户端一个加密后（只有server才�
 > If an attacker somehow manages to steal a user’s JWT, then there’s unfortunately not much that can really be done. To minimize damages, you should design your application to require reauthentication before performing any high profile transaction such as a purchase or the changing of a password. And your JWTs should also have an expiration date. That way a compromised JWT will only work for so long.
 
 但是如果有人把这个header搞到，就能向服务器声称自己是该用户。服务器是只认这个jwt字符串不认人的，碰到这种情况其实也没什么解决办法，最多把jwt的有效期设置的短一点。
+
+
+[子网掩码表示一个网段的方式](https://blog.phpgao.com/linux_ip.html)
+优先级为先检查hosts.deny，再检查hosts.allow， 
+后者设定可越过前者限制， 
+例如： 
+a.限制所有的ssh， 
+除非从218.64.87.0 - 127上来。 
+hosts.deny: 
+in.sshd:ALL 
+hosts.allow: 
+in.sshd:218.64.87.0/255.255.255.128
+ 
+b.封掉218.64.87.0 - 127的telnet 
+hosts.deny 
+in.sshd:218.64.87.0/255.255.255.128
+ 
+c.限制所有人的TCP连接，除非从218.64.87.0 - 127访问 
+hosts.deny 
+ALL:ALL 
+hosts.allow 
+ALL:218.64.87.0/255.255.255.128
+ 
+d.限制218.64.87.0 - 127对所有服务的访问 
+hosts.deny 
+ALL:218.64.87.0/255.255.255.128
+ 
+其中冒号前面是TCP daemon的服务进程名称，通常系统 
+进程在/etc/inetd.conf中指定，比如in.ftpd，in.telnetd，in.sshd 
+ 
+其中IP地址范围的写法有若干中，主要的三种是： 
+    1.网络地址--子网掩码方式： 
+        218.64.87.0/255.255.255.0
+    2.网络地址方式（我自己这样叫，呵呵） 
+        218.64.（即以218.64打头的IP地址） 
+    3.缩略子网掩码方式，既数一数二进制子网掩码前面有多少个“1”比如： 
+        218.64.87.0/255.255.255.0 -- 218.64.87.0/24
+
+> 
+NAPT原理
+简单来说，在NAT网关上会有一张映射表，表上记录了内网向公网哪个IP和端口发起了请求，然后如果内网有主机向公网设备发起了请求，内网主机的请求数据包传输到了NAT网关上，那么NAT网关会修改该数据包的源IP地址和源端口为NAT网关自身的IP地址和任意一个不冲突的自身未使用的端口，并且把这个修改记录到那张映射表上。最后把修改之后的数据包发送到请求的目标主机，等目标主机发回了响应包之后，再根据响应包里面的目的IP地址和目的端口去映射表里面找到该转发给哪个内网主机。这样就实现了内网主机在没有公网IP的情况下，通过NAPT技术借助路由器唯一的一个公网IP来访问公网设备。
+在较早以前的 RFC 1918 文档中对私有地址有相关的说明。
+
+因特网域名分配组织IANA组织（Internet Assigned Numbers Authority）保留了以下三个IP地址块用于私有网络。
+
+10.0.0.0 - 10.255.255.255 (10/8比特前缀)
+
+172.16.0.0 - 172.31.255.255 (172.16/12比特前缀)
+
+192.168.0.0 - 192.168.255.255 (192.168/16比特前缀)
+
+我们可以看到其中有1个A类地址块，32个B类地址块和256个C类地址块。主流的家用路由器使用C类私有地址作为路由器LAN端的IP地址较多，所以我们可以看到路由器设置页面的IP一般都为192.168开头。
+        

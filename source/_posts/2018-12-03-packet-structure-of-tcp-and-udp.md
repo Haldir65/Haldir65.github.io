@@ -95,6 +95,62 @@ TCP 有一个特别的概念叫做半关闭，这个概念是说，TCP 的连接
 
 ##TBD
 
+关键字： tcp read buffer
+> Your Network Interface Card (NIC) is performing all of the necessary tasks of collecting packets and waiting for your OS to read them. Ultimately, when you do a stream read you're pulling from the memory that your OS has reserved and constantly stores the incoming information copy into.
+To answer your question, yes. You are definitely doing a copy. A copy of a copy, the bits are read into a buffer within your NIC, your OS puts them somewhere, and you copy them when you do a stream read.
+
+
+关于tcp read/write buffer，shadowsocks的参数优化提到了一些东西 
+```
+# max open files
+fs.file-max = 1024000
+# max read buffer
+net.core.rmem_max = 67108864
+# max write buffer
+net.core.wmem_max = 67108864
+# default read buffer
+net.core.rmem_default = 65536
+# default write buffer
+net.core.wmem_default = 65536
+# max processor input queue
+net.core.netdev_max_backlog = 4096
+# max backlog
+net.core.somaxconn = 4096
+
+# resist SYN flood attacks
+net.ipv4.tcp_syncookies = 1
+# reuse timewait sockets when safe
+net.ipv4.tcp_tw_reuse = 1
+# turn off fast timewait sockets recycling
+net.ipv4.tcp_tw_recycle = 0
+# short FIN timeout
+net.ipv4.tcp_fin_timeout = 30
+# short keepalive time
+net.ipv4.tcp_keepalive_time = 1200
+# outbound port range
+net.ipv4.ip_local_port_range = 10000 65000
+# max SYN backlog
+net.ipv4.tcp_max_syn_backlog = 4096
+# max timewait sockets held by system simultaneously
+net.ipv4.tcp_max_tw_buckets = 5000
+# TCP receive buffer
+net.ipv4.tcp_rmem = 4096 87380 67108864
+# TCP write buffer
+net.ipv4.tcp_wmem = 4096 65536 67108864
+# turn on path MTU discovery
+net.ipv4.tcp_mtu_probing = 1
+
+# for high-latency network
+net.ipv4.tcp_congestion_control = hybla
+# forward ipv4
+net.ipv4.ip_forward = 1
+```
+[内核文档对于这些参数的定义](https://www.cyberciti.biz/files/linux-kernel/Documentation/networking/ip-sysctl.txt)
+
+
+
 ## 参考
 [TCP 报文结构](https://jerryc8080.gitbooks.io/understand-tcp-and-udp/)
 [tcp包结构](https://www.google.com/search?q=tcp%E5%8C%85%E7%BB%93%E6%9E%84)
+
+[关于tcp协议的一整个series](https://accedian.com/enterprises/blog/tcp-receive-window-everything-need-know/)

@@ -18,3 +18,4 @@ tags:
 [非常非常全的关于python socket编程的文章，文章本身也很长](https://realpython.com/python-sockets/)
 
 [关于c语言写的很好的博客](https://www.zfl9.com/categories/c/)
+[关于网络基本功的](https://wizardforcel.gitbooks.io/network-basic/content/6.html)
