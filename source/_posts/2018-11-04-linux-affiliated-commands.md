@@ -86,6 +86,13 @@ int main(void){
 即使是用文本方式打开文本文件，也要谨慎使用，比如复制文件，就不应该使用文本方式
 
 
+### signal处理
+[HakTip - Linux Terminal 101: Controlling Processes](https://www.youtube.com/watch?v=XUhGdORXL54)
+
+linux上信号有32种，多数在C语言中都有默认的处理方式（并且这种默认的处置方式也是可以更改的），除了SIGKILL(强行terminate)和SIGSTOP(debug遇到断点)不允许开发者更改处理方式。(kill -9也就是强杀非常有效)
+c程序可以通过signal(比较老了)函数或者sigaction(推荐)函数注册收到信号之后的动作
+
+
 
 
 

@@ -87,6 +87,7 @@ alias yourcommand='ls -alr' ##添加这一行，原来的命令也照样用
 重开session即可生效
 急着要想马上生效可以
 source ~/.bashrc ## source命令其实就是执行一个脚本
+取消的话， unalias xxx即可
 
 > touch ~/.bash_aliases  ## unbuntu建议把所有的alias写到一个 ~/.bash_aliases文件里。保存之后,source ~/.bash_aliases。立即生效
 

@@ -91,6 +91,15 @@ string.h 标准库中定义了空指针，NULL(数值0)
 
 ‘\0’是一个“空字符”常量，它表示一个字符串的结束，它的ASCII码值为0。注意它与空格' '（ASCII码值为32）及'0'（ASCII码值为48）不一样的。
 
+编译过程中有时候可能会出现一些警告
+"Implicit declaration of function 'sleep' is invalid in C99"
+比如这里使用了sleep函数,却忘记了include对应的函数，就会报警告
+```
+sleep is a non-standard function.
+On UNIX, you shall include <unistd.h>.
+On MS-Windows, Sleep is rather from <windows.h>.
+```
+
 ## 2. 编译过程的一些解释
 C语言程序编译的顺序是
 source code -> preprocessing -> compilating -> assembling -> linking -> executable file

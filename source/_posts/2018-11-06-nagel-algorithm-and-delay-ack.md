@@ -80,17 +80,21 @@ server 收到 ACK 後，送出 body。
 於是 client 多等了 200ms 才收到完整的 response。
 
 
+
+### tcp缓冲的概念
+[tcp缓冲](https://www.cnblogs.com/promise6522/archive/2012/03/03/2377935.html)
+这些东西对于应用层来说是无感的
+
+
 ## 最后
 启示就是应用层进行开发的时候不要零零散散的发数据，尽量攒成一个大一点的包再发出去。不要让系统层去做这件事。
-
 TCP_NODELAY 是可以关闭Nagle算法的
 
 
-todo
+## todo
 window congestion
 超时重传
 阻塞，超时，
-tcp缓冲
 
 
 
@@ -98,3 +102,4 @@ tcp缓冲
 [Nagle和Delayed ACK优化算法合用导致的死锁问题](http://taozj.net/201808/nagle-and-delayed-ack.html)
 [Nagle’s Algorithm 和 Delayed ACK 以及 Minshall 的加強版](https://medium.com/fcamels-notes/nagles-algorithm-%E5%92%8C-delayed-ack-%E4%BB%A5%E5%8F%8A-minshall-%E7%9A%84%E5%8A%A0%E5%BC%B7%E7%89%88-8fadcb84d96f)
 [再说TCP神奇的40ms](https://cloud.tencent.com/developer/article/1004431)
+[tcp缓冲非常好的文章](https://www.cnblogs.com/promise6522/archive/2012/03/03/2377935.html)

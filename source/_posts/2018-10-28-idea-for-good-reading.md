@@ -19,3 +19,5 @@ tags:
 
 [关于c语言写的很好的博客](https://www.zfl9.com/categories/c/)
 [关于网络基本功的](https://wizardforcel.gitbooks.io/network-basic/content/6.html)
+
+[how hackers start their afternoons.](https://hackernoon.com/) 很像medium的一个网站

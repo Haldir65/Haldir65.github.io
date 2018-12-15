@@ -63,7 +63,7 @@ top : 1
 - [ ] a new article on open-gl intro(on going)
 - [ ] python 的asyncio(in progress)
 - [ ] awk，正则表达式还有数据库这些也算一门编程语言
-
+- [ ] [Why you need a mutex to protect an int](http://www.alexonlinux.com/why-you-need-a-mutex-to-protect-an-int) mutex似乎是操作系统提供的锁
 
 
 
@@ -104,7 +104,6 @@ top : 1
 - [X]c语言的[libevent使用教程](https://yq.aliyun.com/articles/413601) eventloop，添加回调，大致的流程就是这样
 - [X] [indexed DB](http://www.ruanyifeng.com/blog/2018/07/indexeddb.html),浏览器端数据库，还是用第三方库好
 - [X] [block size vs page size](http://forums.justlinux.com/showthread.php?3261-Block-size-vs-page-size) Page是内存相关，block是硬盘相关的
-
 
 
 ### Good For Nothing

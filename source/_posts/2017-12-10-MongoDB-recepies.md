@@ -18,6 +18,9 @@ MongoDB默认装到C盘的program files文件夹里面,需要一个data文件夹
 //这样启动server时记得把--dbpath传一下
 默认安装的时候dbpath被设置为了"c://data//db"，所以可能需要创建这个目录
 
+windows上如果作为一项服务的话，每次都会开机自启，[关闭方式](https://stackoverflow.com/questions/45011195/how-to-stop-mongodb-server-on-windows-startup)
+- Go to your windows services.msc and set your mongoDB on manual. To start your DB open admin prompt net start mongodb. To stop it net stop mongodb.
+
 ## establish connection
 ```bash
 // start db server

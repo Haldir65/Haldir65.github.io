@@ -75,9 +75,7 @@ VIM格式化代码：
 格式化选定的行　　v 选中需要格式化的代码段 =
 
 
-[vim cheat sheet](https://vim.rtorr.com/)
-[youtube上一个比较好的关于vim的视频](https://www.youtube.com/watch?v=Nim4_f5QUxA)
-[练上一年再来总结的vim使用技巧](http://www.pchou.info/linux/2016/11/10/vim-skill.html)
+
 
 很多人都会有一个vimrc文件备份在github上，那么vimrc其实就是对于vim这个编辑器的配置文件
 全局的vimrc文件在/etc/vim/vimrc 这个位置，针对单个用户还是在~/.vimrc这个文件里面改
@@ -90,5 +88,13 @@ set softtabstop=4 “使用tab时 tab空格数
 set tabstop=4 “tab 代表4个空格 
 set expandtab “使用空格替换tab
 ```
+
+
+## 参考
+[vim cheat sheet](https://vim.rtorr.com/)
+[youtube上一个比较好的关于vim的视频](https://www.youtube.com/watch?v=Nim4_f5QUxA)
+[练上一年再来总结的vim使用技巧](http://www.pchou.info/linux/2016/11/10/vim-skill.html)
+[the ultimate vimrc](https://github.com/amix/vimrc)
+
 
 

@@ -14,12 +14,11 @@ You should use multiprocessing (if your machine has multiple cores)
 
 <!--more-->
 
-
 Python Global Interpreter Lock(GIL)
-所有的python bytecode在执行前都需要获得interpreter的lock,one vm thread at a time。
+对于CPython，所有的python bytecode在执行前都需要获得interpreter的lock,one vm thread at a time。(java实现的python似乎没有这个烦恼)
 GIL的出现似乎是历史原因（为了方便的直接使用当时现有的c extension）。而没有在python3中被移除的原因是因为这会造成单线程的程序在python3中跑的反而比python2中慢。
 
-因为GIL的存在，python中的线程并不能实现cpu的并发运行(同时只能有一条线程在运行)。但对于I/O intensive的任务来说，cpu都在等待I/O操作完成，所以爬虫这类操作使用多线程是合适的。
+因为GIL的存在，python中的线程并不能实现cpu的并发运行(同时只能有一条线程在运行)。但对于I/O intensive的任务来说，cpu都在等待I/O操作完成，所以爬虫这类操作使用多线程是合适的。根据[A Jesse Jiryu Davis](https://www.youtube.com/watch?v=7SSYhuk5hmc)在pycon2017上的演讲，在多线程python程序中，如果某条线程开始进行I/O操作，就会主动放弃GIL(这是在socket module的源码中)，或者在cpu-intensive程序中，一条线程连续执行1000次(python2中是一个常数)后就会被夺走gil。
 
 ## 多线程以及一些同步的问题
 单线程的版本
@@ -274,8 +273,75 @@ def fetch_all(urls):
 
 
 ## 关于协程
+coroutine是一个在很多编程语言中都有的概念，在python中coroutine一般指的是generator based coroutines。
 首先，因为协程是一种能暂停的函数，那么它暂停是为了什么？一般是等待某个事件，比如说某个连接建立了；某个 socket 接收到数据了；某个计时器归零了等。而这些事件应用程序只能通过轮询的方式得知是否完成，**但是操作系统（所有现代的操作系统）可以提供一些中断的方式通知应用程序，如 select, epoll, kqueue 等等**。
 [understand-python-asyncio](https://lotabout.me/2017/understand-python-asyncio/)
+
+基础是generator(任何包含yield expression的函数)
+```
+$ >>>def gen_fn():
+        print('start')
+        yiled 1
+        print('middle')
+        yield 2
+        print('done')
+$ >>> gen = gen_fn()
+$ >>> gen
+$ <generator object gen_fn at 0x7f83cddc0b48>
+>>> gen.gi_code.co_code //对应的bytecode
+b't\x00d\x01\x83\x01\x01\x00d\x02V\x00\x01\x00t\x00d\x03\x83\x01\x01\x00d\x04V\x00\x01\x00t\x00d\x05\x83\x01\x01\x00d\x00S\x00'
+>>> len(gen.gi_code.co_code)
+40
+>>> gen.gi_frame.f_lasti //instruction pointer , 说明当前执行到哪个指令了，-1说明还没有开始执行
+-1
+>>> next(gen)
+start
+1
+>>> ret = next(gen)
+middle
+>>> ret
+2 // next方法返回的是yield里面的值
+>>> next(gen)
+done
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+StopIteration // 这是正常的，说明generator执行完毕
+
+
+>>> import dis
+>>> dis.dis(gen)
+  2           0 LOAD_GLOBAL              0 (print)
+              2 LOAD_CONST               1 ('start')
+              4 CALL_FUNCTION            1
+              6 POP_TOP
+
+  3           8 LOAD_CONST               2 (1)
+             10 YIELD_VALUE
+             12 POP_TOP
+
+  4          14 LOAD_GLOBAL              0 (print)
+             16 LOAD_CONST               3 ('middle')
+             18 CALL_FUNCTION            1
+             20 POP_TOP
+
+  5          22 LOAD_CONST               4 (2)
+             24 YIELD_VALUE
+             26 POP_TOP
+
+  6          28 LOAD_GLOBAL              0 (print)
+             30 LOAD_CONST               5 ('done')
+             32 CALL_FUNCTION            1
+             34 POP_TOP
+             36 LOAD_CONST               0 (None)
+             38 RETURN_VALUE
+>>>
+```
+
+python 3.5标准库中出现的async await关键字只是基于generator的sytatic sugar，那么[generator是如何实现的](https://stackoverflow.com/questions/8389812/how-are-generators-and-coroutines-implemented-in-cpython).
+- The yield instruction takes the current executing context as a closure, and transforms it into an own living object. This object has a __iter__ method which will continue after this yield statement.
+So the call stack gets transformed into a heap object.
+
+[解释generator实现原理的文章](https://hackernoon.com/the-magic-behind-python-generator-functions-bc8eeea54220)
 
 ## 牵涉到一些celery的点
 todo

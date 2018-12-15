@@ -16,7 +16,15 @@ select，poll，epoll都是IO多路复用的机制。I/O多路复用就通过一
 在看[socket programming in python](https://realpython.com/python-sockets/)这篇文章时发现有selector这样的操作。其实和c语言的做法很相似。
 
 
+[Windows IOCP与Linux的epoll机制对比](https://www.jianshu.com/p/d2f4c35cb692)
+系统I/O模型 可分为三类：
+阻塞型(blocking model)，
+非阻塞同步型(non-blocking model): "wait until any socket is available to read or write from/to buffer, then call non blocking socket function which returns immediately."
+以及非阻塞异步型(asynchronous aka. overlapping model): "call a socket function which returns immediately, then wait for its completion, then access the result data object"
+IOCP基于非阻塞异步模型，而epoll基于非阻塞同步模型。
 
+
+[Windows IOCP vs Linux EPOLL Performance Comparison](https://www.slideshare.net/sm9kr/iocp-vs-epoll-perfor)
 [IO多路复用之epoll总结](https://www.cnblogs.com/Anker/p/3263780.html)
 [Linux IO模式及 select、poll、epoll详解](https://segmentfault.com/a/1190000003063859)
 [epoll浅析以及nio中的Selector](https://my.oschina.net/hosee/blog/730598)
