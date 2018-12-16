@@ -17,7 +17,7 @@
 <meta property="og:description" content="收集几种语言中使用socket实现httpServer和httpClient的主要步骤">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/sun_rise_dim_grass.jpg">
-<meta property="og:updated_time" content="2018-12-14T14:46:09.055Z">
+<meta property="og:updated_time" content="2018-12-16T14:40:10.412Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从Socket入手实现http协议">
 <meta name="twitter:description" content="收集几种语言中使用socket实现httpServer和httpClient的主要步骤">
@@ -244,7 +244,8 @@ ga('send', 'pageview');
 </blockquote>
 <p>htons();//将short类型的值从主机字节序转换为网络字节序(上面就是把端口号转化一下)<br>inet_addr();//将IP地址字符串转换为long类型的网络字节序（接受一个字符串，返回一个long）<br>gethostbyname();//获得与该域名对应的IP地址<br>inet_ntoa();//将long类型的网络字节序转换成IP地址字符串<br>//这些转换字节序的函数是必须的，因为ip地址，端口这些东西不是应用层处理，而是由路由器这些东西去处理的，后者遵照网络标准使用的是big-endian，所以必须转换字节序。</p>
 <p>读函数read<br>ssize_t read(int fd,void *buf,size_t nbyte)<br>read函数是负责从fd中读取内容.当读成功 时,read返回实际所读的字节数,如果返回的值是0 表示已经读到文件的结束了,小于0表示出现了错误.如果错误为EINTR说明读是由中断引起 的, 如果是ECONNREST表示网络连接出了问题. </p>
-<p>写函数write<br>ssize_t write(int fd, const void*buf,size_t nbytes);<br>write函数将buf中的nbytes字节内容写入文件描述符fd.成功时返回写的字节数.失败时返回-1. 并设置errno变量. 在网络程序中,当我们向套接字文件描述符写时有两可能.<br>1)write的返回值大于0,表示写了部分或者是全部的数据. 这样我们用一个while循环来不停的写入，但是循环过程中的buf参数和nbyte参数得由我们来更新。也就是说，网络写函数是不负责将全部数据写完之后在返回的。<br>2)返回的值小于0,此时出现了错误.我们要根据错误类型来处理.<br>如果错误为EINTR表示在写的时候出现了中断错误.<br>如果为EPIPE表示网络连接出现了问题(对方已经关闭了连接).</p>
+<p>写函数write<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="keyword">ssize_t</span> write(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">void</span> *buf, <span class="keyword">size_t</span> count);</span><br></pre></td></tr></table></figure></p>
+<p>write函数将buf中的nbytes字节内容写入文件描述符fd.成功时返回写的字节数.失败时返回-1. 并设置errno变量. 在网络程序中,当我们向套接字文件描述符写时有两可能.<br>1)write的返回值大于0,表示写了部分或者是全部的数据. 这样我们用一个while循环来不停的写入，但是循环过程中的buf参数和nbyte参数得由我们来更新。也就是说，网络写函数是不负责将全部数据写完之后在返回的。<br>2)返回的值小于0,此时出现了错误.我们要根据错误类型来处理.<br>如果错误为EINTR表示在写的时候出现了中断错误.<br>如果为EPIPE表示网络连接出现了问题(对方已经关闭了连接).</p>
 <p>除了read和write之外<br>还有<br>int recv(int sockfd,void <em>buf,int len,int flags)<br>int send(int sockfd,void </em>buf,int len,int flags)<br>这两个函数，功能差不多，只是多了第四个参数</p>
 <ul>
 <li><p>简单版本的参考<br><a href="http://www.cleey.com/blog/single/id/789.html">使用Linux c语言编写简单的web服务器</a><br><a href="http://www.voidcn.com/article/p-xieequox-bat.html">socket http文件下载器c语言实现</a></p>
@@ -259,8 +260,8 @@ ga('send', 'pageview');
 <ul>
 <li>js并不支持对操作系统socket的直接控制，可能是安全因素(websocket倒是有，不过那是另外一回事了)。</li>
 </ul>
-<p>#include <unistd.h></p>
-<p>ssize_t read(int fd, void *buf, size_t count);<br>read这个函数返回的是读取的byte数，(On success, the number of bytes read is returned (zero indicates end of file), and the file position is advanced by this number;On error, -1 is returned, and errno is set appropriately.  In this case, it is left unspecified whether the file position (if any) changes.)</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="keyword">ssize_t</span> read(<span class="keyword">int</span> fd, <span class="keyword">void</span> *buf, <span class="keyword">size_t</span> count);</span><br></pre></td></tr></table></figure>
+<p>read这个函数返回的是读取的byte数，(On success, the number of bytes read is returned (zero indicates end of file), and the file position is advanced by this number;On error, -1 is returned, and errno is set appropriately.  In this case, it is left unspecified whether the file position (if any) changes.)</p>
 <p>如果read的时候一直统计当前总的read到的bytes数，应该是要比content-length长不少的。<br><a href="https://stackoverflow.com/questions/4850241/how-many-bits-in-a-character">那么一个字符到底多少个byte呢</a><br>首先要明白，read出来的东西是byte(是被utf-8编码过的)。几乎所有的语言在接收到之后都要重新解码一下，所以在这里decode一下，用c语言decode怎么弄？</p>
 <ul>
 <li><p>It depends what is the character and what encoding it is in:</p>
@@ -295,7 +296,7 @@ ga('send', 'pageview');
 <p>在浏览器console里面输入<br>encodeURI(‘你好啊’)<br>“%E4%BD%A0%E5%A5%BD%E5%95%8A” //是不是和python那边收到的东西很像</p>
 <p>所以，c语言这边关键函数<br>send(sock_client,”你好啊”,len,0);<br>看上去是发送了6个字节(每个汉字unicode两个字节)，实际上send调用下层在发送出去的时候回把这个6个字节的数据分散在9个字节长度的utf-8 byte array上。<br>可以认为发送6个字节，耗费9个字节的流量(如果发送的全部是ascii字符就不会这么浪费了，但其实utf-8已经很节省了)</p>
 <p><strong>结论就是utf-8 encode的工作是底层根据locale做的，跟application无关。</strong></p>
-<p>//<a href="http://docs.linuxtone.org/ebooks/C&amp;CPP/c/apas03.html">libc只是当作以0结尾的字符串原封不动地write给内核，识别汉字的工作是由终端的驱动程序做的。</a>也就是基于当前的locale<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"你好\n"</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><a href="http://docs.linuxtone.org/ebooks/C&amp;CPP/c/apas03.html">libc只是当作以0结尾的字符串原封不动地write给内核，识别汉字的工作是由终端的驱动程序做的。</a>也就是基于当前的locale<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"你好\n"</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>上述程序源文件是以UTF-8编码存储的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ od -tc nihao.c </span><br><span class="line">0000000   #   i   n   c   l   u   d   e       &lt;   s   t   d   i   o   .</span><br><span class="line">0000020   h   &gt;  \n  \n   i   n   t       m   a   i   n   (   v   o   i</span><br><span class="line">0000040   d   )  \n   &#123;  \n  \t   p   r   i   n   t   f   (   &quot; 344 275</span><br><span class="line">0000060 240 345 245 275   \   n   &quot;   )   ;  \n  \t   r   e   t   u   r</span><br><span class="line">0000100   n       0   ;  \n   &#125;  \n</span><br><span class="line">0000107</span><br></pre></td></tr></table></figure></p>
 <blockquote>
 <p>其中八进制的344 375 240（十六进制e4 bd a0）就是“你”的UTF-8编码，八进制的345 245 275（十六进制e5 a5 bd）就是“好”。把它编译成目标文件，”你好\n”这个字符串就成了这样一串字节：e4 bd a0 e5 a5 bd 0a 00，汉字在其中仍然是UTF-8编码的，一个汉字占3个字节，这种字符在C语言中称为多字节字符（Multibyte Character）。运行这个程序相当于把这一串字节write到当前终端的设备文件。如果当前终端的驱动程序能够识别UTF-8编码就能打印出汉字，如果当前终端的驱动程序不能识别UTF-8编码（比如一般的字符终端）就打印不出汉字。也就是说，像这种程序，识别汉字的工作既不是由C编译器做的也不是由libc做的，C编译器原封不动地把源文件中的UTF-8编码复制到目标文件中，libc只是当作以0结尾的字符串原封不动地write给内核，识别汉字的工作是由终端的驱动程序做的。</p>
@@ -685,11 +686,11 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">sql</a>
+                <a href="javascript:void(0)" class="js-tag color2">django</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">django</a>
+                <a href="javascript:void(0)" class="js-tag color4">sql</a>
               </li>
              
               <li class="article-tag-list-item">

@@ -16,7 +16,7 @@
 <meta property="og:description" content="Nagle’s Algorithm 和 Delayed ACK 一起用在特定场景下可能会造成网速不必要的延迟傳送 TCP 封包的時候， TCP header 占 20 bytes， IPv4 header 占 20 bytes，若傳送的資料太小， TCP/IPv4 headers 造成的 overhead (40bytes) 並不划算。想像傳送資料只有 1 byte，卻要另外傳 40 bytes">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/nature-grass-wet-plants-high-resolution-wallpaper-573f2c6413708.jpg">
-<meta property="og:updated_time" content="2018-12-14T14:46:09.055Z">
+<meta property="og:updated_time" content="2018-12-16T14:40:10.412Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="tcp-nagel-algorithm-and-delay-ack">
 <meta name="twitter:description" content="Nagle’s Algorithm 和 Delayed ACK 一起用在特定场景下可能会造成网速不必要的延迟傳送 TCP 封包的時候， TCP header 占 20 bytes， IPv4 header 占 20 bytes，若傳送的資料太小， TCP/IPv4 headers 造成的 overhead (40bytes) 並不划算。想像傳送資料只有 1 byte，卻要另外傳 40 bytes">
@@ -216,10 +216,22 @@ ga('send', 'pageview');
 <h3 id="兩者合用的問題"><a href="#兩者合用的問題" class="headerlink" title="兩者合用的問題"></a>兩者合用的問題</h3><p>假設傳送端有開 Nagle’s Algorithm，接收端有開 delayed ACK (兩者在 Linux 都是預設值)。</p>
 <p>以 HTTP 為例，若 server 的 response 被切成兩次 send，一次送 header，一次送 body，兩者都 &lt;MSS。</p>
 <p>server 送完 header 後，因為 client 沒有回 ACK (delayed ACK)，server 也不會送 body (應用層覺得它已經送出了，但 kernel 還沒送)。<br>client 過了 200ms，送出收到 header 的 ACK。<br>server 收到 ACK 後，送出 body。<br>於是 client 多等了 200ms 才收到完整的 response。</p>
-<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>启示就是应用层进行开发的时候不要零零散散的发数据，尽量攒成一个大一点的包再发出去。不要让系统层去做这件事。</p>
-<p>TCP_NODELAY 是可以关闭Nagle算法的</p>
-<p>todo<br>window congestion<br>超时重传<br>阻塞，超时，<br>tcp缓冲</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://taozj.net/201808/nagle-and-delayed-ack.html">Nagle和Delayed ACK优化算法合用导致的死锁问题</a><br><a href="https://medium.com/fcamels-notes/nagles-algorithm-%E5%92%8C-delayed-ack-%E4%BB%A5%E5%8F%8A-minshall-%E7%9A%84%E5%8A%A0%E5%BC%B7%E7%89%88-8fadcb84d96f">Nagle’s Algorithm 和 Delayed ACK 以及 Minshall 的加強版</a><br><a href="https://cloud.tencent.com/developer/article/1004431">再说TCP神奇的40ms</a></p>
+<h3 id="tcp缓冲的概念"><a href="#tcp缓冲的概念" class="headerlink" title="tcp缓冲的概念"></a>tcp缓冲的概念</h3><p><a href="https://www.cnblogs.com/promise6522/archive/2012/03/03/2377935.html">tcp缓冲</a><br>这些东西对于应用层来说是无感的</p>
+<p>socket支持blocking(默认)和non-blocking模式，读写都存在阻塞问题<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="keyword">ssize_t</span> write(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">void</span> *buf, <span class="keyword">size_t</span> count);</span><br></pre></td></tr></table></figure></p>
+<p>牵涉到tcp缓冲层大小</p>
+<p>首先，write成功返回，只是buf中的数据被复制到了kernel中的TCP发送缓冲区。至于数据什么时候被发往网络，什么时候被对方主机接收，什么时候被对方进程读取，系统调用层面不会给予任何保证和通知。<br>已经发送到网络的数据依然需要暂存在send buffer中，只有收到对方的ack后，kernel才从buffer中清除这一部分数据，为后续发送数据腾出空间。接收端将收到的数据暂存在receive buffer中，自动进行确认。但如果socket所在的进程不及时将数据从receive buffer中取出，最终导致receive buffer填满，由于TCP的滑动窗口和拥塞控制，接收端会阻止发送端向其发送数据。这些控制皆发生在TCP/IP栈中，对应用程序是透明的，应用程序继续发送数据，最终导致send buffer填满，write调用阻塞。</p>
+<p>一般来说，由于接收端进程从socket读数据的速度跟不上发送端进程向socket写数据的速度，最终导致发送端write调用阻塞。</p>
+<p>而read调用的行为相对容易理解，从socket的receive buffer中拷贝数据到应用程序的buffer中。read调用阻塞，通常是发送端的数据没有到达。</p>
+<ul>
+<li>read总是在接收缓冲区有数据时立即返回，而不是等到给定的read buffer填满时返回。只有当receive buffer为空时，blocking模式才会等待，而nonblock模式下会立即返回-1（errno = EAGAIN或EWOULDBLOCK）</li>
+<li>blocking的write只有在缓冲区足以放下整个buffer时才返回（与blocking read并不相同）</li>
+<li><p>nonblock write则是返回能够放下的字节数，之后调用则返回-1（errno = EAGAIN或EWOULDBLOCK）</p>
+<p>对于blocking的write有个特例：当write正阻塞等待时对面关闭了socket，则write则会立即将剩余缓冲区填满并返回所写的字节数，再次调用则write失败（connection reset by peer）</p>
+</li>
+</ul>
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>启示就是应用层进行开发的时候不要零零散散的发数据，尽量攒成一个大一点的包再发出去。不要让系统层去做这件事。<br>TCP_NODELAY 是可以关闭Nagle算法的</p>
+<h2 id="todo"><a href="#todo" class="headerlink" title="todo"></a>todo</h2><p>window congestion<br>超时重传<br>阻塞，超时，</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://taozj.net/201808/nagle-and-delayed-ack.html">Nagle和Delayed ACK优化算法合用导致的死锁问题</a><br><a href="https://medium.com/fcamels-notes/nagles-algorithm-%E5%92%8C-delayed-ack-%E4%BB%A5%E5%8F%8A-minshall-%E7%9A%84%E5%8A%A0%E5%BC%B7%E7%89%88-8fadcb84d96f">Nagle’s Algorithm 和 Delayed ACK 以及 Minshall 的加強版</a><br><a href="https://cloud.tencent.com/developer/article/1004431">再说TCP神奇的40ms</a><br><a href="https://www.cnblogs.com/promise6522/archive/2012/03/03/2377935.html">tcp缓冲非常好的文章</a></p>
 
       
 
@@ -591,11 +603,11 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">sql</a>
+                <a href="javascript:void(0)" class="js-tag color2">django</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">django</a>
+                <a href="javascript:void(0)" class="js-tag color4">sql</a>
               </li>
              
               <li class="article-tag-list-item">
