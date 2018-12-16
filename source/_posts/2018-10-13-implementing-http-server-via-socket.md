@@ -578,7 +578,10 @@ ssize_t read(int fd,void *buf,size_t nbyte)
 read函数是负责从fd中读取内容.当读成功 时,read返回实际所读的字节数,如果返回的值是0 表示已经读到文件的结束了,小于0表示出现了错误.如果错误为EINTR说明读是由中断引起 的, 如果是ECONNREST表示网络连接出了问题. 
 
 写函数write
-ssize_t write(int fd, const void*buf,size_t nbytes);
+```c
+#include <unistd.h>
+ssize_t write(int fd, const void *buf, size_t count);
+```
 write函数将buf中的nbytes字节内容写入文件描述符fd.成功时返回写的字节数.失败时返回-1. 并设置errno变量. 在网络程序中,当我们向套接字文件描述符写时有两可能.
 1)write的返回值大于0,表示写了部分或者是全部的数据. 这样我们用一个while循环来不停的写入，但是循环过程中的buf参数和nbyte参数得由我们来更新。也就是说，网络写函数是不负责将全部数据写完之后在返回的。
 2)返回的值小于0,此时出现了错误.我们要根据错误类型来处理.
@@ -633,9 +636,10 @@ Sec-WebSocket-Accept: sasasasaD/tA=
 
 - js并不支持对操作系统socket的直接控制，可能是安全因素(websocket倒是有，不过那是另外一回事了)。
 
+```c
 #include <unistd.h>
-
 ssize_t read(int fd, void *buf, size_t count);
+```
 read这个函数返回的是读取的byte数，(On success, the number of bytes read is returned (zero indicates end of file), and the file position is advanced by this number;On error, -1 is returned, and errno is set appropriately.  In this case, it is left unspecified whether the file position (if any) changes.)
 
 如果read的时候一直统计当前总的read到的bytes数，应该是要比content-length长不少的。
@@ -742,7 +746,7 @@ send(sock_client,"你好啊",len,0);
 **结论就是utf-8 encode的工作是底层根据locale做的，跟application无关。**
 
 
-//[libc只是当作以0结尾的字符串原封不动地write给内核，识别汉字的工作是由终端的驱动程序做的。](http://docs.linuxtone.org/ebooks/C&CPP/c/apas03.html)也就是基于当前的locale
+[libc只是当作以0结尾的字符串原封不动地write给内核，识别汉字的工作是由终端的驱动程序做的。](http://docs.linuxtone.org/ebooks/C&CPP/c/apas03.html)也就是基于当前的locale
 ```c
 #include <stdio.h>
 
@@ -769,6 +773,8 @@ $ od -tc nihao.c
 
 ##不知道为什么,百度首页的response中没有content-length字段
 read from socket , and write it to local file ,how about that?
+
+
 
 
 

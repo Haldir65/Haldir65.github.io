@@ -148,6 +148,7 @@ print(balance)
 改成每一次对共享变量进行操作都需要加锁之后，打印结果就正常了
 [多进程之间的同步方式包括queue,Event,Semaphores，Conditions等](https://hackernoon.com/synchronization-primitives-in-python-564f89fee732)
 
+
 ## 多进程
 
 多进程的版本
@@ -337,11 +338,154 @@ StopIteration // 这是正常的，说明generator执行完毕
 >>>
 ```
 
-python 3.5标准库中出现的async await关键字只是基于generator的sytatic sugar，那么[generator是如何实现的](https://stackoverflow.com/questions/8389812/how-are-generators-and-coroutines-implemented-in-cpython).
+python3.3中开始出现yield关键字，python3.4中开始引入asyncio标准库，python 3.5标准库中出现的async await关键字只是基于generator的sytatic sugar，那么[generator是如何实现的](https://stackoverflow.com/questions/8389812/how-are-generators-and-coroutines-implemented-in-cpython).
 - The yield instruction takes the current executing context as a closure, and transforms it into an own living object. This object has a __iter__ method which will continue after this yield statement.
 So the call stack gets transformed into a heap object.
 
 [解释generator实现原理的文章](https://hackernoon.com/the-magic-behind-python-generator-functions-bc8eeea54220)
+
+[python 2.5开始，generator能够返回数据，这之前还只是iteratble的](https://snarky.ca/how-the-heck-does-async-await-work-in-python-3-5/) 还可以通过gen.send函数往generator传参数
+[event-loop的实现原理简述](https://github.com/AndreLouisCaron/a-tale-of-event-loops)
+
+python3.4需要使用@coroutine的decorator，3.5之后直接使用async await关键字，确实更加方便
+```python
+import asyncio
+import time
+
+async def speak_async(): 
+    print('starting====') 
+    r = await asyncio.sleep(1) ##这里不能使用time.sleep(1)
+    print('OMG asynchronicity!')
+
+loop = asyncio.get_event_loop()  
+loop.run_until_complete(speak_async())  
+loop.close()  
+```
+
+
+### 多线程环境下对资源的操作需要考虑线程安全问题
+有些操作不是原子性的
+[Thinking about Concurrency, Raymond Hettinger, Python core developer](https://www.youtube.com/watch?v=Bv25Dwe84g0)
+java中最初的设计是有kill thread的method的，但是后来被deprecated了（假设你kill了一个获取了锁的线程，程序将进入死锁状态）。 python中理论上是可以kill一个线程的，但是kill一个线程这件事本身就是不应该的。
+
+一个最简单的多线程资源竞争的例子
+```python
+import threading
+
+counter = 0
+
+def worker():
+    global counter
+
+    counter += 1 
+    print('The count is %d' % counter)
+    print('------------')
+
+
+print('Starting up --------')
+
+for i in range(10):
+    threading.Thread(target=worker).start()
+print('Finishing up')    
+```
+输出
+```
+Starting up --------
+
+The count is 1
+------------
+The count is 2
+------------
+The count is 3
+------------
+The count is 4
+------------
+The count is 5
+------------
+The count is 6
+------------
+The count is 7
+------------
+The count is 8
+------------
+The count is 9
+------------
+The count is 10
+------------
+Finishing up
+```
+数据量比较小的时候不容易发现这里存在的race condition。如果在每一次对资源进行操作之间都插入一段thread.sleep，问题就出来了
+
+```python
+import threading,time, random
+
+FUZZ = True
+
+def fuzz():
+    if FUZZ:
+        time.sleep(random.random())
+
+counter = 0
+
+def worker():
+    global counter
+    fuzz()
+    oldcnt = counter
+    fuzz()
+    counter = oldcnt +1
+    fuzz()
+    print('The count is %d' % counter)
+    fuzz()
+    print('------------')
+    fuzz()
+
+
+print('Starting up --------\n')
+fuzz()
+
+for i in range(10):
+    t = threading.Thread(target=worker)
+    t.start()
+    fuzz()
+
+print('Finishing up')  
+fuzz()  
+```
+资源竞争场景下，问题就出来了
+```
+Starting up --------
+
+The count is 1
+------------
+The count is 2
+The count is 3
+------------
+------------
+The count is 5
+The count is 5
+------------
+------------
+The count is 5
+------------
+Finishing up
+The count is 7
+The count is 8
+------------
+------------
+The count is 8
+------------
+The count is 8
+------------
+```
+
+多线程之间的同步问题，一种是加锁，另一种是使用atomic message queue.
+python中有些module内部已经加了锁，logging,decimal(thread local),databases(reader locks and writer locks),email(atomic message queue)。
+锁在写operating system的时候非常有用，但是其他时候不要用。
+所有的资源都应该只能同时被一条线程操作。
+threading中的join就属于一种barrier（主线程调用t.join，就是等t跑完了之后，主线程再去干接下来的事情） 
+
+
+
 
 ## 牵涉到一些celery的点
 todo

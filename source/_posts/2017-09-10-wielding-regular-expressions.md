@@ -83,6 +83,10 @@ e的意思是extended regular expressions（Extended regular expressions include
 [Linux 中 grep 命令的 12 个实践例子](http://blog.jobbole.com/112580/)
 
 
+
+## C语言版本的正则
+[regex.h](https://www.zfl9.com/c-regex-pcre.html)
+
 ![](https://www.haldir66.ga/static/imgs/scenery151110067848.jpg)
 ![](https://www.haldir66.ga/static/imgs/1513521515888.jpg)
 ![](https://www.haldir66.ga/static/imgs/1513521557303.jpg)
