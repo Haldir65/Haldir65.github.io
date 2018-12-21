@@ -92,6 +92,10 @@ int main(void){
 linux上信号有32种，多数在C语言中都有默认的处理方式（并且这种默认的处置方式也是可以更改的），除了SIGKILL(强行terminate)和SIGSTOP(debug遇到断点)不允许开发者更改处理方式。(kill -9也就是强杀非常有效)
 c程序可以通过signal(比较老了)函数或者sigaction(推荐)函数注册收到信号之后的动作
 
+[Linux by default use the RAM as disk cache](https://unix.stackexchange.com/questions/6593/force-directory-to-always-be-in-cache)
+这里的回答解释了系统会默认在内存中缓存磁盘节点的信息，下一次进行find的操作时候，就会快很多。
+
+
 
 
 

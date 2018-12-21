@@ -74,8 +74,8 @@ app.use(bodyParser.json())
 - 获取GET请求的参数
 比如 GET /student/getById/27 这样一个get请求
 ```js
-app.get('/getById/:age',functin(req,res){
-    res.send(req.prarms.age);
+app.get('/getById/:age',function(req,res){
+    res.send(req.params.age);
 })
 ```
 

@@ -508,4 +508,7 @@ NAPT原理
 192.168.0.0 - 192.168.255.255 (192.168/16比特前缀)
 
 我们可以看到其中有1个A类地址块，32个B类地址块和256个C类地址块。主流的家用路由器使用C类私有地址作为路由器LAN端的IP地址较多，所以我们可以看到路由器设置页面的IP一般都为192.168开头。
+
+
+[tcp keep-alive和http的keep-alive是两回事](https://stackoverflow.com/questions/9334401/http-keep-alive-and-tcp-keep-alive) http keep-alive是由webserver负责实现的。 关键字:http keepalive implementation
         

@@ -408,7 +408,7 @@ c语言就是这样，好多功能都得自己实现
 [2] http://www.gnu.org/software/gnulib/ 
 [3] http://apr.apache.org/
 
-
+[gets在c11中被gets_s替代](https://zh.cppreference.com/w/c/io/gets)
 
 
 ## 参考

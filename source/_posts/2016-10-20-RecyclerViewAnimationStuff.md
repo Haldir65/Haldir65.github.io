@@ -841,6 +841,8 @@ package private的变量是否就不能访问到？
 接下来在这个包里面的class就能直接访问RecyclerView中的package-private权限的成员变量了。
 亲测可行。
 
+一个小问题：itemDecoration在notifyItemRemoved(onDrawOver)的时候，那个decoration好像不在动
+
 
 ### 4 . 一些参考资料
 - [RecyclerView Animations and Behind the Scenes (Android Dev Summit 2015)](https://www.youtube.com/watch?v=imsr8NrIAMs)

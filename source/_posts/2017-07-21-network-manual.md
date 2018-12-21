@@ -77,6 +77,7 @@ wiki上的[http名词解释](https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6
 401 Unauthorized
 403 Forbidden
 404 Not Found
+411 Length required 
 414 Request URI Too Long URI太长（HTTP 1.1新）。这就是上面说的Http的GET请求的url长度是有限制的，是服务器方做出的限制
 500 Internal Server Error
 502 Bad Gateway 服务器作为网关或者代理时，为了完成请求访问下一个服务器，但该服务器返回了非法的应答。
@@ -85,6 +86,9 @@ wiki上的[http名词解释](https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6
 [RFC在这里](https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.6)
 [http状态码451](https://juejin.im/entry/5770d05a2e958a0078f1d730)，由于法律上的原因不能显示网页内容
 [http状态码429 too many requests]
+
+http 411的解释:
+(为了兼容HTTP/1.0应用程序，HTTP/1.1的请求消息体中必须包含一个合法的Content-Length头字段，除非知道服务器兼容HTTP/1.1。一个请求包含消息体，并且Content-Length字段没有给定，如果不能判断消息的长度，服务器应该用用400 (bad request) 来响应；或者服务器坚持希望收到一个合法的Content-Length字段，用 411 (length required)来响应。)
 
 ## 3. Header相关的
 首先看下请求百度首页的request和response
@@ -586,6 +590,7 @@ firefox > nginx [ACK] 好的,知道了
 
 
 ### 开启浏览器内支持webp[关于WebP接入方案](https://www.xuanfengge.com/webp-access-scheme.html)
+一般的做法是在nginx里面判断请求头，如果有accept: image/webp 这样的字段的话，那么就返回webp图片，否则返回png图片，当然webp图片可能是临时生成的。
 
 
 [单个网卡最多65535个端口](https://www.google.com/search?q=%E5%8D%95%E4%B8%AA%E7%BD%91%E5%8D%A1%E6%9C%80%E5%A4%9A65535%E4%B8%AA%E7%AB%AF%E5%8F%A3)

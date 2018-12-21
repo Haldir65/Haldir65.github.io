@@ -11,6 +11,9 @@ select，poll，epoll都是IO多路复用的机制。I/O多路复用就通过一
 
 用户态到内核态的内存copy的开销
 
+mac上叫做Kqueue
+[epoll或者Kqueue的原理是什么](https://www.zhihu.com/question/20122137)
+
 
 
 在看[socket programming in python](https://realpython.com/python-sockets/)这篇文章时发现有selector这样的操作。其实和c语言的做法很相似。

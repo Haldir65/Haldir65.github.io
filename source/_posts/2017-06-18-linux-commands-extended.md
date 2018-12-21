@@ -552,6 +552,16 @@ process state
 
 一般都是S比较多，Z属于Zombie进程，直接干掉   
 
+再提一下top是怎么看的
+top其中第三行CPU信息中：
+usr  代表用户空间占用CPU的百分比，
+sys  代表内核空间占用CPU的百分比，
+nic   代表改变过优先级的进程占用CPU的百分比，
+idle  代表空闲的CPU的百分比，
+io    代表IO等待占用CPU的百分比，
+irq   代表硬件中断占用CPU的百分比，
+sirq  代表软件中断占用CPU的百分比。
+
 
 
 Mere trash

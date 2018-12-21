@@ -63,6 +63,7 @@ top : 1
 - [ ] a new article on open-gl intro(on going)
 - [ ] awk，正则表达式还有数据库这些也算一门编程语言
 - [ ] 来来来，[手写一个vm](https://www.youtube.com/watch?v=DUNkdl0Jhgs)
+- [ ] [chromium提供了如何在windows上编译chromium的教程](https://chromium.googlesource.com/chromium/src/+/master/docs/windows_build_instructions.md#System-requirements)
 
 
 

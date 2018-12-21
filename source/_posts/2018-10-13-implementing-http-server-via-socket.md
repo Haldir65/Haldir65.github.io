@@ -773,7 +773,7 @@ $ od -tc nihao.c
 
 ##不知道为什么,百度首页的response中没有content-length字段
 read from socket , and write it to local file ,how about that?
-
+[这篇文章提到](https://www.cnblogs.com/skynet/archive/2010/12/11/1903347.html)，由于http keep-alive的存在，读取server的response已经读不到EOF了，所以也就不能以EOF作为读取完毕的标志。分两种情况：有Content-length的，Transfer-Encoding：chunked（复杂一点点）这两种
 
 
 

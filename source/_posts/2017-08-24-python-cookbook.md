@@ -231,11 +231,25 @@ print(datetime.now())
 ```
 
 
-自带的Log使用
+自带的Log使用, 注意默认的情况下是不打印出info的信息的，需要设置一下level
 ```python
 import logging
+# create logger
 
-logging.warning('this is awesome')
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+ 
+
+
+def main():
+    logger.info('This is a log info')
+    logger.debug('Debugging')
+    logger.warning('Warning exists')
+    logger.info('Finish')
+    pass
+
+if __name__ == "__main__":
+    main()
 ```
 
 [下划线的意义很多种](https://dbader.org/blog/meaning-of-underscores-in-python)
@@ -636,5 +650,8 @@ img.save('sompic.jpg')
 2.The list of directories contained in the PYTHONPATH environment variable, if it is set. (The format for PYTHONPATH is OS-dependent but should mimic the PATH environment variable
 3.An installation-dependent list of directories configured at the time Python is installed
 [vim and python](https://realpython.com/vim-and-python-a-match-made-in-heaven/)
+
+经常会看到支持with xxx as xxx
+可以自己写这样的函数，from contextlib import contextmanager，关键字: context syntax
 
 [James Bennett - A Bit about Bytes: Understanding Python Bytecode - PyCon 2018](https://www.youtube.com/watch?v=cSSpnq362Bk)主要是dis模块

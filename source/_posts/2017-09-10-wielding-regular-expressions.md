@@ -158,4 +158,5 @@ e的意思是extended regular expressions（Extended regular expressions include
 ![](https://haldir66.ga/static/imgs/starry-night-van-gogh.jpg)
 ### 参考
 - [DFA和NFA](http://www.importnew.com/26560.html)
+- [Learn regex the easy way](https://github.com/ziishaned/learn-regex)
 - [必应壁纸](https://bing.ioliu.cn/)

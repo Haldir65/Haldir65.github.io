@@ -485,9 +485,38 @@ python中有些module内部已经加了锁，logging,decimal(thread local),datab
 threading中的join就属于一种barrier（主线程调用t.join，就是等t跑完了之后，主线程再去干接下来的事情） 
 
 
+### Raymond Hettinger提到message queue的task_done方法是他created的。(还是atomic measge queue, 好像是内部加了锁，操作queue中资源的只有那么一条线程，当然不存在并发问题). 其实raymod也提到了，你也可以用RabbitMQ等,ZEROMQ 甚至是database（内部有read write lock）
+```python
+def worker():
+    while True:
+        item = q.get()
+        do_work(item)
+        q.task_done()
+
+q = Queue()
+for i in range(num_worker_threads):
+     t = Thread(target=worker)
+     t.daemon = True
+     t.start()
+
+for item in source():
+    q.put(item)
+
+q.join()       # block until all tasks are done
+```
+
+爬虫简单的多线程版本是每个线程创建的时候，就给出一个args = [someurl] ，然后有多少任务就创建多少线程。但是这样做迟早会碰上操作系统对最大线程数的设置[据说400+]，于是又想到用threadPool,自己实现threadpool的也是大有人在（内部持有一个任务队列，不停去队列里获取任务）。(https://www.shanelynn.ie/using-python-threading-for-multiple-results-queue/)
+```
+error: can't start new thread
+File "/usr/lib/python2.5/threading.py", line 440, in start
+    _start_new_thread(self.__bootstrap, ())
+```
+那么比较实用的使用场景是，spawn 10条线程去进行while not queue.empty() -> requests.get()操作，各自在完成之后丢到一个通用的容器中，再由message queue独立完成所有response的processing.
+
 
 
 ## 牵涉到一些celery的点
+celery能够利用好多进程
 todo
 
 

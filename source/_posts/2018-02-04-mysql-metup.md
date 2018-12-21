@@ -600,3 +600,5 @@ ERROR 1055 (42000): Expression #1 of SELECT list is not in GROUP BY clause and c
 >  SELECT last_name,first_name,state FROM students WHERE first_name LIKE 'D%' OR last_name LIKE '%n' GROUP BY last_name,first_name,state;
 
 启用mysql缓存降低cpu的使用率
+
+经常会看到一个.sql文件，[比方说这个](https://github.com/ouhaohan8023/tcp_icmp_check/blob/master/ss_node.sql)，怎么导出来的？

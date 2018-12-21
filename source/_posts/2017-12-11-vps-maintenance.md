@@ -226,6 +226,7 @@ sudo apt-get install simple-obfs
 ### 2.7 ss-local提供正向代理
 //在ss-local监听1080端口的前提下，这条命令可以正常访问google
 > curl -4sSkL -x socks5h://127.0.0.1:1080 https://www.google.com
+> curl --socks5 127.0.0.1:1080 http://stackoverflow.com/ //这个更简单
 
 ## 3. ubuntu自带的防火墙叫做ufw(Uncomplicated Firewall)，用起来也很简单
 [digital ocean的ufw教程](https://www.digitalocean.com/community/tutorials/ufw-essentials-common-firewall-rules-and-commands)
@@ -502,4 +503,8 @@ sudo fail2ban-regex /var/log/nginx/access.log /etc/fail2ban/filter.d/nginx-x00.c
 
 [iperf是linux下的一个tcp测速软件](https://github.com/shadowsocks/shadowsocks-libev/blob/master/scripts/iperf.sh)
 
+
+## 参考
+[国外的超级ping](https://asm.ca.com/en/ping.php)
+[快速检测 IP 地址是否可用](https://ipcheck.need.sh/)
 
