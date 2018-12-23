@@ -8,16 +8,24 @@
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>tcp和udp包结构分析 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="keywords" content="linux,tools">
+  <meta name="description" content="本文只针对ipv4网络进行分析">
+<meta name="keywords" content="linux,tools">
 <meta property="og:type" content="article">
 <meta property="og:title" content="tcp和udp包结构分析">
 <meta property="og:url" content="https://haldir65.github.io/2018/12/03/2018-12-03-packet-structure-of-tcp-and-udp/index.html">
 <meta property="og:site_name" content="Haldir的博客">
+<meta property="og:description" content="本文只针对ipv4网络进行分析">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/AlanTuringNotebook_EN-AU7743633207_1920x1080.jpg">
-<meta property="og:updated_time" content="2018-12-21T13:37:43.940Z">
+<meta property="og:image" content="https://www.haldir66.ga/static/imgs/TCP-window-syn.png">
+<meta property="og:image" content="https://www.haldir66.ga/static/imgs/TCP-window-http.png">
+<meta property="og:image" content="https://www.haldir66.ga/static/imgs/Transmission-control-protocol-window-scaling.png">
+<meta property="og:image" content="https://www.haldir66.ga/static/imgs/TCP-Zero-Window-Performance-Vision.png">
+<meta property="og:image" content="https://haldir66.ga/static/imgs/tcp_and_udp_size_limit.png">
+<meta property="og:updated_time" content="2018-12-23T14:52:16.308Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="tcp和udp包结构分析">
+<meta name="twitter:description" content="本文只针对ipv4网络进行分析">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/AlanTuringNotebook_EN-AU7743633207_1920x1080.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
@@ -197,7 +205,7 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p><img src="https://www.haldir66.ga/static/imgs/AlanTuringNotebook_EN-AU7743633207_1920x1080.jpg" alt=""><br><a id="more"></a></p>
+        <p>本文只针对ipv4网络进行分析<br><img src="https://www.haldir66.ga/static/imgs/AlanTuringNotebook_EN-AU7743633207_1920x1080.jpg" alt=""><br><a id="more"></a></p>
 <blockquote>
 <p>多数内容来自<a href="https://jerryc8080.gitbooks.io/understand-tcp-and-udp/chapter2.html">TCP 报文结构</a><br>同一台机器上的两个进程，可以通过管道，共享内存，信号量，消息队列等方式进行通信。通信的一个基本前提是每个进程都有唯一的标识，在同一台机器上，使用pid就可以了。两台不同的计算机之间通信，可以使用<strong>ip地址 + 协议 +协议端口号</strong> 来标识网络中的唯一进程。<br>tcp用16位端口号来标识一个端口，也就是两个bytes(65536就这么来的)。</p>
 </blockquote>
@@ -219,16 +227,34 @@ ga('send', 'pageview');
 <h3 id="连接建立过程"><a href="#连接建立过程" class="headerlink" title="连接建立过程"></a>连接建立过程</h3><p>TCP 连接的建立采用客户服务器方式，主动发起连接建立的一方叫客户端（Client），被动等待连接建立的一方叫服务器（Server）。<br>最初的时候，两端都处于 CLOSED 的状态，然后服务器打开了 TCP 服务，进入 LISTEN 状态，监听特定端口，等待客户端的 TCP 请求。<br>第一次握手： 客户端主动打开连接，发送 TCP 报文，进行第一次握手，然后进入 SYN_SEND 状态，等待服务器发回确认报文。<br>这时首部的同步位 SYN = 1，同时初始化一个序号 Sequence Number = J。<br>TCP 规定，SYN 报文段不能携带数据，但会消耗一个序号。<br>第二次握手： 服务器收到了 SYN 报文，如果同意建立连接，则向客户端发送一个确认报文，然后服务器进入 SYN_RCVD 状态。<br>这时首部的 SYN = 1，ACK = 1，而确认号 Acknowledgemt Number = J + 1，同时也为自己初始化一个序号 Sequence Number = K。<br>这个报文同样不携带数据。<br>第三次握手：<br>客户端收到了服务器发过来的确认报文，还要向服务器给出确认，然后进入 ESTABLISHED 状态。<br>这时首部的 SYN 不再置为 1，而 ACK = 1，确认号 Acknowledgemt Number = K + 1，序号 Sequence Number = J + 1。<br>第三次握手，一般会携带真正需要传输的数据，当服务器收到该数据报文的时候，就会同样进入 ESTABLISHED 状态。 此时，TCP 连接已经建立。<br>对于建立连接的三次握手，主要目的是初始化序号 Sequence Number，并且通信的双方都需要告知对方自己的初始化序号，所以这个过程也叫 SYN。<br>这个序号要作为以后的数据通信的序号，以保证应用层接收到的数据不会因为网络上的传输问题而乱序，因为TCP 会用这个序号来拼接数据。</p>
 <h3 id="TCP-Flood-攻击"><a href="#TCP-Flood-攻击" class="headerlink" title="TCP Flood 攻击"></a>TCP Flood 攻击</h3><p>知道了 TCP 建立一个连接，需要进行三次握手。<br>但如果你开始思考「三次握手的必要性」的时候，就会知道，其实网络是很复杂的，一个信息在途中丢失的可能性是有的。<br>如果数据丢失了，那么，就需要重新发送，这时候就要知道数据是否真的送达了。<br>这就是三次握手的必要性。<br>但是再向深一层思考，你给我发信息，我收到了，我回复，因为我是君子。<br>如果是小人，你给我发信息，我就算收到了，我也不回复，你就一直等我着我的回复。<br>那么很多小人都这样做，你就要一直记住你在等待着小人1号、小人2号、小人3号……直到你的脑容量爆棚，烧坏脑袋。<br>黑客就是利用这样的设计缺陷，实施 TCP Flood 攻击，属于 DDOS 攻击的一种。</p>
 <h3 id="四次挥手，释放连接"><a href="#四次挥手，释放连接" class="headerlink" title="四次挥手，释放连接"></a>四次挥手，释放连接</h3><p>TCP 有一个特别的概念叫做半关闭，这个概念是说，TCP 的连接是全双工（可以同时发送和接收）的连接，因此在关闭连接的时候，必须关闭传送和接收两个方向上的连接。<br>客户端给服务器发送一个携带 FIN 的 TCP 结束报文段，然后服务器返回给客户端一个 确认报文段，同时发送一个 结束报文段，当客户端回复一个 确认报文段 之后，连接就结束了。<br>释放连接过程<br>在结束之前，通信双方都是处于 ESTABLISHED 状态，然后其中一方主动断开连接。<br>下面假如客户端先主动断开连接。<br>第一次挥手：<br>客户端向服务器发送结束报文段，然后进入 FIN_WAIT_1 状态。<br>此报文段 FIN = 1， Sequence Number = M。<br>第二次挥手：<br>服务端收到客户端的结束报文段，然后发送确认报文段，进入 CLOSE_WAIT 状态。<br>此报文段 ACK = 1， Sequence Number = M + 1。<br>客户端收到该报文，会进入 FIN_WAIT_2 状态。<br>第三次挥手：<br>同时服务端向客户端发送结束报文段，然后进入 LAST_ACK 状态。<br>此报文段 FIN = 1，Sequence Number = N。<br>第四次挥手：<br>客户端收到服务端的结束报文段，然后发送确认报文段，进入 TIME_WAIT 状态，经过 2MSL 之后，自动进入 CLOSED 状态。<br>此报文段 ACK = 1, Sequence Number = N + 1。<br>服务端收到该报文之后，进入 CLOSED 状态。<br>关于 TIME_WAIT 过渡到 CLOSED 状态说明：<br>从 TIME_WAIT 进入 CLOSED 需要经过 2MSL，其中 MSL 就叫做 最长报文段寿命（Maxinum Segment Lifetime），根据 RFC 793 建议该值这是为 2 分钟，也就是说需要经过 4 分钟，才进入 CLOSED 状态。</p>
-<h3 id="可靠性交付的实现"><a href="#可靠性交付的实现" class="headerlink" title="可靠性交付的实现"></a>可靠性交付的实现</h3><p>滑动窗口<br>超时重传<br>流量控制<br>拥塞控制</p>
-<p>##TBD</p>
-<p>关键字： tcp read buffer</p>
+<h3 id="这里还只是tcp层面，如果加上tls初始化握手，这个速度会更慢一些"><a href="#这里还只是tcp层面，如果加上tls初始化握手，这个速度会更慢一些" class="headerlink" title="这里还只是tcp层面，如果加上tls初始化握手，这个速度会更慢一些"></a>这里还只是tcp层面，如果加上tls初始化握手，这个速度会更慢一些</h3><p>下面从<a href="https://www.infoq.cn/article/2018%2F03%2Fweibo-quic">QUIC 在微博中的落地思考</a>文中摘抄一部分批判tcp</p>
 <blockquote>
-<p>Your Network Interface Card (NIC) is performing all of the necessary tasks of collecting packets and waiting for your OS to read them. Ultimately, when you do a stream read you’re pulling from the memory that your OS has reserved and constantly stores the incoming information copy into.<br>To answer your question, yes. You are definitely doing a copy. A copy of a copy, the bits are read into a buffer within your NIC, your OS puts them somewhere, and you copy them when you do a stream read.</p>
+<p>TCP 协议在建立连接时，需要经历较为漫长的三次握手行为，而在关闭时，也有稍显冗余的 4 次摆手。而 HTTPS 初始连接需要至少 2 个 RTT 交互（添加了握手缓存就会变成了 1-RTT，这里指的是 TLS 1.2），外加 TCP 自身握手流程，最少需要 3 次 RTT 往返，才能够完整建立连接。而 QUIC 协议层面界定了 1-2 个 RTT 握手流程，再次连接为 0-RTT 握手优化流程（但需要添加握手缓存）</p>
 </blockquote>
 <p>关于tcp read/write buffer，shadowsocks的参数优化提到了一些东西<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"># max open files</span><br><span class="line">fs.file-max = 1024000</span><br><span class="line"># max read buffer</span><br><span class="line">net.core.rmem_max = 67108864</span><br><span class="line"># max write buffer</span><br><span class="line">net.core.wmem_max = 67108864</span><br><span class="line"># default read buffer</span><br><span class="line">net.core.rmem_default = 65536</span><br><span class="line"># default write buffer</span><br><span class="line">net.core.wmem_default = 65536</span><br><span class="line"># max processor input queue</span><br><span class="line">net.core.netdev_max_backlog = 4096</span><br><span class="line"># max backlog</span><br><span class="line">net.core.somaxconn = 4096</span><br><span class="line"></span><br><span class="line"># resist SYN flood attacks</span><br><span class="line">net.ipv4.tcp_syncookies = 1</span><br><span class="line"># reuse timewait sockets when safe</span><br><span class="line">net.ipv4.tcp_tw_reuse = 1</span><br><span class="line"># turn off fast timewait sockets recycling</span><br><span class="line">net.ipv4.tcp_tw_recycle = 0</span><br><span class="line"># short FIN timeout</span><br><span class="line">net.ipv4.tcp_fin_timeout = 30</span><br><span class="line"># short keepalive time</span><br><span class="line">net.ipv4.tcp_keepalive_time = 1200</span><br><span class="line"># outbound port range</span><br><span class="line">net.ipv4.ip_local_port_range = 10000 65000</span><br><span class="line"># max SYN backlog</span><br><span class="line">net.ipv4.tcp_max_syn_backlog = 4096</span><br><span class="line"># max timewait sockets held by system simultaneously</span><br><span class="line">net.ipv4.tcp_max_tw_buckets = 5000</span><br><span class="line"># TCP receive buffer</span><br><span class="line">net.ipv4.tcp_rmem = 4096 87380 67108864</span><br><span class="line"># TCP write buffer</span><br><span class="line">net.ipv4.tcp_wmem = 4096 65536 67108864</span><br><span class="line"># turn on path MTU discovery</span><br><span class="line">net.ipv4.tcp_mtu_probing = 1</span><br><span class="line"></span><br><span class="line"># for high-latency network</span><br><span class="line">net.ipv4.tcp_congestion_control = hybla</span><br><span class="line"># forward ipv4</span><br><span class="line">net.ipv4.ip_forward = 1</span><br></pre></td></tr></table></figure></p>
 <p><a href="https://www.cyberciti.biz/files/linux-kernel/Documentation/networking/ip-sysctl.txt">内核文档对于这些参数的定义</a><br>注意，这些参数修改了会影响所有的进程，修改还是慎重一些</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://jerryc8080.gitbooks.io/understand-tcp-and-udp/">TCP 报文结构</a><br><a href="https://www.google.com/search?q=tcp%E5%8C%85%E7%BB%93%E6%9E%84">tcp包结构</a></p>
-<p><a href="https://accedian.com/enterprises/blog/tcp-receive-window-everything-need-know/">关于tcp协议的一整个series</a></p>
+<h3 id="tcp-buffer"><a href="#tcp-buffer" class="headerlink" title="tcp buffer"></a>tcp buffer</h3><p>关键字： tcp read buffer and write buffer<br>这里要分congestion window（发送方的window，对应congestion control）和receive window(接收方的window，对应flow control)<br>receive window</p>
+<blockquote>
+<p>Your Network Interface Card (NIC) is performing all of the necessary tasks of collecting packets and waiting for your OS to read them. Ultimately, when you do a stream read you’re pulling from the memory that your OS has reserved and constantly stores the incoming information copy into.<br>To answer your question, yes. You are definitely doing a copy. A copy of a copy, the bits are read into a buffer within your NIC, your OS puts them somewhere, and you copy them when you do a stream read.</p>
+</blockquote>
+<p>用wireshark抓包的话，在tcp header里面有个”window size value”，比方说这个数是2000，也就是发来这个包的一方告诉当前接受方，你下一次最多再发2000byte的数据过来，再多就装不下了。如果接收方处理速度跟不上，buffer慢慢填满，就会在ack包里调低window size，告诉对方发慢一点。<br>client处理速度够快的时候是这样的<br><img src="https://www.haldir66.ga/static/imgs/TCP-window-syn.png" alt=""></p>
+<p>如果不够快的话,这时候就是client在ack包里告诉server自己跟不上了<br><img src="https://www.haldir66.ga/static/imgs/TCP-window-http.png" alt=""></p>
+<h2 id="TCP-Window-Scaling"><a href="#TCP-Window-Scaling" class="headerlink" title="TCP Window Scaling"></a>TCP Window Scaling</h2><p>注意，window size是在ack包里的,另外,tcp header里面为这个window size准备的空间是2 bytes（65536 bytes,所以一个包最大也就65K?）。这样对于那些大带宽高延迟的连接来说是不利的。事实当然没这么简单，<a href="https://www.ietf.org/rfc/rfc1323.txt">RFC 1323</a> enable the TCP receive window to be increased exponentially(指数增长)。这个功能是在握手的时候互相商定了一个增长的倍数(在tcp握手的header里面有一个window size scaling factor,比如下图这样的，一次乘以4)<br><img src="https://www.haldir66.ga/static/imgs/Transmission-control-protocol-window-scaling.png" alt=""></p>
+<blockquote>
+<p>In the image above, the sender of this packet is advertising a TCP Window of 63,792 bytes and is using a scaling factor of four. This means that that the true window size is 63,792 x 4 (255,168 bytes). Using scaling windows allows endpoints to advertise a window size of over 1GB. To use window scaling, both sides of the connection must advertise this capability in the handshake process. If one side or the other cannot support scaling, then neither will use this function. The scale factor, or multiplier, will only be sent in the SYN packets during the handshake and will be used for the life of the connection. This is one reason why it is so important to capture the handshake process when performing TCP analysis.</p>
+</blockquote>
+<p>就是说4这个数只会出现在握手的syn包中，并且只有在双方都能支持scaling的前提下才会用，而且这个4将会在这条连接的生命周期中一直是这个数，所以要分析的话，逮这个syn包去抓。</p>
+<h3 id="TCP-Zero-window"><a href="#TCP-Zero-window" class="headerlink" title="TCP Zero window"></a>TCP Zero window</h3><p><img src="https://www.haldir66.ga/static/imgs/TCP-Zero-Window-Performance-Vision.png" alt=""><br>意思就是说，这个window size变成0了。通常不会出现这种情况，一般是接收方的进程出问题了，这时候server会等着，随着client的应用层开始处理数据，client会慢慢发TCP Keep-Alive包，带上新的window size，告诉server说，自己正在处理数据，快了快了。</p>
+<blockquote>
+<p>The throughput of a communication is limited by two windows: the congestion window and the receive window. The congestion window tries not to exceed the capacity of the network (congestion control); the receive window tries not to exceed the capacity of the receiver to process data (flow control). The receiver may be overwhelmed by data if for example it is very busy (such as a Web server). Each TCP segment contains the current value of the receive window. If, for example, a sender receives an ack which acknowledges byte 4000 and specifies a receive window of 10000 (bytes), the sender will not send packets after byte 14000, even if the congestion window allows it.<br>总的来说，tcp传输的速度是由congestion window and the receive window控制的，前者控制发送方的发送速度，后者限制接收方的接收速度。</p>
+</blockquote>
+<h3 id="可靠性交付的实现到这里也就清楚了"><a href="#可靠性交付的实现到这里也就清楚了" class="headerlink" title="可靠性交付的实现到这里也就清楚了"></a>可靠性交付的实现到这里也就清楚了</h3><p>滑动窗口(sliding window)<br>超时重传<br>流量控制 (flow control)<br>拥塞控制（congestion control）</p>
+<h2 id="一个tcp-udp或者ip包最大多大，最小多大"><a href="#一个tcp-udp或者ip包最大多大，最小多大" class="headerlink" title="一个tcp,udp或者ip包最大多大，最小多大"></a>一个tcp,udp或者ip包最大多大，最小多大</h2><p>最小我们知道<br>传送TCP数据包的時候，TCP header 占 20 bytes， IPv4 header 占 20 bytes，所以最小40byte。<br>那么最大呢<a href="https://blog.csdn.net/caoshangpa/article/details/51530685">TCP、UDP数据包大小的限制</a><br>应用层udp最大1500-20-8 = 1472 字节(多了会被分片重组，万一分片丢失导致重组失败，就会被丢包)，1500是硬件决定的,20是ip头，8是udp的头<br>结论<br>UDP 包的大小就应该是 1500 - IP头(20) - UDP头(8) = 1472(Bytes)<br>TCP 包的大小就应该是 1500 - IP头(20) - TCP头(20) = 1460 (Bytes)<br>UDP数据报的长度是指包括报头和数据部分在内的总字节数，其中报头长度固定，数据部分可变。数据报的最大长度根据操作环境的不同而各异。从理论上说，包含报头在内的数据报的最大长度为65535字节(64K)。<br>用UDP协议发送时，用sendto函数最大能发送数据的长度为：65535- IP头(20) - UDP头(8)＝65507字节。用sendto函数发送数据时，如果发送数据长度大于该值，则函数会返回错误。<br>MTU 最大传输单元（英语：Maximum Transmission Unit，缩写MTU）是指一种通信协议的某一层上面所能通过的最大数据包大小（以字节为单位），怎么看</p>
+<blockquote>
+<p>ping -l 1472 -f www.baidu.com ##根据提示去调小这个数就是了，一般1350以上是有的</p>
+</blockquote>
+<p>从csdn搞来的图<br><img src="https://haldir66.ga/static/imgs/tcp_and_udp_size_limit.png" alt=""><br>传输层：<br>对于UDP协议来说，整个包的最大长度为65535，其中包头长度是65535-20=65515；<br>对于TCP协议来说，整个包的最大长度是由最大传输大小（MSS，Maxitum Segment Size）决定，MSS就是TCP数据包每次能够传<br>输的最大数据分段。为了达到最佳的传输效能TCP协议在建立连接的时候通常要协商双方的MSS值，这个值TCP协议在实现的时候往往用MTU值代替（需<br>要减去IP数据包包头的大小20Bytes和TCP数据段的包头20Bytes）所以往往MSS为1460。通讯双方会根据双方提供的MSS值得最小值<br>确定为这次连接的最大MSS值。<br>IP层：<br>对于IP协议来说，IP包的大小由MTU决定（IP数据包长度就是MTU-28（包头长度）。 MTU值越大，封包就越大，理论上可增加传送速率，但<br>MTU值又不能设得太大，因为封包太大，传送时出现错误的机会大增。一般默认的设置，PPPoE连接的最高MTU值是1492, 而以太网<br>（Ethernet）的最高MTU值则是1500,而在Internet上，默认的MTU大小是576字节</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://jerryc8080.gitbooks.io/understand-tcp-and-udp/">TCP 报文结构</a><br><a href="https://www.google.com/search?q=tcp%E5%8C%85%E7%BB%93%E6%9E%84">tcp包结构</a><br><a href="https://accedian.com/enterprises/blog/tcp-receive-window-everything-need-know/">推广商业软件的文章，当做关于tcp协议的一整个series来看还是很好的</a> </p>
 
       
 
@@ -555,11 +581,11 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">

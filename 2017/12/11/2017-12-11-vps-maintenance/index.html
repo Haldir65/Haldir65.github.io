@@ -16,7 +16,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/scenery1511100756208.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery1511100809920.jpg">
-<meta property="og:updated_time" content="2018-12-21T13:37:43.936Z">
+<meta property="og:updated_time" content="2018-12-23T14:52:16.304Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="VPS维护的日常">
 <meta name="twitter:image" content="https://haldir66.ga/static/imgs/scenery1511100756208.jpg">
@@ -273,10 +273,16 @@ ga('send', 'pageview');
 <h3 id="2-5-查看日志"><a href="#2-5-查看日志" class="headerlink" title="2.5 查看日志"></a>2.5 查看日志</h3><p>日志文件的位置在/var/log/shadowsocks.log<br>下面这条命令用于查看访问了哪些网站<br>cat  shadowsocks.log | awk ‘{ print $5}’ |grep -o ‘^[^:]*’ | sort | uniq -c | sort -n</p>
 <p>查看尝试连接本服务器的客户端<br>cat shadowsocks.log | awk ‘{ print $NF }’| grep -o ‘^[^:]*’ | sort | uniq -c | sort -n</p>
 <h3 id="2-6-simple-obfs"><a href="#2-6-simple-obfs" class="headerlink" title="2.6 simple-obfs"></a>2.6 simple-obfs</h3><p>sudo apt-get install simple-obfs<br>/etc/shadowsocks-libev/config.json文件中添加<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&quot;plugin&quot;:&quot;obfs-server&quot;,</span><br><span class="line">&quot;plugin_opts&quot;: &quot;obfs=tls;obfs-host=www.bing.com&quot;,</span><br><span class="line">&quot;fast_open&quot;:true,</span><br><span class="line">&quot;reuse_port&quot;:true</span><br></pre></td></tr></table></figure></p>
-<h3 id="2-7-ss-local提供正向代理"><a href="#2-7-ss-local提供正向代理" class="headerlink" title="2.7 ss-local提供正向代理"></a>2.7 ss-local提供正向代理</h3><p>//在ss-local监听1080端口的前提下，这条命令可以正常访问google</p>
+<h3 id="2-7-ss-local提供正向代理"><a href="#2-7-ss-local提供正向代理" class="headerlink" title="2.7 ss-local提供正向代理"></a>2.7 ss-local提供正向代理</h3><p>//curl使用代理，在ss-local监听1080端口的前提下，这条命令可以正常访问google</p>
 <blockquote>
 <p>curl -4sSkL -x socks5h://127.0.0.1:1080 <a href="https://www.google.com">https://www.google.com</a><br>curl –socks5 127.0.0.1:1080 <a href="http://stackoverflow.com/">http://stackoverflow.com/</a> //这个更简单</p>
 </blockquote>
+<p>// 有两种方式</p>
+<blockquote>
+<p>$ export http_proxy=”vivek:myPasswordHere@10.12.249.194:3128/“<br>$ curl -v -O <a href="http://dl.cyberciti.biz/pdfdownloads/b8bf71be9da19d3feeee27a0a6960cb3/569b7f08/cms/631.pdf">http://dl.cyberciti.biz/pdfdownloads/b8bf71be9da19d3feeee27a0a6960cb3/569b7f08/cms/631.pdf</a></p>
+<p>curl -x ‘<a href="http://vivek:myPasswordHere@10.12.249.194:3128">http://vivek:myPasswordHere@10.12.249.194:3128</a>‘ -v -O <a href="https://dl.cyberciti.biz/pdfdownloads/b8bf71be9da19d3feeee27a0a6960cb3/569b7f08/cms/631.pdf">https://dl.cyberciti.biz/pdfdownloads/b8bf71be9da19d3feeee27a0a6960cb3/569b7f08/cms/631.pdf</a></p>
+</blockquote>
+<p><a href="https://linux.cn/article-9223-1.html">如何让 curl 命令通过代理访问</a><br>curl -x socks5://[user:password@]proxyhost[:port]/ url<br>curl –socks5 192.168.1.254:3099 <a href="https://www.cyberciti.biz/">https://www.cyberciti.biz/</a></p>
 <h2 id="3-ubuntu自带的防火墙叫做ufw-Uncomplicated-Firewall-，用起来也很简单"><a href="#3-ubuntu自带的防火墙叫做ufw-Uncomplicated-Firewall-，用起来也很简单" class="headerlink" title="3. ubuntu自带的防火墙叫做ufw(Uncomplicated Firewall)，用起来也很简单"></a>3. ubuntu自带的防火墙叫做ufw(Uncomplicated Firewall)，用起来也很简单</h2><p><a href="https://www.digitalocean.com/community/tutorials/ufw-essentials-common-firewall-rules-and-commands">digital ocean的ufw教程</a></p>
 <h2 id="4-跑分"><a href="#4-跑分" class="headerlink" title="4.跑分"></a>4.跑分</h2><p><a href="https://github.com/Teddysun/across">VPS 跑分软件</a><br>git clone 下来</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> across</span><br><span class="line">wget -qO- bench.sh | bash <span class="comment">###（亲测可用，也可以自己看Readme）</span></span><br><span class="line"><span class="comment">### 或者</span></span><br><span class="line">curl -Lso- bench.sh | bash</span><br></pre></td></tr></table></figure>
@@ -330,6 +336,7 @@ ga('send', 'pageview');
 <p>sudo fail2ban-regex /var/log/nginx/access.log /etc/fail2ban/filter.d/nginx-x00.conf –print-all-matched</p>
 <p>匹配成功<br>|  139.162.184.185 - - [29/Oct/2018:20:02:19 -0400] “\x15\x03\x03\x00\x02\x01\x00” 400 166 “-“ “-“</p>
 <p><a href="https://github.com/shadowsocks/shadowsocks-libev/blob/master/scripts/iperf.sh">iperf是linux下的一个tcp测速软件</a></p>
+<p><a href="http://frankchen.xyz/2018/04/08/private-BT-server/">vps挂下载</a>。注意transmission每次修改设置文件<br>sudo vim /etc/transmission-daemon/settings.json之前要先把transmission这个进程关掉，不然设置文件会被修改。<br>另外，设置文件中显示的rpc-password其实是hash之后的值，记住自己实际上写了什么就好。</p>
 <h2 id="参考-1"><a href="#参考-1" class="headerlink" title="参考"></a>参考</h2><p><a href="https://asm.ca.com/en/ping.php">国外的超级ping</a><br><a href="https://ipcheck.need.sh/">快速检测 IP 地址是否可用</a></p>
 
       
@@ -657,11 +664,11 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">

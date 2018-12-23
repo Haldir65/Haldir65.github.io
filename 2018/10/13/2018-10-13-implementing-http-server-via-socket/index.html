@@ -17,7 +17,7 @@
 <meta property="og:description" content="收集几种语言中使用socket实现httpServer和httpClient的主要步骤">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/sun_rise_dim_grass.jpg">
-<meta property="og:updated_time" content="2018-12-21T13:37:43.940Z">
+<meta property="og:updated_time" content="2018-12-23T14:52:16.308Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从Socket入手实现http协议">
 <meta name="twitter:description" content="收集几种语言中使用socket实现httpServer和httpClient的主要步骤">
@@ -253,6 +253,7 @@ ga('send', 'pageview');
 <li><p>高阶版本的参考<br><a href="https://www.geeksforgeeks.org/socket-programming-in-cc-handling-multiple-clients-on-server-without-multi-threading/">高阶一点，处理并发的</a><br><a href="https://github.com/pminkov/webserver">多线程的server和client源码</a></p>
 </li>
 </ul>
+<p>需要记住的是，read是从系统的缓冲区读取的,write是写到tcp buffer里面的</p>
 <p><strong>还有实现websocket协议的，实现sock5协议的</strong></p>
 <p>见过的一个websocket的请求长这样<br>GET wss://nexus-websocket-b.xxx.io/pubsub/xxx?X-Nexus-New-Client=true&amp;X-Nexus-Version=0.4.53 HTTP/1.1<br>Host: nexus-websocket-b.xxx.io<br>Connection: Upgrade<br>Pragma: no-cache<br>Cache-Control: no-cache<br>User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3538.77 Safari/537.36<br>Upgrade: websocket<br>Origin: <a href="https://app.xxx.io">https://app.xxx.io</a><br>Sec-WebSocket-Version: 13<br>Accept-Encoding: gzip, deflate, br<br>Accept-Language: zh-CN,zh;q=0.9<br>Sec-WebSocket-Key: xaxsasdasdas==<br>Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits</p>
 <p>Response长这样<br>HTTP/1.1 101 Switching Protocols<br>Date: Thu, 25 Oct 2018 06:07:10 GMT<br>Connection: upgrade<br>Upgrade: websocket<br>Sec-WebSocket-Accept: sasasasaD/tA=</p>
@@ -302,7 +303,7 @@ ga('send', 'pageview');
 <p>其中八进制的344 375 240（十六进制e4 bd a0）就是“你”的UTF-8编码，八进制的345 245 275（十六进制e5 a5 bd）就是“好”。把它编译成目标文件，”你好\n”这个字符串就成了这样一串字节：e4 bd a0 e5 a5 bd 0a 00，汉字在其中仍然是UTF-8编码的，一个汉字占3个字节，这种字符在C语言中称为多字节字符（Multibyte Character）。运行这个程序相当于把这一串字节write到当前终端的设备文件。如果当前终端的驱动程序能够识别UTF-8编码就能打印出汉字，如果当前终端的驱动程序不能识别UTF-8编码（比如一般的字符终端）就打印不出汉字。也就是说，像这种程序，识别汉字的工作既不是由C编译器做的也不是由libc做的，C编译器原封不动地把源文件中的UTF-8编码复制到目标文件中，libc只是当作以0结尾的字符串原封不动地write给内核，识别汉字的工作是由终端的驱动程序做的。</p>
 </blockquote>
 <p><a href="https://www.cprogramming.com/tutorial/unicode.html">Unicode in C and C++: What You Can Do About It Today</a></p>
-<p>##不知道为什么,百度首页的response中没有content-length字段<br>read from socket , and write it to local file ,how about that?<br><a href="https://www.cnblogs.com/skynet/archive/2010/12/11/1903347.html">这篇文章提到</a>，由于http keep-alive的存在，读取server的response已经读不到EOF了，所以也就不能以EOF作为读取完毕的标志。分两种情况：有Content-length的，Transfer-Encoding：chunked（复杂一点点）这两种</p>
+<p>##不知道为什么,百度首页的response中没有content-length字段<br>read from socket , and write it to local file ,how about that?<br><a href="https://www.cnblogs.com/skynet/archive/2010/12/11/1903347.html">这篇文章提到</a>，由于http keep-alive的存在，读取server的response已经读不到EOF了，所以也就不能以EOF作为读取完毕的标志。分两种情况：有Content-length的，Transfer-Encoding：chunked（复杂一点点）这两种。<br>chunked简单说就是把一个大文件切分成N个小包，每个包(chunk)里面包括header和body。这个header里面也是有body的长度的。</p>
 <h2 id="todo"><a href="#todo" class="headerlink" title="todo"></a>todo</h2><p>** <a href="https://github.com/gwuhaolin/lightsocks">sock5协议的解释</a></p>
 
       
@@ -626,11 +627,11 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">
