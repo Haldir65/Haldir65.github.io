@@ -42,3 +42,8 @@ ffmpeg -i input.mp4 -aspect 16:9 output.mp4 ## 更改长宽比
 todo 
 opencv
 view video using ffmplayer
+
+tbd
+- [ ] ffmpeg 的js wrapper
+
+[ijkplayer现在看来似乎只是ffmpeg的一层wrapper](https://github.com/Bilibili/ijkplayer)

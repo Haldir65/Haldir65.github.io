@@ -224,9 +224,23 @@ sudo apt-get install simple-obfs
 ```
 
 ### 2.7 ss-local提供正向代理
-//在ss-local监听1080端口的前提下，这条命令可以正常访问google
+//curl使用代理，在ss-local监听1080端口的前提下，这条命令可以正常访问google
+
 > curl -4sSkL -x socks5h://127.0.0.1:1080 https://www.google.com
 > curl --socks5 127.0.0.1:1080 http://stackoverflow.com/ //这个更简单
+
+
+// 有两种方式
+> $ export http_proxy="vivek:myPasswordHere@10.12.249.194:3128/"
+> $ curl -v -O http://dl.cyberciti.biz/pdfdownloads/b8bf71be9da19d3feeee27a0a6960cb3/569b7f08/cms/631.pdf
+
+
+> curl -x 'http://vivek:myPasswordHere@10.12.249.194:3128' -v -O https://dl.cyberciti.biz/pdfdownloads/b8bf71be9da19d3feeee27a0a6960cb3/569b7f08/cms/631.pdf
+
+[如何让 curl 命令通过代理访问](https://linux.cn/article-9223-1.html)
+curl -x socks5://[user:password@]proxyhost[:port]/ url
+curl --socks5 192.168.1.254:3099 https://www.cyberciti.biz/
+
 
 ## 3. ubuntu自带的防火墙叫做ufw(Uncomplicated Firewall)，用起来也很简单
 [digital ocean的ufw教程](https://www.digitalocean.com/community/tutorials/ufw-essentials-common-firewall-rules-and-commands)
@@ -503,6 +517,9 @@ sudo fail2ban-regex /var/log/nginx/access.log /etc/fail2ban/filter.d/nginx-x00.c
 
 [iperf是linux下的一个tcp测速软件](https://github.com/shadowsocks/shadowsocks-libev/blob/master/scripts/iperf.sh)
 
+[vps挂下载](http://frankchen.xyz/2018/04/08/private-BT-server/)。注意transmission每次修改设置文件
+sudo vim /etc/transmission-daemon/settings.json之前要先把transmission这个进程关掉，不然设置文件会被修改。
+另外，设置文件中显示的rpc-password其实是hash之后的值，记住自己实际上写了什么就好。
 
 ## 参考
 [国外的超级ping](https://asm.ca.com/en/ping.php)

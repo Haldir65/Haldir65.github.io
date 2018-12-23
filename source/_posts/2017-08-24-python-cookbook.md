@@ -253,7 +253,7 @@ if __name__ == "__main__":
 ```
 
 [下划线的意义很多种](https://dbader.org/blog/meaning-of-underscores-in-python)
-这其中就包含了magic_method，直接看吧
+这其中就包含了magic_method，或者dunder class. 直接看吧。
 ```python
     ## 一般__init__是写一个class时经常用到的方法，但其实还有一个__new__的方法
     ## 当调用x = SomeClass()的时候，__init__并不是第一个被调用的方法，实际上还有一个
@@ -437,6 +437,11 @@ class Post(db.Model):
 
 __repr__()就是在print的时候打印出的内容，和django里面model的__str__方法差不多
 
+最后补上一条(一个下划线开头的变量通常是说这个变量是private的意思),python并不存在private这种访问限制，所以所有的变量都是全局可访问的。这个并不是官方语法，只是一种convention罢了
+> “Private” instance variables that cannot be accessed except from inside an object don’t exist in Python. However, there is a convention that is followed by most Python code: a name prefixed with an underscore (e.g. _spam) should be treated as a non-public part of the API (whether it is a function, a method or a data member). It should be considered an implementation detail and subject to change without notice.
+
+[python-class-with-double-underscore](https://stackoverflow.com/questions/38645871/python-class-with-double-underscore)
+[Python __Underscore__ Methods](http://www.siafoo.net/article/57)
 
 isinstance和type的区别,isinstance要好一点
 ```python
@@ -484,7 +489,9 @@ $ python setup.py install
 
 > pip freeze | xargs pip uninstall -y ## 在venv下，删除所有安装的pip包
 pip freeze > requirements.txt ## 生成requirements.txt十分简单
-pip insatll -r requirements.txt 安装依赖也十分简单
+pip install -r requirements.txt 安装依赖也十分简单
+
+//然而2018年python社区已经开始推广pipenv了，技术变迁实在是太快。[Kenneth Reitz - Pipenv: The Future of Python Dependency Management - PyCon 2018](https://www.youtube.com/watch?v=GBQAKldqgZs)
 
 
 ### json这个库
@@ -655,3 +662,4 @@ img.save('sompic.jpg')
 可以自己写这样的函数，from contextlib import contextmanager，关键字: context syntax
 
 [James Bennett - A Bit about Bytes: Understanding Python Bytecode - PyCon 2018](https://www.youtube.com/watch?v=cSSpnq362Bk)主要是dis模块
+

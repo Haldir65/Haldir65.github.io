@@ -361,7 +361,7 @@ post一个json出去的时候
 34 "
 125 }
 ```
-这些标点符号都发送出去了，也就是占用的.
+这些标点符号都发送出去了，也就是占用的byte.
 
 [四种常见的POST提交数据方式](https://imququ.com/post/four-ways-to-post-data-in-http.html)
 
@@ -511,4 +511,16 @@ NAPT原理
 
 
 [tcp keep-alive和http的keep-alive是两回事](https://stackoverflow.com/questions/9334401/http-keep-alive-and-tcp-keep-alive) http keep-alive是由webserver负责实现的。 关键字:http keepalive implementation
+这篇回答里解释了http keep-alive是为了让后续的http请求复用这一条tcp连接。而tcp的keep alive则是定期发小的包。
+另外,http server并不会主动去问client是否还连着，只需要起一个timeout(到时间就掐掉这条tcp)就行了。下次客户端再来发起请求，重新起一条tcp吧。
+但是http keepalive在有些时候也是有问题的
+虽说HTTP/1.1 Keep-Alive特性支持多个请求在同一个连接上排队发送，在浏览器端正常的HTML等资源请求，会带来线头阻塞弊端，后一个请求依赖于前一个请求完成，一旦出现阻塞，后续请求只能排队等待。
+
+[移动APP后端网络处理一些问题记录](http://www.blogjava.net/yongboy/archive/2015/03/30/423963.html)
+HTTP/1.1 Pipelining（建立在Keep-Alive持久化基础之上，中文译为管线化，支持连续的幂等的GET/HEAD方法请求，实际环境下，并没有被浏览器所支持。同一个连接，处理同样的三次请求-响应）
+
+
+
+## 参考
+[常见网络协议优化与演进](https://blog.dreamtobe.cn/network_basic/)
         

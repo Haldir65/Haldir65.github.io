@@ -442,7 +442,7 @@ putty登录窗口左侧有一个loggin-auth，进去选择自己windows上刚才
 [有什么问题的话看这个](https://stackoverflow.com/questions/6377009/adding-public-key-to-ssh-authorized-keys-does-not-log-me-in-automatically)
 
 ### 22.iptables命令
-用防火墙屏蔽掉指定ip
+[常用的iptables命令去这里抄，系统管理员可能用的多一些](https://www.digitalocean.com/community/tutorials/iptables-essentials-common-firewall-rules-and-commands)
 
 ```bash
 iptables -L -n ## 查看已添加的iptables规则
@@ -468,7 +468,43 @@ iptables -A INPUT -p icmp -m icmp --icmp-type 8 -j ACCEPT
 iptables -A INPUT -j REJECT  #（注意：如果22端口未加入允许规则，SSH链接会直接断开。）
 iptables -A FORWARD -j REJECT
 ```
-**注意还需要将上述规则添加到开机启动中**，还有使用iptables屏蔽来自[某个国家的IP](https://www.vpser.net/security/iptables-block-countries-ip.html)的教程
+
+```
+openwrt在/etc/firewall.user中添加如下脚本，实现本地透明代理（其实并不完美）
+```sh
+iptables -t nat -N V2RAY
+iptables -t nat -A V2RAY -d x.x.x.x -j RETURN ##xxx是vps的ip地址
+iptables -t nat -A V2RAY -d 0.0.0.0/8 -j RETURN
+iptables -t nat -A V2RAY -d 10.0.0.0/8 -j RETURN
+iptables -t nat -A V2RAY -d 127.0.0.0/8 -j RETURN
+iptables -t nat -A V2RAY -d 169.254.0.0/16 -j RETURN
+iptables -t nat -A V2RAY -d 172.16.0.0/12 -j RETURN
+iptables -t nat -A V2RAY -d 192.168.0.0/16 -j RETURN
+iptables -t nat -A V2RAY -d 224.0.0.0/4 -j RETURN
+iptables -t nat -A V2RAY -d 240.0.0.0/4 -j RETURN
+iptables -t nat -A V2RAY -p tcp -j REDIRECT --to-ports 1060
+iptables -t nat -A PREROUTING -p tcp -j V2RAY
+```
+
+
+> Often, services on the computer communicate with each other by sending network packets to each other. They do this by utilizing a pseudo network interface called the loopback device, which directs traffic back to itself rather than to other computers.
+同一台机器的不同进程之间有时候是通过一个虚拟的网络(loopback device)进行通信的，所以，必须要让iptables允许这些通信
+$ sudo iptables -I INPUT 1 -i lo -j ACCEPT // -I的意思是插入，就是插入到INPUT这个规则里面。 1是说插到第一位，因为iptables排在前面的优先级高。 -i是interface的意思，lo就是loopback的简称。（也就是说，所有使用本地loopback这个interface发过来的包，放行）
+
+**注意还需要将上述规则添加到开机启动中，想要持久化的话好像有一个iptables-persistent**，还有使用iptables屏蔽来自[某个国家的IP](https://www.vpser.net/security/iptables-block-countries-ip.html)的教程
+
+netfilter是kernel的实现
+> Iptables is a standard firewall included in most Linux distributions by default (a modern variant called nftables will begin to replace it). It is actually a front end to the kernel-level netfilter hooks that can manipulate the Linux network stack.
+
+iptables的工作流程
+> direct the packet to the appropriate chain, check it against each rule until one matches, issue the default policy of the chain if no match is found
+
+[a-deep-dive-into-iptables-and-netfilter-architecture](https://www.digitalocean.com/community/tutorials/a-deep-dive-into-iptables-and-netfilter-architecture)
+
+[iptable在透明代理中的原理就是修改了packet的destination address，同时还记住了原来的address](https://unix.stackexchange.com/questions/413545/what-does-iptables-j-redirect-actually-do-to-packet-headers)
+> iptables overrites the original destination address but it remembers the old one. The application code can then fetch it by asking for a special socket option, SO_ORIGINAL_DST
+[著名tcp代理redsocks就是用SO_ORIGINAL_DST的](https://github.com/darkk/redsocks)
+
 
 
 ### 23.  Linux软件安装目录惯例
@@ -534,6 +570,7 @@ fuser -m -u redis-server
 ### 26. 一些看上去比较玄的操作
 ```bash
 bash <(curl -s https://codecov.io/bash) ##重定向还有这么玩的
+pbcopy < somefile.txt ## mac上一般这样复制一个文件的内容到剪切板
 ```
 
 ### 27.htop怎么看
@@ -738,6 +775,7 @@ cat /var/run/nginx.pid
 
 [如果在国内使用的话，使用清华大学开源站的镜像的速度会快一点](https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/)
 
+[oh-my-zsh的git plugin 快捷键](https://github.com/robbyrussell/oh-my-zsh/wiki/Plugin:git)
 grep -ni "python" * //在当前目录下查找所有包含"python"字符串的文件，并且显示出行号。
 
 ctrl +r 可以在history中查找,ctrl + j 把选中的内容剪切到剪切板

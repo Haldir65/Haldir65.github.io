@@ -18,7 +18,7 @@ Python Global Interpreter Lock(GIL)
 对于CPython，所有的python bytecode在执行前都需要获得interpreter的lock,one vm thread at a time。(java实现的python似乎没有这个烦恼)
 GIL的出现似乎是历史原因（为了方便的直接使用当时现有的c extension）。而没有在python3中被移除的原因是因为这会造成单线程的程序在python3中跑的反而比python2中慢。
 
-因为GIL的存在，python中的线程并不能实现cpu的并发运行(同时只能有一条线程在运行)。但对于I/O intensive的任务来说，cpu都在等待I/O操作完成，所以爬虫这类操作使用多线程是合适的。根据[A Jesse Jiryu Davis](https://www.youtube.com/watch?v=7SSYhuk5hmc)在pycon2017上的演讲，在多线程python程序中，如果某条线程开始进行I/O操作，就会主动放弃GIL(这是在socket module的源码中)，或者在cpu-intensive程序中，一条线程连续执行1000次(python2中是一个常数)后就会被夺走gil。
+因为GIL的存在，python中的线程并不能实现cpu的并发运行(同时只能有一条线程在运行)。但对于I/O intensive的任务来说，cpu都在等待I/O操作完成，所以爬虫这类操作使用多线程是合适的。根据[A Jesse Jiryu Davis](https://www.youtube.com/watch?v=7SSYhuk5hmc)在pycon2017上的演讲，在多线程python程序中，如果某条线程开始进行I/O操作，就会主动放弃GIL(这是在socket module的源码中)，或者在cpu-intensive程序中，一条线程连续执行1000次(python2中是一个常数)后就会被夺走gil。[socket里面找关键字Py_BEGIN_ALLOW_THREADS和Py_END_ALLOW_THREADS](https://github.com/python/cpython/blob/master/Modules/socketmodule.c)
 
 ## 多线程以及一些同步的问题
 单线程的版本
@@ -147,6 +147,27 @@ print(balance)
 ```
 改成每一次对共享变量进行操作都需要加锁之后，打印结果就正常了
 [多进程之间的同步方式包括queue,Event,Semaphores，Conditions等](https://hackernoon.com/synchronization-primitives-in-python-564f89fee732)
+
+从bytecode来看，[increment这一操作并不是atomic的](https://www.youtube.com/watch?v=7SSYhuk5hmc&t=890s)
+python里面很方便
+incremnt-is-not-atomic.py
+```python
+def foo():
+    global n
+    n += 1
+
+import dis
+dis.dis(foo)
+```
+python incremnt-is-not-atomic.py
+```
+ 3           0 LOAD_GLOBAL              0 (n)
+              2 LOAD_CONST               1 (1)
+              4 INPLACE_ADD
+              6 STORE_GLOBAL             0 (n)
+              8 LOAD_CONST               0 (None)
+             10 RETURN_VALUE
+```
 
 
 ## 多进程

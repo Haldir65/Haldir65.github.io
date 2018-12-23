@@ -567,6 +567,7 @@ ps a 显示现行终端机下的所有程序，包括其他用户的程序。
  netstat -anp | grep sshd
 
 ps | grep 类似于 pgrep XXX //查找某个进程
+pgrep -lf ss //找到sshd,nginx这些进程
 
 进程命令
 *实时监控，1秒刷新一次*

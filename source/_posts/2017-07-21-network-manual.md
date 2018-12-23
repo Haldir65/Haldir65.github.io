@@ -753,6 +753,8 @@ m3u8就是很多ts文件的目录
 .m3u8 文件，其实就是以 UTF-8 编码的 m3u 文件，这个文件本身不能播放，只是存放了播放信息的文本文件：
 就是说把一个视频切割成很多个TS分片文件。这里面还能牵扯到防盗链等问题。
 
+在vimeo上见过.m4s这种后缀的流媒体
+
 [exoplayer的作者在medium上的一篇文章解释了dash在直播协议中的优点](https://medium.com/google-exoplayer/test-8b62d50362ef)
 翻译一下
 - adaptive streaming over HTTP的协议有三种，

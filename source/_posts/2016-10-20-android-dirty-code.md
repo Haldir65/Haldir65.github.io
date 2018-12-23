@@ -140,7 +140,8 @@ B service startForeground(processId,notification)
 而整体技术层面的实现并不难，只是利用了一个又一个小漏洞罢了。
 所谓脏代码不过是技术上做的一些欺骗系统的手段，作为开发者，理应明白谷歌设计这一套系统是为了更好的提升用户体验（占据市场）。然而在当前国内应用开发环境下，我们真的能够为用户考虑考虑吗，或者说，我们提交的代码能吗？
 
-![](https://haldir66.ga/static/imgs/blamingtheuser-big.png)
+![](https://www.haldir66.ga/static/imgs/blaming_the_user.png)
+
 
 ## updates
 [【腾讯Bugly干货分享】Android 进程保活招式大全](https://segmentfault.com/a/1190000006251859)

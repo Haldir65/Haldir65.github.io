@@ -23,7 +23,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 def test(HandlerClass=SimpleHTTPRequestHandler,
          ServerClass=HTTPServer):
-    protocol = "HTTP/1.0"
+    protocol = "HTTP/1.1``"
     host = ''
     port = 8000
     if len(sys.argv) > 1:

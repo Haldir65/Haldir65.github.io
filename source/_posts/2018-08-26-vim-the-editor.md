@@ -75,8 +75,6 @@ VIM格式化代码：
 格式化选定的行　　v 选中需要格式化的代码段 =
 
 
-
-
 很多人都会有一个vimrc文件备份在github上，那么vimrc其实就是对于vim这个编辑器的配置文件
 全局的vimrc文件在/etc/vim/vimrc 这个位置，针对单个用户还是在~/.vimrc这个文件里面改
 
@@ -90,11 +88,44 @@ set expandtab “使用空格替换tab
 ```
 
 
+比较出名的vimrc是[the ultimate vimrc](https://github.com/amix/vimrc)，自带一些比较好的插件
+首先在任意目录,输入vim。
+任何时候想要退出vim的话 :q 就可以了
+
+
+## 一些好用的插件：
+[NERDTree是一个类似于file browser的插件](https://github.com/scrooloose/nerdtree)
+ctrl + w + h    光标 focus 左侧树形目录
+ctrl + w + l    光标 focus 右侧文件显示窗口
+ctrl + w + w    光标自动在左右侧窗口切换
+ctrl + w + r    移动当前窗口的布局位置
+o       在已有窗口中打开文件、目录或书签，并跳到该窗口
+go      在已有窗口 中打开文件、目录或书签，但不跳到该窗口
+t       在新 Tab 中打开选中文件/书签，并跳到新 Tab
+T       在新 Tab 中打开选中文件/书签，但不跳到新 Tab
+i       split 一个新窗口打开选中文件，并跳到该窗口
+gi      split 一个新窗口打开选中文件，但不跳到该窗口
+s       vsplit 一个新窗口打开选中文件，并跳到该窗口
+gs      vsplit 一个新 窗口打开选中文件，但不跳到该窗口
+:tabnew [++opt选项] ［＋cmd］ 文件      建立对指定文件新的tab
+:tabc   关闭当前的 tab
+:tabo   关闭所有其他的 tab
+:tabs   查看所有打开的 tab
+:tabp   前一个 tab
+:tabn   后一个 tab
+
+
+[vim-fugitive](https://github.com/tpope/vim-fugitive) fugitive.vim: A Git wrapper so awesome, it should be illegal 
+
+
+[ctrl +f 就是激活ctrlp](https://github.com/ctrlpvim/ctrlp.vim)这个插件，类似于文件搜索
+
+[内置了vim-markdown](https://github.com/tpope/vim-markdown)。默认已经可以实现markdown语法高亮。默认是自动把段落收起来的，光标一直挪到右边就自动展开了
+
 ## 参考
 [vim cheat sheet](https://vim.rtorr.com/)
 [youtube上一个比较好的关于vim的视频](https://www.youtube.com/watch?v=Nim4_f5QUxA)
 [练上一年再来总结的vim使用技巧](http://www.pchou.info/linux/2016/11/10/vim-skill.html)
-[the ultimate vimrc](https://github.com/amix/vimrc)
 
 
 

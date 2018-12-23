@@ -602,6 +602,7 @@ int send(int sockfd,void *buf,int len,int flags)
 [高阶一点，处理并发的](https://www.geeksforgeeks.org/socket-programming-in-cc-handling-multiple-clients-on-server-without-multi-threading/)
 [多线程的server和client源码](https://github.com/pminkov/webserver)
 
+需要记住的是，read是从系统的缓冲区读取的,write是写到tcp buffer里面的
 
 
 
@@ -773,7 +774,8 @@ $ od -tc nihao.c
 
 ##不知道为什么,百度首页的response中没有content-length字段
 read from socket , and write it to local file ,how about that?
-[这篇文章提到](https://www.cnblogs.com/skynet/archive/2010/12/11/1903347.html)，由于http keep-alive的存在，读取server的response已经读不到EOF了，所以也就不能以EOF作为读取完毕的标志。分两种情况：有Content-length的，Transfer-Encoding：chunked（复杂一点点）这两种
+[这篇文章提到](https://www.cnblogs.com/skynet/archive/2010/12/11/1903347.html)，由于http keep-alive的存在，读取server的response已经读不到EOF了，所以也就不能以EOF作为读取完毕的标志。分两种情况：有Content-length的，Transfer-Encoding：chunked（复杂一点点）这两种。
+chunked简单说就是把一个大文件切分成N个小包，每个包(chunk)里面包括header和body。这个header里面也是有body的长度的。
 
 
 

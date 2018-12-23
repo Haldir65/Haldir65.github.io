@@ -185,7 +185,7 @@ Linux相关
 - [x]win10 装ubuntu有时候失败是因为删除了C盘的一个文件夹[参考](http://blog.csdn.net/fesdgasdgasdg/article/details/54183577)
 
 网络通信
-- [ ] TCP UDP的不同 TCP三次握手，wireShark[抓包](https://www.youtube.com/watch?v=r0l_54thSYU),抓一个App的包，模拟请求
+- [X] TCP UDP的不同 TCP三次握手，wireShark[抓包](https://www.youtube.com/watch?v=r0l_54thSYU),抓一个App的包，模拟请求
 - [X] 如何维持一个长连接
 - [ ] 点击一个网址底层经历哪些过程
 - [ ] ffmpeg[参考教程](http://blog.csdn.net/leixiaohua1020/article/details/15811977)

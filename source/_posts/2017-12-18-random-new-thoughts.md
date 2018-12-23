@@ -16,10 +16,12 @@ top : 1
 - [js 循环闭包的解决方法](https://segmentfault.com/a/1190000003818163)
 - 动态类型一时爽，代码重构火葬场
 - iview，elementUi
+- [ ] rxjava是如何切换线程的以及源码解析
+- [ ] shadowsocks-android源码
+- [ ] chromium net移植到Android平台[cronet是最简单的方式](https://github.com/GoogleChromeLabs/cronet-sample) [更多下载仓库](https://console.cloud.google.com/storage/browser/chromium-cronet?pli=1)
 - [embeed video with iframe](https://css-tricks.com/NetMag/FluidWidthVideo/Article-FluidWidthVideo.php)[AC2016腾讯前端技术大会 1 1 1 H5直播那些事](https://www.youtube.com/watch?v=g3F7Imjcd4k)
 - [ ] flex,grid
 - [ ] Paul Irish from google
-- [ ] form表单可以跨域一个是历史原因要保持兼容性
 - [ ] [lightbox一个很好看的js图片查看库](http://lokeshdhakar.com/projects/lightbox2/)
 - [ ] [仿门户网站js相册](https://www.js-css.cn/a/jscode/album/2014/0915/1319.html)， [js相册2](https://www.js-css.cn/a/jscode/album/2014/0914/1318.html)
 - [ ] [八大排序算法的python实现](http://python.jobbole.com/82270/)
@@ -30,26 +32,16 @@ top : 1
 - [ ] [在bash脚本中获取当前脚本所在路径](https://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within?rq=1)
 - [ ]一致性哈希原理
 - [ ] [使用redis实现低粒度的分布式锁](http://afghl.github.io/2018/06/17/distributed-lock-and-granarity.html)
-- [ ][Vim cheet sheet](https://vim.rtorr.com/)
-- [ ][LOGSTASH+ELASTICSEARCH+KIBANA处理NGINX访问日志](http://www.wklken.me/posts/2015/04/26/elk-for-nginx-log.html)ELK全家桶
 - [ ] Coordinator behavior以及scroll原理，完善blog
 - [ ]Exoplayer and the MediaCodec api[building-a-video-player-app-in-android](https://medium.com/androiddevelopers/building-a-video-player-app-in-android-part-3-5-19543ea9d416)
 - [ ] instagram好像通过注解的方式自己写了一个json解析器[ig-json-parser](https://github.com/Instagram/ig-json-parser)
 - [ ] when it comes to design , how do we translate px, pt, em  into sp,dp and others(设计方面的，各种单位之间的转换)?
-- [ ] python dunder class复习
-- [ ][分词器](https://lxneng.com/posts/201)
 - [ ] classloader和class的生命周期
 - [ ] learning how textView works is painful yet necessary
-- [ ] rxjava是如何切换线程的以及源码解析
-- [ ] shadowsocks-android源码
-- [ ] chromium net移植到Android平台[cronet是最简单的方式](https://github.com/GoogleChromeLabs/cronet-sample)
 - [ ] linux环境下多进程通讯方式(管道，共享内存，信号,unix domian socket)
 - [ ] mqtt接入实践[mqtt是建立在tcp基础上的应用层协议](https://github.com/mcxiaoke/mqtt)，[netty](https://github.com/netty/netty)也做了实现
-- [ ] logstash接管软件日志
 - [ ] render-script utility
-- [ ] ffmpeg 的js wrapper
 - [ ] play around with xposed
-- [ ] tcp-proxy实用教程
 - [ ] python gui编程
 - [ ] kotlin的coroutine[production-ready]
 - [ ] 宇宙第一ide熟悉使用
@@ -64,6 +56,8 @@ top : 1
 - [ ] awk，正则表达式还有数据库这些也算一门编程语言
 - [ ] 来来来，[手写一个vm](https://www.youtube.com/watch?v=DUNkdl0Jhgs)
 - [ ] [chromium提供了如何在windows上编译chromium的教程](https://chromium.googlesource.com/chromium/src/+/master/docs/windows_build_instructions.md#System-requirements)
+- [ ][How the JVM compiles bytecode into machine code](https://www.youtube.com/watch?v=M8LiOANu3Nk)
+- [ ] tcp-proxy实用教程
 
 
 
@@ -105,8 +99,10 @@ top : 1
 - [X] [indexed DB](http://www.ruanyifeng.com/blog/2018/07/indexeddb.html),浏览器端数据库，还是用第三方库好
 - [X] [block size vs page size](http://forums.justlinux.com/showthread.php?3261-Block-size-vs-page-size) Page是内存相关，block是硬盘相关的
 - [X] python 的asyncio(eventloop , generator, coroutine)
-
-
+- [X][Vim cheet sheet](https://vim.rtorr.com/) vim多用用就熟悉了。
+- [X] python dunder class复习。知道有python descriptor这回事就行了。
+- [X] form表单可以跨域一个是历史原因要保持兼容性（就是说跨域这件事，一个域名的 JS ，在未经允许的情况下，不得读取另一个域名的内容。但浏览器并不阻止你向另一个域名发送请求。所以post的表单可以发出去，但是别指望能够拿到response）
+ 
 ### Good For Nothing
 - [ ] 用GDB调试程序
 - [ ] npm install graphql(mostly a server side javascript stuff)
@@ -128,7 +124,9 @@ OpenType® is a cross-platform font file format developed jointly by Adobe and M
 - [owncloud官方的配合docker安装教程](https://doc.owncloud.org/server/10.0/admin_manual/installation/docker/)网盘这种东西看个人喜好了
 - [ ]CloudFlare cdn解析以及DNS防护 
 - [ ] [python c extension](https://www.tutorialspoint.com/python/python_further_extensions.htm) 
-
+- [ ] [最简单的一个用go写出来的rest api大概长这样](https://github.com/elliotforbes/tutorialedge-rest-api)
+- [ ][分词器](https://lxneng.com/posts/201)
+- [ ][LOGSTASH+ELASTICSEARCH+KIBANA处理NGINX访问日志](http://www.wklken.me/posts/2015/04/26/elk-for-nginx-log.html)ELK全家桶, logstash接管软件日志
 
 [jsonplaceholder](https://jsonplaceholder.typicode.com/)懒得自己写api的话
 就用这个吧
