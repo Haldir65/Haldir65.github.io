@@ -21,3 +21,7 @@ tags:
 [关于网络基本功的](https://wizardforcel.gitbooks.io/network-basic/content/6.html)
 
 [how hackers start their afternoons.](https://hackernoon.com/) 很像medium的一个网站
+
+[Linux 信号处理](https://fixatom.com/deal-with-linux-signals/)
+
+[icymind](https://icymind.com/)
