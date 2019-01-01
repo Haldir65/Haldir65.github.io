@@ -19,21 +19,18 @@ top : 1
 - [ ] rxjava是如何切换线程的以及源码解析
 - [ ] shadowsocks-android源码
 - [ ] chromium net移植到Android平台[cronet是最简单的方式](https://github.com/GoogleChromeLabs/cronet-sample) [更多下载仓库](https://console.cloud.google.com/storage/browser/chromium-cronet?pli=1)
-- [embeed video with iframe](https://css-tricks.com/NetMag/FluidWidthVideo/Article-FluidWidthVideo.php)[AC2016腾讯前端技术大会 1 1 1 H5直播那些事](https://www.youtube.com/watch?v=g3F7Imjcd4k)
+- [embeed video with iframe](https://css-tricks.com/NetMag/FluidWidthVideo/Article-FluidWidthVideo.php)
 - [ ] flex,grid
 - [ ] Paul Irish from google
 - [ ] [lightbox一个很好看的js图片查看库](http://lokeshdhakar.com/projects/lightbox2/)
 - [ ] [仿门户网站js相册](https://www.js-css.cn/a/jscode/album/2014/0915/1319.html)， [js相册2](https://www.js-css.cn/a/jscode/album/2014/0914/1318.html)
 - [ ] [八大排序算法的python实现](http://python.jobbole.com/82270/)
-- [ ] [如何编写 jQuery 插件](https://gist.github.com/quexer/3619237)
 - [ ] Redux和Flux很像,react context api
 - [ ] [一个展示如何在宿主App中提取一个apk文件并加载代码和资源](https://www.jianshu.com/p/a4ab102fa4ac)
 - [ ] nodejs ,go ,protobuf rpc
-- [ ] [在bash脚本中获取当前脚本所在路径](https://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within?rq=1)
 - [ ]一致性哈希原理
 - [ ] [使用redis实现低粒度的分布式锁](http://afghl.github.io/2018/06/17/distributed-lock-and-granarity.html)
 - [ ] Coordinator behavior以及scroll原理，完善blog
-- [ ]Exoplayer and the MediaCodec api[building-a-video-player-app-in-android](https://medium.com/androiddevelopers/building-a-video-player-app-in-android-part-3-5-19543ea9d416)
 - [ ] instagram好像通过注解的方式自己写了一个json解析器[ig-json-parser](https://github.com/Instagram/ig-json-parser)
 - [ ] when it comes to design , how do we translate px, pt, em  into sp,dp and others(设计方面的，各种单位之间的转换)?
 - [ ] classloader和class的生命周期
@@ -50,15 +47,12 @@ top : 1
 - [ ] autoWired, autovalue这些java 的library
 - [ ] code generator(代码生成器)
 - [ ][content-disposition](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)
-- [ ] JavaScript中new FileReader()，以及canvas api,以及[js进行图片缩放和裁剪](https://juejin.im/post/5a98c5c26fb9a028d82b34ee)
 - [ ] 用正则检测或者解析json(jQuery源码里有)
-- [ ] a new article on open-gl intro(on going)
 - [ ] awk，正则表达式还有数据库这些也算一门编程语言
 - [ ] 来来来，[手写一个vm](https://www.youtube.com/watch?v=DUNkdl0Jhgs)
 - [ ] [chromium提供了如何在windows上编译chromium的教程](https://chromium.googlesource.com/chromium/src/+/master/docs/windows_build_instructions.md#System-requirements)
 - [ ][How the JVM compiles bytecode into machine code](https://www.youtube.com/watch?v=M8LiOANu3Nk)
-- [ ] tcp-proxy实用教程
-
+- [ ] WebSocket协议及数据帧
 
 
 ### 已完成
@@ -102,6 +96,12 @@ top : 1
 - [X][Vim cheet sheet](https://vim.rtorr.com/) vim多用用就熟悉了。
 - [X] python dunder class复习。知道有python descriptor这回事就行了。
 - [X] form表单可以跨域一个是历史原因要保持兼容性（就是说跨域这件事，一个域名的 JS ，在未经允许的情况下，不得读取另一个域名的内容。但浏览器并不阻止你向另一个域名发送请求。所以post的表单可以发出去，但是别指望能够拿到response）
+- [X] a new article on open-gl intro(在Android平台上要和MediaCodec相关的音视频格式结合着来一起看)
+- [X] JavaScript中new FileReader(属于html5的东西)，以及canvas api(lineTo,quardTo这些都是相近的),以及[js进行图片缩放和裁剪](https://juejin.im/post/5a98c5c26fb9a028d82b34ee) 
+- [X] tcp-proxy实用教程 
+- [X]Exoplayer and the MediaCodec api[building-a-video-player-app-in-android](https://medium.com/androiddevelopers/building-a-video-player-app-in-android-part-3-5-19543ea9d416) 
+- [AC2016腾讯前端技术大会 1 1 1 H5直播那些事](https://www.youtube.com/watch?v=g3F7Imjcd4k)
+
  
 ### Good For Nothing
 - [ ] 用GDB调试程序
@@ -127,6 +127,8 @@ OpenType® is a cross-platform font file format developed jointly by Adobe and M
 - [ ] [最简单的一个用go写出来的rest api大概长这样](https://github.com/elliotforbes/tutorialedge-rest-api)
 - [ ][分词器](https://lxneng.com/posts/201)
 - [ ][LOGSTASH+ELASTICSEARCH+KIBANA处理NGINX访问日志](http://www.wklken.me/posts/2015/04/26/elk-for-nginx-log.html)ELK全家桶, logstash接管软件日志
+- [ ] [如何编写 jQuery 插件](https://gist.github.com/quexer/3619237)
+
 
 [jsonplaceholder](https://jsonplaceholder.typicode.com/)懒得自己写api的话
 就用这个吧

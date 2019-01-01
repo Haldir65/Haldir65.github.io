@@ -204,6 +204,22 @@ IP层：
 MTU值又不能设得太大，因为封包太大，传送时出现错误的机会大增。一般默认的设置，PPPoE连接的最高MTU值是1492, 而以太网 
 （Ethernet）的最高MTU值则是1500,而在Internet上，默认的MTU大小是576字节
 
+### 协议数据单元(Protocol Data Unit, PDU)
+应用层数据在传输过程中沿着协议栈传递，每一层协议都会往其中添加信息，这就是封装的过程。在封装过程中，每一个阶段的PDU都有不同的名字来反映它的功能。
+
+PDU按照TCP/IP协议的命名规范：
+数据（Data）：应用层PDU的常用术语
+分段（Segment）：传输层PDU
+帧（Frame）：网络层PDU
+比特（Bits）：在介质上物理传输数据所使用的PDU。
+
+最终发出去的数据包应该是
+Data link Ethernet Frame Header(Destination mac address + Source mac address) + 
+Network Layer IP Packet Header(Source network:host + Destination network: host) + 
+Transport Header(port) +
+data
+
+
 
 
 

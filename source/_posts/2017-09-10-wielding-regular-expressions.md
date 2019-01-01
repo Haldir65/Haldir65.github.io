@@ -119,7 +119,6 @@ e的意思是extended regular expressions（Extended regular expressions include
 ![](https://www.haldir66.ga/static/imgs/LetchworthSP_EN-AU14482052774_1920x1080.jpg)
 ![](https://www.haldir66.ga/static/imgs/lidongjieya_ZH-CN9263684179_1920x1080.jpg)
 
-![](https://www.haldir66.ga/static/imgs/MountainDayJapan_EN-AU8690491173_1920x1080.jpg)
 ![](https://www.haldir66.ga/static/imgs/OtterChillin_EN-AU10154811440_1920x1080.jpg)
 ![](https://www.haldir66.ga/static/imgs/ParkRangerIsmael_EN-AU8783805449_1920x1080.jpg)
 ![](https://www.haldir66.ga/static/imgs/PortAntonio_EN-AU9246692740_1920x1080.jpg)

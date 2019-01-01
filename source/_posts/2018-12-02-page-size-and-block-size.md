@@ -90,7 +90,7 @@ du -b sample.txt
 
 > Finally, du -ks dir shows (an estimate of) the space occupied on disk by all files in dir, together with all files in all of dir's subdirectories, in 1 kB = 1024 bytes units. Taking into account the description above, this has no relation whatsoever with the output of ls -kld dir.
 
-
+这本应该是一篇关于操作系统原理，内核简介的文章,to be complemented
 
 ## 参考
 - [ ] [Paging Technique : Memory management in Operating System](https://www.youtube.com/watch?v=0Rf5Jc61ArM)

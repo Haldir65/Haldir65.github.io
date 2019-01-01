@@ -207,6 +207,20 @@ export
 - bash <(curl -L -s https://install.direct/go.sh)
 
 
+[在sh脚本中判断当前脚本所在的位置](https://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within?rq=1))
+```sh
+#!/bin/bash
+echo "The script you are running has basename `basename "$0"`, dirname `dirname "$0"`"
+echo "The present working directory is `pwd`"
+```
+在c语言的main函数中,args[0]就是当前文件的路径，所以在shell里也差不多
+
+
+//统计一下这个脚本耗时多久
+> time bash -c 'echo "hey"'
+> time somescript.sh
+
+
 [LINUX下的21个特殊符号](http://blog.51cto.com/litaotao/1187983)
 [Shell学习笔记](https://notes.wanghao.work/2015-06-02-Shell%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html)
 [how to use variables in shell scripts](https://www.youtube.com/watch?v=Lu-xzWajbFo)

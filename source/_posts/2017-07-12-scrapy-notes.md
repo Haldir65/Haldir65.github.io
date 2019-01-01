@@ -74,6 +74,7 @@ Cookie，UserAgent处理 setting.py中设置需要的参数，Cookie默认是接
 PipeLine是用来持久化的，中间件用于处理Cookie,Ajax等，rules用于筛选需要跟进的url
 
 
+scrapy似乎是提供了一个Request类，传入一个url和callback，另外，项目结构包括scrapy.cfg和setting.py文件，把网络请求的细节隐藏了。最后生成的文件是items.csv(Comma-Separated Values)。应该可以结合其他库去作图。
 
 ## 2. MongoDB存储
 [pymongo](http://api.mongodb.com/python/current/tutorial.html)，就像node环境下有mongoose可以调用mongodb api一样，python环境下也有对于的driver

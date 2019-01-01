@@ -601,7 +601,10 @@ sudo lsof -iTCP -sTCP:ESTABLISHED ## ESTABLISHED状态的
 kill -9 进程id // 9直接干掉进程，慎用。。。
 kill pid // 这个和kill 15是一样的 //15表示terminate,请求进程停下来  
 
-kill -l //列出进程及id
+kill -l //告诉你kill可以传哪些参数
+在linux上输出是这样的：
+> HUP INT QUIT ILL TRAP ABRT BUS FPE KILL USR1 SEGV USR2 PIPE ALRM TERM 16 CHLD CONT STOP TSTP TTIN TTOU URG XCPU XFSZ VTALRM PROF WINCH POLL 30 SYS
+
 
 killall nginx ->> 干掉nginx的所有进程
 
