@@ -16,7 +16,7 @@
 <meta property="og:description" content="ffmpeg安装手记">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/water foot cold dark river.jpg">
-<meta property="og:updated_time" content="2018-12-23T14:52:16.304Z">
+<meta property="og:updated_time" content="2019-01-01T14:26:46.351Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ffmpeg知识手册">
 <meta name="twitter:description" content="ffmpeg安装手记">
@@ -212,6 +212,16 @@ ga('send', 'pageview');
 <p>需要知道的是，<strong><em>视频转码是很费性能的</em></strong>，消耗的时间也比较长。</p>
 <p><a href="https://github.com/mpenkov/ffmpeg-tutorial">ffmpeg c语言写一个video player</a></p>
 <p><a href="https://github.com/fluent-ffmpeg/node-fluent-ffmpeg">ffmpeg的node js 包装</a></p>
+<h3 id="视频基础信息"><a href="#视频基础信息" class="headerlink" title="视频基础信息"></a>视频基础信息</h3><p>视频包括：<br>内容元素<br>Image<br>Audio<br>Metadata(元信息)</p>
+<p>编码解码器(Codec)<br>video: H.263, H.264,H.265<br>Audio: AAC, HE-AAC</p>
+<p>容器文件格式(Container)<br>MP3 , Mp4 ,FLV, AVI</p>
+<p>视频关键字<br>帧率（Frame rate）<br>码率 （Bit rate） – 这个是指文件大小<br>分辨率 (Bit rate)<br>图片群组 (Group of Picture， GOP) I帧率 ： 关键帧(完整，直接解码) B/P帧 ：参考帧 P帧依赖于前帧，B帧依赖于前后帧</p>
+<p>帧数据 编码压缩之后组成多个GOP，最后封装成视频。</p>
+<p>视频直播结构</p>
+<p>摄像头 编码 -&gt; 视频流 -&gt; 传输给server -&gt; server负责推流 -&gt; 交给播放器<br>录制包括Native, webRTC(提供js的api获取视频数据)<br>直播协议这边，分为HLS和rtmp. html5的video标签使用HLS协议(.m3u8)，<br>pc端使用flash,native端使用系统播放器使用rtmp协议</p>
+<h3 id="HLS"><a href="#HLS" class="headerlink" title="HLS"></a>HLS</h3><p>HLS(HTTP Live Streaming)协议播放视频流在webview中使用比较简单,android和ios的webview都支持<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">video</span> <span class="attr">control</span> <span class="attr">autoplay</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">source</span> <span class="attr">src</span>=<span class="string">"http://10.66.99.77:8080/hls/mystream.m38u"</span> <span class="attr">type</span>=<span class="string">"application/vnd.apple.mpegurl"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span> <span class="attr">class</span>=<span class="string">"warning"</span>&gt;</span>Your browser does not support HTML5 video. <span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">video</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>HLS协议的.m3u8文件理论上就是讲推送的视频流切分成多个.ts文件外加一些配置。注意这个.m3u8文件只是一个文本文件，很小的。<br>所以video标签在请求完上面的m3u8文件之后，就会根据配置信息去拉取真正的.ts文件。ts文件时长太长或者太短都不好，一般推荐是5s。</p>
+<h3 id="RTMP-Real-Time-Messaging-Protocol"><a href="#RTMP-Real-Time-Messaging-Protocol" class="headerlink" title="RTMP(Real Time Messaging Protocol)"></a>RTMP(Real Time Messaging Protocol)</h3><p>是Macromedia开发的直播协议，现在属于Adobe。rtmp和HLS一样可以用于视频直播，但是RTMP因为是基于flash的，所以无法在ios生态中播放，但是实时性要比HLS好，就是低延时。所以一般使用这种协议来上传视频流，也就是视频流推送到服务器。RTMP是基于tcp长连接的，延时在2s左右，而HLS是基于http的，延时在10-30s左右。<br>推流端的话，Android一般是用MediaCodec将视频数据编码成rtmp包的格式，RTMP流本质上是FLV格式的音视频<br>nginx上要配合一个nginx-rtmp-module来做</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.jianshu.com/p/fc64102d6162">nginx搭建rtmp推流服务</a></p>
 <p>todo<br>opencv<br>view video using ffmplayer</p>
 <p>tbd</p>
@@ -366,7 +376,7 @@ ga('send', 'pageview');
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2018 Haldir
+    		&copy; 2019 Haldir
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
