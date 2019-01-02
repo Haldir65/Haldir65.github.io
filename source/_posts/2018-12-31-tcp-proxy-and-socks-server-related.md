@@ -126,6 +126,11 @@ sock5协议其实在命令行里就能用上:
 因为走的是明文，这样的代理只是具有学习的性质。更多的需要参考shadowsocks的实现(tcp proxy,支持udp)。
 另外，业内比较出名的tcp proxy有nginx，enovy以及[golang tcp proxy](https://github.com/google/tcpproxy)的实现。
 
+
+[ss的tcp包结构](https://blessing.studio/why-do-shadowsocks-deprecate-ota/)
+主动探测方法
+[协议与结构](https://loggerhead.me/posts/shadowsocks-yuan-ma-fen-xi-xie-yi-yu-jie-gou.html)
+
 ## 参考
 [python小工具：tcp proxy和tcp hub](http://ichuan.net/post/22/tcp-proxy-and-tcp-hub-in-python/)
 [Writing a simple SOCKS server in Python](https://rushter.com/blog/python-socks-server/)

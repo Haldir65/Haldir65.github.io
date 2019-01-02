@@ -21,9 +21,31 @@ mac上叫做Kqueue
 
 [Windows IOCP与Linux的epoll机制对比](https://www.jianshu.com/p/d2f4c35cb692)
 系统I/O模型 可分为三类：
-阻塞型(blocking model)，
-非阻塞同步型(non-blocking model): "wait until any socket is available to read or write from/to buffer, then call non blocking socket function which returns immediately."
-以及非阻塞异步型(asynchronous aka. overlapping model): "call a socket function which returns immediately, then wait for its completion, then access the result data object"
+第一种： 阻塞型(blocking model)，
+应用进程发起connect请求，进入系统内核方法调用。内核负责发送SYN,等待ACK,等到ACK、SYNC到达以后，发送ACK，连接完成，return用户态的connect调用。以上过程中，应用层一直阻塞。
+
+
+第二种： 非阻塞同步型(non-blocking model): "wait until any socket is available to read or write from/to buffer, then call non blocking socket function which returns immediately."
+可以通过设置SOCK_NONBLOCK标记创建非阻塞的socket fd，或者用fcntl也是一样的。
+比方说c语言在linux环境下可以这么写。
+```c
+ // client side
+   int socketfd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
+
+   // server side - see man page for accept4 under linux 
+   int socketfd = accept4( ... , SOCK_NONBLOCK);
+```
+对非阻塞fd调用系统接口时，不需要等待事件发生而立即返回，事件没有发生，接口返回-1，此时需要通过errno的值来区分是否出错，有过网络编程的经验的应该都了解这点。不同的接口，立即返回时的errno值不尽相同，如，recv、send、accept errno通常被设置为EAGIN 或者EWOULDBLOCK，connect 则为EINPRO- GRESS 。
+就是说，客户端程序会不停地去尝试读取数据，但是不会阻塞在那个读方法里，如果读的时候，没有读到内容，也会立即返回。这就允许我们在客户端里，读到不数据的时候可以搞点其他的事情了。
+
+
+第三种： 非阻塞异步型(asynchronous aka. overlapping model): "call a socket function which returns immediately, then wait for its completion, then access the result data object"
+IO多路复用，I/O复用(I/O multiplexing). IO多路复用是nio的核心和关键，也是实现高性能服务器的关键。
+应用进程通过调用epoll_wait阻塞等待可读事件，等可读事件触发时，系统会回调注册的函数。
+
+
+另外还有信号，async io
+
 IOCP基于非阻塞异步模型，而epoll基于非阻塞同步模型。
 
 

@@ -90,7 +90,15 @@ du -b sample.txt
 
 > Finally, du -ks dir shows (an estimate of) the space occupied on disk by all files in dir, together with all files in all of dir's subdirectories, in 1 kB = 1024 bytes units. Taking into account the description above, this has no relation whatsoever with the output of ls -kld dir.
 
+
+
+linux上是ext4文件系统
+应用程序调用read()方法，系统会通过中断从用户空间进入内核处理流程，然后经过VFS(Virtual File System，虚拟文件系统)、具体文件系统、页缓存Page Cache。VFS主要是用于实现屏蔽具体的文件系统，为应用程序的操作提供一个统一的接口。
+Page Cache(页缓存)，读文件的时候，会先看一下它是不是已经在Page Cache里面，如果命中了的话，就不会去读取磁盘。通过/proc/meminfo文件可以查看缓存的内存占用情况，当系统内存不足的时候，系统会回收这部分内存，I/O的性能就会降低。
+
+
 这本应该是一篇关于操作系统原理，内核简介的文章,to be complemented
+
 
 ## 参考
 - [ ] [Paging Technique : Memory management in Operating System](https://www.youtube.com/watch?v=0Rf5Jc61ArM)

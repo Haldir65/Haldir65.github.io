@@ -855,6 +855,13 @@ if (dataSource != DataSource.RESOURCE_DISK_CACHE) {
 也即DiskCacheStrategy.RESOURCE以及DiskCacheStrategy.ALL这种类型的缓存策略在第一次load完decode完之后。下次从disk中加载的时候直接无视transform。
 还有，从一个file中decode出bitmap的方法是从Downsampler.decodeStream这个方法里面调用BitmapFactory.decodeStream方法来做的
 
+先尝试用ByteBufferGifDecoder去decode下载下来的资源（失败了丢一个GlideException出来） ->  换下一个(ByteBufferBitmapDecoder) 这里面就是调用了BitmapFactory.decodeStream这个方法来创建bitmap
+
+### 关于DirectByteBuffer在glide中的使用
+java.nio.DirectByteBuffer这个class,从成员变量来看有MemoryBlock,以及FileChannel.MapModel
+
+
+
 
 
 
