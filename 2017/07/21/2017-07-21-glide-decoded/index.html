@@ -17,7 +17,7 @@
 <meta property="og:description" content="glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&amp;gt;  CacheDispatch  —&amp;gt; NetworkDispatcher  —-&amp;gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/a11f41e0b1df95212c71920b3959cd72.jpg">
-<meta property="og:updated_time" content="2019-01-01T14:29:46.426Z">
+<meta property="og:updated_time" content="2019-01-02T15:10:14.054Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从glide源码到图片加载框架设计思路">
 <meta name="twitter:description" content="glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&amp;gt;  CacheDispatch  —&amp;gt; NetworkDispatcher  —-&amp;gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是">
@@ -332,6 +332,8 @@ ga('send', 'pageview');
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">compile <span class="string">"com.squareup.okhttp3:okhttp:3.8.1"</span></span><br><span class="line">compile <span class="string">'com.github.bumptech.glide:glide:4.0.0'</span></span><br><span class="line">compile (<span class="string">'com.github.bumptech.glide:okhttp3-integration:4.0.0'</span>)&#123;</span><br><span class="line">    exclude group: <span class="string">'glide-parent'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>Glide 4.0的加载顺序是在DecodeJob的runGenerator再到startNext再到loadData。<br>看了下，本地缓存文件是使用ByteBufferFileLoader（就是用java nio去读取文件）的<br>加载cache的顺序还是memory hit &gt; diskcache &gt; remote cache 。后面两个都放在glide-disk-cache-thread上做。<br>在DecodeJob的onResourceDecoded方法中，有这么一个判断<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (dataSource != DataSource.RESOURCE_DISK_CACHE) &#123;</span><br><span class="line">      appliedTransformation = decodeHelper.getTransformation(resourceSubClass);</span><br><span class="line">      transformed = appliedTransformation.transform(glideContext, decoded, width, height);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
 <p>也即DiskCacheStrategy.RESOURCE以及DiskCacheStrategy.ALL这种类型的缓存策略在第一次load完decode完之后。下次从disk中加载的时候直接无视transform。<br>还有，从一个file中decode出bitmap的方法是从Downsampler.decodeStream这个方法里面调用BitmapFactory.decodeStream方法来做的</p>
+<p>先尝试用ByteBufferGifDecoder去decode下载下来的资源（失败了丢一个GlideException出来） -&gt;  换下一个(ByteBufferBitmapDecoder) 这里面就是调用了BitmapFactory.decodeStream这个方法来创建bitmap</p>
+<h3 id="关于DirectByteBuffer在glide中的使用"><a href="#关于DirectByteBuffer在glide中的使用" class="headerlink" title="关于DirectByteBuffer在glide中的使用"></a>关于DirectByteBuffer在glide中的使用</h3><p>java.nio.DirectByteBuffer这个class,从成员变量来看有MemoryBlock,以及FileChannel.MapModel</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="http://frodoking.github.io/2015/10/10/android-glide/">Android Glide源码解析</a></li>
 </ul>
