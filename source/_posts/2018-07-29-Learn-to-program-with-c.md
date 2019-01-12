@@ -415,3 +415,4 @@ c语言就是这样，好多功能都得自己实现
 [automatic directory creation in make](http://ismail.badawi.io/blog/2017/03/28/automatic-directory-creation-in-make/)
 [本文的参考](https://www.zfl9.com/)
 
+mmap 微信MMKV

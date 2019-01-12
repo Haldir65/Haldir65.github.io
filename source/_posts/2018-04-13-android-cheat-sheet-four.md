@@ -509,3 +509,13 @@ void Java_com_example_core_audio_NativeRecorder_encodeFile(JNIEnv *env,
 ### 17. Android平台上native的crash其实是可以catch的
 Chromium 的Breakpad是目前 Native 崩溃捕获中最成熟的方案
 
+### 18. bitmap 4096
+Bitmap too large to be uploaded into a texture (9425x1920, max=8192x8192)
+4096还是8192这个数值不确定,[stackoverflow上的回答](https://stackoverflow.com/questions/15313807/android-maximum-allowed-width-height-of-bitmap)教会如何查
+```java
+int[] maxSize = new int[1];
+gl.glGetIntegerv(GL10.GL_MAX_TEXTURE_SIZE, maxSize, 0);
+Log.e("GL", "CURRENT MAX IS "+String.valueOf(maxSize[0]));
+// maxSize[0] now contains max size(in both dimensions)
+```
+
