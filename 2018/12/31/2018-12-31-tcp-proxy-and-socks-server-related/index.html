@@ -17,7 +17,7 @@
 <meta property="og:description" content="python实现简易的tcp-proxy server及socks代理学习笔记">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/MountainDayJapan_EN-AU8690491173_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-01-12T08:05:16.397Z">
+<meta property="og:updated_time" content="2019-01-13T15:25:41.943Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="tcp-proxy简单实现及socks协议相关">
 <meta name="twitter:description" content="python实现简易的tcp-proxy server及socks代理学习笔记">
@@ -233,8 +233,9 @@ ga('send', 'pageview');
 <p>因为直接从client的报文中提取请求信息其实挺没意思的，所以暂时在python代码里写死了发送给远程的content</p>
 <p>发现curl原来可以直接往任意host:port发送http格式的请求</p>
 <blockquote>
-<p>curl localhost:1090<br>在proxy一侧收到的请求报文：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">GET / HTTP/1.1</span><br><span class="line">Host: localhost:1090</span><br><span class="line">User-Agent: curl/7.54.0</span><br><span class="line">Accept: */*</span><br></pre></td></tr></table></figure></p>
+<p>curl localhost:1090</p>
 </blockquote>
+<p>在proxy一侧收到的请求报文：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">GET / HTTP/1.1</span><br><span class="line">Host: localhost:1090</span><br><span class="line">User-Agent: curl/7.54.0</span><br><span class="line">Accept: */*</span><br></pre></td></tr></table></figure></p>
 <p>最后是有俩换行的</p>
 <p>用nc(netcat)也能往1090端口发数据</p>
 <blockquote>
@@ -253,7 +254,10 @@ ga('send', 'pageview');
 <blockquote>
 <p>curl –sock5 127.0.0.1:1080 <a href="http://www.google.com">http://www.google.com</a></p>
 </blockquote>
-<p>整体的流程:<br>客户端向服务器发送协议版本号及支持认证方式(在proxy server这边会收到几个字节的bind请求<br>05 01 00 xxxx)<br>服务器回应版本号及选定认证方式<br>客户端发送Connect请求<br>服务器对Connect的响应<br>客户端发送被代理的数据<br>服务器响应被代理的数据</p>
+<p>整体的流程:</p>
+<blockquote>
+<p>客户端向服务器发送协议版本号及支持认证方式(在proxy server这边会收到几个字节的bind请求<br>05 01 00 xxxx)<br>服务器回应版本号及选定认证方式<br>客户端发送Connect请求<br>服务器对Connect的响应<br>客户端发送被代理的数据<br>服务器响应被代理的数据</p>
+</blockquote>
 <h3 id="所以最终实现的效果是实现使用代理访问知乎"><a href="#所以最终实现的效果是实现使用代理访问知乎" class="headerlink" title="所以最终实现的效果是实现使用代理访问知乎"></a>所以最终实现的效果是实现使用代理访问知乎</h3><p>因为走的是明文，这样的代理只是具有学习的性质。更多的需要参考shadowsocks的实现(tcp proxy,支持udp)。<br>另外，业内比较出名的tcp proxy有nginx，enovy以及<a href="https://github.com/google/tcpproxy">golang tcp proxy</a>的实现。</p>
 <p><a href="https://blessing.studio/why-do-shadowsocks-deprecate-ota/">ss的tcp包结构</a><br>主动探测方法<br><a href="https://loggerhead.me/posts/shadowsocks-yuan-ma-fen-xi-xie-yi-yu-jie-gou.html">协议与结构</a></p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://ichuan.net/post/22/tcp-proxy-and-tcp-hub-in-python/">python小工具：tcp proxy和tcp hub</a><br><a href="https://rushter.com/blog/python-socks-server/">Writing a simple SOCKS server in Python</a><br><a href="https://geesun.github.io/posts/2015/09/socks5_protocol.html">SOCKS 5协议简析</a></p>
@@ -361,11 +365,11 @@ ga('send', 'pageview');
   
 <nav id="article-nav">
   
-    <a href="/2046/12/18/2017-12-18-random-new-thoughts/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2019/01/10/2019-01-10-java-nio-intro/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          即刻备忘录
+          java nio使用指南
         
       </div>
     </a>
@@ -539,6 +543,14 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">nio</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
               </li>
              
@@ -587,11 +599,11 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -644,6 +656,10 @@ ga('send', 'pageview');
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">sql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">opengl</a>
               </li>
              
               <li class="article-tag-list-item">
