@@ -548,4 +548,4 @@ todo
 [A. Jesse Jiryu Davis](https://emptysqua.re/blog/links-for-how-python-coroutines-work/)
 [How Do Python Coroutines Work](https://www.youtube.com/watch?v=7sCu4gEjH5I)
 [A Jesse Jiryu Davis Grok the GIL Write Fast And Thread Safe Python PyCon 2017](https://www.youtube.com/watch?v=7SSYhuk5hmc) the only thing two threads cann't do in once in Python is run python
-[Behold, my friends, the getaddrinfo lock in Python's socketmodule.c:](https://engineering.mongodb.com/post/the-saga-of-concurrent-dns-in-python-and-the-defeat-of-the-wicked-mutex-troll/)
+[Behold, my friends, the getaddrinfo lock in Python's socketmodule.c:](https://engineering.mongodb.com/post/the-saga-of-concurrent-dns-in-python-and-the-defeat-of-the-wicked-mutex-troll/)  A. Jesse Jiryu Davis关于python中parallel dns query的文章也很好

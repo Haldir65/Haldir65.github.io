@@ -1,7 +1,7 @@
 ---
 title: opengl学习笔记
 date: 2018-11-15 22:53:55
-tags:
+tags: [opengl]
 ---
 
 topics relating opengl stuff

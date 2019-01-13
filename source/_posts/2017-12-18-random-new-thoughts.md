@@ -27,7 +27,7 @@ top : 1
 - [ ] [八大排序算法的python实现](http://python.jobbole.com/82270/)
 - [ ] Redux和Flux很像,react context api
 - [ ] [一个展示如何在宿主App中提取一个apk文件并加载代码和资源](https://www.jianshu.com/p/a4ab102fa4ac)
-- [ ] nodejs ,go ,protobuf rpc
+- [ ] nodejs ,go ,protobuf rpc(proto更多的是作为一种协议来进行rpc数据传输)
 - [ ]一致性哈希原理
 - [ ] [使用redis实现低粒度的分布式锁](http://afghl.github.io/2018/06/17/distributed-lock-and-granarity.html)
 - [ ] Coordinator behavior以及scroll原理，完善blog

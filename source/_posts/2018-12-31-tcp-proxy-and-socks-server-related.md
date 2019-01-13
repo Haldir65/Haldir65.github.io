@@ -73,6 +73,8 @@ s.sendall(string[,flag])
 
 发现curl原来可以直接往任意host:port发送http格式的请求
 > curl localhost:1090
+
+
 在proxy一侧收到的请求报文：
 ```
 GET / HTTP/1.1
@@ -113,7 +115,7 @@ sock5协议其实在命令行里就能用上:
 
 
 整体的流程:
-客户端向服务器发送协议版本号及支持认证方式(在proxy server这边会收到几个字节的bind请求
+>客户端向服务器发送协议版本号及支持认证方式(在proxy server这边会收到几个字节的bind请求
 05 01 00 xxxx)
 服务器回应版本号及选定认证方式
 客户端发送Connect请求

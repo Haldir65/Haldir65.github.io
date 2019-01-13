@@ -1,7 +1,7 @@
 ---
 title: 如何写shell脚本
 date: 2018-11-04 08:50:58
-tags: [linux,tools]
+tags: [linux,tools,tbd]
 
 ---
 

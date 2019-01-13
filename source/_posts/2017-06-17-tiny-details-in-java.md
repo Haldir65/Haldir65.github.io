@@ -1690,7 +1690,7 @@ public class ReadFileWithFixedSizeBuffer
     }
 }
 
-//更快的复制文件
+//更快的复制文件，其实就是mmap，底层也是通过c语言走了mmap的系统调用
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;

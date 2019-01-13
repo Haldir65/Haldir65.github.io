@@ -1,7 +1,7 @@
 ---
 title: netty及nio知识手册
 date: 2018-10-13 21:34:19
-tags:
+tags: [nio,tbd]
 ---
 
 ![](https://www.haldir66.ga/static/imgs/cute_cat_sleepy.jpg)
@@ -15,7 +15,6 @@ allocating stuff is no big deal , garbage collecting it is.
 
 
 selectors
-
 
 [netty的example非常多，http2,cors,upload等等都有](https://netty.io/4.1/xref/overview-summary.html)
 

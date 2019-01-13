@@ -1,7 +1,7 @@
 ---
 title: TextView测量及渲染原理
 date: 2018-11-29 16:11:54
-tags: [android]
+tags: [android,tbd]
 ---
 
 Android上的TextView分为java层和native层，java层包括
@@ -17,7 +17,7 @@ native层包括各种开源库，Minikin,ICU,HarfBuzz,FreeType
 
 TextView是一个很重的控件，由于measure耗时通常很多，Android P提出了Precomputed Text的概念。类似的概念早几年instagram也提出过（如果只是想要展示一段文字，在一个子线程用Layout去计算。
 我碰到的情况是：
-layout.getDesiredwidth(“一个字”) > layout.getDesiredwidth(“一”) + layout.getDesiredwidth(“个”)+ layout.getDesiredwidth(“字”)。
+layout.getDesiredwidth("一个字") > layout.getDesiredwidth("一") + layout.getDesiredwidth(“个”)+ layout.getDesiredwidth(“字”)。
 多数情况下，左边的值和右边的width之和是相等的，但是出现中英文夹杂的时候左边会小于右边。不清楚这是否是提前换行的原因。
 
 Layout有BoringLayout(一行文字),StaticLayout(多行文字)和DynamicLayout(文字会变)这三个子类
