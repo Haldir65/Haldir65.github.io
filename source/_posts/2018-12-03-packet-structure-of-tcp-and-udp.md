@@ -12,6 +12,20 @@ tags: [linux,tools]
 同一台机器上的两个进程，可以通过管道，共享内存，信号量，消息队列等方式进行通信。通信的一个基本前提是每个进程都有唯一的标识，在同一台机器上，使用pid就可以了。两台不同的计算机之间通信，可以使用**ip地址 + 协议 +协议端口号** 来标识网络中的唯一进程。
 tcp用16位端口号来标识一个端口，也就是两个bytes(65536就这么来的)。
 
+以下图片盗自[chinaunix一篇讲解raw socket的文章](http://abcdxyzk.github.io/blog/2015/04/14/kernel-net-sock-raw/)
+
+- ### 这是IP packet
+![](https://www.haldir66.ga/static/imgs/2019-01-19-1.jpg)
+
+- ### 这是TCP header
+![](https://www.haldir66.ga/static/imgs/2019-01-19-2.jpg)
+
+- ### 这是IP header
+![](https://www.haldir66.ga/static/imgs/2019-01-19-3.jpg)
+
+- ### 这是mac header
+![](https://www.haldir66.ga/static/imgs/2019-01-19-4.jpg)
+
 
 什么是报文？
 例如一个 100kb 的 HTML 文档需要传送到另外一台计算机，并不会整个文档直接传送过去，可能会切割成几个部分，比如四个分别为 25kb 的数据段。
@@ -218,10 +232,6 @@ Data link Ethernet Frame Header(Destination mac address + Source mac address) +
 Network Layer IP Packet Header(Source network:host + Destination network: host) + 
 Transport Header(port) +
 data
-
-
-
-
 
 
 ## 参考

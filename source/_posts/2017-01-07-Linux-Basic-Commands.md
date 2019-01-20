@@ -654,6 +654,17 @@ lsb_release -a
 > ssh username@you.ip.address -p 22 ## 会提示输入密码的
 
 
+mac上使用ssh 免密码登录远程server的方式
+首先在本地使用keygen生成一个id_rsa_pub_xxx文件，多个服务器的公钥名字还是取不同的好。输入passphrase的时候最好输入点什么，后面会用上。
+ssh-copy-id ~/.ssh/id_rsa_xxx.pub yourusernameonvps@123.123.123.123 // 把这个id_rsa_xxx.privatekey上传到远程服务器 ，会要求输入密码的
+这个时候如果查看服务器上的~/.ssh/authorized_keys 。这才发现刚才的操作就是把公钥内容追加到这个文件后面了。注意这个文件的权限应该是400
+在本地mac的~/.ssh/config 文件中添加这个Host。User，HostName, Port, authorizedFile什么的。给这个server起个名字，比方叫做: Remy
+再来把这个key添加 ssh-add -k id_rsa_xxx ，这样不用每次都输入passphrase(会出来一个Identity added: id_rsa_xxx)。
+最后 ssh Remy ，一切顺利的话，就可以登录成功了
+
+
+
+
 
 [编码的修改](https://perlgeek.de/en/article/set-up-a-clean-utf8-environment)
 更改locale为utf-8(ubuntu)
@@ -848,6 +859,9 @@ tmux attach -t vim-dev //假设vim-dev是一个session的名字
 ctrl +b + ( //切换到前一个session
 ctrl +b + ) //切换到下一个session
 
+[tmux开了上下两个窗口之后怎么滑动](https://superuser.com/questions/209437/how-do-i-scroll-in-tmux)
+ctrl + b + [ ， 然后键盘上下就可以滑动了 , q是退出
+
 ### 20. 使用systemd管理程序
 Systemctl是一个systemd工具，主要负责控制systemd系统和服务管理器。systemd中一项服务称为unit[Linux开机启动管理---systemd使用](https://blog.csdn.net/qq562029186/article/details/67639676)
 ```bash
@@ -961,8 +975,7 @@ WantedBy=multi-user.target
 > sudo systemctl status 上面这个文件的名字.service
 > sudo systemctl start 上面这个文件的名字.service ## 手动去启动也是可以的
 
-==================================================================================
-## [shell script tutorial](https://www.youtube.com/watch?v=hwrnmQumtPw)
+
 fdisk -l ## show a list of hard drives that are attached to your computer, fdisk就是硬盘分区命令
 
 ## 21. 关于命令行中标点符号的使用

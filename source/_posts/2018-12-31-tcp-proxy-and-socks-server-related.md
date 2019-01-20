@@ -129,6 +129,11 @@ sock5协议其实在命令行里就能用上:
 另外，业内比较出名的tcp proxy有nginx，enovy以及[golang tcp proxy](https://github.com/google/tcpproxy)的实现。
 
 
+### raw socket(原始套接字)
+
+
+
+
 [ss的tcp包结构](https://blessing.studio/why-do-shadowsocks-deprecate-ota/)
 主动探测方法
 [协议与结构](https://loggerhead.me/posts/shadowsocks-yuan-ma-fen-xi-xie-yi-yu-jie-gou.html)

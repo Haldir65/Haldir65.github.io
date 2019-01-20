@@ -840,3 +840,5 @@ chunked简单说就是把一个大文件切分成N个小包，每个包(chunk)�
 
 ## todo
 ** [sock5协议的解释](https://github.com/gwuhaolin/lightsocks)
+c语言libevent实现简单的webserver
+python selector实现高阶的httpserver

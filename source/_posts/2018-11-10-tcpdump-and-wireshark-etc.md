@@ -170,8 +170,9 @@ duplicate ack，这通常出现在receiver收到了out of order packet。
 即sliding window mechanism，原理是调整retransmission的速度（根据dst的recive window），因为dst那边是有一个tcp buffer space的，万一这个buffer溢出，就会造成丢包
 wireshark中，在transmission control protocol下面，有一个window size.
 比方说，src发送了一个isn =1的packet，window size = 8760。dst返回一个ack number = 2921的ack,同时window size变成5840.
-这么来来回回，这个window迟早被小号玩，tcp zero window（正常情况下dst的应用层能够读走这部分数据，但是如果接收方读取速度跟不上的话，会发送一个ack包，告诉src发送慢一点,src接收到了之后，就会一直发keep-alive packet(非常小的包，66byte).如果dst那边还没处理好的话，会一直返回Tcp Zero window 的ack，这样往返数次）
+这么来来回回，这个window迟早被消耗玩，tcp zero window（正常情况下dst的应用层能够读走这部分数据，但是如果接收方读取速度跟不上的话，会发送一个ack包，告诉src发送慢一点,src接收到了之后，就会一直发keep-alive packet(非常小的包，66byte).如果dst那边还没处理好的话，会一直返回Tcp Zero window 的ack，这样往返数次）。这个专门的名词叫做Zero Window Probe
 在wireshark里面,tcp zero window的ack包里面会显示window size value: 0
+**只要有等待的地方都可能出现DDoS攻击，Zero Window也不例外，一些攻击者会在和HTTP建好链发完GET请求后，就把Window设置为0，然后服务端就只能等待进行ZWP，于是攻击者会并发大量的这样的请求，把服务器端的资源耗尽。（关于这方面的攻击，大家可以移步看一下Wikipedia的SockStress词条）**
 
 ### high latency
 这个主要的标志是time这一栏超过1秒，延迟的原因很多。可以分析是去程慢还是返程慢。也有可能是服务器处理很慢。

@@ -59,13 +59,13 @@ echo '$var1 eq $var2'
 else
 echo '$var1 not eq $var2'
 fi //else后面必须加fi
-       if list then
-           do something here
-       elif list then
-           do another thing here
-       else
-         do something else here
-       fi  
+if list then
+    do something here
+elif list then
+    do another thing here
+else
+    do something else here
+fi  
 ```
 
 
@@ -200,8 +200,13 @@ $$ 当前进程的进程号（PID）
 $! 后台运行的最后一个进程的进程号（PID）
 ```
 
-linux下查看环境变量命令：
-export
+unix下查看环境变量命令：
+> export
+
+windows下查看环境变量:
+> set
+
+
 
 直接把一个curl的脚本导到bash去执行的方式
 - bash <(curl -L -s https://install.direct/go.sh)
@@ -224,3 +229,5 @@ echo "The present working directory is `pwd`"
 [LINUX下的21个特殊符号](http://blog.51cto.com/litaotao/1187983)
 [Shell学习笔记](https://notes.wanghao.work/2015-06-02-Shell%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html)
 [how to use variables in shell scripts](https://www.youtube.com/watch?v=Lu-xzWajbFo)
+
+## [shell script tutorial](https://www.youtube.com/watch?v=hwrnmQumtPw)

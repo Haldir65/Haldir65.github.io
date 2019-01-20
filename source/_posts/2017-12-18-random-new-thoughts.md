@@ -53,7 +53,6 @@ top : 1
 - [ ] [chromium提供了如何在windows上编译chromium的教程](https://chromium.googlesource.com/chromium/src/+/master/docs/windows_build_instructions.md#System-requirements)
 - [ ][How the JVM compiles bytecode into machine code](https://www.youtube.com/watch?v=M8LiOANu3Nk)
 - [ ] WebSocket协议及数据帧
-- [ ] tcp-proxy实用教程
 - netfilter框架(imbedded in linux server)
 
 
@@ -104,6 +103,7 @@ top : 1
 - [X] tcp-proxy实用教程 
 - [X]Exoplayer and the MediaCodec api[building-a-video-player-app-in-android](https://medium.com/androiddevelopers/building-a-video-player-app-in-android-part-3-5-19543ea9d416) 
 - [AC2016腾讯前端技术大会 1 1 1 H5直播那些事](https://www.youtube.com/watch?v=g3F7Imjcd4k)
+- [X] tcp-proxy实用教程(tcp replay or udp relay)
 
  
 ### Good For Nothing

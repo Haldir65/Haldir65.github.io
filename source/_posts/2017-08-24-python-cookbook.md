@@ -231,7 +231,7 @@ print(datetime.now())
 ```
 
 
-自带的Log使用, 注意默认的情况下是不打印出info的信息的，需要设置一下level
+自带的Log使用, 注意默认的情况下是不打印出info的信息的，需要设置一下level(默认的是WARNING)
 ```python
 import logging
 # create logger
@@ -239,7 +239,9 @@ import logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
  
-
+ # 下面这两段也可以
+# logging.basicConfig()
+# logging.getLogger().setLevel(logging.DEBUG)
 
 def main():
     logger.info('This is a log info')
@@ -251,6 +253,8 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+
+
 
 [下划线的意义很多种](https://dbader.org/blog/meaning-of-underscores-in-python)
 这其中就包含了magic_method，或者dunder class. 直接看吧。

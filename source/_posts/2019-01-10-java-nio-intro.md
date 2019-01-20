@@ -39,7 +39,7 @@ public static ByteBuffer allocateDirect(int capacity) {
 ```
 DirectByteBuffer的核心就是调用了 unsafe.allocateMemory(size)方法。
 Java对象在Java堆里申请内存的时候，实际上是比malloc要快的，所以DirectBuffer的创建效率往往是比Heap Buffer差的。
-但是，如果进行网络读写或者文件读写的时候，DirectBuffer就会比较快了，说起来好笑，这个快是因为JDK故意把非DirectBuffer的读写搞慢的，我们看一下JDK的源代码。
+但是，如果进行网络读写或者文件读写的时候，DirectBuffer就会比较快了。 **说起来好笑，这个快是因为JDK故意把非DirectBuffer的读写搞慢的，我们看一下JDK的源代码**。
 share/classes/sun/nio/ch/IOUtil.java
 ```java
 static int write(FileDescriptor fd, ByteBuffer src, long position,

@@ -605,7 +605,6 @@ Mere trash
 ===============================================================================
 
 [gdb调试器,debug用的](http://blog.jobbole.com/112547/)
-[chsh命令](http://man.linuxde.net/chsh)
 
 文件描述符限制
 
@@ -631,7 +630,7 @@ rsync用于做系统备份
 rsync -avz --delete Pictures/ 192.168.0.10:Pictures/  ## a表示archive，就是说保留源文件的permission,timestamp等等， v表示verbose, z表示zip(就像gzip一样，通过网络传输的时候能够节省流量),记得Pictures后面的斜杠不能少
 
 ubuntu上使用sudo xxx ，输入密码后，下次sudo就不会再次要求密码了，但其实系统会起一个倒计时，如果接下来的30分钟（大概这个时间）内没有执行sudo命令，将会再次提示要求输入密码
-解决方法sudo -s // 即后续sudo指令不需要秘密
+解决方法sudo -su // 即后续sudo指令不需要密码
 
 打开tty的方法: ctrl + alt + (f1-f8)
 

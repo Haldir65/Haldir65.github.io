@@ -247,6 +247,8 @@ $ ssh-keygen -t rsa -C "your_email@associated_with_githubPersonal.com"
 > $ ssh-keygen -t rsa -C "your_email@associated_with_githubWork.com"
 ### save it as id_rsa_work when prompted
 
+ ssh-keygen -R "[x.x.x.x]:22" //之前通过ssh-kengen记住的，这个R是remove的意思
+
 由此创建四个文件：
 id_rsa_personal
 id_rsa_personal.pub ## 这里面的内容是要粘到github账户setting里面的
