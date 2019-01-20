@@ -25,7 +25,7 @@
 <meta property="og:image" content="https://haldir66.ga/static/imgs/dns_query_round_trip.png">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/dns_query_request_detail.png">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/dns_query_response_detail.png">
-<meta property="og:updated_time" content="2019-01-13T15:25:41.943Z">
+<meta property="og:updated_time" content="2019-01-20T14:12:04.371Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="tcpdump和wireshark使用手册">
 <meta name="twitter:description" content="wireshark expression cheetsheettcpdump cheetwireshark能抓tcp,arp,http,dns,udp,icmp,dhcp…">
@@ -241,7 +241,7 @@ ga('send', 'pageview');
 <h3 id="tcp-duplicates"><a href="#tcp-duplicates" class="headerlink" title="tcp  duplicates"></a>tcp  duplicates</h3><p>duplicate ack，这通常出现在receiver收到了out of order packet。<br>所有的tcp连接都有一个isn( initial sequence number)，就是初始序列号了。后续的packet会在这个数字的基础上,data payload传递了多少，这个数就加多少。比方说src这边的isn是1000，发送了200bytes的数据，那么我收到的ack应该是1200.</p>
 <p>上述是一切正常的情况，但是假如src这边的isn是1000，发出去200bytes，dst那边返回1200的sequence number的ack。此时，src这边出了问题，发出去一个1400的packet，dst那边就会认为，你这不对，重来一遍（发回一个1200的ack，一直尝试3次，直到src终于反应过来发出1200的包，这个正确的包叫做fast retransmission）。<br>在wireshark里面，dst发回来的重复的ack会显示为tcp dup ack。src最后一次正确的packet显示为tcp fast retransmission</p>
 <p>所以一旦出现了skip isn的情况，要么dst发回dup ack，要么src发出fast retransmission</p>
-<h3 id="tcp-flow-control"><a href="#tcp-flow-control" class="headerlink" title="tcp flow control"></a>tcp flow control</h3><p>即sliding window mechanism，原理是调整retransmission的速度（根据dst的recive window），因为dst那边是有一个tcp buffer space的，万一这个buffer溢出，就会造成丢包<br>wireshark中，在transmission control protocol下面，有一个window size.<br>比方说，src发送了一个isn =1的packet，window size = 8760。dst返回一个ack number = 2921的ack,同时window size变成5840.<br>这么来来回回，这个window迟早被小号玩，tcp zero window（正常情况下dst的应用层能够读走这部分数据，但是如果接收方读取速度跟不上的话，会发送一个ack包，告诉src发送慢一点,src接收到了之后，就会一直发keep-alive packet(非常小的包，66byte).如果dst那边还没处理好的话，会一直返回Tcp Zero window 的ack，这样往返数次）<br>在wireshark里面,tcp zero window的ack包里面会显示window size value: 0</p>
+<h3 id="tcp-flow-control"><a href="#tcp-flow-control" class="headerlink" title="tcp flow control"></a>tcp flow control</h3><p>即sliding window mechanism，原理是调整retransmission的速度（根据dst的recive window），因为dst那边是有一个tcp buffer space的，万一这个buffer溢出，就会造成丢包<br>wireshark中，在transmission control protocol下面，有一个window size.<br>比方说，src发送了一个isn =1的packet，window size = 8760。dst返回一个ack number = 2921的ack,同时window size变成5840.<br>这么来来回回，这个window迟早被消耗玩，tcp zero window（正常情况下dst的应用层能够读走这部分数据，但是如果接收方读取速度跟不上的话，会发送一个ack包，告诉src发送慢一点,src接收到了之后，就会一直发keep-alive packet(非常小的包，66byte).如果dst那边还没处理好的话，会一直返回Tcp Zero window 的ack，这样往返数次）。这个专门的名词叫做Zero Window Probe<br>在wireshark里面,tcp zero window的ack包里面会显示window size value: 0<br><strong>只要有等待的地方都可能出现DDoS攻击，Zero Window也不例外，一些攻击者会在和HTTP建好链发完GET请求后，就把Window设置为0，然后服务端就只能等待进行ZWP，于是攻击者会并发大量的这样的请求，把服务器端的资源耗尽。（关于这方面的攻击，大家可以移步看一下Wikipedia的SockStress词条）</strong></p>
 <h3 id="high-latency"><a href="#high-latency" class="headerlink" title="high latency"></a>high latency</h3><p>这个主要的标志是time这一栏超过1秒，延迟的原因很多。可以分析是去程慢还是返程慢。也有可能是服务器处理很慢。<br>network baseline(正常的延迟是多少，比如国内到美国一般150ms以上是起码的，这是物理决定的)</p>
 <h2 id="tcpdump"><a href="#tcpdump" class="headerlink" title="tcpdump"></a>tcpdump</h2><p>安装</p>
 <blockquote>
@@ -593,11 +593,11 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -610,6 +610,10 @@ ga('send', 'pageview');
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">C</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">c</a>
               </li>
              
               <li class="article-tag-list-item">

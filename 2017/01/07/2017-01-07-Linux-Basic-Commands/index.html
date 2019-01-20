@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/bamboo-buds-wallpaper-53859567dd31a.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/fork_you_git.jpg">
-<meta property="og:updated_time" content="2019-01-13T15:25:41.931Z">
+<meta property="og:updated_time" content="2019-01-20T14:12:04.359Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="linux基本命令介绍">
 <meta name="twitter:description" content="一些常用的linux基本命令,仅作为参考。   nohup node server.js &amp;gt; /dev/null 2&amp;gt;&amp;amp;1 &amp;amp;">
@@ -303,6 +303,7 @@ ga('send', 'pageview');
 <blockquote>
 <p>ssh username@you.ip.address -p 22 ## 会提示输入密码的</p>
 </blockquote>
+<p>mac上使用ssh 免密码登录远程server的方式<br>首先在本地使用keygen生成一个id_rsa_pub_xxx文件，多个服务器的公钥名字还是取不同的好。输入passphrase的时候最好输入点什么，后面会用上。<br>ssh-copy-id ~/.ssh/id_rsa_xxx.pub yourusernameonvps@123.123.123.123 // 把这个id_rsa_xxx.privatekey上传到远程服务器 ，会要求输入密码的<br>这个时候如果查看服务器上的~/.ssh/authorized_keys 。这才发现刚才的操作就是把公钥内容追加到这个文件后面了。注意这个文件的权限应该是400<br>在本地mac的~/.ssh/config 文件中添加这个Host。User，HostName, Port, authorizedFile什么的。给这个server起个名字，比方叫做: Remy<br>再来把这个key添加 ssh-add -k id_rsa_xxx ，这样不用每次都输入passphrase(会出来一个Identity added: id_rsa_xxx)。<br>最后 ssh Remy ，一切顺利的话，就可以登录成功了</p>
 <p><a href="https://perlgeek.de/en/article/set-up-a-clean-utf8-environment">编码的修改</a><br>更改locale为utf-8(ubuntu)<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">vi ~/.bashrc</span><br><span class="line"></span><br><span class="line"><span class="comment"># add these lines</span></span><br><span class="line"><span class="built_in">export</span> LC_ALL=en_US.UTF-8</span><br><span class="line"><span class="built_in">export</span> LANG=en_US.UTF-8</span><br><span class="line"><span class="built_in">export</span> LANGUAGE=en_US.UTF-8</span><br><span class="line"></span><br><span class="line">sudo locale-gen <span class="string">"en_US.UTF-8"</span></span><br><span class="line">sudo dpkg-reconfigure locales</span><br></pre></td></tr></table></figure></p>
 <h3 id="12-sed命令"><a href="#12-sed命令" class="headerlink" title="12. sed命令"></a>12. sed命令</h3><p>sed 是一种在线编辑器，<strong><em>它一次处理一行内容</em></strong>。处理时，把当前处理的行存储在临时缓冲区中，称为“模式空间”（pattern space），接着用sed命令处理缓冲区中的内容，处理完成后，把缓冲区的内容送往屏幕。接着处理下一行，这样不断重复，直到文件末尾。文件内容并没有 改变，除非你使用重定向存储输出。<br>本身是不会更改文件内容的。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">##把一段字符串插入文件的第四行和第五行之间，默认是送到了标准输出，加一个重定向更改了文件内容</span></span><br><span class="line">sed -e 4a\/<span class="string">"this will be append to the 5th line"</span> sample.txt &gt;&gt; sample.txt <span class="comment">## 注意这个斜杠是为了语法高亮加的</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## 将 /etc/passwd 的内容列出并且列印行号，同时，请将第 2~5 行删除！</span></span><br><span class="line">nl /etc/passwd | sed <span class="string">'2,5d'</span></span><br></pre></td></tr></table></figure></p>
 <h3 id="13-iptable"><a href="#13-iptable" class="headerlink" title="13. iptable"></a>13. iptable</h3><blockquote>
@@ -334,6 +335,7 @@ ga('send', 'pageview');
 <blockquote>
 <p>tmux list-sessions // 列出当前所有sessions<br>tmux ls // 列出当前所有sessions<br>ctrl+b + $ //可以重命名session<br>如果从一个terminal中开了一个tmux session，然后直接右上角关闭terminal，在其他的terminal中就能看到这个session不是attached的状态<br>如果不想用点击右上角叉号的方式退出session，可以使用ctrl +B +d //disconnect from current session.这样就不用关闭整个terminal了<br>tmux attach -t vim-dev //假设vim-dev是一个session的名字<br>一个好玩的现象是，如果开两个terminal，连接到同一个session，任何在一个session的操作都会在另一个session的terminal中显示，就像远程协助一样。<br>ctrl +b + ( //切换到前一个session<br>ctrl +b + ) //切换到下一个session</p>
 </blockquote>
+<p><a href="https://superuser.com/questions/209437/how-do-i-scroll-in-tmux">tmux开了上下两个窗口之后怎么滑动</a><br>ctrl + b + [ ， 然后键盘上下就可以滑动了 , q是退出</p>
 <h3 id="20-使用systemd管理程序"><a href="#20-使用systemd管理程序" class="headerlink" title="20. 使用systemd管理程序"></a>20. 使用systemd管理程序</h3><p>Systemctl是一个systemd工具，主要负责控制systemd系统和服务管理器。systemd中一项服务称为unit<a href="https://blog.csdn.net/qq562029186/article/details/67639676">Linux开机启动管理—systemd使用</a><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl start application <span class="comment">## 比方说nginx</span></span><br><span class="line">sudo systemctl status nginx <span class="comment">## 看下状态</span></span><br><span class="line">sudo systemctl restart application.service</span><br><span class="line">sudo systemctl reload application.service</span><br><span class="line">sudo systemctl reload-or-restart application.service</span><br><span class="line"></span><br><span class="line">sudo systemctl <span class="built_in">enable</span> application.service <span class="comment">##开机启动</span></span><br><span class="line"><span class="comment">## 开机启动的原理是往/lib/systemd/system或者/etc/systemd/system这个目录下创建了类似于nginx.service的symbolic link。</span></span><br><span class="line"><span class="comment">## 指向在这个文件夹下创建的xxx.target.wants文件</span></span><br><span class="line"></span><br><span class="line">**记得修改了.service文件要reload一下systemd**</span><br><span class="line"></span><br><span class="line">&gt;<span class="comment"># 重新加载配置文件</span></span><br><span class="line">$ sudo systemctl daemon-reload</span><br><span class="line"><span class="comment"># 重启相关服务</span></span><br><span class="line">$ sudo systemctl restart foobar</span><br><span class="line"></span><br><span class="line">sudo systemctl <span class="built_in">disable</span> application.service <span class="comment">## 禁止开机启动</span></span><br><span class="line"><span class="comment">## 这句话就是取消了symbolic link</span></span><br><span class="line"></span><br><span class="line">sudo systemctl is-active nginx.service <span class="comment">## 看下在不在跑</span></span><br><span class="line">active</span><br><span class="line">systemctl is-enabled application.service</span><br><span class="line">systemctl is-failed application.service</span><br><span class="line"></span><br><span class="line">systemctl list-units --all <span class="comment">## 所有systemd加载（或者尝试过加载）的程序</span></span><br><span class="line">systemctl list-units --all --state=inactive <span class="comment">## 只看active的</span></span><br><span class="line"></span><br><span class="line">systemctl list-unit-files <span class="comment">## 和list-units不一样，这里还包括了systemd为尝试过parse的配置</span></span><br><span class="line"></span><br><span class="line">sudo systemctl halt <span class="comment">## 挂起</span></span><br><span class="line">sudo systemctl poweroff <span class="comment">## 关机</span></span><br><span class="line">sudo systemctl reboot <span class="comment">## 重启 其实sudo reboot也是指向/bin/systemctl的软链接</span></span><br><span class="line"></span><br><span class="line">systemctl cat sshd.service <span class="comment">## 查看一个服务的配置文件</span></span><br></pre></td></tr></table></figure></p>
 <p>系统基本service服务配置目录（此目录勿动，一般情况下只放系统核心基础服务配置，否存放应用注册类服务配置）：<br>/etc/systemd/system，自定义服务配置管理目录（存放自定义应用注册类服务和第三方服务类配置）：/usr/lib/systemd/system/</p>
 <p>自定义.service配置文件，实现开机自启(开机执行一个sh脚本)的步骤</p>
@@ -375,8 +377,7 @@ ga('send', 'pageview');
 <blockquote>
 <p>sudo systemctl status 上面这个文件的名字.service<br>sudo systemctl start 上面这个文件的名字.service ## 手动去启动也是可以的</p>
 </blockquote>
-<p>==================================================================================</p>
-<h2 id="shell-script-tutorial"><a href="#shell-script-tutorial" class="headerlink" title="shell script tutorial"></a><a href="https://www.youtube.com/watch?v=hwrnmQumtPw">shell script tutorial</a></h2><p>fdisk -l ## show a list of hard drives that are attached to your computer, fdisk就是硬盘分区命令</p>
+<p>fdisk -l ## show a list of hard drives that are attached to your computer, fdisk就是硬盘分区命令</p>
 <h2 id="21-关于命令行中标点符号的使用"><a href="#21-关于命令行中标点符号的使用" class="headerlink" title="21. 关于命令行中标点符号的使用"></a>21. 关于命令行中标点符号的使用</h2><p>在unix系统上参数的分隔符是” :  “<br>在windows系统上分割符是”  ;  “<br>还有就是forward slash和back slash了</p>
 <p>nl (类似于cat，只是展示文本的时候带上行号),fold(限定每一行最多多少个字符，超过了自动换行)</p>
 <p>curl ipinfo.io/ip 用于获取本机外部ip地址</p>
@@ -748,11 +749,11 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -765,6 +766,10 @@ ga('send', 'pageview');
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">C</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">c</a>
               </li>
              
               <li class="article-tag-list-item">

@@ -17,12 +17,16 @@
 <meta property="og:description" content="本文只针对ipv4网络进行分析">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/AlanTuringNotebook_EN-AU7743633207_1920x1080.jpg">
+<meta property="og:image" content="https://www.haldir66.ga/static/imgs/2019-01-19-1.jpg">
+<meta property="og:image" content="https://www.haldir66.ga/static/imgs/2019-01-19-2.jpg">
+<meta property="og:image" content="https://www.haldir66.ga/static/imgs/2019-01-19-3.jpg">
+<meta property="og:image" content="https://www.haldir66.ga/static/imgs/2019-01-19-4.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/TCP-window-syn.png">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/TCP-window-http.png">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/Transmission-control-protocol-window-scaling.png">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/TCP-Zero-Window-Performance-Vision.png">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/tcp_and_udp_size_limit.png">
-<meta property="og:updated_time" content="2019-01-13T15:25:41.943Z">
+<meta property="og:updated_time" content="2019-01-20T14:12:04.371Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="tcp和udp包结构分析">
 <meta name="twitter:description" content="本文只针对ipv4网络进行分析">
@@ -209,6 +213,17 @@ ga('send', 'pageview');
 <blockquote>
 <p>多数内容来自<a href="https://jerryc8080.gitbooks.io/understand-tcp-and-udp/chapter2.html">TCP 报文结构</a><br>同一台机器上的两个进程，可以通过管道，共享内存，信号量，消息队列等方式进行通信。通信的一个基本前提是每个进程都有唯一的标识，在同一台机器上，使用pid就可以了。两台不同的计算机之间通信，可以使用<strong>ip地址 + 协议 +协议端口号</strong> 来标识网络中的唯一进程。<br>tcp用16位端口号来标识一个端口，也就是两个bytes(65536就这么来的)。</p>
 </blockquote>
+<p>以下图片盗自<a href="http://abcdxyzk.github.io/blog/2015/04/14/kernel-net-sock-raw/">chinaunix一篇讲解raw socket的文章</a></p>
+<ul>
+<li><h3 id="这是IP-packet"><a href="#这是IP-packet" class="headerlink" title="这是IP packet"></a>这是IP packet</h3><p><img src="https://www.haldir66.ga/static/imgs/2019-01-19-1.jpg" alt=""></p>
+</li>
+<li><h3 id="这是TCP-header"><a href="#这是TCP-header" class="headerlink" title="这是TCP header"></a>这是TCP header</h3><p><img src="https://www.haldir66.ga/static/imgs/2019-01-19-2.jpg" alt=""></p>
+</li>
+<li><h3 id="这是IP-header"><a href="#这是IP-header" class="headerlink" title="这是IP header"></a>这是IP header</h3><p><img src="https://www.haldir66.ga/static/imgs/2019-01-19-3.jpg" alt=""></p>
+</li>
+<li><h3 id="这是mac-header"><a href="#这是mac-header" class="headerlink" title="这是mac header"></a>这是mac header</h3><p><img src="https://www.haldir66.ga/static/imgs/2019-01-19-4.jpg" alt=""></p>
+</li>
+</ul>
 <p>什么是报文？<br>例如一个 100kb 的 HTML 文档需要传送到另外一台计算机，并不会整个文档直接传送过去，可能会切割成几个部分，比如四个分别为 25kb 的数据段。<br>而每个数据段再加上一个 TCP 首部，就组成了 TCP 报文。<br>一共四个 TCP 报文，发送到另外一个端。<br>另外一端收到数据包，然后再剔除 TCP 首部，组装起来。<br>等到四个数据包都收到了，就能还原出来一个完整的 HTML 文档了。<br>在 OSI 的七层协议中，第二层（数据链路层）的数据叫「Frame」，第三层（网络层）上的数据叫「Packet」，第四层（传输层）的数据叫「Segment」。<br>TCP 报文 (Segment)，包括首部和数据部分。</p>
 <p>TCP 报文段首部的前20个字节是固定的，后面有 4N 字节是根据需要而增加的。<br>TCP 的首部包括以下内容：</p>
 <ul>
@@ -600,11 +615,11 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -617,6 +632,10 @@ ga('send', 'pageview');
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">C</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">c</a>
               </li>
              
               <li class="article-tag-list-item">
