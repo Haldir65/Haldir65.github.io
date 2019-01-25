@@ -474,9 +474,11 @@ ParameterizedType,TypeVariable,GenericArrayType,WildcardType（这四个全部�
 
 
 
+
 todo
 反编译java代码的基本套路
 [有直接去看hotspot源码来分析的](https://www.zhihu.com/question/60892134)
+[classLoader related topics](https://zhuanlan.zhihu.com/p/51374915)
 
 
 ![](https://www.haldir66.ga/static/imgs/1279081126453.jpg)

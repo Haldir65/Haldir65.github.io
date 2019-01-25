@@ -124,14 +124,76 @@ sock5协议其实在命令行里就能用上:
 服务器响应被代理的数据
 
 
+
+
 ### 所以最终实现的效果是实现使用代理访问知乎
 因为走的是明文，这样的代理只是具有学习的性质。更多的需要参考shadowsocks的实现(tcp proxy,支持udp)。
 另外，业内比较出名的tcp proxy有nginx，enovy以及[golang tcp proxy](https://github.com/google/tcpproxy)的实现。
 
+## udp proxy的实现
+[非常短的一个脚本](https://github.com/EtiennePerot/misc-scripts/blob/master/udp-relay.py)
+```python
+#!/usr/bin/env python
+# Super simple script that listens to a local UDP port and relays all packets to an arbitrary remote host.
+# Packets that the host sends back will also be relayed to the local UDP client.
+# Works with Python 2 and 3
+
+import sys, socket
+
+def fail(reason):
+	sys.stderr.write(reason + '\n')
+	sys.exit(1)
+
+if len(sys.argv) != 2 or len(sys.argv[1].split(':')) != 3:
+	fail('Usage: udp-relay.py localPort:remoteHost:remotePort')
+
+localPort, remoteHost, remotePort = sys.argv[1].split(':')
+
+try:
+	localPort = int(localPort)
+except:
+	fail('Invalid port number: ' + str(localPort))
+try:
+	remotePort = int(remotePort)
+except:
+	fail('Invalid port number: ' + str(remotePort))
+
+try:
+	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	s.bind(('', localPort))
+except:
+	fail('Failed to bind on port ' + str(localPort))
+
+knownClient = None
+knownServer = (remoteHost, remotePort)
+sys.stderr.write('All set.\n')
+while True:
+	data, addr = s.recvfrom(32768)
+	if knownClient is None:
+		knownClient = addr
+	if addr == knownClient:
+		s.sendto(data, knownServer)
+	else:
+		s.sendto(data, knownClient)
+```
 
 ### raw socket(原始套接字)
 
-
+### 优化
+server端监听在一个端口，client端发送数据的端口变来变去。数据量大的时候单线程阻塞式的server还是会有性能问题。python中可以使用selectors模块，在server端，每次socket.accept()之后，就register一个fileno for read and write event。
+[参考udpRelayServer](https://github.com/linhua55/some_kcptun_tools/blob/master/udpRelay/udpRelayServer.py)
+每次selector.select(这个函数是blocking的)，从端口上来看，client这边可以开多个port发数据给proxy， proxy这边只用一个port接受，对外部网络世界多个ip，开多个port。所以proxy内部应该维护一个external port <======> client port 的映射。
+开始select之后，首先是select出来一个readable的client socket(port) ，读取信息，存储到一个{ clientport , [clientmessageOutList] } 的字典里。 然后根据clientmessage中暗示的remote ip和port去register一个socket， register的时候是可以带上一些自定义数据的，这里放上clientport. 当这个register的回调开始时，如果是可写，那么把刚才字典里的信息拿出来，del掉。 如果是可读，那么说明发出去的东西有回信了，这时候去自定义数据里面的port，存到一个{clientport, [messageToBeDelivedBackList] } 的字典里。在select本地port的时候，如果扫到一个writabel的client socket port，就根据这个port num 去字典里获取messageToBeDelivedBack，发送回去。到此结束一个流程。
+任何时间段，proxy这边维持了两个字典，一头是面向client的，port => [要发送的msg1,要发送的msg2,...] , 一头是面向多个remote ip port组合的的。存储了 clientport => [要回复给client的msg1 ,要回复给client的msg2] . 
+面向client只需要做一个selector操作，面向outside需要做多个selector操作（一个外部网站一般一个就够了）。不停的轮询。但实际上只需要一个selector就行了。
+```python
+try:
+    while True:
+        events = sel.select(timeout=1)
+        if events:
+            for key, mask in events:
+                service_connection(key, mask) ## key.fileobj是socket, key,data是register的时候自定义的数据
+```
 
 
 [ss的tcp包结构](https://blessing.studio/why-do-shadowsocks-deprecate-ota/)
