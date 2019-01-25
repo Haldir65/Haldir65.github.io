@@ -8,6 +8,9 @@ import Viewer from './viewer'
 import Share from './share'
 // 边缘
 import Aside from './aside'
+import hljs from 'highlight.js';
+
+
 
 import {addLoadEvent} from './util'
 
@@ -15,4 +18,5 @@ addLoadEvent(function() {
 	Share.init()
 	Viewer.init()
 	Aside.init()
+	hljs.initHighlightingOnLoad()
 })
