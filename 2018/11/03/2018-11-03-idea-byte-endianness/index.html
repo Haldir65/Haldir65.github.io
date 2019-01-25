@@ -16,7 +16,7 @@
 <meta property="og:description" content="字节序（Endianness），在计算机科学领域中，是跨越多字节的程序对象的存储规则。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/ship_docking_along_side_bay.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.043Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.185Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="网络传输的字节序问题">
 <meta name="twitter:description" content="字节序（Endianness），在计算机科学领域中，是跨越多字节的程序对象的存储规则。">
@@ -201,31 +201,248 @@ ga('send', 'pageview');
       
         <p>字节序（Endianness），在计算机科学领域中，是跨越<strong><em>多字节</em></strong>的程序对象的存储规则。 </p>
 <p><img src="https://haldir66.ga/static/imgs/ship_docking_along_side_bay.jpg" alt=""><br><a id="more"></a></p>
-<h2 id="首先确认下c语言下基本数据类型大小"><a href="#首先确认下c语言下基本数据类型大小" class="headerlink" title="首先确认下c语言下基本数据类型大小"></a>首先确认下c语言下基本数据类型大小</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">printf</span>(<span class="string">"sizeof(int)= %ld\n"</span>,<span class="keyword">sizeof</span>(<span class="keyword">int</span>));</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"sizeof(char)= %ld\n"</span>,<span class="keyword">sizeof</span>(<span class="keyword">char</span>));</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"sizeof(long)= %ld\n"</span>,<span class="keyword">sizeof</span>(<span class="keyword">long</span>));</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"sizeof(float)= %ld\n"</span>,<span class="keyword">sizeof</span>(<span class="keyword">float</span>));</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"sizeof(short)= %ld\n"</span>,<span class="keyword">sizeof</span>(<span class="keyword">short</span>));</span><br></pre></td></tr></table></figure>
+<h2 id="首先确认下c语言下基本数据类型大小"><a href="#首先确认下c语言下基本数据类型大小" class="headerlink" title="首先确认下c语言下基本数据类型大小"></a>首先确认下c语言下基本数据类型大小</h2><pre><code class="c">printf(&quot;sizeof(int)= %ld\n&quot;,sizeof(int));
+printf(&quot;sizeof(char)= %ld\n&quot;,sizeof(char));
+printf(&quot;sizeof(long)= %ld\n&quot;,sizeof(long));
+printf(&quot;sizeof(float)= %ld\n&quot;,sizeof(float));
+printf(&quot;sizeof(short)= %ld\n&quot;,sizeof(short));
+</code></pre>
 <blockquote>
 <p>sizeof(int)= 4<br>sizeof(char)= 1<br>sizeof(long)= 8<br>sizeof(float)= 4<br>sizeof(short)= 2</p>
 </blockquote>
-<h2 id="来看一下c语言这边用socket以int，long的形式发送数据，Python这边接收会是怎么样的"><a href="#来看一下c语言这边用socket以int，long的形式发送数据，Python这边接收会是怎么样的" class="headerlink" title="来看一下c语言这边用socket以int，long的形式发送数据，Python这边接收会是怎么样的"></a>来看一下c语言这边用socket以int，long的形式发送数据，Python这边接收会是怎么样的</h2><p>c语言的server长这样<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;netinet/in.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt; // socket</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;  // 基本数据类型</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt; // read write</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fcntl.h&gt; // open close</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/shm.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;signal.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> PORT 7037</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SERV <span class="meta-string">"0.0.0.0"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> QUEUE 20</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> BUFF_SIZE 1024</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> sockfd;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc,<span class="keyword">char</span> *argv[ ])</span></span>&#123;</span><br><span class="line"></span><br><span class="line">        signal(SIGINT,handle_signal);</span><br><span class="line">        <span class="keyword">int</span> count = <span class="number">0</span>; <span class="comment">// 计数</span></span><br><span class="line">        <span class="comment">// 定义 socket</span></span><br><span class="line">        sockfd = socket(AF_INET,SOCK_STREAM,<span class="number">0</span>);</span><br><span class="line">        <span class="comment">// 定义 sockaddr_in</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">skaddr</span>;</span></span><br><span class="line">        skaddr.sin_family = AF_INET; <span class="comment">// ipv4</span></span><br><span class="line">        skaddr.sin_port   = htons(PORT);</span><br><span class="line">        skaddr.sin_addr.s_addr = inet_addr(SERV);</span><br><span class="line">        <span class="comment">// bind，绑定 socket 和 sockaddr_in</span></span><br><span class="line">        <span class="keyword">if</span>( bind(sockfd,(struct sockaddr *)&amp;skaddr,<span class="keyword">sizeof</span>(skaddr)) == <span class="number">-1</span> )&#123;</span><br><span class="line">                perror(<span class="string">"bind error"</span>);</span><br><span class="line">                <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// listen，开始添加端口</span></span><br><span class="line">        <span class="keyword">if</span>( listen(sockfd,QUEUE) == <span class="number">-1</span> )&#123;</span><br><span class="line">                perror(<span class="string">"listen error"</span>);</span><br><span class="line">                <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 客户端信息</span></span><br><span class="line">        <span class="keyword">char</span> buff[BUFF_SIZE];</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">claddr</span>;</span></span><br><span class="line">        <span class="keyword">socklen_t</span> length = <span class="keyword">sizeof</span>(claddr);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(<span class="number">1</span>)&#123;</span><br><span class="line">                <span class="keyword">int</span> sock_client = accept(sockfd,(struct sockaddr *)&amp;claddr, &amp;length);</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">"%d\n"</span>,++count);</span><br><span class="line">                <span class="keyword">if</span>( sock_client &lt;<span class="number">0</span> )&#123;</span><br><span class="line">                        perror(<span class="string">"accept error"</span>);</span><br><span class="line">                        <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">int</span> a[<span class="number">3</span>]=&#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>&#125;; <span class="comment">//在这里发送出byte数组</span></span><br><span class="line">                send(sock_client,(<span class="keyword">char</span>*)a,<span class="keyword">sizeof</span>(a),<span class="number">0</span>);</span><br><span class="line">                close(sock_client);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">fputs</span>(<span class="string">"have a nice day"</span>,<span class="built_in">stdout</span>);</span><br><span class="line">        close(sockfd);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>python的client长这样：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="comment"># -*- coding: UTF-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="comment"># 创建一个socket:</span></span><br><span class="line">s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)</span><br><span class="line"><span class="comment"># 建立连接:</span></span><br><span class="line">s.connect((<span class="string">'192.168.1.45'</span>, <span class="number">7037</span>))</span><br><span class="line">s.send(<span class="string">b'GET / HTTP/1.1\r\nHost: www.sina.com.cn\r\nConnection: close\r\n\r\n'</span>)</span><br><span class="line"><span class="comment"># 接收数据:</span></span><br><span class="line">buffer = []</span><br><span class="line"><span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">    <span class="comment"># 每次最多接收1个字节:</span></span><br><span class="line">    d = s.recv(<span class="number">1</span>)</span><br><span class="line">    t = <span class="string">''</span></span><br><span class="line">    <span class="keyword">for</span> x <span class="keyword">in</span> d:</span><br><span class="line">        print(format(x,<span class="string">'b'</span>))</span><br><span class="line">    <span class="keyword">if</span> d:</span><br><span class="line">        buffer.append(d)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">data = <span class="string">b''</span>.join(buffer)</span><br><span class="line">print(data)</span><br><span class="line">s.close()</span><br></pre></td></tr></table></figure></p>
-<p>在局域网内的两台电脑,server跑在mac上,client跑在win10<br>client这边打印出了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">1    </span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">===我是四个byte等于一个int的手动分割线===</span><br><span class="line">10</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">===我是四个byte等于一个int的手动分割线===</span><br><span class="line">11</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">0</span><br></pre></td></tr></table></figure></p>
-<p>按照server端(intel cpu)是小端的理论，把上面接收到的横过来掉个头<br>前四个字节是”1”<br>1   0   0   0<br>0   0   0   1  -&gt; 显然是1</p>
+<h2 id="来看一下c语言这边用socket以int，long的形式发送数据，Python这边接收会是怎么样的"><a href="#来看一下c语言这边用socket以int，long的形式发送数据，Python这边接收会是怎么样的" class="headerlink" title="来看一下c语言这边用socket以int，long的形式发送数据，Python这边接收会是怎么样的"></a>来看一下c语言这边用socket以int，long的形式发送数据，Python这边接收会是怎么样的</h2><p>c语言的server长这样</p>
+<pre><code class="c">#include &lt;stdio.h&gt;
+#include &lt;netinet/in.h&gt;
+#include &lt;sys/socket.h&gt; // socket
+#include &lt;sys/types.h&gt;  // 基本数据类型
+#include &lt;unistd.h&gt; // read write
+#include &lt;string.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;fcntl.h&gt; // open close
+#include &lt;sys/shm.h&gt;
+
+#include &lt;signal.h&gt;
+
+#define PORT 7037
+#define SERV &quot;0.0.0.0&quot;
+#define QUEUE 20
+#define BUFF_SIZE 1024
+
+
+int sockfd;
+
+int main(int argc,char *argv[ ]){
+
+        signal(SIGINT,handle_signal);
+        int count = 0; // 计数
+        // 定义 socket
+        sockfd = socket(AF_INET,SOCK_STREAM,0);
+        // 定义 sockaddr_in
+        struct sockaddr_in skaddr;
+        skaddr.sin_family = AF_INET; // ipv4
+        skaddr.sin_port   = htons(PORT);
+        skaddr.sin_addr.s_addr = inet_addr(SERV);
+        // bind，绑定 socket 和 sockaddr_in
+        if( bind(sockfd,(struct sockaddr *)&amp;skaddr,sizeof(skaddr)) == -1 ){
+                perror(&quot;bind error&quot;);
+                exit(1);
+        }
+
+        // listen，开始添加端口
+        if( listen(sockfd,QUEUE) == -1 ){
+                perror(&quot;listen error&quot;);
+                exit(1);
+        }
+
+        // 客户端信息
+        char buff[BUFF_SIZE];
+        struct sockaddr_in claddr;
+        socklen_t length = sizeof(claddr);
+
+
+        while(1){
+                int sock_client = accept(sockfd,(struct sockaddr *)&amp;claddr, &amp;length);
+                printf(&quot;%d\n&quot;,++count);
+                if( sock_client &lt;0 ){
+                        perror(&quot;accept error&quot;);
+                        exit(1);
+                }
+                int a[3]={1,2,3}; //在这里发送出byte数组
+                send(sock_client,(char*)a,sizeof(a),0);
+                close(sock_client);
+        }
+        fputs(&quot;have a nice day&quot;,stdout);
+        close(sockfd);
+        return 0;
+}
+</code></pre>
+<p>python的client长这样：</p>
+<pre><code class="python">#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+import socket
+# 创建一个socket:
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# 建立连接:
+s.connect((&#39;192.168.1.45&#39;, 7037))
+s.send(b&#39;GET / HTTP/1.1\r\nHost: www.sina.com.cn\r\nConnection: close\r\n\r\n&#39;)
+# 接收数据:
+buffer = []
+while True:
+    # 每次最多接收1个字节:
+    d = s.recv(1)
+    t = &#39;&#39;
+    for x in d:
+        print(format(x,&#39;b&#39;))
+    if d:
+        buffer.append(d)
+    else:
+        break
+data = b&#39;&#39;.join(buffer)
+print(data)
+s.close()
+</code></pre>
+<p>在局域网内的两台电脑,server跑在mac上,client跑在win10<br>client这边打印出了</p>
+<pre><code>1    
+0
+0
+0
+===我是四个byte等于一个int的手动分割线===
+10
+0
+0
+0
+===我是四个byte等于一个int的手动分割线===
+11
+0
+0
+0
+</code></pre><p>按照server端(intel cpu)是小端的理论，把上面接收到的横过来掉个头<br>前四个字节是”1”<br>1   0   0   0<br>0   0   0   1  -&gt; 显然是1</p>
 <p>中间四个字节是”2”<br>10  0   0   0<br>0   0   0   10 -&gt; 显然是2</p>
 <p>最后四个字节是”3”<br>11  0   0   0<br>0   0   0   11 -&gt; 显然是3</p>
 <p>教科书诚不我欺也</p>
-<p>这里如果把c语言的server改一下<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">float</span> a[<span class="number">3</span>]=&#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>&#125;; <span class="comment">//在这里发送出byte数组</span></span><br><span class="line">send(sock_client,(<span class="keyword">char</span>*)a,<span class="keyword">sizeof</span>(a),<span class="number">0</span>);</span><br></pre></td></tr></table></figure></p>
-<p>client一字不改，得到的是<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">0</span><br><span class="line">0</span><br><span class="line">10000000</span><br><span class="line">111111</span><br><span class="line">===我是四个byte等于一个float的手动分割线===</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">1000000</span><br><span class="line">===我是四个byte等于一个float的手动分割线===</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">1000000</span><br><span class="line">1000000</span><br></pre></td></tr></table></figure></p>
-<p>这个其实跟float是如何表示小数有关了，float有几个bit是专门给小数点后面的数值和指数准备的。<br>float是4个byte，这32位是这么分的：<br>1bit（符号位） 8bits（指数位） 23bits（尾数位）（内存中就长这样）</p>
-<p>改成long呢，short呢？<br>改成long<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">1    </span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">===我是八个byte等于一个long的手动分割线===</span><br><span class="line">10</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">===我是八个byte等于一个long的手动分割线===</span><br><span class="line">11</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">0</span><br></pre></td></tr></table></figure></p>
-<p>问题已经很清楚了。<br>上述是把数字当做int,long,float这种数据类型来发送，但如果是把123这三个数字当做”123”这种字符串，数字1其实只用一个byte就解决了，也就不存在什么字节序的问题了</p>
-<p>如C编写的进程和Java编写的进程间通信，(JVM也是大端）。在主机和网络字节序的互相转化主要涉及IP地址和端口。c语言写server要老老实实去转换ip地址和端口的字节序，这也是为了遵守规范<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;netstat/in.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">int</span> <span class="title">htonl</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">int</span> hostlong)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">short</span>  <span class="keyword">int</span> <span class="title">htons</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">short</span> <span class="keyword">int</span> hostshort)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">int</span> <span class="title">ntohl</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">int</span> netlong)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">short</span> <span class="keyword">int</span> <span class="title">ntohs</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">short</span> <span class="keyword">int</span> netshort)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>这里如果把c语言的server改一下</p>
+<pre><code class="c">float a[3]={1,2,3}; //在这里发送出byte数组
+send(sock_client,(char*)a,sizeof(a),0);
+</code></pre>
+<p>client一字不改，得到的是</p>
+<pre><code>0
+0
+10000000
+111111
+===我是四个byte等于一个float的手动分割线===
+0
+0
+0
+1000000
+===我是四个byte等于一个float的手动分割线===
+0
+0
+1000000
+1000000
+</code></pre><p>这个其实跟float是如何表示小数有关了，float有几个bit是专门给小数点后面的数值和指数准备的。<br>float是4个byte，这32位是这么分的：<br>1bit（符号位） 8bits（指数位） 23bits（尾数位）（内存中就长这样）</p>
+<p>改成long呢，short呢？<br>改成long</p>
+<pre><code>1    
+0
+0
+0
+0
+0
+0
+0
+===我是八个byte等于一个long的手动分割线===
+10
+0
+0
+0
+0
+0
+0
+0
+===我是八个byte等于一个long的手动分割线===
+11
+0
+0
+0
+0
+0
+0
+0
+</code></pre><p>问题已经很清楚了。<br>上述是把数字当做int,long,float这种数据类型来发送，但如果是把123这三个数字当做”123”这种字符串，数字1其实只用一个byte就解决了，也就不存在什么字节序的问题了</p>
+<p>如C编写的进程和Java编写的进程间通信，(JVM也是大端）。在主机和网络字节序的互相转化主要涉及IP地址和端口。c语言写server要老老实实去转换ip地址和端口的字节序，这也是为了遵守规范</p>
+<pre><code class="c">#include &lt;netstat/in.h&gt;
+unsigned long int htonl(unsigned long int hostlong);
+unsigned short  int htons(unsigned short int hostshort);
+unsigned long int ntohl(unsigned long int netlong);
+unsigned short int ntohs(unsigned short int netshort);
+</code></pre>
 <p>网络字节序是一种规定，它规定了传输的数据应该按照大端，因为通信双方的字节序其实是不确定的，但是按照规定我们都认为接收到的数据都是大端，即遵守规定的顺序，这样老老实实地通过htons系列函数处理格式化的数据（如int）保证了不会出现任何错误。</p>
 <p>但是，我们自己写的C/S因为都是小端，所以即使没有遵守规定，依然可以用，但这样并不规范，有潜在的隐患。</p>
 <p>而对于IP地址或者端口，因为这些数据的处理全部是在应用层以下，是路由器，网卡进行处理，它们在设计时自然遵守规定全部依照网络字节序对数据进行处理，而你自己不把IP地址转换顺序，交给下层处理时自然会出错。</p>
 <p>所以，在应用层，也应该遵守规定，对于int double 这样的数据也应该转换字节序，当然字符串也挺好（这大概也就是Json的优势了，而像protobuf这种传输时就要注意顺序）。</p>
 <p><a href="https://blog.csdn.net/XiyouLinux_Kangyijie/article/details/72991235">抓包看ip地址字节序转换</a><br>utf-8还有一个byte-order-mark(bom)的问题</p>
-<p>C语言下可以把一个byte按照binary的方式打印出来(就是把一个byte的每一个bit输出来),int也可以。<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;limits.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">print_bin</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">char</span> byte)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i = CHAR_BIT; <span class="comment">/* however many bits are in a byte on your platform */</span></span><br><span class="line">    <span class="keyword">while</span>(i--) &#123;</span><br><span class="line">        <span class="built_in">putchar</span>(<span class="string">'0'</span> + ((byte &gt;&gt; i) &amp; <span class="number">1</span>)); <span class="comment">/* loop through and print the bits */</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"\n\n"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">print_bin_int</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">int</span> integer)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i = CHAR_BIT * <span class="keyword">sizeof</span> integer; <span class="comment">/* however many bits are in an integer */</span></span><br><span class="line">    <span class="keyword">while</span>(i--) &#123;</span><br><span class="line">        <span class="built_in">putchar</span>(<span class="string">'0'</span> + ((integer &gt;&gt; i) &amp; <span class="number">1</span>));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"\n\n"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">checkCPUendian</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">union</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> a;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> b;</span><br><span class="line">  &#125;c;</span><br><span class="line">  c.a = <span class="number">1</span>;</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">"a = %a , b= %a \n"</span>,c.a , c.b);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">"a = %X , b= %X \n"</span>,c.a , c.b);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">"a = %p , b= %p \n"</span>,c.a , c.b);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">"a = %u , b= %u \n"</span>,c.a , c.b);</span><br><span class="line">  print_bin(c.b);</span><br><span class="line">  print_bin_int(c.a);</span><br><span class="line">  <span class="keyword">return</span> (c.b == <span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> <span class="keyword">const</span> *argv[])</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(checkCPUendian())&#123;</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">"Little endian platform!\n"</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line"></span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">"Big Endian platform!\n"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>输出，这里是从高地址内存开始往低地址的内存读取<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">a = 0x0.07fcbc8474a98p-1022 , b= 0x0p+0</span><br><span class="line">a = 1 , b= 1</span><br><span class="line">a = 0x1 , b= 0x1</span><br><span class="line">a = 1 , b= 1</span><br><span class="line">00000001</span><br><span class="line"></span><br><span class="line">00000000000000000000000000000001</span><br><span class="line"></span><br><span class="line">Little endian platform!</span><br></pre></td></tr></table></figure></p>
+<p>C语言下可以把一个byte按照binary的方式打印出来(就是把一个byte的每一个bit输出来),int也可以。</p>
+<pre><code class="c">#include &lt;stdio.h&gt;
+#include &lt;limits.h&gt;
 
+void print_bin(unsigned char byte)
+{
+    int i = CHAR_BIT; /* however many bits are in a byte on your platform */
+    while(i--) {
+        putchar(&#39;0&#39; + ((byte &gt;&gt; i) &amp; 1)); /* loop through and print the bits */
+    }
+    printf(&quot;\n\n&quot;);
+}
+
+void print_bin_int(unsigned int integer)
+{
+    int i = CHAR_BIT * sizeof integer; /* however many bits are in an integer */
+    while(i--) {
+        putchar(&#39;0&#39; + ((integer &gt;&gt; i) &amp; 1));
+    }
+    printf(&quot;\n\n&quot;);
+}
+
+
+
+int checkCPUendian()
+{
+  union
+  {
+    unsigned int a;
+    unsigned char b;
+  }c;
+  c.a = 1;
+  printf(&quot;a = %a , b= %a \n&quot;,c.a , c.b);
+  printf(&quot;a = %X , b= %X \n&quot;,c.a , c.b);
+  printf(&quot;a = %p , b= %p \n&quot;,c.a , c.b);
+  printf(&quot;a = %u , b= %u \n&quot;,c.a , c.b);
+  print_bin(c.b);
+  print_bin_int(c.a);
+  return (c.b == 1);
+}
+
+int main(int argc, char const *argv[]) {
+        if(checkCPUendian()){
+                printf(&quot;Little endian platform!\n&quot;);
+        } else {
+
+                printf(&quot;Big Endian platform!\n&quot;);
+        }
+
+        return 0;
+}
+</code></pre>
+<p>输出，这里是从高地址内存开始往低地址的内存读取</p>
+<pre><code>a = 0x0.07fcbc8474a98p-1022 , b= 0x0p+0
+a = 1 , b= 1
+a = 0x1 , b= 0x1
+a = 1 , b= 1
+00000001
+
+00000000000000000000000000000001
+
+Little endian platform!
+</code></pre>
       
 
       

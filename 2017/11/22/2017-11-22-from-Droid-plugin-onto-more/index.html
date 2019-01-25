@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery15111006999.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery2a2241cc5c1278cf7a28f15f91dbbb7f.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.039Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.181Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从DroidPlugin谈插件化开发">
 <meta name="twitter:description" content="关于360团队出开源的DroidPlugin的一些记录 过程中发现了关于插件化，Hook系统方法的操作，摘录下来。">
@@ -203,7 +203,11 @@ ga('send', 'pageview');
       
         <p>关于360团队出开源的<a href="https://github.com/DroidPluginTeam/DroidPlugin">DroidPlugin</a>的一些记录<br><img src="https://www.haldir66.ga/static/imgs/scenery15111006999.jpg" alt=""></p>
 <p>过程中发现了关于插件化，Hook系统方法的操作，摘录下来。<br><a id="more"></a></p>
-<h2 id="1-从Context的本质说起"><a href="#1-从Context的本质说起" class="headerlink" title="1. 从Context的本质说起"></a>1. 从Context的本质说起</h2><p>其实也简单，就是ContextImpl，一个各种资源的容器。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Activity extends ContextThemeWrapper</span><br><span class="line">ContextThemeWrapper extends ContextWrapper</span><br><span class="line">ContextWrapper extends Context</span><br></pre></td></tr></table></figure></p>
+<h2 id="1-从Context的本质说起"><a href="#1-从Context的本质说起" class="headerlink" title="1. 从Context的本质说起"></a>1. 从Context的本质说起</h2><p>其实也简单，就是ContextImpl，一个各种资源的容器。</p>
+<pre><code class="java">Activity extends ContextThemeWrapper
+ContextThemeWrapper extends ContextWrapper
+ContextWrapper extends Context
+</code></pre>
 <p>Activity作为一个天然的交互核心，能够以一个容器的身份（继承而来）轻易获取这些外部资源，也使得基于UI页面的开发变得简单。<br>如果对于ActivityThread有所了解的话，就知道Activity的生命周期都是在这个类中完成的<br>简单来说在ContextImpl中createActivityContext方法中使用new的方式创建了一个ContextImpl，整个流程就是ActivityThread在创建一个Activity后，给它不断赋值的过程。ContextImpl只是一个各种资源的容器（比如Resource,Display,PackageInfo,构造函数里面塞了一些，创建出来之后还给一些变量赋了值）。</p>
 <p>Hook(使用Invokcation handler，将一个接口的调用原本的实现包揽下来，把原来的结果占为己有，同时添加一些自己要做的事情)<a href="http://weishu.me/2016/02/16/understand-plugin-framework-binder-hook/">修改getSystemService，添加自定义功能</a><br>Hook掉AMS,在startActivity里面添加一些私货。<br>getSystemService最终会追溯到SystemServiceRegistry.java。这里面用static block的方式初始化了各种service的cache.</p>
 <h3 id="1-1-ActivityThread做了很多事"><a href="#1-1-ActivityThread做了很多事" class="headerlink" title="1.1 ActivityThread做了很多事"></a>1.1 ActivityThread做了很多事</h3><p>onSaveInstance是从ActivityThread的callCallActivityOnSaveInstanceState方法dispatch下来的。</p>
@@ -212,20 +216,55 @@ ga('send', 'pageview');
 <h2 id="3-Android多渠道打包的实现"><a href="#3-Android多渠道打包的实现" class="headerlink" title="3. Android多渠道打包的实现"></a>3. Android多渠道打包的实现</h2><h3 id="3-1-历史上曾经有效的方式，原始方法"><a href="#3-1-历史上曾经有效的方式，原始方法" class="headerlink" title="3.1 历史上曾经有效的方式，原始方法"></a>3.1 历史上曾经有效的方式，原始方法</h3><p>关于gradlew<br>打包release之前，先Build -&gt; Generate Singed apk 创建一个新的keystore , 密码记住，keystore文件保存好。<br>关于打包: 根据<a href="https://www.jianshu.com/p/4f2990cf53bf">Android 多渠道打包梳理</a><br>Gradle UMeng 多渠道打包</p>
 <ul>
 <li><p>Android.manifest文件添加</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta-data</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:name</span>=<span class="string">"UMENG_CHANNEL"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:value</span>=<span class="string">"$&#123;UMENG_CHANNEL_VALUE&#125;"</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+<pre><code class="xml">&lt;meta-data
+ android:name=&quot;UMENG_CHANNEL&quot;
+ android:value=&quot;${UMENG_CHANNEL_VALUE}&quot; /&gt;
+</code></pre>
 </li>
-<li><p>app的build.gradle中添加</p>
-<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">android &#123;  </span><br><span class="line">    ...</span><br><span class="line">    productFlavors &#123;</span><br><span class="line">        xiaomi &#123;</span><br><span class="line">            manifestPlaceholders = [UMENG_CHANNEL_VALUE: <span class="string">"xiaomi"</span>]</span><br><span class="line">        &#125;</span><br><span class="line">        _360 &#123;</span><br><span class="line">            manifestPlaceholders = [UMENG_CHANNEL_VALUE: <span class="string">"_360"</span>]</span><br><span class="line">        &#125;</span><br><span class="line">        baidu &#123;</span><br><span class="line">            manifestPlaceholders = [UMENG_CHANNEL_VALUE: <span class="string">"baidu"</span>]</span><br><span class="line">        &#125;</span><br><span class="line">        wandoujia &#123;</span><br><span class="line">            manifestPlaceholders = [UMENG_CHANNEL_VALUE: <span class="string">"wandoujia"</span>]</span><br><span class="line">        &#125;</span><br><span class="line">        ...</span><br><span class="line">    &#125;  </span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">android &#123;  </span><br><span class="line">    productFlavors &#123;</span><br><span class="line">        xiaomi &#123;&#125;</span><br><span class="line">        _360 &#123;&#125;</span><br><span class="line">        baidu &#123;&#125;</span><br><span class="line">        wandoujia &#123;&#125;</span><br><span class="line">    &#125;  </span><br><span class="line"></span><br><span class="line">    productFlavors.all &#123;</span><br><span class="line">        flavor -&gt; flavor.manifestPlaceholders = [UMENG_CHANNEL_VALUE: name]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>打包<br>除此之外 assemble 还能和 Product Flavor 结合创建新的任务（assemble + Build Variants），Build Variants = Build Type + Product Flavor</p>
-<blockquote>
-<p>./gradlew assembleDebug # 会打包 Debug apk<br>./gradlew assembleRelease # 打包 Release apk<br>./gradlew assembleWandoujiaRelease # 打包 wandoujia Release 版本，大小写不敏感<br>./gradlew assembleWandoujia  # 此命令会生成wandoujia渠道的Release和Debug版本</p>
-</blockquote>
+<li><p>app的build.gradle中添加<br>```gradle<br>android {<br> …<br> productFlavors {</p>
+<pre><code> xiaomi {
+     manifestPlaceholders = [UMENG_CHANNEL_VALUE: &quot;xiaomi&quot;]
+ }
+ _360 {
+     manifestPlaceholders = [UMENG_CHANNEL_VALUE: &quot;_360&quot;]
+ }
+ baidu {
+     manifestPlaceholders = [UMENG_CHANNEL_VALUE: &quot;baidu&quot;]
+ }
+ wandoujia {
+     manifestPlaceholders = [UMENG_CHANNEL_VALUE: &quot;wandoujia&quot;]
+ }
+ ...
+</code></pre><p> }<br> …<br>}</p>
 </li>
 </ul>
-<p>但是，20个渠道就要编译20次，耗时冗长。</p>
-<h3 id="3-2-在META-INF目录内添加空文件，可以不用重新签名应用。已失效"><a href="#3-2-在META-INF目录内添加空文件，可以不用重新签名应用。已失效" class="headerlink" title="3.2 在META-INF目录内添加空文件，可以不用重新签名应用。已失效"></a>3.2 在META-INF目录内添加空文件，可以不用重新签名应用。<del>已失效</del></h3><p>比较出名的有python版本的，就是写了个空文件<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> line <span class="keyword">in</span> channels:</span><br><span class="line">    target_channel = line.strip()</span><br><span class="line">    target_apk = output_dir + apk_names[<span class="number">0</span>] + <span class="string">"-"</span> + target_channel+<span class="string">"-"</span>+apk_names[<span class="number">2</span>] + src_apk_extension</span><br><span class="line">    shutil.copy(src_apk,  target_apk)</span><br><span class="line">    zipped = zipfile.ZipFile(target_apk, <span class="string">'a'</span>, zipfile.ZIP_DEFLATED)</span><br><span class="line">    empty_channel_file = <span class="string">"META-INF/uuchannel_&#123;channel&#125;"</span>.format(channel = target_channel) //所以渠道号简单来说就是往META-INF里写了一个<span class="string">"uuchannel_xiaomi"</span>之类的文件</span><br><span class="line">    zipped.write(src_empty_file, empty_channel_file)</span><br><span class="line">    zipped.close()</span><br></pre></td></tr></table></figure></p>
-<p><strong>亲测</strong> 关于多渠道打包，由于新的签名机制的引入，上面的这种方法是会报错的。</p>
+<p>android {<br>    productFlavors {<br>        xiaomi {}<br>        _360 {}<br>        baidu {}<br>        wandoujia {}<br>    }  </p>
+<pre><code>productFlavors.all {
+    flavor -&gt; flavor.manifestPlaceholders = [UMENG_CHANNEL_VALUE: name]
+}
+</code></pre><p>}</p>
+<pre><code>
+-  打包
+除此之外 assemble 还能和 Product Flavor 结合创建新的任务（assemble + Build Variants），Build Variants = Build Type + Product Flavor
+&gt; ./gradlew assembleDebug # 会打包 Debug apk
+./gradlew assembleRelease # 打包 Release apk
+./gradlew assembleWandoujiaRelease # 打包 wandoujia Release 版本，大小写不敏感
+./gradlew assembleWandoujia  # 此命令会生成wandoujia渠道的Release和Debug版本
+
+但是，20个渠道就要编译20次，耗时冗长。
+
+### 3.2 在META-INF目录内添加空文件，可以不用重新签名应用。&lt;del&gt;已失效&lt;/del&gt;
+比较出名的有python版本的，就是写了个空文件
+```python
+for line in channels:
+    target_channel = line.strip()
+    target_apk = output_dir + apk_names[0] + &quot;-&quot; + target_channel+&quot;-&quot;+apk_names[2] + src_apk_extension
+    shutil.copy(src_apk,  target_apk)
+    zipped = zipfile.ZipFile(target_apk, &#39;a&#39;, zipfile.ZIP_DEFLATED)
+    empty_channel_file = &quot;META-INF/uuchannel_{channel}&quot;.format(channel = target_channel) //所以渠道号简单来说就是往META-INF里写了一个&quot;uuchannel_xiaomi&quot;之类的文件
+    zipped.write(src_empty_file, empty_channel_file)
+    zipped.close()
+</code></pre><p><strong>亲测</strong> 关于多渠道打包，由于新的签名机制的引入，上面的这种方法是会报错的。</p>
 <blockquote>
 <p>$ adb install app-release_channel_xiaomi.apk<br>Failed to install app-release_channel_xiaomi.apk: Failure [INSTALL_PARSE_FAILED_NO_CERTIFICATES: Failed to collect certificates from /data/app/vmdl185799136.tmp/base.apk: META-INF/CERT.SF indicates /data/app/vmdl185799136.tmp/base.apk is signed using APK Signature Scheme v2, but no such signature was found. Signature stripped?]</p>
 </blockquote>
@@ -237,8 +276,13 @@ ga('send', 'pageview');
 <p>End of central directory record<br>Offset    Bytes    Description    译<br>0    4    End of central directory signature = 0x06054b50    核心目录结束标记（0x06054b50）<br>4    2    Number of this disk    当前磁盘编号<br>6    2    Disk where central directory starts    核心目录开始位置的磁盘编号<br>8    2    Number of central directory records on this disk    该磁盘上所记录的核心目录数量<br>10    2    Total number of central directory records    该磁盘上所记录的核心目录数量<br>12    4    Size of central directory (bytes)    核心目录的大小<br>16    4    Offset of start of central directory, relative to start of archive    核心目录开始位置相对于archive开始的位移<br>20    2    Comment length (n)    注释长度 (n)<br>22    n    Comment    注释内容</p>
 </blockquote>
 <p>apk 默认情况下没有comment，所以 comment length的short 两个字节为 0，我们需要把这个值修改为我们的comment的长度，然后把comment追加到后边即可。<br>Android N 中提到了 APK Signature Scheme v2，这种新引入的签名机制，会对整个文件的每个字节都会做校验，包括 comment 区域。所以到时候如果app使用新版本的签名工具的时候，如果启用 scheme v2，那么这个机制则不能工作。目前看代码，是可以disable v2 的。</p>
-<p>虽然目前暂时还是可以disable APK Signature Scheme v2的。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">signingConfigs &#123;</span><br><span class="line">    release &#123;</span><br><span class="line">        v2SigningEnabled false</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h3 id="3-3-当前比较合适的方案是使用美团的walle"><a href="#3-3-当前比较合适的方案是使用美团的walle" class="headerlink" title="3.3 当前比较合适的方案是使用美团的walle"></a>3.3 当前比较合适的方案是使用美团的walle</h3><p><a href="https://www.jianshu.com/p/e4ed249e4cab">Signature Scheme v2的出现让目前美团的walle成为公开已知的多渠道打包的最好选择</a><br><a href="https://github.com/mcxiaoke/packer-ng-plugin">还有一个开源的gradle plugin据说也支持V2签名模式</a></p>
+<p>虽然目前暂时还是可以disable APK Signature Scheme v2的。</p>
+<pre><code>signingConfigs {
+    release {
+        v2SigningEnabled false
+    }
+}
+</code></pre><h3 id="3-3-当前比较合适的方案是使用美团的walle"><a href="#3-3-当前比较合适的方案是使用美团的walle" class="headerlink" title="3.3 当前比较合适的方案是使用美团的walle"></a>3.3 当前比较合适的方案是使用美团的walle</h3><p><a href="https://www.jianshu.com/p/e4ed249e4cab">Signature Scheme v2的出现让目前美团的walle成为公开已知的多渠道打包的最好选择</a><br><a href="https://github.com/mcxiaoke/packer-ng-plugin">还有一个开源的gradle plugin据说也支持V2签名模式</a></p>
 <p><a href="https://www.jianshu.com/p/0ba717f7385f">美团的walle接入指南</a>,原理都在<a href="https://tech.meituan.com/android-apk-v2-signature-scheme.html">新一代开源Android渠道包生成工具Walle</a></p>
 <p><a href="http://www.dss886.com/2017/11/21/01/">有人给出了Android多渠道打包的进化史，很有意思</a></p>
 <p><a href="https://www.zhihu.com/question/39440766">为什么 Android 要采用 Binder 作为 IPC 机制？</a></p>
@@ -257,7 +301,45 @@ ga('send', 'pageview');
 <ul>
 <li>多渠道的话这样的命令要跑多次<br>使用walle就好了。<blockquote>
 <p>project 的 build.gradle 添加:</p>
-<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">dependencies</span> &#123;</span><br><span class="line">    <span class="keyword">classpath</span> <span class="string">'com.meituan.android.walle:plugin:1.0.3'</span></span><br><span class="line">&#125;</span><br><span class="line">app<span class="regexp">/build.gradle 添加：</span></span><br><span class="line"><span class="regexp">apply plugin: 'walle'</span></span><br><span class="line"><span class="regexp">dependencies &#123;</span></span><br><span class="line"><span class="regexp">    ...</span></span><br><span class="line"><span class="regexp">    compile 'com.meituan.android.walle:library:1.0.3'</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br><span class="line"><span class="regexp">在工程目录下创建 channel 文件：</span></span><br><span class="line"><span class="regexp">meituan # 美团</span></span><br><span class="line"><span class="regexp">samsungapps #三星</span></span><br><span class="line"><span class="regexp">hiapk</span></span><br><span class="line"><span class="regexp">anzhi</span></span><br><span class="line"><span class="regexp">xiaomi # 小米</span></span><br><span class="line"><span class="regexp">91com</span></span><br><span class="line"><span class="regexp">gfan</span></span><br><span class="line"><span class="regexp">appchina</span></span><br><span class="line"><span class="regexp">nduoa</span></span><br><span class="line"><span class="regexp">3gcn</span></span><br><span class="line"><span class="regexp">mumayi</span></span><br><span class="line"><span class="regexp">10086com</span></span><br><span class="line"><span class="regexp">wostore</span></span><br><span class="line"><span class="regexp">189store</span></span><br><span class="line"><span class="regexp">lenovomm</span></span><br><span class="line"><span class="regexp">hicloud</span></span><br><span class="line"><span class="regexp">meizu</span></span><br><span class="line"><span class="regexp">wandou</span></span><br><span class="line"><span class="regexp"># Google Play</span></span><br><span class="line"><span class="regexp"># googleplay</span></span><br><span class="line"><span class="regexp"># 百度</span></span><br><span class="line"><span class="regexp">baidu</span></span><br><span class="line"><span class="regexp">#</span></span><br><span class="line"><span class="regexp"># 360</span></span><br><span class="line"><span class="regexp">360cn</span></span><br><span class="line"><span class="regexp">#</span></span><br><span class="line"><span class="regexp"># 应用宝</span></span><br><span class="line"><span class="regexp">myapp</span></span><br></pre></td></tr></table></figure>
+<pre><code class="gradle">dependencies {
+ classpath &#39;com.meituan.android.walle:plugin:1.0.3&#39;
+}
+app/build.gradle 添加：
+apply plugin: &#39;walle&#39;
+dependencies {
+ ...
+ compile &#39;com.meituan.android.walle:library:1.0.3&#39;
+}
+在工程目录下创建 channel 文件：
+meituan # 美团
+samsungapps #三星
+hiapk
+anzhi
+xiaomi # 小米
+91com
+gfan
+appchina
+nduoa
+3gcn
+mumayi
+10086com
+wostore
+189store
+lenovomm
+hicloud
+meizu
+wandou
+# Google Play
+# googleplay
+# 百度
+baidu
+#
+# 360
+360cn
+#
+# 应用宝
+myapp
+</code></pre>
 </blockquote>
 </li>
 </ul>
@@ -283,7 +365,24 @@ ga('send', 'pageview');
 </ol>
 </blockquote>
 <p><a href="https://github.com/wequick/small/wiki/Android-dynamic-register-activities">插件化开发small解释了动态注册activity的原理</a>:<br>app所在进程startActivity会通过Instrumentation的execStartActivity方法向system_server进程的activityManagerService发起请求，在这里要将插件activity的名称换成之前写在manifest中的名称。system_server完成启动Activity会回调到Instrumentation的newActivity方法，在这里可以将manifest中的名称还原成插件的activity名称。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">ActivityThread thread = currentActivityThread();</span><br><span class="line">Instrumentation base = thread.<span class="meta">@mInstrumentation</span>;</span><br><span class="line">Instrumentation wrapper = <span class="keyword">new</span> InstrumentationWrapper(base);</span><br><span class="line">thread.<span class="meta">@mInstrumentation</span> = wrapper;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">InstrumentationWrapper</span> <span class="keyword">extends</span> <span class="title">Instrumentation</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ActivityResult <span class="title">execStartActivity</span><span class="params">(..., Intent intent, ...)</span> </span>&#123;</span><br><span class="line">        fakeToStub(intent); <span class="comment">//这里在intent里面放个className就好了</span></span><br><span class="line">        base.execStartActivity(args);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Activity <span class="title">newActivity</span><span class="params">(ClassLoader cl, String className, Intent intent)</span> </span>&#123;</span><br><span class="line">        className = restoreToReal(intent, className); <span class="comment">//这里从intent中读取className就好了</span></span><br><span class="line">        <span class="keyword">return</span> base.newActivity(cl, className, intent);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="java">ActivityThread thread = currentActivityThread();
+Instrumentation base = thread.@mInstrumentation;
+Instrumentation wrapper = new InstrumentationWrapper(base);
+thread.@mInstrumentation = wrapper;
+
+class InstrumentationWrapper extends Instrumentation {
+    public ActivityResult execStartActivity(..., Intent intent, ...) {
+        fakeToStub(intent); //这里在intent里面放个className就好了
+        base.execStartActivity(args);
+    }
+
+    @Override
+    public Activity newActivity(ClassLoader cl, String className, Intent intent) {
+        className = restoreToReal(intent, className); //这里从intent中读取className就好了
+        return base.newActivity(cl, className, intent);
+    }
+}
+</code></pre>
 <p><a href="https://www.jianshu.com/p/107aaf054140">sharedUid</a>通过Shared User id,拥有同一个User id的多个APK可以配置成运行在同一个进程中.所以默认就是可以互相访问任意数据。</p>
 <p>在windows平台上，gradle下载的缓存文件位置在哪里？</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://github.com/tiann/understand-plugin-framework">分析DroidPlugin，深入理解插件化框架</a><br><a href="http://www.wjdiankong.cn/">逆向大全</a><br><a href="https://tech.meituan.com/android_anti_hooking.html">Android Hook技术防范漫谈</a><br><a href="https://zhuanlan.zhihu.com/p/34346219">爱奇艺组件化探索之原理篇</a><br><a href="http://atlas.taobao.org/docs/principle-intro/Runtime_principle.html">Atlas容器框架</a></p>

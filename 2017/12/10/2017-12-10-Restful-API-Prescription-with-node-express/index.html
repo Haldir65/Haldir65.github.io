@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/sceneryc7fd99f667c9d98a583a174872d58d13.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.039Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.181Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用Node和express开发Restful API">
 <meta name="twitter:image" content="https://haldir66.ga/static/imgs/sceneryc7fd99f667c9d98a583a174872d58d13.jpg">
@@ -198,47 +198,157 @@ ga('send', 'pageview');
     <div class="article-entry" itemprop="articleBody">
       
         <p><img src="https://haldir66.ga/static/imgs/sceneryc7fd99f667c9d98a583a174872d58d13.jpg" alt=""><br><a id="more"></a></p>
-<p>一个最简单的express app如下：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> express = <span class="built_in">require</span>(<span class="string">'express'</span>);</span><br><span class="line"><span class="keyword">var</span> app = express();</span><br><span class="line"></span><br><span class="line">app.get(<span class="string">'/'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>)</span>&#123;</span><br><span class="line">  res.send(<span class="string">'hello world'</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">app.listen(<span class="number">3000</span>);</span><br></pre></td></tr></table></figure></p>
+<p>一个最简单的express app如下：</p>
+<pre><code class="js">var express = require(&#39;express&#39;);
+var app = express();
+
+app.get(&#39;/&#39;, function(req, res){
+  res.send(&#39;hello world&#39;);
+});
+
+app.listen(3000);
+</code></pre>
 <h2 id="1-安装"><a href="#1-安装" class="headerlink" title="1. 安装"></a>1. 安装</h2><blockquote>
 <p>yarn add express body-parser</p>
 </blockquote>
 <h2 id="2-配置"><a href="#2-配置" class="headerlink" title="2. 配置"></a>2. 配置</h2><p>MiddleWare(中间件)的概念：<br>从Request到response之间的流程中，任何组件都可以对这个过程中的数据进行修改，所以router其实也是中间件。中间件需要注意的就是<strong><em>顺序很重要</em></strong>。</p>
-<h3 id="2-1-路由设置"><a href="#2-1-路由设置" class="headerlink" title="2.1 路由设置"></a>2.1 路由设置</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> router = express.Router([options]);<span class="comment">//首先创建router对象，默认urlpath是大小写不敏感的</span></span><br><span class="line">router.use(<span class="string">"/api"</span>,<span class="function"><span class="keyword">function</span>(<span class="params">req,res</span>)</span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="string">"hey there"</span>;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">//所以这个router会默认处理所有/api开头的请求，但是在这个router内部还是分的清的</span></span><br><span class="line">router.get(<span class="string">"/"</span>,...)</span><br><span class="line">router.get(<span class="string">"/detail"</span>,...)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 上面的例子，router会匹配上所有/api开头的url， app.use('/apple', ...) will match “/apple”, “/apple/images”, “/apple/images/news”, and so on.</span></span><br><span class="line">app.use(<span class="function"><span class="keyword">function</span> (<span class="params">req, res, next</span>) </span>&#123; <span class="comment">//path默认是'/'，所以下面这个router会匹配上所有的请求</span></span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'Time: %d'</span>, <span class="built_in">Date</span>.now());</span><br><span class="line">  next();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//明确区分get和post</span></span><br><span class="line">router.get(<span class="string">'/'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res, next</span>)) </span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line">router.post(<span class="string">'/'</span>,<span class="function"><span class="keyword">function</span>(<span class="params">req,res,next</span>))</span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">router.all() <span class="comment">//这种是所有的HTTP METHOD都接受的</span></span><br></pre></td></tr></table></figure>
-<h3 id="2-2-body-parser"><a href="#2-2-body-parser" class="headerlink" title="2.2 body-parser"></a>2.2 body-parser</h3><p>一般这样使用就行了,<a href="http://expressjs.com/en/resources/middleware/body-parser.html">bodyParser只是指明了能够parse那些content-type的request body</a><br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// parse application/x-www-form-urlencoded</span></span><br><span class="line">app.use(bodyParser.urlencoded(&#123; <span class="attr">extended</span>: <span class="literal">false</span> &#125;))</span><br><span class="line"><span class="comment">// parse application/json</span></span><br><span class="line">app.use(bodyParser.json())</span><br></pre></td></tr></table></figure></p>
+<h3 id="2-1-路由设置"><a href="#2-1-路由设置" class="headerlink" title="2.1 路由设置"></a>2.1 路由设置</h3><pre><code class="js">var router = express.Router([options]);//首先创建router对象，默认urlpath是大小写不敏感的
+router.use(&quot;/api&quot;,function(req,res){
+  return &quot;hey there&quot;;
+});
+
+//所以这个router会默认处理所有/api开头的请求，但是在这个router内部还是分的清的
+router.get(&quot;/&quot;,...)
+router.get(&quot;/detail&quot;,...)
+
+
+// 上面的例子，router会匹配上所有/api开头的url， app.use(&#39;/apple&#39;, ...) will match “/apple”, “/apple/images”, “/apple/images/news”, and so on.
+app.use(function (req, res, next) { //path默认是&#39;/&#39;，所以下面这个router会匹配上所有的请求
+  console.log(&#39;Time: %d&#39;, Date.now());
+  next();
+});
+
+
+//明确区分get和post
+router.get(&#39;/&#39;, function(req, res, next)) {
+
+};
+router.post(&#39;/&#39;,function(req,res,next)){
+
+};
+
+router.all() //这种是所有的HTTP METHOD都接受的
+</code></pre>
+<h3 id="2-2-body-parser"><a href="#2-2-body-parser" class="headerlink" title="2.2 body-parser"></a>2.2 body-parser</h3><p>一般这样使用就行了,<a href="http://expressjs.com/en/resources/middleware/body-parser.html">bodyParser只是指明了能够parse那些content-type的request body</a></p>
+<pre><code class="js">// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+// parse application/json
+app.use(bodyParser.json())
+</code></pre>
 <p>添加了bodyParser之后就能获取客户端传来的数据了</p>
 <ul>
 <li><p>获取GET请求的参数<br>比如 GET /student/getById/27 这样一个get请求</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">app.get(<span class="string">'/getById/:age'</span>,<span class="function"><span class="keyword">function</span>(<span class="params">req,res</span>)</span>&#123;</span><br><span class="line">    res.send(req.params.age);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<pre><code class="js">app.get(&#39;/getById/:age&#39;,function(req,res){
+  res.send(req.params.age);
+})
+</code></pre>
 </li>
-<li><p>获取POST请求的参数<br>在postMan发起post请求</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">POST /api/personal?age=10 HTTP/1.1</span><br><span class="line">Host: localhost:8080</span><br><span class="line">Content-Type: application/x-www-form-urlencoded</span><br><span class="line">Cache-Control: no-cache</span><br><span class="line">Postman-Token: 79c6d9a1-de8d-3b0b-8d3d-0ed6e1910f69</span><br><span class="line"></span><br><span class="line">name=Josn&amp;age=12</span><br></pre></td></tr></table></figure>
+<li><p>获取POST请求的参数<br>在postMan发起post请求<br>```<br>POST /api/personal?age=10 HTTP/1.1<br>Host: localhost:8080<br>Content-Type: application/x-www-form-urlencoded<br>Cache-Control: no-cache<br>Postman-Token: 79c6d9a1-de8d-3b0b-8d3d-0ed6e1910f69</p>
 </li>
 </ul>
-<p>POST请求中的body数据从req.body中拿就好了<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">req.params   <span class="comment">//  Object ，Json.String = &#123;&#125;</span></span><br><span class="line">req.body    <span class="comment">//  &#123;name:'Josn',age:'12'&#125;  //这个是post里面发送的body数据</span></span><br><span class="line">req.query  <span class="comment">// &#123;"age","10"&#125;  // 显然这是url里面的query</span></span><br></pre></td></tr></table></figure></p>
-<blockquote>
+<p>name=Josn&amp;age=12</p>
+<pre><code>POST请求中的body数据从req.body中拿就好了
+```js
+req.params   //  Object ，Json.String = {}
+req.body    //  {name:&#39;Josn&#39;,age:&#39;12&#39;}  //这个是post里面发送的body数据
+req.query  // {&quot;age&quot;,&quot;10&quot;}  // 显然这是url里面的query
+</code></pre><blockquote>
 <p>获取请求头<br>req.header(headerName)<br>console.log(JSON.stringify(req.headers));</p>
 </blockquote>
-<h2 id="2-3-处理response"><a href="#2-3-处理response" class="headerlink" title="2.3 处理response"></a>2.3 处理response</h2><p>可以设置header什么的<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* GET  /api/user */</span> much extra information you can set on its header</span><br><span class="line">app.get(<span class="string">"/user"</span>,<span class="function"><span class="keyword">function</span> (<span class="params">req,res</span>) </span>&#123;</span><br><span class="line">    res.set(&#123;</span><br><span class="line">        <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>,</span><br><span class="line">        <span class="string">'Content-Length'</span>: <span class="string">'123'</span>,</span><br><span class="line">        <span class="string">'ETag'</span>: <span class="string">'12345'</span>,</span><br><span class="line">        <span class="string">'Cache-Control'</span>: <span class="string">'max-age=5'</span>,</span><br><span class="line">        <span class="string">"Access-Control-Allow-Origin"</span>: <span class="string">'http://127.0.0.1:8080'</span></span><br><span class="line">    &#125;);</span><br><span class="line">    res.cookie(<span class="string">'name'</span>, <span class="string">'tobi'</span>, &#123; <span class="attr">domain</span>: <span class="string">'.example.com'</span>, <span class="attr">path</span>: <span class="string">'/admin'</span>, <span class="attr">secure</span>: <span class="literal">true</span> &#125;);</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'response send'</span>);</span><br><span class="line">    res.json(&#123;</span><br><span class="line">        <span class="string">"name"</span>:<span class="string">"John"</span>,</span><br><span class="line">        <span class="string">"age"</span>:<span class="number">10</span></span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<h2 id="2-3-处理response"><a href="#2-3-处理response" class="headerlink" title="2.3 处理response"></a>2.3 处理response</h2><p>可以设置header什么的</p>
+<pre><code class="js">/* GET  /api/user */ much extra information you can set on its header
+app.get(&quot;/user&quot;,function (req,res) {
+    res.set({
+        &#39;Content-Type&#39;: &#39;application/json&#39;,
+        &#39;Content-Length&#39;: &#39;123&#39;,
+        &#39;ETag&#39;: &#39;12345&#39;,
+        &#39;Cache-Control&#39;: &#39;max-age=5&#39;,
+        &quot;Access-Control-Allow-Origin&quot;: &#39;http://127.0.0.1:8080&#39;
+    });
+    res.cookie(&#39;name&#39;, &#39;tobi&#39;, { domain: &#39;.example.com&#39;, path: &#39;/admin&#39;, secure: true });
+    console.log(&#39;response send&#39;);
+    res.json({
+        &quot;name&quot;:&quot;John&quot;,
+        &quot;age&quot;:10
+    });
+});
+</code></pre>
 <p>可以直接一个404打回去<br>res.sendStatus(404)</p>
 <p>还可以重定向<br>response.redirect(‘/all’); //在浏览器里面看，response的header是这样的</p>
 <blockquote>
 <p>HTTP/1.1 302 Found<br>X-Powered-By: Express<br>Location: /all<br>Vary: Accept<br>Content-Type: text/html; charset=utf-8<br>Content-Length: 68<br>Date: Sun, 14 Jan 2018 10:08:50 GMT<br>Connection: keep-alive</p>
 <p>response.direction();<br>和window.location.href差不多</p>
 </blockquote>
-<p>在router中主要就是业务逻辑处理了，在所有的需要认证的接口前添加jwt鉴权处理，使用三个函数的方法，例如<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> jwt = <span class="built_in">require</span>(<span class="string">'express-jwt'</span>);</span><br><span class="line"></span><br><span class="line">app.get(<span class="string">'/protected'</span>,</span><br><span class="line">  jwt(&#123;<span class="attr">secret</span>: <span class="string">'shhhhhhared-secret'</span>&#125;),</span><br><span class="line">  <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!req.user.admin) <span class="keyword">return</span> res.sendStatus(<span class="number">401</span>);</span><br><span class="line">    res.sendStatus(<span class="number">200</span>);</span><br><span class="line">  &#125;);</span><br></pre></td></tr></table></figure></p>
-<p>在业务处理中使用Promise<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">router.get(<span class="string">'/'</span>, auth.optional, <span class="function"><span class="keyword">function</span>(<span class="params">req, res, next</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">Promise</span>.all([promise1,promise2])</span><br><span class="line">  .then(<span class="function"><span class="params">values</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> res.json(&#123;<span class="attr">key1</span>:values&#125;);</span><br><span class="line">  &#125;).catch(next);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h3 id="2-4-错误处理"><a href="#2-4-错误处理" class="headerlink" title="2.4 错误处理"></a>2.4 错误处理</h3><p>四个参数<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">app.use(<span class="function"><span class="keyword">function</span>(<span class="params">err, req, res, next</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.error(err.stack);</span><br><span class="line">  res.status(<span class="number">500</span>).send(<span class="string">'Something broke!'</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
-<h2 id="3-Serving-static-files"><a href="#3-Serving-static-files" class="headerlink" title="3 Serving static files"></a>3 Serving static files</h2><p>照说serving static file这种事应该交给nginx类似的反向代理来做，express只是提供了一种选择。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">app.use(express.static(path.join(__dirname,<span class="string">'public'</span>)))</span><br></pre></td></tr></table></figure></p>
+<p>在router中主要就是业务逻辑处理了，在所有的需要认证的接口前添加jwt鉴权处理，使用三个函数的方法，例如</p>
+<pre><code class="js">var jwt = require(&#39;express-jwt&#39;);
+
+app.get(&#39;/protected&#39;,
+  jwt({secret: &#39;shhhhhhared-secret&#39;}),
+  function(req, res) {
+    if (!req.user.admin) return res.sendStatus(401);
+    res.sendStatus(200);
+  });
+</code></pre>
+<p>在业务处理中使用Promise</p>
+<pre><code class="js">router.get(&#39;/&#39;, auth.optional, function(req, res, next) {
+  Promise.all([promise1,promise2])
+  .then(values =&gt; {
+    return res.json({key1:values});
+  }).catch(next);
+}
+</code></pre>
+<h3 id="2-4-错误处理"><a href="#2-4-错误处理" class="headerlink" title="2.4 错误处理"></a>2.4 错误处理</h3><p>四个参数</p>
+<pre><code class="js">app.use(function(err, req, res, next) {
+  console.error(err.stack);
+  res.status(500).send(&#39;Something broke!&#39;);
+});
+</code></pre>
+<h2 id="3-Serving-static-files"><a href="#3-Serving-static-files" class="headerlink" title="3 Serving static files"></a>3 Serving static files</h2><p>照说serving static file这种事应该交给nginx类似的反向代理来做，express只是提供了一种选择。</p>
+<pre><code class="javaScript">app.use(express.static(path.join(__dirname,&#39;public&#39;)))
+</code></pre>
 <p>然后在当前目录新建一个public文件夹，添加img文件夹，里面放一张porn.jpg。<br>浏览器访问： localhost:port/img/porn.jpg 。 就能看到放进去的的那张图片了。</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">app.use(<span class="string">'/jquery'</span>, express.static(__dirname + <span class="string">'/node_modules/jquery/dist/'</span>));</span><br><span class="line">app.use(express.static(__dirname + <span class="string">'/public'</span>)); <span class="comment">//这样的语法也可以</span></span><br></pre></td></tr></table></figure>
+<pre><code class="js">app.use(&#39;/jquery&#39;, express.static(__dirname + &#39;/node_modules/jquery/dist/&#39;));
+app.use(express.static(__dirname + &#39;/public&#39;)); //这样的语法也可以
+</code></pre>
 <p>这意思就是请求/jquery这个目录下的资源就等于访问/node_modules/jquery/dist/目录下同名的资源</p>
-<p>express4.x的文档上还有详尽的设置:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> options = &#123;</span><br><span class="line">  dotfiles: <span class="string">'ignore'</span>,</span><br><span class="line">  etag: <span class="literal">false</span>,</span><br><span class="line">  extensions: [<span class="string">'htm'</span>, <span class="string">'html'</span>],</span><br><span class="line">  index: <span class="literal">false</span>,</span><br><span class="line">  maxAge: <span class="string">'1d'</span>,</span><br><span class="line">  redirect: <span class="literal">false</span>,</span><br><span class="line">  setHeaders: <span class="function"><span class="keyword">function</span> (<span class="params">res, path, stat</span>) </span>&#123;</span><br><span class="line">    res.set(<span class="string">'x-timestamp'</span>, <span class="built_in">Date</span>.now())</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">app.use(express.static(<span class="string">'public'</span>, options))</span><br></pre></td></tr></table></figure></p>
-<h2 id="4-数据库连接"><a href="#4-数据库连接" class="headerlink" title="4. 数据库连接"></a>4. 数据库连接</h2><p>mongoose是连接node和mongodb的库，<a href="http://mongoosejs.com/">官方文档</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">const mongoose = require(&apos;mongoose&apos;);</span><br><span class="line">mongoose.connect(&apos;mongodb://localhost/test&apos;);</span><br><span class="line"></span><br><span class="line">const Cat = mongoose.model(&apos;Cat&apos;, &#123; name: String &#125;);</span><br><span class="line">const kitty = new Cat(&#123; name: &apos;Zildjian&apos; &#125;);</span><br><span class="line">kitty.save().then(() =&gt; console.log(&apos;meow&apos;));</span><br></pre></td></tr></table></figure></p>
-<p><a href="http://mongoosejs.com/docs/queries.html#queries-are-not-promises">看上去查询和promise有点像，但不要当做Promise</a></p>
+<p>express4.x的文档上还有详尽的设置:</p>
+<pre><code class="js">var options = {
+  dotfiles: &#39;ignore&#39;,
+  etag: false,
+  extensions: [&#39;htm&#39;, &#39;html&#39;],
+  index: false,
+  maxAge: &#39;1d&#39;,
+  redirect: false,
+  setHeaders: function (res, path, stat) {
+    res.set(&#39;x-timestamp&#39;, Date.now())
+  }
+}
+
+app.use(express.static(&#39;public&#39;, options))
+</code></pre>
+<h2 id="4-数据库连接"><a href="#4-数据库连接" class="headerlink" title="4. 数据库连接"></a>4. 数据库连接</h2><p>mongoose是连接node和mongodb的库，<a href="http://mongoosejs.com/">官方文档</a></p>
+<pre><code>const mongoose = require(&#39;mongoose&#39;);
+mongoose.connect(&#39;mongodb://localhost/test&#39;);
+
+const Cat = mongoose.model(&#39;Cat&#39;, { name: String });
+const kitty = new Cat({ name: &#39;Zildjian&#39; });
+kitty.save().then(() =&gt; console.log(&#39;meow&#39;));
+</code></pre><p><a href="http://mongoosejs.com/docs/queries.html#queries-are-not-promises">看上去查询和promise有点像，但不要当做Promise</a></p>
 <p>简单的session处理:</p>
 <blockquote>
-<p>yarn add express cookie-parser express-session<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">router.get(<span class="string">"/"</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res, next</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (req.session.user) &#123;</span><br><span class="line">    <span class="keyword">var</span> user = req.session.user;</span><br><span class="line">    <span class="keyword">var</span> name = user.name;</span><br><span class="line">    res.send(<span class="string">"你好"</span> + name + <span class="string">"，欢迎来到我的家园。"</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> user = &#123;</span><br><span class="line">      name: <span class="string">"Chen-xy"</span>,</span><br><span class="line">      age: <span class="string">"22"</span>,</span><br><span class="line">      address: <span class="string">"bj"</span></span><br><span class="line">    &#125;;</span><br><span class="line">    req.session.user = user;</span><br><span class="line">    res.send(<span class="string">"你还没有登录，先登录下再试试！"</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// res.render("index", &#123;</span></span><br><span class="line">  <span class="comment">//   title: "the test for nodejs session",</span></span><br><span class="line">  <span class="comment">//   name: "sessiontest"</span></span><br><span class="line">  <span class="comment">// &#125;);</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>yarn add express cookie-parser express-session<br>```js<br>router.get(“/“, function(req, res, next) {<br>  if (req.session.user) {<br>    var user = req.session.user;<br>    var name = user.name;<br>    res.send(“你好” + name + “，欢迎来到我的家园。”);<br>  } else {<br>    let user = {<br>      name: “Chen-xy”,<br>      age: “22”,<br>      address: “bj”<br>    };<br>    req.session.user = user;<br>    res.send(“你还没有登录，先登录下再试试！”);<br>  }</p>
 </blockquote>
+<p>  // res.render(“index”, {<br>  //   title: “the test for nodejs session”,<br>  //   name: “sessiontest”<br>  // });<br>});<br>```</p>
 <h2 id="5-Deploying-node-app-on-linux-server"><a href="#5-Deploying-node-app-on-linux-server" class="headerlink" title="5. Deploying node app on linux server"></a>5. Deploying node app on linux server</h2><p>在linux server上使用pm2 deploy node project</p>
 <blockquote>
 <ol>

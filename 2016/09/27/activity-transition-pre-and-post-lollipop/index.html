@@ -16,7 +16,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="Lollipop开始引入了新的Activity Transition动画效果，比起常用的overridePendingTransaction() 效果要强大许多 测试环境supportLibVersion = “24.2.1”gradle plugin version : “classpath ‘com.android.tools.build:gradle:2.2.0’”gradle versio">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.043Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.185Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="activity transition pre and post lollipop">
 <meta name="twitter:description" content="Lollipop开始引入了新的Activity Transition动画效果，比起常用的overridePendingTransaction() 效果要强大许多 测试环境supportLibVersion = “24.2.1”gradle plugin version : “classpath ‘com.android.tools.build:gradle:2.2.0’”gradle versio">
@@ -206,10 +206,23 @@ ga('send', 'pageview');
 </ul>
 <p>A activity &gt;&gt;&gt;&gt; B activity</p>
 <p>A activity中:</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">intent = <span class="keyword">new</span> Intent(getActivity(), PictureDetailSubActivity2.class);</span><br><span class="line">               intent.putExtra(EXTRA_IMAGE_URL, R.drawable.b2);</span><br><span class="line">               intent.putExtra(EXTRA_IMAGE_TITLE, <span class="string">"使用ActivityCompat动画"</span>);</span><br><span class="line">               ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.</span><br><span class="line">                       makeSceneTransitionAnimation(getActivity(), view, TRANSIT_PIC);</span><br><span class="line">               <span class="keyword">try</span> &#123;</span><br><span class="line">                   ActivityCompat.startActivity(getActivity(), intent, optionsCompat.toBundle()); <span class="comment">//据说部分三星手机上会失效</span></span><br><span class="line">               &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                   e.printStackTrace();</span><br><span class="line">                   ToastUtils.showTextShort(getActivity(), <span class="string">"ActivityCompat出错！！"</span>);</span><br><span class="line">                   startActivity(intent);</span><br><span class="line">               &#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="java"> intent = new Intent(getActivity(), PictureDetailSubActivity2.class);
+                intent.putExtra(EXTRA_IMAGE_URL, R.drawable.b2);
+                intent.putExtra(EXTRA_IMAGE_TITLE, &quot;使用ActivityCompat动画&quot;);
+                ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.
+                        makeSceneTransitionAnimation(getActivity(), view, TRANSIT_PIC);
+                try {
+                    ActivityCompat.startActivity(getActivity(), intent, optionsCompat.toBundle()); //据说部分三星手机上会失效
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    ToastUtils.showTextShort(getActivity(), &quot;ActivityCompat出错！！&quot;);
+                    startActivity(intent);
+                }
+</code></pre>
 <p>Pair这个class是v4包里的一个Util类，用来装载一组(pair)对象，支持泛型，很好用。由于都是v4包里的方法，省去了做API版本判断，在API 16以下，就只会调用普通的startActivity方法。上面加了try catch是避免部分手机上出现问题</p>
 <p>B activity中onCreate调用</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ViewCompat.setTransitionName(binding.imageDetail, TRANSIT_PIC);</span><br></pre></td></tr></table></figure>
+<pre><code class="java"> ViewCompat.setTransitionName(binding.imageDetail, TRANSIT_PIC);
+</code></pre>
 <p>就可实现普通的转场动画。</p>
 <ul>
 <li><p>兼容方式(将连续的Transition带到API16以下)</p>
@@ -220,7 +233,11 @@ ga('send', 'pageview');
 <li><p>最后是这几天遇到的天坑</p>
 </li>
 </ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState, PersistableBundle persistentState)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.onCreate(savedInstanceState, persistentState);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="java">@Override
+public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
+    super.onCreate(savedInstanceState, persistentState);
+}
+</code></pre>
 <p>这样的Activity绝对会出ClassNotFoundException , 而且并不会主动出现在logcat中</p>
 <ul>
 <li>overridePendingTransaction要在startActivity以及finish之后才能调用</li>

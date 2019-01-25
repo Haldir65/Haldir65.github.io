@@ -17,7 +17,7 @@
 <meta property="og:description" content="介绍React语法及一些Redux的使用方法">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/food-knife-green-kitchen-city-life.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.039Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.181Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="React语法及Redux实践笔记">
 <meta name="twitter:description" content="介绍React语法及一些Redux的使用方法">
@@ -201,32 +201,172 @@ ga('send', 'pageview');
     <div class="article-entry" itemprop="articleBody">
       
         <p><img src="https://www.haldir66.ga/static/imgs/food-knife-green-kitchen-city-life.jpg" alt=""><br>介绍React语法及一些Redux的使用方法<br><a id="more"></a></p>
-<p><strong><em>Take Away</em></strong><br>基本的流程就是创建一个继承React.Component的class，设定state，添加点击事件。<br>最重要的是在render()函数中返回一个element，比如说这样<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LoginControl</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span></span>&#123;</span><br><span class="line">  <span class="keyword">constructor</span>(props)&#123;</span><br><span class="line">    <span class="keyword">super</span>(props);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> myelement= <span class="xml"><span class="tag">&lt;<span class="name">button</span>&gt;</span>hello 这就是jsx语法 there<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span></span><br><span class="line">       <span class="keyword">return</span>(</span><br><span class="line">           <span class="comment">// &lt;div&gt;</span></span><br><span class="line">           <span class="comment">//     &lt;Greeting isLoggedIn=&#123;isLoggedIn&#125;/&gt;</span></span><br><span class="line">           <span class="comment">//     &#123;button&#125;</span></span><br><span class="line">           <span class="comment">// &lt;/div&gt;</span></span><br><span class="line">           myelement <span class="comment">// 这里把html tag提取到外面也行，写在里面也行，混着写的话，&#123;myelement&#125;，加上大括号就是了</span></span><br><span class="line">           <span class="comment">// 官方guide上的原话是: You may embed any expressions in JSX by wrapping them in curly braces(大括号).</span></span><br><span class="line"></span><br><span class="line">       )</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// return里面只能返回一个tag</span></span><br></pre></td></tr></table></figure></p>
+<p><strong><em>Take Away</em></strong><br>基本的流程就是创建一个继承React.Component的class，设定state，添加点击事件。<br>最重要的是在render()函数中返回一个element，比如说这样</p>
+<pre><code class="js">class LoginControl extends React.Component{
+  constructor(props){
+    super(props);
+  }
+
+  const myelement= &lt;button&gt;hello 这就是jsx语法 there&lt;/button&gt;
+       return(
+           // &lt;div&gt;
+           //     &lt;Greeting isLoggedIn={isLoggedIn}/&gt;
+           //     {button}
+           // &lt;/div&gt;
+           myelement // 这里把html tag提取到外面也行，写在里面也行，混着写的话，{myelement}，加上大括号就是了
+           // 官方guide上的原话是: You may embed any expressions in JSX by wrapping them in curly braces(大括号).
+
+       )
+}
+// return里面只能返回一个tag
+</code></pre>
 <p><strong><em>props是只读的</em></strong></p>
 <p><strong><em>JSX allows embedding any expressions ,就是说jsx语句中，大括号包起来的地方，什么js都能写</em></strong></p>
 <h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><blockquote>
 <p>yarn global add create-react-app<br>create-react-app my-app<br>cd my-app<br>npm start</p>
 </blockquote>
-<h2 id="程序入口"><a href="#程序入口" class="headerlink" title="程序入口"></a>程序入口</h2><p>在html文件中添加这样一个tag<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"root"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<p>在index.js中添加这样一段<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> element = <span class="xml"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>Hello, world<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span>;</span><br><span class="line">ReactDOM.render(element, <span class="built_in">document</span>.getElementById(<span class="string">'root'</span>));</span><br></pre></td></tr></table></figure></p>
+<h2 id="程序入口"><a href="#程序入口" class="headerlink" title="程序入口"></a>程序入口</h2><p>在html文件中添加这样一个tag</p>
+<pre><code class="html">&lt;div id=&quot;root&quot;&gt;&lt;/div&gt;
+</code></pre>
+<p>在index.js中添加这样一段</p>
+<pre><code class="js">const element = &lt;h1&gt;Hello, world&lt;/h1&gt;;
+ReactDOM.render(element, document.getElementById(&#39;root&#39;));
+</code></pre>
 <p><strong>可以认为ReactDOM.render方法就是程序的入口</strong></p>
-<h2 id="Element和Component的概念"><a href="#Element和Component的概念" class="headerlink" title="Element和Component的概念"></a>Element和Component的概念</h2><p>Element感觉上就像一个或者多个UI控件的集合<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> element = <span class="xml"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>Hello, world<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span>; <span class="comment">//这就算一个Element,用于描述将要展示在屏幕上的效果</span></span><br></pre></td></tr></table></figure></p>
-<p>Component就像javaScript函数一样，它们接收任意输入，输出React element以显示在屏幕上。需要注意的是，Component的名字一定要 <strong>首字母大写</strong> ，因为React把小写字母开头的当做正常的html element来处理了。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//一个返回Element的函数就算作是Component了</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Welcome</span>(<span class="params">props</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>Hello, &#123;props.name&#125;<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 或者用es6语法</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Welcome</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span> </span>&#123;</span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>Hello, &#123;this.props.name&#125;<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="Element和Component的概念"><a href="#Element和Component的概念" class="headerlink" title="Element和Component的概念"></a>Element和Component的概念</h2><p>Element感觉上就像一个或者多个UI控件的集合</p>
+<pre><code class="js">const element = &lt;h1&gt;Hello, world&lt;/h1&gt;; //这就算一个Element,用于描述将要展示在屏幕上的效果
+</code></pre>
+<p>Component就像javaScript函数一样，它们接收任意输入，输出React element以显示在屏幕上。需要注意的是，Component的名字一定要 <strong>首字母大写</strong> ，因为React把小写字母开头的当做正常的html element来处理了。</p>
+<pre><code class="js">//一个返回Element的函数就算作是Component了
+function Welcome(props) {
+  return &lt;h1&gt;Hello, {props.name}&lt;/h1&gt;;
+}
+
+// 或者用es6语法
+class Welcome extends React.Component {
+  render() {
+    return &lt;h1&gt;Hello, {this.props.name}&lt;/h1&gt;;
+  }
+}
+</code></pre>
 <p>还有就是props是immutable的，想要改的话用State吧。也即Component应该表现为纯粹的function，不修改状态。</p>
 <h2 id="State的更改"><a href="#State的更改" class="headerlink" title="State的更改"></a>State的更改</h2><p>State是在constructor里面初始化的，想要更改其中的值的话，不能直接赋值，需要使用setState方法</p>
 <blockquote>
 <p>this.setState({comment: ‘Hello’});</p>
 </blockquote>
-<p>但有时State的更新是异步的，所以要使用两个参数的setState方法<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">this</span>.setState(<span class="function">(<span class="params">prevState, props</span>) =&gt;</span> (&#123;</span><br><span class="line">  counter: prevState.counter + props.increment</span><br><span class="line">&#125;));</span><br></pre></td></tr></table></figure></p>
-<h2 id="JSX语法"><a href="#JSX语法" class="headerlink" title="JSX语法"></a>JSX语法</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> element = (</span><br><span class="line">  &lt;h1 className=<span class="string">"greeting"</span>&gt;</span><br><span class="line">    Hello, world!</span><br><span class="line">  &lt;<span class="regexp">/h1&gt;</span></span><br><span class="line"><span class="regexp">);</span></span><br><span class="line"><span class="regexp">/</span><span class="regexp">/ 这俩其实是一样的</span></span><br><span class="line"><span class="regexp">const element = React.createElement(</span></span><br><span class="line"><span class="regexp">  'h1',</span></span><br><span class="line"><span class="regexp">  &#123;className: 'greeting'&#125;,</span></span><br><span class="line"><span class="regexp">  'Hello, world!'</span></span><br><span class="line"><span class="regexp">);</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">/</span><span class="regexp">/ jsx语句最终都是被用在component的return语句中的：</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">function WarningBanner(props) &#123;</span></span><br><span class="line"><span class="regexp">  if (!props.warn) &#123;</span></span><br><span class="line"><span class="regexp">    return null;</span></span><br><span class="line"><span class="regexp">  &#125;</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">  return (</span></span><br><span class="line"><span class="regexp">    &lt;div className="warning"&gt;</span></span><br><span class="line"><span class="regexp">      Warning!</span></span><br><span class="line"><span class="regexp">    &lt;/</span>div&gt;</span><br><span class="line">  );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>但有时State的更新是异步的，所以要使用两个参数的setState方法</p>
+<pre><code class="js">this.setState((prevState, props) =&gt; ({
+  counter: prevState.counter + props.increment
+}));
+</code></pre>
+<h2 id="JSX语法"><a href="#JSX语法" class="headerlink" title="JSX语法"></a>JSX语法</h2><pre><code class="js">const element = (
+  &lt;h1 className=&quot;greeting&quot;&gt;
+    Hello, world!
+  &lt;/h1&gt;
+);
+// 这俩其实是一样的
+const element = React.createElement(
+  &#39;h1&#39;,
+  {className: &#39;greeting&#39;},
+  &#39;Hello, world!&#39;
+);
+
+// jsx语句最终都是被用在component的return语句中的：
+
+function WarningBanner(props) {
+  if (!props.warn) {
+    return null;
+  }
+
+  return (
+    &lt;div className=&quot;warning&quot;&gt;
+      Warning!
+    &lt;/div&gt;
+  );
+}
+</code></pre>
 <h3 id="局部更新"><a href="#局部更新" class="headerlink" title="局部更新"></a>局部更新</h3><p>页面发生变化时，React只更新需要刷新的部分</p>
-<h2 id="生命周期钩子函数"><a href="#生命周期钩子函数" class="headerlink" title="生命周期钩子函数"></a>生命周期钩子函数</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">componentDidMount() &#123;</span><br><span class="line">  fetchPosts().then(<span class="function"><span class="params">response</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">this</span>.setState(&#123;</span><br><span class="line">      posts: response.posts</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  fetchComments().then(<span class="function"><span class="params">response</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">this</span>.setState(&#123;</span><br><span class="line">      comments: response.comments</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="事件处理"><a href="#事件处理" class="headerlink" title="事件处理"></a>事件处理</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">ActionLink</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">handleClick</span>(<span class="params">e</span>) </span>&#123;</span><br><span class="line">    e.preventDefault();</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'The link was clicked.'</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    &lt;a href=<span class="string">"#"</span> onClick=&#123;handleClick&#125;&gt;</span><br><span class="line">      Click me</span><br><span class="line">    &lt;<span class="regexp">/a&gt;</span></span><br><span class="line"><span class="regexp">  );</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">const element = &lt;h1&gt;Hello, world&lt;/</span>h1&gt;;</span><br><span class="line">ReactDOM.render(<span class="xml"><span class="tag">&lt;<span class="name">ActionLink</span>/&gt;</span></span>, <span class="built_in">document</span>.getElementById(<span class="string">'root'</span>));</span><br><span class="line"></span><br><span class="line"><span class="comment">// 或者是使用箭头函数 以及  Function.prototype.bind</span></span><br><span class="line">&lt;button onClick=&#123;(e) =&gt; <span class="keyword">this</span>.deleteRow(id, e)&#125;&gt;Delete Row&lt;<span class="regexp">/button&gt;</span></span><br><span class="line"><span class="regexp">&lt;button onClick=&#123;this.deleteRow.bind(this, id)&#125;&gt;Delete Row&lt;/</span>button&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment">//在一个Component中，时间监听最后要加上bind(this)</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Calculator</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span> </span>&#123;</span><br><span class="line">  <span class="keyword">constructor</span>(props) &#123;</span><br><span class="line">    <span class="keyword">super</span>(props);</span><br><span class="line">    <span class="keyword">this</span>.handleChange = <span class="keyword">this</span>.handleChange.bind(<span class="keyword">this</span>);</span><br><span class="line">    <span class="keyword">this</span>.state = &#123;<span class="attr">temperature</span>: <span class="string">''</span>&#125;;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  handleChange(e) &#123;</span><br><span class="line">    <span class="keyword">this</span>.setState(&#123;<span class="attr">temperature</span>: e.target.value&#125;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">const</span> temperature = <span class="keyword">this</span>.state.temperature;</span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">      &lt;fieldset&gt;</span><br><span class="line">        &lt;legend&gt;Enter temperature <span class="keyword">in</span> Celsius:<span class="xml"><span class="tag">&lt;/<span class="name">legend</span>&gt;</span></span></span><br><span class="line">        &lt;input</span><br><span class="line">          value=&#123;temperature&#125;</span><br><span class="line">          onChange=&#123;<span class="keyword">this</span>.handleChange&#125; /&gt;</span><br><span class="line"></span><br><span class="line">        &lt;BoilingVerdict</span><br><span class="line">          celsius=&#123;<span class="built_in">parseFloat</span>(temperature)&#125; /&gt;</span><br><span class="line"></span><br><span class="line">      &lt;<span class="regexp">/fieldset&gt;</span></span><br><span class="line"><span class="regexp">    );</span></span><br><span class="line"><span class="regexp">  &#125;</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br></pre></td></tr></table></figure>
+<h2 id="生命周期钩子函数"><a href="#生命周期钩子函数" class="headerlink" title="生命周期钩子函数"></a>生命周期钩子函数</h2><pre><code class="js">componentDidMount() {
+  fetchPosts().then(response =&gt; {
+    this.setState({
+      posts: response.posts
+    });
+  });
+
+  fetchComments().then(response =&gt; {
+    this.setState({
+      comments: response.comments
+    });
+  });
+}
+</code></pre>
+<h2 id="事件处理"><a href="#事件处理" class="headerlink" title="事件处理"></a>事件处理</h2><pre><code class="js">function ActionLink() {
+  function handleClick(e) {
+    e.preventDefault();
+    console.log(&#39;The link was clicked.&#39;);
+  }
+
+  return (
+    &lt;a href=&quot;#&quot; onClick={handleClick}&gt;
+      Click me
+    &lt;/a&gt;
+  );
+}
+
+const element = &lt;h1&gt;Hello, world&lt;/h1&gt;;
+ReactDOM.render(&lt;ActionLink/&gt;, document.getElementById(&#39;root&#39;));
+
+// 或者是使用箭头函数 以及  Function.prototype.bind
+&lt;button onClick={(e) =&gt; this.deleteRow(id, e)}&gt;Delete Row&lt;/button&gt;
+&lt;button onClick={this.deleteRow.bind(this, id)}&gt;Delete Row&lt;/button&gt;
+
+//在一个Component中，时间监听最后要加上bind(this)
+class Calculator extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleChange = this.handleChange.bind(this);
+    this.state = {temperature: &#39;&#39;};
+  }
+
+  handleChange(e) {
+    this.setState({temperature: e.target.value});
+  }
+
+  render() {
+    const temperature = this.state.temperature;
+    return (
+      &lt;fieldset&gt;
+        &lt;legend&gt;Enter temperature in Celsius:&lt;/legend&gt;
+        &lt;input
+          value={temperature}
+          onChange={this.handleChange} /&gt;
+
+        &lt;BoilingVerdict
+          celsius={parseFloat(temperature)} /&gt;
+
+      &lt;/fieldset&gt;
+    );
+  }
+}
+</code></pre>
 <h2 id="组件之间通信"><a href="#组件之间通信" class="headerlink" title="组件之间通信"></a>组件之间通信</h2><p>In React, sharing state is accomplished by moving it up to the closest common ancestor of the components that need it. 也就是说，要把state提取到最近的公用父组件中。事件发生时，子组件调用this.props.onXXX(由父组件提供)通知父组件，子组件不再维护自身state，父组件的state成为两个子组件唯一的共有的single source of truth</p>
-<p>渲染list的时候记得要加上一个key，这是规定<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//错误</span></span><br><span class="line"><span class="keyword">const</span> listItems = numbers.map(<span class="function">(<span class="params">number</span>) =&gt;</span></span><br><span class="line">  &lt;li&gt;&#123;number&#125;&lt;<span class="regexp">/li&gt;</span></span><br><span class="line"><span class="regexp">);</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">/</span><span class="regexp">/正确</span></span><br><span class="line"><span class="regexp">const listItems = numbers.map((number) =&gt;</span></span><br><span class="line"><span class="regexp">  &lt;li key=&#123;number.toString()&#125;&gt;&#123;number&#125;&lt;/</span>li&gt;</span><br><span class="line">);</span><br><span class="line"><span class="comment">//一个List element中的list元素应当具有独一无二的key，但不同List element实例之间，元素的key没必要遵守这一规则</span></span><br></pre></td></tr></table></figure></p>
+<p>渲染list的时候记得要加上一个key，这是规定</p>
+<pre><code class="js">//错误
+const listItems = numbers.map((number) =&gt;
+  &lt;li&gt;{number}&lt;/li&gt;
+);
+
+//正确
+const listItems = numbers.map((number) =&gt;
+  &lt;li key={number.toString()}&gt;{number}&lt;/li&gt;
+);
+//一个List element中的list元素应当具有独一无二的key，但不同List element实例之间，元素的key没必要遵守这一规则
+</code></pre>
 <h2 id="常见错误"><a href="#常见错误" class="headerlink" title="常见错误"></a>常见错误</h2><blockquote>
-<p>Super expression must either be null or a function, not undefined<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LoginControl</span> <span class="keyword">extends</span> <span class="title">component</span></span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 应该是</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LoginControl</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span></span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Super expression must either be null or a function, not undefined<br>```js<br>class LoginControl extends component{</p>
 </blockquote>
+<p>}<br>// 应该是<br>class LoginControl extends React.Component{</p>
+<p>}<br>```</p>
 
       
 

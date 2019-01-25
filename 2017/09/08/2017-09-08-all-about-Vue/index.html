@@ -19,7 +19,7 @@
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery1511100775410.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/1102531047-2.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/VueJsLogo.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.039Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.181Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="VueJs学习笔记">
 <meta name="twitter:description" content="Vue Js学习笔记">
@@ -235,9 +235,26 @@ ga('send', 'pageview');
 <li>components 标签用于引入可复用的模板,用于注册</li>
 <li>computed 计算属性，computed和data一样，也是方法，只不过只是返回了变量的值的一份copy。不会影响data的值</li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">var vm = new Vue(&#123;</span><br><span class="line">  el: &apos;#example&apos;,</span><br><span class="line">  data: &#123;</span><br><span class="line">    message: &apos;Hello&apos;</span><br><span class="line">  &#125;,</span><br><span class="line">  computed: &#123;</span><br><span class="line">    // 计算属性的 getter</span><br><span class="line">    reversedMessage: function () &#123;</span><br><span class="line">      // `this` 指向 vm 实例</span><br><span class="line">      return this.message.split(&apos;&apos;).reverse().join(&apos;&apos;)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<p>你可以像绑定普通属性一样在模板中绑定计算属性。Vue 知道 vm.reversedMessage 依赖于 vm.message，因此当 vm.message 发生改变时，所有依赖 vm.reversedMessage 的绑定也会更新。而且最妙的是我们已经以声明的方式创建了这种依赖关系：计算属性的 getter 函数是没有副作用 (side effect) 的，这使它更易于测试和理解。<br>普通属性更改的话就真的改了，计算属性只是把这种操作预期的结果返回，并不会修改原来的值。<br>还有一个好处是，计算属性的值依赖于普通属性的值，前者不更改的话，后者直接返回缓存的值。所以这种获取时间的东西就不要放在计算属性里了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">computed: &#123;</span><br><span class="line">  now: function () &#123;</span><br><span class="line">    return Date.now()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>一些常用的事件绑定:</p>
+<pre><code>var vm = new Vue({
+  el: &#39;#example&#39;,
+  data: {
+    message: &#39;Hello&#39;
+  },
+  computed: {
+    // 计算属性的 getter
+    reversedMessage: function () {
+      // `this` 指向 vm 实例
+      return this.message.split(&#39;&#39;).reverse().join(&#39;&#39;)
+    }
+  }
+})
+</code></pre><p>你可以像绑定普通属性一样在模板中绑定计算属性。Vue 知道 vm.reversedMessage 依赖于 vm.message，因此当 vm.message 发生改变时，所有依赖 vm.reversedMessage 的绑定也会更新。而且最妙的是我们已经以声明的方式创建了这种依赖关系：计算属性的 getter 函数是没有副作用 (side effect) 的，这使它更易于测试和理解。<br>普通属性更改的话就真的改了，计算属性只是把这种操作预期的结果返回，并不会修改原来的值。<br>还有一个好处是，计算属性的值依赖于普通属性的值，前者不更改的话，后者直接返回缓存的值。所以这种获取时间的东西就不要放在计算属性里了。</p>
+<pre><code>computed: {
+  now: function () {
+    return Date.now()
+  }
+}
+</code></pre><p>一些常用的事件绑定:</p>
 <ul>
 <li>v-if=’’ //移除或者显示某个Tag，(display:none是隐藏或显示)</li>
 <li>v-on:click=’somefunction’ //点击事件发生时触发某个method</li>
@@ -248,37 +265,172 @@ ga('send', 'pageview');
 <li>v-on的缩写是@符号</li>
 <li>v-bind:的缩写就是: 那个冒号</li>
 </ul>
-<h3 id="1-1-Dynamic-Components"><a href="#1-1-Dynamic-Components" class="headerlink" title="1.1 Dynamic Components"></a>1.1 Dynamic Components</h3><p>页面中需要随时展示不同template是，可以使用component标签。<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">// Imports</span><br><span class="line">import formOne from './components/formOne.vue';</span><br><span class="line">import formTwo from './components/formTwo.vue';</span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">form-one</span>&gt;</span><span class="tag">&lt;/<span class="name">form-one</span>&gt;</span></span><br><span class="line">//这和下面这种写法是一样的</span><br><span class="line"> <span class="tag">&lt;<span class="name">component</span> <span class="attr">v-bind:is</span>=<span class="string">'component'</span>&gt;</span><span class="tag">&lt;/<span class="name">component</span>&gt;</span> //component标签注册在data中，可以随时改变。例如</span><br><span class="line"> <span class="tag">&lt;<span class="name">button</span> <span class="attr">v-on:click</span>=<span class="string">"component='form-one'"</span>&gt;</span>Show form one<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">button</span> <span class="attr">v-on:click</span>=<span class="string">"component='form-two'"</span>&gt;</span>Show form two<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<h3 id="1-2-InputBinding"><a href="#1-2-InputBinding" class="headerlink" title="1.2 InputBinding"></a>1.2 InputBinding</h3><p>将input标签中用户输入的文字显示在一个tag中<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">//在template中</span><br><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">v-model.lazy</span>=<span class="string">'title'</span> <span class="attr">required</span>/&gt;</span> //lazy是指preview部分只会在点击后显示内容</span><br><span class="line">//在data中注册</span><br><span class="line">data () &#123;</span><br><span class="line">    return &#123;</span><br><span class="line">      title :'',</span><br><span class="line">      content: ''</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">在需要展示内容的标签中可以实时获取内容</span><br><span class="line">如<span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123;title&#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span>&gt;  </span><br><span class="line"></span><br><span class="line">或者</span><br><span class="line">data () &#123;</span><br><span class="line">    return &#123;</span><br><span class="line">      blog:&#123;</span><br><span class="line">      title :'',</span><br><span class="line">      content: '',</span><br><span class="line">      categories:[]</span><br><span class="line">      &#125;  </span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="1-1-Dynamic-Components"><a href="#1-1-Dynamic-Components" class="headerlink" title="1.1 Dynamic Components"></a>1.1 Dynamic Components</h3><p>页面中需要随时展示不同template是，可以使用component标签。</p>
+<pre><code class="html">
+// Imports
+import formOne from &#39;./components/formOne.vue&#39;;
+import formTwo from &#39;./components/formTwo.vue&#39;;
+
+&lt;form-one&gt;&lt;/form-one&gt;
+//这和下面这种写法是一样的
+ &lt;component v-bind:is=&#39;component&#39;&gt;&lt;/component&gt; //component标签注册在data中，可以随时改变。例如
+ &lt;button v-on:click=&quot;component=&#39;form-one&#39;&quot;&gt;Show form one&lt;/button&gt;
+ &lt;button v-on:click=&quot;component=&#39;form-two&#39;&quot;&gt;Show form two&lt;/button&gt;
+</code></pre>
+<h3 id="1-2-InputBinding"><a href="#1-2-InputBinding" class="headerlink" title="1.2 InputBinding"></a>1.2 InputBinding</h3><p>将input标签中用户输入的文字显示在一个tag中</p>
+<pre><code class="html">//在template中
+&lt;input type=&quot;text&quot; v-model.lazy=&#39;title&#39; required/&gt; //lazy是指preview部分只会在点击后显示内容
+//在data中注册
+data () {
+    return {
+      title :&#39;&#39;,
+      content: &#39;&#39;
+    }
+  }
+在需要展示内容的标签中可以实时获取内容
+如&lt;p&gt;{{title}}&lt;/p&gt;&gt;  
+
+或者
+data () {
+    return {
+      blog:{
+      title :&#39;&#39;,
+      content: &#39;&#39;,
+      categories:[]
+      }  
+    }
+  }
+</code></pre>
 <p>data中返回的是一个json object，json本身的定义就是(JavaScript Object Notation)。这样做的好处是可以将所有需要的变量存储在一个object,当然，这里面存数组也是可以的。</p>
-<h3 id="1-3-Checkbox-Binding"><a href="#1-3-Checkbox-Binding" class="headerlink" title="1.3 Checkbox Binding"></a>1.3 Checkbox Binding</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"checkboxes"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">label</span>&gt;</span>Apple<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"checkbox"</span> <span class="attr">value</span>=<span class="string">"apple"</span> <span class="attr">v-model</span>=<span class="string">"blog.categories"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">label</span>&gt;</span>Juice<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"checkbox"</span> <span class="attr">value</span>=<span class="string">"juice"</span> <span class="attr">v-model</span>=<span class="string">"blog.categories"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">label</span>&gt;</span>Panda<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"checkbox"</span> <span class="attr">value</span>=<span class="string">"panda"</span> <span class="attr">v-model</span>=<span class="string">"blog.categories"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">label</span>&gt;</span>rocky<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"checkbox"</span> <span class="attr">value</span>=<span class="string">"rocky"</span> <span class="attr">v-model</span>=<span class="string">"blog.categories"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">label</span>&gt;</span>moon<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"checkbox"</span> <span class="attr">value</span>=<span class="string">"moon"</span> <span class="attr">v-model</span>=<span class="string">"blog.categories"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line">在预览区，可以这样展示</span><br><span class="line">  <span class="tag">&lt;<span class="name">ul</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">v-for</span>=<span class="string">'cat in blog.categories'</span>&gt;</span>&#123;&#123;cat&#125;&#125;<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br><span class="line"> 如果checkbox被选中，blog的categories数组中就加入了这个元素，取消选中则从数组中移除。</span><br></pre></td></tr></table></figure>
-<h3 id="1-4-Select-Box-Binding"><a href="#1-4-Select-Box-Binding" class="headerlink" title="1.4 Select Box Binding"></a>1.4 Select Box Binding</h3><p>SelctBox只能单选，绑定数据这样:<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">v-model</span>=<span class="string">'blog.author'</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">option</span> <span class="attr">v-for</span>=<span class="string">'a in authors'</span> &gt;</span>&#123;&#123;a&#125;&#125;<span class="tag">&lt;/<span class="name">option</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line"></span><br><span class="line">data&#123;</span><br><span class="line">    blog:&#123;</span><br><span class="line">        author:'default'</span><br><span class="line">    &#125;,</span><br><span class="line">    authors:['bob','Jessy','Jean','Jean','Dave']</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="1-3-Checkbox-Binding"><a href="#1-3-Checkbox-Binding" class="headerlink" title="1.3 Checkbox Binding"></a>1.3 Checkbox Binding</h3><pre><code class="html">&lt;div id=&quot;checkboxes&quot;&gt;
+    &lt;label&gt;Apple&lt;/label&gt;
+    &lt;input type=&quot;checkbox&quot; value=&quot;apple&quot; v-model=&quot;blog.categories&quot;&gt;
+    &lt;label&gt;Juice&lt;/label&gt;
+    &lt;input type=&quot;checkbox&quot; value=&quot;juice&quot; v-model=&quot;blog.categories&quot;&gt;
+    &lt;label&gt;Panda&lt;/label&gt;
+    &lt;input type=&quot;checkbox&quot; value=&quot;panda&quot; v-model=&quot;blog.categories&quot;&gt;
+    &lt;label&gt;rocky&lt;/label&gt;
+    &lt;input type=&quot;checkbox&quot; value=&quot;rocky&quot; v-model=&quot;blog.categories&quot;&gt;
+    &lt;label&gt;moon&lt;/label&gt;
+    &lt;input type=&quot;checkbox&quot; value=&quot;moon&quot; v-model=&quot;blog.categories&quot;&gt;
+&lt;/div&gt;
+
+在预览区，可以这样展示
+  &lt;ul&gt;
+    &lt;li v-for=&#39;cat in blog.categories&#39;&gt;{{cat}}&lt;/li&gt;
+  &lt;/ul&gt;
+ 如果checkbox被选中，blog的categories数组中就加入了这个元素，取消选中则从数组中移除。
+</code></pre>
+<h3 id="1-4-Select-Box-Binding"><a href="#1-4-Select-Box-Binding" class="headerlink" title="1.4 Select Box Binding"></a>1.4 Select Box Binding</h3><p>SelctBox只能单选，绑定数据这样:</p>
+<pre><code class="html">&lt;select v-model=&#39;blog.author&#39;&gt;
+    &lt;option v-for=&#39;a in authors&#39; &gt;{{a}}&lt;/option&gt;
+&lt;/select&gt;
+
+data{
+    blog:{
+        author:&#39;default&#39;
+    },
+    authors:[&#39;bob&#39;,&#39;Jessy&#39;,&#39;Jean&#39;,&#39;Jean&#39;,&#39;Dave&#39;]
+}
+</code></pre>
 <p>SelectBox会从authors数组中提供选项，选中后，blog.author对象将会被赋予相应的值。</p>
-<h3 id="1-5-HTML模板复用"><a href="#1-5-HTML模板复用" class="headerlink" title="1.5 HTML模板复用"></a>1.5 HTML模板复用</h3><p>组件的意义就在于可以复用UI元素，就像Flask的renderTemplate方法里面可以接收若干参数，vue Component也是一样<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. 在父Component中引入子Component</span><br><span class="line">2. 子Component中添加props:[&apos;variable1&apos;,&apos;variable2&apos;]数组</span><br><span class="line">3. 在父控件中直接在html标签上添加 :variable1 =&apos;&apos; ，注意这个冒号其实是  v-bind: 的缩写，不能省略</span><br><span class="line">4. 在子控件的html中就像引用data一样使用props</span><br></pre></td></tr></table></figure></p>
-<h3 id="1-6各种引用"><a href="#1-6各种引用" class="headerlink" title="1.6各种引用"></a>1.6各种引用</h3><p>在vue组件中this指的是当前的VueComponent（也就是常说的vm），self指的是window对象，this.$el指的是所渲染的template</p>
+<h3 id="1-5-HTML模板复用"><a href="#1-5-HTML模板复用" class="headerlink" title="1.5 HTML模板复用"></a>1.5 HTML模板复用</h3><p>组件的意义就在于可以复用UI元素，就像Flask的renderTemplate方法里面可以接收若干参数，vue Component也是一样</p>
+<pre><code>1. 在父Component中引入子Component
+2. 子Component中添加props:[&#39;variable1&#39;,&#39;variable2&#39;]数组
+3. 在父控件中直接在html标签上添加 :variable1 =&#39;&#39; ，注意这个冒号其实是  v-bind: 的缩写，不能省略
+4. 在子控件的html中就像引用data一样使用props
+</code></pre><h3 id="1-6各种引用"><a href="#1-6各种引用" class="headerlink" title="1.6各种引用"></a>1.6各种引用</h3><p>在vue组件中this指的是当前的VueComponent（也就是常说的vm），self指的是window对象，this.$el指的是所渲染的template</p>
 <h3 id="1-7-嵌套路由破坏了静态资源的引用路径"><a href="#1-7-嵌套路由破坏了静态资源的引用路径" class="headerlink" title="1.7 嵌套路由破坏了静态资源的引用路径"></a>1.7 嵌套路由破坏了静态资源的引用路径</h3><p><a href="https://stackoverflow.com/questions/45133669/nested-routes-breaks-the-static-path">nested-routes-breaks-the-static-path</a><br>解决方法是在 html中置顶css或js等静态资源的location，从绝对路径，根路径开始</p>
 <h2 id="2-使用Http进行CURD操作"><a href="#2-使用Http进行CURD操作" class="headerlink" title="2.使用Http进行CURD操作"></a>2.使用Http进行CURD操作</h2><p>安装：<a href="https://github.com/pagekit/vue-resource">Repo</a><br>注意：需要在当前工作目录.<br>安装完成在package.json中看到</p>
 <ul>
 <li>“dependencies”: {<br>  “vue”: “^2.3.3”,<br>  “Vue-resource”:”^1.3.4”<br>},<br>类似这样即可。</li>
 </ul>
-<h3 id="2-1-进行POST操作"><a href="#2-1-进行POST操作" class="headerlink" title="2.1 进行POST操作"></a>2.1 进行POST操作</h3><p><a href="https://jsonplaceholder.typicode.com/">jsonPlaceHolder</a>是一个免费的API网站。<br>vue-resource提交表单的操作如下:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">post:<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">//use http here</span></span><br><span class="line">    <span class="keyword">this</span>.$http.post(<span class="string">'https://jsonplaceholder.typicode.com/posts'</span>,&#123;</span><br><span class="line">      title:<span class="keyword">this</span>.blog.title,</span><br><span class="line">      body:<span class="keyword">this</span>.blog.content,</span><br><span class="line">      userId:<span class="number">1</span>,</span><br><span class="line">    &#125;).then(<span class="function"><span class="keyword">function</span> (<span class="params">data</span>) </span>&#123;</span><br><span class="line">      <span class="comment">// body...</span></span><br><span class="line">      <span class="built_in">console</span>.log(data)</span><br><span class="line">      <span class="keyword">this</span>.summited = <span class="literal">true</span></span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="2-1-进行POST操作"><a href="#2-1-进行POST操作" class="headerlink" title="2.1 进行POST操作"></a>2.1 进行POST操作</h3><p><a href="https://jsonplaceholder.typicode.com/">jsonPlaceHolder</a>是一个免费的API网站。<br>vue-resource提交表单的操作如下:</p>
+<pre><code class="javaScript">  post:function () {
+      //use http here
+      this.$http.post(&#39;https://jsonplaceholder.typicode.com/posts&#39;,{
+        title:this.blog.title,
+        body:this.blog.content,
+        userId:1,
+      }).then(function (data) {
+        // body...
+        console.log(data)
+        this.summited = true
+      });
+    }
+</code></pre>
 <p>post方法返回的是一个promise，加回调即可打印出api返回结果。</p>
 <h2 id="3-Router-Eventbus-mixin，axios等"><a href="#3-Router-Eventbus-mixin，axios等" class="headerlink" title="3. Router,Eventbus,mixin，axios等"></a>3. Router,Eventbus,mixin，axios等</h2><p>安装:</p>
 <blockquote>
 <p>npm install vue-router –save</p>
 <h2 id="npm-install-vue-bus-–save"><a href="#npm-install-vue-bus-–save" class="headerlink" title="npm install vue-bus –save"></a>npm install vue-bus –save</h2><h3 id="3-1-关于Bus，-是用来在不同的Vue文件中传递事件-数据-用的，安装好后，main-js里面improt并使用"><a href="#3-1-关于Bus，-是用来在不同的Vue文件中传递事件-数据-用的，安装好后，main-js里面improt并使用" class="headerlink" title="3.1 关于Bus， 是用来在不同的Vue文件中传递事件(数据)用的，安装好后，main.js里面improt并使用"></a>3.1 关于Bus， 是用来在不同的Vue文件中传递事件(数据)用的，安装好后，main.js里面improt并使用</h3><p>import Vue from ‘vue’<br>import VueBus from ‘vue-bus’;<br>Vue.use(VueBus);</p>
 </blockquote>
-<p>A.vue中<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">created()&#123;</span><br><span class="line">  <span class="keyword">this</span>.$bus.emit(<span class="string">'loadSuccess'</span>, <span class="string">'创建成功！'</span>);</span><br><span class="line">&#125;,</span><br><span class="line">beforedestory()&#123;</span><br><span class="line">  <span class="keyword">this</span>.$bus.off(<span class="string">'loadSuccess'</span>)</span><br><span class="line">&#125;</span><br><span class="line"> <span class="comment">// B.vue中</span></span><br><span class="line">created()&#123;</span><br><span class="line">  <span class="keyword">this</span>.$bus.on(<span class="string">'loadSuccess'</span>,text=&gt; &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">'receieve msg from another vue component '</span>+ text)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>A.vue中</p>
+<pre><code class="javaScript">created(){
+  this.$bus.emit(&#39;loadSuccess&#39;, &#39;创建成功！&#39;);
+},
+beforedestory(){
+  this.$bus.off(&#39;loadSuccess&#39;)
+}
+ // B.vue中
+created(){
+  this.$bus.on(&#39;loadSuccess&#39;,text=&gt; {
+      console.log(&#39;receieve msg from another vue component &#39;+ text)
+  })
+}
+</code></pre>
 <p>3.2 关于mixin，有比较好的<a href="https://css-tricks.com/using-mixins-vue-js/">介绍</a><br>其实就是把一些公用的methods放到一个js文件中export掉，然后需要的vue文件，自己去import，在data中设置mixins: [] ,使用的时候就可以用this.method()使用这些共有的方法了。其实主要是为了复用。</p>
 <p>3.3 添加全局变量(常量)的<a href="http://www.jianshu.com/p/7547ff8760c3">方法</a>，vuex是官方的</p>
 <p>3.4 router就是建立internal link 页面之间跳转的桥梁<br>在template中添加router-link的tag,会生成一个对应的a Tag,点击跳转即可。<br>router-view标签表示预先准备好的布局会被渲染进入这个标签内（将其取代）</p>
-<p>3.5 axios取代vue-resource用于发起http请求<br>安装在官方介绍页有，子组件可以使用import从mainjs里面拿到。<br>回到axios，作者表示<a href="https://github.com/axios/axios/issues/75">不打算支持jsonp</a>，想用jsonp的话可以用jquery,或者使用<a href="https://github.com/axios/axios/blob/master/COOKBOOK.md#jsonp">jsonp插件</a><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"> $ npm install jsonp --save</span><br><span class="line"> <span class="keyword">var</span> jsonp = <span class="built_in">require</span>(<span class="string">'jsonp'</span>);</span><br><span class="line"></span><br><span class="line">jsonp(<span class="string">'http://api.douban.com/v2/movie/top250'</span>, <span class="literal">null</span>, <span class="function"><span class="keyword">function</span> (<span class="params">err, data</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (err) &#123;</span><br><span class="line">    <span class="built_in">console</span>.error(err.message);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(data);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>3.5 axios取代vue-resource用于发起http请求<br>安装在官方介绍页有，子组件可以使用import从mainjs里面拿到。<br>回到axios，作者表示<a href="https://github.com/axios/axios/issues/75">不打算支持jsonp</a>，想用jsonp的话可以用jquery,或者使用<a href="https://github.com/axios/axios/blob/master/COOKBOOK.md#jsonp">jsonp插件</a></p>
+<pre><code class="javaScript"> $ npm install jsonp --save
+ var jsonp = require(&#39;jsonp&#39;);
+
+jsonp(&#39;http://api.douban.com/v2/movie/top250&#39;, null, function (err, data) {
+  if (err) {
+    console.error(err.message);
+  } else {
+    console.log(data);
+  }
+});
+</code></pre>
 <p>亲测有效。</p>
-<p>take aways:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">##同源：</span><br><span class="line">$.ajax(&#123;</span><br><span class="line">    url:<span class="string">"persons.json"</span>,</span><br><span class="line">    success:<span class="function"><span class="keyword">function</span>(<span class="params">data</span>)</span>&#123;</span><br><span class="line">　　　　<span class="built_in">console</span>.log(data);</span><br><span class="line">　　 　 <span class="comment">//ToDo..</span></span><br><span class="line">　 &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">##跨域：</span><br><span class="line">$.ajax(&#123;</span><br><span class="line">    url:<span class="string">"http://www.B.com/open.php?callback=?"</span>,</span><br><span class="line">    dataType:<span class="string">"jsonp"</span>,</span><br><span class="line">    success:<span class="function"><span class="keyword">function</span>(<span class="params">data</span>)</span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(data);</span><br><span class="line">        <span class="comment">//ToDo..</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
-<p>其实一开始没有callback=?这些个东西的，<a href="http://www.B.com/open.js">http://www.B.com/open.js</a> 这个链接就是一个简单的js<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">foo(&#123;<span class="string">"name"</span>:<span class="string">"B"</span>,<span class="string">"age"</span>:<span class="number">23</span>&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>take aways:</p>
+<pre><code class="javaScript">##同源：
+$.ajax({
+    url:&quot;persons.json&quot;,
+    success:function(data){
+　　　　console.log(data);
+　　 　 //ToDo..
+　 }
+});
+
+##跨域：
+$.ajax({
+    url:&quot;http://www.B.com/open.php?callback=?&quot;,
+    dataType:&quot;jsonp&quot;,
+    success:function(data){
+        console.log(data);
+        //ToDo..
+    }
+});
+</code></pre>
+<p>其实一开始没有callback=?这些个东西的，<a href="http://www.B.com/open.js">http://www.B.com/open.js</a> 这个链接就是一个简单的js</p>
+<pre><code class="javaScript">foo({&quot;name&quot;:&quot;B&quot;,&quot;age&quot;:23});
+</code></pre>
 <p>所以A网站往document里面写一个script之后，直接就执行了A网站的foo() function。 但假如B网站还对C网站提供服务，C网站说foo()这个方法名已经被占用了。所以B就约定，不管是A,B,C D哪家网站，想要调各自的什么方法自己传上来，B负责调用以下。因为jsonp只能是GET，所以只好放在queryParameters里面了。<a href="https://juejin.im/entry/5a45b363f265da431c709fc7">为什么叫callback的原因我也是最近才想清楚的</a><br>上面那个callback不一定非要写callback，其实写什么都行，主要看对方网站是怎么定义的。就是对方这个链接是怎么拿这个url里面的queryParams的。</p>
 <p><em>XSS注入就是利用了CORS</em></p>
-<h2 id="4-Vuex及状态管理"><a href="#4-Vuex及状态管理" class="headerlink" title="4. Vuex及状态管理"></a>4. Vuex及状态管理</h2><p>在js眼中，一段json字符串就是一个object。<br>这是vuex 中改变某项属性的代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">mutations: &#123;</span><br><span class="line">  increment (state, payload) &#123;</span><br><span class="line">    state.count += payload.amount</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">store.commit(<span class="string">'increment'</span>, &#123;</span><br><span class="line">  amount: <span class="number">10</span></span><br><span class="line">&#125;)</span><br><span class="line">两个花括号括起来的(json)，才是对象。这里，函数名叫做<span class="string">'increment'</span>，传进去的payLoad即有效信息，是通过json转达的。</span><br></pre></td></tr></table></figure></p>
+<h2 id="4-Vuex及状态管理"><a href="#4-Vuex及状态管理" class="headerlink" title="4. Vuex及状态管理"></a>4. Vuex及状态管理</h2><p>在js眼中，一段json字符串就是一个object。<br>这是vuex 中改变某项属性的代码：</p>
+<pre><code class="javaScript">mutations: {
+  increment (state, payload) {
+    state.count += payload.amount
+  }
+}
+store.commit(&#39;increment&#39;, {
+  amount: 10
+})
+两个花括号括起来的(json)，才是对象。这里，函数名叫做&#39;increment&#39;，传进去的payLoad即有效信息，是通过json转达的。
+</code></pre>
 <h2 id="事件处理"><a href="#事件处理" class="headerlink" title="事件处理"></a>事件处理</h2><p>点击时会发生MouseEvent,如果想要获取这里面的一些属性，比如点击位置screenX,ScreenY这些，可以在html中绑定事件时，使用$event这个符号将事件传递到方法中。</p>
 <h3 id="基础复习"><a href="#基础复习" class="headerlink" title="基础复习"></a>基础复习</h3><ol>
 <li>id和class的问题<br>html tag的class，不同tag可以有相同的class，引用的时候用.classname来查找<br>id这个tag唯一的，一个页面不能有两个tag有相同的id，引用的时候用#id来找<br>一个是点，一个是#</li>
@@ -294,10 +446,16 @@ ga('send', 'pageview');
 </ol>
 <h3 id="日常开发出错记录"><a href="#日常开发出错记录" class="headerlink" title="日常开发出错记录"></a>日常开发出错记录</h3><ol>
 <li><a href="https://stackoverflow.com/questions/42908525/vue-warn-property-or-method-is-not-defined-on-the-instance-but-referenced-dur">Vue warn]: Property or method is not defined on the instance but referenced during render</a>。原来是template里面的html某个元素里面调用了XXX，而这个XXX并没有在当前Vue实例中声明。</li>
-<li><a href="https://forum.vuejs.org/t/vuex-error-state/1879/6">Cannot read property ‘state’ of undefined</a>.这其实就是在vue component中访问this.$store ===undefines了，需要确保Vue的声明中<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// root instance</span></span><br><span class="line"><span class="keyword">new</span> Vue(&#123;  <span class="comment">// eslint-disable-line no-new</span></span><br><span class="line">    el: <span class="string">"#app"</span>,</span><br><span class="line">    store,</span><br><span class="line">    router,</span><br><span class="line">    render: <span class="function"><span class="params">h</span> =&gt;</span> h(App)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-</li>
+<li><a href="https://forum.vuejs.org/t/vuex-error-state/1879/6">Cannot read property ‘state’ of undefined</a>.这其实就是在vue component中访问this.$store ===undefines了，需要确保Vue的声明中<pre><code class="js">// root instance
+new Vue({  // eslint-disable-line no-new
+ el: &quot;#app&quot;,
+ store,
+ router,
+ render: h =&gt; h(App)
+})
+</code></pre>
+3.</li>
 </ol>
-<p>3.</p>
 <h3 id="tools-tangiable-takeaways"><a href="#tools-tangiable-takeaways" class="headerlink" title="tools,tangiable takeaways"></a>tools,tangiable takeaways</h3><ol>
 <li>atom plugin  ide-typescript sucks , after disable the plugin ,the autocomplete feature works againself.</li>
 <li>config atom behind a firewall :<blockquote>

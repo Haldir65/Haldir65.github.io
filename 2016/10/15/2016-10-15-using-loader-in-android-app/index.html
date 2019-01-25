@@ -16,7 +16,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="App中经常有这样的需求:进入一个页面，首先查询数据库，如果数据库数据有效，直接使用数据库数据。否则去网络查询数据，网络数据返回后重新加载数据。很显然，这里的查询数据库和网络请求都需要放到子线程去操作，异步了。android推荐使用Loader进行数据查询，最大的好处就是Laoder会处理好与生命周期相关的事情，Android Developers推出过关于Loaders的介绍视频，Loader就">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.031Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.173Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用Loader进行异步数据操作">
 <meta name="twitter:description" content="App中经常有这样的需求:进入一个页面，首先查询数据库，如果数据库数据有效，直接使用数据库数据。否则去网络查询数据，网络数据返回后重新加载数据。很显然，这里的查询数据库和网络请求都需要放到子线程去操作，异步了。android推荐使用Loader进行数据查询，最大的好处就是Laoder会处理好与生命周期相关的事情，Android Developers推出过关于Loaders的介绍视频，Loader就">
@@ -206,7 +206,83 @@ ga('send', 'pageview');
 </li>
 </ol>
 <h3 id="1-自定义一个Loader-加载数据类型，Cache处理等"><a href="#1-自定义一个Loader-加载数据类型，Cache处理等" class="headerlink" title="1. 自定义一个Loader(加载数据类型，Cache处理等)"></a>1. 自定义一个Loader(加载数据类型，Cache处理等)</h3><p>Loader的使用就像一个AsyncTask一样，可以提前指定需要在异步线程中做的事情、数据类型以及完成加载后将数据推送到主线程。谷歌给出了一个使用Loader来查询手机上安装的App并显示在一个ListView中的DemoApp，虽然是好几年前的东西了，并且使用的是V4包里的Loader,但还是值得学习。<br>首先来看自定义的AppListLoader</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AppListLoader</span> <span class="keyword">extends</span> <span class="title">AsyncTaskLoader</span>&lt;<span class="title">List</span>&lt;<span class="title">AppEntry</span>&gt;&gt; </span>&#123; <span class="comment">//AsynTaskLoader支持泛型，AppEntry是已安装App信息的包装类。</span></span><br><span class="line">    <span class="keyword">private</span> List&lt;AppEntry&gt; mApps;</span><br><span class="line">    <span class="comment">//查询的App列表保存为成员变量</span></span><br><span class="line">    <span class="keyword">final</span> PackageManager mPm;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> DEBUG = <span class="keyword">true</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String TAG = AppListLoader.class.getSimpleName();</span><br><span class="line"></span><br><span class="line">    <span class="comment">//构造函数</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">AppListLoader</span><span class="params">(Context ctx)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// Loaders may be used across multiple Activitys (assuming they aren't</span></span><br><span class="line">        <span class="comment">// bound to the LoaderManager), so NEVER hold a reference to the context</span></span><br><span class="line">        <span class="comment">// directly. Doing so will cause you to leak an entire Activity's context.</span></span><br><span class="line">        <span class="comment">// The superclass constructor will store a reference to the Application</span></span><br><span class="line">        <span class="comment">// Context instead, and can be retrieved with a call to getContext().</span></span><br><span class="line">        <span class="keyword">super</span>(ctx);</span><br><span class="line">        <span class="comment">//第一，这里运行在主线程上；</span></span><br><span class="line">        <span class="comment">//第二，传进来的context(一般是Activity只是为了获取ApplicationContext)</span></span><br><span class="line">        mPm = getContext().getPackageManager();<span class="comment">//getContext()返回的是Application的Context。</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;AppEntry&gt; <span class="title">loadInBackground</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (DEBUG) Log.i(TAG, <span class="string">"+++ loadInBackground() called! +++"</span>);</span><br><span class="line">        LogUtil.p(<span class="string">""</span>);<span class="comment">// 子线程,耗时的工作放到这里</span></span><br><span class="line">        <span class="comment">// Retrieve all installed applications.</span></span><br><span class="line">        List&lt;ApplicationInfo&gt; apps = mPm.getInstalledApplications(<span class="number">0</span>);<span class="comment">//PackageManager的方法</span></span><br><span class="line">        <span class="keyword">if</span> (apps == <span class="keyword">null</span>) &#123;</span><br><span class="line">            apps = <span class="keyword">new</span> ArrayList&lt;ApplicationInfo&gt;();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// Create corresponding array of entries and load their labels.</span></span><br><span class="line">        List&lt;AppEntry&gt; entries = <span class="keyword">new</span> ArrayList&lt;AppEntry&gt;(apps.size());</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; apps.size(); i++) &#123;</span><br><span class="line">            AppEntry entry = <span class="keyword">new</span> AppEntry(<span class="keyword">this</span>, apps.get(i));</span><br><span class="line">            entry.loadLabel(getContext());</span><br><span class="line">            entries.add(entry);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// Sort the list.</span></span><br><span class="line">        Collections.sort(entries, ALPHA_COMPARATOR);</span><br><span class="line">        <span class="keyword">return</span> entries;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">deliverResult</span><span class="params">(List&lt;AppEntry&gt; apps)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//运行在主线程上</span></span><br><span class="line">        <span class="keyword">if</span> (isReset()) &#123;<span class="comment">//这里就类似于AsyncTask的onPostExecute了，把子线程处理好的数据推送到主线程</span></span><br><span class="line">            <span class="keyword">if</span> (DEBUG)</span><br><span class="line">                Log.w(TAG, <span class="string">"+++ Warning! An async query came in while the Loader was reset! +++"</span>);</span><br><span class="line">            <span class="comment">// The Loader has been reset; ignore the result and invalidate the data.</span></span><br><span class="line">            <span class="comment">// This can happen when the Loader is reset while an asynchronous query</span></span><br><span class="line">            <span class="comment">// is working in the background. That is, when the background thread</span></span><br><span class="line">            <span class="comment">// finishes its work and attempts to deliver the results to the client,</span></span><br><span class="line">            <span class="comment">// it will see here that the Loader has been reset and discard any</span></span><br><span class="line">            <span class="comment">// resources associated with the new data as necessary.</span></span><br><span class="line">            <span class="keyword">if</span> (apps != <span class="keyword">null</span>) &#123;</span><br><span class="line">                releaseResources(apps);</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;<span class="comment">//如果调用了reset()方法，说明子线程加载的数据是无效的，释放资源，处理无效数据</span></span><br><span class="line">        <span class="comment">// Hold a reference to the old data so it doesn't get garbage collected.</span></span><br><span class="line">        <span class="comment">// We must protect it until the new data has been delivered.</span></span><br><span class="line">        List&lt;AppEntry&gt; oldApps = mApps;</span><br><span class="line">        mApps = apps;</span><br><span class="line">        <span class="keyword">if</span> (isStarted()) &#123;<span class="comment">// 如果一切正常，即调用了startLoading且stopLoading和reset均为被调用</span></span><br><span class="line">            <span class="keyword">if</span> (DEBUG) Log.i(TAG, <span class="string">"+++ Delivering results to the LoaderManager for"</span> +</span><br><span class="line">                    <span class="string">" the ListFragment to display! +++"</span>);</span><br><span class="line">            <span class="comment">// If the Loader is in a started state, have the superclass deliver the</span></span><br><span class="line">            <span class="comment">// results to the client.</span></span><br><span class="line">            <span class="keyword">super</span>.deliverResult(apps);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// Invalidate the old data as we don't need it any more.</span></span><br><span class="line">        <span class="keyword">if</span> (oldApps != <span class="keyword">null</span> &amp;&amp; oldApps != apps) &#123;</span><br><span class="line">            <span class="keyword">if</span> (DEBUG) Log.i(TAG, <span class="string">"+++ Releasing any old data associated with this Loader. +++"</span>);</span><br><span class="line">            releaseResources(oldApps);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="java">public class AppListLoader extends AsyncTaskLoader&lt;List&lt;AppEntry&gt;&gt; { //AsynTaskLoader支持泛型，AppEntry是已安装App信息的包装类。
+    private List&lt;AppEntry&gt; mApps;
+    //查询的App列表保存为成员变量
+    final PackageManager mPm;
+    private boolean DEBUG = true;
+    public static final String TAG = AppListLoader.class.getSimpleName();
+
+    //构造函数
+    public AppListLoader(Context ctx) {
+        // Loaders may be used across multiple Activitys (assuming they aren&#39;t
+        // bound to the LoaderManager), so NEVER hold a reference to the context
+        // directly. Doing so will cause you to leak an entire Activity&#39;s context.
+        // The superclass constructor will store a reference to the Application
+        // Context instead, and can be retrieved with a call to getContext().
+        super(ctx);
+        //第一，这里运行在主线程上；
+        //第二，传进来的context(一般是Activity只是为了获取ApplicationContext)
+        mPm = getContext().getPackageManager();//getContext()返回的是Application的Context。
+    }
+
+    @Override
+    public List&lt;AppEntry&gt; loadInBackground() {
+        if (DEBUG) Log.i(TAG, &quot;+++ loadInBackground() called! +++&quot;);
+        LogUtil.p(&quot;&quot;);// 子线程,耗时的工作放到这里
+        // Retrieve all installed applications.
+        List&lt;ApplicationInfo&gt; apps = mPm.getInstalledApplications(0);//PackageManager的方法
+        if (apps == null) {
+            apps = new ArrayList&lt;ApplicationInfo&gt;();
+        }
+        // Create corresponding array of entries and load their labels.
+        List&lt;AppEntry&gt; entries = new ArrayList&lt;AppEntry&gt;(apps.size());
+        for (int i = 0; i &lt; apps.size(); i++) {
+            AppEntry entry = new AppEntry(this, apps.get(i));
+            entry.loadLabel(getContext());
+            entries.add(entry);
+        }
+        // Sort the list.
+        Collections.sort(entries, ALPHA_COMPARATOR);
+        return entries;
+    }
+
+    @Override
+    public void deliverResult(List&lt;AppEntry&gt; apps) {
+        //运行在主线程上
+        if (isReset()) {//这里就类似于AsyncTask的onPostExecute了，把子线程处理好的数据推送到主线程
+            if (DEBUG)
+                Log.w(TAG, &quot;+++ Warning! An async query came in while the Loader was reset! +++&quot;);
+            // The Loader has been reset; ignore the result and invalidate the data.
+            // This can happen when the Loader is reset while an asynchronous query
+            // is working in the background. That is, when the background thread
+            // finishes its work and attempts to deliver the results to the client,
+            // it will see here that the Loader has been reset and discard any
+            // resources associated with the new data as necessary.
+            if (apps != null) {
+                releaseResources(apps);
+                return;
+            }
+        }//如果调用了reset()方法，说明子线程加载的数据是无效的，释放资源，处理无效数据
+        // Hold a reference to the old data so it doesn&#39;t get garbage collected.
+        // We must protect it until the new data has been delivered.
+        List&lt;AppEntry&gt; oldApps = mApps;
+        mApps = apps;
+        if (isStarted()) {// 如果一切正常，即调用了startLoading且stopLoading和reset均为被调用
+            if (DEBUG) Log.i(TAG, &quot;+++ Delivering results to the LoaderManager for&quot; +
+                    &quot; the ListFragment to display! +++&quot;);
+            // If the Loader is in a started state, have the superclass deliver the
+            // results to the client.
+            super.deliverResult(apps);
+        }
+        // Invalidate the old data as we don&#39;t need it any more.
+        if (oldApps != null &amp;&amp; oldApps != apps) {
+            if (DEBUG) Log.i(TAG, &quot;+++ Releasing any old data associated with this Loader. +++&quot;);
+            releaseResources(oldApps);
+        }
+    }
+}
+</code></pre>
 <p>到此，数据加载的Server端算是完成，这里注意调用到了isReset()、isStarted()等方法，这些就是Server端在在处理Client端生命周期是需要注意的，这个后面再说。</p>
 <h3 id="2-使用LoaderManager管理Loader"><a href="#2-使用LoaderManager管理Loader" class="headerlink" title="2. 使用LoaderManager管理Loader"></a>2. 使用LoaderManager管理Loader</h3><p>我们使用LoaderManager在Activity或Fragment中与Loader交互。通常在onCreate或者onActivityCreated中:</p>
 <blockquote>
@@ -220,9 +296,91 @@ ga('send', 'pageview');
 <blockquote>
 <p> // Initialize a Loader with id ‘1’. If the Loader with this id already<br>            // exists, then the LoaderManager will reuse the existing Loader.<br>            getLoaderManager().initLoader(LOADER_ID, null, this);            </p>
 </blockquote>
-<p>相对应的Fragment需要implements  LoaderManager.LoaderCallbacks&lt;List<AppEntry>&gt; //注意泛型<br>这个接口有三个方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">LoaderCallbacks</span>&lt;<span class="title">D</span>&gt; </span>&#123;</span><br><span class="line">       </span><br><span class="line">        <span class="function"><span class="keyword">public</span> Loader&lt;D&gt; <span class="title">onCreateLoader</span><span class="params">(<span class="keyword">int</span> id, Bundle args)</span></span>;</span><br><span class="line"></span><br><span class="line">       </span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onLoadFinished</span><span class="params">(Loader&lt;D&gt; loader, D data)</span></span>;</span><br><span class="line"></span><br><span class="line">       </span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onLoaderReset</span><span class="params">(Loader&lt;D&gt; loader)</span></span>;</span><br><span class="line">    &#125;</span><br><span class="line">```			</span><br><span class="line">看一下Demo中是如何实现的</span><br><span class="line">```java</span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> android.support.v4.content.Loader&lt;List&lt;AppEntry&gt;&gt; onCreateLoader(<span class="keyword">int</span> id, Bundle args) &#123;</span><br><span class="line">            <span class="keyword">if</span> (DEBUG) Log.i(TAG, <span class="string">"+++ onCreateLoader() called! +++"</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> AppListLoader(getActivity());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onLoadFinished</span><span class="params">(android.support.v4.content.Loader&lt;List&lt;AppEntry&gt;&gt; loader, List&lt;AppEntry&gt; data)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (DEBUG) Log.i(TAG, <span class="string">"+++ onLoadFinished() called! +++"</span>);</span><br><span class="line">            mAdapter.setData(data);<span class="comment">//加载数据到UI</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (isResumed()) &#123;</span><br><span class="line">                setListShown(<span class="keyword">true</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                setListShownNoAnimation(<span class="keyword">true</span>);</span><br><span class="line">            &#125; </span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onLoaderReset</span><span class="params">(android.support.v4.content.Loader&lt;List&lt;AppEntry&gt;&gt; loader)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (DEBUG) Log.i(TAG, <span class="string">"+++ onLoadReset() called! +++"</span>);</span><br><span class="line">            mAdapter.setData(<span class="keyword">null</span>);<span class="comment">//loader被reset，UI这边需要清除所有与Loader数据相关的引用，但清除数据的任务会由Loader处理好</span></span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure></p>
+<p>相对应的Fragment需要implements  LoaderManager.LoaderCallbacks&lt;List<AppEntry>&gt; //注意泛型<br>这个接口有三个方法</p>
+<pre><code class="java"> public interface LoaderCallbacks&lt;D&gt; {
+
+        public Loader&lt;D&gt; onCreateLoader(int id, Bundle args);
+
+
+        public void onLoadFinished(Loader&lt;D&gt; loader, D data);
+
+
+        public void onLoaderReset(Loader&lt;D&gt; loader);
+    }
+</code></pre>
+<p>看一下Demo中是如何实现的</p>
+<pre><code class="java">   @Override
+        public android.support.v4.content.Loader&lt;List&lt;AppEntry&gt;&gt; onCreateLoader(int id, Bundle args) {
+            if (DEBUG) Log.i(TAG, &quot;+++ onCreateLoader() called! +++&quot;);
+            return new AppListLoader(getActivity());
+        }
+
+        @Override
+        public void onLoadFinished(android.support.v4.content.Loader&lt;List&lt;AppEntry&gt;&gt; loader, List&lt;AppEntry&gt; data) {
+            if (DEBUG) Log.i(TAG, &quot;+++ onLoadFinished() called! +++&quot;);
+            mAdapter.setData(data);//加载数据到UI
+
+            if (isResumed()) {
+                setListShown(true);
+            } else {
+                setListShownNoAnimation(true);
+            } 
+        }
+
+        @Override
+        public void onLoaderReset(android.support.v4.content.Loader&lt;List&lt;AppEntry&gt;&gt; loader) {
+            if (DEBUG) Log.i(TAG, &quot;+++ onLoadReset() called! +++&quot;);
+            mAdapter.setData(null);//loader被reset，UI这边需要清除所有与Loader数据相关的引用，但清除数据的任务会由Loader处理好
+        }
+</code></pre>
 <p>在三个明显的回调中处理好数据绑定到UI及过期数据的清理即可。</p>
-<h3 id="3-处理Activity生命周期的问题"><a href="#3-处理Activity生命周期的问题" class="headerlink" title="3. 处理Activity生命周期的问题"></a>3. 处理Activity生命周期的问题</h3><p>回到server端(Loader),AsyncTaskLoader是一个abstract class，loadInBackground方法已经实现了，但还有几个方法强调必须要复写或者与生命周期相关<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onStartLoading</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       <span class="comment">/* Subclasses must implement this to take care of loading their data,</span></span><br><span class="line"><span class="comment">         as per &#123;@link #startLoading()&#125;.  This is not called by clients directly,</span></span><br><span class="line"><span class="comment">         but as a result of a call to &#123;@link #startLoading()&#125;.*/</span></span><br><span class="line">       <span class="comment">//在这里检查一下成员变量中的数据是否不为空，有数据的话，deliverResults</span></span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onStopLoading</span><span class="params">()</span> </span>&#123;</span><br><span class="line">         <span class="comment">/*Subclasses must implement this to take care of stopping their loader,</span></span><br><span class="line"><span class="comment">         as per &#123;@link #stopLoading()&#125;.  This is not called by clients directly,</span></span><br><span class="line"><span class="comment">         but as a result of a call to &#123;@link #stopLoading()&#125;.</span></span><br><span class="line"><span class="comment">         This will always be called from the process's main thread.*/</span></span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onReset</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       <span class="comment">/* Subclasses must implement this to take care of resetting their loader,</span></span><br><span class="line"><span class="comment">        as per &#123;@link #reset()&#125;.  This is not called by clients directly,</span></span><br><span class="line"><span class="comment">        but as a result of a call to &#123;@link #reset()&#125;.</span></span><br><span class="line"><span class="comment">        This will always be called from the process's main thread.</span></span><br><span class="line"><span class="comment">        如果调用了destoryLoader或者Loader相关联的Activity/Fragment被destory了</span></span><br><span class="line"><span class="comment">        所以在Demo中可以看到onReset里面调用了onStopLoading去取消当前任务，同时释放资源，取消广播注册*/</span></span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCanceled</span><span class="params">(List&lt;AppEntry&gt; apps)</span> </span>&#123;</span><br><span class="line">        <span class="comment">/* Called if the task was canceled before it was completed.  Gives the class a chance</span></span><br><span class="line"><span class="comment">         to clean up post-cancellation and to properly dispose of the result.</span></span><br><span class="line"><span class="comment">        </span></span><br><span class="line"><span class="comment">         @param data The value that was returned by &#123;@link #loadInBackground&#125;, or null</span></span><br><span class="line"><span class="comment">         if the task threw &#123;@link OperationCanceledException&#125;.*/</span></span><br><span class="line">       <span class="comment">//在这里释放资源</span></span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">forceLoad</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       <span class="comment">/*Force an asynchronous load. Unlike &#123;@link #startLoading()&#125; this will ignore a previously</span></span><br><span class="line"><span class="comment">       loaded data set and load a new one.  This simply calls through to the</span></span><br><span class="line"><span class="comment">       implementation's &#123;@link #onForceLoad()&#125;.  You generally should only call this</span></span><br><span class="line"><span class="comment">       when the loader is started -- that is, &#123;@link #isStarted()&#125; returns true.</span></span><br><span class="line"><span class="comment">       Must be called from the process's main thread.*/</span></span><br><span class="line">       <span class="comment">//startLoading会直接使用onConfigurationchange之前的Activity中Loader加载的数据，但这里则放弃旧的数据，重新加载，所以isStarted会在这时返回true</span></span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="3-处理Activity生命周期的问题"><a href="#3-处理Activity生命周期的问题" class="headerlink" title="3. 处理Activity生命周期的问题"></a>3. 处理Activity生命周期的问题</h3><p>回到server端(Loader),AsyncTaskLoader是一个abstract class，loadInBackground方法已经实现了，但还有几个方法强调必须要复写或者与生命周期相关</p>
+<pre><code class="java"> @Override
+    protected void onStartLoading() {
+        /* Subclasses must implement this to take care of loading their data,
+          as per {@link #startLoading()}.  This is not called by clients directly,
+          but as a result of a call to {@link #startLoading()}.*/
+        //在这里检查一下成员变量中的数据是否不为空，有数据的话，deliverResults
+    }
+
+    @Override
+    protected void onStopLoading() {
+          /*Subclasses must implement this to take care of stopping their loader,
+          as per {@link #stopLoading()}.  This is not called by clients directly,
+          but as a result of a call to {@link #stopLoading()}.
+          This will always be called from the process&#39;s main thread.*/
+    }
+
+    @Override
+    protected void onReset() {
+        /* Subclasses must implement this to take care of resetting their loader,
+         as per {@link #reset()}.  This is not called by clients directly,
+         but as a result of a call to {@link #reset()}.
+         This will always be called from the process&#39;s main thread.
+         如果调用了destoryLoader或者Loader相关联的Activity/Fragment被destory了
+         所以在Demo中可以看到onReset里面调用了onStopLoading去取消当前任务，同时释放资源，取消广播注册*/
+    }
+
+    @Override
+    public void onCanceled(List&lt;AppEntry&gt; apps) {
+         /* Called if the task was canceled before it was completed.  Gives the class a chance
+          to clean up post-cancellation and to properly dispose of the result.
+
+          @param data The value that was returned by {@link #loadInBackground}, or null
+          if the task threw {@link OperationCanceledException}.*/
+        //在这里释放资源
+    }
+
+    @Override
+    public void forceLoad() {
+        /*Force an asynchronous load. Unlike {@link #startLoading()} this will ignore a previously
+        loaded data set and load a new one.  This simply calls through to the
+        implementation&#39;s {@link #onForceLoad()}.  You generally should only call this
+        when the loader is started -- that is, {@link #isStarted()} returns true.
+        Must be called from the process&#39;s main thread.*/
+        //startLoading会直接使用onConfigurationchange之前的Activity中Loader加载的数据，但这里则放弃旧的数据，重新加载，所以isStarted会在这时返回true
+    }
+</code></pre>
 <p>考虑一下，如果在加载数据过程中数据源发生了变化，比如在扫描已安装App过程中又安装了新的App怎么办？所以这里又注册了两个广播，在onReceive的时候调用</p>
 <blockquote>
 <pre><code>mLoader.onContentChanged();

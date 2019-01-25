@@ -19,7 +19,7 @@
 <meta property="og:image" content="https://haldir66.ga/static/imgs/ChMkJ1gq00WIXw_GAA47r_8gjqgAAXxJAH8qOMADjvH566.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/htop-top.png">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/htop-bottom.png">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.035Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.177Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="linux常用命令扩展">
 <meta name="twitter:description" content="一些linux的常用命令，linux环境下运行server ,bash的语法">
@@ -229,15 +229,39 @@ ga('send', 'pageview');
 <blockquote>
 <p>set<br>unset $SOME_PROGRAM </p>
 </blockquote>
-<p>平时在shell中输入sudo XXX ,系统是如何知道怎么执行这条指令的呢。首先，可以查看which XXX ，用于查找某项指令对应的文件的位置。而像sudo这种都放在PATH位置，系统会在几个关键位置查找sudo命令。用户本身完全可以创建一个叫做sudo的文件chmod+X ，然后运行这个sudo。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">查看PATH : echo $PATH </span><br><span class="line">/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games (注意，系统是按照这个顺序找的，如果在第一个目录下找到一个叫sudo的东西，就会直接执行了，所以这里是有潜在的危险的)</span><br><span class="line">看下哪个命令对应的位置在哪里</span><br><span class="line">which XXXk</span><br><span class="line">比如sudo 就放在 /usr/bin/sudo</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"> $PATH</span><br><span class="line">环境变量修改在~./bashrc或者 ~./profile里面</span><br><span class="line">具体来说，比如要把/etc/apache/bin目录添加到PATH中</span><br><span class="line">PATH=$PATH:/etc/apache/bin  #只对本次会话有效</span><br><span class="line">或者  PATH=$PATH:/etc/apache/bin #在~./bashrc或者~./profile里面添加这句话</span><br></pre></td></tr></table></figure></p>
-<p>比如把facebook 的buck添加到环境变量：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> ~</span><br><span class="line">$ vim ~/.bash_profile</span><br><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$HOME</span>/buck/bin:<span class="variable">$PATH</span></span><br><span class="line">$ <span class="built_in">source</span> ~/.bash_profile <span class="comment">## 立刻生效</span></span><br></pre></td></tr></table></figure></p>
+<p>平时在shell中输入sudo XXX ,系统是如何知道怎么执行这条指令的呢。首先，可以查看which XXX ，用于查找某项指令对应的文件的位置。而像sudo这种都放在PATH位置，系统会在几个关键位置查找sudo命令。用户本身完全可以创建一个叫做sudo的文件chmod+X ，然后运行这个sudo。</p>
+<pre><code>查看PATH : echo $PATH 
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games (注意，系统是按照这个顺序找的，如果在第一个目录下找到一个叫sudo的东西，就会直接执行了，所以这里是有潜在的危险的)
+看下哪个命令对应的位置在哪里
+which XXXk
+比如sudo 就放在 /usr/bin/sudo
+
+
+ $PATH
+环境变量修改在~./bashrc或者 ~./profile里面
+具体来说，比如要把/etc/apache/bin目录添加到PATH中
+PATH=$PATH:/etc/apache/bin  #只对本次会话有效
+或者  PATH=$PATH:/etc/apache/bin #在~./bashrc或者~./profile里面添加这句话
+</code></pre><p>比如把facebook 的buck添加到环境变量：</p>
+<pre><code class="bash">$ cd ~
+$ vim ~/.bash_profile
+export PATH=$HOME/buck/bin:$PATH
+$ source ~/.bash_profile ## 立刻生效
+</code></pre>
 <p>顺便说下widnows下怎么看环境变量： echo %path%</p>
-<h3 id="3-alias设置"><a href="#3-alias设置" class="headerlink" title="3. alias设置"></a>3. alias设置</h3><p>查看已经设置过的alias：  alias或者 alias -p<br>vi 中输入 /XXX 可以搜索<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vi ~/.bashrc  <span class="comment">## 这个是对当前用户生效的</span></span><br><span class="line">/etc/bashrc 写到文件这里面是对所有用户生效</span><br><span class="line"><span class="built_in">alias</span> yourcommand=<span class="string">'ls -alr'</span> <span class="comment">##添加这一行，原来的命令也照样用</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="3-alias设置"><a href="#3-alias设置" class="headerlink" title="3. alias设置"></a>3. alias设置</h3><p>查看已经设置过的alias：  alias或者 alias -p<br>vi 中输入 /XXX 可以搜索</p>
+<pre><code class="bash">vi ~/.bashrc  ## 这个是对当前用户生效的
+/etc/bashrc 写到文件这里面是对所有用户生效
+alias yourcommand=&#39;ls -alr&#39; ##添加这一行，原来的命令也照样用
+</code></pre>
 <p>重开session即可生效<br>急着要想马上生效可以<br>source ~/.bashrc ## source命令其实就是执行一个脚本<br>取消的话， unalias xxx即可</p>
 <blockquote>
 <p>touch ~/.bash_aliases  ## unbuntu建议把所有的alias写到一个 ~/.bash_aliases文件里。保存之后,source ~/.bash_aliases。立即生效</p>
 </blockquote>
-<p>据说alias是可以传参数的，不过加上&gt; /dev/null 2&gt;&amp;1 &amp; 就不行了。所以还是写个script算了。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">kwrite <span class="variable">$1</span> &gt; /dev/null 2&gt;&amp;1 &amp;</span><br></pre></td></tr></table></figure></p>
+<p>据说alias是可以传参数的，不过加上&gt; /dev/null 2&gt;&amp;1 &amp; 就不行了。所以还是写个script算了。</p>
+<pre><code class="bash">#!/bin/bash
+kwrite $1 &gt; /dev/null 2&gt;&amp;1 &amp;
+</code></pre>
 <p>然后chomod 755 fileName</p>
 <h3 id="4-pushd和popd（类似于文件夹stack）"><a href="#4-pushd和popd（类似于文件夹stack）" class="headerlink" title="4. pushd和popd（类似于文件夹stack）"></a>4. pushd和popd（类似于文件夹stack）</h3><h3 id="5-linux删除垃圾文件（小硬盘linux磁盘要经常清理需要的命令）"><a href="#5-linux删除垃圾文件（小硬盘linux磁盘要经常清理需要的命令）" class="headerlink" title="5. linux删除垃圾文件（小硬盘linux磁盘要经常清理需要的命令）"></a>5. linux删除垃圾文件（小硬盘linux磁盘要经常清理需要的命令）</h3><p>IBM给出了删除一些垃圾文件的建议<a href="https://www.ibm.com/developerworks/cn/linux/1310_caoyq_linuxdelete/index.html">使用 Linux 命令删除垃圾文件</a></p>
 <blockquote>
@@ -282,13 +306,18 @@ ga('send', 'pageview');
 <p>awk -F ‘“‘ xxxxx ### 以双引号为分隔符的</p>
 <p><a href="https://likegeeks.com/awk-command/">30个实用的awk命令</a></p>
 <p>awk正则<br>awk ‘$1 ~ /J/‘ inventory-shipped  ## 有大写字母J的话就打印出来<br>awk ‘$1 !~ /J/‘ inventory-shipped  ##排除所有包含J的内容</p>
-<h3 id="7-tar命令"><a href="#7-tar命令" class="headerlink" title="7.tar命令"></a>7.tar命令</h3><p>主要是跟压缩和解压文件有关的,<a href="http://man.linuxde.net/tar">参考</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">tar -cvf log.tar log2012.log 仅打包，不压缩！</span><br><span class="line">tar -zcvf log.tar.gz log2012.log 打包后，以 gzip 压缩</span><br><span class="line">tar -jcvf log.tar.bz2 log2012.log 打包后，以 bzip2 压缩</span><br></pre></td></tr></table></figure></p>
-<p><a href="https://www.jb51.net/LINUXjishu/43356.html">常用的tar命令就那么几个</a><br>tar -cvf all.tar.gz 和 tar -xf all.tar.gz这俩其实就够用了</p>
+<h3 id="7-tar命令"><a href="#7-tar命令" class="headerlink" title="7.tar命令"></a>7.tar命令</h3><p>主要是跟压缩和解压文件有关的,<a href="http://man.linuxde.net/tar">参考</a></p>
+<pre><code>tar -cvf log.tar log2012.log 仅打包，不压缩！
+tar -zcvf log.tar.gz log2012.log 打包后，以 gzip 压缩
+tar -jcvf log.tar.bz2 log2012.log 打包后，以 bzip2 压缩
+</code></pre><p><a href="https://www.jb51.net/LINUXjishu/43356.html">常用的tar命令就那么几个</a><br>tar -cvf all.tar.gz 和 tar -xf all.tar.gz这俩其实就够用了</p>
 <p>//其实解压缩应该是这样的就好了<br>alias untar=’tar -zxvf ‘</p>
 <p>对照手册来看：<br>-c //小写的c，–create，表示创建新的备份文件<br>-v //verbose,显示进度什么的<br>-f 指定要操作的archive文件<br>-z –gzip，通过gzip压缩或者解压文件</p>
 <h3 id="8-定时任务怎么写-crontab"><a href="#8-定时任务怎么写-crontab" class="headerlink" title="8.定时任务怎么写(crontab)"></a>8.定时任务怎么写(crontab)</h3><p>已经有网站把各种常用的<a href="https://crontab.guru/every-6-hours">example</a>写出来了，直接照抄就是<br>后面跟上需要的命令，例如重启就是 /sbin/reboot</p>
-<h3 id="9-find"><a href="#9-find" class="headerlink" title="9.find"></a>9.find</h3><p>根据文件名查找文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">- find -name *.config  #在当前目录下查找</span><br><span class="line">- find / -name finename # 在根目录下查找filename的文件(&quot;filename&quot;用双引号包起来)</span><br></pre></td></tr></table></figure></p>
-<h3 id="10-已安装的软件"><a href="#10-已安装的软件" class="headerlink" title="10.已安装的软件"></a>10.已安装的软件</h3><ul>
+<h3 id="9-find"><a href="#9-find" class="headerlink" title="9.find"></a>9.find</h3><p>根据文件名查找文件</p>
+<pre><code>- find -name *.config  #在当前目录下查找
+- find / -name finename # 在根目录下查找filename的文件(&quot;filename&quot;用双引号包起来)
+</code></pre><h3 id="10-已安装的软件"><a href="#10-已安装的软件" class="headerlink" title="10.已安装的软件"></a>10.已安装的软件</h3><ul>
 <li>sudo dpkg -l</li>
 </ul>
 <h3 id="11-Ping一个主机"><a href="#11-Ping一个主机" class="headerlink" title="11.Ping一个主机"></a>11.Ping一个主机</h3><ul>
@@ -326,13 +355,24 @@ ga('send', 'pageview');
 <h2 id="json规范不允许单引号"><a href="#json规范不允许单引号" class="headerlink" title="json规范不允许单引号"></a>json规范不允许单引号</h2><p>curl –header “Content-Type: application/json” -X POST -d ‘{“userId”:10,”title”:”sometitle2”,”body”:”somebody2”,”hobby”:[{“name”:”bob”,”age”:10},{“name”:”sam”,”age”:20}]}’ <a href="http://127.0.0.1:5000/">http://127.0.0.1:5000/</a></p>
 <h3 id="curl-show-raw-response"><a href="#curl-show-raw-response" class="headerlink" title="curl show raw response"></a>curl show raw response</h3><p>curl -iv –raw <a href="https://www.google.com/">https://www.google.com/</a> (#i是include header，v是verbose)</p>
 </blockquote>
-<p>甚至还有直接一行行写html报文的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">echo &apos;GET / HTTP/1.1</span><br><span class="line">Host: baidu.com</span><br><span class="line">&apos; | openssl s_client -quiet -connect baidu.com:443 2&gt;/dev/null</span><br></pre></td></tr></table></figure></p>
-<p>记得http statusCode 302是重定向什么 ：</p>
+<p>甚至还有直接一行行写html报文的：</p>
+<pre><code>echo &#39;GET / HTTP/1.1
+Host: baidu.com
+&#39; | openssl s_client -quiet -connect baidu.com:443 2&gt;/dev/null
+</code></pre><p>记得http statusCode 302是重定向什么 ：</p>
 <ul>
-<li>curl -v mail.qq.com<br>输出：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">curl -v mail.qq.com</span><br><span class="line">* Rebuilt URL to: mail.qq.com/</span><br><span class="line">*   Trying 103.7.30.100...</span><br><span class="line">* Connected to mail.qq.com (103.7.30.100) port 80 (#0)</span><br><span class="line">&gt; GET / HTTP/1.1</span><br><span class="line">&gt; Host: mail.qq.com</span><br><span class="line">&gt; User-Agent: curl/7.47.0</span><br><span class="line">&gt; Accept: */*</span><br><span class="line">&gt;</span><br><span class="line">&lt; HTTP/1.1 302 Found</span><br><span class="line">&lt; Server: TWS</span><br><span class="line">&lt; Connection: close</span><br><span class="line">&lt; Date: Sun, 19 Nov 2017 09:19:46 GMT</span><br><span class="line">&lt; Content-Type: text/html; charset=GB18030</span><br><span class="line">&lt; Location: https://mail.qq.com/cgi-bin/loginpage</span><br><span class="line">&lt; Content-Security-Policy: referrer origin; script-src &apos;self&apos; https://hm.baidu.com http://hm.baidu.com *.google-analytics.com http://mat1.gtimg.com https://mat1.gtimg.com http://*.soso.com https://*.soso.com http://*.qq.com https://*.qq.com http://*.qqmail.com  https://*.qqmail.com http://pub.idqqimg.com blob: &apos;unsafe-inline&apos; &apos;unsafe-eval&apos;; report-uri https://mail.qq.com/cgi-bin/report_cgi?r_subtype=csp&amp;nocheck=false</span><br><span class="line">&lt; Referrer-Policy: origin</span><br><span class="line">&lt; Content-Length: 0</span><br><span class="line">&lt;</span><br><span class="line">* Closing connection 0</span><br></pre></td></tr></table></figure>
-</li>
+<li>curl -v mail.qq.com<br>输出：<br>```<br>curl -v mail.qq.com</li>
 </ul>
-<p>http 302的意思也就说明qq邮箱已经把http重定向到别的地方的</p>
+<ul>
+<li>Rebuilt URL to: mail.qq.com/</li>
+<li>Trying 103.7.30.100…</li>
+<li>Connected to mail.qq.com (103.7.30.100) port 80 (#0)<blockquote>
+<p>GET / HTTP/1.1<br>Host: mail.qq.com<br>User-Agent: curl/7.47.0<br>Accept: <em>/</em></p>
+<p>&lt; HTTP/1.1 302 Found<br>&lt; Server: TWS<br>&lt; Connection: close<br>&lt; Date: Sun, 19 Nov 2017 09:19:46 GMT<br>&lt; Content-Type: text/html; charset=GB18030<br>&lt; Location: <a href="https://mail.qq.com/cgi-bin/loginpage">https://mail.qq.com/cgi-bin/loginpage</a><br>&lt; Content-Security-Policy: referrer origin; script-src ‘self’ <a href="https://hm.baidu.com">https://hm.baidu.com</a> <a href="http://hm.baidu.com">http://hm.baidu.com</a> <em>.google-analytics.com <a href="http://mat1.gtimg.com">http://mat1.gtimg.com</a> <a href="https://mat1.gtimg.com">https://mat1.gtimg.com</a> http://</em>.soso.com <a href="https://*.soso.com">https://*.soso.com</a> <a href="http://*.qq.com">http://*.qq.com</a> <a href="https://*.qq.com">https://*.qq.com</a> <a href="http://*.qqmail.com">http://*.qqmail.com</a>  <a href="https://*.qqmail.com">https://*.qqmail.com</a> <a href="http://pub.idqqimg.com">http://pub.idqqimg.com</a> blob: ‘unsafe-inline’ ‘unsafe-eval’; report-uri <a href="https://mail.qq.com/cgi-bin/report_cgi?r_subtype=csp&amp;nocheck=false">https://mail.qq.com/cgi-bin/report_cgi?r_subtype=csp&amp;nocheck=false</a><br>&lt; Referrer-Policy: origin<br>&lt; Content-Length: 0<br>&lt;</p>
+</blockquote>
+</li>
+<li>Closing connection 0<br>```<br>http 302的意思也就说明qq邮箱已经把http重定向到别的地方的</li>
+</ul>
 <h3 id="16-搭建samba服务器"><a href="#16-搭建samba服务器" class="headerlink" title="16. 搭建samba服务器"></a>16. 搭建samba服务器</h3><p>这个主要是用来从windows上访问linux主机上的文件的</p>
 <ul>
 <li>sudo apt-get install samba<br>剩下的就是设定要分享的目录，给权限，设定访问密码，启动服务这些了<a href="http://www.cnblogs.com/gzdaijie/p/5194033.html">教程</a></li>
@@ -345,7 +385,11 @@ ga('send', 'pageview');
 <p>sudo find . -name “<em>.py” -exec grep “SQLALCHEMY_DATABASE_URI” {} \;<br>sudo find . -name “</em>.py” | xargs grep “SQLALCHEMY_DATABASE_URI”<br>grep SQLALCHEMY_DATABASE_URI . -R</p>
 </blockquote>
 <p>上面这仨都是ok的 ,第一种不会把对应的文件名列出来，第二种和第三种会把文件名列出来。第三种的-R当然是递归(recursive)的意思</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">find /u03 -name server.xml -<span class="built_in">exec</span> grep <span class="string">'9080'</span> &#123;&#125;\;</span><br><span class="line">find . -<span class="built_in">type</span> f -<span class="built_in">exec</span> ls -l &#123;&#125; \; <span class="comment">## exec执行删除之前最好先打印出来，避免删错了</span></span><br><span class="line">find . -<span class="built_in">type</span> f -mtime +14 -<span class="built_in">exec</span> rm &#123;&#125; \;</span><br><span class="line">find /etc -name <span class="string">"passwd*"</span> -<span class="built_in">exec</span> grep <span class="string">"root"</span> &#123;&#125; \;</span><br></pre></td></tr></table></figure>
+<pre><code class="bash">find /u03 -name server.xml -exec grep &#39;9080&#39; {}\;
+find . -type f -exec ls -l {} \; ## exec执行删除之前最好先打印出来，避免删错了
+find . -type f -mtime +14 -exec rm {} \;
+find /etc -name &quot;passwd*&quot; -exec grep &quot;root&quot; {} \;
+</code></pre>
 <p>另外</p>
 <blockquote>
 <p>{} + 和 {} \; 这两种写法是有区别的[what-is-meaning-of-in-finds-exec-command(<a href="https://unix.stackexchange.com/questions/195939/what-is-meaning-of-in-finds-exec-command">https://unix.stackexchange.com/questions/195939/what-is-meaning-of-in-finds-exec-command</a>)</p>
@@ -359,15 +403,59 @@ ga('send', 'pageview');
 <p>find / -type ## 这个-type表示类型，f是普通文件,d是目录,c是字符设备文件,p是管道文件,l是符号链接文件</p>
 <p>要想让系统高负荷运行，就从根目录开始查找所有的文件。<br>find / -name “<em>“ -print<br>如果想在当前目录查找文件名以一个个小写字母开头，最后是4到9加上.log结束的文件：<br>find . -name “[a-z]</em>[4-9].log” -print</p>
 <p>find还可以根据文件权限来查找<br>find . -perm 755 -print ## 比如查找当前755权限的文件<br>find还可以忽略指定目录<br>-prune参数<br>还可以按照修改时间或者访问时间等来查找文件<br>sudo find / -size +10M -mtime -2 -exec du -h {} \; ## 查看最近两天修改的文件中那些大小超过了10M，并且列出来<br>sudo find / -name “*.log” -size +10k -mtime -2 -exec du -h {} \; | sort -n ## 把最近两天内修改的.log文件（超过10K的）按照文件大小从大到小排列出来<br>atime = accesstime(文件被read或者执行的时间)<br>ctime = changetime(文件状态改变时间，比如被chmod就算)<br>mtime = modify time，指的是文件内容被修改的时间<br>这些时间都能通过sta命令查看  </p>
-<h3 id="19-sort命令"><a href="#19-sort命令" class="headerlink" title="19. sort命令"></a>19. sort命令</h3><p>sort命令排序什么的<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ls -al | sort -n ## 按照文件名ASCII码值进行比较</span><br><span class="line">ls -al | sort -rn ## 按照文件名倒序排序</span><br><span class="line">du -hsBM ./* | sort -n  ##查看当前目录下所有文件，从小到大排序</span><br></pre></td></tr></table></figure></p>
-<p>-u(unique)是忽略相同行，查找登录记录的时候有用<br>-t 指定按照栏和栏之间的分隔符</p>
-<h3 id="20-history命令"><a href="#20-history命令" class="headerlink" title="20. history命令"></a>20. history命令</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">history ## 列出曾经执行过的命令</span><br><span class="line">!99 ##执行上面列表中第99条命令</span><br><span class="line">!! ##执行上一条命令</span><br><span class="line">history 10 ##列出最近执行的10条命令</span><br></pre></td></tr></table></figure>
-<h3 id="21-使用sshKeyGen免密码登录的方式"><a href="#21-使用sshKeyGen免密码登录的方式" class="headerlink" title="21. 使用sshKeyGen免密码登录的方式"></a>21. 使用sshKeyGen免密码登录的方式</h3><p>首先在windows上安装putty，默认会装上puttyGen。<br>在开始菜单里面总归能找到。<br>点击那个generate按钮，按照提示鼠标不停挪动，进度条走完。会生成公钥，点击Save private key生成私钥。提示保存在一个文件中，这个要保存好。暂时不要关闭puttygen,需要直接去复制粘贴那个public key(因为要是生成了一个public key，由于windows的原因，中间可能存在换行，就得在文本编辑器里面删掉所有的换行符，非常麻烦)<br>密码登录到服务器端，cd到~/.ssh/文件夹下，没有就mkdir一个，创建一个authorized_keys的文件，要是本来就有，echo &gt; authorized_keys，把内容清除干净。<br>把自己刚才生成的public key粘贴进去，保存文件。<br>看下/etc/ssh/sshd_config中是否符合如下描述如下条件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">RSAAuthentication yes</span><br><span class="line">PubkeyAuthentication yes</span><br><span class="line">PermitRootLogin yes</span><br></pre></td></tr></table></figure></p>
-<p>还要给权限<br>chmod 700 ~/.ssh &amp;&amp; chmod 600 ~/.ssh/authorized_keys<br>重启ssh服务： service sshd restart<br>putty登录窗口左侧有一个loggin-auth，进去选择自己windows上刚才保存的私钥文件。登录输入账户名即可自动登录成功。<br><a href="https://www.ssh.com/ssh/putty/windows/puttygen">PUTTYGEN - KEY GENERATOR FOR PUTTY ON WINDOWS</a><br><a href="https://stackoverflow.com/questions/6377009/adding-public-key-to-ssh-authorized-keys-does-not-log-me-in-automatically">有什么问题的话看这个</a></p>
+<h3 id="19-sort命令"><a href="#19-sort命令" class="headerlink" title="19. sort命令"></a>19. sort命令</h3><p>sort命令排序什么的</p>
+<pre><code>ls -al | sort -n ## 按照文件名ASCII码值进行比较
+ls -al | sort -rn ## 按照文件名倒序排序
+du -hsBM ./* | sort -n  ##查看当前目录下所有文件，从小到大排序
+</code></pre><p>-u(unique)是忽略相同行，查找登录记录的时候有用<br>-t 指定按照栏和栏之间的分隔符</p>
+<h3 id="20-history命令"><a href="#20-history命令" class="headerlink" title="20. history命令"></a>20. history命令</h3><pre><code>history ## 列出曾经执行过的命令
+!99 ##执行上面列表中第99条命令
+!! ##执行上一条命令
+history 10 ##列出最近执行的10条命令
+</code></pre><h3 id="21-使用sshKeyGen免密码登录的方式"><a href="#21-使用sshKeyGen免密码登录的方式" class="headerlink" title="21. 使用sshKeyGen免密码登录的方式"></a>21. 使用sshKeyGen免密码登录的方式</h3><p>首先在windows上安装putty，默认会装上puttyGen。<br>在开始菜单里面总归能找到。<br>点击那个generate按钮，按照提示鼠标不停挪动，进度条走完。会生成公钥，点击Save private key生成私钥。提示保存在一个文件中，这个要保存好。暂时不要关闭puttygen,需要直接去复制粘贴那个public key(因为要是生成了一个public key，由于windows的原因，中间可能存在换行，就得在文本编辑器里面删掉所有的换行符，非常麻烦)<br>密码登录到服务器端，cd到~/.ssh/文件夹下，没有就mkdir一个，创建一个authorized_keys的文件，要是本来就有，echo &gt; authorized_keys，把内容清除干净。<br>把自己刚才生成的public key粘贴进去，保存文件。<br>看下/etc/ssh/sshd_config中是否符合如下描述如下条件</p>
+<pre><code>RSAAuthentication yes
+PubkeyAuthentication yes
+PermitRootLogin yes
+</code></pre><p>还要给权限<br>chmod 700 ~/.ssh &amp;&amp; chmod 600 ~/.ssh/authorized_keys<br>重启ssh服务： service sshd restart<br>putty登录窗口左侧有一个loggin-auth，进去选择自己windows上刚才保存的私钥文件。登录输入账户名即可自动登录成功。<br><a href="https://www.ssh.com/ssh/putty/windows/puttygen">PUTTYGEN - KEY GENERATOR FOR PUTTY ON WINDOWS</a><br><a href="https://stackoverflow.com/questions/6377009/adding-public-key-to-ssh-authorized-keys-does-not-log-me-in-automatically">有什么问题的话看这个</a></p>
 <h3 id="22-iptables命令"><a href="#22-iptables命令" class="headerlink" title="22.iptables命令"></a>22.iptables命令</h3><p><a href="https://www.digitalocean.com/community/tutorials/iptables-essentials-common-firewall-rules-and-commands">常用的iptables命令去这里抄，系统管理员可能用的多一些</a></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">iptables -L -n <span class="comment">## 查看已添加的iptables规则</span></span><br><span class="line">清除已有iptables规则</span><br><span class="line">iptables -F</span><br><span class="line">iptables -X</span><br><span class="line">iptables -Z</span><br><span class="line"><span class="comment">#允许所有本机向外的访问</span></span><br><span class="line">iptables -A OUTPUT -j ACCEPT</span><br><span class="line"><span class="comment"># 允许访问22端口</span></span><br><span class="line">iptables -A INPUT -p tcp --dport 22 -j ACCEPT</span><br><span class="line"><span class="comment">#允许访问80端口</span></span><br><span class="line">iptables -A INPUT -p tcp --dport 80 -j ACCEPT</span><br><span class="line"><span class="comment">#允许访问443端口</span></span><br><span class="line">iptables -A INPUT -p tcp --dport 443 -j ACCEPT</span><br><span class="line"><span class="comment">#允许FTP服务的21和20端口</span></span><br><span class="line">iptables -A INPUT -p tcp --dport 21 -j ACCEPT</span><br><span class="line">iptables -A INPUT -p tcp --dport 20 -j ACCEPT</span><br><span class="line"><span class="comment">#如果有其他端口的话，规则也类似，稍微修改上述语句就行</span></span><br><span class="line"><span class="comment">#允许ping</span></span><br><span class="line">iptables -A INPUT -p icmp -m icmp --icmp-type 8 -j ACCEPT</span><br><span class="line"><span class="comment">#禁止其他未允许的规则访问</span></span><br><span class="line">iptables -A INPUT -j REJECT  <span class="comment">#（注意：如果22端口未加入允许规则，SSH链接会直接断开。）</span></span><br><span class="line">iptables -A FORWARD -j REJECT</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">openwrt在/etc/firewall.user中添加如下脚本，实现本地透明代理（其实并不完美）</span><br><span class="line">```sh</span><br><span class="line">iptables -t nat -N V2RAY</span><br><span class="line">iptables -t nat -A V2RAY -d x.x.x.x -j RETURN ##xxx是vps的ip地址</span><br><span class="line">iptables -t nat -A V2RAY -d 0.0.0.0/8 -j RETURN</span><br><span class="line">iptables -t nat -A V2RAY -d 10.0.0.0/8 -j RETURN</span><br><span class="line">iptables -t nat -A V2RAY -d 127.0.0.0/8 -j RETURN</span><br><span class="line">iptables -t nat -A V2RAY -d 169.254.0.0/16 -j RETURN</span><br><span class="line">iptables -t nat -A V2RAY -d 172.16.0.0/12 -j RETURN</span><br><span class="line">iptables -t nat -A V2RAY -d 192.168.0.0/16 -j RETURN</span><br><span class="line">iptables -t nat -A V2RAY -d 224.0.0.0/4 -j RETURN</span><br><span class="line">iptables -t nat -A V2RAY -d 240.0.0.0/4 -j RETURN</span><br><span class="line">iptables -t nat -A V2RAY -p tcp -j REDIRECT --to-ports 1060</span><br><span class="line">iptables -t nat -A PREROUTING -p tcp -j V2RAY</span><br></pre></td></tr></table></figure>
-<blockquote>
+<pre><code class="bash">iptables -L -n ## 查看已添加的iptables规则
+清除已有iptables规则
+iptables -F
+iptables -X
+iptables -Z
+#允许所有本机向外的访问
+iptables -A OUTPUT -j ACCEPT
+# 允许访问22端口
+iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+#允许访问80端口
+iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+#允许访问443端口
+iptables -A INPUT -p tcp --dport 443 -j ACCEPT
+#允许FTP服务的21和20端口
+iptables -A INPUT -p tcp --dport 21 -j ACCEPT
+iptables -A INPUT -p tcp --dport 20 -j ACCEPT
+#如果有其他端口的话，规则也类似，稍微修改上述语句就行
+#允许ping
+iptables -A INPUT -p icmp -m icmp --icmp-type 8 -j ACCEPT
+#禁止其他未允许的规则访问
+iptables -A INPUT -j REJECT  #（注意：如果22端口未加入允许规则，SSH链接会直接断开。）
+iptables -A FORWARD -j REJECT
+</code></pre>
+<pre><code>openwrt在/etc/firewall.user中添加如下脚本，实现本地透明代理（其实并不完美）
+```sh
+iptables -t nat -N V2RAY
+iptables -t nat -A V2RAY -d x.x.x.x -j RETURN ##xxx是vps的ip地址
+iptables -t nat -A V2RAY -d 0.0.0.0/8 -j RETURN
+iptables -t nat -A V2RAY -d 10.0.0.0/8 -j RETURN
+iptables -t nat -A V2RAY -d 127.0.0.0/8 -j RETURN
+iptables -t nat -A V2RAY -d 169.254.0.0/16 -j RETURN
+iptables -t nat -A V2RAY -d 172.16.0.0/12 -j RETURN
+iptables -t nat -A V2RAY -d 192.168.0.0/16 -j RETURN
+iptables -t nat -A V2RAY -d 224.0.0.0/4 -j RETURN
+iptables -t nat -A V2RAY -d 240.0.0.0/4 -j RETURN
+iptables -t nat -A V2RAY -p tcp -j REDIRECT --to-ports 1060
+iptables -t nat -A PREROUTING -p tcp -j V2RAY
+</code></pre><blockquote>
 <p>Often, services on the computer communicate with each other by sending network packets to each other. They do this by utilizing a pseudo network interface called the loopback device, which directs traffic back to itself rather than to other computers.<br>同一台机器的不同进程之间有时候是通过一个虚拟的网络(loopback device)进行通信的，所以，必须要让iptables允许这些通信<br>$ sudo iptables -I INPUT 1 -i lo -j ACCEPT // -I的意思是插入，就是插入到INPUT这个规则里面。 1是说插到第一位，因为iptables排在前面的优先级高。 -i是interface的意思，lo就是loopback的简称。（也就是说，所有使用本地loopback这个interface发过来的包，放行）</p>
 </blockquote>
 <p><strong>注意还需要将上述规则添加到开机启动中，想要持久化的话好像有一个iptables-persistent</strong>，还有使用iptables屏蔽来自<a href="https://www.vpser.net/security/iptables-block-countries-ip.html">某个国家的IP</a>的教程</p>
@@ -389,9 +477,13 @@ ga('send', 'pageview');
 <p>/usr/src：系统级的源码目录。<br>/usr/local/src：用户级的源码目录。</p>
 <p>各个目录<br>youtube-dl的安装途径就是下一个软件下来，然后chmod给权限，然后<br>/usr/local/bin/youtube-dl和直接敲youtube-dl是一个命令。好像放在这个目录下面就好了。<br>关于这些目录的<a href="http://blog.csdn.net/test1280/article/details/70143465">解释</a><br>/bin是系统的一些指令。bin为binary的简写；<br>/sbin一般是指超级用户指令。就是只有管理员才能执行的命令<br>/usr/bin：通常是一些非必要的，但是普通用户和超级用户都可能使用到的命令<br>/usr/local/bin：通常是用户后来安装的软件，可能被普通用户或超级用户使用</p>
 <p>/var：某些大文件的溢出 区，比方说各种服务的日志文件。<br>/usr：最庞大的目录，要用 到的应用程序和文件几乎都在这个目录。<br>/usr/local: 本地安装的程序和其他东西在/usr/local下<br>一份比较全面的<a href="http://blog.jobbole.com/113519/">Linux 下各文件夹的结构说明及用途介绍</a></p>
-<h3 id="24-一个往dropBox上传文件的Script"><a href="#24-一个往dropBox上传文件的Script" class="headerlink" title="24. 一个往dropBox上传文件的Script"></a>24. 一个往dropBox上传文件的Script</h3><p>dropbox的网盘空间不用感觉有点浪费了，一个将本地文件上传到dropBox的脚本<a href="https://github.com/andreafabrizi/Dropbox-Uploader">Dropbox-Uploader</a><br>亲测可用，也不是一个需要启动时跑起来的程序，就是一个给参数就上传的脚本。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./dropbox_uploader.sh upload /localFileOrDir /dropBoxFileOrDir</span><br></pre></td></tr></table></figure></p>
+<h3 id="24-一个往dropBox上传文件的Script"><a href="#24-一个往dropBox上传文件的Script" class="headerlink" title="24. 一个往dropBox上传文件的Script"></a>24. 一个往dropBox上传文件的Script</h3><p>dropbox的网盘空间不用感觉有点浪费了，一个将本地文件上传到dropBox的脚本<a href="https://github.com/andreafabrizi/Dropbox-Uploader">Dropbox-Uploader</a><br>亲测可用，也不是一个需要启动时跑起来的程序，就是一个给参数就上传的脚本。</p>
+<pre><code class="bash">./dropbox_uploader.sh upload /localFileOrDir /dropBoxFileOrDir
+</code></pre>
 <h3 id="25-fuser显示当前文件正在被哪些进程使用"><a href="#25-fuser显示当前文件正在被哪些进程使用" class="headerlink" title="25. fuser显示当前文件正在被哪些进程使用"></a>25. fuser显示当前文件正在被哪些进程使用</h3><p>fuser -m -u redis-server</p>
-<h3 id="26-一些看上去比较玄的操作"><a href="#26-一些看上去比较玄的操作" class="headerlink" title="26. 一些看上去比较玄的操作"></a>26. 一些看上去比较玄的操作</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">bash &lt;(curl -s https://codecov.io/bash) <span class="comment">##重定向还有这么玩的</span></span><br><span class="line">pbcopy &lt; somefile.txt <span class="comment">## mac上一般这样复制一个文件的内容到剪切板</span></span><br></pre></td></tr></table></figure>
+<h3 id="26-一些看上去比较玄的操作"><a href="#26-一些看上去比较玄的操作" class="headerlink" title="26. 一些看上去比较玄的操作"></a>26. 一些看上去比较玄的操作</h3><pre><code class="bash">bash &lt;(curl -s https://codecov.io/bash) ##重定向还有这么玩的
+pbcopy &lt; somefile.txt ## mac上一般这样复制一个文件的内容到剪切板
+</code></pre>
 <h3 id="27-htop怎么看"><a href="#27-htop怎么看" class="headerlink" title="27.htop怎么看"></a>27.htop怎么看</h3><p>process state<br>图片<a href="https://codeahoy.com/2017/01/20/hhtop-explained-visually/">出处</a><br><img src="https://www.haldir66.ga/static/imgs/htop-top.png" alt=""><br><img src="https://www.haldir66.ga/static/imgs/htop-bottom.png" alt=""></p>
 <blockquote>
 <p>PROCESS STATE CODES<br>   R  running or runnable (on run queue)<br>   D  uninterruptible sleep (usually IO)<br>   S  interruptible sleep (waiting for an event to complete)<br>   Z  defunct/zombie, terminated but not reaped by its parent<br>   T  stopped, either by a job control signal or because<br>      it is being traced<br>   […]</p>
@@ -401,16 +493,111 @@ ga('send', 'pageview');
 <h1 id="Mere-trash"><a href="#Mere-trash" class="headerlink" title="Mere trash"></a>Mere trash</h1><p><a href="http://blog.jobbole.com/112547/">gdb调试器,debug用的</a></p>
 <p>文件描述符限制</p>
 <p>ls -al = l -al（可以少敲一个字母,其实是alias）</p>
-<p>small tricks<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line">cat &gt; filename.txt</span><br><span class="line"><span class="keyword">then</span> start typing your text content</span><br><span class="line">ctrl +d to finish</span><br><span class="line"></span><br><span class="line"><span class="built_in">pushd</span> and <span class="built_in">popd</span> can <span class="built_in">help</span> you jump to some directory can come back later</span><br><span class="line"></span><br><span class="line">gdebi <span class="comment">##  like dpkg command , will install required dependency if needed</span></span><br><span class="line"></span><br><span class="line">cpulimit <span class="built_in">command</span>  <span class="comment">##limit the cpu usage to certain process</span></span><br><span class="line"></span><br><span class="line">htop中按f4可以filter，按f9可以杀进程。 按下空格键可以选中某个process（用于多选）</span><br><span class="line"></span><br><span class="line">bleachbit可以帮助清理垃圾</span><br><span class="line"></span><br><span class="line">rsync用于做系统备份</span><br><span class="line">rsync -avz --delete Pictures/ 192.168.0.10:Pictures/  <span class="comment">## a表示archive，就是说保留源文件的permission,timestamp等等， v表示verbose, z表示zip(就像gzip一样，通过网络传输的时候能够节省流量),记得Pictures后面的斜杠不能少</span></span><br><span class="line"></span><br><span class="line">ubuntu上使用sudo xxx ，输入密码后，下次sudo就不会再次要求密码了，但其实系统会起一个倒计时，如果接下来的30分钟（大概这个时间）内没有执行sudo命令，将会再次提示要求输入密码</span><br><span class="line">解决方法sudo -su // 即后续sudo指令不需要密码</span><br><span class="line"></span><br><span class="line">打开tty的方法: ctrl + alt + (f1-f8)</span><br><span class="line"></span><br><span class="line">sfpt cindy@192.168.0.2  <span class="comment">##以cindy的身份登录这台机器</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## bash的窗口在等待输入的时候一般长这样:</span></span><br><span class="line">john@server ~ $</span><br><span class="line">john表示当前用户名称</span><br><span class="line">sever表示当前主机名称</span><br><span class="line">~表示当前所在目录</span><br><span class="line">$表示没有特殊权限，就是说不是root previledge的意思</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">bash和sh的区别</span><br><span class="line">&gt; <span class="comment">#!/bin/bash ## 一个井号加上一个感叹号在计算机领域叫做shebang.很多shell脚本的第一行都有：</span></span><br><span class="line"><span class="comment">#!/bin/bash 一定是bash，万一没装bash会报错,还有些系统的bash装载/usr/pkg/bin或者/usr/local/bin里面</span></span><br><span class="line">或者是</span><br><span class="line"><span class="comment">#!/bin/sh 就会使用当前操作系统上的sh,不一定是bash.比如debian上sh是dash的symbolic link</span></span><br><span class="line">比较可靠的方式是</span><br><span class="line"><span class="comment">#!/usr/bin/env bash 用的是$PATH</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## file -h /bin/sh 这个命令用于查看文件</span></span><br><span class="line">/bin/sh: symbolic link to dash</span><br><span class="line"></span><br><span class="line">Because sh is a specification, not an implementation, /bin/sh is a symlink (or a hard link) to an actual implementation on most POSIX systems.(sh是POSIX标准规定的一套协议，并非实现.sh的实现有很多种，zsh,dash,bash等等。但在很多系统上，sh是bash的symbolic link).相比起来,bash的功能要比sh强大不少。Plain sh is a very minimalistic programming language.</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">### 下面这三个要跟ctrl+z一起用</span></span><br><span class="line"><span class="built_in">bg</span> <span class="comment">##看之前按ctrl+z退到后台的程序</span></span><br><span class="line"><span class="built_in">jobs</span> <span class="comment">##查看当前在跑的程序</span></span><br><span class="line"><span class="built_in">fg</span> job name <span class="comment">##把这个程序拉到前台</span></span><br><span class="line"></span><br><span class="line">比方说当前目录下有一个dump.sh文件，想要执行的话，输入dump是没有用的。因为<span class="built_in">echo</span> <span class="variable">$PATH</span>中并没有这个dump:目录/dusp.sh。</span><br><span class="line">所以要执行这个sh，需要./dump.sh</span><br><span class="line"></span><br><span class="line">或者建一个symbolic link到 /usr/<span class="built_in">local</span>/bin下面，比如这样</span><br><span class="line">sudo ln -s /full/path/to/your/file /usr/<span class="built_in">local</span>/bin/name_of_new_command</span><br><span class="line">想要可执行的话，记得给权限。chmod +x /full/path/to/your/file</span><br><span class="line">当然，想要移除这个软链接的话.</span><br><span class="line">sudo rm -rf /usr/<span class="built_in">local</span>/bin/name_of_new_command</span><br><span class="line"></span><br><span class="line">关于硬链接和软连接</span><br><span class="line">-s 就是软链接。不加-s就是硬链接。</span><br><span class="line">修改硬链接和软链接的内容都会同步到源文件，软链接和硬链接删掉了都不会影响源文件。有一个区别就是删掉源文件时，硬链接保有了源文件的内容。 软链接就broken了。</span><br><span class="line"></span><br><span class="line">visudo //via sudo 这是一个控制用户权限的文件，比如说希望给特定用户一部分usdo特权，比如只给安装软件的权利，编辑这个文件就可以</span><br><span class="line">为什么不要总以root权限做事:</span><br><span class="line">sudo rm -rf /etc/dummyfile <span class="comment">## 看上去ok</span></span><br><span class="line">sudo rm -rf / etc/dummyfile <span class="comment">## 不小心多了个空格，系统并不会拦着你，这样就删掉了所有的文件</span></span><br><span class="line"></span><br><span class="line">raspberry Pi使用的是Raspbian -- 基于debian</span><br><span class="line"></span><br><span class="line">查看内存除了free 和htop之外</span><br><span class="line">sudo sh -c <span class="string">"sync; echo 3 &gt; /proc/sys/vm/drop_caches"</span> <span class="comment">## 就是用sh执行一个command, 即dump memory cache，类似于windows上360那个点击清内存</span></span><br><span class="line">sudo bash -c <span class="string">"echo 'vm.swappiness =15' &gt;&gt; /etc/sysctl.conf"</span> <span class="comment">## -c表示让bash执行一个命令， swappiness默认值是60，意思是系统在用掉了60%的内存后就将开始启用swap</span></span><br></pre></td></tr></table></figure></p>
+<p>small tricks</p>
+<pre><code class="bash">cat &gt; filename.txt
+then start typing your text content
+ctrl +d to finish
+
+pushd and popd can help you jump to some directory can come back later
+
+gdebi ##  like dpkg command , will install required dependency if needed
+
+cpulimit command  ##limit the cpu usage to certain process
+
+htop中按f4可以filter，按f9可以杀进程。 按下空格键可以选中某个process（用于多选）
+
+bleachbit可以帮助清理垃圾
+
+rsync用于做系统备份
+rsync -avz --delete Pictures/ 192.168.0.10:Pictures/  ## a表示archive，就是说保留源文件的permission,timestamp等等， v表示verbose, z表示zip(就像gzip一样，通过网络传输的时候能够节省流量),记得Pictures后面的斜杠不能少
+
+ubuntu上使用sudo xxx ，输入密码后，下次sudo就不会再次要求密码了，但其实系统会起一个倒计时，如果接下来的30分钟（大概这个时间）内没有执行sudo命令，将会再次提示要求输入密码
+解决方法sudo -su // 即后续sudo指令不需要密码
+
+打开tty的方法: ctrl + alt + (f1-f8)
+
+sfpt cindy@192.168.0.2  ##以cindy的身份登录这台机器
+
+## bash的窗口在等待输入的时候一般长这样:
+john@server ~ $
+john表示当前用户名称
+sever表示当前主机名称
+~表示当前所在目录
+$表示没有特殊权限，就是说不是root previledge的意思
+
+
+bash和sh的区别
+&gt; #!/bin/bash ## 一个井号加上一个感叹号在计算机领域叫做shebang.很多shell脚本的第一行都有：
+#!/bin/bash 一定是bash，万一没装bash会报错,还有些系统的bash装载/usr/pkg/bin或者/usr/local/bin里面
+或者是
+#!/bin/sh 就会使用当前操作系统上的sh,不一定是bash.比如debian上sh是dash的symbolic link
+比较可靠的方式是
+#!/usr/bin/env bash 用的是$PATH
+
+## file -h /bin/sh 这个命令用于查看文件
+/bin/sh: symbolic link to dash
+
+Because sh is a specification, not an implementation, /bin/sh is a symlink (or a hard link) to an actual implementation on most POSIX systems.(sh是POSIX标准规定的一套协议，并非实现.sh的实现有很多种，zsh,dash,bash等等。但在很多系统上，sh是bash的symbolic link).相比起来,bash的功能要比sh强大不少。Plain sh is a very minimalistic programming language.
+
+
+
+### 下面这三个要跟ctrl+z一起用
+bg ##看之前按ctrl+z退到后台的程序
+jobs ##查看当前在跑的程序
+fg job name ##把这个程序拉到前台
+
+比方说当前目录下有一个dump.sh文件，想要执行的话，输入dump是没有用的。因为echo $PATH中并没有这个dump:目录/dusp.sh。
+所以要执行这个sh，需要./dump.sh
+
+或者建一个symbolic link到 /usr/local/bin下面，比如这样
+sudo ln -s /full/path/to/your/file /usr/local/bin/name_of_new_command
+想要可执行的话，记得给权限。chmod +x /full/path/to/your/file
+当然，想要移除这个软链接的话.
+sudo rm -rf /usr/local/bin/name_of_new_command
+
+关于硬链接和软连接
+-s 就是软链接。不加-s就是硬链接。
+修改硬链接和软链接的内容都会同步到源文件，软链接和硬链接删掉了都不会影响源文件。有一个区别就是删掉源文件时，硬链接保有了源文件的内容。 软链接就broken了。
+
+visudo //via sudo 这是一个控制用户权限的文件，比如说希望给特定用户一部分usdo特权，比如只给安装软件的权利，编辑这个文件就可以
+为什么不要总以root权限做事:
+sudo rm -rf /etc/dummyfile ## 看上去ok
+sudo rm -rf / etc/dummyfile ## 不小心多了个空格，系统并不会拦着你，这样就删掉了所有的文件
+
+raspberry Pi使用的是Raspbian -- 基于debian
+
+查看内存除了free 和htop之外
+sudo sh -c &quot;sync; echo 3 &gt; /proc/sys/vm/drop_caches&quot; ## 就是用sh执行一个command, 即dump memory cache，类似于windows上360那个点击清内存
+sudo bash -c &quot;echo &#39;vm.swappiness =15&#39; &gt;&gt; /etc/sysctl.conf&quot; ## -c表示让bash执行一个命令， swappiness默认值是60，意思是系统在用掉了60%的内存后就将开始启用swap
+</code></pre>
 <p>nmap可以用来扫描某台远程主机上open的port<a href="https://hackertarget.com/nmap-cheatsheet-a-quick-reference-guide/">直接看nmap cheetsheet好了</a></p>
 <blockquote>
 <p>nmap -p 1-100 192.168.1.1 ## 扫描1-100的port，非常慢</p>
 </blockquote>
 <p>linux的swap文件需要经常读写，这对于ssd来说是一个需要注意的地方<br><a href="https://www.digitalocean.com/community/tutorials/how-to-add-swap-space-on-ubuntu-16-04">digital ocean在添加swap教程的最前面就写了不建议ssd用户添加swap,因为会费ssd</a></p>
-<p><a href="https://stackoverflow.com/questions/12334526/on-bash-command-line-how-to-delete-all-letters-before-cursor">bash下的一些快捷键</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Ctrl-u - Cut everything before the cursor // 清除光标之前所有文字</span><br><span class="line">Ctrl-k  Cut everything after the cursor //删除光标后面的所有文字</span><br><span class="line"></span><br><span class="line">Ctrl-a  Move cursor to beginning of line //光标挪到最前面</span><br><span class="line">Ctrl-e  Move cursor to end of line // 挪到最右侧</span><br><span class="line"></span><br><span class="line">Ctrl-b  Move cursor back one word //这个是一个字一个字的挪，不识别空格</span><br><span class="line">Ctrl-f  Move cursor forward one word//这个是一个字一个字的挪，不识别空格</span><br><span class="line"></span><br><span class="line">alt + → 一个单词一个单词的往右挪，往左挪自然就是向左箭头了。</span><br><span class="line"></span><br><span class="line">Ctrl-w  Cut the last word</span><br><span class="line">Ctrl-y  Paste the last thing to be cut</span><br><span class="line">Ctrl-_  Undo</span><br></pre></td></tr></table></figure></p>
-<p><a href="https://www.digitalocean.com/community/tutorials/how-to-install-and-manage-supervisor-on-ubuntu-and-debian-vps">supervisor</a>可以用于管理一些程序的运行，挂了负责自动拉起来。很简单的，就是装一个软件，写一个conf。</p>
-<p>apt-get的数据库放在 /var/lib/dpkg/info<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">dpkg: warning: files list file for package `x&apos; missing; assuming package has no files currently installed</span><br><span class="line"></span><br><span class="line">##出现上面的错误，这两条命令修复</span><br><span class="line">sudo rm -f /var/lib/dpkg/info/format</span><br><span class="line">sudo dpkg --configure -a</span><br></pre></td></tr></table></figure></p>
-<p>unix domain socket用于ipc</p>
+<p><a href="https://stackoverflow.com/questions/12334526/on-bash-command-line-how-to-delete-all-letters-before-cursor">bash下的一些快捷键</a></p>
+<pre><code>Ctrl-u - Cut everything before the cursor // 清除光标之前所有文字
+Ctrl-k  Cut everything after the cursor //删除光标后面的所有文字
+
+Ctrl-a  Move cursor to beginning of line //光标挪到最前面
+Ctrl-e  Move cursor to end of line // 挪到最右侧
+
+Ctrl-b  Move cursor back one word //这个是一个字一个字的挪，不识别空格
+Ctrl-f  Move cursor forward one word//这个是一个字一个字的挪，不识别空格
+
+alt + → 一个单词一个单词的往右挪，往左挪自然就是向左箭头了。
+
+Ctrl-w  Cut the last word
+Ctrl-y  Paste the last thing to be cut
+Ctrl-_  Undo
+</code></pre><p><a href="https://www.digitalocean.com/community/tutorials/how-to-install-and-manage-supervisor-on-ubuntu-and-debian-vps">supervisor</a>可以用于管理一些程序的运行，挂了负责自动拉起来。很简单的，就是装一个软件，写一个conf。</p>
+<p>apt-get的数据库放在 /var/lib/dpkg/info</p>
+<pre><code>dpkg: warning: files list file for package `x&#39; missing; assuming package has no files currently installed
+
+##出现上面的错误，这两条命令修复
+sudo rm -f /var/lib/dpkg/info/format
+sudo dpkg --configure -a
+</code></pre><p>unix domain socket用于ipc</p>
 <p>有时候cd进一个权限不够的目录会出现Permission Denied</p>
 <blockquote>
 <p>sudo su<br>cd directory<br>直接转成root就好了</p>

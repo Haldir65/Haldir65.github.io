@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/6da83b3b20094b044a320d1e89dfcd00.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/okHttp_chain.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.035Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.177Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="OkHttp和Okio阅读笔记">
 <meta name="twitter:description" content="很早的时候就知道，OkHttp在io层面上的操作是由Okio代为完成的，所以实际意义上和Socket打交道的应该是Okio。而Okio又比传统的java io要高效。所以，在分析OkHttp之前，有必要针对Okio的一些方法进行展开，作为后面读写操作的铺垫。 Okio -&amp;gt; OkHttp -&amp;gt; Picaso  -&amp;gt; RetrofitOkio版本 1.13.0OkHttp版本 3.">
@@ -204,65 +204,514 @@ ga('send', 'pageview');
         <p>很早的时候就知道，OkHttp在io层面上的操作是由Okio代为完成的，所以实际意义上和Socket打交道的应该是Okio。而Okio又比传统的java io要高效。所以，在分析OkHttp之前，有必要针对Okio的一些方法进行展开，作为后面读写操作的铺垫。</p>
 <p>Okio -&gt; OkHttp -&gt; Picaso  -&gt; Retrofit<br>Okio版本 1.13.0<br>OkHttp版本 3.8.0</p>
 <p><img src="https://www.haldir66.ga/static/imgs/6da83b3b20094b044a320d1e89dfcd00.jpg" alt=""><br><a id="more"></a></p>
-<h2 id="1-Okio与java-io相比的优势"><a href="#1-Okio与java-io相比的优势" class="headerlink" title="1. Okio与java io相比的优势"></a>1. Okio与java io相比的优势</h2><p>java的InputStream可以被查看成是一个数据的来源，调用read方法从中读取数据。由于有些文件特别大，我们不可能在内存中分配一个和文件大小一样大的字节数组来专门来读写文件。因此需要传入一个缓冲数组。所以一般的读写程序的代码是这么写的<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">InputStream</span> <span class="keyword">implements</span> <span class="title">Closeable</span></span>&#123;</span><br><span class="line">       <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">read</span><span class="params">(<span class="keyword">byte</span> b[])</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> read(b, <span class="number">0</span>, b.length);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;  </span><br><span class="line">        <span class="comment">// 指定要读取文件的缓冲输入字节流  </span></span><br><span class="line">        BufferedInputStream in = <span class="keyword">new</span> BufferedInputStream(<span class="keyword">new</span> FileInputStream(<span class="string">"F:\\test.jpg"</span>));  </span><br><span class="line">        File file = <span class="keyword">new</span> File(<span class="string">"E:\\test.jpg"</span>);  </span><br><span class="line">        <span class="keyword">if</span> (file != <span class="keyword">null</span>) &#123;  </span><br><span class="line">            file.createNewFile();  </span><br><span class="line">        &#125;  </span><br><span class="line">        <span class="comment">// 指定要写入文件的缓冲输出字节流  </span></span><br><span class="line">        BufferedOutputStream out = <span class="keyword">new</span> BufferedOutputStream(<span class="keyword">new</span> FileOutputStream(file));  </span><br><span class="line">        <span class="keyword">byte</span>[] bb = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">1024</span>];<span class="comment">// 用来存储每次读取到的字节数组  </span></span><br><span class="line">        <span class="keyword">int</span> n;<span class="comment">// 每次读取到的字节数组的长度  </span></span><br><span class="line">        <span class="keyword">while</span> ((n = in.read(bb)) != -<span class="number">1</span>) &#123;  </span><br><span class="line">            out.write(bb, <span class="number">0</span>, n);<span class="comment">// 写入到输出流  </span></span><br><span class="line">        &#125;  </span><br><span class="line">        out.close();<span class="comment">// 关闭流  </span></span><br><span class="line">        in.close();  </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="1-Okio与java-io相比的优势"><a href="#1-Okio与java-io相比的优势" class="headerlink" title="1. Okio与java io相比的优势"></a>1. Okio与java io相比的优势</h2><p>java的InputStream可以被查看成是一个数据的来源，调用read方法从中读取数据。由于有些文件特别大，我们不可能在内存中分配一个和文件大小一样大的字节数组来专门来读写文件。因此需要传入一个缓冲数组。所以一般的读写程序的代码是这么写的</p>
+<pre><code class="java">public abstract class InputStream implements Closeable{
+       public int read(byte b[]) throws IOException {
+        return read(b, 0, b.length);
+    }
+}
+
+ public static void main(String[] args) throws Exception {  
+        // 指定要读取文件的缓冲输入字节流  
+        BufferedInputStream in = new BufferedInputStream(new FileInputStream(&quot;F:\\test.jpg&quot;));  
+        File file = new File(&quot;E:\\test.jpg&quot;);  
+        if (file != null) {  
+            file.createNewFile();  
+        }  
+        // 指定要写入文件的缓冲输出字节流  
+        BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file));  
+        byte[] bb = new byte[1024];// 用来存储每次读取到的字节数组  
+        int n;// 每次读取到的字节数组的长度  
+        while ((n = in.read(bb)) != -1) {  
+            out.write(bb, 0, n);// 写入到输出流  
+        }  
+        out.close();// 关闭流  
+        in.close();  
+    }
+</code></pre>
 <p>BufferedInputStream和BufferedOutputStream就是提供了这样的缓冲策略，其内部默认分配了一个默认大小的字节数组，或者在read方法中传入一个字节数组，每次一个byte一个byte的读，然后将读出来的内容写进outPutStream。读到-1就是文件终止(EOF)。具体原理可以参考IBM的<a href="https://www.ibm.com/developerworks/cn/java/j-lo-javaio/index.html">深入分析 Java I/O 的工作机制</a>。<br>那么问题来了，buffer[]作为一个字节数组，其容量是恒定的。假设我们想要一次性读取特别多的数据怎么办。例如http的response header一般长这样,然而实际上在无线电传播的过程中，每一行的后面都跟了一个换行符’\r\n’,而且无线电传播的时候其实根本没有换行的概念，就是一个字节跟着一个字节。假如服务器自己定义了特别长的header字段，inputstream读到这里的时候，事先预设的字节数组(没法改了)装不下，一种简单粗暴的方式是尝试扩容，这就意味着要把数据从原始数组copy到新的数组，丢掉旧的数组，把指针指向新的数组(一个是allocate数组，一个是arrayCopy，这俩都造成了性能损耗),当然jdk肯定不是这么干的。<br>BufferedInputStream是用来做提供了缓存的效果，DataInputStream提供了读取基本数据类型的功能(比方说4个bytes当成一个int)，InputStreamReader的read方法需要提供一个char[]，然后外部拿着这个char[]去生成一个String.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Bdpagetype: 1</span><br><span class="line">Bdqid: 0xc8f942640001e753</span><br><span class="line">Bduserid: 0</span><br><span class="line">Cache-Control: private</span><br><span class="line">Connection: Keep-Alive</span><br><span class="line">Content-Encoding: gzip</span><br><span class="line">Content-Type: text/html; charset=utf-8</span><br><span class="line">Date: Fri, 21 Jul 2017 15:35:58 GMT</span><br><span class="line">Expires: Fri, 21 Jul 2017 15:35:29 GMT</span><br><span class="line">Server: BWS/1.1</span><br><span class="line">Set-Cookie: BDSVRTM=0; path=/</span><br><span class="line">Set-Cookie: BD_HOME=0; path=/</span><br><span class="line">Set-Cookie: H_PS_PSSID=1428_21110_20930; path=/; domain=.baidu.com</span><br><span class="line">Strict-Transport-Security: max-age=172800</span><br><span class="line">Vary: Accept-Encoding</span><br><span class="line">X-Powered-By: HPHP</span><br><span class="line">X-Ua-Compatible: IE=Edge,chrome=1</span><br><span class="line">Transfer-Encoding: chunked</span><br></pre></td></tr></table></figure>
-<p>对于Http这种频繁的读写操作，allocate数组和copy数据无形中减慢了网络访问的速度。</p>
+<pre><code>HTTP/1.1 200 OK
+Bdpagetype: 1
+Bdqid: 0xc8f942640001e753
+Bduserid: 0
+Cache-Control: private
+Connection: Keep-Alive
+Content-Encoding: gzip
+Content-Type: text/html; charset=utf-8
+Date: Fri, 21 Jul 2017 15:35:58 GMT
+Expires: Fri, 21 Jul 2017 15:35:29 GMT
+Server: BWS/1.1
+Set-Cookie: BDSVRTM=0; path=/
+Set-Cookie: BD_HOME=0; path=/
+Set-Cookie: H_PS_PSSID=1428_21110_20930; path=/; domain=.baidu.com
+Strict-Transport-Security: max-age=172800
+Vary: Accept-Encoding
+X-Powered-By: HPHP
+X-Ua-Compatible: IE=Edge,chrome=1
+Transfer-Encoding: chunked
+</code></pre><p>对于Http这种频繁的读写操作，allocate数组和copy数据无形中减慢了网络访问的速度。</p>
 <ul>
-<li>Okio的解决方案<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Buffer buffer = new Buffer();//cheap ,allocation literal nothing</span><br><span class="line">buffer.writeUtf8(&quot;Hello Okio&quot;); //java中一个英文字符占一个字节(byte)，一个汉字占2个字节(byte)</span><br><span class="line">buffer.writeUtf8(&quot;you can &quot;); //可以想象segment中被塞进了&quot;you can &quot;这几个byte</span><br><span class="line">buffer.writeUtf8(&quot;Go faster&quot;);</span><br></pre></td></tr></table></figure>
-</li>
+<li>Okio的解决方案<pre><code>Buffer buffer = new Buffer();//cheap ,allocation literal nothing
+buffer.writeUtf8(&quot;Hello Okio&quot;); //java中一个英文字符占一个字节(byte)，一个汉字占2个字节(byte)
+buffer.writeUtf8(&quot;you can &quot;); //可以想象segment中被塞进了&quot;you can &quot;这几个byte
+buffer.writeUtf8(&quot;Go faster&quot;);
+</code></pre>Okio将读写操作集中到到Buffer这个类中，用Sink和Source分别代表数据的去向和来源。而数据的承载类是Segment,读取数据(read)的时候从SegmentPool中索取Segment，读到Segment的byte[]数组中，装不下了再拿一个Segment。这个过程中是没有 new byte[]操作的。</li>
 </ul>
-<p>Okio将读写操作集中到到Buffer这个类中，用Sink和Source分别代表数据的去向和来源。而数据的承载类是Segment,读取数据(read)的时候从SegmentPool中索取Segment，读到Segment的byte[]数组中，装不下了再拿一个Segment。这个过程中是没有 new byte[]操作的。</p>
 <ul>
 <li>Read from a source， write to a sink</li>
 </ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Buffer</span> <span class="keyword">implements</span> <span class="title">BufferedSource</span>, <span class="title">BufferedSink</span>, <span class="title">Cloneable</span> </span>&#123;</span><br><span class="line">    Segment head;</span><br><span class="line">    <span class="keyword">long</span> size;</span><br><span class="line"></span><br><span class="line">     <span class="function"><span class="keyword">public</span> <span class="title">Buffer</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//构造函数里不分配任何对象，所以创建一个Buffer几乎没有什么性能开销</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Segment</span> </span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> SIZE = <span class="number">8192</span>;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> SHARE_MINIMUM = <span class="number">1024</span>;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">byte</span>[] data;</span><br><span class="line">    <span class="keyword">int</span> pos;</span><br><span class="line">    <span class="keyword">int</span> limit;</span><br><span class="line">    <span class="keyword">boolean</span> shared;</span><br><span class="line">    <span class="keyword">boolean</span> owner;</span><br><span class="line">    Segment next;</span><br><span class="line">    Segment prev;  </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>现在那个读取一个文件写到另一个文件的程序可以写成这样:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sink = Okio.sink(dstFile);  <span class="comment">//返回了一个Sink匿名类，write的时候使用public void write(Buffer source, long byteCount)方法进行写操作</span></span><br><span class="line">source = Okio.source(srcFile);</span><br><span class="line">   Buffer buf = <span class="keyword">new</span> Buffer();</span><br><span class="line">   <span class="keyword">for</span> (<span class="keyword">long</span> readCount; (readCount = source.read(buf, <span class="number">2048</span>)) != -<span class="number">1</span>; ) &#123;</span><br><span class="line">      sink.write(buf, readCount);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
+<pre><code class="java">public final class Buffer implements BufferedSource, BufferedSink, Cloneable {
+    Segment head;
+    long size;
+
+     public Buffer() {
+        //构造函数里不分配任何对象，所以创建一个Buffer几乎没有什么性能开销
+    }
+
+    final class Segment {
+    static final int SIZE = 8192;
+    static final int SHARE_MINIMUM = 1024;
+    final byte[] data;
+    int pos;
+    int limit;
+    boolean shared;
+    boolean owner;
+    Segment next;
+    Segment prev;  
+    }
+}
+</code></pre>
+<p>现在那个读取一个文件写到另一个文件的程序可以写成这样:</p>
+<pre><code class="java">sink = Okio.sink(dstFile);  //返回了一个Sink匿名类，write的时候使用public void write(Buffer source, long byteCount)方法进行写操作
+source = Okio.source(srcFile);
+   Buffer buf = new Buffer();
+   for (long readCount; (readCount = source.read(buf, 2048)) != -1; ) {
+      sink.write(buf, readCount);
+   }
+</code></pre>
 <p>看起来还是在数据源和数据终点之间塞了一个缓冲层，sink(dst)和source(src)都是接口，Buffer同时实现了这俩接口。<br>write是从外面拿数据塞到自己的数组中，所以每次写的时候或让Buffer的Size变大(从segment pool中借用segment)。Buffer(Source)的read方法是把数据从Buffer中拿出来，所以会让Buffer的size变小(每一个Segment读完了会返回到segment pool中)<br>在Buffer的所有readXXX方法中都能看到这么一句话<br> <strong>SegmentPool.recycle(segment)</strong><br>因为Buffer内部是通过Segment的next和prev实现了双向链表，write是在尾部添加数据，read是从头部读取数据并移除。</p>
 <p><strong>Okio能够实现高效率的核心在于,在java的inputStream和BufferedInputStream中，如果两块缓冲区之间想要交换数据。前面提到的扩容情况，从一个数组把数据复制到另一个更大的数组，必须走arrayCopy。</strong><br>网上查找了很多博客，总的来说就是java io采用了装饰者模式，不同Stream之间要包一层。<br>写数据时，写原始数据要用DataOutputStream，使用带缓冲的写要用BuffedOutputStream，使用字符编码要用OutputStreamWriter,写字节数组有ByteArrayOutputStream。<br>读数据时也是，原始数据要用DataInputStream，带缓冲的要用BufferedInputStream,字符编码要用InputStreamReader，读字节数有ByteArrayInputStream。</p>
-<p>来看下其中带buffer的装饰类是怎么创建的，顺便把java io批判一下。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">ByteArrayOutPutStream baos = <span class="keyword">new</span> ByteArrayOutPutStream();</span><br><span class="line">ByteArrayInputStream bis = <span class="keyword">new</span> ByteArrayInputStream(baos.toByteAarray()); <span class="comment">//toByteArry内部调用了Arrays.copyOf()，创建了新对象</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">BufferedInputStream</span><span class="params">(InputStream in, <span class="keyword">int</span> size)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(in);</span><br><span class="line">        <span class="keyword">if</span> (size &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"Buffer size &lt;= 0"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        buf = <span class="keyword">new</span> <span class="keyword">byte</span>[size]; <span class="comment">//创建新数组</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="title">BufferedOutputStream</span><span class="params">(OutputStream out, <span class="keyword">int</span> size)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(out);</span><br><span class="line">        <span class="keyword">if</span> (size &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"Buffer size &lt;= 0"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        buf = <span class="keyword">new</span> <span class="keyword">byte</span>[size]; <span class="comment">//创建数组</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
-<p>同样的事情在okio中是这么干的<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">RealBufferedSource(Source source) &#123;</span><br><span class="line">       <span class="keyword">if</span>(source == <span class="keyword">null</span>) &#123;</span><br><span class="line">           <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException(<span class="string">"source == null"</span>);</span><br><span class="line">       &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">           <span class="keyword">this</span>.source = source; <span class="comment">//其实是buffer</span></span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">  RealBufferedSink(Sink sink) &#123;</span><br><span class="line">       <span class="keyword">if</span>(sink == <span class="keyword">null</span>) &#123;</span><br><span class="line">           <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException(<span class="string">"sink == null"</span>);</span><br><span class="line">       &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">           <span class="keyword">this</span>.sink = sink; <span class="comment">//只是挪一下指针</span></span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>来看下其中带buffer的装饰类是怎么创建的，顺便把java io批判一下。</p>
+<pre><code class="java">ByteArrayOutPutStream baos = new ByteArrayOutPutStream();
+ByteArrayInputStream bis = new ByteArrayInputStream(baos.toByteAarray()); //toByteArry内部调用了Arrays.copyOf()，创建了新对象
+
+public BufferedInputStream(InputStream in, int size) {
+        super(in);
+        if (size &lt;= 0) {
+            throw new IllegalArgumentException(&quot;Buffer size &lt;= 0&quot;);
+        }
+        buf = new byte[size]; //创建新数组
+    }
+
+ public BufferedOutputStream(OutputStream out, int size) {
+        super(out);
+        if (size &lt;= 0) {
+            throw new IllegalArgumentException(&quot;Buffer size &lt;= 0&quot;);
+        }
+        buf = new byte[size]; //创建数组
+    }
+</code></pre>
+<p>同样的事情在okio中是这么干的</p>
+<pre><code class="java"> RealBufferedSource(Source source) {
+        if(source == null) {
+            throw new NullPointerException(&quot;source == null&quot;);
+        } else {
+            this.source = source; //其实是buffer
+        }
+    }
+
+   RealBufferedSink(Sink sink) {
+        if(sink == null) {
+            throw new NullPointerException(&quot;sink == null&quot;);
+        } else {
+            this.sink = sink; //只是挪一下指针
+        }
+    }
+</code></pre>
 <p>由于一个Buffer即是source也是sink，挪一下指针就行了。写的时候往链表的尾巴写，读的时候从链表的头部读，读完了segment回收。</p>
 <p>BufferedInputStream要求外部调用者带着一个固定大小的byte数组来取数据，难免会有人传进来一个特别小的数组，这样永远不可能读取超过这个数组大小长度的某一行。</p>
-<p>读写这种事情操作起来总是从一个近似无限大的数据源  一点一点地取出来 存在一个内存中一个临时的地方， 然后再讲这部分数据交给其他接收方。 这就要求所有的读写都要准备进行多次读写，每次读到一个中转站中。在java io中这个中转站的大小是固定的，okio中这个中转站是一个个的Segment连接起来的。<br>java io中各种decorater流之间的包装带来了System.arrayCopy<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> DataInputStream(<span class="keyword">new</span> BufferedInputStream(<span class="keyword">new</span> FileInputStream(<span class="string">""</span>)));</span><br></pre></td></tr></table></figure></p>
+<p>读写这种事情操作起来总是从一个近似无限大的数据源  一点一点地取出来 存在一个内存中一个临时的地方， 然后再讲这部分数据交给其他接收方。 这就要求所有的读写都要准备进行多次读写，每次读到一个中转站中。在java io中这个中转站的大小是固定的，okio中这个中转站是一个个的Segment连接起来的。<br>java io中各种decorater流之间的包装带来了System.arrayCopy</p>
+<pre><code class="java">new DataInputStream(new BufferedInputStream(new FileInputStream(&quot;&quot;)));
+</code></pre>
 <p>比如这样的代码，DataInputStream的read方法实际上传了一个byte[]，调用了BufferedInputStream的read方法，后者再将数据从自身arrayCopy到byte[]中。在Okio中，不存在这样的copy,<br>Buffer的定义是”A collection of bytes in memory.”，与数组不同，Buffer之间传递数据的方式是挪指针。</p>
-<p>BufferedSource在读取Socket数据时，一边从socket里面拿一个Segment大小的数据，然后调用readInt,readLong等方法返回int,long(同时从segment头部清空数据)。如果读到segment最后发现剩下的byte不能组成一个int，就会从segment pool中借一个segment，并从socket中读取数据塞满，把第一个segment剩下的一点byte和第二个segment的头部一点拼成一个int。以BufferSource的readInt为例:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">readInt</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="keyword">this</span>.size &lt; <span class="number">4L</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"size &lt; 4: "</span> + <span class="keyword">this</span>.size);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        Segment segment = <span class="keyword">this</span>.head;</span><br><span class="line">        <span class="keyword">int</span> pos = segment.pos;</span><br><span class="line">        <span class="keyword">int</span> limit = segment.limit;</span><br><span class="line">        <span class="keyword">if</span>(limit - pos &lt; <span class="number">4</span>) &#123; <span class="comment">//一个int 4个byte,这时候segment中未读的数据只剩下不到4个了</span></span><br><span class="line">            <span class="keyword">return</span> (<span class="keyword">this</span>.readByte() &amp; <span class="number">255</span>) &lt;&lt; <span class="number">24</span> | (<span class="keyword">this</span>.readByte() &amp; <span class="number">255</span>) &lt;&lt; <span class="number">16</span> | (<span class="keyword">this</span>.readByte() &amp; <span class="number">255</span>) &lt;&lt; <span class="number">8</span> | <span class="keyword">this</span>.readByte() &amp; <span class="number">255</span>; <span class="comment">//readByte就是从链表的头部开始一个byte一个byte的读，segment读完了自动回收，直到组成一个int。</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123; <span class="comment">//剩下的byte足够组成一个int</span></span><br><span class="line">            <span class="keyword">byte</span>[] data = segment.data;</span><br><span class="line">            <span class="keyword">int</span> i = (data[pos++] &amp; <span class="number">255</span>) &lt;&lt; <span class="number">24</span> | (data[pos++] &amp; <span class="number">255</span>) &lt;&lt; <span class="number">16</span> | (data[pos++] &amp; <span class="number">255</span>) &lt;&lt; <span class="number">8</span> | data[pos++] &amp; <span class="number">255</span>; <span class="comment">//从byte转int</span></span><br><span class="line">            <span class="keyword">this</span>.size -= <span class="number">4L</span>;</span><br><span class="line">            <span class="keyword">if</span>(pos == limit) &#123;</span><br><span class="line">                <span class="keyword">this</span>.head = segment.pop();</span><br><span class="line">                SegmentPool.recycle(segment); <span class="comment">//读完了就把segment回收</span></span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                segment.pos = pos;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> i;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>BufferedSource在读取Socket数据时，一边从socket里面拿一个Segment大小的数据，然后调用readInt,readLong等方法返回int,long(同时从segment头部清空数据)。如果读到segment最后发现剩下的byte不能组成一个int，就会从segment pool中借一个segment，并从socket中读取数据塞满，把第一个segment剩下的一点byte和第二个segment的头部一点拼成一个int。以BufferSource的readInt为例:</p>
+<pre><code class="java">    public int readInt() {
+        if(this.size &lt; 4L) {
+            throw new IllegalStateException(&quot;size &lt; 4: &quot; + this.size);
+        } else {
+            Segment segment = this.head;
+            int pos = segment.pos;
+            int limit = segment.limit;
+            if(limit - pos &lt; 4) { //一个int 4个byte,这时候segment中未读的数据只剩下不到4个了
+                return (this.readByte() &amp; 255) &lt;&lt; 24 | (this.readByte() &amp; 255) &lt;&lt; 16 | (this.readByte() &amp; 255) &lt;&lt; 8 | this.readByte() &amp; 255; //readByte就是从链表的头部开始一个byte一个byte的读，segment读完了自动回收，直到组成一个int。
+            } else { //剩下的byte足够组成一个int
+                byte[] data = segment.data;
+                int i = (data[pos++] &amp; 255) &lt;&lt; 24 | (data[pos++] &amp; 255) &lt;&lt; 16 | (data[pos++] &amp; 255) &lt;&lt; 8 | data[pos++] &amp; 255; //从byte转int
+                this.size -= 4L;
+                if(pos == limit) {
+                    this.head = segment.pop();
+                    SegmentPool.recycle(segment); //读完了就把segment回收
+                } else {
+                    segment.pos = pos;
+                }
+                return i;
+            }
+        }
+    }
+</code></pre>
 <p>一个很有意思的现象是，java BufferedInputStream的默认buffer数组大小是8192，okio 的segment的默认size也是8192，这些都是以byte为单位的。找到一个合理的<a href="https://stackoverflow.com/questions/37404068/why-is-the-default-char-buffer-size-of-bufferedreader-8192">解释</a>。大致意思是8192 = 2^13, windows和linux上这个大小正好占用两个分页文件(8kB)。另外java io的类图确实让人眼花缭乱。</p>
 <h2 id="2-OkHttp的解析"><a href="#2-OkHttp的解析" class="headerlink" title="2. OkHttp的解析"></a>2. OkHttp的解析</h2><h3 id="2-1-使用介绍"><a href="#2-1-使用介绍" class="headerlink" title="2.1 使用介绍"></a>2.1 使用介绍</h3><p>先上一张图<img src="https://www.haldir66.ga/static/imgs/okHttp_chain.jpg" alt="">。这是最简单的直接用OkHttpClient请求<a href="http://www.baidu.com">百度首页</a>的堆栈调用情况。在没有做任何手动配置的情况下，至少发现了五个Interceptor:</p>
 <p> RetryAndFollowUpInterceptor<br> BridgeInterceptor<br> CacheInterceptor<br> ConnectInterceptor<br> CallServerInterceptor</p>
 <p> 走到CallServerInterceptor的时候，可以看到Response已经形成了。每一个Interceptor之间还有一个RealInterceptorChain，将各个Interceptor串联起来，</p>
-<p>首先是调用者的代码<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">mClient = <span class="keyword">new</span> OkHttpClient()</span><br><span class="line"><span class="comment">//同步执行</span></span><br><span class="line"> Request request = <span class="keyword">new</span> Request.Builder()</span><br><span class="line">                .url(<span class="string">"http:www.baidu.com"</span>)</span><br><span class="line">                .build();</span><br><span class="line">        Call call = mClient.newCall(request);</span><br><span class="line">        Response response = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            response = call.execute();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//异步执行代码</span></span><br><span class="line"> Request request = <span class="keyword">new</span> Request.Builder()</span><br><span class="line">                .url(<span class="string">"http:www.baidu.com"</span>)</span><br><span class="line">                .build();</span><br><span class="line">        Call call = mClient.newCall(request);</span><br><span class="line"></span><br><span class="line">        call.enqueue(<span class="keyword">new</span> Callback() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onFailure</span><span class="params">(Call call, IOException e)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onResponse</span><span class="params">(Call call, Response response)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br></pre></td></tr></table></figure></p>
-<h3 id="2-2-参数配置"><a href="#2-2-参数配置" class="headerlink" title="2.2 参数配置"></a>2.2 参数配置</h3><p>首先Request.Builder().build()方法，这里面只是使用Builder模式，和Retrofit很相似，方便链式调用。最终调用了Request的构造函数<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Request(Request.Builder builder) &#123;</span><br><span class="line">       <span class="keyword">this</span>.url = builder.url; <span class="comment">//HttpUrl类型</span></span><br><span class="line">       <span class="keyword">this</span>.method = builder.method; <span class="comment">//String类型</span></span><br><span class="line">       <span class="keyword">this</span>.headers = builder.headers.build(); <span class="comment">//header就是个字典，内部用一个String数组维护。</span></span><br><span class="line">       <span class="keyword">this</span>.body = builder.body;<span class="comment">// RequestBody类型，用于POST提交表单或者Multipart上传文件。</span></span><br><span class="line">       <span class="keyword">this</span>.tag = builder.tag != <span class="keyword">null</span>?builder.tag:<span class="keyword">this</span>; <span class="comment">//Object类型</span></span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
-<p>Request里面的成员代表了一个网络请求所应该有的一切可能的元素，没什么可说的。<br>OkHttpClient的构造也是Builder模式，一旦创建了不能setXX.找到一个比较丰富的例子<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">client = <span class="keyword">new</span> OkHttpClient.Builder()</span><br><span class="line">                          .retryOnConnectionFailure(<span class="keyword">true</span>)</span><br><span class="line">                          .connectTimeout(<span class="number">15</span>, TimeUnit.SECONDS)</span><br><span class="line">                          <span class="comment">//设置缓存</span></span><br><span class="line">                          .cache(cache)</span><br><span class="line">                          .build();</span><br></pre></td></tr></table></figure></p>
+<p>首先是调用者的代码</p>
+<pre><code class="java">mClient = new OkHttpClient()
+//同步执行
+ Request request = new Request.Builder()
+                .url(&quot;http:www.baidu.com&quot;)
+                .build();
+        Call call = mClient.newCall(request);
+        Response response = null;
+        try {
+            response = call.execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+//异步执行代码
+ Request request = new Request.Builder()
+                .url(&quot;http:www.baidu.com&quot;)
+                .build();
+        Call call = mClient.newCall(request);
+
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+
+            }
+        });
+</code></pre>
+<h3 id="2-2-参数配置"><a href="#2-2-参数配置" class="headerlink" title="2.2 参数配置"></a>2.2 参数配置</h3><p>首先Request.Builder().build()方法，这里面只是使用Builder模式，和Retrofit很相似，方便链式调用。最终调用了Request的构造函数</p>
+<pre><code class="java"> Request(Request.Builder builder) {
+        this.url = builder.url; //HttpUrl类型
+        this.method = builder.method; //String类型
+        this.headers = builder.headers.build(); //header就是个字典，内部用一个String数组维护。
+        this.body = builder.body;// RequestBody类型，用于POST提交表单或者Multipart上传文件。
+        this.tag = builder.tag != null?builder.tag:this; //Object类型
+    }
+</code></pre>
+<p>Request里面的成员代表了一个网络请求所应该有的一切可能的元素，没什么可说的。<br>OkHttpClient的构造也是Builder模式，一旦创建了不能setXX.找到一个比较丰富的例子</p>
+<pre><code class="java">client = new OkHttpClient.Builder()
+                          .retryOnConnectionFailure(true)
+                          .connectTimeout(15, TimeUnit.SECONDS)
+                          //设置缓存
+                          .cache(cache)
+                          .build();
+</code></pre>
 <p>到这里都还只是发起真正的请求之前的configuration阶段，来看发起RealCall的过程</p>
 <p> Call call = mClient.newCall(request);<br> 这里面初始化了一个RetryAndFollowUpInterceptor。这个拦截器的作用是在连接server失败后自动重连，但服务器500就不会重连,参考<a href="https://medium.com/inloop/okhttp-is-quietly-retrying-requests-is-your-api-ready-19489ef35ace">okhttp-is-quietly-retrying-requests-is-your-api-ready</a></p>
 <h3 id="2-3-开始执行请求"><a href="#2-3-开始执行请求" class="headerlink" title="2.3 开始执行请求"></a>2.3 开始执行请求</h3><p>response = call.execute();</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Response <span class="title">execute</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="keyword">synchronized</span>(<span class="keyword">this</span>) &#123;</span><br><span class="line">        <span class="keyword">this</span>.executed = <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    Response var2;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">this</span>.client.dispatcher().executed(<span class="keyword">this</span>); <span class="comment">//这个Dispatcher负责记录当前OkHttpClient的所有Request的状态，提供线程池</span></span><br><span class="line">        Response result = <span class="keyword">this</span>.getResponseWithInterceptorChain();</span><br><span class="line">        <span class="keyword">if</span>(result == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IOException(<span class="string">"Canceled"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        var2 = result;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="keyword">this</span>.client.dispatcher().finished(<span class="keyword">this</span>); <span class="comment">//记录状态</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> var2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>重点就在getResponseWithInterceptorChain里面<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Response <span class="title">getResponseWithInterceptorChain</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">       List&lt;Interceptor&gt; interceptors = <span class="keyword">new</span> ArrayList();</span><br><span class="line">       interceptors.addAll(<span class="keyword">this</span>.client.interceptors());</span><br><span class="line">       interceptors.add(<span class="keyword">this</span>.retryAndFollowUpInterceptor);</span><br><span class="line">       interceptors.add(<span class="keyword">new</span> BridgeInterceptor(<span class="keyword">this</span>.client.cookieJar()));</span><br><span class="line">       interceptors.add(<span class="keyword">new</span> CacheInterceptor(<span class="keyword">this</span>.client.internalCache()));</span><br><span class="line">       interceptors.add(<span class="keyword">new</span> ConnectInterceptor(<span class="keyword">this</span>.client));</span><br><span class="line">       <span class="keyword">if</span>(!<span class="keyword">this</span>.forWebSocket) &#123;</span><br><span class="line">           interceptors.addAll(<span class="keyword">this</span>.client.networkInterceptors());</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       interceptors.add(<span class="keyword">new</span> CallServerInterceptor(<span class="keyword">this</span>.forWebSocket));</span><br><span class="line">       Chain chain = <span class="keyword">new</span> RealInterceptorChain(interceptors, (StreamAllocation)<span class="keyword">null</span>, (HttpCodec)<span class="keyword">null</span>, (RealConnection)<span class="keyword">null</span>, <span class="number">0</span>, <span class="keyword">this</span>.originalRequest);</span><br><span class="line">       <span class="keyword">return</span> chain.proceed(<span class="keyword">this</span>.originalRequest);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
+<pre><code class="java">    public Response execute() throws IOException {
+        synchronized(this) {
+            this.executed = true;
+        }
+        Response var2;
+        try {
+            this.client.dispatcher().executed(this); //这个Dispatcher负责记录当前OkHttpClient的所有Request的状态，提供线程池
+            Response result = this.getResponseWithInterceptorChain();
+            if(result == null) {
+                throw new IOException(&quot;Canceled&quot;);
+            }
+
+            var2 = result;
+        } finally {
+            this.client.dispatcher().finished(this); //记录状态
+        }
+        return var2;
+    }
+</code></pre>
+<p>重点就在getResponseWithInterceptorChain里面</p>
+<pre><code class="java"> Response getResponseWithInterceptorChain() throws IOException {
+        List&lt;Interceptor&gt; interceptors = new ArrayList();
+        interceptors.addAll(this.client.interceptors());
+        interceptors.add(this.retryAndFollowUpInterceptor);
+        interceptors.add(new BridgeInterceptor(this.client.cookieJar()));
+        interceptors.add(new CacheInterceptor(this.client.internalCache()));
+        interceptors.add(new ConnectInterceptor(this.client));
+        if(!this.forWebSocket) {
+            interceptors.addAll(this.client.networkInterceptors());
+        }
+
+        interceptors.add(new CallServerInterceptor(this.forWebSocket));
+        Chain chain = new RealInterceptorChain(interceptors, (StreamAllocation)null, (HttpCodec)null, (RealConnection)null, 0, this.originalRequest);
+        return chain.proceed(this.originalRequest);
+    }
+</code></pre>
 <p>注意顺序，用户手动添加的interceptor是最先添加的。在添加完ConnectInterceptor之后，又添加了networkInterceptors(用户手动添加的，一个List)。道理也很清楚，一种是在发起Socket请求之前就拦下来，一种是连上Socket之后的拦截</p>
 <p>Chain的proceed就是从List中一个个取出Inerceptor，然后执行</p>
-<h2 id="3-自带的五个Interceptor"><a href="#3-自带的五个Interceptor" class="headerlink" title="3. 自带的五个Interceptor"></a>3. 自带的五个Interceptor</h2><h3 id="3-1-RetryAndFollowUpInterceptor"><a href="#3-1-RetryAndFollowUpInterceptor" class="headerlink" title="3.1 RetryAndFollowUpInterceptor"></a>3.1 RetryAndFollowUpInterceptor</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span>(!<span class="keyword">this</span>.canceled) &#123;</span><br><span class="line">        Response response = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">boolean</span> releaseConnection = <span class="keyword">true</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            response = ((RealInterceptorChain)chain).proceed(request, <span class="keyword">this</span>.streamAllocation, (HttpCodec)<span class="keyword">null</span>, (RealConnection)<span class="keyword">null</span>);</span><br><span class="line">            releaseConnection = <span class="keyword">false</span>;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (RouteException var13) &#123;</span><br><span class="line">            releaseConnection = <span class="keyword">false</span>;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException var14) &#123;</span><br><span class="line">            releaseConnection = <span class="keyword">false</span>;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="keyword">if</span>(releaseConnection) &#123;</span><br><span class="line">                <span class="keyword">this</span>.streamAllocation.streamFailed((IOException)<span class="keyword">null</span>);</span><br><span class="line">                <span class="keyword">this</span>.streamAllocation.release();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        Request followUp = <span class="keyword">this</span>.followUpRequest(response);</span><br><span class="line">        <span class="keyword">if</span>(followUp == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> response;</span><br><span class="line">        &#125;</span><br><span class="line">        ++followUpCount;</span><br><span class="line">        <span class="keyword">if</span>(followUpCount &gt; <span class="number">20</span>) &#123;</span><br><span class="line">            <span class="keyword">this</span>.streamAllocation.release();</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> ProtocolException(<span class="string">"Too many follow-up requests: "</span> + followUpCount);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="3-自带的五个Interceptor"><a href="#3-自带的五个Interceptor" class="headerlink" title="3. 自带的五个Interceptor"></a>3. 自带的五个Interceptor</h2><h3 id="3-1-RetryAndFollowUpInterceptor"><a href="#3-1-RetryAndFollowUpInterceptor" class="headerlink" title="3.1 RetryAndFollowUpInterceptor"></a>3.1 RetryAndFollowUpInterceptor</h3><pre><code class="java">    while(!this.canceled) {
+            Response response = null;
+            boolean releaseConnection = true;
+
+            try {
+                response = ((RealInterceptorChain)chain).proceed(request, this.streamAllocation, (HttpCodec)null, (RealConnection)null);
+                releaseConnection = false;
+            } catch (RouteException var13) {
+                releaseConnection = false;
+                continue;
+            } catch (IOException var14) {
+                releaseConnection = false;
+                continue;
+            } finally {
+                if(releaseConnection) {
+                    this.streamAllocation.streamFailed((IOException)null);
+                    this.streamAllocation.release();
+                }
+            }
+            Request followUp = this.followUpRequest(response);
+            if(followUp == null) {
+                return response;
+            }
+            ++followUpCount;
+            if(followUpCount &gt; 20) {
+                this.streamAllocation.release();
+                throw new ProtocolException(&quot;Too many follow-up requests: &quot; + followUpCount);
+            }
+        }
+</code></pre>
 <p>这里面写死了一个循环，只要没有cancel，catch到特定的Exception就一直让链条走下去。</p>
-<h3 id="3-2-BridgeInterceptor"><a href="#3-2-BridgeInterceptor" class="headerlink" title="3.2 BridgeInterceptor"></a>3.2 BridgeInterceptor</h3><p>这是第二个Interceptor<br>interceptors.add(new BridgeInterceptor(this.client.cookieJar()));//注意带进来了cookie，主要都是添加header什么的<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Response <span class="title">intercept</span><span class="params">(Chain chain)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    Request userRequest = chain.request();</span><br><span class="line">     <span class="keyword">if</span>(userRequest.header(<span class="string">"Host"</span>) == <span class="keyword">null</span>) &#123;</span><br><span class="line">        requestBuilder.header(<span class="string">"Host"</span>, Util.hostHeader(userRequest.url(), <span class="keyword">false</span>));</span><br><span class="line">    &#125;</span><br><span class="line">    Response networkResponse = chain.proceed(requestBuilder.build());</span><br><span class="line"></span><br><span class="line">    okhttp3.Response.Builder responseBuilder = networkResponse.newBuilder().request(userRequest);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> responseBuilder.build();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="3-2-BridgeInterceptor"><a href="#3-2-BridgeInterceptor" class="headerlink" title="3.2 BridgeInterceptor"></a>3.2 BridgeInterceptor</h3><p>这是第二个Interceptor<br>interceptors.add(new BridgeInterceptor(this.client.cookieJar()));//注意带进来了cookie，主要都是添加header什么的</p>
+<pre><code class="java">    public Response intercept(Chain chain) throws IOException {
+        Request userRequest = chain.request();
+         if(userRequest.header(&quot;Host&quot;) == null) {
+            requestBuilder.header(&quot;Host&quot;, Util.hostHeader(userRequest.url(), false));
+        }
+        Response networkResponse = chain.proceed(requestBuilder.build());
+
+        okhttp3.Response.Builder responseBuilder = networkResponse.newBuilder().request(userRequest);
+
+        }
+        return responseBuilder.build();
+    }
+</code></pre>
 <p>都是些Host,Connection Keep-Alive,User-Agent,Content-Length等跟header有关的东西。随后将request交给链条的下一个interceptor。Response回来之后相应set-Cookie这些东西，下次请求带上cookie，这些都是Http的标准步骤。</p>
-<h3 id="3-3-CacheInterceptor"><a href="#3-3-CacheInterceptor" class="headerlink" title="3.3 CacheInterceptor"></a>3.3 CacheInterceptor</h3><p>接下来轮到cache，对于response的处理也是差不多的过程<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Response <span class="title">intercept</span><span class="params">(Chain chain)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    Response cacheCandidate = <span class="keyword">this</span>.cache != <span class="keyword">null</span>?<span class="keyword">this</span>.cache.get(chain.request()):<span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    Request networkRequest = strategy.networkRequest;</span><br><span class="line">    Response cacheResponse = strategy.cacheResponse;</span><br><span class="line"></span><br><span class="line">        Response networkResponse = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">     networkResponse = chain.proceed(networkRequest);</span><br><span class="line"></span><br><span class="line">        Response response;</span><br><span class="line">        <span class="keyword">if</span>(cacheResponse != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span>(networkResponse.code() == <span class="number">304</span>) &#123;</span><br><span class="line">                response = cacheResponse.newBuilder().headers(combine(cacheResponse.headers(), networkResponse.headers())).sentRequestAtMillis(networkResponse.sentRequestAtMillis()).receivedResponseAtMillis(networkResponse.receivedResponseAtMillis()).cacheResponse(stripBody(cacheResponse)).networkResponse(stripBody(networkResponse)).build();</span><br><span class="line">                networkResponse.body().close();</span><br><span class="line">                <span class="keyword">this</span>.cache.trackConditionalCacheHit();</span><br><span class="line">                <span class="keyword">this</span>.cache.update(cacheResponse, response);</span><br><span class="line">                <span class="keyword">return</span> response; <span class="comment">//只针对304做了自动cache</span></span><br><span class="line">            &#125;</span><br><span class="line">            Util.closeQuietly(cacheResponse.body());</span><br><span class="line">        &#125;</span><br><span class="line">        response = networkResponse.newBuilder().cacheResponse(stripBody(cacheResponse)).networkResponse(stripBody(networkResponse)).build();</span><br><span class="line">        <span class="keyword">return</span> response;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="3-3-CacheInterceptor"><a href="#3-3-CacheInterceptor" class="headerlink" title="3.3 CacheInterceptor"></a>3.3 CacheInterceptor</h3><p>接下来轮到cache，对于response的处理也是差不多的过程</p>
+<pre><code class="java">    public Response intercept(Chain chain) throws IOException {
+        Response cacheCandidate = this.cache != null?this.cache.get(chain.request()):null;
+
+        Request networkRequest = strategy.networkRequest;
+        Response cacheResponse = strategy.cacheResponse;
+
+            Response networkResponse = null;
+
+         networkResponse = chain.proceed(networkRequest);
+
+            Response response;
+            if(cacheResponse != null) {
+                if(networkResponse.code() == 304) {
+                    response = cacheResponse.newBuilder().headers(combine(cacheResponse.headers(), networkResponse.headers())).sentRequestAtMillis(networkResponse.sentRequestAtMillis()).receivedResponseAtMillis(networkResponse.receivedResponseAtMillis()).cacheResponse(stripBody(cacheResponse)).networkResponse(stripBody(networkResponse)).build();
+                    networkResponse.body().close();
+                    this.cache.trackConditionalCacheHit();
+                    this.cache.update(cacheResponse, response);
+                    return response; //只针对304做了自动cache
+                }
+                Util.closeQuietly(cacheResponse.body());
+            }
+            response = networkResponse.newBuilder().cacheResponse(stripBody(cacheResponse)).networkResponse(stripBody(networkResponse)).build();
+            return response;
+
+    }
+</code></pre>
 <p>这里也是让请求接着走下去，response回来之后，只有304的时候才会去主动cache下来。</p>
-<h3 id="3-4-ConnectInterceptor"><a href="#3-4-ConnectInterceptor" class="headerlink" title="3.4 ConnectInterceptor"></a>3.4 ConnectInterceptor</h3><p>这里的interceptor方法异常简短<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> Response <span class="title">intercept</span><span class="params">(Chain chain)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    RealInterceptorChain realChain = (RealInterceptorChain)chain;</span><br><span class="line">    Request request = realChain.request();</span><br><span class="line">    StreamAllocation streamAllocation = realChain.streamAllocation();</span><br><span class="line">    <span class="keyword">boolean</span> doExtensiveHealthChecks = !request.method().equals(<span class="string">"GET"</span>);</span><br><span class="line">    HttpCodec httpCodec = streamAllocation.newStream(<span class="keyword">this</span>.client, doExtensiveHealthChecks);</span><br><span class="line">    RealConnection connection = streamAllocation.connection();</span><br><span class="line">    <span class="keyword">return</span> realChain.proceed(request, streamAllocation, httpCodec, connection);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>这里重点关注 StreamAllocation这个类<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">StreamAllocation</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">final</span> Address address;</span><br><span class="line">    <span class="keyword">private</span> Route route;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ConnectionPool connectionPool;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Object callStackTrace;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> RouteSelector routeSelector;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> refusedStreamCount;</span><br><span class="line">    <span class="keyword">private</span> RealConnection connection;</span><br><span class="line">    <span class="keyword">private</span> HttpCodec codec;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="3-4-ConnectInterceptor"><a href="#3-4-ConnectInterceptor" class="headerlink" title="3.4 ConnectInterceptor"></a>3.4 ConnectInterceptor</h3><p>这里的interceptor方法异常简短</p>
+<pre><code class="java">
+    public Response intercept(Chain chain) throws IOException {
+        RealInterceptorChain realChain = (RealInterceptorChain)chain;
+        Request request = realChain.request();
+        StreamAllocation streamAllocation = realChain.streamAllocation();
+        boolean doExtensiveHealthChecks = !request.method().equals(&quot;GET&quot;);
+        HttpCodec httpCodec = streamAllocation.newStream(this.client, doExtensiveHealthChecks);
+        RealConnection connection = streamAllocation.connection();
+        return realChain.proceed(request, streamAllocation, httpCodec, connection);
+    }
+</code></pre>
+<p>这里重点关注 StreamAllocation这个类</p>
+<pre><code class="java">public final class StreamAllocation {
+    public final Address address;
+    private Route route;
+    private final ConnectionPool connectionPool;
+    private final Object callStackTrace;
+    private final RouteSelector routeSelector;
+    private int refusedStreamCount;
+    private RealConnection connection;
+    private HttpCodec codec;
+}
+</code></pre>
 <p>从HttpCodec httpCodec = streamAllocation.newStream(this.client, doExtensiveHealthChecks); 这句话一直往下走，会走到Socket.connect()，也就是大多数人初学网络编程时被教导的如何创建Socket连接。现在想想，能够从操作系统底层的Socket封装出这么多复杂的步骤，实在是高手。<br>StreamAllocation.newStream  —-&gt; StreamAllocation.findHealthyConnection  —&gt; StreamAallocation.findConnection —&gt; new RealConnection —&gt; RealConnection.connect</p>
-<p>RealConnection.connect()方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">connect</span><span class="params">(<span class="keyword">int</span> connectTimeout, <span class="keyword">int</span> readTimeout, <span class="keyword">int</span> writeTimeout, <span class="keyword">boolean</span> connectionRetryEnabled)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">this</span>.protocol != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"already connected"</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">while</span>(<span class="keyword">true</span>) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    <span class="keyword">if</span>(<span class="keyword">this</span>.route.requiresTunnel()) &#123;</span><br><span class="line">                        <span class="keyword">this</span>.connectTunnel(connectTimeout, readTimeout, writeTimeout);</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        <span class="keyword">this</span>.connectSocket(connectTimeout, readTimeout);</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125; <span class="keyword">catch</span> (IOException var11) &#123;</span><br><span class="line">                    <span class="keyword">if</span>(!connectionRetryEnabled || !connectionSpecSelector.connectionFailed(var11)) &#123;</span><br><span class="line">                        <span class="keyword">throw</span> routeException; <span class="comment">//这个Exception就是给RetryAndFollowupInterceptor准备的</span></span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>RealConnection.connect()方法</p>
+<pre><code class="java">public void connect(int connectTimeout, int readTimeout, int writeTimeout, boolean connectionRetryEnabled) {
+        if(this.protocol != null) {
+            throw new IllegalStateException(&quot;already connected&quot;);
+        } else {
+            while(true) {
+                try {
+                    if(this.route.requiresTunnel()) {
+                        this.connectTunnel(connectTimeout, readTimeout, writeTimeout);
+                    } else {
+                        this.connectSocket(connectTimeout, readTimeout);
+                    }
+                    break;
+                } catch (IOException var11) {
+                    if(!connectionRetryEnabled || !connectionSpecSelector.connectionFailed(var11)) {
+                        throw routeException; //这个Exception就是给RetryAndFollowupInterceptor准备的
+                    }
+                }
+            }
+
+
+
+        }
+    }
+</code></pre>
 <p>最初学习Socket编程的时候，就是写了一个while(true)，是不是很像？</p>
 <p>对了ConnectionPool内部使用了一个Deque保存RealConnection,findConnection里面有这么一段</p>
 <ul>
 <li>Internal.instance.get(this.connectionPool, this.address, this, (Route)null);//查找</li>
 <li>Internal.instance.put(this.connectionPool, result);//放进pool</li>
 </ul>
-<p>connectSocket长这样:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">connectSocket</span><span class="params">(<span class="keyword">int</span> connectTimeout, <span class="keyword">int</span> readTimeout)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    Proxy proxy = <span class="keyword">this</span>.route.proxy();</span><br><span class="line">    Address address = <span class="keyword">this</span>.route.address();</span><br><span class="line">    <span class="keyword">this</span>.rawSocket = proxy.type() != Type.DIRECT &amp;&amp; proxy.type() != Type.HTTP?<span class="keyword">new</span> Socket(proxy):address.socketFactory().createSocket();</span><br><span class="line">    <span class="keyword">this</span>.rawSocket.setSoTimeout(readTimeout);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        Platform.get().connectSocket(<span class="keyword">this</span>.rawSocket, <span class="keyword">this</span>.route.socketAddress(), connectTimeout); <span class="comment">//这里面就一句话socket.connect</span></span><br><span class="line">    &#125; <span class="keyword">catch</span> (ConnectException var7) &#123;</span><br><span class="line">        ConnectException ce = <span class="keyword">new</span> ConnectException(<span class="string">"Failed to connect to "</span> + <span class="keyword">this</span>.route.socketAddress());</span><br><span class="line">        ce.initCause(var7);</span><br><span class="line">        <span class="keyword">throw</span> ce;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">this</span>.source = Okio.buffer(Okio.source(<span class="keyword">this</span>.rawSocket));</span><br><span class="line">        <span class="keyword">this</span>.sink = Okio.buffer(Okio.sink(<span class="keyword">this</span>.rawSocket));</span><br><span class="line">    &#125; <span class="keyword">catch</span> (NullPointerException var8) &#123;</span><br><span class="line">        <span class="keyword">if</span>(<span class="string">"throw with null exception"</span>.equals(var8.getMessage())) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IOException(var8);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>connectSocket长这样:</p>
+<pre><code class="java">
+    private void connectSocket(int connectTimeout, int readTimeout) throws IOException {
+        Proxy proxy = this.route.proxy();
+        Address address = this.route.address();
+        this.rawSocket = proxy.type() != Type.DIRECT &amp;&amp; proxy.type() != Type.HTTP?new Socket(proxy):address.socketFactory().createSocket();
+        this.rawSocket.setSoTimeout(readTimeout);
+
+        try {
+            Platform.get().connectSocket(this.rawSocket, this.route.socketAddress(), connectTimeout); //这里面就一句话socket.connect
+        } catch (ConnectException var7) {
+            ConnectException ce = new ConnectException(&quot;Failed to connect to &quot; + this.route.socketAddress());
+            ce.initCause(var7);
+            throw ce;
+        }
+
+        try {
+            this.source = Okio.buffer(Okio.source(this.rawSocket));
+            this.sink = Okio.buffer(Okio.sink(this.rawSocket));
+        } catch (NullPointerException var8) {
+            if(&quot;throw with null exception&quot;.equals(var8.getMessage())) {
+                throw new IOException(var8);
+            }
+        }
+
+    }
+</code></pre>
 <p><strong>重点看</strong><br>this.source = Okio.buffer(Okio.source(this.rawSocket));<br>this.sink = Okio.buffer(Okio.sink(this.rawSocket));<br>通过sink往Socket里面写数据，通过source网Socket里面写数据，通过Okio包装了，虽然本质上还是socket.getOutputStream和Socket.getInputStream。到这一步，RealConnection内部sink和source初始化完成，socket已经连接上，Socket的inputStream和outPutStream都准备就绪。其实在这种状态下就已经可以开始读写了。</p>
-<h3 id="3-5-CallServerInterceptor"><a href="#3-5-CallServerInterceptor" class="headerlink" title="3.5 CallServerInterceptor"></a>3.5 CallServerInterceptor</h3><p>这里已经连上了服务器，可以像操作本地文件一样读写数据了，当然要在遵守http规范的前提下。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Response <span class="title">intercept</span><span class="params">(Chain chain)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    RealInterceptorChain realChain = (RealInterceptorChain)chain;</span><br><span class="line">    HttpCodec httpCodec = realChain.httpStream();</span><br><span class="line">    StreamAllocation streamAllocation = realChain.streamAllocation();</span><br><span class="line">    RealConnection connection = (RealConnection)realChain.connection();</span><br><span class="line">    Request request = realChain.request();</span><br><span class="line">    <span class="comment">//可以看到，到这一步所需要的数据都准备就绪</span></span><br><span class="line">    <span class="keyword">long</span> sentRequestMillis = System.currentTimeMillis();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    httpCodec.writeRequestHeaders(request); <span class="comment">//开始写数据</span></span><br><span class="line"></span><br><span class="line">    Builder responseBuilder = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">if</span>(HttpMethod.permitsRequestBody(request.method()) &amp;&amp; request.body() != <span class="keyword">null</span>) &#123; <span class="comment">//这里面是跟POST相关的</span></span><br><span class="line">        <span class="keyword">if</span>(<span class="string">"100-continue"</span>.equalsIgnoreCase(request.header(<span class="string">"Expect"</span>))) &#123;</span><br><span class="line">            httpCodec.flushRequest();</span><br><span class="line">            responseBuilder = httpCodec.readResponseHeaders(<span class="keyword">true</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(responseBuilder == <span class="keyword">null</span>) &#123;</span><br><span class="line">            Sink requestBodyOut = httpCodec.createRequestBody(request, request.body().contentLength());</span><br><span class="line">            BufferedSink bufferedRequestBody = Okio.buffer(requestBodyOut);</span><br><span class="line">            request.body().writeTo(bufferedRequestBody); <span class="comment">//这里就是Okio发挥高效的地方</span></span><br><span class="line">            bufferedRequestBody.close();</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span>(!connection.isMultiplexed()) &#123;</span><br><span class="line">            streamAllocation.noNewStreams();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    httpCodec.finishRequest(); <span class="comment">//到这里，client的数据全部写完并且发送给服务器，服务器开始干活。</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(responseBuilder == <span class="keyword">null</span>) &#123;</span><br><span class="line">        responseBuilder = httpCodec.readResponseHeaders(<span class="keyword">false</span>); <span class="comment">//开始从Socket里面读取数据</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Response response = responseBuilder.request(request).handshake(streamAllocation.connection().handshake()).sentRequestAtMillis(sentRequestMillis).receivedResponseAtMillis(System.currentTimeMillis()).build();</span><br><span class="line">    <span class="keyword">int</span> code = response.code();</span><br><span class="line">    <span class="keyword">if</span>(<span class="keyword">this</span>.forWebSocket &amp;&amp; code == <span class="number">101</span>) &#123;</span><br><span class="line">        response = response.newBuilder().body(Util.EMPTY_RESPONSE).build();</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        response = response.newBuilder().body(httpCodec.openResponseBody(response)).build();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(<span class="string">"close"</span>.equalsIgnoreCase(response.request().header(<span class="string">"Connection"</span>)) || <span class="string">"close"</span>.equalsIgnoreCase(response.header(<span class="string">"Connection"</span>))) &#123;</span><br><span class="line">        streamAllocation.noNewStreams();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>((code == <span class="number">204</span> || code == <span class="number">205</span>) &amp;&amp; response.body().contentLength() &gt; <span class="number">0L</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> ProtocolException(<span class="string">"HTTP "</span> + code + <span class="string">" had non-zero Content-Length: "</span> + response.body().contentLength());</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> response;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>这里面就是一步步的开始写数据了。这里再借用下百度,chrome按下F12，打开百度首页，看下request的raw header<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">GET / HTTP/1.1</span><br><span class="line">Host: www.baidu.com</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Cache-Control: max-age=0</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line">User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8</span><br><span class="line">DNT: 1</span><br><span class="line">Accept-Encoding: gzip, deflate, br</span><br><span class="line">Accept-Language: zh-CN,zh;q=0.8,en-US;q=0.6,en;q=0.4</span><br><span class="line">Cookie: PSTM=122178321; BIDUPSID=CF3243290400VSDG52B3859AD4AEC2; BAIDUID=5176CC0A23DB1F3423426454DRTG5EC8:FG=1; MCITY=-%3A; BD_HOME=0; H_PS_PSSID=1428_24320_20930; BD_UPN=1223214323</span><br></pre></td></tr></table></figure></p>
-<p>看下httpCodec.writeRequestHeaders(request)的实现，就会发现真的是这么一行一行的写的<br>例如RequestLine.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">get</span><span class="params">(Request request, Type proxyType)</span> </span>&#123;</span><br><span class="line">       StringBuilder result = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">       result.append(request.method()); <span class="comment">// GET</span></span><br><span class="line">       result.append(<span class="string">' '</span>); <span class="comment">//空格</span></span><br><span class="line">       <span class="keyword">if</span>(includeAuthorityInRequestLine(request, proxyType)) &#123;</span><br><span class="line">           result.append(request.url());</span><br><span class="line">       &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">           result.append(requestPath(request.url()));  <span class="comment">//我们访问的是百度首页，当然是'/'这个Index啦</span></span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       result.append(<span class="string">" HTTP/1.1"</span>);  <span class="comment">//是不是和上面一模一样</span></span><br><span class="line">       <span class="keyword">return</span> result.toString();</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
-<p>接下来轮到Http1Codec.class<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">writeRequest</span><span class="params">(Headers headers, String requestLine)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">this</span>.state != <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"state: "</span> + <span class="keyword">this</span>.state);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">this</span>.sink.writeUtf8(requestLine).writeUtf8(<span class="string">"\r\n"</span>); <span class="comment">//这是第一行，写完了加上换行符</span></span><br><span class="line">            <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> size = headers.size(); i &lt; size; ++i) &#123;</span><br><span class="line">                <span class="keyword">this</span>.sink.writeUtf8(headers.name(i)).writeUtf8(<span class="string">": "</span>).writeUtf8(headers.value(i)).writeUtf8(<span class="string">"\r\n"</span>); <span class="comment">//一个header写完就写一个换行符</span></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">this</span>.sink.writeUtf8(<span class="string">"\r\n"</span>);</span><br><span class="line">            <span class="keyword">this</span>.state = <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="3-5-CallServerInterceptor"><a href="#3-5-CallServerInterceptor" class="headerlink" title="3.5 CallServerInterceptor"></a>3.5 CallServerInterceptor</h3><p>这里已经连上了服务器，可以像操作本地文件一样读写数据了，当然要在遵守http规范的前提下。</p>
+<pre><code class="java">    public Response intercept(Chain chain) throws IOException {
+        RealInterceptorChain realChain = (RealInterceptorChain)chain;
+        HttpCodec httpCodec = realChain.httpStream();
+        StreamAllocation streamAllocation = realChain.streamAllocation();
+        RealConnection connection = (RealConnection)realChain.connection();
+        Request request = realChain.request();
+        //可以看到，到这一步所需要的数据都准备就绪
+        long sentRequestMillis = System.currentTimeMillis();
+
+
+
+        httpCodec.writeRequestHeaders(request); //开始写数据
+
+        Builder responseBuilder = null;
+        if(HttpMethod.permitsRequestBody(request.method()) &amp;&amp; request.body() != null) { //这里面是跟POST相关的
+            if(&quot;100-continue&quot;.equalsIgnoreCase(request.header(&quot;Expect&quot;))) {
+                httpCodec.flushRequest();
+                responseBuilder = httpCodec.readResponseHeaders(true);
+            }
+
+            if(responseBuilder == null) {
+                Sink requestBodyOut = httpCodec.createRequestBody(request, request.body().contentLength());
+                BufferedSink bufferedRequestBody = Okio.buffer(requestBodyOut);
+                request.body().writeTo(bufferedRequestBody); //这里就是Okio发挥高效的地方
+                bufferedRequestBody.close();
+            } else if(!connection.isMultiplexed()) {
+                streamAllocation.noNewStreams();
+            }
+        }
+
+        httpCodec.finishRequest(); //到这里，client的数据全部写完并且发送给服务器，服务器开始干活。
+
+
+        if(responseBuilder == null) {
+            responseBuilder = httpCodec.readResponseHeaders(false); //开始从Socket里面读取数据
+        }
+
+        Response response = responseBuilder.request(request).handshake(streamAllocation.connection().handshake()).sentRequestAtMillis(sentRequestMillis).receivedResponseAtMillis(System.currentTimeMillis()).build();
+        int code = response.code();
+        if(this.forWebSocket &amp;&amp; code == 101) {
+            response = response.newBuilder().body(Util.EMPTY_RESPONSE).build();
+        } else {
+            response = response.newBuilder().body(httpCodec.openResponseBody(response)).build();
+        }
+
+        if(&quot;close&quot;.equalsIgnoreCase(response.request().header(&quot;Connection&quot;)) || &quot;close&quot;.equalsIgnoreCase(response.header(&quot;Connection&quot;))) {
+            streamAllocation.noNewStreams();
+        }
+
+        if((code == 204 || code == 205) &amp;&amp; response.body().contentLength() &gt; 0L) {
+            throw new ProtocolException(&quot;HTTP &quot; + code + &quot; had non-zero Content-Length: &quot; + response.body().contentLength());
+        } else {
+            return response;
+        }
+    }
+</code></pre>
+<p>这里面就是一步步的开始写数据了。这里再借用下百度,chrome按下F12，打开百度首页，看下request的raw header</p>
+<pre><code>GET / HTTP/1.1
+Host: www.baidu.com
+Connection: keep-alive
+Cache-Control: max-age=0
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+DNT: 1
+Accept-Encoding: gzip, deflate, br
+Accept-Language: zh-CN,zh;q=0.8,en-US;q=0.6,en;q=0.4
+Cookie: PSTM=122178321; BIDUPSID=CF3243290400VSDG52B3859AD4AEC2; BAIDUID=5176CC0A23DB1F3423426454DRTG5EC8:FG=1; MCITY=-%3A; BD_HOME=0; H_PS_PSSID=1428_24320_20930; BD_UPN=1223214323
+</code></pre><p>看下httpCodec.writeRequestHeaders(request)的实现，就会发现真的是这么一行一行的写的<br>例如RequestLine.java</p>
+<pre><code class="java"> public static String get(Request request, Type proxyType) {
+        StringBuilder result = new StringBuilder();
+        result.append(request.method()); // GET
+        result.append(&#39; &#39;); //空格
+        if(includeAuthorityInRequestLine(request, proxyType)) {
+            result.append(request.url());
+        } else {
+            result.append(requestPath(request.url()));  //我们访问的是百度首页，当然是&#39;/&#39;这个Index啦
+        }
+
+        result.append(&quot; HTTP/1.1&quot;);  //是不是和上面一模一样
+        return result.toString();
+    }
+</code></pre>
+<p>接下来轮到Http1Codec.class</p>
+<pre><code class="java">public void writeRequest(Headers headers, String requestLine) throws IOException {
+        if(this.state != 0) {
+            throw new IllegalStateException(&quot;state: &quot; + this.state);
+        } else {
+            this.sink.writeUtf8(requestLine).writeUtf8(&quot;\r\n&quot;); //这是第一行，写完了加上换行符
+            int i = 0;
+
+            for(int size = headers.size(); i &lt; size; ++i) {
+                this.sink.writeUtf8(headers.name(i)).writeUtf8(&quot;: &quot;).writeUtf8(headers.value(i)).writeUtf8(&quot;\r\n&quot;); //一个header写完就写一个换行符
+            }
+
+            this.sink.writeUtf8(&quot;\r\n&quot;);
+            this.state = 1;
+        }
+    }
+</code></pre>
 <p>读取Response的顺序和写Request相反，不再赘述。</p>
 <h2 id="4-结语"><a href="#4-结语" class="headerlink" title="4.结语"></a>4.结语</h2><p>这里只是针对OkHttp发起的一个最简单同步的网络请求进行了分析。<br>关于异步请求再说两句：本质上不过是包装了一个回调，丢到线程池里面，相比整个Http请求，实在是不值一提。来看下这个线程池</p>
 <ul>
@@ -281,8 +730,30 @@ ga('send', 'pageview');
 <li>Interceptor，广受业界好评的责任链模式</li>
 </ul>
 <p>写于2017年7月23日0:29</p>
-<h2 id="update"><a href="#update" class="headerlink" title="update"></a>update</h2><p>OkHttp拦截器里面能不能把请求取消掉? 结论几乎是否<br><a href="https://stackoverflow.com/questions/37540616/do-we-have-any-possibility-to-stop-request-in-okhttp-interceptor">do-we-have-any-possibility-to-stop-request-in-okhttp-interceptor</a><br>随便挑一个interceptor出来,上游传递下来的chain只能获取到Request，看了下,request并没有一个cancel的方法。真要cancel的话，得去OkHttpClient那边去cancel，这里并不能获得。就算你全局获得一个Client，这里还得返回一个Response。看了下proceed方法，如果返回null的话，会主动抛一个空指针出来的。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span> <span class="function"><span class="keyword">public</span> Response <span class="title">intercept</span><span class="params">(Chain chain)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">  RealInterceptorChain realChain = (RealInterceptorChain) chain;</span><br><span class="line">  Request request = realChain.request();</span><br><span class="line">  StreamAllocation streamAllocation = realChain.streamAllocation();</span><br><span class="line"></span><br><span class="line">  <span class="comment">// We need the network to satisfy this request. Possibly for validating a conditional GET.</span></span><br><span class="line">  <span class="keyword">boolean</span> doExtensiveHealthChecks = !request.method().equals(<span class="string">"GET"</span>);</span><br><span class="line">  HttpCodec httpCodec = streamAllocation.newStream(client, chain, doExtensiveHealthChecks);</span><br><span class="line">  RealConnection connection = streamAllocation.connection();</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> realChain.proceed(request, streamAllocation, httpCodec, connection);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h3 id="cancel-ongoing-request"><a href="#cancel-ongoing-request" class="headerlink" title="cancel ongoing request"></a>cancel ongoing request</h3><p><a href="https://github.com/square/okhttp/issues/2205">Cancelling async request by tag</a><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">cancel</span><span class="params">(OkHttpClient client, Object tag)</span> </span>&#123;</span><br><span class="line">   <span class="keyword">for</span> (Call call : client.dispatcher().queuedCalls()) &#123;</span><br><span class="line">     <span class="keyword">if</span> (tag.equals(call.request().tag())) call.cancel();</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">for</span> (Call call : client.dispatcher().runningCalls()) &#123;</span><br><span class="line">     <span class="keyword">if</span> (tag.equals(call.request().tag())) call.cancel();</span><br><span class="line">   &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="update"><a href="#update" class="headerlink" title="update"></a>update</h2><p>OkHttp拦截器里面能不能把请求取消掉? 结论几乎是否<br><a href="https://stackoverflow.com/questions/37540616/do-we-have-any-possibility-to-stop-request-in-okhttp-interceptor">do-we-have-any-possibility-to-stop-request-in-okhttp-interceptor</a><br>随便挑一个interceptor出来,上游传递下来的chain只能获取到Request，看了下,request并没有一个cancel的方法。真要cancel的话，得去OkHttpClient那边去cancel，这里并不能获得。就算你全局获得一个Client，这里还得返回一个Response。看了下proceed方法，如果返回null的话，会主动抛一个空指针出来的。</p>
+<pre><code class="java">@Override public Response intercept(Chain chain) throws IOException {
+  RealInterceptorChain realChain = (RealInterceptorChain) chain;
+  Request request = realChain.request();
+  StreamAllocation streamAllocation = realChain.streamAllocation();
+
+  // We need the network to satisfy this request. Possibly for validating a conditional GET.
+  boolean doExtensiveHealthChecks = !request.method().equals(&quot;GET&quot;);
+  HttpCodec httpCodec = streamAllocation.newStream(client, chain, doExtensiveHealthChecks);
+  RealConnection connection = streamAllocation.connection();
+
+  return realChain.proceed(request, streamAllocation, httpCodec, connection);
+}
+</code></pre>
+<h3 id="cancel-ongoing-request"><a href="#cancel-ongoing-request" class="headerlink" title="cancel ongoing request"></a>cancel ongoing request</h3><p><a href="https://github.com/square/okhttp/issues/2205">Cancelling async request by tag</a></p>
+<pre><code class="java">public void cancel(OkHttpClient client, Object tag) {
+   for (Call call : client.dispatcher().queuedCalls()) {
+     if (tag.equals(call.request().tag())) call.cancel();
+   }
+   for (Call call : client.dispatcher().runningCalls()) {
+     if (tag.equals(call.request().tag())) call.cancel();
+   }
+ }
+</code></pre>
 <p>瞅了下call.cancel的实现，其实是对RealCall里面的成员变量RetryAndFollowUpInterceptor调用了cancel方法</p>
 <h3 id="设计模式"><a href="#设计模式" class="headerlink" title="设计模式"></a>设计模式</h3><p>当一个网络请求发出时,需要经过应用层-&gt;传输层-&gt;网络层-&gt;连接层-&gt;物理层<br>收到响应后正好反过来,物理层-&gt;连接层-&gt;网络层-&gt;传输层-&gt;应用层<br>在请求经过各层时,由每层轮流处理.每层都可以对请求或响应进行处理.并可以中断链接,以自身为终点返回响应</p>
 <h2 id="5-参考"><a href="#5-参考" class="headerlink" title="5. 参考"></a>5. 参考</h2><ul>

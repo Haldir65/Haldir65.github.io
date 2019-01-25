@@ -16,7 +16,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="Kotlin是Jetbrain公司推出的面向jvm的语言，编译后的bytecode和java编写的代码并没有什么区别。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.031Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.173Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用Kotlin进行java开发">
 <meta name="twitter:description" content="Kotlin是Jetbrain公司推出的面向jvm的语言，编译后的bytecode和java编写的代码并没有什么区别。">
@@ -200,69 +200,309 @@ ga('send', 'pageview');
       
         <p>Kotlin是Jetbrain公司推出的面向jvm的语言，编译后的bytecode和java编写的代码并没有什么区别。</p>
 <a id="more"></a>
-<h3 id="1-基本语法"><a href="#1-基本语法" class="headerlink" title="1. 基本语法"></a>1. 基本语法</h3><p> 没有new关键字<br> <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> 主函数</span><br><span class="line"> fun main(args : Array&lt;String&gt;) &#123;</span><br><span class="line">    for (i in args.indices) &#123;</span><br><span class="line">       print(args[i])</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>自定义函数</p>
- <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"> fun getStringLength(obj: Any) :Int?&#123; //问号代表有可能返回空值</span><br><span class="line">    if (obj is String) &#123;</span><br><span class="line">        return obj.length</span><br><span class="line">    &#125;</span><br><span class="line">    return 0</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"> 支持lambda</span><br><span class="line"> fun maps(list: List&lt;String&gt;) &#123;</span><br><span class="line">    list.filter &#123; it.startsWith(&quot;a&quot;) &#125;</span><br><span class="line">            .sortedBy &#123; it &#125;</span><br><span class="line">            .map(String::toUpperCase)</span><br><span class="line">            .forEach(::print)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">对于函数有新的认识了</span><br><span class="line"></span><br><span class="line">public fun isOdd(number: Int) = number % 2 != 0 // 函数也可以用一个等式来表达了</span><br><span class="line">public fun isOdd2(number: Int) :Boolean &#123; //这种就啰嗦点</span><br><span class="line">    return number % 2 != 0</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="2-集合相关"><a href="#2-集合相关" class="headerlink" title="2. 集合相关"></a>2. 集合相关</h3><p>常用的迭代一个range的方式<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">for (i in 1..3) &#123;</span><br><span class="line">    println(i) //这个打印出来是1，2，3</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">for (i in 6 downTo 0 step 2) &#123;</span><br><span class="line">    println(i)</span><br><span class="line">&#125; //这个打印出来是6 4 2 0</span><br></pre></td></tr></table></figure></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">//带index的迭代一个集合的方式</span><br><span class="line">val quoteParts = &quot; YOU JUST TALKED TO MUCH !&quot;.split(&quot; &quot;)</span><br><span class="line">for ((index, value) in quoteParts.withIndex()) &#123;</span><br><span class="line">    print(&quot;reading index $index: $value &quot;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//和java定义的List interface不一样，Kotlin定义的interface默认是没有add,remove这些修改性质的方法的。</span><br><span class="line">// 比如说有一个int，想凑到String + int中，不需要String.format了，kotlin给String加上了一个format的ententsion Function，更简单的方式是直接加上美元符号引用即可。感觉和es6很像。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// List&lt;out T&gt;这种集合默认只提供了只读的方法，比如get ,size。想要更改内容需要使用MutableList接口提供的方法</span><br><span class="line">// 直接看代码的话，一个提供了readOnlyMethod，修改(add ,remove ,set ...)的方法是通过MutableList提供的</span><br><span class="line">val numbers: MutableList&lt;Int&gt; = mutableListOf(1, 2, 3)</span><br><span class="line">val readOnlyView: List&lt;Int&gt; = numbers //将原先一个可修改的List包装成一个“只读”的List</span><br><span class="line">println(numbers)        // prints &quot;[1, 2, 3]&quot;</span><br><span class="line">numbers.add(4)</span><br><span class="line">println(readOnlyView)   // prints &quot;[1, 2, 3, 4]&quot; 但是不完全只读，通过修改底层list还是能只读</span><br><span class="line">readOnlyView.clear()    // -&gt; does not compile</span><br><span class="line"></span><br><span class="line">val items = listOf(1, 2, 3) //彻底的只读</span><br><span class="line"></span><br><span class="line">public interface MutableList&lt;E&gt; : List&lt;E&gt;, MutableCollection&lt;E&gt; &#123;</span><br><span class="line">   override fun clear(): Unit</span><br><span class="line">   public fun add(index: Int, element: E): Unit</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">读取一个List的元素推荐使用数组下标</span><br><span class="line">items.get(0) //ide会提示推荐使用下面这种方式</span><br><span class="line">items[0] //</span><br><span class="line"></span><br><span class="line">map也是，推荐通过类似于数组下标的方式去获取value</span><br></pre></td></tr></table></figure>
-<h3 id="3-implementing-an-interface-not-like-in-java"><a href="#3-implementing-an-interface-not-like-in-java" class="headerlink" title="3. implementing an interface not like in java"></a>3. implementing an interface not like in java</h3><p>如果接口只有一个方法<br>简单用lambda</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">button.setOnClickListener( &#123; v-&gt; System.out.print(v.id)&#125;)</span><br></pre></td></tr></table></figure>
-<p>如果有多个方法，语法就显得<a href="https://stackoverflow.com/questions/37672023/how-to-create-an-instance-of-anonymous-interface-in-kotlin">啰嗦的多</a></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">val handler = object : DisposableObserver&lt;Bitmap&gt;() &#123;</span><br><span class="line">        <span class="function">override fun <span class="title">onError</span><span class="params">(e: Throwable)</span> </span>&#123;</span><br><span class="line">           LogUtil.d(<span class="string">"e"</span>)</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function">override fun <span class="title">onNext</span><span class="params">(t: Bitmap)</span> </span>&#123;</span><br><span class="line">            image_two!!.setImageBitmap(t)</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function">override fun <span class="title">onComplete</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            LogUtil.d(<span class="string">"completed"</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<p>提到lambda，可以认为就是一个要执行的规则<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">fun logExecution1(func: () -&gt; String)&#123;</span><br><span class="line">        Log.d(&quot;tag&quot;,&quot;before method call&quot;)</span><br><span class="line">        func()</span><br><span class="line">        Log.d(&quot;tag&quot;,&quot;after method call&quot;)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">logExecution1(&#123;</span><br><span class="line">           val result = &quot;name&quot;</span><br><span class="line">           result</span><br><span class="line">       &#125;)</span><br><span class="line">```     </span><br><span class="line">在high order function的领域里，这就算传入了一个返回值为String的函数，用lambda的话，返回值就不用写return了。好像使用高阶函数，只能这么写lambda.lambda的函数的写法相当邪乎，用两个分号包起来，里面一行行的写，最后也不用写返回值</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">### 4. 没有new关键字了</span><br></pre></td></tr></table></figure></p>
-<p>class somClass{<br>  fun printMsg(msg : String){<br>    println(msg)<br>  }<br>}</p>
-<p>fun main(args: Array<String>){<br>  val instance  = somClass() // 直接把new给删了<br>  instance.printMsg(“Hey there”)<br>}</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">### 5. java Bean不需要写废话了</span><br></pre></td></tr></table></figure>
-<p>data class SomeThing(val id: Int)</p>
-<p>//用的时候</p>
-<p>val instance = SomeThing(10)</p>
-<p>//这种data class会主动对外提供非private属性(都不能叫Field了)的访问权（类似get set）。有些get方法会刻意复写getter<br>private val foo = calcValue(“foo”) //这个只会在第一次访问属性的时候调用这个方法<br>private val bar get() = calcValue(“bar”) //主动添加的get方法，意味着每次调用属性都会调用这个方法</p>
-<p>private fun calcValue(name: String): Int {<br>    println(“Calculating $name”)<br>    return 3<br>}</p>
-<p>// 自定义getter和setter<br>var stringRepresentation: String<br>    get() = this.toString()<br>    set(value) {<br>        setDataFromString(value) // parses the string and assigns values to other properties<br>    }</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">对于不希望生成getter和setter的filed，使用@jvmFiled的注解标识即可</span><br><span class="line"></span><br><span class="line">### 6. 具有更好语义的typealis</span><br></pre></td></tr></table></figure>
-<p>typealias CustomerName = String</p>
-<p>data class Customer(val name: CustomerName,val email: String)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">跟linux上的alias差不多，CustomerName其实就是String，但使用typealias使得传数据时更不容易错误。</span><br><span class="line"></span><br><span class="line">### 7. switch case用when来写</span><br></pre></td></tr></table></figure></p>
-<p>fun returnSomeThing(input :Any) : String{<br>    val actual = when(input){</p>
-<pre><code>    1 -&gt; {
-        println(&quot;1&quot;)
+<h3 id="1-基本语法"><a href="#1-基本语法" class="headerlink" title="1. 基本语法"></a>1. 基本语法</h3><p> 没有new关键字</p>
+<pre><code> 主函数
+ fun main(args : Array&lt;String&gt;) {
+    for (i in args.indices) {
+       print(args[i])
+    }
+}
+</code></pre><p>自定义函数</p>
+<pre><code> fun getStringLength(obj: Any) :Int?{ //问号代表有可能返回空值
+    if (obj is String) {
+        return obj.length
+    }
+    return 0
+}
+
+
+
+ 支持lambda
+ fun maps(list: List&lt;String&gt;) {
+    list.filter { it.startsWith(&quot;a&quot;) }
+            .sortedBy { it }
+            .map(String::toUpperCase)
+            .forEach(::print)
+}
+
+对于函数有新的认识了
+
+public fun isOdd(number: Int) = number % 2 != 0 // 函数也可以用一个等式来表达了
+public fun isOdd2(number: Int) :Boolean { //这种就啰嗦点
+    return number % 2 != 0
+}
+</code></pre><h3 id="2-集合相关"><a href="#2-集合相关" class="headerlink" title="2. 集合相关"></a>2. 集合相关</h3><p>常用的迭代一个range的方式</p>
+<pre><code>for (i in 1..3) {
+    println(i) //这个打印出来是1，2，3
+}
+
+for (i in 6 downTo 0 step 2) {
+    println(i)
+} //这个打印出来是6 4 2 0
+</code></pre><pre><code>//带index的迭代一个集合的方式
+val quoteParts = &quot; YOU JUST TALKED TO MUCH !&quot;.split(&quot; &quot;)
+for ((index, value) in quoteParts.withIndex()) {
+    print(&quot;reading index $index: $value &quot;)
+}
+
+//和java定义的List interface不一样，Kotlin定义的interface默认是没有add,remove这些修改性质的方法的。
+// 比如说有一个int，想凑到String + int中，不需要String.format了，kotlin给String加上了一个format的ententsion Function，更简单的方式是直接加上美元符号引用即可。感觉和es6很像。
+
+
+// List&lt;out T&gt;这种集合默认只提供了只读的方法，比如get ,size。想要更改内容需要使用MutableList接口提供的方法
+// 直接看代码的话，一个提供了readOnlyMethod，修改(add ,remove ,set ...)的方法是通过MutableList提供的
+val numbers: MutableList&lt;Int&gt; = mutableListOf(1, 2, 3)
+val readOnlyView: List&lt;Int&gt; = numbers //将原先一个可修改的List包装成一个“只读”的List
+println(numbers)        // prints &quot;[1, 2, 3]&quot;
+numbers.add(4)
+println(readOnlyView)   // prints &quot;[1, 2, 3, 4]&quot; 但是不完全只读，通过修改底层list还是能只读
+readOnlyView.clear()    // -&gt; does not compile
+
+val items = listOf(1, 2, 3) //彻底的只读
+
+public interface MutableList&lt;E&gt; : List&lt;E&gt;, MutableCollection&lt;E&gt; {
+   override fun clear(): Unit
+   public fun add(index: Int, element: E): Unit
+}
+
+
+读取一个List的元素推荐使用数组下标
+items.get(0) //ide会提示推荐使用下面这种方式
+items[0] //
+
+map也是，推荐通过类似于数组下标的方式去获取value
+</code></pre><h3 id="3-implementing-an-interface-not-like-in-java"><a href="#3-implementing-an-interface-not-like-in-java" class="headerlink" title="3. implementing an interface not like in java"></a>3. implementing an interface not like in java</h3><p>如果接口只有一个方法<br>简单用lambda</p>
+<pre><code>button.setOnClickListener( { v-&gt; System.out.print(v.id)})
+</code></pre><p>如果有多个方法，语法就显得<a href="https://stackoverflow.com/questions/37672023/how-to-create-an-instance-of-anonymous-interface-in-kotlin">啰嗦的多</a></p>
+<pre><code class="java">val handler = object : DisposableObserver&lt;Bitmap&gt;() {
+        override fun onError(e: Throwable) {
+           LogUtil.d(&quot;e&quot;)
+        }
+
+        override fun onNext(t: Bitmap) {
+            image_two!!.setImageBitmap(t)
+        }
+
+        override fun onComplete() {
+            LogUtil.d(&quot;completed&quot;)
+        }
+    }
+</code></pre>
+<p>提到lambda，可以认为就是一个要执行的规则</p>
+<pre><code>fun logExecution1(func: () -&gt; String){
+        Log.d(&quot;tag&quot;,&quot;before method call&quot;)
+        func()
+        Log.d(&quot;tag&quot;,&quot;after method call&quot;)
     }
 
-    2 -&gt; {
-        println(&quot;2&quot;)
+logExecution1({
+           val result = &quot;name&quot;
+           result
+       })
+</code></pre><p>在high order function的领域里，这就算传入了一个返回值为String的函数，用lambda的话，返回值就不用写return了。好像使用高阶函数，只能这么写lambda.lambda的函数的写法相当邪乎，用两个分号包起来，里面一行行的写，最后也不用写返回值</p>
+<h3 id="4-没有new关键字了"><a href="#4-没有new关键字了" class="headerlink" title="4. 没有new关键字了"></a>4. 没有new关键字了</h3><pre><code>class somClass{
+  fun printMsg(msg : String){
+    println(msg)
+  }
+}
+
+fun main(args: Array&lt;String&gt;){
+  val instance  = somClass() // 直接把new给删了
+  instance.printMsg(&quot;Hey there&quot;)
+}
+</code></pre><h3 id="5-java-Bean不需要写废话了"><a href="#5-java-Bean不需要写废话了" class="headerlink" title="5. java Bean不需要写废话了"></a>5. java Bean不需要写废话了</h3><pre><code>data class SomeThing(val id: Int)
+
+//用的时候
+
+val instance = SomeThing(10)
+
+//这种data class会主动对外提供非private属性(都不能叫Field了)的访问权（类似get set）。有些get方法会刻意复写getter
+private val foo = calcValue(&quot;foo&quot;) //这个只会在第一次访问属性的时候调用这个方法
+private val bar get() = calcValue(&quot;bar&quot;) //主动添加的get方法，意味着每次调用属性都会调用这个方法
+
+private fun calcValue(name: String): Int {
+    println(&quot;Calculating $name&quot;)
+    return 3
+}
+
+// 自定义getter和setter
+var stringRepresentation: String
+    get() = this.toString()
+    set(value) {
+        setDataFromString(value) // parses the string and assigns values to other properties
+    }
+</code></pre><p>对于不希望生成getter和setter的filed，使用@jvmFiled的注解标识即可</p>
+<h3 id="6-具有更好语义的typealis"><a href="#6-具有更好语义的typealis" class="headerlink" title="6. 具有更好语义的typealis"></a>6. 具有更好语义的typealis</h3><pre><code>typealias CustomerName = String
+
+data class Customer(val name: CustomerName,val email: String)
+</code></pre><p>跟linux上的alias差不多，CustomerName其实就是String，但使用typealias使得传数据时更不容易错误。</p>
+<h3 id="7-switch-case用when来写"><a href="#7-switch-case用when来写" class="headerlink" title="7. switch case用when来写"></a>7. switch case用when来写</h3><pre><code>fun returnSomeThing(input :Any) : String{
+    val actual = when(input){
+
+        1 -&gt; {
+            println(&quot;1&quot;)
+        }
+
+        2 -&gt; {
+            println(&quot;2&quot;)
+        }
+
+        is Int -&gt; {
+            println(&quot;is Int&quot;)
+        }
+
+        else -&gt;{
+            println(&quot;don&#39;t know which one&quot;)
+        }
     }
 
-    is Int -&gt; {
-        println(&quot;is Int&quot;)
-    }
+    return actual.toString()
 
-    else -&gt;{
-        println(&quot;don&apos;t know which one&quot;)
+}
+
+// when ... is ...是根据传入的object的class类型来进行判断的
+when (x) {
+    is Foo -&gt; ...
+    is Bar -&gt; ...
+    else   -&gt; ...
+}
+</code></pre><h3 id="8-能够接受一个函数作为参数"><a href="#8-能够接受一个函数作为参数" class="headerlink" title="8. 能够接受一个函数作为参数"></a>8. 能够接受一个函数作为参数</h3><p>在调用一些资源的时候，经常需要用完了关闭掉</p>
+<pre><code>fun using(resource: Closeable, body: () -&gt; Unit) {
+    try {
+        body()
+    }finally {
+        resource.close()
     }
 }
 
-return actual.toString()
-</code></pre><p>}</p>
-<p>// when … is …是根据传入的object的class类型来进行判断的<br>when (x) {<br>    is Foo -&gt; …<br>    is Bar -&gt; …<br>    else   -&gt; …<br>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">### 8. 能够接受一个函数作为参数</span><br><span class="line">在调用一些资源的时候，经常需要用完了关闭掉</span><br></pre></td></tr></table></figure></p>
-<p>fun using(resource: Closeable, body: () -&gt; Unit) {<br>    try {<br>        body()<br>    }finally {<br>        resource.close()<br>    }<br>}</p>
-<p>val inputstram = FileInputStream(“/“) as FileInputStream</p>
-<p>   using(inputstram){<br>    //  do stuff with this resource<br>    // it will close for you<br>   }<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">### 9. 获取this</span><br><span class="line">使用this@MyActivity即可</span><br><span class="line"></span><br><span class="line">### 10. findViewById怎么写</span><br><span class="line">&gt; change</span><br><span class="line">val listView = findViewById(R.id.list) as ListView to</span><br><span class="line">val listView = findViewById&lt;ListView&gt;(R.id.list)</span><br><span class="line"></span><br><span class="line">[参考](https://www.jianshu.com/p/e2cb4c65d4ff)</span><br></pre></td></tr></table></figure></p>
-<p>封装：<br>fun <V : View> Activity.bindView(id: Int): Lazy<V> = lazy {<br>    viewFinder(id) as V<br>}</p>
-<p>private val Activity.viewFinder: Activity.(Int) -&gt; View?<br>    get() = { findViewById(it) }</p>
-<p>之后我们就可以在 Activity 中这样注入 View 了<br>val mTextView by bindView<TextView>(R.id.text_view)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line">### 11.extends需要把parentClass设置为open</span><br><span class="line">```java</span><br><span class="line">open class MySuperClass(parameter:String)</span><br><span class="line"></span><br><span class="line">class MyClass2 &#123;</span><br><span class="line">    object AnonymousSubClass:MySuperClass(&quot;something&quot;),MyInterface1,MyInterface2 &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h3 id="12-没有static-关键字了，静态方法的写法"><a href="#12-没有static-关键字了，静态方法的写法" class="headerlink" title="12.没有static 关键字了，静态方法的写法"></a>12.没有static 关键字了，静态方法的写法</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">class Controller &#123;</span><br><span class="line">    private val _items = mutableListOf&lt;String&gt;(&quot;1&quot;,&quot;2&quot;,&quot;4&quot;)</span><br><span class="line">     val items: List&lt;String&gt; get() = _items.toList()</span><br><span class="line"></span><br><span class="line">    companion object &#123;</span><br><span class="line">        fun checkType(args:Any?)&#123;</span><br><span class="line">            when(args)&#123;</span><br><span class="line">                is String -&gt; println(&quot;This is an String Type&quot;)</span><br><span class="line">                is Int -&gt; println(&quot;This is Some Integer Number &quot;)</span><br><span class="line">                else -&gt; println(&quot;i don&apos;t recognize this format doom.....&quot;)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//外部调用</span><br><span class="line">Controller.checkType(10) // -&gt; This is Some Integer Number</span><br><span class="line">//在另一个class中调用Controller.Companion.checkType(18) //和static方法一样，如果方法是private的话，外部也访问不了</span><br></pre></td></tr></table></figure>
-<p>所以比如说像Constants这样的东西，也要丢到companion object中了</p>
-<h3 id="13-class-cast"><a href="#13-class-cast" class="headerlink" title="13. class cast"></a>13. class cast</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">val modifiableMap :MutableMap&lt;String,String&gt; = unmodifiableMap as MutableMap&lt;String, String&gt; //使用as关键字</span><br></pre></td></tr></table></figure>
-<h3 id="14-by-lazy和lateinit的区别"><a href="#14-by-lazy和lateinit的区别" class="headerlink" title="14. by lazy和lateinit的区别"></a>14. by lazy和lateinit的区别</h3><p><a href="http://ebnbin.com/2017/06/16/kotlin_variable_to_be_lazy_or_to_be_late/">参考</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">val myUtil by lazy &#123;</span><br><span class="line">     MyUtil(parameter1, parameter2)</span><br><span class="line">&#125;</span><br><span class="line">// 第一次调用myUtil的时候会调用</span><br><span class="line"></span><br><span class="line">val instance :HashMap&lt;String,String&gt; by lazy &#123;</span><br><span class="line">        HashMap&lt;String,String&gt;()</span><br><span class="line">&#125;</span><br><span class="line">//所以看上去就特别适合作为instance</span><br><span class="line"></span><br><span class="line">//官方推荐的实现singleton的方式</span><br><span class="line">object Resource &#123;</span><br><span class="line">    val name = &quot;Name&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">lateinit var myUtil: MyUtil</span><br><span class="line">// 使用的时候</span><br><span class="line">myUtil = MyUtil(parameter1, parameter2)</span><br><span class="line">// 这明显是把变量的初始化与定义分离开了。</span><br></pre></td></tr></table></figure></p>
-<p>显然的区别是一个是val 一个是var。</p>
+val inputstram = FileInputStream(&quot;/&quot;) as FileInputStream
+
+   using(inputstram){
+    //  do stuff with this resource
+    // it will close for you
+   }
+</code></pre><h3 id="9-获取this"><a href="#9-获取this" class="headerlink" title="9. 获取this"></a>9. 获取this</h3><p>使用this@MyActivity即可</p>
+<h3 id="10-findViewById怎么写"><a href="#10-findViewById怎么写" class="headerlink" title="10. findViewById怎么写"></a>10. findViewById怎么写</h3><blockquote>
+<p>change<br>val listView = findViewById(R.id.list) as ListView to<br>val listView = findViewById<ListView>(R.id.list)</p>
+</blockquote>
+<p><a href="https://www.jianshu.com/p/e2cb4c65d4ff">参考</a></p>
+<pre><code>封装：
+fun &lt;V : View&gt; Activity.bindView(id: Int): Lazy&lt;V&gt; = lazy {
+    viewFinder(id) as V
+}
+
+private val Activity.viewFinder: Activity.(Int) -&gt; View?
+    get() = { findViewById(it) }
+
+
+之后我们就可以在 Activity 中这样注入 View 了
+val mTextView by bindView&lt;TextView&gt;(R.id.text_view)
+</code></pre><h3 id="11-extends需要把parentClass设置为open"><a href="#11-extends需要把parentClass设置为open" class="headerlink" title="11.extends需要把parentClass设置为open"></a>11.extends需要把parentClass设置为open</h3><pre><code class="java">open class MySuperClass(parameter:String)
+
+class MyClass2 {
+    object AnonymousSubClass:MySuperClass(&quot;something&quot;),MyInterface1,MyInterface2 {
+
+    }
+}
+</code></pre>
+<h3 id="12-没有static-关键字了，静态方法的写法"><a href="#12-没有static-关键字了，静态方法的写法" class="headerlink" title="12.没有static 关键字了，静态方法的写法"></a>12.没有static 关键字了，静态方法的写法</h3><pre><code>class Controller {
+    private val _items = mutableListOf&lt;String&gt;(&quot;1&quot;,&quot;2&quot;,&quot;4&quot;)
+     val items: List&lt;String&gt; get() = _items.toList()
+
+    companion object {
+        fun checkType(args:Any?){
+            when(args){
+                is String -&gt; println(&quot;This is an String Type&quot;)
+                is Int -&gt; println(&quot;This is Some Integer Number &quot;)
+                else -&gt; println(&quot;i don&#39;t recognize this format doom.....&quot;)
+            }
+        }
+    }
+}
+
+//外部调用
+Controller.checkType(10) // -&gt; This is Some Integer Number
+//在另一个class中调用Controller.Companion.checkType(18) //和static方法一样，如果方法是private的话，外部也访问不了
+</code></pre><p>所以比如说像Constants这样的东西，也要丢到companion object中了</p>
+<h3 id="13-class-cast"><a href="#13-class-cast" class="headerlink" title="13. class cast"></a>13. class cast</h3><pre><code>val modifiableMap :MutableMap&lt;String,String&gt; = unmodifiableMap as MutableMap&lt;String, String&gt; //使用as关键字
+</code></pre><h3 id="14-by-lazy和lateinit的区别"><a href="#14-by-lazy和lateinit的区别" class="headerlink" title="14. by lazy和lateinit的区别"></a>14. by lazy和lateinit的区别</h3><p><a href="http://ebnbin.com/2017/06/16/kotlin_variable_to_be_lazy_or_to_be_late/">参考</a></p>
+<pre><code>val myUtil by lazy {
+     MyUtil(parameter1, parameter2)
+}
+// 第一次调用myUtil的时候会调用
+
+val instance :HashMap&lt;String,String&gt; by lazy {
+        HashMap&lt;String,String&gt;()
+}
+//所以看上去就特别适合作为instance
+
+//官方推荐的实现singleton的方式
+object Resource {
+    val name = &quot;Name&quot;
+}
+
+lateinit var myUtil: MyUtil
+// 使用的时候
+myUtil = MyUtil(parameter1, parameter2)
+// 这明显是把变量的初始化与定义分离开了。
+</code></pre><p>显然的区别是一个是val 一个是var。</p>
 <blockquote>
 <p>如果是值可修改的变量（即在之后的使用中可能被重新赋值），使用 lateInit 模式<br>如果变量的初始化取决于外部对象（例如需要一些外部变量参与初始化），使用 lateInit 模式。这种情况下，lazy 模式也可行但并不直接适用。<br>如果变量仅仅初始化一次并且全局共享，且更多的是内部使用（依赖于类内部的变量），请使用 lazy 模式。从实现的角度来看，lateinit 模式仍然可用，但 lazy 模式更有利于封装你的初始化代码。</p>
 </blockquote>
-<h3 id="15-NPE还是会有的"><a href="#15-NPE还是会有的" class="headerlink" title="15. NPE还是会有的"></a>15. NPE还是会有的</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">val files = File(&quot;&quot;).listFiles()</span><br><span class="line">println(files.size) // crash</span><br><span class="line"></span><br><span class="line">val files = File(&quot;&quot;).listFiles()</span><br><span class="line">println(files?.size) // 输出 null ?的意思类似于优先判空</span><br></pre></td></tr></table></figure>
-<h3 id="16-let-apply-with-run方法"><a href="#16-let-apply-with-run方法" class="headerlink" title="16. let ,apply ,with,run方法"></a>16. let ,apply ,with,run方法</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * Calls the specified function [block] with `this` value as its argument and returns its result.</span><br><span class="line"> */</span><br><span class="line">// let，其实就是一个实例化的对象上添加一个extension method</span><br><span class="line">val result =&quot;Hello World&quot;.let &#123;</span><br><span class="line">        println(it) //这个it是一个关键字</span><br><span class="line">        520</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">println(result)</span><br><span class="line">输出</span><br><span class="line">&quot;Hello World&quot;</span><br><span class="line">520 //这个时候的result就已经是520了</span><br><span class="line"></span><br><span class="line">// 如果不为Null的话，执行下面这一段代码块</span><br><span class="line">val value = ...</span><br><span class="line"></span><br><span class="line">value?.let &#123;</span><br><span class="line">    ... // execute this block if not null</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>apply的用法<br>val name =  “myName”.apply {<br>      toUpperCase()<br>   }<br>print(name) //出来的还是myName，也就是说apply里面的东西不会对值产生影响</p>
-<h3 id="17-with关键字用于同时调用一个Instance-的多个method"><a href="#17-with关键字用于同时调用一个Instance-的多个method" class="headerlink" title="17. with关键字用于同时调用一个Instance 的多个method"></a>17. with关键字用于同时调用一个Instance 的多个method</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">class Turtle &#123;</span><br><span class="line">    fun penDown()</span><br><span class="line">    fun penUp()</span><br><span class="line">    fun turn(degrees: Double)</span><br><span class="line">    fun forward(pixels: Double)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">val myTurtle = Turtle()</span><br><span class="line">with(myTurtle) &#123; //draw a 100 pix square</span><br><span class="line">    penDown()</span><br><span class="line">    for(i in 1..4) &#123;</span><br><span class="line">        forward(100.0)</span><br><span class="line">        turn(90.0)</span><br><span class="line">    &#125;</span><br><span class="line">    penUp()</span><br><span class="line">&#125;  </span><br><span class="line"></span><br><span class="line">// java7 的try with resources</span><br><span class="line">val stream = Files.newInputStream(Paths.get(&quot;/some/file.txt&quot;))</span><br><span class="line">stream.buffered().reader().use &#123; reader -&gt;</span><br><span class="line">    println(reader.readText())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="18-class还是File"><a href="#18-class还是File" class="headerlink" title="18. class还是File"></a>18. class还是File</h3><p>新建一个class和新建一个File有什么区别，File里面可以写多个class，每个class都是类似于java中static inner class，互相之间是不能引用到的。<br>内部类不是像Java那样写在里面就能引用到外部类了，kotlin写在里面的class默认是引用不到外面class的field和方法的，需要给内部class加上inner关键词。</p>
-<p>java里面写习惯了.class对象，在kotlin中得这么写:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">retrofit.create(ApiStores.class) <span class="comment">//java写法</span></span><br><span class="line"></span><br><span class="line">retrofit.create(ApiStores::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>) // <span class="title">kotlin</span>写法</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="15-NPE还是会有的"><a href="#15-NPE还是会有的" class="headerlink" title="15. NPE还是会有的"></a>15. NPE还是会有的</h3><pre><code>val files = File(&quot;&quot;).listFiles()
+println(files.size) // crash
+
+val files = File(&quot;&quot;).listFiles()
+println(files?.size) // 输出 null ?的意思类似于优先判空
+</code></pre><h3 id="16-let-apply-with-run方法"><a href="#16-let-apply-with-run方法" class="headerlink" title="16. let ,apply ,with,run方法"></a>16. let ,apply ,with,run方法</h3><pre><code>/**
+ * Calls the specified function [block] with `this` value as its argument and returns its result.
+ */
+// let，其实就是一个实例化的对象上添加一个extension method
+val result =&quot;Hello World&quot;.let {
+        println(it) //这个it是一个关键字
+        520
+    }
+
+println(result)
+输出
+&quot;Hello World&quot;
+520 //这个时候的result就已经是520了
+
+// 如果不为Null的话，执行下面这一段代码块
+val value = ...
+
+value?.let {
+    ... // execute this block if not null
+}
+</code></pre><p>apply的用法<br>val name =  “myName”.apply {<br>      toUpperCase()<br>   }<br>print(name) //出来的还是myName，也就是说apply里面的东西不会对值产生影响</p>
+<h3 id="17-with关键字用于同时调用一个Instance-的多个method"><a href="#17-with关键字用于同时调用一个Instance-的多个method" class="headerlink" title="17. with关键字用于同时调用一个Instance 的多个method"></a>17. with关键字用于同时调用一个Instance 的多个method</h3><pre><code>class Turtle {
+    fun penDown()
+    fun penUp()
+    fun turn(degrees: Double)
+    fun forward(pixels: Double)
+}
+
+val myTurtle = Turtle()
+with(myTurtle) { //draw a 100 pix square
+    penDown()
+    for(i in 1..4) {
+        forward(100.0)
+        turn(90.0)
+    }
+    penUp()
+}  
+
+// java7 的try with resources
+val stream = Files.newInputStream(Paths.get(&quot;/some/file.txt&quot;))
+stream.buffered().reader().use { reader -&gt;
+    println(reader.readText())
+}
+</code></pre><h3 id="18-class还是File"><a href="#18-class还是File" class="headerlink" title="18. class还是File"></a>18. class还是File</h3><p>新建一个class和新建一个File有什么区别，File里面可以写多个class，每个class都是类似于java中static inner class，互相之间是不能引用到的。<br>内部类不是像Java那样写在里面就能引用到外部类了，kotlin写在里面的class默认是引用不到外面class的field和方法的，需要给内部class加上inner关键词。</p>
+<p>java里面写习惯了.class对象，在kotlin中得这么写:</p>
+<pre><code class="java">retrofit.create(ApiStores.class) //java写法
+
+retrofit.create(ApiStores::class.java) // kotlin写法
+</code></pre>
 <p>init函数和constructor是有区别的<br><a href="https://stackoverflow.com/questions/33688821/what-are-the-kotlin-class-initialisation-semantics">What are the Kotlin class initialisation semantics?
 </a>.简单来说，init函数</p>
 <h2 id="19-extends-T怎么写"><a href="#19-extends-T怎么写" class="headerlink" title="19. ? extends T怎么写"></a>19. ? extends T怎么写</h2><p>var lst = ArrayList&lt;Class<out Number>&gt;()<br>lst.add(Noun_Class::class.java)</p>

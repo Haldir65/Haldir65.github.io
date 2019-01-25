@@ -17,7 +17,7 @@
 <meta property="og:description" content="pip install SQLAlchemy">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/side_walk_tree.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.043Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.185Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="sqlalchemy速查手册">
 <meta name="twitter:description" content="pip install SQLAlchemy">
@@ -205,37 +205,405 @@ ga('send', 'pageview');
 </blockquote>
 <p><img src="https://www.haldir66.ga/static/imgs/side_walk_tree.jpg" alt=""></p>
 <a id="more"></a>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sqlalchemy <span class="keyword">import</span> create_engine</span><br><span class="line"><span class="comment">## 想用sqlite?</span></span><br><span class="line">engine = create_engine(<span class="string">'sqlite:///foo.db'</span>, echo=<span class="keyword">True</span>) <span class="comment">## 会在当前目录下生成一个foo.db文件，这个True表示程序运行的时候会打印出生成的sql语句。</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## 想用mysql?</span></span><br><span class="line">engine = create_engine(<span class="string">'mysql+mysqlconnector://%s:%s@localhost:3306/%s?charset=utf8'</span> % (config.DB_USER_NAME,config.DB_PASS_WORD,config.DB_NAME)) <span class="comment">## mysql也是支持的</span></span><br><span class="line">这里有一个坑：</span><br><span class="line"><span class="comment">## mysql://username:password@server/db  python3下面不能这么写，虽然flask-sqlalchemy教程上是这么教人的</span></span><br><span class="line"><span class="comment">## mysql+pymysql://username:password@server/db  应该这么写，还有pip install PyMySQL</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">## postgresql也是可以的</span></span><br><span class="line">engine = create_engine(<span class="string">"postgresql://scott:tiger@localhost/test"</span>)</span><br></pre></td></tr></table></figure>
-<p>创建db的时候注意,sqlite因为是直接写文件，所以要把db的路径写清楚了。如果贸然写一个’sqlite:///db.sqlite3’，可能会出现no such table<br>config.py文件里面<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">project_dir = os.path.dirname(os.path.abspath(__file__))</span><br><span class="line">SQLALCHEMY_DATABASE_URI = <span class="string">"sqlite:///&#123;&#125;"</span>.format(os.path.join(project_dir, <span class="string">"backend.db"</span>))</span><br></pre></td></tr></table></figure></p>
-<p>数据库创建了，开始<del>建表</del>设计表<br>其实一般没必要这么搞，直接db.create_all()得了<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">## create table if not exists</span></span><br><span class="line">engine = create_engine(<span class="string">"sqlite:///myexample.db"</span>)  <span class="comment"># Access the DB Engine</span></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> engine.dialect.has_table(engine, Variable_tableName):  <span class="comment"># If table don't exist, Create.</span></span><br><span class="line">    metadata = MetaData(engine)</span><br><span class="line">    <span class="comment"># Create a table with the appropriate Columns</span></span><br><span class="line">    <span class="comment">##主键，auto_increment是这么设置的</span></span><br><span class="line">    Table(Variable_tableName, metadata,</span><br><span class="line">          Column(<span class="string">'Id'</span>, Integer, primary_key=<span class="keyword">True</span>, nullable=<span class="keyword">False</span>,autoincrement = <span class="keyword">True</span>),</span><br><span class="line">          Column(<span class="string">'Date'</span>, Date), Column(<span class="string">'Country'</span>, String),</span><br><span class="line">          Column(<span class="string">'Brand'</span>, String), Column(<span class="string">'Price'</span>, Float),</span><br><span class="line">    <span class="comment"># Implement the creation</span></span><br><span class="line">    metadata.create_all()</span><br></pre></td></tr></table></figure></p>
-<p>Flask比较好的地方是可以和SQLAlechemy紧密结合<br>Flask一起用<a href="https://www.thatyou.cn/flask%E4%BD%BF%E7%94%A8flask-sqlalchemy%E6%93%8D%E4%BD%9Cmysql%E6%95%B0%E6%8D%AE%E5%BA%93%EF%BC%88%E4%BA%8C%EF%BC%89-%E5%8D%95%E8%A1%A8%E6%9F%A5%E8%AF%A2/">代码出处</a><br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask_sqlalchemy <span class="keyword">import</span> SQLAlchemy</span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask, jsonify, request</span><br><span class="line"><span class="keyword">import</span> configparser</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line">my_config = configparser.ConfigParser()</span><br><span class="line">my_config.read(<span class="string">'db.conf'</span>)</span><br><span class="line"></span><br><span class="line">app.config[<span class="string">'SQLALCHEMY_DATABASE_URI'</span>] = <span class="string">'mysql://'</span> + my_config.get(<span class="string">'DB'</span>, <span class="string">'DB_USER'</span>) + <span class="string">':'</span> + my_config.get(<span class="string">'DB'</span>, <span class="string">'DB_PASSWORD'</span>) + <span class="string">'@'</span> + my_config.get(<span class="string">'DB'</span>, <span class="string">'DB_HOST'</span>) + <span class="string">'/'</span> + my_config.get(<span class="string">'DB'</span>, <span class="string">'DB_DB'</span>)</span><br><span class="line">app.config[<span class="string">'SQLALCHEMY_TRACK_MODIFICATIONS'</span>] = <span class="keyword">True</span></span><br><span class="line"></span><br><span class="line">mydb = SQLAlchemy()</span><br><span class="line">mydb.init_app(app)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 用户模型</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span><span class="params">(mydb.Model)</span>:</span></span><br><span class="line">    user_id = mydb.Column(mydb.Integer, primary_key=<span class="keyword">True</span>)</span><br><span class="line">    user_name = mydb.Column(mydb.String(<span class="number">60</span>), nullable=<span class="keyword">False</span>)</span><br><span class="line">    user_password = mydb.Column(mydb.String(<span class="number">30</span>), nullable=<span class="keyword">False</span>)</span><br><span class="line">    user_nickname = mydb.Column(mydb.String(<span class="number">50</span>))</span><br><span class="line">    user_email = mydb.Column(mydb.String(<span class="number">30</span>), nullable=<span class="keyword">False</span>)</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">'&lt;User %r&gt;'</span> % self.user_name</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取用户列表</span></span><br><span class="line"><span class="meta">@app.route('/users', methods=['GET'])</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getUsers</span><span class="params">()</span>:</span></span><br><span class="line">    data = User.query.all()</span><br><span class="line">    datas = []</span><br><span class="line">    <span class="keyword">for</span> user <span class="keyword">in</span> data:</span><br><span class="line">        datas.append(&#123;<span class="string">'user_id'</span>: user.user_id, <span class="string">'user_name'</span>: user.user_name, <span class="string">'user_nickname'</span>: user.user_nickname, <span class="string">'user_email'</span>: user.user_email&#125;)</span><br><span class="line">    <span class="keyword">return</span> jsonify(data=datas)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 添加用户数据</span></span><br><span class="line"><span class="meta">@app.route('/user', methods=['POST'])</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">addUser</span><span class="params">()</span>:</span></span><br><span class="line">    user_name = request.form.get(<span class="string">'user_name'</span>)</span><br><span class="line">    user_password = request.form.get(<span class="string">'user_password'</span>)</span><br><span class="line">    user_nickname = request.form.get(<span class="string">'user_nickname'</span>)</span><br><span class="line">    user_email = request.form.get(<span class="string">'user_email'</span>)</span><br><span class="line">    user = User(user_name=user_name, user_password=user_password, user_nickname=user_nickname, user_email=user_email)</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        mydb.session.add(user)</span><br><span class="line">        mydb.session.commit()</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        mydb.session.rollback()</span><br><span class="line">        mydb.session.flush()</span><br><span class="line">    userId = user.user_id</span><br><span class="line">    <span class="keyword">if</span> (user.user_id <span class="keyword">is</span> <span class="keyword">None</span>):</span><br><span class="line">        result = &#123;<span class="string">'msg'</span>: <span class="string">'添加失败'</span>&#125;</span><br><span class="line">        <span class="keyword">return</span> jsonify(data=result)</span><br><span class="line"></span><br><span class="line">    data = User.query.filter_by(user_id=userId).first()</span><br><span class="line">    result = &#123;<span class="string">'user_id'</span>: user.user_id, <span class="string">'user_name'</span>: user.user_name, <span class="string">'user_nickname'</span>: user.user_nickname, <span class="string">'user_email'</span>: user.user_email&#125;</span><br><span class="line">    <span class="keyword">return</span> jsonify(data=result)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取单条数据</span></span><br><span class="line"><span class="meta">@app.route('/user/&lt;int:userId&gt;', methods=['GET'])</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getUser</span><span class="params">(userId)</span>:</span></span><br><span class="line">    user = User.query.filter_by(user_id=userId).first()</span><br><span class="line">    <span class="keyword">if</span> (user <span class="keyword">is</span> <span class="keyword">None</span>):</span><br><span class="line">        result = &#123;<span class="string">'msg'</span>: <span class="string">'找不到数据'</span>&#125;</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        result = &#123;<span class="string">'user_id'</span>: user.user_id, <span class="string">'user_name'</span>: user.user_name, <span class="string">'user_nickname'</span>: user.user_nickname, <span class="string">'user_email'</span>: user.user_email&#125;</span><br><span class="line">    <span class="keyword">return</span> jsonify(data=result)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 修改用户数据</span></span><br><span class="line"><span class="meta">@app.route('/user/&lt;int:userId&gt;', methods=['PATCH'])</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">updateUser</span><span class="params">(userId)</span>:</span></span><br><span class="line">    user_name = request.form.get(<span class="string">'user_name'</span>)</span><br><span class="line">    user_password = request.form.get(<span class="string">'user_password'</span>)</span><br><span class="line">    user_nickname = request.form.get(<span class="string">'user_nickname'</span>)</span><br><span class="line">    user_email = request.form.get(<span class="string">'user_email'</span>)</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        user = User.query.filter_by(user_id=userId).first()</span><br><span class="line">        <span class="keyword">if</span> (user <span class="keyword">is</span> <span class="keyword">None</span>):</span><br><span class="line">            result = &#123;<span class="string">'msg'</span>: <span class="string">'找不到要修改的记录'</span>&#125;</span><br><span class="line">            <span class="keyword">return</span> jsonify(data=result)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            user.user_name = user_name</span><br><span class="line">            user.user_password = user_password</span><br><span class="line">            user.user_nickname = user_nickname</span><br><span class="line">            user.user_email = user_email</span><br><span class="line">            mydb.session.commit()</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        mydb.session.rollback()</span><br><span class="line">        mydb.session.flush()</span><br><span class="line">    userId = user.user_id</span><br><span class="line">    data = User.query.filter_by(user_id=userId).first()</span><br><span class="line">    result = &#123;<span class="string">'user_id'</span>: user.user_id, <span class="string">'user_name'</span>: user.user_name, <span class="string">'user_password'</span>: user.user_password, <span class="string">'user_nickname'</span>: user.user_nickname, <span class="string">'user_email'</span>: user.user_email&#125;</span><br><span class="line">    <span class="keyword">return</span> jsonify(data=result)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 删除用户数据</span></span><br><span class="line"><span class="meta">@app.route('/user/&lt;int:userId&gt;', methods=['DELETE'])</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">deleteUser</span><span class="params">(userId)</span>:</span></span><br><span class="line">    User.query.filter_by(user_id=userId).delete()</span><br><span class="line">    mydb.session.commit()</span><br><span class="line">    <span class="keyword">return</span> getUsers()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app.run(debug=<span class="keyword">True</span>)</span><br></pre></td></tr></table></figure></p>
+<pre><code class="python">from sqlalchemy import create_engine
+## 想用sqlite?
+engine = create_engine(&#39;sqlite:///foo.db&#39;, echo=True) ## 会在当前目录下生成一个foo.db文件，这个True表示程序运行的时候会打印出生成的sql语句。
+
+## 想用mysql?
+engine = create_engine(&#39;mysql+mysqlconnector://%s:%s@localhost:3306/%s?charset=utf8&#39; % (config.DB_USER_NAME,config.DB_PASS_WORD,config.DB_NAME)) ## mysql也是支持的
+这里有一个坑：
+## mysql://username:password@server/db  python3下面不能这么写，虽然flask-sqlalchemy教程上是这么教人的
+## mysql+pymysql://username:password@server/db  应该这么写，还有pip install PyMySQL
+
+
+
+## postgresql也是可以的
+engine = create_engine(&quot;postgresql://scott:tiger@localhost/test&quot;)
+</code></pre>
+<p>创建db的时候注意,sqlite因为是直接写文件，所以要把db的路径写清楚了。如果贸然写一个’sqlite:///db.sqlite3’，可能会出现no such table<br>config.py文件里面</p>
+<pre><code class="python">import os
+
+project_dir = os.path.dirname(os.path.abspath(__file__))
+SQLALCHEMY_DATABASE_URI = &quot;sqlite:///{}&quot;.format(os.path.join(project_dir, &quot;backend.db&quot;))
+</code></pre>
+<p>数据库创建了，开始<del>建表</del>设计表<br>其实一般没必要这么搞，直接db.create_all()得了</p>
+<pre><code class="python">
+## create table if not exists
+engine = create_engine(&quot;sqlite:///myexample.db&quot;)  # Access the DB Engine
+if not engine.dialect.has_table(engine, Variable_tableName):  # If table don&#39;t exist, Create.
+    metadata = MetaData(engine)
+    # Create a table with the appropriate Columns
+    ##主键，auto_increment是这么设置的
+    Table(Variable_tableName, metadata,
+          Column(&#39;Id&#39;, Integer, primary_key=True, nullable=False,autoincrement = True),
+          Column(&#39;Date&#39;, Date), Column(&#39;Country&#39;, String),
+          Column(&#39;Brand&#39;, String), Column(&#39;Price&#39;, Float),
+    # Implement the creation
+    metadata.create_all()
+</code></pre>
+<p>Flask比较好的地方是可以和SQLAlechemy紧密结合<br>Flask一起用<a href="https://www.thatyou.cn/flask%E4%BD%BF%E7%94%A8flask-sqlalchemy%E6%93%8D%E4%BD%9Cmysql%E6%95%B0%E6%8D%AE%E5%BA%93%EF%BC%88%E4%BA%8C%EF%BC%89-%E5%8D%95%E8%A1%A8%E6%9F%A5%E8%AF%A2/">代码出处</a></p>
+<pre><code class="python">from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, jsonify, request
+import configparser
+
+app = Flask(__name__)
+
+my_config = configparser.ConfigParser()
+my_config.read(&#39;db.conf&#39;)
+
+app.config[&#39;SQLALCHEMY_DATABASE_URI&#39;] = &#39;mysql://&#39; + my_config.get(&#39;DB&#39;, &#39;DB_USER&#39;) + &#39;:&#39; + my_config.get(&#39;DB&#39;, &#39;DB_PASSWORD&#39;) + &#39;@&#39; + my_config.get(&#39;DB&#39;, &#39;DB_HOST&#39;) + &#39;/&#39; + my_config.get(&#39;DB&#39;, &#39;DB_DB&#39;)
+app.config[&#39;SQLALCHEMY_TRACK_MODIFICATIONS&#39;] = True
+
+mydb = SQLAlchemy()
+mydb.init_app(app)
+
+# 用户模型
+class User(mydb.Model):
+    user_id = mydb.Column(mydb.Integer, primary_key=True)
+    user_name = mydb.Column(mydb.String(60), nullable=False)
+    user_password = mydb.Column(mydb.String(30), nullable=False)
+    user_nickname = mydb.Column(mydb.String(50))
+    user_email = mydb.Column(mydb.String(30), nullable=False)
+    def __repr__(self):
+        return &#39;&lt;User %r&gt;&#39; % self.user_name
+
+# 获取用户列表
+@app.route(&#39;/users&#39;, methods=[&#39;GET&#39;])
+def getUsers():
+    data = User.query.all()
+    datas = []
+    for user in data:
+        datas.append({&#39;user_id&#39;: user.user_id, &#39;user_name&#39;: user.user_name, &#39;user_nickname&#39;: user.user_nickname, &#39;user_email&#39;: user.user_email})
+    return jsonify(data=datas)
+
+# 添加用户数据
+@app.route(&#39;/user&#39;, methods=[&#39;POST&#39;])
+def addUser():
+    user_name = request.form.get(&#39;user_name&#39;)
+    user_password = request.form.get(&#39;user_password&#39;)
+    user_nickname = request.form.get(&#39;user_nickname&#39;)
+    user_email = request.form.get(&#39;user_email&#39;)
+    user = User(user_name=user_name, user_password=user_password, user_nickname=user_nickname, user_email=user_email)
+    try:
+        mydb.session.add(user)
+        mydb.session.commit()
+    except:
+        mydb.session.rollback()
+        mydb.session.flush()
+    userId = user.user_id
+    if (user.user_id is None):
+        result = {&#39;msg&#39;: &#39;添加失败&#39;}
+        return jsonify(data=result)
+
+    data = User.query.filter_by(user_id=userId).first()
+    result = {&#39;user_id&#39;: user.user_id, &#39;user_name&#39;: user.user_name, &#39;user_nickname&#39;: user.user_nickname, &#39;user_email&#39;: user.user_email}
+    return jsonify(data=result)
+
+# 获取单条数据
+@app.route(&#39;/user/&lt;int:userId&gt;&#39;, methods=[&#39;GET&#39;])
+def getUser(userId):
+    user = User.query.filter_by(user_id=userId).first()
+    if (user is None):
+        result = {&#39;msg&#39;: &#39;找不到数据&#39;}
+    else:
+        result = {&#39;user_id&#39;: user.user_id, &#39;user_name&#39;: user.user_name, &#39;user_nickname&#39;: user.user_nickname, &#39;user_email&#39;: user.user_email}
+    return jsonify(data=result)
+
+# 修改用户数据
+@app.route(&#39;/user/&lt;int:userId&gt;&#39;, methods=[&#39;PATCH&#39;])
+def updateUser(userId):
+    user_name = request.form.get(&#39;user_name&#39;)
+    user_password = request.form.get(&#39;user_password&#39;)
+    user_nickname = request.form.get(&#39;user_nickname&#39;)
+    user_email = request.form.get(&#39;user_email&#39;)
+    try:
+        user = User.query.filter_by(user_id=userId).first()
+        if (user is None):
+            result = {&#39;msg&#39;: &#39;找不到要修改的记录&#39;}
+            return jsonify(data=result)
+        else:
+            user.user_name = user_name
+            user.user_password = user_password
+            user.user_nickname = user_nickname
+            user.user_email = user_email
+            mydb.session.commit()
+    except:
+        mydb.session.rollback()
+        mydb.session.flush()
+    userId = user.user_id
+    data = User.query.filter_by(user_id=userId).first()
+    result = {&#39;user_id&#39;: user.user_id, &#39;user_name&#39;: user.user_name, &#39;user_password&#39;: user.user_password, &#39;user_nickname&#39;: user.user_nickname, &#39;user_email&#39;: user.user_email}
+    return jsonify(data=result)
+
+# 删除用户数据
+@app.route(&#39;/user/&lt;int:userId&gt;&#39;, methods=[&#39;DELETE&#39;])
+def deleteUser(userId):
+    User.query.filter_by(user_id=userId).delete()
+    mydb.session.commit()
+    return getUsers()
+
+
+if __name__ == &#39;__main__&#39;:
+    app.run(debug=True)
+</code></pre>
 <p>sclalchemy的model的tablename默认是会根据model的name生成小写的tablename:</p>
 <blockquote>
 <p>For instance the table name is automatically set for you unless overridden. It’s derived from the class name converted to lowercase and with “CamelCase” converted to “camel_case”. To override the table name, set the <strong>tablename</strong> class attribute.</p>
 </blockquote>
 <p>来看看curd的一些常用的地方,<a href="http://docs.sqlalchemy.org/en/latest/orm/query.html#the-query-object">query Api</a><br><a href="http://flask-sqlalchemy.pocoo.org/2.3/queries/">Flask SQLAlchemy query api</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; peter = User.query.filter_by(username=&apos;peter&apos;).first()</span><br><span class="line">&gt;&gt;&gt; peter.id</span><br><span class="line">2</span><br><span class="line">&gt;&gt;&gt; peter.email</span><br><span class="line">u&apos;peter@example.org&apos;</span><br></pre></td></tr></table></figure>
-<p>sqlalchemy这种orm也是需要加锁的</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sqlalchemy.exc.InvalidRequestError: When initializing mapper Mapper|Newscate|newscate, expression &apos;News&apos; failed to locate a name (&quot;name &apos;News&apos; is not defined&quot;). If this is a class name, consider adding this relationship() to the &lt;class &apos;category.models.Newscate&apos;&gt; class after both dependent classes have been defined.</span><br></pre></td></tr></table></figure>
-<p><a href="http://flask-sqlalchemy.pocoo.org/2.3/models/">flask-sqlalchemy关于一对多，多对多关系的解释</a><br>抄来的model,一对多关系，一个User可以有多个News，一个Newscategory可以有多个News<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sqlalchemy <span class="keyword">import</span> Table, MetaData, Column, Integer, String, ForeignKey</span><br><span class="line"><span class="keyword">from</span> database <span class="keyword">import</span> db <span class="keyword">as</span> mydb</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span><span class="params">(mydb.Model)</span>:</span></span><br><span class="line">    __tablename__=<span class="string">"t_user"</span></span><br><span class="line">    user_id = mydb.Column(mydb.Integer, primary_key=<span class="keyword">True</span>)</span><br><span class="line">    user_name = mydb.Column(mydb.String(<span class="number">60</span>), nullable=<span class="keyword">False</span>)</span><br><span class="line">    user_password = mydb.Column(mydb.String(<span class="number">30</span>), nullable=<span class="keyword">False</span>)</span><br><span class="line">    user_nickname = mydb.Column(mydb.String(<span class="number">50</span>), nullable=<span class="keyword">False</span>)</span><br><span class="line">    user_email = mydb.Column(mydb.String(<span class="number">100</span>), nullable=<span class="keyword">False</span>)</span><br><span class="line">    newses = mydb.relationship(<span class="string">'News'</span>, backref=<span class="string">'user'</span>, lazy=<span class="keyword">True</span>)</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">'&lt;User %r&gt;'</span> % self.user_nickname</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Newscate</span><span class="params">(mydb.Model)</span>:</span></span><br><span class="line">    __tablename__=<span class="string">"t_newscat"</span></span><br><span class="line">    cate_id = mydb.Column(mydb.Integer, primary_key=<span class="keyword">True</span>)</span><br><span class="line">    cate_name = mydb.Column(mydb.String(<span class="number">50</span>), nullable=<span class="keyword">False</span>)</span><br><span class="line">    cate_title = mydb.Column(mydb.String(<span class="number">50</span>), nullable=<span class="keyword">False</span>)</span><br><span class="line">    newses = mydb.relationship(<span class="string">'News'</span>, backref=<span class="string">'newscate'</span>, lazy=<span class="keyword">True</span>)</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">'&lt;Newscate %r&gt;'</span> % self.cate_name</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">News</span><span class="params">(mydb.Model)</span>:</span></span><br><span class="line">    __tablename__=<span class="string">"t_news"</span></span><br><span class="line">    news_id = mydb.Column(mydb.Integer, primary_key=<span class="keyword">True</span>)</span><br><span class="line">    news_date = mydb.Column(mydb.DateTime, nullable=<span class="keyword">False</span>)</span><br><span class="line">    news_content = mydb.Column(mydb.Text, nullable=<span class="keyword">False</span>)</span><br><span class="line">    news_title = mydb.Column(mydb.String(<span class="number">100</span>), nullable=<span class="keyword">False</span>)</span><br><span class="line">    news_excerpt = mydb.Column(mydb.Text, nullable=<span class="keyword">False</span>)</span><br><span class="line">    news_status = mydb.Column(mydb.String(<span class="number">20</span>), nullable=<span class="keyword">False</span>)</span><br><span class="line">    news_modified = mydb.Column(mydb.DateTime, nullable=<span class="keyword">False</span>)</span><br><span class="line">    news_category = mydb.Column(mydb.Integer, mydb.ForeignKey(<span class="string">'t_newscat.cate_id'</span>), nullable=<span class="keyword">False</span>)</span><br><span class="line">    news_author = mydb.Column(mydb.Integer, mydb.ForeignKey(<span class="string">'t_user.user_id'</span>), nullable=<span class="keyword">False</span>)</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">'&lt;News %r&gt;'</span> % self.news_title</span><br></pre></td></tr></table></figure></p>
-<p>开始建表吧，直接在shell里面搞要快很多<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; python </span><br><span class="line">from app import app ## 这个app是一个Flask实例</span><br><span class="line">from database import db</span><br><span class="line">from models import News,User,Newscate</span><br><span class="line">app.app_context().push() ## 这句话是必须的[context](http://flask-sqlalchemy.pocoo.org/2.3/contexts/)</span><br><span class="line">db.create_all()</span><br></pre></td></tr></table></figure></p>
-<p>如果只要创建一张表的话可以这么干<br>Model.<strong>table</strong>.create(session.bind)</p>
-<p>来看看生成的sql语句<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> t_user (</span><br><span class="line">        user_id <span class="built_in">INTEGER</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> AUTO_INCREMENT,</span><br><span class="line">        user_name <span class="built_in">VARCHAR</span>(<span class="number">60</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">        user_password <span class="built_in">VARCHAR</span>(<span class="number">30</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">        user_nickname <span class="built_in">VARCHAR</span>(<span class="number">50</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">        user_email <span class="built_in">VARCHAR</span>(<span class="number">100</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">        PRIMARY <span class="keyword">KEY</span> (user_id)</span><br><span class="line">)</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> t_newscat (</span><br><span class="line">        cate_id <span class="built_in">INTEGER</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> AUTO_INCREMENT,</span><br><span class="line">        cate_name <span class="built_in">VARCHAR</span>(<span class="number">50</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">        cate_title <span class="built_in">VARCHAR</span>(<span class="number">50</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">        PRIMARY <span class="keyword">KEY</span> (cate_id)</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> t_news (</span><br><span class="line">        news_id <span class="built_in">INTEGER</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> AUTO_INCREMENT,</span><br><span class="line">        news_date DATETIME <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">        news_content <span class="built_in">TEXT</span> <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">        news_title <span class="built_in">VARCHAR</span>(<span class="number">100</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">        news_excerpt <span class="built_in">TEXT</span> <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">        news_status <span class="built_in">VARCHAR</span>(<span class="number">20</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">        news_modified DATETIME <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">        news_category <span class="built_in">INTEGER</span> <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">        news_author <span class="built_in">INTEGER</span> <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">        PRIMARY <span class="keyword">KEY</span> (news_id),</span><br><span class="line">        FOREIGN <span class="keyword">KEY</span>(news_category) <span class="keyword">REFERENCES</span> t_newscat (cate_id),</span><br><span class="line">        FOREIGN <span class="keyword">KEY</span>(news_author) <span class="keyword">REFERENCES</span> t_user (user_id)</span><br><span class="line">)</span><br></pre></td></tr></table></figure></p>
+<pre><code>&gt;&gt;&gt; peter = User.query.filter_by(username=&#39;peter&#39;).first()
+&gt;&gt;&gt; peter.id
+2
+&gt;&gt;&gt; peter.email
+u&#39;peter@example.org&#39;
+</code></pre><p>sqlalchemy这种orm也是需要加锁的</p>
+<pre><code>sqlalchemy.exc.InvalidRequestError: When initializing mapper Mapper|Newscate|newscate, expression &#39;News&#39; failed to locate a name (&quot;name &#39;News&#39; is not defined&quot;). If this is a class name, consider adding this relationship() to the &lt;class &#39;category.models.Newscate&#39;&gt; class after both dependent classes have been defined.
+</code></pre><p><a href="http://flask-sqlalchemy.pocoo.org/2.3/models/">flask-sqlalchemy关于一对多，多对多关系的解释</a><br>抄来的model,一对多关系，一个User可以有多个News，一个Newscategory可以有多个News</p>
+<pre><code class="python">from sqlalchemy import Table, MetaData, Column, Integer, String, ForeignKey
+from database import db as mydb
+
+class User(mydb.Model):
+    __tablename__=&quot;t_user&quot;
+    user_id = mydb.Column(mydb.Integer, primary_key=True)
+    user_name = mydb.Column(mydb.String(60), nullable=False)
+    user_password = mydb.Column(mydb.String(30), nullable=False)
+    user_nickname = mydb.Column(mydb.String(50), nullable=False)
+    user_email = mydb.Column(mydb.String(100), nullable=False)
+    newses = mydb.relationship(&#39;News&#39;, backref=&#39;user&#39;, lazy=True)
+    def __repr__(self):
+        return &#39;&lt;User %r&gt;&#39; % self.user_nickname
+
+class Newscate(mydb.Model):
+    __tablename__=&quot;t_newscat&quot;
+    cate_id = mydb.Column(mydb.Integer, primary_key=True)
+    cate_name = mydb.Column(mydb.String(50), nullable=False)
+    cate_title = mydb.Column(mydb.String(50), nullable=False)
+    newses = mydb.relationship(&#39;News&#39;, backref=&#39;newscate&#39;, lazy=True)
+    def __repr__(self):
+        return &#39;&lt;Newscate %r&gt;&#39; % self.cate_name
+
+class News(mydb.Model):
+    __tablename__=&quot;t_news&quot;
+    news_id = mydb.Column(mydb.Integer, primary_key=True)
+    news_date = mydb.Column(mydb.DateTime, nullable=False)
+    news_content = mydb.Column(mydb.Text, nullable=False)
+    news_title = mydb.Column(mydb.String(100), nullable=False)
+    news_excerpt = mydb.Column(mydb.Text, nullable=False)
+    news_status = mydb.Column(mydb.String(20), nullable=False)
+    news_modified = mydb.Column(mydb.DateTime, nullable=False)
+    news_category = mydb.Column(mydb.Integer, mydb.ForeignKey(&#39;t_newscat.cate_id&#39;), nullable=False)
+    news_author = mydb.Column(mydb.Integer, mydb.ForeignKey(&#39;t_user.user_id&#39;), nullable=False)
+    def __repr__(self):
+        return &#39;&lt;News %r&gt;&#39; % self.news_title
+</code></pre>
+<p>开始建表吧，直接在shell里面搞要快很多</p>
+<pre><code>&gt;&gt;&gt; python 
+from app import app ## 这个app是一个Flask实例
+from database import db
+from models import News,User,Newscate
+app.app_context().push() ## 这句话是必须的[context](http://flask-sqlalchemy.pocoo.org/2.3/contexts/)
+db.create_all()
+</code></pre><p>如果只要创建一张表的话可以这么干<br>Model.<strong>table</strong>.create(session.bind)</p>
+<p>来看看生成的sql语句</p>
+<pre><code class="sql">CREATE TABLE t_user (
+        user_id INTEGER NOT NULL AUTO_INCREMENT,
+        user_name VARCHAR(60) NOT NULL,
+        user_password VARCHAR(30) NOT NULL,
+        user_nickname VARCHAR(50) NOT NULL,
+        user_email VARCHAR(100) NOT NULL,
+        PRIMARY KEY (user_id)
+)
+CREATE TABLE t_newscat (
+        cate_id INTEGER NOT NULL AUTO_INCREMENT,
+        cate_name VARCHAR(50) NOT NULL,
+        cate_title VARCHAR(50) NOT NULL,
+        PRIMARY KEY (cate_id)
+)
+
+CREATE TABLE t_news (
+        news_id INTEGER NOT NULL AUTO_INCREMENT,
+        news_date DATETIME NOT NULL,
+        news_content TEXT NOT NULL,
+        news_title VARCHAR(100) NOT NULL,
+        news_excerpt TEXT NOT NULL,
+        news_status VARCHAR(20) NOT NULL,
+        news_modified DATETIME NOT NULL,
+        news_category INTEGER NOT NULL,
+        news_author INTEGER NOT NULL,
+        PRIMARY KEY (news_id),
+        FOREIGN KEY(news_category) REFERENCES t_newscat (cate_id),
+        FOREIGN KEY(news_author) REFERENCES t_user (user_id)
+)
+</code></pre>
 <p>生成表之后，开始插入数据，还是在shell里面，快一点</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;  User.query.all() </span><br><span class="line">[] ##数据为空</span><br><span class="line">&gt;&gt;&gt; robin = User(user_name=&quot;Tim&quot;,user_password=&quot;secret&quot;,user_nickname=&quot;tim_nick&quot;,user_email=&quot;lenon@gmail.com&quot;)</span><br><span class="line">&gt;&gt;&gt; robin.user_email</span><br><span class="line">&apos;lenon@gmail.com&apos;</span><br><span class="line">&gt;&gt;&gt; robin.newses ## 注意，db中user并没有newses这个column</span><br><span class="line">[]</span><br><span class="line">&gt;&gt;&gt; robin.user_id</span><br><span class="line">&gt;&gt;&gt;   ##什么都没有，因为还没有commit到数据库，那么commit一下</span><br><span class="line">&gt;&gt;&gt; robin.user_id</span><br><span class="line">&gt;&gt;&gt; db.session.add(robin)</span><br><span class="line">&gt;&gt;&gt; db.session.commit()</span><br><span class="line">再查找一下</span><br><span class="line">&gt;&gt;&gt; robin.user_id</span><br><span class="line">2018-07-15 10:26:58,358 INFO sqlalchemy.engine.base.Engine BEGIN (implicit)</span><br><span class="line">2018-07-15 10:26:58,358 INFO sqlalchemy.engine.base.Engine SELECT t_user.user_id AS t_user_user_id, t_user.user_name AS t_user_user_name, t_user.user_password AS t_user_user_password, t_user.user_nickname AS t_user_user_nickname, t_user.user_email AS t_user_user_email</span><br><span class="line">FROM t_user</span><br><span class="line">WHERE t_user.user_id = %(param_1)s</span><br><span class="line">2018-07-15 10:26:58,359 INFO sqlalchemy.engine.base.Engine &#123;&apos;param_1&apos;: 1&#125;</span><br><span class="line">&gt;&gt;&gt; 1 ##这回就有了</span><br></pre></td></tr></table></figure>
-<p>因为news依赖两个Foreign key，user和newcate，且都不为空，所以在创建News之前得先创建Newscate<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; breaking_news = Newscate(cate_name=&quot;beaking_news&quot;,cate_title=&quot;breaking News&quot;)</span><br><span class="line">&gt;&gt;&gt; breaking_news</span><br><span class="line">&lt;Newscate &apos;beaking_news&apos;&gt;</span><br><span class="line">&gt;&gt;&gt; breaking_news.cate_title</span><br><span class="line">&apos;breaking News&apos;</span><br><span class="line">&gt;&gt;&gt;db.session.add(breaking_news)</span><br><span class="line">&gt;&gt;&gt;db.session.commit()</span><br><span class="line">&gt;&gt;&gt;breaking_news.cate_id</span><br><span class="line">1 ## 查下数据库，User和Newscate里面都有数据了</span><br><span class="line"></span><br><span class="line"> newsitem = News(news_date=datetime.utcnow(),news_content=&quot;content of news item one&quot;,news_title=&quot;title of news item one&quot;,news_excerpt=&quot;excerpt of news item one&quot;,news_status=&quot;normal&quot;,news_modified=datetime.now(),news_category=2,news_author=1)</span><br><span class="line">&gt;&gt;&gt; newsitem</span><br><span class="line">&lt;News &apos;title of news item one&apos;&gt;</span><br><span class="line">&gt;&gt;&gt; db.session.add(newsitem)</span><br><span class="line">&gt;&gt;&gt; db.session.commit()</span><br><span class="line">2018-07-15 10:42:11,134 INFO sqlalchemy.engine.base.Engine BEGIN (implicit)</span><br><span class="line">2018-07-15 10:42:11,135 INFO sqlalchemy.engine.base.Engine INSERT INTO t_news (news_date, news_content, news_title, news_excerpt, news_status, news_modified, news_category, news_author) VALUES (%(news_date)s, %(news_content)s, %(news_title)s, %(news_excerpt)s, %(news_status)s, %(news_modified)s, %(news_category)s, %(news_author)s)</span><br><span class="line">2018-07-15 10:42:11,136 INFO sqlalchemy.engine.base.Engine &#123;&apos;news_date&apos;: datetime.datetime(2018, 7, 15, 2, 41, 50, 454505), &apos;news_content&apos;: &apos;content of news item one&apos;, &apos;news_title&apos;: &apos;title of news item one&apos;, &apos;news_excerpt&apos;: &apos;excerpt of news item one&apos;, &apos;news_status&apos;: &apos;normal&apos;, &apos;news_modified&apos;: datetime.datetime(2018, 7, 15, 10, 41, 50, 454505), &apos;news_category&apos;: 2, &apos;news_author&apos;: 1&#125;</span><br><span class="line">2018-07-15 10:42:11,141 INFO sqlalchemy.engine.base.Engine COMMIT</span><br></pre></td></tr></table></figure></p>
+<pre><code>&gt;&gt;  User.query.all() 
+[] ##数据为空
+&gt;&gt;&gt; robin = User(user_name=&quot;Tim&quot;,user_password=&quot;secret&quot;,user_nickname=&quot;tim_nick&quot;,user_email=&quot;lenon@gmail.com&quot;)
+&gt;&gt;&gt; robin.user_email
+&#39;lenon@gmail.com&#39;
+&gt;&gt;&gt; robin.newses ## 注意，db中user并没有newses这个column
+[]
+&gt;&gt;&gt; robin.user_id
+&gt;&gt;&gt;   ##什么都没有，因为还没有commit到数据库，那么commit一下
+&gt;&gt;&gt; robin.user_id
+&gt;&gt;&gt; db.session.add(robin)
+&gt;&gt;&gt; db.session.commit()
+再查找一下
+&gt;&gt;&gt; robin.user_id
+2018-07-15 10:26:58,358 INFO sqlalchemy.engine.base.Engine BEGIN (implicit)
+2018-07-15 10:26:58,358 INFO sqlalchemy.engine.base.Engine SELECT t_user.user_id AS t_user_user_id, t_user.user_name AS t_user_user_name, t_user.user_password AS t_user_user_password, t_user.user_nickname AS t_user_user_nickname, t_user.user_email AS t_user_user_email
+FROM t_user
+WHERE t_user.user_id = %(param_1)s
+2018-07-15 10:26:58,359 INFO sqlalchemy.engine.base.Engine {&#39;param_1&#39;: 1}
+&gt;&gt;&gt; 1 ##这回就有了
+</code></pre><p>因为news依赖两个Foreign key，user和newcate，且都不为空，所以在创建News之前得先创建Newscate</p>
+<pre><code class="`">&gt;&gt;&gt; breaking_news = Newscate(cate_name=&quot;beaking_news&quot;,cate_title=&quot;breaking News&quot;)
+&gt;&gt;&gt; breaking_news
+&lt;Newscate &#39;beaking_news&#39;&gt;
+&gt;&gt;&gt; breaking_news.cate_title
+&#39;breaking News&#39;
+&gt;&gt;&gt;db.session.add(breaking_news)
+&gt;&gt;&gt;db.session.commit()
+&gt;&gt;&gt;breaking_news.cate_id
+1 ## 查下数据库，User和Newscate里面都有数据了
+
+ newsitem = News(news_date=datetime.utcnow(),news_content=&quot;content of news item one&quot;,news_title=&quot;title of news item one&quot;,news_excerpt=&quot;excerpt of news item one&quot;,news_status=&quot;normal&quot;,news_modified=datetime.now(),news_category=2,news_author=1)
+&gt;&gt;&gt; newsitem
+&lt;News &#39;title of news item one&#39;&gt;
+&gt;&gt;&gt; db.session.add(newsitem)
+&gt;&gt;&gt; db.session.commit()
+2018-07-15 10:42:11,134 INFO sqlalchemy.engine.base.Engine BEGIN (implicit)
+2018-07-15 10:42:11,135 INFO sqlalchemy.engine.base.Engine INSERT INTO t_news (news_date, news_content, news_title, news_excerpt, news_status, news_modified, news_category, news_author) VALUES (%(news_date)s, %(news_content)s, %(news_title)s, %(news_excerpt)s, %(news_status)s, %(news_modified)s, %(news_category)s, %(news_author)s)
+2018-07-15 10:42:11,136 INFO sqlalchemy.engine.base.Engine {&#39;news_date&#39;: datetime.datetime(2018, 7, 15, 2, 41, 50, 454505), &#39;news_content&#39;: &#39;content of news item one&#39;, &#39;news_title&#39;: &#39;title of news item one&#39;, &#39;news_excerpt&#39;: &#39;excerpt of news item one&#39;, &#39;news_status&#39;: &#39;normal&#39;, &#39;news_modified&#39;: datetime.datetime(2018, 7, 15, 10, 41, 50, 454505), &#39;news_category&#39;: 2, &#39;news_author&#39;: 1}
+2018-07-15 10:42:11,141 INFO sqlalchemy.engine.base.Engine COMMIT
+</code></pre>
 <p>查下数据库，News也插入成功</p>
 <p>后面开始在gui界面中往数据库里面插入一些数据，准备好假数据之后要db.session.commit()一下才会在sqlalchemy这边同步一下。(session好像也没有什么类似于sync的api)</p>
 <p>开始查询：</p>
-<h3 id="根据一个Newsid去查找这篇news的user"><a href="#根据一个Newsid去查找这篇news的user" class="headerlink" title="根据一个Newsid去查找这篇news的user"></a>根据一个Newsid去查找这篇news的user</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; News.query.all()[0].news_author </span><br><span class="line">1 ##正常啊，这里存储的就是user的id,但是我们想要User，还记得上面建表的时候那个&quot;backref&quot;嘛，写的是backref=&apos;user&apos;</span><br><span class="line">&gt;&gt;&gt; News.query.all()[0].user</span><br><span class="line">&lt;User &apos;tim_nick&apos;&gt;</span><br></pre></td></tr></table></figure>
-<h2 id="查询所有发表过News的User（就是user-newses不为空List）"><a href="#查询所有发表过News的User（就是user-newses不为空List）" class="headerlink" title="查询所有发表过News的User（就是user.newses不为空List）"></a>查询所有发表过News的User（就是user.newses不为空List）</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; User.query.filter(func.length(User.newses) &gt; 0).all()</span><br><span class="line">[&lt;User &apos;tim_nick&apos;&gt;, &lt;User &apos;bounty hounter&apos;&gt;, &lt;User &apos;sally williams&apos;&gt;, &lt;User &apos;john doe&apos;&gt;]显然不正确</span><br><span class="line"></span><br><span class="line">这种情况的一般sql语句应该是这么写的</span><br><span class="line">&gt;&gt;&gt;SELECT t_user.user_id AS t_user_user_id, t_user.user_name AS t_user_user_name, t_user.user_password AS t_user_user_password, t_user.user_nickname AS t_user_user_nickname, t_user.user_email AS t_user_user_email FROM t_user, t_news WHERE t_user.user_id = t_news.news_author GROUP BY t_user_user_name;</span><br><span class="line"></span><br><span class="line">所以最终凑合得到这样的查询</span><br><span class="line">&gt;&gt;&gt; User.query.filter(User.newses).all()</span><br><span class="line">2018-07-15 11:09:17,584 INFO sqlalchemy.engine.base.Engine SELECT t_user.user_id AS t_user_user_id, t_user.user_name AS t_user_user_name, t_user.user_password AS t_user_user_password, t_user.user_nickname AS t_user_user_nickname, t_user.user_email AS t_user_user_email</span><br><span class="line">FROM t_user, t_news</span><br><span class="line">WHERE t_user.user_id = t_news.news_author</span><br><span class="line">2018-07-15 11:09:17,585 INFO sqlalchemy.engine.base.Engine &#123;&#125;</span><br><span class="line">[&lt;User &apos;tim_nick&apos;&gt;]</span><br></pre></td></tr></table></figure>
-<h2 id="查询一个user发布过的所有news"><a href="#查询一个user发布过的所有news" class="headerlink" title="查询一个user发布过的所有news"></a>查询一个user发布过的所有news</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; News.query.filter(News.news_author==1).all()</span><br><span class="line">2018-07-15 11:29:42,306 INFO sqlalchemy.engine.base.Engine SELECT t_news.news_id AS t_news_news_id, t_news.news_date AS t_news_news_date, t_news.news_content AS t_news_news_content, t_news.news_title AS t_news_news_title, t_news.news_excerpt AS t_news_news_excerpt, t_news.news_status AS t_news_news_status, t_news.news_modified AS t_news_news_modified, t_news.news_category AS t_news_news_category, t_news.news_author AS t_news_news_author</span><br><span class="line">FROM t_news</span><br><span class="line">WHERE t_news.news_author = %(news_author_1)s</span><br><span class="line">2018-07-15 11:29:42,306 INFO sqlalchemy.engine.base.Engine &#123;&apos;news_author_1&apos;: 1&#125;</span><br><span class="line">[&lt;News &apos;title of news item one&apos;&gt;, &lt;News &apos;title of news item two&apos;&gt;]</span><br></pre></td></tr></table></figure>
-<h3 id="到这里一共有三张表，那么join这种联表查询也是ok的"><a href="#到这里一共有三张表，那么join这种联表查询也是ok的" class="headerlink" title="到这里一共有三张表，那么join这种联表查询也是ok的"></a>到这里一共有三张表，那么join这种联表查询也是ok的</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; result = db.session.query(News.news_id, News.news_author, News.news_date, News.news_title, News.news_content, News.news_excerpt, News.news_status, News.news_modified, Newscate.cate_name, Newscate.cate_title, User.user_name, User.user_nickname).filter_by(news_id=1).join(Newscate, News.news_category == Newscate.cate_id).join(User, News.news_author == User.user_id).first()</span><br><span class="line">2018-07-15 14:08:27,487 INFO sqlalchemy.engine.base.Engine SELECT t_news.news_id AS t_news_news_id, t_news.news_author AS t_news_news_author, t_news.news_date AS t_news_news_date, t_news.news_title AS t_news_news_title, t_news.news_content AS t_news_news_content, t_news.news_excerpt AS t_news_news_excerpt, t_news.news_status AS t_news_news_status, t_news.news_modified AS t_news_news_modified, t_newscat.cate_name AS t_newscat_cate_name, t_newscat.cate_title AS t_newscat_cate_title, t_user.user_name AS t_user_user_name, t_user.user_nickname AS t_user_user_nickname</span><br><span class="line">FROM t_news INNER JOIN t_newscat ON t_news.news_category = t_newscat.cate_id INNER JOIN t_user ON t_news.news_author = t_user.user_id</span><br><span class="line">WHERE t_news.news_id = %(news_id_1)s</span><br><span class="line"> LIMIT %(param_1)s</span><br><span class="line">2018-07-15 14:08:27,487 INFO sqlalchemy.engine.base.Engine &#123;&apos;news_id_1&apos;: 1, &apos;param_1&apos;: 1&#125;</span><br><span class="line">(1, 1, datetime.datetime(2018, 7, 15, 2, 41, 50), &apos;title of news item one&apos;, &apos;content of news item one&apos;, &apos;excerpt of news item one&apos;, &apos;normal&apos;, datetime.datetime(2018, 7, 15, 10, 41, 50), &apos;economy&apos;, &apos;economy title&apos;, &apos;Tim&apos;, &apos;tim_nick&apos;)</span><br><span class="line">这里得到的是一个&lt;class &apos;sqlalchemy.util._collections.result&apos;&gt;对象</span><br><span class="line">&gt;&gt;&gt; result.cate_name ## 可以这么访问数据</span><br><span class="line">&apos;economy&apos;</span><br></pre></td></tr></table></figure>
-<p>###查找所有用gmail注册的用户<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt;&gt;&gt;&gt; db.session.query(User.user_name).filter(User.user_email.like(&quot;gmail&quot;)).all()</span><br><span class="line">2018-07-15 13:50:56,237 INFO sqlalchemy.engine.base.Engine SELECT t_user.user_name AS t_user_user_name</span><br><span class="line">FROM t_user</span><br><span class="line">WHERE t_user.user_email LIKE %(user_email_1)s</span><br><span class="line">2018-07-15 13:50:56,239 INFO sqlalchemy.engine.base.Engine &#123;&apos;user_email_1&apos;: &apos;gmail&apos;&#125;</span><br><span class="line">[] ##显然有问题</span><br><span class="line"></span><br><span class="line">数据库里执行这句sql就能正确的找出gmail邮箱的user</span><br><span class="line">&gt;&gt;&gt; SELECT t_user.user_name AS t_user_user_name FROM t_user WHERE t_user.user_email LIKE &apos;%gmail%&apos;</span><br><span class="line">于是改成</span><br><span class="line">&gt;&gt;&gt; db.session.query(User.user_name).filter(User.user_email.like(&quot;%gmail%&quot;)).all()</span><br><span class="line">2018-07-15 13:54:08,541 INFO sqlalchemy.engine.base.Engine SELECT t_user.user_name AS t_user_user_name</span><br><span class="line">FROM t_user</span><br><span class="line">WHERE t_user.user_email LIKE %(user_email_1)s</span><br><span class="line">2018-07-15 13:54:08,542 INFO sqlalchemy.engine.base.Engine &#123;&apos;user_email_1&apos;: &apos;%gmail%&apos;&#125;</span><br><span class="line">[(&apos;Tim&apos;,), (&apos;Django&apos;,), (&apos;Sally&apos;,), (&apos;john&apos;,)]</span><br><span class="line"></span><br><span class="line">### 分页接口，limit,count这种怎么写？</span><br><span class="line">用标准的limit,count似乎并不困难</span><br><span class="line">&gt;&gt;&gt; db.session.query(User.user_name).filter(User.user_email.like(&quot;%gmail%&quot;)).limit(1).all()</span><br><span class="line">[(&apos;Tim&apos;,)]</span><br><span class="line">&gt;&gt;&gt; db.session.query(User.user_name).filter(User.user_email.like(&quot;%gmail%&quot;)).limit(1).offset(2).all()</span><br><span class="line">[(&apos;Sally&apos;,)]</span><br><span class="line">offset超出了实际数据的总量如何？</span><br><span class="line">&gt;&gt;&gt; db.session.query(User.user_name).filter(User.user_email.like(&quot;%gmail%&quot;)).limit(1).offset(10).all()</span><br><span class="line">[]</span><br><span class="line"></span><br><span class="line">除了标准的limit方法以外，下面这个paginate方法返回了一个pagination object</span><br><span class="line">&gt;&gt;&gt; db.session.query(User.user_name).filter(User.user_email.like(&quot;%gmail%&quot;)).paginate(2,1,False).items</span><br></pre></td></tr></table></figure></p>
-<p><a href="https://www.jianshu.com/p/7d1b6db64a8f">MYSQL分页limit速度太慢优化方法</a></p>
-<h2 id="Many-to-many-relationship"><a href="#Many-to-many-relationship" class="headerlink" title="Many to many relationship"></a>Many to many relationship</h2><p>添加新的model的时候，旧的model import会报错<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Node</span><span class="params">(Base)</span>:</span></span><br><span class="line">    __tablename__ = <span class="string">"nodes"</span></span><br><span class="line">    __table_args__ = &#123;<span class="string">"useexisting"</span>: <span class="keyword">True</span>&#125; <span class="comment">## 关键是这个</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="根据一个Newsid去查找这篇news的user"><a href="#根据一个Newsid去查找这篇news的user" class="headerlink" title="根据一个Newsid去查找这篇news的user"></a>根据一个Newsid去查找这篇news的user</h3><pre><code>&gt;&gt;&gt; News.query.all()[0].news_author 
+1 ##正常啊，这里存储的就是user的id,但是我们想要User，还记得上面建表的时候那个&quot;backref&quot;嘛，写的是backref=&#39;user&#39;
+&gt;&gt;&gt; News.query.all()[0].user
+&lt;User &#39;tim_nick&#39;&gt;
+</code></pre><h2 id="查询所有发表过News的User（就是user-newses不为空List）"><a href="#查询所有发表过News的User（就是user-newses不为空List）" class="headerlink" title="查询所有发表过News的User（就是user.newses不为空List）"></a>查询所有发表过News的User（就是user.newses不为空List）</h2><pre><code>&gt;&gt;&gt; User.query.filter(func.length(User.newses) &gt; 0).all()
+[&lt;User &#39;tim_nick&#39;&gt;, &lt;User &#39;bounty hounter&#39;&gt;, &lt;User &#39;sally williams&#39;&gt;, &lt;User &#39;john doe&#39;&gt;]显然不正确
+
+这种情况的一般sql语句应该是这么写的
+&gt;&gt;&gt;SELECT t_user.user_id AS t_user_user_id, t_user.user_name AS t_user_user_name, t_user.user_password AS t_user_user_password, t_user.user_nickname AS t_user_user_nickname, t_user.user_email AS t_user_user_email FROM t_user, t_news WHERE t_user.user_id = t_news.news_author GROUP BY t_user_user_name;
+
+所以最终凑合得到这样的查询
+&gt;&gt;&gt; User.query.filter(User.newses).all()
+2018-07-15 11:09:17,584 INFO sqlalchemy.engine.base.Engine SELECT t_user.user_id AS t_user_user_id, t_user.user_name AS t_user_user_name, t_user.user_password AS t_user_user_password, t_user.user_nickname AS t_user_user_nickname, t_user.user_email AS t_user_user_email
+FROM t_user, t_news
+WHERE t_user.user_id = t_news.news_author
+2018-07-15 11:09:17,585 INFO sqlalchemy.engine.base.Engine {}
+[&lt;User &#39;tim_nick&#39;&gt;]
+</code></pre><h2 id="查询一个user发布过的所有news"><a href="#查询一个user发布过的所有news" class="headerlink" title="查询一个user发布过的所有news"></a>查询一个user发布过的所有news</h2><pre><code>&gt;&gt;&gt; News.query.filter(News.news_author==1).all()
+2018-07-15 11:29:42,306 INFO sqlalchemy.engine.base.Engine SELECT t_news.news_id AS t_news_news_id, t_news.news_date AS t_news_news_date, t_news.news_content AS t_news_news_content, t_news.news_title AS t_news_news_title, t_news.news_excerpt AS t_news_news_excerpt, t_news.news_status AS t_news_news_status, t_news.news_modified AS t_news_news_modified, t_news.news_category AS t_news_news_category, t_news.news_author AS t_news_news_author
+FROM t_news
+WHERE t_news.news_author = %(news_author_1)s
+2018-07-15 11:29:42,306 INFO sqlalchemy.engine.base.Engine {&#39;news_author_1&#39;: 1}
+[&lt;News &#39;title of news item one&#39;&gt;, &lt;News &#39;title of news item two&#39;&gt;]
+</code></pre><h3 id="到这里一共有三张表，那么join这种联表查询也是ok的"><a href="#到这里一共有三张表，那么join这种联表查询也是ok的" class="headerlink" title="到这里一共有三张表，那么join这种联表查询也是ok的"></a>到这里一共有三张表，那么join这种联表查询也是ok的</h3><pre><code>&gt;&gt;&gt; result = db.session.query(News.news_id, News.news_author, News.news_date, News.news_title, News.news_content, News.news_excerpt, News.news_status, News.news_modified, Newscate.cate_name, Newscate.cate_title, User.user_name, User.user_nickname).filter_by(news_id=1).join(Newscate, News.news_category == Newscate.cate_id).join(User, News.news_author == User.user_id).first()
+2018-07-15 14:08:27,487 INFO sqlalchemy.engine.base.Engine SELECT t_news.news_id AS t_news_news_id, t_news.news_author AS t_news_news_author, t_news.news_date AS t_news_news_date, t_news.news_title AS t_news_news_title, t_news.news_content AS t_news_news_content, t_news.news_excerpt AS t_news_news_excerpt, t_news.news_status AS t_news_news_status, t_news.news_modified AS t_news_news_modified, t_newscat.cate_name AS t_newscat_cate_name, t_newscat.cate_title AS t_newscat_cate_title, t_user.user_name AS t_user_user_name, t_user.user_nickname AS t_user_user_nickname
+FROM t_news INNER JOIN t_newscat ON t_news.news_category = t_newscat.cate_id INNER JOIN t_user ON t_news.news_author = t_user.user_id
+WHERE t_news.news_id = %(news_id_1)s
+ LIMIT %(param_1)s
+2018-07-15 14:08:27,487 INFO sqlalchemy.engine.base.Engine {&#39;news_id_1&#39;: 1, &#39;param_1&#39;: 1}
+(1, 1, datetime.datetime(2018, 7, 15, 2, 41, 50), &#39;title of news item one&#39;, &#39;content of news item one&#39;, &#39;excerpt of news item one&#39;, &#39;normal&#39;, datetime.datetime(2018, 7, 15, 10, 41, 50), &#39;economy&#39;, &#39;economy title&#39;, &#39;Tim&#39;, &#39;tim_nick&#39;)
+这里得到的是一个&lt;class &#39;sqlalchemy.util._collections.result&#39;&gt;对象
+&gt;&gt;&gt; result.cate_name ## 可以这么访问数据
+&#39;economy&#39;
+</code></pre><p>###查找所有用gmail注册的用户</p>
+<pre><code>&gt;&gt;&gt;&gt;&gt;&gt; db.session.query(User.user_name).filter(User.user_email.like(&quot;gmail&quot;)).all()
+2018-07-15 13:50:56,237 INFO sqlalchemy.engine.base.Engine SELECT t_user.user_name AS t_user_user_name
+FROM t_user
+WHERE t_user.user_email LIKE %(user_email_1)s
+2018-07-15 13:50:56,239 INFO sqlalchemy.engine.base.Engine {&#39;user_email_1&#39;: &#39;gmail&#39;}
+[] ##显然有问题
+
+数据库里执行这句sql就能正确的找出gmail邮箱的user
+&gt;&gt;&gt; SELECT t_user.user_name AS t_user_user_name FROM t_user WHERE t_user.user_email LIKE &#39;%gmail%&#39;
+于是改成
+&gt;&gt;&gt; db.session.query(User.user_name).filter(User.user_email.like(&quot;%gmail%&quot;)).all()
+2018-07-15 13:54:08,541 INFO sqlalchemy.engine.base.Engine SELECT t_user.user_name AS t_user_user_name
+FROM t_user
+WHERE t_user.user_email LIKE %(user_email_1)s
+2018-07-15 13:54:08,542 INFO sqlalchemy.engine.base.Engine {&#39;user_email_1&#39;: &#39;%gmail%&#39;}
+[(&#39;Tim&#39;,), (&#39;Django&#39;,), (&#39;Sally&#39;,), (&#39;john&#39;,)]
+
+### 分页接口，limit,count这种怎么写？
+用标准的limit,count似乎并不困难
+&gt;&gt;&gt; db.session.query(User.user_name).filter(User.user_email.like(&quot;%gmail%&quot;)).limit(1).all()
+[(&#39;Tim&#39;,)]
+&gt;&gt;&gt; db.session.query(User.user_name).filter(User.user_email.like(&quot;%gmail%&quot;)).limit(1).offset(2).all()
+[(&#39;Sally&#39;,)]
+offset超出了实际数据的总量如何？
+&gt;&gt;&gt; db.session.query(User.user_name).filter(User.user_email.like(&quot;%gmail%&quot;)).limit(1).offset(10).all()
+[]
+
+除了标准的limit方法以外，下面这个paginate方法返回了一个pagination object
+&gt;&gt;&gt; db.session.query(User.user_name).filter(User.user_email.like(&quot;%gmail%&quot;)).paginate(2,1,False).items
+</code></pre><p><a href="https://www.jianshu.com/p/7d1b6db64a8f">MYSQL分页limit速度太慢优化方法</a></p>
+<h2 id="Many-to-many-relationship"><a href="#Many-to-many-relationship" class="headerlink" title="Many to many relationship"></a>Many to many relationship</h2><p>添加新的model的时候，旧的model import会报错</p>
+<pre><code class="python">class Node(Base):
+    __tablename__ = &quot;nodes&quot;
+    __table_args__ = {&quot;useexisting&quot;: True} ## 关键是这个
+</code></pre>
 <p>这样db.create_all()的时候也不会去动现有的表里面的数据</p>
-<p><a href="https://stackoverflow.com/questions/25668092/flask-sqlalchemy-many-to-many-insert-data">many-to-many-relationship依赖于第三张表</a><br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">association_table = db.Table(<span class="string">'association'</span>, db.Model.metadata,</span><br><span class="line">    db.Column(<span class="string">'left_id'</span>, db.Integer, db.ForeignKey(<span class="string">'left.id'</span>)),</span><br><span class="line">    db.Column(<span class="string">'right_id'</span>, db.Integer, db.ForeignKey(<span class="string">'right.id'</span>))</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Parent</span><span class="params">(db.Model)</span>:</span></span><br><span class="line">    __tablename__ = <span class="string">'left'</span></span><br><span class="line">    id = db.Column(db.Integer, primary_key=<span class="keyword">True</span>)</span><br><span class="line">    children = db.relationship(<span class="string">"Child"</span>,</span><br><span class="line">                    secondary=association_table)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Child</span><span class="params">(db.Model)</span>:</span></span><br><span class="line">    __tablename__ = <span class="string">'right'</span></span><br><span class="line">    id = db.Column(db.Integer, primary_key=<span class="keyword">True</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">## 添加数据</span></span><br><span class="line">p = Parent()</span><br><span class="line">c = Child()</span><br><span class="line">p.children.append(c)</span><br><span class="line">db.session.add(p)</span><br><span class="line">db.session.commit()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">student_identifier = db.Table(<span class="string">'student_identifier'</span>,</span><br><span class="line">    db.Column(<span class="string">'class_id'</span>, db.Integer, db.ForeignKey(<span class="string">'classes.class_id'</span>)),</span><br><span class="line">    db.Column(<span class="string">'user_id'</span>, db.Integer, db.ForeignKey(<span class="string">'students.user_id'</span>))</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span><span class="params">(db.Model)</span>:</span></span><br><span class="line">    __tablename__ = <span class="string">'students'</span></span><br><span class="line">    user_id = db.Column(db.Integer, primary_key=<span class="keyword">True</span>)</span><br><span class="line">    user_fistName = db.Column(db.String(<span class="number">64</span>))</span><br><span class="line">    user_lastName = db.Column(db.String(<span class="number">64</span>))</span><br><span class="line">    user_email = db.Column(db.String(<span class="number">128</span>), unique=<span class="keyword">True</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Class</span><span class="params">(db.Model)</span>:</span></span><br><span class="line">    __tablename__ = <span class="string">'classes'</span></span><br><span class="line">    class_id = db.Column(db.Integer, primary_key=<span class="keyword">True</span>)</span><br><span class="line">    class_name = db.Column(db.String(<span class="number">128</span>), unique=<span class="keyword">True</span>)</span><br><span class="line">    children = db.relationship(<span class="string">"Student"</span>,</span><br><span class="line">                    secondary=student_identifier)</span><br><span class="line"></span><br><span class="line">s = Student()</span><br><span class="line">c = Class()</span><br><span class="line">c.children.append(s)</span><br><span class="line">db.session.add(c)</span><br><span class="line">db.session.commit()</span><br><span class="line"></span><br><span class="line"><span class="comment">## 查询数据</span></span><br><span class="line">db.session.query(Class).all()[<span class="number">0</span>].children <span class="comment">##得到一个Student的list</span></span><br><span class="line">Class.query.with_parent(user_id) <span class="comment">## 获得一个student上的所有课程</span></span><br></pre></td></tr></table></figure></p>
+<p><a href="https://stackoverflow.com/questions/25668092/flask-sqlalchemy-many-to-many-insert-data">many-to-many-relationship依赖于第三张表</a></p>
+<pre><code class="python">association_table = db.Table(&#39;association&#39;, db.Model.metadata,
+    db.Column(&#39;left_id&#39;, db.Integer, db.ForeignKey(&#39;left.id&#39;)),
+    db.Column(&#39;right_id&#39;, db.Integer, db.ForeignKey(&#39;right.id&#39;))
+)
+
+class Parent(db.Model):
+    __tablename__ = &#39;left&#39;
+    id = db.Column(db.Integer, primary_key=True)
+    children = db.relationship(&quot;Child&quot;,
+                    secondary=association_table)
+
+class Child(db.Model):
+    __tablename__ = &#39;right&#39;
+    id = db.Column(db.Integer, primary_key=True)
+
+## 添加数据
+p = Parent()
+c = Child()
+p.children.append(c)
+db.session.add(p)
+db.session.commit()
+
+
+student_identifier = db.Table(&#39;student_identifier&#39;,
+    db.Column(&#39;class_id&#39;, db.Integer, db.ForeignKey(&#39;classes.class_id&#39;)),
+    db.Column(&#39;user_id&#39;, db.Integer, db.ForeignKey(&#39;students.user_id&#39;))
+)
+
+class Student(db.Model):
+    __tablename__ = &#39;students&#39;
+    user_id = db.Column(db.Integer, primary_key=True)
+    user_fistName = db.Column(db.String(64))
+    user_lastName = db.Column(db.String(64))
+    user_email = db.Column(db.String(128), unique=True)
+
+
+class Class(db.Model):
+    __tablename__ = &#39;classes&#39;
+    class_id = db.Column(db.Integer, primary_key=True)
+    class_name = db.Column(db.String(128), unique=True)
+    children = db.relationship(&quot;Student&quot;,
+                    secondary=student_identifier)
+
+s = Student()
+c = Class()
+c.children.append(s)
+db.session.add(c)
+db.session.commit()
+
+## 查询数据
+db.session.query(Class).all()[0].children ##得到一个Student的list
+Class.query.with_parent(user_id) ## 获得一个student上的所有课程
+</code></pre>
 <p>有时候用db.session.query去查，有时候用Model.query去查</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://docs.sqlalchemy.org/en/latest/orm/tutorial.html">tutorials</a><br><a href="http://docs.sqlalchemy.org/en/latest/orm/query.html">queryapi</a></p>
 

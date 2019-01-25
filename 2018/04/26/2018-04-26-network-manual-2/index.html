@@ -17,7 +17,7 @@
 <meta property="og:description" content="OkHttp通过ConnectionPool做到tcp连接复用（在Timeout内）,所以并不是每个http都去建立一个tcp连接自定义通讯协议，使用java socket实现客户端和服务端。需要注意的是分包问题和黏包问题">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/jpglight-and-shadow-2411321_960_720.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.043Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.185Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="网络通信手册-2">
 <meta name="twitter:description" content="OkHttp通过ConnectionPool做到tcp连接复用（在Timeout内）,所以并不是每个http都去建立一个tcp连接自定义通讯协议，使用java socket实现客户端和服务端。需要注意的是分包问题和黏包问题">
@@ -201,20 +201,116 @@ ga('send', 'pageview');
     <div class="article-entry" itemprop="articleBody">
       
         <p>OkHttp通过ConnectionPool做到tcp连接复用（在Timeout内）,所以并不是每个http都去建立一个tcp连接<br>自定义通讯协议，使用java socket实现客户端和服务端。需要注意的是分包问题和黏包问题<br><img src="https://www.haldir66.ga/static/imgs/jpglight-and-shadow-2411321_960_720.jpg" alt=""><br><a id="more"></a></p>
-<h2 id="1-http请求中tcp连接的复用-深入okHttp-3-9-1的connectionPool以及引用计数"><a href="#1-http请求中tcp连接的复用-深入okHttp-3-9-1的connectionPool以及引用计数" class="headerlink" title="1. http请求中tcp连接的复用(深入okHttp 3.9.1的connectionPool以及引用计数)"></a>1. http请求中tcp连接的复用(深入okHttp 3.9.1的connectionPool以及引用计数)</h2><p>在高并发的请求连接情况下或者同个客户端多次频繁的请求操作，无限制的创建连接会导致性能低下。所以OkHttp做到了对socket的复用和及时清理。<br>从第四个intercepter开始<br>ConnectInterceptor.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">ConnectInterceptor</span> <span class="keyword">implements</span> <span class="title">Interceptor</span></span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span> <span class="function"><span class="keyword">public</span> Response <span class="title">intercept</span><span class="params">(Chain chain)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">  RealInterceptorChain realChain = (RealInterceptorChain) chain;</span><br><span class="line">  Request request = realChain.request();</span><br><span class="line">  <span class="comment">// 第一步，获取streamAllocation</span></span><br><span class="line">  StreamAllocation streamAllocation = realChain.streamAllocation();</span><br><span class="line"></span><br><span class="line">  <span class="comment">// We need the network to satisfy this request. Possibly for validating a conditional GET.</span></span><br><span class="line">  <span class="keyword">boolean</span> doExtensiveHealthChecks = !request.method().equals(<span class="string">"GET"</span>);</span><br><span class="line">  <span class="comment">// 第二步，使用streamAllocation创建(或者复用)一个httpCodec模型（即处理header和body的读写策略，具体实现包括Http1Codec和Http2Codec）</span></span><br><span class="line">  HttpCodec httpCodec = streamAllocation.newStream(client, chain, doExtensiveHealthChecks);</span><br><span class="line">  <span class="comment">// 第三部，挑选出RealConnection,streamAllocation对象中的mConnection变量是在第二步里面赋值的</span></span><br><span class="line">  RealConnection connection = streamAllocation.connection();</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> realChain.proceed(request, streamAllocation, httpCodec, connection);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="1-http请求中tcp连接的复用-深入okHttp-3-9-1的connectionPool以及引用计数"><a href="#1-http请求中tcp连接的复用-深入okHttp-3-9-1的connectionPool以及引用计数" class="headerlink" title="1. http请求中tcp连接的复用(深入okHttp 3.9.1的connectionPool以及引用计数)"></a>1. http请求中tcp连接的复用(深入okHttp 3.9.1的connectionPool以及引用计数)</h2><p>在高并发的请求连接情况下或者同个客户端多次频繁的请求操作，无限制的创建连接会导致性能低下。所以OkHttp做到了对socket的复用和及时清理。<br>从第四个intercepter开始<br>ConnectInterceptor.java</p>
+<pre><code class="java">public final class ConnectInterceptor implements Interceptor{
+
+  @Override public Response intercept(Chain chain) throws IOException {
+  RealInterceptorChain realChain = (RealInterceptorChain) chain;
+  Request request = realChain.request();
+  // 第一步，获取streamAllocation
+  StreamAllocation streamAllocation = realChain.streamAllocation();
+
+  // We need the network to satisfy this request. Possibly for validating a conditional GET.
+  boolean doExtensiveHealthChecks = !request.method().equals(&quot;GET&quot;);
+  // 第二步，使用streamAllocation创建(或者复用)一个httpCodec模型（即处理header和body的读写策略，具体实现包括Http1Codec和Http2Codec）
+  HttpCodec httpCodec = streamAllocation.newStream(client, chain, doExtensiveHealthChecks);
+  // 第三部，挑选出RealConnection,streamAllocation对象中的mConnection变量是在第二步里面赋值的
+  RealConnection connection = streamAllocation.connection();
+
+  return realChain.proceed(request, streamAllocation, httpCodec, connection);
+  }
+}
+</code></pre>
 <p>所以socket连接复用就在这句话里面了</p>
 <blockquote>
 <p>HttpCodec httpCodec = streamAllocation.newStream(client, chain, doExtensiveHealthChecks);</p>
 </blockquote>
-<p>StreamAllocation.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> HttpCodec <span class="title">newStream</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    OkHttpClient client, Interceptor.Chain chain, <span class="keyword">boolean</span> doExtensiveHealthChecks)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// 省略部分，主要是这两句话</span></span><br><span class="line">      RealConnection resultConnection = findHealthyConnection(connectTimeout, readTimeout,</span><br><span class="line">               writeTimeout, connectionRetryEnabled, doExtensiveHealthChecks);</span><br><span class="line">      <span class="comment">//</span></span><br><span class="line">      HttpCodec resultCodec = resultConnection.newCodec(client, chain, <span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
-<p>findHealthyConnection最终走到这里<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Attempt to get a connection from the pool.</span></span><br><span class="line"><span class="keyword">for</span> (RealConnection connection : connections) &#123;</span><br><span class="line">    <span class="keyword">if</span> (connection.isEligible(address, route)) &#123;</span><br><span class="line">      streamAllocation.acquire(connection, <span class="keyword">true</span>);</span><br><span class="line">      <span class="keyword">return</span> connection;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 判断是否isEligible的方法在RealConnection里面</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// If the non-host fields of the address don't overlap, we're done.</span></span><br><span class="line"> <span class="keyword">if</span> (!Internal.instance.equalsNonHost(<span class="keyword">this</span>.route.address(), address)) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line"><span class="comment">// 只要DNS,port,protocols等host无关的参数中有一个不同就不能复用</span></span><br><span class="line"></span><br><span class="line"> <span class="comment">// If the host exactly matches, we're done: this connection can carry the address.</span></span><br><span class="line"> <span class="keyword">if</span> (address.url().host().equals(<span class="keyword">this</span>.route().address().url().host())) &#123;</span><br><span class="line">   <span class="keyword">return</span> <span class="keyword">true</span>; <span class="comment">// This connection is a perfect match.</span></span><br><span class="line"> &#125;</span><br><span class="line"> <span class="comment">// 这里说明host是相同的，上面的DNS什么的都是一样的，只有后面的path,query或者RequestBody不同，那么直接复用</span></span><br></pre></td></tr></table></figure></p>
+<p>StreamAllocation.java</p>
+<pre><code class="java">public HttpCodec newStream(
+    OkHttpClient client, Interceptor.Chain chain, boolean doExtensiveHealthChecks) {
+
+      // 省略部分，主要是这两句话
+      RealConnection resultConnection = findHealthyConnection(connectTimeout, readTimeout,
+               writeTimeout, connectionRetryEnabled, doExtensiveHealthChecks);
+      //
+      HttpCodec resultCodec = resultConnection.newCodec(client, chain, this);
+    }
+</code></pre>
+<p>findHealthyConnection最终走到这里</p>
+<pre><code class="java">// Attempt to get a connection from the pool.
+for (RealConnection connection : connections) {
+    if (connection.isEligible(address, route)) {
+      streamAllocation.acquire(connection, true);
+      return connection;
+    }
+  }
+
+// 判断是否isEligible的方法在RealConnection里面
+
+// If the non-host fields of the address don&#39;t overlap, we&#39;re done.
+ if (!Internal.instance.equalsNonHost(this.route.address(), address)) return false;
+// 只要DNS,port,protocols等host无关的参数中有一个不同就不能复用
+
+ // If the host exactly matches, we&#39;re done: this connection can carry the address.
+ if (address.url().host().equals(this.route().address().url().host())) {
+   return true; // This connection is a perfect match.
+ }
+ // 这里说明host是相同的，上面的DNS什么的都是一样的，只有后面的path,query或者RequestBody不同，那么直接复用
+</code></pre>
 <p>所以这里socket复用的方式是直接使用RealConnection持有Socket对象的引用，每一次在RealConnection的connect成功后，都会讲这个socket包装成一个BufferedSource(读取Response)和BufferedSink(往外写Request)，在timeout时长内，socket不会被关闭。既然缓存就一定会有清理</p>
 <p>在上面的findHealthyConnection中有一段</p>
 <blockquote>
 <p>streamAllocation.acquire(connection, true);</p>
 </blockquote>
-<p>这里面的作用就是将这条请求（Stream）添加到当前连接承载的一个List&lt;Reference<StreamAllocation>&gt;中，也就是所谓的引用计数。提到这一点是要谈到清理的实现：<br>ConnectionPool中有一个Executor，目的就是执行一个cleanupRunnable的Runnable，这里面的清理操作大致如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">long</span> <span class="title">cleanup</span><span class="params">(<span class="keyword">long</span> now)</span> </span>&#123;</span><br><span class="line">   <span class="comment">// Find either a connection to evict, or the time that the next eviction is due.</span></span><br><span class="line">   <span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;</span><br><span class="line">     <span class="keyword">for</span> (Iterator&lt;RealConnection&gt; i = connections.iterator(); i.hasNext(); ) &#123;</span><br><span class="line">       RealConnection connection = i.next();</span><br><span class="line"></span><br><span class="line">       <span class="comment">// If the connection is in use, keep searching.</span></span><br><span class="line">       <span class="keyword">if</span> (pruneAndGetAllocationCount(connection, now) &gt; <span class="number">0</span>) &#123;</span><br><span class="line">         inUseConnectionCount++; <span class="comment">//这条连接还在用</span></span><br><span class="line">         <span class="keyword">continue</span>;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       idleConnectionCount++; <span class="comment">//这条连接现在空闲下来了</span></span><br><span class="line"></span><br><span class="line">       <span class="comment">// If the connection is ready to be evicted, we're done.</span></span><br><span class="line">       <span class="keyword">long</span> idleDurationNs = now - connection.idleAtNanos;<span class="comment">// 这条连接已经多久没用到了，假如超过了闲置时间(默认5纳秒)，就准备干掉这个socket</span></span><br><span class="line">       <span class="keyword">if</span> (idleDurationNs &gt; longestIdleDurationNs) &#123;</span><br><span class="line">         longestIdleDurationNs = idleDurationNs;</span><br><span class="line">         longestIdleConnection = connection;</span><br><span class="line">       &#125;</span><br><span class="line">     &#125;</span><br><span class="line">       <span class="comment">// We've found a connection to evict. Remove it from the list, then close it below (outside</span></span><br><span class="line">       <span class="comment">// of the synchronized block).</span></span><br><span class="line"></span><br><span class="line">       <span class="comment">// A connection will be ready to evict soon.</span></span><br><span class="line"></span><br><span class="line">       <span class="comment">// All connections are in use. It'll be at least the keep alive duration 'til we run again.</span></span><br><span class="line"></span><br><span class="line">       <span class="comment">// No connections, idle or in use.</span></span><br><span class="line">   &#125;</span><br><span class="line">  <span class="comment">// 在这前面如果找不到一条该被干掉的连接，直接return</span></span><br><span class="line">   closeQuietly(longestIdleConnection.socket());<span class="comment">// 这里面就是socket.close了</span></span><br><span class="line"></span><br><span class="line">   <span class="comment">// Cleanup again immediately.</span></span><br><span class="line">   <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></p>
-<p>观察一下ConnectionPool的构造函数<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">  * Create a new connection pool with tuning parameters appropriate for a single-user application.</span></span><br><span class="line"><span class="comment">  * The tuning parameters in this pool are subject to change in future OkHttp releases. Currently</span></span><br><span class="line"><span class="comment">  * this pool holds up to 5 idle connections which will be evicted after 5 minutes of inactivity.</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line">  <span class="comment">// 最多保留5条闲置RealConnection(也就是底层5个Socket),每个连接(Socket)如果超过5分钟没有接客，直接干掉</span></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="title">ConnectionPool</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   <span class="keyword">this</span>(<span class="number">5</span>, <span class="number">5</span>, TimeUnit.MINUTES);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里面的作用就是将这条请求（Stream）添加到当前连接承载的一个List&lt;Reference<StreamAllocation>&gt;中，也就是所谓的引用计数。提到这一点是要谈到清理的实现：<br>ConnectionPool中有一个Executor，目的就是执行一个cleanupRunnable的Runnable，这里面的清理操作大致如下：</p>
+<pre><code class="java">long cleanup(long now) {
+   // Find either a connection to evict, or the time that the next eviction is due.
+   synchronized (this) {
+     for (Iterator&lt;RealConnection&gt; i = connections.iterator(); i.hasNext(); ) {
+       RealConnection connection = i.next();
+
+       // If the connection is in use, keep searching.
+       if (pruneAndGetAllocationCount(connection, now) &gt; 0) {
+         inUseConnectionCount++; //这条连接还在用
+         continue;
+       }
+
+       idleConnectionCount++; //这条连接现在空闲下来了
+
+       // If the connection is ready to be evicted, we&#39;re done.
+       long idleDurationNs = now - connection.idleAtNanos;// 这条连接已经多久没用到了，假如超过了闲置时间(默认5纳秒)，就准备干掉这个socket
+       if (idleDurationNs &gt; longestIdleDurationNs) {
+         longestIdleDurationNs = idleDurationNs;
+         longestIdleConnection = connection;
+       }
+     }
+       // We&#39;ve found a connection to evict. Remove it from the list, then close it below (outside
+       // of the synchronized block).
+
+       // A connection will be ready to evict soon.
+
+       // All connections are in use. It&#39;ll be at least the keep alive duration &#39;til we run again.
+
+       // No connections, idle or in use.
+   }
+  // 在这前面如果找不到一条该被干掉的连接，直接return
+   closeQuietly(longestIdleConnection.socket());// 这里面就是socket.close了
+
+   // Cleanup again immediately.
+   return 0;
+ }
+</code></pre>
+<p>观察一下ConnectionPool的构造函数</p>
+<pre><code class="java">/**
+  * Create a new connection pool with tuning parameters appropriate for a single-user application.
+  * The tuning parameters in this pool are subject to change in future OkHttp releases. Currently
+  * this pool holds up to 5 idle connections which will be evicted after 5 minutes of inactivity.
+  */
+  // 最多保留5条闲置RealConnection(也就是底层5个Socket),每个连接(Socket)如果超过5分钟没有接客，直接干掉
+ public ConnectionPool() {
+   this(5, 5, TimeUnit.MINUTES);
+ }
+</code></pre>
 <p>所以，在创建Client的时候，可以把socket的缓存数量写大一点，也可以自定义一个ConnectionPool，只要实现了put,get,remove等标准的CRD操作就行了。简单来说就是自己设计一个Cache，我觉得可以根据实际的endpoint数量来设定缓存的socket的数量。</p>
 <h2 id="2-自定义通讯协议"><a href="#2-自定义通讯协议" class="headerlink" title="2. 自定义通讯协议"></a>2. 自定义通讯协议</h2><p>http这种属于应用层的协议定义了每个数据包的结构是怎样的。在一些场合下，比如追求通讯速度，自定义加密手段，可能需要自定义结构体。<br>自己用Socket实现一套server-clinent通讯模型其实不难。<br>server这边，先确定自己对外公布的ip,port。然后起一个serverSocket，死循环去accept，每次accept到一个就添加到一个列表中，同时用线程池去执行一个死跑从socket中read的runnable。<br>client这边，根据server的ip和port去连接上，client主动发消息(byte，int,String类型都行)，server这边读到信息，给出response，clinent再读取server的回话，就跟两个人之间你一句我一句说话一样。整个过程中 <strong>保持了长连接</strong>,只要任何一方没有手动设置socket.setSoTimeout的话，放一晚上都不会断开。</p>
 <p>一个重点是双方发送的消息格式，即两个人交流的语言，如果全部是String的话，那就跟http很像了，当然任何数据格式从socket发出去最终都是以byte的形式发出去的(比如string会用utf-8或者gbk编码成byte数组)。<br>google的protoBuffer最重要的两个方法writeTo(object转成byte数组)和parseFrom(byte数组转成object)。</p>
@@ -243,7 +339,9 @@ ga('send', 'pageview');
 <p><a href="https://zhuanlan.zhihu.com/p/36414915">以TCP/IP协议为例，如何通过wireshark抓包分析？</a></p>
 <p><a href="http://chown-jane-y.coding.me/2017/07/21/%E4%BD%BF%E7%94%A8Nginx%E4%BB%A3%E7%90%86ws%E4%B8%BAwss%E5%8D%8F%E8%AE%AE/">使用Nginx代理ws为wss协议</a></p>
 <p><a href="https://zh.wikipedia.org/wiki/%E8%B7%A8%E7%AB%99%E8%AF%B7%E6%B1%82%E4%BC%AA%E9%80%A0">CRSF</a></p>
-<p><a href="http://www.ruanyifeng.com/blog/2016/09/csp.html">Content Security Policy 入门教程</a><br>两种方式设置csp白名单，一种是服务器在response的header中添加’Content-Security-Policy’这个header，另一种是在html中写meta标签<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">"Content-Security-Policy"</span> <span class="attr">content</span>=<span class="string">"script-src 'self'; object-src 'none'; style-src cdn.example.org third-party.org; child-src https:"</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><a href="http://www.ruanyifeng.com/blog/2016/09/csp.html">Content Security Policy 入门教程</a><br>两种方式设置csp白名单，一种是服务器在response的header中添加’Content-Security-Policy’这个header，另一种是在html中写meta标签</p>
+<pre><code class="html">&lt;meta http-equiv=&quot;Content-Security-Policy&quot; content=&quot;script-src &#39;self&#39;; object-src &#39;none&#39;; style-src cdn.example.org third-party.org; child-src https:&quot;&gt;
+</code></pre>
 <p><a href="https://stackoverflow.com/questions/19562501/ajax-what-is-the-default-character-encoding-for-http-header-values">http请求是一行一行的文字，contentType only affects the body/document.you can use any ISO-8859-1 characters in the header.</a>。ISO-8859-1不支持中文，所以header里面的东西不能写中文。<br>body和path里面随意了</p>
 <p>//网页上传excel表格的header<br>Content-Disposition: form-data; name=”files[]” filename=”sample.xls”<br>Content-Type: application/vnd.ms-excel</p>
 <p>html里面上传文件一般是ajax对象send一个FormData出去，<br>也有Base64编码一遍然后在<a href="http://www.nickdesteffen.com/blog/file-uploading-over-ajax-using-html5">服务端base64解码的</a>。主要是html5标准中添加了新的FileReader接口，可以读取客户端文件内容，所以很多开发就调用FileReader的readAsDataURL方法去将文件的内容变成<a href="https://en.wikipedia.org/wiki/Data_URI_scheme">DATA URL形式的字符串</a><br>不过这么干还是有缺点的</p>
@@ -292,16 +390,89 @@ ga('send', 'pageview');
 <p>int 类型数字66666666 在java里是4个字节，<br>在c语言里是2个或者四个字节。<br><strong>需要四个字节</strong></p>
 <p>整体来讲，JSON 是文本的格式，整数和浮点数应该更占空间而且更费时。<br>这就涉及到json和protobuff等二级制协议的比对了，从上面来看，如果你的内容是整数或者浮点数比较多的话，一大长串的数字用string的话就得花上很多内存，但是用int或者float的话可能四个字节就搞定了。所以这事没法绝对的说</p>
 <p>都知道传输的都是byte数组，猜测传的类型是文字形式的。因为读取的时候多数是utf-8形式的，没办法特意指出这块byte是int还是string的一部分</p>
-<p>post一个json出去的时候<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;name&quot;:&quot;john&quot;&#125;</span><br><span class="line">//事实上在byte层面是发送了这么些byte</span><br><span class="line">123 &#123;</span><br><span class="line">34 &quot;</span><br><span class="line">110 n</span><br><span class="line">97 a</span><br><span class="line">109 m</span><br><span class="line">101 e</span><br><span class="line">34 &quot;</span><br><span class="line">58 :</span><br><span class="line">34 &quot;</span><br><span class="line">106 j</span><br><span class="line">111 0</span><br><span class="line">104 h</span><br><span class="line">110 n</span><br><span class="line">34 &quot;</span><br><span class="line">125 &#125;</span><br></pre></td></tr></table></figure></p>
-<p>这些标点符号都发送出去了，也就是占用的byte.</p>
+<p>post一个json出去的时候</p>
+<pre><code>{&quot;name&quot;:&quot;john&quot;}
+//事实上在byte层面是发送了这么些byte
+123 {
+34 &quot;
+110 n
+97 a
+109 m
+101 e
+34 &quot;
+58 :
+34 &quot;
+106 j
+111 0
+104 h
+110 n
+34 &quot;
+125 }
+</code></pre><p>这些标点符号都发送出去了，也就是占用的byte.</p>
 <p><a href="https://imququ.com/post/four-ways-to-post-data-in-http.html">四种常见的POST提交数据方式</a></p>
 <p>application/x-www-form-urlencoded<br>multipart/form-data<br>application/json<br>text/xml</p>
-<p>application/json的post请求的长这样<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">POST / HTTP/1.1</span><br><span class="line">Host: www.baidu.com</span><br><span class="line">User-Agent: ...</span><br><span class="line">Content-Length:27</span><br><span class="line">Cookie: session=fsdaf;aaa=dfasf;......</span><br><span class="line"></span><br><span class="line">&#123;&quot;input1&quot;:&quot;xxx&quot;,&quot;input2&quot;:&quot;oo加密过的xxxxo&quot;,&quot;remember&quot;:false&#125;</span><br></pre></td></tr></table></figure></p>
-<p>application/x-www-form-urlencoded(浏览器的原生 form 表单)的post请求的长这样<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">POST / HTTP/1.1</span><br><span class="line">Host: www.baidu.com</span><br><span class="line">User-Agent: ...</span><br><span class="line">Content-Length:27</span><br><span class="line">Cookie: session=fsdaf;aaa=dfasf;......</span><br><span class="line"></span><br><span class="line">name=user&amp;password=password</span><br></pre></td></tr></table></figure></p>
-<p>multipart/form-data:(表单格式的)这一种是表单格式的，数据类型如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">POST / HTTP/1.1</span><br><span class="line">Host: www.baidu.com</span><br><span class="line">User-Agent: ...</span><br><span class="line">Content-Length:27</span><br><span class="line">Cookie: session=fsdaf;aaa=dfasf;......</span><br><span class="line"></span><br><span class="line">------WebKitFormBoundaryrGKCBY7qhFd3TrwA</span><br><span class="line"></span><br><span class="line">Content-Disposition: form-data; name=&quot;text&quot;</span><br><span class="line"></span><br><span class="line">title</span><br><span class="line"></span><br><span class="line">------WebKitFormBoundaryrGKCBY7qhFd3TrwA</span><br><span class="line"></span><br><span class="line">Content-Disposition: form-data; name=&quot;file&quot;; filename=&quot;chrome.png&quot;</span><br><span class="line"></span><br><span class="line">Content-Type: image/png</span><br><span class="line"></span><br><span class="line">PNG ... content of chrome.png ...</span><br><span class="line"></span><br><span class="line">------WebKitFormBoundaryrGKCBY7qhFd3TrwA--</span><br></pre></td></tr></table></figure></p>
-<p>text/xml:这种直接传的xml的post请求的长这样<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">POST / HTTP/1.1</span><br><span class="line">Host: www.baidu.com</span><br><span class="line">User-Agent: ...</span><br><span class="line">Content-Length:27</span><br><span class="line">Cookie: session=fsdaf;aaa=dfasf;......</span><br><span class="line"></span><br><span class="line">&lt;!--?xml version=&quot;1.0&quot;?--&gt;</span><br><span class="line"></span><br><span class="line">&lt;methodcall&gt;</span><br><span class="line"></span><br><span class="line">&lt;methodname&gt;examples.getStateName&lt;/methodname&gt;</span><br><span class="line"></span><br><span class="line">&lt;params&gt;</span><br><span class="line"></span><br><span class="line">&lt;param&gt;</span><br><span class="line"></span><br><span class="line">&lt;value&gt;&lt;i4&gt;41&lt;/i4&gt;&lt;/value&gt;</span><br><span class="line"></span><br><span class="line">&lt;/params&gt;</span><br><span class="line"></span><br><span class="line">&lt;/methodcall&gt;</span><br></pre></td></tr></table></figure></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">data%3D%7B%22name%22%3A%22john%22%2C%22age%22%2C20%2C%22time%22%2C6%7D</span><br></pre></td></tr></table></figure>
-<p>这种东西通常是懒得看的，<br>需要转码一下，粘贴到<a href="http://tool.oschina.net/encode?type=4">这个里面去就行了</a>，或者自己encodeURIComponent一下就好<br>其实是: data={“name”:”john”,”age”,20,”time”,6}</p>
+<p>application/json的post请求的长这样</p>
+<pre><code>POST / HTTP/1.1
+Host: www.baidu.com
+User-Agent: ...
+Content-Length:27
+Cookie: session=fsdaf;aaa=dfasf;......
+
+{&quot;input1&quot;:&quot;xxx&quot;,&quot;input2&quot;:&quot;oo加密过的xxxxo&quot;,&quot;remember&quot;:false}
+</code></pre><p>application/x-www-form-urlencoded(浏览器的原生 form 表单)的post请求的长这样</p>
+<pre><code>POST / HTTP/1.1
+Host: www.baidu.com
+User-Agent: ...
+Content-Length:27
+Cookie: session=fsdaf;aaa=dfasf;......
+
+name=user&amp;password=password
+</code></pre><p>multipart/form-data:(表单格式的)这一种是表单格式的，数据类型如下</p>
+<pre><code>POST / HTTP/1.1
+Host: www.baidu.com
+User-Agent: ...
+Content-Length:27
+Cookie: session=fsdaf;aaa=dfasf;......
+
+------WebKitFormBoundaryrGKCBY7qhFd3TrwA
+
+Content-Disposition: form-data; name=&quot;text&quot;
+
+title
+
+------WebKitFormBoundaryrGKCBY7qhFd3TrwA
+
+Content-Disposition: form-data; name=&quot;file&quot;; filename=&quot;chrome.png&quot;
+
+Content-Type: image/png
+
+PNG ... content of chrome.png ...
+
+------WebKitFormBoundaryrGKCBY7qhFd3TrwA--
+</code></pre><p>text/xml:这种直接传的xml的post请求的长这样</p>
+<pre><code>POST / HTTP/1.1
+Host: www.baidu.com
+User-Agent: ...
+Content-Length:27
+Cookie: session=fsdaf;aaa=dfasf;......
+
+&lt;!--?xml version=&quot;1.0&quot;?--&gt;
+
+&lt;methodcall&gt;
+
+&lt;methodname&gt;examples.getStateName&lt;/methodname&gt;
+
+&lt;params&gt;
+
+&lt;param&gt;
+
+&lt;value&gt;&lt;i4&gt;41&lt;/i4&gt;&lt;/value&gt;
+
+&lt;/params&gt;
+
+&lt;/methodcall&gt;
+</code></pre><pre><code>data%3D%7B%22name%22%3A%22john%22%2C%22age%22%2C20%2C%22time%22%2C6%7D
+</code></pre><p>这种东西通常是懒得看的，<br>需要转码一下，粘贴到<a href="http://tool.oschina.net/encode?type=4">这个里面去就行了</a>，或者自己encodeURIComponent一下就好<br>其实是: data={“name”:”john”,”age”,20,”time”,6}</p>
 <p><a href="https://borninsummer.com/2015/10/27/about-using-json-in-http-body/">出处</a></p>
 <blockquote>
 <p>HTTP 为超文本传输协议，整个的 HTTP 报文，如果按编程语言里面的类型来分的话，就是一大段字符串。值得注意的是，不像 JSON，application/x-www-form-urlencoded 的方式对复杂类型（例如数组）的处理，并没有严格的标准。有的接口使用 key[]=a&amp;key[]=b 来表示数组 key: [‘a’, ‘b’]，（这也是最常见的，jQuery、superagent等客户端会如此编码），有的库则将数组编码为：key=a&amp;key=b，有的则是携带下标进行编码：key[0]=a&amp;key[1]=b……十分混乱。所以如果是数组且数组的每一项为简单基本类型，而且非要用 application/x-www-form-urlencoded 进行序列化，那么不如用英文逗号分隔的字符串来表示。如果是嵌套对象……那么还是尽早使用 JSON 吧。</p>

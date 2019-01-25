@@ -20,7 +20,7 @@
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/android_screen_coordinate_system.png">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/view_hirearchy_1013.png">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/support_lib_methods_summary.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.031Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.173Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="安卓坐标系常用方法">
 <meta name="twitter:description" content="记录一些Android系统坐标系的常用方法，因为日常开发中难免会碰到需要单独计算View系统坐标的情况。">
@@ -213,7 +213,13 @@ ga('send', 'pageview');
 <blockquote>
 <p> W/ViewAnimationActivity.java: [32 | onWindowFocusChanged]statusBarHeight = 75<br> W/ViewAnimationActivity.java: [35 | onWindowFocusChanged]getLocationInWindow  x = 0 y = 75<br> W/ViewAnimationActivity.java: [38 | onWindowFocusChanged]getLocationOnScreen x = 0 y = 75<br>可以看到返回的就是View左上角的坐标，一般情况下两者区别不重要，stackoverFlow上有<a href="http://stackoverflow.com/questions/17672891/getlocationonscreen-vs-getlocationinwindow">讨论</a></p>
 </blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">View.getLocationInWindow(pos); <span class="comment">//获取在当前window内的绝对坐标</span></span><br><span class="line">View.getLocationOnScreen(pos); <span class="comment">//包括statusBar，以屏幕左上角为坐标原点</span></span><br><span class="line">View.getLocalVisibleRect()  </span><br><span class="line"><span class="comment">//以view自身的左上角为坐标原点，这个很有用，</span></span><br><span class="line"><span class="comment">//返回的坐标一定是(0,0,xxx,xxx)这样的，可以判断当前View是否完全可见</span></span><br><span class="line">View.getGlobalVisibleRect()  <span class="comment">// 以屏幕左上角为坐标原点</span></span><br></pre></td></tr></table></figure>
+<pre><code class="java">View.getLocationInWindow(pos); //获取在当前window内的绝对坐标
+View.getLocationOnScreen(pos); //包括statusBar，以屏幕左上角为坐标原点
+View.getLocalVisibleRect()  
+//以view自身的左上角为坐标原点，这个很有用，
+//返回的坐标一定是(0,0,xxx,xxx)这样的，可以判断当前View是否完全可见
+View.getGlobalVisibleRect()  // 以屏幕左上角为坐标原点
+</code></pre>
 <p>以上四个方法在onCreate里面返回的值都是0，需要在Activity的onWindowFocusChanged(true)中去获得<br>这里需要扯一点关于window的问题，根据大部分博客的介绍：DecorView是FrameLayout的子类，是View视图层级树的根节点。<br>一般会有一个LinearLayout的child</p>
 <p>为此，我在setContentView里面放了一个CoordinateLayout,使用Hierarchy View截图的到这样的结果。<br>图片有点大<br><img src="https://www.haldir66.ga/static/imgs/view_hirearchy_1013.png" alt=""></p>
 <p>在ViewHirearchy中可以看到，Activity中View视图层级从上到下依次为：</p>
@@ -226,20 +232,75 @@ ga('send', 'pageview');
 <p>scrollTo(int x,int y)  // 将View中的内容移动，坐标原点为parentView左上角，注意，参数为正，效果为反<br>例如scrollTo(-100,0) 在手机上看效果是往右移动了</p>
 <p>scrollBy(int x, int y)</p>
 </blockquote>
-<p>scrollBy的源码如下:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">scrollBy</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</span><br><span class="line">      scrollTo(mScrollX + x, mScrollY + y);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
-<p>还有一些不常用的：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setScrollX</span><span class="params">(<span class="keyword">int</span> value)</span> </span>&#123;</span><br><span class="line">        scrollTo(value, mScrollY);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
-<h3 id="6-改变LayoutParams的margin让View移动"><a href="#6-改变LayoutParams的margin让View移动" class="headerlink" title="6. 改变LayoutParams的margin让View移动"></a>6. 改变LayoutParams的margin让View移动</h3><p>这是一种很生硬的方式，不常用<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MarginLayoutParams params = (MarginLayoutParams)mTextView.getLayoutParams(); <span class="comment">//可能为null</span></span><br><span class="line">params.leftMargin + = <span class="number">100</span>;</span><br><span class="line">mTextView.setLayoutParams();<span class="comment">// 这里面调用了requestLayout</span></span><br></pre></td></tr></table></figure></p>
+<p>scrollBy的源码如下:</p>
+<pre><code class="java">  public void scrollBy(int x, int y) {
+        scrollTo(mScrollX + x, mScrollY + y);
+    }
+</code></pre>
+<p>还有一些不常用的：</p>
+<pre><code class="java">public void setScrollX(int value) {
+        scrollTo(value, mScrollY);
+    }
+</code></pre>
+<h3 id="6-改变LayoutParams的margin让View移动"><a href="#6-改变LayoutParams的margin让View移动" class="headerlink" title="6. 改变LayoutParams的margin让View移动"></a>6. 改变LayoutParams的margin让View移动</h3><p>这是一种很生硬的方式，不常用</p>
+<pre><code class="java">MarginLayoutParams params = (MarginLayoutParams)mTextView.getLayoutParams(); //可能为null
+params.leftMargin + = 100;
+mTextView.setLayoutParams();// 这里面调用了requestLayout
+</code></pre>
 <h3 id="7-使用Animation让View动起来"><a href="#7-使用Animation让View动起来" class="headerlink" title="7.使用Animation让View动起来"></a>7.使用Animation让View动起来</h3><p>根据官方文档的<a href="https://developer.android.com/guide/topics/graphics/overview.html">定义</a>Android中一共两种Animation:</p>
 <blockquote>
 <p>Property Animation<br>View Animation(包括Tween animation, Frame animation)</p>
 </blockquote>
 <p>首先从package的位置来看<br>属性动画都位于android.animation这个package下面，常见的如ObjectAnimator继承自ValueAnimator<br>View动画则位于android.view.animation这个package下，常见的如TranslateA,AlphaAnimation等</p>
-<p>View Animation可以代码创建，也可以写在R.anim文件夹下,用法很简单<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ImageView image = (ImageView) findViewById(R.id.image);</span><br><span class="line">Animation hyperspaceJump = AnimationUtils.loadAnimation(<span class="keyword">this</span>, R.anim.hyperspace_jump);</span><br><span class="line">image.startAnimation(hyperspaceJump);</span><br></pre></td></tr></table></figure></p>
-<p>属性动画可以代码创建，也可以写在R.animator文件夹下,用法:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">AnimatorSet set = (AnimatorSet) AnimatorInflater.loadAnimator(myContext,</span><br><span class="line">    R.anim.property_animator);</span><br><span class="line">set.setTarget(myObject);</span><br><span class="line">set.start();</span><br></pre></td></tr></table></figure></p>
-<p>推荐使用ViewPropertyAnimator，这是一个位于android.view下面的class，感觉更像是一个Util,大部分的方法都是在API 12 ,API 14引入的，<br>实际开发中推荐使用ViewCompat.animate() 返回一个ViewPropertyAnimator对象，省去了开发者版本判断的麻烦<br>语法更为简单：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ViewCompat.animate(view).x(<span class="number">500</span>).y(<span class="number">500</span>).setDuration(<span class="number">5000</span>).setInterpolator(<span class="keyword">new</span> DecelaratorInterpolator());  <span class="comment">//不需要调用start()</span></span><br></pre></td></tr></table></figure></p>
+<p>View Animation可以代码创建，也可以写在R.anim文件夹下,用法很简单</p>
+<pre><code class="java">ImageView image = (ImageView) findViewById(R.id.image);
+Animation hyperspaceJump = AnimationUtils.loadAnimation(this, R.anim.hyperspace_jump);
+image.startAnimation(hyperspaceJump);
+</code></pre>
+<p>属性动画可以代码创建，也可以写在R.animator文件夹下,用法:</p>
+<pre><code class="java">AnimatorSet set = (AnimatorSet) AnimatorInflater.loadAnimator(myContext,
+    R.anim.property_animator);
+set.setTarget(myObject);
+set.start();
+</code></pre>
+<p>推荐使用ViewPropertyAnimator，这是一个位于android.view下面的class，感觉更像是一个Util,大部分的方法都是在API 12 ,API 14引入的，<br>实际开发中推荐使用ViewCompat.animate() 返回一个ViewPropertyAnimator对象，省去了开发者版本判断的麻烦<br>语法更为简单：</p>
+<pre><code class="java">ViewCompat.animate(view).x(500).y(500).setDuration(5000).setInterpolator(new DecelaratorInterpolator());  //不需要调用start()
+</code></pre>
 <p>据说这种方式性能最好，Google官方强烈推荐,参考DevByte。<br>另外，据说大部分Google的App使用的都是DecelaratorInterpolator，当然这跟设计有关。</p>
-<h3 id="8-使用Scroller实现smoothScroll"><a href="#8-使用Scroller实现smoothScroll" class="headerlink" title="8.使用Scroller实现smoothScroll"></a>8.使用Scroller实现smoothScroll</h3><p>View有一个方法computeScroll(),复写，像这样就可以了<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Scroller scroller = <span class="keyword">new</span> Scroller(mContext);</span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">smoothScrollTo</span><span class="params">(<span class="keyword">int</span> dstX, <span class="keyword">int</span> dstY)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">int</span> scrollX = getScrollX();</span><br><span class="line">      <span class="keyword">int</span> delta = dstX - scrollX;</span><br><span class="line">      scroller.startScroll(scrollX, <span class="number">0</span>, delta, <span class="number">0</span>, <span class="number">1000</span>);</span><br><span class="line">      invalidate();</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> <span class="meta">@Override</span></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">computeScroll</span><span class="params">()</span> </span>&#123;</span><br><span class="line">     <span class="keyword">if</span> (scroller.computeScrollOffset()) &#123;</span><br><span class="line">         scrollTo(scroller.getCurrX(), scroller.getCurY());</span><br><span class="line">         postInvalidate();</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></p>
-<h3 id="9-补充几个好玩的函数"><a href="#9-补充几个好玩的函数" class="headerlink" title="9. 补充几个好玩的函数"></a>9. 补充几个好玩的函数</h3><p>View.canScrollVertically(int)<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">canChildScrollUp</span><span class="params">(View view)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">if</span> (android.os.Build.VERSION.SDK_INT &lt; <span class="number">14</span>) &#123;</span><br><span class="line">           <span class="keyword">if</span> (view <span class="keyword">instanceof</span> AbsListView) &#123;</span><br><span class="line">               <span class="keyword">final</span> AbsListView absListView = (AbsListView) view;</span><br><span class="line">               <span class="keyword">return</span> absListView.getChildCount() &gt; <span class="number">0</span></span><br><span class="line">                       &amp;&amp; (absListView.getFirstVisiblePosition() &gt; <span class="number">0</span> || absListView.getChildAt(<span class="number">0</span>)</span><br><span class="line">                       .getTop() &lt; absListView.getPaddingTop());</span><br><span class="line">           &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">               <span class="keyword">return</span> view.getScrollY() &gt; <span class="number">0</span>;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">           <span class="keyword">return</span> view.canScrollVertically(-<span class="number">1</span>);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="8-使用Scroller实现smoothScroll"><a href="#8-使用Scroller实现smoothScroll" class="headerlink" title="8.使用Scroller实现smoothScroll"></a>8.使用Scroller实现smoothScroll</h3><p>View有一个方法computeScroll(),复写，像这样就可以了</p>
+<pre><code class="java">Scroller scroller = new Scroller(mContext);
+
+ private void smoothScrollTo(int dstX, int dstY) {
+      int scrollX = getScrollX();
+      int delta = dstX - scrollX;
+      scroller.startScroll(scrollX, 0, delta, 0, 1000);
+      invalidate();
+ }
+
+ @Override
+ public void computeScroll() {
+     if (scroller.computeScrollOffset()) {
+         scrollTo(scroller.getCurrX(), scroller.getCurY());
+         postInvalidate();
+     }
+ }
+</code></pre>
+<h3 id="9-补充几个好玩的函数"><a href="#9-补充几个好玩的函数" class="headerlink" title="9. 补充几个好玩的函数"></a>9. 补充几个好玩的函数</h3><p>View.canScrollVertically(int)</p>
+<pre><code class="java"> public static boolean canChildScrollUp(View view) {
+        if (android.os.Build.VERSION.SDK_INT &lt; 14) {
+            if (view instanceof AbsListView) {
+                final AbsListView absListView = (AbsListView) view;
+                return absListView.getChildCount() &gt; 0
+                        &amp;&amp; (absListView.getFirstVisiblePosition() &gt; 0 || absListView.getChildAt(0)
+                        .getTop() &lt; absListView.getPaddingTop());
+            } else {
+                return view.getScrollY() &gt; 0;
+            }
+        } else {
+            return view.canScrollVertically(-1);
+        }
+    }
+</code></pre>
 <p>这段是我在秋百万的android-ultra-pulltorefresh里面找到的，想当初为了自己写下拉刷新，一遍一遍的打Log，最后甚至用上getVisibleRect才算搞定。<br>其实很多东西前人已经帮我们整理好了。<br>对了这东西在v4包里有ViewCompat.canScrollVertically，v4包除了方法数有点多(10k+好像)这点不好以外，一直都很好用<br>附上supportLibrary各个包的方法数，如果对65536这个数字熟悉的话，还是会注意点的。<br><img src="https://www.haldir66.ga/static/imgs/support_lib_methods_summary.jpg" alt="pic"></p>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
 <li>使用getLocalVisibleRect可以判断一个view是否完全可见</li>

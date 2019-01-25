@@ -17,7 +17,7 @@
 <meta property="og:description" content="记录一下常用git的命令，作为日常使用的参考手册">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/f787b2e8d757dc83b782bcd6d4c9f523.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.043Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.185Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="git常用操作手册">
 <meta name="twitter:description" content="记录一下常用git的命令，作为日常使用的参考手册">
@@ -203,10 +203,23 @@ ga('send', 'pageview');
         <p>记录一下常用git的命令，作为日常使用的参考手册</p>
 <p><img src="https://www.haldir66.ga/static/imgs/f787b2e8d757dc83b782bcd6d4c9f523.jpg" alt=""></p>
 <a id="more"></a>
-<h2 id="1-在本地创建一个项目并同步到github的过程"><a href="#1-在本地创建一个项目并同步到github的过程" class="headerlink" title="1. 在本地创建一个项目并同步到github的过程"></a>1. 在本地创建一个项目并同步到github的过程</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir ~/hello-world    //创建一个项目hello-world</span><br><span class="line">$ cd ~/hello-world       //打开这个项目</span><br><span class="line">$ git init             //初始化</span><br><span class="line">$ touch README   		//创建文件</span><br><span class="line">$ git add README        //更新README文件</span><br><span class="line">$ git commit -m &apos;first commit&apos;     //提交更新，并注释信息“first commit”</span><br><span class="line">$ git remote add origin git@github.test/hellotest.git     //连接远程github项目  </span><br><span class="line">$ git push -u origin master     //将本地项目更新到github项目上去</span><br></pre></td></tr></table></figure>
-<h2 id="2-将本地git-branch和远程github-repository同步"><a href="#2-将本地git-branch和远程github-repository同步" class="headerlink" title="2.  将本地git branch和远程github repository同步"></a>2.  将本地git branch和远程github repository同步</h2><p>可行的方式<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git branch --set-upstream local_branch origin/remote_branch</span><br></pre></td></tr></table></figure></p>
+<h2 id="1-在本地创建一个项目并同步到github的过程"><a href="#1-在本地创建一个项目并同步到github的过程" class="headerlink" title="1. 在本地创建一个项目并同步到github的过程"></a>1. 在本地创建一个项目并同步到github的过程</h2><pre><code class="git">$ mkdir ~/hello-world    //创建一个项目hello-world
+$ cd ~/hello-world       //打开这个项目
+$ git init             //初始化
+$ touch README           //创建文件
+$ git add README        //更新README文件
+$ git commit -m &#39;first commit&#39;     //提交更新，并注释信息“first commit”
+$ git remote add origin git@github.test/hellotest.git     //连接远程github项目  
+$ git push -u origin master     //将本地项目更新到github项目上去
+</code></pre>
+<h2 id="2-将本地git-branch和远程github-repository同步"><a href="#2-将本地git-branch和远程github-repository同步" class="headerlink" title="2.  将本地git branch和远程github repository同步"></a>2.  将本地git branch和远程github repository同步</h2><p>可行的方式</p>
+<pre><code class="git">git branch --set-upstream local_branch origin/remote_branch
+</code></pre>
 <p>这样做可行，但出现下面的错误提示，照着操作就行了。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git branch --set-upstream master origin/master</span><br><span class="line">The --set-upstream flag is deprecated and will be removed. Consider using --track or --set-upstream-to</span><br><span class="line">Branch master set up to track remote branch master from origin.</span><br></pre></td></tr></table></figure>
+<pre><code class="git">$ git branch --set-upstream master origin/master
+The --set-upstream flag is deprecated and will be removed. Consider using --track or --set-upstream-to
+Branch master set up to track remote branch master from origin.
+</code></pre>
 <p>直接拿下面这段就行了<br><strong>如果已经clone下来，想要在本地创建一个和远程分支对应的local分支。</strong></p>
 <blockquote>
 <p>git branch –track dev origin/dev &amp;&amp; git checkout dev</p>
@@ -214,40 +227,129 @@ ga('send', 'pageview');
 <h2 id="3-git处理大小写字母的问题"><a href="#3-git处理大小写字母的问题" class="headerlink" title="3. git处理大小写字母的问题"></a>3. git处理大小写字母的问题</h2><blockquote>
 <p>git默认对大小写不敏感，所以，新建一个文件adapter.java，上传到github之后说不定就给变成了Adapter.java。在windows下面将已经push到远端的文件，改变其文件名的大小写时，git默认会认为文件没有发生任何改动，从而拒绝提交和推送，原因是其默认配置为大小写不敏感，故须在bash下修改配置：</p>
 </blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config core.ignorecase false</span><br></pre></td></tr></table></figure>
-<h2 id="4-git设置用户名"><a href="#4-git设置用户名" class="headerlink" title="4. git设置用户名"></a>4. git设置用户名</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git config --global user.name &quot;name&quot;</span><br><span class="line">$ git config --global user.email xxx@163.com</span><br></pre></td></tr></table></figure>
+<pre><code class="git">git config core.ignorecase false
+</code></pre>
+<h2 id="4-git设置用户名"><a href="#4-git设置用户名" class="headerlink" title="4. git设置用户名"></a>4. git设置用户名</h2><pre><code class="git">$ git config --global user.name &quot;name&quot;
+$ git config --global user.email xxx@163.com
+</code></pre>
 <p>这样可以为git所有的仓库设置用户名，如果想为指定仓库设置用户名或email:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git config user.name &quot;name&quot;</span><br><span class="line">$ git config user.email &quot;myEmail.awesome.com&quot;</span><br></pre></td></tr></table></figure>
-<p>查看当前用户名或email<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git config user.name</span><br><span class="line">$ git config user.email</span><br></pre></td></tr></table></figure></p>
-<h2 id="5-设置代理"><a href="#5-设置代理" class="headerlink" title="5. 设置代理"></a>5. 设置代理</h2><p>只针对当前项目设置代理<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config  http.proxy socks5://127.0.0.1:1080</span><br><span class="line">git config  https.proxy socks5://127.0.0.1:1080</span><br></pre></td></tr></table></figure></p>
-<p>设置全局代理<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global http.proxy socks5://127.0.0.1:1080</span><br><span class="line">git config --global https.proxy socks5://127.0.0.1:1080</span><br></pre></td></tr></table></figure></p>
-<p>取消设置<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git config --global --<span class="built_in">unset</span> http.proxy</span><br><span class="line"></span><br><span class="line">git config --global --<span class="built_in">unset</span> https.proxy</span><br></pre></td></tr></table></figure></p>
+<pre><code class="git">$ git config user.name &quot;name&quot;
+$ git config user.email &quot;myEmail.awesome.com&quot;
+</code></pre>
+<p>查看当前用户名或email</p>
+<pre><code class="git">$ git config user.name
+$ git config user.email
+</code></pre>
+<h2 id="5-设置代理"><a href="#5-设置代理" class="headerlink" title="5. 设置代理"></a>5. 设置代理</h2><p>只针对当前项目设置代理</p>
+<pre><code class="git">git config  http.proxy socks5://127.0.0.1:1080
+git config  https.proxy socks5://127.0.0.1:1080
+</code></pre>
+<p>设置全局代理</p>
+<pre><code class="git">git config --global http.proxy socks5://127.0.0.1:1080
+git config --global https.proxy socks5://127.0.0.1:1080
+</code></pre>
+<p>取消设置</p>
+<pre><code class="bash">git config --global --unset http.proxy
+
+git config --global --unset https.proxy
+</code></pre>
 <h3 id="对指定url设置代理"><a href="#对指定url设置代理" class="headerlink" title="对指定url设置代理"></a>对指定url设置代理</h3><p>git config –global http.&lt;要设置代理的URL&gt;.proxy socks5://127.0.0.1:1080</p>
 <p>git config –global http.<a href="https://github.com.proxy">https://github.com.proxy</a> socks5://127.0.0.1:1080</p>
-<h2 id="6-对上一次commit进行修改-在不添加新的commit的基础上"><a href="#6-对上一次commit进行修改-在不添加新的commit的基础上" class="headerlink" title="6. 对上一次commit进行修改(在不添加新的commit的基础上)"></a>6. 对上一次commit进行修改(在不添加新的commit的基础上)</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git commit --amend</span><br></pre></td></tr></table></figure>
+<h2 id="6-对上一次commit进行修改-在不添加新的commit的基础上"><a href="#6-对上一次commit进行修改-在不添加新的commit的基础上" class="headerlink" title="6. 对上一次commit进行修改(在不添加新的commit的基础上)"></a>6. 对上一次commit进行修改(在不添加新的commit的基础上)</h2><pre><code class="git">git commit --amend
+</code></pre>
 <h2 id="7-git-revert和reset的区别"><a href="#7-git-revert和reset的区别" class="headerlink" title="7. git revert和reset的区别"></a>7. git revert和reset的区别</h2><blockquote>
 <p>reset 是在正常的commit历史中,删除了指定的commit,这时 HEAD 是向后移动了,而 revert 是在正常的commit历史中再commit一次,只不过是反向提交,他的 HEAD 是一直向前的. 即reset是通过一次反向的commit操作撤销之前的commit，而reset则会直接从提交历史里删除commit。如果还没有push，用reset可以在本地解决问题，之后重新commit再push。如果已经push，可以考虑通过一次revert来实现“撤销”的效果。</p>
 </blockquote>
 <p>语法：</p>
-<h3 id="reset"><a href="#reset" class="headerlink" title="reset"></a>reset</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git reset --hard HEAD //本地仓库文件修改也会消失</span><br><span class="line">git reset --soft HEAD //本地文件修改不会消失，类似于回到git add 之前的状态(把绿色的改成红色)</span><br><span class="line">git reset --hard HEAD~3 //最近的三次提交全部撤销</span><br><span class="line">git reset --soft HEAD~ //把最近一次本地提交撤销，上次提交的文件修改还在，等于变成红色的状态</span><br></pre></td></tr></table></figure>
-<p><a href="https://stackoverflow.com/questions/927358/how-to-undo-the-most-recent-commits-in-git">如何撤销最近一次本地提交</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ git commit -m &quot;Something terribly misguided&quot;             # (1)</span><br><span class="line">$ git reset HEAD~                                          # (2)</span><br><span class="line">&lt;&lt; edit files as necessary &gt;&gt;                              # (3)</span><br><span class="line">$ git add ...                                              # (4)</span><br><span class="line">$ git commit -c ORIG_HEAD                                  # (5)</span><br></pre></td></tr></table></figure></p>
-<p>ORIG_HEAD意思是把上一次的commit message带上，同时提供一个editor供修改</p>
-<h3 id="revert"><a href="#revert" class="headerlink" title="revert"></a>revert</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git revert c011eb3c20ba6fb38cc94fe //之后在分支图上就能看到一个新的反向的commit，push即可。</span><br></pre></td></tr></table></figure>
-<h2 id="8-切分支-删除分支"><a href="#8-切分支-删除分支" class="headerlink" title="8. 切分支, 删除分支"></a>8. 切分支, 删除分支</h2><p>本地新建分支<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout -b &lt;branchName&gt;</span><br></pre></td></tr></table></figure></p>
-<p>将这条分支与远程同步的方式<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git branch --set-upstream &lt;laocalBranchName&gt; origin/&lt;RemoteBranchName&gt;</span><br><span class="line">// 或者</span><br><span class="line">git branch -u origin/dev</span><br></pre></td></tr></table></figure></p>
-<p>直接从远程仓库切一个分支出来并保持同步的方式<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git checkout -b &lt;branchName&gt; origin/&lt;branchName&gt;</span><br><span class="line"></span><br><span class="line">git checkout --track origin/dev</span><br></pre></td></tr></table></figure></p>
-<p>删除远程分支:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push origin --delete &lt;branchName&gt;</span><br></pre></td></tr></table></figure></p>
-<p>删除远程tag<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push origin --delete tag &lt;tagName&gt;</span><br></pre></td></tr></table></figure></p>
-<p>顺便说一下<a href="http://blog.csdn.net/wangjia55/article/details/8793577">打tag</a>，这个实在太简单<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">git tag //看下当前仓库有哪些tags</span><br><span class="line">git tag myTag // 在当前head打一个myTag的标签</span><br><span class="line">git push origin myTag //刚才那个tag还只是在本地，需要提交到远程</span><br><span class="line">git checkout myTag //打tag的好处就在于埋下一个里程碑，你随时可以回到当时的状态</span><br><span class="line">git tag -d myTag //删除这个tag也很简单</span><br><span class="line">git tag -a myTag adjksdas31231//假如当前head不在想打的位置，找到想打的位置的log，照着打就好</span><br><span class="line">git push origin -tags //将本地所有标签一次性提交到git服务器</span><br><span class="line">git ls-remote --tags origin //查看远程仓库所有的tags</span><br></pre></td></tr></table></figure></p>
+<h3 id="reset"><a href="#reset" class="headerlink" title="reset"></a>reset</h3><pre><code class="git">git reset --hard HEAD //本地仓库文件修改也会消失
+git reset --soft HEAD //本地文件修改不会消失，类似于回到git add 之前的状态(把绿色的改成红色)
+git reset --hard HEAD~3 //最近的三次提交全部撤销
+git reset --soft HEAD~ //把最近一次本地提交撤销，上次提交的文件修改还在，等于变成红色的状态
+</code></pre>
+<p><a href="https://stackoverflow.com/questions/927358/how-to-undo-the-most-recent-commits-in-git">如何撤销最近一次本地提交</a></p>
+<pre><code>$ git commit -m &quot;Something terribly misguided&quot;             # (1)
+$ git reset HEAD~                                          # (2)
+&lt;&lt; edit files as necessary &gt;&gt;                              # (3)
+$ git add ...                                              # (4)
+$ git commit -c ORIG_HEAD                                  # (5)
+</code></pre><p>ORIG_HEAD意思是把上一次的commit message带上，同时提供一个editor供修改</p>
+<h3 id="revert"><a href="#revert" class="headerlink" title="revert"></a>revert</h3><pre><code class="git">git revert c011eb3c20ba6fb38cc94fe //之后在分支图上就能看到一个新的反向的commit，push即可。
+</code></pre>
+<h2 id="8-切分支-删除分支"><a href="#8-切分支-删除分支" class="headerlink" title="8. 切分支, 删除分支"></a>8. 切分支, 删除分支</h2><p>本地新建分支</p>
+<pre><code class="git">git checkout -b &lt;branchName&gt;
+</code></pre>
+<p>将这条分支与远程同步的方式</p>
+<pre><code class="git">git branch --set-upstream &lt;laocalBranchName&gt; origin/&lt;RemoteBranchName&gt;
+// 或者
+git branch -u origin/dev
+</code></pre>
+<p>直接从远程仓库切一个分支出来并保持同步的方式</p>
+<pre><code class="git">git checkout -b &lt;branchName&gt; origin/&lt;branchName&gt;
+
+git checkout --track origin/dev
+</code></pre>
+<p>删除远程分支:</p>
+<pre><code class="git">git push origin --delete &lt;branchName&gt;
+</code></pre>
+<p>删除远程tag</p>
+<pre><code class="git">git push origin --delete tag &lt;tagName&gt;
+</code></pre>
+<p>顺便说一下<a href="http://blog.csdn.net/wangjia55/article/details/8793577">打tag</a>，这个实在太简单</p>
+<pre><code class="git">git tag //看下当前仓库有哪些tags
+git tag myTag // 在当前head打一个myTag的标签
+git push origin myTag //刚才那个tag还只是在本地，需要提交到远程
+git checkout myTag //打tag的好处就在于埋下一个里程碑，你随时可以回到当时的状态
+git tag -d myTag //删除这个tag也很简单
+git tag -a myTag adjksdas31231//假如当前head不在想打的位置，找到想打的位置的log，照着打就好
+git push origin -tags //将本地所有标签一次性提交到git服务器
+git ls-remote --tags origin //查看远程仓库所有的tags
+</code></pre>
 <h2 id="9-pull和rebase的区别"><a href="#9-pull和rebase的区别" class="headerlink" title="9. pull和rebase的区别"></a>9. pull和rebase的区别</h2><p>pull = fetch +merge ，会生成新的提交</p>
 <blockquote>
 <p>Merge好在它是一个安全的操作。现有的分支不会被更改，避免了rebase潜在的缺点</p>
 </blockquote>
 <p>git pull –rebase = git pull -r</p>
 <h2 id="10-rebase和cherry-pick"><a href="#10-rebase和cherry-pick" class="headerlink" title="10. rebase和cherry-pick"></a>10. rebase和cherry-pick</h2><p>rebase不会生成新的提交，而且会使得项目提交历史呈现出完美的线性。但注意<a href="https://github.com/geeeeeeeeek/git-recipes/wiki/5.1-%E4%BB%A3%E7%A0%81%E5%90%88%E5%B9%B6%EF%BC%9AMerge%E3%80%81Rebase%E7%9A%84%E9%80%89%E6%8B%A9">不要在公共的分支上使用</a></p>
-<h2 id="11-gitignore文件写法"><a href="#11-gitignore文件写法" class="headerlink" title="11. gitignore文件写法"></a>11. gitignore文件写法</h2><p>参考<a href="https://github.com/suzeyu1992/repo/tree/master/project/git">repo</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"># 忽略所有以 .c结尾的文件</span><br><span class="line">*.c</span><br><span class="line"></span><br><span class="line"># 但是 stream.c 会被git追踪</span><br><span class="line">!stream.c</span><br><span class="line"></span><br><span class="line"># 只忽略当前文件夹下的TODO文件, 不包括其他文件夹下的TODO例如: subdir/TODO</span><br><span class="line">/TODO</span><br><span class="line"></span><br><span class="line"># 忽略所有在build文件夹下的文件</span><br><span class="line">build/</span><br><span class="line"></span><br><span class="line"># 忽略 doc/notes.txt, 但不包括多层下.txt例如: doc/server/arch.txt</span><br><span class="line">doc/*.txt</span><br><span class="line"></span><br><span class="line"># 忽略所有在doc目录下的.pdf文件</span><br><span class="line">doc/**/*.pdf</span><br><span class="line"></span><br><span class="line"># 让ignore文件立即生效的方法（如果不该上传到服务器的东西已经上传了，本次提交会把这些不该上传的东西从服务器删掉）</span><br><span class="line">git rm -r --cached .</span><br><span class="line">git add .</span><br><span class="line">git commit -m &quot;.gitignore is now working&quot;</span><br></pre></td></tr></table></figure></p>
-<h2 id="12-git-stash"><a href="#12-git-stash" class="headerlink" title="12. git stash"></a>12. git stash</h2><p>常用命令<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">git stash  //保存下来，压进一个栈，基本上就是先进后出了</span><br><span class="line">git stash pop //推出一个栈</span><br><span class="line"></span><br><span class="line">git stash save -a &quot;message to add&quot; // 添加一次stash，打上标记</span><br><span class="line"></span><br><span class="line">git stash list  //展示当前仓库所有的被stash的变更以及对应的id，记得这个不是跟着branch走的</span><br><span class="line">git stash drop stah@&#123;id&#125; // 从stash的List中删除指定的某一次stash</span><br><span class="line">git stash apply &lt;stash@&#123;id&#125;&gt; //应用某一次的stash</span><br><span class="line"></span><br><span class="line">git stash clear// 一次性删除stash List中所有的item</span><br></pre></td></tr></table></figure></p>
-<h2 id="13-强推"><a href="#13-强推" class="headerlink" title="13. 强推"></a>13. 强推</h2><p>谨慎使用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># Be very careful with this command!</span><br><span class="line">git push --force</span><br></pre></td></tr></table></figure></p>
+<h2 id="11-gitignore文件写法"><a href="#11-gitignore文件写法" class="headerlink" title="11. gitignore文件写法"></a>11. gitignore文件写法</h2><p>参考<a href="https://github.com/suzeyu1992/repo/tree/master/project/git">repo</a></p>
+<pre><code class="git"># 忽略所有以 .c结尾的文件
+*.c
+
+# 但是 stream.c 会被git追踪
+!stream.c
+
+# 只忽略当前文件夹下的TODO文件, 不包括其他文件夹下的TODO例如: subdir/TODO
+/TODO
+
+# 忽略所有在build文件夹下的文件
+build/
+
+# 忽略 doc/notes.txt, 但不包括多层下.txt例如: doc/server/arch.txt
+doc/*.txt
+
+# 忽略所有在doc目录下的.pdf文件
+doc/**/*.pdf
+
+# 让ignore文件立即生效的方法（如果不该上传到服务器的东西已经上传了，本次提交会把这些不该上传的东西从服务器删掉）
+git rm -r --cached .
+git add .
+git commit -m &quot;.gitignore is now working&quot;
+</code></pre>
+<h2 id="12-git-stash"><a href="#12-git-stash" class="headerlink" title="12. git stash"></a>12. git stash</h2><p>常用命令</p>
+<pre><code class="git">git stash  //保存下来，压进一个栈，基本上就是先进后出了
+git stash pop //推出一个栈
+
+git stash save -a &quot;message to add&quot; // 添加一次stash，打上标记
+
+git stash list  //展示当前仓库所有的被stash的变更以及对应的id，记得这个不是跟着branch走的
+git stash drop stah@{id} // 从stash的List中删除指定的某一次stash
+git stash apply &lt;stash@{id}&gt; //应用某一次的stash
+
+git stash clear// 一次性删除stash List中所有的item
+</code></pre>
+<h2 id="13-强推"><a href="#13-强推" class="headerlink" title="13. 强推"></a>13. 强推</h2><p>谨慎使用</p>
+<pre><code class="git"># Be very careful with this command!
+git push --force
+</code></pre>
 <h2 id="14-既然是shell环境，那当然可以写bash-脚本"><a href="#14-既然是shell环境，那当然可以写bash-脚本" class="headerlink" title="14.既然是shell环境，那当然可以写bash 脚本"></a>14.既然是shell环境，那当然可以写bash 脚本</h2><blockquote>
 <p>git add . &amp;&amp; git commit -m “stuff” &amp;&amp; git push</p>
 <h3 id="一部搞定，前提是每一步都得成功，原理就是bash脚本的-amp-amp-和-操作符。"><a href="#一部搞定，前提是每一步都得成功，原理就是bash脚本的-amp-amp-和-操作符。" class="headerlink" title="一部搞定，前提是每一步都得成功，原理就是bash脚本的&amp;&amp;和||操作符。"></a>一部搞定，前提是每一步都得成功，原理就是bash脚本的&amp;&amp;和||操作符。</h3></blockquote>
@@ -262,7 +364,19 @@ ga('send', 'pageview');
 <h3 id="save-it-as-id-rsa-work-when-prompted"><a href="#save-it-as-id-rsa-work-when-prompted" class="headerlink" title="save it as id_rsa_work when prompted"></a>save it as id_rsa_work when prompted</h3></blockquote>
 <p> ssh-keygen -R “[x.x.x.x]:22” //之前通过ssh-kengen记住的，这个R是remove的意思</p>
 <p>由此创建四个文件：<br>id_rsa_personal<br>id_rsa_personal.pub ## 这里面的内容是要粘到github账户setting里面的<br>id_rsa_work<br>id_rsa_work.pub</p>
-<p>touch config，添加如下内容<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">#githubPersonal</span><br><span class="line">Host personal</span><br><span class="line">   HostName github.com</span><br><span class="line">   User git</span><br><span class="line">   IdentityFile ~/.ssh/id_rsa_personal</span><br><span class="line"></span><br><span class="line"># githubWork</span><br><span class="line">Host work</span><br><span class="line">   HostName github.com</span><br><span class="line">   User git</span><br><span class="line">   IdentityFile ~/.ssh/id_rsa_work</span><br></pre></td></tr></table></figure></p>
+<p>touch config，添加如下内容</p>
+<pre><code class="config">#githubPersonal
+Host personal
+   HostName github.com
+   User git
+   IdentityFile ~/.ssh/id_rsa_personal
+
+# githubWork
+Host work
+   HostName github.com
+   User git
+   IdentityFile ~/.ssh/id_rsa_work
+</code></pre>
 <p>另外,确保只有owner有读写权限chmod 600 ~/.ssh/config</p>
 <p>error:Could not open a connection to your authentication agent.</p>
 <blockquote>

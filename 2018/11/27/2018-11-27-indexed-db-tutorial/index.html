@@ -17,7 +17,7 @@
 <meta property="og:description" content="浏览器indexedDb使用方式及注意的点">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/black-mountains.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.043Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.185Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="浏览器indexedDb使用示例">
 <meta name="twitter:description" content="浏览器indexedDb使用方式及注意的点">
@@ -209,12 +209,85 @@ ga('send', 'pageview');
 <p>Object Stores(就像数据库里的table或者collections一样，但是同一个store中存储的数据类型不一定是相同的)</p>
 <p>transaction（所有对IndexDb的操作必须通过transaction）</p>
 <p>接下来是CURD的实例</p>
-<p>db.open返回的是一个IDBRequest对象，没有promise的方式是这样使用的<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> db;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Let us open our database</span></span><br><span class="line"><span class="keyword">var</span> DBOpenRequest = <span class="built_in">window</span>.indexedDB.open(<span class="string">"toDoList"</span>, <span class="number">4</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// these two event handlers act on the database being</span></span><br><span class="line"><span class="comment">// opened successfully, or not</span></span><br><span class="line">DBOpenRequest.onerror = <span class="function"><span class="keyword">function</span>(<span class="params">event</span>) </span>&#123;</span><br><span class="line">  note.innerHTML += <span class="string">'&lt;li&gt;Error loading database.&lt;/li&gt;'</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">DBOpenRequest.onsuccess = <span class="function"><span class="keyword">function</span>(<span class="params">event</span>) </span>&#123;</span><br><span class="line">  note.innerHTML += <span class="string">'&lt;li&gt;Database initialised.&lt;/li&gt;'</span>;</span><br><span class="line"> </span><br><span class="line">  <span class="comment">// store the result of opening the database.</span></span><br><span class="line">  db = DBOpenRequest.result;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>db.open返回的是一个IDBRequest对象，没有promise的方式是这样使用的</p>
+<pre><code class="js">var db;
+
+// Let us open our database
+var DBOpenRequest = window.indexedDB.open(&quot;toDoList&quot;, 4);
+
+// these two event handlers act on the database being
+// opened successfully, or not
+DBOpenRequest.onerror = function(event) {
+  note.innerHTML += &#39;&lt;li&gt;Error loading database.&lt;/li&gt;&#39;;
+};
+
+DBOpenRequest.onsuccess = function(event) {
+  note.innerHTML += &#39;&lt;li&gt;Database initialised.&lt;/li&gt;&#39;;
+
+  // store the result of opening the database.
+  db = DBOpenRequest.result;
+};
+</code></pre>
 <h3 id="Create-创建db的代码"><a href="#Create-创建db的代码" class="headerlink" title="(Create)创建db的代码:"></a>(Create)创建db的代码:</h3><p>indexedDB.open(‘db-name’, 1) //第二个参数是数据库版本</p>
-<h3 id="添加数据的方式"><a href="#添加数据的方式" class="headerlink" title="添加数据的方式"></a>添加数据的方式</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">putSomeData</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> indexedDB = <span class="built_in">window</span>.indexedDB || <span class="built_in">window</span>.mozIndexedDB || <span class="built_in">window</span>.webkitIndexedDB || <span class="built_in">window</span>.msIndexedDB</span><br><span class="line"></span><br><span class="line">    <span class="keyword">let</span> open = indexedDB.open(<span class="string">'db-name'</span>, <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    open.onupgradeneeded = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">let</span> db = open.result</span><br><span class="line">        db.createObjectStore(<span class="string">'objectStoreName'</span>, &#123; <span class="attr">autoIncrement</span>: <span class="literal">true</span> &#125;)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    open.onsuccess = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">let</span> db = open.result</span><br><span class="line">        <span class="keyword">let</span> tx = db.transaction(<span class="string">'objectStoreName'</span>, <span class="string">'readwrite'</span>)</span><br><span class="line">        <span class="keyword">let</span> store = tx.objectStore(<span class="string">'objectStoreName'</span>)</span><br><span class="line"></span><br><span class="line">        store.put(&#123; <span class="attr">firstname</span>: <span class="string">'John'</span>, <span class="attr">lastname</span>: <span class="string">'Doe'</span>, <span class="attr">age</span>: <span class="number">33</span> &#125;)</span><br><span class="line"></span><br><span class="line">        tx.oncomplete = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">            db.close()</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>真啰嗦，还是用第三方库吧，用<a href="https://github.com/jakearchibald/idb">idb</a>好了<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">putSomeData</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> db = <span class="keyword">await</span> idb.open(<span class="string">'db-name'</span>, <span class="number">1</span>, upgradeDB =&gt; upgradeDB.createObjectStore(<span class="string">'objectStoreName'</span>, &#123; <span class="attr">autoIncrement</span>: <span class="literal">true</span> &#125;))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">let</span> tx = db.transaction(<span class="string">'objectStoreName'</span>, <span class="string">'readwrite'</span>)</span><br><span class="line">    <span class="keyword">let</span> store = tx.objectStore(<span class="string">'objectStoreName'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">await</span> store.put(&#123; <span class="attr">firstname</span>: <span class="string">'John'</span>, <span class="attr">lastname</span>: <span class="string">'Doe'</span>, <span class="attr">age</span>: <span class="number">33</span> &#125;)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">await</span> tx.complete</span><br><span class="line">    db.close()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">getAllData</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> db = <span class="keyword">await</span> idb.open(<span class="string">'db-name'</span>, <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">let</span> tx = db.transaction(<span class="string">'objectStoreName'</span>, <span class="string">'readonly'</span>)</span><br><span class="line">    <span class="keyword">let</span> store = tx.objectStore(<span class="string">'objectStoreName'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// add, clear, count, delete, get, getAll, getAllKeys, getKey, put</span></span><br><span class="line">    <span class="keyword">let</span> allSavedItems = <span class="keyword">await</span> store.getAll()</span><br><span class="line"></span><br><span class="line">    <span class="built_in">console</span>.log(allSavedItems)</span><br><span class="line"></span><br><span class="line">    db.close()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="添加数据的方式"><a href="#添加数据的方式" class="headerlink" title="添加数据的方式"></a>添加数据的方式</h3><pre><code class="js">function putSomeData() {
+    let indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB
+
+    let open = indexedDB.open(&#39;db-name&#39;, 1)
+
+    open.onupgradeneeded = function() {
+        let db = open.result
+        db.createObjectStore(&#39;objectStoreName&#39;, { autoIncrement: true })
+    }
+
+    open.onsuccess = function() {
+        let db = open.result
+        let tx = db.transaction(&#39;objectStoreName&#39;, &#39;readwrite&#39;)
+        let store = tx.objectStore(&#39;objectStoreName&#39;)
+
+        store.put({ firstname: &#39;John&#39;, lastname: &#39;Doe&#39;, age: 33 })
+
+        tx.oncomplete = function() {
+            db.close()
+        }
+    }
+}
+</code></pre>
+<p>真啰嗦，还是用第三方库吧，用<a href="https://github.com/jakearchibald/idb">idb</a>好了</p>
+<pre><code class="js">async function putSomeData() {
+    let db = await idb.open(&#39;db-name&#39;, 1, upgradeDB =&gt; upgradeDB.createObjectStore(&#39;objectStoreName&#39;, { autoIncrement: true }))
+
+    let tx = db.transaction(&#39;objectStoreName&#39;, &#39;readwrite&#39;)
+    let store = tx.objectStore(&#39;objectStoreName&#39;)
+
+    await store.put({ firstname: &#39;John&#39;, lastname: &#39;Doe&#39;, age: 33 })
+
+    await tx.complete
+    db.close()
+}
+
+async function getAllData() {
+    let db = await idb.open(&#39;db-name&#39;, 1)
+
+    let tx = db.transaction(&#39;objectStoreName&#39;, &#39;readonly&#39;)
+    let store = tx.objectStore(&#39;objectStoreName&#39;)
+
+    // add, clear, count, delete, get, getAll, getAllKeys, getKey, put
+    let allSavedItems = await store.getAll()
+
+    console.log(allSavedItems)
+
+    db.close()
+}
+</code></pre>
 <h3 id="扯一点关于存储的东西"><a href="#扯一点关于存储的东西" class="headerlink" title="扯一点关于存储的东西"></a>扯一点关于存储的东西</h3><p>当浏览器进入私人模式(private browsing mode，Google Chrome 上对应的应该是叫隐身模式)的时候，会创建一个新的、临时的、空的数据库，用以存储本地数据(local storage data)。当浏览器关闭时，里面的所有数据都将被丢弃。</p>
-<p>判断方式<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//隐身模式下和localStorage满了都会报同样的错误</span></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">  <span class="built_in">window</span>.localStorage.setItem(<span class="string">'test'</span>, <span class="string">'test'</span>)</span><br><span class="line">&#125; <span class="keyword">catch</span> (e)  &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(e) <span class="comment">//QuotaExceddedError(DOM Exception 22):The quota has been exceeded.</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>判断方式</p>
+<pre><code class="js">//隐身模式下和localStorage满了都会报同样的错误
+try {
+  window.localStorage.setItem(&#39;test&#39;, &#39;test&#39;)
+} catch (e)  {
+  console.log(e) //QuotaExceddedError(DOM Exception 22):The quota has been exceeded.
+}
+</code></pre>
 
       
 

@@ -17,7 +17,7 @@
 <meta property="og:description" content="关于java nio的一些点">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/UmbriaCastelluccio_EN-AU8834990889_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.043Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.185Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java nio使用指南">
 <meta name="twitter:description" content="关于java nio的一些点">
@@ -202,28 +202,198 @@ ga('send', 'pageview');
       
         <p>关于java nio的一些点<br><img src="https://www.haldir66.ga/static/imgs/UmbriaCastelluccio_EN-AU8834990889_1920x1080.jpg" alt=""><br><a id="more"></a></p>
 <p><a href="https://zhuanlan.zhihu.com/p/27625923">本文大多数内容来自知乎专栏</a>的复制粘贴，因为别人写的比我好</p>
-<h3 id="nio及DirectByteBuffer相关操作"><a href="#nio及DirectByteBuffer相关操作" class="headerlink" title="nio及DirectByteBuffer相关操作"></a>nio及DirectByteBuffer相关操作</h3><p>nio包含了很多东西，核心的应该是selector<br>DirectBuffer这个东西很容易讲，一句话就能说清楚：这是一块在Java堆外分配的，可以在Java程序中访问的内存。<br>先来解释一下几个堆是什么。以32位系统为例（64位系统也是一样的，只是地址空间更大而已，写起来没有32位系统看上去那么简洁），操作系统会为一个进程提供4G的地址空间，换句话说，一个进程可用的内存是4G。在Linux上，又为内核空间留了1G，剩下的3G是可以供用户使用的(粗略来看是这样的)。这1G就叫做内核空间，3G被称为用户空间。<br>一个java进程下不过对于操作系统而言，肯定是一个用户进程。所以jva也就有了这3G的使用权。jvm想要使用这些内存的时候，会使用malloc方法去找操作系统去要（其实中间还隔了一个C runtime，我们不去管这个细节，只把malloc往下都看成是操作系统的功能，并不会带来太大的问题）<br>而JVM要来的这些的内存，有一块是专门供Java程序创建对象使用的，这块内存在JVM中被称为堆(heap)。堆这个词快被用烂了，操作系统有堆的概念，C runtime也有，JVM里也有，然后还有一种数据结构也叫堆（参看本课程堆排序部分），为了区别，我在以后的文章里只称JVM中的堆为Java堆。关于Java堆的结构和管理，在后面GC调优部分，我会详细地讲，这里我只介绍一下本节课所需要的内容。<br>我们使用普通的ByteBuffer，那么这个ByteBuffer就会在Java堆内，被JVM所管理：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ByteBuffer buf = ByteBuffer.allocate(<span class="number">1024</span>);</span><br></pre></td></tr></table></figure></p>
-<p>在执行GC的时候，JVM实际上会做一些整理内存的工作，也就说buf这个对象在内存中的实际地址是会发生变化的。有些时候，ByteBuffer里都是大量的字节，这些字节在JVM GC整理内存时就显得很笨重，把它们在内存中拷来拷去显然不是一个好主意。<br>那这时候，我们就会想能不能给我一块内存，可以脱离JVM的管理呢？在这样的背景下，就有了DirectBuffer。先看一下用法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ByteBuffer buf = ByteBuffer.allocateDirect(<span class="number">1024</span>);</span><br></pre></td></tr></table></figure></p>
-<p>这两个函数的实现是有区别的:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ByteBuffer <span class="title">allocateDirect</span><span class="params">(<span class="keyword">int</span> capacity)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> DirectByteBuffer(capacity);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ByteBuffer <span class="title">allocate</span><span class="params">(<span class="keyword">int</span> capacity)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (capacity &lt; <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException();</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> HeapByteBuffer(capacity, capacity);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
-<p>DirectByteBuffer的核心就是调用了 unsafe.allocateMemory(size)方法。<br>Java对象在Java堆里申请内存的时候，实际上是比malloc要快的，所以DirectBuffer的创建效率往往是比Heap Buffer差的。<br>但是，如果进行网络读写或者文件读写的时候，DirectBuffer就会比较快了。 <strong>说起来好笑，这个快是因为JDK故意把非DirectBuffer的读写搞慢的，我们看一下JDK的源代码</strong>。<br>share/classes/sun/nio/ch/IOUtil.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">write</span><span class="params">(FileDescriptor fd, ByteBuffer src, <span class="keyword">long</span> position,</span></span></span><br><span class="line"><span class="function"><span class="params">                     NativeDispatcher nd)</span> </span></span><br><span class="line"><span class="function">        <span class="keyword">throws</span> IOException</span></span><br><span class="line"><span class="function">    </span>&#123;   </span><br><span class="line">        <span class="keyword">if</span> (src <span class="keyword">instanceof</span> DirectBuffer)</span><br><span class="line">            <span class="keyword">return</span> writeFromNativeBuffer(fd, src, position, nd);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Substitute a native buffer</span></span><br><span class="line">        <span class="keyword">int</span> pos = src.position();</span><br><span class="line">        <span class="keyword">int</span> lim = src.limit();</span><br><span class="line">        <span class="keyword">assert</span> (pos &lt;= lim);</span><br><span class="line">        <span class="keyword">int</span> rem = (pos &lt;= lim ? lim - pos : <span class="number">0</span>); </span><br><span class="line">        ByteBuffer bb = Util.getTemporaryDirectBuffer(rem);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            bb.put(src);</span><br><span class="line">            bb.flip();</span><br><span class="line">        <span class="comment">// ................略</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="nio及DirectByteBuffer相关操作"><a href="#nio及DirectByteBuffer相关操作" class="headerlink" title="nio及DirectByteBuffer相关操作"></a>nio及DirectByteBuffer相关操作</h3><p>nio包含了很多东西，核心的应该是selector<br>DirectBuffer这个东西很容易讲，一句话就能说清楚：这是一块在Java堆外分配的，可以在Java程序中访问的内存。<br>先来解释一下几个堆是什么。以32位系统为例（64位系统也是一样的，只是地址空间更大而已，写起来没有32位系统看上去那么简洁），操作系统会为一个进程提供4G的地址空间，换句话说，一个进程可用的内存是4G。在Linux上，又为内核空间留了1G，剩下的3G是可以供用户使用的(粗略来看是这样的)。这1G就叫做内核空间，3G被称为用户空间。<br>一个java进程下不过对于操作系统而言，肯定是一个用户进程。所以jva也就有了这3G的使用权。jvm想要使用这些内存的时候，会使用malloc方法去找操作系统去要（其实中间还隔了一个C runtime，我们不去管这个细节，只把malloc往下都看成是操作系统的功能，并不会带来太大的问题）<br>而JVM要来的这些的内存，有一块是专门供Java程序创建对象使用的，这块内存在JVM中被称为堆(heap)。堆这个词快被用烂了，操作系统有堆的概念，C runtime也有，JVM里也有，然后还有一种数据结构也叫堆（参看本课程堆排序部分），为了区别，我在以后的文章里只称JVM中的堆为Java堆。关于Java堆的结构和管理，在后面GC调优部分，我会详细地讲，这里我只介绍一下本节课所需要的内容。<br>我们使用普通的ByteBuffer，那么这个ByteBuffer就会在Java堆内，被JVM所管理：</p>
+<pre><code class="java">ByteBuffer buf = ByteBuffer.allocate(1024);
+</code></pre>
+<p>在执行GC的时候，JVM实际上会做一些整理内存的工作，也就说buf这个对象在内存中的实际地址是会发生变化的。有些时候，ByteBuffer里都是大量的字节，这些字节在JVM GC整理内存时就显得很笨重，把它们在内存中拷来拷去显然不是一个好主意。<br>那这时候，我们就会想能不能给我一块内存，可以脱离JVM的管理呢？在这样的背景下，就有了DirectBuffer。先看一下用法：</p>
+<pre><code class="java">ByteBuffer buf = ByteBuffer.allocateDirect(1024);
+</code></pre>
+<p>这两个函数的实现是有区别的:</p>
+<pre><code class="java">public static ByteBuffer allocateDirect(int capacity) {
+        return new DirectByteBuffer(capacity);
+    }
+
+    public static ByteBuffer allocate(int capacity) {
+        if (capacity &lt; 0)
+            throw new IllegalArgumentException();
+        return new HeapByteBuffer(capacity, capacity);
+    }
+</code></pre>
+<p>DirectByteBuffer的核心就是调用了 unsafe.allocateMemory(size)方法。<br>Java对象在Java堆里申请内存的时候，实际上是比malloc要快的，所以DirectBuffer的创建效率往往是比Heap Buffer差的。<br>但是，如果进行网络读写或者文件读写的时候，DirectBuffer就会比较快了。 <strong>说起来好笑，这个快是因为JDK故意把非DirectBuffer的读写搞慢的，我们看一下JDK的源代码</strong>。<br>share/classes/sun/nio/ch/IOUtil.java</p>
+<pre><code class="java">static int write(FileDescriptor fd, ByteBuffer src, long position,
+                     NativeDispatcher nd) 
+        throws IOException
+    {   
+        if (src instanceof DirectBuffer)
+            return writeFromNativeBuffer(fd, src, position, nd);
+
+        // Substitute a native buffer
+        int pos = src.position();
+        int lim = src.limit();
+        assert (pos &lt;= lim);
+        int rem = (pos &lt;= lim ? lim - pos : 0); 
+        ByteBuffer bb = Util.getTemporaryDirectBuffer(rem);
+        try {
+            bb.put(src);
+            bb.flip();
+        // ................略
+</code></pre>
 <p>如果src是DirectBuffer，就直接调用writeFromNativeBuffer，如果不是，则要先创建一个临时的DirectBuffer，把src拷进去，然后再调用真正的写操作。为什么要这么干呢？还是要从DirectBuffer不会被GC移动说起。writeFromNativeBuffer的实现，最终会把Buffer的address传给操作系统，让操作系统把address开始的那一段内存发送到网络上。这就要求在操作系统进行发送的时候，这块内存是不能动的(jni调用传递的是地址，地址不能乱动)。而我们知道，GC是会乱搬Java堆里的东西的，所以无奈，我们必须得弄一块地址不会变化的内存，然后把这个地址发给操作系统。</p>
-<p>常用的ByteBuffer本质上是一个byte[]，包括这么几个变量<br>容量（Capacity） 缓冲区能够容纳的数据元素的最大数量。容量在缓冲区创建时被设定，并且永远不能被改变。<br>上界（Limit） 缓冲区里的数据的总数，代表了当前缓冲区中一共有多少数据。<br>位置（Position） 下一个要被读或写的元素的位置。Position会自动由相应的 get( )和 put( )函数更新。<br>标记（Mark） 一个备忘位置。用于记录上一次读写的位置。一会儿，我会通过reset方法来说明这个属性的含义。<br>ByteBuffer是一个抽象类，不能new出来<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ByteBuffer byteBuffer = ByteBuffer.allocate(<span class="number">256</span>);</span><br></pre></td></tr></table></figure></p>
+<p>常用的ByteBuffer本质上是一个byte[]，包括这么几个变量<br>容量（Capacity） 缓冲区能够容纳的数据元素的最大数量。容量在缓冲区创建时被设定，并且永远不能被改变。<br>上界（Limit） 缓冲区里的数据的总数，代表了当前缓冲区中一共有多少数据。<br>位置（Position） 下一个要被读或写的元素的位置。Position会自动由相应的 get( )和 put( )函数更新。<br>标记（Mark） 一个备忘位置。用于记录上一次读写的位置。一会儿，我会通过reset方法来说明这个属性的含义。<br>ByteBuffer是一个抽象类，不能new出来</p>
+<pre><code class="java">ByteBuffer byteBuffer = ByteBuffer.allocate(256);
+</code></pre>
 <p>以上的语句可以创建一个大小为256字节的ByteBuffer，此时，mark = -1, pos = 0, limit = 256, capacity = 256。capacity在初始化的时候确定了，运行时就不会再变化了，而另外三个变量是随着程序的执行而不断变化的。</p>
 <p>由于本质上就是一个byte[]，读数据的时候position放到0, limit放到当前已经存放的数据的位置，读完为止。写数据的时候也差不多，position放到当前已经存放的数据的curIndex+1，limit放到capicity的位置，填满为止。</p>
-<p>从读变成写可以这么干<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">byteBuffer.limit(byteBuffer.position())</span><br><span class="line">byteBuffer.position(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//由于这个方法实在太频繁,jdk就帮忙封装了一个叫做flip的方法</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> Buffer <span class="title">flip</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        limit = position;</span><br><span class="line">        position = <span class="number">0</span>;</span><br><span class="line">        mark = -<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>从读变成写可以这么干</p>
+<pre><code class="java">byteBuffer.limit(byteBuffer.position())
+byteBuffer.position(0);
+
+//由于这个方法实在太频繁,jdk就帮忙封装了一个叫做flip的方法
+public final Buffer flip() {
+        limit = position;
+        position = 0;
+        mark = -1;
+        return this;
+    }
+</code></pre>
 <p>显然连续调用flip会导致limit变成0，不能读也不能写了。<br>mark方法类似于打一个标记，待会儿通过reset回到这个position。</p>
 <h3 id="java的byte数组在内存层面不一定是连续的，C语言里面是连续的"><a href="#java的byte数组在内存层面不一定是连续的，C语言里面是连续的" class="headerlink" title="java的byte数组在内存层面不一定是连续的，C语言里面是连续的"></a>java的byte数组在内存层面不一定是连续的，C语言里面是连续的</h3><p>原因是GC会挪动内存</p>
-<h2 id="nio的channel"><a href="#nio的channel" class="headerlink" title="nio的channel"></a>nio的channel</h2><p>在Java IO中，基本上可以分为文件类和Stream类两大类。Channel 也相应地分为了FileChannel 和 Socket Channel，其中 socket channel 又分为三大类，一个是用于监听端口的ServerSocketChannel，第二类是用于TCP通信的SocketChannel，第三类是用于UDP通信的DatagramChannel。channel 最主要的作用还是用于非阻塞式读写。可以使用Channel结合ByteBuffer进行读写。<br>一个简单的client server echo程序可以这样写<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// server</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WebServer</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String args[])</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            ServerSocketChannel ssc = ServerSocketChannel.open();</span><br><span class="line">            ssc.socket().bind(<span class="keyword">new</span> InetSocketAddress(<span class="string">"127.0.0.1"</span>, <span class="number">8000</span>));</span><br><span class="line">            SocketChannel socketChannel = ssc.accept();</span><br><span class="line"></span><br><span class="line">            ByteBuffer readBuffer = ByteBuffer.allocate(<span class="number">128</span>);</span><br><span class="line">            socketChannel.read(readBuffer);</span><br><span class="line"></span><br><span class="line">            readBuffer.flip();</span><br><span class="line">            <span class="keyword">while</span> (readBuffer.hasRemaining()) &#123;</span><br><span class="line">                System.out.println((<span class="keyword">char</span>)readBuffer.get());</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            socketChannel.close();</span><br><span class="line">            ssc.close();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// client</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WebClient</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        SocketChannel socketChannel = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            socketChannel = SocketChannel.open();</span><br><span class="line">            socketChannel.connect(<span class="keyword">new</span> InetSocketAddress(<span class="string">"127.0.0.1"</span>, <span class="number">8000</span>));</span><br><span class="line"></span><br><span class="line">            ByteBuffer writeBuffer = ByteBuffer.allocate(<span class="number">128</span>);</span><br><span class="line">            writeBuffer.put(<span class="string">"hello world"</span>.getBytes());</span><br><span class="line"></span><br><span class="line">            writeBuffer.flip();</span><br><span class="line">            socketChannel.write(writeBuffer);</span><br><span class="line">            socketChannel.close();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="nio的channel"><a href="#nio的channel" class="headerlink" title="nio的channel"></a>nio的channel</h2><p>在Java IO中，基本上可以分为文件类和Stream类两大类。Channel 也相应地分为了FileChannel 和 Socket Channel，其中 socket channel 又分为三大类，一个是用于监听端口的ServerSocketChannel，第二类是用于TCP通信的SocketChannel，第三类是用于UDP通信的DatagramChannel。channel 最主要的作用还是用于非阻塞式读写。可以使用Channel结合ByteBuffer进行读写。<br>一个简单的client server echo程序可以这样写</p>
+<pre><code class="java">// server
+
+public class WebServer {
+    public static void main(String args[]) {
+        try {
+            ServerSocketChannel ssc = ServerSocketChannel.open();
+            ssc.socket().bind(new InetSocketAddress(&quot;127.0.0.1&quot;, 8000));
+            SocketChannel socketChannel = ssc.accept();
+
+            ByteBuffer readBuffer = ByteBuffer.allocate(128);
+            socketChannel.read(readBuffer);
+
+            readBuffer.flip();
+            while (readBuffer.hasRemaining()) {
+                System.out.println((char)readBuffer.get());
+            }
+
+            socketChannel.close();
+            ssc.close();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+// client
+public class WebClient {
+    public static void main(String[] args) {
+        SocketChannel socketChannel = null;
+        try {
+            socketChannel = SocketChannel.open();
+            socketChannel.connect(new InetSocketAddress(&quot;127.0.0.1&quot;, 8000));
+
+            ByteBuffer writeBuffer = ByteBuffer.allocate(128);
+            writeBuffer.put(&quot;hello world&quot;.getBytes());
+
+            writeBuffer.flip();
+            socketChannel.write(writeBuffer);
+            socketChannel.close();
+        } catch (IOException e) {
+        }
+    }
+}
+</code></pre>
 <h3 id="MMAP-memory-mapped-file"><a href="#MMAP-memory-mapped-file" class="headerlink" title="MMAP(memory mapped file)"></a>MMAP(memory mapped file)</h3><p>将文件映射到内存空间的操作，懒得看原理的话，背下这段话就够了</p>
 <blockquote>
 <p><strong>常规文件操作需要从磁盘到页缓存再到用户主存的两次数据拷贝。而mmap操控文件，只需要从磁盘到用户主存的一次数据拷贝过程。说白了，mmap的关键点是实现了用户空间和内核空间的数据直接交互而省去了空间不同数据不通的繁琐过程。因此mmap效率更高</strong></p>
 </blockquote>
 <p>mmap函数是unix/linux下的系统调用，mmap系统调用并不是完全为了用于共享内存而设计的,mmap实现共享内存也是其主要作用之一，事实上可以实现两个java进程之间的通信。</p>
-<p>A进程<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String args[])</span></span>&#123;</span><br><span class="line">        RandomAccessFile f = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            f = <span class="keyword">new</span> RandomAccessFile(<span class="string">"C:/hinusDocs/hello.txt"</span>, <span class="string">"rw"</span>);</span><br><span class="line">            FileChannel fc = f.getChannel();</span><br><span class="line">            MappedByteBuffer buf = fc.map(FileChannel.MapMode.READ_WRITE, <span class="number">0</span>, <span class="number">20</span>);</span><br><span class="line"></span><br><span class="line">            buf.put(<span class="string">"how are you?"</span>.getBytes());</span><br><span class="line"></span><br><span class="line">            Thread.sleep(<span class="number">10000</span>);</span><br><span class="line"></span><br><span class="line">            fc.close();</span><br><span class="line">            f.close();</span><br><span class="line"></span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>B进程<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MapMemoryBuffer</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        RandomAccessFile f = <span class="keyword">new</span> RandomAccessFile(<span class="string">"C:/hinusDocs/hello.txt"</span>, <span class="string">"rw"</span>);</span><br><span class="line">        FileChannel fc = f.getChannel();</span><br><span class="line">        MappedByteBuffer buf = fc.map(FileChannel.MapMode.READ_WRITE, <span class="number">0</span>, fc.size());</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (buf.hasRemaining()) &#123;</span><br><span class="line">            System.out.print((<span class="keyword">char</span>)buf.get());</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>很多java方法本质上就是jni进行了系统调用。<br>在sun.nio.ch.FileChannelImpl里有map的具体实现：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// If no exception was thrown from map0, the address is valid</span></span><br><span class="line">            addr = map0(imode, mapPosition, mapSize);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (OutOfMemoryError x) &#123;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">native</span> <span class="keyword">long</span> <span class="title">map0</span><span class="params">(<span class="keyword">int</span> prot, <span class="keyword">long</span> position, <span class="keyword">long</span> length)</span></span></span><br></pre></td></tr></table></figure></p>
+<p>A进程</p>
+<pre><code class="java">public class Main {
+    public static void main(String args[]){
+        RandomAccessFile f = null;
+        try {
+            f = new RandomAccessFile(&quot;C:/hinusDocs/hello.txt&quot;, &quot;rw&quot;);
+            FileChannel fc = f.getChannel();
+            MappedByteBuffer buf = fc.map(FileChannel.MapMode.READ_WRITE, 0, 20);
+
+            buf.put(&quot;how are you?&quot;.getBytes());
+
+            Thread.sleep(10000);
+
+            fc.close();
+            f.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+<p>B进程</p>
+<pre><code class="java">public class MapMemoryBuffer {
+    public static void main(String[] args) throws Exception {
+        RandomAccessFile f = new RandomAccessFile(&quot;C:/hinusDocs/hello.txt&quot;, &quot;rw&quot;);
+        FileChannel fc = f.getChannel();
+        MappedByteBuffer buf = fc.map(FileChannel.MapMode.READ_WRITE, 0, fc.size());
+
+        while (buf.hasRemaining()) {
+            System.out.print((char)buf.get());
+        }
+        System.out.println();
+    }
+}
+</code></pre>
+<p>很多java方法本质上就是jni进行了系统调用。<br>在sun.nio.ch.FileChannelImpl里有map的具体实现：</p>
+<pre><code class="java">try {
+            // If no exception was thrown from map0, the address is valid
+            addr = map0(imode, mapPosition, mapSize);
+        } catch (OutOfMemoryError x) {
+
+private native long map0(int prot, long position, long length)
+</code></pre>
 <p>比如Java的这个map0函数，具体的实现在<br>solaris/native/sun/nio/ch/FileChannelImpl.c这个文件里</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">JNIEXPORT jlong JNICALL</span><br><span class="line">Java_sun_nio_ch_FileChannelImpl_map0(JNIEnv *env, jobject <span class="keyword">this</span>,</span><br><span class="line">                                     jint prot, jlong off, jlong len)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">void</span> *mapAddress = <span class="number">0</span>;</span><br><span class="line">    jobject fdo = (*env)-&gt;GetObjectField(env, <span class="keyword">this</span>, chan_fd);</span><br><span class="line">    jint fd = fdval(env, fdo);</span><br><span class="line">    <span class="keyword">int</span> protections = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> flags = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (prot == sun_nio_ch_FileChannelImpl_MAP_RO) &#123;</span><br><span class="line">        protections = PROT_READ;</span><br><span class="line">        flags = MAP_SHARED;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (prot == sun_nio_ch_FileChannelImpl_MAP_RW) &#123;</span><br><span class="line">        protections = PROT_WRITE | PROT_READ;</span><br><span class="line">        flags = MAP_SHARED;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (prot == sun_nio_ch_FileChannelImpl_MAP_PV) &#123;</span><br><span class="line">        protections =  PROT_WRITE | PROT_READ;</span><br><span class="line">        flags = MAP_PRIVATE;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    mapAddress = mmap64(</span><br><span class="line">        <span class="number">0</span>,                    <span class="comment">/* Let OS decide location */</span></span><br><span class="line">        len,                  <span class="comment">/* Number of bytes to map */</span></span><br><span class="line">        protections,          <span class="comment">/* File permissions */</span></span><br><span class="line">        flags,                <span class="comment">/* Changes are shared */</span></span><br><span class="line">        fd,                   <span class="comment">/* File descriptor of mapped file */</span></span><br><span class="line">        off);                 <span class="comment">/* Offset into file */</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (mapAddress == MAP_FAILED) &#123;</span><br><span class="line">        <span class="keyword">if</span> (errno == ENOMEM) &#123;</span><br><span class="line">            JNU_ThrowOutOfMemoryError(env, <span class="string">"Map failed"</span>);</span><br><span class="line">            <span class="keyword">return</span> IOS_THROWN;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> handle(env, <span class="number">-1</span>, <span class="string">"Map failed"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> ((jlong) (<span class="keyword">unsigned</span> <span class="keyword">long</span>) mapAddress);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="c">JNIEXPORT jlong JNICALL
+Java_sun_nio_ch_FileChannelImpl_map0(JNIEnv *env, jobject this,
+                                     jint prot, jlong off, jlong len)
+{
+    void *mapAddress = 0;
+    jobject fdo = (*env)-&gt;GetObjectField(env, this, chan_fd);
+    jint fd = fdval(env, fdo);
+    int protections = 0;
+    int flags = 0;
+
+    if (prot == sun_nio_ch_FileChannelImpl_MAP_RO) {
+        protections = PROT_READ;
+        flags = MAP_SHARED;
+    } else if (prot == sun_nio_ch_FileChannelImpl_MAP_RW) {
+        protections = PROT_WRITE | PROT_READ;
+        flags = MAP_SHARED;
+    } else if (prot == sun_nio_ch_FileChannelImpl_MAP_PV) {
+        protections =  PROT_WRITE | PROT_READ;
+        flags = MAP_PRIVATE;
+    }
+
+    mapAddress = mmap64(
+        0,                    /* Let OS decide location */
+        len,                  /* Number of bytes to map */
+        protections,          /* File permissions */
+        flags,                /* Changes are shared */
+        fd,                   /* File descriptor of mapped file */
+        off);                 /* Offset into file */
+
+    if (mapAddress == MAP_FAILED) {
+        if (errno == ENOMEM) {
+            JNU_ThrowOutOfMemoryError(env, &quot;Map failed&quot;);
+            return IOS_THROWN;
+        }
+        return handle(env, -1, &quot;Map failed&quot;);
+    }
+
+    return ((jlong) (unsigned long) mapAddress);
+}
+</code></pre>
 <p>其实就是通过jni调用了c语言api.</p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>netty的作者在演讲中提到java官方的nio并不特别好，所以，生产环境用的都是netty这种。</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://zhuanlan.zhihu.com/p/23488863">美团团队出的关于nio的解说</a><br>这里面有一句原话摘抄下来：</p>

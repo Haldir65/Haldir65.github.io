@@ -17,7 +17,7 @@
 <meta property="og:description" content="关于Android Application集成Tinker的一次记录。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/single-yellow-beauty-flower-on-the-fence-wallpaper-56801fde208df.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.039Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.181Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="集成Tinker的一些记录">
 <meta name="twitter:description" content="关于Android Application集成Tinker的一次记录。">
@@ -219,7 +219,9 @@ ga('send', 'pageview');
 <blockquote>
 <p>adb push ./app/build/outputs/tinkerPatch/debug/patch_signed_7zip.apk /storage/sdcard0/patch_signed_7zip.apk<br>或者在Android Studio 3.0右下角有一个Device File Explorer,把这个文件上传到手机里</p>
 </blockquote>
-<p>上面那个路径不一定准，总之需要和这里面的路径一样，所以我在模拟器里面是sdcard/emulated/0这个目录下<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">TinkerInstaller.onReceiveUpgradePatch(getApplicationContext(), Environment.getExternalStorageDirectory().getAbsolutePath() + <span class="string">"/patch_signed_7zip.apk"</span>);</span><br></pre></td></tr></table></figure></p>
+<p>上面那个路径不一定准，总之需要和这里面的路径一样，所以我在模拟器里面是sdcard/emulated/0这个目录下</p>
+<pre><code class="java">TinkerInstaller.onReceiveUpgradePatch(getApplicationContext(), Environment.getExternalStorageDirectory().getAbsolutePath() + &quot;/patch_signed_7zip.apk&quot;);
+</code></pre>
 <p>上传完毕之后，在当前页面点击Button，点击事件调用到上面这一行代码.<br>一切Ok的话（运气好的话），会出现Toast,其实这个Toast是在SampleResultService（一个IntentService）里面写的，也就是说Patch打上的话，开发者可以自定义一些UI事件。</p>
 <p>这时候再Kill Porcess,据说锁屏也行？<br>重新启动后，刚才取消注释的那一行代码就在logcat里面出现了。</p>
 <p>到此，在没有重新打包的情况下，热修复完成。</p>
@@ -231,8 +233,65 @@ ga('send', 'pageview');
 <blockquote>
 <p> classpath “com.tencent.tinker:tinker-patch-gradle-plugin:${TINKER_VERSION}”</p>
 </blockquote>
-<p>app的build.gradle中需要新增很多东西，建议直接<a href="https://github.com/Tencent/tinker/blob/master/tinker-sample-android/app/build.gradle">复制</a>过来。<br>需要改的地方就是<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ext &#123;</span><br><span class="line">    tinkerOldApkPath = &quot;$&#123;bakPath&#125;/app-debug-1118-15-50-07.apk&quot;</span><br><span class="line">    // 找到当前app/build/bakApk/目录下的apk文件，把名字改成自己和当前的文件一样的</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ignoreWarning = true //默认是false，不改经常编译报错</span><br><span class="line"></span><br><span class="line">implementation(&quot;com.tencent.tinker:tinker-android-lib:$&#123;TINKER_VERSION&#125;&quot;) &#123; changing = true &#125;</span><br><span class="line">provided(&quot;com.tencent.tinker:tinker-android-anno:$&#123;TINKER_VERSION&#125;&quot;)</span><br><span class="line">annotationProcessor(&quot;com.tencent.tinker:tinker-android-anno:$&#123;TINKER_VERSION&#125;&quot;)</span><br></pre></td></tr></table></figure></p>
-<p>接下来是Application，如果自己继承了android.app.Application的话，得改一下<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//原来</span></span><br><span class="line"><span class="keyword">public</span> MyApplication extends Application&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//现在</span></span><br><span class="line"><span class="meta">@SuppressWarnings</span>(<span class="string">"unused"</span>)</span><br><span class="line"><span class="meta">@DefaultLifeCycle</span>(application = <span class="string">"com.包名.SomeName"</span>,</span><br><span class="line">        flags = ShareConstants.TINKER_ENABLE_ALL,</span><br><span class="line">        loadVerifyFlag = <span class="keyword">false</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AppLike</span> <span class="keyword">extends</span> <span class="title">DefaultApplicationLike</span> </span>&#123;</span><br><span class="line">     <span class="keyword">static</span> Context context;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">AppLike</span><span class="params">(Application application, <span class="keyword">int</span> tinkerFlags, <span class="keyword">boolean</span> tinkerLoadVerifyFlag,</span></span></span><br><span class="line"><span class="function"><span class="params">                   <span class="keyword">long</span> applicationStartElapsedTime, <span class="keyword">long</span> applicationStartMillisTime, Intent tinkerResultIntent)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(application, tinkerFlags, tinkerLoadVerifyFlag, applicationStartElapsedTime, applicationStartMillisTime, tinkerResultIntent);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * install multiDex before install tinker</span></span><br><span class="line"><span class="comment">     * so we don't need to put the tinker lib classes in the main dex</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> base</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@TargetApi</span>(Build.VERSION_CODES.ICE_CREAM_SANDWICH)</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onBaseContextAttached</span><span class="params">(Context base)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onBaseContextAttached(base);</span><br><span class="line">        <span class="comment">//you must install multiDex whatever tinker is installed!</span></span><br><span class="line">        MultiDex.install(base);</span><br><span class="line">        AppLike.context = getApplication();</span><br><span class="line">        <span class="comment">//初始化Tinker</span></span><br><span class="line">        TinkerInstaller.install(<span class="keyword">this</span>);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@TargetApi</span>(Build.VERSION_CODES.ICE_CREAM_SANDWICH)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">registerActivityLifecycleCallbacks</span><span class="params">(Application.ActivityLifecycleCallbacks callback)</span> </span>&#123;</span><br><span class="line">        getApplication().registerActivityLifecycleCallbacks(callback);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Context <span class="title">getContext</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> context;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Mainfest里面要改成上面那个“com.包名.SomeName”</span><br></pre></td></tr></table></figure></p>
+<p>app的build.gradle中需要新增很多东西，建议直接<a href="https://github.com/Tencent/tinker/blob/master/tinker-sample-android/app/build.gradle">复制</a>过来。<br>需要改的地方就是</p>
+<pre><code>ext {
+    tinkerOldApkPath = &quot;${bakPath}/app-debug-1118-15-50-07.apk&quot;
+    // 找到当前app/build/bakApk/目录下的apk文件，把名字改成自己和当前的文件一样的
+}
+
+ignoreWarning = true //默认是false，不改经常编译报错
+
+implementation(&quot;com.tencent.tinker:tinker-android-lib:${TINKER_VERSION}&quot;) { changing = true }
+provided(&quot;com.tencent.tinker:tinker-android-anno:${TINKER_VERSION}&quot;)
+annotationProcessor(&quot;com.tencent.tinker:tinker-android-anno:${TINKER_VERSION}&quot;)
+</code></pre><p>接下来是Application，如果自己继承了android.app.Application的话，得改一下</p>
+<pre><code class="java">//原来
+public MyApplication extends Application{
+
+}
+
+//现在
+@SuppressWarnings(&quot;unused&quot;)
+@DefaultLifeCycle(application = &quot;com.包名.SomeName&quot;,
+        flags = ShareConstants.TINKER_ENABLE_ALL,
+        loadVerifyFlag = false)
+public class AppLike extends DefaultApplicationLike {
+     static Context context;
+
+    public AppLike(Application application, int tinkerFlags, boolean tinkerLoadVerifyFlag,
+                   long applicationStartElapsedTime, long applicationStartMillisTime, Intent tinkerResultIntent) {
+        super(application, tinkerFlags, tinkerLoadVerifyFlag, applicationStartElapsedTime, applicationStartMillisTime, tinkerResultIntent);
+    }
+
+    /**
+     * install multiDex before install tinker
+     * so we don&#39;t need to put the tinker lib classes in the main dex
+     *
+     * @param base
+     */
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    @Override
+    public void onBaseContextAttached(Context base) {
+        super.onBaseContextAttached(base);
+        //you must install multiDex whatever tinker is installed!
+        MultiDex.install(base);
+        AppLike.context = getApplication();
+        //初始化Tinker
+        TinkerInstaller.install(this);
+
+    }
+
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    public void registerActivityLifecycleCallbacks(Application.ActivityLifecycleCallbacks callback) {
+        getApplication().registerActivityLifecycleCallbacks(callback);
+    }
+    public static Context getContext() {
+        return context;
+    }
+}
+
+Mainfest里面要改成上面那个“com.包名.SomeName”
+</code></pre>
 <p>接下来按照之前的步骤就Ok了。</p>
 <h2 id="3-Configuration"><a href="#3-Configuration" class="headerlink" title="3. Configuration"></a>3. Configuration</h2><p>以上只是简单的把Demo跑通，接下里需要看下Tinker提供的定制项</p>
 <p>=======================================================================</p>
@@ -266,7 +325,17 @@ ga('send', 'pageview');
 <h1 id="分的这么散估计也是希望能够好扩展吧。"><a href="#分的这么散估计也是希望能够好扩展吧。" class="headerlink" title="分的这么散估计也是希望能够好扩展吧。"></a>分的这么散估计也是希望能够好扩展吧。</h1><p>换dex文件的关键方法在<a href="http://androidxref.com/5.0.0_r2/xref/libcore/dalvik/src/main/java/dalvik/system/DexPathList.java#316">DexPathList.findClass这个方法里面</a>。<a href="https://juejin.im/post/5a42f29ef265da43333eaba0">参考</a></p>
 <p>网上关于源码解析的文章已经很多，有时间看看，应该不难。</p>
 <p>看一下官方Tinker项目中的文件夹，有一个tinker-build，里面有两个python文件，这就很有意思了。再看看tinker-patch-gradle-plugin，里面一大堆groovy文件，所以看懂这个对于gradle插件开发是有好处的。</p>
-<h1 id="目前在1-9-1版本里面好像看到了一个tinkerFastCrashProtect，看来也是跟风天猫快速修复启动保护那一套。"><a href="#目前在1-9-1版本里面好像看到了一个tinkerFastCrashProtect，看来也是跟风天猫快速修复启动保护那一套。" class="headerlink" title="目前在1.9.1版本里面好像看到了一个tinkerFastCrashProtect，看来也是跟风天猫快速修复启动保护那一套。"></a>目前在1.9.1版本里面好像看到了一个<em>tinkerFastCrashProtect</em>，看来也是跟风天猫快速修复启动保护那一套。</h1><p>关于Tinker-Patch这个外包给第三方的服务，纯属好奇就去看了下url到底长什么样。在<a href="https://github.com/TinkerPatch/tinkerpatch-sdk/blob/master/tinkerpatch-sdk/src/main/java/com/tencent/tinker/server/client/TinkerClientAPI.java">TinkerClientAPI</a>里面有这么一段，其实跟Tinker本身庞大的架构比起来，已经算不上什么了。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Uri.Builder urlBuilder = Uri.parse(<span class="keyword">this</span>.host).buildUpon(); <span class="comment">// "http://q.tinkerpatch.com"</span></span><br><span class="line"><span class="keyword">if</span> (clientAPI.debug) &#123;</span><br><span class="line">    urlBuilder.appendPath(<span class="string">"dev"</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">final</span> String url = urlBuilder.appendPath(<span class="keyword">this</span>.appKey)</span><br><span class="line">.appendPath(<span class="keyword">this</span>.appVersion)</span><br><span class="line">.appendQueryParameter(<span class="string">"d"</span>, versionUtils.id())</span><br><span class="line">.appendQueryParameter(<span class="string">"v"</span>, String.valueOf(System.currentTimeMillis()))</span><br><span class="line">.build().toString();</span><br></pre></td></tr></table></figure></p>
+<h1 id="目前在1-9-1版本里面好像看到了一个tinkerFastCrashProtect，看来也是跟风天猫快速修复启动保护那一套。"><a href="#目前在1-9-1版本里面好像看到了一个tinkerFastCrashProtect，看来也是跟风天猫快速修复启动保护那一套。" class="headerlink" title="目前在1.9.1版本里面好像看到了一个tinkerFastCrashProtect，看来也是跟风天猫快速修复启动保护那一套。"></a>目前在1.9.1版本里面好像看到了一个<em>tinkerFastCrashProtect</em>，看来也是跟风天猫快速修复启动保护那一套。</h1><p>关于Tinker-Patch这个外包给第三方的服务，纯属好奇就去看了下url到底长什么样。在<a href="https://github.com/TinkerPatch/tinkerpatch-sdk/blob/master/tinkerpatch-sdk/src/main/java/com/tencent/tinker/server/client/TinkerClientAPI.java">TinkerClientAPI</a>里面有这么一段，其实跟Tinker本身庞大的架构比起来，已经算不上什么了。</p>
+<pre><code class="java">Uri.Builder urlBuilder = Uri.parse(this.host).buildUpon(); // &quot;http://q.tinkerpatch.com&quot;
+if (clientAPI.debug) {
+    urlBuilder.appendPath(&quot;dev&quot;);
+}
+final String url = urlBuilder.appendPath(this.appKey)
+.appendPath(this.appVersion)
+.appendQueryParameter(&quot;d&quot;, versionUtils.id())
+.appendQueryParameter(&quot;v&quot;, String.valueOf(System.currentTimeMillis()))
+.build().toString();
+</code></pre>
 <p>除此之外，为了能够在测试环境验证补丁，还提供了一个<a href="https://github.com/TinkerPatch/tinkerpatch-debug-tool">小工具</a></p>
 <p>很感谢鹅厂能够将Tinker这样的工具开源出来造福广大开发者，抛开技术上的实力不说，能够一直积极维护也是一件了不起的事情。</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>

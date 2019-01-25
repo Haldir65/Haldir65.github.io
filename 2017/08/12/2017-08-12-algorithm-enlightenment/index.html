@@ -17,7 +17,7 @@
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/10013-1109230P20693.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/merge_sort.png">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/selectionsort.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.035Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.177Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="数据结构之-算法手册">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/10013-1109230P20693.jpg">
@@ -202,26 +202,285 @@ ga('send', 'pageview');
         <p><img src="https://www.haldir66.ga/static/imgs/10013-1109230P20693.jpg" alt="FlamingFlowers"><br><a id="more"></a></p>
 <h2 id="1-各种排序的原理及java代码实现"><a href="#1-各种排序的原理及java代码实现" class="headerlink" title="1. 各种排序的原理及java代码实现"></a>1. 各种排序的原理及java代码实现</h2><p>java.utils.Arrays这个类中有各种经典的实现，直接对照着学就好了。</p>
 <h3 id="1-1-BinarySearch-这个不是sort，但还是放第一了"><a href="#1-1-BinarySearch-这个不是sort，但还是放第一了" class="headerlink" title="1.1 BinarySearch[这个不是sort，但还是放第一了]"></a>1.1 BinarySearch[这个不是sort，但还是放第一了]</h3><p>二分法查找，前提是数组中元素全部按照顺序(从小到大或者从大到小)排列好了。Android中SparseArray中用到了binarySearch</p>
-<p>android.support.v4.util.ContainerHelpers<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// This is Arrays.binarySearch(), but doesn't do any argument validation.</span></span><br><span class="line"> <span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">binarySearch</span><span class="params">(<span class="keyword">int</span>[] array, <span class="keyword">int</span> size, <span class="keyword">int</span> value)</span> </span>&#123;</span><br><span class="line">     <span class="keyword">int</span> lo = <span class="number">0</span>;</span><br><span class="line">     <span class="keyword">int</span> hi = size - <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">     <span class="keyword">while</span> (lo &lt;= hi) &#123;</span><br><span class="line">         <span class="keyword">int</span> mid = (lo + hi) &gt;&gt;&gt; <span class="number">1</span>;</span><br><span class="line">         <span class="keyword">int</span> midVal = array[mid];</span><br><span class="line"></span><br><span class="line">         <span class="keyword">if</span> (midVal &lt; value) &#123;</span><br><span class="line">             lo = mid + <span class="number">1</span>;</span><br><span class="line">         &#125; <span class="keyword">else</span> <span class="keyword">if</span> (midVal &gt; value) &#123;</span><br><span class="line">             hi = mid - <span class="number">1</span>;</span><br><span class="line">         &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">             <span class="keyword">return</span> mid;  <span class="comment">// value found</span></span><br><span class="line">         &#125;</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="keyword">return</span> ~lo;  <span class="comment">// value not present（）</span></span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></p>
+<p>android.support.v4.util.ContainerHelpers</p>
+<pre><code class="java">   // This is Arrays.binarySearch(), but doesn&#39;t do any argument validation.
+    static int binarySearch(int[] array, int size, int value) {
+        int lo = 0;
+        int hi = size - 1;
+
+        while (lo &lt;= hi) {
+            int mid = (lo + hi) &gt;&gt;&gt; 1;
+            int midVal = array[mid];
+
+            if (midVal &lt; value) {
+                lo = mid + 1;
+            } else if (midVal &gt; value) {
+                hi = mid - 1;
+            } else {
+                return mid;  // value found
+            }
+        }
+        return ~lo;  // value not present（）
+    }
+</code></pre>
 <p>最后一个用的是位非操作，就是把int(4 bytes)转成2进制所有的0变成1，所有的1变成0.</p>
-<h3 id="1-2-BubbleSort"><a href="#1-2-BubbleSort" class="headerlink" title="1.2 BubbleSort"></a>1.2 BubbleSort</h3><p>把较大的元素挪到右边，较小的元素挪到左边。<br>每次从左到右边，两个两个的比较，大的往右挪，第一次完成后，最大的一个一定已经挪到最后了。接下里对n-1个元素进行同样的操作。<br>java代码<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">bubbleSort</span><span class="params">(<span class="keyword">int</span>[] numArray)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> n = numArray.length;</span><br><span class="line">    <span class="keyword">int</span> temp = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">1</span>; j &lt; (n - i); j++) &#123;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (numArray[j - <span class="number">1</span>] &gt; numArray[j]) &#123;</span><br><span class="line">                temp = numArray[j - <span class="number">1</span>];</span><br><span class="line">                numArray[j - <span class="number">1</span>] = numArray[j];</span><br><span class="line">                numArray[j] = temp;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="1-2-BubbleSort"><a href="#1-2-BubbleSort" class="headerlink" title="1.2 BubbleSort"></a>1.2 BubbleSort</h3><p>把较大的元素挪到右边，较小的元素挪到左边。<br>每次从左到右边，两个两个的比较，大的往右挪，第一次完成后，最大的一个一定已经挪到最后了。接下里对n-1个元素进行同样的操作。<br>java代码</p>
+<pre><code class="java">public static void bubbleSort(int[] numArray) {
+
+    int n = numArray.length;
+    int temp = 0;
+
+    for (int i = 0; i &lt; n; i++) {
+        for (int j = 1; j &lt; (n - i); j++) {
+
+            if (numArray[j - 1] &gt; numArray[j]) {
+                temp = numArray[j - 1];
+                numArray[j - 1] = numArray[j];
+                numArray[j] = temp;
+            }
+
+        }
+    }
+}
+</code></pre>
 <p>Python实现，python中swap两个值非常方便：<br>a , b = b , a</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">bubble_sort</span><span class="params">(lists)</span>:</span></span><br><span class="line">    <span class="comment"># 冒泡排序</span></span><br><span class="line">    count = len(lists)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>, count):</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> range(i + <span class="number">1</span>, count):</span><br><span class="line">            <span class="keyword">if</span> lists[i] &gt; lists[j]:</span><br><span class="line">                lists[i], lists[j] = lists[j], lists[i]</span><br><span class="line">    <span class="keyword">return</span> lists</span><br></pre></td></tr></table></figure>
-<p>其实任何语言都应该有这种不用第三个值去swap两个int的方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">x = x + y;  <span class="comment">// x now becomes 15</span></span><br><span class="line"> y = x - y;  <span class="comment">// y becomes 10</span></span><br><span class="line"> x = x - y;  <span class="comment">// x becomes 5</span></span><br></pre></td></tr></table></figure></p>
+<pre><code class="python">def bubble_sort(lists):
+    # 冒泡排序
+    count = len(lists)
+    for i in range(0, count):
+        for j in range(i + 1, count):
+            if lists[i] &gt; lists[j]:
+                lists[i], lists[j] = lists[j], lists[i]
+    return lists
+</code></pre>
+<p>其实任何语言都应该有这种不用第三个值去swap两个int的方法</p>
+<pre><code class="java">x = x + y;  // x now becomes 15
+ y = x - y;  // y becomes 10
+ x = x - y;  // x becomes 5
+</code></pre>
 <p>the worst case scenario ：array完全倒序 o(n^2)<br>the best case scenario : array已经排序好 Ω（n）</p>
-<h3 id="1-3-Insertion-Sort"><a href="#1-3-Insertion-Sort" class="headerlink" title="1.3 Insertion Sort"></a>1.3 Insertion Sort</h3><p>基本上就是把一个数组从左到右迭代，第一遍声明第一个元素是sorted，第二遍看下第二个和第一个是不是有序的，第二遍完成后第二个元素是sorted。第三遍把前三个排序好。<br>下面这段代码是从<a href="https://courses.cs.washington.edu/courses/cse373/02wi/slides/Measurement/sld010.htm">华盛顿大学教程</a>抄的，应该没问题。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">insertionSort</span><span class="params">(<span class="keyword">int</span>[] a)</span></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;a.length;i++)&#123;</span><br><span class="line">        <span class="keyword">int</span> temp = a[i];</span><br><span class="line">        <span class="keyword">int</span> j;</span><br><span class="line">        <span class="keyword">for</span>(j=i-<span class="number">1</span>;j&gt;=<span class="number">0</span>&amp;&amp;temp&lt;a[j];j--)</span><br><span class="line">            a[j+<span class="number">1</span>] = a[j]</span><br><span class="line">        a[j+<span class="number">1</span>] = temp;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="1-3-Insertion-Sort"><a href="#1-3-Insertion-Sort" class="headerlink" title="1.3 Insertion Sort"></a>1.3 Insertion Sort</h3><p>基本上就是把一个数组从左到右迭代，第一遍声明第一个元素是sorted，第二遍看下第二个和第一个是不是有序的，第二遍完成后第二个元素是sorted。第三遍把前三个排序好。<br>下面这段代码是从<a href="https://courses.cs.washington.edu/courses/cse373/02wi/slides/Measurement/sld010.htm">华盛顿大学教程</a>抄的，应该没问题。</p>
+<pre><code class="java">public static void insertionSort(int[] a){
+    for (int i=1;i&lt;a.length;i++){
+        int temp = a[i];
+        int j;
+        for(j=i-1;j&gt;=0&amp;&amp;temp&lt;a[j];j--)
+            a[j+1] = a[j]
+        a[j+1] = temp;
+
+    }
+}
+</code></pre>
 <p>核心算法就是第N此排序完成后，前N个元素已经排序完毕。</p>
 <p>the worst case scenario ：array完全倒序 o(n^2)<br>the best case scenario : array已经排序好 Ω（n）</p>
-<h3 id="1-4-Merge-Sort"><a href="#1-4-Merge-Sort" class="headerlink" title="1.4 Merge Sort"></a>1.4 Merge Sort</h3><p>这个算法比较复杂，一图胜千言<br><img src="https://www.haldir66.ga/static/imgs/merge_sort.png" alt=""><br><a href="http://www.java2novice.com/java-sorting-algorithms/merge-sort/">参考</a><br>其实就是把array打成一半一半，直到变成多个大小为2的数组，然后再合并起来。java代码直接复制粘贴了，保留包名是对作者的尊重：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.java2novice.sorting;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyMergeSort</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span>[] array;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span>[] tempMergArr;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> length;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String a[])</span></span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span>[] inputArr = &#123;<span class="number">45</span>,<span class="number">23</span>,<span class="number">11</span>,<span class="number">89</span>,<span class="number">77</span>,<span class="number">98</span>,<span class="number">4</span>,<span class="number">28</span>,<span class="number">65</span>,<span class="number">43</span>&#125;;</span><br><span class="line">        MyMergeSort mms = <span class="keyword">new</span> MyMergeSort();</span><br><span class="line">        mms.sort(inputArr);</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i:inputArr)&#123;</span><br><span class="line">            System.out.print(i);</span><br><span class="line">            System.out.print(<span class="string">" "</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sort</span><span class="params">(<span class="keyword">int</span> inputArr[])</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.array = inputArr;</span><br><span class="line">        <span class="keyword">this</span>.length = inputArr.length;</span><br><span class="line">        <span class="keyword">this</span>.tempMergArr = <span class="keyword">new</span> <span class="keyword">int</span>[length];</span><br><span class="line">        doMergeSort(<span class="number">0</span>, length - <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">doMergeSort</span><span class="params">(<span class="keyword">int</span> lowerIndex, <span class="keyword">int</span> higherIndex)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (lowerIndex &lt; higherIndex) &#123;</span><br><span class="line">            <span class="keyword">int</span> middle = lowerIndex + (higherIndex - lowerIndex) / <span class="number">2</span>;</span><br><span class="line">            <span class="comment">// Below step sorts the left side of the array</span></span><br><span class="line">            doMergeSort(lowerIndex, middle);</span><br><span class="line">            <span class="comment">// Below step sorts the right side of the array</span></span><br><span class="line">            doMergeSort(middle + <span class="number">1</span>, higherIndex);</span><br><span class="line">            <span class="comment">// Now merge both sides</span></span><br><span class="line">            mergeParts(lowerIndex, middle, higherIndex);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">mergeParts</span><span class="params">(<span class="keyword">int</span> lowerIndex, <span class="keyword">int</span> middle, <span class="keyword">int</span> higherIndex)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = lowerIndex; i &lt;= higherIndex; i++) &#123;</span><br><span class="line">            tempMergArr[i] = array[i];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> i = lowerIndex;</span><br><span class="line">        <span class="keyword">int</span> j = middle + <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> k = lowerIndex;</span><br><span class="line">        <span class="keyword">while</span> (i &lt;= middle &amp;&amp; j &lt;= higherIndex) &#123;</span><br><span class="line">            <span class="keyword">if</span> (tempMergArr[i] &lt;= tempMergArr[j]) &#123;</span><br><span class="line">                array[k] = tempMergArr[i];</span><br><span class="line">                i++;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                array[k] = tempMergArr[j];</span><br><span class="line">                j++;</span><br><span class="line">            &#125;</span><br><span class="line">            k++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span> (i &lt;= middle) &#123;</span><br><span class="line">            array[k] = tempMergArr[i];</span><br><span class="line">            k++;</span><br><span class="line">            i++;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="1-4-Merge-Sort"><a href="#1-4-Merge-Sort" class="headerlink" title="1.4 Merge Sort"></a>1.4 Merge Sort</h3><p>这个算法比较复杂，一图胜千言<br><img src="https://www.haldir66.ga/static/imgs/merge_sort.png" alt=""><br><a href="http://www.java2novice.com/java-sorting-algorithms/merge-sort/">参考</a><br>其实就是把array打成一半一半，直到变成多个大小为2的数组，然后再合并起来。java代码直接复制粘贴了，保留包名是对作者的尊重：</p>
+<pre><code class="java">package com.java2novice.sorting;
+
+public class MyMergeSort {
+
+    private int[] array;
+    private int[] tempMergArr;
+    private int length;
+
+    public static void main(String a[]){
+
+        int[] inputArr = {45,23,11,89,77,98,4,28,65,43};
+        MyMergeSort mms = new MyMergeSort();
+        mms.sort(inputArr);
+        for(int i:inputArr){
+            System.out.print(i);
+            System.out.print(&quot; &quot;);
+        }
+    }
+
+    public void sort(int inputArr[]) {
+        this.array = inputArr;
+        this.length = inputArr.length;
+        this.tempMergArr = new int[length];
+        doMergeSort(0, length - 1);
+    }
+
+    private void doMergeSort(int lowerIndex, int higherIndex) {
+
+        if (lowerIndex &lt; higherIndex) {
+            int middle = lowerIndex + (higherIndex - lowerIndex) / 2;
+            // Below step sorts the left side of the array
+            doMergeSort(lowerIndex, middle);
+            // Below step sorts the right side of the array
+            doMergeSort(middle + 1, higherIndex);
+            // Now merge both sides
+            mergeParts(lowerIndex, middle, higherIndex);
+        }
+    }
+
+    private void mergeParts(int lowerIndex, int middle, int higherIndex) {
+
+        for (int i = lowerIndex; i &lt;= higherIndex; i++) {
+            tempMergArr[i] = array[i];
+        }
+        int i = lowerIndex;
+        int j = middle + 1;
+        int k = lowerIndex;
+        while (i &lt;= middle &amp;&amp; j &lt;= higherIndex) {
+            if (tempMergArr[i] &lt;= tempMergArr[j]) {
+                array[k] = tempMergArr[i];
+                i++;
+            } else {
+                array[k] = tempMergArr[j];
+                j++;
+            }
+            k++;
+        }
+        while (i &lt;= middle) {
+            array[k] = tempMergArr[i];
+            k++;
+            i++;
+        }
+
+    }
+}
+</code></pre>
 <p><a href="https://www.youtube.com/watch?v=sWtYJv_YXbo">看视频比较方便</a></p>
-<h3 id="1-5-Selection-Sort"><a href="#1-5-Selection-Sort" class="headerlink" title="1.5 Selection Sort"></a>1.5 Selection Sort</h3><p>每次把数组里面最小的元素挪到最左边,图片是从<a href="http://www.java2novice.com/java-sorting-algorithms/selection-sort/">这里</a>抄的<br><img src="https://www.haldir66.ga/static/imgs/selectionsort.jpg" alt=""><br>java代码也是抄的<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.java2novice.algos;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MySelectionSort</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span>[] doSelectionSort(<span class="keyword">int</span>[] arr)&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; arr.length - <span class="number">1</span>; i++)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">int</span> index = i;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = i + <span class="number">1</span>; j &lt; arr.length; j++)</span><br><span class="line">                <span class="keyword">if</span> (arr[j] &lt; arr[index])</span><br><span class="line">                    index = j;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">int</span> smallerNumber = arr[index];  </span><br><span class="line">            arr[index] = arr[i];</span><br><span class="line">            arr[i] = smallerNumber;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> arr;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String a[])</span></span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span>[] arr1 = &#123;<span class="number">10</span>,<span class="number">34</span>,<span class="number">2</span>,<span class="number">56</span>,<span class="number">7</span>,<span class="number">67</span>,<span class="number">88</span>,<span class="number">42</span>&#125;;</span><br><span class="line">        <span class="keyword">int</span>[] arr2 = doSelectionSort(arr1);</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i:arr2)&#123;</span><br><span class="line">            System.out.print(i);</span><br><span class="line">            System.out.print(<span class="string">", "</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="1-5-Selection-Sort"><a href="#1-5-Selection-Sort" class="headerlink" title="1.5 Selection Sort"></a>1.5 Selection Sort</h3><p>每次把数组里面最小的元素挪到最左边,图片是从<a href="http://www.java2novice.com/java-sorting-algorithms/selection-sort/">这里</a>抄的<br><img src="https://www.haldir66.ga/static/imgs/selectionsort.jpg" alt=""><br>java代码也是抄的</p>
+<pre><code class="java">package com.java2novice.algos;
+
+public class MySelectionSort {
+
+    public static int[] doSelectionSort(int[] arr){
+
+        for (int i = 0; i &lt; arr.length - 1; i++)
+        {
+            int index = i;
+            for (int j = i + 1; j &lt; arr.length; j++)
+                if (arr[j] &lt; arr[index])
+                    index = j;
+
+            int smallerNumber = arr[index];  
+            arr[index] = arr[i];
+            arr[i] = smallerNumber;
+        }
+        return arr;
+    }
+
+    public static void main(String a[]){
+
+        int[] arr1 = {10,34,2,56,7,67,88,42};
+        int[] arr2 = doSelectionSort(arr1);
+        for(int i:arr2){
+            System.out.print(i);
+            System.out.print(&quot;, &quot;);
+        }
+    }
+}
+</code></pre>
 <p>注意，每次遍历都都会意味着数组分为有序和无序两部分，遍历是从无序的数组第一个开始的，并且将无序数组中的最小值与无序数组第一个元素swap一下。<br>就是很直观的每次把最小的拿到最左边的做法。</p>
-<h3 id="1-6-Quicksort"><a href="#1-6-Quicksort" class="headerlink" title="1.6 Quicksort"></a>1.6 Quicksort</h3><p>一种比较快速的排序方法<br><a href="https://www.youtube.com/watch?v=aQiWF4E8flQ">视频</a><br>选中数组最后一个元素，称之为pivot。然后从左到右找，把所有小于pivot的元素挪到左边。然后把pivot挪到刚才那个元素右边，一直重复下去。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">quickSort</span><span class="params">(<span class="keyword">int</span>[] data,<span class="keyword">int</span> low,<span class="keyword">int</span> high)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (low &lt; high) &#123;</span><br><span class="line">        <span class="keyword">int</span> povit = partition(data, low, high);</span><br><span class="line">        quickSort(data, low, povit - <span class="number">1</span>);</span><br><span class="line">        quickSort(data, povit + <span class="number">1</span>, high);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">partition</span><span class="params">(<span class="keyword">int</span>[] arr,<span class="keyword">int</span> low , <span class="keyword">int</span> high)</span></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> pivot = arr[low];</span><br><span class="line">    <span class="keyword">while</span> (low &lt; high) &#123;</span><br><span class="line">        <span class="keyword">while</span> (low&lt;high&amp;&amp;arr[high]&gt;=pivot)</span><br><span class="line">        &#123;</span><br><span class="line">            --high;</span><br><span class="line">        &#125;</span><br><span class="line">        arr[low] = arr[high];</span><br><span class="line">        <span class="keyword">while</span> (low&lt;high&amp;&amp;arr[low]&lt;=pivot)</span><br><span class="line">        &#123;</span><br><span class="line">            ++low;</span><br><span class="line">        &#125;</span><br><span class="line">        arr[high] = arr[low];</span><br><span class="line">    &#125;</span><br><span class="line">    arr[low] = pivot;</span><br><span class="line">    <span class="keyword">return</span> low;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="1-6-Quicksort"><a href="#1-6-Quicksort" class="headerlink" title="1.6 Quicksort"></a>1.6 Quicksort</h3><p>一种比较快速的排序方法<br><a href="https://www.youtube.com/watch?v=aQiWF4E8flQ">视频</a><br>选中数组最后一个元素，称之为pivot。然后从左到右找，把所有小于pivot的元素挪到左边。然后把pivot挪到刚才那个元素右边，一直重复下去。</p>
+<pre><code class="java">public static void quickSort(int[] data,int low,int high) {
+    if (low &lt; high) {
+        int povit = partition(data, low, high);
+        quickSort(data, low, povit - 1);
+        quickSort(data, povit + 1, high);
+    }
+
+}
+
+public static int partition(int[] arr,int low , int high){
+    int pivot = arr[low];
+    while (low &lt; high) {
+        while (low&lt;high&amp;&amp;arr[high]&gt;=pivot)
+        {
+            --high;
+        }
+        arr[low] = arr[high];
+        while (low&lt;high&amp;&amp;arr[low]&lt;=pivot)
+        {
+            ++low;
+        }
+        arr[high] = arr[low];
+    }
+    arr[low] = pivot;
+    return low;
+}
+</code></pre>
 <p>这是好不容易看懂的快速排序java实现，感受下手写快排</p>
-<p>另一种使用递归的方式<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">int</span>[] array = &#123;<span class="number">1</span>, <span class="number">4</span>, <span class="number">2</span>, <span class="number">45</span>, <span class="number">6</span>, <span class="number">4</span>, <span class="number">2</span>, <span class="number">4</span>, <span class="number">7</span>, <span class="number">10</span>, <span class="number">24</span>, <span class="number">12</span>, <span class="number">14</span>, <span class="number">17</span>, <span class="number">10</span>, <span class="number">9</span>, <span class="number">4</span>&#125;;</span><br><span class="line">       QuickSort(array, <span class="number">0</span>, array.length-<span class="number">1</span>);</span><br><span class="line">       Utils.printEach(array);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">QuickSort</span><span class="params">(<span class="keyword">int</span>[] arr, <span class="keyword">int</span> start, <span class="keyword">int</span> end)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">if</span> (start &lt; end) &#123;</span><br><span class="line">           <span class="keyword">int</span> key = arr[start];</span><br><span class="line">           <span class="keyword">int</span> i = start, j;</span><br><span class="line">           <span class="keyword">for</span> (j = start+<span class="number">1</span>;j&lt;=end;j++) &#123;</span><br><span class="line">               <span class="keyword">if</span> (arr[j] &lt; key) &#123;</span><br><span class="line">                   Utils.swap(arr, j, i + <span class="number">1</span>);</span><br><span class="line">                   i++;</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;</span><br><span class="line">           arr[start] = arr[i];</span><br><span class="line">           arr[i] = key;</span><br><span class="line">           QuickSort(arr, start, i - <span class="number">1</span>);</span><br><span class="line">           QuickSort(arr, i+<span class="number">1</span>, end);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>另一种使用递归的方式</p>
+<pre><code class="java">public static void main(String[] args) {
+       int[] array = {1, 4, 2, 45, 6, 4, 2, 4, 7, 10, 24, 12, 14, 17, 10, 9, 4};
+       QuickSort(array, 0, array.length-1);
+       Utils.printEach(array);
+   }
+
+   private static void QuickSort(int[] arr, int start, int end) {
+       if (start &lt; end) {
+           int key = arr[start];
+           int i = start, j;
+           for (j = start+1;j&lt;=end;j++) {
+               if (arr[j] &lt; key) {
+                   Utils.swap(arr, j, i + 1);
+                   i++;
+               }
+           }
+           arr[start] = arr[i];
+           arr[i] = key;
+           QuickSort(arr, start, i - 1);
+           QuickSort(arr, i+1, end);
+       }
+   }
+</code></pre>
 <h3 id="1-7-TimSort"><a href="#1-7-TimSort" class="headerlink" title="1.7 TimSort"></a>1.7 TimSort</h3><p>java的Collections.sort的算法，<br><a href="(https://www.youtube.com/watch?v=bvnmbRo7a1Y">Comparison Method Violates Its General Contract!</a>)</p>
 <h2 id="2-其他算法"><a href="#2-其他算法" class="headerlink" title="2. 其他算法"></a>2. 其他算法</h2><p><a href="https://juejin.im/post/5a224e1551882535c56cb940">有环链表的判断问题</a>。时间复杂度和空间复杂度的最优解是创建两根迭代速度不一样的指针</p>
-<p>下面的代码来自<a href="http://blog.csdn.net/jq_ak47/article/details/52739651">csdn</a><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LinkLoop</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">hasLoop</span><span class="params">(Node n)</span></span>&#123;</span><br><span class="line">        <span class="comment">//定义两个指针tmp1,tmp2</span></span><br><span class="line">        Node tmp1 = n;</span><br><span class="line">        Node tmp2 = n.next;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(tmp2!=<span class="keyword">null</span>)&#123;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">int</span> d1 = tmp1.val;</span><br><span class="line">            <span class="keyword">int</span> d2 = tmp2.val;</span><br><span class="line">            <span class="keyword">if</span>(d1 == d2)<span class="keyword">return</span> <span class="keyword">true</span>;<span class="comment">//当两个指针重逢时，说明存在环，否则不存在。</span></span><br><span class="line">            tmp1 = tmp1.next;  <span class="comment">//每次迭代时，指针1走一步，指针2走两步</span></span><br><span class="line">            tmp2 = tmp2.next.next;</span><br><span class="line">            <span class="keyword">if</span>(tmp2 == <span class="keyword">null</span>)<span class="keyword">return</span> <span class="keyword">false</span>;<span class="comment">//不存在环时，退出</span></span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>; <span class="comment">//如果tmp2为null，说明元素只有一个，也可以说明是存在环</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//方法2：将每次走过的节点保存到hash表中，如果节点在hash表中，则表示存在环</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">hasLoop2</span><span class="params">(Node n)</span></span>&#123;</span><br><span class="line">        Node temp1 = n;</span><br><span class="line">        HashMap&lt;Node,Node&gt; ns = <span class="keyword">new</span> HashMap&lt;Node,Node&gt;();</span><br><span class="line">        <span class="keyword">while</span>(n!=<span class="keyword">null</span>)&#123;</span><br><span class="line">            <span class="keyword">if</span>(ns.get(temp1)!=<span class="keyword">null</span>)<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            <span class="keyword">else</span> ns.put(temp1, temp1);</span><br><span class="line">            temp1 = temp1.next;</span><br><span class="line">            <span class="keyword">if</span>(temp1 == <span class="keyword">null</span>)<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Node n1 = <span class="keyword">new</span> Node(<span class="number">1</span>);</span><br><span class="line">        Node n2 = <span class="keyword">new</span> Node(<span class="number">2</span>);</span><br><span class="line">        Node n3 = <span class="keyword">new</span> Node(<span class="number">3</span>);</span><br><span class="line">        Node n4 = <span class="keyword">new</span> Node(<span class="number">4</span>);</span><br><span class="line">        Node n5 = <span class="keyword">new</span> Node(<span class="number">5</span>);</span><br><span class="line"></span><br><span class="line">        n1.next = n2;</span><br><span class="line">        n2.next = n3;</span><br><span class="line">        n3.next = n4;</span><br><span class="line">        n4.next = n5;</span><br><span class="line">        n5.next = n1;  <span class="comment">//构造一个带环的链表,去除此句表示不带环</span></span><br><span class="line"></span><br><span class="line">        System.out.println(hasLoop(n1));</span><br><span class="line">        System.out.println(hasLoop2(n1));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>下面的代码来自<a href="http://blog.csdn.net/jq_ak47/article/details/52739651">csdn</a></p>
+<pre><code class="java">public class LinkLoop {
+
+    public static boolean hasLoop(Node n){
+        //定义两个指针tmp1,tmp2
+        Node tmp1 = n;
+        Node tmp2 = n.next;
+
+        while(tmp2!=null){
+
+            int d1 = tmp1.val;
+            int d2 = tmp2.val;
+            if(d1 == d2)return true;//当两个指针重逢时，说明存在环，否则不存在。
+            tmp1 = tmp1.next;  //每次迭代时，指针1走一步，指针2走两步
+            tmp2 = tmp2.next.next;
+            if(tmp2 == null)return false;//不存在环时，退出
+
+        }
+        return true; //如果tmp2为null，说明元素只有一个，也可以说明是存在环
+    }
+
+    //方法2：将每次走过的节点保存到hash表中，如果节点在hash表中，则表示存在环
+    public static boolean hasLoop2(Node n){
+        Node temp1 = n;
+        HashMap&lt;Node,Node&gt; ns = new HashMap&lt;Node,Node&gt;();
+        while(n!=null){
+            if(ns.get(temp1)!=null)return true;
+            else ns.put(temp1, temp1);
+            temp1 = temp1.next;
+            if(temp1 == null)return false;
+        }
+        return true;
+    }
+
+    public static void main(String[] args) {
+        Node n1 = new Node(1);
+        Node n2 = new Node(2);
+        Node n3 = new Node(3);
+        Node n4 = new Node(4);
+        Node n5 = new Node(5);
+
+        n1.next = n2;
+        n2.next = n3;
+        n3.next = n4;
+        n4.next = n5;
+        n5.next = n1;  //构造一个带环的链表,去除此句表示不带环
+
+        System.out.println(hasLoop(n1));
+        System.out.println(hasLoop2(n1));
+    }
+}
+</code></pre>
 <p>给定两单链表A、B，只给出两头指针。请问：</p>
 <p>1、如何判断两单链表（无环）是否相交？</p>
 <p>有两种可取的办法：</p>
@@ -233,7 +492,16 @@ ga('send', 'pageview');
 <p>（2）一个有环，一个没环：不用判断了，肯定两链表不相交</p>
 <p>（3）两个都有环：判断链表A的碰撞点是否出现在链表B的环中，如果在，则相交。（相交时，环必定是两链表共有的）</p>
 <p>3.最小栈的实现<br>需要两个栈，A和B，B用于存储A中当前min的index，B中由上而下依次是A的最小，第二小，第三小。。。所以万一A中的最小被pop掉了，直接拿B顶上的元素，始终是最小的。时间复杂度是O(1)，空间复杂度最坏是O(N)</p>
-<p>4.在O(1)时间复杂度删除链表节点<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span>  </span><br><span class="line">    <span class="comment"># @param node: the node in the list should be deleted  </span></span><br><span class="line">    <span class="comment"># @return: nothing  </span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">deleteNode</span><span class="params">(self, node)</span>:</span>  </span><br><span class="line">        temp = node.next  </span><br><span class="line">        node.val = temp.val  </span><br><span class="line">        node.next = temp.next  </span><br><span class="line">        <span class="comment"># write your code here</span></span><br></pre></td></tr></table></figure></p>
+<p>4.在O(1)时间复杂度删除链表节点</p>
+<pre><code class="python">class Solution:  
+    # @param node: the node in the list should be deleted  
+    # @return: nothing  
+    def deleteNode(self, node):  
+        temp = node.next  
+        node.val = temp.val  
+        node.next = temp.next  
+        # write your code here
+</code></pre>
 <ol>
 <li>堆排序的实现<br>堆排序，时间复杂度O(nlogn),任何时刻都只需要常数个额外的元素空间存储临时数据。<br>堆的定义</li>
 </ol>
@@ -251,9 +519,43 @@ ga('send', 'pageview');
 <ol>
 <li>给定一个n*m矩阵，求从左上角到右下角总共存在多少条路径，每次只能向右走或者向下走。<br><a href="https://blog.csdn.net/shangqing1123/article/details/47360615">递归和动态规划</a></li>
 </ol>
-<p>首先给出计算总的可能路径的方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">uniquePaths</span><span class="params">(<span class="keyword">int</span> m, <span class="keyword">int</span> n)</span></span>&#123;  </span><br><span class="line"> <span class="number">2</span>              <span class="keyword">if</span>(m==<span class="number">0</span> || n==<span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>;  </span><br><span class="line"> <span class="number">3</span>              <span class="keyword">if</span>(m ==<span class="number">1</span> || n==<span class="number">1</span>) <span class="keyword">return</span> <span class="number">1</span>;  </span><br><span class="line"> <span class="number">4</span>               </span><br><span class="line"> <span class="number">5</span>             <span class="keyword">int</span>[][] dp = <span class="keyword">new</span> <span class="keyword">int</span>[m][n];  </span><br><span class="line"> <span class="number">6</span>               </span><br><span class="line"> <span class="number">7</span>             <span class="comment">//只有一行时，到终点每个格子只有一种走法  </span></span><br><span class="line"> <span class="number">8</span>             <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;n; i++)  </span><br><span class="line"> <span class="number">9</span>                 dp[<span class="number">0</span>][i] = <span class="number">1</span>;  </span><br><span class="line"><span class="number">10</span>               </span><br><span class="line"><span class="number">11</span>             <span class="comment">// 只有一列时，到终点每个格子只有一种走法</span></span><br><span class="line"><span class="number">12</span>             <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;m; i++)  </span><br><span class="line"><span class="number">13</span>                 dp[i][<span class="number">0</span>] = <span class="number">1</span>;  </span><br><span class="line"><span class="number">14</span>               </span><br><span class="line"><span class="number">15</span>             <span class="comment">// for each body node, number of path = paths from top + paths from left  </span></span><br><span class="line"><span class="number">16</span>             <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">1</span>; i&lt;m; i++)&#123;  </span><br><span class="line"><span class="number">17</span>                 <span class="keyword">for</span> (<span class="keyword">int</span> j=<span class="number">1</span>; j&lt;n; j++)&#123;  </span><br><span class="line"><span class="number">18</span>                     dp[i][j] = dp[i-<span class="number">1</span>][j] + dp[i][j-<span class="number">1</span>];  </span><br><span class="line"><span class="number">19</span>                 &#125;  </span><br><span class="line"><span class="number">20</span>             &#125;  </span><br><span class="line"><span class="number">21</span>             <span class="keyword">return</span> dp[m-<span class="number">1</span>][n-<span class="number">1</span>];  </span><br><span class="line"><span class="number">22</span>         &#125;</span><br></pre></td></tr></table></figure></p>
+<p>首先给出计算总的可能路径的方法</p>
+<pre><code class="java">public static int uniquePaths(int m, int n){  
+ 2              if(m==0 || n==0) return 0;  
+ 3              if(m ==1 || n==1) return 1;  
+ 4               
+ 5             int[][] dp = new int[m][n];  
+ 6               
+ 7             //只有一行时，到终点每个格子只有一种走法  
+ 8             for (int i=0; i&lt;n; i++)  
+ 9                 dp[0][i] = 1;  
+10               
+11             // 只有一列时，到终点每个格子只有一种走法
+12             for (int i=0; i&lt;m; i++)  
+13                 dp[i][0] = 1;  
+14               
+15             // for each body node, number of path = paths from top + paths from left  
+16             for (int i=1; i&lt;m; i++){  
+17                 for (int j=1; j&lt;n; j++){  
+18                     dp[i][j] = dp[i-1][j] + dp[i][j-1];  
+19                 }  
+20             }  
+21             return dp[m-1][n-1];  
+22         }
+</code></pre>
 <p>解法二：数学中的组合问题，因为从左上角到右下角，总共需要走n+m-2步，左上角和右下角的元素不考虑在内，我们每次都可以选择向下走，向下走总共需要m-1步，所以在n+m-2步中选择m-1步，这是典型的排列组合问题。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">uniquePaths</span><span class="params">(<span class="keyword">int</span> m, <span class="keyword">int</span> n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">true<span class="keyword">int</span> N = n + m - <span class="number">2</span>;</span><br><span class="line">true<span class="keyword">int</span> K = n - <span class="number">1</span>;</span><br><span class="line">true<span class="keyword">double</span> res = <span class="number">1.0</span>;</span><br><span class="line">true<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= n - <span class="number">1</span>; ++i)</span><br><span class="line">true&#123;</span><br><span class="line">truetrueres = res * (N - K + i) / i;</span><br><span class="line">true&#125;</span><br><span class="line">true<span class="keyword">return</span> (<span class="keyword">int</span>)res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="c">int uniquePaths(int m, int n)
+{
+    int N = n + m - 2;
+    int K = n - 1;
+    double res = 1.0;
+    for (int i = 1; i &lt;= n - 1; ++i)
+    {
+        res = res * (N - K + i) / i;
+    }
+    return (int)res;
+}
+</code></pre>
 <h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="https://juejin.im/post/59cc55b95188250b4007539b">Java关于数据结构的实现：树</a></p>
 
       

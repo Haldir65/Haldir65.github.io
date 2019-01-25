@@ -16,7 +16,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/scenery1511100756208.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery1511100809920.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.039Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.181Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="VPS维护的日常">
 <meta name="twitter:image" content="https://haldir66.ga/static/imgs/scenery1511100756208.jpg">
@@ -223,7 +223,9 @@ ga('send', 'pageview');
 <h3 id="2-1-装-ss"><a href="#2-1-装-ss" class="headerlink" title="2.1 装 ss"></a>2.1 装 ss</h3><blockquote>
 <p>下载 shadowsocks 源码编译<br>git clone <a href="https://github.com/shadowsocks/shadowsocks">https://github.com/shadowsocks/shadowsocks</a></p>
 </blockquote>
-<h1 id="记得切换到-master-分支"><a href="#记得切换到-master-分支" class="headerlink" title="记得切换到 master 分支"></a>记得切换到 master 分支</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">python setup.py build</span><br><span class="line">python setup.py install</span><br></pre></td></tr></table></figure>
+<h1 id="记得切换到-master-分支"><a href="#记得切换到-master-分支" class="headerlink" title="记得切换到 master 分支"></a>记得切换到 master 分支</h1><pre><code class="python">python setup.py build
+python setup.py install
+</code></pre>
 <p>检查下版本</p>
 <blockquote>
 <p>ssserver –version</p>
@@ -232,7 +234,17 @@ ga('send', 'pageview');
 <blockquote>
 <p>vim config.json</p>
 </blockquote>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"server"</span>: <span class="string">"my_server_ip"</span>,  </span><br><span class="line">  <span class="attr">"server_port"</span>: <span class="number">8388</span>,</span><br><span class="line">  <span class="attr">"local_address"</span>: <span class="string">"127.0.0.1"</span>,</span><br><span class="line">  <span class="attr">"local_port"</span>: <span class="number">1080</span>,</span><br><span class="line">  <span class="attr">"password"</span>: <span class="string">"mypassword"</span>,</span><br><span class="line">  <span class="attr">"timeout"</span>: <span class="number">300</span>,</span><br><span class="line">  <span class="attr">"method"</span>: <span class="string">"aes-256-cfb"</span>,</span><br><span class="line">  <span class="attr">"fast_open"</span>: <span class="literal">true</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="json">{
+  &quot;server&quot;: &quot;my_server_ip&quot;,  
+  &quot;server_port&quot;: 8388,
+  &quot;local_address&quot;: &quot;127.0.0.1&quot;,
+  &quot;local_port&quot;: 1080,
+  &quot;password&quot;: &quot;mypassword&quot;,
+  &quot;timeout&quot;: 300,
+  &quot;method&quot;: &quot;aes-256-cfb&quot;,
+  &quot;fast_open&quot;: true
+}
+</code></pre>
 <p>使用ipv6的话(把”my_server_ip”改成”::”),这样访问通过ss访问ipv6.google.com就ok了(当然这要在确认host已有ipv6的前提下)<br>这跟nginx ipv6 server block很像：</p>
 <blockquote>
 <p>listen 80 default_server;<br>listen [::]:80 default_server ipv6only=on;</p>
@@ -247,7 +259,16 @@ ga('send', 'pageview');
 <p>ps -ef | grep sss</p>
 </blockquote>
 <p>ss 命令</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ssserver -c /etc/shadowsocks/config.json <span class="comment"># 前台运行</span></span><br><span class="line"></span><br><span class="line"><span class="comment">### 后台运行和停止</span></span><br><span class="line">ssserver -c /etc/shadowsocks.json -d start -q <span class="comment">##加上-q是quiet的意思，only show warning and error</span></span><br><span class="line">ssserver -c /etc/shadowsocks.json -d stop</span><br><span class="line"></span><br><span class="line"><span class="comment">###  加入开机启动</span></span><br><span class="line"><span class="comment">### 在/etc/rc.local中加入</span></span><br><span class="line">sudo ssserver -c /etc/shadowsocks.json --user username -d start - 不要总是用root用户做事，adduser来做，给sudo权限即可</span><br></pre></td></tr></table></figure>
+<pre><code class="bash">ssserver -c /etc/shadowsocks/config.json # 前台运行
+
+### 后台运行和停止
+ssserver -c /etc/shadowsocks.json -d start -q ##加上-q是quiet的意思，only show warning and error
+ssserver -c /etc/shadowsocks.json -d stop
+
+###  加入开机启动
+### 在/etc/rc.local中加入
+sudo ssserver -c /etc/shadowsocks.json --user username -d start - 不要总是用root用户做事，adduser来做，给sudo权限即可
+</code></pre>
 <p>如果使用systemd来管理的话，就不要使用 -d参数，因为需要root权限，此时应该将ssserver的生命周期管理交给systemd</p>
 <p>nohup /net-speeder/net-speeder/net_speeder eth0 “tcp src port 12345” &gt; /dev/null 2&gt;&amp;1 &amp;</p>
 <p>慎用！！一不小心会把自己的ip加到iptable黑名单里面<br>//防止暴力扫描ss端口<br><a href="https://github.com/shadowsocks/shadowsocks/wiki/Ban-Brute-Force-Crackers">nohup tail -F /var/log/shadowsocks.log | python autoban.py &gt;log 2&gt;log &amp;</a></p>
@@ -261,19 +282,76 @@ ga('send', 'pageview');
 <p>apt-get install libnet1-dev<br>apt-get install libpcap0.8-dev</p>
 <p>venetX，OpenVZ 架构</p>
 </blockquote>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> net-speeder-master/</span><br><span class="line">sh build.sh -DCOOKED</span><br><span class="line"></span><br><span class="line"><span class="comment">###Xen，KVM，物理机</span></span><br><span class="line"><span class="built_in">cd</span> net-speeder-master/</span><br><span class="line">sh build.sh</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">### 加速所有ip协议数据</span></span><br><span class="line"></span><br><span class="line">./net_speeder venet0 <span class="string">"ip"</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">###只加速指定端口，例如只加速TCP协议的 8989端口, 切换到net-speeder的目录下</span></span><br><span class="line">./net_speeder venet0:0 <span class="string">"tcp src port 8989"</span></span><br><span class="line"></span><br><span class="line">./net_speeder venet0 <span class="string">"ip"</span></span><br></pre></td></tr></table></figure>
+<pre><code class="bash">cd net-speeder-master/
+sh build.sh -DCOOKED
+
+###Xen，KVM，物理机
+cd net-speeder-master/
+sh build.sh
+
+
+### 加速所有ip协议数据
+
+./net_speeder venet0 &quot;ip&quot;
+
+
+###只加速指定端口，例如只加速TCP协议的 8989端口, 切换到net-speeder的目录下
+./net_speeder venet0:0 &quot;tcp src port 8989&quot;
+
+./net_speeder venet0 &quot;ip&quot;
+</code></pre>
 <p><a href="https://blog.kuoruan.com/48.html">net-speeder写入开机脚本</a></p>
 <h3 id="2-3-升级内核开启-BBR"><a href="#2-3-升级内核开启-BBR" class="headerlink" title="2.3 升级内核开启 BBR"></a>2.3 升级内核开启 BBR</h3><p><a href="https://qiujunya.com/linodebbr.html">KVM 架构升级内核开启 BBR</a></p>
 <p><a href="http://www.itfanr.cc/2016/10/02/use-shadowsocks-to-have-better-internet-experience/">ubuntu 16.4 安装 shadowsocks-libev</a></p>
 <p>参考 github<a href="https://github.com/shadowsocks/shadowsocks-libev">官方教程</a>安装</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install software-properties-common -y</span><br><span class="line">sudo add-apt-repository ppa:max-c-lv/shadowsocks-libev -y</span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt install shadowsocks-libev</span><br><span class="line"></span><br><span class="line">apt-get install --only-upgrade &lt;packagename&gt; <span class="comment">## 只更新这一个程序</span></span><br><span class="line">apt list --upgradable <span class="comment">## 看一下哪些程序可以更新</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Edit the configuration file</span></span><br><span class="line">sudo vi /etc/shadowsocks-libev/config.json <span class="comment">## 这里记得把server address改成实际的ip</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Edit the default configuration for debian</span></span><br><span class="line">sudo vi /etc/default/shadowsocks-libev</span><br><span class="line"></span><br><span class="line"><span class="comment"># Start the service</span></span><br><span class="line">sudo /etc/init.d/shadowsocks-libev start    <span class="comment"># for sysvinit, or</span></span><br><span class="line">sudo systemctl start shadowsocks-libev      <span class="comment"># for systemd</span></span><br><span class="line"></span><br><span class="line"><span class="comment">##加入开机启动</span></span><br><span class="line"><span class="comment">##在/etc/rc.local中加入</span></span><br><span class="line">sudo /etc/init.d/shadowsocks-libev start</span><br><span class="line">sudo ss-server -c /etc/shadowsocks-libev/config.json -u <span class="comment">## 开启udp转发  netstat -lnp确认ss-server确实监听了udp端口</span></span><br></pre></td></tr></table></figure>
+<pre><code class="bash">sudo apt-get install software-properties-common -y
+sudo add-apt-repository ppa:max-c-lv/shadowsocks-libev -y
+sudo apt-get update
+sudo apt install shadowsocks-libev
+
+apt-get install --only-upgrade &lt;packagename&gt; ## 只更新这一个程序
+apt list --upgradable ## 看一下哪些程序可以更新
+
+# Edit the configuration file
+sudo vi /etc/shadowsocks-libev/config.json ## 这里记得把server address改成实际的ip
+
+# Edit the default configuration for debian
+sudo vi /etc/default/shadowsocks-libev
+
+# Start the service
+sudo /etc/init.d/shadowsocks-libev start    # for sysvinit, or
+sudo systemctl start shadowsocks-libev      # for systemd
+
+##加入开机启动
+##在/etc/rc.local中加入
+sudo /etc/init.d/shadowsocks-libev start
+sudo ss-server -c /etc/shadowsocks-libev/config.json -u ## 开启udp转发  netstat -lnp确认ss-server确实监听了udp端口
+</code></pre>
 <p>其实跟安装 ss 很像的</p>
-<h2 id="2-4-安装libsodium"><a href="#2-4-安装libsodium" class="headerlink" title="2.4 安装libsodium"></a>2.4 安装libsodium</h2><p>转自<a href="https://doub.io/ss-jc51/">逗比</a><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## debian系列</span></span><br><span class="line">apt-get update</span><br><span class="line"><span class="comment">## 安装 编译所需组件包：</span></span><br><span class="line">apt-get install -y build-essential</span><br><span class="line"><span class="comment">### 获取 libsodium最新版本：</span></span><br><span class="line">Libsodiumr_ver=$(wget -qO- <span class="string">"https://github.com/jedisct1/libsodium/tags"</span>|grep <span class="string">"/jedisct1/libsodium/releases/tag/"</span>|head -1|sed -r <span class="string">'s/.*tag\/(.+)\"&gt;.*/\1/'</span>) &amp;&amp; <span class="built_in">echo</span> <span class="string">"<span class="variable">$&#123;Libsodiumr_ver&#125;</span>"</span></span><br><span class="line"><span class="comment">## 下载最新 libsodium版本编译文件：</span></span><br><span class="line">wget --no-check-certificate -N <span class="string">"https://github.com/jedisct1/libsodium/releases/download/<span class="variable">$&#123;Libsodiumr_ver&#125;</span>/libsodium-<span class="variable">$&#123;Libsodiumr_ver&#125;</span>.tar.gz"</span></span><br><span class="line">tar -xzf libsodium-<span class="variable">$&#123;Libsodiumr_ver&#125;</span>.tar.gz &amp;&amp; <span class="built_in">cd</span> libsodium-<span class="variable">$&#123;Libsodiumr_ver&#125;</span></span><br><span class="line">./configure --<span class="built_in">disable</span>-maintainer-mode &amp;&amp; make -j2 &amp;&amp; make install <span class="comment">## 这段最好sudo 去做</span></span><br><span class="line">ldconfig</span><br><span class="line"><span class="comment">## 删掉之前下载的文件</span></span><br><span class="line"><span class="built_in">cd</span> .. &amp;&amp; rm -rf libsodium-<span class="variable">$&#123;Libsodiumr_ver&#125;</span>.tar.gz &amp;&amp; rm -rf libsodium-<span class="variable">$&#123;Libsodiumr_ver&#125;</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="2-4-安装libsodium"><a href="#2-4-安装libsodium" class="headerlink" title="2.4 安装libsodium"></a>2.4 安装libsodium</h2><p>转自<a href="https://doub.io/ss-jc51/">逗比</a></p>
+<pre><code class="bash">## debian系列
+apt-get update
+## 安装 编译所需组件包：
+apt-get install -y build-essential
+### 获取 libsodium最新版本：
+Libsodiumr_ver=$(wget -qO- &quot;https://github.com/jedisct1/libsodium/tags&quot;|grep &quot;/jedisct1/libsodium/releases/tag/&quot;|head -1|sed -r &#39;s/.*tag\/(.+)\&quot;&gt;.*/\1/&#39;) &amp;&amp; echo &quot;${Libsodiumr_ver}&quot;
+## 下载最新 libsodium版本编译文件：
+wget --no-check-certificate -N &quot;https://github.com/jedisct1/libsodium/releases/download/${Libsodiumr_ver}/libsodium-${Libsodiumr_ver}.tar.gz&quot;
+tar -xzf libsodium-${Libsodiumr_ver}.tar.gz &amp;&amp; cd libsodium-${Libsodiumr_ver}
+./configure --disable-maintainer-mode &amp;&amp; make -j2 &amp;&amp; make install ## 这段最好sudo 去做
+ldconfig
+## 删掉之前下载的文件
+cd .. &amp;&amp; rm -rf libsodium-${Libsodiumr_ver}.tar.gz &amp;&amp; rm -rf libsodium-${Libsodiumr_ver}
+</code></pre>
 <p>现在就可以去config.json文件中将加密方式改成: chacha20 了，重启下ss即可</p>
 <h3 id="2-5-查看日志"><a href="#2-5-查看日志" class="headerlink" title="2.5 查看日志"></a>2.5 查看日志</h3><p>日志文件的位置在/var/log/shadowsocks.log<br>下面这条命令用于查看访问了哪些网站<br>cat  shadowsocks.log | awk ‘{ print $5}’ |grep -o ‘^[^:]*’ | sort | uniq -c | sort -n</p>
 <p>查看尝试连接本服务器的客户端<br>cat shadowsocks.log | awk ‘{ print $NF }’| grep -o ‘^[^:]*’ | sort | uniq -c | sort -n</p>
-<h3 id="2-6-simple-obfs"><a href="#2-6-simple-obfs" class="headerlink" title="2.6 simple-obfs"></a>2.6 simple-obfs</h3><p>sudo apt-get install simple-obfs<br>/etc/shadowsocks-libev/config.json文件中添加<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&quot;plugin&quot;:&quot;obfs-server&quot;,</span><br><span class="line">&quot;plugin_opts&quot;: &quot;obfs=tls;obfs-host=www.bing.com&quot;,</span><br><span class="line">&quot;fast_open&quot;:true,</span><br><span class="line">&quot;reuse_port&quot;:true</span><br></pre></td></tr></table></figure></p>
-<h3 id="2-7-ss-local提供正向代理"><a href="#2-7-ss-local提供正向代理" class="headerlink" title="2.7 ss-local提供正向代理"></a>2.7 ss-local提供正向代理</h3><p>//curl使用代理，在ss-local监听1080端口的前提下，这条命令可以正常访问google</p>
+<h3 id="2-6-simple-obfs"><a href="#2-6-simple-obfs" class="headerlink" title="2.6 simple-obfs"></a>2.6 simple-obfs</h3><p>sudo apt-get install simple-obfs<br>/etc/shadowsocks-libev/config.json文件中添加</p>
+<pre><code>&quot;plugin&quot;:&quot;obfs-server&quot;,
+&quot;plugin_opts&quot;: &quot;obfs=tls;obfs-host=www.bing.com&quot;,
+&quot;fast_open&quot;:true,
+&quot;reuse_port&quot;:true
+</code></pre><h3 id="2-7-ss-local提供正向代理"><a href="#2-7-ss-local提供正向代理" class="headerlink" title="2.7 ss-local提供正向代理"></a>2.7 ss-local提供正向代理</h3><p>//curl使用代理，在ss-local监听1080端口的前提下，这条命令可以正常访问google</p>
 <blockquote>
 <p>curl -4sSkL -x socks5h://127.0.0.1:1080 <a href="https://www.google.com">https://www.google.com</a><br>curl –socks5 127.0.0.1:1080 <a href="http://stackoverflow.com/">http://stackoverflow.com/</a> //这个更简单</p>
 </blockquote>
@@ -285,13 +363,136 @@ ga('send', 'pageview');
 <p><a href="https://linux.cn/article-9223-1.html">如何让 curl 命令通过代理访问</a><br>curl -x socks5://[user:password@]proxyhost[:port]/ url<br>curl –socks5 192.168.1.254:3099 <a href="https://www.cyberciti.biz/">https://www.cyberciti.biz/</a></p>
 <h2 id="3-ubuntu自带的防火墙叫做ufw-Uncomplicated-Firewall-，用起来也很简单"><a href="#3-ubuntu自带的防火墙叫做ufw-Uncomplicated-Firewall-，用起来也很简单" class="headerlink" title="3. ubuntu自带的防火墙叫做ufw(Uncomplicated Firewall)，用起来也很简单"></a>3. ubuntu自带的防火墙叫做ufw(Uncomplicated Firewall)，用起来也很简单</h2><p><a href="https://www.digitalocean.com/community/tutorials/ufw-essentials-common-firewall-rules-and-commands">digital ocean的ufw教程</a></p>
 <h2 id="4-跑分"><a href="#4-跑分" class="headerlink" title="4.跑分"></a>4.跑分</h2><p><a href="https://github.com/Teddysun/across">VPS 跑分软件</a><br>git clone 下来</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> across</span><br><span class="line">wget -qO- bench.sh | bash <span class="comment">###（亲测可用，也可以自己看Readme）</span></span><br><span class="line"><span class="comment">### 或者</span></span><br><span class="line">curl -Lso- bench.sh | bash</span><br></pre></td></tr></table></figure>
+<pre><code class="bash">cd across
+wget -qO- bench.sh | bash ###（亲测可用，也可以自己看Readme）
+### 或者
+curl -Lso- bench.sh | bash
+</code></pre>
 <p>下面是一些自己试过的</p>
-<h3 id="BandWagon"><a href="#BandWagon" class="headerlink" title="BandWagon"></a>BandWagon</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">----------------------------------------------------------------------</span><br><span class="line">CPU model            : Intel(R) Xeon(R) CPU E3-1275 v5 @ 3.60GHz</span><br><span class="line">Number of cores      : 1</span><br><span class="line">CPU frequency        : 3600.041 MHz</span><br><span class="line">Total size of Disk   : 12.0 GB (10.0 GB Used)</span><br><span class="line">Total amount of Mem  : 256 MB (217 MB Used)</span><br><span class="line">Total amount of Swap : 128 MB (122 MB Used)</span><br><span class="line">System uptime        : 2 days, 4 hour 20 min</span><br><span class="line">Load average         : 0.06, 0.05, 0.01</span><br><span class="line">OS                   : Ubuntu 14.04.1 LTS</span><br><span class="line">Arch                 : i686 (32 Bit)</span><br><span class="line">Kernel               : 2.6.32-042stab123.3</span><br><span class="line">----------------------------------------------------------------------</span><br><span class="line">I/O speed(1st run)   : 855 MB/s</span><br><span class="line">I/O speed(2nd run)   : 1.0 GB/s</span><br><span class="line">I/O speed(3rd run)   : 1.0 GB/s</span><br><span class="line">Average I/O speed    : 967.7 MB/s</span><br><span class="line">----------------------------------------------------------------------</span><br><span class="line">Node Name                       IPv4 address            Download Speed</span><br><span class="line">CacheFly                        205.234.175.175         76.5MB/s</span><br><span class="line">Linode, Tokyo, JP               106.187.96.148          17.6MB/s</span><br><span class="line">Linode, Singapore, SG           139.162.23.4            8.18MB/s</span><br><span class="line">Linode, London, UK              176.58.107.39           8.67MB/s</span><br><span class="line">Linode, Frankfurt, DE           139.162.130.8           12.8MB/s</span><br><span class="line">Linode, Fremont, CA             50.116.14.9             9.40MB/s</span><br><span class="line">Softlayer, Dallas, TX           173.192.68.18           62.3MB/s</span><br><span class="line">Softlayer, Seattle, WA          67.228.112.250          66.0MB/s</span><br><span class="line">Softlayer, Frankfurt, DE        159.122.69.4            12.2MB/s</span><br><span class="line">Softlayer, Singapore, SG        119.81.28.170           11.8MB/s</span><br><span class="line">Softlayer, HongKong, CN         119.81.130.170          13.2MB/s</span><br><span class="line">----------------------------------------------------------------------</span><br></pre></td></tr></table></figure>
-<h3 id="BuyVm"><a href="#BuyVm" class="headerlink" title="BuyVm"></a>BuyVm</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">CPU model            : Intel(R) Xeon(R) CPU           L5639  @ 2.13GHz</span><br><span class="line">Number of cores      : 1</span><br><span class="line">CPU frequency        : 2000.070 MHz</span><br><span class="line">Total size of Disk   : 15.0 GB (1.3 GB Used)</span><br><span class="line">Total amount of Mem  : 128 MB (80 MB Used)</span><br><span class="line">Total amount of Swap : 128 MB (32 MB Used)</span><br><span class="line">System uptime        : 0 days, 22 hour 28 min</span><br><span class="line">Load average         : 0.10, 0.04, 0.05</span><br><span class="line">OS                   : Ubuntu 14.04.2 LTS</span><br><span class="line">Arch                 : i686 (32 Bit)</span><br><span class="line">Kernel               : 2.6.32-openvz-042stab116.2-amd64</span><br><span class="line">----------------------------------------------------------------------</span><br><span class="line">I/O speed(1st run)   : 102 MB/s</span><br><span class="line">I/O speed(2nd run)   : 97.1 MB/s</span><br><span class="line">I/O speed(3rd run)   : 147 MB/s</span><br><span class="line">Average I/O speed    : 115.4 MB/s</span><br><span class="line">----------------------------------------------------------------------</span><br><span class="line">Node Name                       IPv4 address            Download Speed</span><br><span class="line">CacheFly                        205.234.175.175         14.7MB/s</span><br><span class="line">Linode, Tokyo, JP               106.187.96.148          6.15MB/s</span><br><span class="line">Linode, Singapore, SG           139.162.23.4            2.54MB/s</span><br><span class="line">Linode, London, UK              176.58.107.39           2.99MB/s</span><br><span class="line">Linode, Frankfurt, DE           139.162.130.8           2.96MB/s</span><br><span class="line">Linode, Fremont, CA             50.116.14.9             4.27MB/s</span><br><span class="line">Softlayer, Dallas, TX           173.192.68.18           11.7MB/s</span><br><span class="line">Softlayer, Seattle, WA          67.228.112.250          13.0MB/s</span><br><span class="line">Softlayer, Frankfurt, DE        159.122.69.4            1.89MB/s</span><br><span class="line">Softlayer, Singapore, SG        119.81.28.170           3.26MB/s</span><br><span class="line">Softlayer, HongKong, CN         119.81.130.170          3.72MB/s</span><br><span class="line">----------------------------------------------------------------------</span><br></pre></td></tr></table></figure>
-<h3 id="DigitalOcean-Los-Angeles"><a href="#DigitalOcean-Los-Angeles" class="headerlink" title="DigitalOcean Los Angeles"></a>DigitalOcean Los Angeles</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">----------------------------------------------------------------------</span><br><span class="line">CPU model            : Intel(R) Xeon(R) CPU E5-2650L v3 @ 1.80GHz</span><br><span class="line">Number of cores      : 1</span><br><span class="line">CPU frequency        : 1799.998 MHz</span><br><span class="line">Total size of Disk   : 20.2 GB (1.0 GB Used)</span><br><span class="line">Total amount of Mem  : 488 MB (33 MB Used)</span><br><span class="line">Total amount of Swap : 0 MB (0 MB Used)</span><br><span class="line">System uptime        : 0 days, 0 hour 3 min</span><br><span class="line">Load average         : 0.16, 0.10, 0.03</span><br><span class="line">OS                   : Ubuntu 16.04.2 LTS</span><br><span class="line">Arch                 : x86_64 (64 Bit)</span><br><span class="line">Kernel               : 4.4.0-78-generic</span><br><span class="line">----------------------------------------------------------------------</span><br><span class="line">I/O speed(1st run)   : 581 MB/s</span><br><span class="line">I/O speed(2nd run)   : 711 MB/s</span><br><span class="line">I/O speed(3rd run)   : 777 MB/s</span><br><span class="line">Average I/O speed    : 689.7 MB/s</span><br><span class="line">----------------------------------------------------------------------</span><br><span class="line">Node Name                       IPv4 address            Download Speed</span><br><span class="line">CacheFly                        205.234.175.175         161MB/s</span><br><span class="line">Linode, Tokyo, JP               106.187.96.148          15.7MB/s</span><br><span class="line">Linode, Singapore, SG           139.162.23.4            5.96MB/s</span><br><span class="line">Linode, London, UK              176.58.107.39           5.71MB/s</span><br><span class="line">Linode, Frankfurt, DE           139.162.130.8           6.45MB/s</span><br><span class="line">Linode, Fremont, CA             50.116.14.9             30.4MB/s</span><br><span class="line">Softlayer, Dallas, TX           173.192.68.18           29.9MB/s</span><br><span class="line">Softlayer, Seattle, WA          67.228.112.250          57.7MB/s</span><br><span class="line">Softlayer, Frankfurt, DE        159.122.69.4            3.64MB/s</span><br><span class="line">Softlayer, Singapore, SG        119.81.28.170           7.59MB/s</span><br><span class="line">Softlayer, HongKong, CN         119.81.130.170          8.84MB/s</span><br><span class="line">----------------------------------------------------------------------</span><br></pre></td></tr></table></figure>
-<h3 id="DigitalOcean-Sinapore-ip-address-lokks-like-Russian"><a href="#DigitalOcean-Sinapore-ip-address-lokks-like-Russian" class="headerlink" title="DigitalOcean Sinapore (ip address lokks like Russian)"></a>DigitalOcean Sinapore (ip address lokks like Russian)</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">----------------------------------------------------------------------</span><br><span class="line">CPU model            : Intel(R) Xeon(R) CPU E5-2630L 0 @ 2.00GHz</span><br><span class="line">Number of cores      : 1</span><br><span class="line">CPU frequency        : 1999.999 MHz</span><br><span class="line">Total size of Disk   : 20.2 GB (1.0 GB Used)</span><br><span class="line">Total amount of Mem  : 488 MB (36 MB Used)</span><br><span class="line">Total amount of Swap : 0 MB (0 MB Used)</span><br><span class="line">System uptime        : 0 days, 0 hour 2 min</span><br><span class="line">Load average         : 0.17, 0.20, 0.09</span><br><span class="line">OS                   : Ubuntu 16.04.2 LTS</span><br><span class="line">Arch                 : x86_64 (64 Bit)</span><br><span class="line">Kernel               : 4.4.0-78-generic</span><br><span class="line">----------------------------------------------------------------------</span><br><span class="line">I/O speed(1st run)   : 662 MB/s</span><br><span class="line">I/O speed(2nd run)   : 741 MB/s</span><br><span class="line">I/O speed(3rd run)   : 728 MB/s</span><br><span class="line">Average I/O speed    : 710.3 MB/s</span><br><span class="line">----------------------------------------------------------------------</span><br><span class="line">Node Name                       IPv4 address            Download Speed</span><br><span class="line">CacheFly                        205.234.175.175         20.8MB/s</span><br><span class="line">Linode, Tokyo, JP               106.187.96.148          18.6MB/s</span><br><span class="line">Linode, Singapore, SG           139.162.23.4            83.8MB/s</span><br><span class="line">Linode, London, UK              176.58.107.39           5.71MB/s</span><br><span class="line">Linode, Frankfurt, DE           139.162.130.8           8.13MB/s</span><br><span class="line">Linode, Fremont, CA             50.116.14.9             2.82MB/s</span><br><span class="line">Softlayer, Dallas, TX           173.192.68.18           6.18MB/s</span><br><span class="line">Softlayer, Seattle, WA          67.228.112.250          8.47MB/s</span><br><span class="line">Softlayer, Frankfurt, DE        159.122.69.4            6.77MB/s</span><br><span class="line">Softlayer, Singapore, SG        119.81.28.170           97.9MB/s</span><br><span class="line">Softlayer, HongKong, CN         119.81.130.170          35.2MB/s</span><br><span class="line">----------------------------------------------------------------------</span><br></pre></td></tr></table></figure>
-<p><img src="https://www.haldir66.ga/static/imgs/scenery1511100809920.jpg" alt=""></p>
+<h3 id="BandWagon"><a href="#BandWagon" class="headerlink" title="BandWagon"></a>BandWagon</h3><pre><code>----------------------------------------------------------------------
+CPU model            : Intel(R) Xeon(R) CPU E3-1275 v5 @ 3.60GHz
+Number of cores      : 1
+CPU frequency        : 3600.041 MHz
+Total size of Disk   : 12.0 GB (10.0 GB Used)
+Total amount of Mem  : 256 MB (217 MB Used)
+Total amount of Swap : 128 MB (122 MB Used)
+System uptime        : 2 days, 4 hour 20 min
+Load average         : 0.06, 0.05, 0.01
+OS                   : Ubuntu 14.04.1 LTS
+Arch                 : i686 (32 Bit)
+Kernel               : 2.6.32-042stab123.3
+----------------------------------------------------------------------
+I/O speed(1st run)   : 855 MB/s
+I/O speed(2nd run)   : 1.0 GB/s
+I/O speed(3rd run)   : 1.0 GB/s
+Average I/O speed    : 967.7 MB/s
+----------------------------------------------------------------------
+Node Name                       IPv4 address            Download Speed
+CacheFly                        205.234.175.175         76.5MB/s
+Linode, Tokyo, JP               106.187.96.148          17.6MB/s
+Linode, Singapore, SG           139.162.23.4            8.18MB/s
+Linode, London, UK              176.58.107.39           8.67MB/s
+Linode, Frankfurt, DE           139.162.130.8           12.8MB/s
+Linode, Fremont, CA             50.116.14.9             9.40MB/s
+Softlayer, Dallas, TX           173.192.68.18           62.3MB/s
+Softlayer, Seattle, WA          67.228.112.250          66.0MB/s
+Softlayer, Frankfurt, DE        159.122.69.4            12.2MB/s
+Softlayer, Singapore, SG        119.81.28.170           11.8MB/s
+Softlayer, HongKong, CN         119.81.130.170          13.2MB/s
+----------------------------------------------------------------------
+</code></pre><h3 id="BuyVm"><a href="#BuyVm" class="headerlink" title="BuyVm"></a>BuyVm</h3><pre><code>CPU model            : Intel(R) Xeon(R) CPU           L5639  @ 2.13GHz
+Number of cores      : 1
+CPU frequency        : 2000.070 MHz
+Total size of Disk   : 15.0 GB (1.3 GB Used)
+Total amount of Mem  : 128 MB (80 MB Used)
+Total amount of Swap : 128 MB (32 MB Used)
+System uptime        : 0 days, 22 hour 28 min
+Load average         : 0.10, 0.04, 0.05
+OS                   : Ubuntu 14.04.2 LTS
+Arch                 : i686 (32 Bit)
+Kernel               : 2.6.32-openvz-042stab116.2-amd64
+----------------------------------------------------------------------
+I/O speed(1st run)   : 102 MB/s
+I/O speed(2nd run)   : 97.1 MB/s
+I/O speed(3rd run)   : 147 MB/s
+Average I/O speed    : 115.4 MB/s
+----------------------------------------------------------------------
+Node Name                       IPv4 address            Download Speed
+CacheFly                        205.234.175.175         14.7MB/s
+Linode, Tokyo, JP               106.187.96.148          6.15MB/s
+Linode, Singapore, SG           139.162.23.4            2.54MB/s
+Linode, London, UK              176.58.107.39           2.99MB/s
+Linode, Frankfurt, DE           139.162.130.8           2.96MB/s
+Linode, Fremont, CA             50.116.14.9             4.27MB/s
+Softlayer, Dallas, TX           173.192.68.18           11.7MB/s
+Softlayer, Seattle, WA          67.228.112.250          13.0MB/s
+Softlayer, Frankfurt, DE        159.122.69.4            1.89MB/s
+Softlayer, Singapore, SG        119.81.28.170           3.26MB/s
+Softlayer, HongKong, CN         119.81.130.170          3.72MB/s
+----------------------------------------------------------------------
+</code></pre><h3 id="DigitalOcean-Los-Angeles"><a href="#DigitalOcean-Los-Angeles" class="headerlink" title="DigitalOcean Los Angeles"></a>DigitalOcean Los Angeles</h3><pre><code>----------------------------------------------------------------------
+CPU model            : Intel(R) Xeon(R) CPU E5-2650L v3 @ 1.80GHz
+Number of cores      : 1
+CPU frequency        : 1799.998 MHz
+Total size of Disk   : 20.2 GB (1.0 GB Used)
+Total amount of Mem  : 488 MB (33 MB Used)
+Total amount of Swap : 0 MB (0 MB Used)
+System uptime        : 0 days, 0 hour 3 min
+Load average         : 0.16, 0.10, 0.03
+OS                   : Ubuntu 16.04.2 LTS
+Arch                 : x86_64 (64 Bit)
+Kernel               : 4.4.0-78-generic
+----------------------------------------------------------------------
+I/O speed(1st run)   : 581 MB/s
+I/O speed(2nd run)   : 711 MB/s
+I/O speed(3rd run)   : 777 MB/s
+Average I/O speed    : 689.7 MB/s
+----------------------------------------------------------------------
+Node Name                       IPv4 address            Download Speed
+CacheFly                        205.234.175.175         161MB/s
+Linode, Tokyo, JP               106.187.96.148          15.7MB/s
+Linode, Singapore, SG           139.162.23.4            5.96MB/s
+Linode, London, UK              176.58.107.39           5.71MB/s
+Linode, Frankfurt, DE           139.162.130.8           6.45MB/s
+Linode, Fremont, CA             50.116.14.9             30.4MB/s
+Softlayer, Dallas, TX           173.192.68.18           29.9MB/s
+Softlayer, Seattle, WA          67.228.112.250          57.7MB/s
+Softlayer, Frankfurt, DE        159.122.69.4            3.64MB/s
+Softlayer, Singapore, SG        119.81.28.170           7.59MB/s
+Softlayer, HongKong, CN         119.81.130.170          8.84MB/s
+----------------------------------------------------------------------
+</code></pre><h3 id="DigitalOcean-Sinapore-ip-address-lokks-like-Russian"><a href="#DigitalOcean-Sinapore-ip-address-lokks-like-Russian" class="headerlink" title="DigitalOcean Sinapore (ip address lokks like Russian)"></a>DigitalOcean Sinapore (ip address lokks like Russian)</h3><pre><code>----------------------------------------------------------------------
+CPU model            : Intel(R) Xeon(R) CPU E5-2630L 0 @ 2.00GHz
+Number of cores      : 1
+CPU frequency        : 1999.999 MHz
+Total size of Disk   : 20.2 GB (1.0 GB Used)
+Total amount of Mem  : 488 MB (36 MB Used)
+Total amount of Swap : 0 MB (0 MB Used)
+System uptime        : 0 days, 0 hour 2 min
+Load average         : 0.17, 0.20, 0.09
+OS                   : Ubuntu 16.04.2 LTS
+Arch                 : x86_64 (64 Bit)
+Kernel               : 4.4.0-78-generic
+----------------------------------------------------------------------
+I/O speed(1st run)   : 662 MB/s
+I/O speed(2nd run)   : 741 MB/s
+I/O speed(3rd run)   : 728 MB/s
+Average I/O speed    : 710.3 MB/s
+----------------------------------------------------------------------
+Node Name                       IPv4 address            Download Speed
+CacheFly                        205.234.175.175         20.8MB/s
+Linode, Tokyo, JP               106.187.96.148          18.6MB/s
+Linode, Singapore, SG           139.162.23.4            83.8MB/s
+Linode, London, UK              176.58.107.39           5.71MB/s
+Linode, Frankfurt, DE           139.162.130.8           8.13MB/s
+Linode, Fremont, CA             50.116.14.9             2.82MB/s
+Softlayer, Dallas, TX           173.192.68.18           6.18MB/s
+Softlayer, Seattle, WA          67.228.112.250          8.47MB/s
+Softlayer, Frankfurt, DE        159.122.69.4            6.77MB/s
+Softlayer, Singapore, SG        119.81.28.170           97.9MB/s
+Softlayer, HongKong, CN         119.81.130.170          35.2MB/s
+----------------------------------------------------------------------
+</code></pre><p><img src="https://www.haldir66.ga/static/imgs/scenery1511100809920.jpg" alt=""></p>
 <h3 id="跑java？"><a href="#跑java？" class="headerlink" title="跑java？"></a>跑java？</h3><p>算了吧，简单读个文本文件print出来cpu就飙到50%。</p>
 <h3 id="5-关于-docker"><a href="#5-关于-docker" class="headerlink" title="5. 关于 docker"></a>5. 关于 docker</h3><p>docker image 是snapshot, 而container是docker image的运行实例</p>
 <p>youtube 上有人在 Digital Ocean 的 vps 上安装 docker，主要作用就是将一个复杂的操作系统打包成一个下载即用的容器。进入容器中，可以像在实际的操作系统中一样运行指令。所以虚拟化的机器随时可以使用其他操作系统。<a href="https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-16-04">how-to-install-and-use-docker-on-ubuntu-16-04</a><br><a href="https://nodejs.org/en/docs/guides/nodejs-docker-webapp/">用docker host一个node js app</a>。实测下来image大小在600MB左右，内存占用200MB左右。</p>

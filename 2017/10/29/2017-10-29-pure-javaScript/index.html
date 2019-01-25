@@ -19,7 +19,7 @@
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery04e31f5513d62958957b4caa1d944ae4.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery151110078544.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/magnolia_1920x1440.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.039Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.181Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Vanilla JS Tips">
 <meta name="twitter:description" content="Vanilla JS其实就是原生javascript了。论运行速度，在Vanilla JS面前，所有的js library都要慢很多。">
@@ -216,27 +216,161 @@ ga('send', 'pageview');
 </ol>
 <h2 id="1-一些作为一门语言基本的操作都有"><a href="#1-一些作为一门语言基本的操作都有" class="headerlink" title="1. 一些作为一门语言基本的操作都有"></a>1. 一些作为一门语言基本的操作都有</h2><p><img src="https://www.haldir66.ga/static/imgs/scenery151110078544.jpg" alt=""></p>
 <h3 id="1-1-比如说module（就是import，export这种，虽然是ES6才补上的）"><a href="#1-1-比如说module（就是import，export这种，虽然是ES6才补上的）" class="headerlink" title="1.1 比如说module（就是import，export这种，虽然是ES6才补上的）"></a>1.1 比如说module（就是import，export这种，虽然是ES6才补上的）</h3><p> <del>js中好像没有像java中那种javaBean的特殊的数据类型的存在。</del>其实也不需要，js并不是一种用class来model real world object的语言。<br>ES6开始可以使用import和export语法，有类似的效果，<a href="https://stackoverflow.com/questions/34741111/exporting-importing-json-object-in-es6">参考</a><br>但node js目前(version 8.x)还不支持es 2015的import export语法，偏偏node对于其他es2015的特性都支持到位了。</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// states.js</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  STATES: &#123;</span><br><span class="line">    <span class="string">'AU'</span> : &#123;...&#125;,</span><br><span class="line">    <span class="string">'US'</span> : &#123;...&#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// accept.js</span></span><br><span class="line"><span class="keyword">import</span> &#123; STATES &#125; <span class="keyword">from</span> <span class="string">'./states'</span>;  <span class="comment">//undefined</span></span><br><span class="line"><span class="keyword">import</span>  STATES  <span class="keyword">from</span> <span class="string">'./states'</span>;  <span class="comment">// concrete object ,this works</span></span><br><span class="line"><span class="keyword">import</span> whatever <span class="keyword">from</span> <span class="string">'states'</span>; <span class="comment">// concrete object, this works</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 另一种情况</span></span><br><span class="line"><span class="keyword">var</span> STATES = &#123;&#125;;</span><br><span class="line">STATES.AU = &#123;...&#125;;</span><br><span class="line">STATES.US = &#123;...&#125;;</span><br><span class="line"><span class="keyword">export</span> STATES;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> &#123; STATES &#125; <span class="keyword">from</span> <span class="string">'states'</span>;<span class="comment">//如果输出方使用export default，接收方不应加上大括号。此时输出方输出的是匿名Object，接收方随便起什么名字都行。</span></span><br><span class="line"><span class="comment">// 如果输出方输出有明确定义的function, object，接收方需要添加大括号。</span></span><br></pre></td></tr></table></figure>
-<p>es6的import和export需要注意<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// A.js</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="function"><span class="keyword">function</span> <span class="title">greet</span>(<span class="params">params</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'hello'</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// B.js</span></span><br><span class="line"><span class="keyword">import</span> firstGreet <span class="keyword">from</span> <span class="string">'.A.js'</span>; <span class="comment">//this works</span></span><br><span class="line"><span class="keyword">import</span> &#123; firstGreet &#125; <span class="keyword">from</span> <span class="string">'.A.js'</span>; <span class="comment">// undefined !</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// A.js</span></span><br><span class="line"><span class="keyword">const</span> sayHi = <span class="function"><span class="keyword">function</span> <span class="title">hi</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">"hi"</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">export</span> &#123; sayHi &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// B.js</span></span><br><span class="line"><span class="keyword">import</span> &#123; firstGreet &#125; <span class="keyword">from</span> <span class="string">'.A.js'</span>; <span class="comment">// this works</span></span><br></pre></td></tr></table></figure></p>
+<pre><code class="js">// states.js
+export default {
+  STATES: {
+    &#39;AU&#39; : {...},
+    &#39;US&#39; : {...}
+  }
+};
+
+// accept.js
+import { STATES } from &#39;./states&#39;;  //undefined
+import  STATES  from &#39;./states&#39;;  // concrete object ,this works
+import whatever from &#39;states&#39;; // concrete object, this works
+
+
+// 另一种情况
+var STATES = {};
+STATES.AU = {...};
+STATES.US = {...};
+export STATES;
+
+import { STATES } from &#39;states&#39;;//如果输出方使用export default，接收方不应加上大括号。此时输出方输出的是匿名Object，接收方随便起什么名字都行。
+// 如果输出方输出有明确定义的function, object，接收方需要添加大括号。
+</code></pre>
+<p>es6的import和export需要注意</p>
+<pre><code class="js">// A.js
+export default function greet(params) {
+    console.log(&#39;hello&#39;);
+}
+
+// B.js
+import firstGreet from &#39;.A.js&#39;; //this works
+import { firstGreet } from &#39;.A.js&#39;; // undefined !
+
+// A.js
+const sayHi = function hi() {
+    console.log(&quot;hi&quot;);
+}
+export { sayHi }
+
+// B.js
+import { firstGreet } from &#39;.A.js&#39;; // this works
+</code></pre>
 <p>原因就在于第一种方式是使用匿名export的。</p>
 <h3 id="1-2-基本的操作符，dynanic-type-函数，变量，oop-class（ES6）-for循环-while这些都有"><a href="#1-2-基本的操作符，dynanic-type-函数，变量，oop-class（ES6）-for循环-while这些都有" class="headerlink" title="1.2 基本的操作符，dynanic type,函数，变量，oop,class（ES6）,for循环,while这些都有"></a>1.2 基本的操作符，dynanic type,函数，变量，oop,class（ES6）,for循环,while这些都有</h3><ul>
-<li><p>js里面判断两个变量相等的方式，建议一律使用三个等号（严格相等）</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="number">3</span>;</span><br><span class="line"><span class="keyword">var</span> b = <span class="string">"3"</span>;</span><br><span class="line">a==b 返回 <span class="literal">true</span></span><br><span class="line">a===b 返回 <span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 因为a,b的类型不一样</span></span><br><span class="line"><span class="comment">// ==只比较了值</span></span><br><span class="line"><span class="comment">// ===只有在值和类型完全相同的时候才为true，用来进行严格的比较判断</span></span><br><span class="line"><span class="comment">// !=（只检查值）和!==（检查值和类型）也差不多的意思。</span></span><br><span class="line">= 赋值运算符</span><br><span class="line">== 等于</span><br><span class="line">=== 严格等于</span><br><span class="line">&amp;&amp;和||也有，!=也有</span><br><span class="line"></span><br><span class="line">- <span class="literal">true</span>和<span class="literal">false</span>也有</span><br><span class="line"><span class="comment">// truthy的概念是js里面特有的</span></span><br><span class="line"><span class="comment">// 在console里面输入：</span></span><br><span class="line">Boolan(<span class="number">5</span>)  &gt; 输出<span class="literal">true</span></span><br><span class="line"><span class="built_in">Boolean</span>(<span class="number">-5</span>) &gt;输出<span class="literal">false</span></span><br><span class="line"><span class="built_in">Boolean</span>(<span class="number">7</span>&gt;<span class="number">5</span>) &gt; 输出<span class="literal">true</span></span><br><span class="line"><span class="built_in">Boolean</span>(<span class="string">'someword'</span>) &gt; <span class="literal">true</span></span><br><span class="line"><span class="built_in">Boolean</span>(<span class="string">''</span>) &gt; <span class="literal">false</span></span><br><span class="line"><span class="comment">// 只有Boolan(0)才是false</span></span><br></pre></td></tr></table></figure>
+<li>js里面判断两个变量相等的方式，建议一律使用三个等号（严格相等）<br>```js<br>var a = 3;<br>var b = “3”;<br>a==b 返回 true<br>a===b 返回 false</li>
+</ul>
+<p>// 因为a,b的类型不一样<br>// ==只比较了值<br>// ===只有在值和类型完全相同的时候才为true，用来进行严格的比较判断<br>// !=（只检查值）和!==（检查值和类型）也差不多的意思。<br>= 赋值运算符<br>== 等于<br>=== 严格等于<br>&amp;&amp;和||也有，!=也有</p>
+<ul>
+<li><p>true和false也有<br>// truthy的概念是js里面特有的<br>// 在console里面输入：<br>Boolan(5)  &gt; 输出true<br>Boolean(-5) &gt;输出false<br>Boolean(7&gt;5) &gt; 输出true<br>Boolean(‘someword’) &gt; true<br>Boolean(‘’) &gt; false<br>// 只有Boolan(0)才是false<br>```</p>
 </li>
-<li><p>string，number,array也有</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// var myString = 'i 'm a "funny" string' #这样是不行的</span></span><br><span class="line"><span class="keyword">var</span> myString = <span class="string">'i \'m a "funny" string'</span>;<span class="comment">//加一个转义就好了</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> a = <span class="string">'abc'</span></span><br><span class="line"><span class="keyword">var</span> b = <span class="string">'bcd'</span></span><br><span class="line">a&lt;b <span class="comment">// true,因为ASCII表里面，a在b前面</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> str = <span class="string">'hello world'</span></span><br><span class="line"><span class="keyword">var</span> str2 = str.slice(<span class="number">2</span>,<span class="number">9</span>);</span><br><span class="line">str2 <span class="comment">// 'llo,wo'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> tags = <span class="string">'meat,ham ,salami,prok,beef,chicken'</span></span><br><span class="line"><span class="keyword">var</span> tagsArray = tags.split(<span class="string">","</span>)</span><br><span class="line"><span class="comment">//生成</span></span><br><span class="line">[<span class="string">"meat"</span>,<span class="string">"ham"</span>,<span class="string">"salami"</span>,<span class="string">"prok"</span>,<span class="string">"beef"</span>,<span class="string">"chicken"</span>]</span><br></pre></td></tr></table></figure>
+<li><p>string，number,array也有<br>```javaScript<br>// var myString = ‘i ‘m a “funny” string’ #这样是不行的<br>var myString = ‘i \’m a “funny” string’;//加一个转义就好了</p>
 </li>
 </ul>
-<p><em>js的Array里面能够装不同类型的数据，跟Python很像</em><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//创建Array的方式很多</span></span><br><span class="line"><span class="keyword">var</span> array = []</span><br><span class="line"><span class="keyword">var</span> array1 = [<span class="string">'stuff'</span>,<span class="string">'jeff'</span>,<span class="number">20</span>]</span><br><span class="line"><span class="keyword">var</span> array2 = <span class="keyword">new</span> <span class="built_in">Array</span>()</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> myArray = []<span class="comment">// 初始化就好了，无需指定容量</span></span><br><span class="line">myArray[<span class="number">0</span>] =<span class="string">'stuff'</span></span><br><span class="line">myArray[<span class="number">1</span>] = <span class="number">70</span></span><br><span class="line">myArray &gt; [<span class="string">'stuff'</span>,<span class="number">70</span>]</span><br><span class="line"></span><br><span class="line">myArray[<span class="number">30</span>] = <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 以下为亲测console中的输出就这样</span></span><br><span class="line">myArray &gt; (<span class="number">31</span>) [<span class="string">"stuff"</span>, <span class="number">70</span>, empty × <span class="number">28</span>, <span class="literal">true</span>]</span><br><span class="line">myArray[<span class="number">12</span>] &gt; <span class="string">'undefined'</span></span><br><span class="line">myArray.length &gt; <span class="number">31</span></span><br><span class="line">myArray.sort() &gt; (<span class="number">31</span>) [<span class="number">70</span>, <span class="string">"stuff"</span>, <span class="literal">true</span>, empty × <span class="number">28</span>]</span><br></pre></td></tr></table></figure></p>
-<p><em>Object，class这种oop的特性也有</em><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> myCaR = <span class="keyword">new</span> Car()</span><br><span class="line">VM315:<span class="number">1</span> Uncaught <span class="built_in">ReferenceError</span>: Car is not defined</span><br><span class="line">    at &lt;anonymous&gt;:<span class="number">1</span>:<span class="number">13</span></span><br><span class="line"><span class="keyword">var</span> myString = <span class="keyword">new</span> <span class="built_in">String</span>()</span><br><span class="line">myString = <span class="string">'hello'</span>    </span><br><span class="line">myString.length &gt; <span class="number">5</span></span><br><span class="line"><span class="keyword">var</span> mystring23 = <span class="keyword">new</span> <span class="built_in">String</span>(<span class="string">'stuff'</span>)<span class="comment">//这也是行的</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 直接在console里写</span></span><br><span class="line"><span class="keyword">var</span> myCar = <span class="keyword">new</span> <span class="built_in">Object</span>()</span><br><span class="line"><span class="literal">undefined</span></span><br><span class="line">myCar.speed = <span class="number">20</span></span><br><span class="line"><span class="number">20</span></span><br><span class="line">myCar.speed</span><br><span class="line"><span class="number">20</span></span><br><span class="line">myCar.name = <span class="string">'benz'</span></span><br><span class="line"><span class="string">"benz"</span></span><br><span class="line">myCar.name</span><br><span class="line"><span class="string">"benz"</span></span><br><span class="line">myCar</span><br><span class="line">&#123;<span class="attr">speed</span>: <span class="number">20</span>, <span class="attr">name</span>: <span class="string">"benz"</span>&#125; <span class="comment">//json即object</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> car2 = &#123;<span class="attr">speed</span>: <span class="number">30</span>, <span class="attr">name</span>: <span class="string">"tesla"</span>&#125;</span><br><span class="line"></span><br><span class="line">car2</span><br><span class="line">&#123;<span class="attr">speed</span>: <span class="number">30</span>, <span class="attr">name</span>: <span class="string">"tesla"</span>&#125;</span><br></pre></td></tr></table></figure></p>
-<p><em>上下文的概念也有，this关键字，但要注意闭包</em><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// console直接输入</span></span><br><span class="line"><span class="keyword">this</span></span><br><span class="line">Window &#123;<span class="attr">frames</span>: Window, <span class="attr">postMessage</span>: ƒ, <span class="attr">blur</span>: ƒ, <span class="attr">focus</span>: ƒ, <span class="attr">close</span>: ƒ, …&#125;<span class="comment">//window是一个有很多变量(function也是变量)的对象，在当前语义下，就是window</span></span><br><span class="line"></span><br><span class="line">car2.test = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="built_in">console</span>.log(<span class="keyword">this</span>)&#125;</span><br><span class="line">car2</span><br><span class="line">&#123;<span class="attr">speed</span>: <span class="number">30</span>, <span class="attr">name</span>: <span class="string">"tesla"</span>, <span class="attr">test</span>: ƒ&#125;</span><br><span class="line"></span><br><span class="line">car2.test</span><br><span class="line">ƒ ()&#123;<span class="built_in">console</span>.log(<span class="keyword">this</span>)&#125;</span><br><span class="line"></span><br><span class="line">car2.test()<span class="comment">//这时候this就是car2这个Object了</span></span><br><span class="line">VM592:<span class="number">1</span> &#123;<span class="attr">speed</span>: <span class="number">30</span>, <span class="attr">name</span>: <span class="string">"tesla"</span>, <span class="attr">test</span>: ƒ&#125;</span><br></pre></td></tr></table></figure></p>
+<p>var a = ‘abc’<br>var b = ‘bcd’<br>a&lt;b // true,因为ASCII表里面，a在b前面</p>
+<p>var str = ‘hello world’<br>var str2 = str.slice(2,9);<br>str2 // ‘llo,wo’</p>
+<p>var tags = ‘meat,ham ,salami,prok,beef,chicken’<br>var tagsArray = tags.split(“,”)<br>//生成<br>[“meat”,”ham”,”salami”,”prok”,”beef”,”chicken”]</p>
+<pre><code>
+*js的Array里面能够装不同类型的数据，跟Python很像*
+```javaScript
+//创建Array的方式很多
+var array = []
+var array1 = [&#39;stuff&#39;,&#39;jeff&#39;,20]
+var array2 = new Array()
+
+var myArray = []// 初始化就好了，无需指定容量
+myArray[0] =&#39;stuff&#39;
+myArray[1] = 70
+myArray &gt; [&#39;stuff&#39;,70]
+
+myArray[30] = true
+
+
+// 以下为亲测console中的输出就这样
+myArray &gt; (31) [&quot;stuff&quot;, 70, empty × 28, true]
+myArray[12] &gt; &#39;undefined&#39;
+myArray.length &gt; 31
+myArray.sort() &gt; (31) [70, &quot;stuff&quot;, true, empty × 28]
+</code></pre><p><em>Object，class这种oop的特性也有</em></p>
+<pre><code class="javaScript">var myCaR = new Car()
+VM315:1 Uncaught ReferenceError: Car is not defined
+    at &lt;anonymous&gt;:1:13
+var myString = new String()
+myString = &#39;hello&#39;    
+myString.length &gt; 5
+var mystring23 = new String(&#39;stuff&#39;)//这也是行的
+
+// 直接在console里写
+var myCar = new Object()
+undefined
+myCar.speed = 20
+20
+myCar.speed
+20
+myCar.name = &#39;benz&#39;
+&quot;benz&quot;
+myCar.name
+&quot;benz&quot;
+myCar
+{speed: 20, name: &quot;benz&quot;} //json即object
+
+var car2 = {speed: 30, name: &quot;tesla&quot;}
+
+car2
+{speed: 30, name: &quot;tesla&quot;}
+</code></pre>
+<p><em>上下文的概念也有，this关键字，但要注意闭包</em></p>
+<pre><code class="javaScript">// console直接输入
+this
+Window {frames: Window, postMessage: ƒ, blur: ƒ, focus: ƒ, close: ƒ, …}//window是一个有很多变量(function也是变量)的对象，在当前语义下，就是window
+
+car2.test = function(){console.log(this)}
+car2
+{speed: 30, name: &quot;tesla&quot;, test: ƒ}
+
+car2.test
+ƒ (){console.log(this)}
+
+car2.test()//这时候this就是car2这个Object了
+VM592:1 {speed: 30, name: &quot;tesla&quot;, test: ƒ}
+</code></pre>
 <p>this应该是当前上下文</p>
-<p> <em>Construction function，函数也是一个object的成员</em><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> Car = <span class="function"><span class="keyword">function</span> (<span class="params">name,speed</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.name = name</span><br><span class="line">  <span class="keyword">this</span>.speed = speed</span><br><span class="line">  <span class="keyword">this</span>.test = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'speed is '</span>+speed)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> car24 = <span class="keyword">new</span> Car(<span class="string">'jim'</span>,<span class="number">40</span>)</span><br><span class="line">car24</span><br><span class="line">Car &#123;<span class="attr">name</span>: <span class="string">"jim"</span>, <span class="attr">speed</span>: <span class="number">40</span>, <span class="attr">test</span>: ƒ&#125;</span><br><span class="line">car24.test()</span><br><span class="line">VM621:<span class="number">5</span> speed is <span class="number">40</span></span><br></pre></td></tr></table></figure></p>
+<p> <em>Construction function，函数也是一个object的成员</em></p>
+<pre><code class="javaScript">var Car = function (name,speed) {
+  this.name = name
+  this.speed = speed
+  this.test = function () {
+    console.log(&#39;speed is &#39;+speed)
+  }
+}
+var car24 = new Car(&#39;jim&#39;,40)
+car24
+Car {name: &quot;jim&quot;, speed: 40, test: ƒ}
+car24.test()
+VM621:5 speed is 40
+</code></pre>
 <ul>
 <li>Object definition(construcor)，class也有</li>
 <li>还有随便用的log</li>
 </ul>
-<h3 id="1-3-一些工具，时间-Math，io操作（文件系统、网络）也有"><a href="#1-3-一些工具，时间-Math，io操作（文件系统、网络）也有" class="headerlink" title="1.3 一些工具，时间,Math，io操作（文件系统、网络）也有"></a>1.3 一些工具，时间,Math，io操作（文件系统、网络）也有</h3><p>Date Object的使用<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> past = <span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2007</span>,<span class="number">11</span>,<span class="number">9</span>)</span><br><span class="line"><span class="literal">undefined</span></span><br><span class="line">past</span><br><span class="line"><span class="comment">// Sun Dec 09 2007 00:00:00 GMT+0800 (中国标准时间)</span></span><br><span class="line">past.getDay</span><br><span class="line">ƒ getDay() &#123; [native code] &#125;</span><br><span class="line">past.getDay()</span><br><span class="line"><span class="number">0</span></span><br><span class="line">past.getFullYear()</span><br><span class="line"><span class="number">2007</span></span><br><span class="line">past.getDate</span><br><span class="line">ƒ getDate() &#123; [native code] &#125;</span><br><span class="line">past.getDate()</span><br><span class="line"><span class="number">9</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="1-3-一些工具，时间-Math，io操作（文件系统、网络）也有"><a href="#1-3-一些工具，时间-Math，io操作（文件系统、网络）也有" class="headerlink" title="1.3 一些工具，时间,Math，io操作（文件系统、网络）也有"></a>1.3 一些工具，时间,Math，io操作（文件系统、网络）也有</h3><p>Date Object的使用</p>
+<pre><code class="javaScript">let past = new Date(2007,11,9)
+undefined
+past
+// Sun Dec 09 2007 00:00:00 GMT+0800 (中国标准时间)
+past.getDay
+ƒ getDay() { [native code] }
+past.getDay()
+0
+past.getFullYear()
+2007
+past.getDate
+ƒ getDate() { [native code] }
+past.getDate()
+9
+</code></pre>
 <p><img src="https://www.haldir66.ga/static/imgs/magnolia_1920x1440.jpg" alt=""></p>
 <p>网络请求，Ajax(Asynchronous javaScript &amp; xml)请求的套路也有(AJAX命名上就是异步的)<br>XMLHttpRequest缩写是(XHR)<br>关于XHR Object</p>
 <ul>
@@ -248,22 +382,152 @@ ga('send', 'pageview');
 <p>有很多的<del>Library</del>能干ajax一样的事情:<br>jQuery,Axios,Superagent,Fetch API,Prototype,Node HTTP</p>
 <p>ajax的onload只会在onreadystatechange==4的时候才会触发<br>MDN文档上说ajax的readyState有五种：<br>0    UNSENT    代理被创建，但尚未调用 open() 方法。<br>1    OPENED    open() 方法已经被调用。<br>2    HEADERS_RECEIVED    send() 方法已经被调用，并且头部和状态已经可获得。<br>3    LOADING    下载中； responseText 属性已经包含部分数据。<br>4    DONE    下载操作已完成。</p>
 <p>xhr.onProgress的readyState是3，这个时候显示加载进入条就可以了。</p>
-<p>表单的操作<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>Normal get form<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">method</span>=<span class="string">"GET"</span> <span class="attr">action</span>=<span class="string">"process.php"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">'name'</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"Submit"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>Ajax get form<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">id</span>=<span class="string">'getForm'</span> &gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">'name'</span> <span class="attr">id</span>=<span class="string">'name1'</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"Submit"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>Normal post form<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">method</span>=<span class="string">"POST"</span> <span class="attr">action</span>=<span class="string">"process.php"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">'name'</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"Submit"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>Ajax post form<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">id</span>=<span class="string">'postForm'</span> <span class="attr">name</span>=<span class="string">'name'</span> <span class="attr">id</span>=<span class="string">'name2'</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">'name'</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"Submit"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">document</span>.getElementById(<span class="string">'getForm'</span>).addEventListener(<span class="string">'submit'</span>,</span><br><span class="line">getName);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getName</span>(<span class="params">e</span>)</span>&#123;</span><br><span class="line">  e.preventDefault();</span><br><span class="line">  <span class="keyword">var</span> name = <span class="built_in">document</span>.getElementById(<span class="string">'name1'</span>).value;<span class="comment">//用户输入的内容</span></span><br><span class="line">  <span class="keyword">var</span> xhr = <span class="keyword">new</span> XMLHttpRequest();</span><br><span class="line">  xhr.open(<span class="string">'GET'</span>,<span class="string">'process.php?name='</span>+name,<span class="literal">true</span>);</span><br><span class="line">  xhr.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="keyword">this</span>.responseText);</span><br><span class="line">  &#125;</span><br><span class="line">  xhr.send();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">document</span>.getElementById(<span class="string">'postForm'</span>).addEventListener(<span class="string">'submit'</span>,</span><br><span class="line">postName);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">postName</span>(<span class="params">e</span>)</span>&#123;</span><br><span class="line">  e.preventDefault();</span><br><span class="line">  <span class="keyword">var</span> name = <span class="built_in">document</span>.getElementById(<span class="string">'name2'</span>).value;<span class="comment">//用户输入的内容</span></span><br><span class="line">  <span class="keyword">var</span> params =<span class="string">"name="</span>+name;</span><br><span class="line">  <span class="keyword">var</span> xhr = <span class="keyword">new</span> XMLHttpRequest();</span><br><span class="line">  xhr.open(<span class="string">'POST'</span>,<span class="string">'process.php'</span>,<span class="literal">true</span>);</span><br><span class="line">  xhr.setRequestHeader(<span class="string">'Content-type'</span>,<span class="string">'application/x-www-form-urlencoded'</span>)</span><br><span class="line">  xhr.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="keyword">this</span>.responseText);</span><br><span class="line">  &#125;</span><br><span class="line">  xhr.send();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>JavaScript random方法得到随机整数<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">document</span>.write(<span class="built_in">Math</span>.ceil(<span class="built_in">Math</span>.random()*<span class="number">3</span>))  <span class="comment">//得到1-3的整数</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">document</span>.write(<span class="built_in">Math</span>.floor(<span class="built_in">Math</span>.random()*<span class="number">4</span>)); <span class="comment">//得到0-3的整数</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">Math</span>.round() <span class="comment">//当小数是0.5或者大于0.5的时候向上一位</span></span><br><span class="line"><span class="built_in">Math</span>.ceil() <span class="comment">//始终向上一位</span></span><br><span class="line"><span class="built_in">Math</span>.floor() <span class="comment">// 始终向下舍入</span></span><br></pre></td></tr></table></figure></p>
-<h2 id="2-操作HTML-DOM的一些方法"><a href="#2-操作HTML-DOM的一些方法" class="headerlink" title="2. 操作HTML-DOM的一些方法"></a>2. 操作HTML-DOM的一些方法</h2><p>通过 id 找到 HTML 元素 window.document.getElementById()<br>通过标签名找到 HTML 元素 window.document.getElementsByTagName()//比如说’h2’这种<br>通过类名找到 HTML 元素 window.document.getElementsByClassName()<br>注意方法名称，带s的返回的是一个数组，不带s返回一个object<br>找form 标签的话，还有一种方法:<br>先手写一段html<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"utf-8"</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">title</span>&gt;</span>有时候手写html不是坏事<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">link</span> <span class="attr">href</span>=<span class="string">"style.css"</span> <span class="attr">type</span>=<span class="string">"text/css"</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span>&gt;</span><span class="tag">&lt;/<span class="name">link</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">form</span> <span class="attr">id</span>=<span class="string">'my-form'</span> <span class="attr">name</span>=<span class="string">'myForm'</span> <span class="attr">action</span>=<span class="string">"#"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">"name"</span>&gt;</span>Name: <span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"name"</span>&gt;</span><span class="tag">&lt;<span class="name">br</span>/&gt;</span></span><br><span class="line">      &lt;label&gt;Hobbies: &lt;/label&lt;br/&gt;</span><br><span class="line">      <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"checkbox"</span> <span class="attr">name</span>=<span class="string">"biking"</span> <span class="attr">value</span>=<span class="string">"biking"</span>&gt;</span>Biking<span class="tag">&lt;/<span class="name">br</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"checkbox"</span> <span class="attr">name</span>=<span class="string">"sking"</span> <span class="attr">value</span>=<span class="string">"sking"</span>&gt;</span>Sking<span class="tag">&lt;/<span class="name">br</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"checkbox"</span> <span class="attr">name</span>=<span class="string">"diving"</span> <span class="attr">value</span>=<span class="string">"diving"</span>&gt;</span>Diving<span class="tag">&lt;/<span class="name">br</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">"colour"</span>&gt;</span>Fav colour: <span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">select</span> <span class="attr">name</span>=<span class="string">"colour"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">option</span>&gt;</span>Red<span class="tag">&lt;/<span class="name">option</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">option</span>&gt;</span>Blue<span class="tag">&lt;/<span class="name">option</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">option</span>&gt;</span>Green<span class="tag">&lt;/<span class="name">option</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">name</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">'Submit'</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"test.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> myForm = <span class="built_in">document</span>.forms.myForm<span class="comment">//myForm是这个Form标签的name属性,form是跟input配合使用的</span></span><br><span class="line">myForm.name  &gt; 那个input标</span><br><span class="line">myForm.name.value  &gt; 那个input标签，其实也就是那个输入框里面的文字</span><br><span class="line">myForm.colour.vaule &gt; 显示当前选中的select值</span><br></pre></td></tr></table></figure>
-<p>还是上面那个表单<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> myForm = <span class="built_in">document</span>.forms.myForm</span><br><span class="line"><span class="keyword">var</span> message = <span class="built_in">document</span>.getElementById(<span class="string">'message'</span>)</span><br><span class="line"></span><br><span class="line">myForm.onsubmit = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;<span class="comment">//就是上面那个submit被点击时触发</span></span><br><span class="line">  <span class="keyword">if</span>(myForm.name.value === <span class="string">''</span>)&#123;</span><br><span class="line">    message.innerHtml = <span class="string">'please enter an not empty name'</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span> <span class="comment">//summit事件被终止</span></span><br><span class="line">  &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">    message.innerHtml = <span class="string">''</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>div.innerHtml（把整个html对象都返回了）和div.textContent(只返回文字)。所以innerHtml可以用来把一个div里面的tag全部替换掉（比如原来是个p，现在换成h1），而textContent只能把某一个tag里面的文字改掉。<br>想要<a href="https://stackoverflow.com/questions/4365246/how-to-change-href-of-a-tag-on-button-click-through-javascript">改href</a>的话，得这样：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> link = <span class="built_in">document</span>.getElementById(<span class="string">"abc"</span>);</span><br><span class="line">link.setAttribute(<span class="string">"href"</span>, <span class="string">"xyz.php"</span>);</span><br></pre></td></tr></table></figure></p>
-<p>setAttribute()可以用于设置一个在当前tag上不存在的attr<br>设置class可以用setAttribute(‘class’,’XXX’)，也可以用div.className = ‘XXX’<br>对于一个a标签<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/subpage"</span>&gt;</span>Some Thing<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>表单的操作</p>
+<pre><code class="html">&lt;h1&gt;Normal get form&lt;/h1&gt;
+&lt;form method=&quot;GET&quot; action=&quot;process.php&quot;&gt;
+  &lt;input type=&quot;text&quot; name=&#39;name&#39;&gt;
+  &lt;input type=&quot;submit&quot; value=&quot;Submit&quot;&gt;
+&lt;/form&gt;
+
+&lt;h1&gt;Ajax get form&lt;/h1&gt;
+&lt;form id=&#39;getForm&#39; &gt;
+  &lt;input type=&quot;text&quot; name=&#39;name&#39; id=&#39;name1&#39;&gt;
+  &lt;input type=&quot;submit&quot; value=&quot;Submit&quot;&gt;
+&lt;/form&gt;
+
+&lt;h1&gt;Normal post form&lt;/h1&gt;
+&lt;form method=&quot;POST&quot; action=&quot;process.php&quot;&gt;
+  &lt;input type=&quot;text&quot; name=&#39;name&#39;&gt;
+  &lt;input type=&quot;submit&quot; value=&quot;Submit&quot;&gt;
+&lt;/form&gt;
+
+&lt;h1&gt;Ajax post form&lt;/h1&gt;
+&lt;form id=&#39;postForm&#39; name=&#39;name&#39; id=&#39;name2&#39;&gt;
+  &lt;input type=&quot;text&quot; name=&#39;name&#39;&gt;
+  &lt;input type=&quot;submit&quot; value=&quot;Submit&quot;&gt;
+&lt;/form&gt;
+</code></pre>
+<pre><code class="js">document.getElementById(&#39;getForm&#39;).addEventListener(&#39;submit&#39;,
+getName);
+
+function getName(e){
+  e.preventDefault();
+  var name = document.getElementById(&#39;name1&#39;).value;//用户输入的内容
+  var xhr = new XMLHttpRequest();
+  xhr.open(&#39;GET&#39;,&#39;process.php?name=&#39;+name,true);
+  xhr.onload = function(){
+    console.log(this.responseText);
+  }
+  xhr.send();
+}
+
+document.getElementById(&#39;postForm&#39;).addEventListener(&#39;submit&#39;,
+postName);
+
+function postName(e){
+  e.preventDefault();
+  var name = document.getElementById(&#39;name2&#39;).value;//用户输入的内容
+  var params =&quot;name=&quot;+name;
+  var xhr = new XMLHttpRequest();
+  xhr.open(&#39;POST&#39;,&#39;process.php&#39;,true);
+  xhr.setRequestHeader(&#39;Content-type&#39;,&#39;application/x-www-form-urlencoded&#39;)
+  xhr.onload = function(){
+    console.log(this.responseText);
+  }
+  xhr.send();
+}
+</code></pre>
+<p>JavaScript random方法得到随机整数</p>
+<pre><code class="js">document.write(Math.ceil(Math.random()*3))  //得到1-3的整数
+
+document.write(Math.floor(Math.random()*4)); //得到0-3的整数
+
+Math.round() //当小数是0.5或者大于0.5的时候向上一位
+Math.ceil() //始终向上一位
+Math.floor() // 始终向下舍入
+</code></pre>
+<h2 id="2-操作HTML-DOM的一些方法"><a href="#2-操作HTML-DOM的一些方法" class="headerlink" title="2. 操作HTML-DOM的一些方法"></a>2. 操作HTML-DOM的一些方法</h2><p>通过 id 找到 HTML 元素 window.document.getElementById()<br>通过标签名找到 HTML 元素 window.document.getElementsByTagName()//比如说’h2’这种<br>通过类名找到 HTML 元素 window.document.getElementsByClassName()<br>注意方法名称，带s的返回的是一个数组，不带s返回一个object<br>找form 标签的话，还有一种方法:<br>先手写一段html</p>
+<pre><code class="html">&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;utf-8&quot;/&gt;
+  &lt;title&gt;有时候手写html不是坏事&lt;/title&gt;
+  &lt;link href=&quot;style.css&quot; type=&quot;text/css&quot; rel=&quot;stylesheet&quot;&gt;&lt;/link&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div&gt;
+    &lt;form id=&#39;my-form&#39; name=&#39;myForm&#39; action=&quot;#&quot;&gt;
+      &lt;label for=&quot;name&quot;&gt;Name: &lt;/label&gt;
+      &lt;input type=&quot;text&quot; name=&quot;name&quot;&gt;&lt;br/&gt;
+      &lt;label&gt;Hobbies: &lt;/label&lt;br/&gt;
+      &lt;input type=&quot;checkbox&quot; name=&quot;biking&quot; value=&quot;biking&quot;&gt;Biking&lt;/br&gt;
+      &lt;input type=&quot;checkbox&quot; name=&quot;sking&quot; value=&quot;sking&quot;&gt;Sking&lt;/br&gt;
+      &lt;input type=&quot;checkbox&quot; name=&quot;diving&quot; value=&quot;diving&quot;&gt;Diving&lt;/br&gt;
+      &lt;label for=&quot;colour&quot;&gt;Fav colour: &lt;/label&gt;
+      &lt;select name=&quot;colour&quot;&gt;
+        &lt;option&gt;Red&lt;/option&gt;
+        &lt;option&gt;Blue&lt;/option&gt;
+        &lt;option&gt;Green&lt;/option&gt;
+      &lt;/select&gt;
+      &lt;input type=&quot;submit&quot; name=&quot;submit&quot; value=&#39;Submit&#39;&gt;
+    &lt;/form&gt;
+  &lt;/div&gt;
+  &lt;script src=&quot;test.js&quot;&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<pre><code class="javaScript">var myForm = document.forms.myForm//myForm是这个Form标签的name属性,form是跟input配合使用的
+myForm.name  &gt; 那个input标
+myForm.name.value  &gt; 那个input标签，其实也就是那个输入框里面的文字
+myForm.colour.vaule &gt; 显示当前选中的select值
+</code></pre>
+<p>还是上面那个表单</p>
+<pre><code class="javaScript">var myForm = document.forms.myForm
+var message = document.getElementById(&#39;message&#39;)
+
+myForm.onsubmit = function () {//就是上面那个submit被点击时触发
+  if(myForm.name.value === &#39;&#39;){
+    message.innerHtml = &#39;please enter an not empty name&#39;
+    return false //summit事件被终止
+  }else {
+    message.innerHtml = &#39;&#39;
+    return true
+  }
+}
+</code></pre>
+<p>div.innerHtml（把整个html对象都返回了）和div.textContent(只返回文字)。所以innerHtml可以用来把一个div里面的tag全部替换掉（比如原来是个p，现在换成h1），而textContent只能把某一个tag里面的文字改掉。<br>想要<a href="https://stackoverflow.com/questions/4365246/how-to-change-href-of-a-tag-on-button-click-through-javascript">改href</a>的话，得这样：</p>
+<pre><code class="javaScript">var link = document.getElementById(&quot;abc&quot;);
+link.setAttribute(&quot;href&quot;, &quot;xyz.php&quot;);
+</code></pre>
+<p>setAttribute()可以用于设置一个在当前tag上不存在的attr<br>设置class可以用setAttribute(‘class’,’XXX’)，也可以用div.className = ‘XXX’<br>对于一个a标签</p>
+<pre><code class="html">&lt;a href=&quot;/subpage&quot;&gt;Some Thing&lt;/a&gt;
+</code></pre>
 <p>这时候调用a.href &gt; 会输出’<a href="http://www.host.com/subpage&#39;，即输出完整的路径">http://www.host.com/subpage&#39;，即输出完整的路径</a><br>但是如果使用a.getAttribute(‘href’) &gt; 输出’/subpage’</p>
-<p>改一个tag的背景元素不能这么改：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a.style.background-color= <span class="string">'blue'</span></span><br><span class="line"><span class="comment">//得这样</span></span><br><span class="line">a.style.backgroundColor= <span class="string">'blue'</span><span class="comment">//其实就是横线换成CammelCase</span></span><br></pre></td></tr></table></figure></p>
+<p>改一个tag的背景元素不能这么改：</p>
+<pre><code class="javaScript">a.style.background-color= &#39;blue&#39;
+//得这样
+a.style.backgroundColor= &#39;blue&#39;//其实就是横线换成CammelCase
+</code></pre>
 <ol>
-<li>在dom中新增一个element的方法<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> li = <span class="built_in">document</span>.createElement(<span class="string">'li'</span>) <span class="comment">//创建一个新的li标签,</span></span><br><span class="line">parentTag.appendChild(li)<span class="comment">//添加到尾部</span></span><br><span class="line">parentTag.insertBefore(li,parentTag.getElementsByTagName(<span class="string">'li'</span>)[<span class="number">0</span>])<span class="comment">//添加到原来的0元素前面</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//删除一个tag的话</span></span><br><span class="line"><span class="keyword">var</span> removed = parentTag.removeChild(li)<span class="comment">//移除方法会返回被移除的元素</span></span><br></pre></td></tr></table></figure>
-</li>
+<li>在dom中新增一个element的方法<br>```javaScript<br>var li = document.createElement(‘li’) //创建一个新的li标签,<br>parentTag.appendChild(li)//添加到尾部<br>parentTag.insertBefore(li,parentTag.getElementsByTagName(‘li’)[0])//添加到原来的0元素前面</li>
 </ol>
-<h2 id="3-从onclick开始到整个交互事件模型"><a href="#3-从onclick开始到整个交互事件模型" class="headerlink" title="3.从onclick开始到整个交互事件模型"></a>3.从onclick开始到整个交互事件模型</h2><h2 id="4-异步的实现"><a href="#4-异步的实现" class="headerlink" title="4. 异步的实现"></a>4. 异步的实现</h2><p>首先js里面也是有callback hell这种概念的，一个接口好了请求另一个接口，好了之后在请求第三个接口，这样一层套一层谁也不喜欢。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> http = <span class="keyword">new</span> XMLHttpRequest();</span><br><span class="line">   http.onreadystatechange=<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">       <span class="keyword">if</span>(http.readyState==<span class="number">4</span>&amp;&amp;http.status==<span class="number">200</span>)&#123;</span><br><span class="line">           <span class="built_in">console</span>.log(<span class="built_in">JSON</span>.parse(http.response))</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;;</span><br><span class="line"></span><br><span class="line">   http.open(<span class="string">"GET"</span>,<span class="string">'data/tweets.json'</span>,<span class="literal">true</span>);</span><br><span class="line">   http.send();</span><br></pre></td></tr></table></figure></p>
-<p>上面这段直接在chrome里面跑的话会出错： Cross origin requests are only supported<br> for protocol schemes: http, data, chrome, chrome-extension, https<br> Chrome 默认不支持跨域请求，启动时要加上个flag就行了</p>
+<p>//删除一个tag的话<br>var removed = parentTag.removeChild(li)//移除方法会返回被移除的元素</p>
+<pre><code>
+## 3.从onclick开始到整个交互事件模型
+
+## 4. 异步的实现
+
+首先js里面也是有callback hell这种概念的，一个接口好了请求另一个接口，好了之后在请求第三个接口，这样一层套一层谁也不喜欢。
+```js
+var http = new XMLHttpRequest();
+   http.onreadystatechange=function(){
+       if(http.readyState==4&amp;&amp;http.status==200){
+           console.log(JSON.parse(http.response))
+       }
+   };
+
+   http.open(&quot;GET&quot;,&#39;data/tweets.json&#39;,true);
+   http.send();
+</code></pre><p>上面这段直接在chrome里面跑的话会出错： Cross origin requests are only supported<br> for protocol schemes: http, data, chrome, chrome-extension, https<br> Chrome 默认不支持跨域请求，启动时要加上个flag就行了</p>
 <blockquote>
 <p>ajax的readyState有四种</p>
 <ol>
@@ -275,68 +539,513 @@ ga('send', 'pageview');
 </ol>
 </blockquote>
 <p>ajax的open第三个参数表示是异步还是同步，一般都得异步。由于js是单线程的，<br>所以会把实际的网络请求工作放到一条js以外的线程中，完成后丢到当前js线程任务池的最后。 当前线程的任务完成后就可以执行这段回调</p>
-<p>ES6提供了Promise，能够将事情简化。<br>xhr用Promise包装一下是这样的：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//promise(ES6) is a placeholder for something that will happen in the future</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getViaPromise</span>(<span class="params">url</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> promise = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve ,reject</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> client = <span class="keyword">new</span> XMLHttpRequest();</span><br><span class="line">        client.open(<span class="string">'GET'</span>,url,<span class="literal">true</span>);</span><br><span class="line">        client.onreadystatechange = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">           <span class="keyword">if</span>(client.readyState === <span class="number">4</span> ) &#123;</span><br><span class="line">               <span class="keyword">if</span>(client.status === <span class="number">200</span> )&#123;</span><br><span class="line">                   resolve(client.responseText);</span><br><span class="line">                  <span class="comment">//  console.log("response of GET Arrived");</span></span><br><span class="line">               &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                   <span class="keyword">var</span> reason = &#123; <span class="attr">code</span> : client.status, <span class="attr">response</span>: client.resonse &#125;;</span><br><span class="line">                   reject(reason);</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">        client.send()</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">return</span> promise;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">postViaPromise</span>(<span class="params">url ,data</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve,reject</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> client = <span class="keyword">new</span> XMLHttpRequest();</span><br><span class="line">        client.open(<span class="string">"POST"</span>, url ,<span class="literal">true</span>);</span><br><span class="line">        client.setRequestHeader(<span class="string">"Content-type"</span>,<span class="string">"application/x-www-form-urlencoded"</span>);</span><br><span class="line">        client.onreadystatechange = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (client.readyState === <span class="number">4</span>) &#123;</span><br><span class="line">                <span class="keyword">if</span>(client.status &gt;=<span class="number">200</span>  &amp;&amp; client.status &lt;=<span class="number">400</span> )&#123;</span><br><span class="line">                    resolve(client.responseText);</span><br><span class="line">                    <span class="comment">// console.log("response of POST Arrived");</span></span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">let</span> reason = &#123; <span class="string">'code'</span>: client.status, <span class="string">"response"</span>: client.response&#125;</span><br><span class="line">                    reject(reason);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        client.send();</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//使用的时候：</span></span><br><span class="line"><span class="comment">//可以把两个promise合并在一起，等到两个都执行完毕再去做一些操作</span></span><br><span class="line"><span class="keyword">let</span> p1 =  getViaPromise(<span class="string">"https://jsonplaceholder.typicode.com/posts"</span>);</span><br><span class="line"><span class="keyword">let</span> data =   &#123;</span><br><span class="line">  <span class="string">"userId"</span>: <span class="number">1</span>,</span><br><span class="line">  <span class="string">"id"</span>: <span class="number">2</span>,</span><br><span class="line">  <span class="string">"title"</span>: <span class="string">"dumb post"</span>,</span><br><span class="line">  <span class="string">"body"</span>: <span class="string">"this is some dumb post , dont care"</span></span><br><span class="line">&#125;     </span><br><span class="line"><span class="keyword">let</span> p2 = postViaPromise(<span class="string">"https://jsonplaceholder.typicode.com/posts"</span>,data);</span><br><span class="line"></span><br><span class="line"><span class="built_in">Promise</span>.all([p1,p2]).then(<span class="function"><span class="params">values</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(values);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">//也可以在一个完成之后再去执行另外一个</span></span><br><span class="line"><span class="keyword">let</span> data =   &#123;</span><br><span class="line">  <span class="string">"userId"</span>: <span class="number">1</span>,</span><br><span class="line">  <span class="string">"id"</span>: <span class="number">2</span>,</span><br><span class="line">  <span class="string">"title"</span>: <span class="string">"dumb post"</span>,</span><br><span class="line">  <span class="string">"body"</span>: <span class="string">"this is some dumb post , dont care"</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">let</span> p1 =  getViaPromise(<span class="string">"https://jsonplaceholder.typicode.com/posts"</span>);</span><br><span class="line"><span class="keyword">let</span> p2 = postViaPromise(<span class="string">"https://jsonplaceholder.typicode.com/posts"</span>,data);</span><br><span class="line">p1.then( <span class="function"><span class="params">data</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">`data of Promise1 is <span class="subst">$&#123;data&#125;</span>`</span> );</span><br><span class="line">  <span class="keyword">return</span> p2;</span><br><span class="line">&#125;</span><br><span class="line">).then(<span class="function"><span class="params">data</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">`data of promise2 is <span class="subst">$&#123;data&#125;</span>`</span>);</span><br><span class="line">&#125;).catch(<span class="function"><span class="params">err</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(err);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
-<p>更加有效的方式是使用generator，还不是很了解<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span>* <span class="title">gen</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">yield</span> <span class="number">10</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> myGen = gen()</span><br><span class="line"><span class="comment">// myGen.done</span></span><br><span class="line"><span class="comment">//myGen.value()</span></span><br></pre></td></tr></table></figure></p>
-<h2 id="5-ES6新增的一些东西"><a href="#5-ES6新增的一些东西" class="headerlink" title="5. ES6新增的一些东西"></a>5. ES6新增的一些东西</h2><p>let(lexical)的用法就在一个循环里给function赋值，很常见。<br>注意的是var的作用域是跨大括号的。所以大括号里面的var是能被大括号外面访问的，let就不行。<br>async await 都是ES2017（比ES2015更高的版本）中出现的。<br>default parameters： 默认参数，和python中很像<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">myLog</span>(<span class="params">name,age,id</span>)</span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">myDefaultFunction</span>(<span class="params">name=<span class="string">'john'</span>,age=<span class="number">27</span>,id =<span class="number">100</span></span>)</span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 调用：</span></span><br><span class="line">myDefalutFunction()<span class="comment">// 不传参也可</span></span><br></pre></td></tr></table></figure></p>
-<p>spread operator<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> num1 = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]</span><br><span class="line"><span class="keyword">var</span> num2 = [num1,<span class="number">5</span>,<span class="number">6</span>]</span><br><span class="line"><span class="built_in">console</span>.log(num2)</span><br><span class="line"><span class="comment">// var num2 = [num1,5,6]</span></span><br><span class="line"><span class="keyword">var</span> num2 = [...num1,<span class="number">5</span>,<span class="number">6</span>] <span class="comment">//三个点</span></span><br><span class="line"><span class="built_in">console</span>.log(num2)</span><br><span class="line"><span class="comment">// (5) [1, 2, 3, 5, 6]</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//另外一个用处</span></span><br><span class="line"><span class="keyword">var</span> num3 = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">acceptAnArray</span>(<span class="params">a,b,c</span>)</span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(a+b+c)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//调用</span></span><br><span class="line">acceptAnArray(...num3) <span class="comment">// 输出6</span></span><br></pre></td></tr></table></figure></p>
-<p>template String(这个不是引号，是在tab键上面那个)<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> myString = <span class="string">`This is an template String ,</span></span><br><span class="line"><span class="string">          note we have some line break here,that will be honored. Also there are some whiteSpace afront , which will be honored too`</span></span><br><span class="line"><span class="built_in">console</span>.log(myString)          </span><br><span class="line"><span class="keyword">var</span> nextString = <span class="string">`This is `</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">logLiteralString</span>(<span class="params">name,age</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">`the name is <span class="subst">$&#123;name&#125;</span> and the age is <span class="subst">$&#123;<span class="number">10</span>+<span class="number">12</span>&#125;</span>`</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// the name is hhaha and the age is 22 。 String literals.</span></span><br></pre></td></tr></table></figure></p>
-<p>String新增了一些方法<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> str = <span class="string">'hahhaha'</span></span><br><span class="line"><span class="built_in">console</span>.log(str.repeat(<span class="number">3</span>));</span><br><span class="line"><span class="comment">// hahhahahahhahahahhaha</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> str2 = <span class="string">'goodbye'</span></span><br><span class="line"><span class="built_in">console</span>.log(str2.startWith(<span class="string">'good'</span>)); <span class="comment">// true</span></span><br><span class="line"><span class="built_in">console</span>.log(str2.startWith(<span class="string">'bye'</span>,<span class="number">4</span>)); <span class="comment">// true</span></span><br><span class="line"><span class="built_in">console</span>.log(str2.endsWith(<span class="string">'good'</span>)); <span class="comment">//false</span></span><br><span class="line"><span class="built_in">console</span>.log(str2.endsWith(<span class="string">'good'</span>,str2.length<span class="number">-3</span>)); <span class="comment">//true</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> str3 = <span class="string">'Good Day'</span></span><br><span class="line"><span class="built_in">console</span>.log(str3.includes(<span class="string">'Day'</span>)); <span class="comment">//true</span></span><br></pre></td></tr></table></figure></p>
-<p>Object Literal notation<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// es5得这么写</span></span><br><span class="line"><span class="keyword">var</span> name = <span class="string">'Josh'</span></span><br><span class="line"><span class="keyword">var</span> age = <span class="number">27</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> person = &#123;</span><br><span class="line">  name: name,</span><br><span class="line">  age: age,</span><br><span class="line">  greet: <span class="function"><span class="keyword">function</span> (<span class="params">X</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">`you say <span class="subst">$&#123;X&#125;</span> in your greets`</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// es6这样就行了</span></span><br><span class="line"><span class="keyword">var</span> person = &#123;</span><br><span class="line">  name,age,</span><br><span class="line">  greet(X)&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">`you say <span class="subst">$&#123;X&#125;</span> in your greets`</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>ES6提供了Promise，能够将事情简化。<br>xhr用Promise包装一下是这样的：</p>
+<pre><code class="js">//promise(ES6) is a placeholder for something that will happen in the future
+function getViaPromise(url) {
+    var promise = new Promise((resolve ,reject) =&gt; {
+        let client = new XMLHttpRequest();
+        client.open(&#39;GET&#39;,url,true);
+        client.onreadystatechange = () =&gt; {
+           if(client.readyState === 4 ) {
+               if(client.status === 200 ){
+                   resolve(client.responseText);
+                  //  console.log(&quot;response of GET Arrived&quot;);
+               } else {
+                   var reason = { code : client.status, response: client.resonse };
+                   reject(reason);
+               }
+           }
+        };
+        client.send()
+    });
+    return promise;
+}
+
+
+function postViaPromise(url ,data) {
+    return new Promise((resolve,reject) =&gt; {
+        let client = new XMLHttpRequest();
+        client.open(&quot;POST&quot;, url ,true);
+        client.setRequestHeader(&quot;Content-type&quot;,&quot;application/x-www-form-urlencoded&quot;);
+        client.onreadystatechange = () =&gt; {
+            if (client.readyState === 4) {
+                if(client.status &gt;=200  &amp;&amp; client.status &lt;=400 ){
+                    resolve(client.responseText);
+                    // console.log(&quot;response of POST Arrived&quot;);
+                } else {
+                    let reason = { &#39;code&#39;: client.status, &quot;response&quot;: client.response}
+                    reject(reason);
+                }
+            }
+        }
+        client.send();
+    });
+}
+
+//使用的时候：
+//可以把两个promise合并在一起，等到两个都执行完毕再去做一些操作
+let p1 =  getViaPromise(&quot;https://jsonplaceholder.typicode.com/posts&quot;);
+let data =   {
+  &quot;userId&quot;: 1,
+  &quot;id&quot;: 2,
+  &quot;title&quot;: &quot;dumb post&quot;,
+  &quot;body&quot;: &quot;this is some dumb post , dont care&quot;
+}     
+let p2 = postViaPromise(&quot;https://jsonplaceholder.typicode.com/posts&quot;,data);
+
+Promise.all([p1,p2]).then(values =&gt; {
+  console.log(values);
+});
+
+//也可以在一个完成之后再去执行另外一个
+let data =   {
+  &quot;userId&quot;: 1,
+  &quot;id&quot;: 2,
+  &quot;title&quot;: &quot;dumb post&quot;,
+  &quot;body&quot;: &quot;this is some dumb post , dont care&quot;
+};
+let p1 =  getViaPromise(&quot;https://jsonplaceholder.typicode.com/posts&quot;);
+let p2 = postViaPromise(&quot;https://jsonplaceholder.typicode.com/posts&quot;,data);
+p1.then( data =&gt; {
+  console.log(`data of Promise1 is ${data}` );
+  return p2;
+}
+).then(data =&gt; {
+  console.log(`data of promise2 is ${data}`);
+}).catch(err =&gt; {
+  console.log(err);
+});
+</code></pre>
+<p>更加有效的方式是使用generator，还不是很了解</p>
+<pre><code class="js">function* gen() {
+  yield 10;
+}
+
+var myGen = gen()
+// myGen.done
+//myGen.value()
+</code></pre>
+<h2 id="5-ES6新增的一些东西"><a href="#5-ES6新增的一些东西" class="headerlink" title="5. ES6新增的一些东西"></a>5. ES6新增的一些东西</h2><p>let(lexical)的用法就在一个循环里给function赋值，很常见。<br>注意的是var的作用域是跨大括号的。所以大括号里面的var是能被大括号外面访问的，let就不行。<br>async await 都是ES2017（比ES2015更高的版本）中出现的。<br>default parameters： 默认参数，和python中很像</p>
+<pre><code class="js">function myLog(name,age,id){
+
+}
+
+function myDefaultFunction(name=&#39;john&#39;,age=27,id =100){
+
+}
+
+// 调用：
+myDefalutFunction()// 不传参也可
+</code></pre>
+<p>spread operator</p>
+<pre><code class="js">var num1 = [1,2,3]
+var num2 = [num1,5,6]
+console.log(num2)
+// var num2 = [num1,5,6]
+var num2 = [...num1,5,6] //三个点
+console.log(num2)
+// (5) [1, 2, 3, 5, 6]
+
+//另外一个用处
+var num3 = [1,2,3]
+function acceptAnArray(a,b,c){
+  console.log(a+b+c)
+}
+
+//调用
+acceptAnArray(...num3) // 输出6
+</code></pre>
+<p>template String(这个不是引号，是在tab键上面那个)</p>
+<pre><code class="js">var myString = `This is an template String ,
+          note we have some line break here,that will be honored. Also there are some whiteSpace afront , which will be honored too`
+console.log(myString)          
+var nextString = `This is `
+
+function logLiteralString(name,age) {
+  console.log(`the name is ${name} and the age is ${10+12}`);
+}
+// the name is hhaha and the age is 22 。 String literals.
+</code></pre>
+<p>String新增了一些方法</p>
+<pre><code class="js">var str = &#39;hahhaha&#39;
+console.log(str.repeat(3));
+// hahhahahahhahahahhaha
+
+var str2 = &#39;goodbye&#39;
+console.log(str2.startWith(&#39;good&#39;)); // true
+console.log(str2.startWith(&#39;bye&#39;,4)); // true
+console.log(str2.endsWith(&#39;good&#39;)); //false
+console.log(str2.endsWith(&#39;good&#39;,str2.length-3)); //true
+
+var str3 = &#39;Good Day&#39;
+console.log(str3.includes(&#39;Day&#39;)); //true
+</code></pre>
+<p>Object Literal notation</p>
+<pre><code class="js">// es5得这么写
+var name = &#39;Josh&#39;
+var age = 27
+
+var person = {
+  name: name,
+  age: age,
+  greet: function (X) {
+    console.log(`you say ${X} in your greets`);
+  }
+}
+
+// es6这样就行了
+var person = {
+  name,age,
+  greet(X){
+    console.log(`you say ${X} in your greets`);
+  }
+}
+</code></pre>
 <p>简明很多</p>
-<p>Arrow Function（箭头函数）<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">window</span>.onload = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> stuff = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'say Stuff'</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">var</span> stuff2 = <span class="function"><span class="params">()</span> =&gt;</span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'this is more precise'</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">var</span> stuff3 = <span class="function"><span class="params">()</span> =&gt;</span>   <span class="built_in">console</span>.log(<span class="string">'只有一行的话可以不要大括号'</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> stuff4 = <span class="function">(<span class="params">name</span>) =&gt;</span> <span class="built_in">console</span>.log(<span class="string">`the name is <span class="subst">$&#123;name&#125;</span> and hi`</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> stuff5 = <span class="function"><span class="params">name</span> =&gt;</span> <span class="built_in">console</span>.log(<span class="string">`只有一个参数 <span class="subst">$&#123;name&#125;</span>的话，参数的小括号也不要了`</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>还有一个好处就是: the arrow function will bind the this keyword lexically.<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">window</span>.onload = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> jam = &#123;</span><br><span class="line">    name : <span class="string">'Jane'</span>,</span><br><span class="line">    greeting: <span class="function"><span class="keyword">function</span> (<span class="params">X</span>) </span>&#123;</span><br><span class="line">      <span class="built_in">window</span>.setInterval(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">          <span class="keyword">if</span> (X&gt;<span class="number">0</span>) &#123;</span><br><span class="line">            <span class="built_in">console</span>.log(<span class="keyword">this</span>.name+<span class="string">' greet you'</span>);</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;,<span class="number">500</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  jam.greeting(<span class="number">3</span>)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 输出 greet you</span></span><br></pre></td></tr></table></figure></p>
-<p>原因是this已经不是jam这个object了，也就是闭包问题.es6之前用下面这种方式规避一下<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">window</span>.onload = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> jam = &#123;</span><br><span class="line">    name : <span class="string">'Jane'</span>,</span><br><span class="line">    greeting(X) &#123;</span><br><span class="line">      <span class="keyword">var</span> _this =<span class="keyword">this</span>;</span><br><span class="line">      <span class="built_in">window</span>.setInterval(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">          <span class="keyword">if</span> (X&gt;<span class="number">0</span>) &#123;</span><br><span class="line">            <span class="built_in">console</span>.log(_this.name+<span class="string">' greet you'</span>);</span><br><span class="line">            X--;</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;,<span class="number">500</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  jam.greeting(<span class="number">3</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">window</span>.onload = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> jam = &#123;</span><br><span class="line">    name : <span class="string">'Jane'</span>,</span><br><span class="line">    greeting(X) &#123;</span><br><span class="line">      <span class="built_in">window</span>.setInterval(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">          <span class="keyword">if</span> (X&gt;<span class="number">0</span>) &#123;</span><br><span class="line">            <span class="built_in">console</span>.log(<span class="keyword">this</span>.name+<span class="string">' greet you'</span>);</span><br><span class="line">            X--;</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;,<span class="number">500</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  jam.greeting(<span class="number">3</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>class definition<br>es6 新增了class的概念，还有extends的概念<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Band</span> </span>&#123;</span><br><span class="line">  <span class="keyword">constructor</span>(name ,location) &#123;</span><br><span class="line">    <span class="keyword">this</span>.name = name;</span><br><span class="line">    <span class="keyword">this</span>.location = location;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">greet</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="keyword">this</span>.name);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SubBand</span> <span class="keyword">extends</span> <span class="title">Band</span> </span>&#123;</span><br><span class="line">  construcor(name ,location,popularity) &#123;</span><br><span class="line">    <span class="keyword">super</span>(name ,location); <span class="comment">// this is essential , 如果后面想要使用parent 的属性的话，需要加上super()</span></span><br><span class="line">    <span class="keyword">this</span>.popularity = popularity;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 调用</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> garage = <span class="keyword">new</span> Band(<span class="string">'john'</span>, <span class="string">'Doe'</span>);</span><br><span class="line">garage.greet();</span><br></pre></td></tr></table></figure></p>
-<p>Sets是新增的用于存储unique数据的集合(元素不能重复)<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> names = <span class="keyword">new</span> <span class="built_in">Set</span>();</span><br><span class="line">names.add(<span class="string">"josh"</span>).add(<span class="string">'bob'</span>).add(<span class="string">'neo'</span>)</span><br><span class="line"><span class="built_in">console</span>.log(names);</span><br><span class="line"><span class="built_in">console</span>.log(names.size);</span><br><span class="line">names.delete(<span class="string">'bob'</span>) <span class="comment">// 返回true表示删除成功，false表示删除失败</span></span><br><span class="line">names.clear()</span><br><span class="line">names.has(<span class="string">'bob'</span>) <span class="comment">//就是contains的意思</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> duplicatedArray = [<span class="number">1</span>,<span class="number">2</span>,<span class="string">'jane'</span>,<span class="string">'harry'</span>,<span class="number">2</span>];</span><br><span class="line"><span class="keyword">var</span> undepulicatedSet = <span class="keyword">new</span> <span class="built_in">Set</span>(duplicatedArray);</span><br><span class="line"><span class="built_in">console</span>.log(undepulicatedSet);</span><br><span class="line">duplicatedArray = [...undepulicatedSet] <span class="comment">//使用spread operater将set变成各个单一的元素</span></span><br><span class="line"><span class="built_in">console</span>.log(duplicatedArray);</span><br></pre></td></tr></table></figure></p>
+<p>Arrow Function（箭头函数）</p>
+<pre><code class="js">window.onload = function () {
+  var stuff = function () {
+    console.log(&#39;say Stuff&#39;);
+  }
+  var stuff2 = () =&gt;{
+    console.log(&#39;this is more precise&#39;);
+  }
+  var stuff3 = () =&gt;   console.log(&#39;只有一行的话可以不要大括号&#39;);
+
+  var stuff4 = (name) =&gt; console.log(`the name is ${name} and hi`);
+
+  var stuff5 = name =&gt; console.log(`只有一个参数 ${name}的话，参数的小括号也不要了`);
+}
+</code></pre>
+<p>还有一个好处就是: the arrow function will bind the this keyword lexically.</p>
+<pre><code class="js">window.onload = function () {
+  var jam = {
+    name : &#39;Jane&#39;,
+    greeting: function (X) {
+      window.setInterval(function () {
+          if (X&gt;0) {
+            console.log(this.name+&#39; greet you&#39;);
+          }
+      },500)
+    }
+  }
+  jam.greeting(3)
+}
+// 输出 greet you
+</code></pre>
+<p>原因是this已经不是jam这个object了，也就是闭包问题.es6之前用下面这种方式规避一下</p>
+<pre><code class="js">window.onload = function () {
+  var jam = {
+    name : &#39;Jane&#39;,
+    greeting(X) {
+      var _this =this;
+      window.setInterval(function () {
+          if (X&gt;0) {
+            console.log(_this.name+&#39; greet you&#39;);
+            X--;
+          }
+      },500)
+    }
+  }
+  jam.greeting(3)
+}
+
+window.onload = function () {
+  var jam = {
+    name : &#39;Jane&#39;,
+    greeting(X) {
+      window.setInterval(() =&gt; {
+          if (X&gt;0) {
+            console.log(this.name+&#39; greet you&#39;);
+            X--;
+          }
+      },500)
+    }
+  }
+  jam.greeting(3)
+}
+</code></pre>
+<p>class definition<br>es6 新增了class的概念，还有extends的概念</p>
+<pre><code class="js">class Band {
+  constructor(name ,location) {
+    this.name = name;
+    this.location = location;
+  }
+
+  function greet() {
+    console.log(this.name);
+  }
+}
+
+
+class SubBand extends Band {
+  construcor(name ,location,popularity) {
+    super(name ,location); // this is essential , 如果后面想要使用parent 的属性的话，需要加上super()
+    this.popularity = popularity;
+  }
+}
+
+
+// 调用
+
+let garage = new Band(&#39;john&#39;, &#39;Doe&#39;);
+garage.greet();
+</code></pre>
+<p>Sets是新增的用于存储unique数据的集合(元素不能重复)</p>
+<pre><code class="js">var names = new Set();
+names.add(&quot;josh&quot;).add(&#39;bob&#39;).add(&#39;neo&#39;)
+console.log(names);
+console.log(names.size);
+names.delete(&#39;bob&#39;) // 返回true表示删除成功，false表示删除失败
+names.clear()
+names.has(&#39;bob&#39;) //就是contains的意思
+
+var duplicatedArray = [1,2,&#39;jane&#39;,&#39;harry&#39;,2];
+var undepulicatedSet = new Set(duplicatedArray);
+console.log(undepulicatedSet);
+duplicatedArray = [...undepulicatedSet] //使用spread operater将set变成各个单一的元素
+console.log(duplicatedArray);
+</code></pre>
 <p>add的时候如果存在重复元素直接无视新增的重复元素</p>
 <h2 id="6-我也不知道归到哪一类的问题"><a href="#6-我也不知道归到哪一类的问题" class="headerlink" title="6. 我也不知道归到哪一类的问题"></a>6. 我也不知道归到哪一类的问题</h2><ul>
 <li><p>js语法上虽说不用加分号，但实际应用中为避免压缩js文件时出现歧义，还是得老老实实加上分号</p>
 </li>
 <li><p>js 是大小写敏感的</p>
 </li>
-<li><p>IIFE(Immediately Invoked Function Expression) Library use this to avoid polluting global environment<br>声明了之后立刻调用该函数执行<br>iife的例子:</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;<span class="built_in">console</span>.log(<span class="string">'this is invoked!'</span>)&#125;)();</span><br><span class="line"></span><br><span class="line"><span class="comment">// iife的好处是只对外提供必要功能，内部成员不用暴露给外部(这在模块化里面就很重要了，作为一个module，一些内部的private method不希望对外公开，就可以用iife写，同时这也避免了polluting global nameSpace)。 Javascript模块的基本写法</span></span><br><span class="line"><span class="keyword">var</span> module1 = (<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line"></span><br><span class="line">　　　　<span class="keyword">var</span> _count = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">　　　　<span class="keyword">var</span> m1 = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">　　　　　　<span class="comment">//...</span></span><br><span class="line">　　　　&#125;;</span><br><span class="line"></span><br><span class="line">　　　　<span class="keyword">var</span> m2 = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">　　　　　　<span class="comment">//...</span></span><br><span class="line">　　　　&#125;;</span><br><span class="line"></span><br><span class="line">　　　　<span class="keyword">return</span> &#123;</span><br><span class="line">　　　　　　m1 : m1,</span><br><span class="line">　　　　　　m2 : m2</span><br><span class="line">　　　　&#125;;</span><br><span class="line"></span><br><span class="line">　　&#125;)();</span><br><span class="line"><span class="built_in">console</span>.info(module1._count); <span class="comment">//undefined</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 放大模式"（augmentation），一个模块继承另一个模块</span></span><br><span class="line"><span class="keyword">var</span> module1 = (<span class="function"><span class="keyword">function</span> (<span class="params">mod</span>)</span>&#123;</span><br><span class="line"></span><br><span class="line">　　　　mod.m3 = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">　　　　　　<span class="comment">//...</span></span><br><span class="line">　　　　&#125;;</span><br><span class="line"></span><br><span class="line">　　　　<span class="keyword">return</span> mod;</span><br><span class="line"></span><br><span class="line">　　&#125;)(module1);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 宽放大模式（Loose augmentation）</span></span><br><span class="line"><span class="keyword">var</span> module1 = ( <span class="function"><span class="keyword">function</span> (<span class="params">mod</span>)</span>&#123;</span><br><span class="line"></span><br><span class="line">　　　　<span class="comment">//...</span></span><br><span class="line"></span><br><span class="line">　　　　<span class="keyword">return</span> mod;</span><br><span class="line"></span><br><span class="line">　　&#125;)(<span class="built_in">window</span>.module1 || &#123;&#125;);</span><br></pre></td></tr></table></figure>
+<li><p>IIFE(Immediately Invoked Function Expression) Library use this to avoid polluting global environment<br>声明了之后立刻调用该函数执行<br>iife的例子:<br>```js<br>(function () {console.log(‘this is invoked!’)})();</p>
 </li>
 </ul>
-<p><a href="http://www.ruanyifeng.com/blog/2012/10/javascript_module.html">Javascript模块化编程（一）：模块的写法</a><br><a href="http://web.jobbole.com/82520/">iife的一篇翻译的文章</a></p>
-<p>Paul Irish的视频中提到了jQuery的Source中用到了这种做法。</p>
-<ul>
-<li>如果引用一个未声明的变量，js会直接创建一个（除非使用use strict）</li>
-</ul>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">'use strict'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;&#125;);</span><br></pre></td></tr></table></figure>
-<p>use strict是什么意思？</p>
-<p>在正常模式中，如果一个变量没有声明就赋值，默认是全局变量。严格模式禁止这种用法，全局变量必须显式声明。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"use strict"</span>;</span><br><span class="line"></span><br><span class="line">　　v = <span class="number">1</span>; // 报错，v未声明</span><br><span class="line"></span><br><span class="line">　　<span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; <span class="number">2</span>; i++) &#123; // 报错，i未声明</span><br><span class="line">　　&#125;</span><br></pre></td></tr></table></figure></p>
-<p>意思大概就是<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">"use strict"</span>;</span><br><span class="line">x = <span class="number">3.14</span>;                <span class="comment">// 报错 (x 未定义)但正常不会报错的</span></span><br></pre></td></tr></table></figure></p>
+<p>// iife的好处是只对外提供必要功能，内部成员不用暴露给外部(这在模块化里面就很重要了，作为一个module，一些内部的private method不希望对外公开，就可以用iife写，同时这也避免了polluting global nameSpace)。 Javascript模块的基本写法<br>var module1 = (function(){</p>
+<p>　　　　var _count = 0;</p>
+<p>　　　　var m1 = function(){<br>　　　　　　//…<br>　　　　};</p>
+<p>　　　　var m2 = function(){<br>　　　　　　//…<br>　　　　};</p>
+<p>　　　　return {<br>　　　　　　m1 : m1,<br>　　　　　　m2 : m2<br>　　　　};</p>
+<p>　　})();<br>console.info(module1._count); //undefined</p>
+<p>// 放大模式”（augmentation），一个模块继承另一个模块<br>var module1 = (function (mod){</p>
+<p>　　　　mod.m3 = function () {<br>　　　　　　//…<br>　　　　};</p>
+<p>　　　　return mod;</p>
+<p>　　})(module1);</p>
+<p>// 宽放大模式（Loose augmentation）<br>var module1 = ( function (mod){</p>
+<p>　　　　//…</p>
+<p>　　　　return mod;</p>
+<p>　　})(window.module1 || {});</p>
+<pre><code>[Javascript模块化编程（一）：模块的写法](http://www.ruanyifeng.com/blog/2012/10/javascript_module.html)
+[iife的一篇翻译的文章](http://web.jobbole.com/82520/)
+
+Paul Irish的视频中提到了jQuery的Source中用到了这种做法。
+
+- 如果引用一个未声明的变量，js会直接创建一个（除非使用use strict）
+
+
+```js
+&#39;use strict&#39;;
+
+new Promise(function () {});
+</code></pre><p>use strict是什么意思？</p>
+<p>在正常模式中，如果一个变量没有声明就赋值，默认是全局变量。严格模式禁止这种用法，全局变量必须显式声明。</p>
+<pre><code class="python">&quot;use strict&quot;;
+
+　　v = 1; // 报错，v未声明
+
+　　for(i = 0; i &lt; 2; i++) { // 报错，i未声明
+　　}
+</code></pre>
+<p>意思大概就是</p>
+<pre><code class="js">&quot;use strict&quot;;
+x = 3.14;                // 报错 (x 未定义)但正常不会报错的
+</code></pre>
 <p>不允许删除变量或对象。不允许删除函数。不允许变量重名:。。。。总之感觉跟lint有点像</p>
 <ul>
-<li>undefined和null的关系<br>null: absence of value for a variable; undefined: absence of variable itself;<br><a href="https://stackoverflow.com/questions/5076944/what-is-the-difference-between-null-and-undefined-in-javascript">what-is-the-difference-between-null-and-undefined-in-javascript</a> undefined的意思是事先声明了一个var但没有给赋值，null是一个object，表示no value。<br>typeof(Undefined) = ‘undefined’, typeof(‘Null’) = ‘object’<br><a href="https://stackoverflow.com/questions/461966/why-is-there-a-null-value-in-javascript">why-is-there-a-null-value-in-javascript</a><br><a href="https://stackoverflow.com/questions/5076944/what-is-the-difference-between-null-and-undefined-in-javascript">null is a special keyword that indicates an absence of value.</a><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> foo;</span><br><span class="line">defined empty variable is <span class="literal">null</span> <span class="keyword">of</span> datatype <span class="literal">undefined</span> <span class="comment">//这种声明了但是没给赋值的变量的值是null,数据类型是undefined</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> a = <span class="string">''</span>;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> a); <span class="comment">// string</span></span><br><span class="line"><span class="built_in">console</span>.log(a == <span class="literal">null</span>); <span class="comment">//false</span></span><br><span class="line"><span class="built_in">console</span>.log(a == <span class="literal">undefined</span>); <span class="comment">// false</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 两个等号表示只检查value</span></span><br><span class="line"><span class="keyword">var</span> a;</span><br><span class="line"><span class="built_in">console</span>.log(a == <span class="literal">null</span>); <span class="comment">//true</span></span><br><span class="line"><span class="built_in">console</span>.log(a == <span class="literal">undefined</span>); <span class="comment">//true</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 三个等号表示既检查value也检查type</span></span><br><span class="line"><span class="keyword">var</span> a;</span><br><span class="line"><span class="built_in">console</span>.log(a === <span class="literal">null</span>); <span class="comment">//false</span></span><br><span class="line"><span class="built_in">console</span>.log(a === <span class="literal">undefined</span>); <span class="comment">// true</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> a = <span class="string">'javascript'</span>;</span><br><span class="line">a = <span class="literal">null</span> ; <span class="comment">// will change the type of variable "a" from string to object</span></span><br></pre></td></tr></table></figure>
-</li>
+<li>undefined和null的关系<br>null: absence of value for a variable; undefined: absence of variable itself;<br><a href="https://stackoverflow.com/questions/5076944/what-is-the-difference-between-null-and-undefined-in-javascript">what-is-the-difference-between-null-and-undefined-in-javascript</a> undefined的意思是事先声明了一个var但没有给赋值，null是一个object，表示no value。<br>typeof(Undefined) = ‘undefined’, typeof(‘Null’) = ‘object’<br><a href="https://stackoverflow.com/questions/461966/why-is-there-a-null-value-in-javascript">why-is-there-a-null-value-in-javascript</a><br><a href="https://stackoverflow.com/questions/5076944/what-is-the-difference-between-null-and-undefined-in-javascript">null is a special keyword that indicates an absence of value.</a><br>```js<br>var foo;<br>defined empty variable is null of datatype undefined //这种声明了但是没给赋值的变量的值是null,数据类型是undefined</li>
 </ul>
-<p>js的数据类型包括：<br>Number,String,Boolean,Object,Function,Undefined和Null</p>
-<p>js中是存在一些全局属性和全局函数的<br>比如Infinity(代表正的无穷大),NaN(指某个值是不是数字)<br>全局的函数比如decodeURI(),escape(),eval(),parseInt(),parseFloat()，这些方法不属于任何对象</p>
-<p>这两个函数都接受String作为参数<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">parseInt</span>(<span class="string">"10"</span>);  <span class="comment">//返回 10，官方文档说返回的是integer(也就是Number了)</span></span><br><span class="line"><span class="built_in">parseFloat</span>(<span class="string">"10.33"</span>) <span class="comment">// 返回10.33</span></span><br></pre></td></tr></table></figure></p>
-<p>===================================================</p>
+<p>var a = ‘’;<br>console.log(typeof a); // string<br>console.log(a == null); //false<br>console.log(a == undefined); // false</p>
+<p>// 两个等号表示只检查value<br>var a;<br>console.log(a == null); //true<br>console.log(a == undefined); //true</p>
+<p>// 三个等号表示既检查value也检查type<br>var a;<br>console.log(a === null); //false<br>console.log(a === undefined); // true</p>
+<p>var a = ‘javascript’;<br>a = null ; // will change the type of variable “a” from string to object</p>
+<pre><code>js的数据类型包括：
+Number,String,Boolean,Object,Function,Undefined和Null
+
+js中是存在一些全局属性和全局函数的
+比如Infinity(代表正的无穷大),NaN(指某个值是不是数字)
+全局的函数比如decodeURI(),escape(),eval(),parseInt(),parseFloat()，这些方法不属于任何对象
+
+这两个函数都接受String作为参数
+```js
+parseInt(&quot;10&quot;);  //返回 10，官方文档说返回的是integer(也就是Number了)
+parseFloat(&quot;10.33&quot;) // 返回10.33
+</code></pre><p>===================================================</p>
 <ol>
-<li>交互事件的捕获，拦截，消费（冒泡）<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//添加点击事件点击事件：</span></span><br><span class="line"><span class="keyword">var</span> button = <span class="built_in">document</span>.getElementById(<span class="string">'btn'</span>)</span><br><span class="line">button.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'you click this button'</span>);</span><br><span class="line">&#125;</span><br><span class="line">button.onfocus = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="comment">// body...</span></span><br><span class="line">&#125;</span><br><span class="line">button.onblur = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">cancelEvent</span>(<span class="params">e</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(e) &#123;</span><br><span class="line">        e.stopPropagation();  <span class="comment">//非IE</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">window</span>.event.cancelBubble = <span class="literal">true</span>;  <span class="comment">//IE</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<li>交互事件的捕获，拦截，消费（冒泡）<br>```javaScript<br>//添加点击事件点击事件：<br>var button = document.getElementById(‘btn’)<br>button.onclick = function () {<br>console.log(‘you click this button’);<br>}<br>button.onfocus = function() {<br>// body…<br>}<br>button.onblur = function () {<br>//<br>}</li>
+</ol>
+<p>function cancelEvent(e) {<br>    if(e) {<br>        e.stopPropagation();  //非IE<br>    } else {<br>        window.event.cancelBubble = true;  //IE<br>    }<br>}</p>
+<pre><code>在一个元素上触发事件，如果此元素定义了处理程序，那么此次事件就会被捕获，根据程序进行该事件的处理。否则这个事件会根据DOM树向父节点逐级传播，如果从始至终都没有被处理，那么最终会到达document或window根元素。所以事件是往上传递的，即冒泡。
+
+//事件注册的时机
+对于简单的script，需要在body的最后一行，因为浏览器是从上到下解析的，轮到script解析的时候，需要操作dom，这就要求dom元素已经建立好。有时候，就算你把script写在body最后一行，轮到解析script的时候，前面的html还在加载（比如说非常大的html什么的，总之是有可能的）。所以一般用window.onLoad来注册事件。
+
+复杂点的script放在外面，用src引用。 也要用window.onLoad来注册事件。所以，一般的js长这样（假如的你js要操作dom）：
+```javaScript
+function setUpEvents() {
+  var button = ....
+  var ....
+  button.onclick = function () {
+    //
+  }
+
+  button.
+}
+
+window.onLoad = function () {
+  setUpEvents()
+}
+</code></pre><ol>
+<li>this的作用范围<br>代码<a href="https://cn.vuejs.org/v2/guide/computed.html">来源</a><pre><code class="javaScript">&lt;script src=&quot;https://cdn.jsdelivr.net/npm/axios@0.12.0/dist/axios.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+var watchExampleVM = new Vue({
+el: &#39;#watch-example&#39;,
+data: {
+ question: &#39;&#39;,
+ answer: &#39;I cannot give you an answer until you ask a question!&#39;
+},
+watch: {
+ // 如果 `question` 发生改变，这个函数就会运行
+ question: function (newQuestion) {
+   this.answer = &#39;Waiting for you to stop typing...&#39;
+   this.getAnswer()
+ }
+},
+methods: {
+ // `_.debounce` 是一个通过 Lodash 限制操作频率的函数。
+ // 在这个例子中，我们希望限制访问 yesno.wtf/api 的频率
+ // AJAX 请求直到用户输入完毕才会发出。想要了解更多关于
+ // `_.debounce` 函数 (及其近亲 `_.throttle`) 的知识，
+ // 请参考：https://lodash.com/docs#debounce
+ getAnswer: _.debounce(
+   function () {
+     if (this.question.indexOf(&#39;?&#39;) === -1) {
+       this.answer = &#39;Questions usually contain a question mark. ;-)&#39;
+       return
+     }
+     this.answer = &#39;Thinking...&#39;
+     var vm = this //这里需要把this（VewComponent）作为一个变量
+     axios.get(&#39;https://yesno.wtf/api&#39;)
+       .then(function (response) {
+         vm.answer = _.capitalize(response.data.answer)
+       })
+       .catch(function (error) {
+         vm.answer = &#39;Error! Could not reach the API. &#39; + error
+       })
+   },
+   // 这是我们为判定用户停止输入等待的毫秒数
+   500
+ )
+}
+})
+&lt;/script&gt;
+</code></pre>
 </li>
 </ol>
-<p>在一个元素上触发事件，如果此元素定义了处理程序，那么此次事件就会被捕获，根据程序进行该事件的处理。否则这个事件会根据DOM树向父节点逐级传播，如果从始至终都没有被处理，那么最终会到达document或window根元素。所以事件是往上传递的，即冒泡。</p>
-<p>//事件注册的时机<br>对于简单的script，需要在body的最后一行，因为浏览器是从上到下解析的，轮到script解析的时候，需要操作dom，这就要求dom元素已经建立好。有时候，就算你把script写在body最后一行，轮到解析script的时候，前面的html还在加载（比如说非常大的html什么的，总之是有可能的）。所以一般用window.onLoad来注册事件。</p>
-<p>复杂点的script放在外面，用src引用。 也要用window.onLoad来注册事件。所以，一般的js长这样（假如的你js要操作dom）：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">setUpEvents</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> button = ....</span><br><span class="line">  <span class="keyword">var</span> ....</span><br><span class="line">  button.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  button.</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">window</span>.onLoad = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  setUpEvents()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="7-小测试"><a href="#7-小测试" class="headerlink" title="7. 小测试"></a>7. 小测试</h2><p><a href="https://stackoverflow.com/questions/958908/how-do-you-reverse-a-string-in-place-in-javascript">如何用js反转一个String</a></p>
+<pre><code class="js">function reverse(s){
+    return s.split(&quot;&quot;).reverse().join(&quot;&quot;);
+}
+
+// 另一种方式
+function revserse2(s){
+  let revString = &quot;&quot;;
+  for(let i = s.length; i&gt;=0;i--) {
+    revString = revString+str[i];
+  }
+  return revString;
+}
+
+// 用forEach的话
+function reverse3(string) {
+  let revString = &quot;&quot;;
+  string.split(&#39;&#39;).forEach((c) =&gt; {
+    revString = c + revString;
+  });
+  return revString;
+}
+
+function reverse4(string){
+  return string.split(&#39;&#39;).reduce(function(revString, char) {
+    return char + revString;
+  },&#39;&#39;);
+}
+</code></pre>
+<h3 id="反转一个int"><a href="#反转一个int" class="headerlink" title="反转一个int"></a>反转一个int</h3><pre><code class="js">function reverseInt(int) {
+  const revString = int.toString().split(&#39;&#39;).reverse().join(&#39;&#39;);
+  return parseInt(revString)*Math.sign(int);
+}
+</code></pre>
+<h3 id="首字母大写"><a href="#首字母大写" class="headerlink" title="首字母大写"></a>首字母大写</h3><pre><code class="js">function capitalizedLetters(str){
+  const strArr = str.toLowerCase().split(&#39; &#39;);
+  for(let i=0;i&lt;strArr.length;i++){
+    strArr[i] = strArr[i].subString(0,1).toUpperCase()+
+    strArr[i].subString(1);
+  }
+  return strArr.join(&#39; &#39;);
+}
+
+function capitalizedLetters2(str){
+  return str
+  .toLowerCase()
+  .split(&#39; &#39;)
+  .map( (word) =&gt; word[0].toUpperCase()+word.subString[1])
+  .join(&#39; &#39;);
+}
+</code></pre>
+<h3 id="how-about-shuffle-an-array"><a href="#how-about-shuffle-an-array" class="headerlink" title="how about shuffle an array"></a>how about shuffle an array</h3><pre><code class="js">/**
+ * Shuffles array in place.
+ * @param {Array} a items An array containing the items.
+ */
+function shuffle(a) {
+    var j, x, i;
+    for (i = a.length - 1; i &gt; 0; i--) {
+        j = Math.floor(Math.random() * (i + 1));
+        x = a[i];
+        a[i] = a[j];
+        a[j] = x;
+    }
+}
+
+// Used like so
+var arr = [2, 11, 37, 42];
+shuffle(arr);
+console.log(arr);
+</code></pre>
 <ol>
-<li>this的作用范围<br>代码<a href="https://cn.vuejs.org/v2/guide/computed.html">来源</a><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">&lt;script src=<span class="string">"https://cdn.jsdelivr.net/npm/axios@0.12.0/dist/axios.min.js"</span>&gt;<span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br><span class="line">&lt;script src=<span class="string">"https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js"</span>&gt;<span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br><span class="line">&lt;script&gt;</span><br><span class="line"><span class="keyword">var</span> watchExampleVM = <span class="keyword">new</span> Vue(&#123;</span><br><span class="line">  el: <span class="string">'#watch-example'</span>,</span><br><span class="line">  data: &#123;</span><br><span class="line">    question: <span class="string">''</span>,</span><br><span class="line">    answer: <span class="string">'I cannot give you an answer until you ask a question!'</span></span><br><span class="line">  &#125;,</span><br><span class="line">  watch: &#123;</span><br><span class="line">    <span class="comment">// 如果 `question` 发生改变，这个函数就会运行</span></span><br><span class="line">    question: <span class="function"><span class="keyword">function</span> (<span class="params">newQuestion</span>) </span>&#123;</span><br><span class="line">      <span class="keyword">this</span>.answer = <span class="string">'Waiting for you to stop typing...'</span></span><br><span class="line">      <span class="keyword">this</span>.getAnswer()</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    <span class="comment">// `_.debounce` 是一个通过 Lodash 限制操作频率的函数。</span></span><br><span class="line">    <span class="comment">// 在这个例子中，我们希望限制访问 yesno.wtf/api 的频率</span></span><br><span class="line">    <span class="comment">// AJAX 请求直到用户输入完毕才会发出。想要了解更多关于</span></span><br><span class="line">    <span class="comment">// `_.debounce` 函数 (及其近亲 `_.throttle`) 的知识，</span></span><br><span class="line">    <span class="comment">// 请参考：https://lodash.com/docs#debounce</span></span><br><span class="line">    getAnswer: _.debounce(</span><br><span class="line">      <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.question.indexOf(<span class="string">'?'</span>) === <span class="number">-1</span>) &#123;</span><br><span class="line">          <span class="keyword">this</span>.answer = <span class="string">'Questions usually contain a question mark. ;-)'</span></span><br><span class="line">          <span class="keyword">return</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">this</span>.answer = <span class="string">'Thinking...'</span></span><br><span class="line">        <span class="keyword">var</span> vm = <span class="keyword">this</span> <span class="comment">//这里需要把this（VewComponent）作为一个变量</span></span><br><span class="line">        axios.get(<span class="string">'https://yesno.wtf/api'</span>)</span><br><span class="line">          .then(<span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>&#123;</span><br><span class="line">            vm.answer = _.capitalize(response.data.answer)</span><br><span class="line">          &#125;)</span><br><span class="line">          .catch(<span class="function"><span class="keyword">function</span> (<span class="params">error</span>) </span>&#123;</span><br><span class="line">            vm.answer = <span class="string">'Error! Could not reach the API. '</span> + error</span><br><span class="line">          &#125;)</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="comment">// 这是我们为判定用户停止输入等待的毫秒数</span></span><br><span class="line">      <span class="number">500</span></span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line">&lt;<span class="regexp">/script&gt;</span></span><br></pre></td></tr></table></figure>
+<li>js去刷新当前页面，返回上级页面。。<pre><code class="html">&lt;a href=&quot;javascript:history.go(-1)&quot;&gt;返回上一页&lt;/a&gt;
+&lt;a href=&quot;javascript:location.reload()&quot;&gt;刷新当前页面&lt;/a&gt;
+&lt;a href=&quot;javascript:&quot; onclick=&quot;history.go(-2); &quot;&gt;返回前两页&lt;/a&gt;
+&lt;a href=&quot;javascript:&quot; onclick=&quot;self.location=document.referrer;&quot;&gt;返回上一页并刷新&lt;/a&gt;
+&lt;a href=&quot;javascript:&quot; onclick=&quot;history.back(); &quot;&gt;返回上一页&lt;/a&gt;
+</code></pre>
 </li>
 </ol>
-<h2 id="7-小测试"><a href="#7-小测试" class="headerlink" title="7. 小测试"></a>7. 小测试</h2><p><a href="https://stackoverflow.com/questions/958908/how-do-you-reverse-a-string-in-place-in-javascript">如何用js反转一个String</a><br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">reverse</span>(<span class="params">s</span>)</span>&#123;</span><br><span class="line">    <span class="keyword">return</span> s.split(<span class="string">""</span>).reverse().join(<span class="string">""</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 另一种方式</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">revserse2</span>(<span class="params">s</span>)</span>&#123;</span><br><span class="line">  <span class="keyword">let</span> revString = <span class="string">""</span>;</span><br><span class="line">  <span class="keyword">for</span>(<span class="keyword">let</span> i = s.length; i&gt;=<span class="number">0</span>;i--) &#123;</span><br><span class="line">    revString = revString+str[i];</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> revString;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 用forEach的话</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">reverse3</span>(<span class="params">string</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> revString = <span class="string">""</span>;</span><br><span class="line">  string.split(<span class="string">''</span>).forEach(<span class="function">(<span class="params">c</span>) =&gt;</span> &#123;</span><br><span class="line">    revString = c + revString;</span><br><span class="line">  &#125;);</span><br><span class="line">  <span class="keyword">return</span> revString;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">reverse4</span>(<span class="params">string</span>)</span>&#123;</span><br><span class="line">  <span class="keyword">return</span> string.split(<span class="string">''</span>).reduce(<span class="function"><span class="keyword">function</span>(<span class="params">revString, char</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> char + revString;</span><br><span class="line">  &#125;,<span class="string">''</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h3 id="反转一个int"><a href="#反转一个int" class="headerlink" title="反转一个int"></a>反转一个int</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">reverseInt</span>(<span class="params">int</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> revString = int.toString().split(<span class="string">''</span>).reverse().join(<span class="string">''</span>);</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">parseInt</span>(revString)*<span class="built_in">Math</span>.sign(int);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="首字母大写"><a href="#首字母大写" class="headerlink" title="首字母大写"></a>首字母大写</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">capitalizedLetters</span>(<span class="params">str</span>)</span>&#123;</span><br><span class="line">  <span class="keyword">const</span> strArr = str.toLowerCase().split(<span class="string">' '</span>);</span><br><span class="line">  <span class="keyword">for</span>(<span class="keyword">let</span> i=<span class="number">0</span>;i&lt;strArr.length;i++)&#123;</span><br><span class="line">    strArr[i] = strArr[i].subString(<span class="number">0</span>,<span class="number">1</span>).toUpperCase()+</span><br><span class="line">    strArr[i].subString(<span class="number">1</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> strArr.join(<span class="string">' '</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">capitalizedLetters2</span>(<span class="params">str</span>)</span>&#123;</span><br><span class="line">  <span class="keyword">return</span> str</span><br><span class="line">  .toLowerCase()</span><br><span class="line">  .split(<span class="string">' '</span>)</span><br><span class="line">  .map( <span class="function">(<span class="params">word</span>) =&gt;</span> word[<span class="number">0</span>].toUpperCase()+word.subString[<span class="number">1</span>])</span><br><span class="line">  .join(<span class="string">' '</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="how-about-shuffle-an-array"><a href="#how-about-shuffle-an-array" class="headerlink" title="how about shuffle an array"></a>how about shuffle an array</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Shuffles array in place.</span></span><br><span class="line"><span class="comment"> * @param &#123;Array&#125; a items An array containing the items.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">shuffle</span>(<span class="params">a</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> j, x, i;</span><br><span class="line">    <span class="keyword">for</span> (i = a.length - <span class="number">1</span>; i &gt; <span class="number">0</span>; i--) &#123;</span><br><span class="line">        j = <span class="built_in">Math</span>.floor(<span class="built_in">Math</span>.random() * (i + <span class="number">1</span>));</span><br><span class="line">        x = a[i];</span><br><span class="line">        a[i] = a[j];</span><br><span class="line">        a[j] = x;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Used like so</span></span><br><span class="line"><span class="keyword">var</span> arr = [<span class="number">2</span>, <span class="number">11</span>, <span class="number">37</span>, <span class="number">42</span>];</span><br><span class="line">shuffle(arr);</span><br><span class="line"><span class="built_in">console</span>.log(arr);</span><br></pre></td></tr></table></figure>
 <ol>
-<li><p>js去刷新当前页面，返回上级页面。。</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"javascript:history.go(-1)"</span>&gt;</span>返回上一页<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"javascript:location.reload()"</span>&gt;</span>刷新当前页面<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"javascript:"</span> <span class="attr">onclick</span>=<span class="string">"history.go(-2); "</span>&gt;</span>返回前两页<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"javascript:"</span> <span class="attr">onclick</span>=<span class="string">"self.location=document.referrer;"</span>&gt;</span>返回上一页并刷新<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"javascript:"</span> <span class="attr">onclick</span>=<span class="string">"history.back(); "</span>&gt;</span>返回上一页<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<li>监听关闭窗口事件<pre><code class="javaScript">window.onbeforeunload = function () {
+   return &quot;Bye now!&quot;
+}
+</code></pre>
+<a href="http://www.ruanyifeng.com/blog/2014/12/unicode.html">JavaScript使用哪一种编码？</a>,不是utf-8</li>
+</ol>
+<p><a href="http://blog.csdn.net/qianghaohao/article/details/52331432">atom安装插件被墙问题</a><br>Atom推荐插件<br><a href="https://atom.io/packages/atom-beautify">atom-beautify</a></p>
+<ol>
+<li><p>setTimeout是schedule一个task，setInterval是设定一个周期性执行的任务。</p>
 </li>
-<li><p>监听关闭窗口事件</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">window</span>.onbeforeunload = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">       <span class="keyword">return</span> <span class="string">"Bye now!"</span></span><br><span class="line">   &#125;</span><br><span class="line"><span class="string">``</span><span class="string">`   </span></span><br><span class="line"><span class="string">[JavaScript使用哪一种编码？](http://www.ruanyifeng.com/blog/2014/12/unicode.html),不是utf-8</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">[atom安装插件被墙问题](http://blog.csdn.net/qianghaohao/article/details/52331432)</span></span><br><span class="line"><span class="string">Atom推荐插件</span></span><br><span class="line"><span class="string">[atom-beautify](https://atom.io/packages/atom-beautify)</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">9. setTimeout是schedule一个task，setInterval是设定一个周期性执行的任务。</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">8. 可以检测是ES5还是ES6</span></span><br><span class="line"><span class="string">`</span><span class="string">``</span>javaScript</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">f</span>(<span class="params"></span>) </span>&#123; <span class="built_in">console</span>.log(<span class="string">'I am outside!'</span>); &#125;</span><br><span class="line">(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line"><span class="keyword">if</span>(<span class="literal">false</span>) &#123;</span><br><span class="line"><span class="comment">// 重复声明一次函数f,ES5会输出'i am insider', ES6会输出'i am outsider'</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">f</span>(<span class="params"></span>) </span>&#123; <span class="built_in">console</span>.log(<span class="string">'I am inside!'</span>); &#125;</span><br><span class="line">&#125;</span><br><span class="line">f();</span><br><span class="line">&#125;());</span><br></pre></td></tr></table></figure>
+<li><p>可以检测是ES5还是ES6</p>
+<pre><code class="javaScript">function f() { console.log(&#39;I am outside!&#39;); }
+(function () {
+if(false) {
+// 重复声明一次函数f,ES5会输出&#39;i am insider&#39;, ES6会输出&#39;i am outsider&#39;
+function f() { console.log(&#39;I am inside!&#39;); }
+}
+f();
+}());
+</code></pre>
 </li>
 <li><p>javaScript debug的方法：选中一个html 的tag，break on 。。。 自然会在执行到的时候停下来，evalulate value需要自己在console里面敲（注意此时应该位于Sources标签页下）。</p>
 </li>
@@ -344,20 +1053,116 @@ ga('send', 'pageview');
 </li>
 </ol>
 <ol>
-<li>js迭代一个数组的方法：<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; array.length; i++) &#123;</span><br><span class="line">  <span class="comment">// array[i]</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>,len=array.length; i &lt; len; i++) &#123;</span><br><span class="line">  <span class="comment">// array[i]</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">array.forEach(<span class="function"><span class="keyword">function</span>(<span class="params">item</span>)</span>&#123;</span><br><span class="line">  <span class="comment">// item</span></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 用于列出对象所有的属性</span></span><br><span class="line"><span class="keyword">var</span> obj = &#123;</span><br><span class="line">    name: <span class="string">'test'</span>,</span><br><span class="line">    color: <span class="string">'red'</span>,</span><br><span class="line">    day: <span class="string">'sunday'</span>,</span><br><span class="line">    number: <span class="number">5</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">var</span> key <span class="keyword">in</span> obj) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(obj[key])</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// es6</span></span><br><span class="line"><span class="keyword">for</span> (variable <span class="keyword">of</span> iterable) &#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">array.map(<span class="function"><span class="keyword">function</span>(<span class="params">item</span>)</span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">array.filter(<span class="function"><span class="keyword">function</span>(<span class="params">item</span>)</span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-</li>
+<li>js迭代一个数组的方法：<br>```js<br>for (var i = 0; i &lt; array.length; i++) {<br>// array[i]<br>}</li>
 </ol>
-<p>基本上就这些了<a href="https://juejin.im/post/5a3a59e7518825698e72376b">参考</a></p>
-<p>异常捕获(try catch也有)</p>
-<p>javaScript操作cookie:</p>
-<p>这种方式就是给String全局添加一个方法，当然不是说推荐这么干<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">String</span>.prototype.hashCode = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> hash = <span class="number">0</span>,</span><br><span class="line">    i,</span><br><span class="line">    chr;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">this</span>.length === <span class="number">0</span>) <span class="keyword">return</span> hash;</span><br><span class="line">  <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="keyword">this</span>.length; i++) &#123;</span><br><span class="line">    chr = <span class="keyword">this</span>.charCodeAt(i);</span><br><span class="line">    hash = (hash &lt;&lt; <span class="number">5</span>) - hash + chr;</span><br><span class="line">    hash |= <span class="number">0</span>; <span class="comment">// Convert to 32bit integer</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> hash;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
-<p>string concatnate的方法也有，然而<a href="https://stackoverflow.com/questions/16696632/best-way-to-concatenate-strings-in-javascript">最快的方式</a>还是使用+=这种<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> hello = <span class="string">'Hello, '</span>;</span><br><span class="line"><span class="built_in">console</span>.log(hello.concat(<span class="string">'Kevin'</span>, <span class="string">'. Have a nice day.'</span>));</span><br></pre></td></tr></table></figure></p>
+<p>for (var i = 0,len=array.length; i &lt; len; i++) {<br>  // array[i]<br>}</p>
+<p>array.forEach(function(item){<br>  // item<br>})</p>
+<p>// 用于列出对象所有的属性<br>var obj = {<br>    name: ‘test’,<br>    color: ‘red’,<br>    day: ‘sunday’,<br>    number: 5<br>}<br>for (var key in obj) {<br>    console.log(obj[key])<br>}<br>//</p>
+<p>// es6<br>for (variable of iterable) {</p>
+<p>}</p>
+<p>array.map(function(item){</p>
+<p>})</p>
+<p>array.filter(function(item){</p>
+<p>})</p>
+<pre><code>基本上就这些了[参考](https://juejin.im/post/5a3a59e7518825698e72376b)
+
+
+
+
+
+异常捕获(try catch也有)
+
+javaScript操作cookie:
+
+
+这种方式就是给String全局添加一个方法，当然不是说推荐这么干
+```js
+String.prototype.hashCode = function() {
+  var hash = 0,
+    i,
+    chr;
+  if (this.length === 0) return hash;
+  for (i = 0; i &lt; this.length; i++) {
+    chr = this.charCodeAt(i);
+    hash = (hash &lt;&lt; 5) - hash + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+};
+</code></pre><p>string concatnate的方法也有，然而<a href="https://stackoverflow.com/questions/16696632/best-way-to-concatenate-strings-in-javascript">最快的方式</a>还是使用+=这种</p>
+<pre><code class="js">var hello = &#39;Hello, &#39;;
+console.log(hello.concat(&#39;Kevin&#39;, &#39;. Have a nice day.&#39;));
+</code></pre>
 <p>XMLHttpRequest Level 2添加了一个新的接口FormData.利用FormData对象,我们可以通过JavaScript用一些键值对来模拟一系列表单控件,我们还可以使用XMLHttpRequest的send()方法来异步的提交这个”表单”.比起普通的ajax,使用FormData的最大优点就是我们可以异步上传一个二进制文件.</p>
-<p><a href="https://developer.mozilla.org/en-US/docs/Web/API/FileReader">FileReader api</a><br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">onsubmit</span>=<span class="string">"return false;"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"hidden"</span> <span class="attr">name</span>=<span class="string">"file_base64"</span> <span class="attr">id</span>=<span class="string">"file_base64"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"file"</span> <span class="attr">id</span>=<span class="string">"fileup"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"submit"</span> <span class="attr">onclick</span>=<span class="string">"$.post('./uploader.php', $(this).parent().serialize());"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">$(<span class="built_in">document</span>).ready(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">    $(<span class="string">"#fileup"</span>).change(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">var</span> v = $(<span class="keyword">this</span>).val();</span></span><br><span class="line"><span class="javascript">        <span class="keyword">var</span> reader = <span class="keyword">new</span> FileReader();</span></span><br><span class="line"><span class="javascript">        reader.readAsDataURL(<span class="keyword">this</span>.files[<span class="number">0</span>]);</span></span><br><span class="line"><span class="javascript">        reader.onload = <span class="function"><span class="keyword">function</span>(<span class="params">e</span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">            <span class="built_in">console</span>.log(e.target.result);</span></span><br><span class="line"><span class="javascript">            $(<span class="string">'#file_base64'</span>).val(e.target.result);</span></span><br><span class="line"><span class="undefined">        &#125;;</span></span><br><span class="line"><span class="undefined">    &#125;);</span></span><br><span class="line"><span class="undefined">&#125;);</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/API/FileReader">FileReader api</a></p>
+<pre><code class="html">&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;/head&gt;
+
+&lt;form onsubmit=&quot;return false;&quot;&gt;
+    &lt;input type=&quot;hidden&quot; name=&quot;file_base64&quot; id=&quot;file_base64&quot;&gt;
+    &lt;input type=&quot;file&quot; id=&quot;fileup&quot;&gt;
+    &lt;input type=&quot;submit&quot; value=&quot;submit&quot; onclick=&quot;$.post(&#39;./uploader.php&#39;, $(this).parent().serialize());&quot;&gt;
+&lt;/form&gt;
+
+&lt;script src=&quot;http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+$(document).ready(function(){
+    $(&quot;#fileup&quot;).change(function(){
+        var v = $(this).val();
+        var reader = new FileReader();
+        reader.readAsDataURL(this.files[0]);
+        reader.onload = function(e){
+            console.log(e.target.result);
+            $(&#39;#file_base64&#39;).val(e.target.result);
+        };
+    });
+});
+&lt;/script&gt;
+</code></pre>
 <p>indexed db api</p>
 <p>html里面有一些奇怪的符号<br>“ &amp; “ 在html里面等同于”&amp;”<br><a href="https://stackoverflow.com/questions/9084237/what-is-amp-used-for">ampersand</a><br>冒号(“)会变成”  &quot;   “这种</p>
 <p>web api有一些用的不多的东西:<br>File,Blob,ArrayBuffer<br>createObjectURL方法</p>
-<p>TextUtils.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Html-encode the string.</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> s the string to be encoded</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> the encoded string</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">htmlEncode</span><span class="params">(String s)</span> </span>&#123;</span><br><span class="line">       StringBuilder sb = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">       <span class="keyword">char</span> c;</span><br><span class="line">       <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; s.length(); i++) &#123;</span><br><span class="line">           c = s.charAt(i);</span><br><span class="line">           <span class="keyword">switch</span> (c) &#123;</span><br><span class="line">           <span class="keyword">case</span> <span class="string">'&lt;'</span>:</span><br><span class="line">               sb.append(<span class="string">"&amp;lt;"</span>); <span class="comment">//$NON-NLS-1$</span></span><br><span class="line">               <span class="keyword">break</span>;</span><br><span class="line">           <span class="keyword">case</span> <span class="string">'&gt;'</span>:</span><br><span class="line">               sb.append(<span class="string">"&amp;gt;"</span>); <span class="comment">//$NON-NLS-1$</span></span><br><span class="line">               <span class="keyword">break</span>;</span><br><span class="line">           <span class="keyword">case</span> <span class="string">'&amp;'</span>:</span><br><span class="line">               sb.append(<span class="string">"&amp;amp;"</span>); <span class="comment">//$NON-NLS-1$</span></span><br><span class="line">               <span class="keyword">break</span>;</span><br><span class="line">           <span class="keyword">case</span> <span class="string">'\''</span>:</span><br><span class="line">               <span class="comment">//http://www.w3.org/TR/xhtml1</span></span><br><span class="line">               <span class="comment">// The named character reference &amp;apos; (the apostrophe, U+0027) was introduced in</span></span><br><span class="line">               <span class="comment">// XML 1.0 but does not appear in HTML. Authors should therefore use &amp;#39; instead</span></span><br><span class="line">               <span class="comment">// of &amp;apos; to work as expected in HTML 4 user agents.</span></span><br><span class="line">               sb.append(<span class="string">"&amp;#39;"</span>); <span class="comment">//$NON-NLS-1$</span></span><br><span class="line">               <span class="keyword">break</span>;</span><br><span class="line">           <span class="keyword">case</span> <span class="string">'"'</span>:</span><br><span class="line">               sb.append(<span class="string">"&amp;quot;"</span>); <span class="comment">//$NON-NLS-1$</span></span><br><span class="line">               <span class="keyword">break</span>;</span><br><span class="line">           <span class="keyword">default</span>:</span><br><span class="line">               sb.append(c);</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">return</span> sb.toString();</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="comment">/**</span></span><br></pre></td></tr></table></figure></p>
+<p>TextUtils.java</p>
+<pre><code class="java"> /**
+     * Html-encode the string.
+     * @param s the string to be encoded
+     * @return the encoded string
+     */
+    public static String htmlEncode(String s) {
+        StringBuilder sb = new StringBuilder();
+        char c;
+        for (int i = 0; i &lt; s.length(); i++) {
+            c = s.charAt(i);
+            switch (c) {
+            case &#39;&lt;&#39;:
+                sb.append(&quot;&amp;lt;&quot;); //$NON-NLS-1$
+                break;
+            case &#39;&gt;&#39;:
+                sb.append(&quot;&amp;gt;&quot;); //$NON-NLS-1$
+                break;
+            case &#39;&amp;&#39;:
+                sb.append(&quot;&amp;amp;&quot;); //$NON-NLS-1$
+                break;
+            case &#39;\&#39;&#39;:
+                //http://www.w3.org/TR/xhtml1
+                // The named character reference &amp;apos; (the apostrophe, U+0027) was introduced in
+                // XML 1.0 but does not appear in HTML. Authors should therefore use &amp;#39; instead
+                // of &amp;apos; to work as expected in HTML 4 user agents.
+                sb.append(&quot;&amp;#39;&quot;); //$NON-NLS-1$
+                break;
+            case &#39;&quot;&#39;:
+                sb.append(&quot;&amp;quot;&quot;); //$NON-NLS-1$
+                break;
+            default:
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+</code></pre>
 <p>触控事件对象中包含了事件的坐标，这个有event.x,event.pageX,event.clientX等等</p>
 <h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="https://tonghuashuo.github.io/blog/jsonp.html">5 分钟彻底明白 JSONP</a><br><a href="https://github.com/trekhleb/javascript-algorithms">javaScript algorithms</a></p>
 <p>两个关于asynchronous javaScript的视频，一个解释了Event Loop的感念，另一个讲到了Promise基于microTask的原理。<br><a href="https://www.youtube.com/watch?v=8aGhZQkoFbQ">菲利普·罗伯茨：到底什么是Event Loop呢？ | 欧洲 JSConf 2014</a><br><a href="https://www.youtube.com/watch?v=SrNQS8J67zc">Asynchrony: Under the Hood - Shelley Vohr - JSConf EU 2018</a></p>

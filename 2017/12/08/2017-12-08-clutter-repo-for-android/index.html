@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery1511100734648.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery1511100809920.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.039Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.181Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android知识集合[三]">
 <meta name="twitter:description" content="之前的文章快装不下了，所以另外开一篇文章专门放Android相关的杂乱的知识点。">
@@ -204,44 +204,246 @@ ga('send', 'pageview');
         <p>之前的文章快装不下了，所以另外开一篇文章专门放Android相关的杂乱的知识点。<br><img src="https://www.haldir66.ga/static/imgs/scenery1511100734648.jpg" alt=""><br><a id="more"></a></p>
 <p><a href="https://android-review.googlesource.com">Android Source code</a>，能够实时看到提交信息<br><a href="http://androidxref.com/7.1.2_r36/xref/frameworks/base/core/java/android/widget/">androidxref，一个比较好的查看源码的网站</a><br><a href="https://www.youtube.com/watch?v=CMzCccqE_R0">From View to Pixel</a>讲了ViewRootImpl,SurfaceFlinger这些东西<br><a href="https://juejin.im/post/5a1e8d5ef265da431280ae19">一个很长的关于显示原理的文章</a>，基本上什么都讲了</p>
 <h3 id="1-基本上所有的Android-System-Event都是从ActivityThread中发起的"><a href="#1-基本上所有的Android-System-Event都是从ActivityThread中发起的" class="headerlink" title="1.基本上所有的Android System Event都是从ActivityThread中发起的"></a>1.基本上所有的Android System Event都是从ActivityThread中发起的</h3><p>onDetachedFromWindow是从ActivityThread的handleDestoryActivity传下来的，走到windowManager.removeViewImediate,然后ViewRootImpl.doDie,然后ViewRootImpl.dispatchDetachedFromWindow，然后DecoreView.dispatchDetachedFromWindow，然后一个个child传下去。所有的View走完了之后，DecorView在onDetachedFromWindow中以Window.Callback的方式顺手通知了Activity的onDetachedFromWindow。其实打个断点看的话就快一点。</p>
-<h3 id="2-onSaveInstance对于有id的View，系统会自动帮忙存一点东西"><a href="#2-onSaveInstance对于有id的View，系统会自动帮忙存一点东西" class="headerlink" title="2. onSaveInstance对于有id的View，系统会自动帮忙存一点东西"></a>2. onSaveInstance对于有id的View，系统会自动帮忙存一点东西</h3><p>当然onSaveInstance也是从ActivityThread里面传递下来的。还有就是onCreate(Bundle)和onRestroreSaveInstanceState(Bundle)里面的bundle是同一个object。romain Guy说最初onSaveInstance和onRestroreSaveInstanceState本来叫onIcy(冻结)和onThaw（解冻），确实很形象。<br>其实这个到现在还有一些痕迹:<br>ViewGroup.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">dispatchFreezeSelfOnly</span><span class="params">(SparseArray&lt;Parcelable&gt; container)</span> </span>&#123;</span><br><span class="line">     <span class="keyword">super</span>.dispatchSaveInstanceState(container);</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">dispatchThawSelfOnly</span><span class="params">(SparseArray&lt;Parcelable&gt; container)</span> </span>&#123;</span><br><span class="line">     <span class="keyword">super</span>.dispatchRestoreInstanceState(container);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="2-onSaveInstance对于有id的View，系统会自动帮忙存一点东西"><a href="#2-onSaveInstance对于有id的View，系统会自动帮忙存一点东西" class="headerlink" title="2. onSaveInstance对于有id的View，系统会自动帮忙存一点东西"></a>2. onSaveInstance对于有id的View，系统会自动帮忙存一点东西</h3><p>当然onSaveInstance也是从ActivityThread里面传递下来的。还有就是onCreate(Bundle)和onRestroreSaveInstanceState(Bundle)里面的bundle是同一个object。romain Guy说最初onSaveInstance和onRestroreSaveInstanceState本来叫onIcy(冻结)和onThaw（解冻），确实很形象。<br>其实这个到现在还有一些痕迹:<br>ViewGroup.java</p>
+<pre><code class="java">protected void dispatchFreezeSelfOnly(SparseArray&lt;Parcelable&gt; container) {
+     super.dispatchSaveInstanceState(container);
+ }
+
+ protected void dispatchThawSelfOnly(SparseArray&lt;Parcelable&gt; container) {
+     super.dispatchRestoreInstanceState(container);
+ }
+</code></pre>
 <h3 id="3-android-asset-atlas"><a href="#3-android-asset-atlas" class="headerlink" title="3.android asset atlas"></a>3.android asset atlas</h3><p>就是为了节省asset耗费的内存，将一些系统公用的资源作为一个服务先跑起来，所有app的process共用这部分资源。</p>
 <h3 id="4-ZygoteInit"><a href="#4-ZygoteInit" class="headerlink" title="4. ZygoteInit"></a>4. ZygoteInit</h3><p><a href="http://www.10tiao.com/html/599/201703/2651434963/1.html">这篇文章</a>讲到了从Launcher点击icon到起一个app的过程，Launcher所在进程通过IPC走startActivity请求位于system_server进程的ActivityManagerService,后者通过socket(Zygote进程跑起来之后就一直在循环等待请求)请求Zygote fork出一个app的进程，接着通知system_server去走Binder IPC去scheduleStartActivity(后面就都是App所在进程了)。</p>
 <h3 id="5-Michael-Bailey每年的演讲都很精彩"><a href="#5-Michael-Bailey每年的演讲都很精彩" class="headerlink" title="5. Michael Bailey每年的演讲都很精彩"></a>5. Michael Bailey每年的演讲都很精彩</h3><p><a href="https://www.youtube.com/watch?v=eAtMon8ndfk">Droidcon NYC 2015 - How the Main Thread works</a><br><a href="https://www.youtube.com/watch?v=Y06wmVIFlsw">Droidcon NYC 2016 - How LayoutInflater works</a><br><a href="https://www.youtube.com/watch?v=7lCsp84wVPM">droidcon NYC 2017 - How Espresso Works</a></p>
-<p>2016年的演讲中提到了LayoutInflater中的好玩的注释<br>LayoutInflater.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (name.equals(TAG_1995)) &#123;</span><br><span class="line">            <span class="comment">// Let's party like it's 1995!</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> BlinkLayout(context, attrs);</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure></p>
+<p>2016年的演讲中提到了LayoutInflater中的好玩的注释<br>LayoutInflater.java</p>
+<pre><code class="java">if (name.equals(TAG_1995)) {
+            // Let&#39;s party like it&#39;s 1995!
+            return new BlinkLayout(context, attrs);
+        }
+</code></pre>
 <h3 id="6-Chris-Banes在2017年给出了关于状态栏的解释"><a href="#6-Chris-Banes在2017年给出了关于状态栏的解释" class="headerlink" title="6. Chris Banes在2017年给出了关于状态栏的解释"></a>6. Chris Banes在2017年给出了关于状态栏的解释</h3><p><a href="https://www.youtube.com/watch?v=_mGDMVRO3iE">droidcon NYC 2017 - Becoming a master window fitter</a></p>
 <h3 id="7-Android默认的launcher的repo在"><a href="#7-Android默认的launcher的repo在" class="headerlink" title="7. Android默认的launcher的repo在"></a>7. Android默认的launcher的repo在</h3><p><a href="https://android.googlesource.com/platform/packages/apps/Launcher3/">Launcher3</a>,应该是属于System UI Team在维护。<br>todo 那个点击了icon进应用的点击事件在哪里。大致是在Launcher.java这个文件的startActivitySafely里面</p>
-<h3 id="8-在string-xml里面放一些format的字符"><a href="#8-在string-xml里面放一些format的字符" class="headerlink" title="8. 在string.xml里面放一些format的字符"></a>8. 在string.xml里面放一些format的字符</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">   String s1 = <span class="string">"这里面可以放多个字符串%1$s,%2$s前面加上一个百分号和数字，代表顺序"</span>;</span><br><span class="line">   String s2 = <span class="string">"百分号的d和百分号的s可以混着%1$s用的，比如这个%2$d数字什么的，第三个是带百分号的数字%3$d%%这个由于需要显示百分号，所以加上两个百分号"</span>;</span><br><span class="line"></span><br><span class="line">   System.out.println(String.format(s1,<span class="string">"XXXX"</span>,<span class="string">"XXX"</span>));</span><br><span class="line">   System.out.println(String.format(s2,<span class="string">"XXX"</span>, <span class="number">100</span>, <span class="number">100</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="8-在string-xml里面放一些format的字符"><a href="#8-在string-xml里面放一些format的字符" class="headerlink" title="8. 在string.xml里面放一些format的字符"></a>8. 在string.xml里面放一些format的字符</h3><pre><code class="java">public static void main(String[] args) {
+   String s1 = &quot;这里面可以放多个字符串%1$s,%2$s前面加上一个百分号和数字，代表顺序&quot;;
+   String s2 = &quot;百分号的d和百分号的s可以混着%1$s用的，比如这个%2$d数字什么的，第三个是带百分号的数字%3$d%%这个由于需要显示百分号，所以加上两个百分号&quot;;
+
+   System.out.println(String.format(s1,&quot;XXXX&quot;,&quot;XXX&quot;));
+   System.out.println(String.format(s2,&quot;XXX&quot;, 100, 100));
+}
+</code></pre>
 <p>实际输出</p>
 <blockquote>
 <p>这里面可以放多个字符串XXXX,XXX前面加上一个百分号和数字，代表顺序<br>百分号的d和百分号的s可以混着XXX用的，比如这个100数字什么的，第三个是带百分号的数字100%这个由于需要显示百分号，所以加上两个百分号</p>
 </blockquote>
 <p><a href="https://stackoverflow.com/questions/3693079/problem-with-system-out-printf-command-in-java">%d represents an integer; you want to use %f for a double.  </a><br>据猜测d代表decimal而不是double</p>
-<h3 id="9-我记得Chet-Haase说过Lollipop及以上的Button默认是有一个elevation的"><a href="#9-我记得Chet-Haase说过Lollipop及以上的Button默认是有一个elevation的" class="headerlink" title="9.我记得Chet Haase说过Lollipop及以上的Button默认是有一个elevation的"></a>9.我记得Chet Haase说过Lollipop及以上的Button默认是有一个elevation的</h3><p>记得Chet在一次演讲中说到Appcompat在5.0以上默认使用material Theme, Button的默认elevation好像是3dp。日常开发中也经常会看见button和设置elevation=0的button相比确实有些阴影。在Button的构造函数里面打了断点，在setElevation也打了断点，最后发现是在View创建之后Choregrapher在doFrame的时候run了一个Animation，在这个animation中设置了一个6px的elevation(2dp，原来Chet记错了)。<br>至于这个2dp是那来的呢：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Button</span></span></span><br><span class="line"><span class="tag">    <span class="attr">...</span></span></span><br><span class="line"><span class="tag"></span></span><br><span class="line"><span class="tag">    <span class="attr">android:stateListAnimator</span>=<span class="string">"@null"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">Button</span></span></span><br><span class="line"><span class="tag">    <span class="attr">...</span></span></span><br><span class="line"><span class="tag"></span></span><br><span class="line"><span class="tag">    <span class="attr">android:stateListAnimator</span>=<span class="string">"@anim/my_animator"</span> /&gt;</span></span><br></pre></td></tr></table></figure></p>
-<p>最终在网上<a href="http://www.itmmd.com/201412/240.html">找到了</a><br>core/res/res/anim/button_state_list_anim_material.xml<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">selector</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">item</span> <span class="attr">android:state_pressed</span>=<span class="string">"true"</span> <span class="attr">android:state_enabled</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">set</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">objectAnimator</span> <span class="attr">android:propertyName</span>=<span class="string">"translationZ"</span></span></span><br><span class="line"><span class="tag">                          <span class="attr">android:duration</span>=<span class="string">"@integer/button_pressed_animation_duration"</span> <span class="attr">100ms</span></span></span><br><span class="line"><span class="tag">                          <span class="attr">android:valueTo</span>=<span class="string">"@dimen/button_pressed_z_material"</span> ## <span class="attr">4dp</span> 其实稍微注意下，手指按住一个<span class="attr">Button</span>的时候，<span class="attr">Button</span>底部的阴影会扩大，就是这个<span class="attr">4dp</span>的属性动画在跑</span></span><br><span class="line"><span class="tag">                          <span class="attr">android:valueType</span>=<span class="string">"floatType"</span>/&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">objectAnimator</span> <span class="attr">android:propertyName</span>=<span class="string">"elevation"</span></span></span><br><span class="line"><span class="tag">                          <span class="attr">android:duration</span>=<span class="string">"0"</span></span></span><br><span class="line"><span class="tag">                          <span class="attr">android:valueTo</span>=<span class="string">"@dimen/button_elevation_material"</span> ## <span class="attr">2dp</span></span></span><br><span class="line"><span class="tag">                          <span class="attr">android:valueType</span>=<span class="string">"floatType"</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">set</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">item</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- base state --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">item</span> <span class="attr">android:state_enabled</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">set</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">objectAnimator</span> <span class="attr">android:propertyName</span>=<span class="string">"translationZ"</span></span></span><br><span class="line"><span class="tag">                          <span class="attr">android:duration</span>=<span class="string">"@integer/button_pressed_animation_duration"</span>  ##<span class="attr">100ms</span></span></span><br><span class="line"><span class="tag">                          <span class="attr">android:valueTo</span>=<span class="string">"0"</span></span></span><br><span class="line"><span class="tag">                          <span class="attr">android:startDelay</span>=<span class="string">"@integer/button_pressed_animation_delay"</span> ## <span class="attr">100ms</span></span></span><br><span class="line"><span class="tag">                          <span class="attr">android:valueType</span>=<span class="string">"floatType"</span>/&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">objectAnimator</span> <span class="attr">android:propertyName</span>=<span class="string">"elevation"</span></span></span><br><span class="line"><span class="tag">                          <span class="attr">android:duration</span>=<span class="string">"0"</span></span></span><br><span class="line"><span class="tag">                          <span class="attr">android:valueTo</span>=<span class="string">"@dimen/button_elevation_material"</span> ## <span class="attr">2dp</span></span></span><br><span class="line"><span class="tag">                          <span class="attr">android:valueType</span>=<span class="string">"floatType"</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">set</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">item</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">item</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">set</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">objectAnimator</span> <span class="attr">android:propertyName</span>=<span class="string">"translationZ"</span></span></span><br><span class="line"><span class="tag">                          <span class="attr">android:duration</span>=<span class="string">"0"</span></span></span><br><span class="line"><span class="tag">                          <span class="attr">android:valueTo</span>=<span class="string">"0"</span></span></span><br><span class="line"><span class="tag">                          <span class="attr">android:valueType</span>=<span class="string">"floatType"</span>/&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">objectAnimator</span> <span class="attr">android:propertyName</span>=<span class="string">"elevation"</span></span></span><br><span class="line"><span class="tag">                          <span class="attr">android:duration</span>=<span class="string">"0"</span></span></span><br><span class="line"><span class="tag">                          <span class="attr">android:valueTo</span>=<span class="string">"0"</span></span></span><br><span class="line"><span class="tag">                          <span class="attr">android:valueType</span>=<span class="string">"floatType"</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">set</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">item</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">selector</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<p>注意那个button_elevation_material：<br>在<a href="https://android.googlesource.com/platform/frameworks/base/+/master/core/res/res/values/dimens_material.xml">aosp</a>中<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- Elevation when button is pressed --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dimen</span> <span class="attr">name</span>=<span class="string">"button_elevation_material"</span>&gt;</span>2dp<span class="tag">&lt;/<span class="name">dimen</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- Z translation to apply when button is pressed --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dimen</span> <span class="attr">name</span>=<span class="string">"button_pressed_z_material"</span>&gt;</span>4dp<span class="tag">&lt;/<span class="name">dimen</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="9-我记得Chet-Haase说过Lollipop及以上的Button默认是有一个elevation的"><a href="#9-我记得Chet-Haase说过Lollipop及以上的Button默认是有一个elevation的" class="headerlink" title="9.我记得Chet Haase说过Lollipop及以上的Button默认是有一个elevation的"></a>9.我记得Chet Haase说过Lollipop及以上的Button默认是有一个elevation的</h3><p>记得Chet在一次演讲中说到Appcompat在5.0以上默认使用material Theme, Button的默认elevation好像是3dp。日常开发中也经常会看见button和设置elevation=0的button相比确实有些阴影。在Button的构造函数里面打了断点，在setElevation也打了断点，最后发现是在View创建之后Choregrapher在doFrame的时候run了一个Animation，在这个animation中设置了一个6px的elevation(2dp，原来Chet记错了)。<br>至于这个2dp是那来的呢：</p>
+<pre><code class="xml">&lt;Button
+    ...
+
+    android:stateListAnimator=&quot;@null&quot; /&gt;
+
+    &lt;Button
+    ...
+
+    android:stateListAnimator=&quot;@anim/my_animator&quot; /&gt;
+</code></pre>
+<p>最终在网上<a href="http://www.itmmd.com/201412/240.html">找到了</a><br>core/res/res/anim/button_state_list_anim_material.xml</p>
+<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;selector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;&gt;
+  &lt;item android:state_pressed=&quot;true&quot; android:state_enabled=&quot;true&quot;&gt;
+      &lt;set&gt;
+          &lt;objectAnimator android:propertyName=&quot;translationZ&quot;
+                          android:duration=&quot;@integer/button_pressed_animation_duration&quot; 100ms
+                          android:valueTo=&quot;@dimen/button_pressed_z_material&quot; ## 4dp 其实稍微注意下，手指按住一个Button的时候，Button底部的阴影会扩大，就是这个4dp的属性动画在跑
+                          android:valueType=&quot;floatType&quot;/&gt;
+          &lt;objectAnimator android:propertyName=&quot;elevation&quot;
+                          android:duration=&quot;0&quot;
+                          android:valueTo=&quot;@dimen/button_elevation_material&quot; ## 2dp
+                          android:valueType=&quot;floatType&quot;/&gt;
+      &lt;/set&gt;
+  &lt;/item&gt;
+  &lt;!-- base state --&gt;
+  &lt;item android:state_enabled=&quot;true&quot;&gt;
+      &lt;set&gt;
+          &lt;objectAnimator android:propertyName=&quot;translationZ&quot;
+                          android:duration=&quot;@integer/button_pressed_animation_duration&quot;  ##100ms
+                          android:valueTo=&quot;0&quot;
+                          android:startDelay=&quot;@integer/button_pressed_animation_delay&quot; ## 100ms
+                          android:valueType=&quot;floatType&quot;/&gt;
+          &lt;objectAnimator android:propertyName=&quot;elevation&quot;
+                          android:duration=&quot;0&quot;
+                          android:valueTo=&quot;@dimen/button_elevation_material&quot; ## 2dp
+                          android:valueType=&quot;floatType&quot; /&gt;
+      &lt;/set&gt;
+  &lt;/item&gt;
+  &lt;item&gt;
+      &lt;set&gt;
+          &lt;objectAnimator android:propertyName=&quot;translationZ&quot;
+                          android:duration=&quot;0&quot;
+                          android:valueTo=&quot;0&quot;
+                          android:valueType=&quot;floatType&quot;/&gt;
+          &lt;objectAnimator android:propertyName=&quot;elevation&quot;
+                          android:duration=&quot;0&quot;
+                          android:valueTo=&quot;0&quot;
+                          android:valueType=&quot;floatType&quot;/&gt;
+      &lt;/set&gt;
+  &lt;/item&gt;
+&lt;/selector&gt;
+</code></pre>
+<p>注意那个button_elevation_material：<br>在<a href="https://android.googlesource.com/platform/frameworks/base/+/master/core/res/res/values/dimens_material.xml">aosp</a>中</p>
+<pre><code class="xml">&lt;!-- Elevation when button is pressed --&gt;
+    &lt;dimen name=&quot;button_elevation_material&quot;&gt;2dp&lt;/dimen&gt;
+    &lt;!-- Z translation to apply when button is pressed --&gt;
+    &lt;dimen name=&quot;button_pressed_z_material&quot;&gt;4dp&lt;/dimen&gt;
+</code></pre>
 <p><strong><em>所以Lollipop上使用Appcompat主题，什么都不改，button默认是会有2dp的elevation的</em></strong><br>至于这个elevation为什么不是在初始化的时候就设置的（打断点的时候走完构造函数,getElevation还是0），就在于这上面这个AnimationDelay(其实是100ms之后再去运行这个动画)，从堆栈来看，最终导致调用setElevation的地方是在drawableStateChange这个方法里面。</p>
 <h3 id="10-内网传输功能的原理"><a href="#10-内网传输功能的原理" class="headerlink" title="10. 内网传输功能的原理"></a>10. 内网传输功能的原理</h3><p>有些App提供局域网内无限传输文件的能力：本质上是用了TCP或者UDP。在java层的话，TCP用的是java.net.Socket，UDP用的是java.net.DatagramSocket。由于数据传输是双向的，客户端和Server端都需要创建这样的Object Instance。<br><a href="https://github.com/xanarry/LanTrans-android">一个比较好的Demo</a><br>Unix的输入输出(IO)系统遵循Open-Read-Write-Close这样的操作范本。</p>
-<h3 id="11-v7包里面的Toolbar只是一个自定义View"><a href="#11-v7包里面的Toolbar只是一个自定义View" class="headerlink" title="11.v7包里面的Toolbar只是一个自定义View"></a>11.v7包里面的Toolbar只是一个自定义View</h3><p>随便举一个例子，右上角的optionMenu点击跳出的弹窗里面其实是一个ListView，具体的class是android.support.v7.view.menu.ListMenuItemView。都是很常规的自定义View的做法，这个ListView的Adapter叫做MenuAdapter，这个Adapter的itemLayout布局文件叫做abc_popup_menu_item_layout.xml<br>abc_popup_menu_item_layout.xml<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">android.support.v7.internal.view.menu.ListMenuItemView</span></span></span><br><span class="line"><span class="tag">        <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_width</span>=<span class="string">"fill_parent"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_height</span>=<span class="string">"?attr/dropdownListPreferredItemHeight"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:minWidth</span>=<span class="string">"196dip"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:paddingRight</span>=<span class="string">"16dip"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- Icon will be inserted here. --&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- The title and summary have some gap between them, and this 'group' should be centered vertically. --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">RelativeLayout</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:layout_width</span>=<span class="string">"0dip"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:layout_weight</span>=<span class="string">"1"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:layout_gravity</span>=<span class="string">"center_vertical"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:layout_marginLeft</span>=<span class="string">"16dip"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:duplicateParentState</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="name">TextView</span></span></span><br><span class="line"><span class="tag">                <span class="attr">android:id</span>=<span class="string">"@+id/title"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">android:layout_width</span>=<span class="string">"fill_parent"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">android:layout_alignParentTop</span>=<span class="string">"true"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">android:layout_alignParentLeft</span>=<span class="string">"true"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">android:textAppearance</span>=<span class="string">"?attr/textAppearanceLargePopupMenu"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">android:singleLine</span>=<span class="string">"true"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">android:duplicateParentState</span>=<span class="string">"true"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">android:ellipsize</span>=<span class="string">"marquee"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">android:fadingEdge</span>=<span class="string">"horizontal"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="name">TextView</span></span></span><br><span class="line"><span class="tag">                <span class="attr">android:id</span>=<span class="string">"@+id/shortcut"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">android:layout_width</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">android:layout_below</span>=<span class="string">"@id/title"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">android:layout_alignParentLeft</span>=<span class="string">"true"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">android:textAppearance</span>=<span class="string">"?attr/textAppearanceSmallPopupMenu"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">android:singleLine</span>=<span class="string">"true"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">android:duplicateParentState</span>=<span class="string">"true"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;/<span class="name">RelativeLayout</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- Checkbox, and/or radio button will be inserted here. --&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">android.support.v7.internal.view.menu.ListMenuItemView</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="11-v7包里面的Toolbar只是一个自定义View"><a href="#11-v7包里面的Toolbar只是一个自定义View" class="headerlink" title="11.v7包里面的Toolbar只是一个自定义View"></a>11.v7包里面的Toolbar只是一个自定义View</h3><p>随便举一个例子，右上角的optionMenu点击跳出的弹窗里面其实是一个ListView，具体的class是android.support.v7.view.menu.ListMenuItemView。都是很常规的自定义View的做法，这个ListView的Adapter叫做MenuAdapter，这个Adapter的itemLayout布局文件叫做abc_popup_menu_item_layout.xml<br>abc_popup_menu_item_layout.xml</p>
+<pre><code class="xml">&lt;android.support.v7.internal.view.menu.ListMenuItemView
+        xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+        android:layout_width=&quot;fill_parent&quot;
+        android:layout_height=&quot;?attr/dropdownListPreferredItemHeight&quot;
+        android:minWidth=&quot;196dip&quot;
+        android:paddingRight=&quot;16dip&quot;&gt;
+
+    &lt;!-- Icon will be inserted here. --&gt;
+
+    &lt;!-- The title and summary have some gap between them, and this &#39;group&#39; should be centered vertically. --&gt;
+    &lt;RelativeLayout
+            android:layout_width=&quot;0dip&quot;
+            android:layout_weight=&quot;1&quot;
+            android:layout_height=&quot;wrap_content&quot;
+            android:layout_gravity=&quot;center_vertical&quot;
+            android:layout_marginLeft=&quot;16dip&quot;
+            android:duplicateParentState=&quot;true&quot;&gt;
+
+        &lt;TextView
+                android:id=&quot;@+id/title&quot;
+                android:layout_width=&quot;fill_parent&quot;
+                android:layout_height=&quot;wrap_content&quot;
+                android:layout_alignParentTop=&quot;true&quot;
+                android:layout_alignParentLeft=&quot;true&quot;
+                android:textAppearance=&quot;?attr/textAppearanceLargePopupMenu&quot;
+                android:singleLine=&quot;true&quot;
+                android:duplicateParentState=&quot;true&quot;
+                android:ellipsize=&quot;marquee&quot;
+                android:fadingEdge=&quot;horizontal&quot;/&gt;
+
+        &lt;TextView
+                android:id=&quot;@+id/shortcut&quot;
+                android:layout_width=&quot;wrap_content&quot;
+                android:layout_height=&quot;wrap_content&quot;
+                android:layout_below=&quot;@id/title&quot;
+                android:layout_alignParentLeft=&quot;true&quot;
+                android:textAppearance=&quot;?attr/textAppearanceSmallPopupMenu&quot;
+                android:singleLine=&quot;true&quot;
+                android:duplicateParentState=&quot;true&quot;/&gt;
+
+    &lt;/RelativeLayout&gt;
+
+    &lt;!-- Checkbox, and/or radio button will be inserted here. --&gt;
+
+&lt;/android.support.v7.internal.view.menu.ListMenuItemView&gt;
+</code></pre>
 <p>一般来讲，MenuItem的字体大小，颜色都是需要在theme中写的。所以照说硬要用findViewById(ViewGroup的findViewTraversal)其实是能找到的。</p>
-<h3 id="12-Message-ontain以及相似的场景"><a href="#12-Message-ontain以及相似的场景" class="headerlink" title="12. Message.ontain以及相似的场景"></a>12. Message.ontain以及相似的场景</h3><p>MotionEvent.ontain()，TouchTarget.ontain(),HoverTarget.ontain()….<br>MotionEvent最多缓存10个，TouchTarget和HoverTarget这些都是在看ViewGroup源码的时候瞅到的，简单点。<br>稍微看下就知道这种obtain,recycle写法的套路。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">TouchTarget</span> </span>&#123;</span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MAX_RECYCLED = <span class="number">32</span>;</span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Object sRecycleLock = <span class="keyword">new</span> Object[<span class="number">0</span>];</span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">static</span> TouchTarget sRecycleBin;</span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> sRecycledCount;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> ALL_POINTER_IDS = -<span class="number">1</span>; <span class="comment">// all ones</span></span><br><span class="line"></span><br><span class="line">      <span class="comment">// The touched child view.</span></span><br><span class="line">      <span class="keyword">public</span> View child;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// The combined bit mask of pointer ids for all pointers captured by the target.</span></span><br><span class="line">      <span class="keyword">public</span> <span class="keyword">int</span> pointerIdBits;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// The next target in the target list.</span></span><br><span class="line">      <span class="keyword">public</span> TouchTarget next;</span><br><span class="line"></span><br><span class="line">      <span class="function"><span class="keyword">private</span> <span class="title">TouchTarget</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> TouchTarget <span class="title">obtain</span><span class="params">(@NonNull View child, <span class="keyword">int</span> pointerIdBits)</span> </span>&#123;</span><br><span class="line">          <span class="keyword">if</span> (child == <span class="keyword">null</span>) &#123;</span><br><span class="line">              <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"child must be non-null"</span>);</span><br><span class="line">          &#125;</span><br><span class="line"></span><br><span class="line">          <span class="keyword">final</span> TouchTarget target;</span><br><span class="line">          <span class="keyword">synchronized</span> (sRecycleLock) &#123;</span><br><span class="line">              <span class="keyword">if</span> (sRecycleBin == <span class="keyword">null</span>) &#123;</span><br><span class="line">                  target = <span class="keyword">new</span> TouchTarget();</span><br><span class="line">              &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                  target = sRecycleBin;</span><br><span class="line">                  sRecycleBin = target.next;</span><br><span class="line">                   sRecycledCount--;</span><br><span class="line">                  target.next = <span class="keyword">null</span>;</span><br><span class="line">              &#125;</span><br><span class="line">          &#125;</span><br><span class="line">          target.child = child;</span><br><span class="line">          target.pointerIdBits = pointerIdBits;</span><br><span class="line">          <span class="keyword">return</span> target;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">recycle</span><span class="params">()</span> </span>&#123;</span><br><span class="line">          <span class="keyword">if</span> (child == <span class="keyword">null</span>) &#123;</span><br><span class="line">              <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"already recycled once"</span>);</span><br><span class="line">          &#125;</span><br><span class="line"></span><br><span class="line">          <span class="keyword">synchronized</span> (sRecycleLock) &#123;</span><br><span class="line">              <span class="keyword">if</span> (sRecycledCount &lt; MAX_RECYCLED) &#123;</span><br><span class="line">                  next = sRecycleBin;</span><br><span class="line">                  sRecycleBin = <span class="keyword">this</span>;</span><br><span class="line">                  sRecycledCount += <span class="number">1</span>;</span><br><span class="line">              &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                  next = <span class="keyword">null</span>;</span><br><span class="line">              &#125;</span><br><span class="line">              child = <span class="keyword">null</span>;</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="12-Message-ontain以及相似的场景"><a href="#12-Message-ontain以及相似的场景" class="headerlink" title="12. Message.ontain以及相似的场景"></a>12. Message.ontain以及相似的场景</h3><p>MotionEvent.ontain()，TouchTarget.ontain(),HoverTarget.ontain()….<br>MotionEvent最多缓存10个，TouchTarget和HoverTarget这些都是在看ViewGroup源码的时候瞅到的，简单点。<br>稍微看下就知道这种obtain,recycle写法的套路。</p>
+<pre><code class="java">private static final class TouchTarget {
+      private static final int MAX_RECYCLED = 32;
+      private static final Object sRecycleLock = new Object[0];
+      private static TouchTarget sRecycleBin;
+      private static int sRecycledCount;
+
+      public static final int ALL_POINTER_IDS = -1; // all ones
+
+      // The touched child view.
+      public View child;
+
+      // The combined bit mask of pointer ids for all pointers captured by the target.
+      public int pointerIdBits;
+
+      // The next target in the target list.
+      public TouchTarget next;
+
+      private TouchTarget() {
+      }
+
+      public static TouchTarget obtain(@NonNull View child, int pointerIdBits) {
+          if (child == null) {
+              throw new IllegalArgumentException(&quot;child must be non-null&quot;);
+          }
+
+          final TouchTarget target;
+          synchronized (sRecycleLock) {
+              if (sRecycleBin == null) {
+                  target = new TouchTarget();
+              } else {
+                  target = sRecycleBin;
+                  sRecycleBin = target.next;
+                   sRecycledCount--;
+                  target.next = null;
+              }
+          }
+          target.child = child;
+          target.pointerIdBits = pointerIdBits;
+          return target;
+      }
+
+      public void recycle() {
+          if (child == null) {
+              throw new IllegalStateException(&quot;already recycled once&quot;);
+          }
+
+          synchronized (sRecycleLock) {
+              if (sRecycledCount &lt; MAX_RECYCLED) {
+                  next = sRecycleBin;
+                  sRecycleBin = this;
+                  sRecycledCount += 1;
+              } else {
+                  next = null;
+              }
+              child = null;
+          }
+      }
+  }
+</code></pre>
 <h3 id="13-从点击Launcher到应用启动的过程"><a href="#13-从点击Launcher到应用启动的过程" class="headerlink" title="13. 从点击Launcher到应用启动的过程"></a>13. 从点击Launcher到应用启动的过程</h3><blockquote>
 <p>借助binder驱动<br>ActivityManagerService.startActivity-&gt; (AMS)<br>…<br>//一系类AMS的调用链和一些与Launcher通过Binder的互相调用过程，此时仍然未创建应用程序的进程。<br>…<br> AMS创建一个新的进程，用来启动一个ActivityThread实例，<br> 即将要启动的Activity就是在这个ActivityThread实例中运行<br>Process.start(“android.app.ActivityThread”,…)-&gt;<br>// 通过zygote机制创建一个新的进程<br>Process.startViaZygote-&gt;调用新进程的main()<br>ActivityThread.main-&gt;</p>
 </blockquote>
 <p><a href="https://juejin.im/entry/5a0d02086fb9a045263b2387">Android 应用点击图标到Activity界面显示的过程分析</a></p>
-<h3 id="14-Context是什么"><a href="#14-Context是什么" class="headerlink" title="14. Context是什么"></a>14. Context是什么</h3><p>ActivityThread.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">createBaseContextForActivity&#123;</span><br><span class="line">  ContextImpl appContext = ContextImpl.createActivityContext(</span><br><span class="line">                 <span class="keyword">this</span>, r.packageInfo, r.activityInfo, r.token, displayId, r.overrideConfig);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="14-Context是什么"><a href="#14-Context是什么" class="headerlink" title="14. Context是什么"></a>14. Context是什么</h3><p>ActivityThread.java  </p>
+<pre><code class="java">createBaseContextForActivity{
+  ContextImpl appContext = ContextImpl.createActivityContext(
+                 this, r.packageInfo, r.activityInfo, r.token, displayId, r.overrideConfig);
+}
+</code></pre>
 <p>ContextImpl包含资源信息、对Context的一些函数的实现等。每次创建Activity都会新建一个ContextImpl</p>
 <h3 id="15-Dex-file-explained"><a href="#15-Dex-file-explained" class="headerlink" title="15. Dex file explained"></a>15. Dex file explained</h3><p><a href="https://blog.bugsnag.com/dex-and-d8/">The Dex File Format</a></p>
 <h3 id="16-PackageParser和Android-manifest文件有关"><a href="#16-PackageParser和Android-manifest文件有关" class="headerlink" title="16 .PackageParser和Android.manifest文件有关"></a>16 .PackageParser和Android.manifest文件有关</h3><p><a href="http://blog.csdn.net/zhbinary/article/details/7353739">Android APK应用安装原理(1)-解析AndroidManifest原理-</a>.</p>
 <h3 id="17-在Dialog中getContext获取的是ContextThemeWrapper"><a href="#17-在Dialog中getContext获取的是ContextThemeWrapper" class="headerlink" title="17. 在Dialog中getContext获取的是ContextThemeWrapper"></a>17. 在Dialog中getContext获取的是ContextThemeWrapper</h3><p>ContextThemeWrapper是API 1就有了的，主要是包装一下context，将Context的外部调用添加一些包装。</p>
-<h3 id="18-低版本的xml属性怎么写"><a href="#18-低版本的xml属性怎么写" class="headerlink" title="18. 低版本的xml属性怎么写"></a>18. 低版本的xml属性怎么写</h3><p>mylayout.xml<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Button</span></span></span><br><span class="line"><span class="tag">       <span class="attr">android:layout_width</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">android:elevation</span>=<span class="string">"10dp"</span></span></span><br><span class="line"><span class="tag">       /&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="18-低版本的xml属性怎么写"><a href="#18-低版本的xml属性怎么写" class="headerlink" title="18. 低版本的xml属性怎么写"></a>18. 低版本的xml属性怎么写</h3><p>mylayout.xml</p>
+<pre><code class="xml">&lt;Button
+       android:layout_width=&quot;wrap_content&quot;
+       android:layout_height=&quot;wrap_content&quot;
+       android:elevation=&quot;10dp&quot;
+       /&gt;
+</code></pre>
 <p>这样写的话，Lint肯定会报warning。<br>解决办法，alt+enter，Android studio自动生成一个/layout-v21/maylayout.xml。现在想起来很多项目里v-xx文件夹，其实是这个意思。<br>还有一种写法</p>
 <blockquote>
 <p>style=”?android:attr/borderlessButtonStyle”<br>自己写style也是行的</p>
 </blockquote>
 <h3 id="19-LocalBroadCastManager好像确实是基于handler实现的"><a href="#19-LocalBroadCastManager好像确实是基于handler实现的" class="headerlink" title="19. LocalBroadCastManager好像确实是基于handler实现的"></a>19. LocalBroadCastManager<del>好像</del>确实是基于handler实现的</h3><p>App内部全局拥有一个LocalBroadCastManager实例，内部持有一个handler，对外暴露功能sendBroadcast。就是往handler里丢一个message MSG_EXEC_PENDING_BROADCASTS，处理这个message就是executePendingBroadcasts。所以默认是在下一个message中处理的。如果想在当前message中就处理掉，还有一个sendBroadcastSync方法，但这会把当前持有的所有待处理消息全部flush掉。sendBroadcast，unregisterReceiver，registerReceiver内部用了synchronize，所以是线程安全的。<br><a href="https://stackoverflow.com/questions/38751320/android-unable-to-receive-local-broadcast-in-my-activity-from-service">stackoverflow上也有人指出LocalBrodcatManager不支持ipc</a>.BroadcastReceiver倒是可以的，ContentProvider也是官方支持ipc的组件</p>
 <h3 id="20-ViewPager为什么没有那些attrs的可以写在xml里面的属性"><a href="#20-ViewPager为什么没有那些attrs的可以写在xml里面的属性" class="headerlink" title="20. ViewPager为什么没有那些attrs的可以写在xml里面的属性"></a>20. ViewPager为什么没有那些attrs的可以写在xml里面的属性</h3><p> Adam Powell在15年的Android Dev summit上说过：this is pre aar gradle age, if we were to do it today , we definitely would add。<br> 看了下aosp的git日志，ViewPager是2011年就有了的。而<a href="https://developer.android.com/studio/projects/android-library.html#CreateLibrary">aar</a>是随着android studio的发布推出的。<br> jar和aar的区别:<br> jar : JAR 文件就是 Java Archive File，顾名思意，它的应用是与 Java 息息相关的，是 Java 的一种文档格式。只包含了class文件与清单文件 ，不包含资源文件，如图片等所有res中的文件。<br> aar: aar，AAR（Android Archive）包是一个Android库项目的二进制归档文件,包含一些自己写的控件布局文件以及字体等资源文件(resources或者manifest文件)那么就只能使用*.aar文件。</p>
-<h3 id="21-都知道RelativeLayout会measure两次child，LinearLayout在加weight的时候也会measure两次"><a href="#21-都知道RelativeLayout会measure两次child，LinearLayout在加weight的时候也会measure两次" class="headerlink" title="21. 都知道RelativeLayout会measure两次child，LinearLayout在加weight的时候也会measure两次"></a>21. 都知道RelativeLayout会measure两次child，LinearLayout在加weight的时候也会measure两次</h3><p>LinearLayout.java<br>measureVertical()<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// We have no limit, so make all weighted views as tall as the largest child.</span></span><br><span class="line">        <span class="comment">// Children will have already been measured once.</span></span><br><span class="line">        <span class="keyword">if</span> (useLargestChild &amp;&amp; heightMode != MeasureSpec.EXACTLY) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; count; i++) &#123;</span><br><span class="line">                <span class="keyword">final</span> View child = getVirtualChildAt(i);</span><br><span class="line">                  <span class="comment">// ......</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="21-都知道RelativeLayout会measure两次child，LinearLayout在加weight的时候也会measure两次"><a href="#21-都知道RelativeLayout会measure两次child，LinearLayout在加weight的时候也会measure两次" class="headerlink" title="21. 都知道RelativeLayout会measure两次child，LinearLayout在加weight的时候也会measure两次"></a>21. 都知道RelativeLayout会measure两次child，LinearLayout在加weight的时候也会measure两次</h3><p>LinearLayout.java<br>measureVertical()</p>
+<pre><code class="java">// We have no limit, so make all weighted views as tall as the largest child.
+        // Children will have already been measured once.
+        if (useLargestChild &amp;&amp; heightMode != MeasureSpec.EXACTLY) {
+            for (int i = 0; i &lt; count; i++) {
+                final View child = getVirtualChildAt(i);
+                  // ......
+            }
+        }
+</code></pre>
 <h3 id="22-gradle-wrapper文件的作用"><a href="#22-gradle-wrapper文件的作用" class="headerlink" title="22. gradle wrapper文件的作用"></a>22. gradle wrapper文件的作用</h3><p><a href="https://medium.com/@bherbst/understanding-the-gradle-wrapper-a62f35662ab7">understanding-the-gradle-wrapper</a><br>进一个新目录</p>
 <blockquote>
 <p>gradle wrapper 命令会生成如下目录<br>├─.gradle<br>│  ├─4.4.1<br>│  │  ├─fileChanges<br>│  │  ├─fileHashes<br>│  │  └─taskHistory<br>│  └─buildOutputCleanup<br>└─gradle<br>    └─wrapper<br>这里提到了一些点：gradlew.bat是给windows平台用的，gradlew是给unix平台用的。<br>gradle/wrapper/gradle-wrapper.jar 里面装的是Gradle Wrapper的代码<br>gradlew就是一个调用gradle命令的脚本，内部会根据gradle-wrapper.properties里面的distributionUrl下载对应版本的gradle distribution zip文件并解压缩，并只会使用该版本的gradle进行编译</p>
@@ -252,13 +454,188 @@ ga('send', 'pageview');
 </blockquote>
 <h3 id="23-java平台下扫描本地samba服务器用的的一个library叫做import-jcifs-smb-SmbFile"><a href="#23-java平台下扫描本地samba服务器用的的一个library叫做import-jcifs-smb-SmbFile" class="headerlink" title="23. java平台下扫描本地samba服务器用的的一个library叫做import jcifs.smb.SmbFile"></a>23. java平台下扫描本地samba服务器用的的一个library叫做import jcifs.smb.SmbFile</h3><p><a href="https://github.com/eriklupander/microgramcaster/blob/master/src/com/squeed/microgramcaster/smb/SambaExplorer.java">找到一个实例代码</a></p>
 <h3 id="24-Android平台上js交互的速度"><a href="#24-Android平台上js交互的速度" class="headerlink" title="24.Android平台上js交互的速度"></a>24.Android平台上js交互的速度</h3><p>也是从别处看到的，说是java调js的效率不高，大概200ms，js调java好一点，大概50ms左右，所以尽量用js调java。</p>
-<h3 id="25-在Android平台发起上传图片请求的重点在于掌握http协议（关键词Boundary）"><a href="#25-在Android平台发起上传图片请求的重点在于掌握http协议（关键词Boundary）" class="headerlink" title="25.在Android平台发起上传图片请求的重点在于掌握http协议（关键词Boundary）"></a>25.在Android平台发起上传图片请求的重点在于掌握http协议（关键词Boundary）</h3><p>自己用express写了一个上传文件的后台，前端请求/post接口即可上传图片<br>看了下chrome里面的network<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">POST /upload/ HTTP/1.1</span><br><span class="line">Host: localhost:3000</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Content-Length: 9860</span><br><span class="line">Accept: */*</span><br><span class="line">Origin: http://localhost:3000</span><br><span class="line">X-Requested-With: XMLHttpRequest</span><br><span class="line">User-Agent: Mozilla/5.0 (iPhone; CPU iPhone OS 10_3 like Mac OS X) AppleWebKit/602.1.50 (KHTML, like Gecko) CriOS/56.0.2924.75 Mobile/14E5239e Safari/602.1</span><br><span class="line">Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryw0ZREBdOiJbbwuAg // 注意这句</span><br><span class="line">DNT: 1</span><br><span class="line">Referer: http://localhost:3000/</span><br><span class="line">Accept-Encoding: gzip, deflate, br</span><br><span class="line">Accept-Language: zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7</span><br></pre></td></tr></table></figure></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">------WebKitFormBoundaryw0ZREBdOiJbbwuAg</span><br><span class="line">Content-Disposition: form-data; name=&quot;uploads[]&quot;; filename=&quot;278a516893f31a16feee.jpg&quot;</span><br><span class="line">Content-Type: image/jpeg</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">------WebKitFormBoundaryw0ZREBdOiJbbwuAg--</span><br></pre></td></tr></table></figure>
+<h3 id="25-在Android平台发起上传图片请求的重点在于掌握http协议（关键词Boundary）"><a href="#25-在Android平台发起上传图片请求的重点在于掌握http协议（关键词Boundary）" class="headerlink" title="25.在Android平台发起上传图片请求的重点在于掌握http协议（关键词Boundary）"></a>25.在Android平台发起上传图片请求的重点在于掌握http协议（关键词Boundary）</h3><p>自己用express写了一个上传文件的后台，前端请求/post接口即可上传图片<br>看了下chrome里面的network</p>
+<pre><code class="text">POST /upload/ HTTP/1.1
+Host: localhost:3000
+Connection: keep-alive
+Content-Length: 9860
+Accept: */*
+Origin: http://localhost:3000
+X-Requested-With: XMLHttpRequest
+User-Agent: Mozilla/5.0 (iPhone; CPU iPhone OS 10_3 like Mac OS X) AppleWebKit/602.1.50 (KHTML, like Gecko) CriOS/56.0.2924.75 Mobile/14E5239e Safari/602.1
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryw0ZREBdOiJbbwuAg // 注意这句
+DNT: 1
+Referer: http://localhost:3000/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7
+</code></pre>
+<pre><code class="text">------WebKitFormBoundaryw0ZREBdOiJbbwuAg
+Content-Disposition: form-data; name=&quot;uploads[]&quot;; filename=&quot;278a516893f31a16feee.jpg&quot;
+Content-Type: image/jpeg
+
+
+------WebKitFormBoundaryw0ZREBdOiJbbwuAg--
+</code></pre>
 <p>那个WebKitFormBoundary是浏览器自动加的，Content-Disposition也是浏览器加的</p>
-<p>这里借用<a href="http://blog.csdn.net/lmj623565791/article/details/23781773">鸿洋的代码</a><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String BOUNDARY = <span class="string">"----WebKitFormBoundaryT1HoybnYeFOGFlBR"</span>;  </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">uploadForm</span><span class="params">(Map&lt;String, String&gt; params, String fileFormName,  </span></span></span><br><span class="line"><span class="function"><span class="params">            File uploadFile, String newFileName, String urlStr)</span>  </span></span><br><span class="line"><span class="function">            <span class="keyword">throws</span> IOException </span>&#123;  </span><br><span class="line">        <span class="keyword">if</span> (newFileName == <span class="keyword">null</span> || newFileName.trim().equals(<span class="string">""</span>)) &#123;  </span><br><span class="line">            newFileName = uploadFile.getName();  </span><br><span class="line">        &#125;  </span><br><span class="line"></span><br><span class="line">        StringBuilder sb = <span class="keyword">new</span> StringBuilder();  </span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 普通的表单数据</span></span><br><span class="line"><span class="comment">         */</span>  </span><br><span class="line">        <span class="keyword">for</span> (String key : params.keySet()) &#123;  </span><br><span class="line">            sb.append(<span class="string">"--"</span> + BOUNDARY + <span class="string">"\r\n"</span>);  </span><br><span class="line">            sb.append(<span class="string">"Content-Disposition: form-data; name=\""</span> + key + <span class="string">"\""</span>  </span><br><span class="line">                    + <span class="string">"\r\n"</span>);  </span><br><span class="line">            sb.append(<span class="string">"\r\n"</span>);  </span><br><span class="line">            sb.append(params.get(key) + <span class="string">"\r\n"</span>);  </span><br><span class="line">        &#125;  </span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 上传文件的头</span></span><br><span class="line"><span class="comment">         */</span>  </span><br><span class="line">        sb.append(<span class="string">"--"</span> + BOUNDARY + <span class="string">"\r\n"</span>);  </span><br><span class="line">        sb.append(<span class="string">"Content-Disposition: form-data; name=\""</span> + fileFormName  </span><br><span class="line">                + <span class="string">"\"; filename=\""</span> + newFileName + <span class="string">"\""</span> + <span class="string">"\r\n"</span>);  </span><br><span class="line">        sb.append(<span class="string">"Content-Type: image/jpeg"</span> + <span class="string">"\r\n"</span>);<span class="comment">// 如果服务器端有文件类型的校验，必须明确指定ContentType  </span></span><br><span class="line">        sb.append(<span class="string">"\r\n"</span>);  </span><br><span class="line"></span><br><span class="line">        <span class="keyword">byte</span>[] headerInfo = sb.toString().getBytes(<span class="string">"UTF-8"</span>);  </span><br><span class="line">        <span class="keyword">byte</span>[] endInfo = (<span class="string">"\r\n--"</span> + BOUNDARY + <span class="string">"--\r\n"</span>).getBytes(<span class="string">"UTF-8"</span>);  </span><br><span class="line">        System.out.println(sb.toString());  </span><br><span class="line">        URL url = <span class="keyword">new</span> URL(urlStr);  </span><br><span class="line">        HttpURLConnection conn = (HttpURLConnection) url.openConnection();  </span><br><span class="line">        conn.setRequestMethod(<span class="string">"POST"</span>);  </span><br><span class="line">        conn.setRequestProperty(<span class="string">"Content-Type"</span>,  </span><br><span class="line">                <span class="string">"multipart/form-data; boundary="</span> + BOUNDARY);  </span><br><span class="line">        conn.setRequestProperty(<span class="string">"Content-Length"</span>, String  </span><br><span class="line">                .valueOf(headerInfo.length + uploadFile.length()  </span><br><span class="line">                        + endInfo.length));  </span><br><span class="line">        conn.setDoOutput(<span class="keyword">true</span>);  </span><br><span class="line"></span><br><span class="line">        OutputStream out = conn.getOutputStream();  </span><br><span class="line">        InputStream in = <span class="keyword">new</span> FileInputStream(uploadFile);  </span><br><span class="line">        out.write(headerInfo);  </span><br><span class="line"></span><br><span class="line">        <span class="keyword">byte</span>[] buf = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">1024</span>];  </span><br><span class="line">        <span class="keyword">int</span> len;  </span><br><span class="line">        <span class="keyword">while</span> ((len = in.read(buf)) != -<span class="number">1</span>)  </span><br><span class="line">            out.write(buf, <span class="number">0</span>, len);  </span><br><span class="line"></span><br><span class="line">        out.write(endInfo);  </span><br><span class="line">        in.close();  </span><br><span class="line">        out.close();  </span><br><span class="line">        <span class="keyword">if</span> (conn.getResponseCode() == <span class="number">200</span>) &#123;  </span><br><span class="line">            System.out.println(<span class="string">"上传成功"</span>);  </span><br><span class="line">        &#125;  </span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
-<h3 id="26-ScrollView，RecyclerView的截屏实现"><a href="#26-ScrollView，RecyclerView的截屏实现" class="headerlink" title="26.ScrollView，RecyclerView的截屏实现"></a>26.ScrollView，RecyclerView的截屏实现</h3><p>主要是用lru包装下，<a href="https://gist.github.com/PrashamTrivedi/809d2541776c8c141d9a">参考</a><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Bitmap <span class="title">shotRecyclerView</span><span class="params">(RecyclerView view)</span> </span>&#123;</span><br><span class="line">    RecyclerView.Adapter adapter = view.getAdapter();</span><br><span class="line">    Bitmap bigBitmap = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">if</span> (adapter != <span class="keyword">null</span>) &#123;</span><br><span class="line">      <span class="keyword">int</span> size = adapter.getItemCount();</span><br><span class="line">      <span class="keyword">int</span> height = <span class="number">0</span>;</span><br><span class="line">      Paint paint = <span class="keyword">new</span> Paint();</span><br><span class="line">      <span class="keyword">int</span> iHeight = <span class="number">0</span>;</span><br><span class="line">      <span class="keyword">final</span> <span class="keyword">int</span> maxMemory = (<span class="keyword">int</span>) (Runtime.getRuntime().maxMemory() / <span class="number">1024</span>);</span><br><span class="line"></span><br><span class="line">      <span class="comment">// Use 1/8th of the available memory for this memory cache.</span></span><br><span class="line">      <span class="keyword">final</span> <span class="keyword">int</span> cacheSize = maxMemory / <span class="number">8</span>;</span><br><span class="line">      LruCache&lt;String, Bitmap&gt; bitmaCache = <span class="keyword">new</span> LruCache&lt;&gt;(cacheSize);</span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; size; i++) &#123;</span><br><span class="line">        RecyclerView.ViewHolder holder = adapter.createViewHolder(view, adapter.getItemViewType(i));</span><br><span class="line">        adapter.onBindViewHolder(holder, i);</span><br><span class="line">        holder.itemView.measure(</span><br><span class="line">            View.MeasureSpec.makeMeasureSpec(view.getWidth(), View.MeasureSpec.EXACTLY),</span><br><span class="line">            View.MeasureSpec.makeMeasureSpec(<span class="number">0</span>, View.MeasureSpec.UNSPECIFIED));</span><br><span class="line">        holder.itemView.layout(<span class="number">0</span>, <span class="number">0</span>, holder.itemView.getMeasuredWidth(),</span><br><span class="line">            holder.itemView.getMeasuredHeight());</span><br><span class="line">        holder.itemView.setDrawingCacheEnabled(<span class="keyword">true</span>);</span><br><span class="line">        holder.itemView.buildDrawingCache();</span><br><span class="line">        Bitmap drawingCache = holder.itemView.getDrawingCache();</span><br><span class="line">        <span class="keyword">if</span> (drawingCache != <span class="keyword">null</span>) &#123;</span><br><span class="line"></span><br><span class="line">          bitmaCache.put(String.valueOf(i), drawingCache);</span><br><span class="line">        &#125;</span><br><span class="line">        height += holder.itemView.getMeasuredHeight();</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      bigBitmap = Bitmap.createBitmap(view.getMeasuredWidth(), height, Bitmap.Config.ARGB_8888);</span><br><span class="line">      Canvas bigCanvas = <span class="keyword">new</span> Canvas(bigBitmap);</span><br><span class="line">      Drawable lBackground = view.getBackground();</span><br><span class="line">      <span class="keyword">if</span> (lBackground <span class="keyword">instanceof</span> ColorDrawable) &#123;</span><br><span class="line">        ColorDrawable lColorDrawable = (ColorDrawable) lBackground;</span><br><span class="line">        <span class="keyword">int</span> lColor = lColorDrawable.getColor();</span><br><span class="line">        bigCanvas.drawColor(lColor);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; size; i++) &#123;</span><br><span class="line">        Bitmap bitmap = bitmaCache.get(String.valueOf(i));</span><br><span class="line">        bigCanvas.drawBitmap(bitmap, <span class="number">0f</span>, iHeight, paint);</span><br><span class="line">        iHeight += bitmap.getHeight();</span><br><span class="line">        bitmap.recycle();</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> bigBitmap;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 截取listView也是差不多，主要是一个makeMeasureSpec View.MeasureSpec.UNSPECIFIED</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Bitmap <span class="title">shotListView</span><span class="params">(ListView listview)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">     ListAdapter adapter = listview.getAdapter();</span><br><span class="line">     <span class="keyword">int</span> itemscount = adapter.getCount();</span><br><span class="line">     <span class="keyword">int</span> allitemsheight = <span class="number">0</span>;</span><br><span class="line">     List&lt;Bitmap&gt; bmps = <span class="keyword">new</span> ArrayList&lt;Bitmap&gt;();</span><br><span class="line"></span><br><span class="line">     <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; itemscount; i++) &#123;</span><br><span class="line"></span><br><span class="line">       View childView = adapter.getView(i, <span class="keyword">null</span>, listview);</span><br><span class="line">       childView.measure(</span><br><span class="line">           View.MeasureSpec.makeMeasureSpec(listview.getWidth(), View.MeasureSpec.EXACTLY),</span><br><span class="line">           View.MeasureSpec.makeMeasureSpec(<span class="number">0</span>, View.MeasureSpec.UNSPECIFIED));</span><br><span class="line"></span><br><span class="line">       childView.layout(<span class="number">0</span>, <span class="number">0</span>, childView.getMeasuredWidth(), childView.getMeasuredHeight());</span><br><span class="line">       childView.setDrawingCacheEnabled(<span class="keyword">true</span>);</span><br><span class="line">       childView.buildDrawingCache();</span><br><span class="line">       bmps.add(childView.getDrawingCache());</span><br><span class="line">       allitemsheight += childView.getMeasuredHeight();</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     Bitmap bigbitmap =</span><br><span class="line">         Bitmap.createBitmap(listview.getMeasuredWidth(), allitemsheight, Bitmap.Config.ARGB_8888);</span><br><span class="line">     Canvas bigcanvas = <span class="keyword">new</span> Canvas(bigbitmap);</span><br><span class="line"></span><br><span class="line">     Paint paint = <span class="keyword">new</span> Paint();</span><br><span class="line">     <span class="keyword">int</span> iHeight = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">     <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; bmps.size(); i++) &#123;</span><br><span class="line">       Bitmap bmp = bmps.get(i);</span><br><span class="line">       bigcanvas.drawBitmap(bmp, <span class="number">0</span>, iHeight, paint);</span><br><span class="line">       iHeight += bmp.getHeight();</span><br><span class="line"></span><br><span class="line">       bmp.recycle();</span><br><span class="line">       bmp = <span class="keyword">null</span>;</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     <span class="keyword">return</span> bigbitmap;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里借用<a href="http://blog.csdn.net/lmj623565791/article/details/23781773">鸿洋的代码</a></p>
+<pre><code class="java">private static final String BOUNDARY = &quot;----WebKitFormBoundaryT1HoybnYeFOGFlBR&quot;;  
+
+public void uploadForm(Map&lt;String, String&gt; params, String fileFormName,  
+            File uploadFile, String newFileName, String urlStr)  
+            throws IOException {  
+        if (newFileName == null || newFileName.trim().equals(&quot;&quot;)) {  
+            newFileName = uploadFile.getName();  
+        }  
+
+        StringBuilder sb = new StringBuilder();  
+        /**
+         * 普通的表单数据
+         */  
+        for (String key : params.keySet()) {  
+            sb.append(&quot;--&quot; + BOUNDARY + &quot;\r\n&quot;);  
+            sb.append(&quot;Content-Disposition: form-data; name=\&quot;&quot; + key + &quot;\&quot;&quot;  
+                    + &quot;\r\n&quot;);  
+            sb.append(&quot;\r\n&quot;);  
+            sb.append(params.get(key) + &quot;\r\n&quot;);  
+        }  
+        /**
+         * 上传文件的头
+         */  
+        sb.append(&quot;--&quot; + BOUNDARY + &quot;\r\n&quot;);  
+        sb.append(&quot;Content-Disposition: form-data; name=\&quot;&quot; + fileFormName  
+                + &quot;\&quot;; filename=\&quot;&quot; + newFileName + &quot;\&quot;&quot; + &quot;\r\n&quot;);  
+        sb.append(&quot;Content-Type: image/jpeg&quot; + &quot;\r\n&quot;);// 如果服务器端有文件类型的校验，必须明确指定ContentType  
+        sb.append(&quot;\r\n&quot;);  
+
+        byte[] headerInfo = sb.toString().getBytes(&quot;UTF-8&quot;);  
+        byte[] endInfo = (&quot;\r\n--&quot; + BOUNDARY + &quot;--\r\n&quot;).getBytes(&quot;UTF-8&quot;);  
+        System.out.println(sb.toString());  
+        URL url = new URL(urlStr);  
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();  
+        conn.setRequestMethod(&quot;POST&quot;);  
+        conn.setRequestProperty(&quot;Content-Type&quot;,  
+                &quot;multipart/form-data; boundary=&quot; + BOUNDARY);  
+        conn.setRequestProperty(&quot;Content-Length&quot;, String  
+                .valueOf(headerInfo.length + uploadFile.length()  
+                        + endInfo.length));  
+        conn.setDoOutput(true);  
+
+        OutputStream out = conn.getOutputStream();  
+        InputStream in = new FileInputStream(uploadFile);  
+        out.write(headerInfo);  
+
+        byte[] buf = new byte[1024];  
+        int len;  
+        while ((len = in.read(buf)) != -1)  
+            out.write(buf, 0, len);  
+
+        out.write(endInfo);  
+        in.close();  
+        out.close();  
+        if (conn.getResponseCode() == 200) {  
+            System.out.println(&quot;上传成功&quot;);  
+        }  
+
+    }
+</code></pre>
+<h3 id="26-ScrollView，RecyclerView的截屏实现"><a href="#26-ScrollView，RecyclerView的截屏实现" class="headerlink" title="26.ScrollView，RecyclerView的截屏实现"></a>26.ScrollView，RecyclerView的截屏实现</h3><p>主要是用lru包装下，<a href="https://gist.github.com/PrashamTrivedi/809d2541776c8c141d9a">参考</a></p>
+<pre><code class="java">public static Bitmap shotRecyclerView(RecyclerView view) {
+    RecyclerView.Adapter adapter = view.getAdapter();
+    Bitmap bigBitmap = null;
+    if (adapter != null) {
+      int size = adapter.getItemCount();
+      int height = 0;
+      Paint paint = new Paint();
+      int iHeight = 0;
+      final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+
+      // Use 1/8th of the available memory for this memory cache.
+      final int cacheSize = maxMemory / 8;
+      LruCache&lt;String, Bitmap&gt; bitmaCache = new LruCache&lt;&gt;(cacheSize);
+      for (int i = 0; i &lt; size; i++) {
+        RecyclerView.ViewHolder holder = adapter.createViewHolder(view, adapter.getItemViewType(i));
+        adapter.onBindViewHolder(holder, i);
+        holder.itemView.measure(
+            View.MeasureSpec.makeMeasureSpec(view.getWidth(), View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        holder.itemView.layout(0, 0, holder.itemView.getMeasuredWidth(),
+            holder.itemView.getMeasuredHeight());
+        holder.itemView.setDrawingCacheEnabled(true);
+        holder.itemView.buildDrawingCache();
+        Bitmap drawingCache = holder.itemView.getDrawingCache();
+        if (drawingCache != null) {
+
+          bitmaCache.put(String.valueOf(i), drawingCache);
+        }
+        height += holder.itemView.getMeasuredHeight();
+      }
+
+      bigBitmap = Bitmap.createBitmap(view.getMeasuredWidth(), height, Bitmap.Config.ARGB_8888);
+      Canvas bigCanvas = new Canvas(bigBitmap);
+      Drawable lBackground = view.getBackground();
+      if (lBackground instanceof ColorDrawable) {
+        ColorDrawable lColorDrawable = (ColorDrawable) lBackground;
+        int lColor = lColorDrawable.getColor();
+        bigCanvas.drawColor(lColor);
+      }
+
+      for (int i = 0; i &lt; size; i++) {
+        Bitmap bitmap = bitmaCache.get(String.valueOf(i));
+        bigCanvas.drawBitmap(bitmap, 0f, iHeight, paint);
+        iHeight += bitmap.getHeight();
+        bitmap.recycle();
+      }
+    }
+    return bigBitmap;
+  }
+
+// 截取listView也是差不多，主要是一个makeMeasureSpec View.MeasureSpec.UNSPECIFIED
+  public static Bitmap shotListView(ListView listview) {
+
+     ListAdapter adapter = listview.getAdapter();
+     int itemscount = adapter.getCount();
+     int allitemsheight = 0;
+     List&lt;Bitmap&gt; bmps = new ArrayList&lt;Bitmap&gt;();
+
+     for (int i = 0; i &lt; itemscount; i++) {
+
+       View childView = adapter.getView(i, null, listview);
+       childView.measure(
+           View.MeasureSpec.makeMeasureSpec(listview.getWidth(), View.MeasureSpec.EXACTLY),
+           View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+
+       childView.layout(0, 0, childView.getMeasuredWidth(), childView.getMeasuredHeight());
+       childView.setDrawingCacheEnabled(true);
+       childView.buildDrawingCache();
+       bmps.add(childView.getDrawingCache());
+       allitemsheight += childView.getMeasuredHeight();
+     }
+
+     Bitmap bigbitmap =
+         Bitmap.createBitmap(listview.getMeasuredWidth(), allitemsheight, Bitmap.Config.ARGB_8888);
+     Canvas bigcanvas = new Canvas(bigbitmap);
+
+     Paint paint = new Paint();
+     int iHeight = 0;
+
+     for (int i = 0; i &lt; bmps.size(); i++) {
+       Bitmap bmp = bmps.get(i);
+       bigcanvas.drawBitmap(bmp, 0, iHeight, paint);
+       iHeight += bmp.getHeight();
+
+       bmp.recycle();
+       bmp = null;
+     }
+
+     return bigbitmap;
+   }
+</code></pre>
 <p><a href="http://www.cnblogs.com/onelikeone/p/7091246.html">都在这里了</a></p>
-<h3 id="27-正常使用Android-WebView的方法大概这样"><a href="#27-正常使用Android-WebView的方法大概这样" class="headerlink" title="27.正常使用Android WebView的方法大概这样"></a>27.正常使用Android WebView的方法大概这样</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mWebView = findViewById(R.id.my_webview)</span><br><span class="line">mWebView.getSettings().setJavaScriptEnabled(<span class="keyword">true</span>) <span class="comment">//这只是enable js</span></span><br><span class="line">mWebView.setWebViewClient(WebViewClient()) <span class="comment">//没有这句LayoutInflater调用newInstance的时候就崩了</span></span><br><span class="line">mWebView.loadUrl(<span class="string">"https://www.baidu.com"</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="27-正常使用Android-WebView的方法大概这样"><a href="#27-正常使用Android-WebView的方法大概这样" class="headerlink" title="27.正常使用Android WebView的方法大概这样"></a>27.正常使用Android WebView的方法大概这样</h3><pre><code class="java">mWebView = findViewById(R.id.my_webview)
+mWebView.getSettings().setJavaScriptEnabled(true) //这只是enable js
+mWebView.setWebViewClient(WebViewClient()) //没有这句LayoutInflater调用newInstance的时候就崩了
+mWebView.loadUrl(&quot;https://www.baidu.com&quot;)
+</code></pre>
 <p>对于Android调用JS代码的方法有2种：<br>[Android：你要的WebView与 JS 交互方式 都在这里了(<a href="https://blog.csdn.net/carson_ho/article/details/64904691">https://blog.csdn.net/carson_ho/article/details/64904691</a>)</p>
 <ol>
 <li>通过WebView的loadUrl（）</li>
@@ -270,13 +647,249 @@ ga('send', 'pageview');
 <li>通过 WebViewClient 的shouldOverrideUrlLoading ()方法回调拦截 url</li>
 <li>通过 WebChromeClient 的onJsAlert()、onJsConfirm()、onJsPrompt（）方法回调拦截JS对话框alert()、confirm()、prompt（） 消息</li>
 </ol>
-<p>然后是WebView的截屏<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> fun <span class="title">screenShot</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="comment">//这种方式只能截出来当前屏幕上显示的内容，状态栏以下，手机屏幕底部以上的内容，仅此而已</span></span><br><span class="line">    val screenWidth :Float = Utils.getScreenWidth(<span class="keyword">this</span>).toFloat()</span><br><span class="line">    val screenHeight = Utils.getScreenHeight(<span class="keyword">this</span>).toFloat()</span><br><span class="line">    val shortImage = Bitmap.createBitmap(screenWidth.toInt(), screenHeight.toInt(), Bitmap.Config.RGB_565)</span><br><span class="line">    val canvas = Canvas(shortImage)   <span class="comment">// 画布的宽高和屏幕的宽高保持一致</span></span><br><span class="line">    val paint = Paint()</span><br><span class="line">    canvas.drawBitmap(shortImage, screenWidth, screenHeight, paint)</span><br><span class="line">    mWebView.draw(canvas)</span><br><span class="line">    savebitmap(<span class="string">"1_awesome"</span>,shortImage)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 然而下面这种方式截出来的长度是对了，但底部是空的，得到的是一张很长的，但除了顶部有当前屏幕显示内容以外底部空白的图片</span></span><br><span class="line"><span class="comment">//就是只能截下来可视区域</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> fun <span class="title">screenShotLong</span><span class="params">()</span></span>&#123;</span><br><span class="line">     mWebView.measure(View.MeasureSpec.makeMeasureSpec(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED),</span><br><span class="line">             View.MeasureSpec.makeMeasureSpec(<span class="number">0</span>, View.MeasureSpec.UNSPECIFIED))</span><br><span class="line">     mWebView.layout(<span class="number">0</span>,<span class="number">0</span>,mWebView.measuredWidth,mWebView.measuredHeight)</span><br><span class="line">     mWebView.isDrawingCacheEnabled = <span class="keyword">true</span></span><br><span class="line">     mWebView.buildDrawingCache() <span class="comment">//图片大的话，这段也卡很长时间</span></span><br><span class="line">     val longBitmap = Bitmap.createBitmap(mWebView.measuredWidth,mWebView.measuredHeight,Bitmap.Config.ARGB_8888)</span><br><span class="line">     val canvas = Canvas(longBitmap)</span><br><span class="line">     val  paint =  Paint()</span><br><span class="line">     canvas.drawBitmap(longBitmap,<span class="number">0f</span>,mWebView.measuredHeight.toFloat(),paint)</span><br><span class="line">     mWebView.draw(canvas)</span><br><span class="line">     savebitmap(<span class="string">"longbitmap"</span>,longBitmap)</span><br><span class="line">     ToastUtil.showTextLong(<span class="keyword">this</span>,<span class="string">"All done!"</span>)</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//然后找了下，只要在setContentView前，调用这个方法就ok了。但这个方法得在App中所有WebView创建前调用</span></span><br><span class="line"> <span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.LOLLIPOP) &#123;</span><br><span class="line">       WebView.enableSlowWholeDocumentDraw();</span><br><span class="line"> &#125;</span><br><span class="line"> setContentView(R.layout.activity_webview);</span><br><span class="line"> <span class="comment">// 然而看到了这样的日志</span></span><br><span class="line"><span class="comment">// View: WebView not displayed because it is too large to fit into a software layer (or drawing cache), needs 20710080 bytes, only 8294400 available</span></span><br><span class="line"><span class="comment">//保存下来的png大小正好普遍在MB量级，另外，保存图片期间完全卡顿（把createBitmap和saveBitmap这段挪到子线程好点了，cpu占用25%以上持续10s，内存占用从32MB飙到400MB，一直不下来了）</span></span><br></pre></td></tr></table></figure></p>
+<p>然后是WebView的截屏</p>
+<pre><code class="java">private fun screenShot() {
+  //这种方式只能截出来当前屏幕上显示的内容，状态栏以下，手机屏幕底部以上的内容，仅此而已
+    val screenWidth :Float = Utils.getScreenWidth(this).toFloat()
+    val screenHeight = Utils.getScreenHeight(this).toFloat()
+    val shortImage = Bitmap.createBitmap(screenWidth.toInt(), screenHeight.toInt(), Bitmap.Config.RGB_565)
+    val canvas = Canvas(shortImage)   // 画布的宽高和屏幕的宽高保持一致
+    val paint = Paint()
+    canvas.drawBitmap(shortImage, screenWidth, screenHeight, paint)
+    mWebView.draw(canvas)
+    savebitmap(&quot;1_awesome&quot;,shortImage)
+}
+
+// 然而下面这种方式截出来的长度是对了，但底部是空的，得到的是一张很长的，但除了顶部有当前屏幕显示内容以外底部空白的图片
+//就是只能截下来可视区域
+private fun screenShotLong(){
+     mWebView.measure(View.MeasureSpec.makeMeasureSpec(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED),
+             View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED))
+     mWebView.layout(0,0,mWebView.measuredWidth,mWebView.measuredHeight)
+     mWebView.isDrawingCacheEnabled = true
+     mWebView.buildDrawingCache() //图片大的话，这段也卡很长时间
+     val longBitmap = Bitmap.createBitmap(mWebView.measuredWidth,mWebView.measuredHeight,Bitmap.Config.ARGB_8888)
+     val canvas = Canvas(longBitmap)
+     val  paint =  Paint()
+     canvas.drawBitmap(longBitmap,0f,mWebView.measuredHeight.toFloat(),paint)
+     mWebView.draw(canvas)
+     savebitmap(&quot;longbitmap&quot;,longBitmap)
+     ToastUtil.showTextLong(this,&quot;All done!&quot;)
+ }
+
+//然后找了下，只要在setContentView前，调用这个方法就ok了。但这个方法得在App中所有WebView创建前调用
+ if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.LOLLIPOP) {
+       WebView.enableSlowWholeDocumentDraw();
+ }
+ setContentView(R.layout.activity_webview);
+ // 然而看到了这样的日志
+// View: WebView not displayed because it is too large to fit into a software layer (or drawing cache), needs 20710080 bytes, only 8294400 available
+//保存下来的png大小正好普遍在MB量级，另外，保存图片期间完全卡顿（把createBitmap和saveBitmap这段挪到子线程好点了，cpu占用25%以上持续10s，内存占用从32MB飙到400MB，一直不下来了）
+</code></pre>
 <p>还有,js调java的时候，走的是java的一个叫做JavaBridge的线程，操作UI的话post就好了。</p>
-<h3 id="28-分析一点ViewPager的源码"><a href="#28-分析一点ViewPager的源码" class="headerlink" title="28. 分析一点ViewPager的源码"></a>28. 分析一点ViewPager的源码</h3><p>首先是快速滑动的时候为了性能只是挪了bitmap，这比调用layout要快得多。<br>ViewPager.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">setScrollingCacheEnabled</span><span class="params">(<span class="keyword">boolean</span> enabled)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">if</span> (mScrollingCacheEnabled != enabled) &#123;</span><br><span class="line">           mScrollingCacheEnabled = enabled;</span><br><span class="line">           <span class="keyword">if</span> (USE_CACHE) &#123; <span class="comment">//这个一直是false</span></span><br><span class="line">               <span class="keyword">final</span> <span class="keyword">int</span> size = getChildCount();</span><br><span class="line">               <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; size; ++i) &#123;</span><br><span class="line">                   <span class="keyword">final</span> View child = getChildAt(i);</span><br><span class="line">                   <span class="keyword">if</span> (child.getVisibility() != GONE) &#123;</span><br><span class="line">                       child.setDrawingCacheEnabled(enabled);</span><br><span class="line">                   &#125;</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 这里要说的是，PagerAdapter中可以复写的方法很多，比如一些状态的保存就可以写在adapter中</span></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">     <span class="function"><span class="keyword">public</span> Parcelable <span class="title">onSaveInstanceState</span><span class="params">()</span> </span>&#123;</span><br><span class="line">         Parcelable superState = <span class="keyword">super</span>.onSaveInstanceState();</span><br><span class="line">         SavedState ss = <span class="keyword">new</span> SavedState(superState);</span><br><span class="line">         ss.position = mCurItem;</span><br><span class="line">         <span class="keyword">if</span> (mAdapter != <span class="keyword">null</span>) &#123;</span><br><span class="line">             ss.adapterState = mAdapter.saveState();</span><br><span class="line">         &#125;</span><br><span class="line">         <span class="keyword">return</span> ss;</span><br><span class="line">     &#125;</span><br></pre></td></tr></table></figure></p>
-<p>ViewPager的 onMeasure中有这么一段话,这也就解释了为什么viewPager宽高不能设置为wrap_content。<a href="https://stackoverflow.com/questions/8394681/android-i-am-unable-to-have-viewpager-wrap-content"></a><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onMeasure</span><span class="params">(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</span> </span>&#123;</span><br><span class="line">      <span class="comment">// For simple implementation, our internal size is always 0.</span></span><br><span class="line">      <span class="comment">// We depend on the container to specify the layout size of</span></span><br><span class="line">      <span class="comment">// our view.  We can't really know what it is since we will be</span></span><br><span class="line">      <span class="comment">// adding and removing different arbitrary views and do not</span></span><br><span class="line">      <span class="comment">// want the layout to change as this happens.</span></span><br><span class="line">      setMeasuredDimension(getDefaultSize(<span class="number">0</span>, widthMeasureSpec),</span><br><span class="line">              getDefaultSize(<span class="number">0</span>, heightMeasureSpec));</span><br><span class="line">               <span class="comment">// ................................</span></span><br><span class="line"></span><br><span class="line">            &#125;</span><br></pre></td></tr></table></figure></p>
-<p>ViewPager横向挪动child的方法是<br>ViewPager.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onInterceptTouchEvent</span><span class="params">(MotionEvent ev)</span> </span>&#123;</span><br><span class="line">       <span class="comment">/*</span></span><br><span class="line"><span class="comment">        * This method JUST determines whether we want to intercept the motion.</span></span><br><span class="line"><span class="comment">        * If we return true, onMotionEvent will be called and we do the actual</span></span><br><span class="line"><span class="comment">        * scrolling there.</span></span><br><span class="line"><span class="comment">      */</span></span><br><span class="line">      <span class="comment">// 这里只是做一个拦截，真正去挪动child的方法在onTouchEvent里面</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Not else! Note that mIsBeingDragged can be set above.</span></span><br><span class="line"> <span class="keyword">if</span> (mIsBeingDragged) &#123;</span><br><span class="line">     <span class="comment">// Scroll to follow the motion event</span></span><br><span class="line">     <span class="keyword">final</span> <span class="keyword">int</span> activePointerIndex = ev.findPointerIndex(mActivePointerId);</span><br><span class="line">     <span class="keyword">final</span> <span class="keyword">float</span> x = ev.getX(activePointerIndex);</span><br><span class="line">     needsInvalidate |= performDrag(x);</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">performDrag</span><span class="params">(<span class="keyword">float</span> x)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">boolean</span> needsInvalidate = <span class="keyword">false</span>;</span><br><span class="line">       scrollTo((<span class="keyword">int</span>) scrollX, getScrollY()); <span class="comment">//其实是ViewPager自己在滑动</span></span><br><span class="line">       pageScrolled((<span class="keyword">int</span>) scrollX);  <span class="comment">//pageScrollView中并未涉及child的挪动</span></span><br><span class="line"></span><br><span class="line">       <span class="keyword">return</span> needsInvalidate;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 因为在onLayout中是这么写的，所以后面的child其实已经被layout到屏幕右边排队了，手指往左滑动的时候带着ViewPager，相当于直接把右边的children拽出来了。</span></span><br><span class="line">child.layout(childLeft, childTop,</span><br><span class="line">                         childLeft + child.getMeasuredWidth(),</span><br><span class="line">                         childTop + child.getMeasuredHeight());   </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// offsetLeftAndRight底层的实现是修改displayList的数据，native方法</span></span><br><span class="line">mLeft += offset;</span><br><span class="line">mRight += offset;</span><br><span class="line">mRenderNode.offsetLeftAndRight(offset);</span><br></pre></td></tr></table></figure></p>
-<p>在smoothScrollTo中这个方法被调用，传了一个true。其实类似的<a href="https://stackoverflow.com/questions/15570041/scrollingcache">scrollCache</a>的讨论还很多。原理就是调用所有child的setDrawingCacheEnabled方法（不过目前看来这个因为USE_CACHE一直是false所以没用）<br>看ViewPager的时候又想到一件事，最早的时候以为这种跟adapter打交道的View不应该用setData，应该用addData，并天真的以为内部实现就是直接从外部的list中取数据。<br>在ViewPager源码中，有一个mItems的ArrayList,这么看来实际上外部的数据也只是被拿来填充到内部的一个新的List中。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">ItemInfo <span class="title">addNewItem</span><span class="params">(<span class="keyword">int</span> position, <span class="keyword">int</span> index)</span> </span>&#123;</span><br><span class="line">      ItemInfo ii = <span class="keyword">new</span> ItemInfo();</span><br><span class="line">      ii.position = position;</span><br><span class="line">      ii.object = mAdapter.instantiateItem(<span class="keyword">this</span>, position);</span><br><span class="line">      ii.widthFactor = mAdapter.getPageWidth(position);</span><br><span class="line">      <span class="keyword">if</span> (index &lt; <span class="number">0</span> || index &gt;= mItems.size()) &#123;</span><br><span class="line">          mItems.add(ii);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          mItems.add(index, ii);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> ii;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line"></span><br><span class="line"><span class="comment">// notifyDataSetChange最终走到了这里，关键在于getItemPosition这个方法的实现</span></span><br><span class="line">   <span class="function"><span class="keyword">void</span> <span class="title">dataSetChanged</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// This method only gets called if our observer is attached, so mAdapter is non-null.</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> adapterCount = mAdapter.getCount();</span><br><span class="line">        mExpectedAdapterCount = adapterCount;</span><br><span class="line">        <span class="keyword">boolean</span> needPopulate = mItems.size() &lt; mOffscreenPageLimit * <span class="number">2</span> + <span class="number">1</span></span><br><span class="line">                &amp;&amp; mItems.size() &lt; adapterCount; <span class="comment">// mOffscreenPageLimit默认是1</span></span><br><span class="line">        <span class="comment">// 比如原来的数量只有2，或者添加了新的数据，都需要重走一遍layout</span></span><br><span class="line">        <span class="keyword">int</span> newCurrItem = mCurItem;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">boolean</span> isUpdating = <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; mItems.size(); i++) &#123;</span><br><span class="line">            <span class="keyword">final</span> ItemInfo ii = mItems.get(i);</span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">int</span> newPos = mAdapter.getItemPosition(ii.object);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (newPos == PagerAdapter.POSITION_UNCHANGED) &#123;</span><br><span class="line">                <span class="keyword">continue</span>; <span class="comment">//这也就是adapter中getItemPosition发挥作用的地方，ViewPager更新了数据，如果不去复写这个方法，下面的destoryItem就无法走到(比如说删除了一个数据就没法删掉这个fragment)</span></span><br><span class="line">            &#125;</span><br><span class="line">           </span><br><span class="line">        </span><br><span class="line">            <span class="keyword">if</span> (newPos == PagerAdapter.POSITION_NONE) &#123;</span><br><span class="line">                mItems.remove(i);</span><br><span class="line">                i--;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (!isUpdating) &#123;</span><br><span class="line">                    mAdapter.startUpdate(<span class="keyword">this</span>);</span><br><span class="line">                    isUpdating = <span class="keyword">true</span>;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                mAdapter.destroyItem(<span class="keyword">this</span>, ii.position, ii.object);</span><br><span class="line">                needPopulate = <span class="keyword">true</span>;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (mCurItem == ii.position) &#123;</span><br><span class="line">                    <span class="comment">// Keep the current item in the valid range</span></span><br><span class="line">                    newCurrItem = Math.max(<span class="number">0</span>, Math.min(mCurItem, adapterCount - <span class="number">1</span>));</span><br><span class="line">                    needPopulate = <span class="keyword">true</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (ii.position != newPos) &#123;</span><br><span class="line">                <span class="keyword">if</span> (ii.position == mCurItem) &#123;</span><br><span class="line">                    <span class="comment">// Our current item changed position. Follow it.</span></span><br><span class="line">                    newCurrItem = newPos;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                ii.position = newPos;</span><br><span class="line">                needPopulate = <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (isUpdating) &#123;</span><br><span class="line">            mAdapter.finishUpdate(<span class="keyword">this</span>); <span class="comment">//这里无论是FragmentPagerAdapter还是FragmentStatePagerAdapter都只是调用了transaction.commitNowAllowingStateLoss</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Collections.sort(mItems, COMPARATOR);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (needPopulate) &#123;</span><br><span class="line">            <span class="comment">// Reset our known page widths; populate will recompute them.</span></span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">int</span> childCount = getChildCount();</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; childCount; i++) &#123;</span><br><span class="line">                <span class="keyword">final</span> View child = getChildAt(i);</span><br><span class="line">                <span class="keyword">final</span> LayoutParams lp = (LayoutParams) child.getLayoutParams();</span><br><span class="line">                <span class="keyword">if</span> (!lp.isDecor) &#123;</span><br><span class="line">                    lp.widthFactor = <span class="number">0</span>.f;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            setCurrentItemInternal(newCurrItem, <span class="keyword">false</span>, <span class="keyword">true</span>);</span><br><span class="line">            requestLayout();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
-<p>最后是关于ViewPager的预加载问题<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">populate</span><span class="params">(<span class="keyword">int</span> newCurrentItem)</span> </span>&#123;</span><br><span class="line">     <span class="keyword">if</span> (curItem == <span class="keyword">null</span> &amp;&amp; N &gt; <span class="number">0</span>) &#123;</span><br><span class="line">          curItem = addNewItem(mCurItem, curIndex); <span class="comment">//首先是加载当前的item</span></span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// Fill 3x the available width or up to the number of offscreen</span></span><br><span class="line">         <span class="comment">// pages requested to either side, whichever is larger.</span></span><br><span class="line">         <span class="comment">// If we have no current item we have no work to do.</span></span><br><span class="line">         <span class="comment">// 左右两侧都放至少offscreenLimit*screenwidth的宽度，所以左右至少都加载一个</span></span><br><span class="line">         <span class="comment">//实际加载的方法是在addNewItem里面，</span></span><br><span class="line"></span><br><span class="line">         <span class="comment">// Fill 3x the available width or up to the number of offscreen</span></span><br><span class="line">         <span class="comment">// pages requested to either side, whichever is larger.</span></span><br><span class="line">         <span class="comment">// If we have no current item we have no work to do.</span></span><br><span class="line"></span><br><span class="line">     <span class="keyword">if</span> (curItem != <span class="keyword">null</span>) &#123;</span><br><span class="line">         <span class="keyword">float</span> extraWidthLeft = <span class="number">0</span>.f;</span><br><span class="line">         <span class="keyword">if</span>(....)&#123;</span><br><span class="line">           addNewItem()</span><br><span class="line">         &#125;</span><br><span class="line">         <span class="comment">// .... 先填充左边</span></span><br><span class="line"></span><br><span class="line">         <span class="keyword">float</span> extraWidthRight = curItem.widthFactor;</span><br><span class="line">         <span class="comment">// ...然后是右边</span></span><br><span class="line">         <span class="keyword">if</span>(....)&#123;</span><br><span class="line">           addNewItem()</span><br><span class="line">         &#125;</span><br><span class="line">         calculatePageOffsets(curItem, curIndex, oldCurInfo);</span><br><span class="line">     &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="28-分析一点ViewPager的源码"><a href="#28-分析一点ViewPager的源码" class="headerlink" title="28. 分析一点ViewPager的源码"></a>28. 分析一点ViewPager的源码</h3><p>首先是快速滑动的时候为了性能只是挪了bitmap，这比调用layout要快得多。<br>ViewPager.java</p>
+<pre><code class="java">private void setScrollingCacheEnabled(boolean enabled) {
+       if (mScrollingCacheEnabled != enabled) {
+           mScrollingCacheEnabled = enabled;
+           if (USE_CACHE) { //这个一直是false
+               final int size = getChildCount();
+               for (int i = 0; i &lt; size; ++i) {
+                   final View child = getChildAt(i);
+                   if (child.getVisibility() != GONE) {
+                       child.setDrawingCacheEnabled(enabled);
+                   }
+               }
+           }
+       }
+   }
+
+// 这里要说的是，PagerAdapter中可以复写的方法很多，比如一些状态的保存就可以写在adapter中
+   @Override
+     public Parcelable onSaveInstanceState() {
+         Parcelable superState = super.onSaveInstanceState();
+         SavedState ss = new SavedState(superState);
+         ss.position = mCurItem;
+         if (mAdapter != null) {
+             ss.adapterState = mAdapter.saveState();
+         }
+         return ss;
+     }
+</code></pre>
+<p>ViewPager的 onMeasure中有这么一段话,这也就解释了为什么viewPager宽高不能设置为wrap_content。<a href="https://stackoverflow.com/questions/8394681/android-i-am-unable-to-have-viewpager-wrap-content"></a></p>
+<pre><code class="java"> @Override
+   protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+       // For simple implementation, our internal size is always 0.
+       // We depend on the container to specify the layout size of
+       // our view.  We can&#39;t really know what it is since we will be
+       // adding and removing different arbitrary views and do not
+       // want the layout to change as this happens.
+       setMeasuredDimension(getDefaultSize(0, widthMeasureSpec),
+               getDefaultSize(0, heightMeasureSpec));
+                // ................................
+
+             }
+</code></pre>
+<p>ViewPager横向挪动child的方法是<br>ViewPager.java</p>
+<pre><code class="java">
+@Override
+   public boolean onInterceptTouchEvent(MotionEvent ev) {
+       /*
+        * This method JUST determines whether we want to intercept the motion.
+        * If we return true, onMotionEvent will be called and we do the actual
+        * scrolling there.
+      */
+      // 这里只是做一个拦截，真正去挪动child的方法在onTouchEvent里面
+    }
+
+// Not else! Note that mIsBeingDragged can be set above.
+ if (mIsBeingDragged) {
+     // Scroll to follow the motion event
+     final int activePointerIndex = ev.findPointerIndex(mActivePointerId);
+     final float x = ev.getX(activePointerIndex);
+     needsInvalidate |= performDrag(x);
+ }
+
+ private boolean performDrag(float x) {
+       boolean needsInvalidate = false;
+       scrollTo((int) scrollX, getScrollY()); //其实是ViewPager自己在滑动
+       pageScrolled((int) scrollX);  //pageScrollView中并未涉及child的挪动
+
+       return needsInvalidate;
+   }
+
+// 因为在onLayout中是这么写的，所以后面的child其实已经被layout到屏幕右边排队了，手指往左滑动的时候带着ViewPager，相当于直接把右边的children拽出来了。
+child.layout(childLeft, childTop,
+                         childLeft + child.getMeasuredWidth(),
+                         childTop + child.getMeasuredHeight());   
+
+
+
+// offsetLeftAndRight底层的实现是修改displayList的数据，native方法
+mLeft += offset;
+mRight += offset;
+mRenderNode.offsetLeftAndRight(offset);
+</code></pre>
+<p>在smoothScrollTo中这个方法被调用，传了一个true。其实类似的<a href="https://stackoverflow.com/questions/15570041/scrollingcache">scrollCache</a>的讨论还很多。原理就是调用所有child的setDrawingCacheEnabled方法（不过目前看来这个因为USE_CACHE一直是false所以没用）<br>看ViewPager的时候又想到一件事，最早的时候以为这种跟adapter打交道的View不应该用setData，应该用addData，并天真的以为内部实现就是直接从外部的list中取数据。<br>在ViewPager源码中，有一个mItems的ArrayList,这么看来实际上外部的数据也只是被拿来填充到内部的一个新的List中。</p>
+<pre><code class="java">ItemInfo addNewItem(int position, int index) {
+      ItemInfo ii = new ItemInfo();
+      ii.position = position;
+      ii.object = mAdapter.instantiateItem(this, position);
+      ii.widthFactor = mAdapter.getPageWidth(position);
+      if (index &lt; 0 || index &gt;= mItems.size()) {
+          mItems.add(ii);
+      } else {
+          mItems.add(index, ii);
+      }
+      return ii;
+  }
+
+
+// notifyDataSetChange最终走到了这里，关键在于getItemPosition这个方法的实现
+   void dataSetChanged() {
+        // This method only gets called if our observer is attached, so mAdapter is non-null.
+
+        final int adapterCount = mAdapter.getCount();
+        mExpectedAdapterCount = adapterCount;
+        boolean needPopulate = mItems.size() &lt; mOffscreenPageLimit * 2 + 1
+                &amp;&amp; mItems.size() &lt; adapterCount; // mOffscreenPageLimit默认是1
+        // 比如原来的数量只有2，或者添加了新的数据，都需要重走一遍layout
+        int newCurrItem = mCurItem;
+
+        boolean isUpdating = false;
+        for (int i = 0; i &lt; mItems.size(); i++) {
+            final ItemInfo ii = mItems.get(i);
+            final int newPos = mAdapter.getItemPosition(ii.object);
+
+            if (newPos == PagerAdapter.POSITION_UNCHANGED) {
+                continue; //这也就是adapter中getItemPosition发挥作用的地方，ViewPager更新了数据，如果不去复写这个方法，下面的destoryItem就无法走到(比如说删除了一个数据就没法删掉这个fragment)
+            }
+
+
+            if (newPos == PagerAdapter.POSITION_NONE) {
+                mItems.remove(i);
+                i--;
+
+                if (!isUpdating) {
+                    mAdapter.startUpdate(this);
+                    isUpdating = true;
+                }
+
+                mAdapter.destroyItem(this, ii.position, ii.object);
+                needPopulate = true;
+
+                if (mCurItem == ii.position) {
+                    // Keep the current item in the valid range
+                    newCurrItem = Math.max(0, Math.min(mCurItem, adapterCount - 1));
+                    needPopulate = true;
+                }
+                continue;
+            }
+
+            if (ii.position != newPos) {
+                if (ii.position == mCurItem) {
+                    // Our current item changed position. Follow it.
+                    newCurrItem = newPos;
+                }
+
+                ii.position = newPos;
+                needPopulate = true;
+            }
+        }
+
+        if (isUpdating) {
+            mAdapter.finishUpdate(this); //这里无论是FragmentPagerAdapter还是FragmentStatePagerAdapter都只是调用了transaction.commitNowAllowingStateLoss
+        }
+
+        Collections.sort(mItems, COMPARATOR);
+
+        if (needPopulate) {
+            // Reset our known page widths; populate will recompute them.
+            final int childCount = getChildCount();
+            for (int i = 0; i &lt; childCount; i++) {
+                final View child = getChildAt(i);
+                final LayoutParams lp = (LayoutParams) child.getLayoutParams();
+                if (!lp.isDecor) {
+                    lp.widthFactor = 0.f;
+                }
+            }
+
+            setCurrentItemInternal(newCurrItem, false, true);
+            requestLayout();
+        }
+    }
+</code></pre>
+<p>最后是关于ViewPager的预加载问题</p>
+<pre><code class="java"> void populate(int newCurrentItem) {
+      if (curItem == null &amp;&amp; N &gt; 0) {
+           curItem = addNewItem(mCurItem, curIndex); //首先是加载当前的item
+       }
+
+       // Fill 3x the available width or up to the number of offscreen
+          // pages requested to either side, whichever is larger.
+          // If we have no current item we have no work to do.
+          // 左右两侧都放至少offscreenLimit*screenwidth的宽度，所以左右至少都加载一个
+          //实际加载的方法是在addNewItem里面，
+
+          // Fill 3x the available width or up to the number of offscreen
+          // pages requested to either side, whichever is larger.
+          // If we have no current item we have no work to do.
+
+      if (curItem != null) {
+          float extraWidthLeft = 0.f;
+          if(....){
+            addNewItem()
+          }
+          // .... 先填充左边
+
+          float extraWidthRight = curItem.widthFactor;
+          // ...然后是右边
+          if(....){
+            addNewItem()
+          }
+          calculatePageOffsets(curItem, curIndex, oldCurInfo);
+      }
+ }
+</code></pre>
 <p>viewPager的layoutParams是不认margin的，所以加左右margin得这样</p>
 <blockquote>
 <p>viewPager.pageMargin =  gap<br>viewPager.clipToPadding = false<br>viewPager.setPadding(gap,0,gap,0)</p>
@@ -286,18 +899,114 @@ ga('send', 'pageview');
 <p>亲测，adapter继承FragmentPagerAdapter，比方说adapter中有一个List<Fragment>，如果想要替换第0个和第1个的位置（这种不属于结构性替换），这样就可以了<br>val list = adapter1.myFragments<br>Collections.swap(list,0,1)<br>adapter1.notifyDataSetChanged() // 这里走完了并不会调用任何scrollToItem方法，所以还是需要有下面的setCurrentItem<br>pager1.setCurrentItem(0,false) //这里只是避免动画</p>
 <p>在adapter中这两个方法要保持一致性<br> override fun getItemId(position: Int): Long {<br>    return (myFragments[position] as PagerFragment).hashCode().toLong() //这里只需要返回一个足够表明独一无二身份的东西就好了,hashCode足以<br>}</p>
 <p>override fun getItemPosition(<code>object</code>: Any): Int {<br>//如果是两个数据之间调换了的话<br>return myFragments.indexOf(<code>object</code>)<br>}<br>所以POSITION_NONE只是确保adapter的destoryItem方法会走到所有旧的fragment<br>上述做法适用于FragmentPagerAdapter以及FragmentStatePagerAdapter<br>这里还不得不提到FragmentPagerAdapter和FragmentStatePagerAdapter的区别</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// FragmentPagerAdapter的</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">instantiateItem</span><span class="params">(ViewGroup container, <span class="keyword">int</span> position)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> itemId = getItemId(position); <span class="comment">// 这个方法默认返回了position，但事实上可以如果后续更新了某一个position的fragment，还是会使用之前的fragment,而不是走到getItem的重新创建item。个人觉得可以返回一个position+lastUpdateTimeStamp这样的String。也就能完成FragmentPagerAdapter的刷新问题了</span></span><br><span class="line">    <span class="comment">// Do we already have this fragment?</span></span><br><span class="line">    String name = makeFragmentName(container.getId(), itemId);</span><br><span class="line">    Fragment fragment = mFragmentManager.findFragmentByTag(name);</span><br><span class="line">    <span class="keyword">if</span> (fragment != <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (DEBUG) Log.v(TAG, <span class="string">"Attaching item #"</span> + itemId + <span class="string">": f="</span> + fragment);</span><br><span class="line">    mCurTransaction.attach(fragment);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    fragment = getItem(position);</span><br><span class="line">    <span class="keyword">if</span> (DEBUG) Log.v(TAG, <span class="string">"Adding item #"</span> + itemId + <span class="string">": f="</span> + fragment);</span><br><span class="line">    mCurTransaction.add(container.getId(), fragment,</span><br><span class="line">            makeFragmentName(container.getId(), itemId));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// FragmentStatePagerAdapter的</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">instantiateItem</span><span class="params">(ViewGroup container, <span class="keyword">int</span> position)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// If we already have this item instantiated, there is nothing</span></span><br><span class="line">    <span class="comment">// to do.  This can happen when we are restoring the entire pager</span></span><br><span class="line">    <span class="comment">// from its saved state, where the fragment manager has already</span></span><br><span class="line">    <span class="comment">// taken care of restoring the fragments we previously had instantiated.</span></span><br><span class="line">    <span class="keyword">if</span> (mFragments.size() &gt; position) &#123;</span><br><span class="line">        Fragment f = mFragments.get(position);</span><br><span class="line">        <span class="keyword">if</span> (f != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> f;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (mCurTransaction == <span class="keyword">null</span>) &#123;</span><br><span class="line">        mCurTransaction = mFragmentManager.beginTransaction();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Fragment fragment = getItem(position);</span><br><span class="line">    <span class="keyword">if</span> (DEBUG) Log.v(TAG, <span class="string">"Adding item #"</span> + position + <span class="string">": f="</span> + fragment);</span><br><span class="line">    <span class="keyword">if</span> (mSavedState.size() &gt; position) &#123;</span><br><span class="line">        Fragment.SavedState fss = mSavedState.get(position);</span><br><span class="line">        <span class="keyword">if</span> (fss != <span class="keyword">null</span>) &#123;</span><br><span class="line">            fragment.setInitialSavedState(fss);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">while</span> (mFragments.size() &lt;= position) &#123;</span><br><span class="line">        mFragments.add(<span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    fragment.setMenuVisibility(<span class="keyword">false</span>);</span><br><span class="line">    fragment.setUserVisibleHint(<span class="keyword">false</span>);</span><br><span class="line">    mFragments.set(position, fragment);</span><br><span class="line">    mCurTransaction.add(container.getId(), fragment);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> fragment;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="java">// FragmentPagerAdapter的
+public Object instantiateItem(ViewGroup container, int position) {
+    final long itemId = getItemId(position); // 这个方法默认返回了position，但事实上可以如果后续更新了某一个position的fragment，还是会使用之前的fragment,而不是走到getItem的重新创建item。个人觉得可以返回一个position+lastUpdateTimeStamp这样的String。也就能完成FragmentPagerAdapter的刷新问题了
+    // Do we already have this fragment?
+    String name = makeFragmentName(container.getId(), itemId);
+    Fragment fragment = mFragmentManager.findFragmentByTag(name);
+    if (fragment != null) {
+    if (DEBUG) Log.v(TAG, &quot;Attaching item #&quot; + itemId + &quot;: f=&quot; + fragment);
+    mCurTransaction.attach(fragment);
+    } else {
+    fragment = getItem(position);
+    if (DEBUG) Log.v(TAG, &quot;Adding item #&quot; + itemId + &quot;: f=&quot; + fragment);
+    mCurTransaction.add(container.getId(), fragment,
+            makeFragmentName(container.getId(), itemId));
+    }
+}
+
+// FragmentStatePagerAdapter的
+@Override
+public Object instantiateItem(ViewGroup container, int position) {
+    // If we already have this item instantiated, there is nothing
+    // to do.  This can happen when we are restoring the entire pager
+    // from its saved state, where the fragment manager has already
+    // taken care of restoring the fragments we previously had instantiated.
+    if (mFragments.size() &gt; position) {
+        Fragment f = mFragments.get(position);
+        if (f != null) {
+            return f;
+        }
+    }
+
+    if (mCurTransaction == null) {
+        mCurTransaction = mFragmentManager.beginTransaction();
+    }
+
+    Fragment fragment = getItem(position);
+    if (DEBUG) Log.v(TAG, &quot;Adding item #&quot; + position + &quot;: f=&quot; + fragment);
+    if (mSavedState.size() &gt; position) {
+        Fragment.SavedState fss = mSavedState.get(position);
+        if (fss != null) {
+            fragment.setInitialSavedState(fss);
+        }
+    }
+    while (mFragments.size() &lt;= position) {
+        mFragments.add(null);
+    }
+    fragment.setMenuVisibility(false);
+    fragment.setUserVisibleHint(false);
+    mFragments.set(position, fragment);
+    mCurTransaction.add(container.getId(), fragment);
+
+    return fragment;
+}
+</code></pre>
 <p>在AbsListView中，setScrollingCacheEnabled这个方法也存在，同样是调用的child的drawingCacheEnabled<br><a href="http://www.curious-creature.com/2008/12/22/why-is-my-list-black-an-android-optimization/">Romain Guy的博客提到了ListView默认开启，但他忘记了GridView默认开启</a></p>
 <h3 id="29-关于65536问题"><a href="#29-关于65536问题" class="headerlink" title="29.关于65536问题"></a>29.关于65536问题</h3><p><a href="http://www.jackywang.tech/2017/06/14/Too-many-classes-in-main-dex-list-main-dex-capacity-exceeded-%E4%B8%BBDex%E5%BC%95%E7%94%A8%E5%A4%AA%E5%A4%9A%E6%80%8E%E4%B9%88%E5%8A%9E%EF%BC%9F/">Too many classes in –main-dex-list, main dex capacity exceeded | 主Dex引用太多怎么办？</a><br>MultiDex对于minSdk&gt; =21 不会生效，如果最低版本是21上面所有的任务都不会执行，也不会有主Dex列表的计算。这是因为在应用安装期间所有的dex文件都会被ART转换为一个.oat文件。所以minSdk高的也不用开multiDex了。<br>在使用ART虚拟机的设备上(部分4.4设备，5.0+以上都默认ART环境)，已经<a href="https://developer.android.com/studio/build/multidex.html">原生支持</a>多Dex，因此就不需要手动支持了</p>
 <blockquote>
 <p>Android 5.0 (API level 21) and higher uses a runtime called ART which natively supports loading multiple DEX files from APK files. ART performs pre-compilation at app install time which scans for classesN.dex files and compiles them into a single .oat file for execution by the Android device. Therefore, if your minSdkVersion is 21 or higher, you do not need the multidex support library.</p>
 </blockquote>
-<p>看下MultiDex的源码，secondaryDex文件的路径是/date/date/<package_name>/code_cache/secondary-dexes/ 这是一个文件夹<br>MultiDex的原理基本上在<a href="https://www.jianshu.com/p/33f22b21ef1e">简书</a><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">V14</span></span></span><br><span class="line"><span class="class">    </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">install</span><span class="params">(<span class="keyword">final</span> ClassLoader loader, <span class="keyword">final</span> List&lt;File&gt; additionalClassPathEntries, <span class="keyword">final</span> File optimizedDirectory)</span> <span class="keyword">throws</span> IllegalArgumentException, IllegalAccessException, NoSuchFieldException, InvocationTargetException, NoSuchMethodException </span>&#123;</span><br><span class="line">            <span class="comment">//通过反射获取loader的pathList字段，loader是由Application.getClassLoader()获取的，实际获取到的是PathClassLoader对象的pathList字段</span></span><br><span class="line">            <span class="keyword">final</span> Field pathListField = findField(loader, <span class="string">"pathList"</span>);</span><br><span class="line">            <span class="keyword">final</span> Object dexPathList = pathListField.get(loader);</span><br><span class="line">            <span class="comment">//dexPathList是PathClassLoader的私有字段，里面保存的是Main Dex中的class</span></span><br><span class="line">            <span class="comment">//dexElements是一个数组，里面的每一个item就是一个Dex文件</span></span><br><span class="line">            <span class="comment">//makeDexElements()返回的是其他Dex文件中获取到的Elements[]对象，内部通过反射makeDexElements()获取</span></span><br><span class="line">            <span class="comment">//expandFieldArray是为了把makeDexElements()返回的Elements[]对象添加到dexPathList字段的成员变量dexElements中</span></span><br><span class="line">            expandFieldArray(dexPathList, <span class="string">"dexElements"</span>, makeDexElements(dexPathList, <span class="keyword">new</span> ArrayList&lt;File&gt;(additionalClassPathEntries), optimizedDirectory));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> Object[] makeDexElements(<span class="keyword">final</span> Object dexPathList, <span class="keyword">final</span> ArrayList&lt;File&gt; files, <span class="keyword">final</span> File optimizedDirectory) <span class="keyword">throws</span> IllegalAccessException, InvocationTargetException, NoSuchMethodException &#123;</span><br><span class="line">            <span class="keyword">final</span> Method makeDexElements = findMethod(dexPathList, <span class="string">"makeDexElements"</span>, (Class&lt;?&gt;[])<span class="keyword">new</span> Class[] &#123; ArrayList.class, File.class &#125;);</span><br><span class="line">            <span class="keyword">return</span> (Object[])makeDexElements.invoke(dexPathList, files, optimizedDirectory);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
-<p>这里面注意makeDexElements方法，是通过反射调用了Dalvik的DexPathList class的这个方法<a href="https://android.googlesource.com/platform/libcore-snapshot/+/ics-mr1/dalvik/src/main/java/dalvik/system/DexPathList.java">makeDexElements</a>。说白了，整个过程就是在/data/data/(packagename)/code_cache/这个目录下面复制粘贴文件(class.dex文件也是文件)，复制粘贴文件带来的影响就是classLoader(Android上是BaseDexClassLoader)在findClass的时候调用的是DexPathList的findClass方法:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Class <span class="title">findClass</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">for</span> (Element element : dexElements) &#123;</span><br><span class="line">          DexFile dex = element.dexFile;</span><br><span class="line">          <span class="keyword">if</span> (dex != <span class="keyword">null</span>) &#123;</span><br><span class="line">              Class clazz = dex.loadClassBinaryName(name, definingContext);</span><br><span class="line">              <span class="keyword">if</span> (clazz != <span class="keyword">null</span>) &#123;</span><br><span class="line">                  <span class="keyword">return</span> clazz;</span><br><span class="line">              &#125;</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
+<p>看下MultiDex的源码，secondaryDex文件的路径是/date/date/<package_name>/code_cache/secondary-dexes/ 这是一个文件夹<br>MultiDex的原理基本上在<a href="https://www.jianshu.com/p/33f22b21ef1e">简书</a></p>
+<pre><code class="java">private static final class V14
+    {
+        private static void install(final ClassLoader loader, final List&lt;File&gt; additionalClassPathEntries, final File optimizedDirectory) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, InvocationTargetException, NoSuchMethodException {
+            //通过反射获取loader的pathList字段，loader是由Application.getClassLoader()获取的，实际获取到的是PathClassLoader对象的pathList字段
+            final Field pathListField = findField(loader, &quot;pathList&quot;);
+            final Object dexPathList = pathListField.get(loader);
+            //dexPathList是PathClassLoader的私有字段，里面保存的是Main Dex中的class
+            //dexElements是一个数组，里面的每一个item就是一个Dex文件
+            //makeDexElements()返回的是其他Dex文件中获取到的Elements[]对象，内部通过反射makeDexElements()获取
+            //expandFieldArray是为了把makeDexElements()返回的Elements[]对象添加到dexPathList字段的成员变量dexElements中
+            expandFieldArray(dexPathList, &quot;dexElements&quot;, makeDexElements(dexPathList, new ArrayList&lt;File&gt;(additionalClassPathEntries), optimizedDirectory));
+        }
+
+        private static Object[] makeDexElements(final Object dexPathList, final ArrayList&lt;File&gt; files, final File optimizedDirectory) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+            final Method makeDexElements = findMethod(dexPathList, &quot;makeDexElements&quot;, (Class&lt;?&gt;[])new Class[] { ArrayList.class, File.class });
+            return (Object[])makeDexElements.invoke(dexPathList, files, optimizedDirectory);
+        }
+    }
+</code></pre>
+<p>这里面注意makeDexElements方法，是通过反射调用了Dalvik的DexPathList class的这个方法<a href="https://android.googlesource.com/platform/libcore-snapshot/+/ics-mr1/dalvik/src/main/java/dalvik/system/DexPathList.java">makeDexElements</a>。说白了，整个过程就是在/data/data/(packagename)/code_cache/这个目录下面复制粘贴文件(class.dex文件也是文件)，复制粘贴文件带来的影响就是classLoader(Android上是BaseDexClassLoader)在findClass的时候调用的是DexPathList的findClass方法:</p>
+<pre><code class="java">public Class findClass(String name) {
+      for (Element element : dexElements) {
+          DexFile dex = element.dexFile;
+          if (dex != null) {
+              Class clazz = dex.loadClassBinaryName(name, definingContext);
+              if (clazz != null) {
+                  return clazz;
+              }
+          }
+      }
+      return null;
+  }
+</code></pre>
 <p>当然，Tinker也是采用的极其相似的方法，完成了dex替换(谁在这个数组前面谁就先得到加载)<br><a href="https://www.jianshu.com/p/33f22b21ef1e">凯子哥提到由于在App冷启动的时候由于反射外加io操作，可能会比较卡甚至ANR</a>,把这部分操作弄到子线程也是行的，一种可能的方案是从Instrumentation下手。</p>
-<h3 id="30-从已安装的app中提取apk"><a href="#30-从已安装的app中提取apk" class="headerlink" title="30 . 从已安装的app中提取apk"></a>30 . 从已安装的app中提取apk</h3><p><a href="http://blog.csdn.net/lmj623565791/article/details/52761658">鸿洋的博客中提到过如何使用bsdiff比较旧的apk和新的apk的差异</a><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">context = context.getApplicationContext();</span><br><span class="line">ApplicationInfo applicationInfo = context.getApplicationInfo();</span><br><span class="line">String apkPath = applicationInfo.sourceDir;</span><br><span class="line"><span class="keyword">return</span> apkPath;</span><br></pre></td></tr></table></figure></p>
+<h3 id="30-从已安装的app中提取apk"><a href="#30-从已安装的app中提取apk" class="headerlink" title="30 . 从已安装的app中提取apk"></a>30 . 从已安装的app中提取apk</h3><p><a href="http://blog.csdn.net/lmj623565791/article/details/52761658">鸿洋的博客中提到过如何使用bsdiff比较旧的apk和新的apk的差异</a></p>
+<pre><code class="java">context = context.getApplicationContext();
+ApplicationInfo applicationInfo = context.getApplicationInfo();
+String apkPath = applicationInfo.sourceDir;
+return apkPath;
+</code></pre>
 <p>在Android Studio 3.0后，直接在Device Explorer中查看data/app/com.example.appname，发现里面有个base.apk文件。几乎就是把原有的apk文件复制了一份。</p>
-<h3 id="31-老版本的WebView是存在内存泄露的"><a href="#31-老版本的WebView是存在内存泄露的" class="headerlink" title="31. 老版本的WebView是存在内存泄露的"></a>31. 老版本的WebView是存在内存泄露的</h3><p><a href="https://www.jianshu.com/p/eada9b652d99">参考</a><br>大致上就是主动调用了WebView.destory方法，原本在onDetachedFromWindow中系统的一些资源释放就没有走到，<br>作者给出了这样的解决方案<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ViewParent parent = mWebView.getParent();</span><br><span class="line">    <span class="keyword">if</span> (parent != <span class="keyword">null</span>) &#123;</span><br><span class="line">        ((ViewGroup) parent).removeView(mWebView);<span class="comment">// 这里面会调用到 view.dispatchDetachedFromWindow();</span></span><br><span class="line">    &#125;</span><br><span class="line">    mWebView.destroy();</span><br></pre></td></tr></table></figure></p>
+<h3 id="31-老版本的WebView是存在内存泄露的"><a href="#31-老版本的WebView是存在内存泄露的" class="headerlink" title="31. 老版本的WebView是存在内存泄露的"></a>31. 老版本的WebView是存在内存泄露的</h3><p><a href="https://www.jianshu.com/p/eada9b652d99">参考</a><br>大致上就是主动调用了WebView.destory方法，原本在onDetachedFromWindow中系统的一些资源释放就没有走到，<br>作者给出了这样的解决方案</p>
+<pre><code class="java">ViewParent parent = mWebView.getParent();
+    if (parent != null) {
+        ((ViewGroup) parent).removeView(mWebView);// 这里面会调用到 view.dispatchDetachedFromWindow();
+    }
+    mWebView.destroy();
+</code></pre>
 <p><a href="https://android.googlesource.com/platform/external/chromium_org/+/lollipop-release/android_webview/java/src/org/chromium/android_webview/AwContents.java">webView的sourceCode</a></p>
 <h3 id="32-App升级或者安装之前是要做一些检查的"><a href="#32-App升级或者安装之前是要做一些检查的" class="headerlink" title="32. App升级或者安装之前是要做一些检查的"></a>32. App升级或者安装之前是要做一些检查的</h3><p><a href="http://blog.csdn.net/sk719887916/article/details/52233112">这篇文章详尽描述了需要做的一些方案</a><br>可能被劫持的地方有三处： 升级api(就是返回下载链接的接口)，下载api(就是那个cdn), 安装过程(调用packageManager之前)</p>
 <ul>
@@ -305,24 +1014,294 @@ ga('send', 'pageview');
 <li>检查file的md5和服务器response中的md5是否一致</li>
 <li>还要对下载的文件进行包名和签名验证，防止Apk被恶意植入木马</li>
 </ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 升级接口返回下载地址之后</span></span><br><span class="line">UpgradeModel  aResult = xxxx;<span class="comment">//解析服务器返回的后数据</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (aResult != <span class="keyword">null</span> &amp;&amp; aResult.getData() != <span class="keyword">null</span> ) &#123;</span><br><span class="line">      String url = aResult.getData().getDownUrl();</span><br><span class="line">      <span class="keyword">if</span> (url == <span class="keyword">null</span> || !TextUtils.equals(url, <span class="string">"the_domain_that_i_own"</span>)) &#123;</span><br><span class="line">        <span class="comment">// 如果不是自己掌握的域名，不下载</span></span><br><span class="line">      &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 判断下载下来的文件的md5和升级接口描述的md5是否一致</span></span><br><span class="line">File file = DownUtils.getFile(url);</span><br><span class="line">        <span class="comment">// 监测是否要重新下载</span></span><br><span class="line"> <span class="keyword">if</span> (file.exists() &amp;&amp;   TextUtils.equals(aResult.getData().getHashCode(), EncryptUtils.Md5File(file))) &#123;</span><br><span class="line">  &amp;&amp; TextUtils.equals(aResult.getData().getKey(), DownLoadModel.getData()..getKey())</span><br><span class="line">  <span class="comment">// 如果符合，就去安装 不符合重新下载 删除恶意文件</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 下面这些代码来自上述文章</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">installApK</span><span class="params">(Context context, <span class="keyword">final</span> String path, <span class="keyword">final</span> String name )</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!SafetyUtils.checkFile(path + name, context)) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!SafetyUtils.checkPagakgeName(context, path + name)) &#123;</span><br><span class="line">        Toast.makeText(context, <span class="string">"升级包被恶意软件篡改 请重新升级下载安装"</span>, Toast.LENGTH_SHORT ).show();</span><br><span class="line">        DLUtils.deleteFile(path + name);</span><br><span class="line">        ((Activity)context).finish();</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">switch</span> (SafetyUtils.checkPagakgeSign(context, path + name)) &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">case</span> SafetyUtils.SUCCESS:</span><br><span class="line">            DLUtils.openFile(path + name, context);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">case</span> SafetyUtils.SIGNATURES_INVALIDATE:</span><br><span class="line"></span><br><span class="line">            Toast.makeText(context, <span class="string">"升级包安全校验失败 请重新升级"</span>, Toast.LENGTH_SHORT ).show();</span><br><span class="line">            ((Activity)context).finish();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">case</span> SafetyUtils.VERIFY_SIGNATURES_FAIL:</span><br><span class="line"></span><br><span class="line">            Toast.makeText(context, <span class="string">"升级包为盗版应用 请重新升级"</span>, Toast.LENGTH_SHORT ).show();</span><br><span class="line">            ((Activity)context).finish();</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 安全校验</span></span><br><span class="line"><span class="comment">* Created by LIUYONGKUI on 2016-04-21.</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SafetyUtils</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/** install sucess */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> SUCCESS = <span class="number">0</span>;</span><br><span class="line">    <span class="comment">/** SIGNATURES_INVALIDATE */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> SIGNATURES_INVALIDATE = <span class="number">3</span>;</span><br><span class="line">    <span class="comment">/** SIGNATURES_NOT_SAME */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> VERIFY_SIGNATURES_FAIL = <span class="number">4</span>;</span><br><span class="line">    <span class="comment">/** is needcheck */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">boolean</span> NEED_VERIFY_CERT = <span class="keyword">true</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * checkPagakgeSigns.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">checkPagakgeSign</span><span class="params">(Context context, String srcPluginFile)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    PackageInfo PackageInfo = context.getPackageManager().getPackageArchiveInfo(srcPluginFile, <span class="number">0</span>);</span><br><span class="line">    <span class="comment">//Signature[] pluginSignatures = PackageInfo.signatures;</span></span><br><span class="line">    Signature[] pluginSignatures = PackageParser.collectCertificates(srcPluginFile, <span class="keyword">false</span>);</span><br><span class="line">    <span class="keyword">boolean</span> isDebugable = (<span class="number">0</span> != (context.getApplicationInfo().flags &amp; ApplicationInfo.FLAG_DEBUGGABLE));</span><br><span class="line">    <span class="keyword">if</span> (pluginSignatures == <span class="keyword">null</span>) &#123;</span><br><span class="line">        PaLog.e(<span class="string">"签名验证失败"</span>, srcPluginFile);</span><br><span class="line">        <span class="keyword">new</span> File(srcPluginFile).delete();</span><br><span class="line">        <span class="keyword">return</span> SIGNATURES_INVALIDATE;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (NEED_VERIFY_CERT &amp;&amp; !isDebugable) &#123;</span><br><span class="line">        <span class="comment">//可选步骤，验证APK证书是否和现在程序证书相同。</span></span><br><span class="line">        Signature[] mainSignatures = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            PackageInfo pkgInfo = context.getPackageManager().getPackageInfo(</span><br><span class="line">                    context.getPackageName(), PackageManager.GET_SIGNATURES);</span><br><span class="line">            mainSignatures = pkgInfo.signatures;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (PackageManager.NameNotFoundException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (!PackageParser.isSignaturesSame(mainSignatures, pluginSignatures)) &#123;</span><br><span class="line">            PaLog.e(<span class="string">"升级包证书和旧版本证书不一致"</span>, srcPluginFile);</span><br><span class="line">            <span class="keyword">new</span> File(srcPluginFile).delete();</span><br><span class="line">            <span class="keyword">return</span> VERIFY_SIGNATURES_FAIL;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> SUCCESS;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * checkPagakgeName</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> context</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> srcNewFile</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">checkPagakgeName</span> <span class="params">(Context context, String srcNewFile)</span> </span>&#123;</span><br><span class="line">    PackageInfo packageInfo = context.getPackageManager().getPackageArchiveInfo(srcNewFile, PackageManager.GET_ACTIVITIES);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (packageInfo != <span class="keyword">null</span>) &#123;</span><br><span class="line"></span><br><span class="line">       <span class="keyword">return</span> TextUtils.equals(context.getPackageName(), packageInfo.packageName);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * checkFile</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> aPath</span></span><br><span class="line"><span class="comment"> *            文件路径</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> context</span></span><br><span class="line"><span class="comment"> *            context</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">checkFile</span><span class="params">(String aPath, Context context)</span> </span>&#123;</span><br><span class="line">    File aFile = <span class="keyword">new</span> File(aPath);</span><br><span class="line">    <span class="keyword">if</span> (aFile == <span class="keyword">null</span> || !aFile.exists()) &#123;</span><br><span class="line">        Toast.makeText(context, <span class="string">"安装包已被恶意软件删除"</span>, Toast.LENGTH_SHORT).show();</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>  (context == <span class="keyword">null</span>)  &#123;</span><br><span class="line">         Toast.makeText(context, <span class="string">"安装包异常"</span>, Toast.LENGTH_SHORT).show();</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="33-TextView原生支持一些比较好玩的属性"><a href="#33-TextView原生支持一些比较好玩的属性" class="headerlink" title="33. TextView原生支持一些比较好玩的属性"></a>33. TextView原生支持一些比较好玩的属性</h2><p><a href="https://www.youtube.com/watch?v=q2GtM1_RmMw">Advanced Android TextView</a><br>比方说<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Bitmap bitmap = BitmapFactory.</span><br><span class="line">            decodeResource(getResource(),R.drawable_cheetah_title);</span><br><span class="line">Shader shader = <span class="keyword">new</span> BitmapShader(</span><br><span class="line">  bitmap,</span><br><span class="line">  Shader.TileMode.REPEAT,</span><br><span class="line">  Shader.TileMode.REPEAT);</span><br><span class="line">textView.getPaint().setShader(shader);</span><br><span class="line">)</span><br></pre></td></tr></table></figure></p>
+<pre><code class="java">// 升级接口返回下载地址之后
+UpgradeModel  aResult = xxxx;//解析服务器返回的后数据
+
+if (aResult != null &amp;&amp; aResult.getData() != null ) {
+      String url = aResult.getData().getDownUrl();
+      if (url == null || !TextUtils.equals(url, &quot;the_domain_that_i_own&quot;)) {
+        // 如果不是自己掌握的域名，不下载
+      }
+}
+
+// 判断下载下来的文件的md5和升级接口描述的md5是否一致
+File file = DownUtils.getFile(url);
+        // 监测是否要重新下载
+ if (file.exists() &amp;&amp;   TextUtils.equals(aResult.getData().getHashCode(), EncryptUtils.Md5File(file))) {
+  &amp;&amp; TextUtils.equals(aResult.getData().getKey(), DownLoadModel.getData()..getKey())
+  // 如果符合，就去安装 不符合重新下载 删除恶意文件
+}
+
+
+// 下面这些代码来自上述文章
+public static void installApK(Context context, final String path, final String name ) {
+
+    if (!SafetyUtils.checkFile(path + name, context)) {
+        return;
+    }
+
+    if (!SafetyUtils.checkPagakgeName(context, path + name)) {
+        Toast.makeText(context, &quot;升级包被恶意软件篡改 请重新升级下载安装&quot;, Toast.LENGTH_SHORT ).show();
+        DLUtils.deleteFile(path + name);
+        ((Activity)context).finish();
+        return;
+    }
+
+    switch (SafetyUtils.checkPagakgeSign(context, path + name)) {
+
+        case SafetyUtils.SUCCESS:
+            DLUtils.openFile(path + name, context);
+            break;
+
+        case SafetyUtils.SIGNATURES_INVALIDATE:
+
+            Toast.makeText(context, &quot;升级包安全校验失败 请重新升级&quot;, Toast.LENGTH_SHORT ).show();
+            ((Activity)context).finish();
+
+            break;
+
+        case SafetyUtils.VERIFY_SIGNATURES_FAIL:
+
+            Toast.makeText(context, &quot;升级包为盗版应用 请重新升级&quot;, Toast.LENGTH_SHORT ).show();
+            ((Activity)context).finish();
+            break;
+
+        default:
+            break;
+    }
+
+}
+
+
+/**
+* 安全校验
+* Created by LIUYONGKUI on 2016-04-21.
+*/
+public class SafetyUtils {
+
+    /** install sucess */
+    protected static final int SUCCESS = 0;
+    /** SIGNATURES_INVALIDATE */
+    protected static final int SIGNATURES_INVALIDATE = 3;
+    /** SIGNATURES_NOT_SAME */
+    protected static final int VERIFY_SIGNATURES_FAIL = 4;
+    /** is needcheck */
+    private static final boolean NEED_VERIFY_CERT = true;
+
+/**
+ * checkPagakgeSigns.
+ */
+public static int checkPagakgeSign(Context context, String srcPluginFile) {
+
+    PackageInfo PackageInfo = context.getPackageManager().getPackageArchiveInfo(srcPluginFile, 0);
+    //Signature[] pluginSignatures = PackageInfo.signatures;
+    Signature[] pluginSignatures = PackageParser.collectCertificates(srcPluginFile, false);
+    boolean isDebugable = (0 != (context.getApplicationInfo().flags &amp; ApplicationInfo.FLAG_DEBUGGABLE));
+    if (pluginSignatures == null) {
+        PaLog.e(&quot;签名验证失败&quot;, srcPluginFile);
+        new File(srcPluginFile).delete();
+        return SIGNATURES_INVALIDATE;
+    } else if (NEED_VERIFY_CERT &amp;&amp; !isDebugable) {
+        //可选步骤，验证APK证书是否和现在程序证书相同。
+        Signature[] mainSignatures = null;
+        try {
+            PackageInfo pkgInfo = context.getPackageManager().getPackageInfo(
+                    context.getPackageName(), PackageManager.GET_SIGNATURES);
+            mainSignatures = pkgInfo.signatures;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        if (!PackageParser.isSignaturesSame(mainSignatures, pluginSignatures)) {
+            PaLog.e(&quot;升级包证书和旧版本证书不一致&quot;, srcPluginFile);
+            new File(srcPluginFile).delete();
+            return VERIFY_SIGNATURES_FAIL;
+        }
+    }
+    return SUCCESS;
+}
+
+/**
+ * checkPagakgeName
+ * @param context
+ * @param srcNewFile
+ * @return
+ */
+public static boolean checkPagakgeName (Context context, String srcNewFile) {
+    PackageInfo packageInfo = context.getPackageManager().getPackageArchiveInfo(srcNewFile, PackageManager.GET_ACTIVITIES);
+
+    if (packageInfo != null) {
+
+       return TextUtils.equals(context.getPackageName(), packageInfo.packageName);
+    }
+
+    return false;
+}
+
+/**
+ * checkFile
+ *
+ * @param aPath
+ *            文件路径
+ * @param context
+ *            context
+ */
+public static boolean checkFile(String aPath, Context context) {
+    File aFile = new File(aPath);
+    if (aFile == null || !aFile.exists()) {
+        Toast.makeText(context, &quot;安装包已被恶意软件删除&quot;, Toast.LENGTH_SHORT).show();
+        return false;
+    }
+    if  (context == null)  {
+         Toast.makeText(context, &quot;安装包异常&quot;, Toast.LENGTH_SHORT).show();
+        return false;
+     }
+
+     return true;
+ }
+}
+</code></pre>
+<h2 id="33-TextView原生支持一些比较好玩的属性"><a href="#33-TextView原生支持一些比较好玩的属性" class="headerlink" title="33. TextView原生支持一些比较好玩的属性"></a>33. TextView原生支持一些比较好玩的属性</h2><p><a href="https://www.youtube.com/watch?v=q2GtM1_RmMw">Advanced Android TextView</a><br>比方说</p>
+<pre><code class="java">Bitmap bitmap = BitmapFactory.
+            decodeResource(getResource(),R.drawable_cheetah_title);
+Shader shader = new BitmapShader(
+  bitmap,
+  Shader.TileMode.REPEAT,
+  Shader.TileMode.REPEAT);
+textView.getPaint().setShader(shader);
+)
+</code></pre>
 <p>TextView渲染html文档的时候可以自定义一个tagHandler<br>显示数学上的带有分子和分母的分数，可以使用<afrc>标签<br>TextView里面有一个Layout.Alignment的属性，然后创建一个AlignMentSpan，可以用来实现类似于聊天的文字左对齐，右对齐，只用一个TextView</p>
 <h2 id="34-ContentProvider的一些点"><a href="#34-ContentProvider的一些点" class="headerlink" title="34. ContentProvider的一些点"></a>34. ContentProvider的一些点</h2><p>可以自定义权限，在manifest里面写<br>URI有固定格式：</p>
 <p>分析URI：content://com.ljq.provider.personprovider/person/10/name，其中content://是Scheme，com.ljq.provider.personprovider表示主机名或者authorities，person/10/name表示路径，此URI要操作person表中id为10的name字段。</p>
-<p>自定义权限<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">permission</span> <span class="attr">android:name</span>=<span class="string">"me.pengtao.READ"</span> <span class="attr">android:protectionLevel</span>=<span class="string">"normal"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">provider</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:authorities</span>=<span class="string">"me.pengtao.contentprovidertest"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:name</span>=<span class="string">".provider.TestProvider"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:readPermission</span>=<span class="string">"me.pengtao.READ"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:exported</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">provider</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- 在第三方app中就可以声明： --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">"me.pengtao.READ"</span>/&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>自定义权限</p>
+<pre><code class="xml">&lt;permission android:name=&quot;me.pengtao.READ&quot; android:protectionLevel=&quot;normal&quot;/&gt;
+
+&lt;provider
+    android:authorities=&quot;me.pengtao.contentprovidertest&quot;
+    android:name=&quot;.provider.TestProvider&quot;
+    android:readPermission=&quot;me.pengtao.READ&quot;
+    android:exported=&quot;true&quot;&gt;
+&lt;/provider&gt;
+
+&lt;!-- 在第三方app中就可以声明： --&gt;
+&lt;uses-permission android:name=&quot;me.pengtao.READ&quot;/&gt;
+</code></pre>
 <p>另外说一句，ContentProvider是在App启动的时候就创建的，比Application的onCreate还要早</p>
 <h2 id="35-android-multiprocess-”true”"><a href="#35-android-multiprocess-”true”" class="headerlink" title="35. android:multiprocess=”true”"></a>35. android:multiprocess=”true”</h2><p>Activity可以在Manifest中声明这个属性，provider也可以声明这个属性。这个意思就是说，这个activity或者provider在A进程被拉起，那就创建一个A进程的Activity实例。在B进程被拉起，就创建一个B进程的Activity实例。在那个进程被打开就创建一个跑在哪个进程的实例</p>
 <blockquote>
 <p>If the app runs in multiple processes, this attribute determines whether multiple instances of the content provder are created. If true, each of the app’s processes has its own content provider object. If false, the app’s processes share only one content provider object. The default value is false.<br>Setting this flag to true may improve performance by reducing the overhead of interprocess communication, but it also increases the memory footprint of each process.</p>
 </blockquote>
 <h2 id="36-两个App之间共享数据"><a href="#36-两个App之间共享数据" class="headerlink" title="36. 两个App之间共享数据"></a>36. 两个App之间共享数据</h2><p> 两个应用的ShareUserId相同，则共享对方的data目录下的文件，包括SharePreference, file, lib等文件。例如，在ShareUserId相同的情况下，读取另一个应用的SharePreference文件。</p>
- <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"> //第一个应用程序为的menifest文件代码如下：  </span><br><span class="line"><span class="tag">&lt;<span class="name">manifest</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span>  </span></span><br><span class="line"><span class="tag"><span class="attr">package</span>=<span class="string">"com.mythou.serviceID"</span>  </span></span><br><span class="line"><span class="tag"><span class="attr">android:sharedUserId</span>=<span class="string">"com.mythou.share"</span>  </span></span><br><span class="line"><span class="tag">&gt;</span>  </span><br><span class="line">//第二个应用程序的menifest文件代码如下：  </span><br><span class="line"><span class="tag">&lt;<span class="name">manifest</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span>  </span></span><br><span class="line"><span class="tag"><span class="attr">package</span>=<span class="string">"com.mythou.clientID"</span>  </span></span><br><span class="line"><span class="tag"><span class="attr">android:sharedUserId</span>=<span class="string">"com.mythou.share"</span>  </span></span><br><span class="line"><span class="tag">&gt;</span></span><br></pre></td></tr></table></figure>
-<p>读取的时候这么读<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;  </span><br><span class="line">     Context ct=<span class="keyword">this</span>.createPackageContext (<span class="string">"com.mythou.serviceID"</span>, Context.CONTEXT_IGNORE_SECURITY);  </span><br><span class="line">     SharedPreferences sp = ct.getSharedPreferences(<span class="string">"appInfo"</span>, MODE_PRIVATE);  </span><br><span class="line">     String str2 = sp.getString(<span class="string">"appname"</span>, <span class="string">"service"</span>);  </span><br><span class="line">     Log.d(<span class="string">"test"</span>, <span class="string">"share preference--&gt;"</span> + str2);  </span><br><span class="line">&#125; <span class="keyword">catch</span> (NameNotFoundException e) &#123;  </span><br><span class="line">     <span class="comment">// TODO Auto-generated catch block  </span></span><br><span class="line">     e.printStackTrace();  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h2 id="37-ActivityAlias就跟Alias一样"><a href="#37-ActivityAlias就跟Alias一样" class="headerlink" title="37. ActivityAlias就跟Alias一样"></a>37. ActivityAlias就跟Alias一样</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">"com.mytest.StartupActivity"</span>  </span></span><br><span class="line"><span class="tag">    <span class="attr">android:exported</span>=<span class="string">"true"</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">activity</span>&gt;</span>  </span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- Solution for upgrading issue --&gt;</span>  </span><br><span class="line"><span class="tag">&lt;<span class="name">activity-alias</span> <span class="attr">android:name</span>=<span class="string">"com.mytest.HomeActivity"</span>  </span></span><br><span class="line"><span class="tag">    <span class="attr">android:targetActivity</span>=<span class="string">"com.mytest.StartupActivity"</span>  </span></span><br><span class="line"><span class="tag">    <span class="attr">android:exported</span>=<span class="string">"true"</span>  </span></span><br><span class="line"><span class="tag">    <span class="attr">android:enabled</span>=<span class="string">"true"</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">intent-filter</span>&gt;</span>  </span><br><span class="line">        <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">"android.intent.action.MAIN"</span> /&gt;</span>  </span><br><span class="line">        <span class="tag">&lt;<span class="name">category</span> <span class="attr">android:name</span>=<span class="string">"android.intent.category.LAUNCHER"</span> /&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;/<span class="name">intent-filter</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">activity-alias</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<h2 id="38-自定义一个scheme也很简单"><a href="#38-自定义一个scheme也很简单" class="headerlink" title="38. 自定义一个scheme也很简单"></a>38. 自定义一个scheme也很简单</h2><p>比如说App打电话就是:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//电话号码  </span></span><br><span class="line">String phoneNum = phoneNumEdit.getText().toString().trim();  </span><br><span class="line"><span class="comment">//打电话  </span></span><br><span class="line">Intent callIntent = <span class="keyword">new</span> Intent(Intent.ACTION_CALL);  </span><br><span class="line">callIntent.setData(Uri.parse(<span class="string">"tel:"</span>+phoneNum));  </span><br><span class="line">startActivity(callIntent);  </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Intent takePhotoIntent = <span class="keyword">new</span> Intent(MediaStore.ACTION_IMAGE_CAPTURE);  </span><br><span class="line">startActivityForResult(takePhotoIntent, REQUEST_TAKE_PHOTO);  </span><br><span class="line"></span><br><span class="line"><span class="comment">// 系统相机进程的数据还能通过onActivityResult返回，跨进程了</span></span><br><span class="line"><span class="meta">@Override</span>  </span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onActivityResult</span><span class="params">(<span class="keyword">int</span> requestCode, <span class="keyword">int</span> resultCode, Intent data)</span> </span>&#123;  </span><br><span class="line"></span><br><span class="line">    <span class="comment">//如果去拍照请求返回  </span></span><br><span class="line">    <span class="keyword">if</span> (requestCode == REQUEST_TAKE_PHOTO) &#123;  </span><br><span class="line"></span><br><span class="line">        <span class="comment">//如果结果返回成功  </span></span><br><span class="line">        <span class="keyword">if</span> (resultCode == RESULT_OK) &#123;  </span><br><span class="line"></span><br><span class="line">            Bitmap bmp = (Bitmap) data.getExtras().get(<span class="string">"data"</span>);  </span><br><span class="line">            takeResultImg.setImageBitmap(bmp);  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">    <span class="keyword">super</span>.onActivityResult(requestCode, resultCode, data);  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">"com.sarnasea.interprocess.ShareActivity"</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">intent-filter</span>&gt;</span>  </span><br><span class="line">        <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">"com.sarnasea.interprocess.MYACTION"</span>/&gt;</span>  </span><br><span class="line">        <span class="tag">&lt;<span class="name">data</span> <span class="attr">android:scheme</span>=<span class="string">"message"</span>/&gt;</span>  </span><br><span class="line">        <span class="tag">&lt;<span class="name">category</span> <span class="attr">android:name</span>=<span class="string">"android.intent.category.DEFAULT"</span>/&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;/<span class="name">intent-filter</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//  在ShareActivity获得其他应用程序传递过来的数据  （完全可以多进程）</span></span><br><span class="line">Uri data = getIntent().getData();  </span><br><span class="line"><span class="keyword">if</span> (data != <span class="keyword">null</span>) &#123;  </span><br><span class="line"></span><br><span class="line">    <span class="comment">//获得Host,也就是message://后面的主体内容  </span></span><br><span class="line">    String host = data.getHost();  </span><br><span class="line">    Toast.makeText(<span class="keyword">this</span>, host, Toast.LENGTH_SHORT).show();  </span><br><span class="line">&#125;  </span><br><span class="line"></span><br><span class="line">Bundle bundle = getIntent().getExtras();  </span><br><span class="line"><span class="keyword">if</span>(bundle != <span class="keyword">null</span>)&#123;  </span><br><span class="line"></span><br><span class="line">    <span class="comment">//获得其他应用程序调用该Activity时传递过来的Extras数据  </span></span><br><span class="line">    String value = bundle.getString(<span class="string">"value"</span>);  </span><br><span class="line">    Toast.makeText(<span class="keyword">this</span>, value, Toast.LENGTH_SHORT).show();  </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 外部启动这个Activity的方法</span></span><br><span class="line">Intent intent = <span class="keyword">new</span> Intent();  </span><br><span class="line">intent.setAction(<span class="string">"com.sarnasea.interprocess.MYACTION"</span>);   </span><br><span class="line">intent.setData(Uri.parse(<span class="string">"message://Hello World!"</span>));  </span><br><span class="line">intent.putExtra(<span class="string">"value"</span>, <span class="string">"yanglu"</span>);  </span><br><span class="line">startActivity(intent);  </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//这个Activty还可以从另一个进程返回数据</span></span><br><span class="line">Intent data = <span class="keyword">new</span> Intent();  </span><br><span class="line"><span class="comment">// 设置要返回的数据  </span></span><br><span class="line">data.putExtra(<span class="string">"result"</span>, <span class="string">"关闭Activity时返回的数据"</span>);  </span><br><span class="line"><span class="comment">// 设置返回码和Intent对象  </span></span><br><span class="line">setResult(Activity.RESULT_OK, data);  </span><br><span class="line"><span class="comment">// 关闭Activity  </span></span><br><span class="line">finish();</span><br></pre></td></tr></table></figure>
+<pre><code class="xml"> //第一个应用程序为的menifest文件代码如下：  
+&lt;manifest xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;  
+package=&quot;com.mythou.serviceID&quot;  
+android:sharedUserId=&quot;com.mythou.share&quot;  
+&gt;  
+//第二个应用程序的menifest文件代码如下：  
+&lt;manifest xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;  
+package=&quot;com.mythou.clientID&quot;  
+android:sharedUserId=&quot;com.mythou.share&quot;  
+&gt;
+</code></pre>
+<p>读取的时候这么读</p>
+<pre><code class="java">try {  
+     Context ct=this.createPackageContext (&quot;com.mythou.serviceID&quot;, Context.CONTEXT_IGNORE_SECURITY);  
+     SharedPreferences sp = ct.getSharedPreferences(&quot;appInfo&quot;, MODE_PRIVATE);  
+     String str2 = sp.getString(&quot;appname&quot;, &quot;service&quot;);  
+     Log.d(&quot;test&quot;, &quot;share preference--&gt;&quot; + str2);  
+} catch (NameNotFoundException e) {  
+     // TODO Auto-generated catch block  
+     e.printStackTrace();  
+}
+</code></pre>
+<h2 id="37-ActivityAlias就跟Alias一样"><a href="#37-ActivityAlias就跟Alias一样" class="headerlink" title="37. ActivityAlias就跟Alias一样"></a>37. ActivityAlias就跟Alias一样</h2><pre><code class="xml">&lt;activity android:name=&quot;com.mytest.StartupActivity&quot;  
+    android:exported=&quot;true&quot;&gt;  
+&lt;/activity&gt;  
+
+&lt;!-- Solution for upgrading issue --&gt;  
+&lt;activity-alias android:name=&quot;com.mytest.HomeActivity&quot;  
+    android:targetActivity=&quot;com.mytest.StartupActivity&quot;  
+    android:exported=&quot;true&quot;  
+    android:enabled=&quot;true&quot;&gt;  
+    &lt;intent-filter&gt;  
+        &lt;action android:name=&quot;android.intent.action.MAIN&quot; /&gt;  
+        &lt;category android:name=&quot;android.intent.category.LAUNCHER&quot; /&gt;  
+    &lt;/intent-filter&gt;  
+&lt;/activity-alias&gt;
+</code></pre>
+<h2 id="38-自定义一个scheme也很简单"><a href="#38-自定义一个scheme也很简单" class="headerlink" title="38. 自定义一个scheme也很简单"></a>38. 自定义一个scheme也很简单</h2><p>比如说App打电话就是:</p>
+<pre><code class="java">//电话号码  
+String phoneNum = phoneNumEdit.getText().toString().trim();  
+//打电话  
+Intent callIntent = new Intent(Intent.ACTION_CALL);  
+callIntent.setData(Uri.parse(&quot;tel:&quot;+phoneNum));  
+startActivity(callIntent);  
+
+
+Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);  
+startActivityForResult(takePhotoIntent, REQUEST_TAKE_PHOTO);  
+
+// 系统相机进程的数据还能通过onActivityResult返回，跨进程了
+@Override  
+protected void onActivityResult(int requestCode, int resultCode, Intent data) {  
+
+    //如果去拍照请求返回  
+    if (requestCode == REQUEST_TAKE_PHOTO) {  
+
+        //如果结果返回成功  
+        if (resultCode == RESULT_OK) {  
+
+            Bitmap bmp = (Bitmap) data.getExtras().get(&quot;data&quot;);  
+            takeResultImg.setImageBitmap(bmp);  
+        }  
+    }  
+    super.onActivityResult(requestCode, resultCode, data);  
+}
+</code></pre>
+<pre><code class="xml">&lt;activity android:name=&quot;com.sarnasea.interprocess.ShareActivity&quot;&gt;  
+    &lt;intent-filter&gt;  
+        &lt;action android:name=&quot;com.sarnasea.interprocess.MYACTION&quot;/&gt;  
+        &lt;data android:scheme=&quot;message&quot;/&gt;  
+        &lt;category android:name=&quot;android.intent.category.DEFAULT&quot;/&gt;  
+    &lt;/intent-filter&gt;  
+&lt;/activity&gt;
+</code></pre>
+<pre><code class="java">//  在ShareActivity获得其他应用程序传递过来的数据  （完全可以多进程）
+Uri data = getIntent().getData();  
+if (data != null) {  
+
+    //获得Host,也就是message://后面的主体内容  
+    String host = data.getHost();  
+    Toast.makeText(this, host, Toast.LENGTH_SHORT).show();  
+}  
+
+Bundle bundle = getIntent().getExtras();  
+if(bundle != null){  
+
+    //获得其他应用程序调用该Activity时传递过来的Extras数据  
+    String value = bundle.getString(&quot;value&quot;);  
+    Toast.makeText(this, value, Toast.LENGTH_SHORT).show();  
+}
+
+
+
+// 外部启动这个Activity的方法
+Intent intent = new Intent();  
+intent.setAction(&quot;com.sarnasea.interprocess.MYACTION&quot;);   
+intent.setData(Uri.parse(&quot;message://Hello World!&quot;));  
+intent.putExtra(&quot;value&quot;, &quot;yanglu&quot;);  
+startActivity(intent);  
+
+
+//这个Activty还可以从另一个进程返回数据
+Intent data = new Intent();  
+// 设置要返回的数据  
+data.putExtra(&quot;result&quot;, &quot;关闭Activity时返回的数据&quot;);  
+// 设置返回码和Intent对象  
+setResult(Activity.RESULT_OK, data);  
+// 关闭Activity  
+finish();
+</code></pre>
 <h2 id="39-Intent的底层实现是共享内存"><a href="#39-Intent的底层实现是共享内存" class="headerlink" title="39. Intent的底层实现是共享内存"></a>39. Intent的底层实现是共享内存</h2><p>两个Activity之间Intent传递数据的时候，Intent中的数据已经经历了两轮序列化和反序列化，当然是不同的对象<br>熟悉AIDL的同学都很清楚，AIDL跨进程通信支持的数据类型是：</p>
 <blockquote>
 <p>Java 的原生类型，如int,boolean,long,float…<br>String 和CharSequence<br>List 和 Map ,List和Map 对象的元素必须是AIDL支持的数据类型<br>AIDL 自动生成的接口 需要导入(import)<br>实现android.os.Parcelable 接口的类. 需要导入(import)。<br>这里并不包括Serializable类型。<br>于是去看了源码，发现是Parcel自己对Serializable类型的对象做了兼容，可以直接写入其中。<br>public class Intent implements Parcelable, Cloneable</p>

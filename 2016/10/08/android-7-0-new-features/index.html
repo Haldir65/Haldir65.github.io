@@ -16,7 +16,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="Google I/O 2016上的What’s new in Android介绍的比较全面，MultiWindow、Notification、ConstraintLayout等都比较简单。这里拎出来开发者不得不注意的几点来介绍。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.043Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.185Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="android 7.0一些新特性介绍及适配方案">
 <meta name="twitter:description" content="Google I/O 2016上的What’s new in Android介绍的比较全面，MultiWindow、Notification、ConstraintLayout等都比较简单。这里拎出来开发者不得不注意的几点来介绍。">
@@ -202,10 +202,42 @@ ga('send', 'pageview');
 <h3 id="1-BackGround-Optimization"><a href="#1-BackGround-Optimization" class="headerlink" title="1. BackGround Optimization"></a>1. BackGround Optimization</h3><p><del>CONNECTIVITY_CHANGE</del>(很多应用喜欢在Manifest里注册这个BroadcastReceiver，导致网络变化时，一大堆应用都被唤醒，而ram中无法同时存在这么多process，系统不得不kill old process，由此导致memory thrashing)</p>
 <p>同时被移除的还有<del>NEW_PICTURE</del>,<del>NEW_VIDEO</del>.</p>
 <p>具体来说: 对于<strong>targeting N</strong>的应用，在manifest文件中声明 static broadcastReceiver，监听<del>CONNECTIVITY_CHANGE</del>将不会唤醒应用。如果应用正在运行，使用context.registerReceiver，将仍能够接受到broadcast。但不会被唤醒。</p>
-<p>解决方案: 使用JobScheduler或firebase jobDispatcher。<br>举个例子:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MY_BACKGROUND_JOB = <span class="number">0</span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">scheduleJob</span><span class="params">(Context context)</span></span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.LOLLIPOP) &#123;</span><br><span class="line">          JobScheduler js =</span><br><span class="line">                  (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);</span><br><span class="line">          JobInfo job = <span class="keyword">new</span> JobInfo.Builder(</span><br><span class="line">                  MY_BACKGROUND_JOB,</span><br><span class="line">                  <span class="keyword">new</span> ComponentName(context,MyJobService.class)).</span><br><span class="line">                  setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED).</span><br><span class="line">                  setRequiresCharging(<span class="keyword">true</span>).</span><br><span class="line">                  build();</span><br><span class="line">          js.schedule(job);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
+<p>解决方案: 使用JobScheduler或firebase jobDispatcher。<br>举个例子:</p>
+<pre><code class="java">  public static final int MY_BACKGROUND_JOB = 0;
+    public static void scheduleJob(Context context){
+        if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.LOLLIPOP) {
+            JobScheduler js =
+                    (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            JobInfo job = new JobInfo.Builder(
+                    MY_BACKGROUND_JOB,
+                    new ComponentName(context,MyJobService.class)).
+                    setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED).
+                    setRequiresCharging(true).
+                    build();
+            js.schedule(job);
+        }
+
+    }
+</code></pre>
 <p>对于<del>NEW_PICTURE</del>,<del>NEW_VIDEO</del>.</p>
 <p>所有在7.0 Nuget以上设备运行的应用(无论是否 target N) 都不会收到这些broadcast。简单来说，fully deprecated  !!!</p>
-<p>解决方案：使用JobScheduler(可以监听contentProvider change)<br><del>NEW_PICTURE</del>的处理(这段代码只在API24以上存在，所以加了版本判断)<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">scheduleJob</span><span class="params">(Context context)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.N) &#123;</span><br><span class="line">        JobScheduler js =</span><br><span class="line">                context.getSystemService(JobScheduler.class);</span><br><span class="line">        JobInfo.Builder builder = <span class="keyword">new</span> JobInfo.Builder(</span><br><span class="line">                R.id.schedule_photo_jobs,</span><br><span class="line">                <span class="keyword">new</span> ComponentName(context,PhotoContentJob.class));</span><br><span class="line"></span><br><span class="line">        builder.addTriggerContentUri(</span><br><span class="line">                <span class="keyword">new</span> JobInfo.TriggerContentUri(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,</span><br><span class="line">                        JobInfo.TriggerContentUri.FLAG_NOTIFY_FOR_DESCENDANTS)</span><br><span class="line">        );</span><br><span class="line">        js.schedule(builder.build());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>解决方案：使用JobScheduler(可以监听contentProvider change)<br><del>NEW_PICTURE</del>的处理(这段代码只在API24以上存在，所以加了版本判断)</p>
+<pre><code class="java">    public static void scheduleJob(Context context){
+        if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.N) {
+            JobScheduler js =
+                    context.getSystemService(JobScheduler.class);
+            JobInfo.Builder builder = new JobInfo.Builder(
+                    R.id.schedule_photo_jobs,
+                    new ComponentName(context,PhotoContentJob.class));
+
+            builder.addTriggerContentUri(
+                    new JobInfo.TriggerContentUri(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                            JobInfo.TriggerContentUri.FLAG_NOTIFY_FOR_DESCENDANTS)
+            );
+            js.schedule(builder.build());
+        }
+    }
+</code></pre>
 <p>参考<a href="https://www.youtube.com/watch?v=3ZX0CfVfVP8">youtube上谷歌员工的演讲</a></p>
 <h3 id="2-文件系统的权限更改-FileProvider"><a href="#2-文件系统的权限更改-FileProvider" class="headerlink" title="2. 文件系统的权限更改(FileProvider)"></a>2. 文件系统的权限更改(FileProvider)</h3><p> File storage permission change<br> 简单来说就是Uri.fromFile(file://URI)不能再用了，需要使用FileProvider，这主要是为了6.0开始引进的permission model 考虑的，storage permission例如WRITE_EXTERNAL_STORAGE这种都已经属于Dangerous permission了。<br> 一个常见的场景就是调用系统相机拍照，给Intent设置一个uri，在7.0上直接用Uri.FromFile会崩<br> 需要通过FileProvider提供Uri,写了一个<a href="https://github.com/Haldir65/FileProviderDmo">Demo</a>，使用FileProvider传递文件给另一个App。<br> 另一个需要注意的就是DownloadManager访问COLUMN_LOCAL_FILENAME会报错，这个不常见。</p>
 <h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ol>

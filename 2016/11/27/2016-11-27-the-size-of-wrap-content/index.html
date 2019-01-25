@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/480617.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/timelineView.png">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.031Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.173Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="wrap_content到底多大">
 <meta name="twitter:description" content="转眼就十一月了，java的分析越来越少，虽然常常在业务上碰到不少坑。。。">
@@ -211,7 +211,13 @@ ga('send', 'pageview');
 <li>在onMeasure里面拿到的height == 0 , 具体一点就是:<br>整个ViewGroup包含多个Item，每个Item包括左侧的自定义View(CustomView)，高度是wrap_content，右边的TextView高度是wrap_content(自适应嘛)。可是debug时发现左侧的自定义View拿到的高度是0，简直日了哈士奇了。随后拿着关键词去Google搜索，还是没有什么收获。</li>
 </ol>
 </blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onMeasure</span><span class="params">(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">final</span> <span class="keyword">int</span> widthMode = MeasureSpec.getMode(widthMeasureSpec);</span><br><span class="line">       <span class="keyword">final</span> <span class="keyword">int</span> heightMode = MeasureSpec.getMode(heightMeasureSpec);<span class="comment">// 这里是UNSPECIFIED, 常规概念里wrap_content对应的应该是AT_MOST</span></span><br><span class="line">       <span class="keyword">final</span> <span class="keyword">int</span> widthSize = MeasureSpec.getSize(widthMeasureSpec);</span><br><span class="line">       <span class="keyword">final</span> <span class="keyword">int</span> heightSize = MeasureSpec.getSize(heightMeasureSpec); <span class="comment">// 居然等于0</span></span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="java"> protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        final int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        final int heightMode = MeasureSpec.getMode(heightMeasureSpec);// 这里是UNSPECIFIED, 常规概念里wrap_content对应的应该是AT_MOST
+        final int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+        final int heightSize = MeasureSpec.getSize(heightMeasureSpec); // 居然等于0
+    }
+</code></pre>
 <p>回顾这个Item的实现，Item继承自RelativeLayout，左边的View是调用addView(view,RelativeLayout.Layoutparams)加进去的,params设置了一些rules，像是AlignParentLeft这种，记得给左边的View和右边的TextView都设置一个id就好。TextView也是这样addView进去的。后来查到了秋百万对于MeasureSpec的介绍，我想到RelativeLayout的onMeasure会调用两次，在第一次测量的时候，左边的View和右边的TextView都把高度设置为wrap_content了。要命的是这个Item本身添加到UI的方式也是类似的addView(view,RelativeLayout.Layoutparams)方式，这里的height也是wrap_content。即Item本身高度需要由其child决定，左边的child决定不了，只有右边的TextView才能决定。所以第一轮测量下来，左边的View的高度只能是0，右边的TextView高度倒是确定了。这时候Item本身的高度也就能确定了。在第二遍测量的时候，就能顺利拿到高度了。</p>
 <blockquote>
 <ol>

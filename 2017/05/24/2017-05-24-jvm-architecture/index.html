@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/high_way_scene.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/starry_sky.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.035Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.177Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="jvm架构概述">
 <meta name="twitter:description" content="关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下">
@@ -202,7 +202,10 @@ ga('send', 'pageview');
     <div class="article-entry" itemprop="articleBody">
       
         <p>关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下<br><img src="https://www.haldir66.ga/static/imgs/high_way_scene.jpg" alt=""><br><a id="more"></a></p>
-<h2 id="1-从MyApp-java文件开始"><a href="#1-从MyApp-java文件开始" class="headerlink" title="1.从MyApp.java文件开始"></a>1.从MyApp.java文件开始</h2><p>大家都知道最开始学习Java的时候，要用javac 来编译MyApp.java来生成一个class文件。<br>在命令行里，大致是这样的执行顺序:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">javac MyApp.java</span><br><span class="line">java MyApp</span><br></pre></td></tr></table></figure></p>
+<h2 id="1-从MyApp-java文件开始"><a href="#1-从MyApp-java文件开始" class="headerlink" title="1.从MyApp.java文件开始"></a>1.从MyApp.java文件开始</h2><p>大家都知道最开始学习Java的时候，要用javac 来编译MyApp.java来生成一个class文件。<br>在命令行里，大致是这样的执行顺序:</p>
+<pre><code class="java">javac MyApp.java
+java MyApp
+</code></pre>
 <p><strong> 实际上后一句话就创建了一个jvm instance.</strong></p>
 <h2 id="2-从class-loader进入Execution-Engine-再到Host-Operating-System"><a href="#2-从class-loader进入Execution-Engine-再到Host-Operating-System" class="headerlink" title="2. 从class loader进入Execution Engine 再到Host Operating System"></a>2. 从class loader进入Execution Engine 再到Host Operating System</h2><p>java MyApp会调用class loader，后者不仅要负责加载MyApp.class文件，还需要加载java API中的class文件（String,Object,Collection….）。加载的class文件（byte code）被传递给Execution Engine,后者则负责执行byte code（其实也是调用宿主操作系统的方法执行操作）</p>
 <h2 id="3-where-did-class-loader-load-class-into"><a href="#3-where-did-class-loader-load-class-into" class="headerlink" title="3. where did class loader load class into ?"></a>3. where did class loader load class into ?</h2><p>classloader将class 文件加载进内存中的一部分（Runtime data areas）。到此，jvm architecture的三个主要组件：class loader subsystem,Runtime data areas 以及execution Enigne的主要功能都说清楚了。<br>所以，这篇文章主要就按照class loader subsystem -&gt; Runtime data areas -&gt; Execution Engine的顺序来讲。</p>

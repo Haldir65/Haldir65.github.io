@@ -16,7 +16,7 @@
 <meta property="og:description" content="Nagle’s Algorithm 和 Delayed ACK 一起用在特定场景下可能会造成网速不必要的延迟傳送 TCP 封包的時候， TCP header 占 20 bytes， IPv4 header 占 20 bytes，若傳送的資料太小， TCP/IPv4 headers 造成的 overhead (40bytes) 並不划算。想像傳送資料只有 1 byte，卻要另外傳 40 bytes">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/nature-grass-wet-plants-high-resolution-wallpaper-573f2c6413708.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.043Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.185Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="tcp-nagel-algorithm-and-delay-ack">
 <meta name="twitter:description" content="Nagle’s Algorithm 和 Delayed ACK 一起用在特定场景下可能会造成网速不必要的延迟傳送 TCP 封包的時候， TCP header 占 20 bytes， IPv4 header 占 20 bytes，若傳送的資料太小， TCP/IPv4 headers 造成的 overhead (40bytes) 並不划算。想像傳送資料只有 1 byte，卻要另外傳 40 bytes">
@@ -202,8 +202,29 @@ ga('send', 'pageview');
         <p>Nagle’s Algorithm 和 Delayed ACK 一起用在特定场景下可能会造成网速不必要的延迟<br>傳送 TCP 封包的時候， TCP header 占 20 bytes， IPv4 header 占 20 bytes，若傳送的資料太小， TCP/IPv4 headers 造成的 overhead (40bytes) 並不划算。想像傳送資料只有 1 byte，卻要另外傳 40 bytes header，這是很大的浪費。若網路上有大量小封包，會占去網路頻寬，可能會造成網路擁塞 。这个是针对发送方而言的。</p>
 <p><img src="https://www.haldir66.ga/static/imgs/nature-grass-wet-plants-high-resolution-wallpaper-573f2c6413708.jpg" alt=""><br><a id="more"></a></p>
 <p>一个TCP数据包的传输至少需要固定的40字节头部信息(20字节TCP + 20字节IP)，如果数据包实际负载都比较小的话，那么传输的效率就非常低，但是如果将这些小包的负载都尽量集中起来，封装到一个TCP数据包中进行传输，那么传输效率势必将会大大提高。此处我们再次强调，TCP传输的是一个字节流，本身不存在所谓的离散形式的数据包的概念，协议可以任意组合、拆分每次调用实际传输的数据长度。</p>
-<p>Nagle算法的思路在<a href="https://zh.wikipedia.org/wiki/%E7%B4%8D%E6%A0%BC%E7%AE%97%E6%B3%95">wiki</a>上也能找到<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">if there is new data to send</span><br><span class="line"></span><br><span class="line">  if the window size &gt;= MSS and available data is &gt;= MSS</span><br><span class="line"></span><br><span class="line">    send complete MSS segment now</span><br><span class="line"></span><br><span class="line">  else</span><br><span class="line"></span><br><span class="line">    if there is unconfirmed data still in the pipe</span><br><span class="line"></span><br><span class="line">      enqueue data in the buffer until an acknowledge is received</span><br><span class="line"></span><br><span class="line">    else</span><br><span class="line"></span><br><span class="line">      send data immediately</span><br><span class="line"></span><br><span class="line">    end if</span><br><span class="line"></span><br><span class="line">  end if</span><br><span class="line"></span><br><span class="line">end if</span><br></pre></td></tr></table></figure></p>
-<p>如果发送内容大于1个MSS， 立即发送；<br>如果之前没有包未被确认， 立即发送；<br>如果之前有包未被确认， 缓存发送内容；<br>如果收到ack， 立即发送缓存的内容。</p>
+<p>Nagle算法的思路在<a href="https://zh.wikipedia.org/wiki/%E7%B4%8D%E6%A0%BC%E7%AE%97%E6%B3%95">wiki</a>上也能找到</p>
+<pre><code>if there is new data to send
+
+  if the window size &gt;= MSS and available data is &gt;= MSS
+
+    send complete MSS segment now
+
+  else
+
+    if there is unconfirmed data still in the pipe
+
+      enqueue data in the buffer until an acknowledge is received
+
+    else
+
+      send data immediately
+
+    end if
+
+  end if
+
+end if
+</code></pre><p>如果发送内容大于1个MSS， 立即发送；<br>如果之前没有包未被确认， 立即发送；<br>如果之前有包未被确认， 缓存发送内容；<br>如果收到ack， 立即发送缓存的内容。</p>
 <p>概括地说来，其流程表述为：(a)不考虑窗口流量控制的限制，一旦累积的数据达到MSS就立即执行传输；(b)否则如果当前有未ACK的数据，就将数据堆积到发送队列里延迟发送；(c)如果没有待需要ACK的数据，就立即发送。简单说来，就是在数据没有累积到MSS的大小情况下，整个连接中允许有未ACK的数据。<br>　　Nagel算法本质上就是个时间换带宽的方法，所以对于那些带宽要求不大但对实时性要求高的程序，比如类似网络游戏类，需要使用TCP_NODELAY这个socket选项来关闭这个特性以减小延时发生。不过话外说来，对于这类程序或许使用UDP协议也是个选择。</p>
 <p>想象一下，同时丢出去一大堆只有50个字节的包还是会造成带宽的浪费，还不如攒在一起发出去。</p>
 <p>在Nagle算法中参数MSS(maximum segment size，IPv4默认值是576-20-20 = 536)<br><a href="https://en.wikipedia.org/wiki/Maximum_segment_size">Maximum_segment_size在wiki上还有专门的介绍</a></p>
@@ -217,7 +238,10 @@ ga('send', 'pageview');
 <p>以 HTTP 為例，若 server 的 response 被切成兩次 send，一次送 header，一次送 body，兩者都 &lt;MSS。</p>
 <p>server 送完 header 後，因為 client 沒有回 ACK (delayed ACK)，server 也不會送 body (應用層覺得它已經送出了，但 kernel 還沒送)。<br>client 過了 200ms，送出收到 header 的 ACK。<br>server 收到 ACK 後，送出 body。<br>於是 client 多等了 200ms 才收到完整的 response。</p>
 <h3 id="tcp缓冲的概念"><a href="#tcp缓冲的概念" class="headerlink" title="tcp缓冲的概念"></a>tcp缓冲的概念</h3><p><a href="https://www.cnblogs.com/promise6522/archive/2012/03/03/2377935.html">tcp缓冲</a><br>这些东西对于应用层来说是无感的</p>
-<p>socket支持blocking(默认)和non-blocking模式，读写都存在阻塞问题<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="keyword">ssize_t</span> write(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">void</span> *buf, <span class="keyword">size_t</span> count);</span><br></pre></td></tr></table></figure></p>
+<p>socket支持blocking(默认)和non-blocking模式，读写都存在阻塞问题</p>
+<pre><code class="c">#include &lt;unistd.h&gt;
+ssize_t write(int fd, const void *buf, size_t count);
+</code></pre>
 <p>牵涉到tcp缓冲层大小</p>
 <p>首先，write成功返回，只是buf中的数据被复制到了kernel中的TCP发送缓冲区。至于数据什么时候被发往网络，什么时候被对方主机接收，什么时候被对方进程读取，系统调用层面不会给予任何保证和通知。<br>已经发送到网络的数据依然需要暂存在send buffer中，只有收到对方的ack后，kernel才从buffer中清除这一部分数据，为后续发送数据腾出空间。接收端将收到的数据暂存在receive buffer中，自动进行确认。但如果socket所在的进程不及时将数据从receive buffer中取出，最终导致receive buffer填满，由于TCP的滑动窗口和拥塞控制，接收端会阻止发送端向其发送数据。这些控制皆发生在TCP/IP栈中，对应用程序是透明的，应用程序继续发送数据，最终导致send buffer填满，write调用阻塞。</p>
 <p>一般来说，由于接收端进程从socket读数据的速度跟不上发送端进程向socket写数据的速度，最终导致发送端write调用阻塞。</p>

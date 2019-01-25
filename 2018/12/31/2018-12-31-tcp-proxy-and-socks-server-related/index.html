@@ -17,7 +17,7 @@
 <meta property="og:description" content="python实现简易的tcp-proxy server及socks代理学习笔记">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/MountainDayJapan_EN-AU8690491173_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.043Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.185Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="tcp-proxy简单实现及socks协议相关">
 <meta name="twitter:description" content="python实现简易的tcp-proxy server及socks代理学习笔记">
@@ -216,9 +216,24 @@ ga('send', 'pageview');
 <li>这里面每个会话的remote server都是一个一个固定的ip:port，但是local client的port是变来变去的</li>
 </ol>
 <p>看看第三步，其实就是一个往返，所以顺序掉个头就行了，而且彼此互相不干扰（在只有一个会话的时候，remote.recv可以认为就是对当前client.send的回应）<br>这个往返用代码描述一下就是:</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sock_proxy</span><span class="params">(remote, local)</span>:</span></span><br><span class="line">    local_request = local.recv(<span class="number">4096</span>) <span class="comment">## 如果local和remote对调一下，这里就是从remote读数据</span></span><br><span class="line">    <span class="comment">## ....</span></span><br><span class="line">    remote.sendAll(local_request.encode()) <span class="comment">## 这里就是 GET / HTTP1.1 ...这种字符串，如果local和remote对调一下，就是发数据给local client</span></span><br></pre></td></tr></table></figure>
-<p>省略了一些try except和socket.close的代码。上面写了4096，是说最大接收数据量是4096字节，不是一次读取4096个字节的意思。下面是python中这几个函数的定义<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">s.recv(bufsize[,flag])</span><br><span class="line"></span><br><span class="line">接受TCP套接字的数据。数据以字符串形式返回，bufsize指定要接收的最大数据量。flag提供有关消息的其他信息，通常可以忽略。</span><br><span class="line"></span><br><span class="line">s.send(string[,flag])</span><br><span class="line"></span><br><span class="line">发送TCP数据。将string中的数据发送到连接的套接字。返回值是要发送的字节数量，该数量可能小于string的字节大小。</span><br><span class="line"></span><br><span class="line">s.sendall(string[,flag])</span><br><span class="line"></span><br><span class="line">完整发送TCP数据。将string中的数据发送到连接的套接字，但在返回之前会尝试发送所有数据。成功返回None，失败则抛出异常。</span><br></pre></td></tr></table></figure></p>
-<p>具体用什么语言来实现，其实都没什么大的差别了。用Python好在跨平台，代码量少。</p>
+<pre><code class="python">def sock_proxy(remote, local):
+    local_request = local.recv(4096) ## 如果local和remote对调一下，这里就是从remote读数据
+    ## ....
+    remote.sendAll(local_request.encode()) ## 这里就是 GET / HTTP1.1 ...这种字符串，如果local和remote对调一下，就是发数据给local client
+</code></pre>
+<p>省略了一些try except和socket.close的代码。上面写了4096，是说最大接收数据量是4096字节，不是一次读取4096个字节的意思。下面是python中这几个函数的定义</p>
+<pre><code>s.recv(bufsize[,flag])
+
+接受TCP套接字的数据。数据以字符串形式返回，bufsize指定要接收的最大数据量。flag提供有关消息的其他信息，通常可以忽略。
+
+s.send(string[,flag])
+
+发送TCP数据。将string中的数据发送到连接的套接字。返回值是要发送的字节数量，该数量可能小于string的字节大小。
+
+s.sendall(string[,flag])
+
+完整发送TCP数据。将string中的数据发送到连接的套接字，但在返回之前会尝试发送所有数据。成功返回None，失败则抛出异常。
+</code></pre><p>具体用什么语言来实现，其实都没什么大的差别了。用Python好在跨平台，代码量少。</p>
 <ul>
 <li>使用方式<blockquote>
 <p>python tcp_proxy -l 0.0.0.0:1090 -r zhihu.com:80 -v //代码是在别人的基础上改的，直接用别人的argument parser了</p>
@@ -235,8 +250,12 @@ ga('send', 'pageview');
 <blockquote>
 <p>curl localhost:1090</p>
 </blockquote>
-<p>在proxy一侧收到的请求报文：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">GET / HTTP/1.1</span><br><span class="line">Host: localhost:1090</span><br><span class="line">User-Agent: curl/7.54.0</span><br><span class="line">Accept: */*</span><br></pre></td></tr></table></figure></p>
-<p>最后是有俩换行的</p>
+<p>在proxy一侧收到的请求报文：</p>
+<pre><code>GET / HTTP/1.1
+Host: localhost:1090
+User-Agent: curl/7.54.0
+Accept: */*
+</code></pre><p>最后是有俩换行的</p>
 <p>用nc(netcat)也能往1090端口发数据</p>
 <blockquote>
 <p>nc 127.0.0.1 1090<br>GET / HTTP 1.1 \r\n\r\n 这个可以直接打换行，更方便</p>

@@ -17,7 +17,7 @@
 <meta property="og:description" content="收集几种语言中使用socket实现httpServer和httpClient的主要步骤">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/sun_rise_dim_grass.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.043Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.185Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从Socket入手实现http协议">
 <meta name="twitter:description" content="收集几种语言中使用socket实现httpServer和httpClient的主要步骤">
@@ -209,11 +209,152 @@ ga('send', 'pageview');
 <p>在 OSI 的七层协议中，第二层（数据链路层）的数据叫「Frame」，第三层（网络层）上的数据叫「Packet」，第四层（传输层）的数据叫「Segment」。(在wireShark的抓包结果就是这么展示的)</p>
 </blockquote>
 <p><a href="https://jerryc8080.gitbooks.io/understand-tcp-and-udp/chapter1.html">tcp包结构，udp的也有</a></p>
-<h2 id="java"><a href="#java" class="headerlink" title="java"></a>java</h2><p>用java实现一个httpclient怎么样?<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HttpSocketClient</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Socket mSocket;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        HttpSocketClient client = <span class="keyword">new</span> HttpSocketClient();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            client.sendGet(<span class="string">"www.baidu.com"</span>,<span class="number">80</span>,<span class="string">"/"</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">HttpSocketClient</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.mSocket = <span class="keyword">new</span> Socket();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/** 在百度服务器面前，这就是一个正常的浏览器</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> host</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> port</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> path</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> IOException</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">sendGet</span><span class="params">(String host, <span class="keyword">int</span> port, String path)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        SocketAddress dest = <span class="keyword">new</span> InetSocketAddress(host, port);</span><br><span class="line">        mSocket.connect(dest);</span><br><span class="line">        OutputStreamWriter streamWriter = <span class="keyword">new</span> OutputStreamWriter(mSocket.getOutputStream());</span><br><span class="line">        BufferedWriter bufferedWriter = <span class="keyword">new</span> BufferedWriter(streamWriter);</span><br><span class="line"></span><br><span class="line">        bufferedWriter.write(<span class="string">"GET "</span> + path + <span class="string">" HTTP/1.1\r\n"</span>);</span><br><span class="line">        bufferedWriter.write(<span class="string">"Host: "</span> + host + <span class="string">"\r\n"</span>);</span><br><span class="line">        bufferedWriter.write(<span class="string">"Connection: "</span> + <span class="string">"keep-alive"</span> + <span class="string">"\r\n"</span>);</span><br><span class="line">        bufferedWriter.write(<span class="string">"User-Agent: "</span> + <span class="string">"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36"</span> + <span class="string">"\r\n"</span>);</span><br><span class="line">        bufferedWriter.write(<span class="string">"Accept: "</span> + <span class="string">"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"</span> + <span class="string">"\r\n"</span>);</span><br><span class="line">        bufferedWriter.write(<span class="string">"Accept-Language: "</span> + <span class="string">"zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7"</span> + <span class="string">"\r\n"</span>);</span><br><span class="line">        bufferedWriter.write(<span class="string">"\r\n"</span>);</span><br><span class="line">        bufferedWriter.flush(); <span class="comment">//flush一下很重要，等于说已经写完了</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        BufferedInputStream stream = <span class="keyword">new</span> BufferedInputStream(mSocket.getInputStream());</span><br><span class="line">        BufferedReader bufferedReader = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(stream));</span><br><span class="line">        String line = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">while</span> ((line = bufferedReader.readLine())!=<span class="keyword">null</span>) &#123;</span><br><span class="line">            System.out.println(line);</span><br><span class="line">        &#125;</span><br><span class="line">        bufferedReader.close();</span><br><span class="line">        bufferedWriter.close();</span><br><span class="line">        mSocket.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>输出<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 302 Moved Temporarily</span><br><span class="line">Date: Sat, 24 Mar 2018 06:44:20 GMT</span><br><span class="line">Content-Type: text/html</span><br><span class="line">Content-Length: 225</span><br><span class="line">Connection: Keep-Alive</span><br><span class="line">Set-Cookie: BAIDUID=259D5F393E329E8E44651C589037C093:FG=1; expires=Thu, 31-Dec-37 23:55:55 GMT; max-age=2147483647; path=/; domain=.baidu.com</span><br><span class="line">Set-Cookie: BIDUPSID=259D5F393E329E8E44651C589037C093; expires=Thu, 31-Dec-37 23:55:55 GMT; max-age=2147483647; path=/; domain=.baidu.com</span><br><span class="line">Set-Cookie: PSTM=1521873860; expires=Thu, 31-Dec-37 23:55:55 GMT; max-age=2147483647; path=/; domain=.baidu.com</span><br><span class="line">Set-Cookie: BD_LAST_QID=10107339987852007720; path=/; Max-Age=1</span><br><span class="line">P3P: CP=&quot; OTI DSP COR IVA OUR IND COM &quot;</span><br><span class="line">Location: https://www.baidu.com/</span><br><span class="line">Server: BWS/1.1</span><br><span class="line">X-UA-Compatible: IE=Edge,chrome=1</span><br><span class="line"></span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;&lt;title&gt;302 Found&lt;/title&gt;&lt;/head&gt;</span><br><span class="line">&lt;body bgcolor=&quot;white&quot;&gt;</span><br><span class="line">&lt;center&gt;&lt;h1&gt;302 Found&lt;/h1&gt;&lt;/center&gt;</span><br><span class="line">&lt;hr&gt;&lt;center&gt;65d90fa34a5e777be72b3e20c859c335f9198cc2</span><br><span class="line">Time : Thu Mar 15 16:20:59 CST 2018&lt;/center&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure></p>
-<p>当然因为访问的是http，302是临时重定向（另外，几乎没见过谁返回301的，301的结果会被浏览器缓存），注意上面返回了Location字段，所以是符合规范的</p>
+<h2 id="java"><a href="#java" class="headerlink" title="java"></a>java</h2><p>用java实现一个httpclient怎么样?</p>
+<pre><code class="java">public class HttpSocketClient {
+
+    private Socket mSocket;
+
+    public static void main(String[] args) {
+        HttpSocketClient client = new HttpSocketClient();
+        try {
+            client.sendGet(&quot;www.baidu.com&quot;,80,&quot;/&quot;);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public HttpSocketClient() {
+        this.mSocket = new Socket();
+
+    }
+
+    /** 在百度服务器面前，这就是一个正常的浏览器
+     * @param host
+     * @param port
+     * @param path
+     * @throws IOException
+     */
+    void sendGet(String host, int port, String path) throws IOException {
+        SocketAddress dest = new InetSocketAddress(host, port);
+        mSocket.connect(dest);
+        OutputStreamWriter streamWriter = new OutputStreamWriter(mSocket.getOutputStream());
+        BufferedWriter bufferedWriter = new BufferedWriter(streamWriter);
+
+        bufferedWriter.write(&quot;GET &quot; + path + &quot; HTTP/1.1\r\n&quot;);
+        bufferedWriter.write(&quot;Host: &quot; + host + &quot;\r\n&quot;);
+        bufferedWriter.write(&quot;Connection: &quot; + &quot;keep-alive&quot; + &quot;\r\n&quot;);
+        bufferedWriter.write(&quot;User-Agent: &quot; + &quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36&quot; + &quot;\r\n&quot;);
+        bufferedWriter.write(&quot;Accept: &quot; + &quot;text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8&quot; + &quot;\r\n&quot;);
+        bufferedWriter.write(&quot;Accept-Language: &quot; + &quot;zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7&quot; + &quot;\r\n&quot;);
+        bufferedWriter.write(&quot;\r\n&quot;);
+        bufferedWriter.flush(); //flush一下很重要，等于说已经写完了
+
+
+        BufferedInputStream stream = new BufferedInputStream(mSocket.getInputStream());
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));
+        String line = null;
+        while ((line = bufferedReader.readLine())!=null) {
+            System.out.println(line);
+        }
+        bufferedReader.close();
+        bufferedWriter.close();
+        mSocket.close();
+    }
+}
+</code></pre>
+<p>输出</p>
+<pre><code>HTTP/1.1 302 Moved Temporarily
+Date: Sat, 24 Mar 2018 06:44:20 GMT
+Content-Type: text/html
+Content-Length: 225
+Connection: Keep-Alive
+Set-Cookie: BAIDUID=259D5F393E329E8E44651C589037C093:FG=1; expires=Thu, 31-Dec-37 23:55:55 GMT; max-age=2147483647; path=/; domain=.baidu.com
+Set-Cookie: BIDUPSID=259D5F393E329E8E44651C589037C093; expires=Thu, 31-Dec-37 23:55:55 GMT; max-age=2147483647; path=/; domain=.baidu.com
+Set-Cookie: PSTM=1521873860; expires=Thu, 31-Dec-37 23:55:55 GMT; max-age=2147483647; path=/; domain=.baidu.com
+Set-Cookie: BD_LAST_QID=10107339987852007720; path=/; Max-Age=1
+P3P: CP=&quot; OTI DSP COR IVA OUR IND COM &quot;
+Location: https://www.baidu.com/
+Server: BWS/1.1
+X-UA-Compatible: IE=Edge,chrome=1
+
+&lt;html&gt;
+&lt;head&gt;&lt;title&gt;302 Found&lt;/title&gt;&lt;/head&gt;
+&lt;body bgcolor=&quot;white&quot;&gt;
+&lt;center&gt;&lt;h1&gt;302 Found&lt;/h1&gt;&lt;/center&gt;
+&lt;hr&gt;&lt;center&gt;65d90fa34a5e777be72b3e20c859c335f9198cc2
+Time : Thu Mar 15 16:20:59 CST 2018&lt;/center&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre><p>当然因为访问的是http，302是临时重定向（另外，几乎没见过谁返回301的，301的结果会被浏览器缓存），注意上面返回了Location字段，所以是符合规范的</p>
 <p>server这边普遍用的是netty，正好netty的官网上也有相关的教程.<br><a href="https://netty.io/4.1/xref/overview-summary.html">netty的example非常多，http2,cors,upload等等都有</a></p>
-<h2 id="Python"><a href="#Python" class="headerlink" title="Python"></a>Python</h2><p><a href="https://github.com/Haldir65/Jimmy/blob/rm/basics/simpleHttpServer/httpServer.py">我自己抄来的简易版</a><br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## server </span></span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> codecs,logging</span><br><span class="line"></span><br><span class="line">sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)</span><br><span class="line">sock.bind((HOST, <span class="number">18004</span>))</span><br><span class="line">sock.listen(<span class="number">100</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># infinite loop</span></span><br><span class="line"><span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">    <span class="comment"># maximum number of requests waiting</span></span><br><span class="line">    conn, addr = sock.accept()</span><br><span class="line">    request = conn.recv(<span class="number">1024</span>)</span><br><span class="line">    <span class="keyword">if</span> isinstance(request,bytes):</span><br><span class="line">        request = str(request)</span><br><span class="line">        logging.error(request)</span><br><span class="line"></span><br><span class="line">    splited = request.split(<span class="string">' '</span>)    </span><br><span class="line">    <span class="keyword">if</span>(len(splited)&lt;<span class="number">2</span>):</span><br><span class="line">        <span class="keyword">continue</span></span><br><span class="line">    method = request.split(<span class="string">' '</span>)[<span class="number">0</span>]</span><br><span class="line">    src = request.split(<span class="string">' '</span>)[<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">    print(<span class="string">'Connect by: '</span>, addr)</span><br><span class="line">    print(<span class="string">'Request is:\n'</span>, request)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># deal wiht GET method</span></span><br><span class="line">    <span class="keyword">if</span> method == <span class="string">'GET'</span> <span class="keyword">or</span> method.__contains__(<span class="string">'GET'</span>):</span><br><span class="line">        <span class="keyword">if</span> src == <span class="string">'/index.html'</span>:</span><br><span class="line">            content = index_content</span><br><span class="line">        <span class="keyword">elif</span> src == <span class="string">'/image/image_12.jpg'</span>:</span><br><span class="line">            content = pic_content</span><br><span class="line">        <span class="keyword">elif</span> src == <span class="string">'/reg.html'</span>:</span><br><span class="line">            content = reg_content</span><br><span class="line">        <span class="keyword">elif</span> re.match(<span class="string">'^/\?.*$'</span>, src):</span><br><span class="line">            entry = src.split(<span class="string">'?'</span>)[<span class="number">1</span>]  <span class="comment"># main content of the request</span></span><br><span class="line">            content = <span class="string">'HTTP/1.x 200 ok\r\nContent-Type: text/html\r\n\r\n'</span></span><br><span class="line">            content += entry</span><br><span class="line">            content += <span class="string">'&lt;br /&gt;&lt;font color="green" size="7"&gt;register successs!&lt;/p&gt;'</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># deal with POST method</span></span><br><span class="line">    <span class="keyword">elif</span> method == <span class="string">'POST'</span>:</span><br><span class="line">        form = request.split(<span class="string">'\r\n'</span>)</span><br><span class="line">        entry = form[<span class="number">-1</span>]  <span class="comment"># main content of the request</span></span><br><span class="line">        content = <span class="string">'HTTP/1.x 200 ok\r\nContent-Type: text/html\r\n\r\n'</span></span><br><span class="line">        content += entry</span><br><span class="line">        content += <span class="string">'&lt;br /&gt;&lt;font color="green" size="7"&gt;register successs!&lt;/p&gt;'</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">######</span></span><br><span class="line">    <span class="comment"># More operations, such as put the form into database</span></span><br><span class="line">    <span class="comment"># ...</span></span><br><span class="line">    <span class="comment">######</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">continue</span></span><br><span class="line">    <span class="keyword">if</span>(type(content) <span class="keyword">is</span> str):</span><br><span class="line">        content = content.encode(<span class="string">'utf-8'</span>)</span><br><span class="line">    conn.sendall(content)</span><br><span class="line">    <span class="comment"># close connection</span></span><br><span class="line">    conn.close()</span><br></pre></td></tr></table></figure></p>
+<h2 id="Python"><a href="#Python" class="headerlink" title="Python"></a>Python</h2><p><a href="https://github.com/Haldir65/Jimmy/blob/rm/basics/simpleHttpServer/httpServer.py">我自己抄来的简易版</a></p>
+<pre><code class="python">## server 
+import socket
+import re
+import os
+import codecs,logging
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock.bind((HOST, 18004))
+sock.listen(100)
+
+
+# infinite loop
+while True:
+    # maximum number of requests waiting
+    conn, addr = sock.accept()
+    request = conn.recv(1024)
+    if isinstance(request,bytes):
+        request = str(request)
+        logging.error(request)
+
+    splited = request.split(&#39; &#39;)    
+    if(len(splited)&lt;2):
+        continue
+    method = request.split(&#39; &#39;)[0]
+    src = request.split(&#39; &#39;)[1]
+
+    print(&#39;Connect by: &#39;, addr)
+    print(&#39;Request is:\n&#39;, request)
+
+    # deal wiht GET method
+    if method == &#39;GET&#39; or method.__contains__(&#39;GET&#39;):
+        if src == &#39;/index.html&#39;:
+            content = index_content
+        elif src == &#39;/image/image_12.jpg&#39;:
+            content = pic_content
+        elif src == &#39;/reg.html&#39;:
+            content = reg_content
+        elif re.match(&#39;^/\?.*$&#39;, src):
+            entry = src.split(&#39;?&#39;)[1]  # main content of the request
+            content = &#39;HTTP/1.x 200 ok\r\nContent-Type: text/html\r\n\r\n&#39;
+            content += entry
+            content += &#39;&lt;br /&gt;&lt;font color=&quot;green&quot; size=&quot;7&quot;&gt;register successs!&lt;/p&gt;&#39;
+        else:
+            continue
+
+    # deal with POST method
+    elif method == &#39;POST&#39;:
+        form = request.split(&#39;\r\n&#39;)
+        entry = form[-1]  # main content of the request
+        content = &#39;HTTP/1.x 200 ok\r\nContent-Type: text/html\r\n\r\n&#39;
+        content += entry
+        content += &#39;&lt;br /&gt;&lt;font color=&quot;green&quot; size=&quot;7&quot;&gt;register successs!&lt;/p&gt;&#39;
+
+    ######
+    # More operations, such as put the form into database
+    # ...
+    ######
+
+    else:
+        continue
+    if(type(content) is str):
+        content = content.encode(&#39;utf-8&#39;)
+    conn.sendall(content)
+    # close connection
+    conn.close()
+</code></pre>
 <p>本地浏览器访问localhost:10086应该就能看到结果了，值得一提的是自己在chrome里面访问”<a href="http://localhost:18004/index.html&quot;这个地址的时候，事实上浏览器发送的数据是这样的">http://localhost:18004/index.html&quot;这个地址的时候，事实上浏览器发送的数据是这样的</a></p>
 <blockquote>
 <p>b’GET /index.html HTTP/1.1\r\nHost: localhost:18004\r\nConnection: keep-alive\r\nCache-Control: max-age=0\r\nUpgrade-Insecure-Requests: 1\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36\r\nDNT: 1\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,<em>/</em>;q=0.8\r\nAccept-Encoding: gzip, deflate, br\r\nAccept-Language: zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7\r\nCookie: _ga=GA1.1.dsadsa.dsadas; _gid=GA1.1.dsadsa.dsadasda\r\n\r\n’</p>
@@ -222,29 +363,375 @@ ga('send', 'pageview');
 <blockquote>
 <p>b’GET /favicon.ico HTTP/1.1\r\nHost: localhost:18004\r\nConnection: keep-alive\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36\r\nDNT: 1\r\nAccept: image/webp,image/apng,image/<em>,</em>/*;q=0.8\r\nReferer: <a href="http://localhost:18004/index.html\r\nAccept-Encoding">http://localhost:18004/index.html\r\nAccept-Encoding</a>: gzip, deflate, br\r\nAccept-Language: zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7\r\nCookie: _ga=GA1.1.dsadsa.dsadas; _gid=GA1.1.dsadsa.dsadasda\r\n\r\n’</p>
 </blockquote>
-<p>平时用的都是<a href="https://github.com/requests/requests/">requests</a>这个库,不过自己写也还是很简单<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="comment"># -*- coding: UTF-8 -*-</span></span><br><span class="line"><span class="comment"># 导入socket库:</span></span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建一个socket:</span></span><br><span class="line">s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)</span><br><span class="line"><span class="comment"># 建立连接:</span></span><br><span class="line">s.connect((<span class="string">'www.sina.com.cn'</span>, <span class="number">80</span>))</span><br><span class="line">s.send(<span class="string">b'GET / HTTP/1.1\r\nHost: www.sina.com.cn\r\nConnection: close\r\n\r\n'</span>)</span><br><span class="line"><span class="comment"># 接收数据:</span></span><br><span class="line">buffer = []</span><br><span class="line"><span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">    <span class="comment"># 每次最多接收1k字节:</span></span><br><span class="line">    d = s.recv(<span class="number">1024</span>)</span><br><span class="line">    <span class="keyword">if</span> d:</span><br><span class="line">        buffer.append(d)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">data = <span class="string">b''</span>.join(buffer)</span><br><span class="line"></span><br><span class="line">s.close()</span><br><span class="line">header, html = data.split(<span class="string">b'\r\n\r\n'</span>, <span class="number">1</span>)</span><br><span class="line">print(header.decode(<span class="string">'utf-8'</span>))</span><br><span class="line"><span class="comment"># 把接收的数据写入文件:</span></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'sina.html'</span>, <span class="string">'wb'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.write(html)</span><br></pre></td></tr></table></figure></p>
+<p>平时用的都是<a href="https://github.com/requests/requests/">requests</a>这个库,不过自己写也还是很简单</p>
+<pre><code class="python">#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+# 导入socket库:
+import socket
+
+# 创建一个socket:
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# 建立连接:
+s.connect((&#39;www.sina.com.cn&#39;, 80))
+s.send(b&#39;GET / HTTP/1.1\r\nHost: www.sina.com.cn\r\nConnection: close\r\n\r\n&#39;)
+# 接收数据:
+buffer = []
+while True:
+    # 每次最多接收1k字节:
+    d = s.recv(1024)
+    if d:
+        buffer.append(d)
+    else:
+        break
+data = b&#39;&#39;.join(buffer)
+
+s.close()
+header, html = data.split(b&#39;\r\n\r\n&#39;, 1)
+print(header.decode(&#39;utf-8&#39;))
+# 把接收的数据写入文件:
+with open(&#39;sina.html&#39;, &#39;wb&#39;) as f:
+    f.write(html)
+</code></pre>
 <p>上述代码，server和client都不能很好的处理并发或者利用多进程</p>
 <p><a href="https://realpython.com/python-sockets/">高阶版</a></p>
 <h2 id="C语言版本"><a href="#C语言版本" class="headerlink" title="C语言版本"></a>C语言版本</h2><p>C语言的应该最接近底层,C语言实现HTTP的GET和POST请求<br><a href="http://pminkov.github.io/blog/socket-programming-in-linux.html">似乎有很多现成的例子可以直接拿来抄</a></p>
-<p>一个简单的httpServer.c(unix环境下运行)<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;netinet/in.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt; // socket</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;  // 基本数据类型</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt; // read write</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fcntl.h&gt; // open close</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/shm.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;signal.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> PORT 8888</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SERV <span class="meta-string">"0.0.0.0"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> QUEUE 20</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> BUFF_SIZE 1024</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">doc_type</span>&#123;</span></span><br><span class="line">        <span class="keyword">char</span> *key;</span><br><span class="line">        <span class="keyword">char</span> *value;</span><br><span class="line">&#125;HTTP_CONTENT_TYPE;</span><br><span class="line"></span><br><span class="line">HTTP_CONTENT_TYPE http_content_type[] = &#123;</span><br><span class="line">        &#123; <span class="string">"html"</span>,<span class="string">"text/html"</span> &#125;,</span><br><span class="line">        &#123; <span class="string">"gif"</span> ,<span class="string">"image/gif"</span> &#125;,</span><br><span class="line">        &#123; <span class="string">"jpeg"</span>,<span class="string">"image/jpeg"</span> &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> sockfd;</span><br><span class="line"><span class="keyword">char</span> *http_res_tmpl = <span class="string">"HTTP/1.1 200 OK\r\n"</span></span><br><span class="line">        <span class="string">"Server: Cleey's Server V1.0\r\n"</span></span><br><span class="line">    <span class="string">"Accept-Ranges: bytes\r\n"</span></span><br><span class="line">        <span class="string">"Content-Length: %d\r\n"</span></span><br><span class="line">        <span class="string">"Connection: close\r\n"</span></span><br><span class="line">        <span class="string">"Content-Type: %s\r\n\r\n"</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">handle_signal</span><span class="params">(<span class="keyword">int</span> sign)</span></span>; <span class="comment">// 退出信号处理</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">http_send</span><span class="params">(<span class="keyword">int</span> sock,<span class="keyword">char</span> *content)</span></span>; <span class="comment">// http 发送相应报文</span></span><br><span class="line"><span class="function"><span class="keyword">char</span>* <span class="title">joinString</span><span class="params">(<span class="keyword">char</span> *s1, <span class="keyword">char</span> *s2)</span></span>;<span class="comment">//字符串拼接</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc,<span class="keyword">char</span> *argv[ ])</span></span>&#123;</span><br><span class="line"></span><br><span class="line">        signal(SIGINT,handle_signal);</span><br><span class="line">        <span class="keyword">int</span> count = <span class="number">0</span>; <span class="comment">// 计数</span></span><br><span class="line">        <span class="comment">// 定义 socket</span></span><br><span class="line">        sockfd = socket(AF_INET,SOCK_STREAM,<span class="number">0</span>);</span><br><span class="line">        <span class="comment">// 定义 sockaddr_in</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">skaddr</span>;</span></span><br><span class="line">        skaddr.sin_family = AF_INET; <span class="comment">// ipv4</span></span><br><span class="line">        skaddr.sin_port   = htons(PORT);</span><br><span class="line">        skaddr.sin_addr.s_addr = inet_addr(SERV);</span><br><span class="line">        <span class="comment">// bind，绑定 socket 和 sockaddr_in</span></span><br><span class="line">        <span class="keyword">if</span>( bind(sockfd,(struct sockaddr *)&amp;skaddr,<span class="keyword">sizeof</span>(skaddr)) == <span class="number">-1</span> )&#123;</span><br><span class="line">                perror(<span class="string">"bind error"</span>);</span><br><span class="line">                <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// listen，开始添加端口</span></span><br><span class="line">        <span class="keyword">if</span>( listen(sockfd,QUEUE) == <span class="number">-1</span> )&#123;</span><br><span class="line">                perror(<span class="string">"listen error"</span>);</span><br><span class="line">                <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 客户端信息</span></span><br><span class="line">        <span class="keyword">char</span> buff[BUFF_SIZE];</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">claddr</span>;</span></span><br><span class="line">        <span class="keyword">socklen_t</span> length = <span class="keyword">sizeof</span>(claddr);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(<span class="number">1</span>)&#123;</span><br><span class="line">                <span class="keyword">int</span> sock_client = accept(sockfd,(struct sockaddr *)&amp;claddr, &amp;length);</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">"%d\n"</span>,++count);</span><br><span class="line">                <span class="keyword">if</span>( sock_client &lt;<span class="number">0</span> )&#123;</span><br><span class="line">                        perror(<span class="string">"accept error"</span>);</span><br><span class="line">                        <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="built_in">memset</span>(buff,<span class="number">0</span>,<span class="keyword">sizeof</span>(buff));</span><br><span class="line">                <span class="keyword">int</span> len = recv(sock_client,buff,<span class="keyword">sizeof</span>(buff),<span class="number">0</span>);</span><br><span class="line">                <span class="built_in">fputs</span>(buff,<span class="built_in">stdout</span>);</span><br><span class="line">                <span class="comment">//send(sock_client,buff,len,0);</span></span><br><span class="line">                <span class="keyword">char</span> *re = joinString(<span class="string">"&lt;h2&gt;the client said&lt;/h2&gt; &lt;br&gt;  "</span>,buff);</span><br><span class="line">                http_send(sock_client,re);</span><br><span class="line">                close(sock_client);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">fputs</span>(<span class="string">"Bye Cleey"</span>,<span class="built_in">stdout</span>);</span><br><span class="line">        close(sockfd);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">http_send</span><span class="params">(<span class="keyword">int</span> sock_client,<span class="keyword">char</span> *content)</span></span>&#123;</span><br><span class="line">        <span class="keyword">char</span> HTTP_HEADER[BUFF_SIZE],HTTP_INFO[BUFF_SIZE];</span><br><span class="line">        <span class="keyword">int</span> len = <span class="built_in">strlen</span>(content);</span><br><span class="line">        <span class="built_in">sprintf</span>(HTTP_HEADER,http_res_tmpl,len,<span class="string">"text/html"</span>);</span><br><span class="line">        len = <span class="built_in">sprintf</span>(HTTP_INFO,<span class="string">"%s%s"</span>,HTTP_HEADER,content);</span><br><span class="line"></span><br><span class="line">        send(sock_client,HTTP_INFO,len,<span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">handle_signal</span><span class="params">(<span class="keyword">int</span> sign)</span></span>&#123;</span><br><span class="line">        <span class="built_in">fputs</span>(<span class="string">"\nSIGNAL INTERRUPT \nBye Cleey! \nSAFE EXIT\n"</span>,<span class="built_in">stdout</span>);</span><br><span class="line">        close(sockfd);</span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">char</span>* <span class="title">joinString</span><span class="params">(<span class="keyword">char</span> *s1, <span class="keyword">char</span> *s2)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> *result = <span class="built_in">malloc</span>(<span class="built_in">strlen</span>(s1)+<span class="built_in">strlen</span>(s2)+<span class="number">1</span>);<span class="comment">//+1 for the zero-terminator</span></span><br><span class="line">    <span class="comment">//in real code you would check for errors in malloc here</span></span><br><span class="line">    <span class="keyword">if</span> (result == <span class="literal">NULL</span>) <span class="built_in">exit</span> (<span class="number">1</span>);</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">strcpy</span>(result, s1);</span><br><span class="line">    <span class="built_in">strcat</span>(result, s2);</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>一个简单的httpServer.c(unix环境下运行)</p>
+<pre><code class="c">#include &lt;stdio.h&gt;
+#include &lt;netinet/in.h&gt;
+#include &lt;sys/socket.h&gt; // socket
+#include &lt;sys/types.h&gt;  // 基本数据类型
+#include &lt;unistd.h&gt; // read write
+#include &lt;string.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;fcntl.h&gt; // open close
+#include &lt;sys/shm.h&gt;
+
+#include &lt;signal.h&gt;
+
+#define PORT 8888
+#define SERV &quot;0.0.0.0&quot;
+#define QUEUE 20
+#define BUFF_SIZE 1024
+
+
+typedef struct doc_type{
+        char *key;
+        char *value;
+}HTTP_CONTENT_TYPE;
+
+HTTP_CONTENT_TYPE http_content_type[] = {
+        { &quot;html&quot;,&quot;text/html&quot; },
+        { &quot;gif&quot; ,&quot;image/gif&quot; },
+        { &quot;jpeg&quot;,&quot;image/jpeg&quot; }
+};
+
+int sockfd;
+char *http_res_tmpl = &quot;HTTP/1.1 200 OK\r\n&quot;
+        &quot;Server: Cleey&#39;s Server V1.0\r\n&quot;
+    &quot;Accept-Ranges: bytes\r\n&quot;
+        &quot;Content-Length: %d\r\n&quot;
+        &quot;Connection: close\r\n&quot;
+        &quot;Content-Type: %s\r\n\r\n&quot;;
+
+void handle_signal(int sign); // 退出信号处理
+void http_send(int sock,char *content); // http 发送相应报文
+char* joinString(char *s1, char *s2);//字符串拼接
+
+int main(int argc,char *argv[ ]){
+
+        signal(SIGINT,handle_signal);
+        int count = 0; // 计数
+        // 定义 socket
+        sockfd = socket(AF_INET,SOCK_STREAM,0);
+        // 定义 sockaddr_in
+        struct sockaddr_in skaddr;
+        skaddr.sin_family = AF_INET; // ipv4
+        skaddr.sin_port   = htons(PORT);
+        skaddr.sin_addr.s_addr = inet_addr(SERV);
+        // bind，绑定 socket 和 sockaddr_in
+        if( bind(sockfd,(struct sockaddr *)&amp;skaddr,sizeof(skaddr)) == -1 ){
+                perror(&quot;bind error&quot;);
+                exit(1);
+        }
+
+        // listen，开始添加端口
+        if( listen(sockfd,QUEUE) == -1 ){
+                perror(&quot;listen error&quot;);
+                exit(1);
+        }
+
+        // 客户端信息
+        char buff[BUFF_SIZE];
+        struct sockaddr_in claddr;
+        socklen_t length = sizeof(claddr);
+
+
+        while(1){
+                int sock_client = accept(sockfd,(struct sockaddr *)&amp;claddr, &amp;length);
+                printf(&quot;%d\n&quot;,++count);
+                if( sock_client &lt;0 ){
+                        perror(&quot;accept error&quot;);
+                        exit(1);
+                }
+                memset(buff,0,sizeof(buff));
+                int len = recv(sock_client,buff,sizeof(buff),0);
+                fputs(buff,stdout);
+                //send(sock_client,buff,len,0);
+                char *re = joinString(&quot;&lt;h2&gt;the client said&lt;/h2&gt; &lt;br&gt;  &quot;,buff);
+                http_send(sock_client,re);
+                close(sock_client);
+        }
+        fputs(&quot;Bye Cleey&quot;,stdout);
+        close(sockfd);
+        return 0;
+}
+
+void http_send(int sock_client,char *content){
+        char HTTP_HEADER[BUFF_SIZE],HTTP_INFO[BUFF_SIZE];
+        int len = strlen(content);
+        sprintf(HTTP_HEADER,http_res_tmpl,len,&quot;text/html&quot;);
+        len = sprintf(HTTP_INFO,&quot;%s%s&quot;,HTTP_HEADER,content);
+
+        send(sock_client,HTTP_INFO,len,0);
+}
+
+void handle_signal(int sign){
+        fputs(&quot;\nSIGNAL INTERRUPT \nBye Cleey! \nSAFE EXIT\n&quot;,stdout);
+        close(sockfd);
+        exit(0);
+}
+
+char* joinString(char *s1, char *s2)
+{
+    char *result = malloc(strlen(s1)+strlen(s2)+1);//+1 for the zero-terminator
+    //in real code you would check for errors in malloc here
+    if (result == NULL) exit (1);
+
+    strcpy(result, s1);
+    strcat(result, s2);
+
+    return result;
+}
+</code></pre>
 <p>使用方式:</p>
 <blockquote>
 <p>curl -X GET -d  –header “Content-Type:application/json” –header “Authorization:JWT somerandomjwtstringandstuffs” “<a href="http://127.0.0.1:8888/user">http://127.0.0.1:8888/user</a>“</p>
 </blockquote>
-<p>一个类似于简易的curl的c语言httpClient可能长这样<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt; </span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;arpa/inet.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;netdb.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;netinet/in.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">get_ip_by_domain</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *domain, <span class="keyword">char</span> *ip)</span></span>; <span class="comment">// 根据域名获取ip</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span>&#123;</span><br><span class="line"><span class="keyword">if</span>(argc!=<span class="number">2</span>)&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"please input host name %s ipn"</span>,argv[<span class="number">0</span>]); </span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">char</span> * host = argv[<span class="number">1</span>];</span><br><span class="line"><span class="keyword">int</span> sockfd;</span><br><span class="line"><span class="keyword">int</span> len; </span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">address</span>;</span> </span><br><span class="line"><span class="keyword">int</span> result; </span><br><span class="line"><span class="keyword">char</span> httpstring[<span class="number">1000</span>]; </span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> * server_ip[<span class="number">100</span>];</span><br><span class="line">get_ip_by_domain(host,server_ip);</span><br><span class="line"><span class="built_in">strcat</span>(httpstring,<span class="string">"GET / HTTP/1.1\r\n"</span>);</span><br><span class="line"><span class="built_in">strcat</span>(httpstring,<span class="string">"Host: "</span>);</span><br><span class="line"><span class="built_in">strcat</span>(httpstring,host);</span><br><span class="line"><span class="built_in">strcat</span>(httpstring,<span class="string">"\r\n"</span>);</span><br><span class="line"><span class="built_in">strcat</span>(httpstring,</span><br><span class="line"><span class="string">"Connection: keep-alive\r\n"</span></span><br><span class="line"><span class="string">"Cache-Control: max-age=0\r\n"</span></span><br><span class="line"><span class="string">"Upgrade-Insecure-Requests: 1\r\n"</span></span><br><span class="line"><span class="string">"User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.67 Safari/537.36\r\n"</span></span><br><span class="line"><span class="string">"DNT: 1\r\n"</span></span><br><span class="line"><span class="string">"Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8\r\n"</span></span><br><span class="line"><span class="string">"Accept-Encoding: gzip, deflate, br\r\n"</span></span><br><span class="line"><span class="string">"Accept-Language: zh-CN,zh;q=0.9\r\n\r\n"</span>); </span><br><span class="line"><span class="keyword">char</span> ch;</span><br><span class="line">sockfd = socket(AF_INET, SOCK_STREAM, <span class="number">0</span>); </span><br><span class="line">address.sin_family = AF_INET; </span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"the server host is %s and the ip is %s\n"</span>,argv[<span class="number">1</span>],server_ip);</span><br><span class="line">address.sin_addr.s_addr = inet_addr(server_ip); </span><br><span class="line">address.sin_port = htons(<span class="number">80</span>); </span><br><span class="line">len = <span class="keyword">sizeof</span>(address);</span><br><span class="line">result = connect(sockfd,(struct sockaddr *)&amp;address,len); </span><br><span class="line"><span class="keyword">if</span>(result == <span class="number">-1</span>)&#123; </span><br><span class="line">    perror(<span class="string">"oops: client connect error"</span>); </span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>; </span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"befor connect!!"</span>);</span><br><span class="line">write(sockfd,httpstring,<span class="built_in">strlen</span>(httpstring)); </span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"after write!!\n"</span>);</span><br><span class="line"><span class="keyword">while</span>(read(sockfd,&amp;ch,<span class="number">1</span>))&#123; </span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"%c"</span>, ch); </span><br><span class="line">&#125; </span><br><span class="line">close(sockfd); </span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"n"</span>); </span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125; </span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> IP_SIZE		16</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 根据域名获取ip</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">get_ip_by_domain</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *domain, <span class="keyword">char</span> *ip)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> **pptr;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">hostent</span> *<span class="title">hptr</span>;</span></span><br><span class="line">    hptr = gethostbyname(domain);</span><br><span class="line">    <span class="keyword">if</span>(<span class="literal">NULL</span> == hptr)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"gethostbyname error for host:%s/n"</span>, domain);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span>(pptr = hptr-&gt;h_addr_list ; *pptr != <span class="literal">NULL</span>; pptr++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="literal">NULL</span> != inet_ntop(hptr-&gt;h_addrtype, *pptr, ip, IP_SIZE) )</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>; <span class="comment">// 只获取第一个 ip</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>一个类似于简易的curl的c语言httpClient可能长这样</p>
+<pre><code class="C">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;sys/types.h&gt; 
+#include &lt;sys/socket.h&gt;
+#include &lt;arpa/inet.h&gt;
+#include &lt;netdb.h&gt;
+#include &lt;netinet/in.h&gt;
+#include &lt;unistd.h&gt;
+
+int get_ip_by_domain(const char *domain, char *ip); // 根据域名获取ip
+
+int main(int argc, char *argv[]){
+if(argc!=2){
+    printf(&quot;please input host name %s ipn&quot;,argv[0]); 
+    return 1;
+}
+char * host = argv[1];
+int sockfd;
+int len; 
+struct sockaddr_in address; 
+int result; 
+char httpstring[1000]; 
+
+char * server_ip[100];
+get_ip_by_domain(host,server_ip);
+strcat(httpstring,&quot;GET / HTTP/1.1\r\n&quot;);
+strcat(httpstring,&quot;Host: &quot;);
+strcat(httpstring,host);
+strcat(httpstring,&quot;\r\n&quot;);
+strcat(httpstring,
+&quot;Connection: keep-alive\r\n&quot;
+&quot;Cache-Control: max-age=0\r\n&quot;
+&quot;Upgrade-Insecure-Requests: 1\r\n&quot;
+&quot;User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.67 Safari/537.36\r\n&quot;
+&quot;DNT: 1\r\n&quot;
+&quot;Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8\r\n&quot;
+&quot;Accept-Encoding: gzip, deflate, br\r\n&quot;
+&quot;Accept-Language: zh-CN,zh;q=0.9\r\n\r\n&quot;); 
+char ch;
+sockfd = socket(AF_INET, SOCK_STREAM, 0); 
+address.sin_family = AF_INET; 
+printf(&quot;the server host is %s and the ip is %s\n&quot;,argv[1],server_ip);
+address.sin_addr.s_addr = inet_addr(server_ip); 
+address.sin_port = htons(80); 
+len = sizeof(address);
+result = connect(sockfd,(struct sockaddr *)&amp;address,len); 
+if(result == -1){ 
+    perror(&quot;oops: client connect error&quot;); 
+    return 1; 
+}
+printf(&quot;befor connect!!&quot;);
+write(sockfd,httpstring,strlen(httpstring)); 
+printf(&quot;after write!!\n&quot;);
+while(read(sockfd,&amp;ch,1)){ 
+    printf(&quot;%c&quot;, ch); 
+} 
+close(sockfd); 
+printf(&quot;n&quot;); 
+return 0;
+} 
+
+#define IP_SIZE        16
+
+// 根据域名获取ip
+int get_ip_by_domain(const char *domain, char *ip)
+{
+    char **pptr;
+    struct hostent *hptr;
+    hptr = gethostbyname(domain);
+    if(NULL == hptr)
+    {
+        printf(&quot;gethostbyname error for host:%s/n&quot;, domain);
+        return -1;
+    }
+    for(pptr = hptr-&gt;h_addr_list ; *pptr != NULL; pptr++)
+    {
+        if (NULL != inet_ntop(hptr-&gt;h_addrtype, *pptr, ip, IP_SIZE) )
+        {
+            return 0; // 只获取第一个 ip
+        }
+    }
+    return -1;
+}
+</code></pre>
 <p>使用方式:</p>
 <blockquote>
 <p>./bin/client www.baidu.com ##这时候，在百度服务器看来，这个程序和普通的浏览器没有区别。试了下主流的网站，都没有什么问题。优酷返回了一大串奇怪的字符串，看了下，应该是content-encoding: gzip了，所以在终端里面看上去乱七八糟的。</p>
 </blockquote>
 <p>上面这段会卡在read里面，因为读到最后一个字节的时候，客户端并不知道是没有更多数据还是网络不好堵住了。需要在每一次读完之后去找那个”\r\n\r\n”的结束标志。</p>
-<p>一个使用libevent的版本的客户端可以这样写<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;signal.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;assert.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;evhttp.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;event2/event.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;event2/util.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;event2/http.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;event2/bufferevent.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">http_request_done</span><span class="params">(struct evhttp_request *req, <span class="keyword">void</span> *arg)</span></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> buf[<span class="number">8196</span>]; <span class="comment">//这里没处理了</span></span><br><span class="line">    <span class="keyword">int</span> s = evbuffer_remove(req-&gt;input_buffer, &amp;buf, <span class="keyword">sizeof</span>(buf) - <span class="number">1</span>);</span><br><span class="line">    buf[s] = <span class="string">'\0'</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"%s"</span>, buf);</span><br><span class="line">    <span class="comment">// terminate event_base_dispatch()</span></span><br><span class="line">    event_base_loopbreak((struct event_base *)arg);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> *</span><br><span class="line">get_tcp_socket_for_host(<span class="keyword">const</span> <span class="keyword">char</span> *hostname, <span class="keyword">ev_uint16_t</span> port)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">char</span> port_buf[<span class="number">6</span>];</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">evutil_addrinfo</span> <span class="title">hints</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">evutil_addrinfo</span> *<span class="title">answer</span> = <span class="title">NULL</span>;</span></span><br><span class="line">    <span class="keyword">int</span> err;</span><br><span class="line">    <span class="keyword">evutil_socket_t</span> sock;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Convert the port to decimal. */</span></span><br><span class="line">    evutil_snprintf(port_buf, <span class="keyword">sizeof</span>(port_buf), <span class="string">"%d"</span>, (<span class="keyword">int</span>)port);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Build the hints to tell getaddrinfo how to act. */</span></span><br><span class="line">    <span class="built_in">memset</span>(&amp;hints, <span class="number">0</span>, <span class="keyword">sizeof</span>(hints));</span><br><span class="line">    hints.ai_family = AF_UNSPEC; <span class="comment">/* v4 or v6 is fine. */</span></span><br><span class="line">    hints.ai_socktype = SOCK_STREAM;</span><br><span class="line">    hints.ai_protocol = IPPROTO_TCP; <span class="comment">/* We want a TCP socket */</span></span><br><span class="line">    <span class="comment">/* Only return addresses we can use. */</span></span><br><span class="line">    hints.ai_flags = EVUTIL_AI_ADDRCONFIG;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Look up the hostname. */</span></span><br><span class="line">    err = evutil_getaddrinfo(hostname, port_buf, &amp;hints, &amp;answer);</span><br><span class="line">    <span class="keyword">if</span> (err != <span class="number">0</span>) &#123;</span><br><span class="line">          <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">"Error while resolving '%s': %s"</span>,</span><br><span class="line">                  hostname, evutil_gai_strerror(err));</span><br><span class="line">          <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* If there was no error, we should have at least one answer. */</span></span><br><span class="line">    assert(answer);</span><br><span class="line">    <span class="comment">/* Just use the first answer. */</span></span><br><span class="line">    sock = socket(answer-&gt;ai_family,</span><br><span class="line">                  answer-&gt;ai_socktype,</span><br><span class="line">                  answer-&gt;ai_protocol);</span><br><span class="line">    <span class="keyword">if</span> (sock &lt; <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    <span class="keyword">if</span> (connect(sock, answer-&gt;ai_addr, answer-&gt;ai_addrlen)) &#123;</span><br><span class="line">        <span class="comment">/* Note that we're doing a blocking connect in this function.</span></span><br><span class="line"><span class="comment">         * If this were nonblocking, we'd need to treat some errors</span></span><br><span class="line"><span class="comment">         * (like EINTR and EAGAIN) specially. */</span></span><br><span class="line">        EVUTIL_CLOSESOCKET(sock);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *s = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="keyword">char</span> buf[<span class="number">128</span>];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ( answer-&gt;ai_family == AF_INET)&#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> *<span class="title">sin</span> = (<span class="title">struct</span> <span class="title">sockaddr_in</span> *)<span class="title">answer</span>-&gt;<span class="title">ai_addr</span>;</span></span><br><span class="line">        s = evutil_inet_ntop(AF_INET, &amp;<span class="built_in">sin</span>-&gt;sin_addr, buf, <span class="number">128</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> ( answer-&gt;ai_family == AF_INET6)&#123;</span><br><span class="line">        struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *)answer-&gt;ai_addr;</span><br><span class="line">        s = evutil_inet_ntop(AF_INET6, &amp;sin6-&gt;sin6_addr, buf, <span class="number">128</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (s)&#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"  -&gt;%s\n"</span> , s);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">char</span> *res = (<span class="keyword">char</span> *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">char</span>)*<span class="built_in">strlen</span>(s)+<span class="number">1</span>);</span><br><span class="line">    <span class="built_in">strcpy</span>(res,s);</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> **argv)</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span> *ip_addresss = get_tcp_socket_for_host(<span class="string">"www.taobao.com"</span>,<span class="number">80</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"the ip address of taobao is  %s \n"</span>,ip_addresss);</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">event_base</span> *<span class="title">base</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">evhttp_connection</span> *<span class="title">conn</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">evhttp_request</span> *<span class="title">req</span>;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    base = event_base_new();</span><br><span class="line"> </span><br><span class="line">    conn = evhttp_connection_base_new(base, <span class="literal">NULL</span>, ip_addresss, <span class="number">80</span>);</span><br><span class="line">    req = evhttp_request_new(http_request_done, base);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 这里就是写request 的 header</span></span><br><span class="line">    evhttp_add_header(req-&gt;output_headers, <span class="string">"Host"</span>, <span class="string">"www.taobao.com"</span>);</span><br><span class="line">    evhttp_add_header(req-&gt;output_headers, <span class="string">"Connection"</span>, <span class="string">"keep-alive"</span>);</span><br><span class="line">    evhttp_add_header(req-&gt;output_headers, <span class="string">"Accept"</span>, <span class="string">"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"</span>);</span><br><span class="line">    evhttp_add_header(req-&gt;output_headers, <span class="string">"User-Agent"</span>, <span class="string">"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36"</span>);</span><br><span class="line"></span><br><span class="line">    evhttp_make_request(conn, req, EVHTTP_REQ_GET, <span class="string">"/index.html"</span>);</span><br><span class="line">    evhttp_connection_set_timeout(req-&gt;evcon, <span class="number">600</span>);</span><br><span class="line">    event_base_dispatch(base);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>一个使用libevent的版本的客户端可以这样写</p>
+<pre><code class="c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;signal.h&gt;
+#include &lt;assert.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;evhttp.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;event2/event.h&gt;
+#include &lt;event2/util.h&gt;
+#include &lt;event2/http.h&gt;
+#include &lt;event2/bufferevent.h&gt;
+
+void http_request_done(struct evhttp_request *req, void *arg){
+    char buf[8196]; //这里没处理了
+    int s = evbuffer_remove(req-&gt;input_buffer, &amp;buf, sizeof(buf) - 1);
+    buf[s] = &#39;\0&#39;;
+    printf(&quot;%s&quot;, buf);
+    // terminate event_base_dispatch()
+    event_base_loopbreak((struct event_base *)arg);
+}
+
+char *
+get_tcp_socket_for_host(const char *hostname, ev_uint16_t port)
+{
+    char port_buf[6];
+    struct evutil_addrinfo hints;
+    struct evutil_addrinfo *answer = NULL;
+    int err;
+    evutil_socket_t sock;
+
+    /* Convert the port to decimal. */
+    evutil_snprintf(port_buf, sizeof(port_buf), &quot;%d&quot;, (int)port);
+
+    /* Build the hints to tell getaddrinfo how to act. */
+    memset(&amp;hints, 0, sizeof(hints));
+    hints.ai_family = AF_UNSPEC; /* v4 or v6 is fine. */
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = IPPROTO_TCP; /* We want a TCP socket */
+    /* Only return addresses we can use. */
+    hints.ai_flags = EVUTIL_AI_ADDRCONFIG;
+
+    /* Look up the hostname. */
+    err = evutil_getaddrinfo(hostname, port_buf, &amp;hints, &amp;answer);
+    if (err != 0) {
+          fprintf(stderr, &quot;Error while resolving &#39;%s&#39;: %s&quot;,
+                  hostname, evutil_gai_strerror(err));
+          return NULL;
+    }
+
+    /* If there was no error, we should have at least one answer. */
+    assert(answer);
+    /* Just use the first answer. */
+    sock = socket(answer-&gt;ai_family,
+                  answer-&gt;ai_socktype,
+                  answer-&gt;ai_protocol);
+    if (sock &lt; 0)
+        return NULL;
+    if (connect(sock, answer-&gt;ai_addr, answer-&gt;ai_addrlen)) {
+        /* Note that we&#39;re doing a blocking connect in this function.
+         * If this were nonblocking, we&#39;d need to treat some errors
+         * (like EINTR and EAGAIN) specially. */
+        EVUTIL_CLOSESOCKET(sock);
+        return NULL;
+    }
+
+    const char *s = NULL;
+    char buf[128];
+
+    if ( answer-&gt;ai_family == AF_INET){
+        struct sockaddr_in *sin = (struct sockaddr_in *)answer-&gt;ai_addr;
+        s = evutil_inet_ntop(AF_INET, &amp;sin-&gt;sin_addr, buf, 128);
+    } else if ( answer-&gt;ai_family == AF_INET6){
+        struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *)answer-&gt;ai_addr;
+        s = evutil_inet_ntop(AF_INET6, &amp;sin6-&gt;sin6_addr, buf, 128);
+    }
+    if (s){
+        printf(&quot;  -&gt;%s\n&quot; , s);
+    }
+    char *res = (char *)malloc(sizeof(char)*strlen(s)+1);
+    strcpy(res,s);
+    return res;
+}
+
+int main(int argc, char **argv){
+
+    char *ip_addresss = get_tcp_socket_for_host(&quot;www.taobao.com&quot;,80);
+    printf(&quot;the ip address of taobao is  %s \n&quot;,ip_addresss);
+
+    struct event_base *base;
+    struct evhttp_connection *conn;
+    struct evhttp_request *req;
+
+
+    base = event_base_new();
+
+    conn = evhttp_connection_base_new(base, NULL, ip_addresss, 80);
+    req = evhttp_request_new(http_request_done, base);
+
+    // 这里就是写request 的 header
+    evhttp_add_header(req-&gt;output_headers, &quot;Host&quot;, &quot;www.taobao.com&quot;);
+    evhttp_add_header(req-&gt;output_headers, &quot;Connection&quot;, &quot;keep-alive&quot;);
+    evhttp_add_header(req-&gt;output_headers, &quot;Accept&quot;, &quot;text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8&quot;);
+    evhttp_add_header(req-&gt;output_headers, &quot;User-Agent&quot;, &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36&quot;);
+
+    evhttp_make_request(conn, req, EVHTTP_REQ_GET, &quot;/index.html&quot;);
+    evhttp_connection_set_timeout(req-&gt;evcon, 600);
+    event_base_dispatch(base);
+
+    return 0;
+}
+</code></pre>
 <p>网络通信显然还要注意一个字节序的问题，简单来讲,java是大端的,c++是跟着平台走的且多数为小端<br><a href="https://blog.csdn.net/windshg/article/details/12956107">c++的服务器和java的客户端之间的通信</a></p>
 <blockquote>
 <p>C/C++语言编写的程序里数据存储顺序是跟编译平台所在的CPU相关的，而现在比较普遍的 x86 处理器是 Little Endian<br>JAVA编写的程序则唯一采用 Big Endian 方式来存储数据</p>
 </blockquote>
 <p>htons();//将short类型的值从主机字节序转换为网络字节序(上面就是把端口号转化一下)<br>inet_addr();//将IP地址字符串转换为long类型的网络字节序（接受一个字符串，返回一个long）<br>gethostbyname();//获得与该域名对应的IP地址<br>inet_ntoa();//将long类型的网络字节序转换成IP地址字符串<br>//这些转换字节序的函数是必须的，因为ip地址，端口这些东西不是应用层处理，而是由路由器这些东西去处理的，后者遵照网络标准使用的是big-endian，所以必须转换字节序。</p>
 <p>读函数read<br>ssize_t read(int fd,void *buf,size_t nbyte)<br>read函数是负责从fd中读取内容.当读成功 时,read返回实际所读的字节数,如果返回的值是0 表示已经读到文件的结束了,小于0表示出现了错误.如果错误为EINTR说明读是由中断引起 的, 如果是ECONNREST表示网络连接出了问题. </p>
-<p>写函数write<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="keyword">ssize_t</span> write(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">void</span> *buf, <span class="keyword">size_t</span> count);</span><br></pre></td></tr></table></figure></p>
+<p>写函数write</p>
+<pre><code class="c">#include &lt;unistd.h&gt;
+ssize_t write(int fd, const void *buf, size_t count);
+</code></pre>
 <p>write函数将buf中的nbytes字节内容写入文件描述符fd.成功时返回写的字节数.失败时返回-1. 并设置errno变量. 在网络程序中,当我们向套接字文件描述符写时有两可能.<br>1)write的返回值大于0,表示写了部分或者是全部的数据. 这样我们用一个while循环来不停的写入，但是循环过程中的buf参数和nbyte参数得由我们来更新。也就是说，网络写函数是不负责将全部数据写完之后在返回的。<br>2)返回的值小于0,此时出现了错误.我们要根据错误类型来处理.<br>如果错误为EINTR表示在写的时候出现了中断错误.<br>如果为EPIPE表示网络连接出现了问题(对方已经关闭了连接).</p>
 <p><a href="https://www.cnblogs.com/jianqiang2010/archive/2010/08/20/1804598.html">recv和send都是跟buffer打交道的</a><br>Socket send函数和recv函数详解<br>1.send 函数</p>
 <p>int send( SOCKET s, const char FAR *buf, int len, int flags );  </p>
@@ -302,7 +789,9 @@ recv函数返回其实际copy的字节数。如果recv在copy时出错，那么�
 <ul>
 <li>js并不支持对操作系统socket的直接控制，可能是安全因素(websocket倒是有，不过那是另外一回事了)。</li>
 </ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="keyword">ssize_t</span> read(<span class="keyword">int</span> fd, <span class="keyword">void</span> *buf, <span class="keyword">size_t</span> count);</span><br></pre></td></tr></table></figure>
+<pre><code class="c">#include &lt;unistd.h&gt;
+ssize_t read(int fd, void *buf, size_t count);
+</code></pre>
 <p>read这个函数返回的是读取的byte数，(On success, the number of bytes read is returned (zero indicates end of file), and the file position is advanced by this number;On error, -1 is returned, and errno is set appropriately.  In this case, it is left unspecified whether the file position (if any) changes.)</p>
 <p>如果read的时候一直统计当前总的read到的bytes数，应该是要比content-length长不少的。<br><a href="https://stackoverflow.com/questions/4850241/how-many-bits-in-a-character">那么一个字符到底多少个byte呢</a><br>首先要明白，read出来的东西是byte(是被utf-8编码过的)。几乎所有的语言在接收到之后都要重新解码一下，所以在这里decode一下，用c语言decode怎么弄？</p>
 <ul>
@@ -329,7 +818,21 @@ recv函数返回其实际copy的字节数。如果recv在copy时出错，那么�
 </blockquote>
 <p><a href="https://stackoverflow.com/questions/45893641/output-difference-in-c-implementation-of-java-code">java用utf-8,c用了ascii</a></p>
 <p> 用上面的c语言的server发出这样一个字符串<br> “你好啊\r\n”</p>
-<p> python的client每次读取一个字节,然后打印出0101这样的形式<br> <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">    <span class="comment"># 每次最多接收1个字节:</span></span><br><span class="line">    d = s.recv(<span class="number">1</span>)</span><br><span class="line">    t = <span class="string">''</span></span><br><span class="line">    <span class="keyword">for</span> x <span class="keyword">in</span> d:</span><br><span class="line">        t+= format(ord(x),<span class="string">'b'</span>)</span><br><span class="line">        print(t)</span><br><span class="line">    <span class="keyword">if</span> d:</span><br><span class="line">        buffer.append(d)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">data = <span class="string">b''</span>.join(buffer)</span><br><span class="line">print(data);</span><br></pre></td></tr></table></figure></p>
+<p> python的client每次读取一个字节,然后打印出0101这样的形式</p>
+<pre><code class="python"> while True:
+    # 每次最多接收1个字节:
+    d = s.recv(1)
+    t = &#39;&#39;
+    for x in d:
+        t+= format(ord(x),&#39;b&#39;)
+        print(t)
+    if d:
+        buffer.append(d)
+    else:
+        break
+data = b&#39;&#39;.join(buffer)
+print(data);
+</code></pre>
 <p>//在python的socket client这边接收到了<br>11100100<br>10111101<br>10100000<br>11100101<br>10100101<br>10111101<br>11100101<br>10010101<br>10001010</p>
 <p> b’\xe4’<br> b’\xbd’<br> b’\xa0’<br> b’\xe5’<br> b’\xa5’<br> b’\xbd’<br> b’\xe5’<br> b’\x95’<br> b’\x8a’<br> ‘\r’<br> ‘\n’<br> 因为tcp是有序的，所以发送端的字节以什么顺序排列的，接受端就是受到完全一样顺序排列的字节。这里因为网络传输是以字节为单位的。而sizeof(char) = 1 ，但是sizeof(int) = 4, 以上都还只是text-based content，字节序这回事只跟多字节类型的数据有关的比如int,short,long这类数字类型有关，所以基于文本传输的协议当然不存在字节序问题(当然content-length这种数字还是要注意一下的)。</p>
 <p> //在console里面还能够正常的打印出“你好啊”这三个字（包括换行也做了）</p>
@@ -338,9 +841,24 @@ recv函数返回其实际copy的字节数。如果recv在copy时出错，那么�
 <p>在浏览器console里面输入<br>encodeURI(‘你好啊’)<br>“%E4%BD%A0%E5%A5%BD%E5%95%8A” //是不是和python那边收到的东西很像</p>
 <p>所以，c语言这边关键函数<br>send(sock_client,”你好啊”,len,0);<br>看上去是发送了6个字节(每个汉字unicode两个字节)，实际上send调用下层在发送出去的时候回把这个6个字节的数据分散在9个字节长度的utf-8 byte array上。<br>可以认为发送6个字节，耗费9个字节的流量(如果发送的全部是ascii字符就不会这么浪费了，但其实utf-8已经很节省了)</p>
 <p><strong>结论就是utf-8 encode的工作是底层根据locale做的，跟application无关。</strong></p>
-<p><a href="http://docs.linuxtone.org/ebooks/C&amp;CPP/c/apas03.html">libc只是当作以0结尾的字符串原封不动地write给内核，识别汉字的工作是由终端的驱动程序做的。</a>也就是基于当前的locale<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"你好\n"</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>上述程序源文件是以UTF-8编码存储的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ od -tc nihao.c </span><br><span class="line">0000000   #   i   n   c   l   u   d   e       &lt;   s   t   d   i   o   .</span><br><span class="line">0000020   h   &gt;  \n  \n   i   n   t       m   a   i   n   (   v   o   i</span><br><span class="line">0000040   d   )  \n   &#123;  \n  \t   p   r   i   n   t   f   (   &quot; 344 275</span><br><span class="line">0000060 240 345 245 275   \   n   &quot;   )   ;  \n  \t   r   e   t   u   r</span><br><span class="line">0000100   n       0   ;  \n   &#125;  \n</span><br><span class="line">0000107</span><br></pre></td></tr></table></figure></p>
-<blockquote>
+<p><a href="http://docs.linuxtone.org/ebooks/C&amp;CPP/c/apas03.html">libc只是当作以0结尾的字符串原封不动地write给内核，识别汉字的工作是由终端的驱动程序做的。</a>也就是基于当前的locale</p>
+<pre><code class="c">#include &lt;stdio.h&gt;
+
+int main(void)
+{
+    printf(&quot;你好\n&quot;);
+    return 0;
+}
+</code></pre>
+<p>上述程序源文件是以UTF-8编码存储的：</p>
+<pre><code>$ od -tc nihao.c 
+0000000   #   i   n   c   l   u   d   e       &lt;   s   t   d   i   o   .
+0000020   h   &gt;  \n  \n   i   n   t       m   a   i   n   (   v   o   i
+0000040   d   )  \n   {  \n  \t   p   r   i   n   t   f   (   &quot; 344 275
+0000060 240 345 245 275   \   n   &quot;   )   ;  \n  \t   r   e   t   u   r
+0000100   n       0   ;  \n   }  \n
+0000107
+</code></pre><blockquote>
 <p>其中八进制的344 375 240（十六进制e4 bd a0）就是“你”的UTF-8编码，八进制的345 245 275（十六进制e5 a5 bd）就是“好”。把它编译成目标文件，”你好\n”这个字符串就成了这样一串字节：e4 bd a0 e5 a5 bd 0a 00，汉字在其中仍然是UTF-8编码的，一个汉字占3个字节，这种字符在C语言中称为多字节字符（Multibyte Character）。运行这个程序相当于把这一串字节write到当前终端的设备文件。如果当前终端的驱动程序能够识别UTF-8编码就能打印出汉字，如果当前终端的驱动程序不能识别UTF-8编码（比如一般的字符终端）就打印不出汉字。也就是说，像这种程序，识别汉字的工作既不是由C编译器做的也不是由libc做的，C编译器原封不动地把源文件中的UTF-8编码复制到目标文件中，libc只是当作以0结尾的字符串原封不动地write给内核，识别汉字的工作是由终端的驱动程序做的。</p>
 </blockquote>
 <p><a href="https://www.cprogramming.com/tutorial/unicode.html">Unicode in C and C++: What You Can Do About It Today</a></p>

@@ -16,7 +16,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/street%20lights%20dark%20night%20car%20city%20bw.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/toast_transact.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.039Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.185Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android知识集合[四]">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/street%20lights%20dark%20night%20car%20city%20bw.jpg">
@@ -200,30 +200,253 @@ ga('send', 'pageview');
       
         <p><img src="https://www.haldir66.ga/static/imgs/street%20lights%20dark%20night%20car%20city%20bw.jpg" alt=""></p>
 <a id="more"></a>
-<h2 id="1-在子线程中显示一个Toast是亲测可行的"><a href="#1-在子线程中显示一个Toast是亲测可行的" class="headerlink" title="1. 在子线程中显示一个Toast是亲测可行的"></a>1. 在子线程中显示一个Toast是亲测可行的</h2><p>不是那种post到主线程的方案<br><a href="https://www.zhihu.com/question/51099935">其实知乎上已经有了讨论</a><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ToastThread</span> <span class="keyword">extends</span> <span class="title">Thread</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">     Context mContext;</span><br><span class="line"></span><br><span class="line">     <span class="function"><span class="keyword">public</span> <span class="title">ToastThread</span><span class="params">(Context mContext)</span> </span>&#123;</span><br><span class="line">         <span class="keyword">this</span>.mContext = mContext;</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     <span class="meta">@Override</span></span><br><span class="line"></span><br><span class="line">     <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">         Looper.prepare();</span><br><span class="line">         String threadId = String.valueOf(Thread.currentThread().getId());</span><br><span class="line">         Toast.makeText(mContext,threadId,Toast.LENGTH_SHORT).show();</span><br><span class="line">         Looper.loop();</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></p>
-<p><img src="https://www.haldir66.ga/static/imgs/toast_transact.jpg" alt=""><br>其实Toast的原理就是通过IPC向NotificationManager请求加入队列，后者会检测权限xxxx。然后通过上面的ipc回调到客户端的onTransact中，这里也就是走到了Toast.TN这个static inner class的handler中，发送一个Message，handlerMessage中完成了WindowManager.addView的操作<br>需要注意的是，这里还是子线程，所以确实可能存在多条线程同时操作UI的现象。从形式上看，主线程和子线程中的Toast对象各自通过自己的Looper维护了一个消息循环队列，这其中的消息类型包括show,hide和cancel。所以可能存在多条线程同时调用WindowManager的方法，View也是每条线程各自独有的，最坏的场景莫过于两条线程同时各自添加了一个View到window上。另外，子线程中引入looper的形式也造成了子线程实质上的阻塞，当然可以直接当成一个handlerThread来用。<br>所以不是很推荐这么干，只是说可以做。<br><strong>Toast.TN.handleShow</strong><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">      mWM.addView(mView, mParams);</span><br><span class="line">      trySendAccessibilityEvent();</span><br><span class="line">  &#125; <span class="keyword">catch</span> (WindowManager.BadTokenException e) &#123;</span><br><span class="line">      <span class="comment">/* ignore */</span></span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="1-在子线程中显示一个Toast是亲测可行的"><a href="#1-在子线程中显示一个Toast是亲测可行的" class="headerlink" title="1. 在子线程中显示一个Toast是亲测可行的"></a>1. 在子线程中显示一个Toast是亲测可行的</h2><p>不是那种post到主线程的方案<br><a href="https://www.zhihu.com/question/51099935">其实知乎上已经有了讨论</a></p>
+<pre><code class="java">static class ToastThread extends Thread {
+
+     Context mContext;
+
+     public ToastThread(Context mContext) {
+         this.mContext = mContext;
+     }
+
+     @Override
+
+     public void run() {
+         Looper.prepare();
+         String threadId = String.valueOf(Thread.currentThread().getId());
+         Toast.makeText(mContext,threadId,Toast.LENGTH_SHORT).show();
+         Looper.loop();
+     }
+ }
+</code></pre>
+<p><img src="https://www.haldir66.ga/static/imgs/toast_transact.jpg" alt=""><br>其实Toast的原理就是通过IPC向NotificationManager请求加入队列，后者会检测权限xxxx。然后通过上面的ipc回调到客户端的onTransact中，这里也就是走到了Toast.TN这个static inner class的handler中，发送一个Message，handlerMessage中完成了WindowManager.addView的操作<br>需要注意的是，这里还是子线程，所以确实可能存在多条线程同时操作UI的现象。从形式上看，主线程和子线程中的Toast对象各自通过自己的Looper维护了一个消息循环队列，这其中的消息类型包括show,hide和cancel。所以可能存在多条线程同时调用WindowManager的方法，View也是每条线程各自独有的，最坏的场景莫过于两条线程同时各自添加了一个View到window上。另外，子线程中引入looper的形式也造成了子线程实质上的阻塞，当然可以直接当成一个handlerThread来用。<br>所以不是很推荐这么干，只是说可以做。<br><strong>Toast.TN.handleShow</strong></p>
+<pre><code class="java">try {
+      mWM.addView(mView, mParams);
+      trySendAccessibilityEvent();
+  } catch (WindowManager.BadTokenException e) {
+      /* ignore */
+  }
+</code></pre>
 <h2 id="2-ContentProvider的onCreate要早于Application的onCreate发生"><a href="#2-ContentProvider的onCreate要早于Application的onCreate发生" class="headerlink" title="2.ContentProvider的onCreate要早于Application的onCreate发生"></a>2.ContentProvider的onCreate要早于Application的onCreate发生</h2><p>比如ArchitectureComponent中的lifeCycle就是这么干的，写了个dummpy的contentProvider，在provider的onCreate中去loadLibrary.</p>
 <h2 id="3-看到一个关于apk反编译和重新打包的帖子，非常好用"><a href="#3-看到一个关于apk反编译和重新打包的帖子，非常好用" class="headerlink" title="3. 看到一个关于apk反编译和重新打包的帖子，非常好用"></a>3. 看到一个关于apk反编译和重新打包的帖子，非常好用</h2><p><a href="https://www.jianshu.com/p/792a08d5452c">Android apk反编译及重新打包流程</a>，关键词apktool。<br>但是，360加固之后的apk是不能用dex2jar查看java代码的。</p>
 <h3 id="4-从base-apk谈到apk安装的过程"><a href="#4-从base-apk谈到apk安装的过程" class="headerlink" title="4.从base.apk谈到apk安装的过程"></a>4.从base.apk谈到apk安装的过程</h3><p><a href="https://www.jianshu.com/p/ae45af3c3098">APK安装过程</a>。<br>之前无意间在FileExplorer中看到了base.apk这个文件，由此展开apk安装过程的研究。</p>
 <h2 id="5-关于模块化和项目重构"><a href="#5-关于模块化和项目重构" class="headerlink" title="5.关于模块化和项目重构"></a>5.关于模块化和项目重构</h2><p>很多关于Android甚至java项目的重构的文章都会最终提到两条：<br>面向接口编程 -&gt; 依赖注入(IOC)<br>然后跟上一大堆专业分析和没什么用的废话。<br>这俩在java的领域翻译过来就是：<br>在A模块中用Dagger2生成B模块中定义的interface的impl实例。<br><del>其实不用Dagger2也行，就是每次在B模块的生命周期开始时准备一个HashMap<interfaceClass,ImplClass>这样的一大堆键值对，然后在A模块中根据想要的interface class去找impl class，用反射去创建，生产环境肯定不能这么干。</del><br>在Dagger2中大致是这么干的：</p>
-<p>先声明好B模块对外提供的接口，以下这俩都在另一个module中，A module通过gradle引用了B模块<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Store</span> </span>&#123;</span><br><span class="line">    <span class="function">String <span class="title">sell</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StoreImpl</span> <span class="keyword">implements</span> <span class="title">Store</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">sell</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"Dummy products"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>B模块中再提供Component和provide的module<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span>(modules = StoreModule.class)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">StoreComponent</span> </span>&#123;</span><br><span class="line">    <span class="function">Store <span class="title">eject</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Module</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StoreModule</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Provides</span></span><br><span class="line">    <span class="function">Store <span class="title">provideStore</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> StoreImpl();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>A模块中最终使用的方式应该是<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Store store = DaggerStoreComponent.builder().build().eject();</span><br></pre></td></tr></table></figure></p>
-<h2 id="6-写sqlite语句的时候总是容易出小错误"><a href="#6-写sqlite语句的时候总是容易出小错误" class="headerlink" title="6.写sqlite语句的时候总是容易出小错误"></a>6.写sqlite语句的时候总是容易出小错误</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">//错误写法</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">NOT</span> <span class="keyword">EXISTS</span> table_one ( _id <span class="built_in">INTEGER</span> PRIMARY <span class="keyword">KEY</span> AUTOINCREMENT, studentName <span class="built_in">TEXT</span>,studentNick <span class="built_in">TEXT</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">OR</span> <span class="keyword">IGNORE</span> <span class="keyword">INTO</span> table_one (studentName,studentNick) <span class="keyword">VALUES</span> ( name1,nick1)</span><br><span class="line">//  SQLiteException: <span class="keyword">no</span> such <span class="keyword">column</span>: name1 (code <span class="number">1</span>) 报错</span><br><span class="line"></span><br><span class="line">//正确写法</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">NOT</span> <span class="keyword">EXISTS</span> table_one ( _id <span class="built_in">INTEGER</span> PRIMARY <span class="keyword">KEY</span> AUTOINCREMENT, studentName <span class="built_in">TEXT</span>,studentNick <span class="built_in">TEXT</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">OR</span> <span class="keyword">IGNORE</span> <span class="keyword">INTO</span> table_one (studentName,studentNick) <span class="keyword">VALUES</span> ( <span class="string">'name1'</span>,<span class="string">'nick1'</span>)</span><br></pre></td></tr></table></figure>
+<p>先声明好B模块对外提供的接口，以下这俩都在另一个module中，A module通过gradle引用了B模块</p>
+<pre><code class="java">public interface Store {
+    String sell();
+}
+
+public class StoreImpl implements Store {
+    @Override
+    public String sell() {
+        return &quot;Dummy products&quot;;
+    }
+}
+</code></pre>
+<p>B模块中再提供Component和provide的module</p>
+<pre><code class="java">@Component(modules = StoreModule.class)
+public interface StoreComponent {
+    Store eject();
+}
+
+@Module
+public class StoreModule {
+    @Provides
+    Store provideStore() {
+        return new StoreImpl();
+    }
+}
+</code></pre>
+<p>A模块中最终使用的方式应该是</p>
+<pre><code class="java"> Store store = DaggerStoreComponent.builder().build().eject();
+</code></pre>
+<h2 id="6-写sqlite语句的时候总是容易出小错误"><a href="#6-写sqlite语句的时候总是容易出小错误" class="headerlink" title="6.写sqlite语句的时候总是容易出小错误"></a>6.写sqlite语句的时候总是容易出小错误</h2><pre><code class="sql">//错误写法
+CREATE TABLE IF NOT EXISTS table_one ( _id INTEGER PRIMARY KEY AUTOINCREMENT, studentName TEXT,studentNick TEXT)
+INSERT OR IGNORE INTO table_one (studentName,studentNick) VALUES ( name1,nick1)
+//  SQLiteException: no such column: name1 (code 1) 报错
+
+//正确写法
+CREATE TABLE IF NOT EXISTS table_one ( _id INTEGER PRIMARY KEY AUTOINCREMENT, studentName TEXT,studentNick TEXT)
+INSERT OR IGNORE INTO table_one (studentName,studentNick) VALUES ( &#39;name1&#39;,&#39;nick1&#39;)
+</code></pre>
 <p>唯一的区别就在于name1和nick1这俩用 <strong>单引号单引号单引号</strong> 包起来了。</p>
 <h2 id="7-Webview的坑的总结"><a href="#7-Webview的坑的总结" class="headerlink" title="7. Webview的坑的总结"></a>7. Webview的坑的总结</h2><p><a href="http://iluhcm.com/2017/12/10/design-an-elegant-and-powerful-android-webview-part-one/">WebView的那些坑</a></p>
 <h2 id="8-BitmapRegionDecoder不要随便用，到处是坑，主要问题和jpg图片的colorSpace有关，动不动就爆出IOException"><a href="#8-BitmapRegionDecoder不要随便用，到处是坑，主要问题和jpg图片的colorSpace有关，动不动就爆出IOException" class="headerlink" title="8.BitmapRegionDecoder不要随便用，到处是坑，主要问题和jpg图片的colorSpace有关，动不动就爆出IOException"></a>8.BitmapRegionDecoder不要随便用，到处是坑，主要问题和jpg图片的colorSpace有关，动不动就爆出IOException</h2><blockquote>
 <p>The Skia library on which BitmapRegionDecoder is based had some bugs that will not be fixed in versions of Android prior to Nougat or Oreo. It will still display the vast majority of images properly, but you may see problems displaying CMYK JPGs, and grayscale PNGs, especially on older devices. To reduce the frequency of these problems, the view automatically falls back to BitmapFactory when the image does not need to be subsampled.<br><a href="https://github.com/davemorrissey/subsampling-scale-image-view/wiki/02.-Displaying-images">subsampling-scale-image-view这个库</a></p>
 </blockquote>
 <h2 id="9-Bitmap对象的recycle问题还是要调用"><a href="#9-Bitmap对象的recycle问题还是要调用" class="headerlink" title="9.Bitmap对象的recycle问题还是要调用"></a>9.Bitmap对象的recycle问题还是要调用</h2><p>Bitmap类有一个方法recycle()，从方法名可以看出意思是回收。这里就有疑问了，Android系统有自己的垃圾回收机制，可以不定期的回收掉不使用的内存空间，当然也包括Bitmap的空间。那为什么还需要这个方法呢？<br>Bitmap类的构造方法都是私有的，所以开发者不能直接new出一个Bitmap对象，只能通过BitmapFactory类的各种静态方法来实例化一个Bitmap。仔细查看BitmapFactory的源代码可以看到，生成Bitmap对象最终都是通过JNI调用方式实现的。所以，加载Bitmap到内存里以后，是包含两部分内存区域的。简单的说，一部分是Java部分的，一部分是C部分的。这个Bitmap对象是由Java部分分配的，不用的时候系统就会自动回收了，但是那个对应的C可用的内存区域，虚拟机是不能直接回收的，这个只能调用底层的功能释放。所以需要调用recycle()方法来释放C部分的内存。从Bitmap类的源代码也可以看到，recycle()方法里也的确是调用了JNI方法了的。<br>那如果不调用recycle()，是否就一定存在内存泄露呢？也不是的。Android的每个应用都运行在独立的进程里，有着独立的内存，如果整个进程被应用本身或者系统杀死了，内存也就都被释放掉了，当然也包括C部分的内存。<br>Android对于进程的管理是非常复杂的。简单的说，Android系统的进程分为几个级别，系统会在内存不足的情况下杀死一些低优先级的进程，以提供给其它进程充足的内存空间。在实际项目开发过程中，有的开发者会在退出程序的时候使用Process.killProcess(Process.myPid())的方式将自己的进程杀死，但是有的应用仅仅会使用调用Activity.finish()方法的方式关闭掉所有的Activity。</p>
-<h2 id="10-原来layer-list还可以这么用啊"><a href="#10-原来layer-list还可以这么用啊" class="headerlink" title="10. 原来layer_list还可以这么用啊"></a>10. 原来layer_list还可以这么用啊</h2><p>给一个View加边框，只在左边，上面和下面三条边上加边框，用layer_list就可以了<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">layer-list</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 连框颜色值 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">item</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">shape</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">solid</span> <span class="attr">android:color</span>=<span class="string">"@color/md_blue_700"</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">shape</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">item</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 主体背景颜色值 --&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 此处定义只有上下两边有边框 高度为1像素--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">item</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:bottom</span>=<span class="string">"10dp"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:left</span>=<span class="string">"10dp"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:top</span>=<span class="string">"10dp"</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--边框里面背景颜色 白色--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">shape</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">solid</span> <span class="attr">android:color</span>=<span class="string">"#ffffff"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">shape</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">item</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">layer-list</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<h3 id="11-proguard可以把log干掉"><a href="#11-proguard可以把log干掉" class="headerlink" title="11.proguard可以把log干掉"></a>11.proguard可以把log干掉</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">-assumenosideeffects class android.util.Log &#123;</span><br><span class="line">    public static boolean isLoggable(java.lang.String, int);</span><br><span class="line">    public static int v(...);</span><br><span class="line">    public static int i(...);</span><br><span class="line">    public static int w(...);</span><br><span class="line">    public static int d(...);</span><br><span class="line">    public static int e(...);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="12-国产Rom的权限问题是在是头疼"><a href="#12-国产Rom的权限问题是在是头疼" class="headerlink" title="12.国产Rom的权限问题是在是头疼"></a>12.国产Rom的权限问题是在是头疼</h3><p>以5.1的rom为例<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(ContextCompat.checkSelfPermission(activity,Manifest.permission.Camera)== PackageManager.PERMISSION_GRANTED):</span><br><span class="line">    Camera c = Camera.open();<span class="comment">// 还是null</span></span><br></pre></td></tr></table></figure></p>
-<p>类似的问题衍生出了<a href="https://github.com/jokermonn/permissions4m">国产手机5.0,6.0权限适配框架</a><br>找到了启动魅族权限管理的Activity的代码<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> String N_MANAGER_OUT_CLS = <span class="string">"com.meizu.safe.permission.PermissionMainActivity"</span>; </span><br><span class="line"><span class="keyword">final</span> String L_MANAGER_OUT_CLS = <span class="string">"com.meizu.safe.SecurityMainActivity"</span>; <span class="comment">// 5.1上叫做这个名字</span></span><br><span class="line"><span class="keyword">final</span> String PKG = <span class="string">"com.meizu.safe"</span>;</span><br><span class="line">Activity activity = (Activity) context;</span><br><span class="line">Intent intent = <span class="keyword">new</span> Intent();</span><br><span class="line">intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);</span><br><span class="line">intent.putExtra(<span class="string">"package"</span>, activity.getPackageName());</span><br><span class="line">ComponentName comp = <span class="keyword">new</span> ComponentName(PKG, L_MANAGER_OUT_CLS);</span><br><span class="line">intent.setComponent(comp);</span><br><span class="line">activity.startActivity(intent);</span><br></pre></td></tr></table></figure></p>
-<h3 id="13-Canvas-clipPath会出现锯齿的问题以及可能的解决方案"><a href="#13-Canvas-clipPath会出现锯齿的问题以及可能的解决方案" class="headerlink" title="13. Canvas.clipPath会出现锯齿的问题以及可能的解决方案"></a>13. Canvas.clipPath会出现锯齿的问题以及可能的解决方案</h3><p>a Navive implementation of CircleImageView would look something like this:<br>xml里面宽高都写成200dp，方便一点。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> android.content.Context;</span><br><span class="line"><span class="keyword">import</span> android.graphics.Canvas;</span><br><span class="line"><span class="keyword">import</span> android.graphics.Path;</span><br><span class="line"><span class="keyword">import</span> android.graphics.RectF;</span><br><span class="line"><span class="keyword">import</span> android.support.v7.widget.AppCompatImageView;</span><br><span class="line"><span class="keyword">import</span> android.util.AttributeSet;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RoundCornerImageView1</span> <span class="keyword">extends</span> <span class="title">AppCompatImageView</span> </span>&#123;</span><br><span class="line">    <span class="keyword">float</span>[] radiusArray = <span class="keyword">new</span> <span class="keyword">float</span>[<span class="number">8</span>];</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RoundCornerImageView1</span><span class="params">(Context context)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(context);</span><br><span class="line">        init();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RoundCornerImageView1</span><span class="params">(Context context, AttributeSet attrs)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(context, attrs);</span><br><span class="line">        init();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RoundCornerImageView1</span><span class="params">(Context context, AttributeSet attrs, <span class="keyword">int</span> defStyleAttr)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(context, attrs, defStyleAttr);</span><br><span class="line">        init();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        setScaleType(ScaleType.CENTER_CROP);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setRadius</span><span class="params">(<span class="keyword">float</span> leftTop, <span class="keyword">float</span> rightTop, <span class="keyword">float</span> rightBottom, <span class="keyword">float</span> leftBottom)</span> </span>&#123;</span><br><span class="line">        radiusArray[<span class="number">0</span>] = leftTop;</span><br><span class="line">        radiusArray[<span class="number">1</span>] = leftTop;</span><br><span class="line">        radiusArray[<span class="number">2</span>] = rightTop;</span><br><span class="line">        radiusArray[<span class="number">3</span>] = rightTop;</span><br><span class="line">        radiusArray[<span class="number">4</span>] = rightBottom;</span><br><span class="line">        radiusArray[<span class="number">5</span>] = rightBottom;</span><br><span class="line">        radiusArray[<span class="number">6</span>] = leftBottom;</span><br><span class="line">        radiusArray[<span class="number">7</span>] = leftBottom;</span><br><span class="line">        invalidate();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onDraw</span><span class="params">(Canvas canvas)</span> </span>&#123;</span><br><span class="line">        Path path = <span class="keyword">new</span> Path();</span><br><span class="line">        <span class="keyword">int</span> width = getWidth();</span><br><span class="line">        <span class="keyword">int</span> height = getHeight();</span><br><span class="line">        setRadius(width/<span class="number">2</span>,width/<span class="number">2</span>,height/<span class="number">2</span>,height/<span class="number">2</span>);</span><br><span class="line">        path.addRoundRect(<span class="keyword">new</span> RectF(<span class="number">0</span>, <span class="number">0</span>, width,height), radiusArray, Path.Direction.CW);</span><br><span class="line">        canvas.clipPath(path);</span><br><span class="line">        <span class="keyword">super</span>.onDraw(canvas);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="10-原来layer-list还可以这么用啊"><a href="#10-原来layer-list还可以这么用啊" class="headerlink" title="10. 原来layer_list还可以这么用啊"></a>10. 原来layer_list还可以这么用啊</h2><p>给一个View加边框，只在左边，上面和下面三条边上加边框，用layer_list就可以了</p>
+<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;layer-list xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;&gt;
+
+    &lt;!-- 连框颜色值 --&gt;
+    &lt;item&gt;
+        &lt;shape&gt;
+            &lt;solid android:color=&quot;@color/md_blue_700&quot; /&gt;
+        &lt;/shape&gt;
+    &lt;/item&gt;
+    &lt;!-- 主体背景颜色值 --&gt;
+    &lt;!-- 此处定义只有上下两边有边框 高度为1像素--&gt;
+    &lt;item
+    android:bottom=&quot;10dp&quot;
+    android:left=&quot;10dp&quot;
+    android:top=&quot;10dp&quot;&gt;
+    &lt;!--边框里面背景颜色 白色--&gt;
+    &lt;shape&gt;
+        &lt;solid android:color=&quot;#ffffff&quot; /&gt;
+    &lt;/shape&gt;
+    &lt;/item&gt;
+&lt;/layer-list&gt;
+</code></pre>
+<h3 id="11-proguard可以把log干掉"><a href="#11-proguard可以把log干掉" class="headerlink" title="11.proguard可以把log干掉"></a>11.proguard可以把log干掉</h3><pre><code class="config">-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int i(...);
+    public static int w(...);
+    public static int d(...);
+    public static int e(...);
+}
+</code></pre>
+<h3 id="12-国产Rom的权限问题是在是头疼"><a href="#12-国产Rom的权限问题是在是头疼" class="headerlink" title="12.国产Rom的权限问题是在是头疼"></a>12.国产Rom的权限问题是在是头疼</h3><p>以5.1的rom为例</p>
+<pre><code class="java">if(ContextCompat.checkSelfPermission(activity,Manifest.permission.Camera)== PackageManager.PERMISSION_GRANTED):
+    Camera c = Camera.open();// 还是null
+</code></pre>
+<p>类似的问题衍生出了<a href="https://github.com/jokermonn/permissions4m">国产手机5.0,6.0权限适配框架</a><br>找到了启动魅族权限管理的Activity的代码</p>
+<pre><code class="java">final String N_MANAGER_OUT_CLS = &quot;com.meizu.safe.permission.PermissionMainActivity&quot;; 
+final String L_MANAGER_OUT_CLS = &quot;com.meizu.safe.SecurityMainActivity&quot;; // 5.1上叫做这个名字
+final String PKG = &quot;com.meizu.safe&quot;;
+Activity activity = (Activity) context;
+Intent intent = new Intent();
+intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+intent.putExtra(&quot;package&quot;, activity.getPackageName());
+ComponentName comp = new ComponentName(PKG, L_MANAGER_OUT_CLS);
+intent.setComponent(comp);
+activity.startActivity(intent);
+</code></pre>
+<h3 id="13-Canvas-clipPath会出现锯齿的问题以及可能的解决方案"><a href="#13-Canvas-clipPath会出现锯齿的问题以及可能的解决方案" class="headerlink" title="13. Canvas.clipPath会出现锯齿的问题以及可能的解决方案"></a>13. Canvas.clipPath会出现锯齿的问题以及可能的解决方案</h3><p>a Navive implementation of CircleImageView would look something like this:<br>xml里面宽高都写成200dp，方便一点。</p>
+<pre><code class="java">import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Path;
+import android.graphics.RectF;
+import android.support.v7.widget.AppCompatImageView;
+import android.util.AttributeSet;
+
+public class RoundCornerImageView1 extends AppCompatImageView {
+    float[] radiusArray = new float[8];
+
+    public RoundCornerImageView1(Context context) {
+        super(context);
+        init();
+    }
+
+    public RoundCornerImageView1(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init();
+    }
+
+    public RoundCornerImageView1(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init();
+    }
+
+    private void init() {
+        setScaleType(ScaleType.CENTER_CROP);
+    }
+
+    public void setRadius(float leftTop, float rightTop, float rightBottom, float leftBottom) {
+        radiusArray[0] = leftTop;
+        radiusArray[1] = leftTop;
+        radiusArray[2] = rightTop;
+        radiusArray[3] = rightTop;
+        radiusArray[4] = rightBottom;
+        radiusArray[5] = rightBottom;
+        radiusArray[6] = leftBottom;
+        radiusArray[7] = leftBottom;
+        invalidate();
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        Path path = new Path();
+        int width = getWidth();
+        int height = getHeight();
+        setRadius(width/2,width/2,height/2,height/2);
+        path.addRoundRect(new RectF(0, 0, width,height), radiusArray, Path.Direction.CW);
+        canvas.clipPath(path);
+        super.onDraw(canvas);
+    }
+}
+</code></pre>
 <p>不出意外的话，在真机上运行会出现圆形边角有锯齿的问题。google一下clipPath锯齿就会发现类似的<a href="https://www.cnblogs.com/everhad/p/6161083.html">issue</a>，framework只是对skia library的一层很薄的包装。</p>
 <p><a href="https://github.com/hehonghui/android-tech-frontier/blob/aa6f125b1a3801820e697f5ac6246b4827acd5a5/issue-45/Android%E5%9C%86%E5%BC%A7%E6%95%B4%E5%AE%B9%E4%B9%8B%E8%B0%9C.md">早先版本的系统画圆弧似乎不是特别准</a></p>
-<p>多数时候对这种问题的解决方式是使用PorterDuff.SRCIN的方式，用canvas saveLayer(貌似layer是一种栈的结构)的方式在其他的layer中去画bitmap。最后顶层的layer全部pop掉之后会合并到initial的layer上，类似于在顶层的layer中合成这张bitmap。<br>canvas.saveLayer(0, 0, w, h, null, Canvas.ALL_SAVE_FLAG); // 大致就在这里,layer似乎可以理解成photoShop里面的图层的概念<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RoundCornerImageView2</span> <span class="keyword">extends</span> <span class="title">AppCompatImageView</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 四个角的x,y半径</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">float</span>[] radiusArray = &#123; <span class="number">0f</span>, <span class="number">0f</span>, <span class="number">0f</span>, <span class="number">0f</span>, <span class="number">0f</span>, <span class="number">0f</span>, <span class="number">0f</span>, <span class="number">0f</span> &#125;;</span><br><span class="line">    <span class="keyword">private</span> Paint bitmapPaint = <span class="keyword">new</span> Paint(Paint.ANTI_ALIAS_FLAG);</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> Bitmap <span class="title">makeRoundRectFrame</span><span class="params">(<span class="keyword">int</span> w, <span class="keyword">int</span> h)</span> </span>&#123;</span><br><span class="line">        Bitmap bm = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);</span><br><span class="line">        Canvas c = <span class="keyword">new</span> Canvas(bm);</span><br><span class="line">        Path path = <span class="keyword">new</span> Path();</span><br><span class="line">        setRadius(w/<span class="number">2</span>,w/<span class="number">2</span>,h/<span class="number">2</span>,h/<span class="number">2</span>);</span><br><span class="line">        path.addRoundRect(<span class="keyword">new</span> RectF(<span class="number">0</span>, <span class="number">0</span>, w, h), radiusArray, Path.Direction.CW);</span><br><span class="line">        Paint bitmapPaint = <span class="keyword">new</span> Paint(Paint.ANTI_ALIAS_FLAG);</span><br><span class="line">        bitmapPaint.setColor(Color.GREEN); <span class="comment">// 颜色随意，不要有透明度。</span></span><br><span class="line">        c.drawPath(path, bitmapPaint);</span><br><span class="line">        <span class="keyword">return</span> bm;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RoundCornerImageView2</span><span class="params">(Context context)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(context);</span><br><span class="line">        init();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RoundCornerImageView2</span><span class="params">(Context context, AttributeSet attrs)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(context, attrs);</span><br><span class="line">        init();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RoundCornerImageView2</span><span class="params">(Context context, AttributeSet attrs, <span class="keyword">int</span> defStyleAttr)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(context, attrs, defStyleAttr);</span><br><span class="line">        init();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line"><span class="comment">//        setLayerType(LAYER_TYPE_SOFTWARE, null); // Xfermode 需要禁用硬件加速</span></span><br><span class="line">        setScaleType(ScaleType.CENTER_CROP);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setRadius</span><span class="params">(<span class="keyword">float</span> leftTop, <span class="keyword">float</span> rightTop, <span class="keyword">float</span> rightBottom, <span class="keyword">float</span> leftBottom)</span> </span>&#123;</span><br><span class="line">        radiusArray[<span class="number">0</span>] = leftTop;</span><br><span class="line">        radiusArray[<span class="number">1</span>] = leftTop;</span><br><span class="line">        radiusArray[<span class="number">2</span>] = rightTop;</span><br><span class="line">        radiusArray[<span class="number">3</span>] = rightTop;</span><br><span class="line">        radiusArray[<span class="number">4</span>] = rightBottom;</span><br><span class="line">        radiusArray[<span class="number">5</span>] = rightBottom;</span><br><span class="line">        radiusArray[<span class="number">6</span>] = leftBottom;</span><br><span class="line">        radiusArray[<span class="number">7</span>] = leftBottom;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onDraw</span><span class="params">(Canvas canvas)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> w = getWidth();</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> h = getHeight();</span><br><span class="line">        Bitmap bitmapOriginal = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);</span><br><span class="line">        Canvas c = <span class="keyword">new</span> Canvas(bitmapOriginal);</span><br><span class="line">        <span class="keyword">super</span>.onDraw(c);</span><br><span class="line"></span><br><span class="line">        Bitmap bitmapFrame = makeRoundRectFrame(w, h);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> sc = canvas.saveLayer(<span class="number">0</span>, <span class="number">0</span>, w, h, <span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">        canvas.drawBitmap(bitmapFrame, <span class="number">0</span>, <span class="number">0</span>, bitmapPaint); <span class="comment">//先画一个圆形的框框条条出来</span></span><br><span class="line"><span class="comment">// 利用Xfermode取交集（利用bitmapFrame作为画框来裁剪bitmapOriginal）</span></span><br><span class="line">        bitmapPaint.setXfermode(<span class="keyword">new</span> PorterDuffXfermode(PorterDuff.Mode.SRC_IN)); <span class="comment">//后续的画图操作，只有交集的部分才会显示在最终的canvas上</span></span><br><span class="line">        canvas.drawBitmap(bitmapOriginal, <span class="number">0</span>, <span class="number">0</span>, bitmapPaint);</span><br><span class="line"></span><br><span class="line">        bitmapPaint.setXfermode(<span class="keyword">null</span>);</span><br><span class="line">        canvas.restoreToCount(sc);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>多数时候对这种问题的解决方式是使用PorterDuff.SRCIN的方式，用canvas saveLayer(貌似layer是一种栈的结构)的方式在其他的layer中去画bitmap。最后顶层的layer全部pop掉之后会合并到initial的layer上，类似于在顶层的layer中合成这张bitmap。<br>canvas.saveLayer(0, 0, w, h, null, Canvas.ALL_SAVE_FLAG); // 大致就在这里,layer似乎可以理解成photoShop里面的图层的概念</p>
+<pre><code class="java">public class RoundCornerImageView2 extends AppCompatImageView {
+    // 四个角的x,y半径
+    private float[] radiusArray = { 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f };
+    private Paint bitmapPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+    private Bitmap makeRoundRectFrame(int w, int h) {
+        Bitmap bm = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(bm);
+        Path path = new Path();
+        setRadius(w/2,w/2,h/2,h/2);
+        path.addRoundRect(new RectF(0, 0, w, h), radiusArray, Path.Direction.CW);
+        Paint bitmapPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        bitmapPaint.setColor(Color.GREEN); // 颜色随意，不要有透明度。
+        c.drawPath(path, bitmapPaint);
+        return bm;
+    }
+    public RoundCornerImageView2(Context context) {
+        super(context);
+        init();
+    }
+    public RoundCornerImageView2(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init();
+    }
+    public RoundCornerImageView2(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init();
+    }
+    private void init() {
+//        setLayerType(LAYER_TYPE_SOFTWARE, null); // Xfermode 需要禁用硬件加速
+        setScaleType(ScaleType.CENTER_CROP);
+    }
+
+    public void setRadius(float leftTop, float rightTop, float rightBottom, float leftBottom) {
+        radiusArray[0] = leftTop;
+        radiusArray[1] = leftTop;
+        radiusArray[2] = rightTop;
+        radiusArray[3] = rightTop;
+        radiusArray[4] = rightBottom;
+        radiusArray[5] = rightBottom;
+        radiusArray[6] = leftBottom;
+        radiusArray[7] = leftBottom;
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+
+        final int w = getWidth();
+        final int h = getHeight();
+        Bitmap bitmapOriginal = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(bitmapOriginal);
+        super.onDraw(c);
+
+        Bitmap bitmapFrame = makeRoundRectFrame(w, h);
+
+        int sc = canvas.saveLayer(0, 0, w, h, null);
+
+        canvas.drawBitmap(bitmapFrame, 0, 0, bitmapPaint); //先画一个圆形的框框条条出来
+// 利用Xfermode取交集（利用bitmapFrame作为画框来裁剪bitmapOriginal）
+        bitmapPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN)); //后续的画图操作，只有交集的部分才会显示在最终的canvas上
+        canvas.drawBitmap(bitmapOriginal, 0, 0, bitmapPaint);
+
+        bitmapPaint.setXfermode(null);
+        canvas.restoreToCount(sc);
+    }
+}
+</code></pre>
 <p>这种方式一般称为离屏缓冲</p>
 <h3 id="14-jni使用"><a href="#14-jni使用" class="headerlink" title="14. jni使用"></a>14. jni使用</h3><p><a href="https://blog.csdn.net/baidu_34045013/article/details/78994516">一般使用javah生成header文件</a></p>
 <p>多数教程都是写一个<br>gradle.properties添加一句android.useDeprecatedNdk=true<br>随着studio版本升级，还是不得不升级到使用cmake的方式。</p>
@@ -239,7 +462,24 @@ ga('send', 'pageview');
 <blockquote>
 <p>Use a SpannedString when your text has style but you don’t need to change either the text or the style after it is created. (似乎平时也应该这样使用，但从源码来看，两者几乎没有性能上的区别。真正的性能差异要取决于实际的use case)<br>Use a SpannableString when your text doesn’t need to be changed but the styling does.<br>Use a SpannableStringBuilder when you will need to update the text and its style.</p>
 </blockquote>
-<p>SPAN_EXCLUSIVE_EXCLUSIVE，SPAN_EXCLUSIVE_INCLUSIVE这些东西的意思是针对新的文字插入之后的行为来说的。<br>SPAN_EXCLUSIVE_INCLUSIVE就是说新的文字插入之后，之前设置的span将自动扩增并应用到这段新的文字上。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">spannable.setSpan(</span><br><span class="line">     ForegroundColorSpan(Color.RED), </span><br><span class="line">     <span class="comment">/* start index */</span> <span class="number">8</span>, <span class="comment">/* end index */</span> <span class="number">12</span>, </span><br><span class="line">     Spannable.SPAN_EXCLUSIVE_INCLUSIVE)</span><br><span class="line">spannable.insert(<span class="number">12</span>, “(&amp; fon)”) <span class="comment">//注意SpannableStringBuilder的这个insert方法是可以指定insert的位置的</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">val spannable = SpannableString(“Text is spantastic!”)</span><br><span class="line">spannable.setSpan(</span><br><span class="line">     ForegroundColorSpan(Color.RED), </span><br><span class="line">     <span class="number">8</span>, <span class="number">12</span>, </span><br><span class="line">     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)</span><br><span class="line">spannable.setSpan(</span><br><span class="line">     StyleSpan(BOLD), </span><br><span class="line">     <span class="number">8</span>, spannable.length, </span><br><span class="line">     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE) <span class="comment">//一段文字可以同时应用多个Spannable样式</span></span><br></pre></td></tr></table></figure></p>
+<p>SPAN_EXCLUSIVE_EXCLUSIVE，SPAN_EXCLUSIVE_INCLUSIVE这些东西的意思是针对新的文字插入之后的行为来说的。<br>SPAN_EXCLUSIVE_INCLUSIVE就是说新的文字插入之后，之前设置的span将自动扩增并应用到这段新的文字上。</p>
+<pre><code class="java">spannable.setSpan(
+     ForegroundColorSpan(Color.RED), 
+     /* start index */ 8, /* end index */ 12, 
+     Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
+spannable.insert(12, “(&amp; fon)”) //注意SpannableStringBuilder的这个insert方法是可以指定insert的位置的
+
+
+val spannable = SpannableString(“Text is spantastic!”)
+spannable.setSpan(
+     ForegroundColorSpan(Color.RED), 
+     8, 12, 
+     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+spannable.setSpan(
+     StyleSpan(BOLD), 
+     8, spannable.length, 
+     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE) //一段文字可以同时应用多个Spannable样式
+</code></pre>
 <p>Framework自带的spans可以分为两类：一种是改变文字外观的（Appearance affecting span），另一种是改变文字大小的(Metric affecting span)。</p>
 <p>文章里还提到了可以使用TextView.setText(Spannable, BufferType.SPANNABLE)方法，如果后续需要修改文字的span样式的话，可以getText，获得的是之前设置的span，这时候再去对这个span进行操作（不要再setText回去了），这对提升性能有帮助（text的measure和layout都是耗性能的操作）。但注意，如果是使用了RelativeSizeSpan的话，因为更改了TextView的大小，这必然会触发重新measure和layout，上述的优化似乎也就没有必要了。</p>
 <p>自定义Span的话：<br>Affecting text at the character level -&gt; CharacterStyle<br>Affecting text at the paragraph level -&gt; ParagraphStyle<br>Affecting text appearance -&gt; UpdateAppearance<br>Affecting text metrics -&gt; UpdateLayout</p>
@@ -250,9 +490,100 @@ ga('send', 'pageview');
 <p><strong>全角半角对汉字没有影响</strong><br>TextView有时候会出现提前换行的问题,这事据说跟全角半角有关（全角状态下字母、数字符号等都会占两个字节的位置，也就是一个汉字那么宽，半角状态下，字母数字符号一般会占一个字节，也就是半个汉字的位置，全角半角对汉字没有影响。）<br>一个直观的表现是全角的情况下你发现冒号，分号这些东西都变得比较宽。（;；MＭ）也就是所谓的中文标点符号 .对了，全角的情况下字母，数字也会变宽一点（本质上是占用两个字符）</p>
 <p>[Instagram是如何提升TextView渲染性能的(<a href="http://codethink.me/2015/04/23/improving-comment-rendering-on-android/),关键字TextLayoutCache">http://codethink.me/2015/04/23/improving-comment-rendering-on-android/),关键字TextLayoutCache</a><br><a href="https://zhuanlan.zhihu.com/p/40921043">compile ffmpeg for android</a><br>需要修改B0 -&gt; b0 ，linux平台或者mac平台可用<br><a href="https://yesimroy.gitbooks.io/android-note/content/compile_ffmpeg_for_android.html">compile ffmpeg for android</a></p>
 <p>Andorid平台上默认的isLoggable的允许的LogLevel是info，也就是说，log.d和log.v是不会显示的。<a href="https://stackoverflow.com/questions/28434901/why-are-log-d-and-log-v-not-printing">wht are log-d and log-v not printing</a><br>当然这也要看手机厂商设置，魅族手机就是设置为info级别及以上了。这话2016年有人提醒过我。</p>
-<h3 id="16-lamemp3-移植到android平台"><a href="#16-lamemp3-移植到android平台" class="headerlink" title="16.lamemp3 移植到android平台"></a>16.lamemp3 移植到android平台</h3><p><a href="https://www.jianshu.com/p/534741f5151c">lame版本3.99.5</a><br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;jni.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;android/log.h&gt; </span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"libmp3lame/lame.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> LOG_TAG <span class="meta-string">"LAME ENCODER"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> LOGD(format, args...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, format, ##args);</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> BUFFER_SIZE 8192</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> be_short(s) ((short) ((unsigned short) (s) <span class="meta-string">&lt;&lt; 8) | ((unsigned short) (s) &gt;&gt; 8))</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">lame_t</span> lame;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">read_samples</span><span class="params">(FILE *input_file, <span class="keyword">short</span> *input)</span> </span>&#123;</span><br><span class="line">true<span class="keyword">int</span> nb_read;</span><br><span class="line">truenb_read = fread(input, <span class="number">1</span>, <span class="keyword">sizeof</span>(<span class="keyword">short</span>), input_file) / <span class="keyword">sizeof</span>(<span class="keyword">short</span>);</span><br><span class="line"></span><br><span class="line">true<span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">true<span class="keyword">while</span> (i &lt; nb_read) &#123;</span><br><span class="line">truetrueinput[i] = be_short(input[i]);</span><br><span class="line">truetruei++;</span><br><span class="line">true&#125;</span><br><span class="line"></span><br><span class="line">true<span class="keyword">return</span> nb_read;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Java_com_example_core_audio_NativeRecorder_initEncoder</span><span class="params">(JNIEnv *env,</span></span></span><br><span class="line"><span class="function"><span class="params">		jobject jobj, jint in_num_channels, jint in_samplerate, jint in_brate,</span></span></span><br><span class="line"><span class="function"><span class="params">		jint in_mode, jint in_quality)</span> </span>&#123;</span><br><span class="line">truelame = lame_init();</span><br><span class="line"></span><br><span class="line"><span class="comment">//	LOGD("Init parameters:");</span></span><br><span class="line">truelame_set_num_channels(lame, in_num_channels);</span><br><span class="line"><span class="comment">//	LOGD("Number of channels: %d", in_num_channels);</span></span><br><span class="line">truelame_set_in_samplerate(lame, in_samplerate);</span><br><span class="line"><span class="comment">//	LOGD("Sample rate: %d", in_samplerate);</span></span><br><span class="line">truelame_set_brate(lame, in_brate);</span><br><span class="line"><span class="comment">//	LOGD("Bitrate: %d", in_brate);</span></span><br><span class="line">truelame_set_mode(lame, in_mode);</span><br><span class="line"><span class="comment">//	LOGD("Mode: %d", in_mode);</span></span><br><span class="line">truelame_set_quality(lame, in_quality);</span><br><span class="line"><span class="comment">//	LOGD("Quality: %d", in_quality);</span></span><br><span class="line"></span><br><span class="line">true<span class="keyword">int</span> res = lame_init_params(lame);</span><br><span class="line"><span class="comment">//	LOGD("Init returned: %d", res);</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Java_com_example_core_audio_NativeRecorder_destroyEncoder</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">		JNIEnv *env, jobject jobj)</span> </span>&#123;</span><br><span class="line">true<span class="keyword">int</span> res = lame_close(lame);</span><br><span class="line"><span class="comment">//	LOGD("Deinit returned: %d", res);</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Java_com_example_core_audio_NativeRecorder_encodeFile</span><span class="params">(JNIEnv *env,</span></span></span><br><span class="line"><span class="function"><span class="params">		jobject jobj, jstring in_source_path, jstring in_target_path)</span> </span>&#123;</span><br><span class="line">true<span class="keyword">const</span> <span class="keyword">char</span> *source_path, *target_path;</span><br><span class="line">truesource_path = (*env)-&gt;GetStringUTFChars(env, in_source_path, <span class="literal">NULL</span>);</span><br><span class="line">truetarget_path = (*env)-&gt;GetStringUTFChars(env, in_target_path, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">trueFILE *input_file, *output_file;</span><br><span class="line">trueinput_file = fopen(source_path, <span class="string">"rb"</span>);</span><br><span class="line">trueoutput_file = fopen(target_path, <span class="string">"wb"</span>);</span><br><span class="line"></span><br><span class="line">true<span class="keyword">short</span> input[BUFFER_SIZE];</span><br><span class="line">true<span class="keyword">char</span> output[BUFFER_SIZE];</span><br><span class="line">true<span class="keyword">int</span> nb_read = <span class="number">0</span>;</span><br><span class="line">true<span class="keyword">int</span> nb_write = <span class="number">0</span>;</span><br><span class="line">true<span class="keyword">int</span> nb_total = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//	LOGD("Encoding started");</span></span><br><span class="line">true<span class="keyword">while</span> (nb_read = read_samples(input_file, input)) &#123;</span><br><span class="line">truetruenb_write = lame_encode_buffer(lame, input, input, nb_read, output,</span><br><span class="line">truetruetruetrueBUFFER_SIZE);</span><br><span class="line">truetruefwrite(output, nb_write, <span class="number">1</span>, output_file);</span><br><span class="line">truetruenb_total += nb_write;</span><br><span class="line">true&#125;</span><br><span class="line"><span class="comment">//	LOGD("Encoded %d bytes", nb_total);</span></span><br><span class="line"></span><br><span class="line">truenb_write = lame_encode_flush(lame, output, BUFFER_SIZE);</span><br><span class="line">truefwrite(output, nb_write, <span class="number">1</span>, output_file);</span><br><span class="line"><span class="comment">//	LOGD("Flushed %d bytes", nb_write);</span></span><br><span class="line"></span><br><span class="line">truefclose(input_file);</span><br><span class="line">truefclose(output_file);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="16-lamemp3-移植到android平台"><a href="#16-lamemp3-移植到android平台" class="headerlink" title="16.lamemp3 移植到android平台"></a>16.lamemp3 移植到android平台</h3><p><a href="https://www.jianshu.com/p/534741f5151c">lame版本3.99.5</a></p>
+<pre><code class="c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;jni.h&gt;
+#include &lt;android/log.h&gt; 
+#include &quot;libmp3lame/lame.h&quot;
+
+#define LOG_TAG &quot;LAME ENCODER&quot;
+#define LOGD(format, args...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, format, ##args);
+#define BUFFER_SIZE 8192
+#define be_short(s) ((short) ((unsigned short) (s) &lt;&lt; 8) | ((unsigned short) (s) &gt;&gt; 8))
+
+lame_t lame;
+
+int read_samples(FILE *input_file, short *input) {
+    int nb_read;
+    nb_read = fread(input, 1, sizeof(short), input_file) / sizeof(short);
+
+    int i = 0;
+    while (i &lt; nb_read) {
+        input[i] = be_short(input[i]);
+        i++;
+    }
+
+    return nb_read;
+}
+
+void Java_com_example_core_audio_NativeRecorder_initEncoder(JNIEnv *env,
+        jobject jobj, jint in_num_channels, jint in_samplerate, jint in_brate,
+        jint in_mode, jint in_quality) {
+    lame = lame_init();
+
+//    LOGD(&quot;Init parameters:&quot;);
+    lame_set_num_channels(lame, in_num_channels);
+//    LOGD(&quot;Number of channels: %d&quot;, in_num_channels);
+    lame_set_in_samplerate(lame, in_samplerate);
+//    LOGD(&quot;Sample rate: %d&quot;, in_samplerate);
+    lame_set_brate(lame, in_brate);
+//    LOGD(&quot;Bitrate: %d&quot;, in_brate);
+    lame_set_mode(lame, in_mode);
+//    LOGD(&quot;Mode: %d&quot;, in_mode);
+    lame_set_quality(lame, in_quality);
+//    LOGD(&quot;Quality: %d&quot;, in_quality);
+
+    int res = lame_init_params(lame);
+//    LOGD(&quot;Init returned: %d&quot;, res);
+}
+
+void Java_com_example_core_audio_NativeRecorder_destroyEncoder(
+        JNIEnv *env, jobject jobj) {
+    int res = lame_close(lame);
+//    LOGD(&quot;Deinit returned: %d&quot;, res);
+}
+
+void Java_com_example_core_audio_NativeRecorder_encodeFile(JNIEnv *env,
+        jobject jobj, jstring in_source_path, jstring in_target_path) {
+    const char *source_path, *target_path;
+    source_path = (*env)-&gt;GetStringUTFChars(env, in_source_path, NULL);
+    target_path = (*env)-&gt;GetStringUTFChars(env, in_target_path, NULL);
+
+    FILE *input_file, *output_file;
+    input_file = fopen(source_path, &quot;rb&quot;);
+    output_file = fopen(target_path, &quot;wb&quot;);
+
+    short input[BUFFER_SIZE];
+    char output[BUFFER_SIZE];
+    int nb_read = 0;
+    int nb_write = 0;
+    int nb_total = 0;
+
+//    LOGD(&quot;Encoding started&quot;);
+    while (nb_read = read_samples(input_file, input)) {
+        nb_write = lame_encode_buffer(lame, input, input, nb_read, output,
+                BUFFER_SIZE);
+        fwrite(output, nb_write, 1, output_file);
+        nb_total += nb_write;
+    }
+//    LOGD(&quot;Encoded %d bytes&quot;, nb_total);
+
+    nb_write = lame_encode_flush(lame, output, BUFFER_SIZE);
+    fwrite(output, nb_write, 1, output_file);
+//    LOGD(&quot;Flushed %d bytes&quot;, nb_write);
+
+    fclose(input_file);
+    fclose(output_file);
+}
+</code></pre>
 <h3 id="17-Android平台上native的crash其实是可以catch的"><a href="#17-Android平台上native的crash其实是可以catch的" class="headerlink" title="17. Android平台上native的crash其实是可以catch的"></a>17. Android平台上native的crash其实是可以catch的</h3><p>Chromium 的Breakpad是目前 Native 崩溃捕获中最成熟的方案</p>
-<h3 id="18-bitmap-4096"><a href="#18-bitmap-4096" class="headerlink" title="18. bitmap 4096"></a>18. bitmap 4096</h3><p>Bitmap too large to be uploaded into a texture (9425x1920, max=8192x8192)<br>4096还是8192这个数值不确定,<a href="https://stackoverflow.com/questions/15313807/android-maximum-allowed-width-height-of-bitmap">stackoverflow上的回答</a>教会如何查<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span>[] maxSize = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">1</span>];</span><br><span class="line">gl.glGetIntegerv(GL10.GL_MAX_TEXTURE_SIZE, maxSize, <span class="number">0</span>);</span><br><span class="line">Log.e(<span class="string">"GL"</span>, <span class="string">"CURRENT MAX IS "</span>+String.valueOf(maxSize[<span class="number">0</span>]));</span><br><span class="line"><span class="comment">// maxSize[0] now contains max size(in both dimensions)</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="18-bitmap-4096"><a href="#18-bitmap-4096" class="headerlink" title="18. bitmap 4096"></a>18. bitmap 4096</h3><p>Bitmap too large to be uploaded into a texture (9425x1920, max=8192x8192)<br>4096还是8192这个数值不确定,<a href="https://stackoverflow.com/questions/15313807/android-maximum-allowed-width-height-of-bitmap">stackoverflow上的回答</a>教会如何查</p>
+<pre><code class="java">int[] maxSize = new int[1];
+gl.glGetIntegerv(GL10.GL_MAX_TEXTURE_SIZE, maxSize, 0);
+Log.e(&quot;GL&quot;, &quot;CURRENT MAX IS &quot;+String.valueOf(maxSize[0]));
+// maxSize[0] now contains max size(in both dimensions)
+</code></pre>
 
       
 

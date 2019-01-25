@@ -17,7 +17,7 @@
 <meta property="og:description" content="这周终于把Google I/O 2016的Android App在Device上跑起来了，顺便尝试多多使用命令行进行编译或者安装。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/device-2017-03-11-222239.png">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.031Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.173Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用IDE内置的Terminal">
 <meta name="twitter:description" content="这周终于把Google I/O 2016的Android App在Device上跑起来了，顺便尝试多多使用命令行进行编译或者安装。">
@@ -222,34 +222,153 @@ ga('send', 'pageview');
 <blockquote>
 <p>don’t do premature optimazition<br>在你整天思考到底要用Enum还是IntDef的时候，你的网络库已经allocate了一大堆的垃圾。将精力集中在解决最严重的问题上。，</p>
 </blockquote>
-<h2 id="1-Systrace用于跟踪一段方法执行过程中的影响"><a href="#1-Systrace用于跟踪一段方法执行过程中的影响" class="headerlink" title="1. Systrace用于跟踪一段方法执行过程中的影响"></a>1. Systrace用于跟踪一段方法执行过程中的影响</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    Trace.beginSection(TAG);</span><br><span class="line">    <span class="comment">// do stuff</span></span><br><span class="line">    &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">     Trace.endSection();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="1-Systrace用于跟踪一段方法执行过程中的影响"><a href="#1-Systrace用于跟踪一段方法执行过程中的影响" class="headerlink" title="1. Systrace用于跟踪一段方法执行过程中的影响"></a>1. Systrace用于跟踪一段方法执行过程中的影响</h2><pre><code class="java">try {
+    Trace.beginSection(TAG);
+    // do stuff
+    }finally {
+     Trace.endSection();
+    }
+</code></pre>
 <p>计算一段方法到底花了多长时间，当然还是要在Android device monitor里面begin trace，注意要勾选<strong>Enable Application Traces from XXXX</strong>，选中自己的包名就好了。一开始可能不是特别好找，只要在html中ctrl+f找到了自己写的TAG，慢慢来应该能找到的。</p>
 <h2 id="2-FileObserver"><a href="#2-FileObserver" class="headerlink" title="2. FileObserver"></a>2. FileObserver</h2><p><a href="https://developer.android.com/reference/android/os/FileObserver.html">FileObserver</a>可以监控设备上文件的更改，删除，读取。<br>底层原理是使用了linux内核的inotify机制。<br>但<a href="https://www.jianshu.com/p/f3c74063a8e4">简书上有人说</a></p>
 <blockquote>
 <p>android fileobserver 可以对文件系统的文件夹进行监听，但不能监听子目录。<br>要监听子目录必须递归遍历所有的文件夹对其添加监听。<br>fileobserver 在 Android 4.0 和 5.0 中是好用的，但在 Android 6.0 中有 bug 监听不能工作。</p>
 </blockquote>
-<h2 id="3-Environment-getXXX长什么样"><a href="#3-Environment-getXXX长什么样" class="headerlink" title="3. Environment.getXXX长什么样"></a>3. Environment.getXXX长什么样</h2><p>私有文件应该放在哪里，公开的文件适合放在哪里，tmp文件可以放在哪里。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Log.i(<span class="string">"codecraeer"</span>, <span class="string">"getFilesDir = "</span> + getFilesDir());</span><br><span class="line">Log.i(<span class="string">"codecraeer"</span>, <span class="string">"getExternalFilesDir = "</span> + getExternalFilesDir(<span class="string">"exter_test"</span>).getAbsolutePath());</span><br><span class="line">Log.i(<span class="string">"codecraeer"</span>, <span class="string">"getDownloadCacheDirectory = "</span> + Environment.getDownloadCacheDirectory().getAbsolutePath());</span><br><span class="line">Log.i(<span class="string">"codecraeer"</span>, <span class="string">"getDataDirectory = "</span> + Environment.getDataDirectory().getAbsolutePath());</span><br><span class="line">Log.i(<span class="string">"codecraeer"</span>, <span class="string">"getExternalStorageDirectory = "</span> + Environment.getExternalStorageDirectory().getAbsolutePath());</span><br><span class="line">Log.i(<span class="string">"codecraeer"</span>, <span class="string">"getExternalStoragePublicDirectory = "</span> + Environment.getExternalStoragePublicDirectory(<span class="string">"pub_test"</span>));</span><br></pre></td></tr></table></figure></p>
-<h2 id="4-对象池-Object-Pool"><a href="#4-对象池-Object-Pool" class="headerlink" title="4.对象池(Object Pool)"></a>4.对象池(Object Pool)</h2><p>这个看一下Glide里面的BitmapPool就好了<br>LruBitmapPool.java<br>pool的大小是MemorySizeCalculator算出来的，考虑了App可以使用的最大内存和屏幕分辨率像素对应容量这两个因素。<br>对象池主要关注put和get这两个方法。<br>Glide中的LruBitmapPool.java中有一段很有意思的注释<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> Bitmap <span class="title">get</span><span class="params">(<span class="keyword">int</span> width, <span class="keyword">int</span> height, Bitmap.Config config)</span> </span>&#123;</span><br><span class="line">       Bitmap result = getDirty(width, height, config);</span><br><span class="line">       <span class="keyword">if</span> (result != <span class="keyword">null</span>) &#123;</span><br><span class="line">           <span class="comment">// Bitmaps in the pool contain random data that in some cases must be cleared for an image to be rendered</span></span><br><span class="line">           <span class="comment">// correctly. we shouldn't force all consumers to independently erase the contents individually, so we do so</span></span><br><span class="line">           <span class="comment">// here. See issue #131.</span></span><br><span class="line">           result.eraseColor(Color.TRANSPARENT);</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="keyword">return</span> result;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="3-Environment-getXXX长什么样"><a href="#3-Environment-getXXX长什么样" class="headerlink" title="3. Environment.getXXX长什么样"></a>3. Environment.getXXX长什么样</h2><p>私有文件应该放在哪里，公开的文件适合放在哪里，tmp文件可以放在哪里。</p>
+<pre><code class="java">Log.i(&quot;codecraeer&quot;, &quot;getFilesDir = &quot; + getFilesDir());
+Log.i(&quot;codecraeer&quot;, &quot;getExternalFilesDir = &quot; + getExternalFilesDir(&quot;exter_test&quot;).getAbsolutePath());
+Log.i(&quot;codecraeer&quot;, &quot;getDownloadCacheDirectory = &quot; + Environment.getDownloadCacheDirectory().getAbsolutePath());
+Log.i(&quot;codecraeer&quot;, &quot;getDataDirectory = &quot; + Environment.getDataDirectory().getAbsolutePath());
+Log.i(&quot;codecraeer&quot;, &quot;getExternalStorageDirectory = &quot; + Environment.getExternalStorageDirectory().getAbsolutePath());
+Log.i(&quot;codecraeer&quot;, &quot;getExternalStoragePublicDirectory = &quot; + Environment.getExternalStoragePublicDirectory(&quot;pub_test&quot;));
+</code></pre>
+<h2 id="4-对象池-Object-Pool"><a href="#4-对象池-Object-Pool" class="headerlink" title="4.对象池(Object Pool)"></a>4.对象池(Object Pool)</h2><p>这个看一下Glide里面的BitmapPool就好了<br>LruBitmapPool.java<br>pool的大小是MemorySizeCalculator算出来的，考虑了App可以使用的最大内存和屏幕分辨率像素对应容量这两个因素。<br>对象池主要关注put和get这两个方法。<br>Glide中的LruBitmapPool.java中有一段很有意思的注释</p>
+<pre><code class="java"> @Override
+    public synchronized Bitmap get(int width, int height, Bitmap.Config config) {
+        Bitmap result = getDirty(width, height, config);
+        if (result != null) {
+            // Bitmaps in the pool contain random data that in some cases must be cleared for an image to be rendered
+            // correctly. we shouldn&#39;t force all consumers to independently erase the contents individually, so we do so
+            // here. See issue #131.
+            result.eraseColor(Color.TRANSPARENT);
+        }
+
+        return result;
+    }
+</code></pre>
 <p>就是说，从回收池里面取出来的Bitmap可能存储了一些脏数据，在复用之前要清除下旧数据。</p>
 <blockquote>
 <p>另外，MotionEvent,Message,VelocityTracker以及Okio里面的Segment都是可以被recycle和obtain的可回收再利用对象。Andorid Bitmap后期支持了inBitmap，也是类似于回收再利用的概念。<br>Bitmap有点不同，虽然内存中的表现形式只是二维byte数组。但在支持inBitmap之前，并不是每一个Bitmap都可以被直接回收用于存储下一个Bitmap.</p>
 </blockquote>
 <p><a href="https://developer.android.com/reference/android/support/v4/util/Pools.html">V4包里提供了简单的实现</a></p>
 <h2 id="5-MediaScanner是一个和有趣的可以扫描多媒体文件的类"><a href="#5-MediaScanner是一个和有趣的可以扫描多媒体文件的类" class="headerlink" title="5.MediaScanner是一个和有趣的可以扫描多媒体文件的类"></a>5.MediaScanner是一个和有趣的可以扫描多媒体文件的类</h2><p><a href="http://droidyue.com/blog/2014/07/12/scan-media-files-in-android-chinese-edition/">技术小黑屋</a></p>
-<h3 id="6-Drawable跟单例有点像"><a href="#6-Drawable跟单例有点像" class="headerlink" title="6. Drawable跟单例有点像"></a>6. Drawable跟单例有点像</h3><p><a href="https://developer.android.com/guide/topics/graphics/2d-graphics.html#drawables">官方文档</a>上有这么一句，看起来很不起眼的<br>Note: Each unique resource in your project can maintain only one state, no matter how many different objects you instantiate for it. For example, if you instantiate two Drawable objects from the same image resource and change a property (such as the alpha) for one object, then it also affects the other. When dealing with multiple instances of an image resource, instead of directly transforming the Drawable object you should perform a tween animation.<br>这件事的意义在于，Drawable在整个Application中是单例。<br>简单来说，getDrawable每次返回的都是一个新的Drawable，但Drawable只是一个Wrapper，放在res文件夹里的Drawable资源在整个Application中是单例。<br>证明的方式很简单: 两个相同资源的Drawable可能不一样，但Drawable.getConstantState都是同一个instance。<br>原理的话，参考 <a href="https://www.youtube.com/watch?v=JuE13KXRMxg">Cyril Mottier在2013年的演讲</a><br>就跟xml是binary optimized的一样，<br>亲测，在一个Activity中改变Drawable的Alpha属性，退出重新进，Drawable的Alpha就已经是被更改了的。在另一个Activity中引用这个Drawable，Alpha也受到影响。<br>更严重的是，在一个Activity中使用((BitmapDrawable)getDrawable).getBitmap().recycle()，在另一个Activity中使用这个Drawable，直接报错：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">java.lang.RuntimeException: Canvas: trying to use a recycled bitmap android.graphics.Bitmap@c08bbc6</span><br><span class="line">at android.graphics.Canvas.throwIfCannotDraw(Canvas.java:1270)</span><br><span class="line">at android.graphics.Canvas.drawBitmap(Canvas.java:1404)</span><br><span class="line">at android.graphics.drawable.BitmapDrawable.draw(BitmapDrawable.java:544)</span><br><span class="line">at android.widget.ImageView.onDraw(ImageView.java:1228)</span><br></pre></td></tr></table></figure></p>
-<p><strong>这种东西根本防不胜防。</strong><br><a href="https://stackoverflow.com/questions/25858362/issue-when-recycling-bitmap-obtained-from-bitmapdrawable">stackOverFlow</a>上也有讨论<br>被人为调用Bitmap.recycle()的res中的图片资源直接不能用了，怎么办，重新用BitmapFactory去decode或者创建一张Canvas，用原来的bitmap去画呗。照说Android 3.0之后就不应该调用Recycle方法了，记得Chet Haase说过，Recycle doesn’t do anything。<br>另外一种说法是，bitmap.isMutable()返回是false的话(从res加载的)就不该去mutate。真要更改像素属性的话，可以创建一个Canvas，然后用原来的bitmap去画一个一样大的，或者用bitmap.copy方法创建一个新的。</p>
+<h3 id="6-Drawable跟单例有点像"><a href="#6-Drawable跟单例有点像" class="headerlink" title="6. Drawable跟单例有点像"></a>6. Drawable跟单例有点像</h3><p><a href="https://developer.android.com/guide/topics/graphics/2d-graphics.html#drawables">官方文档</a>上有这么一句，看起来很不起眼的<br>Note: Each unique resource in your project can maintain only one state, no matter how many different objects you instantiate for it. For example, if you instantiate two Drawable objects from the same image resource and change a property (such as the alpha) for one object, then it also affects the other. When dealing with multiple instances of an image resource, instead of directly transforming the Drawable object you should perform a tween animation.<br>这件事的意义在于，Drawable在整个Application中是单例。<br>简单来说，getDrawable每次返回的都是一个新的Drawable，但Drawable只是一个Wrapper，放在res文件夹里的Drawable资源在整个Application中是单例。<br>证明的方式很简单: 两个相同资源的Drawable可能不一样，但Drawable.getConstantState都是同一个instance。<br>原理的话，参考 <a href="https://www.youtube.com/watch?v=JuE13KXRMxg">Cyril Mottier在2013年的演讲</a><br>就跟xml是binary optimized的一样，<br>亲测，在一个Activity中改变Drawable的Alpha属性，退出重新进，Drawable的Alpha就已经是被更改了的。在另一个Activity中引用这个Drawable，Alpha也受到影响。<br>更严重的是，在一个Activity中使用((BitmapDrawable)getDrawable).getBitmap().recycle()，在另一个Activity中使用这个Drawable，直接报错：</p>
+<pre><code>java.lang.RuntimeException: Canvas: trying to use a recycled bitmap android.graphics.Bitmap@c08bbc6
+at android.graphics.Canvas.throwIfCannotDraw(Canvas.java:1270)
+at android.graphics.Canvas.drawBitmap(Canvas.java:1404)
+at android.graphics.drawable.BitmapDrawable.draw(BitmapDrawable.java:544)
+at android.widget.ImageView.onDraw(ImageView.java:1228)
+</code></pre><p><strong>这种东西根本防不胜防。</strong><br><a href="https://stackoverflow.com/questions/25858362/issue-when-recycling-bitmap-obtained-from-bitmapdrawable">stackOverFlow</a>上也有讨论<br>被人为调用Bitmap.recycle()的res中的图片资源直接不能用了，怎么办，重新用BitmapFactory去decode或者创建一张Canvas，用原来的bitmap去画呗。照说Android 3.0之后就不应该调用Recycle方法了，记得Chet Haase说过，Recycle doesn’t do anything。<br>另外一种说法是，bitmap.isMutable()返回是false的话(从res加载的)就不该去mutate。真要更改像素属性的话，可以创建一个Canvas，然后用原来的bitmap去画一个一样大的，或者用bitmap.copy方法创建一个新的。</p>
 <h3 id="7-Aidl里面有些关键字"><a href="#7-Aidl里面有些关键字" class="headerlink" title="7. Aidl里面有些关键字"></a>7. Aidl里面有些关键字</h3><p>oneway关键字。<br>AIDL 接口的实现必须是完全线程安全实现。 oneway 关键字用于修改远程调用的行为。使用该关键字时，远程调用不会阻塞；它只是发送事务数据并立即返回</p>
-<h3 id="8-自定义View一个不容易发现的点"><a href="#8-自定义View一个不容易发现的点" class="headerlink" title="8. 自定义View一个不容易发现的点"></a>8. 自定义View一个不容易发现的点</h3><p>自定义View的套路一般是这样的<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">CustomTitleView</span><span class="params">(Context context, AttributeSet attrs)</span> </span>&#123;</span><br><span class="line">   &#123;  </span><br><span class="line">       <span class="keyword">this</span>(context, attrs, <span class="number">0</span>);  </span><br><span class="line">   &#125;  </span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="title">CustomTitleView</span><span class="params">(Context context)</span>  </span></span><br><span class="line"><span class="function">   </span>&#123;  </span><br><span class="line">       <span class="keyword">this</span>(context, <span class="keyword">null</span>);  </span><br><span class="line">   &#125;  </span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="title">CustomTitleView</span><span class="params">(Context context, AttributeSet attrs, <span class="keyword">int</span> defStyle)</span>  </span></span><br><span class="line"><span class="function">   </span>&#123;  </span><br><span class="line">       <span class="keyword">super</span>(context, attrs, defStyle);  </span><br><span class="line">      <span class="comment">// 获得我们所定义的自定义样式属性</span></span><br><span class="line">        init();</span><br><span class="line">   &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="8-自定义View一个不容易发现的点"><a href="#8-自定义View一个不容易发现的点" class="headerlink" title="8. 自定义View一个不容易发现的点"></a>8. 自定义View一个不容易发现的点</h3><p>自定义View的套路一般是这样的</p>
+<pre><code class="java">public CustomTitleView(Context context, AttributeSet attrs) {
+   {  
+       this(context, attrs, 0);  
+   }  
+
+   public CustomTitleView(Context context)  
+   {  
+       this(context, null);  
+   }  
+
+   public CustomTitleView(Context context, AttributeSet attrs, int defStyle)  
+   {  
+       super(context, attrs, defStyle);  
+      // 获得我们所定义的自定义样式属性
+        init();
+   }  
+}
+</code></pre>
 <p>然后在layout里面去findViewById，妥妥的找不到。写在xml里面，会调到两个参数的构造函数，因为id这种东西写是在xml里面的，所以在两个参数的构造函数里面做事情就好了。</p>
-<h3 id="9-Dialog会出的一些错误"><a href="#9-Dialog会出的一些错误" class="headerlink" title="9. Dialog会出的一些错误"></a>9. Dialog会出的一些错误</h3><p>9.1. showDialog之前最好判断下,activity.isFinishing<br>否则会崩成这样：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">E/AndroidRuntime: FATAL EXCEPTION: main</span><br><span class="line">Process: com.xxx.xxx, PID: 30025</span><br><span class="line"> android.view.WindowManager$BadTokenException: Unable to add window -- token android.os.BinderProxy@59d55fe is not valid; is your activity running?</span><br><span class="line"> at android.view.ViewRootImpl.setView(ViewRootImpl.java:579)</span><br><span class="line"> at android.view.WindowManagerGlobal.addView(WindowManagerGlobal.java:310)</span><br><span class="line"> at android.view.WindowManagerImpl.addView(WindowManagerImpl.java:91)</span><br><span class="line"> at android.app.Dialog.show(Dialog.java:319)</span><br><span class="line"> ...</span><br></pre></td></tr></table></figure></p>
-<p>9.2. show一个Dialog，忘记关掉就finish，App不会崩，但日志里面有error：<br>从用户角度来看，Dialog随着页面的关闭也关了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">E/WindowManager: android.view.WindowLeaked: Activity com.example.SomeActivity has leaked window com.android.internal.policy.PhoneWindow$DecorView</span><br><span class="line">at android.view.ViewRootImpl.&lt;init&gt;(ViewRootImpl.java:380)</span><br><span class="line">at android.view.WindowManagerGlobal.addView(WindowManagerGlobal.java:299)</span><br><span class="line">at android.view.WindowManagerImpl.addView(WindowManagerImpl.java:91)</span><br><span class="line">at android.app.Dialog.show(Dialog.java:319)</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
-<p>对比一下上面那个error，目测只有FATAL EXCEPTION才会导致App崩溃</p>
-<p>9.3. activity finish掉之后再去Dismiss，先出2的日志，然后是一个fatal exception<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">button.setOnClickListener &#123; v -&gt;</span><br><span class="line">            showDialog()</span><br><span class="line">            finish() <span class="comment">// onBackPressed也一样</span></span><br><span class="line">            v.postDelayed( Runnable &#123; mDialg!!.dismiss() &#125;,<span class="number">2000</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">//第一个是这个</span><br><span class="line">E/WindowManager: android.view.WindowLeaked: Activity com.xxx.DialogActivity has leaked window com.android.internal.policy.PhoneWindow$DecorView&#123;240a531 V</span><br><span class="line">//2秒之后出现这个</span><br><span class="line">E/AndroidRuntime: FATAL EXCEPTION: main</span><br><span class="line"> Process: com.harris.simplezhihu, PID: 7256</span><br><span class="line">  java.lang.IllegalArgumentException: View=com.android.internal.policy.PhoneWindow$DecorView&#123;240a531 V.E...... R......D 0,0-1026,716&#125; not attached to window manager</span><br><span class="line">at android.view.WindowManagerGlobal.findViewLocked(WindowManagerGlobal.java:424)</span><br><span class="line">at android.view.WindowManagerGlobal.removeView(WindowManagerGlobal.java:350)</span><br><span class="line">at android.view.WindowManagerImpl.removeViewImmediate(WindowManagerImpl.java:123)</span><br><span class="line">at android.app.Dialog.dismissDialog(Dialog.java:362)</span><br></pre></td></tr></table></figure>
-<p>就崩了，dismiss之前先判断下isFinishing就没事了</p>
-<p>9.4. dialog.show不是异步方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">showDialog()</span><br><span class="line">finish()</span><br></pre></td></tr></table></figure></p>
-<p>App不会崩，和2一样的error日志,看来不是Fatal<br>瞅一眼源码<br>Dialog.java:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">show</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="comment">// .......</span></span><br><span class="line">      mWindowManager.addView(mDecor, l);</span><br><span class="line">      mShowing = <span class="keyword">true</span>;</span><br><span class="line">      sendShowMessage();<span class="comment">//发个消息给，OnShowListener</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">sendShowMessage</span><span class="params">()</span> </span>&#123;</span><br><span class="line">     <span class="keyword">if</span> (mShowMessage != <span class="keyword">null</span>) &#123;</span><br><span class="line">         <span class="comment">// Obtain a new message so this dialog can be re-used</span></span><br><span class="line">         Message.obtain(mShowMessage).sendToTarget();</span><br><span class="line">         <span class="comment">//sendToTarget是到主线程的MessageQueue去排队了</span></span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></p>
-<p>所以ui上显示出Dialog和onShow不是一前一后(在同一个消息里面)调用的。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">ListenersHandler</span> <span class="keyword">extends</span> <span class="title">Handler</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> WeakReference&lt;DialogInterface&gt; mDialog;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ListenersHandler</span><span class="params">(Dialog dialog)</span> </span>&#123;</span><br><span class="line">        mDialog = <span class="keyword">new</span> WeakReference&lt;&gt;(dialog);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">switch</span> (msg.what) &#123;</span><br><span class="line">            <span class="keyword">case</span> DISMISS:</span><br><span class="line">                ((OnDismissListener) msg.obj).onDismiss(mDialog.get());</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> CANCEL:</span><br><span class="line">                ((OnCancelListener) msg.obj).onCancel(mDialog.get());</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> SHOW:</span><br><span class="line">                ((OnShowListener) msg.obj).onShow(mDialog.get());</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="9-Dialog会出的一些错误"><a href="#9-Dialog会出的一些错误" class="headerlink" title="9. Dialog会出的一些错误"></a>9. Dialog会出的一些错误</h3><p>9.1. showDialog之前最好判断下,activity.isFinishing<br>否则会崩成这样：</p>
+<pre><code>E/AndroidRuntime: FATAL EXCEPTION: main
+Process: com.xxx.xxx, PID: 30025
+ android.view.WindowManager$BadTokenException: Unable to add window -- token android.os.BinderProxy@59d55fe is not valid; is your activity running?
+ at android.view.ViewRootImpl.setView(ViewRootImpl.java:579)
+ at android.view.WindowManagerGlobal.addView(WindowManagerGlobal.java:310)
+ at android.view.WindowManagerImpl.addView(WindowManagerImpl.java:91)
+ at android.app.Dialog.show(Dialog.java:319)
+ ...
+</code></pre><p>9.2. show一个Dialog，忘记关掉就finish，App不会崩，但日志里面有error：<br>从用户角度来看，Dialog随着页面的关闭也关了</p>
+<pre><code> E/WindowManager: android.view.WindowLeaked: Activity com.example.SomeActivity has leaked window com.android.internal.policy.PhoneWindow$DecorView
+ at android.view.ViewRootImpl.&lt;init&gt;(ViewRootImpl.java:380)
+ at android.view.WindowManagerGlobal.addView(WindowManagerGlobal.java:299)
+ at android.view.WindowManagerImpl.addView(WindowManagerImpl.java:91)
+ at android.app.Dialog.show(Dialog.java:319)
+ ...
+</code></pre><p>对比一下上面那个error，目测只有FATAL EXCEPTION才会导致App崩溃</p>
+<p>9.3. activity finish掉之后再去Dismiss，先出2的日志，然后是一个fatal exception</p>
+<pre><code class="java">button.setOnClickListener { v -&gt;
+            showDialog()
+            finish() // onBackPressed也一样
+            v.postDelayed( Runnable { mDialg!!.dismiss() },2000)
+}
+</code></pre>
+<pre><code>//第一个是这个
+E/WindowManager: android.view.WindowLeaked: Activity com.xxx.DialogActivity has leaked window com.android.internal.policy.PhoneWindow$DecorView{240a531 V
+//2秒之后出现这个
+E/AndroidRuntime: FATAL EXCEPTION: main
+ Process: com.harris.simplezhihu, PID: 7256
+  java.lang.IllegalArgumentException: View=com.android.internal.policy.PhoneWindow$DecorView{240a531 V.E...... R......D 0,0-1026,716} not attached to window manager
+at android.view.WindowManagerGlobal.findViewLocked(WindowManagerGlobal.java:424)
+at android.view.WindowManagerGlobal.removeView(WindowManagerGlobal.java:350)
+at android.view.WindowManagerImpl.removeViewImmediate(WindowManagerImpl.java:123)
+at android.app.Dialog.dismissDialog(Dialog.java:362)
+</code></pre><p>就崩了，dismiss之前先判断下isFinishing就没事了</p>
+<p>9.4. dialog.show不是异步方法</p>
+<pre><code class="java">showDialog()
+finish()
+</code></pre>
+<p>App不会崩，和2一样的error日志,看来不是Fatal<br>瞅一眼源码<br>Dialog.java:</p>
+<pre><code class="java">public void show() {
+      // .......
+      mWindowManager.addView(mDecor, l);
+      mShowing = true;
+      sendShowMessage();//发个消息给，OnShowListener
+    }
+
+private void sendShowMessage() {
+     if (mShowMessage != null) {
+         // Obtain a new message so this dialog can be re-used
+         Message.obtain(mShowMessage).sendToTarget();
+         //sendToTarget是到主线程的MessageQueue去排队了
+     }
+ }
+</code></pre>
+<p>所以ui上显示出Dialog和onShow不是一前一后(在同一个消息里面)调用的。</p>
+<pre><code class="java">private static final class ListenersHandler extends Handler {
+    private final WeakReference&lt;DialogInterface&gt; mDialog;
+
+    public ListenersHandler(Dialog dialog) {
+        mDialog = new WeakReference&lt;&gt;(dialog);
+    }
+
+    @Override
+    public void handleMessage(Message msg) {
+        switch (msg.what) {
+            case DISMISS:
+                ((OnDismissListener) msg.obj).onDismiss(mDialog.get());
+                break;
+            case CANCEL:
+                ((OnCancelListener) msg.obj).onCancel(mDialog.get());
+                break;
+            case SHOW:
+                ((OnShowListener) msg.obj).onShow(mDialog.get());
+                break;
+        }
+    }
+}
+</code></pre>
 <p>很容易想到onDismiss(Dialog)里面的dialog可能为null，(主线程恰好在排队，正好来一次GC)，可能性应该不大。</p>
 <p>9.5. Dialog中有一个OnKeyListener，所以用户手动按返回键会去dismissDialog并消费掉事件，代码调用onBackPressed和手动按返回键是不一样的。</p>
 <h3 id="10-RecyclerView的ItemAnimator有很多方法可以override"><a href="#10-RecyclerView的ItemAnimator有很多方法可以override" class="headerlink" title="10. RecyclerView的ItemAnimator有很多方法可以override"></a>10. RecyclerView的ItemAnimator有很多方法可以override</h3><p>Chet的<a href="https://github.com/google/android-ui-toolkit-demos">Demo</a></p>
@@ -265,8 +384,32 @@ ga('send', 'pageview');
 <li>UI widget检查Thread是在ViewRootImpl里面有一段方法checkThread() 。</li>
 </ul>
 <h3 id="12-No-Activity-found-to-handle-Intent-act-com-android-camera-action-CROP"><a href="#12-No-Activity-found-to-handle-Intent-act-com-android-camera-action-CROP" class="headerlink" title="12. No Activity found to handle Intent { act=com.android.camera.action.CROP"></a>12. No Activity found to handle Intent { act=com.android.camera.action.CROP</h3><p><a href="https://commonsware.com/blog/2013/01/23/no-android-does-not-have-crop-intent.html">com.android.camera.action.CROP</a>并不是一个AOSP官方规定的Intent，有些设备上是会报错的。这个链接的作者是<a href="https://stackoverflow.com/users/115145/commonsware">Mark Murphy</a>，很有趣的一个人。<br><a href="https://stackoverflow.com/questions/41890891/no-activity-found-to-handle-intent-com-android-camera-action-crop">stackOverFlow上也有讨论</a><br>解决办法就是加一个catch(ActivityNotFoundException)就好了</p>
-<h3 id="13-Dalvik和Art崩的时候堆栈是不一样的"><a href="#13-Dalvik和Art崩的时候堆栈是不一样的" class="headerlink" title="13. Dalvik和Art崩的时候堆栈是不一样的"></a>13. Dalvik和Art崩的时候堆栈是不一样的</h3><p>//Dalvik是这么崩的<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">at android.view.View.performClick(View.java:<span class="number">4438</span>)</span><br><span class="line">at android.view.View$PerformClick.run(View.java:<span class="number">18439</span>)</span><br><span class="line">at android.os.Handler.handleCallback(Handler.java:<span class="number">733</span>)</span><br><span class="line">at android.os.Handler.dispatchMessage(Handler.java:<span class="number">95</span>)</span><br><span class="line">at android.os.Looper.loop(Looper.java:<span class="number">136</span>)</span><br><span class="line">at android.app.ActivityThread.main(ActivityThread.java:<span class="number">5095</span>)</span><br><span class="line">at java.lang.reflect.Method.invokeNative(Method.java)</span><br><span class="line">at java.lang.reflect.Method.invoke(Method.java:<span class="number">515</span>)</span><br><span class="line">at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:<span class="number">786</span>)</span><br><span class="line">at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:<span class="number">602</span>)</span><br><span class="line">at dalvik.system.NativeStart.main(NativeStart.java)</span><br></pre></td></tr></table></figure></p>
-<p>//art是这么崩的<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">at android.app.Activity.performStart(Activity.java:<span class="number">6311</span>)</span><br><span class="line">at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:<span class="number">2387</span>)</span><br><span class="line">at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:<span class="number">2484</span>)</span><br><span class="line">at android.app.ActivityThread.access$<span class="number">900</span>(ActivityThread.java:<span class="number">158</span>)</span><br><span class="line">at android.app.ActivityThread$H.handleMessage(ActivityThread.java:<span class="number">1352</span>)</span><br><span class="line">at android.os.Handler.dispatchMessage(Handler.java:<span class="number">102</span>)</span><br><span class="line">at android.os.Looper.loop(Looper.java:<span class="number">171</span>)</span><br><span class="line">at android.app.ActivityThread.main(ActivityThread.java:<span class="number">5454</span>)</span><br><span class="line">at java.lang.reflect.Method.invoke(Method.java)</span><br><span class="line">at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:<span class="number">726</span>)</span><br><span class="line">at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:<span class="number">616</span>)</span><br></pre></td></tr></table></figure></p>
+<h3 id="13-Dalvik和Art崩的时候堆栈是不一样的"><a href="#13-Dalvik和Art崩的时候堆栈是不一样的" class="headerlink" title="13. Dalvik和Art崩的时候堆栈是不一样的"></a>13. Dalvik和Art崩的时候堆栈是不一样的</h3><p>//Dalvik是这么崩的</p>
+<pre><code class="java">at android.view.View.performClick(View.java:4438)
+at android.view.View$PerformClick.run(View.java:18439)
+at android.os.Handler.handleCallback(Handler.java:733)
+at android.os.Handler.dispatchMessage(Handler.java:95)
+at android.os.Looper.loop(Looper.java:136)
+at android.app.ActivityThread.main(ActivityThread.java:5095)
+at java.lang.reflect.Method.invokeNative(Method.java)
+at java.lang.reflect.Method.invoke(Method.java:515)
+at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:786)
+at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:602)
+at dalvik.system.NativeStart.main(NativeStart.java)
+</code></pre>
+<p>//art是这么崩的</p>
+<pre><code class="java">at android.app.Activity.performStart(Activity.java:6311)
+at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:2387)
+at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:2484)
+at android.app.ActivityThread.access$900(ActivityThread.java:158)
+at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1352)
+at android.os.Handler.dispatchMessage(Handler.java:102)
+at android.os.Looper.loop(Looper.java:171)
+at android.app.ActivityThread.main(ActivityThread.java:5454)
+at java.lang.reflect.Method.invoke(Method.java)
+at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:726)
+at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:616)
+</code></pre>
 <h3 id="14-理解Canvas-surface-window等概念"><a href="#14-理解Canvas-surface-window等概念" class="headerlink" title="14. 理解Canvas,surface,window等概念"></a>14. 理解Canvas,surface,window等概念</h3><p><a href="https://stackoverflow.com/questions/4576909/understanding-canvas-and-surface-concepts/4577249#4577249">Dianne Hackborn的回答</a><br>onDraw里面的canvas是lock surface得到的</p>
 <h3 id="15-如果想要用一个动画移动一个View的话，没必要animate更改LayoutParams"><a href="#15-如果想要用一个动画移动一个View的话，没必要animate更改LayoutParams" class="headerlink" title="15.如果想要用一个动画移动一个View的话，没必要animate更改LayoutParams"></a>15.如果想要用一个动画移动一个View的话，没必要animate更改LayoutParams</h3><p>更改LayoutParams看上去是现实生活中应该做的，但其实只需要用setTranslationX或者setTranslationY就好了。如果动画的每一帧都去更改layoutParams（会requestLayout，非常慢）,正确的做法是在视觉上做到正确的，animate TranslationX，这些是postLayout params，等动画结束后再把应有的layout属性设置上去。这样动画会更加流畅。 —- Android for Java Developers(Big Android BBQ 2015)  – Chet Haase</p>
 <h3 id="16-tint跑在GPU上，background会invalidate整个Drawable"><a href="#16-tint跑在GPU上，background会invalidate整个Drawable" class="headerlink" title="16. tint跑在GPU上，background会invalidate整个Drawable"></a>16. tint跑在GPU上，background会invalidate整个Drawable</h3><p>如果想要动画渐变一个View的Background的话,<a href="https://www.youtube.com/watch?v=71ISWyJPSEY&amp;index=9&amp;list=PLWz5rJ2EKKc_HyE1QX9heAgTPdAMqc50z">animate tint</a>即可，性能更好</p>
@@ -277,26 +420,135 @@ ga('send', 'pageview');
 </blockquote>
 <h3 id="19-网络请求的Batch"><a href="#19-网络请求的Batch" class="headerlink" title="19. 网络请求的Batch"></a>19. 网络请求的Batch</h3><p>网络较差的情况下，可以将Request cache下来，等到网络较好的时候再执行。<br>Jesse Wilson<a href="https://stackoverflow.com/questions/37529303/how-to-cache-the-request-queue-not-responses-with-okhttp">推荐</a>使用<a href="https://github.com/square/tape">TAPE</a><br>有两种实现，基于文件系统的和基于内存的。基于内存的很简单，基于文件的能够在crash发生时自动回退。</p>
 <h3 id="20-getSystemService是存在memory-leak问题的"><a href="#20-getSystemService是存在memory-leak问题的" class="headerlink" title="20.getSystemService是存在memory leak问题的"></a>20.getSystemService是存在<a href="https://segmentfault.com/a/1190000004882511">memory leak</a>问题的</h3><p>context.getSystemService源码分析到最后，是从一个Hashmap里面取出Service<br>activity.getSystemService -&gt; ContextImpl.getSystemService -&gt; SystemServiceRegistry.getSystemService(SystemServiceRegistry里面有个HashMap&lt;String, ServiceFetcher&lt;?&gt;&gt;)<br>WifiManager存在leak的<a href="https://issuetracker.google.com/issues/63244509">issue</a></p>
-<h3 id="21-PopupWindow在7-0和7-1上是存在问题的"><a href="#21-PopupWindow在7-0和7-1上是存在问题的" class="headerlink" title="21. PopupWindow在7.0和7.1上是存在问题的"></a>21. PopupWindow在7.0和7.1上是存在问题的</h3><p><a href="http://www.jianshu.com/p/dbd792b910ce">参考</a>解决方式<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (Build.VERSION.SDK_INT &lt; <span class="number">24</span>) &#123;</span><br><span class="line">                    popupWindow.showAsDropDown(button);</span><br><span class="line">   &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">int</span>[] location = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">2</span>];  <span class="comment">// 获取控件在屏幕的位置</span></span><br><span class="line">        button.getLocationOnScreen(location);</span><br><span class="line">      <span class="keyword">if</span> (Build.VERSION.SDK_INT == <span class="number">25</span>) &#123;</span><br><span class="line">         <span class="keyword">int</span> tempheight = popupWindow.getHeight();</span><br><span class="line">      <span class="keyword">if</span> (tempheight == WindowManager.LayoutParams.MATCH_PARENT || screenHeight &lt;= tempheight) &#123;</span><br><span class="line">             popupWindow.setHeight(screenHeight - location[<span class="number">1</span>] - button.getHeight());</span><br><span class="line">           &#125;</span><br><span class="line">     &#125;</span><br><span class="line">       popupWindow.showAtLocation(button, Gravity.NO_GRAVITY, location[<span class="number">0</span>], location[<span class="number">1</span>] + button.getHeight());</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></p>
-<h3 id="22-onSaveInstance的调用顺序以及ActivityThread的一些点"><a href="#22-onSaveInstance的调用顺序以及ActivityThread的一些点" class="headerlink" title="22. onSaveInstance的调用顺序以及ActivityThread的一些点"></a>22. onSaveInstance的调用顺序以及ActivityThread的一些点</h3><p>onSaveInstance在HoneyComb之前会在onPause前调用，HoneyComb开始，会在onStop前调用<br>3.0之前的基本不用看了，目前在Android 25 sdk中<br>ActivityThread.performStopActivityInner<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!r.activity.mFinished &amp;&amp; saveState) &#123;</span><br><span class="line">          <span class="keyword">if</span> (r.state == <span class="keyword">null</span>) &#123;</span><br><span class="line">              callCallActivityOnSaveInstanceState(r);</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="comment">// Now we are idle.</span></span><br><span class="line">       r.activity.performStop(<span class="keyword">false</span> <span class="comment">/*preserveWindow*/</span>);</span><br><span class="line">   &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">       <span class="keyword">if</span> (!mInstrumentation.onException(r.activity, e)) &#123;</span><br><span class="line">           <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(</span><br><span class="line">                   <span class="string">"Unable to stop activity "</span></span><br><span class="line">                   + r.intent.getComponent().toShortString()</span><br><span class="line">                   + <span class="string">": "</span> + e.toString(), e);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
-<p>其实Activity的所有onXXX都是由ActivityThread发起的，其实主函数也在这里。<br>那么开始吧<br>ActivityThread.handleLaunchActivity<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">handleLaunchActivity</span><span class="params">(ActivityClientRecord r, Intent customIntent, String reason)</span></span>&#123;</span><br><span class="line">     <span class="comment">// ...................</span></span><br><span class="line">    Activity a = performLaunchActivity(r, customIntent);</span><br><span class="line">    <span class="comment">//'''''''''</span></span><br><span class="line">    <span class="keyword">if</span> (a != <span class="keyword">null</span>) &#123;</span><br><span class="line">       handleResumeActivity(r.token, <span class="keyword">false</span>, r.isForward,</span><br><span class="line">               !r.activity.mFinished &amp;&amp; !r.startsNotResumed, r.lastProcessedSeq, reason);</span><br><span class="line">                 &#125;</span><br><span class="line">    <span class="comment">//''''''''''</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> Activity <span class="title">performLaunchActivity</span><span class="params">(ActivityClientRecord r, Intent customIntent)</span></span>&#123;</span><br><span class="line">  <span class="comment">// ............</span></span><br><span class="line">  activity = mInstrumentation.newActivity(</span><br><span class="line">                  cl, component.getClassName(), r.intent);</span><br><span class="line">  <span class="comment">//Activity实例就是在这里面反射创建出来的</span></span><br><span class="line">   <span class="keyword">if</span> (activity != <span class="keyword">null</span>) &#123;</span><br><span class="line">     <span class="comment">//......</span></span><br><span class="line">     mInstrumentation.callActivityOnCreate(activity, r.state);   <span class="comment">/// onCreate</span></span><br><span class="line">     <span class="keyword">if</span> (!r.activity.mFinished) &#123; <span class="comment">//经常会有人在onCreate里面finish</span></span><br><span class="line">                  activity.performStart();   <span class="comment">// onStart</span></span><br><span class="line">                  r.stopped = <span class="keyword">false</span>;</span><br><span class="line">              &#125;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="21-PopupWindow在7-0和7-1上是存在问题的"><a href="#21-PopupWindow在7-0和7-1上是存在问题的" class="headerlink" title="21. PopupWindow在7.0和7.1上是存在问题的"></a>21. PopupWindow在7.0和7.1上是存在问题的</h3><p><a href="http://www.jianshu.com/p/dbd792b910ce">参考</a>解决方式</p>
+<pre><code class="java">if (Build.VERSION.SDK_INT &lt; 24) {
+                    popupWindow.showAsDropDown(button);
+   } else {
+        int[] location = new int[2];  // 获取控件在屏幕的位置
+        button.getLocationOnScreen(location);
+      if (Build.VERSION.SDK_INT == 25) {
+         int tempheight = popupWindow.getHeight();
+      if (tempheight == WindowManager.LayoutParams.MATCH_PARENT || screenHeight &lt;= tempheight) {
+             popupWindow.setHeight(screenHeight - location[1] - button.getHeight());
+           }
+     }
+       popupWindow.showAtLocation(button, Gravity.NO_GRAVITY, location[0], location[1] + button.getHeight());
+ }
+</code></pre>
+<h3 id="22-onSaveInstance的调用顺序以及ActivityThread的一些点"><a href="#22-onSaveInstance的调用顺序以及ActivityThread的一些点" class="headerlink" title="22. onSaveInstance的调用顺序以及ActivityThread的一些点"></a>22. onSaveInstance的调用顺序以及ActivityThread的一些点</h3><p>onSaveInstance在HoneyComb之前会在onPause前调用，HoneyComb开始，会在onStop前调用<br>3.0之前的基本不用看了，目前在Android 25 sdk中<br>ActivityThread.performStopActivityInner</p>
+<pre><code class="java">if (!r.activity.mFinished &amp;&amp; saveState) {
+          if (r.state == null) {
+              callCallActivityOnSaveInstanceState(r);
+          }
+      }
+
+try {
+      // Now we are idle.
+       r.activity.performStop(false /*preserveWindow*/);
+   } catch (Exception e) {
+       if (!mInstrumentation.onException(r.activity, e)) {
+           throw new RuntimeException(
+                   &quot;Unable to stop activity &quot;
+                   + r.intent.getComponent().toShortString()
+                   + &quot;: &quot; + e.toString(), e);
+       }
+   }
+</code></pre>
+<p>其实Activity的所有onXXX都是由ActivityThread发起的，其实主函数也在这里。<br>那么开始吧<br>ActivityThread.handleLaunchActivity</p>
+<pre><code class="java"> private void handleLaunchActivity(ActivityClientRecord r, Intent customIntent, String reason){
+      // ...................
+     Activity a = performLaunchActivity(r, customIntent);
+     //&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;
+     if (a != null) {
+        handleResumeActivity(r.token, false, r.isForward,
+                !r.activity.mFinished &amp;&amp; !r.startsNotResumed, r.lastProcessedSeq, reason);
+                  }
+     //&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;
+
+ }
+
+ private Activity performLaunchActivity(ActivityClientRecord r, Intent customIntent){
+   // ............
+   activity = mInstrumentation.newActivity(
+                   cl, component.getClassName(), r.intent);
+   //Activity实例就是在这里面反射创建出来的
+    if (activity != null) {
+      //......
+      mInstrumentation.callActivityOnCreate(activity, r.state);   /// onCreate
+      if (!r.activity.mFinished) { //经常会有人在onCreate里面finish
+                   activity.performStart();   // onStart
+                   r.stopped = false;
+               }
+    }
+
+ }
+</code></pre>
 <p>所以总的顺序是<br>ActivityThread#handleLaunchActivity -&gt;<br>ActivityThread#performLaunchActivity -&gt;<br>反射创建Activity实例 -&gt;<br>mInstrumentation.callActivityOnCreate -&gt;<br>activity.performStart() -&gt;<br>handleResumeActivity()<br>以上都是在一个Message里面做的这个Message的what是“LAUNCH_ACTIVITY =100”，这个Message是<br>基本的尿性是 handleXXX -&gt; performXXX<br>另外,onActivityResult是在ActivityThread的deliverResults里面触发的</p>
 <h3 id="23-编译出错"><a href="#23-编译出错" class="headerlink" title="23. 编译出错"></a>23. 编译出错</h3><blockquote>
 <p>duplicate files copied in apk lib/x86/libRoadLineRebuildAPI.so 集成高德地图的时候</p>
 </blockquote>
-<p>在app的build.gradle中添加<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">packagingOptions &#123;</span><br><span class="line">    pickFirst &apos;lib/**.so&apos;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h3 id="24-Could-not-resolve-com-android-support-appcompat-v7-26-1-0"><a href="#24-Could-not-resolve-com-android-support-appcompat-v7-26-1-0" class="headerlink" title="24. Could not resolve com.android.support:appcompat-v7:26.1.0"></a>24. Could not resolve com.android.support:appcompat-v7:26.1.0</h3><p>Android Studio里面设置httpProxy要生效其实得看gradle.properities文件里面这几行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">systemProp.http.proxyPort=1080</span><br><span class="line">systemProp.http.proxyHost=127.0.0.1</span><br><span class="line">systemProp.https.proxyPort=1080</span><br><span class="line">systemProp.https.proxyHost=127.0.0.1</span><br></pre></td></tr></table></figure></p>
-<p>注意，maven(),google()这些库都是https的，所以得把https也勾上。</p>
+<p>在app的build.gradle中添加</p>
+<pre><code>packagingOptions {
+    pickFirst &#39;lib/**.so&#39;
+}
+</code></pre><h3 id="24-Could-not-resolve-com-android-support-appcompat-v7-26-1-0"><a href="#24-Could-not-resolve-com-android-support-appcompat-v7-26-1-0" class="headerlink" title="24. Could not resolve com.android.support:appcompat-v7:26.1.0"></a>24. Could not resolve com.android.support:appcompat-v7:26.1.0</h3><p>Android Studio里面设置httpProxy要生效其实得看gradle.properities文件里面这几行</p>
+<pre><code>systemProp.http.proxyPort=1080
+systemProp.http.proxyHost=127.0.0.1
+systemProp.https.proxyPort=1080
+systemProp.https.proxyHost=127.0.0.1
+</code></pre><p>注意，maven(),google()这些库都是https的，所以得把https也勾上。</p>
 <h3 id="25-执行gradlew命令多了之后c盘占用空间越来越小"><a href="#25-执行gradlew命令多了之后c盘占用空间越来越小" class="headerlink" title="25. 执行gradlew命令多了之后c盘占用空间越来越小"></a>25. 执行gradlew命令多了之后c盘占用空间越来越小</h3><p>执行gradlew命令，会根据gradlew-wrapper.properities中设置的distributionUrl去下载对应的gradle-4.1-all.zip，然后unzip到</p>
 <blockquote>
 <p>C://Users//username//.gradle//wrapper//dists</p>
 </blockquote>
 <p>这个目录。所以切换到这个目录，可以把之前2.x,3.x的全部都删掉了，看了下大小，将近3个GB。<br>还有每个Android项目的根目录下都有一个.gradle文件夹。按照linux文件系统的传统，前面加上一个点的意思都是隐藏文件。点进去看，里面的东西删除也没问题。</p>
-<h3 id="26-在-AndroidStudio-工程点击-Run-按钮，-实际上做了什么操作呢？"><a href="#26-在-AndroidStudio-工程点击-Run-按钮，-实际上做了什么操作呢？" class="headerlink" title="26. 在 AndroidStudio 工程点击 Run 按钮， 实际上做了什么操作呢？"></a>26. 在 AndroidStudio 工程点击 Run 按钮， 实际上做了什么操作呢？</h3><p><a href="https://www.zhihu.com/question/65289196">知乎的回答</a><br>看下日志就很清晰了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">17:35:33 Executing tasks: [:app:assembleDebug]</span><br><span class="line">17:35:34 Gradle build finished in 858ms</span><br><span class="line"></span><br><span class="line">03/06 15:50:39: Launching app</span><br><span class="line">$ adb push F:\workspace\clones\AndroidRepo\app\build\outputs\apk\debug\app-debug.apk /data/local/tmp/com.me.harris.myapplication</span><br><span class="line">$ adb shell pm install -t -r &quot;/data/local/tmp/com.me.harris.myapplication&quot;</span><br><span class="line">Success</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">$ adb shell am start -n &quot;com.me.harris.myapplication/com.me.harris.myapplication.MainActivity&quot; -a android.intent.action.MAIN -c android.intent.category.LAUNCHER</span><br><span class="line">Client not ready yet..Waiting for process to come online</span><br><span class="line">Waiting for process to come online</span><br><span class="line">Connected to process 16409 on device vivo-vivo_x9-a9c690fb</span><br><span class="line">Success</span><br><span class="line"></span><br><span class="line">$ adb shell am start -n &quot;com.didi.virtualapk/com.didi.virtualapk.MainActivity&quot; -a android.intent.action.MAIN -c android.intent.category.LAUNCHER</span><br><span class="line">Client not ready yet..Waiting for process to come online</span><br><span class="line">Connected to process 21777 on device samsung-sm_g9500-98895a473737504e42</span><br></pre></td></tr></table></figure></p>
+<h3 id="26-在-AndroidStudio-工程点击-Run-按钮，-实际上做了什么操作呢？"><a href="#26-在-AndroidStudio-工程点击-Run-按钮，-实际上做了什么操作呢？" class="headerlink" title="26. 在 AndroidStudio 工程点击 Run 按钮， 实际上做了什么操作呢？"></a>26. 在 AndroidStudio 工程点击 Run 按钮， 实际上做了什么操作呢？</h3><p><a href="https://www.zhihu.com/question/65289196">知乎的回答</a><br>看下日志就很清晰了</p>
+<pre><code class="text">17:35:33 Executing tasks: [:app:assembleDebug]
+17:35:34 Gradle build finished in 858ms
+
+03/06 15:50:39: Launching app
+$ adb push F:\workspace\clones\AndroidRepo\app\build\outputs\apk\debug\app-debug.apk /data/local/tmp/com.me.harris.myapplication
+$ adb shell pm install -t -r &quot;/data/local/tmp/com.me.harris.myapplication&quot;
+Success
+
+
+$ adb shell am start -n &quot;com.me.harris.myapplication/com.me.harris.myapplication.MainActivity&quot; -a android.intent.action.MAIN -c android.intent.category.LAUNCHER
+Client not ready yet..Waiting for process to come online
+Waiting for process to come online
+Connected to process 16409 on device vivo-vivo_x9-a9c690fb
+Success
+
+$ adb shell am start -n &quot;com.didi.virtualapk/com.didi.virtualapk.MainActivity&quot; -a android.intent.action.MAIN -c android.intent.category.LAUNCHER
+Client not ready yet..Waiting for process to come online
+Connected to process 21777 on device samsung-sm_g9500-98895a473737504e42
+</code></pre>
 <p>简单来说就是gradle installDebug<br> Android Stuido点击build按钮做了什么<a href="https://developer.android.com/studio/build/index.html">Configure Your Build</a></p>
-<h3 id="27-多进程场景下Application的onCreate是会被多次调用的"><a href="#27-多进程场景下Application的onCreate是会被多次调用的" class="headerlink" title="27. 多进程场景下Application的onCreate是会被多次调用的"></a>27. 多进程场景下Application的onCreate是会被多次调用的</h3><p>在Application的onCreate中添加日志<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//正常的Application起来都是1</span></span><br><span class="line">Log.e(<span class="string">"current-process-id is "</span>+android.os.Process.myPid()); <span class="comment">// 1</span></span><br><span class="line">Log.e(<span class="string">"current-thread-id is "</span>+Thread.currentThread().getId()); <span class="comment">// 1</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//在应用内点击按钮起一个process，application的onCreate又被执行了一次</span></span><br><span class="line">Log.e(<span class="string">"current-process-id is "</span>+android.os.Process.myPid()); <span class="comment">// 12055</span></span><br><span class="line">Log.e(<span class="string">"current-thread-id is "</span>+Thread.currentThread().getId()); <span class="comment">// 1</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//这时候看下当前系统中跑的所有进程，这个12055的进程就在这里面</span></span><br><span class="line">ActivityManager mActivityManager = (ActivityManager)<span class="keyword">this</span>.getSystemService(getApplicationContext().ACTIVITY_SERVICE);</span><br><span class="line">        <span class="keyword">for</span> (ActivityManager.RunningAppProcessInfo appProcess : mActivityManager.getRunningAppProcesses()) &#123;</span><br><span class="line">            <span class="keyword">if</span> (appProcess.pid == pid) &#123;</span><br><span class="line">                processNameString = appProcess.processName;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="27-多进程场景下Application的onCreate是会被多次调用的"><a href="#27-多进程场景下Application的onCreate是会被多次调用的" class="headerlink" title="27. 多进程场景下Application的onCreate是会被多次调用的"></a>27. 多进程场景下Application的onCreate是会被多次调用的</h3><p>在Application的onCreate中添加日志</p>
+<pre><code class="java">//正常的Application起来都是1
+Log.e(&quot;current-process-id is &quot;+android.os.Process.myPid()); // 1
+Log.e(&quot;current-thread-id is &quot;+Thread.currentThread().getId()); // 1
+
+//在应用内点击按钮起一个process，application的onCreate又被执行了一次
+Log.e(&quot;current-process-id is &quot;+android.os.Process.myPid()); // 12055
+Log.e(&quot;current-thread-id is &quot;+Thread.currentThread().getId()); // 1
+
+//这时候看下当前系统中跑的所有进程，这个12055的进程就在这里面
+ActivityManager mActivityManager = (ActivityManager)this.getSystemService(getApplicationContext().ACTIVITY_SERVICE);
+        for (ActivityManager.RunningAppProcessInfo appProcess : mActivityManager.getRunningAppProcesses()) {
+            if (appProcess.pid == pid) {
+                processNameString = appProcess.processName;
+            }
+        }
+</code></pre>
 <p>至于原因的话，ActivityThread的handleCreateService方法中有这么一句： Application app = packageInfo.makeApplication(false, mInstrumentation);但是这个不会把MainActivity重新创建一个。</p>
-<p>至于为什么要用多进程，<a href="http://www.infoq.com/cn/articles/wechat-android-background-keep-alive">微信Android客户端后台保活经验分享</a>这篇文章中提到了微信至少用了三个进程，这篇文章还提到Shadowsocks-Android就开了个进程跑C程序来维护代理。记得系统给每个Application分配的内存总量不那么多，可以通过<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Runtime runtime = Runtime.getRuntime();</span><br><span class="line">LogUtil.w(TAG, String.valueOf(toMB(runtime.freeMemory()))); <span class="comment">// 5.79MB</span></span><br><span class="line">LogUtil.w(TAG, String.valueOf(toMB(runtime.totalMemory()))); <span class="comment">//14.13MB</span></span><br><span class="line"> <span class="function"><span class="keyword">private</span> String <span class="title">toMB</span><span class="params">(<span class="keyword">long</span> number)</span> </span>&#123;</span><br><span class="line">         <span class="keyword">return</span> String.format(<span class="string">"%.2f"</span>, number / <span class="number">1024.0</span> / <span class="number">1024.0</span>);</span><br><span class="line">     &#125;</span><br></pre></td></tr></table></figure></p>
+<p>至于为什么要用多进程，<a href="http://www.infoq.com/cn/articles/wechat-android-background-keep-alive">微信Android客户端后台保活经验分享</a>这篇文章中提到了微信至少用了三个进程，这篇文章还提到Shadowsocks-Android就开了个进程跑C程序来维护代理。记得系统给每个Application分配的内存总量不那么多，可以通过   </p>
+<pre><code class="java">Runtime runtime = Runtime.getRuntime();
+LogUtil.w(TAG, String.valueOf(toMB(runtime.freeMemory()))); // 5.79MB
+LogUtil.w(TAG, String.valueOf(toMB(runtime.totalMemory()))); //14.13MB
+ private String toMB(long number) {
+         return String.format(&quot;%.2f&quot;, number / 1024.0 / 1024.0);
+     }
+</code></pre>
 <p>大概也就几十个MB的样子，确实不是很多。多进程下，等于平白多了几十MB的内存，对于缓解性能压力还是有好处的。</p>
 <p><a href="https://stackoverflow.com/questions/4658511/android-how-to-decide-whether-to-run-a-service-in-a-separate-process">大概什么时候就应该开一个多进程呢</a><br>子进程挂了，主进程照样能跑，亲测会出现这样的log</p>
 <blockquote>
@@ -306,9 +558,35 @@ ga('send', 'pageview');
 <blockquote>
 <p>ODEX 文件是 Dalvik 将 DEX 文件中可执行文件——class.dex——文件解压出来后，存储在本地后生成的。因为 Android 系统无法直接运行 APK 文件，需要将其解压后找到 class.dex 文件后才可以运行，因此在安装时就将其取出放在本地，可以提高应用启动速度。除了这个原因，其实在将 class.dex 转换成 ODEX 文件过程中，还根据当前系统进行了优化（直接复制到其他系统不一定可以运行），文件大小会减少，ODEX 文件比 DEX 文件更难反编译，这也在一定程度上提高了安全性，因此在一些系统预装或系统级应用大多采用了 ODEX 优化。<br>一般 ODEX 不直接运行，在 Dalvik 运行 ODEX 时，需要通过 JIT 进行优化，提高运行效率。JIT 是一种在运行时同步将字节码转化成机器码的过程，Dalvik 直接运行转化后的机器码，这会导致部分的内存和时间开销，但是整体来说，在某些情况下是会提高系统性能的。（有些动态编译器，可能根据经验或尝试编译，优化这一过程，可能运行次数越多，优化效果越好）<br>OAT 文件是 ART 运行的文件，是一种二进制可运行文件，包含 DEX 文件和编译出的本地机器指令文件，其文件格式类似于网络数据报文，包含文件头和文件体，文件头的 oatdata、oatexec 和 oatlastword 字段分别描述 DEX 文件位置和本地机器指令的起止位置。因为 OAT 文件包含 DEX 文件，因此比 ODEX 文件占用空间更大，由于其在安装时经过了 ART 的处理，ART 加载 OAT 文件后不需要经过处理就可以直接运行，它没有了从字节码装换成机器码的过程，因此运行速度更快。可以理解为 JIT 从运行时才解析提前到了安装时解析，安装变慢，运行变快。</p>
 </blockquote>
-<p>再仔细一点挖掘的话，找到这样一篇<a href="https://blog.csdn.net/zhiyuan263287/article/details/21033309">文章</a><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">connect</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">    <span class="keyword">if</span> (mSocket != <span class="keyword">null</span>) &#123;  </span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;  </span><br><span class="line">    &#125;  </span><br><span class="line">    Slog.i(TAG, <span class="string">"connecting..."</span>);  </span><br><span class="line">    <span class="keyword">try</span> &#123;  </span><br><span class="line">        mSocket = <span class="keyword">new</span> LocalSocket();  </span><br><span class="line"></span><br><span class="line">        LocalSocketAddress address = <span class="keyword">new</span> LocalSocketAddress(<span class="string">"installd"</span>,  </span><br><span class="line">                LocalSocketAddress.Namespace.RESERVED);  </span><br><span class="line"></span><br><span class="line">        mSocket.connect(address);  </span><br><span class="line"></span><br><span class="line">        mIn = mSocket.getInputStream();  </span><br><span class="line">        mOut = mSocket.getOutputStream();  </span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException ex) &#123;  </span><br><span class="line">        disconnect();  </span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;  </span><br><span class="line">    &#125;  </span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>再仔细一点挖掘的话，找到这样一篇<a href="https://blog.csdn.net/zhiyuan263287/article/details/21033309">文章</a></p>
+<pre><code class="java">private boolean connect() {  
+    if (mSocket != null) {  
+        return true;  
+    }  
+    Slog.i(TAG, &quot;connecting...&quot;);  
+    try {  
+        mSocket = new LocalSocket();  
+
+        LocalSocketAddress address = new LocalSocketAddress(&quot;installd&quot;,  
+                LocalSocketAddress.Namespace.RESERVED);  
+
+        mSocket.connect(address);  
+
+        mIn = mSocket.getInputStream();  
+        mOut = mSocket.getOutputStream();  
+    } catch (IOException ex) {  
+        disconnect();  
+        return false;  
+    }  
+    return true;  
+}
+</code></pre>
 <p>显然是通过socket通信的，应用程序的安装与卸载并非PackageManagerService来完成，而是通过PackageManagerService来访问installd服务来执行程序包的安装与卸载的。</p>
-<p>installd是通过init.rc在系统启动时就开始运行的服务，installd进程是用c写的，这里面也是写了一个循环在跑的server:<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (;;) &#123;  </span><br><span class="line">  s = accept(lsocket, &amp;addr, &amp;alen);  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>installd是通过init.rc在系统启动时就开始运行的服务，installd进程是用c写的，这里面也是写了一个循环在跑的server:</p>
+<pre><code class="c">for (;;) {  
+  s = accept(lsocket, &amp;addr, &amp;alen);  
+}
+</code></pre>
 <h3 id="29-Android的动画分为Animation和Animator实现"><a href="#29-Android的动画分为Animation和Animator实现" class="headerlink" title="29.Android的动画分为Animation和Animator实现"></a>29.Android的动画分为Animation和Animator实现</h3><p><a href="Animation">android 动画原理</a>.<br>ObjectAnimator和ValueAnimator这些东西要记得在页面销毁的时候去cancel或者end。end会通知一声onAnimationUpdate，cancel不会。所以不要在onAnimationUpdate里面调用end -&gt; onAnimationUpdate里面调用end -&gt; onAnimationUpdate里面调用end -&gt; onA….</p>
 <blockquote>
 <p>Fatal Exception: java.lang.StackOverflowError<br>at android.animation.ValueAnimator.getOrCreateAnimationHandler(ValueAnimator.java:1332)</p>
@@ -316,8 +594,13 @@ ga('send', 'pageview');
 <h3 id="30-在api24之前，WifiManager存在leak"><a href="#30-在api24之前，WifiManager存在leak" class="headerlink" title="30. 在api24之前，WifiManager存在leak"></a>30. 在api24之前，WifiManager存在leak</h3><blockquote>
 <p>On versions prior to Android N (24), initializing the WifiManager via Context#getSystemService can cause a memory leak if the context is not the application context</p>
 </blockquote>
-<h3 id="31-Android手机显示的电量是从哪读取的？"><a href="#31-Android手机显示的电量是从哪读取的？" class="headerlink" title="31. Android手机显示的电量是从哪读取的？"></a>31. Android手机显示的电量是从哪读取的？</h3><p>batterystats.bin不是用来做电池校正的。<br>2012年1月13日，DianneHackborn在G+上给出了答案：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Today&apos;s myth debunking:</span><br><span class="line"></span><br><span class="line">&quot;The battery indicator in the status/notification bar is a reflection of the batterystats.bin file in the data/system/ directory.&quot;</span><br><span class="line"></span><br><span class="line">No, it does not.</span><br></pre></td></tr></table></figure></p>
-<p>这个文件只是用来显示“设置”里面App耗电量的,across reboot。<br><a href="http://www.cnblogs.com/hyddd/p/4402621.html">深入浅出Android App耗电量统计</a>这篇文章指出，实际读取的文件位置由OEM厂商决定，<a href="https://source.android.com/devices/tech/power/#power-values">官方文档</a></p>
+<h3 id="31-Android手机显示的电量是从哪读取的？"><a href="#31-Android手机显示的电量是从哪读取的？" class="headerlink" title="31. Android手机显示的电量是从哪读取的？"></a>31. Android手机显示的电量是从哪读取的？</h3><p>batterystats.bin不是用来做电池校正的。<br>2012年1月13日，DianneHackborn在G+上给出了答案：</p>
+<pre><code>Today&#39;s myth debunking:
+
+&quot;The battery indicator in the status/notification bar is a reflection of the batterystats.bin file in the data/system/ directory.&quot;
+
+No, it does not.
+</code></pre><p>这个文件只是用来显示“设置”里面App耗电量的,across reboot。<br><a href="http://www.cnblogs.com/hyddd/p/4402621.html">深入浅出Android App耗电量统计</a>这篇文章指出，实际读取的文件位置由OEM厂商决定，<a href="https://source.android.com/devices/tech/power/#power-values">官方文档</a></p>
 <blockquote>
 <p>device///frameworks/base/core/res/res/xml/power_profile.xml 这个文件</p>
 </blockquote>
@@ -325,21 +608,88 @@ ga('send', 'pageview');
 <blockquote>
 <p>adb shell dumpsys batterystats</p>
 </blockquote>
-<h3 id="32-多进程SharedPreference读写使用ContentProvider就好了"><a href="#32-多进程SharedPreference读写使用ContentProvider就好了" class="headerlink" title="32. 多进程SharedPreference读写使用ContentProvider就好了"></a>32. 多进程SharedPreference读写使用ContentProvider就好了</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> SharedPreferences <span class="title">getSharedPreferences</span><span class="params">(String name, @PreferencesMode <span class="keyword">int</span> mode)</span></span>;</span><br><span class="line"><span class="comment">//默认传进来的是MODE_PRIVATE，</span></span><br><span class="line"><span class="comment">// MODE_MULTI_PROCESS 其实不能保证</span></span><br></pre></td></tr></table></figure>
-<p>所以一般的做法是利用ContentProvider去IPC。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">getContentResolver().getType()  <span class="comment">//客户端发起请求</span></span><br><span class="line"></span><br><span class="line">provider的getType方法中返回对应的String，一次IPC来回</span><br></pre></td></tr></table></figure></p>
-<p>打断点发现provider进程会走到execTransact -&gt; onTransact -&gt; query方法。这期间client被挂起，远程方法返回之后client方法继续执行。客户端发送请求后，会被挂起，所以如果长时间不返回，当前线程会一直阻塞，所以要在子线程发送异步请求。<br>写contentProvider的套路基本就是<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String AUTHORITY = <span class="string">"com.me.book.provider"</span>; <span class="comment">// 与AndroidManifest保持一致</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Uri BOOK_CONTENT_URI = Uri.parse(<span class="string">"content://"</span> + AUTHORITY + <span class="string">"/book"</span>);</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Uri USER_CONTENT_URI = Uri.parse(<span class="string">"content://"</span> + AUTHORITY + <span class="string">"/user"</span>);</span><br></pre></td></tr></table></figure></p>
+<h3 id="32-多进程SharedPreference读写使用ContentProvider就好了"><a href="#32-多进程SharedPreference读写使用ContentProvider就好了" class="headerlink" title="32. 多进程SharedPreference读写使用ContentProvider就好了"></a>32. 多进程SharedPreference读写使用ContentProvider就好了</h3><pre><code class="java">public abstract SharedPreferences getSharedPreferences(String name, @PreferencesMode int mode);
+//默认传进来的是MODE_PRIVATE，
+// MODE_MULTI_PROCESS 其实不能保证
+</code></pre>
+<p>所以一般的做法是利用ContentProvider去IPC。</p>
+<pre><code class="java">getContentResolver().getType()  //客户端发起请求
+
+provider的getType方法中返回对应的String，一次IPC来回
+</code></pre>
+<p>打断点发现provider进程会走到execTransact -&gt; onTransact -&gt; query方法。这期间client被挂起，远程方法返回之后client方法继续执行。客户端发送请求后，会被挂起，所以如果长时间不返回，当前线程会一直阻塞，所以要在子线程发送异步请求。<br>写contentProvider的套路基本就是</p>
+<pre><code class="java">    public static final String AUTHORITY = &quot;com.me.book.provider&quot;; // 与AndroidManifest保持一致
+    public static final Uri BOOK_CONTENT_URI = Uri.parse(&quot;content://&quot; + AUTHORITY + &quot;/book&quot;);
+    public static final Uri USER_CONTENT_URI = Uri.parse(&quot;content://&quot; + AUTHORITY + &quot;/user&quot;);
+</code></pre>
 <p>数据库的位置是放在/data/data/com.packagename.applicationName/databases里<br>/data/data/com.packagename.applicationName/这个文件夹里一共四个文件夹，cache, code_cache(dex), files,databases</p>
 <p>好像7.0之后sharedPreference的存储的位置挪到了<br>“/data/data/应用程序包/shared_prefs”这里</p>
 <h3 id="33-Activity的生命周期一直是一个很重要的话题"><a href="#33-Activity的生命周期一直是一个很重要的话题" class="headerlink" title="33. Activity的生命周期一直是一个很重要的话题"></a>33. Activity的生命周期一直是一个很重要的话题</h3><p>A start B forResult , B回来之后A被系统干掉了怎么办？<br>回来的时候A已经不是原来的A，所以要在onSaveInstance和onRestoreInstance中维护数据</p>
-<h3 id="34-集成微信登录，微信如何和App通信的？"><a href="#34-集成微信登录，微信如何和App通信的？" class="headerlink" title="34. 集成微信登录，微信如何和App通信的？"></a>34. 集成微信登录，微信如何和App通信的？</h3><p>WXEntryActivity一般是这样的:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WXEntryActivity</span> <span class="keyword">extends</span> <span class="title">Activity</span> <span class="keyword">implements</span> <span class="title">IWXAPIEventHandler</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> IWXAPI api;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">       api = WXAPIFactory.createWXAPI(<span class="keyword">this</span>, mWXAppKey);</span><br><span class="line">       api.handleIntent(getIntent(), <span class="keyword">this</span>);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onResp</span><span class="params">(BaseResp resp)</span> </span>&#123;</span><br><span class="line">     <span class="keyword">switch</span> (resp.errCode) &#123;</span><br><span class="line">       <span class="keyword">case</span> BaseResp.ErrCode.ERR_OK:</span><br><span class="line">       <span class="keyword">break</span>;</span><br><span class="line">     &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// api.handleIntent(getIntent(), this); 这里面的实现如下：</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">handleIntent</span><span class="params">(Intent var1, IWXAPIEventHandler var2)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">try</span> &#123;</span><br><span class="line">           <span class="keyword">int</span> var16 = var1.getIntExtra(<span class="string">"_wxapi_command_type"</span>, <span class="number">0</span>); <span class="comment">//这里其实已经跑在当前App的进程了</span></span><br><span class="line">           <span class="keyword">switch</span>(var16) &#123;</span><br><span class="line">           <span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">               Resp var23 = <span class="keyword">new</span> Resp(var1.getExtras());</span><br><span class="line">               var2.onResp(var23); <span class="comment">// 直接调用WXEntryActivity中的onResp方法</span></span><br><span class="line">               <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">           <span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">               com.tencent.mm.opensdk.modelmsg.SendMessageToWX.Resp var22 = <span class="keyword">new</span> com.tencent.mm.opensdk.modelmsg.SendMessageToWX.Resp(var1.getExtras());</span><br><span class="line">               var2.onResp(var22);</span><br><span class="line">               <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">          <span class="comment">// ......</span></span><br><span class="line">        &#125;  </span><br><span class="line">      &#125;    </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
-<p>再结合xml中的exported = true ;<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">activity</span></span></span><br><span class="line"><span class="tag">         <span class="attr">android:name</span>=<span class="string">".wxapi.WXEntryActivity"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">android:exported</span>=<span class="string">"true"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">android:launchMode</span>=<span class="string">"singleTop"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">android:theme</span>=<span class="string">"@android:style/Theme.Translucent"</span> /&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="34-集成微信登录，微信如何和App通信的？"><a href="#34-集成微信登录，微信如何和App通信的？" class="headerlink" title="34. 集成微信登录，微信如何和App通信的？"></a>34. 集成微信登录，微信如何和App通信的？</h3><p>WXEntryActivity一般是这样的:</p>
+<pre><code class="java">public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
+    private IWXAPI api;
+
+    @Override
+   public void onCreate(Bundle savedInstanceState) {
+       super.onCreate(savedInstanceState);
+       api = WXAPIFactory.createWXAPI(this, mWXAppKey);
+       api.handleIntent(getIntent(), this);
+   }
+
+   @Override
+  public void onResp(BaseResp resp) {
+     switch (resp.errCode) {
+       case BaseResp.ErrCode.ERR_OK:
+       break;
+     }
+  }
+}
+
+
+// api.handleIntent(getIntent(), this); 这里面的实现如下：
+public final boolean handleIntent(Intent var1, IWXAPIEventHandler var2) {
+       try {
+           int var16 = var1.getIntExtra(&quot;_wxapi_command_type&quot;, 0); //这里其实已经跑在当前App的进程了
+           switch(var16) {
+           case 1:
+               Resp var23 = new Resp(var1.getExtras());
+               var2.onResp(var23); // 直接调用WXEntryActivity中的onResp方法
+               return true;
+           case 2:
+               com.tencent.mm.opensdk.modelmsg.SendMessageToWX.Resp var22 = new com.tencent.mm.opensdk.modelmsg.SendMessageToWX.Resp(var1.getExtras());
+               var2.onResp(var22);
+               return true;
+          // ......
+        }  
+      }    
+    }
+</code></pre>
+<p>再结合xml中的exported = true ;</p>
+<pre><code class="xml">&lt;activity
+         android:name=&quot;.wxapi.WXEntryActivity&quot;
+         android:exported=&quot;true&quot;
+         android:launchMode=&quot;singleTop&quot;
+         android:theme=&quot;@android:style/Theme.Translucent&quot; /&gt;
+</code></pre>
 <p>猜测是通过Intent直接设置component发送请求，传递数据，很正规的实现</p>
 <h3 id="35-多进程虚拟机都是单独的"><a href="#35-多进程虚拟机都是单独的" class="headerlink" title="35. 多进程虚拟机都是单独的"></a>35. 多进程虚拟机都是单独的</h3><p>Android为每个应用都分配了一个独立的虚拟机(VM)，确切说是为每个进程都分配了一个独立的虚拟机，不同的虚拟机在内存分配上有不同的地址空间，这样在不同的虚拟机(即进程)中访问同一个类的对象时就会产生多份副本，而这些副本之间也是相互独立，互不影响的。</p>
 <h3 id="36-Parcelable-与-Serializable-区别"><a href="#36-Parcelable-与-Serializable-区别" class="headerlink" title="36. Parcelable 与 Serializable 区别"></a>36. Parcelable 与 Serializable 区别</h3><p>Serializable的设计初衷是为了序列化对象到本地文件、数据库、网络流、RMI以便数据传输，当然这种传输可以是程序内的也可以是两个程序间的。而Android的Parcelable的设计初衷是由于Serializable效率过低，消耗大，而android中数据传递主要是在内存环境中（内存属于android中的稀有资源），因此Parcelable的出现为了满足数据在内存中低开销而且高效地传递问题。<br>Parcelable的性能比Serializable好，在内存开销方面较小，所以Android应用程序在内存间数据传输时推荐使用Parcelable，如activity间传输数据和AIDL数据传递，而Serializable将数据持久化的操作方便，因此在将对象序列化到存储设置中或将对象序列化后通过网络传输时建议选择Serializable（Parcelable也是可以，只不过实现和操作过程过于麻烦并且为了防止android版本不同而导致Parcelable可能不同的情况，因此在序列化到存储设备或者网络传输方面还是尽量选择Serializable接口）。<br> 无论是Parcelable还是Serializable，执行反序列操作后的对象都是新创建的，与原来的对象并不相同，只不过内容一样罢了。<br><a href="https://blog.csdn.net/justin_1107/article/details/72903006">详细介绍Android中Parcelable的原理和使用方法</a><br>Parcelable基本上是将对象映射成一个Parcel对象，提供了两者之间转换的函数，Parcel对象可以被写进共享内存。跨进程直接使用。<br>Serializable在恢复一个Object的时候是去使用ObjecInputStream的readObject方法，这里面调用了newInstance方法，反射，性能当然会差一点。</p>
 <blockquote>
 <p>3.Parcelable与Serializable的性能比较<br>首先Parcelable的性能要强于Serializable的原因我需要简单的阐述一下<br>  1）. 在内存的使用中,前者在性能方面要强于后者<br>  2）. 后者在序列化操作的时候会产生大量的临时变量,(原因是使用了反射机制)从而导致GC的频繁调用,因此在性能上会稍微逊色<br>  3）. Parcelable是以Ibinder作为信息载体的.在内存上的开销比较小,因此在内存之间进行数据传递的时候,Android推荐使用Parcelable,既然是内存方面比价有优势,那么自然就要优先选择.<br>  4）. 在读写数据的时候,Parcelable是在内存中直接进行读写,而Serializable是通过使用IO流的形式将数据读写入在硬盘上.<br>  但是：虽然Parcelable的性能要强于Serializable,但是仍然有特殊的情况需要使用Serializable,而不去使用Parcelable,因为Parcelable无法将数据进行持久化,因此在将数据保存在磁盘的时候,仍然需要使用后者,因为前者无法很好的将数据进行持久化.(原因是在不同的Android版本当中,Parcelable可能会不同,因此数据的持久化方面仍然是使用Serializable)</p>
 </blockquote>
-<h3 id="37-WebView的statusCode的获取"><a href="#37-WebView的statusCode的获取" class="headerlink" title="37.WebView的statusCode的获取"></a>37.WebView的statusCode的获取</h3><p><a href="https://stackoverflow.com/questions/45659618/http-status-code-webview-android-webviewclient?rq=1">来自stackoverFlow</a><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@TargetApi</span>(Build.VERSION_CODES.M)</span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onReceivedError</span><span class="params">(WebView view, WebResourceRequest req, WebResourceError rerr)</span> </span>&#123;</span><br><span class="line">      onReceivedError(view, rerr.getErrorCode(), rerr.getDescription().toString(), req.getUrl().toString());</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@SuppressWarnings</span>(<span class="string">"deprecation"</span>)</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onReceivedError</span><span class="params">(WebView view, <span class="keyword">int</span> errorCode, String description, String failingUrl)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (errorCode == -<span class="number">14</span>) <span class="comment">// -14 is error for file not found, like 404.</span></span><br><span class="line">          view.loadUrl(<span class="string">"http://youriphost"</span>);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="37-WebView的statusCode的获取"><a href="#37-WebView的statusCode的获取" class="headerlink" title="37.WebView的statusCode的获取"></a>37.WebView的statusCode的获取</h3><p><a href="https://stackoverflow.com/questions/45659618/http-status-code-webview-android-webviewclient?rq=1">来自stackoverFlow</a></p>
+<pre><code class="java">@TargetApi(Build.VERSION_CODES.M)
+  @Override
+  public void onReceivedError(WebView view, WebResourceRequest req, WebResourceError rerr) {
+      onReceivedError(view, rerr.getErrorCode(), rerr.getDescription().toString(), req.getUrl().toString());
+  }
+
+  @SuppressWarnings(&quot;deprecation&quot;)
+  public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+      if (errorCode == -14) // -14 is error for file not found, like 404.
+          view.loadUrl(&quot;http://youriphost&quot;);
+  }
+</code></pre>
 
       
 

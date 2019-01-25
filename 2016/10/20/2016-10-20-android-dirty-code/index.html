@@ -17,7 +17,7 @@
 <meta property="og:description" content="今天在V2EX上看到有人提到Notification有漏洞，好奇也就查了一下，结果发现有人专门针对这个问题进行了分析。本身的技术分析并不多，写在这里只是为了作为今后的一个参考。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/blaming_the_user.png">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.031Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.173Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="让service常驻后台的方法">
 <meta name="twitter:description" content="今天在V2EX上看到有人提到Notification有漏洞，好奇也就查了一下，结果发现有人专门针对这个问题进行了分析。本身的技术分析并不多，写在这里只是为了作为今后的一个参考。">
@@ -209,12 +209,101 @@ ga('send', 'pageview');
 <li>后台进程</li>
 <li>空进程</li>
 </ul>
-<p>越靠前的进程就越不容易被系统干掉，所以大家都希望能够成为前台进程。成为前台进程的条件:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">用户当前操作所必需的进程。如果一个进程满足以下任一条件，即视为前台进程：</span><br><span class="line">托管用户正在交互的 Activity（已调用 Activity 的 onResume() 方法）</span><br><span class="line">托管某个 Service，后者绑定到用户正在交互的 Activity</span><br><span class="line">托管正在“前台”运行的 Service（服务已调用 startForeground()）</span><br><span class="line">托管正执行一个生命周期回调的 Service（onCreate()、onStart() 或 onDestroy()）</span><br><span class="line">托管正执行其 onReceive() 方法的 BroadcastReceiver</span><br><span class="line">通常，在任意给定时间前台进程都为数不多。只有在内在不足以支持它们同时继续运行这一万不得已的情况下，系统才会终止它们。 此时，设备往往已达到内存分页状态，因此需要终止一些前台进程来确保用户界面正常响应。</span><br></pre></td></tr></table></figure></p>
-<p>以上条件只有startForeground满足条件了，但大家都知道startForeground会在通知栏常驻一个Notification，且用户取消不了。对于我这种强迫症来说实在是太丑。</p>
-<h3 id="2-startForeground一定会在系统状态栏显示一个通知，真的吗"><a href="#2-startForeground一定会在系统状态栏显示一个通知，真的吗" class="headerlink" title="2. startForeground一定会在系统状态栏显示一个通知，真的吗?"></a>2. startForeground一定会在系统状态栏显示一个通知，真的吗?</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">startForeground</span> <span class="params">(<span class="keyword">int</span> id,</span></span></span><br><span class="line"><span class="function"><span class="params">                Notification notification)</span></span></span><br></pre></td></tr></table></figure>
-<p>我找到了G+上的Chris Banes的一篇<a href="https://plus.google.com/+AndroidDevelopers/posts/NEPWzPwSruR">post</a>，这其中明确指出<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Unfortunately there are a number of applications on Google Play which are using the startForeground() API without passing a valid notification. While this worked in previous versions of Android, it is a loophole which has been fixed in Android 4.3. The system now displays a notifications for you automatically if you do not provide a valid one.</span><br></pre></td></tr></table></figure></p>
-<p>也就是说，API 18以前，只需要提供一个无效的Notification就可以让Notification不显示了。所以，判断下API&lt;18的时候，直接new Notification()就可以得到一个不完整的Notification.<br>文章也指出了这是一个Loophole（已经是个贬义词了）。<br>Api 18之后的修复措施，看<a href="https://android.googlesource.com/platform/frameworks/base.git/+/android-4.3_r2.1/services/java/com/android/server/am/ServiceRecord.java">ServiceRecord的源码</a>:</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">postNotification</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> appUid = appInfo.uid;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> appPid = app.pid;</span><br><span class="line">        <span class="keyword">if</span> (foregroundId != <span class="number">0</span> &amp;&amp; foregroundNoti != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// Do asynchronous communication with notification manager to</span></span><br><span class="line">            <span class="comment">// avoid deadlocks.</span></span><br><span class="line">            <span class="keyword">final</span> String localPackageName = packageName;</span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">int</span> localForegroundId = foregroundId;</span><br><span class="line">            <span class="keyword">final</span> Notification localForegroundNoti = foregroundNoti;</span><br><span class="line">            ams.mHandler.post(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                    NotificationManagerService nm =</span><br><span class="line">                            (NotificationManagerService) NotificationManager.getService();</span><br><span class="line">                    <span class="keyword">if</span> (nm == <span class="keyword">null</span>) &#123;</span><br><span class="line">                        <span class="keyword">return</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        <span class="keyword">if</span> (localForegroundNoti.icon == <span class="number">0</span>) &#123;</span><br><span class="line">                            <span class="comment">// It is not correct for the caller to supply a notification</span></span><br><span class="line">                            <span class="comment">// icon, but this used to be able to slip through, so for</span></span><br><span class="line">                            <span class="comment">// those dirty apps give it the app's icon.</span></span><br><span class="line">                            localForegroundNoti.icon = appInfo.icon;</span><br><span class="line">                            <span class="comment">// Do not allow apps to present a sneaky invisible content view either.</span></span><br><span class="line">                            localForegroundNoti.contentView = <span class="keyword">null</span>;</span><br><span class="line">                            localForegroundNoti.bigContentView = <span class="keyword">null</span>;</span><br><span class="line">                            CharSequence appName = appInfo.loadLabel(</span><br><span class="line">                                    ams.mContext.getPackageManager());</span><br><span class="line">                            <span class="keyword">if</span> (appName == <span class="keyword">null</span>) &#123;</span><br><span class="line">                                appName = appInfo.packageName;</span><br><span class="line">                            &#125;</span><br><span class="line">                            Context ctx = <span class="keyword">null</span>;</span><br><span class="line">                            <span class="keyword">try</span> &#123;</span><br><span class="line">                                ctx = ams.mContext.createPackageContext(</span><br><span class="line">                                        appInfo.packageName, <span class="number">0</span>);</span><br><span class="line">                                Intent runningIntent = <span class="keyword">new</span> Intent(</span><br><span class="line">                                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS);</span><br><span class="line">                                runningIntent.setData(Uri.fromParts(<span class="string">"package"</span>,</span><br><span class="line">                                        appInfo.packageName, <span class="keyword">null</span>));</span><br><span class="line">                                PendingIntent pi = PendingIntent.getActivity(ams.mContext, <span class="number">0</span>,</span><br><span class="line">                                        runningIntent, PendingIntent.FLAG_UPDATE_CURRENT);</span><br><span class="line">                                localForegroundNoti.setLatestEventInfo(ctx,</span><br><span class="line">                                        ams.mContext.getString(</span><br><span class="line">                                                com.android.internal.R.string</span><br><span class="line">                                                        .app_running_notification_title,</span><br><span class="line">                                                appName),</span><br><span class="line">                                        ams.mContext.getString(</span><br><span class="line">                                                com.android.internal.R.string</span><br><span class="line">                                                        .app_running_notification_text,</span><br><span class="line">                                                appName),</span><br><span class="line">                                        pi);</span><br><span class="line">                            &#125; <span class="keyword">catch</span> (PackageManager.NameNotFoundException e) &#123;</span><br><span class="line">                                localForegroundNoti.icon = <span class="number">0</span>;</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="keyword">if</span> (localForegroundNoti.icon == <span class="number">0</span>) &#123;</span><br><span class="line">                            <span class="comment">// Notifications whose icon is 0 are defined to not show</span></span><br><span class="line">                            <span class="comment">// a notification, silently ignoring it.  We don't want to</span></span><br><span class="line">                            <span class="comment">// just ignore it, we want to prevent the service from</span></span><br><span class="line">                            <span class="comment">// being foreground.</span></span><br><span class="line">                            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"icon must be non-zero"</span>);</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="keyword">int</span>[] outId = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">1</span>];</span><br><span class="line">                        nm.enqueueNotificationInternal(localPackageName, localPackageName,</span><br><span class="line">                                appUid, appPid, <span class="keyword">null</span>, localForegroundId, localForegroundNoti,</span><br><span class="line">                                outId, userId);</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (RuntimeException e) &#123;</span><br><span class="line">                        Slog.w(ActivityManagerService.TAG,</span><br><span class="line">                                <span class="string">"Error showing notification for service"</span>, e);</span><br><span class="line">                        <span class="comment">// If it gave us a garbage notification, it doesn't</span></span><br><span class="line">                        <span class="comment">// get to be foreground.</span></span><br><span class="line">                        ams.setServiceForeground(name, ServiceRecord.<span class="keyword">this</span>,</span><br><span class="line">                                <span class="number">0</span>, <span class="keyword">null</span>, <span class="keyword">true</span>);</span><br><span class="line">                        ams.crashApplication(appUid, appPid, localPackageName,</span><br><span class="line">                                <span class="string">"Bad notification for startForeground: "</span> + e);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>越靠前的进程就越不容易被系统干掉，所以大家都希望能够成为前台进程。成为前台进程的条件:</p>
+<pre><code>用户当前操作所必需的进程。如果一个进程满足以下任一条件，即视为前台进程：
+托管用户正在交互的 Activity（已调用 Activity 的 onResume() 方法）
+托管某个 Service，后者绑定到用户正在交互的 Activity
+托管正在“前台”运行的 Service（服务已调用 startForeground()）
+托管正执行一个生命周期回调的 Service（onCreate()、onStart() 或 onDestroy()）
+托管正执行其 onReceive() 方法的 BroadcastReceiver
+通常，在任意给定时间前台进程都为数不多。只有在内在不足以支持它们同时继续运行这一万不得已的情况下，系统才会终止它们。 此时，设备往往已达到内存分页状态，因此需要终止一些前台进程来确保用户界面正常响应。
+</code></pre><p>以上条件只有startForeground满足条件了，但大家都知道startForeground会在通知栏常驻一个Notification，且用户取消不了。对于我这种强迫症来说实在是太丑。</p>
+<h3 id="2-startForeground一定会在系统状态栏显示一个通知，真的吗"><a href="#2-startForeground一定会在系统状态栏显示一个通知，真的吗" class="headerlink" title="2. startForeground一定会在系统状态栏显示一个通知，真的吗?"></a>2. startForeground一定会在系统状态栏显示一个通知，真的吗?</h3><pre><code class="java">void startForeground (int id,
+                Notification notification)
+</code></pre>
+<p>我找到了G+上的Chris Banes的一篇<a href="https://plus.google.com/+AndroidDevelopers/posts/NEPWzPwSruR">post</a>，这其中明确指出</p>
+<pre><code>Unfortunately there are a number of applications on Google Play which are using the startForeground() API without passing a valid notification. While this worked in previous versions of Android, it is a loophole which has been fixed in Android 4.3. The system now displays a notifications for you automatically if you do not provide a valid one.
+</code></pre><p>也就是说，API 18以前，只需要提供一个无效的Notification就可以让Notification不显示了。所以，判断下API&lt;18的时候，直接new Notification()就可以得到一个不完整的Notification.<br>文章也指出了这是一个Loophole（已经是个贬义词了）。<br>Api 18之后的修复措施，看<a href="https://android.googlesource.com/platform/frameworks/base.git/+/android-4.3_r2.1/services/java/com/android/server/am/ServiceRecord.java">ServiceRecord的源码</a>:</p>
+<pre><code class="java">public void postNotification() {
+        final int appUid = appInfo.uid;
+        final int appPid = app.pid;
+        if (foregroundId != 0 &amp;&amp; foregroundNoti != null) {
+            // Do asynchronous communication with notification manager to
+            // avoid deadlocks.
+            final String localPackageName = packageName;
+            final int localForegroundId = foregroundId;
+            final Notification localForegroundNoti = foregroundNoti;
+            ams.mHandler.post(new Runnable() {
+                public void run() {
+                    NotificationManagerService nm =
+                            (NotificationManagerService) NotificationManager.getService();
+                    if (nm == null) {
+                        return;
+                    }
+                    try {
+                        if (localForegroundNoti.icon == 0) {
+                            // It is not correct for the caller to supply a notification
+                            // icon, but this used to be able to slip through, so for
+                            // those dirty apps give it the app&#39;s icon.
+                            localForegroundNoti.icon = appInfo.icon;
+                            // Do not allow apps to present a sneaky invisible content view either.
+                            localForegroundNoti.contentView = null;
+                            localForegroundNoti.bigContentView = null;
+                            CharSequence appName = appInfo.loadLabel(
+                                    ams.mContext.getPackageManager());
+                            if (appName == null) {
+                                appName = appInfo.packageName;
+                            }
+                            Context ctx = null;
+                            try {
+                                ctx = ams.mContext.createPackageContext(
+                                        appInfo.packageName, 0);
+                                Intent runningIntent = new Intent(
+                                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                runningIntent.setData(Uri.fromParts(&quot;package&quot;,
+                                        appInfo.packageName, null));
+                                PendingIntent pi = PendingIntent.getActivity(ams.mContext, 0,
+                                        runningIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                                localForegroundNoti.setLatestEventInfo(ctx,
+                                        ams.mContext.getString(
+                                                com.android.internal.R.string
+                                                        .app_running_notification_title,
+                                                appName),
+                                        ams.mContext.getString(
+                                                com.android.internal.R.string
+                                                        .app_running_notification_text,
+                                                appName),
+                                        pi);
+                            } catch (PackageManager.NameNotFoundException e) {
+                                localForegroundNoti.icon = 0;
+                            }
+                        }
+                        if (localForegroundNoti.icon == 0) {
+                            // Notifications whose icon is 0 are defined to not show
+                            // a notification, silently ignoring it.  We don&#39;t want to
+                            // just ignore it, we want to prevent the service from
+                            // being foreground.
+                            throw new RuntimeException(&quot;icon must be non-zero&quot;);
+                        }
+                        int[] outId = new int[1];
+                        nm.enqueueNotificationInternal(localPackageName, localPackageName,
+                                appUid, appPid, null, localForegroundId, localForegroundNoti,
+                                outId, userId);
+                    } catch (RuntimeException e) {
+                        Slog.w(ActivityManagerService.TAG,
+                                &quot;Error showing notification for service&quot;, e);
+                        // If it gave us a garbage notification, it doesn&#39;t
+                        // get to be foreground.
+                        ams.setServiceForeground(name, ServiceRecord.this,
+                                0, null, true);
+                        ams.crashApplication(appUid, appPid, localPackageName,
+                                &quot;Bad notification for startForeground: &quot; + e);
+                    }
+                }
+            });
+        }
+    }
+</code></pre>
 <p>单单是看注释大概能看出来Android团队对于这种做法的不满。所以如果不提供有效Notification，则显示你的App的Icon。所以Api 18以上一定会显示一个Notification。</p>
 <p>然而套路还是太深。。。。又有人给出了API 18以上的解决办法:<br>我在<a href="http://blog.csdn.net/wxx614817/article/details/50669420">这里</a>找到了新的方法，简单来说就是起两个Service，两个Service都在一个进程里。<br>先Start A Service ，onCreate里面 bind B Service，<br>在onServiceConnected的时候A service startForeground(processId,notification)<br>B service startForeground(processId,notification)<br>随后立即调用B service stopForeGround(true)<br>由于两个Notification具有相同的id，所以A service最终成为Foreground Service，Notification也被清除掉了。</p>
 <h3 id="3-最后"><a href="#3-最后" class="headerlink" title="3.最后"></a>3.最后</h3><p>整个过程看下来，API 18以下，给一个不完整的Notification(比如new Notification())，就不会出现在通知栏；API 18以上，起两个Service，B Service负责取消Notification就可以了。<br>目前看来，国内很多App为了保活，都采取了类似的方式。<br>而整体技术层面的实现并不难，只是利用了一个又一个小漏洞罢了。<br>所谓脏代码不过是技术上做的一些欺骗系统的手段，作为开发者，理应明白谷歌设计这一套系统是为了更好的提升用户体验（占据市场）。然而在当前国内应用开发环境下，我们真的能够为用户考虑考虑吗，或者说，我们提交的代码能吗？</p>

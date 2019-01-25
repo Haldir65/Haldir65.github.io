@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/46ee54dd915d71da90e435703d4568fb.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/Googling-the-Error-Message.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.031Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.173Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Python 3 学习记录">
 <meta name="twitter:description" content="人生苦短，Python是岸">
@@ -209,44 +209,213 @@ ga('send', 'pageview');
 <p>第二个缺点就是代码不能加密</p>
 <p>GIL导致的多线程低效率</p>
 </blockquote>
-<p>以下内容出自<a href="http://cuiqingcai.com/3325.html">静觅 » Python爬虫进阶五之多线程的用法</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">1、GIL是什么？</span><br><span class="line"></span><br><span class="line">GIL的全称是Global Interpreter Lock(全局解释器锁)，来源是python设计之初的考虑，为了数据安全所做的决定。</span><br><span class="line"></span><br><span class="line">2、每个CPU在同一时间只能执行一个线程（在单核CPU下的多线程其实都只是并发，不是并行，并发和并行从宏观上来讲都是同时处理多路请求的概念。但并发和并行又有区别，并行是指两个或者多个事件在同一时刻发生；而并发是指两个或多个事件在同一时间间隔内发生。）</span><br><span class="line"></span><br><span class="line">在Python多线程下，每个线程的执行方式：</span><br><span class="line"></span><br><span class="line">获取GIL</span><br><span class="line">执行代码直到sleep或者是python虚拟机将其挂起。</span><br><span class="line">释放GIL</span><br><span class="line">可见，某个线程想要执行，必须先拿到GIL，我们可以把GIL看作是“通行证”，并且在一个python进程中，GIL只有一个。拿不到通行证的线程，就不允许进入CPU执行。</span><br><span class="line"></span><br><span class="line">在Python2.x里，GIL的释放逻辑是当前线程遇见IO操作或者ticks计数达到100（ticks可以看作是Python自身的一个计数器，专门做用于GIL，每次释放后归零，这个计数可以通过 sys.setcheckinterval 来调整），进行释放。</span><br><span class="line"></span><br><span class="line">而每次释放GIL锁，线程进行锁竞争、切换线程，会消耗资源。并且由于GIL锁存在，python里一个进程永远只能同时执行一个线程(拿到GIL的线程才能执行)，这就是为什么在多核CPU上，python的多线程效率并不高。</span><br></pre></td></tr></table></figure></p>
+<p>以下内容出自<a href="http://cuiqingcai.com/3325.html">静觅 » Python爬虫进阶五之多线程的用法</a></p>
+<pre><code class="text">1、GIL是什么？
+
+GIL的全称是Global Interpreter Lock(全局解释器锁)，来源是python设计之初的考虑，为了数据安全所做的决定。
+
+2、每个CPU在同一时间只能执行一个线程（在单核CPU下的多线程其实都只是并发，不是并行，并发和并行从宏观上来讲都是同时处理多路请求的概念。但并发和并行又有区别，并行是指两个或者多个事件在同一时刻发生；而并发是指两个或多个事件在同一时间间隔内发生。）
+
+在Python多线程下，每个线程的执行方式：
+
+获取GIL
+执行代码直到sleep或者是python虚拟机将其挂起。
+释放GIL
+可见，某个线程想要执行，必须先拿到GIL，我们可以把GIL看作是“通行证”，并且在一个python进程中，GIL只有一个。拿不到通行证的线程，就不允许进入CPU执行。
+
+在Python2.x里，GIL的释放逻辑是当前线程遇见IO操作或者ticks计数达到100（ticks可以看作是Python自身的一个计数器，专门做用于GIL，每次释放后归零，这个计数可以通过 sys.setcheckinterval 来调整），进行释放。
+
+而每次释放GIL锁，线程进行锁竞争、切换线程，会消耗资源。并且由于GIL锁存在，python里一个进程永远只能同时执行一个线程(拿到GIL的线程才能执行)，这就是为什么在多核CPU上，python的多线程效率并不高。
+</code></pre>
 <h3 id="2-安装package各种can’t-resolve-XXX"><a href="#2-安装package各种can’t-resolve-XXX" class="headerlink" title="2. 安装package各种can’t resolve XXX"></a>2. 安装package各种can’t resolve XXX</h3><p><a href="http://stackoverflow.com/questions/2792650/python3-error-import-error-no-module-name-urllib2">no module named urllib2</a></p>
 <blockquote>
 <p>The urllib2 module has been split across several modules in Python 3 named urllib.request and urllib.error. The 2to3 tool will automatically adapt imports when converting your sources to Python 3.</p>
 </blockquote>
 <p>This is what look like on py 2.7</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> urllib2</span><br><span class="line">req = urllib2.Request(url,headers=header)</span><br><span class="line">html = urllib2.urlopen(req)</span><br><span class="line">html_data = html.read</span><br><span class="line">html_path = etree.HTML(html_data)</span><br><span class="line">```   </span><br><span class="line"></span><br><span class="line">on Python <span class="number">3.</span>X</span><br><span class="line">```python</span><br><span class="line"><span class="keyword">from</span> urllib.request <span class="keyword">import</span> urlopen</span><br><span class="line"><span class="keyword">from</span> urllib.request <span class="keyword">import</span> Request</span><br><span class="line"></span><br><span class="line">req = Request(img_url, headers=headers)</span><br><span class="line">urlhtml = urlopen(req)</span><br></pre></td></tr></table></figure>
+<pre><code class="python">import urllib2
+req = urllib2.Request(url,headers=header)
+html = urllib2.urlopen(req)
+html_data = html.read
+html_path = etree.HTML(html_data)
+</code></pre>
+<p>on Python 3.X</p>
+<pre><code class="python">from urllib.request import urlopen
+from urllib.request import Request
+
+req = Request(img_url, headers=headers)
+urlhtml = urlopen(req)
+</code></pre>
 <p>如果是自己写了一个.py文件，调用里面的函数,import的时候要把包路径写完整</p>
 <h3 id="3-pip-install-XXXX"><a href="#3-pip-install-XXXX" class="headerlink" title="3. pip install XXXX"></a>3. pip install XXXX</h3><p>安装package的方式 pip install xxxx….<br>很多包会建议你来一个<br>pip install -U XXX<br>这个U的意思是upgrade if alreay install<br><strong> if not working</strong><br><img src="https://www.haldir66.ga/static/imgs/Googling-the-Error-Message.jpg" alt=""></p>
-<h3 id="4-List、tuple、dict、set以及基本的数据类型"><a href="#4-List、tuple、dict、set以及基本的数据类型" class="headerlink" title="4. List、tuple、dict、set以及基本的数据类型"></a>4. List、tuple、dict、set以及基本的数据类型</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">list   mylist = [<span class="string">'Tom'</span>,<span class="string">'Jerry'</span>,<span class="string">'Henry'</span>]</span><br><span class="line">       mylist[<span class="number">0</span>] = <span class="string">'Tom'</span></span><br><span class="line"></span><br><span class="line">tuple  mytuple = (<span class="string">'rock'</span>,<span class="string">'pop'</span>,<span class="string">'jazz'</span>)</span><br><span class="line">        mytuple[<span class="number">0</span>] = <span class="string">'rock'</span></span><br><span class="line"></span><br><span class="line">tuple在初始化时就已经确定，不能修改</span><br><span class="line"></span><br><span class="line">dict: d=&#123;<span class="string">'name'</span>:<span class="string">'tom'</span>,<span class="string">'job'</span>:<span class="string">'doctor'</span>,<span class="string">'age'</span>,<span class="number">99</span>&#125;</span><br><span class="line">       d[<span class="string">'name'</span>] = <span class="string">'tom'</span></span><br><span class="line"></span><br><span class="line">set:  s = set([<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]) <span class="comment"># 需要传入一个list作为参数</span></span><br><span class="line">   &gt;&gt; s</span><br><span class="line">   &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>&#125;</span><br><span class="line">   set无序，不可有重复元素</span><br><span class="line">   set和dict的区别在于前者没有存储value，两者内部都不能有重复元素(key)</span><br></pre></td></tr></table></figure>
+<h3 id="4-List、tuple、dict、set以及基本的数据类型"><a href="#4-List、tuple、dict、set以及基本的数据类型" class="headerlink" title="4. List、tuple、dict、set以及基本的数据类型"></a>4. List、tuple、dict、set以及基本的数据类型</h3><pre><code class="python"> list   mylist = [&#39;Tom&#39;,&#39;Jerry&#39;,&#39;Henry&#39;]
+        mylist[0] = &#39;Tom&#39;
+
+ tuple  mytuple = (&#39;rock&#39;,&#39;pop&#39;,&#39;jazz&#39;)
+         mytuple[0] = &#39;rock&#39;
+
+ tuple在初始化时就已经确定，不能修改
+
+ dict: d={&#39;name&#39;:&#39;tom&#39;,&#39;job&#39;:&#39;doctor&#39;,&#39;age&#39;,99}
+        d[&#39;name&#39;] = &#39;tom&#39;
+
+ set:  s = set([1,2,3]) # 需要传入一个list作为参数
+    &gt;&gt; s
+    {1,2,3}
+    set无序，不可有重复元素
+    set和dict的区别在于前者没有存储value，两者内部都不能有重复元素(key)
+</code></pre>
 <p>tuple用的比较多，例如有多个返回值的函数，Python其实返回了一个Tuple。</p>
 <h3 id="类名应该写成驼峰样式，变量名应该小写"><a href="#类名应该写成驼峰样式，变量名应该小写" class="headerlink" title="类名应该写成驼峰样式，变量名应该小写"></a>类名应该写成驼峰样式，变量名应该小写</h3><p>class name should be cammelCase, Arguments,variable name should be lowercase</p>
-<p>循环<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">2</span>, <span class="number">5</span>):</span><br><span class="line">        print(i)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>result: <span class="number">2</span> <span class="number">3</span> <span class="number">4</span> 左闭右开</span><br><span class="line"></span><br><span class="line">条件判断</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add_end</span><span class="params">(L=None)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> L <span class="keyword">is</span> <span class="keyword">None</span>:</span><br><span class="line">        L = []</span><br><span class="line">    L.append(<span class="string">'END'</span>)</span><br><span class="line">    <span class="keyword">return</span> L</span><br></pre></td></tr></table></figure></p>
+<p>循环</p>
+<pre><code class="python"> for i in range(2, 5):
+        print(i)
+&gt;&gt;&gt; result: 2 3 4 左闭右开
+
+条件判断
+
+def add_end(L=None):
+    if L is None:
+        L = []
+    L.append(&#39;END&#39;)
+    return L
+</code></pre>
 <h3 id="函数参数相关，函数组合（一共五种）"><a href="#函数参数相关，函数组合（一共五种）" class="headerlink" title="函数参数相关，函数组合（一共五种）"></a>函数参数相关，函数组合（一共五种）</h3><p>位置参数，默认参数，可变参数，关键字参数，命名关键字参数</p>
-<p>定义一个函数可以带上默认值，默认值是一个固定的对象，上次操作的值会保留到下一次调用<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sell</span><span class="params">(name,price,amount=<span class="number">1</span>)</span>:</span></span><br><span class="line">    print(price*amount)</span><br><span class="line"></span><br><span class="line">sell(<span class="string">'product'</span>,<span class="number">26</span>)</span><br><span class="line">sell(<span class="string">'product'</span>,<span class="number">26</span>,<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="number">26</span>    </span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="number">52</span></span><br></pre></td></tr></table></figure></p>
-<p>默认参数函数<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">power</span><span class="params">(x, n=<span class="number">2</span>)</span>:</span> <span class="comment">#这里的n=2就是默认参数，注意，默认参数应该是不可变对象,例如str、None这种</span></span><br><span class="line">    s = <span class="number">1</span></span><br><span class="line">    <span class="keyword">while</span> n &gt; <span class="number">0</span>:</span><br><span class="line">        n = n - <span class="number">1</span></span><br><span class="line">        s = s * x</span><br><span class="line">    <span class="keyword">return</span> s</span><br><span class="line"></span><br><span class="line">power(<span class="number">5</span>) &gt;&gt; <span class="number">25</span></span><br><span class="line">power(<span class="number">5</span>,<span class="number">2</span>) &gt;&gt;&gt;<span class="number">25</span></span><br></pre></td></tr></table></figure></p>
-<p>可变参数函数# 定义的时候在参数前面加一个*号就可以了，内部会默认组装成一个tuple<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">calc</span><span class="params">(*numbers)</span>:</span> <span class="comment">#函数内部接收到的是一个tuple</span></span><br><span class="line">    sum = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> n <span class="keyword">in</span> numbers:</span><br><span class="line">        sum = sum + n * n</span><br><span class="line">    <span class="keyword">return</span> sum</span><br><span class="line"></span><br><span class="line">calc(<span class="number">1</span>,<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">calc(<span class="number">2</span>,<span class="number">3</span>,<span class="number">5</span>)    </span><br><span class="line"></span><br><span class="line">nums = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]</span><br><span class="line">cal(*nums)<span class="comment">#把tuple内的元素作为参数传进去</span></span><br></pre></td></tr></table></figure></p>
-<p>关键字参数<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">person</span><span class="params">(name, age, **kw)</span>:</span></span><br><span class="line">    print(<span class="string">'name:'</span>, name, <span class="string">'age:'</span>, age, <span class="string">'other:'</span>, kw)</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>person(<span class="string">'Michael'</span>, <span class="number">30</span>)</span><br><span class="line">name: Michael age: <span class="number">30</span> other: &#123;&#125;</span><br><span class="line"></span><br><span class="line">内部自动将关键字参数转换成一个dict</span><br></pre></td></tr></table></figure></p>
-<p>命名关键字函数<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">shoppping</span><span class="params">(name,time,*,price,count)</span># <span class="title">price</span>可以有默认值</span></span><br><span class="line"><span class="function">    <span class="title">print</span><span class="params">(price*count)</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">&gt;&gt; <span class="title">shopping</span><span class="params">(john,<span class="number">0325</span>,price=<span class="number">39</span>,count=<span class="number">5</span>)</span></span></span><br><span class="line"><span class="function">&gt;&gt; 195</span></span><br></pre></td></tr></table></figure></p>
+<p>定义一个函数可以带上默认值，默认值是一个固定的对象，上次操作的值会保留到下一次调用</p>
+<pre><code class="python">def sell(name,price,amount=1):
+    print(price*amount)
+
+sell(&#39;product&#39;,26)
+sell(&#39;product&#39;,26,2)
+
+&gt;&gt;&gt; 26    
+&gt;&gt;&gt; 52
+</code></pre>
+<p>默认参数函数</p>
+<pre><code class="python">def power(x, n=2): #这里的n=2就是默认参数，注意，默认参数应该是不可变对象,例如str、None这种
+    s = 1
+    while n &gt; 0:
+        n = n - 1
+        s = s * x
+    return s
+
+power(5) &gt;&gt; 25
+power(5,2) &gt;&gt;&gt;25
+</code></pre>
+<p>可变参数函数# 定义的时候在参数前面加一个*号就可以了，内部会默认组装成一个tuple</p>
+<pre><code class="python">def calc(*numbers): #函数内部接收到的是一个tuple
+    sum = 0
+    for n in numbers:
+        sum = sum + n * n
+    return sum
+
+calc(1,2)
+
+calc(2,3,5)    
+
+nums = [1,2,3]
+cal(*nums)#把tuple内的元素作为参数传进去
+</code></pre>
+<p>关键字参数</p>
+<pre><code class="python">def person(name, age, **kw):
+    print(&#39;name:&#39;, name, &#39;age:&#39;, age, &#39;other:&#39;, kw)
+
+&gt;&gt;&gt; person(&#39;Michael&#39;, 30)
+name: Michael age: 30 other: {}
+
+内部自动将关键字参数转换成一个dict
+</code></pre>
+<p>命名关键字函数</p>
+<pre><code class="python">def shoppping(name,time,*,price,count)# price可以有默认值
+    print(price*count)
+
+&gt;&gt; shopping(john,0325,price=39,count=5)
+&gt;&gt; 195
+</code></pre>
 <h3 id="5-爬虫相关"><a href="#5-爬虫相关" class="headerlink" title="5. 爬虫相关"></a>5. 爬虫相关</h3><p>Chrome自带开发者工具，可以查看每一个request的header，cookies等信息。模拟浏览器行为比较有效。ctrl+shift+R神器</p>
 <h3 id="5-1-Request-Urllib2"><a href="#5-1-Request-Urllib2" class="headerlink" title="5.1 Request, Urllib2"></a>5.1 Request, Urllib2</h3><h3 id="5-2-UnicodeEncodeError-‘ascii’-codec-can’t-encode-characters-in-position"><a href="#5-2-UnicodeEncodeError-‘ascii’-codec-can’t-encode-characters-in-position" class="headerlink" title="5.2 UnicodeEncodeError: ‘ascii’ codec can’t encode characters in position"></a>5.2 UnicodeEncodeError: ‘ascii’ codec can’t encode characters in position</h3><p>就中文来说</p>
 <blockquote>
 <p>GB18030 》 GBK 》 GB2312</p>
 </blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"># how to invoke this error</span><br><span class="line">b = &quot;this is english within ascii range&quot;.encode(&apos;ascii&apos;)  # totally fine</span><br><span class="line"></span><br><span class="line">s = &quot;你好&quot;.encode(&apos;ascii&apos;)</span><br><span class="line"># this will raise an error ,UnicodeEncodeError: &apos;ascii&apos; codec can&apos;t encode characters in position 0-1: ordinal not in range(128)&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"> print((b&quot;totally cool binary representation of english words within ascii range&quot;).decode(&apos;ascii&apos;))</span><br><span class="line"> print((b&quot;totally cool binary cause utf-8 include ascii&quot;).decode(&apos;utf-8&apos;))</span><br><span class="line"> # 完全正常</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"> # eg.</span><br><span class="line">string = &quot;你好啊&quot;</span><br><span class="line">binary_string = b&apos;\xe4\xbd\xa0\xe5\xa5\xbd\xe5\x95\x8a&apos;</span><br><span class="line">binary_string_2_string = bstring.decode(&apos;utf-8&apos;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">code :</span><br><span class="line">print(string)  </span><br><span class="line">print(string.encode(&apos;utf-8&apos;))</span><br><span class="line">print(bstring2string)</span><br><span class="line">print(bstring2string)</span><br><span class="line"></span><br><span class="line">print(which_instance_is_this(string))</span><br><span class="line">print(which_instance_is_this(bstring))</span><br><span class="line">print(which_instance_is_this(bstring2string))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">outputs:</span><br><span class="line">你好啊</span><br><span class="line">b&apos;\xe4\xbd\xa0\xe5\xa5\xbd\xe5\x95\x8a&apos;</span><br><span class="line">你好啊</span><br><span class="line">你好啊</span><br><span class="line"></span><br><span class="line">is str</span><br><span class="line">is byte</span><br><span class="line">is str</span><br><span class="line"></span><br><span class="line">**Since Python 3.0, the language features a str type that contain Unicode characters, meaning any string created using &quot;unicode rocks!&quot;, &apos;unicode rocks!&apos;, or the triple-quoted string syntax is stored as Unicode.**</span><br><span class="line"></span><br><span class="line">冒号里面的都是str，都是unicode的集合。生成unicode可以用chr(12345) ，该方法接受一个integer返回一个长度为1的Unicode String。</span><br><span class="line">反过来可以用ord(你) 生成“你”这个字在unicode中的编号</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(chr(20320))   &gt;&gt;&gt;&gt; 你</span><br><span class="line">print(ord(&apos;你&apos;))    &gt;&gt;&gt;&gt; 20320 #这里只能用长度为1的string</span><br><span class="line"></span><br><span class="line">binary to string is called decode ,string to binary is encode</span><br><span class="line">bytes.decode(&apos;utf-8&apos;)   &lt;----&gt; str.encode(&apos;utf-8&apos;)</span><br><span class="line"></span><br><span class="line">回到UnicodeEncodeError: &apos;ascii&apos; codec can&apos;t encode characters in position</span><br><span class="line">str.encode(&apos;ascii&apos;)，unicode字符超出了ascii的范围，无法decode成binary</span><br></pre></td></tr></table></figure>
-<h3 id="6-一些细节"><a href="#6-一些细节" class="headerlink" title="6.一些细节"></a>6.一些细节</h3><p>文件读写的各种模式以及解码问题<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> open(filepath, <span class="string">'r'</span>, encoding=<span class="string">"utf8"</span>) <span class="keyword">as</span> f:</span><br><span class="line">   f.write(<span class="string">'最好用utf8读和写文件'</span>)</span><br><span class="line">   <span class="comment">#已经自动做好close文件的工作</span></span><br></pre></td></tr></table></figure></p>
+<pre><code># how to invoke this error
+b = &quot;this is english within ascii range&quot;.encode(&#39;ascii&#39;)  # totally fine
+
+s = &quot;你好&quot;.encode(&#39;ascii&#39;)
+# this will raise an error ,UnicodeEncodeError: &#39;ascii&#39; codec can&#39;t encode characters in position 0-1: ordinal not in range(128)&gt;
+
+
+
+ print((b&quot;totally cool binary representation of english words within ascii range&quot;).decode(&#39;ascii&#39;))
+ print((b&quot;totally cool binary cause utf-8 include ascii&quot;).decode(&#39;utf-8&#39;))
+ # 完全正常
+
+
+ # eg.
+string = &quot;你好啊&quot;
+binary_string = b&#39;\xe4\xbd\xa0\xe5\xa5\xbd\xe5\x95\x8a&#39;
+binary_string_2_string = bstring.decode(&#39;utf-8&#39;)
+
+
+code :
+print(string)  
+print(string.encode(&#39;utf-8&#39;))
+print(bstring2string)
+print(bstring2string)
+
+print(which_instance_is_this(string))
+print(which_instance_is_this(bstring))
+print(which_instance_is_this(bstring2string))
+
+
+outputs:
+你好啊
+b&#39;\xe4\xbd\xa0\xe5\xa5\xbd\xe5\x95\x8a&#39;
+你好啊
+你好啊
+
+is str
+is byte
+is str
+
+**Since Python 3.0, the language features a str type that contain Unicode characters, meaning any string created using &quot;unicode rocks!&quot;, &#39;unicode rocks!&#39;, or the triple-quoted string syntax is stored as Unicode.**
+
+冒号里面的都是str，都是unicode的集合。生成unicode可以用chr(12345) ，该方法接受一个integer返回一个长度为1的Unicode String。
+反过来可以用ord(你) 生成“你”这个字在unicode中的编号
+
+
+print(chr(20320))   &gt;&gt;&gt;&gt; 你
+print(ord(&#39;你&#39;))    &gt;&gt;&gt;&gt; 20320 #这里只能用长度为1的string
+
+binary to string is called decode ,string to binary is encode
+bytes.decode(&#39;utf-8&#39;)   &lt;----&gt; str.encode(&#39;utf-8&#39;)
+
+回到UnicodeEncodeError: &#39;ascii&#39; codec can&#39;t encode characters in position
+str.encode(&#39;ascii&#39;)，unicode字符超出了ascii的范围，无法decode成binary
+</code></pre><h3 id="6-一些细节"><a href="#6-一些细节" class="headerlink" title="6.一些细节"></a>6.一些细节</h3><p>文件读写的各种模式以及解码问题</p>
+<pre><code class="python"> with open(filepath, &#39;r&#39;, encoding=&quot;utf8&quot;) as f:
+    f.write(&#39;最好用utf8读和写文件&#39;)
+    #已经自动做好close文件的工作
+</code></pre>
 <p> how to upgrade installed packages?</p>
 <blockquote>
 <p>pip install –upgrade setuptools</p>
 </blockquote>
-<p>迭代一个字典，并打印出key,vaule<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> key,value <span class="keyword">in</span> d.items(): <span class="comment"># 这个items函数其实是字典自带的函数</span></span><br><span class="line">        print(<span class="string">'%s key has the value %s'</span>%(key,value)) <span class="comment">#第三个百分号是用来把key填到第一个百分号后，把value填到第二个百分号后面的</span></span><br><span class="line"><span class="comment"># 用普通的for i 方式迭代一个字典，迭代出来的是一个个的key，可以用dict[key]把value搞出来</span></span><br></pre></td></tr></table></figure></p>
+<p>迭代一个字典，并打印出key,vaule</p>
+<pre><code class="python">for key,value in d.items(): # 这个items函数其实是字典自带的函数
+        print(&#39;%s key has the value %s&#39;%(key,value)) #第三个百分号是用来把key填到第一个百分号后，把value填到第二个百分号后面的
+# 用普通的for i 方式迭代一个字典，迭代出来的是一个个的key，可以用dict[key]把value搞出来
+</code></pre>
 <h3 id="7-在PyCharm中使用virtualenv"><a href="#7-在PyCharm中使用virtualenv" class="headerlink" title="7. 在PyCharm中使用virtualenv"></a>7. 在PyCharm中使用virtualenv</h3><p>virtualenv一般都是在命令行里面创建，PyCharm里面，setting-project-project Interpreter 那个选择的箭头右边有一个齿轮，直接创建一个新的就好了。<br>virtualenv的好处是不会干扰机器上已安装的package，有些包现在还只能在2.7下运行，如flask_mail。用完之后，ide cmd输入 deactivate即可退出virtualenv。</p>
 <!-- install mongoDb(better performance than sql) -->
 <!-- install pip -->
 <p><a href="https://www.youtube.com/watch?v=GBQAKldqgZs">Kenneth Reitz - Pipenv: The Future of Python Dependency Management - PyCon 2018</a> PipEnv取代virtualenv</p>
 <h3 id="8-在linux环境中运行Python及调用系统API"><a href="#8-在linux环境中运行Python及调用系统API" class="headerlink" title="8.在linux环境中运行Python及调用系统API"></a>8.在linux环境中运行Python及调用系统API</h3><p><a href="http://dragonball.blog.51cto.com/1459915/1413369">计算当前系统磁盘空间占用率</a><br><a href="http://blog.csdn.net/pipisorry/article/details/46972171">推荐使用os.subprocess模块调用shell</a></p>
 <p>grep log in command console<br>basic grammars<br>network, disk ,database, io , dic, list ,etc<br>class object orientated  </p>
-<h3 id="9-future模块是为了在2-7中使用3的功能"><a href="#9-future模块是为了在2-7中使用3的功能" class="headerlink" title="9.  future模块是为了在2.7中使用3的功能"></a>9.  <strong>future</strong>模块是为了在2.7中使用3的功能</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> __future__ <span class="keyword">import</span> division</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> <span class="string">'10 / 3 ='</span>, <span class="number">10</span> / <span class="number">3</span></span><br><span class="line"><span class="keyword">print</span> <span class="string">'10.0 / 3 ='</span>, <span class="number">10.0</span> / <span class="number">3</span></span><br><span class="line"><span class="keyword">print</span> <span class="string">'10 // 3 ='</span>, <span class="number">10</span> // <span class="number">3</span></span><br></pre></td></tr></table></figure>
+<h3 id="9-future模块是为了在2-7中使用3的功能"><a href="#9-future模块是为了在2-7中使用3的功能" class="headerlink" title="9.  future模块是为了在2.7中使用3的功能"></a>9.  <strong>future</strong>模块是为了在2.7中使用3的功能</h3><pre><code class="python">from __future__ import division
+
+print &#39;10 / 3 =&#39;, 10 / 3
+print &#39;10.0 / 3 =&#39;, 10.0 / 3
+print &#39;10 // 3 =&#39;, 10 // 3
+</code></pre>
 <p>直接在2.7中使用3的除法（2.7中的除法是10/3=3，3中的除法是10/3=3.33333…）</p>
 <h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><ul>
 <li><a href="http://www.liaoxuefeng.com/">廖雪峰的官方网站</a></li>

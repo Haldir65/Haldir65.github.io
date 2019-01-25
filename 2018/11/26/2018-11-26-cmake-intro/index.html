@@ -17,7 +17,7 @@
 <meta property="og:description" content="当我们敲下cmake命令的时候，cmake会在当前目录下找CMakeLists.txt这个文件，找不到会报错的">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/fresh-sparkle-dew-drops-on-red-flower-wallpaper-53861cf580909.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.043Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.185Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="cmake实用手册">
 <meta name="twitter:description" content="当我们敲下cmake命令的时候，cmake会在当前目录下找CMakeLists.txt这个文件，找不到会报错的">
@@ -254,11 +254,82 @@ ga('send', 'pageview');
 <h3 id="对于include文件夹"><a href="#对于include文件夹" class="headerlink" title="对于include文件夹"></a>对于include文件夹</h3><blockquote>
 <p>target_include_directories(target<br>    PRIVATE<br>        ${PROJECT_SOURCE_DIR}/include<br>)<br>这样编译器就会在编译参数上加上-I/directory/path这种东西</p>
 </blockquote>
-<h3 id="static-library的处理"><a href="#static-library的处理" class="headerlink" title="static library的处理"></a>static library的处理</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">cmake_minimum_required(VERSION 3.5)</span><br><span class="line"></span><br><span class="line">project(hello_library)</span><br><span class="line"></span><br><span class="line">############################################################</span><br><span class="line"># Create a library</span><br><span class="line">############################################################</span><br><span class="line"></span><br><span class="line">#Generate the static library from the library sources</span><br><span class="line">add_library(hello_library STATIC </span><br><span class="line">    src/Hello.cpp //创建一个libhello_library.a 的static library</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">target_include_directories(hello_library</span><br><span class="line">    PUBLIC </span><br><span class="line">        $&#123;PROJECT_SOURCE_DIR&#125;/include</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">############################################################</span><br><span class="line"># Create an executable</span><br><span class="line">############################################################</span><br><span class="line"></span><br><span class="line"># Add an executable with the above sources</span><br><span class="line">add_executable(hello_binary </span><br><span class="line">    src/main.cpp</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"># link the new hello_library target with the hello_binary target</span><br><span class="line">target_link_libraries( hello_binary</span><br><span class="line">    PRIVATE </span><br><span class="line">        hello_library</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-<h3 id="shared-library的处理"><a href="#shared-library的处理" class="headerlink" title="shared library的处理"></a>shared library的处理</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">cmake_minimum_required(VERSION 3.5)</span><br><span class="line"></span><br><span class="line">project(hello_library)</span><br><span class="line"></span><br><span class="line">############################################################</span><br><span class="line"># Create a library</span><br><span class="line">############################################################</span><br><span class="line"></span><br><span class="line">#Generate the shared library from the library sources</span><br><span class="line">add_library(hello_library SHARED </span><br><span class="line">    src/Hello.cpp  // 用传入该函数的文件创建一个 libhello_library.so Library</span><br><span class="line">)</span><br><span class="line">add_library(hello::library ALIAS hello_library)</span><br><span class="line"></span><br><span class="line">target_include_directories(hello_library //hello_library需要这个include directory</span><br><span class="line">    PUBLIC </span><br><span class="line">        $&#123;PROJECT_SOURCE_DIR&#125;/include  </span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">############################################################</span><br><span class="line"># Create an executable</span><br><span class="line">############################################################</span><br><span class="line"></span><br><span class="line"># Add an executable with the above sources</span><br><span class="line">add_executable(hello_binary</span><br><span class="line">    src/main.cpp</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"># link the new hello_library target with the hello_binary target</span><br><span class="line">target_link_libraries( hello_binary // 接下来就是Link了，这里使用了上面的一个alias</span><br><span class="line">    PRIVATE </span><br><span class="line">        hello::library</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-<h3 id="接下来是make-install-将生成的可执行文件安装到系统中，似乎就是复制到-usr-bin里面"><a href="#接下来是make-install-将生成的可执行文件安装到系统中，似乎就是复制到-usr-bin里面" class="headerlink" title="接下来是make install (将生成的可执行文件安装到系统中，似乎就是复制到/usr/bin里面)"></a>接下来是make install (将生成的可执行文件安装到系统中，似乎就是复制到/usr/bin里面)</h3><p>默认情况下cmake会把生成的可执行文件安装到系统中，我们可以指定安装到特定的位置<br>cmake .. -DCMAKE_INSTALL_PREFIX=/install/location</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">install (TARGETS cmake_examples_inst_bin</span><br><span class="line">    DESTINATION bin)</span><br><span class="line">// target cmake_examples_inst_bin target to the destination $&#123;CMAKE_INSTALL_PREFIX&#125;/bin</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">install (TARGETS cmake_examples_inst</span><br><span class="line">    LIBRARY DESTINATION lib) </span><br><span class="line">//install the shared library generated from the target cmake_examples_inst target to the destination $&#123;CMAKE_INSTALL_PREFIX&#125;/lib</span><br></pre></td></tr></table></figure>
-<blockquote>
+<h3 id="static-library的处理"><a href="#static-library的处理" class="headerlink" title="static library的处理"></a>static library的处理</h3><pre><code>cmake_minimum_required(VERSION 3.5)
+
+project(hello_library)
+
+############################################################
+# Create a library
+############################################################
+
+#Generate the static library from the library sources
+add_library(hello_library STATIC 
+    src/Hello.cpp //创建一个libhello_library.a 的static library
+)
+
+target_include_directories(hello_library
+    PUBLIC 
+        ${PROJECT_SOURCE_DIR}/include
+)
+
+
+############################################################
+# Create an executable
+############################################################
+
+# Add an executable with the above sources
+add_executable(hello_binary 
+    src/main.cpp
+)
+
+# link the new hello_library target with the hello_binary target
+target_link_libraries( hello_binary
+    PRIVATE 
+        hello_library
+)
+</code></pre><h3 id="shared-library的处理"><a href="#shared-library的处理" class="headerlink" title="shared library的处理"></a>shared library的处理</h3><pre><code>cmake_minimum_required(VERSION 3.5)
+
+project(hello_library)
+
+############################################################
+# Create a library
+############################################################
+
+#Generate the shared library from the library sources
+add_library(hello_library SHARED 
+    src/Hello.cpp  // 用传入该函数的文件创建一个 libhello_library.so Library
+)
+add_library(hello::library ALIAS hello_library)
+
+target_include_directories(hello_library //hello_library需要这个include directory
+    PUBLIC 
+        ${PROJECT_SOURCE_DIR}/include  
+)
+
+############################################################
+# Create an executable
+############################################################
+
+# Add an executable with the above sources
+add_executable(hello_binary
+    src/main.cpp
+)
+
+# link the new hello_library target with the hello_binary target
+target_link_libraries( hello_binary // 接下来就是Link了，这里使用了上面的一个alias
+    PRIVATE 
+        hello::library
+)
+</code></pre><h3 id="接下来是make-install-将生成的可执行文件安装到系统中，似乎就是复制到-usr-bin里面"><a href="#接下来是make-install-将生成的可执行文件安装到系统中，似乎就是复制到-usr-bin里面" class="headerlink" title="接下来是make install (将生成的可执行文件安装到系统中，似乎就是复制到/usr/bin里面)"></a>接下来是make install (将生成的可执行文件安装到系统中，似乎就是复制到/usr/bin里面)</h3><p>默认情况下cmake会把生成的可执行文件安装到系统中，我们可以指定安装到特定的位置<br>cmake .. -DCMAKE_INSTALL_PREFIX=/install/location</p>
+<pre><code>install (TARGETS cmake_examples_inst_bin
+    DESTINATION bin)
+// target cmake_examples_inst_bin target to the destination ${CMAKE_INSTALL_PREFIX}/bin
+
+
+install (TARGETS cmake_examples_inst
+    LIBRARY DESTINATION lib) 
+//install the shared library generated from the target cmake_examples_inst target to the destination ${CMAKE_INSTALL_PREFIX}/lib
+</code></pre><blockquote>
 <p>$ ls /usr/local/bin/<br>cmake_examples_inst_bin</p>
 <p>$ ls /usr/local/lib<br>libcmake_examples_inst.so</p>
 <p>$ ls /usr/local/etc/<br>cmake-examples.conf</p>
@@ -274,10 +345,40 @@ ga('send', 'pageview');
 <p>configure文件是用autoconf根据configure.ac创建出来的，而configure.ac能用autoscan自动创建出来</p>
 <p>随便创建一个文件夹</p>
 <p>$ ls<br>epoch.c Makefile</p>
-<p>$ cat epoch.c<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/time.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;time.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"config.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">double</span> <span class="title">get_epoch</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">double</span> sec;</span><br><span class="line">  <span class="meta">#<span class="meta-keyword">ifdef</span> HAVE_GETTIMEOFDAY</span></span><br><span class="line">     <span class="class"><span class="keyword">struct</span> <span class="title">timeval</span> <span class="title">tv</span>;</span></span><br><span class="line">     gettimeofday(&amp;tv, <span class="literal">NULL</span>);</span><br><span class="line">     sec = tv.tv_sec;</span><br><span class="line">     sec += tv.tv_usec / <span class="number">1000000.0</span>;</span><br><span class="line">  <span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">     sec = time(<span class="literal">NULL</span>);</span><br><span class="line">  <span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">  <span class="keyword">return</span> sec;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>* argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">   <span class="built_in">printf</span>(<span class="string">"%f\n"</span>, get_epoch());</span><br><span class="line">   <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>$ cat epoch.c</p>
+<pre><code class="c">#include &lt;stdio.h&gt;
+#include &lt;sys/time.h&gt;
+#include &lt;time.h&gt;
+#include &quot;config.h&quot;
+
+double get_epoch()
+{
+  double sec;
+  #ifdef HAVE_GETTIMEOFDAY
+     struct timeval tv;
+     gettimeofday(&amp;tv, NULL);
+     sec = tv.tv_sec;
+     sec += tv.tv_usec / 1000000.0;
+  #else
+     sec = time(NULL);
+  #endif
+  return sec;
+}
+
+int main(int argc, char* argv[])
+{
+   printf(&quot;%f\n&quot;, get_epoch());
+   return 0;
+}
+</code></pre>
 <p>这么写的原因是gettimeofday()这个函数不是在所有的平台上都有，这种时候就要用time()函数了。</p>
-<p>$ cat Makefile<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># Makefile: A standard Makefile for epoch.c</span><br><span class="line">all: epoch</span><br><span class="line"></span><br><span class="line">clean:</span><br><span class="line">    rm ­f epoch</span><br></pre></td></tr></table></figure></p>
-<p>这样其实已经可以直接make生成可执行文件了。但是我们用autoconf来生成试一下</p>
+<p>$ cat Makefile</p>
+<pre><code># Makefile: A standard Makefile for epoch.c
+all: epoch
+
+clean:
+    rm ­f epoch
+</code></pre><p>这样其实已经可以直接make生成可执行文件了。但是我们用autoconf来生成试一下</p>
 <ol>
 <li>生成config.h文件<br>config.h文件是configure命令根据config.h.in文件生成的，config.h.in文件是由autoheader（C的source code）中生成的（总之也是自动的）<br>$ ls<br>epoch.c Makefile<br>$ autoscan<br>$ ls<br>autoscan.log  configure.scan  epoch.c  Makefile<br>$  mv configure.scan configure.ac<br>$ ls<br>autoscan.log  configure.ac  epoch.c  Makefile<br>$ autoheader<br>$ ls<br>autom4te.cache  autoscan.log  config.h.in  configure.ac  epoch.c  Makefile<br>$  mv Makefile Makefile.in<br>$ autoconf<br>$ ls<br>autom4te.cache  autoscan.log  config.h.in  configure  configure.ac  epoch.c  Makefile.in<br>$ ./configure<br>checking for gcc… gcc<br>checking whether the C compiler works… yes<br>checking for C compiler default output file name… a.out<br>checking for suffix of executables…<br>checking whether we are cross compiling… no<br>checking for suffix of object files… o<br>checking whether we are using the GNU C compiler… yes<br>checking whether gcc accepts -g… yes<br>checking for gcc option to accept ISO C89… none needed<br>checking how to run the C preprocessor… gcc -E<br>checking for grep that handles long lines and -e… /bin/grep<br>checking for egrep… /bin/grep -E<br>checking for ANSI C header files… yes<br>checking for sys/types.h… yes<br>checking for sys/stat.h… yes<br>checking for stdlib.h… yes<br>checking for string.h… yes<br>checking for memory.h… yes<br>checking for strings.h… yes<br>checking for inttypes.h… yes<br>checking for stdint.h… yes<br>checking for unistd.h… yes<br>checking sys/time.h usability… yes<br>checking sys/time.h presence… yes<br>checking for sys/time.h… yes<br>checking for gettimeofday… yes<br>configure: creating ./config.status<br>config.status: creating Makefile<br>config.status: creating config.h<br>$  ls<br>autom4te.cache  autoscan.log  config.h  config.h.in  config.log  config.status  configure  configure.ac  epoch.c  Makefile  Makefile.in<br>$ make<br>$ ls<br>autom4te.cache  config.h     config.log     configure     epoch    Makefile<br>autoscan.log    config.h.in  config.status  configure.ac  epoch.c  Makefile.in<br>$  ./epoch<br>1544345416.704451</li>
 </ol>
@@ -285,8 +386,33 @@ ga('send', 'pageview');
 <p>另一种方式<br>手动创造“Makefile.am”文件<br>$ cat Makefile.am</p>
 <h1 id="Makefile-am-for-epoch-c"><a href="#Makefile-am-for-epoch-c" class="headerlink" title="Makefile.am for epoch.c"></a>Makefile.am for epoch.c</h1><p>bin_PROGRAMS=epoch<br>epoch_SOURCES=epoch.c</p>
 <p>$ ls<br>epoch.c  Makefile.am</p>
-<p>$ autoscan<br>$  mv configure.scan configure.ac<br>$ autoheader<br>$ ls<br>autom4te.cache  autoscan.log  config.h.in  configure.ac  epoch.c  Makefile.am<br>$ vim configure.ac<br>改成这样<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">#                                               -*- Autoconf -*-</span><br><span class="line"># Process this file with autoconf to produce a configure script.</span><br><span class="line"></span><br><span class="line">AC_PREREQ([2.69])</span><br><span class="line">AC_INIT([FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS])</span><br><span class="line">AM_INIT_AUTOMAKE</span><br><span class="line">AC_CONFIG_SRCDIR([epoch.c])</span><br><span class="line">AC_CONFIG_HEADERS([config.h])</span><br><span class="line"></span><br><span class="line"># Checks for programs.</span><br><span class="line">AC_PROG_CC</span><br><span class="line"></span><br><span class="line"># Checks for libraries.</span><br><span class="line"></span><br><span class="line"># Checks for header files.</span><br><span class="line">AC_CHECK_HEADERS([sys/time.h])</span><br><span class="line"></span><br><span class="line"># Checks for typedefs, structures, and compiler characteristics.</span><br><span class="line">AC_HEADER_TIME</span><br><span class="line"></span><br><span class="line"># Checks for library functions.</span><br><span class="line">AC_CHECK_FUNCS([gettimeofday])</span><br><span class="line"></span><br><span class="line">AC_CONFIG_FILES([Makefile])</span><br><span class="line">AC_OUTPUT</span><br></pre></td></tr></table></figure></p>
-<p>其实就是加了AM_INIT_AUTOMAKE这一行还有AC_HEADER_TIME<br>$ aclocal<br>$ automake ­­add­missing ­­copy<br>$ autoconf<br>$ ./configure 在这一步因为没有生成Makefile.in所以停下来了</p>
+<p>$ autoscan<br>$  mv configure.scan configure.ac<br>$ autoheader<br>$ ls<br>autom4te.cache  autoscan.log  config.h.in  configure.ac  epoch.c  Makefile.am<br>$ vim configure.ac<br>改成这样</p>
+<pre><code>#                                               -*- Autoconf -*-
+# Process this file with autoconf to produce a configure script.
+
+AC_PREREQ([2.69])
+AC_INIT([FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS])
+AM_INIT_AUTOMAKE
+AC_CONFIG_SRCDIR([epoch.c])
+AC_CONFIG_HEADERS([config.h])
+
+# Checks for programs.
+AC_PROG_CC
+
+# Checks for libraries.
+
+# Checks for header files.
+AC_CHECK_HEADERS([sys/time.h])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_HEADER_TIME
+
+# Checks for library functions.
+AC_CHECK_FUNCS([gettimeofday])
+
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT
+</code></pre><p>其实就是加了AM_INIT_AUTOMAKE这一行还有AC_HEADER_TIME<br>$ aclocal<br>$ automake ­­add­missing ­­copy<br>$ autoconf<br>$ ./configure 在这一步因为没有生成Makefile.in所以停下来了</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://mirkokiefer.com/cmake-by-example-f95eb47d45b1">cmake的教程，非常好</a><br><a href="https://github.com/ttroy50/cmake-examples">Useful CMake Examples</a>本文来自这里的实例<br><a href="http://www.lugod.org/presentations/autotools/presentation/autotools.pdf">autotools教程</a></p>
 
       

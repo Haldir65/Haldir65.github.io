@@ -26,7 +26,7 @@
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/Transmission-control-protocol-window-scaling.png">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/TCP-Zero-Window-Performance-Vision.png">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/tcp_and_udp_size_limit.png">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.043Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.185Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="tcp和udp包结构分析">
 <meta name="twitter:description" content="本文只针对ipv4网络进行分析">
@@ -246,8 +246,50 @@ ga('send', 'pageview');
 <blockquote>
 <p>TCP 协议在建立连接时，需要经历较为漫长的三次握手行为，而在关闭时，也有稍显冗余的 4 次摆手。而 HTTPS 初始连接需要至少 2 个 RTT 交互（添加了握手缓存就会变成了 1-RTT，这里指的是 TLS 1.2），外加 TCP 自身握手流程，最少需要 3 次 RTT 往返，才能够完整建立连接。而 QUIC 协议层面界定了 1-2 个 RTT 握手流程，再次连接为 0-RTT 握手优化流程（但需要添加握手缓存）</p>
 </blockquote>
-<p>关于tcp read/write buffer，shadowsocks的参数优化提到了一些东西<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"># max open files</span><br><span class="line">fs.file-max = 1024000</span><br><span class="line"># max read buffer</span><br><span class="line">net.core.rmem_max = 67108864</span><br><span class="line"># max write buffer</span><br><span class="line">net.core.wmem_max = 67108864</span><br><span class="line"># default read buffer</span><br><span class="line">net.core.rmem_default = 65536</span><br><span class="line"># default write buffer</span><br><span class="line">net.core.wmem_default = 65536</span><br><span class="line"># max processor input queue</span><br><span class="line">net.core.netdev_max_backlog = 4096</span><br><span class="line"># max backlog</span><br><span class="line">net.core.somaxconn = 4096</span><br><span class="line"></span><br><span class="line"># resist SYN flood attacks</span><br><span class="line">net.ipv4.tcp_syncookies = 1</span><br><span class="line"># reuse timewait sockets when safe</span><br><span class="line">net.ipv4.tcp_tw_reuse = 1</span><br><span class="line"># turn off fast timewait sockets recycling</span><br><span class="line">net.ipv4.tcp_tw_recycle = 0</span><br><span class="line"># short FIN timeout</span><br><span class="line">net.ipv4.tcp_fin_timeout = 30</span><br><span class="line"># short keepalive time</span><br><span class="line">net.ipv4.tcp_keepalive_time = 1200</span><br><span class="line"># outbound port range</span><br><span class="line">net.ipv4.ip_local_port_range = 10000 65000</span><br><span class="line"># max SYN backlog</span><br><span class="line">net.ipv4.tcp_max_syn_backlog = 4096</span><br><span class="line"># max timewait sockets held by system simultaneously</span><br><span class="line">net.ipv4.tcp_max_tw_buckets = 5000</span><br><span class="line"># TCP receive buffer</span><br><span class="line">net.ipv4.tcp_rmem = 4096 87380 67108864</span><br><span class="line"># TCP write buffer</span><br><span class="line">net.ipv4.tcp_wmem = 4096 65536 67108864</span><br><span class="line"># turn on path MTU discovery</span><br><span class="line">net.ipv4.tcp_mtu_probing = 1</span><br><span class="line"></span><br><span class="line"># for high-latency network</span><br><span class="line">net.ipv4.tcp_congestion_control = hybla</span><br><span class="line"># forward ipv4</span><br><span class="line">net.ipv4.ip_forward = 1</span><br></pre></td></tr></table></figure></p>
-<p><a href="https://www.cyberciti.biz/files/linux-kernel/Documentation/networking/ip-sysctl.txt">内核文档对于这些参数的定义</a><br>注意，这些参数修改了会影响所有的进程，修改还是慎重一些</p>
+<p>关于tcp read/write buffer，shadowsocks的参数优化提到了一些东西 </p>
+<pre><code># max open files
+fs.file-max = 1024000
+# max read buffer
+net.core.rmem_max = 67108864
+# max write buffer
+net.core.wmem_max = 67108864
+# default read buffer
+net.core.rmem_default = 65536
+# default write buffer
+net.core.wmem_default = 65536
+# max processor input queue
+net.core.netdev_max_backlog = 4096
+# max backlog
+net.core.somaxconn = 4096
+
+# resist SYN flood attacks
+net.ipv4.tcp_syncookies = 1
+# reuse timewait sockets when safe
+net.ipv4.tcp_tw_reuse = 1
+# turn off fast timewait sockets recycling
+net.ipv4.tcp_tw_recycle = 0
+# short FIN timeout
+net.ipv4.tcp_fin_timeout = 30
+# short keepalive time
+net.ipv4.tcp_keepalive_time = 1200
+# outbound port range
+net.ipv4.ip_local_port_range = 10000 65000
+# max SYN backlog
+net.ipv4.tcp_max_syn_backlog = 4096
+# max timewait sockets held by system simultaneously
+net.ipv4.tcp_max_tw_buckets = 5000
+# TCP receive buffer
+net.ipv4.tcp_rmem = 4096 87380 67108864
+# TCP write buffer
+net.ipv4.tcp_wmem = 4096 65536 67108864
+# turn on path MTU discovery
+net.ipv4.tcp_mtu_probing = 1
+
+# for high-latency network
+net.ipv4.tcp_congestion_control = hybla
+# forward ipv4
+net.ipv4.ip_forward = 1
+</code></pre><p><a href="https://www.cyberciti.biz/files/linux-kernel/Documentation/networking/ip-sysctl.txt">内核文档对于这些参数的定义</a><br>注意，这些参数修改了会影响所有的进程，修改还是慎重一些</p>
 <h3 id="tcp-buffer"><a href="#tcp-buffer" class="headerlink" title="tcp buffer"></a>tcp buffer</h3><p>关键字： tcp read buffer and write buffer<br>这里要分congestion window（发送方的window，对应congestion control）和receive window(接收方的window，对应flow control)<br>receive window</p>
 <blockquote>
 <p>Your Network Interface Card (NIC) is performing all of the necessary tasks of collecting packets and waiting for your OS to read them. Ultimately, when you do a stream read you’re pulling from the memory that your OS has reserved and constantly stores the incoming information copy into.<br>To answer your question, yes. You are definitely doing a copy. A copy of a copy, the bits are read into a buffer within your NIC, your OS puts them somewhere, and you copy them when you do a stream read.</p>

@@ -17,7 +17,7 @@
 <meta property="og:description" content="Scrappy框架学习首先建议安装virtualenv，在env中进行操作。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/green_forest_alogside_river.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.035Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.177Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Scrappy框架学习笔记">
 <meta name="twitter:description" content="Scrappy框架学习首先建议安装virtualenv，在env中进行操作。">
@@ -209,13 +209,46 @@ ga('send', 'pageview');
 <blockquote>
 <p>scrapy startproject tutorial #创建一个project。会生成一个tutorial的文件夹，在tutorial/spiders文件夹中新建一个quotes_spider.py</p>
 </blockquote>
-<p>参考<a href="http://cuiqingcai.com/3952.html/2">Scrapy教程</a><br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scrapy</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">QuotesSpider</span><span class="params">(scrapy.Spider)</span>:</span></span><br><span class="line">    name = <span class="string">"quotes"</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start_requests</span><span class="params">(self)</span>:</span></span><br><span class="line">        urls = [</span><br><span class="line">            <span class="string">'http://quotes.toscrape.com/page/1/'</span>,</span><br><span class="line">            <span class="string">'http://quotes.toscrape.com/page/2/'</span>,</span><br><span class="line">        ]</span><br><span class="line">        <span class="keyword">for</span> url <span class="keyword">in</span> urls:</span><br><span class="line">            <span class="keyword">yield</span> scrapy.Request(url=url, callback=self.parse)</span><br><span class="line">     <span class="comment">#这个callback就是response拉下来之后的解析过程</span></span><br><span class="line">     <span class="comment">#下面的这个做法只是把response写到一个文件中，通常还可以使用css或者xpath解析获得相应值。</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        page = response.url.split(<span class="string">"/"</span>)[<span class="number">-2</span>]</span><br><span class="line">        filename = <span class="string">'quotes-%s.html'</span> % page</span><br><span class="line">        <span class="keyword">with</span> open(filename, <span class="string">'wb'</span>) <span class="keyword">as</span> f:</span><br><span class="line">            f.write(response.body)</span><br><span class="line">        self.log(<span class="string">'Saved file %s'</span> % filename)</span><br></pre></td></tr></table></figure></p>
+<p>参考<a href="http://cuiqingcai.com/3952.html/2">Scrapy教程</a></p>
+<pre><code class="python">import scrapy
+class QuotesSpider(scrapy.Spider):
+    name = &quot;quotes&quot;
+
+    def start_requests(self):
+        urls = [
+            &#39;http://quotes.toscrape.com/page/1/&#39;,
+            &#39;http://quotes.toscrape.com/page/2/&#39;,
+        ]
+        for url in urls:
+            yield scrapy.Request(url=url, callback=self.parse)
+     #这个callback就是response拉下来之后的解析过程
+     #下面的这个做法只是把response写到一个文件中，通常还可以使用css或者xpath解析获得相应值。
+
+    def parse(self, response):
+        page = response.url.split(&quot;/&quot;)[-2]
+        filename = &#39;quotes-%s.html&#39; % page
+        with open(filename, &#39;wb&#39;) as f:
+            f.write(response.body)
+        self.log(&#39;Saved file %s&#39; % filename)
+</code></pre>
 <blockquote>
 <p>scrapy crawl quotes #开始爬quotes.toscrape.com的内容,需要切换到tutorial文件夹下</p>
 <p>scrapy shell ‘<a href="http://quotes.toscrape.com/page/1/">http://quotes.toscrape.com/page/1/</a>‘ #从Response中提取所需的值  </p>
 </blockquote>
-<p>输入就能得到大致这样的交互<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; response.css(&apos;title::text&apos;).extract()</span><br><span class="line">[&apos;Quotes to Scrape&apos;]</span><br></pre></td></tr></table></figure></p>
-<p>由于没有安装vc2014，只能在virtualenv中运行,pycharm中也是显示scrapy没有安装。只能用命令行运行。想要看具体的值需要这样<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>response.css(<span class="string">'title::text'</span>).extract_first()</span><br><span class="line"><span class="string">'Quotes to Scrape'</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>response.css(<span class="string">'title::text'</span>).re(<span class="string">r'Quotes.*'</span>) <span class="comment">#这里是正则了</span></span><br><span class="line">[<span class="string">'Quotes to Scrape'</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">#或者使用xpath</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>response.xpath(<span class="string">'//title/text()'</span>).extract_first()</span><br><span class="line"><span class="string">'Quotes to Scrape'</span></span><br></pre></td></tr></table></figure></p>
+<p>输入就能得到大致这样的交互</p>
+<pre><code>&gt;&gt;&gt; response.css(&#39;title::text&#39;).extract()
+[&#39;Quotes to Scrape&#39;]
+</code></pre><p>由于没有安装vc2014，只能在virtualenv中运行,pycharm中也是显示scrapy没有安装。只能用命令行运行。想要看具体的值需要这样</p>
+<pre><code class="python">&gt;&gt;&gt; response.css(&#39;title::text&#39;).extract_first()
+&#39;Quotes to Scrape&#39;
+
+&gt;&gt;&gt; response.css(&#39;title::text&#39;).re(r&#39;Quotes.*&#39;) #这里是正则了
+[&#39;Quotes to Scrape&#39;]
+
+#或者使用xpath
+&gt;&gt;&gt; response.xpath(&#39;//title/text()&#39;).extract_first()
+&#39;Quotes to Scrape&#39;
+</code></pre>
 <p>处理登录请求，afterLogin<br>网站登录多数需要提交一个表单（Dict）</p>
 <blockquote>
 <p>formadata = {‘userName’:  ‘Bob’,’pwd’：123456}<br>中间件(MiddleWare)的作用<br>Cookie，UserAgent处理 setting.py中设置需要的参数，Cookie默认是接受的<br>PipeLine是用来持久化的，中间件用于处理Cookie,Ajax等，rules用于筛选需要跟进的url</p>

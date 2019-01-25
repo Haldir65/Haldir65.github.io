@@ -21,7 +21,7 @@
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/2019-01-19-2.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/2019-01-19-3.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/2019-01-19-4.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.043Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.185Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="原始套接字学习指南">
 <meta name="twitter:description" content="从原始套接字 SOCK_RAW学习到的知识">
@@ -224,14 +224,179 @@ ga('send', 'pageview');
 </blockquote>
 <p>raw socket一般用于网络监测程序中比较多，比如ping , nmap这种。这类协议是没有端口的。</p>
 <p>另一种场景是伪造tcp header应对运营商udp屏蔽和流量qos，这种类似的实现在2017年出来的比较多。(就是用一个raw socket把一个udp包伪装成一个tcp包)。</p>
-<p>接下来这个例子是使用raw socket监听server端收到的ip packet包内容<br>server.c<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;linux/if_ether.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;arpa/inet.h&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;     </span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"main is running\n"</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> iSock, nRead, iProtocol;        </span><br><span class="line"><span class="keyword">char</span> buffer[<span class="number">4096</span>] = &#123;<span class="number">0</span>&#125;;</span><br><span class="line"><span class="keyword">char</span>  *ethhead, *iphead, *tcphead, *udphead, *icmphead, *p;</span><br><span class="line">    </span><br><span class="line"><span class="keyword">if</span>((iSock = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_IP))) &lt; <span class="number">0</span>)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"create iSocket error, check root\n"</span>);  <span class="comment">// 需要root权限， 最后运行的时候， 可以用sudo ./server</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line">        </span><br><span class="line"><span class="keyword">while</span>(<span class="number">1</span>) </span><br><span class="line">&#123;</span><br><span class="line">    nRead = recvfrom(iSock, buffer, <span class="number">2048</span>, <span class="number">0</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);  </span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">        以太网帧头 14</span></span><br><span class="line"><span class="comment">        ip头       20</span></span><br><span class="line"><span class="comment">        udp头      8</span></span><br><span class="line"><span class="comment">        总共42字节(最少)</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">if</span>(nRead &lt; <span class="number">42</span>) </span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"packet error\n"</span>);</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">            </span><br><span class="line">    <span class="keyword">int</span> n = <span class="number">0XFF</span>;</span><br><span class="line">    <span class="keyword">char</span> szVisBuf[<span class="number">1024</span>] = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">unsigned</span> <span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nRead; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">char</span> szTmp[<span class="number">3</span>] = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">        <span class="built_in">sprintf</span>(szTmp, <span class="string">"%02x"</span>, buffer[i]&amp;n);</span><br><span class="line">        <span class="built_in">strcat</span>(szVisBuf, szTmp);</span><br><span class="line">    &#125;</span><br><span class="line">        </span><br><span class="line">    </span><br><span class="line">    ethhead = buffer;</span><br><span class="line">    p = ethhead;</span><br><span class="line">    </span><br><span class="line">    iphead = ethhead + <span class="number">14</span>;  </span><br><span class="line">    p = iphead + <span class="number">12</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span> szIps[<span class="number">128</span>] = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">    <span class="built_in">snprintf</span>(szIps, <span class="keyword">sizeof</span>(szIps), <span class="string">"IP: %d.%d.%d.%d =&gt; %d.%d.%d.%d"</span>,</span><br><span class="line">        p[<span class="number">0</span>]&amp;n, p[<span class="number">1</span>]&amp;n, p[<span class="number">2</span>]&amp;n, p[<span class="number">3</span>]&amp;n,</span><br><span class="line">        p[<span class="number">4</span>]&amp;n, p[<span class="number">5</span>]&amp;n, p[<span class="number">6</span>]&amp;n, p[<span class="number">7</span>]&amp;n);</span><br><span class="line">    iProtocol = (iphead + <span class="number">9</span>)[<span class="number">0</span>];</span><br><span class="line">    p = iphead + <span class="number">20</span>;</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> iDstPort = (p[<span class="number">2</span>]&lt;&lt;<span class="number">8</span>)&amp;<span class="number">0xff00</span> | p[<span class="number">3</span>]&amp;n;</span><br><span class="line">    <span class="keyword">switch</span>(iProtocol)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">case</span> IPPROTO_UDP : </span><br><span class="line">            <span class="keyword">if</span>(iDstPort == <span class="number">8888</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">"source port: %u,"</span>,(p[<span class="number">0</span>]&lt;&lt;<span class="number">8</span>)&amp;<span class="number">0xff00</span> |  p[<span class="number">1</span>]&amp;n);</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">"dest port: %u\n"</span>, iDstPort);</span><br><span class="line">                </span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">"%s\n"</span>, szIps);	</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">"%s\n"</span>, szVisBuf);</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">"nRead is %d\n"</span>, nRead);	</span><br><span class="line">                </span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> IPPROTO_RAW : </span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">"raw\n"</span>);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>client.c<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;netinet/in.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;arpa/inet.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">srvAddr</span>;</span></span><br><span class="line">    bzero(&amp;srvAddr, <span class="keyword">sizeof</span>(srvAddr));</span><br><span class="line">    srvAddr.sin_family = AF_INET;</span><br><span class="line">    srvAddr.sin_addr.s_addr = inet_addr(<span class="string">"127.0.0.1"</span>);</span><br><span class="line">    srvAddr.sin_port = htons(<span class="number">8888</span>);</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">int</span> iSock = socket(AF_INET, SOCK_DGRAM, <span class="number">0</span>); <span class="comment">// udp</span></span><br><span class="line">true<span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">truetrue<span class="built_in">printf</span>(<span class="string">"press enter to send data\n"</span>);</span><br><span class="line">        <span class="keyword">while</span> (( i = getchar()) != <span class="string">'\n'</span>)&#123;</span><br><span class="line">            <span class="keyword">char</span> szBuf[<span class="number">32</span>] = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">            <span class="built_in">snprintf</span>(szBuf, <span class="keyword">sizeof</span>(szBuf), <span class="string">"hello %d"</span>, ++i);</span><br><span class="line">            sendto(iSock, szBuf, <span class="built_in">strlen</span>(szBuf) + <span class="number">1</span>, <span class="number">0</span>, (struct sockaddr *)&amp;srvAddr, <span class="keyword">sizeof</span>(srvAddr));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">trueclose(iSock);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>接下来这个例子是使用raw socket监听server端收到的ip packet包内容<br>server.c</p>
+<pre><code class="c">#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;linux/if_ether.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;arpa/inet.h&gt;
+
+int main()
+{     
+printf(&quot;main is running\n&quot;);
+
+int iSock, nRead, iProtocol;        
+char buffer[4096] = {0};
+char  *ethhead, *iphead, *tcphead, *udphead, *icmphead, *p;
+
+if((iSock = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_IP))) &lt; 0)
+{
+    printf(&quot;create iSocket error, check root\n&quot;);  // 需要root权限， 最后运行的时候， 可以用sudo ./server
+    return 1;
+}
+
+while(1) 
+{
+    nRead = recvfrom(iSock, buffer, 2048, 0, NULL, NULL);  
+    /*
+        以太网帧头 14
+        ip头       20
+        udp头      8
+        总共42字节(最少)
+    */
+    if(nRead &lt; 42) 
+    {
+        printf(&quot;packet error\n&quot;);
+        continue;
+    }
+
+    int n = 0XFF;
+    char szVisBuf[1024] = {0};
+    for(unsigned int i = 0; i &lt; nRead; ++i)
+    {
+        char szTmp[3] = {0};
+        sprintf(szTmp, &quot;%02x&quot;, buffer[i]&amp;n);
+        strcat(szVisBuf, szTmp);
+    }
+
+
+    ethhead = buffer;
+    p = ethhead;
+
+    iphead = ethhead + 14;  
+    p = iphead + 12;
+
+    char szIps[128] = {0};
+    snprintf(szIps, sizeof(szIps), &quot;IP: %d.%d.%d.%d =&gt; %d.%d.%d.%d&quot;,
+        p[0]&amp;n, p[1]&amp;n, p[2]&amp;n, p[3]&amp;n,
+        p[4]&amp;n, p[5]&amp;n, p[6]&amp;n, p[7]&amp;n);
+    iProtocol = (iphead + 9)[0];
+    p = iphead + 20;
+
+
+    unsigned int iDstPort = (p[2]&lt;&lt;8)&amp;0xff00 | p[3]&amp;n;
+    switch(iProtocol)
+    {
+        case IPPROTO_UDP : 
+            if(iDstPort == 8888)
+            {
+                printf(&quot;source port: %u,&quot;,(p[0]&lt;&lt;8)&amp;0xff00 |  p[1]&amp;n);
+                printf(&quot;dest port: %u\n&quot;, iDstPort);
+
+                printf(&quot;%s\n&quot;, szIps);    
+                printf(&quot;%s\n&quot;, szVisBuf);
+                printf(&quot;nRead is %d\n&quot;, nRead);    
+
+            }
+            break;
+        case IPPROTO_RAW : 
+            printf(&quot;raw\n&quot;);
+            break;
+        default:
+            break;
+    }
+}
+}
+</code></pre>
+<p>client.c</p>
+<pre><code class="c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;netinet/in.h&gt;
+#include &lt;arpa/inet.h&gt;
+#include &lt;unistd.h&gt;
+
+int main()
+{
+    struct sockaddr_in srvAddr;
+    bzero(&amp;srvAddr, sizeof(srvAddr));
+    srvAddr.sin_family = AF_INET;
+    srvAddr.sin_addr.s_addr = inet_addr(&quot;127.0.0.1&quot;);
+    srvAddr.sin_port = htons(8888);
+
+    int iSock = socket(AF_INET, SOCK_DGRAM, 0); // udp
+    int i = 0;
+    while(1)
+    {
+        printf(&quot;press enter to send data\n&quot;);
+        while (( i = getchar()) != &#39;\n&#39;){
+            char szBuf[32] = {0};
+            snprintf(szBuf, sizeof(szBuf), &quot;hello %d&quot;, ++i);
+            sendto(iSock, szBuf, strlen(szBuf) + 1, 0, (struct sockaddr *)&amp;srvAddr, sizeof(srvAddr));
+        }
+    }
+
+    close(iSock);
+    return 0;
+}
+</code></pre>
 <p>从raw socket 接受过来的buffer 的地址是数据链路层的地址，具体我们获取的东西就是通过偏移量来，这个偏移量我们需要查看网络书或者抓个包分析下链路层的数据格式等等。<br>client很简单，就是一个udp发包到localhost，关键在于server这边：</p>
 <blockquote>
 <p>iSock = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_IP)</p>
 </blockquote>
 <p>这个socket能够监听本机接收到的所有ip packet，接收到的数据帧的头6个字节是目的地的MAC地址，紧接着6个字节是源MAC地址 , 如果是udp或者tcp的话，还能读取到port。也就是一些常用抓包工具的实现原理。</p>
-<p>所以可以写一个简单的抓包工具，将那些发给本机的IPV4报文全部打印出来。<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;errno.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;netinet/in.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;netinet/ip.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;netinet/if_ether.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> **argv)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"><span class="keyword">int</span> sock, n;</span><br><span class="line"><span class="keyword">char</span> buffer[<span class="number">2048</span>];</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">ethhdr</span> *<span class="title">eth</span>;</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">iphdr</span> *<span class="title">iph</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (<span class="number">0</span> &gt; (sock = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_IP)))) &#123;</span><br><span class="line">    perror(<span class="string">"socket"</span>);</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"=====================================\n"</span>);</span><br><span class="line">    <span class="comment">//注意：在这之前我没有调用bind函数，raw socket这一层已经不存在port的概念了</span></span><br><span class="line">    n = recvfrom(sock, buffer, <span class="number">2048</span>, <span class="number">0</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"%d bytes read\n"</span>, n);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//接收到的数据帧头6字节是目的MAC地址，紧接着6字节是源MAC地址。</span></span><br><span class="line">    eth = (struct ethhdr*)buffer;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Dest MAC addr:%02x:%02x:%02x:%02x:%02x:%02x\n"</span>,eth-&gt;h_dest[<span class="number">0</span>],eth-&gt;h_dest[<span class="number">1</span>],eth-&gt;h_dest[<span class="number">2</span>],eth-&gt;h_dest[<span class="number">3</span>],eth-&gt;h_dest[<span class="number">4</span>],eth-&gt;h_dest[<span class="number">5</span>]);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Source MAC addr:%02x:%02x:%02x:%02x:%02x:%02x\n"</span>,eth-&gt;h_source[<span class="number">0</span>],eth-&gt;h_source[<span class="number">1</span>],eth-&gt;h_source[<span class="number">2</span>],eth-&gt;h_source[<span class="number">3</span>],eth-&gt;h_source[<span class="number">4</span>],eth-&gt;h_source[<span class="number">5</span>]);</span><br><span class="line"></span><br><span class="line">    iph = (struct iphdr*)(buffer + <span class="keyword">sizeof</span>(struct ethhdr));</span><br><span class="line">    <span class="comment">//我们只对IPV4且没有选项字段的IPv4报文感兴趣</span></span><br><span class="line">    <span class="keyword">if</span>(iph-&gt;version == <span class="number">4</span> &amp;&amp; iph-&gt;ihl == <span class="number">5</span>)&#123;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> *sd, *dd;</span><br><span class="line">    sd = (<span class="keyword">unsigned</span> <span class="keyword">char</span>*)&amp;iph-&gt;saddr;</span><br><span class="line">    dd = (<span class="keyword">unsigned</span> <span class="keyword">char</span>*)&amp;iph-&gt;daddr;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Source Host: %d.%d.%d.%d Dest host: %d.%d.%d.%d\n"</span>, sd[<span class="number">0</span>], sd[<span class="number">1</span>], sd[<span class="number">2</span>], sd[<span class="number">3</span>], dd[<span class="number">0</span>], dd[<span class="number">1</span>], dd[<span class="number">2</span>], dd[<span class="number">3</span>]);</span><br><span class="line">    <span class="comment">//    printf("Source host:%s\n", inet_ntoa(iph-&gt;saddr));</span></span><br><span class="line">    <span class="comment">//    printf("Dest host:%s\n", inet_ntoa(iph-&gt;daddr));</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>所以可以写一个简单的抓包工具，将那些发给本机的IPV4报文全部打印出来。</p>
+<pre><code class="c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;netinet/in.h&gt;
+#include &lt;netinet/ip.h&gt;
+#include &lt;netinet/if_ether.h&gt;
+
+int main(int argc, char **argv)
+{
+int sock, n;
+char buffer[2048];
+struct ethhdr *eth;
+struct iphdr *iph;
+
+if (0 &gt; (sock = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_IP)))) {
+    perror(&quot;socket&quot;);
+    exit(1);
+}
+
+while (1) {
+    printf(&quot;=====================================\n&quot;);
+    //注意：在这之前我没有调用bind函数，raw socket这一层已经不存在port的概念了
+    n = recvfrom(sock, buffer, 2048, 0, NULL, NULL);
+    printf(&quot;%d bytes read\n&quot;, n);
+
+    //接收到的数据帧头6字节是目的MAC地址，紧接着6字节是源MAC地址。
+    eth = (struct ethhdr*)buffer;
+    printf(&quot;Dest MAC addr:%02x:%02x:%02x:%02x:%02x:%02x\n&quot;,eth-&gt;h_dest[0],eth-&gt;h_dest[1],eth-&gt;h_dest[2],eth-&gt;h_dest[3],eth-&gt;h_dest[4],eth-&gt;h_dest[5]);
+    printf(&quot;Source MAC addr:%02x:%02x:%02x:%02x:%02x:%02x\n&quot;,eth-&gt;h_source[0],eth-&gt;h_source[1],eth-&gt;h_source[2],eth-&gt;h_source[3],eth-&gt;h_source[4],eth-&gt;h_source[5]);
+
+    iph = (struct iphdr*)(buffer + sizeof(struct ethhdr));
+    //我们只对IPV4且没有选项字段的IPv4报文感兴趣
+    if(iph-&gt;version == 4 &amp;&amp; iph-&gt;ihl == 5){
+    unsigned char *sd, *dd;
+    sd = (unsigned char*)&amp;iph-&gt;saddr;
+    dd = (unsigned char*)&amp;iph-&gt;daddr;
+    printf(&quot;Source Host: %d.%d.%d.%d Dest host: %d.%d.%d.%d\n&quot;, sd[0], sd[1], sd[2], sd[3], dd[0], dd[1], dd[2], dd[3]);
+    //    printf(&quot;Source host:%s\n&quot;, inet_ntoa(iph-&gt;saddr));
+    //    printf(&quot;Dest host:%s\n&quot;, inet_ntoa(iph-&gt;daddr));
+    }
+}
+return 0;
+}
+</code></pre>
 <p>顺便提一下，一般我们在Linux机器上是可以查看到当前系统对应的内核的头文件的</p>
 <blockquote>
 <p> root][~]# grep -n ‘ethhdr’ /usr/include/linux/if_ether.h<br>107:struct ethhdr {<br>[root][~]#<br>[root][~]# grep -n ‘iphdr’ /usr/include/linux/*<br>/usr/include/linux/if_tunnel.h:32:      struct iphdr            iph;<br>/usr/include/linux/ip.h:85:struct iphdr {</p>

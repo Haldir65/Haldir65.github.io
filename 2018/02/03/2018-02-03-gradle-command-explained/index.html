@@ -14,7 +14,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/street lights dark night car city.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.039Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.181Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="gradle command记事本">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/street lights dark night car city.jpg">
@@ -206,7 +206,18 @@ ga('send', 'pageview');
 <p>gradlew :app:dependencies –configuration releaseCompileClasspath<br>//前面这个:app只是代表app这个project的<br>gradle tasks –all ## 查看当前project的所有tasks<br>gradle taskA taskB ##多个task是可以同时执行的<br>gradle –status  ## 查看当前操作系统中还有那些Daemon可以用</p>
 </blockquote>
 <p>afterEvaluate是属于project的属性(也可以在allProject中加)</p>
-<p>I forced the version of support-v4 using this block in root build.gradle:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">subprojects &#123;</span><br><span class="line">    project.configurations.all &#123;</span><br><span class="line">        resolutionStrategy.eachDependency &#123; details -&gt;</span><br><span class="line">            <span class="keyword">if</span> (details.requested.group == <span class="string">'com.android.support'</span></span><br><span class="line">                    &amp;&amp; !details.requested.name.contains(<span class="string">'multidex'</span>) ) &#123;</span><br><span class="line">                details.useVersion <span class="string">"$supportlib_version"</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>I forced the version of support-v4 using this block in root build.gradle:</p>
+<pre><code class="java">subprojects {
+    project.configurations.all {
+        resolutionStrategy.eachDependency { details -&gt;
+            if (details.requested.group == &#39;com.android.support&#39;
+                    &amp;&amp; !details.requested.name.contains(&#39;multidex&#39;) ) {
+                details.useVersion &quot;$supportlib_version&quot;
+            }
+        }
+    }
+}
+</code></pre>
 <p><a href="https://stackoverflow.com/questions/42374151/all-com-android-support-libraries-must-use-the-exact-same-version-specification">All com.android.support libraries must use the exact same version [duplicate]
 </a></p>
 <p>关于gradlew只是一层gradle的wrapper，找到这么一段话:<br><strong>The Gradle Wrapper is the preferred way of starting a Gradle build. It consists of a batch script for Windows and a shell script for OS X and Linux. These scripts allow you to run a Gradle build without requiring that Gradle be installed on your system. This used to be something added to your build file, but it’s been folded into Gradle, so there is no longer any need. Instead, you simply use the following command.</strong></p>
@@ -224,8 +235,35 @@ ga('send', 'pageview');
 <blockquote>
 <p>When a module includes an api dependency, it’s letting Gradle know that the module wants to transitively export that dependency to other modules, so that it’s available to them at both runtime and compile time. This configuration behaves just like compile (which is now deprecated), and you should typically use this only in library modules. That’s because, if an api dependency changes its external API, Gradle recompiles all modules that have access to that dependency at compile time. So, having a large number of api dependencies can significantly increase build times. Unless you want to expose a dependency’s API to a separate test module, app modules should instead use implementation dependencies.<br>//所以如果想要把自己的某项依赖暴露出去，让依赖自己的mudule也能用到这项依赖，就要用api了<br>但是api和之前的compile是一样的，所以编译速度比implementation慢很多。</p>
 </blockquote>
-<p>看到一份关于android build tasks解释的<a href="https://www.diycode.cc/topics/683">非常好的文章</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">mergeDebugResources任务的作用是解压所有的aar包输出到app/build/intermediates/exploded-aar，并且把所有的资源文件合并到app/build/intermediates/res/merged/debug目录里</span><br><span class="line"></span><br><span class="line">processDebugManifest任务是把所有aar包里的AndroidManifest.xml中的节点，合并到项目的AndroidManifest.xml中，并根据app/build.gradle中当前buildType的manifestPlaceholders配置内容替换manifest文件中的占位符，最后输出到app/build/intermediates/manifests/full/debug/AndroidManifest.xml</span><br><span class="line"></span><br><span class="line">processDebugResources的作用</span><br><span class="line">1、调用aapt生成项目和所有aar依赖的R.java,输出到app/build/generated/source/r/debug目录</span><br><span class="line">3、生成资源索引文件app/build/intermediates/res/resources-debug.ap_</span><br><span class="line">2、把符号表输出到app/build/intermediates/symbols/debug/R.txt</span><br><span class="line"></span><br><span class="line">compileDebugJavaWithJavac这个任务是用来把java文件编译成class文件，输出的路径是app/build/intermediates/classes/debug</span><br><span class="line">编译的输入目录有</span><br><span class="line">- 1、项目源码目录，默认路径是app/src/main/java，可以通过sourceSets的dsl配置，允许有多个（打印project.android.sourceSets.main.java.srcDirs可以查看当前所有的源码路径,具体配置可以参考android-doc</span><br><span class="line">- 2、app/build/generated/source/aidl</span><br><span class="line">- 3、app/build/generated/source/buildConfig</span><br><span class="line">- 4、app/build/generated/source/apt(继承javax.annotation.processing.AbstractProcessor做动态代码生成的一些库，输出在这个目录，具体可以参考Butterknife 和 Tinker)的代码</span><br><span class="line"></span><br><span class="line">transformClassesWithJarMergingForDebug的作用是把compileDebugJavaWithJavac任务的输出app/build/intermediates/classes/debug，和app/build/intermediates/exploded-aar中所有的classes.jar和libs里的jar包作为输入，合并起来输出到app/build/intermediates/transforms/jarMerging/debug/jars/1/1f/combined.jar，我们在开发中依赖第三方库的时候有时候报duplicate entry:xxx 的错误，就是因为在合并的过程中在不同jar包里发现了相同路径的类</span><br><span class="line"></span><br><span class="line">transformClassesWithMultidexlistForDebug这个任务花费的时间也很长将近8秒，它有两个作用</span><br><span class="line">- 1、扫描项目的AndroidManifest.xml文件和分析类之间的依赖关系，计算出那些类必须放在第一个dex里面,最后把分析的结果写到app/build/intermediates/multi-dex/debug/maindexlist.txt文件里面</span><br><span class="line">- 2、生成混淆配置项输出到app/build/intermediates/multi-dex/debug/manifest_keep.txt文件里</span><br><span class="line"></span><br><span class="line">项目里的代码入口是manifest中application节点的属性android.name配置的继承自Application的类，在android5.0以前的版本系统只会加载一个dex(classes.dex)，classes2.dex .......classesN.dex 一般是使用android.support.multidex.MultiDex加载的，所以如果入口的Application类不在classes.dex里5.0以下肯定会挂掉，另外当入口Application依赖的类不在classes.dex时初始化的时候也会因为类找不到而挂掉，还有如果混淆的时候类名变掉了也会因为对应不了而挂掉,综上所述就是这个任务的作用</span><br><span class="line"></span><br><span class="line">transformClassesWithDexForDebug这个任务的作用是把包含所有class文件的jar包转换为dex，class文件越多转换的越慢</span><br><span class="line">输入的jar包路径是app/build/intermediates/transforms/jarMerging/debug/jars/1/1f/combined.jar</span><br><span class="line">输出dex的目录是build/intermediates/transforms/dex/debug/folders/1000/1f/main</span><br></pre></td></tr></table></figure></p>
-<p>app/build/intermediates/symbols/debug/R.txt这个文件长这样</p>
+<p>看到一份关于android build tasks解释的<a href="https://www.diycode.cc/topics/683">非常好的文章</a></p>
+<pre><code>mergeDebugResources任务的作用是解压所有的aar包输出到app/build/intermediates/exploded-aar，并且把所有的资源文件合并到app/build/intermediates/res/merged/debug目录里
+
+processDebugManifest任务是把所有aar包里的AndroidManifest.xml中的节点，合并到项目的AndroidManifest.xml中，并根据app/build.gradle中当前buildType的manifestPlaceholders配置内容替换manifest文件中的占位符，最后输出到app/build/intermediates/manifests/full/debug/AndroidManifest.xml
+
+processDebugResources的作用
+1、调用aapt生成项目和所有aar依赖的R.java,输出到app/build/generated/source/r/debug目录
+3、生成资源索引文件app/build/intermediates/res/resources-debug.ap_
+2、把符号表输出到app/build/intermediates/symbols/debug/R.txt
+
+compileDebugJavaWithJavac这个任务是用来把java文件编译成class文件，输出的路径是app/build/intermediates/classes/debug
+编译的输入目录有
+- 1、项目源码目录，默认路径是app/src/main/java，可以通过sourceSets的dsl配置，允许有多个（打印project.android.sourceSets.main.java.srcDirs可以查看当前所有的源码路径,具体配置可以参考android-doc
+- 2、app/build/generated/source/aidl
+- 3、app/build/generated/source/buildConfig
+- 4、app/build/generated/source/apt(继承javax.annotation.processing.AbstractProcessor做动态代码生成的一些库，输出在这个目录，具体可以参考Butterknife 和 Tinker)的代码
+
+transformClassesWithJarMergingForDebug的作用是把compileDebugJavaWithJavac任务的输出app/build/intermediates/classes/debug，和app/build/intermediates/exploded-aar中所有的classes.jar和libs里的jar包作为输入，合并起来输出到app/build/intermediates/transforms/jarMerging/debug/jars/1/1f/combined.jar，我们在开发中依赖第三方库的时候有时候报duplicate entry:xxx 的错误，就是因为在合并的过程中在不同jar包里发现了相同路径的类
+
+transformClassesWithMultidexlistForDebug这个任务花费的时间也很长将近8秒，它有两个作用
+- 1、扫描项目的AndroidManifest.xml文件和分析类之间的依赖关系，计算出那些类必须放在第一个dex里面,最后把分析的结果写到app/build/intermediates/multi-dex/debug/maindexlist.txt文件里面
+- 2、生成混淆配置项输出到app/build/intermediates/multi-dex/debug/manifest_keep.txt文件里
+
+项目里的代码入口是manifest中application节点的属性android.name配置的继承自Application的类，在android5.0以前的版本系统只会加载一个dex(classes.dex)，classes2.dex .......classesN.dex 一般是使用android.support.multidex.MultiDex加载的，所以如果入口的Application类不在classes.dex里5.0以下肯定会挂掉，另外当入口Application依赖的类不在classes.dex时初始化的时候也会因为类找不到而挂掉，还有如果混淆的时候类名变掉了也会因为对应不了而挂掉,综上所述就是这个任务的作用
+
+transformClassesWithDexForDebug这个任务的作用是把包含所有class文件的jar包转换为dex，class文件越多转换的越慢
+输入的jar包路径是app/build/intermediates/transforms/jarMerging/debug/jars/1/1f/combined.jar
+输出dex的目录是build/intermediates/transforms/dex/debug/folders/1000/1f/main
+</code></pre><p>app/build/intermediates/symbols/debug/R.txt这个文件长这样</p>
 <blockquote>
 <p>int anim abc_fade_in 0x7f010000<br>int anim abc_fade_out 0x7f010001<br>int anim abc_grow_fade_in_from_bottom 0x7f010002<br>int anim abc_popup_enter 0x7f010003<br>int anim abc_popup_exit 0x7f010004<br>int anim abc_shrink_fade_out_from_bottom 0x7f010005<br>int anim abc_slide_in_bottom 0x7f010006<br>int anim abc_slide_in_top 0x7f010007<br>int anim abc_slide_out_bottom 0x7f010008<br>int anim abc_slide_out_top 0x7f010009<br>int anim design_bottom_sheet_slide_in 0x7f01000a<br>int anim design_bottom_sheet_slide_out 0x7f01000b<br>int anim design_snackbar_in 0x7f01000c<br>int anim design_snackbar_out 0x7f01000d<br>int anim tooltip_enter 0x7f01000e<br>int anim tooltip_exit 0x7f01000f<br>int animator design_appbar_state_list_animator 0x7f020000<br>int attr actionBarDivider 0x7f030000<br>int attr actionBarItemBackground 0x7f030001<br>int attr actionBarPopupTheme 0x7f030002<br>int attr actionBarSize 0x7f030003<br>…<br>按照字母从a-z开始，hex value自增(0x7f开头)</p>
 </blockquote>
@@ -245,7 +283,9 @@ ga('send', 'pageview');
 <p>Gradle的Flavor能否配置sourceset?<br>在sourceSets中可以设置不同flavor各自的java.srcDirs和res.srcDirs</p>
 <p>Product flavors<br>一个product flavor定义了从项目中构建了一个应用的自定义版本。一个单一的项目可以同时定义多个不同的flavor来改变应用的输出。<br>Build Type  + Product Flavor = Build Variant（构建类型+定制产品=构建变种版本）<br>这句话的意思就是，BuildTypes有n种，product flavor有m种，最终可能的组合有m*n种<br><a href="http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Build-Variants">Gradle Plugin User Guide</a></p>
 <p><a href="https://tech.meituan.com/meituan_food_delivery_android_architecture_evolution.html">美团外卖Android平台化架构演进实践</a></p>
-<p><a href="https://github.com/HujiangTechnology/gradle_plugin_android_aspectjx/pull/75/files#diff-a5277607f48bf80ac7edd5dbafa307ae">gradle 4.4之后Clock 被Deprecated的方案是自己创建一个groovy文件</a><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">org.gradle.util.Clock() <span class="comment">// 被Deprecated之后的解决方案</span></span><br></pre></td></tr></table></figure></p>
+<p><a href="https://github.com/HujiangTechnology/gradle_plugin_android_aspectjx/pull/75/files#diff-a5277607f48bf80ac7edd5dbafa307ae">gradle 4.4之后Clock 被Deprecated的方案是自己创建一个groovy文件</a></p>
+<pre><code class="java">org.gradle.util.Clock() // 被Deprecated之后的解决方案
+</code></pre>
 <p><a href="https://guides.gradle.org/building-android-apps/">building-android-apps</a></p>
 <h2 id="2-创建java-Library并提交到jcenter的方法"><a href="#2-创建java-Library并提交到jcenter的方法" class="headerlink" title="2. 创建java Library并提交到jcenter的方法"></a>2. 创建java Library并提交到jcenter的方法</h2><p>JFrog 是软件管理和分发的领先通用解决方案JFrog 是软件管理和分发的领先通用解决方案，JFrog Bintray（通用分发平台）只是他家的众多服务之一。这个通用分发平台，就当CDN用好了。<br><a href="https://bintray.com/signup/oss">bintray的注册地址</a>。注册好了之后登录bintray，创建一个仓库，随便起名字，比如叫maven。在build.gradle中就可以引入</p>
 <blockquote>
@@ -259,43 +299,266 @@ ga('send', 'pageview');
 <blockquote>
 <p>classpath ‘com.github.dcendents:android-maven-gradle-plugin:1.3’   //<br>  classpath ‘com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6’</p>
 </blockquote>
-<p>配好了大概长这样<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">// Top-level build file where you can add configuration options common to all sub-projects/modules.</span><br><span class="line"></span><br><span class="line">buildscript &#123;</span><br><span class="line">    repositories &#123;</span><br><span class="line">        jcenter()</span><br><span class="line">        google()</span><br><span class="line">    &#125;</span><br><span class="line">    dependencies &#123;</span><br><span class="line">        classpath &apos;com.android.tools.build:gradle:3.0.1&apos;</span><br><span class="line"></span><br><span class="line">        classpath &apos;com.github.dcendents:android-maven-gradle-plugin:1.4.1&apos;</span><br><span class="line">        classpath &apos;com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6&apos;</span><br><span class="line">        // NOTE: Do not place your application dependencies here; they belong</span><br><span class="line">        // in the individual module build.gradle files</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">allprojects &#123;</span><br><span class="line">    repositories &#123;</span><br><span class="line">        jcenter()</span><br><span class="line">        google()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>android-maven-gradle-plugin插件是用来打包Maven所需文件的。<br>gradle-bintray-plugin插件是用来将生成的Maven所需文件上传到Bintray的。</p>
-<p>二.在library module的build.gradle中添加<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line">apply plugin: &apos;com.github.dcendents.android-maven&apos;</span><br><span class="line">apply plugin: &apos;com.jfrog.bintray&apos;</span><br><span class="line">// This is the library version used when deploying the artifact</span><br><span class="line">version = &quot;1.0.0&quot;</span><br><span class="line"></span><br><span class="line">def siteUrl = &apos;https://github.com/Haldir65/androidMedia&apos;      // 项目的主页</span><br><span class="line">def gitUrl = &apos;https://github.com/Haldir65/androidMedia.git&apos;   // Git仓库的url</span><br><span class="line">group = &quot;com.github.haldir65.starry&quot;                                        // Maven Group ID for the artifact，一般填你唯一的包名</span><br><span class="line">install &#123;</span><br><span class="line">    repositories.mavenInstaller &#123;</span><br><span class="line">        // This generates POM.xml with proper parameters</span><br><span class="line">        pom &#123;</span><br><span class="line">            project &#123;</span><br><span class="line">                packaging &apos;aar&apos;</span><br><span class="line">                // Add your description here</span><br><span class="line">                name &apos;Starry\n&apos; +</span><br><span class="line">                        &apos;Starry night\n&apos; +</span><br><span class="line">                        &apos;Paint your palette blue and grey&apos;</span><br><span class="line">                url siteUrl</span><br><span class="line">                // Set your license</span><br><span class="line">                licenses &#123;</span><br><span class="line">                    license &#123;</span><br><span class="line">                        name &apos;The Apache Software License, Version 2.0&apos;</span><br><span class="line">                        url &apos;http://www.apache.org/licenses/LICENSE-2.0.txt&apos;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                developers &#123;</span><br><span class="line">                    developer &#123;</span><br><span class="line">                        id &apos;haldir&apos;        //填写的一些基本信息</span><br><span class="line">                        name &apos;johnDoe&apos;</span><br><span class="line">                        email &apos;mjw090608@gmail.com&apos;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                scm &#123;</span><br><span class="line">                    connection gitUrl</span><br><span class="line">                    developerConnection gitUrl</span><br><span class="line">                    url siteUrl</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">task sourcesJar(type: Jar) &#123;</span><br><span class="line">    from android.sourceSets.main.java.srcDirs</span><br><span class="line">    classifier = &apos;sources&apos;</span><br><span class="line">&#125;</span><br><span class="line">task javadoc(type: Javadoc) &#123;</span><br><span class="line">    source = android.sourceSets.main.java.srcDirs</span><br><span class="line">    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))</span><br><span class="line">&#125;</span><br><span class="line">task javadocJar(type: Jar, dependsOn: javadoc) &#123;</span><br><span class="line">    classifier = &apos;javadoc&apos;</span><br><span class="line">    from javadoc.destinationDir</span><br><span class="line">&#125;</span><br><span class="line">artifacts &#123;</span><br><span class="line">    archives javadocJar</span><br><span class="line">    archives sourcesJar</span><br><span class="line">&#125;</span><br><span class="line">Properties properties = new Properties()</span><br><span class="line">properties.load(project.rootProject.file(&apos;local.properties&apos;).newDataInputStream())</span><br><span class="line">bintray &#123;</span><br><span class="line">    user = properties.getProperty(&quot;bintray.user&quot;)</span><br><span class="line">    key = properties.getProperty(&quot;bintray.apikey&quot;)</span><br><span class="line">    configurations = [&apos;archives&apos;]</span><br><span class="line">    pkg &#123;</span><br><span class="line">        repo = &quot;maven&quot;</span><br><span class="line">        name = &quot;Starry&quot;    //发布到JCenter上的项目名字</span><br><span class="line">        websiteUrl = siteUrl</span><br><span class="line">        vcsUrl = gitUrl</span><br><span class="line">        licenses = [&quot;Apache-2.0&quot;]</span><br><span class="line">        publish = true</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">javadoc &#123; //jav doc采用utf-8编码否则会报“GBK的不可映射字符”错误</span><br><span class="line">    options&#123;</span><br><span class="line">        encoding &quot;UTF-8&quot;</span><br><span class="line">        charSet &apos;UTF-8&apos;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>配好了大概长这样</p>
+<pre><code>// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    repositories {
+        jcenter()
+        google()
+    }
+    dependencies {
+        classpath &#39;com.android.tools.build:gradle:3.0.1&#39;
+
+        classpath &#39;com.github.dcendents:android-maven-gradle-plugin:1.4.1&#39;
+        classpath &#39;com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6&#39;
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        google()
+    }
+}
+</code></pre><p>android-maven-gradle-plugin插件是用来打包Maven所需文件的。<br>gradle-bintray-plugin插件是用来将生成的Maven所需文件上传到Bintray的。</p>
+<p>二.在library module的build.gradle中添加</p>
+<pre><code class="config">apply plugin: &#39;com.github.dcendents.android-maven&#39;
+apply plugin: &#39;com.jfrog.bintray&#39;
+// This is the library version used when deploying the artifact
+version = &quot;1.0.0&quot;
+
+def siteUrl = &#39;https://github.com/Haldir65/androidMedia&#39;      // 项目的主页
+def gitUrl = &#39;https://github.com/Haldir65/androidMedia.git&#39;   // Git仓库的url
+group = &quot;com.github.haldir65.starry&quot;                                        // Maven Group ID for the artifact，一般填你唯一的包名
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging &#39;aar&#39;
+                // Add your description here
+                name &#39;Starry\n&#39; +
+                        &#39;Starry night\n&#39; +
+                        &#39;Paint your palette blue and grey&#39;
+                url siteUrl
+                // Set your license
+                licenses {
+                    license {
+                        name &#39;The Apache Software License, Version 2.0&#39;
+                        url &#39;http://www.apache.org/licenses/LICENSE-2.0.txt&#39;
+                    }
+                }
+                developers {
+                    developer {
+                        id &#39;haldir&#39;        //填写的一些基本信息
+                        name &#39;johnDoe&#39;
+                        email &#39;mjw090608@gmail.com&#39;
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+                }
+            }
+        }
+    }
+}
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = &#39;sources&#39;
+}
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = &#39;javadoc&#39;
+    from javadoc.destinationDir
+}
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+Properties properties = new Properties()
+properties.load(project.rootProject.file(&#39;local.properties&#39;).newDataInputStream())
+bintray {
+    user = properties.getProperty(&quot;bintray.user&quot;)
+    key = properties.getProperty(&quot;bintray.apikey&quot;)
+    configurations = [&#39;archives&#39;]
+    pkg {
+        repo = &quot;maven&quot;
+        name = &quot;Starry&quot;    //发布到JCenter上的项目名字
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        licenses = [&quot;Apache-2.0&quot;]
+        publish = true
+    }
+}
+javadoc { //jav doc采用utf-8编码否则会报“GBK的不可映射字符”错误
+    options{
+        encoding &quot;UTF-8&quot;
+        charSet &#39;UTF-8&#39;
+    }
+}
+</code></pre>
 <p>三.在local.properities中添加</p>
 <blockquote>
 <p>bintray.user=your bintray username<br>bintray.apikey=your apikey</p>
 </blockquote>
 <p>记得把local.properties加到gitignore里面，搞定</p>
-<p>在需要使用的module的build.gradle中引入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">buildscript &#123;</span><br><span class="line">    repositories &#123;</span><br><span class="line">        maven &#123;</span><br><span class="line">            url &apos;https://dl.bintray.com/haldir65/maven&apos;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">dependencies &#123;</span><br><span class="line">    implementation &apos;com.github.haldir65.starry:starry:1.0.0&apos;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h2 id="3-Building-LifeCycle"><a href="#3-Building-LifeCycle" class="headerlink" title="3. Building LifeCycle"></a>3. Building LifeCycle</h2><p><a href="https://docs.gradle.org/current/userguide/build_lifecycle.html#sec:build_phases">编译的各个阶段的hook</a><br>正如gradle官网所介绍的，Build流程分为三个阶段(Initialization -&gt; Configuration -&gt; Execution) .</p>
+<p>在需要使用的module的build.gradle中引入</p>
+<pre><code>buildscript {
+    repositories {
+        maven {
+            url &#39;https://dl.bintray.com/haldir65/maven&#39;
+        }
+    }
+}
+
+dependencies {
+    implementation &#39;com.github.haldir65.starry:starry:1.0.0&#39;
+}
+</code></pre><h2 id="3-Building-LifeCycle"><a href="#3-Building-LifeCycle" class="headerlink" title="3. Building LifeCycle"></a>3. Building LifeCycle</h2><p><a href="https://docs.gradle.org/current/userguide/build_lifecycle.html#sec:build_phases">编译的各个阶段的hook</a><br>正如gradle官网所介绍的，Build流程分为三个阶段(Initialization -&gt; Configuration -&gt; Execution) .</p>
 <p>The settings file is executed during the initialization phase. 即settings.gradle中的语句是最早被执行的</p>
 <h3 id="setting-gradle"><a href="#setting-gradle" class="headerlink" title="setting.gradle"></a>setting.gradle</h3><blockquote>
 <p>println ‘This is executed during the initialization phase.’</p>
 </blockquote>
-<h3 id="build-gradle"><a href="#build-gradle" class="headerlink" title="build.gradle"></a>build.gradle</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">println <span class="string">'This is executed during the configuration phase.'</span></span><br><span class="line"></span><br><span class="line">task configured &#123;</span><br><span class="line">    println <span class="string">'This is also executed during the configuration phase.'</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">task test &#123;</span><br><span class="line">    doLast &#123;</span><br><span class="line">        println <span class="string">'This is executed during the execution phase.'</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">task testBoth &#123;</span><br><span class="line">    doFirst &#123;</span><br><span class="line">      println <span class="string">'This is executed first during the execution phase.'</span></span><br><span class="line">    &#125;</span><br><span class="line">    doLast &#123;</span><br><span class="line">      println <span class="string">'This is executed last during the execution phase.'</span></span><br><span class="line">    &#125;</span><br><span class="line">    println <span class="string">'This is executed during the configuration phase as well.'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="build-gradle"><a href="#build-gradle" class="headerlink" title="build.gradle"></a>build.gradle</h3><pre><code class="java">println &#39;This is executed during the configuration phase.&#39;
+
+task configured {
+    println &#39;This is also executed during the configuration phase.&#39;
+}
+
+task test {
+    doLast {
+        println &#39;This is executed during the execution phase.&#39;
+    }
+}
+
+task testBoth {
+    doFirst {
+      println &#39;This is executed first during the execution phase.&#39;
+    }
+    doLast {
+      println &#39;This is executed last during the execution phase.&#39;
+    }
+    println &#39;This is executed during the configuration phase as well.&#39;
+}
+</code></pre>
 <p>输出</p>
 <blockquote>
 <p> gradle test testBoth<br>This is executed during the initialization phase.<br>This is executed during the configuration phase.<br>This is also executed during the configuration phase.<br>This is executed during the configuration phase as well.<br>:test<br>This is executed during the execution phase.<br>:testBoth<br>This is executed first during the execution phase.<br>This is executed last during the execution phase.<br>BUILD SUCCESSFUL in 0s<br>2 actionable tasks: 2 executed</p>
 </blockquote>
-<p>经常会在build.gradle中看到这样一段<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">afterEvaluate &#123; project -&gt;</span><br><span class="line">    logger.info(<span class="string">"=========afterEvaluate=============="</span>)</span><br><span class="line">    project.tasks.each &#123; task -&gt;</span><br><span class="line">        <span class="keyword">if</span> (task.name == <span class="string">"test"</span>||task.name.contains(<span class="string">"lint"</span>))&#123;</span><br><span class="line">            task.enabled = <span class="keyword">false</span> <span class="comment">// 有些不必要的确实可以剔除掉</span></span><br><span class="line">        &#125;</span><br><span class="line"><span class="comment">//        task.enabled = false 这么干的话全部任务都不会执行</span></span><br><span class="line">       println(<span class="string">"-------------$&#123;task.name&#125;----"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>经常会在build.gradle中看到这样一段</p>
+<pre><code class="java">afterEvaluate { project -&gt;
+    logger.info(&quot;=========afterEvaluate==============&quot;)
+    project.tasks.each { task -&gt;
+        if (task.name == &quot;test&quot;||task.name.contains(&quot;lint&quot;)){
+            task.enabled = false // 有些不必要的确实可以剔除掉
+        }
+//        task.enabled = false 这么干的话全部任务都不会执行
+       println(&quot;-------------${task.name}----&quot;)
+    }
+}
+</code></pre>
 <p>closure就是一对花括号包着的东西<br>afterEvaluate发生在Configuration之后，实际上也就是在project配置完成后，开始执行所有task前，对外提供一个closure，其实beforeEvaluate也有。</p>
-<p><strong>immediately invoked after a task is added to a project</strong> 在Task被添加到project的时候执行closure<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">tasks.whenTaskAdded &#123; task -&gt;</span><br><span class="line">    task.ext.srcDir = <span class="string">'src/main/java'</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">task a</span><br><span class="line"></span><br><span class="line">println <span class="string">"source dir is $&#123;a.srcDir&#125;"</span></span><br></pre></td></tr></table></figure></p>
-<p>project evaluate有可能成功，也会失败。但无论成功还是失败，下面的notification都会触发<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">gradle.afterProject &#123;project, projectState -&gt;</span><br><span class="line">    <span class="keyword">if</span> (projectState.failure) &#123;</span><br><span class="line">        println <span class="string">"Evaluation of $project FAILED"</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        println <span class="string">"Evaluation of $project succeeded"</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>在gradle的plugin中实现也有类似的<br>PluginImpl.groovy<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PluginImpl</span> <span class="keyword">implements</span> <span class="title">Plugin</span>&lt;<span class="title">Project</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="keyword">void</span> <span class="title">apply</span><span class="params">(Project project)</span> </span>&#123;</span><br><span class="line">     project.gradle.addProjectEvaluationListener() <span class="comment">// 和在build.gradle中afterEvaluate差不多</span></span><br><span class="line">     project.getGradle().taskGraph.addTaskExecutionGraphListener() <span class="comment">//在执行前</span></span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>immediately invoked after a task is added to a project</strong> 在Task被添加到project的时候执行closure</p>
+<pre><code class="java">tasks.whenTaskAdded { task -&gt;
+    task.ext.srcDir = &#39;src/main/java&#39;
+}
+
+task a
+
+println &quot;source dir is ${a.srcDir}&quot;
+</code></pre>
+<p>project evaluate有可能成功，也会失败。但无论成功还是失败，下面的notification都会触发</p>
+<pre><code class="java">gradle.afterProject {project, projectState -&gt;
+    if (projectState.failure) {
+        println &quot;Evaluation of $project FAILED&quot;
+    } else {
+        println &quot;Evaluation of $project succeeded&quot;
+    }
+}
+</code></pre>
+<p>在gradle的plugin中实现也有类似的<br>PluginImpl.groovy</p>
+<pre><code class="java">public class PluginImpl implements Plugin&lt;Project&gt; {
+
+   void apply(Project project) {
+     project.gradle.addProjectEvaluationListener() // 和在build.gradle中afterEvaluate差不多
+     project.getGradle().taskGraph.addTaskExecutionGraphListener() //在执行前
+   }
+}
+</code></pre>
 <p>Task execution graph ready(    graphPopulated,This method is called when the TaskExecutionGraph has been populated, and before any tasks are executed.)在任何task执行前被执行</p>
-<p>Task execution(You can receive a notification immediately before and after any task is executed.)<br>(TaskExecutionListener,在task执行前和执行后)<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">project.gradle.addListener(<span class="keyword">new</span> TaskExecutionListener() &#123;</span><br><span class="line">          <span class="meta">@Override</span></span><br><span class="line">          <span class="function"><span class="keyword">void</span> <span class="title">beforeExecute</span><span class="params">(Task task)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">          &#125;</span><br><span class="line"></span><br><span class="line">          <span class="meta">@Override</span></span><br><span class="line">          <span class="function"><span class="keyword">void</span> <span class="title">afterExecute</span><span class="params">(Task task, TaskState taskState)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">          &#125;</span><br><span class="line">      &#125;)</span><br></pre></td></tr></table></figure></p>
-<p>而在build.gradle中是这样的写法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">task ok</span><br><span class="line"></span><br><span class="line"><span class="function">task <span class="title">broken</span><span class="params">(dependsOn: ok)</span> </span>&#123;</span><br><span class="line">    group <span class="string">'Welcome'</span> <span class="comment">// 这个是task的一个属性</span></span><br><span class="line">    description <span class="string">'Produces a greeting'</span> <span class="comment">// 这个是在project中输入gradle tasks之后输出的任务列表中每一项后面的描述信息</span></span><br><span class="line"></span><br><span class="line">    doLast &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">'broken'</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">gradle.taskGraph.beforeTask &#123; Task task -&gt;</span><br><span class="line">    println <span class="string">"executing $task ..."</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">gradle.taskGraph.afterTask &#123; Task task, TaskState state -&gt;</span><br><span class="line">    <span class="keyword">if</span> (state.failure) &#123;</span><br><span class="line">        println <span class="string">"FAILED"</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        println <span class="string">"done"</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Task execution(You can receive a notification immediately before and after any task is executed.)<br>(TaskExecutionListener,在task执行前和执行后)</p>
+<pre><code class="java">project.gradle.addListener(new TaskExecutionListener() {
+          @Override
+          void beforeExecute(Task task) {
+
+          }
+
+          @Override
+          void afterExecute(Task task, TaskState taskState) {
+
+          }
+      })
+</code></pre>
+<p>而在build.gradle中是这样的写法</p>
+<pre><code class="java">task ok
+
+task broken(dependsOn: ok) {
+    group &#39;Welcome&#39; // 这个是task的一个属性
+    description &#39;Produces a greeting&#39; // 这个是在project中输入gradle tasks之后输出的任务列表中每一项后面的描述信息
+
+    doLast {
+        throw new RuntimeException(&#39;broken&#39;)
+    }
+}
+
+gradle.taskGraph.beforeTask { Task task -&gt;
+    println &quot;executing $task ...&quot;
+}
+
+gradle.taskGraph.afterTask { Task task, TaskState state -&gt;
+    if (state.failure) {
+        println &quot;FAILED&quot;
+    }
+    else {
+        println &quot;done&quot;
+    }
+}
+</code></pre>
 <h2 id="4-How-to-create-gradle-Plugin"><a href="#4-How-to-create-gradle-Plugin" class="headerlink" title="4. How to create gradle Plugin"></a>4. How to create gradle Plugin</h2><p><a href="https://github.com/helen-x/gradle-plugin-demo">整体的过程和这里面说的差不多</a></p>
 <ol>
 <li>add to your buidl script // 不可复用</li>
 <li>创建BuildSrc文件夹 //依旧不可复用</li>
 <li>创建一个Standalone Project //可复用</li>
 </ol>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GreetingPlugin</span> <span class="keyword">implements</span> <span class="title">Plugin</span>&lt;<span class="title">Project</span>&gt; </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">apply</span><span class="params">(Project project)</span> </span>&#123;</span><br><span class="line">        project.task(<span class="string">"hello"</span>)</span><br><span class="line">          .doLast(task -&gt; System.out.println(<span class="string">"Hello Gradle!"</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="java">public class GreetingPlugin implements Plugin&lt;Project&gt; {
+    @Override
+    public void apply(Project project) {
+        project.task(&quot;hello&quot;)
+          .doLast(task -&gt; System.out.println(&quot;Hello Gradle!&quot;));
+    }
+}
+</code></pre>
 <p><a href="https://www.jianshu.com/p/f43d48abfbf3">使用Transform Api在class变成dex之前对class进行字节码修改</a><br>本质上是在merge{ProductFlavor}{BuildType}Assets Task之后，transformClassesWithDexFor{ProductFlavor}{BuildType} Transform 之前,插入一个transformClassesWith{YourTransformName}For{ProductFlavor}{BuildType} Transform</p>
-<h2 id="5-update"><a href="#5-update" class="headerlink" title="5. update"></a>5. update</h2><p><a href="https://github.com/myjoybar/Android-Router/blob/master/route.sh">待查看</a><br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">preBuild &lt;&lt; &#123;</span><br><span class="line">    <span class="built_in">String</span> cmd = <span class="string">"sh inrouter/maker/route.sh "</span> + project.getName()</span><br><span class="line">    def cmdResult = cmd.execute().text.trim()</span><br><span class="line">    println cmdResult</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#echo "Start make"</span></span><br><span class="line"><span class="comment">#javac -encoding utf-8 ./inrouter/maker/java/com/me/obo/maker/utils/*.java ./inrouter/maker/java/com/me/obo/maker/*.java -d inrouter/maker/class/  -cp inrouter/maker/libs/javapoet-1.9.0.jar</span></span><br><span class="line"><span class="comment">#java -Djava.ext.dirs=inrouter/maker/libs -classpath inrouter/maker/class com.me.obo.maker.CodeMaker $1 $2</span></span><br><span class="line"><span class="comment">#echo "End make"</span></span><br></pre></td></tr></table></figure>
+<h2 id="5-update"><a href="#5-update" class="headerlink" title="5. update"></a>5. update</h2><p><a href="https://github.com/myjoybar/Android-Router/blob/master/route.sh">待查看</a></p>
+<pre><code class="js">preBuild &lt;&lt; {
+    String cmd = &quot;sh inrouter/maker/route.sh &quot; + project.getName()
+    def cmdResult = cmd.execute().text.trim()
+    println cmdResult
+}
+</code></pre>
+<pre><code class="bash">#echo &quot;Start make&quot;
+#javac -encoding utf-8 ./inrouter/maker/java/com/me/obo/maker/utils/*.java ./inrouter/maker/java/com/me/obo/maker/*.java -d inrouter/maker/class/  -cp inrouter/maker/libs/javapoet-1.9.0.jar
+#java -Djava.ext.dirs=inrouter/maker/libs -classpath inrouter/maker/class com.me.obo.maker.CodeMaker $1 $2
+#echo &quot;End make&quot;
+</code></pre>
 <p><a href="https://github.com/Tencent/tinker/blob/master/tinker-build/tinker-patch-gradle-plugin/src/main/groovy/com/tencent/tinker/build/gradle/TinkerPatchPlugin.groovy">Tinker的gradle plugin实现，非常有参考意义</a><br>和java libraray提交到jcenter不同，gradle需要提交到<a href="https://guides.gradle.org/publishing-plugins-to-gradle-plugin-portal/">Gradle Plugin Portal</a>。没错，一个完全不一样的网站</p>
 <p><a href="https://stackoverflow.com/questions/47300679/configuration-compile-in-is-deprecated-but-all-configurations-are-implementa">明明已经把所有的包都改成implementation了，编译器还是报error</a></p>
 <blockquote>
@@ -305,9 +568,35 @@ ga('send', 'pageview');
 <blockquote>
 <p>include ‘:library1’<br>project(‘:library1’).projectDir = new File(‘../StickyListHeader/library1’)</p>
 </blockquote>
-<p>buildScript中gradle library的搜索顺序。比如自己添加了一个<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">maven &#123;</span><br><span class="line">            url &apos;https://maven.google.com/&apos;</span><br><span class="line">            name &apos;Google&apos;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure></p>
-<p>像这样的repository</p>
-<p>信不信由你，build.gradle文件有时候是从上往下读的。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">    buildTypes &#123;</span><br><span class="line">        release &#123;</span><br><span class="line">            minifyEnabled <span class="literal">true</span></span><br><span class="line">            proguardFiles getDefaultProguardFile(<span class="string">'proguard-android.txt'</span>), <span class="string">'proguard-rules.pro'</span></span><br><span class="line">            signingConfig signingConfigs.release</span><br><span class="line">            shrinkResources <span class="literal">true</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        debug &#123;</span><br><span class="line">            minifyEnabled <span class="literal">false</span></span><br><span class="line">            proguardFiles getDefaultProguardFile(<span class="string">'proguard-android.txt'</span>), <span class="string">'proguard-rules.pro'</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// signingConfigs写在下面是不认的，把这个signingConfigs挪到上面就行了。这跟多数语言的函数声明要写在引用前头是一样的。</span></span><br><span class="line">    signingConfigs &#123;</span><br><span class="line">        release &#123;</span><br><span class="line">           <span class="comment">// ...</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>buildScript中gradle library的搜索顺序。比如自己添加了一个</p>
+<pre><code>maven {
+            url &#39;https://maven.google.com/&#39;
+            name &#39;Google&#39;
+        }
+</code></pre><p>像这样的repository</p>
+<p>信不信由你，build.gradle文件有时候是从上往下读的。</p>
+<pre><code class="js">    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile(&#39;proguard-android.txt&#39;), &#39;proguard-rules.pro&#39;
+            signingConfig signingConfigs.release
+            shrinkResources true
+        }
+
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile(&#39;proguard-android.txt&#39;), &#39;proguard-rules.pro&#39;
+        }
+
+    }
+
+// signingConfigs写在下面是不认的，把这个signingConfigs挪到上面就行了。这跟多数语言的函数声明要写在引用前头是一样的。
+    signingConfigs {
+        release {
+           // ...
+        }
+    }
+</code></pre>
 <p><a href="https://github.com/adwiv/android-fat-aar">比较复杂的gradle knowledge</a><br><a href="https://guides.gradle.org/creating-new-gradle-builds/">official gradle docs 是最好的学习资料</a><br><a href="https://docs.gradle.org/current/userguide/custom_plugins.html">custom_plugins</a><br><a href="https://docs.gradle.org/current/userguide/tutorial_using_tasks.html#configure-by-dag">Build Script Basics</a><br><a href="https://juejin.im/post/5a756f11f265da4e7c185bc5">关于Android Gradle你需要知道这些（4）</a><br><a href="https://juejin.im/post/5a767c7cf265da4e9c6300a1#heading-5">Gradle插件学习笔记（四)</a><br><a href="https://android.googlesource.com/platform/tools/build/+/tools_r22/gradle/src/main/groovy/com/android/build/gradle/BasePlugin.groovy">Android Gradle Plugin  source Code</a></p>
 
       

@@ -17,7 +17,7 @@
 <meta property="og:description" content="原本只打算写一点关于线程池的实现原理，后来发现坑越挖越大。不得不写到一半停下来，所以，这算是一篇不那么完善的关于原理的解析吧。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.031Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.177Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java线程池的实现原理">
 <meta name="twitter:description" content="原本只打算写一点关于线程池的实现原理，后来发现坑越挖越大。不得不写到一半停下来，所以，这算是一篇不那么完善的关于原理的解析吧。">
@@ -202,16 +202,166 @@ ga('send', 'pageview');
       
         <p>原本只打算写一点关于线程池的实现原理，后来发现坑越挖越大。不得不写到一半停下来，所以，这算是一篇不那么完善的关于原理的解析吧。<br><img src="https://www.haldir66.ga/static/imgs/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg" alt=""><br><a id="more"></a></p>
 <ol>
-<li>线程池的常规使用方式<br>通常说的线程池对外表现为具有一系列操作功能的接口，Executor提供了execute一个runnable的功能，而其子类ExecutorService则对外提供了更多的实用功能，所以平时用的都是ExecutorService的实现类。<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Executor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Executes the given command at some time in the future.  The command</span></span><br><span class="line"><span class="comment">     * may execute in a new thread, in a pooled thread, or in the calling</span></span><br><span class="line"><span class="comment">     * thread, at the discretion of the &#123;<span class="doctag">@code</span> Executor&#125; implementation.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> command the runnable task</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> RejectedExecutionException if this task cannot be</span></span><br><span class="line"><span class="comment">     * accepted for execution</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> NullPointerException if command is null</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">execute</span><span class="params">(Runnable command)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ExecutorService</span> <span class="keyword">extends</span> <span class="title">Executor</span></span>&#123;</span><br><span class="line">true</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AbstractExecutorService</span> <span class="keyword">implements</span> <span class="title">ExecutorService</span> </span>&#123;</span><br><span class="line">true</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ThreadPoolExecutor</span> <span class="keyword">extends</span> <span class="title">AbstractExecutorService</span> </span>&#123;</span><br><span class="line">true</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
+<li>线程池的常规使用方式<br>通常说的线程池对外表现为具有一系列操作功能的接口，Executor提供了execute一个runnable的功能，而其子类ExecutorService则对外提供了更多的实用功能，所以平时用的都是ExecutorService的实现类。<br>```java</li>
 </ol>
-<p>更具体一点来说，java.util.concurrent.ThreadPoolExecutor这个类提供了上述接口的具体实现，同时对外提供了一些hook(beforeExecute、afterExecute等)，当然开发者也可以继承这个方法，实现更多自定义功能。<br>它的构造函数如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public ThreadPoolExecutor(int corePoolSize,</span><br><span class="line">                              int maximumPoolSize,</span><br><span class="line">                              long keepAliveTime,</span><br><span class="line">                              TimeUnit unit,</span><br><span class="line">                              BlockingQueue&lt;Runnable&gt; workQueue) &#123;</span><br><span class="line">        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue,</span><br><span class="line">             Executors.defaultThreadFactory(), defaultHandler);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
-<p>但实际上，java不建议这样直接弄一个线程池出来，而是使用java.util.concurrent.Executors中的一些现成的工厂方法来创建一个线程池实例，具体的方法名很好理解，newFixedThreadPool，newSingleThreadExecutor，newCachedThreadPool等等。关于线程池构造函数各个参数的意义以及Executors提供的各种线程方法的适用场合，网上有很多详尽的文章。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Thread有这些状态</span><br><span class="line">    */</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">enum</span> State &#123;</span><br><span class="line">        NEW,</span><br><span class="line">        RUNNABLE,</span><br><span class="line">        BLOCKED,</span><br><span class="line">        WAITING,</span><br><span class="line">        TIMED_WAITING,</span><br><span class="line">        TERMINATED;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<p>这里针对execute方法具体的实现来展开，即，如何做到自动扩容，如何做到线程缓存，如何实现终止，以及资源同步问题。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(Runnable command)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">if</span> (command == <span class="keyword">null</span>)</span><br><span class="line">           <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException();</span><br><span class="line">       <span class="comment">/*</span></span><br><span class="line"><span class="comment">        * Proceed in 3 steps:</span></span><br><span class="line"><span class="comment">        *</span></span><br><span class="line"><span class="comment">        * 1. If fewer than corePoolSize threads are running, try to</span></span><br><span class="line"><span class="comment">        * start a new thread with the given command as its first</span></span><br><span class="line"><span class="comment">        * task.  The call to addWorker atomically checks runState and</span></span><br><span class="line"><span class="comment">        * workerCount, and so prevents false alarms that would add</span></span><br><span class="line"><span class="comment">        * threads when it shouldn't, by returning false.</span></span><br><span class="line"><span class="comment">        *</span></span><br><span class="line"><span class="comment">        * 2. If a task can be successfully queued, then we still need</span></span><br><span class="line"><span class="comment">        * to double-check whether we should have added a thread</span></span><br><span class="line"><span class="comment">        * (because existing ones died since last checking，上一次检查之后可能有线程挂掉了) or that</span></span><br><span class="line"><span class="comment">        * the pool shut down since entry into this method. So we</span></span><br><span class="line"><span class="comment">        * recheck state and if necessary roll back the enqueuing if</span></span><br><span class="line"><span class="comment">        * stopped, or start a new thread if there are none.</span></span><br><span class="line"><span class="comment">        *</span></span><br><span class="line"><span class="comment">        * 3. If we cannot queue task, then we try to add a new</span></span><br><span class="line"><span class="comment">        * thread.  If it fails, we know we are shut down or saturated</span></span><br><span class="line"><span class="comment">        * and so reject the task.</span></span><br><span class="line"><span class="comment">        */</span></span><br><span class="line">       <span class="keyword">int</span> c = ctl.get();</span><br><span class="line">       <span class="keyword">if</span> (workerCountOf(c) &lt; corePoolSize) &#123; <span class="comment">//</span></span><br><span class="line">      <span class="comment">// Core pool size is the minimum number of workers to keep alive (and not allow to time out etc)</span></span><br><span class="line">       unless allowCoreThreadTimeOut is set, in which <span class="keyword">case</span> the minimum is zero.</span><br><span class="line">           <span class="keyword">if</span> (addWorker(command, <span class="keyword">true</span>))<span class="comment">//true表示创建新的Worker时的上限是coolPoolSize,false表示上限是maximunPoolSize</span></span><br><span class="line">           一般前者都小于等于后者，成功创建新的Worker并执行任务的话,直接在这里就<span class="keyword">return</span>掉了</span><br><span class="line">               <span class="keyword">return</span>;</span><br><span class="line">           c = ctl.get(); <span class="comment">//当前pool的state,ctl是一个AtomicInteger</span></span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">if</span> (isRunning(c) &amp;&amp; workQueue.offer(command)) &#123;<span class="comment">//addworker就是创建一个新的Worker并立即执行command，没能成功就得暂时放进queue了。offer就是往这里面加一个runnable</span></span><br><span class="line">           <span class="keyword">int</span> recheck = ctl.get();<span class="comment">//recheck的原因源码中也说明了</span></span><br><span class="line">          <span class="comment">//走到这一步，说明已经成功加入到队列中了。</span></span><br><span class="line">           <span class="keyword">if</span> (! isRunning(recheck) &amp;&amp; remove(command))</span><br><span class="line">               reject(command);<span class="comment">//pool随时可能会被关掉</span></span><br><span class="line">           <span class="keyword">else</span> <span class="keyword">if</span> (workerCountOf(recheck) == <span class="number">0</span>)</span><br><span class="line">               addWorker(<span class="keyword">null</span>, <span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">else</span> <span class="keyword">if</span> (!addWorker(command, <span class="keyword">false</span>))</span><br><span class="line">           reject(command);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>public interface Executor {</p>
+<pre><code>/**
+ * Executes the given command at some time in the future.  The command
+ * may execute in a new thread, in a pooled thread, or in the calling
+ * thread, at the discretion of the {@code Executor} implementation.
+ *
+ * @param command the runnable task
+ * @throws RejectedExecutionException if this task cannot be
+ * accepted for execution
+ * @throws NullPointerException if command is null
+ */
+void execute(Runnable command);
+</code></pre><p>}</p>
+<p>public interface ExecutorService extends Executor{</p>
+<p>}</p>
+<p>public abstract class AbstractExecutorService implements ExecutorService {</p>
+<p>}<br>public class ThreadPoolExecutor extends AbstractExecutorService {</p>
+<p>}</p>
+<pre><code>更具体一点来说，java.util.concurrent.ThreadPoolExecutor这个类提供了上述接口的具体实现，同时对外提供了一些hook(beforeExecute、afterExecute等)，当然开发者也可以继承这个方法，实现更多自定义功能。
+它的构造函数如下：
+</code></pre><p>public ThreadPoolExecutor(int corePoolSize,<br>                              int maximumPoolSize,<br>                              long keepAliveTime,<br>                              TimeUnit unit,<br>                              BlockingQueue<Runnable> workQueue) {<br>        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue,<br>             Executors.defaultThreadFactory(), defaultHandler);<br>    }</p>
+<pre><code>但实际上，java不建议这样直接弄一个线程池出来，而是使用java.util.concurrent.Executors中的一些现成的工厂方法来创建一个线程池实例，具体的方法名很好理解，newFixedThreadPool，newSingleThreadExecutor，newCachedThreadPool等等。关于线程池构造函数各个参数的意义以及Executors提供的各种线程方法的适用场合，网上有很多详尽的文章。
+
+
+```java
+Thread有这些状态
+    */
+    public enum State {
+        NEW,
+        RUNNABLE,
+        BLOCKED,
+        WAITING,
+        TIMED_WAITING,
+        TERMINATED;
+    }
+</code></pre><p>这里针对execute方法具体的实现来展开，即，如何做到自动扩容，如何做到线程缓存，如何实现终止，以及资源同步问题。</p>
+<pre><code class="java"> public void execute(Runnable command) {
+        if (command == null)
+            throw new NullPointerException();
+        /*
+         * Proceed in 3 steps:
+         *
+         * 1. If fewer than corePoolSize threads are running, try to
+         * start a new thread with the given command as its first
+         * task.  The call to addWorker atomically checks runState and
+         * workerCount, and so prevents false alarms that would add
+         * threads when it shouldn&#39;t, by returning false.
+         *
+         * 2. If a task can be successfully queued, then we still need
+         * to double-check whether we should have added a thread
+         * (because existing ones died since last checking，上一次检查之后可能有线程挂掉了) or that
+         * the pool shut down since entry into this method. So we
+         * recheck state and if necessary roll back the enqueuing if
+         * stopped, or start a new thread if there are none.
+         *
+         * 3. If we cannot queue task, then we try to add a new
+         * thread.  If it fails, we know we are shut down or saturated
+         * and so reject the task.
+         */
+        int c = ctl.get();
+        if (workerCountOf(c) &lt; corePoolSize) { //
+       // Core pool size is the minimum number of workers to keep alive (and not allow to time out etc)
+        unless allowCoreThreadTimeOut is set, in which case the minimum is zero.
+            if (addWorker(command, true))//true表示创建新的Worker时的上限是coolPoolSize,false表示上限是maximunPoolSize
+            一般前者都小于等于后者，成功创建新的Worker并执行任务的话,直接在这里就return掉了
+                return;
+            c = ctl.get(); //当前pool的state,ctl是一个AtomicInteger
+        }
+        if (isRunning(c) &amp;&amp; workQueue.offer(command)) {//addworker就是创建一个新的Worker并立即执行command，没能成功就得暂时放进queue了。offer就是往这里面加一个runnable
+            int recheck = ctl.get();//recheck的原因源码中也说明了
+           //走到这一步，说明已经成功加入到队列中了。
+            if (! isRunning(recheck) &amp;&amp; remove(command))
+                reject(command);//pool随时可能会被关掉
+            else if (workerCountOf(recheck) == 0)
+                addWorker(null, false);
+
+        }
+        else if (!addWorker(command, false))
+            reject(command);
+    }
+</code></pre>
 <p>来看addWorker的实现</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">addWorker</span><span class="params">(Runnable firstTask, <span class="keyword">boolean</span> core)</span> </span>&#123;</span><br><span class="line">        retry:</span><br><span class="line">        、、、省略代码</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            w = <span class="keyword">new</span> Worker(firstTask);</span><br><span class="line">            <span class="comment">//每一个不为null的command都会创建一个新的worker</span></span><br><span class="line">            <span class="keyword">final</span> Thread t = w.thread;</span><br><span class="line">            <span class="keyword">if</span> (t != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">final</span> ReentrantLock mainLock = <span class="keyword">this</span>.mainLock;</span><br><span class="line">                mainLock.lock();<span class="comment">//加锁</span></span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                        workers.add(w); <span class="comment">//workers就是一个普通的HashSet,同步的问题通过ReentrantLock解决</span></span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                    mainLock.unlock();</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (workerAdded) &#123;</span><br><span class="line">                    t.start(); <span class="comment">//这里就是真正执行command的方法了</span></span><br><span class="line">                    workerStarted = <span class="keyword">true</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; </span><br><span class="line">        <span class="keyword">return</span> workerStarted; <span class="comment">//这里可以看出来,addWorker返回值表示这个command有没有被执行</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">final</span> <span class="keyword">void</span> <span class="title">runWorker</span><span class="params">(Worker w)</span> </span>&#123; <span class="comment">//每一条线程运行起来的时候都会走这个方法</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">while</span> (task != <span class="keyword">null</span> || (task = getTask()) != <span class="keyword">null</span>) &#123;</span><br><span class="line">                w.lock();<span class="comment">//task可能是第一个runnable，也可能是从queue中取出来的</span></span><br><span class="line">                <span class="comment">//getTask方法就是不断的从队列中获取任务。注意之前addTask的方法入参说明,command是该worker执行的第一个任务。也就是说，一个worker之后还有可能从queue中获取新的任务。线程能够一直有任务执行，就不会进入死亡状态(Thread有几个状态)</span></span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    beforeExecute(wt, task);<span class="comment">//钩子</span></span><br><span class="line">                    Throwable thrown = <span class="keyword">null</span>;</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        task.run(); </span><br><span class="line">                    &#125; <span class="keyword">catch</span> (RuntimeException x) &#123;</span><br><span class="line">                        thrown = x; <span class="keyword">throw</span> x;</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (Error x) &#123;</span><br><span class="line">                        thrown = x; <span class="keyword">throw</span> x;</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (Throwable x) &#123;</span><br><span class="line">                        thrown = x; <span class="keyword">throw</span> <span class="keyword">new</span> Error(x);</span><br><span class="line">                    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                        afterExecute(task, thrown);<span class="comment">//钩子</span></span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                    task = <span class="keyword">null</span>;</span><br><span class="line">                    w.completedTasks++;</span><br><span class="line">                    w.unlock();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            completedAbruptly = <span class="keyword">false</span>;</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            processWorkerExit(w, completedAbruptly);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<p>addWorker会创建一个新的Worker(线程)，并将command作为这个线程要执行的第一个任务，而Worker的run方法是线程跑起来执行的方法。至于如何实现从queue中获取任务交给线程去完成，看getTask方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Runnable <span class="title">getTask</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">boolean</span> timedOut = <span class="keyword">false</span>; <span class="comment">// Did the last poll() time out?</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (;;) &#123; <span class="comment">//轮询</span></span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                Runnable r = timed ?</span><br><span class="line">                    workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS) : <span class="comment">//从queue中提取任务</span></span><br><span class="line">                    workQueue.take();</span><br><span class="line">                <span class="keyword">if</span> (r != <span class="keyword">null</span>)</span><br><span class="line">                    <span class="keyword">return</span> r;</span><br><span class="line">                </span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException retry) &#123;</span><br><span class="line">                timedOut = <span class="keyword">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<pre><code class="java">private boolean addWorker(Runnable firstTask, boolean core) {
+        retry:
+        、、、省略代码
+        try {
+            w = new Worker(firstTask);
+            //每一个不为null的command都会创建一个新的worker
+            final Thread t = w.thread;
+            if (t != null) {
+                final ReentrantLock mainLock = this.mainLock;
+                mainLock.lock();//加锁
+                try {
+                        workers.add(w); //workers就是一个普通的HashSet,同步的问题通过ReentrantLock解决
+                    }
+                } finally {
+                    mainLock.unlock();
+                }
+                if (workerAdded) {
+                    t.start(); //这里就是真正执行command的方法了
+                    workerStarted = true;
+                }
+            }
+        } 
+        return workerStarted; //这里可以看出来,addWorker返回值表示这个command有没有被执行
+    }
+
+
+
+ final void runWorker(Worker w) { //每一条线程运行起来的时候都会走这个方法
+        try {
+            while (task != null || (task = getTask()) != null) {
+                w.lock();//task可能是第一个runnable，也可能是从queue中取出来的
+                //getTask方法就是不断的从队列中获取任务。注意之前addTask的方法入参说明,command是该worker执行的第一个任务。也就是说，一个worker之后还有可能从queue中获取新的任务。线程能够一直有任务执行，就不会进入死亡状态(Thread有几个状态)
+                try {
+                    beforeExecute(wt, task);//钩子
+                    Throwable thrown = null;
+                    try {
+                        task.run(); 
+                    } catch (RuntimeException x) {
+                        thrown = x; throw x;
+                    } catch (Error x) {
+                        thrown = x; throw x;
+                    } catch (Throwable x) {
+                        thrown = x; throw new Error(x);
+                    } finally {
+                        afterExecute(task, thrown);//钩子
+                    }
+                } finally {
+                    task = null;
+                    w.completedTasks++;
+                    w.unlock();
+                }
+            }
+            completedAbruptly = false;
+        } finally {
+            processWorkerExit(w, completedAbruptly);
+        }
+    }
+</code></pre>
+<p>addWorker会创建一个新的Worker(线程)，并将command作为这个线程要执行的第一个任务，而Worker的run方法是线程跑起来执行的方法。至于如何实现从queue中获取任务交给线程去完成，看getTask方法</p>
+<pre><code class="java">private Runnable getTask() {
+        boolean timedOut = false; // Did the last poll() time out?
+
+        for (;;) { //轮询
+            try {
+                Runnable r = timed ?
+                    workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS) : //从queue中提取任务
+                    workQueue.take();
+                if (r != null)
+                    return r;
+
+            } catch (InterruptedException retry) {
+                timedOut = false;
+            }
+        }
+    }
+</code></pre>
 <p>整体来说，executor.execute方法就是通过new出Woker，而Worker则会在run方法中不停的从queue中获取新的任务，从而确保线程不会挂掉。也就是所谓的线程池缓存了线程，避免了频繁创建线程的开销。</p>
 <ol>
 <li>Worker这个类继承自AbstractQueuedSynchronizer<br>AbstractQueuedSynchronizer即大名鼎鼎的AQS。</li>

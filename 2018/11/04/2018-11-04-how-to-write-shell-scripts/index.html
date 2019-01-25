@@ -17,7 +17,7 @@
 <meta property="og:description" content="linux下shell脚本语句的语法，脚本以Shebang)开始  #!/bin/sh">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/timg.jpg">
-<meta property="og:updated_time" content="2019-01-20T14:13:07.043Z">
+<meta property="og:updated_time" content="2019-01-25T14:56:51.185Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="如何写shell脚本">
 <meta name="twitter:description" content="linux下shell脚本语句的语法，脚本以Shebang)开始  #!/bin/sh">
@@ -206,22 +206,135 @@ ga('send', 'pageview');
 </blockquote>
 <p><img src="https://www.haldir66.ga/static/imgs/timg.jpg" alt=""><br><a id="more"></a></p>
 <h3 id="linux下shell脚本语句的语法"><a href="#linux下shell脚本语句的语法" class="headerlink" title="linux下shell脚本语句的语法"></a>linux下shell脚本语句的语法</h3><p>linux大小写敏感</p>
-<p>eg: echo类似于print<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">##例：myvar=“Hi there！”</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">echo</span> <span class="variable">$myvar</span>  <span class="comment">## Hi there！</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"<span class="variable">$myvar</span>"</span>  <span class="comment">## Hi there!</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">' $myvar'</span> <span class="comment">## $myvar</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">echo</span> \<span class="variable">$myvar</span> <span class="comment">## $myvar</span></span><br></pre></td></tr></table></figure></p>
-<p>eg:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line">myPath=<span class="string">"/var/log/httpd/"</span></span><br><span class="line">myFile=<span class="string">"/var /log/httpd/access.log"</span></span><br><span class="line"><span class="comment">#这里的-x 参数判断$myPath是否存在并且是否具有可执行权限</span></span><br><span class="line"><span class="keyword">if</span> [ ! -x <span class="string">"<span class="variable">$myPath</span>"</span>]; <span class="keyword">then</span></span><br><span class="line">mkdir <span class="string">"<span class="variable">$myPath</span>"</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"><span class="comment">#这里的-d 参数判断$myPath是否存在</span></span><br><span class="line"><span class="keyword">if</span> [ ! -d <span class="string">"<span class="variable">$myPath</span>"</span>]; <span class="keyword">then</span></span><br><span class="line">mkdir <span class="string">"<span class="variable">$myPath</span>"</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"><span class="comment">#这里的-f参数判断$myFile是否存在</span></span><br><span class="line"><span class="keyword">if</span> [ ! -f <span class="string">"<span class="variable">$myFile</span>"</span> ]; <span class="keyword">then</span></span><br><span class="line">touch <span class="string">"<span class="variable">$myFile</span>"</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"><span class="comment">#其他参数还有-n,-n是判断一个变量是否是否有值</span></span><br><span class="line"><span class="keyword">if</span> [ ! -n <span class="string">"<span class="variable">$myVar</span>"</span> ]; <span class="keyword">then</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"<span class="variable">$myVar</span> is empty"</span></span><br><span class="line"><span class="built_in">exit</span> 0</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"><span class="comment">#两个变量判断是否相等</span></span><br><span class="line"><span class="keyword">if</span> [ <span class="string">"<span class="variable">$var1</span>"</span> == <span class="string">"<span class="variable">$var2</span>"</span> ]; <span class="keyword">then</span>  //<span class="keyword">if</span> 后面必须加<span class="keyword">then</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">'$var1 eq $var2'</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">'$var1 not eq $var2'</span></span><br><span class="line"><span class="keyword">fi</span> //<span class="keyword">else</span>后面必须加<span class="keyword">fi</span></span><br><span class="line"><span class="keyword">if</span> list <span class="keyword">then</span></span><br><span class="line">    <span class="keyword">do</span> something here</span><br><span class="line"><span class="keyword">elif</span> list <span class="keyword">then</span></span><br><span class="line">    <span class="keyword">do</span> another thing here</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    <span class="keyword">do</span> something <span class="keyword">else</span> here</span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bashbash</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"hello there"</span></span><br><span class="line">foo=<span class="string">"Hello"</span></span><br><span class="line">foo=<span class="string">"<span class="variable">$foo</span> World"</span>  <span class="comment">## 拼接一个现成的string到另一个string的尾部，用冒号跟美元符号就好了</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$foo</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"Number of files in this directory: `ls | wc -l`"</span>  <span class="comment">## 但是将ls | wc -l的输出作为一个String拼接到一个string中，用单引号</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"all the files under the directory `ls  /usr/*/g* | head -n3`"</span></span><br></pre></td></tr></table></figure>
-<p>一个把文件夹（/public/imgs）下所有文件重命名为img-x.jpg的shell脚本<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">FORMAT_JPG=<span class="string">"jpg"</span></span><br><span class="line">FORMAT_JPEG=<span class="string">"jpeg"</span></span><br><span class="line">index=1</span><br><span class="line">dir=$(<span class="built_in">eval</span> <span class="built_in">pwd</span>)/public/imgs</span><br><span class="line">ALLIMGES=$(ls <span class="variable">$dir</span> | grep  <span class="string">".<span class="variable">$FORMAT_JPEG</span>\|.<span class="variable">$FORMAT_JPG</span>"</span>)</span><br><span class="line"><span class="keyword">for</span> file <span class="keyword">in</span> <span class="variable">$ALLIMGES</span></span><br><span class="line">        <span class="keyword">do</span></span><br><span class="line">        name=img-<span class="variable">$&#123;index&#125;</span>.jpg</span><br><span class="line">        <span class="built_in">echo</span> renaming <span class="variable">$dir</span>/<span class="variable">$file</span> to  <span class="variable">$dir</span>/<span class="variable">$name</span></span><br><span class="line">        mv <span class="variable">$dir</span>/<span class="variable">$file</span> <span class="variable">$dir</span>/<span class="variable">$name</span></span><br><span class="line">        ((index++))</span><br><span class="line">        <span class="comment"># name=$(ls $file | cut -d. -f1)</span></span><br><span class="line">        <span class="comment"># mv $dir/public/imgs/$file $&#123;name&#125;.$suffix</span></span><br><span class="line">        <span class="keyword">done</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"renaming <span class="variable">$index</span> image files =====&gt; x.jpg done!"</span></span><br></pre></td></tr></table></figure></p>
-<p>同时grep多种文件的时候，比如又想要jpg又想要jpeg的话，grep 要加上反斜杠，或者下面这三种<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">grep &quot;aaa\|bbb&quot;</span><br><span class="line">grep -E &quot;aaa|bbb&quot;</span><br><span class="line">grep -E aaa\|bbb</span><br></pre></td></tr></table></figure></p>
-<p><a href="https://www.cyberciti.biz/faq/howto-use-grep-command-in-linux-unix/">how to grep</a></p>
-<p>想要在bash中设置一个variable为一个命令的输出<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">OUTPUT=<span class="string">"<span class="variable">$(ls -1)</span>"</span>  <span class="comment">## 注意，这里等于号前后不能有空格</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"<span class="variable">$&#123;OUTPUT&#125;</span>"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">##那如果就是平时在terminal里面随便敲敲呢，下面这些亲测无误</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"<span class="variable">$(ls -al | wc)</span>"</span></span><br><span class="line"><span class="string">"<span class="variable">$(which java)</span>"</span> -h</span><br><span class="line"><span class="comment">## 比如说我想把java的路径填充到一段命令中间</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"<span class="variable">$(which java)</span>"</span>/something</span><br><span class="line">&gt;&gt; /usr/bin/java/something</span><br><span class="line"></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">java_stuff=<span class="string">"<span class="variable">$(which java)</span>"</span></span><br><span class="line"><span class="variable">$&#123;java_stuff&#125;</span> --version</span><br></pre></td></tr></table></figure></p>
-<p>经常会在别人的bash脚本最前面看到一行 <a href="http://www.ruanyifeng.com/blog/2017/11/bash-set.html">set-e</a>：在阮一峰老师的博客中找到了解释<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env bash</span><br><span class="line">set -e ## 这个set -e的原因，因为bash一般对错误容忍度比较高，一行命令出了错还能往下走，可是实际生产中，我们希望出了错就此打住。在文件前面写这个就行了</span><br><span class="line"></span><br><span class="line">## 总比下面这些这么写好吧</span><br><span class="line">command || exit 1 </span><br><span class="line">command || &#123; echo &quot;command failed&quot;; exit 1; &#125;</span><br><span class="line"></span><br><span class="line">set -eo pipefail ##set -e对于管道无效，这么写就连管道的错误都拦下来了</span><br></pre></td></tr></table></figure></p>
-<p>$ set -e</p>
+<p>eg: echo类似于print</p>
+<pre><code class="bash">##例：myvar=“Hi there！”
+
+    echo $myvar  ## Hi there！
+
+    echo &quot;$myvar&quot;  ## Hi there!
+
+    echo &#39; $myvar&#39; ## $myvar
+
+    echo \$myvar ## $myvar
+</code></pre>
+<p>eg:</p>
+<pre><code class="bash">#!/bin/sh
+myPath=&quot;/var/log/httpd/&quot;
+myFile=&quot;/var /log/httpd/access.log&quot;
+#这里的-x 参数判断$myPath是否存在并且是否具有可执行权限
+if [ ! -x &quot;$myPath&quot;]; then
+mkdir &quot;$myPath&quot;
+fi
+#这里的-d 参数判断$myPath是否存在
+if [ ! -d &quot;$myPath&quot;]; then
+mkdir &quot;$myPath&quot;
+fi
+#这里的-f参数判断$myFile是否存在
+if [ ! -f &quot;$myFile&quot; ]; then
+touch &quot;$myFile&quot;
+fi
+#其他参数还有-n,-n是判断一个变量是否是否有值
+if [ ! -n &quot;$myVar&quot; ]; then
+echo &quot;$myVar is empty&quot;
+exit 0
+fi
+#两个变量判断是否相等
+if [ &quot;$var1&quot; == &quot;$var2&quot; ]; then  //if 后面必须加then
+echo &#39;$var1 eq $var2&#39;
+else
+echo &#39;$var1 not eq $var2&#39;
+fi //else后面必须加fi
+if list then
+    do something here
+elif list then
+    do another thing here
+else
+    do something else here
+fi
+</code></pre>
+<pre><code class="bash">#!/bin/bashbash
+echo &quot;hello there&quot;
+foo=&quot;Hello&quot;
+foo=&quot;$foo World&quot;  ## 拼接一个现成的string到另一个string的尾部，用冒号跟美元符号就好了
+echo $foo
+echo &quot;Number of files in this directory: `ls | wc -l`&quot;  ## 但是将ls | wc -l的输出作为一个String拼接到一个string中，用单引号
+echo &quot;all the files under the directory `ls  /usr/*/g* | head -n3`&quot;
+</code></pre>
+<p>一个把文件夹（/public/imgs）下所有文件重命名为img-x.jpg的shell脚本</p>
+<pre><code class="bash">#!/bin/bash
+FORMAT_JPG=&quot;jpg&quot;
+FORMAT_JPEG=&quot;jpeg&quot;
+index=1
+dir=$(eval pwd)/public/imgs
+ALLIMGES=$(ls $dir | grep  &quot;.$FORMAT_JPEG\|.$FORMAT_JPG&quot;)
+for file in $ALLIMGES
+        do
+        name=img-${index}.jpg
+        echo renaming $dir/$file to  $dir/$name
+        mv $dir/$file $dir/$name
+        ((index++))
+        # name=$(ls $file | cut -d. -f1)
+        # mv $dir/public/imgs/$file ${name}.$suffix
+        done
+echo &quot;renaming $index image files =====&gt; x.jpg done!&quot;
+</code></pre>
+<p>同时grep多种文件的时候，比如又想要jpg又想要jpeg的话，grep 要加上反斜杠，或者下面这三种</p>
+<pre><code>grep &quot;aaa\|bbb&quot;
+grep -E &quot;aaa|bbb&quot;
+grep -E aaa\|bbb
+</code></pre><p><a href="https://www.cyberciti.biz/faq/howto-use-grep-command-in-linux-unix/">how to grep</a></p>
+<p>想要在bash中设置一个variable为一个命令的输出</p>
+<pre><code class="bash">#!/bin/bash
+OUTPUT=&quot;$(ls -1)&quot;  ## 注意，这里等于号前后不能有空格
+echo &quot;${OUTPUT}&quot;
+
+##那如果就是平时在terminal里面随便敲敲呢，下面这些亲测无误
+echo &quot;$(ls -al | wc)&quot;
+&quot;$(which java)&quot; -h
+## 比如说我想把java的路径填充到一段命令中间
+echo &quot;$(which java)&quot;/something
+&gt;&gt; /usr/bin/java/something
+
+#!/bin/bash
+java_stuff=&quot;$(which java)&quot;
+${java_stuff} --version
+</code></pre>
+<p>经常会在别人的bash脚本最前面看到一行 <a href="http://www.ruanyifeng.com/blog/2017/11/bash-set.html">set-e</a>：在阮一峰老师的博客中找到了解释</p>
+<pre><code>#!/usr/bin/env bash
+set -e ## 这个set -e的原因，因为bash一般对错误容忍度比较高，一行命令出了错还能往下走，可是实际生产中，我们希望出了错就此打住。在文件前面写这个就行了
+
+## 总比下面这些这么写好吧
+command || exit 1 
+command || { echo &quot;command failed&quot;; exit 1; }
+
+set -eo pipefail ##set -e对于管道无效，这么写就连管道的错误都拦下来了
+</code></pre><p>$ set -e</p>
 <p>这行代码之后的任何代码，如果返回一个非0的值，那么整个脚本立即退出，官方的说明是为了防止错误出现滚雪球的现象</p>
 <p>$ set -o pipefail</p>
 <p>原文解释如下：</p>
 <p>If set, the return value of a pipeline is the value of the last (rightmost) command to exit with a non-zero status,or zero if all commands in the pipeline exit successfully. This option is disabled by default.</p>
 <p>可理解为：</p>
 <p>告诉 bash 返回从右到左第一个以非0状态退出的管道命令的返回值，如果所有命令都成功执行时才返回0</p>
-<h3 id="变量-其实就是美元符号了"><a href="#变量-其实就是美元符号了" class="headerlink" title="变量($其实就是美元符号了)"></a>变量($其实就是美元符号了)</h3><p>变量调用符号($)<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">LI=date</span><br><span class="line"><span class="variable">$LI</span> <span class="comment">##</span></span><br><span class="line"><span class="comment"># Tue Dec  5 04:06:18 EST 2017</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 所以经常会有这样的脚本</span></span><br><span class="line"><span class="comment"># Check if user is root</span></span><br><span class="line"><span class="keyword">if</span> [ $(id -u) != <span class="string">"0"</span> ]; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">" Not the root user! Try using sudo Command ! "</span></span><br><span class="line">    <span class="built_in">exit</span> 1</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"Pass the test! You are the root user!"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## 亲测下面这种可用</span></span><br><span class="line"><span class="keyword">if</span> [ `whoami` = <span class="string">"root"</span> ];<span class="keyword">then</span>  </span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"root用户！"</span>  </span><br><span class="line"><span class="keyword">else</span>  </span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"非root用户！"</span>  </span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="变量-其实就是美元符号了"><a href="#变量-其实就是美元符号了" class="headerlink" title="变量($其实就是美元符号了)"></a>变量($其实就是美元符号了)</h3><p>变量调用符号($)</p>
+<pre><code class="bash">LI=date
+$LI ##
+# Tue Dec  5 04:06:18 EST 2017
+
+# 所以经常会有这样的脚本
+# Check if user is root
+if [ $(id -u) != &quot;0&quot; ]; then
+    echo &quot; Not the root user! Try using sudo Command ! &quot;
+    exit 1
+fi
+echo &quot;Pass the test! You are the root user!&quot;
+
+## 亲测下面这种可用
+if [ `whoami` = &quot;root&quot; ];then  
+    echo &quot;root用户！&quot;  
+else  
+    echo &quot;非root用户！&quot;  
+fi
+</code></pre>
 <p>变量分为用户自定义的和环境变量（其实就是系统预设的）,有些区别</p>
 <blockquote>
 <p>用户自定义变量只在当前的shell中生效，环境变量在当前shell和这个shell的所有子shell中生效。<br>环境变量是全局变量，用户自定义变量是局部变量。<br>对系统生效的环境变量名和变量作用是固定的。</p>
@@ -229,7 +342,12 @@ ga('send', 'pageview');
 <h3 id="常用的环境变量"><a href="#常用的环境变量" class="headerlink" title="常用的环境变量"></a>常用的环境变量</h3><blockquote>
 <p>HOSTNAME：主机名<br>SHELL：当前的shell<br>TREM：终端环境<br>HISTSIZE：历史命令条数<br>SSH_CLIENT：当前操作环境是用ssh链接的，这里记录客户端的ip<br>SSH_TTY：ssh连接的终端是pts/1<br>USER:当前登录的用户</p>
 </blockquote>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="variable">$HOSTNAME</span></span><br><span class="line"><span class="comment">## unbutu</span></span><br><span class="line">$? 最后一次执行的命令的返回状态。如果这个变量的值为0，证明上一个命令正确执行；如果这个变量的值非0（具体是哪个数，由命令自己决定），则证明上一个命令执行不正确了。</span><br><span class="line">$$ 当前进程的进程号（PID）</span><br><span class="line">$! 后台运行的最后一个进程的进程号（PID）</span><br></pre></td></tr></table></figure>
+<pre><code class="bash">echo $HOSTNAME
+## unbutu
+$? 最后一次执行的命令的返回状态。如果这个变量的值为0，证明上一个命令正确执行；如果这个变量的值非0（具体是哪个数，由命令自己决定），则证明上一个命令执行不正确了。
+$$ 当前进程的进程号（PID）
+$! 后台运行的最后一个进程的进程号（PID）
+</code></pre>
 <p>unix下查看环境变量命令：</p>
 <blockquote>
 <p>export</p>
@@ -242,7 +360,11 @@ ga('send', 'pageview');
 <ul>
 <li>bash &lt;(curl -L -s <a href="https://install.direct/go.sh">https://install.direct/go.sh</a>)</li>
 </ul>
-<p><a href="https://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within?rq=1">在sh脚本中判断当前脚本所在的位置</a>)<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"The script you are running has basename `basename "</span><span class="variable">$0</span><span class="string">"`, dirname `dirname "</span><span class="variable">$0</span><span class="string">"`"</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"The present working directory is `pwd`"</span></span><br></pre></td></tr></table></figure></p>
+<p><a href="https://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within?rq=1">在sh脚本中判断当前脚本所在的位置</a>)</p>
+<pre><code class="sh">#!/bin/bash
+echo &quot;The script you are running has basename `basename &quot;$0&quot;`, dirname `dirname &quot;$0&quot;`&quot;
+echo &quot;The present working directory is `pwd`&quot;
+</code></pre>
 <p>在c语言的main函数中,args[0]就是当前文件的路径，所以在shell里也差不多</p>
 <p>//统计一下这个脚本耗时多久</p>
 <blockquote>
