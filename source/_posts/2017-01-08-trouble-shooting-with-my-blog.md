@@ -319,6 +319,9 @@ cd 到themes/yilia里面,rm -rf source/ , 然后把source-src里面的report.js�
 其实看下里面，就是一个webpack的配置，自己重新编译一下就好了。编译后会在source里面重新生成需要的js文件。
 奇怪的是在windows上编译失败，在linux上编译失败，在mac上终于成功了。
 
+## 16. hexo server 
+[enospc的解决方式](https://stackoverflow.com/questions/22475849/node-js-what-is-enospc-error-and-how-to-solve)
+由于需要监听多个文件，所以linux下允许监听的文件数有个上限，这里修改一下就可以了
 
 ### 参考
 
