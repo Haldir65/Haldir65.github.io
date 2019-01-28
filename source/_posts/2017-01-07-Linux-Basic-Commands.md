@@ -2,7 +2,7 @@
 title: linux基本命令介绍
 date: 2017-01-07 15:38:43
 categories: blog
-tags: [置顶,linux,tools]
+tags: [tools,linux]
 ---
 
 一些常用的linux基本命令,仅作为参考。
@@ -488,9 +488,6 @@ install snap package(通常通过apt-get install软件时候会顺带将该软�
 ### 9. 网络监控
 tcpdump结合wireshark可实现完整的网络抓包，这个放在下面写。
 
-
-
-
 ```bash
 netstat
 netstat -i ## 查看某个网络接口发出和接收了多少byte的数据
@@ -513,7 +510,7 @@ netstat -tn 2>/dev/null | grep :80 | awk '{print $5}' | cut -d: -f1 | sort | uni
 
 
 ```bash
-ifconfig ## 查看机器上的网卡
+ifconfig ## 查看机器上的网卡,不过ifconfig已经被deprecated很久了，以后要习惯使用ip命令
 en01 ##Ethernet
 ##注意 RX bytes(接收到的数据)和TX bytes(发送出去的数据)后面的数字
 
@@ -691,41 +688,8 @@ sed -e 4a\/"this will be append to the 5th line" sample.txt >> sample.txt ## 注
 nl /etc/passwd | sed '2,5d'
 ```
 
-### 13. iptable
-> iptables -L -n -v ## 查看已添加的iptables规则
 
-默认是全部接受的
-```
-Chain INPUT (policy ACCEPT) ## 允许进入这台电脑
-target     prot opt source               destination
-
-Chain FORWARD (policy ACCEPT)  ## 路由相关
-target     prot opt source               destination
-
-Chain OUTPUT (policy ACCEPT) ## 允许发出这台电脑
-target     prot opt source               destination
-```
-
-```bash
-iptables -P FORWARD DROP ## 把forward 一律改为drop
-iptables -A INPUT -s  192.168.1.3  ## A是append s是source，拒绝接受192.168.1.3的访问，就是黑名单了
-iptables -A INPUT -s  192.168.0.0/24 -p tcp --destination-port 25 -j DROP  ## block all devices on this network ,  p是protocol,SMTP一般是25端口
-
-iptables -A INPUT -s 192.168.0.66 -j ACCEPT  ## 白名单
-iptables -D INPUT 3 ##这个3是当前INPUT表的第3条规则
-iptables -I INPUT -s 192.168.0.66 -j ACCEPT  ## 白名单，和-A不同，A是加到尾部，I是加到list的头部，顺序很重要。
-
-iptables -I INPUT -s 123.45.6.7 -j DROP       #屏蔽单个IP的命令
-iptables -I INPUT -s 123.0.0.0/8 -j DROP      #封整个段即从123.0.0.1到123.255.255.254的命令
-iptables -I INPUT -s 124.45.0.0/16 -j DROP    #封IP段即从123.45.0.1到123.45.255.254的命令
-
-## 清除已有iptables规则
-iptables -F
-iptables -X
-iptables -Z
-```
-
-### 14. 多个tty(TeleTYpewriter)
+### 14. 多个tty(TeleTypewriter)
 [how-to-multitask-in-the-linux-terminal-3-ways-to-use-multiple-shells-at-once](https://www.howtogeek.com/111417/how-to-multitask-in-the-linux-terminal-3-ways-to-use-multiple-shells-at-once/)
 > sudo apt-get install screen
 > screen 。进入一个新的GNU screen // 可以执行耗时指令

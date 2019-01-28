@@ -2,8 +2,7 @@
 title: linux常用命令扩展
 date: 2017-06-18 16:51:49
 categories: blog
-tags:
-  - linux
+tags: [tools,linux]
 ---
 > 一些linux的常用命令，linux环境下运行server ,bash的语法
 >  
@@ -32,8 +31,9 @@ echo $PATH ## 看下改好没
 
 export FLASK_DEBUG=1
 $FLASK_DEBUG
+```
 >> 1
-
+```
 
 永久生效（谨慎为之）
 修改/etc/profile文件：（对所有用户都生效）
@@ -443,6 +443,41 @@ putty登录窗口左侧有一个loggin-auth，进去选择自己windows上刚才
 
 ### 22.iptables命令
 [常用的iptables命令去这里抄，系统管理员可能用的多一些](https://www.digitalocean.com/community/tutorials/iptables-essentials-common-firewall-rules-and-commands)
+
+
+### 13. iptable
+> iptables -L -n -v ## 查看已添加的iptables规则
+
+默认是全部接受的
+```
+Chain INPUT (policy ACCEPT) ## 允许进入这台电脑
+target     prot opt source               destination
+
+Chain FORWARD (policy ACCEPT)  ## 路由相关
+target     prot opt source               destination
+
+Chain OUTPUT (policy ACCEPT) ## 允许发出这台电脑
+target     prot opt source               destination
+```
+
+```bash
+iptables -P FORWARD DROP ## 把forward 一律改为drop
+iptables -A INPUT -s  192.168.1.3  ## A是append s是source，拒绝接受192.168.1.3的访问，就是黑名单了
+iptables -A INPUT -s  192.168.0.0/24 -p tcp --destination-port 25 -j DROP  ## block all devices on this network ,  p是protocol,SMTP一般是25端口
+
+iptables -A INPUT -s 192.168.0.66 -j ACCEPT  ## 白名单
+iptables -D INPUT 3 ##这个3是当前INPUT表的第3条规则
+iptables -I INPUT -s 192.168.0.66 -j ACCEPT  ## 白名单，和-A不同，A是加到尾部，I是加到list的头部，顺序很重要。
+
+iptables -I INPUT -s 123.45.6.7 -j DROP       #屏蔽单个IP的命令
+iptables -I INPUT -s 123.0.0.0/8 -j DROP      #封整个段即从123.0.0.1到123.255.255.254的命令
+iptables -I INPUT -s 124.45.0.0/16 -j DROP    #封IP段即从123.45.0.1到123.45.255.254的命令
+
+## 清除已有iptables规则
+iptables -F
+iptables -X
+iptables -Z
+```
 
 ```bash
 iptables -L -n ## 查看已添加的iptables规则
