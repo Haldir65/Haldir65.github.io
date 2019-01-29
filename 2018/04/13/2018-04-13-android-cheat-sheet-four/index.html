@@ -16,7 +16,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/street%20lights%20dark%20night%20car%20city%20bw.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/toast_transact.jpg">
-<meta property="og:updated_time" content="2019-01-27T15:25:22.972Z">
+<meta property="og:updated_time" content="2019-01-29T15:20:50.359Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android知识集合[四]">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/street%20lights%20dark%20night%20car%20city%20bw.jpg">
@@ -510,71 +510,71 @@ int read_samples(FILE *input_file, short *input) {
 
     int i = 0;
     while (i &lt; nb_read) {
-        input[i] = be_short(input[i]);
-        i++;
-    }
+    input[i] = be_short(input[i]);
+    i++;
+}
 
     return nb_read;
 }
 
 void Java_com_example_core_audio_NativeRecorder_initEncoder(JNIEnv *env,
-        jobject jobj, jint in_num_channels, jint in_samplerate, jint in_brate,
-        jint in_mode, jint in_quality) {
+jobject jobj, jint in_num_channels, jint in_samplerate, jint in_brate,
+jint in_mode, jint in_quality) {
     lame = lame_init();
 
-//    LOGD(&quot;Init parameters:&quot;);
+    //    LOGD(&quot;Init parameters:&quot;);
     lame_set_num_channels(lame, in_num_channels);
-//    LOGD(&quot;Number of channels: %d&quot;, in_num_channels);
+    //    LOGD(&quot;Number of channels: %d&quot;, in_num_channels);
     lame_set_in_samplerate(lame, in_samplerate);
-//    LOGD(&quot;Sample rate: %d&quot;, in_samplerate);
+    //    LOGD(&quot;Sample rate: %d&quot;, in_samplerate);
     lame_set_brate(lame, in_brate);
-//    LOGD(&quot;Bitrate: %d&quot;, in_brate);
+    //    LOGD(&quot;Bitrate: %d&quot;, in_brate);
     lame_set_mode(lame, in_mode);
-//    LOGD(&quot;Mode: %d&quot;, in_mode);
+    //    LOGD(&quot;Mode: %d&quot;, in_mode);
     lame_set_quality(lame, in_quality);
-//    LOGD(&quot;Quality: %d&quot;, in_quality);
+    //    LOGD(&quot;Quality: %d&quot;, in_quality);
 
     int res = lame_init_params(lame);
-//    LOGD(&quot;Init returned: %d&quot;, res);
+    //    LOGD(&quot;Init returned: %d&quot;, res);
 }
 
 void Java_com_example_core_audio_NativeRecorder_destroyEncoder(
-        JNIEnv *env, jobject jobj) {
+JNIEnv *env, jobject jobj) {
     int res = lame_close(lame);
-//    LOGD(&quot;Deinit returned: %d&quot;, res);
+    //    LOGD(&quot;Deinit returned: %d&quot;, res);
 }
 
 void Java_com_example_core_audio_NativeRecorder_encodeFile(JNIEnv *env,
-        jobject jobj, jstring in_source_path, jstring in_target_path) {
-    const char *source_path, *target_path;
-    source_path = (*env)-&gt;GetStringUTFChars(env, in_source_path, NULL);
-    target_path = (*env)-&gt;GetStringUTFChars(env, in_target_path, NULL);
+jobject jobj, jstring in_source_path, jstring in_target_path) {
+const char *source_path, *target_path;
+source_path = (*env)-&gt;GetStringUTFChars(env, in_source_path, NULL);
+target_path = (*env)-&gt;GetStringUTFChars(env, in_target_path, NULL);
 
-    FILE *input_file, *output_file;
-    input_file = fopen(source_path, &quot;rb&quot;);
-    output_file = fopen(target_path, &quot;wb&quot;);
+FILE *input_file, *output_file;
+input_file = fopen(source_path, &quot;rb&quot;);
+output_file = fopen(target_path, &quot;wb&quot;);
 
-    short input[BUFFER_SIZE];
-    char output[BUFFER_SIZE];
-    int nb_read = 0;
-    int nb_write = 0;
-    int nb_total = 0;
+short input[BUFFER_SIZE];
+char output[BUFFER_SIZE];
+int nb_read = 0;
+int nb_write = 0;
+int nb_total = 0;
 
 //    LOGD(&quot;Encoding started&quot;);
-    while (nb_read = read_samples(input_file, input)) {
-        nb_write = lame_encode_buffer(lame, input, input, nb_read, output,
-                BUFFER_SIZE);
-        fwrite(output, nb_write, 1, output_file);
-        nb_total += nb_write;
-    }
+while (nb_read = read_samples(input_file, input)) {
+nb_write = lame_encode_buffer(lame, input, input, nb_read, output,
+BUFFER_SIZE);
+fwrite(output, nb_write, 1, output_file);
+nb_total += nb_write;
+}
 //    LOGD(&quot;Encoded %d bytes&quot;, nb_total);
 
-    nb_write = lame_encode_flush(lame, output, BUFFER_SIZE);
-    fwrite(output, nb_write, 1, output_file);
+nb_write = lame_encode_flush(lame, output, BUFFER_SIZE);
+fwrite(output, nb_write, 1, output_file);
 //    LOGD(&quot;Flushed %d bytes&quot;, nb_write);
 
-    fclose(input_file);
-    fclose(output_file);
+fclose(input_file);
+fclose(output_file);
 }
 </code></pre>
 <h3 id="17-Android平台上native的crash其实是可以catch的"><a href="#17-Android平台上native的crash其实是可以catch的" class="headerlink" title="17. Android平台上native的crash其实是可以catch的"></a>17. Android平台上native的crash其实是可以catch的</h3><p>Chromium 的Breakpad是目前 Native 崩溃捕获中最成熟的方案</p>

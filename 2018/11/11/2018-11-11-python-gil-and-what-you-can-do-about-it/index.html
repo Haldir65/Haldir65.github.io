@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/1102533137-5.jpg">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/lockExplanation.jpg">
-<meta property="og:updated_time" content="2019-01-27T15:25:22.976Z">
+<meta property="og:updated_time" content="2019-01-29T15:20:50.359Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="python中多进程、多线程以及GIL记录">
 <meta name="twitter:description" content="If your code has a lot of I/O or Network usage:Multithreading is your best bet because of its low overhead If you have a GUIMultithreading so your UI thread doesn’t get locked up If your code is CPU">
@@ -504,7 +504,7 @@ StopIteration // 这是正常的，说明generator执行完毕
 </ul>
 <p><a href="https://hackernoon.com/the-magic-behind-python-generator-functions-bc8eeea54220">解释generator实现原理的文章</a></p>
 <p><a href="https://snarky.ca/how-the-heck-does-async-await-work-in-python-3-5/">python 2.5开始，generator能够返回数据，这之前还只是iteratble的</a> 还可以通过gen.send函数往generator传参数<br><a href="https://github.com/AndreLouisCaron/a-tale-of-event-loops">event-loop的实现原理简述</a></p>
-<p>python3.4需要使用@coroutine的decorator，3.5之后直接使用async await关键字，确实更加方便</p>
+<p>@asyncio.coroutine这个decorator是3.4出现的，3.5之后直接使用async await关键字。这个decorator也就过时了</p>
 <pre><code class="python">import asyncio
 import time
 
@@ -517,6 +517,50 @@ loop = asyncio.get_event_loop()
 loop.run_until_complete(speak_async())  
 loop.close()
 </code></pre>
+<p>对于阻塞式的io调用，不是说加一个await函数就能实现异步了<br>To use requests (or any other blocking libraries) with asyncio, you can use BaseEventLoop.run_in_executor to run a function in another thread and yield from it to get the result.<br>asyncio毕竟只有一条线程，所以request这种阻塞式的函数不能直接拿来用，需要run_in_executor或者用线程池、进程包装一下</p>
+<pre><code class="python">import time
+import requests
+import asyncio
+
+async def getUrlBlocking(url):
+    print(&quot;starting request to %s &quot; % url)
+    loop = asyncio.get_event_loop()
+    response = await loop.run_in_executor(None, requests.get, url)
+    print(response.status_code)
+    return response
+
+async def gotResponse(url):
+    res = await getUrlBlocking(url)
+    print(res.text)
+    return res
+
+if __name__ == &quot;__main__&quot;:
+    s = time.perf_counter()
+    loop = asyncio.get_event_loop()
+    tasks = [gotResponse(&quot;https://jsonplaceholder.typicode.com/posts/%s&quot; % i) for i in range(100)]
+    loop.run_until_complete(asyncio.wait(tasks))
+    loop.close()
+    elapsed = time.perf_counter() - s
+    print(f&quot;{__file__} executed in {elapsed:0.2f} seconds.&quot;)
+</code></pre>
+<p>async await要求await的东西是<a href="https://docs.python.org/3/reference/datamodel.html#awaitable-objects">awaitable的</a></p>
+<h3 id="asyncio中创建任务的语法有好几种"><a href="#asyncio中创建任务的语法有好几种" class="headerlink" title="asyncio中创建任务的语法有好几种"></a>asyncio中创建任务的语法有好几种</h3><pre><code class="python">import asyncio  
+
+async def doit(i):
+    print(&quot;Start %d&quot; % i)
+    await asyncio.sleep(3)
+    print(&quot;End %d&quot; % i)
+    return i
+
+if __name__ == &#39;__main__&#39;:
+    loop = asyncio.get_event_loop()
+    #futures = [asyncio.ensure_future(doit(i), loop=loop) for i in range(10)]
+    #futures = [loop.create_task(doit(i)) for i in range(10)]
+    futures = [doit(i) for i in range(10)]
+    result = loop.run_until_complete(asyncio.gather(*futures))
+    print(result)
+</code></pre>
+<p>以上这三种创造出来的task全部都是无序执行的。不过python3.7以后官方更推荐使用asyncio.create_task而不是ensure_future去创建任务。</p>
 <h3 id="多线程环境下对资源的操作需要考虑线程安全问题"><a href="#多线程环境下对资源的操作需要考虑线程安全问题" class="headerlink" title="多线程环境下对资源的操作需要考虑线程安全问题"></a>多线程环境下对资源的操作需要考虑线程安全问题</h3><p>有些操作不是原子性的<br><a href="https://www.youtube.com/watch?v=Bv25Dwe84g0">Thinking about Concurrency, Raymond Hettinger, Python core developer</a><br>java中最初的设计是有kill thread的method的，但是后来被deprecated了（假设你kill了一个获取了锁的线程，程序将进入死锁状态）。 python中理论上是可以kill一个线程的，但是kill一个线程这件事本身就是不应该的。</p>
 <p>一个最简单的多线程资源竞争的例子</p>
 <pre><code class="python">import threading
@@ -644,7 +688,7 @@ File &quot;/usr/lib/python2.5/threading.py&quot;, line 440, in start
     _start_new_thread(self.__bootstrap, ())
 </code></pre><p>那么比较实用的使用场景是，spawn 10条线程去进行while not queue.empty() -&gt; requests.get()操作，各自在完成之后丢到一个通用的容器中，再由message queue独立完成所有response的processing.</p>
 <h2 id="牵涉到一些celery的点"><a href="#牵涉到一些celery的点" class="headerlink" title="牵涉到一些celery的点"></a>牵涉到一些celery的点</h2><p>celery能够利用好多进程<br>todo</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://codewithoutrules.com/2018/09/04/python-multiprocessing/">多进程还可以牵涉到进程池的概念</a><br><a href="https://realpython.com/python-gil/">What is the Python Global Interpreter Lock (GIL)?</a><br><a href="https://timber.io/blog/multiprocessing-vs-multithreading-in-python-what-you-need-to-know/">multiprocessing-vs-multithreading-in-python-what-you-need-to-know</a><br><a href="https://emptysqua.re/blog/links-for-how-python-coroutines-work/">A. Jesse Jiryu Davis</a><br><a href="https://www.youtube.com/watch?v=7sCu4gEjH5I">How Do Python Coroutines Work</a><br><a href="https://www.youtube.com/watch?v=7SSYhuk5hmc">A Jesse Jiryu Davis Grok the GIL Write Fast And Thread Safe Python PyCon 2017</a> the only thing two threads cann’t do in once in Python is run python<br><a href="https://engineering.mongodb.com/post/the-saga-of-concurrent-dns-in-python-and-the-defeat-of-the-wicked-mutex-troll/">Behold, my friends, the getaddrinfo lock in Python’s socketmodule.c:</a>  A. Jesse Jiryu Davis关于python中parallel dns query的文章也很好</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://codewithoutrules.com/2018/09/04/python-multiprocessing/">多进程还可以牵涉到进程池的概念</a><br><a href="https://realpython.com/python-gil/">What is the Python Global Interpreter Lock (GIL)?</a><br><a href="https://timber.io/blog/multiprocessing-vs-multithreading-in-python-what-you-need-to-know/">multiprocessing-vs-multithreading-in-python-what-you-need-to-know</a><br><a href="https://emptysqua.re/blog/links-for-how-python-coroutines-work/">A. Jesse Jiryu Davis</a><br><a href="https://www.youtube.com/watch?v=7sCu4gEjH5I">How Do Python Coroutines Work</a><br><a href="https://www.youtube.com/watch?v=7SSYhuk5hmc">A Jesse Jiryu Davis Grok the GIL Write Fast And Thread Safe Python PyCon 2017</a> the only thing two threads cann’t do in once in Python is run python<br><a href="https://engineering.mongodb.com/post/the-saga-of-concurrent-dns-in-python-and-the-defeat-of-the-wicked-mutex-troll/">Behold, my friends, the getaddrinfo lock in Python’s socketmodule.c:</a>  A. Jesse Jiryu Davis关于python中parallel dns query的文章也很好<br><a href="https://magic.io/blog/uvloop-blazing-fast-python-networking/">uvloop跑分</a></p>
 
       
 

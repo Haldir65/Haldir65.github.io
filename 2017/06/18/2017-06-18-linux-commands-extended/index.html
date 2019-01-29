@@ -19,7 +19,7 @@
 <meta property="og:image" content="https://haldir66.ga/static/imgs/ChMkJ1gq00WIXw_GAA47r_8gjqgAAXxJAH8qOMADjvH566.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/htop-top.png">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/htop-bottom.png">
-<meta property="og:updated_time" content="2019-01-27T15:25:22.964Z">
+<meta property="og:updated_time" content="2019-01-29T15:20:50.351Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="linux常用命令扩展">
 <meta name="twitter:description" content="一些linux的常用命令，linux环境下运行server ,bash的语法">
@@ -272,7 +272,7 @@ kwrite $1 &gt; /dev/null 2&gt;&amp;1 &amp;
 <p>The link /initrd.img.old is a damaged link<br>Removing symbolic link initrd.img.old<br> you may need to re-run your boot loader[grub]</p>
 </blockquote>
 <p> 根据<a href="https://askubuntu.com/questions/518997/how-do-i-re-run-boot-loader">askubuntu</a>的解答，不用管</p>
-<p>&gt;<br>du –max-depth=1 -h # 查看当前路径下所有文件/文件夹的大小<br>du -k –max-depth=2 | sort -rn # 加上排序<br>find / -name core -print -exec rm -rf {} \; //分号也要，亲测<br>find / -size +100M：列出所有大于100M的文件，亲测。靠着这个找到了shadowsocks的日志文件,170MB<br>上面这个命令是不能列出文件大小的，还想要查看文件大小的话<br>find / -type f -size +50M -exec du -h {} \; | sort -n<br>find . -mindepth 1 -maxdepth 1 -printf ‘%f\n’ //打印出当前目录下所有文件，基本上就是一个ls命令了</p>
+<p>&gt;<br>du –max-depth=1 -h # 查看当前路径下所有文件/文件夹的大小<br>du -k –max-depth=2 | sort -rn # 加上排序<br>find / -name core -print -exec rm -rf {} \; //分号也要，亲测<br>find / -size +100M：列出所有大于100M的文件，亲测。靠着这个找到了shadowsocks的日志文件,170MB<br>上面这个命令是不能列出文件大小的，还想要查看文件大小的话<br>find / -type f -size +50M -exec du -h {} \; | sort -n<br>find . -mindepth 1 -maxdepth 1 -printf ‘%f\n’ //打印出当前目录下所有文件，基本上就是一个ls命令了<br>find / -type f -printf ‘%T+ %p\n’ | sort | head -n 1 //how-to-find-the-oldest-file-in-a-directory-tree，找到一个目录下最老的文件</p>
 <p>删除/boot分区不需要的内核<br>先df -h看/boot分区使用情况；<br>然后 dpkg –get-selections|grep linux-image ;<br>查看当前使用的内核 uname -a ;</p>
 <blockquote>
 <p>lsb_release -a </p>
@@ -418,60 +418,6 @@ PubkeyAuthentication yes
 PermitRootLogin yes
 </code></pre><p>还要给权限<br>chmod 700 ~/.ssh &amp;&amp; chmod 600 ~/.ssh/authorized_keys<br>重启ssh服务： service sshd restart<br>putty登录窗口左侧有一个loggin-auth，进去选择自己windows上刚才保存的私钥文件。登录输入账户名即可自动登录成功。<br><a href="https://www.ssh.com/ssh/putty/windows/puttygen">PUTTYGEN - KEY GENERATOR FOR PUTTY ON WINDOWS</a><br><a href="https://stackoverflow.com/questions/6377009/adding-public-key-to-ssh-authorized-keys-does-not-log-me-in-automatically">有什么问题的话看这个</a></p>
 <h3 id="22-iptables命令"><a href="#22-iptables命令" class="headerlink" title="22.iptables命令"></a>22.iptables命令</h3><p><a href="https://www.digitalocean.com/community/tutorials/iptables-essentials-common-firewall-rules-and-commands">常用的iptables命令去这里抄，系统管理员可能用的多一些</a></p>
-<pre><code class="bash">iptables -L -n ## 查看已添加的iptables规则
-清除已有iptables规则
-iptables -F
-iptables -X
-iptables -Z
-#允许所有本机向外的访问
-iptables -A OUTPUT -j ACCEPT
-# 允许访问22端口
-iptables -A INPUT -p tcp --dport 22 -j ACCEPT
-#允许访问80端口
-iptables -A INPUT -p tcp --dport 80 -j ACCEPT
-#允许访问443端口
-iptables -A INPUT -p tcp --dport 443 -j ACCEPT
-#允许FTP服务的21和20端口
-iptables -A INPUT -p tcp --dport 21 -j ACCEPT
-iptables -A INPUT -p tcp --dport 20 -j ACCEPT
-#如果有其他端口的话，规则也类似，稍微修改上述语句就行
-#允许ping
-iptables -A INPUT -p icmp -m icmp --icmp-type 8 -j ACCEPT
-#禁止其他未允许的规则访问
-iptables -A INPUT -j REJECT  #（注意：如果22端口未加入允许规则，SSH链接会直接断开。）
-iptables -A FORWARD -j REJECT
-</code></pre>
-<pre><code>openwrt在/etc/firewall.user中添加如下脚本，实现本地透明代理（其实并不完美）
-```sh
-iptables -t nat -N V2RAY
-iptables -t nat -A V2RAY -d x.x.x.x -j RETURN ##xxx是vps的ip地址
-iptables -t nat -A V2RAY -d 0.0.0.0/8 -j RETURN
-iptables -t nat -A V2RAY -d 10.0.0.0/8 -j RETURN
-iptables -t nat -A V2RAY -d 127.0.0.0/8 -j RETURN
-iptables -t nat -A V2RAY -d 169.254.0.0/16 -j RETURN
-iptables -t nat -A V2RAY -d 172.16.0.0/12 -j RETURN
-iptables -t nat -A V2RAY -d 192.168.0.0/16 -j RETURN
-iptables -t nat -A V2RAY -d 224.0.0.0/4 -j RETURN
-iptables -t nat -A V2RAY -d 240.0.0.0/4 -j RETURN
-iptables -t nat -A V2RAY -p tcp -j REDIRECT --to-ports 1060
-iptables -t nat -A PREROUTING -p tcp -j V2RAY
-</code></pre><blockquote>
-<p>Often, services on the computer communicate with each other by sending network packets to each other. They do this by utilizing a pseudo network interface called the loopback device, which directs traffic back to itself rather than to other computers.<br>同一台机器的不同进程之间有时候是通过一个虚拟的网络(loopback device)进行通信的，所以，必须要让iptables允许这些通信<br>$ sudo iptables -I INPUT 1 -i lo -j ACCEPT // -I的意思是插入，就是插入到INPUT这个规则里面。 1是说插到第一位，因为iptables排在前面的优先级高。 -i是interface的意思，lo就是loopback的简称。（也就是说，所有使用本地loopback这个interface发过来的包，放行）</p>
-</blockquote>
-<p><strong>注意还需要将上述规则添加到开机启动中，想要持久化的话好像有一个iptables-persistent</strong>，还有使用iptables屏蔽来自<a href="https://www.vpser.net/security/iptables-block-countries-ip.html">某个国家的IP</a>的教程</p>
-<p>netfilter是kernel的实现</p>
-<blockquote>
-<p>Iptables is a standard firewall included in most Linux distributions by default (a modern variant called nftables will begin to replace it). It is actually a front end to the kernel-level netfilter hooks that can manipulate the Linux network stack.</p>
-</blockquote>
-<p>iptables的工作流程</p>
-<blockquote>
-<p>direct the packet to the appropriate chain, check it against each rule until one matches, issue the default policy of the chain if no match is found</p>
-</blockquote>
-<p><a href="https://www.digitalocean.com/community/tutorials/a-deep-dive-into-iptables-and-netfilter-architecture">a-deep-dive-into-iptables-and-netfilter-architecture</a></p>
-<p><a href="https://unix.stackexchange.com/questions/413545/what-does-iptables-j-redirect-actually-do-to-packet-headers">iptable在透明代理中的原理就是修改了packet的destination address，同时还记住了原来的address</a></p>
-<blockquote>
-<p>iptables overrites the original destination address but it remembers the old one. The application code can then fetch it by asking for a special socket option, SO_ORIGINAL_DST<br><a href="https://github.com/darkk/redsocks">著名tcp代理redsocks就是用SO_ORIGINAL_DST的</a></p>
-</blockquote>
 <h3 id="23-Linux软件安装目录惯例"><a href="#23-Linux软件安装目录惯例" class="headerlink" title="23.  Linux软件安装目录惯例"></a>23.  Linux软件安装目录惯例</h3><p>转载自<a href="http://blog.csdn.net/aqxin/article/details/48324377"></a>。<br>一般特定文件夹里放什么东西是有惯例的。<br>cd到根目录下长这样<br>drwxr-xr-x  26 root   root     4096 Jan 26 10:08 .<br>drwxr-xr-x  26 root   root     4096 Jan 26 10:08 ..<br>drwxr-xr-x   2 root   root    12288 Jan  5 22:52 bin ##sbin和bin一样，存executable programs<br>drwxr-xr-x   4 root   root     3072 Jan 26 10:08 boot<br>drwxr-xr-x  18 root   root     4060 Feb  3 17:00 dev<br>drwxr-xr-x 109 root   root     4096 Feb  4 04:18 etc ##configuration files , 比如passwd<br>drwxr-xr-x   3 root   root     4096 Aug  6 05:42 home ##所有用户的home directory<br>drwxr-xr-x  22 root   root     4096 Jan  5 22:53 lib ## 系统用的common library<br>drwxr-xr-x   2 root   root     4096 Jan 19 06:30 lib64 ##<br>drwx——   2 root   root    16384 Mar 14  2017 lost+found<br>drwxr-xr-x   3 root   root     4096 Mar 14  2017 media<br>drwxr-xr-x   2 root   root     4096 Feb 15  2017 mnt ##temp file systems are attached like cd rom or usb drive(就当优盘好了)<br>drwxr-xr-x   2 root   root     4096 Feb 15  2017 opt<br>dr-xr-xr-x 130 root   root        0 Feb  3 17:00 proc ##这个念procedure, 代表virtual file system stores kernel info，知道为什么看cpu型号要cat /proc了吧<br>drwx——   6 root   root     4096 Dec 21 02:16 root  ##root account的根目录<br>drwxr-xr-x  25 root   root      940 Feb  4 08:07 run<br>drwxr-xr-x   2 root   root    12288 Jan 19 06:30 sbin ##sbin和bin一样，存executable programs,s代表essential system binary<br>drwxr-xr-x   2 root   root     4096 Jan 14  2017 snap<br>drwxr-xr-x   2 root   root     4096 Feb 15  2017 srv<br>dr-xr-xr-x  13 root   root        0 Feb  4 08:08 sys<br>drwxrwxrwt   9 root   root     4096 Feb  4 08:05 tmp ## contain temporary data,注意，该目录下文件重启后被erased<br>drwxr-xr-x  11 root   root     4096 Dec 10 01:04 usr ##这里面有bin man sbin等目录，存放user program and other data(并不是user，而是universal system resources)<br>drwxr-xr-x  14 root   root     4096 Dec 10 22:21 var ## 全称variable，存放variable data where system must be able to write during operation(就是log)</p>
 <p>/usr：系统级的目录，可以理解为C:/Windows/，/usr/lib理解为C:/Windows/System32。<br>/usr/local：用户级的程序目录，可以理解为C:/Progrem Files/。用户自己编译的软件默认会安装到这个目录下。<br>/opt：用户级的程序目录，可以理解为D:/Software，opt有可选的意思，这里可以用于放置第三方大型软件（或游戏），当你不需要时，直接rm -rf掉即可。在硬盘容量不够时，也可将/opt单独挂载到其他磁盘上使用。</p>
 <p>/usr/src：系统级的源码目录。<br>/usr/local/src：用户级的源码目录。</p>

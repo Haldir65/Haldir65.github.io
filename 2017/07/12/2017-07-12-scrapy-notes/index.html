@@ -17,7 +17,7 @@
 <meta property="og:description" content="Scrappy框架学习首先建议安装virtualenv，在env中进行操作。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/green_forest_alogside_river.jpg">
-<meta property="og:updated_time" content="2019-01-27T15:25:22.968Z">
+<meta property="og:updated_time" content="2019-01-29T15:20:50.351Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Scrappy框架学习笔记">
 <meta name="twitter:description" content="Scrappy框架学习首先建议安装virtualenv，在env中进行操作。">
@@ -255,6 +255,15 @@ class QuotesSpider(scrapy.Spider):
 </blockquote>
 <p>scrapy似乎是提供了一个Request类，传入一个url和callback，另外，项目结构包括scrapy.cfg和setting.py文件，把网络请求的细节隐藏了。最后生成的文件是items.csv(Comma-Separated Values)。应该可以结合其他库去作图。</p>
 <h2 id="2-MongoDB存储"><a href="#2-MongoDB存储" class="headerlink" title="2. MongoDB存储"></a>2. MongoDB存储</h2><p><a href="http://api.mongodb.com/python/current/tutorial.html">pymongo</a>，就像node环境下有mongoose可以调用mongodb api一样，python环境下也有对于的driver</p>
+<h3 id="requests的timeout并不是说整个请求的时间限定在10s内完成，而是底层的socket过了10s还没有收到一个Byte"><a href="#requests的timeout并不是说整个请求的时间限定在10s内完成，而是底层的socket过了10s还没有收到一个Byte" class="headerlink" title="requests的timeout并不是说整个请求的时间限定在10s内完成，而是底层的socket过了10s还没有收到一个Byte."></a>requests的timeout并不是说整个请求的时间限定在10s内完成，而是底层的socket过了10s还没有收到一个Byte.</h3><blockquote>
+<p>timeout is not a time limit on the entire response download; rather, an exception is raised if the server has not issued a response for timeout seconds (more precisely, if no bytes have been received on the underlying socket for timeout seconds). If no timeout is specified explicitly, requests do not time out.</p>
+</blockquote>
+<h3 id="content-encoding的一些点"><a href="#content-encoding的一些点" class="headerlink" title="content-encoding的一些点"></a>content-encoding的一些点</h3><p>在request中添加了’accept-encoding’:’gzip, deflate, br’的header之后，返回的response可能是gzip或者是br压缩的.这时候就需要根据response中的content-encoding来决定采用什么样的解压缩方式了。<br>比如是gzip的话要import gzip，其他的还要另外import。这是python，当然早就有现成的工具了</p>
+<pre><code class="python">import brotli
+bytecontent = brotli.decompress(response.content) ## byte，还需要decode(&#39;utf-8&#39;) 然后如果是json的话 , 
+strcontent = bytecontent.decode(&#39;utf-8&#39;)
+jobj = json.loads(strcontent)
+</code></pre>
 
       
 

@@ -17,7 +17,7 @@
 <meta property="og:description" content="linux下shell脚本语句的语法，脚本以Shebang)开始  #!/bin/sh">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/timg.jpg">
-<meta property="og:updated_time" content="2019-01-27T15:25:22.976Z">
+<meta property="og:updated_time" content="2019-01-29T15:20:50.359Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="如何写shell脚本">
 <meta name="twitter:description" content="linux下shell脚本语句的语法，脚本以Shebang)开始  #!/bin/sh">
@@ -209,13 +209,13 @@ ga('send', 'pageview');
 <p>eg: echo类似于print</p>
 <pre><code class="bash">##例：myvar=“Hi there！”
 
-    echo $myvar  ## Hi there！
+echo $myvar  ## Hi there！
 
-    echo &quot;$myvar&quot;  ## Hi there!
+echo &quot;$myvar&quot;  ## Hi there!
 
-    echo &#39; $myvar&#39; ## $myvar
+echo &#39; $myvar&#39; ## $myvar
 
-    echo \$myvar ## $myvar
+echo \$myvar ## $myvar
 </code></pre>
 <p>eg:</p>
 <pre><code class="bash">#!/bin/sh
@@ -371,7 +371,39 @@ echo &quot;The present working directory is `pwd`&quot;
 <p>time bash -c ‘echo “hey”‘<br>time somescript.sh</p>
 </blockquote>
 <p><a href="http://blog.51cto.com/litaotao/1187983">LINUX下的21个特殊符号</a><br><a href="https://notes.wanghao.work/2015-06-02-Shell%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html">Shell学习笔记</a><br><a href="https://www.youtube.com/watch?v=Lu-xzWajbFo">how to use variables in shell scripts</a></p>
-<h2 id="shell-script-tutorial"><a href="#shell-script-tutorial" class="headerlink" title="shell script tutorial"></a><a href="https://www.youtube.com/watch?v=hwrnmQumtPw">shell script tutorial</a></h2>
+<h2 id="shell-script-tutorial"><a href="#shell-script-tutorial" class="headerlink" title="shell script tutorial"></a><a href="https://www.youtube.com/watch?v=hwrnmQumtPw">shell script tutorial</a></h2><p>sh xxx.sh出现下面这个错误</p>
+<blockquote>
+<p>[[: not found…………………..</p>
+</blockquote>
+<p><a href="https://superuser.com/questions/374406/why-do-i-get-not-found-when-running-a-script">原因是sh不支持这种用法，bash支持。所以改成bash xxx.sh就可以了</a><br>sh只是一个符号链接，最终指向是一个叫做dash的程序，自Ubuntu 6.10以后，系统的默认shell /bin/sh被改成了dash。dash(the Debian Almquist shell) 是一个比bash小很多但仍兼容POSIX标准的shell，它占用的磁盘空间更少，执行shell脚本比bash更快，依赖的库文件更少，当然，在功能上无法与bash相比。dash来自于NetBSD版本的Almquist Shell(ash)。<br>Ubuntu中将默认shell改为dash的主要原因是效率。由于Ubuntu启动过程中需要启动大量的shell脚本，为了优化启动速度和资源使用情况，Ubuntu做了这样的改动。</p>
+<h2 id="shell里面判断一个命令是否执行成功"><a href="#shell里面判断一个命令是否执行成功" class="headerlink" title="shell里面判断一个命令是否执行成功"></a>shell里面判断一个命令是否执行成功</h2><p>其实在terminal中执行命令的话，有一个小细节：注意看最左下方的符号。上一个命令如果成功的话，是绿色的，不成功的话是红色的。<br>c语言中有一个errornum,shell 里面有差不多的东西，用于判断上一个命令是否返回非0的return value。</p>
+<pre><code># iptables -C INPUT -p tcp --dport 8080 --jump ACCEPT
+iptables: Bad rule (does a matching rule exist in that chain?).
+# echo $?
+1
+
+# iptables -A INPUT -p tcp --dport 8080 --jump ACCEPT
+
+# iptables -C INPUT -p tcp --dport 8080 --jump ACCEPT
+# echo $?
+0
+</code></pre><p>上面这个例子，未曾设置这个iptables rule ，这个命令返回1 ，否则返回0<br>shell里面判断if else就可以这么写</p>
+<pre><code class="shell">if [ $? -eq 0 ]; then
+    echo &quot;no error from last command&quot;
+else
+    echo &quot;some error from last command&quot;    
+fi
+
+if [ $? != 0 ]; then
+    echo &quot;there&#39;s error from executing last command!&quot;
+else
+    echo &quot;no error from last command&quot;    
+fi
+</code></pre>
+<h3 id="直接挑选几个拿的上台面的脚本开始看吧"><a href="#直接挑选几个拿的上台面的脚本开始看吧" class="headerlink" title="直接挑选几个拿的上台面的脚本开始看吧"></a>直接挑选几个拿的上台面的脚本开始看吧</h3><p><a href="https://github.com/cokebar/gfwlist2dnsmasq/blob/master/gfwlist2dnsmasq.sh">一个直接把gfwlist的bs64文本转换成dnsmasq配置文件的脚本</a> 注意，base64在linux上是预装的</p>
+<p><a href="https://github.com/hiboyhiboy/opt-script">opt-script</a></p>
+<p><a href="https://my.oschina.net/u/1032146/blog/146941">linux shell 的here document 用法 (cat &lt;&lt; EOF) </a></p>
+
       
 
       
