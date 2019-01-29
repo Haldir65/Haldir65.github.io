@@ -236,7 +236,7 @@ setsockopt (packet_send_sd, IPPROTO_IP, IP_HDRINCL, val, sizeof (one)) // IP_HDR
 为了将一个udp包伪装成tcp包，需要一个SOCK_RAW的socket
 > socket(AF_INET , SOCK_RAW , IPPROTO_TCP)
 
-接下来就是自己组装tcp包结构，
+接下来就是自己组装tcp包结构，tbd(这个不同的网卡的值是不一样的，最简单的就是抓包就可以了)
 
 
 ## python也提供了对应rawsocket的api 

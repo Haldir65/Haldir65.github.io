@@ -311,7 +311,7 @@ travis encrypt-file super_secret.txt --pro
 
 hexo server的意思是类似于express的serve static功能，[默认只处理public文件下的文件，所以如果本地运行hexo s 出现404的话，直接copy到public文件夹下就可以了](https://hexo.io/zh-cn/docs/server.html)注意hexo clear会删掉public文件夹
 
-[Refused to Execute Script From Because Its MIME Type (Text/plain) Is Not Executable, and Strict MIME Type Checking Is Enabled]这句话的意思
+[Refused to Execute Script From Because Its MIME Type (Text/plain) Is Not Executable, and Strict MIME Type Checking Is Enabled]这句话的意思,这其实是我本地跑hexo server的时候，没有找到一个xx.js文件，所以express返回了一个类似于404的plain text（而不是js文件），所以就出这个问题了。
 
 ## 15. yilia的主题里面badjs report的问题
 yilia的主题里面有一个badjs的report，去掉的方法：
@@ -322,6 +322,16 @@ cd 到themes/yilia里面,rm -rf source/ , 然后把source-src里面的report.js�
 ## 16. hexo server 
 [enospc的解决方式](https://stackoverflow.com/questions/22475849/node-js-what-is-enospc-error-and-how-to-solve)
 由于需要监听多个文件，所以linux下允许监听的文件数有个上限，这里修改一下就可以了
+
+## 17. hexo自带的代码高亮有一些不是很好的地方
+改用highlightjs就可以了。
+首先要把最外面的_config.yml里面的高亮关掉
+```
+highlight:
+  enable: false
+```
+由于最终生成的html文件中引用的是theme中webpack -p 打出来的js文件，所以照着highlightjs的说明修改一下yilia的源码，source-src目录，npm install highlight.js --save重新yarn dist就好了。yilia的theme修改还算简单。
+
 
 ### 参考
 

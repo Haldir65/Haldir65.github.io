@@ -78,3 +78,19 @@ scrapy似乎是提供了一个Request类，传入一个url和callback，另外�
 
 ## 2. MongoDB存储
 [pymongo](http://api.mongodb.com/python/current/tutorial.html)，就像node环境下有mongoose可以调用mongodb api一样，python环境下也有对于的driver
+
+
+### requests的timeout并不是说整个请求的时间限定在10s内完成，而是底层的socket过了10s还没有收到一个Byte.
+> timeout is not a time limit on the entire response download; rather, an exception is raised if the server has not issued a response for timeout seconds (more precisely, if no bytes have been received on the underlying socket for timeout seconds). If no timeout is specified explicitly, requests do not time out.
+
+
+### content-encoding的一些点
+在request中添加了'accept-encoding':'gzip, deflate, br'的header之后，返回的response可能是gzip或者是br压缩的.这时候就需要根据response中的content-encoding来决定采用什么样的解压缩方式了。
+比如是gzip的话要import gzip，其他的还要另外import。这是python，当然早就有现成的工具了
+```python
+import brotli
+bytecontent = brotli.decompress(response.content) ## byte，还需要decode('utf-8') 然后如果是json的话 , 
+strcontent = bytecontent.decode('utf-8')
+jobj = json.loads(strcontent)
+```
+

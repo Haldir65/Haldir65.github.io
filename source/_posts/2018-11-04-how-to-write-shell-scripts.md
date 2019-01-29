@@ -22,13 +22,13 @@ eg: echo类似于print
 ```bash
 ##例：myvar=“Hi there！”
 
-    echo $myvar  ## Hi there！
+echo $myvar  ## Hi there！
 
-    echo "$myvar"  ## Hi there!
+echo "$myvar"  ## Hi there!
 
-    echo ' $myvar' ## $myvar
+echo ' $myvar' ## $myvar
 
-    echo \$myvar ## $myvar
+echo \$myvar ## $myvar
 ```
 
 eg:
@@ -231,3 +231,51 @@ echo "The present working directory is `pwd`"
 [how to use variables in shell scripts](https://www.youtube.com/watch?v=Lu-xzWajbFo)
 
 ## [shell script tutorial](https://www.youtube.com/watch?v=hwrnmQumtPw)
+
+sh xxx.sh出现下面这个错误
+> [[: not found…………………..
+
+[原因是sh不支持这种用法，bash支持。所以改成bash xxx.sh就可以了](https://superuser.com/questions/374406/why-do-i-get-not-found-when-running-a-script)
+sh只是一个符号链接，最终指向是一个叫做dash的程序，自Ubuntu 6.10以后，系统的默认shell /bin/sh被改成了dash。dash(the Debian Almquist shell) 是一个比bash小很多但仍兼容POSIX标准的shell，它占用的磁盘空间更少，执行shell脚本比bash更快，依赖的库文件更少，当然，在功能上无法与bash相比。dash来自于NetBSD版本的Almquist Shell(ash)。
+Ubuntu中将默认shell改为dash的主要原因是效率。由于Ubuntu启动过程中需要启动大量的shell脚本，为了优化启动速度和资源使用情况，Ubuntu做了这样的改动。
+
+## shell里面判断一个命令是否执行成功
+其实在terminal中执行命令的话，有一个小细节：注意看最左下方的符号。上一个命令如果成功的话，是绿色的，不成功的话是红色的。
+c语言中有一个errornum,shell 里面有差不多的东西，用于判断上一个命令是否返回非0的return value。
+```
+# iptables -C INPUT -p tcp --dport 8080 --jump ACCEPT
+iptables: Bad rule (does a matching rule exist in that chain?).
+# echo $?
+1
+
+# iptables -A INPUT -p tcp --dport 8080 --jump ACCEPT
+
+# iptables -C INPUT -p tcp --dport 8080 --jump ACCEPT
+# echo $?
+0
+```
+上面这个例子，未曾设置这个iptables rule ，这个命令返回1 ，否则返回0
+shell里面判断if else就可以这么写
+```shell
+if [ $? -eq 0 ]; then
+    echo "no error from last command"
+else
+    echo "some error from last command"    
+fi
+
+if [ $? != 0 ]; then
+    echo "there's error from executing last command!"
+else
+    echo "no error from last command"    
+fi
+```
+
+
+### 直接挑选几个拿的上台面的脚本开始看吧
+[一个直接把gfwlist的bs64文本转换成dnsmasq配置文件的脚本](https://github.com/cokebar/gfwlist2dnsmasq/blob/master/gfwlist2dnsmasq.sh) 注意，base64在linux上是预装的
+
+[opt-script](https://github.com/hiboyhiboy/opt-script)
+
+
+
+[linux shell 的here document 用法 (cat << EOF) ](https://my.oschina.net/u/1032146/blog/146941)

@@ -58,6 +58,9 @@ h       l
 走到当前行的末尾: $
 走到当前行的开头: 0
 
+走到文档开头[[
+走到文档末尾]]    
+
 
 
 visual mode
@@ -121,6 +124,9 @@ gs      vsplit 一个新 窗口打开选中文件，但不跳到该窗口
 [ctrl +f 就是激活ctrlp](https://github.com/ctrlpvim/ctrlp.vim)这个插件，类似于文件搜索
 
 [内置了vim-markdown](https://github.com/tpope/vim-markdown)。默认已经可以实现markdown语法高亮。默认是自动把段落收起来的，光标一直挪到右边就自动展开了
+
+
+自动补全，在编辑模式(i) ，Ctrl+ p 
 
 ## 参考
 [vim cheat sheet](https://vim.rtorr.com/)

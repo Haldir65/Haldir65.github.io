@@ -100,3 +100,5 @@ tbd
 - [ ] ffmpeg 的js wrapper
 
 [ijkplayer现在看来似乎只是ffmpeg的一层wrapper](https://github.com/Bilibili/ijkplayer)
+
+[ijkplayer如何使用FFmpeg 4.0内核？](https://zhuanlan.zhihu.com/p/51010662)

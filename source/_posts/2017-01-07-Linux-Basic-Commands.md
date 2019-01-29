@@ -216,6 +216,8 @@ use 'less +F' to view logfiles, instead of 'tail' (ctrl-c, shift-f, q to quit)
 ctrl-x-e - continue editing your current shell line in a text editor (uses $EDITOR)
 alt-. - paste previous command's argument (useful for running multiple commands on the same resource)
 
+ctrl + r 查找历史命令
+
 
 
 ### 4. 用户和用户组的问题
@@ -691,39 +693,7 @@ sed -e 4a\/"this will be append to the 5th line" sample.txt >> sample.txt ## 注
 nl /etc/passwd | sed '2,5d'
 ```
 
-### 13. iptable
-> iptables -L -n -v ## 查看已添加的iptables规则
 
-默认是全部接受的
-```
-Chain INPUT (policy ACCEPT) ## 允许进入这台电脑
-target     prot opt source               destination
-
-Chain FORWARD (policy ACCEPT)  ## 路由相关
-target     prot opt source               destination
-
-Chain OUTPUT (policy ACCEPT) ## 允许发出这台电脑
-target     prot opt source               destination
-```
-
-```bash
-iptables -P FORWARD DROP ## 把forward 一律改为drop
-iptables -A INPUT -s  192.168.1.3  ## A是append s是source，拒绝接受192.168.1.3的访问，就是黑名单了
-iptables -A INPUT -s  192.168.0.0/24 -p tcp --destination-port 25 -j DROP  ## block all devices on this network ,  p是protocol,SMTP一般是25端口
-
-iptables -A INPUT -s 192.168.0.66 -j ACCEPT  ## 白名单
-iptables -D INPUT 3 ##这个3是当前INPUT表的第3条规则
-iptables -I INPUT -s 192.168.0.66 -j ACCEPT  ## 白名单，和-A不同，A是加到尾部，I是加到list的头部，顺序很重要。
-
-iptables -I INPUT -s 123.45.6.7 -j DROP       #屏蔽单个IP的命令
-iptables -I INPUT -s 123.0.0.0/8 -j DROP      #封整个段即从123.0.0.1到123.255.255.254的命令
-iptables -I INPUT -s 124.45.0.0/16 -j DROP    #封IP段即从123.45.0.1到123.45.255.254的命令
-
-## 清除已有iptables规则
-iptables -F
-iptables -X
-iptables -Z
-```
 
 ### 14. 多个tty(TeleTYpewriter)
 [how-to-multitask-in-the-linux-terminal-3-ways-to-use-multiple-shells-at-once](https://www.howtogeek.com/111417/how-to-multitask-in-the-linux-terminal-3-ways-to-use-multiple-shells-at-once/)

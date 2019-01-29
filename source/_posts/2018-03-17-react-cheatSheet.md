@@ -219,6 +219,7 @@ const listItems = numbers.map((number) =>
 
 ## 常见错误
 > Super expression must either be null or a function, not undefined
+
 ```js
 class LoginControl extends component{
 
