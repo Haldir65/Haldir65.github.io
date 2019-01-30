@@ -25,3 +25,5 @@ tags: [tbd]
 [Linux 信号处理](https://fixatom.com/deal-with-linux-signals/)
 
 [icymind](https://icymind.com/)
+
+[关于linux的任何事](https://www.cyberciti.biz/)

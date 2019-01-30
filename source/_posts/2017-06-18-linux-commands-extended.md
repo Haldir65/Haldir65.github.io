@@ -122,6 +122,7 @@ find / -size +100M：列出所有大于100M的文件，亲测。靠着这个找�
 上面这个命令是不能列出文件大小的，还想要查看文件大小的话
 find / -type f -size +50M -exec du -h {} \; | sort -n
 find . -mindepth 1 -maxdepth 1 -printf '%f\n' //打印出当前目录下所有文件，基本上就是一个ls命令了
+find / -type f -printf '%T+ %p\n' | sort | head -n 1 //how-to-find-the-oldest-file-in-a-directory-tree，找到一个目录下最老的文件
 
 删除/boot分区不需要的内核
 先df -h看/boot分区使用情况；
@@ -445,103 +446,6 @@ putty登录窗口左侧有一个loggin-auth，进去选择自己windows上刚才
 [常用的iptables命令去这里抄，系统管理员可能用的多一些](https://www.digitalocean.com/community/tutorials/iptables-essentials-common-firewall-rules-and-commands)
 
 
-### 13. iptable
-> iptables -L -n -v ## 查看已添加的iptables规则
-
-默认是全部接受的
-```
-Chain INPUT (policy ACCEPT) ## 允许进入这台电脑
-target     prot opt source               destination
-
-Chain FORWARD (policy ACCEPT)  ## 路由相关
-target     prot opt source               destination
-
-Chain OUTPUT (policy ACCEPT) ## 允许发出这台电脑
-target     prot opt source               destination
-```
-
-```bash
-iptables -P FORWARD DROP ## 把forward 一律改为drop
-iptables -A INPUT -s  192.168.1.3  ## A是append s是source，拒绝接受192.168.1.3的访问，就是黑名单了
-iptables -A INPUT -s  192.168.0.0/24 -p tcp --destination-port 25 -j DROP  ## block all devices on this network ,  p是protocol,SMTP一般是25端口
-
-iptables -A INPUT -s 192.168.0.66 -j ACCEPT  ## 白名单
-iptables -D INPUT 3 ##这个3是当前INPUT表的第3条规则
-iptables -I INPUT -s 192.168.0.66 -j ACCEPT  ## 白名单，和-A不同，A是加到尾部，I是加到list的头部，顺序很重要。
-
-iptables -I INPUT -s 123.45.6.7 -j DROP       #屏蔽单个IP的命令
-iptables -I INPUT -s 123.0.0.0/8 -j DROP      #封整个段即从123.0.0.1到123.255.255.254的命令
-iptables -I INPUT -s 124.45.0.0/16 -j DROP    #封IP段即从123.45.0.1到123.45.255.254的命令
-
-## 清除已有iptables规则
-iptables -F
-iptables -X
-iptables -Z
-```
-
-```bash
-iptables -L -n ## 查看已添加的iptables规则
-清除已有iptables规则
-iptables -F
-iptables -X
-iptables -Z
-#允许所有本机向外的访问
-iptables -A OUTPUT -j ACCEPT
-# 允许访问22端口
-iptables -A INPUT -p tcp --dport 22 -j ACCEPT
-#允许访问80端口
-iptables -A INPUT -p tcp --dport 80 -j ACCEPT
-#允许访问443端口
-iptables -A INPUT -p tcp --dport 443 -j ACCEPT
-#允许FTP服务的21和20端口
-iptables -A INPUT -p tcp --dport 21 -j ACCEPT
-iptables -A INPUT -p tcp --dport 20 -j ACCEPT
-#如果有其他端口的话，规则也类似，稍微修改上述语句就行
-#允许ping
-iptables -A INPUT -p icmp -m icmp --icmp-type 8 -j ACCEPT
-#禁止其他未允许的规则访问
-iptables -A INPUT -j REJECT  #（注意：如果22端口未加入允许规则，SSH链接会直接断开。）
-iptables -A FORWARD -j REJECT
-```
-
-```
-openwrt在/etc/firewall.user中添加如下脚本，实现本地透明代理（其实并不完美）
-```sh
-iptables -t nat -N V2RAY
-iptables -t nat -A V2RAY -d x.x.x.x -j RETURN ##xxx是vps的ip地址
-iptables -t nat -A V2RAY -d 0.0.0.0/8 -j RETURN
-iptables -t nat -A V2RAY -d 10.0.0.0/8 -j RETURN
-iptables -t nat -A V2RAY -d 127.0.0.0/8 -j RETURN
-iptables -t nat -A V2RAY -d 169.254.0.0/16 -j RETURN
-iptables -t nat -A V2RAY -d 172.16.0.0/12 -j RETURN
-iptables -t nat -A V2RAY -d 192.168.0.0/16 -j RETURN
-iptables -t nat -A V2RAY -d 224.0.0.0/4 -j RETURN
-iptables -t nat -A V2RAY -d 240.0.0.0/4 -j RETURN
-iptables -t nat -A V2RAY -p tcp -j REDIRECT --to-ports 1060
-iptables -t nat -A PREROUTING -p tcp -j V2RAY
-```
-
-
-> Often, services on the computer communicate with each other by sending network packets to each other. They do this by utilizing a pseudo network interface called the loopback device, which directs traffic back to itself rather than to other computers.
-同一台机器的不同进程之间有时候是通过一个虚拟的网络(loopback device)进行通信的，所以，必须要让iptables允许这些通信
-$ sudo iptables -I INPUT 1 -i lo -j ACCEPT // -I的意思是插入，就是插入到INPUT这个规则里面。 1是说插到第一位，因为iptables排在前面的优先级高。 -i是interface的意思，lo就是loopback的简称。（也就是说，所有使用本地loopback这个interface发过来的包，放行）
-
-**注意还需要将上述规则添加到开机启动中，想要持久化的话好像有一个iptables-persistent**，还有使用iptables屏蔽来自[某个国家的IP](https://www.vpser.net/security/iptables-block-countries-ip.html)的教程
-
-netfilter是kernel的实现
-> Iptables is a standard firewall included in most Linux distributions by default (a modern variant called nftables will begin to replace it). It is actually a front end to the kernel-level netfilter hooks that can manipulate the Linux network stack.
-
-iptables的工作流程
-> direct the packet to the appropriate chain, check it against each rule until one matches, issue the default policy of the chain if no match is found
-
-[a-deep-dive-into-iptables-and-netfilter-architecture](https://www.digitalocean.com/community/tutorials/a-deep-dive-into-iptables-and-netfilter-architecture)
-
-[iptable在透明代理中的原理就是修改了packet的destination address，同时还记住了原来的address](https://unix.stackexchange.com/questions/413545/what-does-iptables-j-redirect-actually-do-to-packet-headers)
-> iptables overrites the original destination address but it remembers the old one. The application code can then fetch it by asking for a special socket option, SO_ORIGINAL_DST
-[著名tcp代理redsocks就是用SO_ORIGINAL_DST的](https://github.com/darkk/redsocks)
-
-
-
 ### 23.  Linux软件安装目录惯例
 转载自[](http://blog.csdn.net/aqxin/article/details/48324377)。
 一般特定文件夹里放什么东西是有惯例的。
@@ -760,10 +664,6 @@ dpkg: warning: files list file for package `x' missing; assuming package has no 
 sudo rm -f /var/lib/dpkg/info/format
 sudo dpkg --configure -a
 ```
-
-
-
-
 
 unix domain socket用于ipc
 

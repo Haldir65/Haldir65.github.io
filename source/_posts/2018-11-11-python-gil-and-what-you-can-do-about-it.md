@@ -368,7 +368,7 @@ So the call stack gets transformed into a heap object.
 [python 2.5开始，generator能够返回数据，这之前还只是iteratble的](https://snarky.ca/how-the-heck-does-async-await-work-in-python-3-5/) 还可以通过gen.send函数往generator传参数
 [event-loop的实现原理简述](https://github.com/AndreLouisCaron/a-tale-of-event-loops)
 
-python3.4需要使用@coroutine的decorator，3.5之后直接使用async await关键字，确实更加方便
+@asyncio.coroutine这个decorator是3.4出现的，3.5之后直接使用async await关键字。这个decorator也就过时了
 ```python
 import asyncio
 import time
@@ -382,7 +382,57 @@ loop = asyncio.get_event_loop()
 loop.run_until_complete(speak_async())  
 loop.close()  
 ```
+对于阻塞式的io调用，不是说加一个await函数就能实现异步了
+To use requests (or any other blocking libraries) with asyncio, you can use BaseEventLoop.run_in_executor to run a function in another thread and yield from it to get the result. 
+asyncio毕竟只有一条线程，所以request这种阻塞式的函数不能直接拿来用，需要run_in_executor或者用线程池、进程包装一下
+```python
+import time
+import requests
+import asyncio
 
+async def getUrlBlocking(url):
+    print("starting request to %s " % url)
+    loop = asyncio.get_event_loop()
+    response = await loop.run_in_executor(None, requests.get, url)
+    print(response.status_code)
+    return response
+
+async def gotResponse(url):
+    res = await getUrlBlocking(url)
+    print(res.text)
+    return res
+
+if __name__ == "__main__":
+    s = time.perf_counter()
+    loop = asyncio.get_event_loop()
+    tasks = [gotResponse("https://jsonplaceholder.typicode.com/posts/%s" % i) for i in range(100)]
+    loop.run_until_complete(asyncio.wait(tasks))
+    loop.close()
+    elapsed = time.perf_counter() - s
+    print(f"{__file__} executed in {elapsed:0.2f} seconds.")    
+```
+
+async await要求await的东西是[awaitable的](https://docs.python.org/3/reference/datamodel.html#awaitable-objects)
+
+### asyncio中创建任务的语法有好几种
+```python
+import asyncio  
+
+async def doit(i):
+    print("Start %d" % i)
+    await asyncio.sleep(3)
+    print("End %d" % i)
+    return i
+
+if __name__ == '__main__':
+    loop = asyncio.get_event_loop()
+    #futures = [asyncio.ensure_future(doit(i), loop=loop) for i in range(10)]
+    #futures = [loop.create_task(doit(i)) for i in range(10)]
+    futures = [doit(i) for i in range(10)]
+    result = loop.run_until_complete(asyncio.gather(*futures))
+    print(result)
+```
+以上这三种创造出来的task全部都是无序执行的。不过python3.7以后官方更推荐使用asyncio.create_task而不是ensure_future去创建任务。
 
 ### 多线程环境下对资源的操作需要考虑线程安全问题
 有些操作不是原子性的
@@ -549,3 +599,4 @@ todo
 [How Do Python Coroutines Work](https://www.youtube.com/watch?v=7sCu4gEjH5I)
 [A Jesse Jiryu Davis Grok the GIL Write Fast And Thread Safe Python PyCon 2017](https://www.youtube.com/watch?v=7SSYhuk5hmc) the only thing two threads cann't do in once in Python is run python
 [Behold, my friends, the getaddrinfo lock in Python's socketmodule.c:](https://engineering.mongodb.com/post/the-saga-of-concurrent-dns-in-python-and-the-defeat-of-the-wicked-mutex-troll/)  A. Jesse Jiryu Davis关于python中parallel dns query的文章也很好
+[uvloop跑分](https://magic.io/blog/uvloop-blazing-fast-python-networking/)

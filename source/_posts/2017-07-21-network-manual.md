@@ -74,6 +74,7 @@ wiki上的[http名词解释](https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6
 301 Moved Permanently 客户请求的文档在其他地方，新的URL在Location头中给出，浏览器应该自动地访问新的URL。
 302 Found 类似于301，但新的URL应该被视为临时性的替代，而不是永久性的。
 304 Not Modified 客户端有缓冲的文档并发出了一个条件性的请求（一般是提供If-Modified-Since头表示客户只想比指定日期更新的文档）。服务器告诉客户，原来缓冲的文档还可以继续使用。
+307 这个其实和302一个意思，只是302会把GET、POST这些全部重定向到GET，这个是说你可以用之前的method再来一次
 401 Unauthorized
 403 Forbidden
 404 Not Found

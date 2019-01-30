@@ -378,7 +378,7 @@ WHERE t_news.news_id = %(news_id_1)s
 'economy'
 ```
 
-###查找所有用gmail注册的用户
+### 查找所有用gmail注册的用户
 ```
 >>>>>> db.session.query(User.user_name).filter(User.user_email.like("gmail")).all()
 2018-07-15 13:50:56,237 INFO sqlalchemy.engine.base.Engine SELECT t_user.user_name AS t_user_user_name

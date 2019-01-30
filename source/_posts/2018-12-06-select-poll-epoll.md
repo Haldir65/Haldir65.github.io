@@ -56,3 +56,5 @@ IOCP基于非阻塞异步模型，而epoll基于非阻塞同步模型。
 [大话 Select、Poll、Epoll](https://cloud.tencent.com/developer/article/1005481)
 [There is no Windows equivalent to epoll/kqueue , but there is Overlapped IO](https://news.ycombinator.com/item?id=8526264) 简单说就是windows在这方面设计的更优秀，只是开发者并未买账
 [Coroutines, Async/Await, Asyncio and the Pulsar Library](https://www.youtube.com/watch?v=M5-mcKh8QmY) node, go goroutine, nginx, gui libraries ,java nio等都以各种形式采用了或实现了自己的event loop
+
+[IO 多路复用 — SELECT 和 POLL](https://void-shana.moe/linux/io-%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8-select-%E5%92%8C-poll.html)

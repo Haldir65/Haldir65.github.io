@@ -185,6 +185,11 @@ sudo ss-server -c /etc/shadowsocks-libev/config.json -u ## 开启udp转发  nets
 ```
 
 其实跟安装 ss 很像的
+用iptables限制到shadowsocks端口的最大连接数
+```
+# Up to 32 connections are enough for normal usage
+iptables -A INPUT -p tcp --syn --dport ${SHADOWSOCKS_PORT} -m connlimit --connlimit-above 32 -j REJECT --reject-with tcp-reset
+```
 
 ## 2.4 安装libsodium
 转自[逗比](https://doub.io/ss-jc51/)

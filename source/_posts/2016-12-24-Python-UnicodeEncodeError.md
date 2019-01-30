@@ -298,7 +298,7 @@ print '10 // 3 =', 10 // 3
 直接在2.7中使用3的除法（2.7中的除法是10/3=3，3中的除法是10/3=3.33333...）
 
 
-### Reference
+### 参考
 - [廖雪峰的官方网站](http://www.liaoxuefeng.com/)
 - [静觅](http://cuiqingcai.com/category/technique/python)
 - [unicodeencodeerror-ascii-codec-cant-encode-character](https://stackoverflow.com/questions/9942594/unicodeencodeerror-ascii-codec-cant-encode-character-u-xa0-in-position-20?rq=1)

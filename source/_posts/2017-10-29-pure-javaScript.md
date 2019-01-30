@@ -81,6 +81,7 @@ import { firstGreet } from '.A.js'; // this works
 
 ### 1.2 基本的操作符，dynanic type,函数，变量，oop,class（ES6）,for循环,while这些都有
 - js里面判断两个变量相等的方式，建议一律使用三个等号（严格相等）
+
 ```js
 var a = 3;
 var b = "3";
@@ -97,6 +98,7 @@ a===b 返回 false
 &&和||也有，!=也有
 
 - true和false也有
+
 // truthy的概念是js里面特有的
 // 在console里面输入：
 Boolan(5)  > 输出true
@@ -108,6 +110,7 @@ Boolean('') > false
 ```
 
 - string，number,array也有
+
 ```javaScript
 // var myString = 'i 'm a "funny" string' #这样是不行的
 var myString = 'i \'m a "funny" string';//加一个转义就好了
@@ -237,7 +240,7 @@ past.getDate()
 
 网络请求，Ajax(Asynchronous javaScript & xml)请求的套路也有(AJAX命名上就是异步的)
 XMLHttpRequest缩写是(XHR)
-关于XHR Object
+关于XHR Object的一些特点
 - API In the form of an object
 - Provided by the browser's js environment
 - can be used with other protocols than http
@@ -757,6 +760,7 @@ add的时候如果存在重复元素直接无视新增的重复元素
 
 - IIFE(Immediately Invoked Function Expression) Library use this to avoid polluting global environment
 声明了之后立刻调用该函数执行
+
 iife的例子:
 ```js
 (function () {console.log('this is invoked!')})();
@@ -841,6 +845,7 @@ null: absence of value for a variable; undefined: absence of variable itself;
 typeof(Undefined) = 'undefined', typeof('Null') = 'object'
 [why-is-there-a-null-value-in-javascript](https://stackoverflow.com/questions/461966/why-is-there-a-null-value-in-javascript)
 [null is a special keyword that indicates an absence of value.](https://stackoverflow.com/questions/5076944/what-is-the-difference-between-null-and-undefined-in-javascript)
+
 ```js
 var foo;
 defined empty variable is null of datatype undefined //这种声明了但是没给赋值的变量的值是null,数据类型是undefined
@@ -871,14 +876,15 @@ js中是存在一些全局属性和全局函数的
 全局的函数比如decodeURI(),escape(),eval(),parseInt(),parseFloat()，这些方法不属于任何对象
 
 这两个函数都接受String作为参数
+
 ```js
 parseInt("10");  //返回 10，官方文档说返回的是integer(也就是Number了)
 parseFloat("10.33") // 返回10.33
 ```
 
-===================================================
-9. 交互事件的捕获，拦截，消费（冒泡）
-```javaScript
+## 9. 交互事件的捕获，拦截，消费（冒泡）
+
+```js
 //添加点击事件点击事件：
 var button = document.getElementById('btn')
 button.onclick = function () {
@@ -901,7 +907,7 @@ function cancelEvent(e) {
 ```
 在一个元素上触发事件，如果此元素定义了处理程序，那么此次事件就会被捕获，根据程序进行该事件的处理。否则这个事件会根据DOM树向父节点逐级传播，如果从始至终都没有被处理，那么最终会到达document或window根元素。所以事件是往上传递的，即冒泡。
 
-//事件注册的时机
+### 事件注册的时机
 对于简单的script，需要在body的最后一行，因为浏览器是从上到下解析的，轮到script解析的时候，需要操作dom，这就要求dom元素已经建立好。有时候，就算你把script写在body最后一行，轮到解析script的时候，前面的html还在加载（比如说非常大的html什么的，总之是有可能的）。所以一般用window.onLoad来注册事件。
 
 复杂点的script放在外面，用src引用。 也要用window.onLoad来注册事件。所以，一般的js长这样（假如的你js要操作dom）：
@@ -924,7 +930,8 @@ window.onLoad = function () {
 
 9. this的作用范围
 代码[来源](https://cn.vuejs.org/v2/guide/computed.html)
-```javaScript
+
+```js
 <script src="https://cdn.jsdelivr.net/npm/axios@0.12.0/dist/axios.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js"></script>
 <script>
@@ -1056,9 +1063,8 @@ console.log(arr);
 
 
 
-
-
 8. js去刷新当前页面，返回上级页面。。
+
 ```html
 <a href="javascript:history.go(-1)">返回上一页</a>
 <a href="javascript:location.reload()">刷新当前页面</a>
@@ -1069,8 +1075,9 @@ console.log(arr);
 
 
 
-10. 监听关闭窗口事件
-```javaScript
+### 10. 监听关闭窗口事件
+
+```js
 window.onbeforeunload = function () {
        return "Bye now!"
    }
@@ -1084,10 +1091,10 @@ Atom推荐插件
 
 
 
-
 9. setTimeout是schedule一个task，setInterval是设定一个周期性执行的任务。
 
 8. 可以检测是ES5还是ES6
+
 ```javaScript
 function f() { console.log('I am outside!'); }
 (function () {
@@ -1105,6 +1112,7 @@ f();
 
 
 9. js迭代一个数组的方法：
+
 ```js
 for (var i = 0; i < array.length; i++) {
   // array[i]

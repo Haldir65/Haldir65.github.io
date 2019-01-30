@@ -216,6 +216,8 @@ use 'less +F' to view logfiles, instead of 'tail' (ctrl-c, shift-f, q to quit)
 ctrl-x-e - continue editing your current shell line in a text editor (uses $EDITOR)
 alt-. - paste previous command's argument (useful for running multiple commands on the same resource)
 
+ctrl + r 查找历史命令
+
 
 
 ### 4. 用户和用户组的问题
