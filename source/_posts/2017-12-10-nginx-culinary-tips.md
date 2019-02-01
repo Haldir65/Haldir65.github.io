@@ -12,6 +12,7 @@ tags: [nginx,tools]
 
 
 ### 1.安装
+不推荐在windows上安装nginx
 [Installing nginx on windows](http://nginx.org/en/docs/windows.html)
 安装教程，google 'installing nginx on ubuntu'
 基本上就是把DigitalOcean写的这些复制粘贴过来
@@ -298,6 +299,7 @@ server
 ## 5. proxy_pass
 根据[how-to-set-up-a-node-js-application-for-production-on-ubuntu-14-04](https://www.digitalocean.com/community/tutorials/how-to-set-up-a-node-js-application-for-production-on-ubuntu-14-04)
 > /etc/nginx/sites-available/default
+
 ``` config
 server {
     listen 80;
@@ -334,26 +336,28 @@ from [mitigating-ddos-attacks-with-nginx-and-nginx-plus/](https://www.nginx.com/
 **allow a single client IP address to attempt to login only every 2 seconds (equivalent to 30 requests per minute):**
 
 
-1. Limiting the Rate of Requests
+### 1. Limiting the Rate of Requests
 eg: 单ip访问login接口频率不能超过2秒每次。
+
 ```config
 limit_req_zone $binary_remote_addr zone=one:10m rate=30r/m;
 
 server {
-    # ...
+    ...
     location /login.html {
         limit_req zone=one;
-    # ...
+    ...
     }
 }
 ```
-2. Limiting the Number of Connections
+
+### 2. Limiting the Number of Connections
 eg: 单ip访问/store/不能创建超过10条connections
-```config
+```nginx
 limit_conn_zone $binary_remote_addr zone=addr:10m;
 
 server {
-    # ...
+        # ...
     location /store/ {
         limit_conn addr 10;
         # ...
@@ -432,7 +436,7 @@ http_image_filter_module（图片裁剪模块）
 首先查看是否已安装http_image_filter_module模块
 > nginx -V
 /etc/nginx/nginx.conf文件添加
-```config
+```nginx
 location /image {
 		   alias "/imgdirectory/"; 
             ## 这样直接输入 yourip/image/imgname.jpg就能返回原始图片
@@ -701,7 +705,7 @@ server {
 
 关于server_name这个参数，nginx网站上在[how nginx process requests中是这么说的](http://nginx.org/en/docs/http/request_processing.html) 一个.conf文件里这么写是没有问题的.还有这个server_name写成domain name或者ip address都是可以的.
 
-```
+```nginx
 server {
     listen      80;
     server_name example.org www.example.org;

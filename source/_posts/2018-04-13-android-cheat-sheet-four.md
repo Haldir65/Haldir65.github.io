@@ -519,3 +519,52 @@ Log.e("GL", "CURRENT MAX IS "+String.valueOf(maxSize[0]));
 // maxSize[0] now contains max size(in both dimensions)
 ```
 
+### 19. RenderScript的使用方式
+
+```java
+//首先从一个view中获取Bitmap,在父viewgroup中addView(ImageView),setImageBItmap(blurredBitmap)
+public static Bitmap getViewBitmap(View v) {
+    if(v.getWidth() == 0 || v.getHeight() == 0)
+        return null;
+    Bitmap b = Bitmap.createBitmap( v.getWidth(), v.getHeight(), Bitmap.Config.ARGB_8888);
+    Canvas c = new Canvas(b);
+    v.draw(c);
+    return b;
+}
+
+public Bitmap blurBitmap(Bitmap bitmap){
+		
+	//Let's create an empty bitmap with the same size of the bitmap we want to blur
+	Bitmap outBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Config.ARGB_8888);
+		
+	//Instantiate a new Renderscript
+	RenderScript rs = RenderScript.create(getApplicationContext());
+		
+	//Create an Intrinsic Blur Script using the Renderscript
+	ScriptIntrinsicBlur blurScript = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs));
+		
+	//Create the Allocations (in/out) with the Renderscript and the in/out bitmaps
+	Allocation allIn = Allocation.createFromBitmap(rs, bitmap);
+	Allocation allOut = Allocation.createFromBitmap(rs, outBitmap);
+		
+	//Set the radius of the blur: 0 < radius <= 25
+	blurScript.setRadius(25.0f);
+		
+	//Perform the Renderscript
+	blurScript.setInput(allIn);
+	blurScript.forEach(allOut);
+		
+	//Copy the final bitmap created by the out Allocation to the outBitmap
+	allOut.copyTo(outBitmap);
+		
+	//recycle the original bitmap
+	bitmap.recycle();
+		
+	//After finishing everything, we destroy the Renderscript.
+	rs.destroy();
+		
+	return outBitmap;	
+		
+}
+```
+

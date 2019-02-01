@@ -58,3 +58,5 @@ IOCP基于非阻塞异步模型，而epoll基于非阻塞同步模型。
 [Coroutines, Async/Await, Asyncio and the Pulsar Library](https://www.youtube.com/watch?v=M5-mcKh8QmY) node, go goroutine, nginx, gui libraries ,java nio等都以各种形式采用了或实现了自己的event loop
 
 [IO 多路复用 — SELECT 和 POLL](https://void-shana.moe/linux/io-%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8-select-%E5%92%8C-poll.html)
+
+[linux kernel aio是另一个内核提供的异步框架，但是不如epoll成熟](https://www.zhihu.com/question/26943558)

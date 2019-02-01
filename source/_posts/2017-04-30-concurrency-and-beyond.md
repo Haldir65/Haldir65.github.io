@@ -10,8 +10,8 @@ tags: [concurrency]
 
 1. 线程池的常规使用方式
 通常说的线程池对外表现为具有一系列操作功能的接口，Executor提供了execute一个runnable的功能，而其子类ExecutorService则对外提供了更多的实用功能，所以平时用的都是ExecutorService的实现类。
-```java
 
+```java
 public interface Executor {
 
     /**
@@ -26,13 +26,12 @@ public interface Executor {
      */
     void execute(Runnable command);
 }
+```
 
-
+```java
 public interface ExecutorService extends Executor{
 	
 }
-
-
 public abstract class AbstractExecutorService implements ExecutorService {
 	
 }
@@ -42,7 +41,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 ```
 更具体一点来说，java.util.concurrent.ThreadPoolExecutor这个类提供了上述接口的具体实现，同时对外提供了一些hook(beforeExecute、afterExecute等)，当然开发者也可以继承这个方法，实现更多自定义功能。
 它的构造函数如下：
-```
+```java
 public ThreadPoolExecutor(int corePoolSize,
                               int maximumPoolSize,
                               long keepAliveTime,

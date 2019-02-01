@@ -70,6 +70,7 @@ Transfer-Encoding: chunked
 对于Http这种频繁的读写操作，allocate数组和copy数据无形中减慢了网络访问的速度。
 
 - Okio的解决方案
+
 ```
 Buffer buffer = new Buffer();//cheap ,allocation literal nothing
 buffer.writeUtf8("Hello Okio"); //java中一个英文字符占一个字节(byte)，一个汉字占2个字节(byte)

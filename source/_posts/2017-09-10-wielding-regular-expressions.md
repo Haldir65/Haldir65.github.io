@@ -122,7 +122,7 @@ e的意思是extended regular expressions（Extended regular expressions include
 ![](https://www.haldir66.ga/static/imgs/OtterChillin_EN-AU10154811440_1920x1080.jpg)
 ![](https://www.haldir66.ga/static/imgs/ParkRangerIsmael_EN-AU8783805449_1920x1080.jpg)
 ![](https://www.haldir66.ga/static/imgs/PortAntonio_EN-AU9246692740_1920x1080.jpg)
-![](https://www.haldir66.ga/static/imgs/PuffinWales_EN-AU12757555133_1920x1080.jpg)
+
 ![](https://www.haldir66.ga/static/imgs/RedAntarctica_EN-AU12197122155_1920x1080.jpg)
 ![](https://www.haldir66.ga/static/imgs/SaltApple_EN-AU13056568956_1920x1080.jpg)
 
@@ -136,7 +136,6 @@ e的意思是extended regular expressions（Extended regular expressions include
 ![](https://www.haldir66.ga/static/imgs/ElkValleyVideo_EN-AU7645555683_1920x1080.jpg)
 ![](https://www.haldir66.ga/static/imgs/Forest_ZH-CN16430313748_1920x1080.jpg)
 ![](https://www.haldir66.ga/static/imgs/HeronIslandShark_EN-AU12565902939_1920x1080.jpg)
-![](https://www.haldir66.ga/static/imgs/HongKongFireworks_ZH-CN13422096721_1920x1080.jpg)
 ![](https://www.haldir66.ga/static/imgs/Mapleleaf_ZH-CN9491310356_1920x1080.jpg)
 ![](https://www.haldir66.ga/static/imgs/MaryLouWilliams_EN-AU11937645356_1920x1080.jpg)
 ![](https://www.haldir66.ga/static/imgs/Mooncake_ZH-CN10274798301_1920x1080.jpg)
@@ -154,7 +153,6 @@ e的意思是extended regular expressions（Extended regular expressions include
 
 ![](https://www.haldir66.ga/static/imgs/VernalFall_ZH-CN10631212377_1920x1080.jpg)
 ![](https://www.haldir66.ga/static/imgs/LakePowellStorm_ZH-CN6822865622_1920x1080.jpg)
-![](https://www.haldir66.ga/static/imgs/Prayercard_ZH-CN13472871640_1920x1080.jpg)
 ![](https://www.haldir66.ga/static/imgs/OceanCurrents_ZH-CN13704695457_1920x1080.jpg)
 ![](https://www.haldir66.ga/static/imgs/WolfeCreekCrater_ZH-CN10953577427_1920x1080.jpg)
 ![](https://www.haldir66.ga/static/imgs/Aldabra_EN-AU10067035056_1920x1080.jpg)

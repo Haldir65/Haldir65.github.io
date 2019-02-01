@@ -473,6 +473,7 @@ ParameterizedType,TypeVariable,GenericArrayType,WildcardType（这四个全部�
 
 Java 系统监控有一个小的技巧是，你可以使用kill -3 <pid> 发一个SIGQUIT的信号给JVM，可以把堆栈信息（包括垃圾回收的信息）dump到stderr/logs。
 
+### ClassLOader的使用套路
 
 
 

@@ -18,7 +18,11 @@ tags: [tools,linux]
 >  sudo rm -rf /var/tmp ## 一般来说/tmp和/var/tmp/文件夹里面的东西可以随便删除，稳妥起见还是先看下这个目录下有没有什么文件被正在跑的程序使用：
 > sudo lsof +D /var ## 我看到一大堆mysql的东西 ，另外说一下，为什么/tmp文件夹这么小，因为ubuntu系统每次重启都会把这里面清一下
 
-
+### 把本机的一个文件上传到vps上
+如果之前改过ssh端口的话，这里端口自己可以改，目的地位置也可以指定
+```
+scp -P 22 porn.mp4 username@xxx.xxx.xxx.xxx:/home/username/
+```
 
 ## 2.必要软件
 
@@ -411,7 +415,9 @@ Softlayer, HongKong, CN         119.81.130.170          35.2MB/s
 
 ###  跑java？
 算了吧，简单读个文本文件print出来cpu就飙到50%。
-
+安装jdk的话
+sudo apt install openjdk-8-jdk //只装这个的话在intelij里面是看不了jdk源码的
+sudo apt install openjdk-8-source //这样就能在linux desktop的intelij里面看jdk源码了
 
 
 

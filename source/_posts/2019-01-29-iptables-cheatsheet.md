@@ -268,7 +268,21 @@ To allow 3 ssh connections per client host, enter:(一个client最多能够连3�
 http端口一个client最多20个连接
 # iptables -p tcp --syn --dport 80 -m connlimit --connlimit-above 20 --connlimit-mask 24 -j DROP
 ```
-
+### 使用iptables阻止syn-flood
+一般在路由器里面都有这么一条
+```
+iptables -N syn-flood
+iptables -A syn-flood -m limit --limit 50/s --limit-burst 10 -j RETURN
+iptables -A syn-flood -j DROP
+iptables -I INPUT -j syn-flood
+```
+```
+-N 创建一个条新的链
+--limit 50/s 表示每秒50次;1/m 则为每分钟一次
+--limit-burst 表示允许触发 limit 限制的最大包个数 (预设5)，它就像是一个容器，最多装10个，超过10个就装不下了，这些包就给后面的规则了
+-I INPUT -j syn-flood  把INPUT的包交给syn-flood链处理
+这里的--limit-burst=10相当于说最开始有10个可以匹配的包去转发，然后匹配的包的个数是根据--limit=50/s进行限制的，也就是每秒限制转发50个数据包，多余的会被下面符合要求的DROP规则去处理，进行丢弃，这样就实现了对数据包的限速问题。
+```
 
 ## 现在来看看fail2ban是怎么拉黑一个ip的
 一般来说要拒绝一个ip访问http,https可以这么干
@@ -393,11 +407,11 @@ $ sudo iptables -I INPUT 1 -i lo -j ACCEPT // -I的意思是插入，就是插�
 ```
 iptables -t nat -L -n -v //在路由器上这个会有
 ```
-tbd
 
 一般路由器就是干这个的（使用iptables配置nat）
 POSTROUTING 和 PREROUTING的概念
 
+还有一个ipset 可以认为是一次性执行多个iptables命令,openwrt上经常用
 
 netfilter是kernel的实现
 > Iptables is a standard firewall included in most Linux distributions by default (a modern variant called nftables will begin to replace it). It is actually a front end to the kernel-level netfilter hooks that can manipulate the Linux network stack.

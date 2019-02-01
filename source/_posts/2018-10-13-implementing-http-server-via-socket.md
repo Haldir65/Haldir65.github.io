@@ -219,6 +219,24 @@ with open('sina.html', 'wb') as f:
 
 [高阶版](https://realpython.com/python-sockets/)
 
+[自己用selector实现了一个toy server](https://github.com/Haldir65/Jimmy/blob/rm/src/_045_realpython_socket_article/dumbHttpServer.py)，使用curl可以像请求一个本地服务一样去获得response
+
+> sudo python3 src/_045_realpython_socket_article/dumbHttpServer.py 127.0.0.1 80
+
+完成的地方包括:
+1. server注册socket non-blocking监听。有新的client连接上就把client socket加入selector监听。
+2. 在出现EventRead之后使用socket.recv()读取请求（GET /index.html http/1.1 ....），把"index.html"这样的path加入data
+3. 在出现EventWrite之后，从data中获取之前的path（实际中可以根据这个path去找服务或者文件资源），返回utf-8 encoded内容，外加http response header (socket.sendall).
+
+主要的缺陷包括:
+1. client这边ctrl+c之后，server这边会接收到一个13的信号，默认对这个信号的处理是杀进程
+2. 在send或者read的时候有可能出现BrokenPipeError或者ConnectionResetError。暂时只好到处try except.
+3. 自己用socket伪造http协议的content-length字段是能够被wget认可的，只是这个content-length = len(正文.encode('utf-8'))。就是这部分长度是字节数组的长度，否则会短一些。
+4. http response协议头字段之间加(\r\n header最后跟两个换行符) 这些都是必要的
+5. curl不知道为什么在读完response之后还卡在那里（除非server主动close掉socket）
+6. wrk跑分看不出来这个toy server的吞吐量。
+
+
 
 ## C语言版本
 C语言的应该最接近底层,C语言实现HTTP的GET和POST请求

@@ -14,7 +14,10 @@ java给人一种不需要清理garbage的illusion
 allocating stuff is no big deal , garbage collecting it is.
 
 
-selectors
+
+
+
+Vertx，是一个基于JVM、轻量级、高性能的应用平台，非常适用于移动端后台、互联网、企业应用架构。[vertx框架底层基于netty](https://vertx.io/)，也是异步io，selector那一套
 
 [netty的example非常多，http2,cors,upload等等都有](https://netty.io/4.1/xref/overview-summary.html)
 

@@ -175,6 +175,10 @@ pull = fetch +merge ，会生成新的提交
 
 git pull --rebase = git pull -r
 
+
+git merge --no-ff //能够 fast forward的merge，但是我还是希望能够保留历史
+git merge --squash //要合过来的分之上的提交乱七八糟，统一做成一个commit，这里需要做一次提交
+
 ## 10. rebase和cherry-pick
 rebase不会生成新的提交，而且会使得项目提交历史呈现出完美的线性。但注意[不要在公共的分支上使用](https://github.com/geeeeeeeeek/git-recipes/wiki/5.1-%E4%BB%A3%E7%A0%81%E5%90%88%E5%B9%B6%EF%BC%9AMerge%E3%80%81Rebase%E7%9A%84%E9%80%89%E6%8B%A9)
 

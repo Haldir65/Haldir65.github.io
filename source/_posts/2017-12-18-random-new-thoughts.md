@@ -12,17 +12,17 @@ top : 1
 
 ### 期待能够完成的
 - [个人分享--web 前端学习资源分享](https://juejin.im/post/5a0c1956f265da430a501f51)
-- [WPA 所代表的 Web 开发应是未来](https://huangxuan.me/2017/02/09/nextgen-web-pwa/)据说Electron要被PWA干掉
+- [PWA 所代表的 Web 开发应是未来](https://huangxuan.me/2017/02/09/nextgen-web-pwa/)据说Electron要被PWA干掉
 - [js 循环闭包的解决方法](https://segmentfault.com/a/1190000003818163)
 - 动态类型一时爽，代码重构火葬场
 - iview，elementUi
 - [ ] rxjava是如何切换线程的以及源码解析
-- [ ] shadowsocks-android源码
+- [ ] shadowsocks-android源码（据说是起了一个c进程守护）
 - [ ] chromium net移植到Android平台[cronet是最简单的方式](https://github.com/GoogleChromeLabs/cronet-sample) [更多下载仓库](https://console.cloud.google.com/storage/browser/chromium-cronet?pli=1)
 - [embeed video with iframe](https://css-tricks.com/NetMag/FluidWidthVideo/Article-FluidWidthVideo.php)
-- [ ] flex,grid
 - [ ] Paul Irish from google
 - [ ] [lightbox一个很好看的js图片查看库](http://lokeshdhakar.com/projects/lightbox2/)
+- [ ] [一个很好看的h5音乐播放器](https://github.com/wangpengfei15975/skPlayer/)
 - [ ] [仿门户网站js相册](https://www.js-css.cn/a/jscode/album/2014/0915/1319.html)， [js相册2](https://www.js-css.cn/a/jscode/album/2014/0914/1318.html)
 - [ ] [八大排序算法的python实现](http://python.jobbole.com/82270/)
 - [ ] Redux和Flux很像,react context api
@@ -37,7 +37,6 @@ top : 1
 - [ ] learning how textView works is painful yet necessary
 - [ ] linux环境下多进程通讯方式(管道，共享内存，信号,unix domian socket)
 - [ ] mqtt接入实践[mqtt是建立在tcp基础上的应用层协议](https://github.com/mcxiaoke/mqtt)，[netty](https://github.com/netty/netty)也做了实现
-- [ ] render-script utility
 - [ ] play around with xposed
 - [ ] python gui编程
 - [ ] kotlin的coroutine[production-ready]
@@ -47,13 +46,16 @@ top : 1
 - [ ] autoWired, autovalue这些java 的library
 - [ ] code generator(代码生成器)
 - [ ][content-disposition](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)
-- [ ] 用正则检测或者解析json(jQuery源码里有)
+- [ ] 用正则检测或者解析json(jQuery源码里有) 在线正则检测网站
 - [ ] awk，正则表达式还有数据库这些也算一门编程语言
 - [ ] 来来来，[手写一个vm](https://www.youtube.com/watch?v=DUNkdl0Jhgs)
 - [ ] [chromium提供了如何在windows上编译chromium的教程](https://chromium.googlesource.com/chromium/src/+/master/docs/windows_build_instructions.md#System-requirements)
 - [ ][How the JVM compiles bytecode into machine code](https://www.youtube.com/watch?v=M8LiOANu3Nk)
 - [ ] WebSocket协议及数据帧
-- netfilter框架(imbedded in linux server)
+- [ ]Lua脚本是一个很轻量级的脚本，也是号称性能最高的脚本。路由器上都有运行环境，语法和c语言差不多
+- [腾讯的mmkv是shared preference的有效替代品](https://juejin.im/post/5baf8ae8f265da0ae92a7df5) mmap的使用值得学习
+- [ ] [openjdk的C语言实现可以随便调基几处来看看](https://github.com/keerath/openjdk-8-source/blob/master/jdk/src/windows/native/java/net/SocketOutputStream.c)
+
 
 
 
@@ -88,7 +90,7 @@ top : 1
 - [scheme 这东西算跨客户端平台的](https://sspai.com/post/31500)，比如在 App 中调起支付宝(用的是 alipayqr://)。其实就是一个系统内跨应用调用。[用法](http://blog.csdn.net/qq_23547831/article/details/51685310)
 这个主要是ios app之间通信的协议，以及快速跳转某个app某个页面的功能实现，还有x-callback-URL这样类似的协议。不过有了3d-touch之后，很多app都能长按图标进入页面，所以url scheme这个功能只能说是不复往日辉煌了
 - [X]linux的sed命令(文本替换比较常用)
-- [nio](https://juejin.im/post/59fffdb76fb9a0450a66bd58) 还是netty好
+- [nio](https://juejin.im/post/59fffdb76fb9a0450a66bd58) 还是netty好。也可以看点别的[并发编程网](http://ifeve.com/java-nio%E7%B3%BB%E5%88%97%E6%95%99%E7%A8%8B%EF%BC%88%E5%8D%81%E5%85%AD%EF%BC%89-java-nio-files/)
 - [X]js 的async await,就是一个async修饰一个method，里面随便写await
 - [X] Linux下TCP延迟确认机制
 - [X]c语言的[libevent使用教程](https://yq.aliyun.com/articles/413601) eventloop，添加回调，大致的流程就是这样
@@ -104,6 +106,10 @@ top : 1
 - [X]Exoplayer and the MediaCodec api[building-a-video-player-app-in-android](https://medium.com/androiddevelopers/building-a-video-player-app-in-android-part-3-5-19543ea9d416) 
 - [AC2016腾讯前端技术大会 1 1 1 H5直播那些事](https://www.youtube.com/watch?v=g3F7Imjcd4k)
 - [X] tcp-proxy实用教程(tcp replay or udp relay)
+- [X] render-script utility
+- [X]C语言fork进程以及进程之间通信的套路
+- [X] flex,grid. css的box-size真是坑人
+
 
  
 ### Good For Nothing
@@ -131,9 +137,13 @@ OpenType® is a cross-platform font file format developed jointly by Adobe and M
 - [ ][分词器](https://lxneng.com/posts/201)
 - [ ][LOGSTASH+ELASTICSEARCH+KIBANA处理NGINX访问日志](http://www.wklken.me/posts/2015/04/26/elk-for-nginx-log.html)ELK全家桶, logstash接管软件日志
 - [ ] [如何编写 jQuery 插件](https://gist.github.com/quexer/3619237)
+- netfilter框架(imbedded in linux server)
 
 
 [jsonplaceholder](https://jsonplaceholder.typicode.com/)懒得自己写api的话
 就用这个吧
+
+
+<script>console.log("hey there")</script>
 
 

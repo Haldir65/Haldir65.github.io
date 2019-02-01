@@ -332,6 +332,19 @@ highlight:
 ```
 由于最终生成的html文件中引用的是theme中webpack -p 打出来的js文件，所以照着highlightjs的说明修改一下yilia的源码，source-src目录，npm install highlight.js --save重新yarn dist就好了。yilia的theme修改还算简单。
 
+## 18. hexo渲染md文件时有些特定字符串是不能写的
+hexo本质上是一个js模板渲染工具，和jinja，handlerbars这一类模板一样，经常会用花括号包起来表示一个变量
+下面这个，美元符号加一个花括号抱起来的井号就不能单独拿出来写
+```
+${#} 
+```
+报的错大概长这样
+```
+Template render error: (unknown path) [Line 101, Column 142]
+  unexpected token: }}
+```
+[原因是这种看上去像是引用一个变量的东西是某些js库的保留syntax](https://github.com/hexojs/hexo/issues/2384#issuecomment-277494121)
+
 
 ### 参考
 
