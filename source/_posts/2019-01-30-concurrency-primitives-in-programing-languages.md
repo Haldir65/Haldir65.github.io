@@ -1,7 +1,7 @@
 ---
 title: 编程语言中使用到的多线程基础数据结构
 date: 2019-01-30 07:53:33
-tags: [java]
+tags: [java, tbd]
 ---
 
 ![](https://www.haldir66.ga/static/imgs/HongKongFireworks_ZH-CN13422096721_1920x1080.jpg)
@@ -10,9 +10,11 @@ tags: [java]
 <!--more-->
 ## java
 
-###　wait和notify
+
+### wait和notify
 有一个异常叫做java.lang.IllegalMonitorStateException。意思就是没有在synchronized block中调用wait或者notify方法。
 java Object中是有一个monitor对象的，wait和notify就是基于这个属性去实现的。只要在同一对象上去调用notify/notifyAll方法，就可以唤醒对应对象monitor上等待的线程了。
+为什么jvm需要对象的头部信息呢，一是给GC，锁做标记，二是hash数据和分代年龄，三是为了从对象指针就可以会的其数据类型及动态分派的能力，四是数组类型需要有数量信息。
 
 ### synchronized关键字
 从语法上讲，synchronized可以用在
@@ -83,8 +85,65 @@ Synchronized是通过对象内部的一个叫做监视器锁（monitor）来实�
 生产者的run方法里while(true)，再加上synchronized，往queue里面丢东西，塞满了就notify一下（让消费者去消费）。
 消费者的run方法里面while(true)，再加上synchronized，从queue里面取东西，发现没东西了。notify一下其他人（让生产者去生产）。
 
+## Sleep和wait的区别
+不要搞混淆了，sleep是不会让出cpu的执行权的，而wait则会让出cpu执行权，也就是释放锁。
 
-=================================
+## yield的用法
+yield是让当前线程从running的状态变成runnable的状态（不过这个方法很少用到）
+
+## join的用法
+和python一样，主线程调用childThread.join()就是让主线程等子线程执行完了之后再去执行后面的语句。不过从源码来看,join调用了wait。
+```java
+public final void join() throws InterruptedException {
+    join(0); //这里面调用了wait方法，也就是主线程会wait住
+}
+
+public synchronized void start() {
+    //Thread的start方法中做了相应的处理，所以当join的线程执行完成以后，会自动唤醒主线程继续往下执行
+}
+```
+[调用join的线程总得被唤醒啊](https://stackoverflow.com/questions/9866193/who-and-when-notify-the-thread-wait-when-thread-join-is-called) stackoverflow上说是在native层面调用的notify。有人翻出来openjdk的cpp源码
+```cpp
+void JavaThread::run() {
+  ...
+  thread_main_inner();
+}
+
+void JavaThread::thread_main_inner() {
+  ...
+  this->exit(false);
+  delete this;
+}
+
+void JavaThread::exit(bool destroy_vm, ExitType exit_type) {
+  ...
+  // Notify waiters on thread object. This has to be done after exit() is called
+  // on the thread (if the thread is the last thread in a daemon ThreadGroup the
+  // group should have the destroyed bit set before waiters are notified).
+  ensure_join(this);
+  ...
+}
+
+static void ensure_join(JavaThread* thread) {
+  // We do not need to grap the Threads_lock, since we are operating on ourself.
+  Handle threadObj(thread, thread->threadObj());
+  assert(threadObj.not_null(), "java thread object must exist");
+  ObjectLocker lock(threadObj, thread);
+  // Ignore pending exception (ThreadDeath), since we are exiting anyway
+  thread->clear_pending_exception();
+  // Thread is exiting. So set thread_status field in  java.lang.Thread class to TERMINATED.
+  java_lang_Thread::set_thread_status(threadObj(), java_lang_Thread::TERMINATED);
+  // Clear the native thread instance - this makes isAlive return false and allows the join()
+  // to complete once we've done the notify_all below
+  java_lang_Thread::set_thread(threadObj(), NULL);
+  lock.notify_all(thread);
+  // Ignore pending exception (ThreadDeath), since we are exiting anyway
+  thread->clear_pending_exception();
+}
+```
+答案就在
+lock.notify_all(thread);这里
+
 
 [图解java并发](http://ifeve.com/图解java并发上/)
 unSafe

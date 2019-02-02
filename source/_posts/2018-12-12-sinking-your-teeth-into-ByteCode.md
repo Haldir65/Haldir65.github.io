@@ -21,4 +21,5 @@ javap -c someclas
 ## 参考
 [JVM bytecode engineering 101](https://www.youtube.com/watch?v=lP4ED_dN16g)
 [JVM Bytecode for Dummies (and the Rest of Us Too)](https://www.youtube.com/watch?v=rPyqB1l4gko)
-[](https://coolshell.cn/articles/9229.html)
+[实例分析JAVA CLASS的文件结构](https://coolshell.cn/articles/9229.html)
+[从字节码层面看“HelloWorld”](https://www.cnblogs.com/paddix/p/5282004.html)
