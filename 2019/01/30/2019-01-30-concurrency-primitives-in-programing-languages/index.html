@@ -9,7 +9,7 @@
   <title>编程语言中使用到的多线程基础数据结构 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="主要讲讲java中的notify,wait,synchronized ，unsafe等多线程基础工具的使用方式。">
-<meta name="keywords" content="java">
+<meta name="keywords" content="java,tbd">
 <meta property="og:type" content="article">
 <meta property="og:title" content="编程语言中使用到的多线程基础数据结构">
 <meta property="og:url" content="https://haldir65.github.io/2019/01/30/2019-01-30-concurrency-primitives-in-programing-languages/index.html">
@@ -17,7 +17,7 @@
 <meta property="og:description" content="主要讲讲java中的notify,wait,synchronized ，unsafe等多线程基础工具的使用方式。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/HongKongFireworks_ZH-CN13422096721_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-02-02T02:08:41.731Z">
+<meta property="og:updated_time" content="2019-02-02T20:08:24.349Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="编程语言中使用到的多线程基础数据结构">
 <meta name="twitter:description" content="主要讲讲java中的notify,wait,synchronized ，unsafe等多线程基础工具的使用方式。">
@@ -202,7 +202,7 @@ ga('send', 'pageview');
       
         <p><img src="https://www.haldir66.ga/static/imgs/HongKongFireworks_ZH-CN13422096721_1920x1080.jpg" alt=""><br>主要讲讲java中的notify,wait,synchronized ，unsafe等多线程基础工具的使用方式。</p>
 <a id="more"></a>
-<h2 id="java"><a href="#java" class="headerlink" title="java"></a>java</h2><p>###　wait和notify<br>有一个异常叫做java.lang.IllegalMonitorStateException。意思就是没有在synchronized block中调用wait或者notify方法。<br>java Object中是有一个monitor对象的，wait和notify就是基于这个属性去实现的。只要在同一对象上去调用notify/notifyAll方法，就可以唤醒对应对象monitor上等待的线程了。</p>
+<h2 id="java"><a href="#java" class="headerlink" title="java"></a>java</h2><h3 id="wait和notify"><a href="#wait和notify" class="headerlink" title="wait和notify"></a>wait和notify</h3><p>有一个异常叫做java.lang.IllegalMonitorStateException。意思就是没有在synchronized block中调用wait或者notify方法。<br>java Object中是有一个monitor对象的，wait和notify就是基于这个属性去实现的。只要在同一对象上去调用notify/notifyAll方法，就可以唤醒对应对象monitor上等待的线程了。<br>为什么jvm需要对象的头部信息呢，一是给GC，锁做标记，二是hash数据和分代年龄，三是为了从对象指针就可以会的其数据类型及动态分派的能力，四是数组类型需要有数量信息。</p>
 <h3 id="synchronized关键字"><a href="#synchronized关键字" class="headerlink" title="synchronized关键字"></a>synchronized关键字</h3><p>从语法上讲，synchronized可以用在<br>instance　method(锁在这个instance上), static method (锁在这个class )以及method block(锁这一块代码逻辑)。<br>➜ $ cat SynchronizedSample.java </p>
 <pre><code class="java">package com.me.harris.concurrent;
 
@@ -254,7 +254,56 @@ public class com.me.harris.concurrent.SynchronizedSample {
 <p><a href="http://www.cnblogs.com/paddix/p/5405678.html">轻量级锁和偏向锁</a></p>
 <p>类似的，synchronized修饰的instance method在编译后添加了一个ACC_SYNCHRONIZED的flag，同步是通过这个标志实现的。</p>
 <h2 id="回顾一下用notify-wait-synchronized实现的生产者-消费者模型"><a href="#回顾一下用notify-wait-synchronized实现的生产者-消费者模型" class="headerlink" title="回顾一下用notify,wait,synchronized实现的生产者-消费者模型"></a>回顾一下用notify,wait,synchronized实现的生产者-消费者模型</h2><p>基本的思路就是生产者和消费者共同持有一个锁（随便new一个Object出来就是了），生产者和消费者都extends Thread。<br>生产者的run方法里while(true)，再加上synchronized，往queue里面丢东西，塞满了就notify一下（让消费者去消费）。<br>消费者的run方法里面while(true)，再加上synchronized，从queue里面取东西，发现没东西了。notify一下其他人（让生产者去生产）。</p>
-<p>=================================</p>
+<h2 id="Sleep和wait的区别"><a href="#Sleep和wait的区别" class="headerlink" title="Sleep和wait的区别"></a>Sleep和wait的区别</h2><p>不要搞混淆了，sleep是不会让出cpu的执行权的，而wait则会让出cpu执行权，也就是释放锁。</p>
+<h2 id="yield的用法"><a href="#yield的用法" class="headerlink" title="yield的用法"></a>yield的用法</h2><p>yield是让当前线程从running的状态变成runnable的状态（不过这个方法很少用到）</p>
+<h2 id="join的用法"><a href="#join的用法" class="headerlink" title="join的用法"></a>join的用法</h2><p>和python一样，主线程调用childThread.join()就是让主线程等子线程执行完了之后再去执行后面的语句。不过从源码来看,join调用了wait。</p>
+<pre><code class="java">public final void join() throws InterruptedException {
+    join(0); //这里面调用了wait方法，也就是主线程会wait住
+}
+
+public synchronized void start() {
+    //Thread的start方法中做了相应的处理，所以当join的线程执行完成以后，会自动唤醒主线程继续往下执行
+}
+</code></pre>
+<p><a href="https://stackoverflow.com/questions/9866193/who-and-when-notify-the-thread-wait-when-thread-join-is-called">调用join的线程总得被唤醒啊</a> stackoverflow上说是在native层面调用的notify。有人翻出来openjdk的cpp源码</p>
+<pre><code class="cpp">void JavaThread::run() {
+  ...
+  thread_main_inner();
+}
+
+void JavaThread::thread_main_inner() {
+  ...
+  this-&gt;exit(false);
+  delete this;
+}
+
+void JavaThread::exit(bool destroy_vm, ExitType exit_type) {
+  ...
+  // Notify waiters on thread object. This has to be done after exit() is called
+  // on the thread (if the thread is the last thread in a daemon ThreadGroup the
+  // group should have the destroyed bit set before waiters are notified).
+  ensure_join(this);
+  ...
+}
+
+static void ensure_join(JavaThread* thread) {
+  // We do not need to grap the Threads_lock, since we are operating on ourself.
+  Handle threadObj(thread, thread-&gt;threadObj());
+  assert(threadObj.not_null(), &quot;java thread object must exist&quot;);
+  ObjectLocker lock(threadObj, thread);
+  // Ignore pending exception (ThreadDeath), since we are exiting anyway
+  thread-&gt;clear_pending_exception();
+  // Thread is exiting. So set thread_status field in  java.lang.Thread class to TERMINATED.
+  java_lang_Thread::set_thread_status(threadObj(), java_lang_Thread::TERMINATED);
+  // Clear the native thread instance - this makes isAlive return false and allows the join()
+  // to complete once we&#39;ve done the notify_all below
+  java_lang_Thread::set_thread(threadObj(), NULL);
+  lock.notify_all(thread);
+  // Ignore pending exception (ThreadDeath), since we are exiting anyway
+  thread-&gt;clear_pending_exception();
+}
+</code></pre>
+<p>答案就在<br>lock.notify_all(thread);这里</p>
 <p><a href="http://ifeve.com/图解java并发上/">图解java并发</a><br>unSafe</p>
 <p>hacknoon中有关于python中多线程primitives的文章<br>c语言中多线程通信基础<br>基本的思想都是相通的</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://tech.meituan.com/2018/11/15/java-lock.html">美团博客中关于java锁的一片文章</a></p>
@@ -293,6 +342,10 @@ public class com.me.harris.concurrent.SynchronizedSample {
 			 
         		<li class="article-tag-list-item">
         			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">java</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">tbd</a>
         		</li>
       		
 		</ul>
@@ -588,10 +641,6 @@ public class com.me.harris.concurrent.SynchronizedSample {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
@@ -617,6 +666,10 @@ public class com.me.harris.concurrent.SynchronizedSample {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
               <li class="article-tag-list-item">

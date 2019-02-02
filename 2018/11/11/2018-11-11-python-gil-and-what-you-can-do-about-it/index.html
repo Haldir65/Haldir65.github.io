@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/1102533137-5.jpg">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/lockExplanation.jpg">
-<meta property="og:updated_time" content="2019-02-02T02:08:41.731Z">
+<meta property="og:updated_time" content="2019-02-02T20:08:24.349Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="python中多进程、多线程以及GIL记录">
 <meta name="twitter:description" content="If your code has a lot of I/O or Network usage:Multithreading is your best bet because of its low overhead If you have a GUIMultithreading so your UI thread doesn’t get locked up If your code is CPU">
@@ -209,7 +209,7 @@ ga('send', 'pageview');
 </ul>
 <a id="more"></a>
 <p>Python Global Interpreter Lock(GIL)<br>对于CPython，所有的python bytecode在执行前都需要获得interpreter的lock,one vm thread at a time。(java实现的python似乎没有这个烦恼)<br>GIL的出现似乎是历史原因（为了方便的直接使用当时现有的c extension）。而没有在python3中被移除的原因是因为这会造成单线程的程序在python3中跑的反而比python2中慢。</p>
-<p>因为GIL的存在，python中的线程并不能实现cpu的并发运行(同时只能有一条线程在运行)。但对于I/O intensive的任务来说，cpu都在等待I/O操作完成，所以爬虫这类操作使用多线程是合适的。根据<a href="https://www.youtube.com/watch?v=7SSYhuk5hmc">A Jesse Jiryu Davis</a>在pycon2017上的演讲，在多线程python程序中，如果某条线程开始进行I/O操作，就会主动放弃GIL(这是在socket module的源码中)，或者在cpu-intensive程序中，一条线程连续执行1000次(python2中是一个常数)后就会被夺走gil。<a href="https://github.com/python/cpython/blob/master/Modules/socketmodule.c">socket里面找关键字Py_BEGIN_ALLOW_THREADS和Py_END_ALLOW_THREADS</a></p>
+<p>因为GIL的存在，python中的线程并不能实现cpu的并发运行(同时只能有一条线程在运行)。但对于I/O intensive的任务来说，cpu都在等待I/O操作完成，所以爬虫这类操作使用多线程是合适的。根据<a href="https://www.youtube.com/watch?v=7SSYhuk5hmc">A Jesse Jiryu Davis</a>在pycon2017上的演讲，在多线程python程序中，如果某条线程开始进行I/O操作，就会主动放弃GIL(这是在socket module的源码中)，或者在cpu-intensive程序中，一条线程连续执行1000次(python2中是一个常数)后就会被夺走gil。<a href="https://github.com/python/cpython/blob/master/Modules/socketmodule.c">socket里面找关键字Py_BEGIN_ALLOW_THREADS和Py_END_ALLOW_THREADS</a> 这是两个macro，自己写python c entension的时候可能会用得上</p>
 <h2 id="多线程以及一些同步的问题"><a href="#多线程以及一些同步的问题" class="headerlink" title="多线程以及一些同步的问题"></a>多线程以及一些同步的问题</h2><p>单线程的版本</p>
 <pre><code class="python"># single_threaded.py
 import time
@@ -227,7 +227,7 @@ end = time.time()
 
 print(&#39;Time taken in seconds -&#39;, end - start)
 </code></pre>
-<p>多线程的版本</p>
+<p>多线程的版本<br>多线程下总会对公共资源的操作是需要考虑race condition的，并且这种问题很难通过测试测出来。</p>
 <pre><code class="python"># multi_threaded.py
 import time
 from threading import Thread
@@ -334,234 +334,7 @@ dis.dis(foo)
               6 STORE_GLOBAL             0 (n)
               8 LOAD_CONST               0 (None)
              10 RETURN_VALUE
-</code></pre><h2 id="多进程"><a href="#多进程" class="headerlink" title="多进程"></a>多进程</h2><p>多进程的版本</p>
-<pre><code class="python">from multiprocessing import Pool
-import time
-
-COUNT = 50000000
-def countdown(n):
-    while n&gt;0:
-        n -= 1
-
-if __name__ == &#39;__main__&#39;:
-    pool = Pool(processes=2)
-    start = time.time()
-    r1 = pool.apply_async(countdown, [COUNT//2])
-    r2 = pool.apply_async(countdown, [COUNT//2])
-    pool.close()
-    pool.join()
-    end = time.time()
-    print(&#39;Time taken in seconds -&#39;, end - start)
-</code></pre>
-<p>多进程之间内存不共享，同步方式是使用Queue(fifo)</p>
-<pre><code class="python">#!/usr/bin/env python3
-
-import multiprocessing
-import time
-import random
-import os
-from multiprocessing import Queue
-
-q = Queue()
-
-def hello(n):
-    time.sleep(random.randint(1,3))
-    q.put(os.getpid())
-    print(&quot;[{0}] Hello!&quot;.format(n))
-
-processes = [ ]
-for i in range(10):
-    t = multiprocessing.Process(target=hello, args=(i,))
-    processes.append(t)
-    t.start()
-
-for one_process in processes:
-    one_process.join()
-
-mylist = [ ]
-while not q.empty():
-    mylist.append(q.get())
-
-print(&quot;Done!&quot;)
-print(len(mylist))
-print(mylist)
-</code></pre>
-<p>更加Pythonic的方式是使用asyncio</p>
-<h2 id="Asyncio"><a href="#Asyncio" class="headerlink" title="Asyncio"></a>Asyncio</h2><p>优点包括</p>
-<ul>
-<li>Based on futures</li>
-<li>Faster than threads</li>
-<li>Massive I/O concurrency</li>
-</ul>
-<pre><code class="python">async def fetch_url(url):
-        return await aiohttp.request(&#39;GET&#39; , url) ## you get the future, the function is not executed immediatedly
-
-async def fetch_two(url_a,url_b):
-        future_a = fetch_url(url_a)
-        future_b = fetch_url(url_b)
-        a ,b = await asyncio.gather(future_a, future_b)  ## 一旦开始await这个future,这个coroutine才会被加入event loop
-        return a, b
-</code></pre>
-<p>上述代码虽然还是在同一个进程中运行，还受到GIL制约，但是由于是I/O操作，所以也没什么问题。只是在process返回的结果是，就会受到GIL的影响了。（实际操作中你会发现coroutine还没执行就timeout了）<br>也就是说，I/O操作用asyncio，数据处理使用multi-processing，这是最好的情况。<br>由于coroutine和multi-processing是两个相对独立的模块，所以需要自己把两者结合起来。用多进程进行数据处理，每个进程中各自有独立的coroutine在运行。<br><a href="https://www.youtube.com/watch?v=0kXaLh8Fz3k">John Reese - Thinking Outside the GIL with AsyncIO and Multiprocessing - PyCon 2018</a></p>
-<pre><code class="python">async def run_loop(tx, rx):
-        ... ## real work here 
-        limit = 10
-        pending = set()
-        while True:
-                while len(pending) &lt; limit:
-                        task = tx.get_nowait()
-                        fn ,args, kwargs = task
-                        pending.add(fn(args,kwargs))
-                done, pending = await asyncio.wait(pending, ..)        
-                for future in done:
-                        rx.put_nowait(await future)
-
-def bootstrap(tx, rx):
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_untile_complete(run_loop(tx, rx))
-
-def main():        
-        p = multiprocessing.Process(target = bootstrap, args = (tx, rx))
-        p.start()
-</code></pre>
-<p>实际操作可能看起来像这样</p>
-<pre><code class="python">async def fetch_url(url):
-        return await aiohttp.request(&#39;GET&#39; , url) 
-
-def fetch_all(urls):
-       tx, rx = Queue(), Queue()
-       Process(
-               target=bootstrap,
-               args=(tx,rx)
-       ).start()
-       for url in urls:
-           task = fetch_url,(url,), {}
-           tx.put_nowait(task)
-</code></pre>
-<p>已经开源 pip install aiomultiprocess<br><a href="https://github.com/dano/aioprocessing">aioprocessing</a></p>
-<h2 id="关于协程"><a href="#关于协程" class="headerlink" title="关于协程"></a>关于协程</h2><p>coroutine是一个在很多编程语言中都有的概念，在python中coroutine一般指的是generator based coroutines。<br>首先，因为协程是一种能暂停的函数，那么它暂停是为了什么？一般是等待某个事件，比如说某个连接建立了；某个 socket 接收到数据了；某个计时器归零了等。而这些事件应用程序只能通过轮询的方式得知是否完成，<strong>但是操作系统（所有现代的操作系统）可以提供一些中断的方式通知应用程序，如 select, epoll, kqueue 等等</strong>。<br><a href="https://lotabout.me/2017/understand-python-asyncio/">understand-python-asyncio</a></p>
-<p>基础是generator(任何包含yield expression的函数)</p>
-<pre><code>$ &gt;&gt;&gt;def gen_fn():
-        print(&#39;start&#39;)
-        yiled 1
-        print(&#39;middle&#39;)
-        yield 2
-        print(&#39;done&#39;)
-$ &gt;&gt;&gt; gen = gen_fn()
-$ &gt;&gt;&gt; gen
-$ &lt;generator object gen_fn at 0x7f83cddc0b48&gt;
-&gt;&gt;&gt; gen.gi_code.co_code //对应的bytecode
-b&#39;t\x00d\x01\x83\x01\x01\x00d\x02V\x00\x01\x00t\x00d\x03\x83\x01\x01\x00d\x04V\x00\x01\x00t\x00d\x05\x83\x01\x01\x00d\x00S\x00&#39;
-&gt;&gt;&gt; len(gen.gi_code.co_code)
-40
-&gt;&gt;&gt; gen.gi_frame.f_lasti //instruction pointer , 说明当前执行到哪个指令了，-1说明还没有开始执行
--1
-&gt;&gt;&gt; next(gen)
-start
-1
-&gt;&gt;&gt; ret = next(gen)
-middle
-&gt;&gt;&gt; ret
-2 // next方法返回的是yield里面的值
-&gt;&gt;&gt; next(gen)
-done
-Traceback (most recent call last):
-  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
-StopIteration // 这是正常的，说明generator执行完毕
-
-
-&gt;&gt;&gt; import dis
-&gt;&gt;&gt; dis.dis(gen)
-  2           0 LOAD_GLOBAL              0 (print)
-              2 LOAD_CONST               1 (&#39;start&#39;)
-              4 CALL_FUNCTION            1
-              6 POP_TOP
-
-  3           8 LOAD_CONST               2 (1)
-             10 YIELD_VALUE
-             12 POP_TOP
-
-  4          14 LOAD_GLOBAL              0 (print)
-             16 LOAD_CONST               3 (&#39;middle&#39;)
-             18 CALL_FUNCTION            1
-             20 POP_TOP
-
-  5          22 LOAD_CONST               4 (2)
-             24 YIELD_VALUE
-             26 POP_TOP
-
-  6          28 LOAD_GLOBAL              0 (print)
-             30 LOAD_CONST               5 (&#39;done&#39;)
-             32 CALL_FUNCTION            1
-             34 POP_TOP
-             36 LOAD_CONST               0 (None)
-             38 RETURN_VALUE
-&gt;&gt;&gt;
-</code></pre><p>python3.3中开始出现yield关键字，python3.4中开始引入asyncio标准库，python 3.5标准库中出现的async await关键字只是基于generator的sytatic sugar，那么<a href="https://stackoverflow.com/questions/8389812/how-are-generators-and-coroutines-implemented-in-cpython">generator是如何实现的</a>.</p>
-<ul>
-<li>The yield instruction takes the current executing context as a closure, and transforms it into an own living object. This object has a <strong>iter</strong> method which will continue after this yield statement.<br>So the call stack gets transformed into a heap object.</li>
-</ul>
-<p><a href="https://hackernoon.com/the-magic-behind-python-generator-functions-bc8eeea54220">解释generator实现原理的文章</a></p>
-<p><a href="https://snarky.ca/how-the-heck-does-async-await-work-in-python-3-5/">python 2.5开始，generator能够返回数据，这之前还只是iteratble的</a> 还可以通过gen.send函数往generator传参数<br><a href="https://github.com/AndreLouisCaron/a-tale-of-event-loops">event-loop的实现原理简述</a></p>
-<p>@asyncio.coroutine这个decorator是3.4出现的，3.5之后直接使用async await关键字。这个decorator也就过时了</p>
-<pre><code class="python">import asyncio
-import time
-
-async def speak_async(): 
-    print(&#39;starting====&#39;) 
-    r = await asyncio.sleep(1) ##这里不能使用time.sleep(1)
-    print(&#39;OMG asynchronicity!&#39;)
-
-loop = asyncio.get_event_loop()  
-loop.run_until_complete(speak_async())  
-loop.close()
-</code></pre>
-<p>对于阻塞式的io调用，不是说加一个await函数就能实现异步了<br>To use requests (or any other blocking libraries) with asyncio, you can use BaseEventLoop.run_in_executor to run a function in another thread and yield from it to get the result.<br>asyncio毕竟只有一条线程，所以request这种阻塞式的函数不能直接拿来用，需要run_in_executor或者用线程池、进程包装一下</p>
-<pre><code class="python">import time
-import requests
-import asyncio
-
-async def getUrlBlocking(url):
-    print(&quot;starting request to %s &quot; % url)
-    loop = asyncio.get_event_loop()
-    response = await loop.run_in_executor(None, requests.get, url)
-    print(response.status_code)
-    return response
-
-async def gotResponse(url):
-    res = await getUrlBlocking(url)
-    print(res.text)
-    return res
-
-if __name__ == &quot;__main__&quot;:
-    s = time.perf_counter()
-    loop = asyncio.get_event_loop()
-    tasks = [gotResponse(&quot;https://jsonplaceholder.typicode.com/posts/%s&quot; % i) for i in range(100)]
-    loop.run_until_complete(asyncio.wait(tasks))
-    loop.close()
-    elapsed = time.perf_counter() - s
-    print(f&quot;{__file__} executed in {elapsed:0.2f} seconds.&quot;)
-</code></pre>
-<p>async await要求await的东西是<a href="https://docs.python.org/3/reference/datamodel.html#awaitable-objects">awaitable的</a></p>
-<h3 id="asyncio中创建任务的语法有好几种"><a href="#asyncio中创建任务的语法有好几种" class="headerlink" title="asyncio中创建任务的语法有好几种"></a>asyncio中创建任务的语法有好几种</h3><pre><code class="python">import asyncio  
-
-async def doit(i):
-    print(&quot;Start %d&quot; % i)
-    await asyncio.sleep(3)
-    print(&quot;End %d&quot; % i)
-    return i
-
-if __name__ == &#39;__main__&#39;:
-    loop = asyncio.get_event_loop()
-    #futures = [asyncio.ensure_future(doit(i), loop=loop) for i in range(10)]
-    #futures = [loop.create_task(doit(i)) for i in range(10)]
-    futures = [doit(i) for i in range(10)]
-    result = loop.run_until_complete(asyncio.gather(*futures))
-    print(result)
-</code></pre>
-<p>以上这三种创造出来的task全部都是无序执行的。不过python3.7以后官方更推荐使用asyncio.create_task而不是ensure_future去创建任务。</p>
-<h3 id="多线程环境下对资源的操作需要考虑线程安全问题"><a href="#多线程环境下对资源的操作需要考虑线程安全问题" class="headerlink" title="多线程环境下对资源的操作需要考虑线程安全问题"></a>多线程环境下对资源的操作需要考虑线程安全问题</h3><p>有些操作不是原子性的<br><a href="https://www.youtube.com/watch?v=Bv25Dwe84g0">Thinking about Concurrency, Raymond Hettinger, Python core developer</a><br>java中最初的设计是有kill thread的method的，但是后来被deprecated了（假设你kill了一个获取了锁的线程，程序将进入死锁状态）。 python中理论上是可以kill一个线程的，但是kill一个线程这件事本身就是不应该的。</p>
+</code></pre><h3 id="多线程环境下对资源的操作需要考虑线程安全问题"><a href="#多线程环境下对资源的操作需要考虑线程安全问题" class="headerlink" title="多线程环境下对资源的操作需要考虑线程安全问题"></a>多线程环境下对资源的操作需要考虑线程安全问题</h3><p>有些操作不是原子性的<br><a href="https://www.youtube.com/watch?v=Bv25Dwe84g0">Thinking about Concurrency, Raymond Hettinger, Python core developer</a><br>java中最初的设计是有kill thread的method的，但是后来被deprecated了（假设你kill了一个获取了锁的线程，程序将进入死锁状态）。 python中理论上是可以kill一个线程的，但是kill一个线程这件事本身就是不应该的。</p>
 <p>一个最简单的多线程资源竞争的例子</p>
 <pre><code class="python">import threading
 
@@ -665,7 +438,8 @@ The count is 8
 The count is 8
 ------------
 </code></pre><p>多线程之间的同步问题，一种是加锁，另一种是使用atomic message queue.<br>python中有些module内部已经加了锁，logging,decimal(thread local),databases(reader locks and writer locks),email(atomic message queue)。<br>锁在写operating system的时候非常有用，但是其他时候不要用。<br>所有的资源都应该只能同时被一条线程操作。<br>threading中的join就属于一种barrier（主线程调用t.join，就是等t跑完了之后，主线程再去干接下来的事情） </p>
-<h3 id="Raymond-Hettinger提到message-queue的task-done方法是他created的。-还是atomic-measge-queue-好像是内部加了锁，操作queue中资源的只有那么一条线程，当然不存在并发问题-其实raymod也提到了，你也可以用RabbitMQ等-ZEROMQ-甚至是database（内部有read-write-lock）"><a href="#Raymond-Hettinger提到message-queue的task-done方法是他created的。-还是atomic-measge-queue-好像是内部加了锁，操作queue中资源的只有那么一条线程，当然不存在并发问题-其实raymod也提到了，你也可以用RabbitMQ等-ZEROMQ-甚至是database（内部有read-write-lock）" class="headerlink" title="Raymond Hettinger提到message queue的task_done方法是他created的。(还是atomic measge queue, 好像是内部加了锁，操作queue中资源的只有那么一条线程，当然不存在并发问题). 其实raymod也提到了，你也可以用RabbitMQ等,ZEROMQ 甚至是database（内部有read write lock）"></a>Raymond Hettinger提到message queue的task_done方法是他created的。(还是atomic measge queue, 好像是内部加了锁，操作queue中资源的只有那么一条线程，当然不存在并发问题). 其实raymod也提到了，你也可以用RabbitMQ等,ZEROMQ 甚至是database（内部有read write lock）</h3><pre><code class="python">def worker():
+<p><strong>Raymond Hettinger提到message queue的task_done方法是他created的。</strong><br>(还是atomic measge queue, 好像是内部加了锁，操作queue中资源的只有那么一条线程，当然不存在并发问题). 其实raymod也提到了，你也可以用RabbitMQ等,ZEROMQ 甚至是database（内部有read write lock）</p>
+<pre><code class="python">def worker():
     while True:
         item = q.get()
         do_work(item)
@@ -686,9 +460,254 @@ q.join()       # block until all tasks are done
 <pre><code>error: can&#39;t start new thread
 File &quot;/usr/lib/python2.5/threading.py&quot;, line 440, in start
     _start_new_thread(self.__bootstrap, ())
-</code></pre><p>那么比较实用的使用场景是，spawn 10条线程去进行while not queue.empty() -&gt; requests.get()操作，各自在完成之后丢到一个通用的容器中，再由message queue独立完成所有response的processing.</p>
+</code></pre><p>那么比较实用的使用场景是，spawn 10条线程去进行while not queue.empty() -&gt; requests.get()操作，各自在完成之后丢到一个通用的容器中，再由message queue独立完成所有response的processing.<br>到这里还只是停留在<strong>多线程</strong>的阶段。</p>
+<h2 id="多进程"><a href="#多进程" class="headerlink" title="多进程"></a>多进程</h2><p>人们很容易想到多进程的版本，可以不用顾虑GIL的存在</p>
+<pre><code class="python">from multiprocessing import Pool
+import time
+
+COUNT = 50000000
+def countdown(n):
+    while n&gt;0:
+        n -= 1
+
+if __name__ == &#39;__main__&#39;:
+    pool = Pool(processes=2)
+    start = time.time()
+    r1 = pool.apply_async(countdown, [COUNT//2])
+    r2 = pool.apply_async(countdown, [COUNT//2])
+    pool.close()
+    pool.join()
+    end = time.time()
+    print(&#39;Time taken in seconds -&#39;, end - start)
+</code></pre>
+<p>多进程之间内存不共享，同步方式是使用Queue(fifo)</p>
+<pre><code class="python">#!/usr/bin/env python3
+
+import multiprocessing
+import time
+import random
+import os
+from multiprocessing import Queue
+
+q = Queue()
+
+def hello(n):
+    time.sleep(random.randint(1,3))
+    q.put(os.getpid())
+    print(&quot;[{0}] Hello!&quot;.format(n))
+
+processes = [ ]
+for i in range(10):
+    t = multiprocessing.Process(target=hello, args=(i,))
+    processes.append(t)
+    t.start()
+
+for one_process in processes:
+    one_process.join()
+
+mylist = [ ]
+while not q.empty():
+    mylist.append(q.get())
+
+print(&quot;Done!&quot;)
+print(len(mylist))
+print(mylist)
+</code></pre>
+<p>更加Pythonic的方式是使用asyncio</p>
+<h2 id="Asyncio"><a href="#Asyncio" class="headerlink" title="Asyncio"></a>Asyncio</h2><p>优点包括</p>
+<ul>
+<li>Based on futures</li>
+<li>Faster than threads</li>
+<li>Massive I/O concurrency</li>
+</ul>
+<pre><code class="python">async def fetch_url(url):
+        return await aiohttp.request(&#39;GET&#39; , url) ## you get the future, the function is not executed immediatedly
+
+async def fetch_two(url_a,url_b):
+        future_a = fetch_url(url_a)
+        future_b = fetch_url(url_b)
+        a ,b = await asyncio.gather(future_a, future_b)  ## 一旦开始await这个future,这个coroutine才会被加入event loop
+        return a, b
+</code></pre>
+<p>上述代码虽然还是在同一个进程中运行，还受到GIL制约，但是由于是I/O操作，所以也没什么问题。只是在process返回的结果是，就会受到GIL的影响了。（实际操作中你会发现coroutine还没执行就timeout了）</p>
+<p>@asyncio.coroutine这个decorator是3.4出现的，3.5之后直接使用async await关键字。这个decorator也就过时了</p>
+<pre><code class="python">import asyncio
+import time
+
+async def speak_async(): 
+    print(&#39;starting====&#39;) 
+    r = await asyncio.sleep(1) ##这里不能使用time.sleep(1)
+    print(&#39;OMG asynchronicity!&#39;)
+
+loop = asyncio.get_event_loop()  
+loop.run_until_complete(speak_async())  
+loop.close()
+</code></pre>
+<p>对于阻塞式的io调用，不是说加一个await函数就能实现异步了<br>To use requests (or any other blocking libraries) with asyncio, you can use BaseEventLoop.run_in_executor to run a function in another thread and yield from it to get the result.<br>asyncio毕竟只有一条线程，所以request这种阻塞式的函数不能直接拿来用，需要run_in_executor或者用线程池、进程包装一下</p>
+<pre><code class="python">import time
+import requests
+import asyncio
+
+async def getUrlBlocking(url):
+    print(&quot;starting request to %s &quot; % url)
+    loop = asyncio.get_event_loop()
+    response = await loop.run_in_executor(None, requests.get, url)
+    print(response.status_code)
+    return response
+
+async def gotResponse(url):
+    res = await getUrlBlocking(url)
+    print(res.text)
+    return res
+
+if __name__ == &quot;__main__&quot;:
+    s = time.perf_counter()
+    loop = asyncio.get_event_loop()
+    tasks = [gotResponse(&quot;https://jsonplaceholder.typicode.com/posts/%s&quot; % i) for i in range(100)]
+    loop.run_until_complete(asyncio.wait(tasks))
+    loop.close()
+    elapsed = time.perf_counter() - s
+    print(f&quot;{__file__} executed in {elapsed:0.2f} seconds.&quot;)
+</code></pre>
+<p>async await要求await的东西是<a href="https://docs.python.org/3/reference/datamodel.html#awaitable-objects">awaitable的</a></p>
+<h3 id="asyncio中创建任务的语法有好几种"><a href="#asyncio中创建任务的语法有好几种" class="headerlink" title="asyncio中创建任务的语法有好几种"></a>asyncio中创建任务的语法有好几种</h3><pre><code class="python">import asyncio  
+
+async def doit(i):
+    print(&quot;Start %d&quot; % i)
+    await asyncio.sleep(3)
+    print(&quot;End %d&quot; % i)
+    return i
+
+if __name__ == &#39;__main__&#39;:
+    loop = asyncio.get_event_loop()
+    #futures = [asyncio.ensure_future(doit(i), loop=loop) for i in range(10)]
+    #futures = [loop.create_task(doit(i)) for i in range(10)]
+    futures = [doit(i) for i in range(10)]
+    result = loop.run_until_complete(asyncio.gather(*futures))
+    print(result)
+</code></pre>
+<p>以上这三种创造出来的task全部都是无序执行的。不过python3.7以后官方更推荐使用asyncio.create_task (3.7+添加的)而不是ensure_future(3.7之前)去创建任务。</p>
+<p>所以一般的将async tasks添加到event loop的套路是这样的。main函数是async 的，3.5-3.6麻烦一点，3.7最简单<br>python3.5-3.6</p>
+<pre><code class="python">loop = asyncio.get_event_loop()
+try:
+    loop.run_until_complete(main())
+finally:
+    loop.close()
+</code></pre>
+<p>python 3.7</p>
+<pre><code class="python">asyncio.run(main())  # Python 3.7+
+</code></pre>
+<pre><code>Generator functions are, as it so happens, the foundation of async IO (regardless of whether you declare coroutines with async def rather than the older @asyncio.coroutine wrapper). Technically, await is more closely analogous to yield from than it is to yield. (But remember that yield from x() is just syntactic sugar to replace for i in x(): yield i.)
+</code></pre><p><strong>generator函数(无论是用asyc def创建的还是用@asyncio.coroutine的docorator)是asyncio的基础。从技术层面来讲,await ≈≈ yield from (但是记住yield from x() 只是一个语法糖而已)</strong></p>
+<h2 id="Mulitiprocessing-is-good-asyncio-is-great-Why-not-both"><a href="#Mulitiprocessing-is-good-asyncio-is-great-Why-not-both" class="headerlink" title="Mulitiprocessing is good , asyncio is great, Why not both"></a>Mulitiprocessing is good , asyncio is great, Why not both</h2><p>也就是说，I/O操作用asyncio，数据处理使用multi-processing，这几乎是完美的解决方案了<br>正常情况下，一个async event是跑在一条线程，一个cpu core上就足够了。<a href="https://www.youtube.com/watch?v=0kXaLh8Fz3k">John Reese - Thinking Outside the GIL with AsyncIO and Multiprocessing - PyCon 2018</a> 这里讲述了如何在多个core之间跑一个event loop<br>由于coroutine和multi-processing是两个相对独立的模块，所以需要自己把两者结合起来。用多进程进行数据处理，每个进程中各自有独立的coroutine在运行。</p>
+<pre><code class="python">async def run_loop(tx, rx):
+        ... ## real work here 
+        limit = 10
+        pending = set()
+        while True:
+                while len(pending) &lt; limit:
+                        task = tx.get_nowait()
+                        fn ,args, kwargs = task
+                        pending.add(fn(args,kwargs))
+                done, pending = await asyncio.wait(pending, ..)        
+                for future in done:
+                        rx.put_nowait(await future)
+
+def bootstrap(tx, rx):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_untile_complete(run_loop(tx, rx))
+
+def main():        
+        p = multiprocessing.Process(target = bootstrap, args = (tx, rx))
+        p.start()
+</code></pre>
+<p>实际操作可能看起来像这样</p>
+<pre><code class="python">async def fetch_url(url):
+        return await aiohttp.request(&#39;GET&#39; , url) 
+
+def fetch_all(urls):
+       tx, rx = Queue(), Queue()
+       Process(
+               target=bootstrap,
+               args=(tx,rx)
+       ).start()
+       for url in urls:
+           task = fetch_url,(url,), {}
+           tx.put_nowait(task)
+</code></pre>
+<p><strong>已经开源</strong><br><a href="https://github.com/dano/aioprocessing">aioprocessing</a></p>
+<blockquote>
+<p> pip install aiomultiprocess</p>
+</blockquote>
+<h2 id="关于协程"><a href="#关于协程" class="headerlink" title="关于协程"></a>关于协程</h2><p>coroutine是一个在很多编程语言中都有的概念，在python中coroutine一般指的是generator based coroutines。<br>首先，因为协程是一种能暂停的函数，那么它暂停是为了什么？一般是等待某个事件，比如说某个连接建立了；某个 socket 接收到数据了；某个计时器归零了等。而这些事件应用程序只能通过轮询的方式得知是否完成，<strong>但是操作系统（所有现代的操作系统）可以提供一些中断的方式通知应用程序，如 select, epoll, kqueue 等等</strong>。<br><a href="https://lotabout.me/2017/understand-python-asyncio/">understand-python-asyncio</a></p>
+<p>基础是generator(任何包含yield expression的函数)</p>
+<pre><code>$ &gt;&gt;&gt;def gen_fn():
+        print(&#39;start&#39;)
+        yiled 1
+        print(&#39;middle&#39;)
+        yield 2
+        print(&#39;done&#39;)
+$ &gt;&gt;&gt; gen = gen_fn()
+$ &gt;&gt;&gt; gen
+$ &lt;generator object gen_fn at 0x7f83cddc0b48&gt;
+&gt;&gt;&gt; gen.gi_code.co_code //对应的bytecode
+b&#39;t\x00d\x01\x83\x01\x01\x00d\x02V\x00\x01\x00t\x00d\x03\x83\x01\x01\x00d\x04V\x00\x01\x00t\x00d\x05\x83\x01\x01\x00d\x00S\x00&#39;
+&gt;&gt;&gt; len(gen.gi_code.co_code)
+40
+&gt;&gt;&gt; gen.gi_frame.f_lasti //instruction pointer , 说明当前执行到哪个指令了，-1说明还没有开始执行
+-1
+&gt;&gt;&gt; next(gen)
+start
+1
+&gt;&gt;&gt; ret = next(gen)
+middle
+&gt;&gt;&gt; ret
+2 // next方法返回的是yield里面的值
+&gt;&gt;&gt; next(gen)
+done
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+StopIteration // 这是正常的，说明generator执行完毕
+
+
+&gt;&gt;&gt; import dis
+&gt;&gt;&gt; dis.dis(gen)
+  2           0 LOAD_GLOBAL              0 (print)
+              2 LOAD_CONST               1 (&#39;start&#39;)
+              4 CALL_FUNCTION            1
+              6 POP_TOP
+
+  3           8 LOAD_CONST               2 (1)
+             10 YIELD_VALUE
+             12 POP_TOP
+
+  4          14 LOAD_GLOBAL              0 (print)
+             16 LOAD_CONST               3 (&#39;middle&#39;)
+             18 CALL_FUNCTION            1
+             20 POP_TOP
+
+  5          22 LOAD_CONST               4 (2)
+             24 YIELD_VALUE
+             26 POP_TOP
+
+  6          28 LOAD_GLOBAL              0 (print)
+             30 LOAD_CONST               5 (&#39;done&#39;)
+             32 CALL_FUNCTION            1
+             34 POP_TOP
+             36 LOAD_CONST               0 (None)
+             38 RETURN_VALUE
+&gt;&gt;&gt;
+</code></pre><p>python3.3中开始出现yield关键字，python3.4中开始引入asyncio标准库，python 3.5标准库中出现的async await关键字只是基于generator的sytatic sugar，那么<a href="https://stackoverflow.com/questions/8389812/how-are-generators-and-coroutines-implemented-in-cpython">generator是如何实现的</a>.</p>
+<ul>
+<li>The yield instruction takes the current executing context as a closure, and transforms it into an own living object. This object has a <strong>iter</strong> method which will continue after this yield statement.<br>So the call stack gets transformed into a heap object.</li>
+</ul>
+<p><a href="https://hackernoon.com/the-magic-behind-python-generator-functions-bc8eeea54220">解释generator实现原理的文章</a></p>
+<p><a href="https://snarky.ca/how-the-heck-does-async-await-work-in-python-3-5/">python 2.5开始，generator能够返回数据，这之前还只是iteratble的</a> 还可以通过gen.send函数往generator传参数<br><a href="https://github.com/AndreLouisCaron/a-tale-of-event-loops">event-loop的实现原理简述</a></p>
+<p>python中event loop是plugable的，也就是说完全可以提供自己开发的版本。所以就有了<a href="https://github.com/MagicStack/uvloop">uvloop</a>这种跑分特别高的。asyncio包默认只提供了两种eventLoop的实现，分别是<br>class asyncio.SelectorEventLoop(unix和windows上)<br>class asyncio.ProactorEventLoop(windows上)<br>查看windows_events.py中，默认的asyncio.get_event_loop()获得的就是SelectorEventLoop</p>
+<p>基于asyncio的有名的库包括aiohttp和aiofile。二者都是对i/o进行操作 。<br>更多的还有aio-redis, aio-lrucache….</p>
 <h2 id="牵涉到一些celery的点"><a href="#牵涉到一些celery的点" class="headerlink" title="牵涉到一些celery的点"></a>牵涉到一些celery的点</h2><p>celery能够利用好多进程<br>todo</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://codewithoutrules.com/2018/09/04/python-multiprocessing/">多进程还可以牵涉到进程池的概念</a><br><a href="https://realpython.com/python-gil/">What is the Python Global Interpreter Lock (GIL)?</a><br><a href="https://timber.io/blog/multiprocessing-vs-multithreading-in-python-what-you-need-to-know/">multiprocessing-vs-multithreading-in-python-what-you-need-to-know</a><br><a href="https://emptysqua.re/blog/links-for-how-python-coroutines-work/">A. Jesse Jiryu Davis</a><br><a href="https://www.youtube.com/watch?v=7sCu4gEjH5I">How Do Python Coroutines Work</a><br><a href="https://www.youtube.com/watch?v=7SSYhuk5hmc">A Jesse Jiryu Davis Grok the GIL Write Fast And Thread Safe Python PyCon 2017</a> the only thing two threads cann’t do in once in Python is run python<br><a href="https://engineering.mongodb.com/post/the-saga-of-concurrent-dns-in-python-and-the-defeat-of-the-wicked-mutex-troll/">Behold, my friends, the getaddrinfo lock in Python’s socketmodule.c:</a>  A. Jesse Jiryu Davis关于python中parallel dns query的文章也很好<br><a href="https://magic.io/blog/uvloop-blazing-fast-python-networking/">uvloop跑分</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://codewithoutrules.com/2018/09/04/python-multiprocessing/">多进程还可以牵涉到进程池的概念</a><br><a href="https://realpython.com/python-gil/">What is the Python Global Interpreter Lock (GIL)?</a><br><a href="https://timber.io/blog/multiprocessing-vs-multithreading-in-python-what-you-need-to-know/">multiprocessing-vs-multithreading-in-python-what-you-need-to-know</a><br><a href="https://emptysqua.re/blog/links-for-how-python-coroutines-work/">A. Jesse Jiryu Davis</a><br><a href="https://www.youtube.com/watch?v=7sCu4gEjH5I">How Do Python Coroutines Work</a><br><a href="https://www.youtube.com/watch?v=7SSYhuk5hmc">A Jesse Jiryu Davis Grok the GIL Write Fast And Thread Safe Python PyCon 2017</a> the only thing two threads cann’t do in once in Python is run python<br><a href="https://engineering.mongodb.com/post/the-saga-of-concurrent-dns-in-python-and-the-defeat-of-the-wicked-mutex-troll/">Behold, my friends, the getaddrinfo lock in Python’s socketmodule.c:</a>  A. Jesse Jiryu Davis关于python中parallel dns query的文章也很好<br><a href="https://magic.io/blog/uvloop-blazing-fast-python-networking/">uvloop跑分</a><br><a href="https://realpython.com/async-io-python/">asyncio in python</a></p>
 
       
 
@@ -1019,10 +1038,6 @@ File &quot;/usr/lib/python2.5/threading.py&quot;, line 440, in start
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
@@ -1048,6 +1063,10 @@ File &quot;/usr/lib/python2.5/threading.py&quot;, line 440, in start
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
               <li class="article-tag-list-item">
