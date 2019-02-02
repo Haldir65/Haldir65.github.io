@@ -17,7 +17,7 @@
 <meta property="og:description" content="linode的docs里面是这么介绍的  nginx is a lightweight, high performance web server designed to deliver large amounts of static content quickly with efficient use of system resources. nginx’s strong point is its">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery151110073841.jpg">
-<meta property="og:updated_time" content="2019-01-30T02:10:26.292Z">
+<meta property="og:updated_time" content="2019-02-02T02:08:41.727Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Nginx使用记录">
 <meta name="twitter:description" content="linode的docs里面是这么介绍的  nginx is a lightweight, high performance web server designed to deliver large amounts of static content quickly with efficient use of system resources. nginx’s strong point is its">
@@ -205,7 +205,7 @@ ga('send', 'pageview');
 <p>nginx is a lightweight, high performance web server designed to deliver large amounts of static content quickly with efficient use of system resources. nginx’s strong point is its ability to efficiently serve static content, like plain HTML and media files. Some consider it a less than ideal server for dynamic content.</p>
 </blockquote>
 <p><img src="https://www.haldir66.ga/static/imgs/scenery151110073841.jpg" alt=""><br><a id="more"></a></p>
-<h3 id="1-安装"><a href="#1-安装" class="headerlink" title="1.安装"></a>1.安装</h3><p><a href="http://nginx.org/en/docs/windows.html">Installing nginx on windows</a><br>安装教程，google ‘installing nginx on ubuntu’<br>基本上就是把DigitalOcean写的这些复制粘贴过来</p>
+<h3 id="1-安装"><a href="#1-安装" class="headerlink" title="1.安装"></a>1.安装</h3><p>不推荐在windows上安装nginx<br><a href="http://nginx.org/en/docs/windows.html">Installing nginx on windows</a><br>安装教程，google ‘installing nginx on ubuntu’<br>基本上就是把DigitalOcean写的这些复制粘贴过来</p>
 <p>当然apt get 默认的源可能有些老，所以如果追求最新版本的话，可以<a href="https://launchpad.net/~nginx/+archive/ubuntu/stable">添加ppa</a></p>
 <pre><code class="bash">sudo apt-get update
 sudo apt-get install nginx
@@ -424,71 +424,69 @@ server
 </code></pre>
 <h2 id="5-proxy-pass"><a href="#5-proxy-pass" class="headerlink" title="5. proxy_pass"></a>5. proxy_pass</h2><p>根据<a href="https://www.digitalocean.com/community/tutorials/how-to-set-up-a-node-js-application-for-production-on-ubuntu-14-04">how-to-set-up-a-node-js-application-for-production-on-ubuntu-14-04</a></p>
 <blockquote>
-<p>/etc/nginx/sites-available/default<br>``` config<br>server {<br>    listen 80;</p>
+<p>/etc/nginx/sites-available/default</p>
 </blockquote>
-<pre><code>server_name example.com;
+<pre><code class="config">server {
+    listen 80;
 
-location / {
-    proxy_pass http://APP_PRIVATE_IP_ADDRESS:8080; // A应用跑在8080端口，外部访问http://example.com/即可访问应用服务
-    proxy_http_version 1.1;
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection &#39;upgrade&#39;;
-    proxy_set_header Host $host;
-    proxy_cache_bypass $http_upgrade;
+    server_name example.com;
+
+    location / {
+        proxy_pass http://APP_PRIVATE_IP_ADDRESS:8080; // A应用跑在8080端口，外部访问http://example.com/即可访问应用服务
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection &#39;upgrade&#39;;
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    location /app2 {
+       proxy_pass http://APP_PRIVATE_IP_ADDRESS:8081; // B应用跑在8081端口，外部访问http://example.com/app2即可访问应用服务
+       proxy_http_version 1.1;
+       proxy_set_header Upgrade $http_upgrade;
+       proxy_set_header Connection &#39;upgrade&#39;;
+       proxy_set_header Host $host;
+       proxy_cache_bypass $http_upgrade;
+   }
 }
-
-location /app2 {
-   proxy_pass http://APP_PRIVATE_IP_ADDRESS:8081; // B应用跑在8081端口，外部访问http://example.com/app2即可访问应用服务
-   proxy_http_version 1.1;
-   proxy_set_header Upgrade $http_upgrade;
-   proxy_set_header Connection &#39;upgrade&#39;;
-   proxy_set_header Host $host;
-   proxy_cache_bypass $http_upgrade;
-</code></pre><p>   }<br>}</p>
-<pre><code>
-### 5.1 pratical take aways
-[nginx配置location总结及rewrite规则写法](http://seanlook.com/2015/05/17/nginx-location-rewrite/)
-
-
-### ddos防御
-from [mitigating-ddos-attacks-with-nginx-and-nginx-plus/](https://www.nginx.com/blog/mitigating-ddos-attacks-with-nginx-and-nginx-plus/)
-
-**allow a single client IP address to attempt to login only every 2 seconds (equivalent to 30 requests per minute):**
-
-
-1. Limiting the Rate of Requests
-eg: 单ip访问login接口频率不能超过2秒每次。
-```config
-limit_req_zone $binary_remote_addr zone=one:10m rate=30r/m;
+</code></pre>
+<h3 id="5-1-pratical-take-aways"><a href="#5-1-pratical-take-aways" class="headerlink" title="5.1 pratical take aways"></a>5.1 pratical take aways</h3><p><a href="http://seanlook.com/2015/05/17/nginx-location-rewrite/">nginx配置location总结及rewrite规则写法</a></p>
+<h3 id="ddos防御"><a href="#ddos防御" class="headerlink" title="ddos防御"></a>ddos防御</h3><p>from <a href="https://www.nginx.com/blog/mitigating-ddos-attacks-with-nginx-and-nginx-plus/">mitigating-ddos-attacks-with-nginx-and-nginx-plus/</a></p>
+<p><strong>allow a single client IP address to attempt to login only every 2 seconds (equivalent to 30 requests per minute):</strong></p>
+<h3 id="1-Limiting-the-Rate-of-Requests"><a href="#1-Limiting-the-Rate-of-Requests" class="headerlink" title="1. Limiting the Rate of Requests"></a>1. Limiting the Rate of Requests</h3><p>eg: 单ip访问login接口频率不能超过2秒每次。</p>
+<pre><code class="config">limit_req_zone $binary_remote_addr zone=one:10m rate=30r/m;
 
 server {
-    # ...
+    ...
     location /login.html {
         limit_req zone=one;
-    # ...
+    ...
     }
 }
-</code></pre><ol>
-<li>Limiting the Number of Connections<br>eg: 单ip访问/store/不能创建超过10条connections<br>```config<br>limit_conn_zone $binary_remote_addr zone=addr:10m;</li>
-</ol>
-<p>server {</p>
-<pre><code># ...
-location /store/ {
-    limit_conn addr 10;
-    # ...
-}
-</code></pre><p>}</p>
-<pre><code>
-3. Closing Slow Connections
-eg: 限定nginx一条connection写client header和写client body的时间间隔为5s，默认为60s
-```config
+</code></pre>
+<h3 id="2-Limiting-the-Number-of-Connections"><a href="#2-Limiting-the-Number-of-Connections" class="headerlink" title="2. Limiting the Number of Connections"></a>2. Limiting the Number of Connections</h3><p>eg: 单ip访问/store/不能创建超过10条connections</p>
+<pre><code class="nginx">limit_conn_zone $binary_remote_addr zone=addr:10m;
+
 server {
-    client_body_timeout 5s;
-    client_header_timeout 5s;
-    # ...
+        # ...
+    location /store/ {
+        limit_conn addr 10;
+        # ...
+    }
 }
-</code></pre><ol>
-<li>黑名单<br>```config<br>// 123.123.123.1 through 123.123.123.16 拉黑<br>location / {<br> deny 123.123.123.0/28;<h1 id="…"><a href="#…" class="headerlink" title="…"></a>…</h1>}</li>
+</code></pre>
+<ol>
+<li><p>Closing Slow Connections<br>eg: 限定nginx一条connection写client header和写client body的时间间隔为5s，默认为60s</p>
+<pre><code class="config">server {
+ client_body_timeout 5s;
+ client_header_timeout 5s;
+ # ...
+}
+</code></pre>
+</li>
+<li><p>黑名单<br>```config<br>// 123.123.123.1 through 123.123.123.16 拉黑<br>location / {<br> deny 123.123.123.0/28;</p>
+<h1 id="…"><a href="#…" class="headerlink" title="…"></a>…</h1><p>}</p>
+</li>
 </ol>
 <p>location / {<br>    deny 123.123.123.3;<br>    deny 123.123.123.5;<br>    deny 123.123.123.7;</p>
 <pre><code># ...
@@ -530,7 +528,7 @@ upstream website {
 }
 </code></pre><h3 id="5-2-Nginx模块"><a href="#5-2-Nginx模块" class="headerlink" title="5.2 Nginx模块"></a>5.2 Nginx模块</h3><p>http_image_filter_module（图片裁剪模块）<br>首先查看是否已安装http_image_filter_module模块</p>
 <blockquote>
-<p>nginx -V<br>/etc/nginx/nginx.conf文件添加<br>```config<br>location /image {<br>           alias “/imgdirectory/“; </p>
+<p>nginx -V<br>/etc/nginx/nginx.conf文件添加<br>```nginx<br>location /image {<br>           alias “/imgdirectory/“; </p>
 <pre><code>        ## 这样直接输入 yourip/image/imgname.jpg就能返回原始图片
 </code></pre><p>}<br>location ~<em> (.</em>.(jpg|jpeg|gif|png))!(.<em>)!(.</em>)$ {  ## 这个是匹配全站图片资源<br>                set $width      $3;<br>                set $height     $4;<br>                rewrite “(.<em>.(jpg|jpeg|gif|png))(.</em>)$” $1;  ## 这样输入 yourip/image/imgname.jpg!200!200就能返回200*200的图片<br>}  </p>
 </blockquote>
@@ -749,7 +747,7 @@ sudo ln -s /etc/nginx/sites-available/test.com /etc/nginx/sites-enabled/
 }
 </code></pre>
 <p>关于server_name这个参数，nginx网站上在<a href="http://nginx.org/en/docs/http/request_processing.html">how nginx process requests中是这么说的</a> 一个.conf文件里这么写是没有问题的.还有这个server_name写成domain name或者ip address都是可以的.</p>
-<pre><code>server {
+<pre><code class="nginx">server {
     listen      80;
     server_name example.org www.example.org;
     ...
@@ -766,7 +764,8 @@ server {
     server_name example.com www.example.com;
     ...
 }
-</code></pre><p>server_name对应客户端发来的request中的HOST这个header，一个个去匹配，没有的话就默认用第一个。当然我非要第二个作为默认的也是可以的，加一个default_server就行了</p>
+</code></pre>
+<p>server_name对应客户端发来的request中的HOST这个header，一个个去匹配，没有的话就默认用第一个。当然我非要第二个作为默认的也是可以的，加一个default_server就行了</p>
 <pre><code>server {
     listen      80 default_server;
     server_name example.net www.example.net;
@@ -1304,14 +1303,6 @@ limit_conn addr 30;
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
@@ -1353,6 +1344,14 @@ limit_conn addr 30;
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">

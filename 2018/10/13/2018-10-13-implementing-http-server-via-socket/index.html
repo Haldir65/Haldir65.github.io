@@ -17,7 +17,7 @@
 <meta property="og:description" content="收集几种语言中使用socket实现httpServer和httpClient的主要步骤">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/sun_rise_dim_grass.jpg">
-<meta property="og:updated_time" content="2019-01-30T02:10:26.296Z">
+<meta property="og:updated_time" content="2019-02-02T02:08:41.727Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从Socket入手实现http协议">
 <meta name="twitter:description" content="收集几种语言中使用socket实现httpServer和httpClient的主要步骤">
@@ -394,6 +394,25 @@ with open(&#39;sina.html&#39;, &#39;wb&#39;) as f:
 </code></pre>
 <p>上述代码，server和client都不能很好的处理并发或者利用多进程</p>
 <p><a href="https://realpython.com/python-sockets/">高阶版</a></p>
+<p><a href="https://github.com/Haldir65/Jimmy/blob/rm/src/_045_realpython_socket_article/dumbHttpServer.py">自己用selector实现了一个toy server</a>，使用curl可以像请求一个本地服务一样去获得response</p>
+<blockquote>
+<p>sudo python3 src/_045_realpython_socket_article/dumbHttpServer.py 127.0.0.1 80</p>
+</blockquote>
+<p>完成的地方包括:</p>
+<ol>
+<li>server注册socket non-blocking监听。有新的client连接上就把client socket加入selector监听。</li>
+<li>在出现EventRead之后使用socket.recv()读取请求（GET /index.html http/1.1 ….），把”index.html”这样的path加入data</li>
+<li>在出现EventWrite之后，从data中获取之前的path（实际中可以根据这个path去找服务或者文件资源），返回utf-8 encoded内容，外加http response header (socket.sendall).</li>
+</ol>
+<p>主要的缺陷包括:</p>
+<ol>
+<li>client这边ctrl+c之后，server这边会接收到一个13的信号，默认对这个信号的处理是杀进程</li>
+<li>在send或者read的时候有可能出现BrokenPipeError或者ConnectionResetError。暂时只好到处try except.</li>
+<li>自己用socket伪造http协议的content-length字段是能够被wget认可的，只是这个content-length = len(正文.encode(‘utf-8’))。就是这部分长度是字节数组的长度，否则会短一些。</li>
+<li>http response协议头字段之间加(\r\n header最后跟两个换行符) 这些都是必要的</li>
+<li>curl不知道为什么在读完response之后还卡在那里（除非server主动close掉socket）</li>
+<li>wrk跑分看不出来这个toy server的吞吐量。</li>
+</ol>
 <h2 id="C语言版本"><a href="#C语言版本" class="headerlink" title="C语言版本"></a>C语言版本</h2><p>C语言的应该最接近底层,C语言实现HTTP的GET和POST请求<br><a href="http://pminkov.github.io/blog/socket-programming-in-linux.html">似乎有很多现成的例子可以直接拿来抄</a></p>
 <p>一个简单的httpServer.c(unix环境下运行)</p>
 <pre><code class="c">#include &lt;stdio.h&gt;
@@ -1186,14 +1205,6 @@ int main(void)
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
@@ -1235,6 +1246,14 @@ int main(void)
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">

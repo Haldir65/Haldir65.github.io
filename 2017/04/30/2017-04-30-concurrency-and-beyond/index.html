@@ -17,7 +17,7 @@
 <meta property="og:description" content="原本只打算写一点关于线程池的实现原理，后来发现坑越挖越大。不得不写到一半停下来，所以，这算是一篇不那么完善的关于原理的解析吧。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg">
-<meta property="og:updated_time" content="2019-01-30T02:10:26.284Z">
+<meta property="og:updated_time" content="2019-02-02T02:08:41.719Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java线程池的实现原理">
 <meta name="twitter:description" content="原本只打算写一点关于线程池的实现原理，后来发现坑越挖越大。不得不写到一半停下来，所以，这算是一篇不那么完善的关于原理的解析吧。">
@@ -202,34 +202,45 @@ ga('send', 'pageview');
       
         <p>原本只打算写一点关于线程池的实现原理，后来发现坑越挖越大。不得不写到一半停下来，所以，这算是一篇不那么完善的关于原理的解析吧。<br><img src="https://www.haldir66.ga/static/imgs/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg" alt=""><br><a id="more"></a></p>
 <ol>
-<li>线程池的常规使用方式<br>通常说的线程池对外表现为具有一系列操作功能的接口，Executor提供了execute一个runnable的功能，而其子类ExecutorService则对外提供了更多的实用功能，所以平时用的都是ExecutorService的实现类。<br>```java</li>
+<li>线程池的常规使用方式<br>通常说的线程池对外表现为具有一系列操作功能的接口，Executor提供了execute一个runnable的功能，而其子类ExecutorService则对外提供了更多的实用功能，所以平时用的都是ExecutorService的实现类。</li>
 </ol>
-<p>public interface Executor {</p>
-<pre><code>/**
- * Executes the given command at some time in the future.  The command
- * may execute in a new thread, in a pooled thread, or in the calling
- * thread, at the discretion of the {@code Executor} implementation.
- *
- * @param command the runnable task
- * @throws RejectedExecutionException if this task cannot be
- * accepted for execution
- * @throws NullPointerException if command is null
- */
-void execute(Runnable command);
-</code></pre><p>}</p>
-<p>public interface ExecutorService extends Executor{</p>
-<p>}</p>
-<p>public abstract class AbstractExecutorService implements ExecutorService {</p>
-<p>}<br>public class ThreadPoolExecutor extends AbstractExecutorService {</p>
-<p>}</p>
-<pre><code>更具体一点来说，java.util.concurrent.ThreadPoolExecutor这个类提供了上述接口的具体实现，同时对外提供了一些hook(beforeExecute、afterExecute等)，当然开发者也可以继承这个方法，实现更多自定义功能。
-它的构造函数如下：
-</code></pre><p>public ThreadPoolExecutor(int corePoolSize,<br>                              int maximumPoolSize,<br>                              long keepAliveTime,<br>                              TimeUnit unit,<br>                              BlockingQueue<Runnable> workQueue) {<br>        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue,<br>             Executors.defaultThreadFactory(), defaultHandler);<br>    }</p>
-<pre><code>但实际上，java不建议这样直接弄一个线程池出来，而是使用java.util.concurrent.Executors中的一些现成的工厂方法来创建一个线程池实例，具体的方法名很好理解，newFixedThreadPool，newSingleThreadExecutor，newCachedThreadPool等等。关于线程池构造函数各个参数的意义以及Executors提供的各种线程方法的适用场合，网上有很多详尽的文章。
+<pre><code class="java">public interface Executor {
 
+    /**
+     * Executes the given command at some time in the future.  The command
+     * may execute in a new thread, in a pooled thread, or in the calling
+     * thread, at the discretion of the {@code Executor} implementation.
+     *
+     * @param command the runnable task
+     * @throws RejectedExecutionException if this task cannot be
+     * accepted for execution
+     * @throws NullPointerException if command is null
+     */
+    void execute(Runnable command);
+}
+</code></pre>
+<pre><code class="java">public interface ExecutorService extends Executor{
 
-```java
-Thread有这些状态
+}
+public abstract class AbstractExecutorService implements ExecutorService {
+
+}
+public class ThreadPoolExecutor extends AbstractExecutorService {
+
+}
+</code></pre>
+<p>更具体一点来说，java.util.concurrent.ThreadPoolExecutor这个类提供了上述接口的具体实现，同时对外提供了一些hook(beforeExecute、afterExecute等)，当然开发者也可以继承这个方法，实现更多自定义功能。<br>它的构造函数如下：</p>
+<pre><code class="java">public ThreadPoolExecutor(int corePoolSize,
+                              int maximumPoolSize,
+                              long keepAliveTime,
+                              TimeUnit unit,
+                              BlockingQueue&lt;Runnable&gt; workQueue) {
+        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue,
+             Executors.defaultThreadFactory(), defaultHandler);
+    }
+</code></pre>
+<p>但实际上，java不建议这样直接弄一个线程池出来，而是使用java.util.concurrent.Executors中的一些现成的工厂方法来创建一个线程池实例，具体的方法名很好理解，newFixedThreadPool，newSingleThreadExecutor，newCachedThreadPool等等。关于线程池构造函数各个参数的意义以及Executors提供的各种线程方法的适用场合，网上有很多详尽的文章。</p>
+<pre><code class="java">Thread有这些状态
     */
     public enum State {
         NEW,
@@ -239,7 +250,8 @@ Thread有这些状态
         TIMED_WAITING,
         TERMINATED;
     }
-</code></pre><p>这里针对execute方法具体的实现来展开，即，如何做到自动扩容，如何做到线程缓存，如何实现终止，以及资源同步问题。</p>
+</code></pre>
+<p>这里针对execute方法具体的实现来展开，即，如何做到自动扩容，如何做到线程缓存，如何实现终止，以及资源同步问题。</p>
 <pre><code class="java"> public void execute(Runnable command) {
         if (command == null)
             throw new NullPointerException();
@@ -699,14 +711,6 @@ Thread有这些状态
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
@@ -748,6 +752,14 @@ Thread有这些状态
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">

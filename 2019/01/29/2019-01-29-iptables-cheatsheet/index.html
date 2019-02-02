@@ -17,7 +17,7 @@
 <meta property="og:description" content="iptables是控制linux 内核netfilter的command line frontend tool，只存在于linux平台，是system admin常用的防火墙。(虽然已经被nftables取代了，学习点网络知识还是很有必要)">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/lidongjieya_ZH-CN9263684179_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-01-30T02:10:26.296Z">
+<meta property="og:updated_time" content="2019-02-02T02:08:41.731Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iptables速查手册">
 <meta name="twitter:description" content="iptables是控制linux 内核netfilter的command line frontend tool，只存在于linux平台，是system admin常用的防火墙。(虽然已经被nftables取代了，学习点网络知识还是很有必要)">
@@ -392,6 +392,16 @@ iptables -I INPUT -p tcp --dport 3306 -j ACCEPT
 # iptables -A INPUT -p tcp --syn --dport 22 -m connlimit --connlimit-above 3 -j REJECT
 http端口一个client最多20个连接
 # iptables -p tcp --syn --dport 80 -m connlimit --connlimit-above 20 --connlimit-mask 24 -j DROP
+</code></pre><h3 id="使用iptables阻止syn-flood"><a href="#使用iptables阻止syn-flood" class="headerlink" title="使用iptables阻止syn-flood"></a>使用iptables阻止syn-flood</h3><p>一般在路由器里面都有这么一条</p>
+<pre><code>iptables -N syn-flood
+iptables -A syn-flood -m limit --limit 50/s --limit-burst 10 -j RETURN
+iptables -A syn-flood -j DROP
+iptables -I INPUT -j syn-flood
+</code></pre><pre><code>-N 创建一个条新的链
+--limit 50/s 表示每秒50次;1/m 则为每分钟一次
+--limit-burst 表示允许触发 limit 限制的最大包个数 (预设5)，它就像是一个容器，最多装10个，超过10个就装不下了，这些包就给后面的规则了
+-I INPUT -j syn-flood  把INPUT的包交给syn-flood链处理
+这里的--limit-burst=10相当于说最开始有10个可以匹配的包去转发，然后匹配的包的个数是根据--limit=50/s进行限制的，也就是每秒限制转发50个数据包，多余的会被下面符合要求的DROP规则去处理，进行丢弃，这样就实现了对数据包的限速问题。
 </code></pre><h2 id="现在来看看fail2ban是怎么拉黑一个ip的"><a href="#现在来看看fail2ban是怎么拉黑一个ip的" class="headerlink" title="现在来看看fail2ban是怎么拉黑一个ip的"></a>现在来看看fail2ban是怎么拉黑一个ip的</h2><p>一般来说要拒绝一个ip访问http,https可以这么干</p>
 <pre><code>iptables -L INPUT -s xxx.xxx.xxx.xxx -p tcp --dport 80 -j DROP
 iptables -L INPUT -s xxx.xxx.xxx.xxx -p tcp --dport 443 -j DROP
@@ -481,8 +491,8 @@ ss-redir -u -c /etc/config/shadowsocks.json -f /var/run/shadowsocks.pid
 </blockquote>
 <p><strong>注意还需要将上述规则添加到开机启动中，想要持久化的话好像有一个iptables-persistent</strong>，还有使用iptables屏蔽来自<a href="https://www.vpser.net/security/iptables-block-countries-ip.html">某个国家的IP</a>的教程</p>
 <h2 id="tbd"><a href="#tbd" class="headerlink" title="tbd"></a>tbd</h2><h3 id="nat相关"><a href="#nat相关" class="headerlink" title="nat相关"></a>nat相关</h3><pre><code>iptables -t nat -L -n -v //在路由器上这个会有
-</code></pre><p>tbd</p>
-<p>一般路由器就是干这个的（使用iptables配置nat）<br>POSTROUTING 和 PREROUTING的概念</p>
+</code></pre><p>一般路由器就是干这个的（使用iptables配置nat）<br>POSTROUTING 和 PREROUTING的概念</p>
+<p>还有一个ipset 可以认为是一次性执行多个iptables命令,openwrt上经常用</p>
 <p>netfilter是kernel的实现</p>
 <blockquote>
 <p>Iptables is a standard firewall included in most Linux distributions by default (a modern variant called nftables will begin to replace it). It is actually a front end to the kernel-level netfilter hooks that can manipulate the Linux network stack.</p>
@@ -605,11 +615,11 @@ ss-redir -u -c /etc/config/shadowsocks.json -f /var/run/shadowsocks.pid
   
 <nav id="article-nav">
   
-    <a href="/2046/12/18/2017-12-18-random-new-thoughts/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2019/01/30/2019-01-30-concurrency-primitives-in-programing-languages/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          即刻备忘录
+          编程语言中使用到的多线程基础数据结构
         
       </div>
     </a>
@@ -823,14 +833,6 @@ ss-redir -u -c /etc/config/shadowsocks.json -f /var/run/shadowsocks.pid
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
@@ -872,6 +874,14 @@ ss-redir -u -c /etc/config/shadowsocks.json -f /var/run/shadowsocks.pid
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">

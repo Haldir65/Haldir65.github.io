@@ -16,7 +16,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/street%20lights%20dark%20night%20car%20city%20bw.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/toast_transact.jpg">
-<meta property="og:updated_time" content="2019-01-30T02:10:26.292Z">
+<meta property="og:updated_time" content="2019-02-02T02:08:41.727Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android知识集合[四]">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/street%20lights%20dark%20night%20car%20city%20bw.jpg">
@@ -584,6 +584,51 @@ gl.glGetIntegerv(GL10.GL_MAX_TEXTURE_SIZE, maxSize, 0);
 Log.e(&quot;GL&quot;, &quot;CURRENT MAX IS &quot;+String.valueOf(maxSize[0]));
 // maxSize[0] now contains max size(in both dimensions)
 </code></pre>
+<h3 id="19-RenderScript的使用方式"><a href="#19-RenderScript的使用方式" class="headerlink" title="19. RenderScript的使用方式"></a>19. RenderScript的使用方式</h3><pre><code class="java">//首先从一个view中获取Bitmap,在父viewgroup中addView(ImageView),setImageBItmap(blurredBitmap)
+public static Bitmap getViewBitmap(View v) {
+    if(v.getWidth() == 0 || v.getHeight() == 0)
+        return null;
+    Bitmap b = Bitmap.createBitmap( v.getWidth(), v.getHeight(), Bitmap.Config.ARGB_8888);
+    Canvas c = new Canvas(b);
+    v.draw(c);
+    return b;
+}
+
+public Bitmap blurBitmap(Bitmap bitmap){
+
+    //Let&#39;s create an empty bitmap with the same size of the bitmap we want to blur
+    Bitmap outBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Config.ARGB_8888);
+
+    //Instantiate a new Renderscript
+    RenderScript rs = RenderScript.create(getApplicationContext());
+
+    //Create an Intrinsic Blur Script using the Renderscript
+    ScriptIntrinsicBlur blurScript = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs));
+
+    //Create the Allocations (in/out) with the Renderscript and the in/out bitmaps
+    Allocation allIn = Allocation.createFromBitmap(rs, bitmap);
+    Allocation allOut = Allocation.createFromBitmap(rs, outBitmap);
+
+    //Set the radius of the blur: 0 &lt; radius &lt;= 25
+    blurScript.setRadius(25.0f);
+
+    //Perform the Renderscript
+    blurScript.setInput(allIn);
+    blurScript.forEach(allOut);
+
+    //Copy the final bitmap created by the out Allocation to the outBitmap
+    allOut.copyTo(outBitmap);
+
+    //recycle the original bitmap
+    bitmap.recycle();
+
+    //After finishing everything, we destroy the Renderscript.
+    rs.destroy();
+
+    return outBitmap;    
+
+}
+</code></pre>
 
       
 
@@ -906,14 +951,6 @@ Log.e(&quot;GL&quot;, &quot;CURRENT MAX IS &quot;+String.valueOf(maxSize[0]));
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
               </li>
              
@@ -955,6 +992,14 @@ Log.e(&quot;GL&quot;, &quot;CURRENT MAX IS &quot;+String.valueOf(maxSize[0]));
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
