@@ -23,7 +23,7 @@
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/4dab298b9f7ce29c43f9d8eaf686e02f.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/reading_network_response_on_main_thread.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/observing_on_ui_thread.jpg">
-<meta property="og:updated_time" content="2019-02-02T20:09:00.700Z">
+<meta property="og:updated_time" content="2019-02-15T07:23:05.588Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Rxjava2 的一些点">
 <meta name="twitter:description" content="本文多数内容来自Jake Wharton的演讲，配合一些个人的感受，作为今后使用Rxjava2的一些参考。">
@@ -594,7 +594,236 @@ Observable.subscribeOn(Schedulers.io()) //
 <blockquote>
 <p>Note that even though Publisher appears to be a functional interface, it is not recommended to implement it through a lambda as the specification requires state management that is not achievable with a stateless lambda.</p>
 </blockquote>
-<h2 id="todo"><a href="#todo" class="headerlink" title="todo"></a>todo</h2><p><a href="https://blog.piasy.com/AdvancedRxJava/2016/08/26/schedulers-3/">知道线程调度是怎么实现的吗</a></p>
+<h2 id="rxjava线程切换的原理"><a href="#rxjava线程切换的原理" class="headerlink" title="rxjava线程切换的原理"></a>rxjava线程切换的原理</h2><p><a href="https://www.jianshu.com/p/a9ebf730cd08">线程切换的原理以及subscribeOn只能用一次的原因</a><br>Observable.observeOn()</p>
+<pre><code class="java">@CheckReturnValue
+@SchedulerSupport(SchedulerSupport.CUSTOM)
+public final Observable&lt;T&gt; observeOn(Scheduler scheduler, boolean delayError, int bufferSize) {
+    ObjectHelper.requireNonNull(scheduler, &quot;scheduler is null&quot;);
+    ObjectHelper.verifyPositive(bufferSize, &quot;bufferSize&quot;);
+    return RxJavaPlugins.onAssembly(new ObservableObserveOn&lt;T&gt;(this, scheduler, delayError, bufferSize)); 
+}
+</code></pre>
+<p>observeOn方法实际返回了一个ObservableObserveOn实例。外部调用subscribe -&gt; ObservableObserveOn.subScribeActual -&gt; 上游source.subscribe(new ObserveOnObserver<T>(observer, w, delayError, bufferSize))，这个observer是外部调用者写的，等于说这个ObserveOnObserver是上游（actual）和下游(开发者写的observer)之间的桥梁，在收到上游onNext的时候会最终走到<br>NewThreadWorker.scheduleDirect</p>
+<pre><code class="java">  @NonNull
+    public ScheduledRunnable scheduleActual(final Runnable run, long delayTime, @NonNull TimeUnit unit, @Nullable DisposableContainer parent) {
+        // ...
+        ScheduledRunnable sr = new ScheduledRunnable(decoratedRun, parent);
+        Future&lt;?&gt; f;
+        try {
+            if (delayTime &lt;= 0) {
+                f = executor.submit((Callable&lt;Object&gt;)sr);
+            } else {
+                f = executor.schedule((Callable&lt;Object&gt;)sr, delayTime, unit);
+            }
+            sr.setFuture(f);
+        } catch (RejectedExecutionException ex) {
+          //....
+        }
+        return sr;
+    }
+</code></pre>
+<p>返回了一个ScheduledRunnable,里面包装了一个Future。往executor提交了task之后，task的run方法将被执行，也就是ScheduledRunnable的run方法</p>
+<pre><code class="java"> @Override
+    public void run() {
+        lazySet(THREAD_INDEX, Thread.currentThread());
+        try {
+            try {
+                actual.run();
+            } catch (Throwable e) {
+                // Exceptions.throwIfFatal(e); nowhere to go
+                RxJavaPlugins.onError(e);
+            }
+        } finally {
+            //...
+            if (o != PARENT_DISPOSED &amp;&amp; compareAndSet(PARENT_INDEX, o, DONE) &amp;&amp; o != null) {
+                ((DisposableContainer)o).delete(this);
+            }
+            for (;;) {
+                o = get(FUTURE_INDEX);
+                if (o == SYNC_DISPOSED || o == ASYNC_DISPOSED || compareAndSet(FUTURE_INDEX, o, DONE)) {
+                    break;//判断当前处于DONE的状态的话就可以跳出循环
+                }
+            }
+        }
+    }
+</code></pre>
+<p>回头看ObserveOnObserver 的创建，</p>
+<pre><code class="java">new ObservableObserveOn&lt;T&gt;(this, scheduler, delayError, bufferSize));//这个this是Observable
+</code></pre>
+<p>接下来开始subScribe -&gt; subScribeActual</p>
+<pre><code class="java">  @Override
+    protected void subscribeActual(Observer&lt;? super T&gt; observer) {
+        if (scheduler instanceof TrampolineScheduler) {
+            source.subscribe(observer);
+        } else {
+            Scheduler.Worker w = scheduler.createWorker();
+            source.subscribe(new ObserveOnObserver&lt;T&gt;(observer, w, delayError, bufferSize)); //这个source就是上面的Observable。这个ObserveOnObserver就像我们平时写的Observer一样，有onNext,onComplete,onError等
+        }
+    }
+
+//下面是ObserveOnObserver的构造函数
+ObserveOnObserver(Observer&lt;? super T&gt; actual, Scheduler.Worker worker, boolean delayError, int bufferSize) {
+        this.actual = actual;
+        this.worker = worker;
+        this.delayError = delayError;
+        this.bufferSize = bufferSize;
+    }
+
+ @Override
+public void onNext(T t) {
+    if (done) {
+        return;
+    }
+     if (sourceMode != QueueDisposable.ASYNC) {
+        queue.offer(t); //这里，把上游的数据存进queue
+    }
+    schedule();
+}  
+
+void schedule() {
+        if (getAndIncrement() == 0) {
+            worker.schedule(this); //显然这个this是一个runnable
+        }
+    }
+
+@Override
+public void run() {
+    if (outputFused) {
+        drainFused();
+    } else {
+        drainNormal();
+    }
+}   
+
+//一个for循环
+ void drainNormal() {
+     //
+                for (;;) {
+                    boolean d = done;
+                    T v;
+
+                    try {
+                        v = q.poll();
+                    } catch (Throwable ex) {
+                        // ..                        
+                    }
+                    //..
+                    a.onNext(v);
+                }
+        }
+</code></pre>
+<p>整理一下，上游的Observable发出OnNext的时候，ObserveOnObserver开始schedule,<strong>也就是通过worker.schedule将任务调度到新的线程</strong>。新的线程运行run方法中for循环从queue中查找result。ObserveOnObserver就是在onNext中接收到上游数据，存到queue里面之后，调度另一条线程去跑一个run方法，该方法会去drain这个queue，也就是取出刚才放进去的数据</p>
+<h3 id="SubscribeOn也是类似的道理"><a href="#SubscribeOn也是类似的道理" class="headerlink" title="SubscribeOn也是类似的道理"></a>SubscribeOn也是类似的道理</h3><p>SubscribeOn返回了一个ObservableSubscribeOn实例<br>ObservableSubscribeOn</p>
+<pre><code class="java">   @Override
+    public void subscribeActual(final Observer&lt;? super T&gt; s) {
+        final SubscribeOnObserver&lt;T&gt; parent = new SubscribeOnObserver&lt;T&gt;(s);
+        s.onSubscribe(parent);
+        parent.setDisposable(scheduler.scheduleDirect(new SubscribeTask(parent))); //scheduleDirect就是把task丢到scheduler的线程
+    }
+</code></pre>
+<p>顺便提一下<br>io.reactivex.schedulers.Schedulers<br>典型的线程安全单例模式</p>
+<pre><code class="java">  static final class SingleHolder {
+        static final Scheduler DEFAULT = new SingleScheduler();
+    }
+
+    static final class ComputationHolder {
+        static final Scheduler DEFAULT = new ComputationScheduler();
+    }
+
+    static final class IoHolder {
+        static final Scheduler DEFAULT = new IoScheduler();
+    }
+
+    static final class NewThreadHolder {
+        static final Scheduler DEFAULT = new NewThreadScheduler();
+    }
+</code></pre>
+<p>这些Scheduler都继承Scheduler这个abstract class</p>
+<pre><code class="java"> @NonNull
+    public abstract Worker createWorker();
+</code></pre>
+<p>Schedulers.io()  —&gt; io.reactivex.internal.schedulers.ComputationScheduler //尽量cache,忙不过来的话创建新的线程<br>Schedulers.computation() io.reactivex.internal.schedulers.ComputationScheduler //只是维持了cpu核心数以内的线程，有任务来的时候round-robin</p>
+<pre><code class="java">/**
+ * Holds a fixed pool of worker threads and assigns them
+ * to requested Scheduler.Workers in a round-robin fashion.
+ */
+public final class ComputationScheduler extends Scheduler implements SchedulerMultiWorkerSupport {
+      private static final String THREAD_NAME_PREFIX = &quot;RxComputationThreadPool&quot;; //这个熟悉的字眼
+
+
+    @NonNull
+    @Override
+    public Worker createWorker() {
+        return new EventLoopWorker(pool.get().getEventLoop());
+    }
+}
+
+/**
+ * Scheduler that creates and caches a set of thread pools and reuses them if possible.
+ */
+public final class IoScheduler extends Scheduler {
+     @NonNull
+    @Override
+    public Worker createWorker() {
+        return new EventLoopWorker(pool.get());
+    }
+}
+
+//EventLoopWorker实际上代理了PoolWorker（继承NewThreadWorker）的工作
+
+public class NewThreadWorker extends Scheduler.Worker implements Disposable {
+    private final ScheduledExecutorService executor; //有一个scheduleAtFixedRate的功能可以拿来做定时任务
+
+    volatile boolean disposed;
+
+    public NewThreadWorker(ThreadFactory threadFactory) {
+        executor = SchedulerPoolFactory.create(threadFactory); 
+    }
+
+}
+</code></pre>
+<h2 id="为什么多个subscribeOn没有卵用"><a href="#为什么多个subscribeOn没有卵用" class="headerlink" title="为什么多个subscribeOn没有卵用"></a>为什么多个subscribeOn没有卵用</h2><p>就是下面这种</p>
+<pre><code class="java"> Observable.just(1)
+                .map(new Function&lt;Integer, Integer&gt;() {
+                    @Override
+                    public Integer apply(@NonNull Integer integer) throws Exception {
+                        Log.i(TAG, &quot;map-1:&quot;+Thread.currentThread().getName()); //实际运行在RxNewThreadScheduler-1上
+                        return integer;
+                    }
+                })
+                .subscribeOn(Schedulers.newThread())
+                .map(new Function&lt;Integer, Integer&gt;() {
+                    @Override
+                    public Integer apply(@NonNull Integer integer) throws Exception {
+                        Log.i(TAG, &quot;map-2:&quot;+Thread.currentThread().getName());//实际运行在RxNewThreadScheduler-1上
+                        return integer;
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .map(new Function&lt;Integer, Integer&gt;() {
+                    @Override
+                    public Integer apply(@NonNull Integer integer) throws Exception {
+                        Log.i(TAG, &quot;map-3:&quot;+Thread.currentThread().getName());//实际运行在RxNewThreadScheduler-1上
+                        return integer;
+                    }
+                })
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer&lt;Integer&gt;() {
+                    @Override
+                    public void accept(@NonNull Integer integer) throws Exception {
+                        Log.i(TAG, &quot;subscribe:&quot;+Thread.currentThread().getName());//实际运行在RxNewThreadScheduler-1上
+                    }
+                });
+</code></pre>
+<p>官方文档这么说的：</p>
+<blockquote>
+<p>the SubscribeOn operator designates which thread the Observable will begin operating on, no matter at what point in the chain of operators that operator is called. ObserveOn, on the other hand, affects the thread that the Observable will use below where that operator appears. For this reason, you may call ObserveOn multiple times at various points during the chain of Observable operators in order to change on which threads certain of those operators operate.</p>
+</blockquote>
+<p>subScribeOn返回的是ObservableSubscribeOn<br>它的subscribeActual里面主要做了这件事</p>
+<pre><code class="java">scheduler.scheduleDirect(new SubscribeTask(parent)) //parent是自己包装的一个Observer,SubscribeTask的run方法就是upstream.subScribe(parent)，大致如此
+</code></pre>
+<p>ObservableSubscribeOn.subScribe会调用到ObservableSubscribeOn.subscribeActual —&gt; 调来调去回到SubscribeTask 的 run()，它又开始往上去订阅(subScribeActual)，如此循环到第一个位置</p>
+<p>上层事件发生时，会一步步地调用actual.onNext -&gt; actual.onNext…这些actual的连接都是在上面几个不同的线程中连接上的。只是事件发生时，没有走线程调度，直接从第一个scheduler的线程开始运行这段链条状的onNext调用，所以也就只有第一次subScribeOn有用了</p>
 <h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><p>– <a href="https://www.google.com/url?sa=t&amp;rct=j&amp;q=&amp;esrc=s&amp;source=web&amp;cd=6&amp;cad=rja&amp;uact=8&amp;ved=0ahUKEwjlvrfg8bnTAhUI0mMKHcXZC1MQtwIITDAF&amp;url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DhtIXKI5gOQU&amp;usg=AFQjCNEYczqXGkjYXOUbovtP1CxDPARcXA&amp;sig2=gmLYEd2cVOhI7C2WjOHr9g">GOTO 2016 • Exploring RxJava 2 for Android • Jake Wharton - YouTube</a><br>– <a href="https://juejin.im/entry/5a025b3b51882561a3265bb7">掘金</a><br>– <a href="http://www.jianshu.com/p/6f3b6b934787">使用concat从数据库，内存，网络三层中获取数据</a><br>– <a href="http://blog.chengyunfeng.com/?p=981">RxJava 教程第四部分：并发 之数据流发射太快如何办</a></p>
 
       
@@ -985,10 +1214,6 @@ Observable.subscribeOn(Schedulers.io()) //
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
               </li>
              
@@ -1010,6 +1235,10 @@ Observable.subscribeOn(Schedulers.io()) //
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">sql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">

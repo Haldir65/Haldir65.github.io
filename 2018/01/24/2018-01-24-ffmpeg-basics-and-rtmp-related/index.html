@@ -16,7 +16,7 @@
 <meta property="og:description" content="ffmpeg安装手记">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/water foot cold dark river.jpg">
-<meta property="og:updated_time" content="2019-02-02T20:09:00.704Z">
+<meta property="og:updated_time" content="2019-02-15T07:23:05.596Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ffmpeg知识手册">
 <meta name="twitter:description" content="ffmpeg安装手记">
@@ -226,7 +226,7 @@ ga('send', 'pageview');
 <p>HLS协议的.m3u8文件理论上就是讲推送的视频流切分成多个.ts文件外加一些配置。注意这个.m3u8文件只是一个文本文件，很小的。<br>所以video标签在请求完上面的m3u8文件之后，就会根据配置信息去拉取真正的.ts文件。ts文件时长太长或者太短都不好，一般推荐是5s。</p>
 <h3 id="RTMP-Real-Time-Messaging-Protocol"><a href="#RTMP-Real-Time-Messaging-Protocol" class="headerlink" title="RTMP(Real Time Messaging Protocol)"></a>RTMP(Real Time Messaging Protocol)</h3><p>是Macromedia开发的直播协议，现在属于Adobe。rtmp和HLS一样可以用于视频直播，但是RTMP因为是基于flash的，所以无法在ios生态中播放，但是实时性要比HLS好，就是低延时。所以一般使用这种协议来上传视频流，也就是视频流推送到服务器。RTMP是基于tcp长连接的，延时在2s左右，而HLS是基于http的，延时在10-30s左右。<br>推流端的话，Android一般是用MediaCodec将视频数据编码成rtmp包的格式，RTMP流本质上是FLV格式的音视频<br>nginx上要配合一个nginx-rtmp-module来做</p>
 <h2 id="移动端音视频方案选择"><a href="#移动端音视频方案选择" class="headerlink" title="移动端音视频方案选择"></a>移动端音视频方案选择</h2><p>一般来说，音视频，摄像头这一块相关的api。Google在这方面的控制力都非常弱，导致各大厂商之间的实现存在各种差异。<a href="http://ragnraok.github.io/android_video_record.html">吐槽MediaCodec的文章很多</a><br>现实中，在Android平台上音视频编码器的选择包括：<br>用NediaCodec或者FFMpeg+x264/openh264。<br>MediaRecorder能录，但是不能一帧帧地去处理。<br><a href="https://stackoverflow.com/questions/42737378/android-choosing-between-mediarecorder-mediacodec-and-ffmpeg">有人比较了mediaRecoder、ffmpeg和mediaCodec的差别</a><br>简单来讲,MediaCodec有硬件加成，速度快，更加接近底层(但是强烈依赖OEM的实现，不同机型表现不同，bug有不少)<br>ffmpeg慢一点，但是几乎什么都能干，不同机型上表现一致。但是so文件很大。</p>
-<h2 id="MediaCodec-这个类的使用（-MediaCodec-MediaMuxer-and-MediaExtractor）"><a href="#MediaCodec-这个类的使用（-MediaCodec-MediaMuxer-and-MediaExtractor）" class="headerlink" title="MediaCodec 这个类的使用（ MediaCodec, MediaMuxer, and MediaExtractor）"></a>MediaCodec 这个类的使用（ MediaCodec, MediaMuxer, and MediaExtractor）</h2><p><a href="https://developer.android.com/reference/android/media/MediaCodec">MediaCodec的api page</a><br>MediaCodec可以处理的数据有以下三种类型：压缩数据、原始音频数据、原始视频数据。这三种类型的数据均可以利用ByteBuffers进行处理，但是对于原始视频数据应提供一个Surface以提高编解码器的性能。Surface直接使用native视频数据缓存，而没有映射或复制它们到ByteBuffers，因此，这种方式会更加高效。<br>MediaCodec采用异步方式处理数据，并且使用了一组输入输出缓存（ByteBuffer）。通过请求一个空的输入缓存（ByteBuffer），向其中填充满数据并将它传递给编解码器处理。编解码器处理完这些数据并将处理结果输出至一个空的输出缓存（ByteBuffer）中。使用完输出缓存的数据之后，将其释放回编解码器：<br>在使用一个Surface的时候，可以使用ImageReader获取视频某一帧的raw date，也可以使用Image这个class的getInputImage()方法</p>
+<h2 id="MediaCodec-这个类的使用（-MediaCodec-MediaMuxer-and-MediaExtractor）"><a href="#MediaCodec-这个类的使用（-MediaCodec-MediaMuxer-and-MediaExtractor）" class="headerlink" title="MediaCodec 这个类的使用（ MediaCodec, MediaMuxer, and MediaExtractor）"></a>MediaCodec 这个类的使用（ MediaCodec, MediaMuxer, and MediaExtractor）</h2><p>MediaMuxer是用来把video track和audio track合并起来的<br><a href="https://developer.android.com/reference/android/media/MediaCodec">MediaCodec的api page</a><br>MediaCodec可以处理的数据有以下三种类型：压缩数据、原始音频数据、原始视频数据。这三种类型的数据均可以利用ByteBuffers进行处理，但是对于原始视频数据应提供一个Surface以提高编解码器的性能。Surface直接使用native视频数据缓存，而没有映射或复制它们到ByteBuffers，因此，这种方式会更加高效。<br>MediaCodec采用异步方式处理数据，并且使用了一组输入输出缓存（ByteBuffer）。通过请求一个空的输入缓存（ByteBuffer），向其中填充满数据并将它传递给编解码器处理。编解码器处理完这些数据并将处理结果输出至一个空的输出缓存（ByteBuffer）中。使用完输出缓存的数据之后，将其释放回编解码器：<br>在使用一个Surface的时候，可以使用ImageReader获取视频某一帧的raw date，也可以使用Image这个class的getInputImage()方法</p>
 <pre><code>Use MediaCodecList to create a MediaCodec for a specific MediaFormat. When decoding a file or a stream, you can get the desired format from MediaExtractor.getTrackFormat. Inject any specific features that you want to add using MediaFormat.setFeatureEnabled, then call MediaCodecList.findDecoderForFormat to get the name of a codec that can handle that specific media format. Finally, create the codec using createByCodecName(String).
 </code></pre><p>就是说MediaCode的创建需要走factory method那一套，首先根据dataSource，使用MediaExtractor去提取音视频track，然后使用MediaCodecList.findDecoderForFormat找到一个可以用的codec的名称。最后，使用createByCodecName去创建出一个MediaCodec.</p>
 <p>创建完MediaCodec之后就要去初始化它了，可以使用setCallback去进行异步解码。<br>这个callback长这样。</p>
@@ -448,7 +448,7 @@ public final void releaseOutputBuffer(int index, long renderTimestampNs) {
 </code></pre>
 <h2 id="ijkplayer的原理"><a href="#ijkplayer的原理" class="headerlink" title="ijkplayer的原理"></a>ijkplayer的原理</h2><p>ijkplayer可以选择mediaPlayer，exoplayer或者是IjkMediaPlayer。exoplayer是基于MediaCodec的，而IjkMediaPlayer是<strong>一个基于FFPlay的轻量级Android/iOS视频播放器，实现了跨平台的功能，API易于集成；编译配置可裁剪，方便控制安装包大小。</strong></p>
 <p>整体的代码结构是：<br>tool - 初始化的一些脚本<br>config - 编译ffmpeg的一些配置文件<br>extra 用于存放编译ijkplayer所需要的依赖源文件，比如ffmpeg，openssl等<br>ijkmedia 核心代码<br> —  ijkplayer 播放器数据下载及解码相关<br> — ijksdl 音视频数据渲染相关（理由有一个gles2文件夹，里头装了opengl渲染yuv格式的代码）<br>ios ios平台上的上层接口封装<br>andriod 一些jni函数 </p>
-<p>Android相关的代码在android/ijkplayer/ijkplayer-java/src/main/java/tv/danmaku/ijk/media/player/IjkMediaPlayer.java这里，java层start最终调用到<br>比方说这个start方法</p>
+<p>Android相关的代码在android/ijkplayer/ijkplayer-java/src/main/java/tv/danmaku/ijk/media/player/IjkMediaPlayer.java这里，比方说这个start方法，java层start最终调用到</p>
 <pre><code class="java">private native void _start() throws IllegalStateException;
 </code></pre>
 <p>映射到jni这边是ijkplayer/ijkmedia/ijkplayer/android/ijkplayer_jni.c这个文件</p>
@@ -567,7 +567,7 @@ static int read_thread(void *arg){
             // TODO: clear invaild audio data
             // SDL_AoutFlushAudio(ffp-&gt;aout);
         }
-        if (is-&gt;subtitle_stream &gt;= 0) { //把字母放进队列
+        if (is-&gt;subtitle_stream &gt;= 0) { //把字幕放进队列
             packet_queue_flush(&amp;is-&gt;subtitleq);
             packet_queue_put(&amp;is-&gt;subtitleq, &amp;flush_pkt);
         }
@@ -613,14 +613,9 @@ static IJKFF_Pipenode *func_open_video_decoder(IJKFF_Pipeline *pipeline, FFPlaye
 <p><a href="https://github.com/Bilibili/ijkplayer">ijkplayer现在看来似乎只是ffmpeg的一层wrapper</a></p>
 <p>MediaCodec应该就是硬解，ffmpeg是软解(后面好像支持了硬解)</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li><a href="https://www.jianshu.com/p/daf0a61cc1e0">Ijkplayer解析</a><br><a href="https://github.com/mpenkov/ffmpeg-tutorial">ffmpeg c语言写一个video player</a><br><a href="https://github.com/fluent-ffmpeg/node-fluent-ffmpeg">ffmpeg的node js 包装</a><br><a href="https://www.jianshu.com/p/fc64102d6162">nginx搭建rtmp推流服务</a></li>
+<li><a href="https://www.jianshu.com/p/daf0a61cc1e0">Ijkplayer解析</a><br><a href="https://github.com/mpenkov/ffmpeg-tutorial">ffmpeg c语言写一个video player</a><br><a href="https://github.com/fluent-ffmpeg/node-fluent-ffmpeg">ffmpeg的node js 包装</a><br><a href="https://www.jianshu.com/p/fc64102d6162">nginx搭建rtmp推流服务</a><br><a href="https://zhuanlan.zhihu.com/p/51010662">ijkplayer如何使用FFmpeg 4.0内核？</a><br><a href="https://github.com/WeMobileDev/article/blob/master/微信Android视频编码爬过的那些坑.md">微信Android视频编码爬过的那些坑</a> 使用Neon指令</li>
 </ul>
-<p>todo<br>opencv<br>view video using ffmplayer</p>
-<p>tbd</p>
-<ul>
-<li>[ ] ffmpeg 的js wrapper</li>
-</ul>
-<p><a href="https://zhuanlan.zhihu.com/p/51010662">ijkplayer如何使用FFmpeg 4.0内核？</a></p>
+<p>tbd<br>opencv<br>play video using ffmplayer</p>
 
       
 
@@ -984,10 +979,6 @@ static IJKFF_Pipenode *func_open_video_decoder(IJKFF_Pipeline *pipeline, FFPlaye
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
               </li>
              
@@ -1009,6 +1000,10 @@ static IJKFF_Pipenode *func_open_video_decoder(IJKFF_Pipeline *pipeline, FFPlaye
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">sql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">

@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery15111006999.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery2a2241cc5c1278cf7a28f15f91dbbb7f.jpg">
-<meta property="og:updated_time" content="2019-02-02T20:09:00.704Z">
+<meta property="og:updated_time" content="2019-02-15T07:23:05.592Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从DroidPlugin谈插件化开发">
 <meta name="twitter:description" content="关于360团队出开源的DroidPlugin的一些记录 过程中发现了关于插件化，Hook系统方法的操作，摘录下来。">
@@ -298,6 +298,7 @@ for line in channels:
 <p>Xposed的介绍与入门<br>Xposed的原理与Multidex及动态加载问题</p>
 <h3 id="组件化、插件化"><a href="#组件化、插件化" class="headerlink" title="组件化、插件化"></a>组件化、插件化</h3><p>组件化、插件化的前提就是解耦</p>
 <p><a href="https://github.com/jaredrummler/AndroidShell">在Android中执行shell指令</a><br><a href="https://github.com/didi/VirtualAPK">滴滴的virtualApp</a>。 目前看来就是用android.content.pm.PackageParse去解析一个apk文件，封装成一个LoadedPlugin对象（Cache下来），后续调用apk中描述的功能进行操作。所以应该还是在host的进程中跑的。由此联系到<a href="http://www.cnblogs.com/myitm/archive/2012/05/17/2506635.html">PackageInstaller 原理简述</a></p>
+<p>组件化的方案多为路由 + 接口下沉的方式，所有接口下沉到base中，组件中实现接口</p>
 <ul>
 <li>多渠道的话这样的命令要跑多次<br>使用walle就好了。<blockquote>
 <p>project 的 build.gradle 添加:</p>
@@ -385,6 +386,10 @@ class InstrumentationWrapper extends Instrumentation {
 </code></pre>
 <p><a href="https://www.jianshu.com/p/107aaf054140">sharedUid</a>通过Shared User id,拥有同一个User id的多个APK可以配置成运行在同一个进程中.所以默认就是可以互相访问任意数据。</p>
 <p>在windows平台上，gradle下载的缓存文件位置在哪里？</p>
+<p><strong>最后引用<a href="https://juejin.im/entry/5c64da44518825620b450918">移动开发的罗曼蒂克消亡史 | InfoQ</a>中的一段话</strong></p>
+<blockquote>
+<p>插件化和热更新技术是真的不可避免的衰落了，它们已经错过了历史机遇期，新的技术已经从另一个维度实施了降维打击，没错，说的就是小程序。</p>
+</blockquote>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://github.com/tiann/understand-plugin-framework">分析DroidPlugin，深入理解插件化框架</a><br><a href="http://www.wjdiankong.cn/">逆向大全</a><br><a href="https://tech.meituan.com/android_anti_hooking.html">Android Hook技术防范漫谈</a><br><a href="https://zhuanlan.zhihu.com/p/34346219">爱奇艺组件化探索之原理篇</a><br><a href="http://atlas.taobao.org/docs/principle-intro/Runtime_principle.html">Atlas容器框架</a></p>
 
       
@@ -764,10 +769,6 @@ class InstrumentationWrapper extends Instrumentation {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
               </li>
              
@@ -789,6 +790,10 @@ class InstrumentationWrapper extends Instrumentation {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">sql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">

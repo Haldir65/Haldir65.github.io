@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/b9ae1189145b4a4d9dfe4d0b89a21b47.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/ed541bc1ed61ead0bf6ea8233ef01c0a.jpg">
-<meta property="og:updated_time" content="2019-02-02T20:09:00.700Z">
+<meta property="og:updated_time" content="2019-02-15T07:23:05.592Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="网络通信手册">
 <meta name="twitter:description" content="网络相关的查找手册">
@@ -476,7 +476,12 @@ Postman-Token: ddc99b57-f703-4d05-abbe-c0123d4f5fed
 <blockquote>
 <p>IP直连，httpdns的原理非常简单，主要有两步：A、客户端直接访问HttpDNS接口(直接用ip地址访问)，获取业务在域名配置管理系统上配置的访问延迟最优的IP。（基于容灾考虑，还是保留次选使用运营商LocalDNS解析域名的方式）B、客户端向获取到的IP后就向直接往此IP发送业务协议请求。以Http请求为例，通过在header中指定host字段，向HttpDNS返回的IP发送标准的Http请求即可。<br>https，注意https是解决链路劫持的方案，并无法解决DNS劫持的问题。https安全但性能稍差</p>
 </blockquote>
+<p><a href="https://blog.csdn.net/leelit/article/details/77829196">httpdns方案及需要注意的点非常多</a> <a href="https://tech.meituan.com/2017/03/17/shark-sdk.html">美团</a> 证书校验,sni，还有ip直连导致的连接复用失效等等<br><a href="https://kangzubin.com/httpdns-https/">sni场景下可能出现的问题</a></p>
+<blockquote>
+<p>通常情况下，一台服务器往往会配置多个域名来建立不同 Web 站点或提供不同的服务。例如，域名 a.com 和 b.com 都同时解析到同一 IP 1.1.1.1 上，然后服务器根据客户端请求中的 Host 字段来区分，将请求分配给不同的后台服务来处理。<br>如前面所述，对于 HTTPS 请求前，需要额外进行 SSL/TLS 握手，但是由于服务器配置了多个域名的 SSL 证书，在握手发送证书时，不知道客户端访问的是哪个域名（因为握手是在某一具体请求之前进行的），所以无法根据不同域名发送不同的证书。<br>SNI(Server Name Indication) 就是为了解决一个服务器使用多个域名和证书的 SSL/TLS 扩展。它的工作原理是：在进行 SSL/TLS 握手之前，先发送要访问站点的域名（Hostname），这样服务器会根据这个域名返回一个合适的证书。目前，大多数操作系统和浏览器以及主流 HTTP 服务器软件都已经很好地支持 SNI 扩展。<br>但是同样的问题又来了，当我们采用 HTTPDNS 解析域名，如前所述，请求 URL 中的 host 会被替换成解析后的 IP，此时握手前发送的 SNI 字段是 IP，导致服务器最终获取到的”域名”仍然为 IP，无法找到匹配的证书，只能返回默认的证书或者不返回，所以也会出现 SSL/TLS 握手不成功的错误。</p>
+</blockquote>
 <p>WebView中反运营商DNS劫持的手段<br><a href="https://github.com/tencentyun/httpdns-android-sdk">生产环境使用腾讯云的httpdns得了</a>,腾讯云的网站上也挂出了一个dns解析的<a href="https://cloud.tencent.com/product/hd">入口</a></p>
+<p><a href="https://sdk.cn/news/7795">java层用反射接管InetAddress.getAllByName</a>， native层把 getaddrinfo 的内存地址替换成自定义的 my_getaddrinfo 地址</p>
 <p>至于原理嘛：在腾讯云的httpdns的jar文件解压之后找到一个MSDKDnsResolver文件，里面有几个很显眼的ip:<br>182.254.116.117<br>182.254.16.100<br>找一下这个ip: 广东省深圳市 深圳市腾讯计算机系统有限公司电信节点(BGP)， ip直连无疑了。<br>腾讯云的文档上还指出WebViewClient有一个方法shouldInterceptRequest可以在webview里面使用</p>
 <p><a href="http://finance.sina.com.cn/stock/t/2015-12-25/doc-ifxmxxst0459707.shtml">今日头条、小米、腾讯等六公司联合抵制流量劫持 已有多项证据直接指向某些机构</a></p>
 <h3 id="8-Fiddler抓包"><a href="#8-Fiddler抓包" class="headerlink" title="8.Fiddler抓包"></a>8.Fiddler抓包</h3><ul>
@@ -993,10 +998,6 @@ function sha1(real_user_id){
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
               </li>
              
@@ -1018,6 +1019,10 @@ function sha1(real_user_id){
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">sql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
