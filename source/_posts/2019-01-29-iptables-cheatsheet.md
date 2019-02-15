@@ -104,7 +104,7 @@ REJECT differs to DROP that it does send a packet back, but the answer is as if 
 取消拉黑：也就是删除上面这条规则
 >iptables -D INPUT -s xxx.xxx.xxx.xxx -j DROP
 
-比方说我不小心把202.51.1.1拉黑了，怎么挽回
+比方说我不小心把202.54.1.1拉黑了，怎么挽回
 ```
 iptables -L OUTPUT -n --line-numbers | grep 202.54.1.1 //发现在条规则第四行
 iptabels -D INPUT 4 //把这个第四行的规则删掉

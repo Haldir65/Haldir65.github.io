@@ -341,7 +341,7 @@ javah -d jni com.your.package.name.classyoujustWroteWithnativeMethod
 移植mp3lame到Android平台照着[这里](https://www.jianshu.com/p/065bfe6d3ec2)操作就行了。
 这篇博客使用的是lame-3.99.5，注意下载对应的版本。
 [cmake的一些知识点](http://cfanr.cn/2017/08/26/Android-NDK-dev-CMake-s-usage/)
-cmake生成的.so文件在"\app\build\intermediates\cmake\debug\obj\arm64-v8a"这个路径下
+cmake生成的.so文件在"\app\build\intermediates\cmake\debug\obj\arm64-v8a"这个路径下。另外，CMakeLists.txt文件中比如说指定了生成的.so文件名字为xxx,那么在这个路径下找到的将会是libxxx.so
 
 java调用c语言性能还好,c语言调用java的性能就比较差了
 
@@ -568,3 +568,7 @@ public Bitmap blurBitmap(Bitmap bitmap){
 }
 ```
 
+## 20. webView是可以设置代理的
+在Android中webView是可以通过反射的方式为webView设置代理的
+[参考](https://www.jianshu.com/p/d02e8818a72e)。
+[蘑菇街在处理系统 WebView 请求的时候，为系统的 WebView 设置代理，将请求发送至本地端口。同时在网络库中实现了一个 Http Proxy Server，能转发所监听端口的 http，https 请求，所有接收到的 http，https 请求，可以经过自己的网络库转发出去，这样所有自有网络库的修改，优化都可以生效。](https://www.infoq.cn/article/mogujie-app-chromium-network-layer)

@@ -501,6 +501,7 @@ netstat -nlpt ##获取进程名、进程号以及用户 ID
 netstat -s ##可以打印出网络统计数据，包括某个协议下的收发包数量。
 netstat -ct ## c:持续输出
 netstat -tn ##
+netstat -lnput ## check Active Internet connections (only servers)
 
 ## 使用watch命令监视active状态的连接，实时显示网络流量
 watch -d -n0 "netstat -atnp | grep ESTA"

@@ -90,6 +90,7 @@ ffmpeg慢一点，但是几乎什么都能干，不同机型上表现一致。�
 
 
 ## MediaCodec 这个类的使用（ MediaCodec, MediaMuxer, and MediaExtractor）
+MediaMuxer是用来把video track和audio track合并起来的
 [MediaCodec的api page](https://developer.android.com/reference/android/media/MediaCodec)
 MediaCodec可以处理的数据有以下三种类型：压缩数据、原始音频数据、原始视频数据。这三种类型的数据均可以利用ByteBuffers进行处理，但是对于原始视频数据应提供一个Surface以提高编解码器的性能。Surface直接使用native视频数据缓存，而没有映射或复制它们到ByteBuffers，因此，这种方式会更加高效。
 MediaCodec采用异步方式处理数据，并且使用了一组输入输出缓存（ByteBuffer）。通过请求一个空的输入缓存（ByteBuffer），向其中填充满数据并将它传递给编解码器处理。编解码器处理完这些数据并将处理结果输出至一个空的输出缓存（ByteBuffer）中。使用完输出缓存的数据之后，将其释放回编解码器：
@@ -353,8 +354,8 @@ andriod 一些jni函数
 
 
 
-Android相关的代码在android/ijkplayer/ijkplayer-java/src/main/java/tv/danmaku/ijk/media/player/IjkMediaPlayer.java这里，java层start最终调用到
-比方说这个start方法
+Android相关的代码在android/ijkplayer/ijkplayer-java/src/main/java/tv/danmaku/ijk/media/player/IjkMediaPlayer.java这里，比方说这个start方法，java层start最终调用到
+
 ```java
 private native void _start() throws IllegalStateException;
 ```
@@ -486,7 +487,7 @@ static int read_thread(void *arg){
             // TODO: clear invaild audio data
             // SDL_AoutFlushAudio(ffp->aout);
         }
-        if (is->subtitle_stream >= 0) { //把字母放进队列
+        if (is->subtitle_stream >= 0) { //把字幕放进队列
             packet_queue_flush(&is->subtitleq);
             packet_queue_put(&is->subtitleq, &flush_pkt);
         }
@@ -544,18 +545,20 @@ ijkplayer在默认情况下也是使用音频作为参考时钟源，处理同�
 
 
 MediaCodec应该就是硬解，ffmpeg是软解(后面好像支持了硬解)
+
+
 ## 参考
 - [Ijkplayer解析](https://www.jianshu.com/p/daf0a61cc1e0)
 [ffmpeg c语言写一个video player](https://github.com/mpenkov/ffmpeg-tutorial)
 [ffmpeg的node js 包装](https://github.com/fluent-ffmpeg/node-fluent-ffmpeg)
 [nginx搭建rtmp推流服务](https://www.jianshu.com/p/fc64102d6162)
+[ijkplayer如何使用FFmpeg 4.0内核？](https://zhuanlan.zhihu.com/p/51010662)
+[微信Android视频编码爬过的那些坑](https://github.com/WeMobileDev/article/blob/master/微信Android视频编码爬过的那些坑.md) 使用Neon指令
 
-todo 
-opencv
-view video using ffmplayer
+
 
 tbd
-- [ ] ffmpeg 的js wrapper
+opencv
+play video using ffmplayer
 
 
-[ijkplayer如何使用FFmpeg 4.0内核？](https://zhuanlan.zhihu.com/p/51010662)

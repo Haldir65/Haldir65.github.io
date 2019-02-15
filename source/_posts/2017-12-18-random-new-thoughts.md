@@ -33,13 +33,12 @@ top : 1
 - [ ] Coordinator behavior以及scroll原理，完善blog
 - [ ] instagram好像通过注解的方式自己写了一个json解析器[ig-json-parser](https://github.com/Instagram/ig-json-parser)
 - [ ] when it comes to design , how do we translate px, pt, em  into sp,dp and others(设计方面的，各种单位之间的转换)?
-- [ ] classloader和class的生命周期,[知乎专栏](https://zhuanlan.zhihu.com/p/51374915)
 - [ ] learning how textView works is painful yet necessary
 - [ ] linux环境下多进程通讯方式(管道，共享内存，信号,unix domian socket)
 - [ ] mqtt接入实践[mqtt是建立在tcp基础上的应用层协议](https://github.com/mcxiaoke/mqtt)，[netty](https://github.com/netty/netty)也做了实现
 - [ ] play around with xposed
 - [ ] python gui编程
-- [ ] kotlin的coroutine[production-ready]
+- [ ] [Kotlin Coroutines Tutorial (STABLE VERSION) ](https://www.youtube.com/watch?v=jYuK1qzFrJg)
 - [ ] 宇宙第一ide熟悉使用
 - [ ] js的闭包等面试常谈
 - [ ] java的aspectJ教程，Spring AOP 与AspectJ 实现原理上并不完全一致，但功能上是相似的
@@ -55,7 +54,7 @@ top : 1
 - [ ]Lua脚本是一个很轻量级的脚本，也是号称性能最高的脚本。路由器上都有运行环境，语法和c语言差不多
 - [腾讯的mmkv是shared preference的有效替代品](https://juejin.im/post/5baf8ae8f265da0ae92a7df5) mmap的使用值得学习
 - [ ] [openjdk的C语言实现可以随便调几处来看看](https://github.com/keerath/openjdk-8-source/blob/master/jdk/src/windows/native/java/net/SocketOutputStream.c)
-
+- [简单的组件化方案](https://www.jianshu.com/p/5f9a7bc902e1)
 
 
 

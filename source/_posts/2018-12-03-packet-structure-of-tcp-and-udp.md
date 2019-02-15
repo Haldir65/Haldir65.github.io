@@ -233,8 +233,37 @@ Network Layer IP Packet Header(Source network:host + Destination network: host) 
 Transport Header(port) +
 data
 
+https版本的握手，证书校验，change cipher
+![](https://www.haldir66.ga/static/imgs/https_hand_shake.jpg)
+[出处](https://mp.weixin.qq.com/s/682cugg2niNfdg_eDYHdyw)
+证书验证完毕之后，觉得这个服务端是可信的，于是客户端计算产生随机数字Pre-master，发送Client Key Exchange，用证书中的公钥加密，再发送给服务器，服务器可以通过私钥解密出来。
+接下来，无论是客户端还是服务器，都有了三个随机数，分别是：自己的、对端的，以及刚生成的Pre-Master随机数。通过这三个随机数，可以在客户端和服务器产生相同的对称密钥。
+有了对称密钥，客户端就可以说：“Change Cipher Spec，咱们以后都采用协商的通信密钥和加密算法进行加密通信了。”
+然后客户端发送一个Encrypted Handshake Message，将已经商定好的参数等，采用协商密钥进行加密，发送给服务器用于数据与握手验证。
+同样，服务器也可以发送Change Cipher Spec，说：“没问题，咱们以后都采用协商的通信密钥和加密算法进行加密通信了”，并且也发送Encrypted Handshake Message的消息试试。
+当双方握手结束之后，就可以通过对称密钥进行加密传输了
+
+
+![](https://www.haldir66.ga/static/imgs/tcp_packet_structure.jpg)
+
+下面这段摘自微信公众号"刘超的通俗云计算"
+> 出了NAT网关，就从核心网到达了互联网。在网络世界，每一个运营商的网络成为自治系统AS。每个自治系统都有边界路由器，通过它和外面的世界建立联系。
+对于云平台来讲，它可以被称为Multihomed AS，有多个连接连到其他的AS，但是大多拒绝帮其他的AS传输包。例如一些大公司的网络。对于运营商来说，它可以被称为Transit AS，有多个连接连到其他的AS，并且可以帮助其他的AS传输包，比如主干网。
+如何从出口的运营商到达云平台的边界路由器？在路由器之间需要通过BGP协议实现，BGP又分为两类，eBGP和iBGP。自治系统间，边界路由器之间使用eBGP广播路由。内部网络也需要访问其他的自治系统。
+边界路由器如何将BGP学习到的路由导入到内部网络呢？通过运行iBGP，使内部的路由器能够找到到达外网目的地最好的边界路由器。
+网站的SLB的公网IP地址早已经通过云平台的边界路由器，让全网都知道了。于是这个下单的网络包选择了下一跳是A2，也即将A2的MAC地址放在目标MAC地址中。
+到达A2之后，从路由表中找到下一跳是路由器C1，于是将目标MAC换成C1的MAC地址。到达C1之后，找到下一跳是C2，将目标MAC地址设置为C2的MAC。到达C2后，找到下一跳是云平台的边界路由器，于是将目标MAC设置为边界路由器的MAC地址。
+**你会发现，这一路，都是只换MAC，不换目标IP地址。这就是所谓下一跳的概念。**
+在云平台的边界路由器，会将下单的包转发进来，经过核心交换，汇聚交换，到达外网网关节点上的SLB的公网IP地址。
+我们可以看到，手机到SLB的公网IP，是一个端到端的连接，连接的过程发送了很多包。所有这些包，无论是TCP三次握手，还是HTTPS的密钥交换，都是要走如此复杂的过程到达SLB的，当然每个包走的路径不一定一致。
+
+
+
+
 
 ## 参考
 [TCP 报文结构](https://jerryc8080.gitbooks.io/understand-tcp-and-udp/)
 [tcp包结构](https://www.google.com/search?q=tcp%E5%8C%85%E7%BB%93%E6%9E%84)
 [推广商业软件的文章，当做关于tcp协议的一整个series来看还是很好的](https://accedian.com/enterprises/blog/tcp-receive-window-everything-need-know/) 
+
+HTTP幂等性(用CAS)避免下单两次

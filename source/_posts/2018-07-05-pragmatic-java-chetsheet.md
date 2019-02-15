@@ -473,7 +473,64 @@ ParameterizedType,TypeVariable,GenericArrayType,WildcardType（这四个全部�
 
 Java 系统监控有一个小的技巧是，你可以使用kill -3 <pid> 发一个SIGQUIT的信号给JVM，可以把堆栈信息（包括垃圾回收的信息）dump到stderr/logs。
 
-### ClassLOader的使用套路
+### ClassLoader的使用套路
+classloader和class的生命周期,[知乎专栏](https://zhuanlan.zhihu.com/p/51374915)
+```
+JVM 中内置了三个重要的 ClassLoader，分别是 BootstrapClassLoader、ExtensionClassLoader 和 AppClassLoader。
+BootstrapClassLoader 负责加载 JVM 运行时核心类，这些类位于 JAVA_HOME/lib/rt.jar 文件中，我们常用内置库 java.xxx.* 都在里面，比如 java.util.*、java.io.*、java.nio.*、java.lang.* 等等。这个 ClassLoader 比较特殊，它是由 C 代码实现的，我们将它称之为「根加载器」。
+
+ExtensionClassLoader 负责加载 JVM 扩展类，比如 swing 系列、内置的 js 引擎、xml 解析器 等等，这些库名通常以 javax 开头，它们的 jar 包位于 JAVA_HOME/lib/ext/*.jar 中，有很多 jar 包。
+
+AppClassLoader 才是直接面向我们用户的加载器，它会加载 Classpath 环境变量里定义的路径中的 jar 包和目录。我们自己编写的代码以及使用的第三方 jar 包通常都是由它来加载的。
+
+那些位于网络上静态文件服务器提供的 jar 包和 class文件，jdk 内置了一个 URLClassLoader，用户只需要传递规范的网络路径给构造器，就可以使用 URLClassLoader 来加载远程类库了。
+ExtensionClassLoader 和 AppClassLoader 都是 URLClassLoader 的子类，它们都是从本地文件系统里加载类库。
+```
+
+双亲委派
+```
+AppClassLoader 在加载一个未知的类名时，它并不是立即去搜寻 Classpath，它会首先将这个类名称交给 ExtensionClassLoader 来加载，如果 ExtensionClassLoader 可以加载，那么 AppClassLoader 就不用麻烦了。否则它就会搜索 Classpath 。
+
+而 ExtensionClassLoader 在加载一个未知的类名时，它也并不是立即搜寻 ext 路径，它会首先将类名称交给 BootstrapClassLoader 来加载，如果 BootstrapClassLoader 可以加载，那么 ExtensionClassLoader 也就不用麻烦了。否则它就会搜索 ext 路径下的 jar 包。
+
+这三个 ClassLoader 之间形成了级联的父子关系，每个 ClassLoader 都很懒，尽量把工作交给父亲做，父亲干不了了自己才会干。每个 ClassLoader 对象内部都会有一个 parent 属性指向它的父加载器。
+```
+
+```java
+$ cat ~/source/jcl/v1/Dep.java
+public class Dep {
+    public void print() {
+        System.out.println("v1");
+    }
+}
+
+$ cat ~/source/jcl/v2/Dep.java
+public class Dep {
+ public void print() {
+  System.out.println("v1");
+ }
+}
+
+$ cat ~/source/jcl/Test.java
+public class Test {
+    public static void main(String[] args) throws Exception {
+        String v1dir = "file:///Users/qianwp/source/jcl/v1/";
+        String v2dir = "file:///Users/qianwp/source/jcl/v2/";
+        URLClassLoader v1 = new URLClassLoader(new URL[]{new URL(v1dir)});
+        URLClassLoader v2 = new URLClassLoader(new URL[]{new URL(v2dir)});
+
+        Class<?> depv1Class = v1.loadClass("Dep");
+        Object depv1 = depv1Class.getConstructor().newInstance();
+        depv1Class.getMethod("print").invoke(depv1);
+
+        Class<?> depv2Class = v2.loadClass("Dep");
+        Object depv2 = depv2Class.getConstructor().newInstance();
+        depv2Class.getMethod("print").invoke(depv2);
+
+        System.out.println(depv1Class.equals(depv2Class));
+   }
+}
+```
 
 
 

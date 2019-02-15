@@ -200,6 +200,10 @@ grep -i test test.txt | awk '/[0-9]/ { print }'
 想要找出系统内所有大小超出10MB的，合计一下这些大文件一共占用了多少MB的空间
 sudo find / -size +10M -exec du -h {} \; | awk '{ s+=$1  } END { print s}'
 
+***查找大文件，并且按照文件大小从大到小排序**
+sudo find  -type f -size +10M -print0 |xargs -0 du -h|sort -nr
+
+
 awk里面还能for循环
 sudo netstat -a | awk '/^tcp/ {++S[$NF]} END {for(a in S) print a, S[a]}'
 
@@ -211,7 +215,7 @@ awk正则
 awk '$1 ~ /J/' inventory-shipped  ## 有大写字母J的话就打印出来
 awk '$1 !~ /J/' inventory-shipped  ##排除所有包含J的内容
 
-
+[阮一峰的awk教程](http://www.ruanyifeng.com/blog/2018/11/awk.html)
 
 
 ### 7.tar命令

@@ -194,6 +194,8 @@ Xposed的原理与Multidex及动态加载问题
 [在Android中执行shell指令](https://github.com/jaredrummler/AndroidShell)
 [滴滴的virtualApp](https://github.com/didi/VirtualAPK)。 目前看来就是用android.content.pm.PackageParse去解析一个apk文件，封装成一个LoadedPlugin对象（Cache下来），后续调用apk中描述的功能进行操作。所以应该还是在host的进程中跑的。由此联系到[PackageInstaller 原理简述](http://www.cnblogs.com/myitm/archive/2012/05/17/2506635.html)
 
+组件化的方案多为路由 + 接口下沉的方式，所有接口下沉到base中，组件中实现接口
+
 
 -  多渠道的话这样的命令要跑多次
 使用walle就好了。
@@ -288,8 +290,8 @@ class InstrumentationWrapper extends Instrumentation {
 在windows平台上，gradle下载的缓存文件位置在哪里？
 
 
-
-
+**最后引用[移动开发的罗曼蒂克消亡史 | InfoQ](https://juejin.im/entry/5c64da44518825620b450918)中的一段话**
+> 插件化和热更新技术是真的不可避免的衰落了，它们已经错过了历史机遇期，新的技术已经从另一个维度实施了降维打击，没错，说的就是小程序。
 
 ## 参考
 [分析DroidPlugin，深入理解插件化框架](https://github.com/tiann/understand-plugin-framework)

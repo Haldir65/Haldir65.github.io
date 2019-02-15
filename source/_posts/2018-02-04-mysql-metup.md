@@ -602,3 +602,9 @@ ERROR 1055 (42000): Expression #1 of SELECT list is not in GROUP BY clause and c
 启用mysql缓存降低cpu的使用率
 
 经常会看到一个.sql文件，[比方说这个](https://github.com/ouhaohan8023/tcp_icmp_check/blob/master/ss_node.sql)，怎么导出来的？
+
+
+qps和tps这种术语
+QPS： Queries Per Second意思是“每秒查询率”，是一台服务器每秒能够相应的查询次数，是对一个特定的查询服务器在规定时间内所处理流量多少的衡量标准。
+
+TPS： 是TransactionsPerSecond的缩写，也就是事务数/秒。它是软件测试结果的测量单位。客户机在发送请求时开始计时，收到服务器响应后结束计时，以此来计算使用的时间和完成的事务个数。

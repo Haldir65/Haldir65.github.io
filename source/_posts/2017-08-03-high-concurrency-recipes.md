@@ -321,6 +321,8 @@ put方法在队列满的时候会阻塞直到有队列成员被消费，take方�
 ## 15. AtomicXXX只是将value写成volatile，这样get就安全了，set的话直接交给Unsafe了
 volatile并不是Atomic操作，例如，A线程对volatile变量进行写操作(实际上是读和写操作)，B线程可能在这两个操作之间进行了写操作；例如用volatile修饰count变量那么 count++ 操作就不是原子性的。而AtomicInteger类提供的atomic方法可以让这种操作具有原子性如getAndIncrement()方法会原子性的进行增量操作把当前值加一,因为AtomicInteger的getAndIncrement方法就是简单的调用了Unsafe的getAndAddInt。
 
+[CAS还是不能解决ABA问题](https://mp.weixin.qq.com/s/nRnQKhiSUrDKu3mz3vItWg) 在java中用AtomicStampedReference就可以了
+
 ## 16. 读多写少的场景下的同步
  CopyOnWriteArrayList和Collections.synchronizedList相比。在高并发前提下，前者读的性能更好，后者写的性能更好（前者的写性能极差）。[CopyOnWriteArrayList与Collections.synchronizedList的性能对比](http://blog.csdn.net/yangzl2008/article/details/39456817)。CopyOnWriteArrayList适合做缓存。
  **ReentrantReadWriteLock** 用于针对读多写少的场景进行优化。（获得读锁后，其它线程可获得读锁而不能获取写锁

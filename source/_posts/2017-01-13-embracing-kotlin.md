@@ -434,11 +434,16 @@ lst.add(Noun_Class::class.java)
 [stackoverflow](https://stackoverflow.com/questions/45267041/not-enough-information-to-infer-parameter-t-with-kotlin-and-android)
 init代码块不是构造函数，同时，init的执行效果要看写在哪一行了，如果在Init中引用了一个propertity，这个属性要是在Init之前就初始化了那倒还好，要是在后面,那么在init调用的时候看到的就是null.
 
+```js
+@Insert
+fun insertAll(vararg users: User) //这个vararg等于java里面的...就是一个数组的意思
+```
+
 ### 参考
 
 1. [Kotlin in production](https://www.youtube.com/watch?v=mDpnc45WwlI&index=10&list=PLnVy79PaFHMXJha06t6pWfkYcATV4oPvC)
 2. [10 Kotlin Tricks in 10 ish minutes by Jake Wharton](https://www.youtube.com/watch?v=YKzUbeUtTak)​
 3. [Try Kotlin](https://try.kotlinlang.org/#/Examples/Basic%20syntax%20walk-through/Null-checks/Null-checks.kt)
 4. [What can Kotlin do for me? (GDD Europe '17)](https://www.youtube.com/watch?v=YbF8Q8LxAJs)
-
 [KotlinConf 2017 - Deep Dive into Coroutines on JVM by Roman Elizarov](https://www.youtube.com/watch?v=YrrUCSi72E8) coroutine在jvm上的实现原理
+[getting-started-with-coroutines-on-android](https://medium.com/datadriveninvestor/getting-started-with-coroutines-on-android-c99407c3bd9c)

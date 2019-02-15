@@ -487,8 +487,17 @@ public class Test {
 > IP直连，httpdns的原理非常简单，主要有两步：A、客户端直接访问HttpDNS接口(直接用ip地址访问)，获取业务在域名配置管理系统上配置的访问延迟最优的IP。（基于容灾考虑，还是保留次选使用运营商LocalDNS解析域名的方式）B、客户端向获取到的IP后就向直接往此IP发送业务协议请求。以Http请求为例，通过在header中指定host字段，向HttpDNS返回的IP发送标准的Http请求即可。
 https，注意https是解决链路劫持的方案，并无法解决DNS劫持的问题。https安全但性能稍差
 
+[httpdns方案及需要注意的点非常多](https://blog.csdn.net/leelit/article/details/77829196) [美团](https://tech.meituan.com/2017/03/17/shark-sdk.html) 证书校验,sni，还有ip直连导致的连接复用失效等等
+[sni场景下可能出现的问题](https://kangzubin.com/httpdns-https/)
+> 通常情况下，一台服务器往往会配置多个域名来建立不同 Web 站点或提供不同的服务。例如，域名 a.com 和 b.com 都同时解析到同一 IP 1.1.1.1 上，然后服务器根据客户端请求中的 Host 字段来区分，将请求分配给不同的后台服务来处理。
+如前面所述，对于 HTTPS 请求前，需要额外进行 SSL/TLS 握手，但是由于服务器配置了多个域名的 SSL 证书，在握手发送证书时，不知道客户端访问的是哪个域名（因为握手是在某一具体请求之前进行的），所以无法根据不同域名发送不同的证书。
+SNI(Server Name Indication) 就是为了解决一个服务器使用多个域名和证书的 SSL/TLS 扩展。它的工作原理是：在进行 SSL/TLS 握手之前，先发送要访问站点的域名（Hostname），这样服务器会根据这个域名返回一个合适的证书。目前，大多数操作系统和浏览器以及主流 HTTP 服务器软件都已经很好地支持 SNI 扩展。
+但是同样的问题又来了，当我们采用 HTTPDNS 解析域名，如前所述，请求 URL 中的 host 会被替换成解析后的 IP，此时握手前发送的 SNI 字段是 IP，导致服务器最终获取到的”域名”仍然为 IP，无法找到匹配的证书，只能返回默认的证书或者不返回，所以也会出现 SSL/TLS 握手不成功的错误。
+
 WebView中反运营商DNS劫持的手段
 [生产环境使用腾讯云的httpdns得了](https://github.com/tencentyun/httpdns-android-sdk),腾讯云的网站上也挂出了一个dns解析的[入口](https://cloud.tencent.com/product/hd)
+
+[java层用反射接管InetAddress.getAllByName](https://sdk.cn/news/7795)， native层把 getaddrinfo 的内存地址替换成自定义的 my_getaddrinfo 地址
 
 至于原理嘛：在腾讯云的httpdns的jar文件解压之后找到一个MSDKDnsResolver文件，里面有几个很显眼的ip:
 182.254.116.117
