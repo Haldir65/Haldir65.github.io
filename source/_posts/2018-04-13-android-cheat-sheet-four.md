@@ -572,3 +572,34 @@ public Bitmap blurBitmap(Bitmap bitmap){
 在Android中webView是可以通过反射的方式为webView设置代理的
 [参考](https://www.jianshu.com/p/d02e8818a72e)。
 [蘑菇街在处理系统 WebView 请求的时候，为系统的 WebView 设置代理，将请求发送至本地端口。同时在网络库中实现了一个 Http Proxy Server，能转发所监听端口的 http，https 请求，所有接收到的 http，https 请求，可以经过自己的网络库转发出去，这样所有自有网络库的修改，优化都可以生效。](https://www.infoq.cn/article/mogujie-app-chromium-network-layer)
+
+
+## 21.Android上敏感信息存储本地应该存在哪里
+在shadowsocks-android中看到这样一段源码,外加这样一段注释说config文件属于敏感信息，要么加密保存，要么存在设备存储中
+```js
+  /**
+     * Sensitive shadowsocks configuration file requires extra protection. It may be stored in encrypted storage or
+     * device storage, depending on which is currently available.
+     */
+ val configRoot = (if (Build.VERSION.SDK_INT < 24 || app.getSystemService<UserManager>()
+                            ?.isUserUnlocked != false) app else Core.deviceStorage).noBackupFilesDir
+ val configFile =  File(configRoot, "shadowsocks.conf")                            
+```
+
+**isUserUnlocked（added in api 24）**
+>
+Return whether the calling user is running in an "unlocked" state.
+On devices with direct boot, a user is unlocked only after they've entered their credentials (such as a lock pattern or PIN). On devices without direct boot, a user is unlocked as soon as it starts.
+When a user is locked, only device-protected data storage is available. When a user is unlocked, both device-protected and credential-protected private app data storage is available.
+
+所以上面的文件路径在api 24或者userUnlocked（已经解锁）的情况下，用的是Application.noBackupFilesDir,否则用的是context.createDeviceProtectedStorageContext()创建出来的一个context(也就是在24以上)。noBackupFilesDir的意思只是不会被自动同步，这种敏感信息当然不应该被同步。
+
+至于安全性，getFilesDir()这种返回的属于internal Storage。根据[Commonsware的解释](https://stackoverflow.com/questions/43710317/is-storing-data-using-file-input-output-stream-method-secure)的解释，这个位置的文件只有当前app（或者有root权限的app）能够读或者写，其他的app一律deny。所以如果不考虑root的情况下，这个位置其实是很安全的。
+
+android:sharedUserId这个属性可以让两个app共享getFilesDir()下面的文件（前提是signing key相同），事实上这些文件的owner都是同一个linux user。
+最后提一下这个目录的位置
+```java
+File f=new File("/data/data/their.app.package.name/files/foo.txt");
+File f=new File(getFilesDir(), "foo.txt");
+```
+their.app.package.name这个文件夹下面有几个目录cache,shared_prefs...

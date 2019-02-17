@@ -390,6 +390,9 @@ ss-redir -u -c /etc/config/shadowsocks.json -f /var/run/shadowsocks.pid
 shell中全局的http代理可以这么设置
 ```
 export http_proxy=http://127.0.0.1:8118; export https_proxy=$http_proxy
+//如果是socks5协议的话可以改一下
+export http_proxy=socks5://127.0.0.1:8118; export https_proxy=$http_proxy
+//只对当前shell有效
 ```
 接下来，git、curl、wget 等命令会自动从环境变量中读取 http 代理信息，然后通过 http 代理连接目的服务器。但有些软件是不认这个的。
 那问题来了，ss-local 提供的是 socks5 代理，不能直接使用怎么办？也简单，Linux 中有很多将 socks5 包装为 http 代理的工具，比如 privoxy。只需要在 /etc/privoxy/config 里面添加一行 forward-socks5 / 127.0.0.1:1080 .，启动 privoxy，默认监听 127.0.0.1:8118 端口，注意别搞混了，8118 是 privoxy 提供的 http 代理地址，而 1080 是 ss-local 提供的 socks5 代理地址，发往 8118 端口的数据会被 privoxy 处理并转发给 ss-local。所以我们现在可以执行 export http_proxy=http://127.0.0.1:8118; export https_proxy=$http_proxy 来配置当前终端的 http 代理，这样 git、curl、wget 这些就会自动走 ss-local 出去了。

@@ -16,7 +16,6 @@ top : 1
 - [js 循环闭包的解决方法](https://segmentfault.com/a/1190000003818163)
 - 动态类型一时爽，代码重构火葬场
 - iview，elementUi
-- [ ] rxjava是如何切换线程的以及源码解析
 - [ ] shadowsocks-android源码（据说是起了一个c进程守护）
 - [ ] chromium net移植到Android平台[cronet是最简单的方式](https://github.com/GoogleChromeLabs/cronet-sample) [更多下载仓库](https://console.cloud.google.com/storage/browser/chromium-cronet?pli=1)
 - [embeed video with iframe](https://css-tricks.com/NetMag/FluidWidthVideo/Article-FluidWidthVideo.php)
@@ -108,6 +107,8 @@ top : 1
 - [X] render-script utility
 - [X]C语言fork进程以及进程之间通信的套路
 - [X] flex,grid. css的box-size真是坑人
+- [X] rxjava是如何切换线程的以及源码解析，ObserveOnObserver和ObservableSubscribeOn实例是桥梁
+
 
 
  
