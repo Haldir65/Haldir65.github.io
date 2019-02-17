@@ -4,59 +4,12 @@ jobs:
     branches:
       only:
         - source
-    working_directory: ~/mern-starter
     docker:
-      - image: circleci/node:8.11.2
+      — image: circleci/node:7.10
+    # working_directory: ~/repo
     steps:
-      - checkout
-      - run:
-          name: update-npm 
-          command: 'sudo npm install -g npm@latest'
-      - restore_cache: # special step to restore the dependency cache 
-          key: dependency-cache-{{ checksum "package.json" }}
-      - run:
-          name: install-npm-wee
-          command: npm install
-      - save_cache: # special step to save the dependency cache
-          key: dependency-cache-{{ checksum "package.json" }}
-          paths:
-            - ./node_modules
-  test:
-    branches:
-      only:
-        - source
-    docker:
-      - image: circleci/node:8.11.2
-    steps:
-      - checkout
-      - run:
-          name: update-npm 
-          command: 'sudo npm install -g npm@latest'
-      - run: # run tests
-          name: test
-          command: npm run-script test   
-# workflows:
-#   version: 2
-#   build_and_test:
-#     jobs:
-#       - build
-#           filters:
-#             branches:
-#               only: source
-#       - test
-#           filters:
-#             branches:
-#               only: source
+      — checkout
+      - run: npm install
 
-workflows:
-  version: 2
-  dev_stage_pre-prod:
-    jobs:
-      - build:
-          filters:
-            branches:
-              only: source
-      - test:
-          filters:
-            branches:
-              only: source
+ 
+      # — run: npm test
