@@ -16,7 +16,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/scenery1511100756208.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery1511100809920.jpg">
-<meta property="og:updated_time" content="2019-02-17T14:56:52.062Z">
+<meta property="og:updated_time" content="2019-02-24T15:29:15.215Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="VPS维护的日常">
 <meta name="twitter:image" content="https://haldir66.ga/static/imgs/scenery1511100756208.jpg">
@@ -254,7 +254,7 @@ python setup.py install
 <p>如果你的服务器Linux 内核在3.7+，可以开启fast_open 以降低延迟。<br>linux 内核版本查看：</p>
 <blockquote>
 <p>cat /proc/version</p>
-<p>ssserver -c config.json -d start #启动完成</p>
+<p>ssserver -c config.json -d start #启动完成<br>python3 shadowsocks/server.py -c yourconfig.json ## 这样也行</p>
 </blockquote>
 <p>检查下是否启动了</p>
 <blockquote>
@@ -365,6 +365,29 @@ cd .. &amp;&amp; rm -rf libsodium-${Libsodiumr_ver}.tar.gz &amp;&amp; rm -rf lib
 <p>curl -x ‘<a href="http://vivek:myPasswordHere@10.12.249.194:3128">http://vivek:myPasswordHere@10.12.249.194:3128</a>‘ -v -O <a href="https://dl.cyberciti.biz/pdfdownloads/b8bf71be9da19d3feeee27a0a6960cb3/569b7f08/cms/631.pdf">https://dl.cyberciti.biz/pdfdownloads/b8bf71be9da19d3feeee27a0a6960cb3/569b7f08/cms/631.pdf</a></p>
 </blockquote>
 <p><a href="https://linux.cn/article-9223-1.html">如何让 curl 命令通过代理访问</a><br>curl -x socks5://[user:password@]proxyhost[:port]/ url<br>curl –socks5 192.168.1.254:3099 <a href="https://www.cyberciti.biz/">https://www.cyberciti.biz/</a></p>
+<h3 id="ss各种加密算法跑分测试"><a href="#ss各种加密算法跑分测试" class="headerlink" title="ss各种加密算法跑分测试"></a>ss各种加密算法跑分测试</h3><p>首先安装iperf<br>apt-get install iperf<br><a href="https://gist.github.com/madeye/c046fc35e10a82154f4697fb316a7ac6">iperf.sh</a></p>
+<pre><code class="shell">#!/bin/bash
+
+method=$1
+
+ss-tunnel -k test -m $method -l 8387 -L 127.0.0.1:8388 -s 127.0.0.1 -p 8389 &amp;
+ss_tunnel_pid=$!
+ss-server -k test -m $method -s 127.0.0.1 -p 8389 &amp;
+ss_server_pid=$!
+
+iperf -s -p 8388 &amp;
+iperf_pid=$!
+
+sleep 3
+
+iperf -c 127.0.0.1 -p 8387
+
+kill $ss_tunnel_pid
+kill $ss_server_pid
+kill $iperf_pid
+
+echo &quot;Test Finished&quot;
+</code></pre>
 <h2 id="3-ubuntu自带的防火墙叫做ufw-Uncomplicated-Firewall-，用起来也很简单"><a href="#3-ubuntu自带的防火墙叫做ufw-Uncomplicated-Firewall-，用起来也很简单" class="headerlink" title="3. ubuntu自带的防火墙叫做ufw(Uncomplicated Firewall)，用起来也很简单"></a>3. ubuntu自带的防火墙叫做ufw(Uncomplicated Firewall)，用起来也很简单</h2><p><a href="https://www.digitalocean.com/community/tutorials/ufw-essentials-common-firewall-rules-and-commands">digital ocean的ufw教程</a></p>
 <h2 id="4-跑分"><a href="#4-跑分" class="headerlink" title="4.跑分"></a>4.跑分</h2><p><a href="https://github.com/Teddysun/across">VPS 跑分软件</a><br>git clone 下来</p>
 <pre><code class="bash">cd across
@@ -542,7 +565,7 @@ Softlayer, HongKong, CN         119.81.130.170          35.2MB/s
 <p>匹配成功<br>|  139.162.184.185 - - [29/Oct/2018:20:02:19 -0400] “\x15\x03\x03\x00\x02\x01\x00” 400 166 “-“ “-“</p>
 <p><a href="https://github.com/shadowsocks/shadowsocks-libev/blob/master/scripts/iperf.sh">iperf是linux下的一个tcp测速软件</a></p>
 <p><a href="http://frankchen.xyz/2018/04/08/private-BT-server/">vps挂下载</a>。注意transmission每次修改设置文件<br>sudo vim /etc/transmission-daemon/settings.json之前要先把transmission这个进程关掉，不然设置文件会被修改。<br>另外，设置文件中显示的rpc-password其实是hash之后的值，记住自己实际上写了什么就好。</p>
-<h2 id="参考-1"><a href="#参考-1" class="headerlink" title="参考"></a>参考</h2><p><a href="https://asm.ca.com/en/ping.php">国外的超级ping</a><br><a href="https://ipcheck.need.sh/">快速检测 IP 地址是否可用</a></p>
+<h2 id="参考-1"><a href="#参考-1" class="headerlink" title="参考"></a>参考</h2><p><a href="https://asm.ca.com/en/ping.php">国外的超级ping</a><br><a href="https://ipcheck.need.sh/">快速检测 IP 地址是否可用</a><br><a href="http://www.gonewto.com/?post/v4kfyi">路由器透明代理</a><br><a href="http://www.keepwn.com/technology/see-the-big-world-on-openwrt/">dnsmasq</a><br><a href="http://blog.zedyeung.com/2018/08/14/Ubuntu-18-04-set-up-Shadowsocks-server-with-fail2ban/">shadowsocks-libev fail2ban reg</a><br><a href="http://ip111.cn/">访问没有被封的国外网站所使用的IP</a></p>
 
       
 
@@ -885,10 +908,6 @@ Softlayer, HongKong, CN         119.81.130.170          35.2MB/s
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
@@ -934,6 +953,10 @@ Softlayer, HongKong, CN         119.81.130.170          35.2MB/s
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
               <li class="article-tag-list-item">

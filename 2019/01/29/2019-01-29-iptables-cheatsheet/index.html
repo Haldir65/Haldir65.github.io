@@ -17,7 +17,7 @@
 <meta property="og:description" content="iptables是控制linux 内核netfilter的command line frontend tool，只存在于linux平台，是system admin常用的防火墙。(虽然已经被nftables取代了，学习点网络知识还是很有必要)">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/lidongjieya_ZH-CN9263684179_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-02-17T14:56:52.066Z">
+<meta property="og:updated_time" content="2019-02-24T15:29:15.219Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iptables速查手册">
 <meta name="twitter:description" content="iptables是控制linux 内核netfilter的command line frontend tool，只存在于linux平台，是system admin常用的防火墙。(虽然已经被nftables取代了，学习点网络知识还是很有必要)">
@@ -415,7 +415,20 @@ iptables -L INPUT -s xxx.xxx.xxx.xxx -p tcp --dport 443 -j DROP
 # Values:  CMD
 #
 actionban = &lt;iptables&gt; -I f2b-&lt;name&gt; 1 -s &lt;ip&gt; -j &lt;blocktype&gt;
-</code></pre><h2 id="REDIRECT-Transparent-proxy-related"><a href="#REDIRECT-Transparent-proxy-related" class="headerlink" title="REDIRECT (Transparent proxy related)"></a>REDIRECT (Transparent proxy related)</h2><p>经常会看到教程如何把一台局域网linux nas或者虚拟机变成软路由的教程，首先需要设备开启ip转发</p>
+</code></pre><h2 id="REDIRECT-Transparent-proxy-related"><a href="#REDIRECT-Transparent-proxy-related" class="headerlink" title="REDIRECT (Transparent proxy related)"></a>REDIRECT (Transparent proxy related)</h2><p>首先来看一个把所有走网卡eth0的数据包都转发到redSocks的规则</p>
+<pre><code>// 新建路由转发表中的一个链 REDSOCKS
+sudo iptables -t nat -N REDSOCKS
+// 设置不需要代理转发的网段
+// 目的为墙外代理服务器的数据包一定不能转发
+sudo iptables -t nat -A REDSOCKS -d $SS_SERVER_IP -j RETURN
+// 目的为局域网和本地回环地址的数据包不用转发
+sudo iptables -t nat -A REDSOCKS -d 172.0.0.0/24 -j RETURN
+sudo iptables -t nat -A REDSOCKS -d 192.168.0.0/16 -j RETURN
+// 将数据包转发到 redsocks
+sudo iptables -t nat -A REDSOCKS -p tcp -j REDIRECT --to-ports 12345
+// 将 REDSOCKS 链的规则应用到经过 eth0 网卡的数据包
+sudo iptables -t nat -A OUTPUT -p tcp -o eth0 -j REDSOCKS
+</code></pre><p>经常会看到教程如何把一台局域网linux nas或者虚拟机变成软路由的教程，首先需要设备开启ip转发</p>
 <pre><code>cat /proc/sys/net/ipv4/ip_forward
 1 // 这个值默认是0
 </code></pre><p>比方说把所有incoming 流量(目标端口是80的)导向8080端口</p>
@@ -852,10 +865,6 @@ export http_proxy=socks5://127.0.0.1:8118; export https_proxy=$http_proxy
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
@@ -901,6 +910,10 @@ export http_proxy=socks5://127.0.0.1:8118; export https_proxy=$http_proxy
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
               <li class="article-tag-list-item">

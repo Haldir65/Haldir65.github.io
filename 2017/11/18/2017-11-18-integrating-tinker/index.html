@@ -17,7 +17,7 @@
 <meta property="og:description" content="关于Android Application集成Tinker的一次记录。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/single-yellow-beauty-flower-on-the-fence-wallpaper-56801fde208df.jpg">
-<meta property="og:updated_time" content="2019-02-17T14:56:52.058Z">
+<meta property="og:updated_time" content="2019-02-24T15:29:15.215Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="集成Tinker的一些记录">
 <meta name="twitter:description" content="关于Android Application集成Tinker的一次记录。">
@@ -315,6 +315,17 @@ Mainfest里面要改成上面那个“com.包名.SomeName”
 </blockquote>
 <p>Q: patch进程是如何和业务进程交互的<br>A： tinker-android/tinker-android-lib/src/main/AndroidManifest.xml中明确指明了打补丁是在一个youpackagename:patch的进程中去操作的。这样做也是为了减少对于主业务的影响。跨进程交互并没有写aidl，其实只是起了一个IntentService通知主业务进程。</p>
 <p>Q: 关于CLASS_ISPREVERIFIED这个关键词<br>A：dexElements数组更换之后就完事了？其实还差一个类的校验。这里不是说classLaoder的校验（这个好像有五个步骤），<a href="https://yq.aliyun.com/articles/70321">这篇文章</a>提到了</p>
+<p>Q: 多渠道要不要打多个包啊<br>A: 如果是使用productFlavor这种官方方式打出来的多渠道包，确实需要打多个补丁，这个gradle task的名字叫做<br>buildAllFlavorsTinkerPatchRelease(相当长)<br><a href="https://buglydevteam.github.io/2017/05/15/solution-of-multiple-channel-hotpatch/">bugly团队的解释</a>，因为</p>
+<pre><code class="java">public final class BuildConfig {
+  public static final boolean DEBUG = Boolean.parseBoolean(&quot;true&quot;);
+  public static final String APPLICATION_ID = &quot;com.example.application&quot;;
+  public static final String BUILD_TYPE = &quot;debug&quot;;
+  public static final String FLAVOR = &quot;&quot;;
+  public static final int VERSION_CODE = 1;
+  public static final String VERSION_NAME = &quot;1.0&quot;;
+}
+</code></pre>
+<p>不同的渠道包的BuildConfig这个class文件变量，所以最后的dex文件都不一样了。<br>所以更好的方式是使用美团的walle(往APK Signature Block这里添加ID-Value),能够这么做的原因仅仅是google目前还没对这块限制，也就是这里可以当做一个自定义的key-value存储block。<br>因为这种方式没有碰dex，所以就可以一个补丁修复所有渠道了（在bakApk文件夹下面不是有基准包嘛）</p>
 <p><strong>在apk安装的时候系统会将dex文件优化成odex文件，在优化的过程中会涉及一个预校验的过程<br>如果一个类的static方法，private方法，override方法以及构造函数中引用了其他类，而且这些类都属于同一个dex文件，此时该类就会被打上CLASS_ISPREVERIFIED<br>如果在运行时被打上CLASS_ISPREVERIFIED的类引用了其他dex的类，就会报错<br>所以MainActivity的onCreate()方法中引用另一个dex的类就会出现上文中的问题<br>正常的分包方案会保证相关类被打入同一个dex文件<br>想要使得patch可以被正常加载，就必须保证类不会被打上CLASS_ISPREVERIFIED标记。而要实现这个目的就必须要在分完包后的class中植入对其他dex文件中类的引用。<br>如果A类引用了C类，C类在其他Dex中，那么就可以避免A类被打上标记。只要在static方法，构造方法，private方法，Override方法中直接饮用了其他dex中的类，这个类就不会被打上CLASS_ISPREVERIFIED的标记。<br>要在已经编译完成后的类中植入对其他类的引用，就需要操作字节码，惯用的方案是插桩。常见的工具有javaassist，asm等。</strong></p>
 <p>所以QQ空间给出的方案是在所有class的构造函数中添加一行println(C.class)方法，直接引用另一个dex包中的类。这个添加的过程用javaAssist这种操作字节码的方式就可以简单实现<br><a href="https://blog.csdn.net/u010386612/article/details/51192421"> Android热补丁动态修复技术</a>这一系列文章介绍了使用gradle api对编译过程进行hook，实现自动化补丁操作的过程</p>
 <p>好的学习资料<br><a href="https://www.jianshu.com/p/7034c3fec6c8">Tinker学习计划(2)-Tinker的原理一</a><br><a href="https://www.jianshu.com/p/23ea8e332dcd">Android 基于gradle插件实现多渠道打包</a><br><a href="https://www.jianshu.com/p/53923d8f241c">加快apk的构建速度，如何把编译时间从130秒降到17秒</a><br><a href="https://github.com/typ0520/fastdex">fastdex</a><br><a href="https://github.com/typ0520/multiple-apk-generator">multiple-apk-generator</a></p>
@@ -688,10 +699,6 @@ final String url = urlBuilder.appendPath(this.appKey)
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
@@ -737,6 +744,10 @@ final String url = urlBuilder.appendPath(this.appKey)
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
               <li class="article-tag-list-item">

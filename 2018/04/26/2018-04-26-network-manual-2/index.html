@@ -17,7 +17,7 @@
 <meta property="og:description" content="OkHttp通过ConnectionPool做到tcp连接复用（在Timeout内）,所以并不是每个http都去建立一个tcp连接自定义通讯协议，使用java socket实现客户端和服务端。需要注意的是分包问题和黏包问题">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/jpglight-and-shadow-2411321_960_720.jpg">
-<meta property="og:updated_time" content="2019-02-17T14:56:52.062Z">
+<meta property="og:updated_time" content="2019-02-24T15:29:15.219Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="网络通信手册-2">
 <meta name="twitter:description" content="OkHttp通过ConnectionPool做到tcp连接复用（在Timeout内）,所以并不是每个http都去建立一个tcp连接自定义通讯协议，使用java socket实现客户端和服务端。需要注意的是分包问题和黏包问题">
@@ -487,7 +487,9 @@ Cookie: session=fsdaf;aaa=dfasf;......
 <p>c.限制所有人的TCP连接，除非从218.64.87.0 - 127访问<br>hosts.deny<br>ALL:ALL<br>hosts.allow<br>ALL:218.64.87.0/255.255.255.128</p>
 <p>d.限制218.64.87.0 - 127对所有服务的访问<br>hosts.deny<br>ALL:218.64.87.0/255.255.255.128</p>
 <p>其中冒号前面是TCP daemon的服务进程名称，通常系统<br>进程在/etc/inetd.conf中指定，比如in.ftpd，in.telnetd，in.sshd </p>
-<p>其中IP地址范围的写法有若干中，主要的三种是：<br>    1.网络地址–子网掩码方式：<br>        218.64.87.0/255.255.255.0<br>    2.网络地址方式（我自己这样叫，呵呵）<br>        218.64.（即以218.64打头的IP地址）<br>    3.缩略子网掩码方式，既数一数二进制子网掩码前面有多少个“1”比如：<br>        218.64.87.0/255.255.255.0 – 218.64.87.0/24</p>
+<p>其中IP地址范围的写法有若干中，主要的三种是：<br>    1.网络地址–子网掩码方式：<br>        218.64.87.0/255.255.255.0<br>    2.网络地址方式（我自己这样叫，呵呵）<br>        218.64.（即以218.64打头的IP地址）<br>    3.缩略子网掩码方式，即数一数二进制子网掩码前面有多少个“1”比如：<br>        218.64.87.0/255.255.255.0 – 218.64.87.0/24</p>
+<p>比方说：在子网192.168.20.0/30中，能接收到目的地址为192.168.20.3的IP分组的最大主机数是（）<br>到这个<a href="http://tool.chinaz.com/tools/subnetmask">在线子网掩码计算器</a>中输入，结果是<br>可用ip 2<br>掩码 255 255 255 252<br>网络 192 168 20 0<br>第一可用 192 168 20 1<br>第二可用 192 168 20 2<br>广播 192 168 20 3</p>
+<p>解释下就是 30 说明前面有30个1，后面只剩下俩位，也就是四种可能，但有俩是要保留给网络和广播的，所以只剩下2个</p>
 <blockquote>
 <p>NAPT原理<br>简单来说，在NAT网关上会有一张映射表，表上记录了内网向公网哪个IP和端口发起了请求，然后如果内网有主机向公网设备发起了请求，内网主机的请求数据包传输到了NAT网关上，那么NAT网关会修改该数据包的源IP地址和源端口为NAT网关自身的IP地址和任意一个不冲突的自身未使用的端口，并且把这个修改记录到那张映射表上。最后把修改之后的数据包发送到请求的目标主机，等目标主机发回了响应包之后，再根据响应包里面的目的IP地址和目的端口去映射表里面找到该转发给哪个内网主机。这样就实现了内网主机在没有公网IP的情况下，通过NAPT技术借助路由器唯一的一个公网IP来访问公网设备。<br>在较早以前的 RFC 1918 文档中对私有地址有相关的说明。</p>
 </blockquote>
@@ -838,10 +840,6 @@ Cookie: session=fsdaf;aaa=dfasf;......
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
@@ -887,6 +885,10 @@ Cookie: session=fsdaf;aaa=dfasf;......
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
               <li class="article-tag-list-item">

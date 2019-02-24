@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/01f691dea62d22e138481a353fbb6228.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/ascii-Table.jpg">
-<meta property="og:updated_time" content="2019-02-17T14:56:52.058Z">
+<meta property="og:updated_time" content="2019-02-24T15:29:15.211Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="二进制编码总结">
 <meta name="twitter:description" content="OkHttp作者Jesse Wilson在2016 Droidcon NYC上作了一篇关于编码的演讲，十分有趣。对于了解计算机基础非常有用，结合着写一些关于这方面的笔记。">
@@ -453,7 +453,19 @@ tv.setTextColor(Color.rgb(255, 255, 255));
 <blockquote>
 <p>scaledWidth<em>scaledHeight</em>4</p>
 </blockquote>
-<p><a href="https://kotlintc.com/articles/3875?fr=sidebar">一篇研究bitmap存储位置的文章，讲到cpp层</a>。<br>根据<a href="https://stackoverflow.com/questions/4576909/understanding-canvas-and-surface-concepts/4577249#4577249">Dianne Hackborn的解释</a></p>
+<p><a href="https://kotlintc.com/articles/3875?fr=sidebar">一篇研究bitmap存储位置的文章，讲到cpp层</a>。</p>
+<p>找到了cpp层调用java层的gVMRuntime_newNonMovableArray方法:<br><a href="https://android.googlesource.com/platform/frameworks/base.git/+/nougat-release/core/jni/android/graphics/Graphics.cpp">至少到了7.0还是通过jni把像素这个数据大户放到了java heap上面</a></p>
+<pre><code class="cpp">android::Bitmap* GraphicsJNI::allocateJavaPixelRef(JNIEnv* env, SkBitmap* bitmap,
+                                             SkColorTable* ctable) {
+
+    jbyteArray arrayObj = (jbyteArray) env-&gt;CallObjectMethod(gVMRuntime,
+                                                             gVMRuntime_newNonMovableArray,
+                                                             gByte_class, size);
+    return wrapper;
+}
+</code></pre>
+<p><a href="https://www.jianshu.com/p/d5714e8987f3">Android Bitmap变迁与原理解析（4.x-8.x）</a>谈到了这一块的分配非常乱</p>
+<p>根据<a href="https://stackoverflow.com/questions/4576909/understanding-canvas-and-surface-concepts/4577249#4577249">Dianne Hackborn的解释</a></p>
 <blockquote>
 <p>A Bitmap is just an interface to some pixel data. The pixels may be allocated by Bitmap itself when you are directly creating one, or it may be pointing to pixels it doesn’t own such as what internally happens to hook a Canvas up to a Surface for drawing. (A Bitmap is created and pointed to the current drawing buffer of the Surface.)</p>
 </blockquote>
@@ -1062,10 +1074,6 @@ for(int i = 0; i&lt; size; i++){
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
@@ -1111,6 +1119,10 @@ for(int i = 0; i&lt; size; i++){
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
               <li class="article-tag-list-item">
