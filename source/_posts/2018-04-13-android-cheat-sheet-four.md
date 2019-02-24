@@ -603,3 +603,51 @@ File f=new File("/data/data/their.app.package.name/files/foo.txt");
 File f=new File(getFilesDir(), "foo.txt");
 ```
 their.app.package.name这个文件夹下面有几个目录cache,shared_prefs...
+
+## 22. 在Android上使用mmap等linux通信手段
+> 在数据访问中，内存的访问速度肯定是最快的，所以对于有些文件需要频繁高效访问的时候就可以考虑使用内存映射进行直接读写操作，代替IO读写，达到更高的效率。
+
+[Android简单内存映射与访问](http://www.wxtlife.com/2016/01/17/Android-memory-map/) Linux提供了内存映射函数mmap, 它把文件内容映射到一段内存上(准确说是虚拟内存上), 通过对这段内存的读取和修改, 实现对文件的读取和修改,mmap()系统调用使得进程之间可以通过映射一个普通的文件实现共享内存。普通文件映射到进程地址空间后，进程可以向访问内存的方式对文件进行访问，不需要其他系统调用(read,write)去操作。
+
+
+[进程崩溃时，mmap的内存内核是会帮你写回到磁盘的](https://github.com/wangxuemin/myblog/blob/master/md_bk/linux中mmap文件到内存中，该进程发生错误被挂掉后mmap映射的内存能否写回到文件中的问题.md)
+
+当然可以自己写jni打成so文件，只是jdk已经提供了写好的jni（其实MappedByteBuffer就是简单的一层c语言mmap包裹），没必要自己写
+```java
+private MappedByteBuffer memoryMap = null;
+private void initMemoryMap() {
+		if (memoryMap == null) {
+			RandomAccessFile raf = null;
+			try {
+				// 和前面c++映射的文件名一致。
+				raf = new RandomAccessFile("/tmp/memory_map", "rw");
+				FileChannel fc = raf.getChannel();
+				memoryMap = fc.map(FileChannel.MapMode.READ_WRITE, 0, 16);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				if (raf != null) {
+					try {
+						raf.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+	}
+```
+通过FileChannel的map(),可以将指定区域范围的文件直接读到内存中，返回MappedByteBuffer类型,这里称之为内存映射.然后通过MappedByteBuffer取或写对应标记位数据。
+如何取呢？通过memoryMap.get(index) 来取指定位置的字节数据，index根据标记位的位置来确认，比如前面mFlag的标记位为是在文件头向后偏移了一个4个字节，所以这里要取相同的值则是要使用memoryMap.get(4)即可，如果要设置标记位的值可以使用put(index,value)函数，例如：memoryMap.put(4,(byte)1);
+其实在Android上层也很简单，相当于读文件，**把文件描述符映射到内存中，这种方式比每次进行文件IO操作肯定快很多。** 想到什么？ log4j使用mmmap将写日志变成对内存的操作 [早就有人这样做了](https://github.com/pqpo/Log4a) 注意的是，快是快，但多线程操作还是要加锁，多进程操作还是要用信号量同步
+
+类似的使用mmap的库还有很多: mmkv (腾讯的KV存储),Tokyo Cabinet (比较早的一个kv存储系统)
+
+## 23. Android图片质量会比iPhone的差是有原因的
+[替换libjpeg库](https://www.jianshu.com/p/9b47fc25f526)
+大致是，Android编码保存图片就是通过Java层函数——Native层函数——Skia库函数——对应第三方库函数（例如libjpeg），这一层层调用做到的。 libjpeg在压缩图像时，有一个参数叫optimize_coding，如果设置optimize_coding为TRUE，将会使得压缩图像过程中基于图像数据计算哈弗曼表，由于这个计算会显著消耗空间和时间，默认值被设置为FALSE。对于当时的计算设备来说，空间和时间的消耗可能是显著的，但到今天，这似乎不应再是问题。但谷歌的Skia项目工程师们对optimize_coding在Skia中默认的等于了FALSE，这就意味着更差的图片质量和更大的图片文件。还有其他和iOS的比较可以看下。
+也讲到了Android可以替换libjpeg库达到设置为TRUE的目的。
+[Android图片编码机制深度解析（Bitmap，Skia，libJpeg）](http://www.cnblogs.com/hrlnw/p/4403334.html)
+

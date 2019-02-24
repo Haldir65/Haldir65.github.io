@@ -374,6 +374,22 @@ if (willScale && decodeMode != SkImageDecoder::kDecodeBounds_Mode) {
 > scaledWidth*scaledHeight*4
 
 [一篇研究bitmap存储位置的文章，讲到cpp层](https://kotlintc.com/articles/3875?fr=sidebar)。
+
+
+找到了cpp层调用java层的gVMRuntime_newNonMovableArray方法:
+[至少到了7.0还是通过jni把像素这个数据大户放到了java heap上面](https://android.googlesource.com/platform/frameworks/base.git/+/nougat-release/core/jni/android/graphics/Graphics.cpp)
+```cpp
+android::Bitmap* GraphicsJNI::allocateJavaPixelRef(JNIEnv* env, SkBitmap* bitmap,
+                                             SkColorTable* ctable) {
+    
+    jbyteArray arrayObj = (jbyteArray) env->CallObjectMethod(gVMRuntime,
+                                                             gVMRuntime_newNonMovableArray,
+                                                             gByte_class, size);
+    return wrapper;
+}
+```
+[Android Bitmap变迁与原理解析（4.x-8.x）](https://www.jianshu.com/p/d5714e8987f3)谈到了这一块的分配非常乱
+
 根据[Dianne Hackborn的解释](https://stackoverflow.com/questions/4576909/understanding-canvas-and-surface-concepts/4577249#4577249)
 > A Bitmap is just an interface to some pixel data. The pixels may be allocated by Bitmap itself when you are directly creating one, or it may be pointing to pixels it doesn't own such as what internally happens to hook a Canvas up to a Surface for drawing. (A Bitmap is created and pointed to the current drawing buffer of the Surface.)
 

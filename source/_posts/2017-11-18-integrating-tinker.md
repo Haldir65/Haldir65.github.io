@@ -177,6 +177,26 @@ A： tinker-android/tinker-android-lib/src/main/AndroidManifest.xml中明确指�
 Q: 关于CLASS_ISPREVERIFIED这个关键词
 A：dexElements数组更换之后就完事了？其实还差一个类的校验。这里不是说classLaoder的校验（这个好像有五个步骤），[这篇文章](https://yq.aliyun.com/articles/70321)提到了
 
+Q: 多渠道要不要打多个包啊
+A: 如果是使用productFlavor这种官方方式打出来的多渠道包，确实需要打多个补丁，这个gradle task的名字叫做
+buildAllFlavorsTinkerPatchRelease(相当长)
+[bugly团队的解释](https://buglydevteam.github.io/2017/05/15/solution-of-multiple-channel-hotpatch/)，因为
+```java
+public final class BuildConfig {
+  public static final boolean DEBUG = Boolean.parseBoolean("true");
+  public static final String APPLICATION_ID = "com.example.application";
+  public static final String BUILD_TYPE = "debug";
+  public static final String FLAVOR = "";
+  public static final int VERSION_CODE = 1;
+  public static final String VERSION_NAME = "1.0";
+}
+```
+不同的渠道包的BuildConfig这个class文件变量，所以最后的dex文件都不一样了。
+所以更好的方式是使用美团的walle(往APK Signature Block这里添加ID-Value),能够这么做的原因仅仅是google目前还没对这块限制，也就是这里可以当做一个自定义的key-value存储block。
+因为这种方式没有碰dex，所以就可以一个补丁修复所有渠道了（在bakApk文件夹下面不是有基准包嘛）
+
+
+
 **在apk安装的时候系统会将dex文件优化成odex文件，在优化的过程中会涉及一个预校验的过程
 如果一个类的static方法，private方法，override方法以及构造函数中引用了其他类，而且这些类都属于同一个dex文件，此时该类就会被打上CLASS_ISPREVERIFIED
 如果在运行时被打上CLASS_ISPREVERIFIED的类引用了其他dex的类，就会报错

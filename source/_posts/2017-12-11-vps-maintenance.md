@@ -93,6 +93,7 @@ linux 内核版本查看：
 > cat /proc/version
 
 > ssserver -c config.json -d start #启动完成
+> python3 shadowsocks/server.py -c yourconfig.json ## 这样也行
 
 检查下是否启动了
 
@@ -249,6 +250,34 @@ sudo apt-get install simple-obfs
 [如何让 curl 命令通过代理访问](https://linux.cn/article-9223-1.html)
 curl -x socks5://[user:password@]proxyhost[:port]/ url
 curl --socks5 192.168.1.254:3099 https://www.cyberciti.biz/
+
+### ss各种加密算法跑分测试
+首先安装iperf
+apt-get install iperf 
+[iperf.sh](https://gist.github.com/madeye/c046fc35e10a82154f4697fb316a7ac6)
+```shell
+#!/bin/bash
+
+method=$1
+
+ss-tunnel -k test -m $method -l 8387 -L 127.0.0.1:8388 -s 127.0.0.1 -p 8389 &
+ss_tunnel_pid=$!
+ss-server -k test -m $method -s 127.0.0.1 -p 8389 &
+ss_server_pid=$!
+
+iperf -s -p 8388 &
+iperf_pid=$!
+
+sleep 3
+
+iperf -c 127.0.0.1 -p 8387
+
+kill $ss_tunnel_pid
+kill $ss_server_pid
+kill $iperf_pid
+
+echo "Test Finished"
+```
 
 
 ## 3. ubuntu自带的防火墙叫做ufw(Uncomplicated Firewall)，用起来也很简单
@@ -532,7 +561,11 @@ sudo fail2ban-regex /var/log/nginx/access.log /etc/fail2ban/filter.d/nginx-x00.c
 sudo vim /etc/transmission-daemon/settings.json之前要先把transmission这个进程关掉，不然设置文件会被修改。
 另外，设置文件中显示的rpc-password其实是hash之后的值，记住自己实际上写了什么就好。
 
+
 ## 参考
 [国外的超级ping](https://asm.ca.com/en/ping.php)
 [快速检测 IP 地址是否可用](https://ipcheck.need.sh/)
-
+[路由器透明代理](http://www.gonewto.com/?post/v4kfyi)
+[dnsmasq](http://www.keepwn.com/technology/see-the-big-world-on-openwrt/)
+[shadowsocks-libev fail2ban reg](http://blog.zedyeung.com/2018/08/14/Ubuntu-18-04-set-up-Shadowsocks-server-with-fail2ban/)
+[访问没有被封的国外网站所使用的IP](http://ip111.cn/)

@@ -303,11 +303,30 @@ actionban = <iptables> -I f2b-<name> 1 -s <ip> -j <blocktype>
 ```
 
 ## REDIRECT (Transparent proxy related)
+首先来看一个把所有走网卡eth0的数据包都转发到redSocks的规则
+```
+// 新建路由转发表中的一个链 REDSOCKS
+sudo iptables -t nat -N REDSOCKS
+// 设置不需要代理转发的网段
+// 目的为墙外代理服务器的数据包一定不能转发
+sudo iptables -t nat -A REDSOCKS -d $SS_SERVER_IP -j RETURN
+// 目的为局域网和本地回环地址的数据包不用转发
+sudo iptables -t nat -A REDSOCKS -d 172.0.0.0/24 -j RETURN
+sudo iptables -t nat -A REDSOCKS -d 192.168.0.0/16 -j RETURN
+// 将数据包转发到 redsocks
+sudo iptables -t nat -A REDSOCKS -p tcp -j REDIRECT --to-ports 12345
+// 将 REDSOCKS 链的规则应用到经过 eth0 网卡的数据包
+sudo iptables -t nat -A OUTPUT -p tcp -o eth0 -j REDSOCKS
+```
+
+
 经常会看到教程如何把一台局域网linux nas或者虚拟机变成软路由的教程，首先需要设备开启ip转发
 ```
 cat /proc/sys/net/ipv4/ip_forward
 1 // 这个值默认是0
 ```
+
+
 
 比方说把所有incoming 流量(目标端口是80的)导向8080端口
 ```

@@ -188,7 +188,7 @@ Linux相关
 - [X] TCP UDP的不同 TCP三次握手，wireShark[抓包](https://www.youtube.com/watch?v=r0l_54thSYU),抓一个App的包，模拟请求
 - [X] 如何维持一个长连接
 - [ ] 点击一个网址底层经历哪些过程
-- [ ] ffmpeg[参考教程](http://blog.csdn.net/leixiaohua1020/article/details/15811977)
+- [X] ffmpeg[参考教程](http://blog.csdn.net/leixiaohua1020/article/details/15811977)
 
 Gradle相关
 - [ ]写一些DSL吧[Old Driver](https://github.com/Ccixyj/JBusDriver)
@@ -206,13 +206,13 @@ Python
 - [ ] Realm的优点
 
 C语言从入门到放弃
-- [ ] 加载ffmpeg需要，不得不学[ffmpeg教程](http://blog.csdn.net/leixiaohua1020/article/details/47008825)
+- [X] 加载ffmpeg需要，不得不学[ffmpeg教程](http://blog.csdn.net/leixiaohua1020/article/details/47008825)
 
 
 数据结构，算法(注意，不值得深究)
 - [ ] 数据结构，操作系统
 - [X] 编码，底层二进制
-- [ ] 二分法查找，排序，冒泡，复杂度
+- [X] 二分法查找，排序，冒泡，复杂度
 - [ ] 数组跟链表区别,数组跟链表排序时区别,数组跟链表排序时区别
 - [ ] 八大排序[算法](http://www.cnblogs.com/123hll/p/6903454.html)
 - [ ] 算法刷题网站[剑指offer](https://www.nowcoder.com/ta/coding-interviews),[leetcode](https://www.nowcoder.com/ta/leetcode)

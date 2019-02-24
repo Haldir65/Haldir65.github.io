@@ -178,7 +178,7 @@ android {
 }
 ```
 
-###调用ndk的api
+### 调用ndk的api
 比方说这种头文件
 ```c
 #include <android/native_window_jni.h>
