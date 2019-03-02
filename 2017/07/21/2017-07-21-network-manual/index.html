@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/b9ae1189145b4a4d9dfe4d0b89a21b47.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/ed541bc1ed61ead0bf6ea8233ef01c0a.jpg">
-<meta property="og:updated_time" content="2019-02-24T15:30:03.569Z">
+<meta property="og:updated_time" content="2019-03-02T14:34:42.255Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="网络通信手册">
 <meta name="twitter:description" content="网络相关的查找手册">
@@ -440,7 +440,7 @@ Postman-Token: ddc99b57-f703-4d05-abbe-c0123d4f5fed
 <p>这篇文章顺便提到了如果在Token过期的时候去实现重刷Token的操作，首先客户端<strong>绝对不会</strong>存账户密码这种敏感信息。第一次登录成功后，后台返回token(有一定时长有效期)和一个refreshToken(如果前面的token失效了，直接拿着这个去请求后台给个新的Token)。所以客户端基本上就是在onError里面判断如果是Token失效的话，拿着refreshToken去重新获取Token。</p>
 <p>token的话，一般是和用户一一对应的， 放在http的header里也行，放在cookie里面也行（不大好，CSRF漏洞），放在post请求的body里面也行。</p>
 <p><a href="https://segmentfault.com/q/1010000008903882">session和简单的token本质上都是一串加密的字符串</a>，只不过session一般放cookie里面，浏览器对这个支持比较好，android和ios一般不会一直维护一个webview专门用来存session_id，所以用token比较合适。<a href="https://www.v2ex.com/t/148426">v2上有人讨论session和token的区别</a>。但要是说oAuth Token，这还是比session复杂得多的。</p>
-<h2 id="5-长连接"><a href="#5-长连接" class="headerlink" title="5. 长连接"></a>5. 长连接</h2><p>像即时通讯软件，或者消息推送这种场景，都得维护一个长连接。<br><a href="http://blog.csdn.net/mr_liabill/article/details/50705130">HTTP长连接和短连接</a></p>
+<h2 id="5-长连接"><a href="#5-长连接" class="headerlink" title="5. 长连接"></a>5. 长连接</h2><p>像即时通讯软件，或者消息推送这种场景，都得维护一个长连接。<br><a href="http://blog.csdn.net/mr_liabill/article/details/50705130">HTTP长连接和短连接</a><br>HTTP那个长连接更多的时候被叫做“持久连接”<br>tcp 长连接 的时间默认是2小时 ： /proc/sys/net/ipv4/tcp_keepalive_time 7200</p>
 <h3 id="5-1长连接的实现原理"><a href="#5-1长连接的实现原理" class="headerlink" title="5.1长连接的实现原理"></a>5.1长连接的实现原理</h3><ul>
 <li>轮询</li>
 <li>维护长连接的心跳(心跳的目的很简单：通过定期的数据包，对抗NAT超时)</li>

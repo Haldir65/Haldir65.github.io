@@ -19,7 +19,7 @@
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/dispatch_touch_event_video.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/touch_event_1.png">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/touch_event_2.png">
-<meta property="og:updated_time" content="2019-02-24T15:30:03.581Z">
+<meta property="og:updated_time" content="2019-03-02T14:34:42.267Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="安卓事件分发流程">
 <meta name="twitter:description" content="图1 默认情况下事件传递的路径  Touch事件始于ACTION_DOWN, 终止于ACTION_UP, 这其中可能会伴随着ACTION_MOVE,ACTION_CANCEL等等。">
@@ -707,22 +707,51 @@ private class GestureListener extends GestureDetector.SimpleOnGestureListener {
 </code></pre>
 <p>而在ViewGroup那一层，如果交给child.dispatchTouchEvent都不愿处理的话，默认会调用View.dispatchTouchEvent，这里面多半会调到自己的onTouchEvent。所以Activity -&gt; ViewGroup -&gt; View -&gt; ViewGroup -&gt; Activity这一个流程是没错的。难点就在于这个ViewGroup -&gt; View的层级有多深。<br>在ViewGroup里面，往子View下发TouchEvent的唯一途径是dispatchTransformedTouchEvent。这个方法的调用次数也不多，估计就是在这里控制住的。</p>
 </li>
-<li><p>TouchEvent只是java层的抽象<br>之前看过一篇文章，是用户手指在LCD面板上面滑动产生电阻变化，硬件由此产生中断。接下来的顺序是<br>Driver -&gt; kernel -&gt; Framework -&gt; Application -&gt; UserInterface ，说的非常好，好像是知乎上的，可惜一时间找不到出处了。</p>
+<li><p>TouchEvent只是java层的抽象<br><a href="https://www.jianshu.com/p/b7cef3b3e703">Linux内核会将硬件产生的触摸事件包装为Event存到/dev/input/event[x]目录下</a>当屏幕被触摸，Linux内核会将硬件产生的触摸事件包装为Event存到/dev/input/event[x]目录下。对，你没看错，事件被搞成文件保存了下来！<br>接着，系统创建的一个InputReaderThread线程loop起来让EventHub调用getEvent()不断的从/dev/input/文件夹下读取输入事件。<br>然后InputReader则从EventHub中获得事件交给InputDispatch。<br>而InputDispatch又会把事件分发到需要的地方，比如ViewRootImpl的WindowInputEventReceiver中。<br>以上过程是在底层中完成，大部分由c++实现，我们了解流程就好</p>
 </li>
 </ol>
-<ul>
-<li><h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2></li>
-</ul>
-<ol>
+<h2 id="7-从cpp层到java层的转换"><a href="#7-从cpp层到java层的转换" class="headerlink" title="7. 从cpp层到java层的转换"></a>7. 从cpp层到java层的转换</h2><p><a href="https://www.jianshu.com/p/38f2da61973d">从底层cpp说去</a><br><a href="https://www.jianshu.com/p/b7cef3b3e703">从cpp层讲到java层</a><br>   ​</p>
+<h2 id="8-MotionEvent-getAction和MotionEvent-getActionMasked的区别"><a href="#8-MotionEvent-getAction和MotionEvent-getActionMasked的区别" class="headerlink" title="8. MotionEvent.getAction和MotionEvent.getActionMasked的区别"></a>8. MotionEvent.getAction和MotionEvent.getActionMasked的区别</h2><p>先来看下这些数分别是多少</p>
+<pre><code class="java">ACTION_MASK             0x000000ff (0x表示16进制，两个数代表一个byte,8位，所以都是Int)
+ACTION_DOWN             0x00000000 
+ACTION_UP               0x00000001  
+ACTION_MOVE             0x00000002 
+ACTION_POINTER_DOWN     0x00000005 
+ACTION_POINTER_UP       0x00000006 
+ACTION_POINTER_1_DOWN   0x00000005  
+ACTION_POINTER_1_UP     0x00000006   
+ACTION_POINTER_2_DOWN   0x00000105   
+ACTION_POINTER_2_UP     0x00000106 
+ACTION_POINTER_3_DOWN   0x00000205           
+ACTION_POINTER_3_UP     0x00000206 
+
+public final int getAction() {
+    return nativeGetAction(mNativePtr);
+}
+
+
+public final int getActionMasked() {
+    return nativeGetAction(mNativePtr) &amp; ACTION_MASK;
+}
+
+public final int getActionIndex() {
+    return (nativeGetAction(mNativePtr) &amp; ACTION_POINTER_INDEX_MASK)
+            &gt;&gt; ACTION_POINTER_INDEX_SHIFT;
+}
+</code></pre>
+<p>我们发现单指DOWN/UP分别为 0x005和0x006, 而双值和三指DOWN/UP分别为 0x105和0x106,0x205和0x206<br>假设当前触摸动作为ACTIONPOINTER2_DOWN时，</p>
+<pre><code class="java">int action=0x105;
+int maskAction=0x0ff&amp;0x105; //  maskAction=0x005;
+</code></pre>
+<p>如此，触摸动作含义改变为ACTIONPOINTERDOWN。<br>三根手指同时move汇集到应用层，接收到的是ACTION_POINTER_3_MOVE.<br>结论是，getActionIndex就是获取 0x00000206 里面那个2，也就是第几根手指上去的。getActionMasked就是，我不管你是1根手指DOWN，2根手指DOWN还是3根手指DOWN上去，mask之后全部变成ACTION_DOWN。所以一般来说，ACTION_POINTER_2_DOWN这一类的东西通常用于多点触控。一个Int 4个byte，第三个byte保存index（第几根手指），第四个byte保存类型（DOWN,MOVE还是别的什么）</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ol>
 <li><a href="http://www.jianshu.com/p/e99b5e8bd67b">图解安卓事件分发机制</a></li>
 <li><a href="https://www.youtube.com/watch?v=usBaTHZdXSI">making sense of the touch system</a></li>
 <li><a href="http://blog.csdn.net/ddna/article/details/5451722">Android onTouchEvent, onClick及onLongClick的调用机制</a></li>
 <li><a href="http://wangkuiwu.github.io/2015/01/03/TouchEvent-View/">Android触摸事件机制(三)</a></li>
 <li><a href="http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2013/0225/907.html">ViewConfiguration用法</a></li>
 <li><a href="http://glblong.blog.51cto.com/3058613/1559320">触摸事件的分析与总结</a></li>
-<li><p><a href="http://mouxuejie.com/blog/2016-05-01/view-touch-event-source-analysis/">View事件分发及消费源码分析</a></p>
-<p>​</p>
-</li>
+<li><a href="http://mouxuejie.com/blog/2016-05-01/view-touch-event-source-analysis/">View事件分发及消费源码分析</a></li>
 </ol>
 
       

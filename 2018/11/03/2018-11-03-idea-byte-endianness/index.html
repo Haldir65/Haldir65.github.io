@@ -16,7 +16,7 @@
 <meta property="og:description" content="字节序（Endianness），在计算机科学领域中，是跨越多字节的程序对象的存储规则。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/ship_docking_along_side_bay.jpg">
-<meta property="og:updated_time" content="2019-02-24T15:30:03.577Z">
+<meta property="og:updated_time" content="2019-03-02T14:34:42.263Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="网络传输的字节序问题">
 <meta name="twitter:description" content="字节序（Endianness），在计算机科学领域中，是跨越多字节的程序对象的存储规则。">
@@ -288,8 +288,7 @@ s.send(b&#39;GET / HTTP/1.1\r\nHost: www.sina.com.cn\r\nConnection: close\r\n\r\
 # 接收数据:
 buffer = []
 while True:
-    # 每次最多接收1个字节:
-    d = s.recv(1)
+    d = s.recv(1) ##其实这里应该是有误区的，，recv并不是从socket里直接读数据，recv只是从tcp的buffer中(已经帮我们转成了小端，所以这事应该得抓包才能看懂）
     t = &#39;&#39;
     for x in d:
         print(format(x,&#39;b&#39;))
@@ -316,10 +315,10 @@ s.close()
 0
 0
 0
-</code></pre><p>按照server端(intel cpu)是小端的理论，把上面接收到的横过来掉个头<br>前四个字节是”1”<br>1   0   0   0<br>0   0   0   1  -&gt; 显然是1</p>
+</code></pre><p>前四个字节是”1”<br>1   0   0   0<br>0   0   0   1  -&gt; 显然是1</p>
 <p>中间四个字节是”2”<br>10  0   0   0<br>0   0   0   10 -&gt; 显然是2</p>
 <p>最后四个字节是”3”<br>11  0   0   0<br>0   0   0   11 -&gt; 显然是3</p>
-<p>教科书诚不我欺也</p>
+<p>这个实验其实没有证明什么，c语言端发出的int[3] = {1, 2, 3}在走tcp层的时候其实是[0001, 0002, 0003]这么发的，达到达客户端的时候，客户端的tcp buffer收到了之后手动把每个转成小端[1000, 2000,3000] ，应用层程序读取的时候是从这个buffer里面读取的</p>
 <p>这里如果把c语言的server改一下</p>
 <pre><code class="c">float a[3]={1,2,3}; //在这里发送出byte数组
 send(sock_client,(char*)a,sizeof(a),0);

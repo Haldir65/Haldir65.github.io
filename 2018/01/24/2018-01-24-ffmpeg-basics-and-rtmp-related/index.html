@@ -16,7 +16,7 @@
 <meta property="og:description" content="ffmpeg安装手记">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/water foot cold dark river.jpg">
-<meta property="og:updated_time" content="2019-02-24T15:30:03.573Z">
+<meta property="og:updated_time" content="2019-03-02T14:34:42.259Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ffmpeg知识手册">
 <meta name="twitter:description" content="ffmpeg安装手记">
@@ -436,7 +436,61 @@ ga('send', 'pageview');
     }
 }
 </code></pre>
-<p><a href="https://blog.csdn.net/zhi184816/article/details/52514138">Android 视频分离和合成(MediaMuxer和MediaExtractor)</a></p>
+<p><a href="https://blog.csdn.net/zhi184816/article/details/52514138">Android 视频分离和合成(MediaMuxer和MediaExtractor)</a><br><a href="https://github.com/PhilLab/Android-MediaCodec-Examples">关于MediaCodec这个类的使用</a></p>
+<p>这里贴一个NV21和Yuv420之间的转换</p>
+<pre><code class="java">public class Yuv420Util {
+    /**
+     * Nv21:
+     * YYYYYYYY
+     * YYYYYYYY
+     * YYYYYYYY
+     * YYYYYYYY
+     * VUVU
+     * VUVU
+     * VUVU
+     * VUVU
+     * &lt;p&gt;
+     * I420:
+     * YYYYYYYY
+     * YYYYYYYY
+     * YYYYYYYY
+     * YYYYYYYY
+     * UUUU
+     * UUUU
+     * VVVV
+     * VVVV
+     *
+     * @param data
+     * @param dstData
+     * @param w
+     * @param h
+     */
+    public static void Nv21ToI420(byte[] data, byte[] dstData, int w, int h) {
+
+        int size = w * h;
+        // Y
+        System.arraycopy(data, 0, dstData, 0, size);//Y都是一样的
+        for (int i = 0; i &lt; size / 4; i++) {
+            dstData[size + i] = data[size + i * 2 + 1]; //U
+            dstData[size + size / 4 + i] = data[size + i * 2]; //V
+        }
+    }
+
+// Nv21 to Yuv Semi Planar
+    public static void Nv21ToYuv420SP(byte[] data, byte[] dstData, int w, int h) {
+        int size = w * h;
+        // Y都是一样的
+        System.arraycopy(data, 0, dstData, 0, size);
+
+        for (int i = 0; i &lt; size / 4; i++) {
+            dstData[size + i * 2] = data[size + i * 2 + 1]; //U
+            dstData[size + i * 2 + 1] = data[size + i * 2]; //V
+        }
+    }
+
+}
+</code></pre>
+<p><a href="https://github.com/cats-oss/android-gpuimage/blob/master/library/src/main/cpp/yuv-decoder.c">c语言的实现YUVtoRBGA和YUVtoARBG</a> </p>
 <h2 id="Exoplayer"><a href="#Exoplayer" class="headerlink" title="Exoplayer"></a>Exoplayer</h2><p>查看exoplayer的源码，dataSource在拉到数据之后，最终交给MediaCodecRender，后者调用processOutputBuffer，核心代码是这句:</p>
 <pre><code class="java">codec.releaseOutputBuffer(bufferIndex, releaseTimeNs);//codec是MediaCodec实例
 

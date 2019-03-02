@@ -16,7 +16,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/street%20lights%20dark%20night%20car%20city%20bw.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/toast_transact.jpg">
-<meta property="og:updated_time" content="2019-02-24T15:30:03.573Z">
+<meta property="og:updated_time" content="2019-03-02T14:34:42.259Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android知识集合[四]">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/street%20lights%20dark%20night%20car%20city%20bw.jpg">
@@ -454,7 +454,96 @@ public class RoundCornerImageView1 extends AppCompatImageView {
 <p>先写好java的native方法，然后cd到src/main/java路径<br>javah -d jni com.your.package.name.classyoujustWroteWithnativeMethod</p>
 <p>把生成的header文件剪切到和main/Java文件夹平级的jni文件夹中，再去写c的实现。<br>注意的一小点是： printf是不会打印到logcat里面的，需要使用android/log.h头文件里面的东西</p>
 <p>移植mp3lame到Android平台照着<a href="https://www.jianshu.com/p/065bfe6d3ec2">这里</a>操作就行了。<br>这篇博客使用的是lame-3.99.5，注意下载对应的版本。<br><a href="http://cfanr.cn/2017/08/26/Android-NDK-dev-CMake-s-usage/">cmake的一些知识点</a><br>cmake生成的.so文件在”\app\build\intermediates\cmake\debug\obj\arm64-v8a”这个路径下。另外，CMakeLists.txt文件中比如说指定了生成的.so文件名字为xxx,那么在这个路径下找到的将会是libxxx.so</p>
-<p>java调用c语言性能还好,c语言调用java的性能就比较差了</p>
+<p>java调用c语言性能还好,c语言调用java的性能就比较差了<br><a href="https://blog.csdn.net/honjane/article/details/53958166">两头调来调去的例子</a><br>下面是c层面调用java代码的例子，分别是调用java instance method 和java static method</p>
+<pre><code class="c">private String sex = &quot;female&quot;;//需要赋初始值或定义成static，不然在没有调用accessPublicMethod方法前，调用getSex方法会抛异常
+
+    public void setSex(String sex){
+        this.sex = sex;
+    }
+
+    public String getSex(){
+        return sex;
+    }
+
+    public native void accessPublicMethod();
+</code></pre>
+<pre><code class="c++">//访问java中public方法
+extern &quot;C&quot;
+void Java_com_honjane_ndkdemo_JNIUtils_accessPublicMethod( JNIEnv* env, jobject jobj){
+    //1.获得实例对应的class类
+    jclass jcls = env-&gt;GetObjectClass(jobj);
+
+    //2.通过class类找到对应的method id
+    //name 为java类中变量名，Ljava/lang/String; 为变量的类型String
+    jmethodID jmid = env-&gt;GetMethodID(jcls,&quot;setSex&quot;,&quot;(Ljava/lang/String;)V&quot;);
+    //定义一个性别赋值给java中的方法
+    char c[10] = &quot;male&quot;;
+    jstring jsex = env-&gt;NewStringUTF(c);
+    //3.通过obj获得对应的method
+    env-&gt;CallVoidMethod(jobj,jmid,jsex);
+}
+</code></pre>
+<pre><code class="java"> private static int height = 160;
+
+    public static int getHeight(){
+        return height;
+    }
+
+    public native int accessStaticMethod();
+</code></pre>
+<pre><code class="c++">
+//访问java中static方法
+extern &quot;C&quot;
+jint Java_com_honjane_ndkdemo_JNIUtils_accessStaticMethod( JNIEnv* env, jobject jobj){
+    //1.获得实例对应的class类
+    jclass jcls = env-&gt;GetObjectClass(jobj);
+
+    //2.通过class类找到对应的method id
+    jmethodID jmid = env-&gt;GetStaticMethodID(jcls,&quot;getHeight&quot;,&quot;()I&quot;);
+
+    //3.静态方法通过class获得对应的method
+    return env-&gt;CallStaticIntMethod(jcls,jmid);
+}
+</code></pre>
+<p>//访问field用的是GetObjectClass和getXXXField(这里无论是public还是private field都能拿到)</p>
+<pre><code class="java">public class JNIUtils {
+
+    public int num = 10;
+
+    public native int addNum();
+
+    static {
+        System.loadLibrary(&quot;native-lib&quot;);
+    }
+}
+</code></pre>
+<pre><code class="c++">#include &lt;jni.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdio.h&gt;
+
+//访问java对象中num属性，并对其作加法运算
+extern &quot;C&quot;
+jint Java_com_honjane_ndkdemo_JNIUtils_addNum( JNIEnv* env, jobject jobj){
+    //1.获得实例对应的class类
+    jclass jcls = env-&gt;GetObjectClass(jobj);
+
+    //2.通过class类找到对应的field id
+    //num 为java类中变量名，I 为变量的类型int
+    jfieldID fid = env-&gt;GetFieldID(jcls,&quot;num&quot;,&quot;I&quot;);
+
+    //3.通过实例object获得对应的field
+    jint jnum = env-&gt;GetIntField(jobj,fid);
+    //add
+    jnum += 10;
+
+    return jnum;
+}
+</code></pre>
+<p>从jni层抛出一个java Exception也是可以的，其实就是new 一个java object(Exception)</p>
+<blockquote>
+<p>1、当调用一个JNI函数后，必须先检查、处理、清除异常后再做其它 JNI 函数调用，否则会产生不可预知的结果。<br>2、一旦发生异常，立即返回，让调用者处理这个异常。或 调用 ExceptionClear 清除异常，然后执行自己的异常处理代码。<br>3、异常处理的相关JNI函数总结：<br>1&gt; ExceptionCheck：检查是否发生了异常，若有异常返回JNI_TRUE，否则返回JNI_FALSE<br>2&gt; ExceptionOccurred：检查是否发生了异常，若用异常返回该异常的引用，否则返回NULL<br>3&gt; ExceptionDescribe：打印异常的堆栈信息<br>4&gt; ExceptionClear：清除异常堆栈信息<br>5&gt; ThrowNew：在当前线程触发一个异常，并自定义输出异常信息<br>jint (JNICALL <em>ThrowNew) (JNIEnv </em>env, jclass clazz, const char <em>msg);<br>6&gt; Throw：丢弃一个现有的异常对象，在当前线程触发一个新的异常<br>jint (JNICALL </em>Throw) (JNIEnv <em>env, jthrowable obj);<br>7&gt; FatalError：致命异常，用于输出一个异常信息，并终止当前VM实例（即退出程序）<br>void (JNICALL </em>FatalError) (JNIEnv <em>env, const char </em>msg);</p>
+</blockquote>
+<p>jni是一套规范,oracle有一个<a href="https://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/functions.html">文档</a>，不同的vm照着这个规范实现就是了</p>
 <ol>
 <li>关于Spannable String的问题<br>Medium上有关于使用span的文章 <a href="https://medium.com/google-developers/spantastic-text-styling-with-spans-17b0c16b4568">Spantastic text styling with Spans</a> 其实有SpannableString(mutable),SpannableStringBuilder还有SpannedString(immutable)。<br>Just reading and not setting the text nor the spans? -&gt; SpannedString(文字和style都改不了)<br>Setting the text and the spans? -&gt; SpannableStringBuilder(文字和Style都能改)<br>Setting a small number of spans (&lt;~10)? -&gt; SpannableString(文字不能改，Style能改)<br>Setting a larger number of spans (&gt;~10) -&gt; SpannableStringBuilder</li>
 </ol>
@@ -681,6 +770,48 @@ private void initMemoryMap() {
 <p>通过FileChannel的map(),可以将指定区域范围的文件直接读到内存中，返回MappedByteBuffer类型,这里称之为内存映射.然后通过MappedByteBuffer取或写对应标记位数据。<br>如何取呢？通过memoryMap.get(index) 来取指定位置的字节数据，index根据标记位的位置来确认，比如前面mFlag的标记位为是在文件头向后偏移了一个4个字节，所以这里要取相同的值则是要使用memoryMap.get(4)即可，如果要设置标记位的值可以使用put(index,value)函数，例如：memoryMap.put(4,(byte)1);<br>其实在Android上层也很简单，相当于读文件，<strong>把文件描述符映射到内存中，这种方式比每次进行文件IO操作肯定快很多。</strong> 想到什么？ log4j使用mmmap将写日志变成对内存的操作 <a href="https://github.com/pqpo/Log4a">早就有人这样做了</a> 注意的是，快是快，但多线程操作还是要加锁，多进程操作还是要用信号量同步</p>
 <p>类似的使用mmap的库还有很多: mmkv (腾讯的KV存储),Tokyo Cabinet (比较早的一个kv存储系统)</p>
 <h2 id="23-Android图片质量会比iPhone的差是有原因的"><a href="#23-Android图片质量会比iPhone的差是有原因的" class="headerlink" title="23. Android图片质量会比iPhone的差是有原因的"></a>23. Android图片质量会比iPhone的差是有原因的</h2><p><a href="https://www.jianshu.com/p/9b47fc25f526">替换libjpeg库</a><br>大致是，Android编码保存图片就是通过Java层函数——Native层函数——Skia库函数——对应第三方库函数（例如libjpeg），这一层层调用做到的。 libjpeg在压缩图像时，有一个参数叫optimize_coding，如果设置optimize_coding为TRUE，将会使得压缩图像过程中基于图像数据计算哈弗曼表，由于这个计算会显著消耗空间和时间，默认值被设置为FALSE。对于当时的计算设备来说，空间和时间的消耗可能是显著的，但到今天，这似乎不应再是问题。但谷歌的Skia项目工程师们对optimize_coding在Skia中默认的等于了FALSE，这就意味着更差的图片质量和更大的图片文件。还有其他和iOS的比较可以看下。<br>也讲到了Android可以替换libjpeg库达到设置为TRUE的目的。<br><a href="http://www.cnblogs.com/hrlnw/p/4403334.html">Android图片编码机制深度解析（Bitmap，Skia，libJpeg）</a></p>
+<h2 id="24-TransactionTooLargeException的原因及规避方案"><a href="#24-TransactionTooLargeException的原因及规避方案" class="headerlink" title="24.TransactionTooLargeException的原因及规避方案"></a>24.TransactionTooLargeException的原因及规避方案</h2><p><a href="https://github.com/mc2012/Android-AshMemory">使用AndroidSharedMemory</a> 其实也就是MemoryFile这个class了<br><a href="https://www.jianshu.com/p/73714d399eb7">Android 通过匿名共享内存传输Parcelable对象列表</a></p>
+<blockquote>
+<p>TransactionTooLargeException这个异常，这个java异常是在jni层抛出的，可见android_util_binder.cpp中关于这个异常的解释，大概意思是“传输太大是最常见的原应，但是不是唯一原应，也有可能是FD，应该就是描述binder驱动的文件描是符关闭了，以及可能其他原因”，这里暂且只关注常见的。我们在组件间通信时会使用intent传输一些参数，一步小心会带上一些大对象，组件启动到底层都会通过ActivityManagerService这个守护神，属于进程间通信，最终都需要使用Parcel将数据写入内核中由Binder开辟的一块区域，Binder驱动open的区域一般为4M，而进程间传输的数据大小会限制在1M，而且这1M是被这个进程所有正在进行的binder通信所共同使用的，所以一般情况下也就达不到1M，可想而知，我们要是传个Bitmap啥的，离奔溃也就不远了。</p>
+</blockquote>
+<p>原理就是在主进程里面使用MemoryFile(“test”,bytearray.length), 往这个memoryFile里面写bytes，搞定之后通过反射拿到MemoryFile.getFileDescriptor方法,invoke这个方法。（获得底层SharedMemory在本进程中的fd,注意，这只是个Int值，并且在另一个进程中这个int值是不一样的。但是我们可以通过binder把这个fd包装成ParcelFileDescriptor，传到remote process中。）remote process在读取bytes的时候，读到的fd 的int值不一样，但是可以直接根据new FileInputStream(fd)，从中读取指定长度的bytes array， marshall一下，也就能够在remote process中创建刚才那份object的备份了。(api 27之后提供了sharedMemory的public api，而MemoryFile则是MemoryFile的一层Wrapper)<br>亲测，这种方式可以写50MB以上的byte array，只是bytes[]太大的话，写的进程会看到很多GC日志，所以会比较慢。读数据的一端也是一样的道理，会慢一点。<br>看上去就像是A进程往一个系统共享的内存写了50MB数据，然后走Binder告诉B进程这个内存的地址，后者自己去那里读数据<br>共享内存只要读一次，写一次，效率最高<br>采用共享内存通信的一个显而易见的好处是效率高，因为进程可以直接读写内存，而不需要任何数据的拷贝。<br>对于像管道和消息队列等通信方式，则需要在内核和用户空间进行四次的数据拷贝，<br>而共享内存则只拷贝两次数据[1]：<br>1.一次从输入文件到共享内存区，<br>2.另一次从共享内存区到输出文件。</p>
+<p>至少在<a href="https://android.googlesource.com/platform/frameworks/base/+/refs/heads/marshmallow-release/core/jni/android/graphics/Bitmap.cpp">6.0的Bitmap.cpp</a>代码中还看到parcel写bitmap会尝试使用匿名共享内存的影子。如果不行才走writeBlob方法(1MB限制，TransactionTooLargeException是jni丢出来的方法).</p>
+<pre><code class="c++">static jboolean Bitmap_writeToParcel(JNIEnv* env, jobject,
+                                     jlong bitmapHandle,
+                                     jboolean isMutable, jint density,
+                                     jobject parcel) {
+                                         ...
+    // Transfer the underlying ashmem region if we have one and it&#39;s immutable.
+    android::status_t status;
+    int fd = androidBitmap-&gt;getAshmemFd(); //这里获得共享内存
+    if (fd &gt;= 0 &amp;&amp; !isMutable &amp;&amp; p-&gt;allowFds()) { //allowFds默认是true的
+#if DEBUG_PARCEL
+        ALOGD(&quot;Bitmap.writeToParcel: transferring immutable bitmap&#39;s ashmem fd as &quot;
+                &quot;immutable blob (fds %s)&quot;,
+                p-&gt;allowFds() ? &quot;allowed&quot; : &quot;forbidden&quot;);
+#endif
+        status = p-&gt;writeDupImmutableBlobFileDescriptor(fd);
+        if (status) {
+            doThrowRE(env, &quot;Could not write bitmap blob file descriptor.&quot;);
+            return JNI_FALSE;
+        }
+        return JNI_TRUE;
+    }
+    // Copy the bitmap to a new blob.
+    bool mutableCopy = isMutable;
+#if DEBUG_PARCEL
+    ALOGD(&quot;Bitmap.writeToParcel: copying %s bitmap into new %s blob (fds %s)&quot;,
+            isMutable ? &quot;mutable&quot; : &quot;immutable&quot;,
+            mutableCopy ? &quot;mutable&quot; : &quot;immutable&quot;,
+            p-&gt;allowFds() ? &quot;allowed&quot; : &quot;forbidden&quot;);
+#endif
+    size_t size = bitmap.getSize();
+    android::Parcel::WritableBlob blob;
+    status = p-&gt;writeBlob(size, mutableCopy, &amp;blob); //退而求其次，使用writeBlob
+    ....
+    }
+</code></pre>
+<p>不过后来的release好像又删掉了走共享内存这段</p>
 
       
 
