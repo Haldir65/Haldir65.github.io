@@ -75,7 +75,7 @@ android {
   // Use this block to link Gradle to your CMake or ndk-build script.似乎只是用来告诉gradle CMakeList.txt的位置在哪里
   externalNativeBuild {
        cmake {
-            path 'CMakeLists.txt'
+            path 'CMakeLists.txt' //这个是说明CMakeLists.txt这个文件在哪里的，studio 里面link project with c++ program就是干这个的
         }
   }
 }
@@ -451,6 +451,8 @@ echo "-------- End --------"
 [如何把ffmpeg生成的so文件压缩大小](https://blog.csdn.net/u011485531/article/details/55804380)
 
 然后才是交叉编译
+
+
 
 ## 参考
 [configure-cmake](https://developer.android.com/studio/projects/configure-cmake)

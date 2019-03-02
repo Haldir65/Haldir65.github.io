@@ -1274,13 +1274,19 @@ TextUtils.java
 
 触控事件对象中包含了事件的坐标，这个有event.x,event.pageX,event.clientX等等
 
+### Event Loop
+[前端经典面试题: 从输入URL到页面加载发生了什么？](https://segmentfault.com/a/1190000006879700)
+![](https://www.haldir66.ga/static/imgs/js-event-loop.png)
+JS的解析是由浏览器中的JS解析引擎完成的。JS是单线程运行，也就是说，在同一个时间内只能做一件事，所有的任务都需要排队，前一个任务结束，后一个任务才能开始。但是又存在某些任务比较耗时，如IO读写等，所以需要一种机制可以先执行排在后面的任务，这就是：同步任务(synchronous)和异步任务(asynchronous)。JS的执行机制就可以看做是一个主线程加上一个任务队列(task queue)。同步任务就是放在主线程上执行的任务，异步任务是放在任务队列中的任务。所有的同步任务在主线程上执行，形成一个执行栈;异步任务有了运行结果就会在任务队列中放置一个事件；脚本运行时先依次运行执行栈，然后会从任务队列里提取事件，运行任务队列中的任务，这个过程是不断重复的，所以又叫做事件循环(Event loop)。
+
 
 ### 参考
 [5 分钟彻底明白 JSONP](https://tonghuashuo.github.io/blog/jsonp.html)
 [javaScript algorithms](https://github.com/trekhleb/javascript-algorithms)
-
 两个关于asynchronous javaScript的视频，一个解释了Event Loop的感念，另一个讲到了Promise基于microTask的原理。
 [菲利普·罗伯茨：到底什么是Event Loop呢？ | 欧洲 JSConf 2014](https://www.youtube.com/watch?v=8aGhZQkoFbQ)
+
+
 [Asynchrony: Under the Hood - Shelley Vohr - JSConf EU 2018](https://www.youtube.com/watch?v=SrNQS8J67zc)
 
 ## 使用Atom的时候，按下ctrl+shift+i ，会发现原来atom编辑页面就特么是一个网页。

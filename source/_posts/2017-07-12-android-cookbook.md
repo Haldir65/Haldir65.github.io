@@ -164,7 +164,7 @@ Android相关
 - [ ] 要不是Jake Wharton在DroidConNYC2017上提到，还不知道有v4包里面有**AtomicFile**这玩意
 - [X] LocalBroadCastManager好像是基于handler实现的
 - [ ] armeabiv,arm64-v8a等问题[Android 设备的CPU类型(通常称为”ABIs”)](https://zhuanlan.zhihu.com/p/23102158)
-- [ ] Romain Guy提到了android asset atlas，顺带看下[ZygotoInit](http://blog.csdn.net/luoshengyang/article/details/45831269)
+- [ ] Romain Guy提到了android asset atlas，顺带看下[ZygotoInit](http://blog.csdn.net/luoshengyang/article/details/45831269).preloadDrawable的定义在[com.android.internal.R.array.preloadingdrawables](https://android.googlesource.com/platform/frameworks/base/+/refs/heads/nougat-release/core/res/res/values/arrays.xml)
 - [ ] Zygote进程启动流程
 - [X] SystemServer进程启动流程
 - [ ] Launcher启动流程
@@ -178,9 +178,9 @@ Android相关
 > Studio里面看源码，find usage没有的话，find in path , choose android sdk
 
 Linux相关
-- [ ] linux进程间通信方式有哪些（信号量这种）
-- [ ] Linux command extended
-- [ ] 搭建mail服务
+- [X] linux进程间通信方式有哪些（信号量这种）
+- [X] Linux command extended
+- [X] 搭建mail服务
 - [x] win10加ubuntu[双系统](http://www.jianshu.com/p/2eebd6ad284d)安装[如果不需要了直接删分区，删除引导即可]
 - [x]win10 装ubuntu有时候失败是因为删除了C盘的一个文件夹[参考](http://blog.csdn.net/fesdgasdgasdg/article/details/54183577)
 

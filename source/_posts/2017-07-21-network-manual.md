@@ -404,7 +404,8 @@ token的话，一般是和用户一一对应的， 放在http的header里也行�
 ## 5. 长连接
 像即时通讯软件，或者消息推送这种场景，都得维护一个长连接。
 [HTTP长连接和短连接](http://blog.csdn.net/mr_liabill/article/details/50705130)
-
+HTTP那个长连接更多的时候被叫做“持久连接”
+tcp 长连接 的时间默认是2小时 ： /proc/sys/net/ipv4/tcp_keepalive_time 7200
 
 ### 5.1长连接的实现原理
 - 轮询

@@ -558,12 +558,62 @@ public boolean dispatchTouchEvent(MotionEvent ev) {
 在ViewGroup里面，往子View下发TouchEvent的唯一途径是dispatchTransformedTouchEvent。这个方法的调用次数也不多，估计就是在这里控制住的。
 
 6. TouchEvent只是java层的抽象
-之前看过一篇文章，是用户手指在LCD面板上面滑动产生电阻变化，硬件由此产生中断。接下来的顺序是
-Driver -> kernel -> Framework -> Application -> UserInterface ，说的非常好，好像是知乎上的，可惜一时间找不到出处了。
+[Linux内核会将硬件产生的触摸事件包装为Event存到/dev/input/event[x]目录下](https://www.jianshu.com/p/b7cef3b3e703)当屏幕被触摸，Linux内核会将硬件产生的触摸事件包装为Event存到/dev/input/event[x]目录下。对，你没看错，事件被搞成文件保存了下来！
+接着，系统创建的一个InputReaderThread线程loop起来让EventHub调用getEvent()不断的从/dev/input/文件夹下读取输入事件。
+然后InputReader则从EventHub中获得事件交给InputDispatch。
+而InputDispatch又会把事件分发到需要的地方，比如ViewRootImpl的WindowInputEventReceiver中。
+以上过程是在底层中完成，大部分由c++实现，我们了解流程就好
+
+
+## 7. 从cpp层到java层的转换
+[从底层cpp说去](https://www.jianshu.com/p/38f2da61973d)
+[从cpp层讲到java层](https://www.jianshu.com/p/b7cef3b3e703)
+   ​
+
+## 8. MotionEvent.getAction和MotionEvent.getActionMasked的区别
+
+先来看下这些数分别是多少
+```java
+ACTION_MASK             0x000000ff (0x表示16进制，两个数代表一个byte,8位，所以都是Int)
+ACTION_DOWN             0x00000000 
+ACTION_UP               0x00000001  
+ACTION_MOVE             0x00000002 
+ACTION_POINTER_DOWN     0x00000005 
+ACTION_POINTER_UP       0x00000006 
+ACTION_POINTER_1_DOWN   0x00000005  
+ACTION_POINTER_1_UP     0x00000006   
+ACTION_POINTER_2_DOWN   0x00000105   
+ACTION_POINTER_2_UP     0x00000106 
+ACTION_POINTER_3_DOWN   0x00000205           
+ACTION_POINTER_3_UP     0x00000206 
+
+public final int getAction() {
+    return nativeGetAction(mNativePtr);
+}
+
+ 
+public final int getActionMasked() {
+    return nativeGetAction(mNativePtr) & ACTION_MASK;
+}
+
+public final int getActionIndex() {
+    return (nativeGetAction(mNativePtr) & ACTION_POINTER_INDEX_MASK)
+            >> ACTION_POINTER_INDEX_SHIFT;
+}
+```
+我们发现单指DOWN/UP分别为 0x005和0x006, 而双值和三指DOWN/UP分别为 0x105和0x106,0x205和0x206
+假设当前触摸动作为ACTIONPOINTER2_DOWN时，
+```java
+int action=0x105;
+int maskAction=0x0ff&0x105; //  maskAction=0x005;
+```
+如此，触摸动作含义改变为ACTIONPOINTERDOWN。
+三根手指同时move汇集到应用层，接收到的是ACTION_POINTER_3_MOVE.
+结论是，getActionIndex就是获取 0x00000206 里面那个2，也就是第几根手指上去的。getActionMasked就是，我不管你是1根手指DOWN，2根手指DOWN还是3根手指DOWN上去，mask之后全部变成ACTION_DOWN。所以一般来说，ACTION_POINTER_2_DOWN这一类的东西通常用于多点触控。一个Int 4个byte，第三个byte保存index（第几根手指），第四个byte保存类型（DOWN,MOVE还是别的什么）
 
 
 
-- ## Reference
+## Reference
 
 1. [图解安卓事件分发机制](http://www.jianshu.com/p/e99b5e8bd67b)
 2. [making sense of the touch system](https://www.youtube.com/watch?v=usBaTHZdXSI)
@@ -573,4 +623,3 @@ Driver -> kernel -> Framework -> Application -> UserInterface ，说的非常好
 6. [触摸事件的分析与总结](http://glblong.blog.51cto.com/3058613/1559320)
 7. [View事件分发及消费源码分析](http://mouxuejie.com/blog/2016-05-01/view-touch-event-source-analysis/)
 
-   ​

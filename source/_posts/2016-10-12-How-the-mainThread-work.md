@@ -262,6 +262,22 @@ postDelayed本身就是把一条消息推迟到相对时间多久之后。关键
 >  // Next message is not ready.  Set a timeout to wake up when it is ready.       
 >  nextPollTimeoutMillis = (int) Math.min(msg.when - now, Integer.MAX_VALUE);
 
+**但这里的堵塞并非占用CPU资源**
+这基本是一个类似生产者消费者的模型，简单说如果在主线程的MessageQueue没有消息时，就会阻塞在loop的queue.next()方法里，这时候主线程会释放CPU资源进入休眠状态，直到有下个消息进来时候就会唤醒主线程，在2.2 版本以前，这套机制是用我们熟悉的线程的wait和notify 来实现的，之后的版本涉及到Linux pipe/epoll机制，通过往pipe管道写端写入数据来唤醒主线程工作。原理类似于I/O,读写是堵塞的，不占用CPU资源。
+
+nativePollOnce(ptr, nextPollTimeoutMillis);函数的调用。线程会被阻塞在这个地方。这个native方法会调用到底层的JNI函数android_os_MessageQueue_nativePollOnce()，进一步调用c/c++层的nativeMessageQueue的pollOnce()函数，在这个函数中又会通过本线程在底层的Looper的pollOnce()函数，进而调用pollInner()函数。在pollInner()函数中会调用**epoll_wait()**函数(这个函数不堵塞)
+对应nativePollOnce的还有nativeWake，就是表明pipe写端有write事件发生，从而让epoll_wait()退出等待。
+
+主线程（UI线程）执行到这一步就进入了死循环，不断地去拿消息队列里面的消息出来处理？那么问题来了
+1、UI线程一直在这个循环里跳不出来，主线程不会因为Looper.loop()里的死循环卡死吗，那还怎么执行其他的操作呢？
+
+在looper启动后，主线程上执行的任何代码都是被looper从消息队列里取出来执行的。也就是说主线程之后都是通过其他线程给它发消息来实现执行其他操作的。生命周期的回调也是如此的，系统服务ActivityManagerService通过Binder发送IPC调用给APP进程，App进程接到到调用后，通过App进程的**Binder线程**给主线程的消息队列插入一条消息来实现的。
+2、主线程是UI线程和用户交互的线程，优先级应该很高，主线程的死循环一直运行是不是会特别消耗CPU资源吗？App进程的其他线程怎么办？
+
+这基本是一个类似生产者消费者的模型，简单说如果在主线程的MessageQueue没有消息时，就会阻塞在loop的queue.next()方法里，这时候主线程会释放CPU资源进入休眠状态，直到有下个消息进来时候就会唤醒主线程，在2.2 版本以前，这套机制是用我们熟悉的线程的wait和notify 来实现的，之后的版本涉及到Linux pipe/epoll机制，通过往pipe管道写端写入数据来唤醒主线程工作。原理类似于I/O,读写是堵塞的，不占用CPU资源。
+
+
+
 所以确实是blocked了。但这并不意味着从postDelayed(r,10)开始，接下来的10ms就真的完全堵塞了(queue.next阻塞)
 PostDelayed最终会调用到enqueMessage方法，看一下:
 ```java
@@ -347,6 +363,48 @@ public static void prepareMainLooper() {
 android.app.ActivityThread中和com.android.server.SystemServer中分别调用了这个方法，言下之意systemServer虽然跑在app_process进程中，但其实也还是有一个looper的循环模型的。
 
 
+## KeyEvent不是推到handler queue的
+InputEvent有2个子类：KeyEvent和MotionEvent，其中KeyEvent表示键盘事件，而MotionEvent表示点击事件。
+[BlockCanary有些事情是拿不到的](https://github.com/markzhai/AndroidPerformanceMonitor/issues/102)
+```java
+//这种是走handler的
+ at android.os.Handler.handleCallback(Handler.java:751)
+	  at android.os.Handler.dispatchMessage(Handler.java:95)
+	  at android.os.Looper.loop(Looper.java:154)
+	  at android.app.ActivityThread.main(ActivityThread.java:6119)
+	  at java.lang.reflect.Method.invoke(Method.java:-1)
+
+// 这种就不走handler
+ at android.view.ViewRootImpl$WindowInputEventReceiver.onInputEvent(ViewRootImpl.java:6349)
+      at android.view.InputEventReceiver.dispatchInputEvent(InputEventReceiver.java:185)
+      at android.os.MessageQueue.nativePollOnce(MessageQueue.java:-1)
+      at android.os.MessageQueue.next(MessageQueue.java:323)
+      at android.os.Looper.loop(Looper.java:136)      
+```
+
+
+AndroidPerformanceMonitor(BlockCanary)的缺陷,不能检测触控事件处理的block
+[nativePollOnce直接调用了android.view.InputEventReceiver.dispatchInputEvent。](https://www.jianshu.com/p/9849026e7232)
+原因在这一段代码
+```java
+    // Called from native code. //直接由native端调用
+    @SuppressWarnings("unused")
+    private void dispatchInputEvent(int seq, InputEvent event) {
+        mSeqMap.put(event.getSequenceNumber(), seq);
+        onInputEvent(event);
+    }
+```
+[cpp层在这个文件里](https://android.googlesource.com/platform/frameworks/base/+/master/core/jni/android_view_InputEventReceiver.cpp)
+```c++
+env->CallVoidMethod(receiverObj.get(),
+                    gInputEventReceiverClassInfo.dispatchInputEvent, seq, inputEventObj,
+                    displayId);
+```
+
+Looper.cpp利用epoll机制接收events,并调用callback回调的handleEvent方法.
+```c++
+mMessageQueue->getLooper()->addFd(fd, 0, events, this, NULL);
+```
 
 ### Reference
 1. [Handler.postDelayed()是如何精确延迟指定时间的](http://www.dss886.com/android/2016/08/17/17-18)

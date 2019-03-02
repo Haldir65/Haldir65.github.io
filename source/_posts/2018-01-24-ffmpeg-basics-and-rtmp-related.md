@@ -323,8 +323,64 @@ private void exactorMedia() {
 
 ```
 [Android 视频分离和合成(MediaMuxer和MediaExtractor)](https://blog.csdn.net/zhi184816/article/details/52514138)
+[关于MediaCodec这个类的使用](https://github.com/PhilLab/Android-MediaCodec-Examples)
 
 
+这里贴一个NV21和Yuv420之间的转换
+```java
+public class Yuv420Util {
+    /**
+     * Nv21:
+     * YYYYYYYY
+     * YYYYYYYY
+     * YYYYYYYY
+     * YYYYYYYY
+     * VUVU
+     * VUVU
+     * VUVU
+     * VUVU
+     * <p>
+     * I420:
+     * YYYYYYYY
+     * YYYYYYYY
+     * YYYYYYYY
+     * YYYYYYYY
+     * UUUU
+     * UUUU
+     * VVVV
+     * VVVV
+     *
+     * @param data
+     * @param dstData
+     * @param w
+     * @param h
+     */
+    public static void Nv21ToI420(byte[] data, byte[] dstData, int w, int h) {
+
+        int size = w * h;
+        // Y
+        System.arraycopy(data, 0, dstData, 0, size);//Y都是一样的
+        for (int i = 0; i < size / 4; i++) {
+            dstData[size + i] = data[size + i * 2 + 1]; //U
+            dstData[size + size / 4 + i] = data[size + i * 2]; //V
+        }
+    }
+
+// Nv21 to Yuv Semi Planar
+    public static void Nv21ToYuv420SP(byte[] data, byte[] dstData, int w, int h) {
+        int size = w * h;
+        // Y都是一样的
+        System.arraycopy(data, 0, dstData, 0, size);
+
+        for (int i = 0; i < size / 4; i++) {
+            dstData[size + i * 2] = data[size + i * 2 + 1]; //U
+            dstData[size + i * 2 + 1] = data[size + i * 2]; //V
+        }
+    }
+
+}
+```
+[c语言的实现YUVtoRBGA和YUVtoARBG](https://github.com/cats-oss/android-gpuimage/blob/master/library/src/main/cpp/yuv-decoder.c) 
 
 ## Exoplayer
 查看exoplayer的源码，dataSource在拉到数据之后，最终交给MediaCodecRender，后者调用processOutputBuffer，核心代码是这句:

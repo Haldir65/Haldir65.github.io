@@ -10,6 +10,9 @@ tags: [linux,tools]
 
 > 多数内容来自[TCP 报文结构](https://jerryc8080.gitbooks.io/understand-tcp-and-udp/chapter2.html)
 同一台机器上的两个进程，可以通过管道，共享内存，信号量，消息队列等方式进行通信。通信的一个基本前提是每个进程都有唯一的标识，在同一台机器上，使用pid就可以了。两台不同的计算机之间通信，可以使用**ip地址 + 协议 +协议端口号** 来标识网络中的唯一进程。
+
+
+## TCP
 tcp用16位端口号来标识一个端口，也就是两个bytes(65536就这么来的)。
 
 以下图片盗自[chinaunix一篇讲解raw socket的文章](http://abcdxyzk.github.io/blog/2015/04/14/kernel-net-sock-raw/)
@@ -36,6 +39,7 @@ tcp用16位端口号来标识一个端口，也就是两个bytes(65536就这么�
 在 OSI 的七层协议中，第二层（数据链路层）的数据叫「Frame」，第三层（网络层）上的数据叫「Packet」，第四层（传输层）的数据叫「Segment」。
 TCP 报文 (Segment)，包括首部和数据部分。
 
+
 TCP 报文段首部的前20个字节是固定的，后面有 4N 字节是根据需要而增加的。
 TCP 的首部包括以下内容：
 - 源端口 source port
@@ -58,15 +62,16 @@ TCP 连接的建立采用客户服务器方式，主动发起连接建立的一�
 这时首部的同步位 SYN = 1，同时初始化一个序号 Sequence Number = J。
 TCP 规定，SYN 报文段不能携带数据，但会消耗一个序号。
 第二次握手： 服务器收到了 SYN 报文，如果同意建立连接，则向客户端发送一个确认报文，然后服务器进入 SYN_RCVD 状态。
-这时首部的 SYN = 1，ACK = 1，而确认号 Acknowledgemt Number = J + 1，同时也为自己初始化一个序号 Sequence Number = K。
+这时首部的 SYN = 1，ACK = 1，而确认号 Acknowledgement Number = J + 1，同时也为自己初始化一个序号 Sequence Number = K。
 这个报文同样不携带数据。
 第三次握手：
 客户端收到了服务器发过来的确认报文，还要向服务器给出确认，然后进入 ESTABLISHED 状态。
-这时首部的 SYN 不再置为 1，而 ACK = 1，确认号 Acknowledgemt Number = K + 1，序号 Sequence Number = J + 1。
+这时首部的 SYN 不再置为 1，而 ACK = 1，确认号 Acknowledgement Number = K + 1，序号 Sequence Number = J + 1。
 第三次握手，一般会携带真正需要传输的数据，当服务器收到该数据报文的时候，就会同样进入 ESTABLISHED 状态。 此时，TCP 连接已经建立。
 对于建立连接的三次握手，主要目的是初始化序号 Sequence Number，并且通信的双方都需要告知对方自己的初始化序号，所以这个过程也叫 SYN。
 这个序号要作为以后的数据通信的序号，以保证应用层接收到的数据不会因为网络上的传输问题而乱序，因为TCP 会用这个序号来拼接数据。
 
+[TCP端口状态说明ESTABLISHED、TIME_WAIT](http://www.cnblogs.com/jiunadianshi/articles/2981068.html)
 
 ### TCP Flood 攻击
 知道了 TCP 建立一个连接，需要进行三次握手。
@@ -78,6 +83,7 @@ TCP 规定，SYN 报文段不能携带数据，但会消耗一个序号。
 那么很多小人都这样做，你就要一直记住你在等待着小人1号、小人2号、小人3号......直到你的脑容量爆棚，烧坏脑袋。
 黑客就是利用这样的设计缺陷，实施 TCP Flood 攻击，属于 DDOS 攻击的一种。
 
+[TCP进阶](https://halfrost.com/advance_tcp/)
 
 ### 四次挥手，释放连接
 TCP 有一个特别的概念叫做半关闭，这个概念是说，TCP 的连接是全双工（可以同时发送和接收）的连接，因此在关闭连接的时候，必须关闭传送和接收两个方向上的连接。
@@ -89,7 +95,7 @@ TCP 有一个特别的概念叫做半关闭，这个概念是说，TCP 的连接
 客户端向服务器发送结束报文段，然后进入 FIN_WAIT_1 状态。
 此报文段 FIN = 1， Sequence Number = M。
 第二次挥手：
-服务端收到客户端的结束报文段，然后发送确认报文段，进入 CLOSE_WAIT 状态。
+服务端收到客户端的结束报文段，然后发送确认报文段，进入 CLOSE_WAIT 状态(通常来说，一个 CLOSE_WAIT 会维持至少 2 个小时的时间)。
 此报文段 ACK = 1， Sequence Number = M + 1。
 客户端收到该报文，会进入 FIN_WAIT_2 状态。
 第三次挥手：
@@ -258,8 +264,8 @@ https版本的握手，证书校验，change cipher
 我们可以看到，手机到SLB的公网IP，是一个端到端的连接，连接的过程发送了很多包。所有这些包，无论是TCP三次握手，还是HTTPS的密钥交换，都是要走如此复杂的过程到达SLB的，当然每个包走的路径不一定一致。
 
 
-
-
+## UDP
+UDP的首部只有8个字节，12 字节的伪首部是为了计算检验和临时添加的。
 
 ## 参考
 [TCP 报文结构](https://jerryc8080.gitbooks.io/understand-tcp-and-udp/)

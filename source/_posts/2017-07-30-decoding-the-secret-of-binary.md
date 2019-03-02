@@ -580,7 +580,13 @@ C/C++语言编写的程序里数据存储顺序是跟编译平台所在的CPU相
 因此，在你的C程序传给JAVA程序之前有必要进行字节序的转换工作。 
 
 大小端转化的算法在java这边是这样的[参考](https://blog.csdn.net/windshg/article/details/12956107)
+
 ```java
+/** 
+  * 将int转为低字节在前，高字节在后的byte数组 
+  * @param n int 
+  * @return byte[] 
+  */  
 public static byte[] toLH(int n) {  
   byte[] b = new byte[4];  
   b[0] = (byte) (n & 0xff);  
@@ -601,7 +607,7 @@ public static byte[] toHH(int n) {
   b[1] = (byte) (n >> 16 & 0xff);  
   b[0] = (byte) (n >> 24 & 0xff);  
   return b;  
-} 
+}
 
 public static String bytesToString(byte[] b) {  
   StringBuffer result = new StringBuffer("");  
@@ -625,7 +631,8 @@ c语言的转换[参考](https://www.cnblogs.com/luxiaoxun/archive/2012/09/05/26
 htonl() htons() 从主机字节顺序转换成网络字节顺序
 ntohl() ntohs() 从网络字节顺序转换为主机字节顺序
 用c语言检查当前平台大小端
-```c
+
+```C
 {
   int i = 1;   
     char *p = (char *)&i;   

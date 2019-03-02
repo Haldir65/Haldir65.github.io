@@ -104,7 +104,10 @@ public class MainActivity extends AppCompatActivity {
 ```
 需要注意的是，aidl不一定非得多进程才能用，同一进程之间的不同组件之间也能用aidl，而且，framework会判断如果是当前进程，直接返回在当前进程的引用。
 
+## 客户端调用远程进程的流程： 
+服务端跨进程的类都要继承Binder类。我们所持有的Binder引用(即服务端的类引用)并不是实际真实的远程Binder对象，我们的引用在Binder驱动里还要做一次映射。也就是说，设备驱动根据我们的引用对象找到对应的远程进程。客户端要调用远程对象函数时，只需把数据写入到Parcel，在调用所持有的Binder引用的transact()函数，transact函数执行过程中会把参数、标识符（标记远程对象及其函数）等数据放入到Client的共享内存，Binder驱动从Client的共享内存中读取数据，根据这些数据找到对应的远程进程的共享内存，把数据拷贝到远程进程的共享内存中，并通知远程进程执行onTransact()函数，这个函数也是属于Binder类。远程进程Binder对象执行完成后，将得到的写入自己的共享内存中，Binder驱动再将远程进程的共享内存数据拷贝到客户端的共享内存，并唤醒客户端线程。
 
-### reference
-[Android开发高级进阶——多进程间通信](https://www.jianshu.com/p/ce1e35c84134)
-[csdn](http://blog.csdn.net/javazejian/article/details/52709857)
+
+
+## 参考
+[Binder学习心得](https://blog.csdn.net/bjp000111/article/details/51919595)
