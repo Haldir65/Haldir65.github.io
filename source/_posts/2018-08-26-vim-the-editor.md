@@ -61,6 +61,12 @@ h       l
 走到文档开头[[
 走到文档末尾]]    
 
+在vim中执行bash命令：
+vim all.txt
+:read !ls
+//ls的结果被直接写入当前文件
+
+
 
 
 visual mode

@@ -72,9 +72,11 @@ Google I/O 2016上的[What's new in Android](https://www.youtube.com/watch?v=B08
 
 
 
+## 更新
+转眼Android 9都出来了，Android9中限制了私有函数的调用，就是反射不好用了。
+有一种[使用unSafe操作规避的方式](https://fucknmb.com/2018/10/05/一种纯Java层绕过Android-P私有函数调用限制的方式/#more)
 
-
-## Reference
+## 参考
 
 1. [Docs](https://developer.android.com/topic/performance/background-optimization.html?utm_campaign=adp_series__100616&utm_source=anddev&utm_medium=yt-desc)
 2. [youtube](https://www.youtube.com/watch?v=vBjTXKpaFj8)

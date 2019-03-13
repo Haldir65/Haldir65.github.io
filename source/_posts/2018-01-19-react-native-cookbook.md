@@ -136,6 +136,18 @@ styling as seprate file在后面跟一个大括号，引用style对象的properi
 ## Components
 ### ScrollView
 Android平台一个ScrollView只能有一个ChildView(Node)，在react-native上似乎没有这样的限制
+
+```
+The React Native Button is very limited in what you can do, see; Button
+
+It does not have a style prop, and you don't set text the "web-way" like <Button>txt</Button> but via the title property <Button title="txt" />
+
+If you want to have more control over the appearance you should use one of the TouchableXXXX' components like TouchableOpacity They are really easy to use :-)
+```
+
+// Adding alignItems to a component's style determines the alignment of children along the secondary axis 
+
+
 ==========================
 async storage
 

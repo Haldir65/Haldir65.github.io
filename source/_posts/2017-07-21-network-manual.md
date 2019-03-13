@@ -495,10 +495,14 @@ https，注意https是解决链路劫持的方案，并无法解决DNS劫持的�
 SNI(Server Name Indication) 就是为了解决一个服务器使用多个域名和证书的 SSL/TLS 扩展。它的工作原理是：在进行 SSL/TLS 握手之前，先发送要访问站点的域名（Hostname），这样服务器会根据这个域名返回一个合适的证书。目前，大多数操作系统和浏览器以及主流 HTTP 服务器软件都已经很好地支持 SNI 扩展。
 但是同样的问题又来了，当我们采用 HTTPDNS 解析域名，如前所述，请求 URL 中的 host 会被替换成解析后的 IP，此时握手前发送的 SNI 字段是 IP，导致服务器最终获取到的”域名”仍然为 IP，无法找到匹配的证书，只能返回默认的证书或者不返回，所以也会出现 SSL/TLS 握手不成功的错误。
 
+[sni解决方案](https://help.aliyun.com/document_detail/30143.html)
+
 WebView中反运营商DNS劫持的手段
 [生产环境使用腾讯云的httpdns得了](https://github.com/tencentyun/httpdns-android-sdk),腾讯云的网站上也挂出了一个dns解析的[入口](https://cloud.tencent.com/product/hd)
 
 [java层用反射接管InetAddress.getAllByName](https://sdk.cn/news/7795)， native层把 getaddrinfo 的内存地址替换成自定义的 my_getaddrinfo 地址
+
+[目前okHttp是不遵守dns的ttl查询结果的](https://github.com/square/okhttp/issues/3374) [Jesse Wilson](https://github.com/swankjesse)的依据是，浏览器没这么做
 
 至于原理嘛：在腾讯云的httpdns的jar文件解压之后找到一个MSDKDnsResolver文件，里面有几个很显眼的ip:
 182.254.116.117

@@ -590,7 +590,7 @@ static IJKFF_Pipenode *func_open_video_decoder(IJKFF_Pipeline *pipeline, FFPlaye
 不管视频解码还是音频解码，其基本流程都是从解码前的数据缓冲区中取出一帧数据进行解码，完成后放入相应的解码后的数据缓冲区
 
 ### 音频输出
-ijkplayer中Android平台使用OpenSL ES或AudioTrack输出音频，iOS平台使用AudioQueue输出音频。
+ijkplayer中Android平台使用OpenGL ES或AudioTrack输出音频，iOS平台使用AudioQueue输出音频。
 
 ### 视频的音视频同步
 通常音视频同步的解决方案就是选择一个参考时钟，播放时读取音视频帧上的时间戳，同时参考当前时钟参考时钟上的时间来安排播放

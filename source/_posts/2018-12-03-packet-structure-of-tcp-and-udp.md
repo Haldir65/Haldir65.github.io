@@ -71,7 +71,7 @@ TCP 规定，SYN 报文段不能携带数据，但会消耗一个序号。
 对于建立连接的三次握手，主要目的是初始化序号 Sequence Number，并且通信的双方都需要告知对方自己的初始化序号，所以这个过程也叫 SYN。
 这个序号要作为以后的数据通信的序号，以保证应用层接收到的数据不会因为网络上的传输问题而乱序，因为TCP 会用这个序号来拼接数据。
 
-[TCP端口状态说明ESTABLISHED、TIME_WAIT](http://www.cnblogs.com/jiunadianshi/articles/2981068.html)
+
 
 ### TCP Flood 攻击
 知道了 TCP 建立一个连接，需要进行三次握手。
@@ -273,3 +273,5 @@ UDP的首部只有8个字节，12 字节的伪首部是为了计算检验和临�
 [推广商业软件的文章，当做关于tcp协议的一整个series来看还是很好的](https://accedian.com/enterprises/blog/tcp-receive-window-everything-need-know/) 
 
 HTTP幂等性(用CAS)避免下单两次
+
+[TCP端口状态说明ESTABLISHED、TIME_WAIT](http://www.cnblogs.com/jiunadianshi/articles/2981068.html)FIN_WAIT2

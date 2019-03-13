@@ -561,6 +561,11 @@ sudo fail2ban-regex /var/log/nginx/access.log /etc/fail2ban/filter.d/nginx-x00.c
 sudo vim /etc/transmission-daemon/settings.json之前要先把transmission这个进程关掉，不然设置文件会被修改。
 另外，设置文件中显示的rpc-password其实是hash之后的值，记住自己实际上写了什么就好。
 
+base64的用法
+```
+base64 -d  <(curl -L -s https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt)
+```
+
 
 ## 参考
 [国外的超级ping](https://asm.ca.com/en/ping.php)

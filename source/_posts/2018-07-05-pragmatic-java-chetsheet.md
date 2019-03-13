@@ -532,6 +532,67 @@ public class Test {
 }
 ```
 
+反射替换final成员变量的时候要小心[一种全局拦截并监控 DNS 的方式](https://fucknmb.com/2018/04/16/一种全局拦截并监控DNS的方式/) 文中提到
+```java
+try {
+    //获取InetAddress中的impl
+    Field impl = InetAddress.class.getDeclaredField("impl");
+    impl.setAccessible(true);
+    //获取accessFlags
+    Field modifiersField = Field.class.getDeclaredField("accessFlags");
+    modifiersField.setAccessible(true);
+    //去final
+    modifiersField.setInt(impl, impl.getModifiers() & ~java.lang.reflect.Modifier.FINAL);
+    //获取原始InetAddressImpl对象
+    final Object originalImpl = impl.get(null);
+    //构建动态代理InetAddressImpl对象
+    Object dynamicImpl = Proxy.newProxyInstance(originalImpl.getClass().getClassLoader(), originalImpl.getClass().getInterfaces(), new InvocationHandler() {
+        final Object lock = new Object();
+        Constructor<Inet4Address> constructor = null;
+
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            //如果函数名为lookupAllHostAddr，并且参数长度为2，第一个参数是host，第二个参数是netId
+            if (method.getName().equals("lookupAllHostAddr") && args != null && args.length == 2) {
+                Log.e("TAG", "lookupAllHostAddr：" + Arrays.asList(args));
+                //获取Inet4Address的构造函数，可能还需要Inet6Address的构造函数，为了演示，简单处理
+                if (constructor == null) {
+                    synchronized (lock) {
+                        if (constructor == null) {
+                            try {
+                                constructor = Inet4Address.class.getDeclaredConstructor(String.class, byte[].class);
+                                constructor.setAccessible(true);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+                if (constructor != null) {
+                    //这里实现自己的逻辑
+                    //构造一个mock的dns解析并返回
+                    if (args[0] != null && "www.baidu.com".equalsIgnoreCase(args[0].toString())) {
+                        try {
+                            Inet4Address inetAddress = constructor.newInstance(null, new byte[]{(byte) 61, (byte) 135, (byte) 169, (byte) 121});
+                            return new InetAddress[]{inetAddress};
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+            return method.invoke(originalImpl, args);
+        }
+    });
+    //替换impl为动态代理对象
+    impl.set(null, dynamicImpl);
+    //还原final
+    modifiersField.setInt(impl, impl.getModifiers() & java.lang.reflect.Modifier.FINAL);
+} catch (Exception e) {
+    e.printStackTrace();
+}
+```
+
 
 
 

@@ -583,7 +583,7 @@ C/C++语言编写的程序里数据存储顺序是跟编译平台所在的CPU相
 
 ```java
 /** 
-  * 将int转为低字节在前，高字节在后的byte数组 
+  * 将int转为低字节在前，高字节在后的byte数组 (小端)
   * @param n int 
   * @return byte[] 
   */  
@@ -592,11 +592,11 @@ public static byte[] toLH(int n) {
   b[0] = (byte) (n & 0xff);  
   b[1] = (byte) (n >> 8 & 0xff);  
   b[2] = (byte) (n >> 16 & 0xff);  
-  b[3] = (byte) (n >> 24 & 0xff);  
+  b[3] = (byte) (n >> 24 & 0xff); // 把高字节拿到后面
   return b;  
 }   
 /** 
-  * 将int转为高字节在前，低字节在后的byte数组 
+  * 将int转为高字节在前，低字节在后的byte数组 （大端）
   * @param n int 
   * @return byte[] 
   */  

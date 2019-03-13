@@ -636,7 +636,7 @@ Log.e("GL", "CURRENT MAX IS "+String.valueOf(maxSize[0]));
 ```
 
 ### 19. RenderScript的使用方式
-
+[高斯模糊](https://www.jianshu.com/p/f2352c95d391)
 ```java
 //首先从一个view中获取Bitmap,在父viewgroup中addView(ImageView),setImageBItmap(blurredBitmap)
 public static Bitmap getViewBitmap(View v) {
@@ -820,3 +820,42 @@ static jboolean Bitmap_writeToParcel(JNIEnv* env, jobject,
     }
 ```
 不过后来的release好像又删掉了走共享内存这段
+
+### 25. activity的启动流程是怎样的
+```java
+Activity.startActivity
+Activity.startActivityForResult
+Instrumentation.execStartActivity
+ActivityManagerProxy.startActivity
+---
+ActivityManagerService.startActivity
+ActivityStack.startActivityMayWait
+ActivityStack.startActivityLocked
+ActivityStack.startActivityUncheckedLocked
+ActivityStack.resumeTopActivityLocked
+ActivityStack.startPausingLocked
+ApplicationThreadProxy.schedulePauseActivity
+---
+ApplicationThread.schedulePauseActivity
+ActivityThread.queueOrSendMessage
+H.handleMessage
+ActivityThread.handlePauseActivity
+ActivityManagerProxy.activityPaused
+---
+ActivityManagerService.activityPaused
+ActivityStack.activityPaused
+ActivityStack.completePauseLocked
+ActivityStack.resumeTopActivityLokced
+ActivityStack.startSpecificActivityLocked
+ActivityStack.realStartActivityLocked
+---
+ApplicationThreadProxy.scheduleLaunchActivity
+ApplicationThread.scheduleLaunchActivity
+ActivityThread.queueOrSendMessage
+H.handleMessage
+ActivityThread.handleLaunchActivity
+ActivityThread.performLaunchActivity
+*AcitiviyB.onCreate
+```
+
+[安卓打包流程](https://www.haldir66.ga/static/imgs/android_build_detail.png)

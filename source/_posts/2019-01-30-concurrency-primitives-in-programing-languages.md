@@ -81,6 +81,17 @@ Synchronized是通过对象内部的一个叫做监视器锁（monitor）来实�
 
 
 ## 回顾一下用notify,wait,synchronized实现的生产者-消费者模型
+Effective java里面说要把wait写在一个while检查里面
+```java
+// The standard idiom for calling the wait method in Java 
+synchronized (sharedObject) { 
+    while (condition) { 
+    sharedObject.wait(); 
+        // (Releases lock, and reacquires on wakeup) 
+    } 
+    // do action based upon condition e.g. take or put into queue 
+}
+```
 基本的思路就是生产者和消费者共同持有一个锁（随便new一个Object出来就是了），生产者和消费者都extends Thread。
 生产者的run方法里while(true)，再加上synchronized，往queue里面丢东西，塞满了就notify一下（让消费者去消费）。
 消费者的run方法里面while(true)，再加上synchronized，从queue里面取东西，发现没东西了。notify一下其他人（让生产者去生产）。

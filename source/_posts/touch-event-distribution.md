@@ -612,6 +612,26 @@ int maskAction=0x0ff&0x105; //  maskAction=0x005;
 结论是，getActionIndex就是获取 0x00000206 里面那个2，也就是第几根手指上去的。getActionMasked就是，我不管你是1根手指DOWN，2根手指DOWN还是3根手指DOWN上去，mask之后全部变成ACTION_DOWN。所以一般来说，ACTION_POINTER_2_DOWN这一类的东西通常用于多点触控。一个Int 4个byte，第三个byte保存index（第几根手指），第四个byte保存类型（DOWN,MOVE还是别的什么）
 
 
+***如果View没有消费ACTION_DOWN事件，则之后的ACTION_MOVE等事件都不会再接收。***
+
+另外,addTouchTarget方法在遍历当前child过程中只要找到一个就break当前遍历，所以正常情况下，这个链表只会有一歌个。但是，这个遍历外面还包裹了一个```
+```java
+actionMasked == MotionEvent.ACTION_DOWN
+                        || (split && actionMasked == MotionEvent.ACTION_POINTER_DOWN)
+                        || actionMasked == MotionEvent.ACTION_HOVER_MOVE
+```
+所以，假如一开始一根手指上去，发生了ACTION_DOWN，随后这只手指不放开，再上去一根手指，就触发了ACTION_POINTER_DOWN，又会去遍历，并可能调用addTouchTarget方法，TouchTarget里面有一个成员遍历pointerIdBits，可以认为是绑定的这根手指的id。
+另外，在dispatchTouchEvent最一开始是会将之前保留的touchTarget队列清空的，在ACTION_UP里面也做了
+```java
+  if (actionMasked == MotionEvent.ACTION_DOWN) {
+                // Throw away all previous state when starting a new touch gesture.
+                // The framework may have dropped the up or cancel event for the previous gesture
+                // due to an app switch, ANR, or some other state change.
+                cancelAndClearTouchTargets(ev);
+                resetTouchState();
+            }
+```
+
 
 ## Reference
 
@@ -622,4 +642,5 @@ int maskAction=0x0ff&0x105; //  maskAction=0x005;
 5. [ViewConfiguration用法](http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2013/0225/907.html)
 6. [触摸事件的分析与总结](http://glblong.blog.51cto.com/3058613/1559320)
 7. [View事件分发及消费源码分析](http://mouxuejie.com/blog/2016-05-01/view-touch-event-source-analysis/)
+ [看这篇文章就够了](https://www.jianshu.com/p/06574d8f10bf)
 

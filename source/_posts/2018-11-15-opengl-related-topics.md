@@ -458,7 +458,7 @@ GLES20.glUniform3fv(hChangeColor,1,filter.data(),0);
 ```
 所以，滤镜(filter)效果对应的片元着色器可以这样写:
 GLSL语言
-```s
+```c
 precision mediump float;
 
 uniform sampler2D vTexture;
@@ -551,6 +551,48 @@ Android的Camera及Camera2都允许使用SurfaceTexture作为预览载体，但�
 黑白图片上，每个像素点的RGB三个通道值应该是相等的。知道了这个，将彩色图片处理成黑白图片就非常简单了。我们直接获取像素点的RGB三个通道，相加然后除以3作为处理后每个通道的值就可以得到一个黑白图片了。这是均值的方式是常见黑白图片处理的一种方法。类似的还有权值方法（给予RGB三个通道不同的比例）、只取绿色通道等方式。 
 与之类似的，冷色调的处理就是单一增加蓝色通道的值，暖色调的处理可以增加红绿通道的值。还有其他复古、浮雕等处理也都差不多。
 
+类似的滤镜效果还有：
+胶片效果：
+就是把RGBA的A,R,G,B全部用255减掉
+即：
+A = 255 - A
+R = 255 -R
+G = 255 - G
+B = 255 - B
+
+但是实际上用取反操作符(~)就可以了
+因为ARGB正好是4个byte(1个int)
+比方说
+1111， 取反(位非)之后变成11111110 11111110 11111110 11111110
+也就是255减去的效果
+
+[这个RGBA的顺序不能搞错](https://en.wikipedia.org/wiki/RGBA_color_space)
+In OpenGL and Portable Network Graphics (PNG), the RGBA (byte-order) is used, where the colors are stored in memory such that R is at the lowest address, G after it, B after that, and A last. On a little endian architecture this is equivalent to ABGR (word-order).
+
+就是说，opengl和png数据中,byte array的顺序从内存低地址到高地址依次是RGBA，在小端上会掉头
+
+[Android 关于美颜/滤镜 从OpenGl录制视频的一种方案](https://www.jianshu.com/p/12f06da0a4ec)有这样的操作byte[]的代码，需要指出的是。
+java平台上，因为有jvm的存在，所以是大端。所以这下面的代码才成立
+```java
+ int[] pixelData = new int[width * height];
+
+                int offset = 0;
+                int index = 0;
+                for (int i = 0; i < height; ++i) {
+                    for (int j = 0; j < width; ++j) {
+                        int pixel = 0;
+                        pixel |= (data[offset] & 0xff) << 16;     // R
+                        pixel |= (data[offset + 1] & 0xff) << 8;  // G
+                        pixel |= (data[offset + 2] & 0xff);       // B
+                        pixel |= (data[offset + 3] & 0xff) << 24; // A
+                        pixelData[index++] = pixel;
+                        offset += pixelStride;
+                    }
+                    offset += rowPadding;
+                }
+```
+
+
 图片模糊
 图片模糊处理相对上面的色调处理稍微复杂一点，通常图片模糊处理是采集周边多个点，然后利用这些点的色彩和这个点自身的色彩进行计算，得到一个新的色彩值作为目标色彩。模糊处理有很多算法，类似高斯模糊、径向模糊等等。
 
@@ -577,6 +619,7 @@ B = Y + 1.772 (U - 128)
 ```
 
 Camera可以通过setPreviewFormat()方法来设置预览图像的数据格式，推荐选择的有ImageFormat.NV21和ImageFormat.YV12，默认是NV21。NV21属于YUV图像.
+[Android Camera2 API YUV_420_888 to JPEG](https://stackoverflow.com/questions/40090681/android-camera2-api-yuv-420-888-to-jpeg)
 
 [YuvImage.compressToJpeg](https://developer.android.com/reference/android/graphics/YuvImage.html#compressToJpeg(android.graphics.Rect,%20int,%20java.io.OutputStream)) android sdk提供了将yuv转为jpg的方法
 ```

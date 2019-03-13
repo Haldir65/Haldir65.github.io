@@ -45,7 +45,36 @@ Retrofit retrofit = new Retrofit.Builder()
 ```
 关键来看这段 retroft.create ,重点都在这里面。关键的代码就在这三行里面了
 
+大名鼎鼎的动态代理
+```java
+@SuppressWarnings("unchecked") // Single-interface proxy creation guarded by parameter safety.
+public <T> T create(final Class<T> service) {
+  Utils.validateServiceInterface(service);
+  if (validateEagerly) {
+    eagerlyValidateMethods(service);
+  }
+  return (T) Proxy.newProxyInstance(service.getClassLoader(), new Class<?>[] { service },
+      new InvocationHandler() {
+        private final Platform platform = Platform.get();
 
+        @Override public Object invoke(Object proxy, Method method, @Nullable Object[] args)
+            throws Throwable {
+          // If the method is a method from Object then defer to normal invocation.
+          if (method.getDeclaringClass() == Object.class) {
+            return method.invoke(this, args);
+          }
+          if (platform.isDefaultMethod(method)) {
+            return platform.invokeDefaultMethod(method, service, proxy, args);
+          }
+          ServiceMethod<Object, Object> serviceMethod =
+              (ServiceMethod<Object, Object>) loadServiceMethod(method);
+          OkHttpCall<Object> okHttpCall = new OkHttpCall<>(serviceMethod, args);
+          return serviceMethod.adapt(okHttpCall);
+        }
+      });
+}
+```
+主要就这三个方法
 >ServiceMethod serviceMethod = loadServiceMethod(method);
 OkHttpCall okHttpCall = new OkHttpCall<>(serviceMethod, args);
 return serviceMethod.callAdapter.adapt(okHttpCall);
@@ -102,7 +131,7 @@ contentType（MimeType）
 ```
 
 
-关键是这三个方法，Buider在这个过程中完成了一些变量的赋值
+关键是这三个方法，Builder在这个过程中完成了一些变量的赋值
 
 1. createCallAdapter  --->  retrofit.callAdapter(returnType, annotations); 从adapterFactories(显然可以有多个)中遍历，找到了一个就返回。已经实现的的有三种**策略**，DefaultCallAdapterFactory、ExecutorCallAdapterFactory和RxjavaCallAdapterFactory。显然用户可以在创建retrofit实例的过程中install自己的callAdapter实现。
 再次强调这个CallAdapter的作用，就是将Retrofit的Call adapt成对应的Response class的实例。
@@ -185,7 +214,7 @@ ServiceMethod(Builder<T> builder) {
 
 ### 1.3 第二个方法和OkHttpCall
 第二个方法:
- OkHttpCall<Object> okHttpCall = new OkHttpCall<>(serviceMethod, args);
+OkHttpCall<Object> okHttpCall = new OkHttpCall<>(serviceMethod, args);
 
 OkHttpCall的成员变量：
 okhttp3.Call rawCall //用于发起请求
@@ -193,22 +222,27 @@ ServiceMethod<T, ?> serviceMethod;  //这就是刚才实例化的serviceMethod�
 这个类相对简单，主要看execute方法
 
 ```java
- @Override public Response<T> execute() throws IOException {
-    okhttp3.Call call;
-    synchronized (this) {
-      if (executed) throw new IllegalStateException("Already executed.");
-      executed = true;
-      call = rawCall;
-      if (call == null) {
-        try {
-          call = rawCall = createRawCall();
-        } catch (IOException | RuntimeException e) {
-        }
+@Override public Response<T> execute() throws IOException {
+  okhttp3.Call call;
+
+  synchronized (this) {
+    if (executed) throw new IllegalStateException("Already executed.");
+    executed = true;
+  // ...
+    call = rawCall;
+    if (call == null) {
+      try {
+        call = rawCall = createRawCall();
+      } catch (IOException | RuntimeException | Error e) {
+        //...
+        throw e;
       }
     }
-    return parseResponse(call.execute()); //建立连接，发起请求，解析response都在这里了（都在一条线程上）。execute是okHttp的方法。
   }
+  return parseResponse(call.execute()); //建立连接，发起请求，解析response都在这里了（都在一条线程上）。execute是okHttp的方法。
+}
 ```
+
 还记得最简单的Demo吗，同步执行网络请求
 Call<List<Contributor>> call = github.contributors("square", "retrofit");
 List<Contributor> contributors = call.execute().body();
@@ -250,7 +284,7 @@ parseRespnse的实现
 
     ExceptionCatchingRequestBody catchingBody = new ExceptionCatchingRequestBody(rawBody);
     try {
-      T body = serviceMethod.toResponse(catchingBody); //调用ServiceMethod的responseConverter去转换，前面说过，responseConverter是在builder初始化的时候根据策略，从Retrofit的converterFactories中遍历，找到了就返回。
+      T body = serviceMethod.toResponse(catchingBody); //调用ServiceMethod的responseConverter去转换，前面说过，responseConverter是在builder初始化的时候根据策略，从Retrofit的converterFactories中遍历，找到了就返回。 就是在这里把byte转成Object的
       return Response.success(body, rawResponse); //返回创建一个body为定义好的数据类型的Retrofit2.Response，一般情况下，调用Response.body()就能得到所要的实体数据。
     } catch (RuntimeException e) {
       // If the underlying source threw an exception, propagate that rather than indicating it was
@@ -263,8 +297,17 @@ parseRespnse的实现
 这里可以得知，Retrofit对于状态码的处理，1XX和3XX以上全部走到error中
 
 
-execute是同步方法，enqueue是异步请求的方法，底层其实就调用了OkHttp.Call.enqueue()，所以说Retrofit本身并不负责创建网络请求，线程调度。只做了parseRespnse的方法，另外，OkHttp和Retrofit本身并不负责把Response推到主线程上，Android 平台可能要注意。
-
+execute是同步方法，enqueue是异步请求的方法，底层其实就调用了OkHttp.Call.enqueue()，所以说Retrofit本身并不负责创建网络请求，线程调度。只做了parseRespnse的方法，另外，OkHttp本身并不负责把Response推到主线程上，不过Retrofit判断了Paltform，是Android的话就设置了默认的回调线程为主线程。
+```java
+public Retrofit build() {
+//....
+Executor callbackExecutor = this.callbackExecutor;
+    if (callbackExecutor == null) {
+      callbackExecutor = platform.defaultCallbackExecutor(); //这里面有一个MainThreadExecutor
+    }
+//....    
+}
+```
 ### 1.4 第三个方法和AdapterFactory
 return serviceMethod.callAdapter.adapt(okHttpCall); //这个return需要的是Object,涉及到动态代理，可以无视。
 

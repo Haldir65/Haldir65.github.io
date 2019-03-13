@@ -809,3 +809,6 @@ ObservableSubscribeOn.subScribe会调用到ObservableSubscribeOn.subscribeActual
 -- [掘金](https://juejin.im/entry/5a025b3b51882561a3265bb7)
 -- [使用concat从数据库，内存，网络三层中获取数据](http://www.jianshu.com/p/6f3b6b934787)
 -- [RxJava 教程第四部分：并发 之数据流发射太快如何办](http://blog.chengyunfeng.com/?p=981)
+
+
+- [rxjava2操作符详解](https://maxwell-nc.github.io/android/rxjava2-6.html)
