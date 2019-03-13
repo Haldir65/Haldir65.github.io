@@ -24,7 +24,7 @@
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/different_response.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/delegate_converters.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/always_observe_on_mian_thread.jpg">
-<meta property="og:updated_time" content="2019-03-02T14:34:42.255Z">
+<meta property="og:updated_time" content="2019-03-13T02:30:25.318Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Retrofit源码阅读笔记">
 <meta name="twitter:description" content="This is gonna be nasty…… TL;DR">
@@ -235,6 +235,35 @@ Retrofit retrofit = new Retrofit.Builder()
     }
 </code></pre>
 <p>关键来看这段 retroft.create ,重点都在这里面。关键的代码就在这三行里面了</p>
+<p>大名鼎鼎的动态代理</p>
+<pre><code class="java">@SuppressWarnings(&quot;unchecked&quot;) // Single-interface proxy creation guarded by parameter safety.
+public &lt;T&gt; T create(final Class&lt;T&gt; service) {
+  Utils.validateServiceInterface(service);
+  if (validateEagerly) {
+    eagerlyValidateMethods(service);
+  }
+  return (T) Proxy.newProxyInstance(service.getClassLoader(), new Class&lt;?&gt;[] { service },
+      new InvocationHandler() {
+        private final Platform platform = Platform.get();
+
+        @Override public Object invoke(Object proxy, Method method, @Nullable Object[] args)
+            throws Throwable {
+          // If the method is a method from Object then defer to normal invocation.
+          if (method.getDeclaringClass() == Object.class) {
+            return method.invoke(this, args);
+          }
+          if (platform.isDefaultMethod(method)) {
+            return platform.invokeDefaultMethod(method, service, proxy, args);
+          }
+          ServiceMethod&lt;Object, Object&gt; serviceMethod =
+              (ServiceMethod&lt;Object, Object&gt;) loadServiceMethod(method);
+          OkHttpCall&lt;Object&gt; okHttpCall = new OkHttpCall&lt;&gt;(serviceMethod, args);
+          return serviceMethod.adapt(okHttpCall);
+        }
+      });
+}
+</code></pre>
+<p>主要就这三个方法</p>
 <blockquote>
 <p>ServiceMethod serviceMethod = loadServiceMethod(method);<br>OkHttpCall okHttpCall = new OkHttpCall&lt;&gt;(serviceMethod, args);<br>return serviceMethod.callAdapter.adapt(okHttpCall);</p>
 </blockquote>
@@ -283,7 +312,7 @@ contentType（MimeType）
     }
 }
 </code></pre>
-<p>关键是这三个方法，Buider在这个过程中完成了一些变量的赋值</p>
+<p>关键是这三个方法，Builder在这个过程中完成了一些变量的赋值</p>
 <ol>
 <li><p>createCallAdapter  —&gt;  retrofit.callAdapter(returnType, annotations); 从adapterFactories(显然可以有多个)中遍历，找到了一个就返回。已经实现的的有三种<strong>策略</strong>，DefaultCallAdapterFactory、ExecutorCallAdapterFactory和RxjavaCallAdapterFactory。显然用户可以在创建retrofit实例的过程中install自己的callAdapter实现。<br>再次强调这个CallAdapter的作用，就是将Retrofit的Call adapt成对应的Response class的实例。</p>
 </li>
@@ -350,23 +379,27 @@ contentType（MimeType）
   }
 </code></pre>
 <p>上面最重要的三个方法讲完了第一个。  </p>
-<h3 id="1-3-第二个方法和OkHttpCall"><a href="#1-3-第二个方法和OkHttpCall" class="headerlink" title="1.3 第二个方法和OkHttpCall"></a>1.3 第二个方法和OkHttpCall</h3><p>第二个方法:<br> OkHttpCall<Object> okHttpCall = new OkHttpCall&lt;&gt;(serviceMethod, args);</p>
+<h3 id="1-3-第二个方法和OkHttpCall"><a href="#1-3-第二个方法和OkHttpCall" class="headerlink" title="1.3 第二个方法和OkHttpCall"></a>1.3 第二个方法和OkHttpCall</h3><p>第二个方法:<br>OkHttpCall<Object> okHttpCall = new OkHttpCall&lt;&gt;(serviceMethod, args);</p>
 <p>OkHttpCall的成员变量：<br>okhttp3.Call rawCall //用于发起请求<br>ServiceMethod<T, ?> serviceMethod;  //这就是刚才实例化的serviceMethod对象<br>这个类相对简单，主要看execute方法</p>
-<pre><code class="java"> @Override public Response&lt;T&gt; execute() throws IOException {
-    okhttp3.Call call;
-    synchronized (this) {
-      if (executed) throw new IllegalStateException(&quot;Already executed.&quot;);
-      executed = true;
-      call = rawCall;
-      if (call == null) {
-        try {
-          call = rawCall = createRawCall();
-        } catch (IOException | RuntimeException e) {
-        }
+<pre><code class="java">@Override public Response&lt;T&gt; execute() throws IOException {
+  okhttp3.Call call;
+
+  synchronized (this) {
+    if (executed) throw new IllegalStateException(&quot;Already executed.&quot;);
+    executed = true;
+  // ...
+    call = rawCall;
+    if (call == null) {
+      try {
+        call = rawCall = createRawCall();
+      } catch (IOException | RuntimeException | Error e) {
+        //...
+        throw e;
       }
     }
-    return parseResponse(call.execute()); //建立连接，发起请求，解析response都在这里了（都在一条线程上）。execute是okHttp的方法。
   }
+  return parseResponse(call.execute()); //建立连接，发起请求，解析response都在这里了（都在一条线程上）。execute是okHttp的方法。
+}
 </code></pre>
 <p>还记得最简单的Demo吗，同步执行网络请求<br>Call&lt;List<Contributor>&gt; call = github.contributors(“square”, “retrofit”);<br>List<Contributor> contributors = call.execute().body();<br>这也是Retrofit2.Call.execute方法最终就是走到了这里</p>
 <p>createRawCall方法</p>
@@ -403,7 +436,7 @@ contentType（MimeType）
 
     ExceptionCatchingRequestBody catchingBody = new ExceptionCatchingRequestBody(rawBody);
     try {
-      T body = serviceMethod.toResponse(catchingBody); //调用ServiceMethod的responseConverter去转换，前面说过，responseConverter是在builder初始化的时候根据策略，从Retrofit的converterFactories中遍历，找到了就返回。
+      T body = serviceMethod.toResponse(catchingBody); //调用ServiceMethod的responseConverter去转换，前面说过，responseConverter是在builder初始化的时候根据策略，从Retrofit的converterFactories中遍历，找到了就返回。 就是在这里把byte转成Object的
       return Response.success(body, rawResponse); //返回创建一个body为定义好的数据类型的Retrofit2.Response，一般情况下，调用Response.body()就能得到所要的实体数据。
     } catch (RuntimeException e) {
       // If the underlying source threw an exception, propagate that rather than indicating it was
@@ -414,7 +447,16 @@ contentType（MimeType）
   }
 </code></pre>
 <p>这里可以得知，Retrofit对于状态码的处理，1XX和3XX以上全部走到error中</p>
-<p>execute是同步方法，enqueue是异步请求的方法，底层其实就调用了OkHttp.Call.enqueue()，所以说Retrofit本身并不负责创建网络请求，线程调度。只做了parseRespnse的方法，另外，OkHttp和Retrofit本身并不负责把Response推到主线程上，Android 平台可能要注意。</p>
+<p>execute是同步方法，enqueue是异步请求的方法，底层其实就调用了OkHttp.Call.enqueue()，所以说Retrofit本身并不负责创建网络请求，线程调度。只做了parseRespnse的方法，另外，OkHttp本身并不负责把Response推到主线程上，不过Retrofit判断了Paltform，是Android的话就设置了默认的回调线程为主线程。</p>
+<pre><code class="java">public Retrofit build() {
+//....
+Executor callbackExecutor = this.callbackExecutor;
+    if (callbackExecutor == null) {
+      callbackExecutor = platform.defaultCallbackExecutor(); //这里面有一个MainThreadExecutor
+    }
+//....    
+}
+</code></pre>
 <h3 id="1-4-第三个方法和AdapterFactory"><a href="#1-4-第三个方法和AdapterFactory" class="headerlink" title="1.4 第三个方法和AdapterFactory"></a>1.4 第三个方法和AdapterFactory</h3><p>return serviceMethod.callAdapter.adapt(okHttpCall); //这个return需要的是Object,涉及到动态代理，可以无视。</p>
 <p>回头看一下serviceMethod的createCallAdapter方法，就是从retrofit对象的adapterFactories中一个个遍历：</p>
 <blockquote>

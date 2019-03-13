@@ -16,7 +16,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/20160720094529840.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/1279081126453.jpg">
-<meta property="og:updated_time" content="2019-03-02T14:34:42.263Z">
+<meta property="og:updated_time" content="2019-03-13T02:30:25.326Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="pragmatic-java-chetsheet">
 <meta name="twitter:image" content="https://haldir66.ga/static/imgs/20160720094529840.jpg">
@@ -664,6 +664,65 @@ public class Test {
 
         System.out.println(depv1Class.equals(depv2Class));
    }
+}
+</code></pre>
+<p>反射替换final成员变量的时候要小心<a href="https://fucknmb.com/2018/04/16/一种全局拦截并监控DNS的方式/">一种全局拦截并监控 DNS 的方式</a> 文中提到</p>
+<pre><code class="java">try {
+    //获取InetAddress中的impl
+    Field impl = InetAddress.class.getDeclaredField(&quot;impl&quot;);
+    impl.setAccessible(true);
+    //获取accessFlags
+    Field modifiersField = Field.class.getDeclaredField(&quot;accessFlags&quot;);
+    modifiersField.setAccessible(true);
+    //去final
+    modifiersField.setInt(impl, impl.getModifiers() &amp; ~java.lang.reflect.Modifier.FINAL);
+    //获取原始InetAddressImpl对象
+    final Object originalImpl = impl.get(null);
+    //构建动态代理InetAddressImpl对象
+    Object dynamicImpl = Proxy.newProxyInstance(originalImpl.getClass().getClassLoader(), originalImpl.getClass().getInterfaces(), new InvocationHandler() {
+        final Object lock = new Object();
+        Constructor&lt;Inet4Address&gt; constructor = null;
+
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            //如果函数名为lookupAllHostAddr，并且参数长度为2，第一个参数是host，第二个参数是netId
+            if (method.getName().equals(&quot;lookupAllHostAddr&quot;) &amp;&amp; args != null &amp;&amp; args.length == 2) {
+                Log.e(&quot;TAG&quot;, &quot;lookupAllHostAddr：&quot; + Arrays.asList(args));
+                //获取Inet4Address的构造函数，可能还需要Inet6Address的构造函数，为了演示，简单处理
+                if (constructor == null) {
+                    synchronized (lock) {
+                        if (constructor == null) {
+                            try {
+                                constructor = Inet4Address.class.getDeclaredConstructor(String.class, byte[].class);
+                                constructor.setAccessible(true);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+                if (constructor != null) {
+                    //这里实现自己的逻辑
+                    //构造一个mock的dns解析并返回
+                    if (args[0] != null &amp;&amp; &quot;www.baidu.com&quot;.equalsIgnoreCase(args[0].toString())) {
+                        try {
+                            Inet4Address inetAddress = constructor.newInstance(null, new byte[]{(byte) 61, (byte) 135, (byte) 169, (byte) 121});
+                            return new InetAddress[]{inetAddress};
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+            return method.invoke(originalImpl, args);
+        }
+    });
+    //替换impl为动态代理对象
+    impl.set(null, dynamicImpl);
+    //还原final
+    modifiersField.setInt(impl, impl.getModifiers() &amp; java.lang.reflect.Modifier.FINAL);
+} catch (Exception e) {
+    e.printStackTrace();
 }
 </code></pre>
 <p>todo<br>反编译java代码的基本套路<br><a href="https://www.zhihu.com/question/60892134">有直接去看hotspot源码来分析的</a><br><a href="https://zhuanlan.zhihu.com/p/51374915">classLoader related topics</a></p>

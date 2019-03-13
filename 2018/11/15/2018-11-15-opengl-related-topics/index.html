@@ -17,7 +17,7 @@
 <meta property="og:description" content="topics relating opengl stuff">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery151110074347.jpg">
-<meta property="og:updated_time" content="2019-03-02T14:34:42.263Z">
+<meta property="og:updated_time" content="2019-03-13T02:30:25.326Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="opengl学习笔记">
 <meta name="twitter:description" content="topics relating opengl stuff">
@@ -570,7 +570,7 @@ void main(){
 GLES20.glUniform3fv(hChangeColor,1,filter.data(),0);
 </code></pre>
 <p>所以，滤镜(filter)效果对应的片元着色器可以这样写:<br>GLSL语言</p>
-<pre><code class="s">precision mediump float;
+<pre><code class="c">precision mediump float;
 
 uniform sampler2D vTexture;
 uniform int vChangeType;
@@ -646,6 +646,28 @@ void main(){
 <pre><code class="xml">&lt;color name=&quot;bg_color&quot;&gt;#FF88269F&lt;/color&gt;
 </code></pre>
 <p>黑白图片是怎么来的？<br>黑白图片上，每个像素点的RGB三个通道值应该是相等的。知道了这个，将彩色图片处理成黑白图片就非常简单了。我们直接获取像素点的RGB三个通道，相加然后除以3作为处理后每个通道的值就可以得到一个黑白图片了。这是均值的方式是常见黑白图片处理的一种方法。类似的还有权值方法（给予RGB三个通道不同的比例）、只取绿色通道等方式。<br>与之类似的，冷色调的处理就是单一增加蓝色通道的值，暖色调的处理可以增加红绿通道的值。还有其他复古、浮雕等处理也都差不多。</p>
+<p>类似的滤镜效果还有：<br>胶片效果：<br>就是把RGBA的A,R,G,B全部用255减掉<br>即：<br>A = 255 - A<br>R = 255 -R<br>G = 255 - G<br>B = 255 - B</p>
+<p>但是实际上用取反操作符(~)就可以了<br>因为ARGB正好是4个byte(1个int)<br>比方说<br>1111， 取反(位非)之后变成11111110 11111110 11111110 11111110<br>也就是255减去的效果</p>
+<p><a href="https://en.wikipedia.org/wiki/RGBA_color_space">这个RGBA的顺序不能搞错</a><br>In OpenGL and Portable Network Graphics (PNG), the RGBA (byte-order) is used, where the colors are stored in memory such that R is at the lowest address, G after it, B after that, and A last. On a little endian architecture this is equivalent to ABGR (word-order).</p>
+<p>就是说，opengl和png数据中,byte array的顺序从内存低地址到高地址依次是RGBA，在小端上会掉头</p>
+<p><a href="https://www.jianshu.com/p/12f06da0a4ec">Android 关于美颜/滤镜 从OpenGl录制视频的一种方案</a>有这样的操作byte[]的代码，需要指出的是。<br>java平台上，因为有jvm的存在，所以是大端。所以这下面的代码才成立</p>
+<pre><code class="java"> int[] pixelData = new int[width * height];
+
+                int offset = 0;
+                int index = 0;
+                for (int i = 0; i &lt; height; ++i) {
+                    for (int j = 0; j &lt; width; ++j) {
+                        int pixel = 0;
+                        pixel |= (data[offset] &amp; 0xff) &lt;&lt; 16;     // R
+                        pixel |= (data[offset + 1] &amp; 0xff) &lt;&lt; 8;  // G
+                        pixel |= (data[offset + 2] &amp; 0xff);       // B
+                        pixel |= (data[offset + 3] &amp; 0xff) &lt;&lt; 24; // A
+                        pixelData[index++] = pixel;
+                        offset += pixelStride;
+                    }
+                    offset += rowPadding;
+                }
+</code></pre>
 <p>图片模糊<br>图片模糊处理相对上面的色调处理稍微复杂一点，通常图片模糊处理是采集周边多个点，然后利用这些点的色彩和这个点自身的色彩进行计算，得到一个新的色彩值作为目标色彩。模糊处理有很多算法，类似高斯模糊、径向模糊等等。</p>
 <h3 id="YUV格式解释-相机返回的是YUV格式的图像数据"><a href="#YUV格式解释-相机返回的是YUV格式的图像数据" class="headerlink" title="YUV格式解释(相机返回的是YUV格式的图像数据)"></a>YUV格式解释(相机返回的是YUV格式的图像数据)</h3><blockquote>
 <p>RGB图像大家都了解，RGB图像分为了三个颜色分量，R红色分量，G绿色分量，B蓝色分量。而YUV图像，也是分为了三个分量，Y亮度分量，用来表示明亮度，也叫灰阶值，U分量和V分量是色值分量，用来表示图像色彩与饱和度，其中U分量也叫Cb，表示的图像蓝色偏移量，V分量也叫Cr，用来表示图像红色部分偏移量，所以YUV有时也写作YCbCr。<br>YUV图像把亮度和色度分开了，避免了亮度和色度的相互干扰，可以在降低色度采样率的情况下，保持图像的视觉质量。<br>```<br>RGB转YUV:</p>
@@ -659,6 +681,7 @@ void main(){
 <p>B = Y + 1.772 (U - 128)</p>
 <pre><code>
 Camera可以通过setPreviewFormat()方法来设置预览图像的数据格式，推荐选择的有ImageFormat.NV21和ImageFormat.YV12，默认是NV21。NV21属于YUV图像.
+[Android Camera2 API YUV_420_888 to JPEG](https://stackoverflow.com/questions/40090681/android-camera2-api-yuv-420-888-to-jpeg)
 
 [YuvImage.compressToJpeg](https://developer.android.com/reference/android/graphics/YuvImage.html#compressToJpeg(android.graphics.Rect,%20int,%20java.io.OutputStream)) android sdk提供了将yuv转为jpg的方法
 </code></pre><p>public boolean compressToJpeg (Rect rectangle,<br>                int quality,<br>                OutputStream stream)<br>```<br>将一个YuvImage压缩成jpeg，存到一个outputStream中。<strong>这个方法借助Android的JNI，实现了非常高效率的JPEG格式文件写入（比Bitmap.compress()效率都要高不少）</strong></p>

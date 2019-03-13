@@ -17,7 +17,7 @@
 <meta property="og:description" content="主要讲讲java中的notify,wait,synchronized ，unsafe等多线程基础工具的使用方式。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/HongKongFireworks_ZH-CN13422096721_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-03-02T14:34:42.263Z">
+<meta property="og:updated_time" content="2019-03-13T02:30:25.330Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="编程语言中使用到的多线程基础数据结构">
 <meta name="twitter:description" content="主要讲讲java中的notify,wait,synchronized ，unsafe等多线程基础工具的使用方式。">
@@ -253,7 +253,17 @@ public class com.me.harris.concurrent.SynchronizedSample {
 </blockquote>
 <p><a href="http://www.cnblogs.com/paddix/p/5405678.html">轻量级锁和偏向锁</a></p>
 <p>类似的，synchronized修饰的instance method在编译后添加了一个ACC_SYNCHRONIZED的flag，同步是通过这个标志实现的。</p>
-<h2 id="回顾一下用notify-wait-synchronized实现的生产者-消费者模型"><a href="#回顾一下用notify-wait-synchronized实现的生产者-消费者模型" class="headerlink" title="回顾一下用notify,wait,synchronized实现的生产者-消费者模型"></a>回顾一下用notify,wait,synchronized实现的生产者-消费者模型</h2><p>基本的思路就是生产者和消费者共同持有一个锁（随便new一个Object出来就是了），生产者和消费者都extends Thread。<br>生产者的run方法里while(true)，再加上synchronized，往queue里面丢东西，塞满了就notify一下（让消费者去消费）。<br>消费者的run方法里面while(true)，再加上synchronized，从queue里面取东西，发现没东西了。notify一下其他人（让生产者去生产）。</p>
+<h2 id="回顾一下用notify-wait-synchronized实现的生产者-消费者模型"><a href="#回顾一下用notify-wait-synchronized实现的生产者-消费者模型" class="headerlink" title="回顾一下用notify,wait,synchronized实现的生产者-消费者模型"></a>回顾一下用notify,wait,synchronized实现的生产者-消费者模型</h2><p>Effective java里面说要把wait写在一个while检查里面</p>
+<pre><code class="java">// The standard idiom for calling the wait method in Java 
+synchronized (sharedObject) { 
+    while (condition) { 
+    sharedObject.wait(); 
+        // (Releases lock, and reacquires on wakeup) 
+    } 
+    // do action based upon condition e.g. take or put into queue 
+}
+</code></pre>
+<p>基本的思路就是生产者和消费者共同持有一个锁（随便new一个Object出来就是了），生产者和消费者都extends Thread。<br>生产者的run方法里while(true)，再加上synchronized，往queue里面丢东西，塞满了就notify一下（让消费者去消费）。<br>消费者的run方法里面while(true)，再加上synchronized，从queue里面取东西，发现没东西了。notify一下其他人（让生产者去生产）。</p>
 <h2 id="Sleep和wait的区别"><a href="#Sleep和wait的区别" class="headerlink" title="Sleep和wait的区别"></a>Sleep和wait的区别</h2><p>不要搞混淆了，sleep是不会让出cpu的执行权的，而wait则会让出cpu执行权，也就是释放锁。</p>
 <h2 id="yield的用法"><a href="#yield的用法" class="headerlink" title="yield的用法"></a>yield的用法</h2><p>yield是让当前线程从running的状态变成runnable的状态（不过这个方法很少用到）</p>
 <h2 id="join的用法"><a href="#join的用法" class="headerlink" title="join的用法"></a>join的用法</h2><p>和python一样，主线程调用childThread.join()就是让主线程等子线程执行完了之后再去执行后面的语句。不过从源码来看,join调用了wait。</p>

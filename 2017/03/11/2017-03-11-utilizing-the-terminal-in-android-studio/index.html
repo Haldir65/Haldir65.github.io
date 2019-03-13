@@ -17,7 +17,7 @@
 <meta property="og:description" content="这周终于把Google I/O 2016的Android App在Device上跑起来了，顺便尝试多多使用命令行进行编译或者安装。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/device-2017-03-11-222239.png">
-<meta property="og:updated_time" content="2019-03-02T14:34:42.251Z">
+<meta property="og:updated_time" content="2019-03-13T02:30:25.314Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用IDE内置的Terminal">
 <meta name="twitter:description" content="这周终于把Google I/O 2016的Android App在Device上跑起来了，顺便尝试多多使用命令行进行编译或者安装。">
@@ -689,6 +689,71 @@ public final boolean handleIntent(Intent var1, IWXAPIEventHandler var2) {
       if (errorCode == -14) // -14 is error for file not found, like 404.
           view.loadUrl(&quot;http://youriphost&quot;);
   }
+</code></pre>
+<h3 id="38-WebView的Cookie问题"><a href="#38-WebView的Cookie问题" class="headerlink" title="38 .WebView的Cookie问题"></a>38 .WebView的Cookie问题</h3><pre><code class="java">List&lt;Cookie&gt; mCookies;
+mOkHttpClient = new OkHttpClient.Builder()
+        ...
+        // 下面就是对OkHttp的cookie的处理
+        .cookieJar(new CookieJar() {
+                    // 对服务器返回的cookie的处理的方法
+                    // 参数url和cookie就是cookie对应的url和cookie的值
+                    @Override
+                    public void saveFromResponse(HttpUrl url, List&lt;Cookie&gt; cookies) {
+                        // 对cookie的处理，一般是存到内存中，使其他地方可以获得
+                        mCookies = cookies;
+                    }
+                    // 发送请求时的cookie的处理，返回的List&lt;Cookie&gt;即请求的cookie
+                    @Override
+                    public List&lt;Cookie&gt; loadForRequest(HttpUrl url) {
+                        return mCookies;
+                        //return null;
+                    }
+                })
+        .build();
+
+//从okHttp那边拿到cookie之后
+private void syncCookies(String url, List&lt;Cookie&gt; cookies) {
+    // 一些前提设置
+    CookieSyncManager.createInstance(this);
+    final CookieManager cookieManager = CookieManager.getInstance();
+    cookieManager.setAcceptCookie(true);
+    /**
+     * 设置webView支持JS的Cookie的调用，5.0以上才要设置
+     */
+    if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.LOLLIPOP) {
+        cookieManager.setAcceptThirdPartyCookies(mWebView, true);
+    }
+    //cookieManager.removeAllCookie();
+    // 向WebView中添加Cookie，
+    for (Cookie cookie : cookies) {
+        cookieManager.setCookie(url, cookie.toString());
+    }
+    // 刷新，同步
+    if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.LOLLIPOP_MR1) {
+        CookieManager.getInstance().flush();
+    } 
+    CookieSyncManager.getInstance().sync();
+    //String newCookie = cookieManager.getCookie(url);验证是否将cookie同步进去
+    //KLog.i(&quot;newCookie: &quot; + newCookie);
+}        
+
+//但是顺序很重要
+// 1.先初始化WebView，各种设置setting，webViewClient和chromeClient等
+initWebView();
+// 2.再获得，并同步cookie
+// MyCookieJar.getInstance().getCookies()可以换成ApiManager.getInstance().getCookies()等
+syncCookies(url, MyCookieJar.getInstance().getCookies());
+// 3.最后加载url
+mWebView.loadUrl(url);
+</code></pre>
+<p><a href="https://www.jianshu.com/p/40c767312103">cookie带不过去的解决</a><br>问题：Native已经登录，cookie可以设置进去，但是网页进行了复杂的ajax操作（我也不知道什么操作），cookie带不过去，到指定页面还得登录。5.0以下正常<br>解决：经过排查，发现高版本时问题出在ajax跳转时，是Js对Cookie的操作，不经过WebView，正常的WebView设置没有作用。看了很多博客，还是在StackOverFlow上发现解决方法。一行代码</p>
+<pre><code class="java">final CookieManager cookieManager = CookieManager.getInstance();
+cookieManager.setAcceptCookie(true);
+/**
+ * 设置webView支持JS的Cookie的调用，5.0以上才要设置
+ */
+// 大致意思：mWebView接收第三方对Cookie的操作，也就是支持Js对cookie的操作
+cookieManager.setAcceptThirdPartyCookies(mWebView, true);
 </code></pre>
 
       

@@ -16,7 +16,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/street%20lights%20dark%20night%20car%20city%20bw.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/toast_transact.jpg">
-<meta property="og:updated_time" content="2019-03-02T14:34:42.259Z">
+<meta property="og:updated_time" content="2019-03-13T02:30:25.326Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android知识集合[四]">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/street%20lights%20dark%20night%20car%20city%20bw.jpg">
@@ -673,7 +673,8 @@ gl.glGetIntegerv(GL10.GL_MAX_TEXTURE_SIZE, maxSize, 0);
 Log.e(&quot;GL&quot;, &quot;CURRENT MAX IS &quot;+String.valueOf(maxSize[0]));
 // maxSize[0] now contains max size(in both dimensions)
 </code></pre>
-<h3 id="19-RenderScript的使用方式"><a href="#19-RenderScript的使用方式" class="headerlink" title="19. RenderScript的使用方式"></a>19. RenderScript的使用方式</h3><pre><code class="java">//首先从一个view中获取Bitmap,在父viewgroup中addView(ImageView),setImageBItmap(blurredBitmap)
+<h3 id="19-RenderScript的使用方式"><a href="#19-RenderScript的使用方式" class="headerlink" title="19. RenderScript的使用方式"></a>19. RenderScript的使用方式</h3><p><a href="https://www.jianshu.com/p/f2352c95d391">高斯模糊</a></p>
+<pre><code class="java">//首先从一个view中获取Bitmap,在父viewgroup中addView(ImageView),setImageBItmap(blurredBitmap)
 public static Bitmap getViewBitmap(View v) {
     if(v.getWidth() == 0 || v.getHeight() == 0)
         return null;
@@ -812,6 +813,41 @@ private void initMemoryMap() {
     }
 </code></pre>
 <p>不过后来的release好像又删掉了走共享内存这段</p>
+<h3 id="25-activity的启动流程是怎样的"><a href="#25-activity的启动流程是怎样的" class="headerlink" title="25. activity的启动流程是怎样的"></a>25. activity的启动流程是怎样的</h3><pre><code class="java">Activity.startActivity
+Activity.startActivityForResult
+Instrumentation.execStartActivity
+ActivityManagerProxy.startActivity
+---
+ActivityManagerService.startActivity
+ActivityStack.startActivityMayWait
+ActivityStack.startActivityLocked
+ActivityStack.startActivityUncheckedLocked
+ActivityStack.resumeTopActivityLocked
+ActivityStack.startPausingLocked
+ApplicationThreadProxy.schedulePauseActivity
+---
+ApplicationThread.schedulePauseActivity
+ActivityThread.queueOrSendMessage
+H.handleMessage
+ActivityThread.handlePauseActivity
+ActivityManagerProxy.activityPaused
+---
+ActivityManagerService.activityPaused
+ActivityStack.activityPaused
+ActivityStack.completePauseLocked
+ActivityStack.resumeTopActivityLokced
+ActivityStack.startSpecificActivityLocked
+ActivityStack.realStartActivityLocked
+---
+ApplicationThreadProxy.scheduleLaunchActivity
+ApplicationThread.scheduleLaunchActivity
+ActivityThread.queueOrSendMessage
+H.handleMessage
+ActivityThread.handleLaunchActivity
+ActivityThread.performLaunchActivity
+*AcitiviyB.onCreate
+</code></pre>
+<p><a href="https://www.haldir66.ga/static/imgs/android_build_detail.png">安卓打包流程</a></p>
 
       
 

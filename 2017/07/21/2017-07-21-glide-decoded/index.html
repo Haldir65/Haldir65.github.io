@@ -17,7 +17,7 @@
 <meta property="og:description" content="glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&amp;gt;  CacheDispatch  —&amp;gt; NetworkDispatcher  —-&amp;gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/a11f41e0b1df95212c71920b3959cd72.jpg">
-<meta property="og:updated_time" content="2019-03-02T14:34:42.255Z">
+<meta property="og:updated_time" content="2019-03-13T02:30:25.318Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从glide源码到图片加载框架设计思路">
 <meta name="twitter:description" content="glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&amp;gt;  CacheDispatch  —&amp;gt; NetworkDispatcher  —-&amp;gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是">
@@ -234,7 +234,7 @@ ga('send', 'pageview');
         return current;
     }
 </code></pre>
-<p>with方法只是返回了一个RequestManager，with方法可以接受Fragemnt,Activity以及Context等.以上面的activity为例，supportFragmentGet方法只是通过FragmentActivity的supportFragmentManager去findFragmentByTag，这个Tag叫做：“com.bumptech.glide.manager”，所以一般在Debug的时候，去SupportFragmentManager里面查找，有时候能够看到一个这样的Fragment。这个方法里面就是查找这样的一个Fragment，甚至我们自己也可以FindFragmentByTag去调用这个Fragment的方法(这是一个Public的class)然后从这个Fragemnt里面获得RequestManager成员变量（没有就new一个并set）。可以看出，一个Fragment只有一个RequestManager，Fragment主要是为了跟Activity生命周期挂钩的。这里有必要讲一下为什么要写两次current ==null，findFragmentByTag并不会在commitAllowingStateLoss之后就会返回添加的Fragment，只是往主线程的MessageQueue里面丢了一个消息，这个消息执行完毕之后才findFragmentByTag才不为空。这里用Handler丢一条消息，这条消息肯定要排在之前那条消息之后才被执行，所以才有这样一个Pendingmap的设计。当然到这里，最重要的还是Glide是通过commit了一个特殊的Fragment来实现生命周期监听。<br>具体来看：SupportRequestManagerFragment中</p>
+<p>with方法只是返回了一个RequestManager，with方法可以接受Fragment,Activity以及Context等.以上面的activity为例，supportFragmentGet方法只是通过FragmentActivity的supportFragmentManager去findFragmentByTag，这个Tag叫做：“com.bumptech.glide.manager”，所以一般在Debug的时候，去SupportFragmentManager里面查找，有时候能够看到一个这样的Fragment。这个方法里面就是查找这样的一个Fragment，甚至我们自己也可以FindFragmentByTag去调用这个Fragment的方法(这是一个Public的class)然后从这个Fragment里面获得RequestManager成员变量（没有就new一个并set）。可以看出，一个Fragment只有一个RequestManager，Fragment主要是为了跟Activity生命周期挂钩的。这里有必要讲一下为什么要写两次current ==null，findFragmentByTag并不会在commitAllowingStateLoss之后就会返回添加的Fragment，只是往主线程的MessageQueue里面丢了一个消息，这个消息执行完毕之后才findFragmentByTag才不为空。这里用Handler丢一条消息，这条消息肯定要排在之前那条消息之后才被执行，所以才有这样一个Pendingmap的设计。当然到这里，最重要的还是Glide是通过commit了一个特殊的Fragment来实现生命周期监听。<br>具体来看：SupportRequestManagerFragment中</p>
 <pre><code class="java">  @Override
     public void onStart() {
         super.onStart();

@@ -19,7 +19,7 @@
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/dispatch_touch_event_video.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/touch_event_1.png">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/touch_event_2.png">
-<meta property="og:updated_time" content="2019-03-02T14:34:42.267Z">
+<meta property="og:updated_time" content="2019-03-13T02:30:25.330Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="安卓事件分发流程">
 <meta name="twitter:description" content="图1 默认情况下事件传递的路径  Touch事件始于ACTION_DOWN, 终止于ACTION_UP, 这其中可能会伴随着ACTION_MOVE,ACTION_CANCEL等等。">
@@ -744,6 +744,21 @@ public final int getActionIndex() {
 int maskAction=0x0ff&amp;0x105; //  maskAction=0x005;
 </code></pre>
 <p>如此，触摸动作含义改变为ACTIONPOINTERDOWN。<br>三根手指同时move汇集到应用层，接收到的是ACTION_POINTER_3_MOVE.<br>结论是，getActionIndex就是获取 0x00000206 里面那个2，也就是第几根手指上去的。getActionMasked就是，我不管你是1根手指DOWN，2根手指DOWN还是3根手指DOWN上去，mask之后全部变成ACTION_DOWN。所以一般来说，ACTION_POINTER_2_DOWN这一类的东西通常用于多点触控。一个Int 4个byte，第三个byte保存index（第几根手指），第四个byte保存类型（DOWN,MOVE还是别的什么）</p>
+<p><strong><em>如果View没有消费ACTION_DOWN事件，则之后的ACTION_MOVE等事件都不会再接收。</em></strong></p>
+<p>另外,addTouchTarget方法在遍历当前child过程中只要找到一个就break当前遍历，所以正常情况下，这个链表只会有一歌个。但是，这个遍历外面还包裹了一个```</p>
+<pre><code class="java">actionMasked == MotionEvent.ACTION_DOWN
+                        || (split &amp;&amp; actionMasked == MotionEvent.ACTION_POINTER_DOWN)
+                        || actionMasked == MotionEvent.ACTION_HOVER_MOVE
+</code></pre>
+<p>所以，假如一开始一根手指上去，发生了ACTION_DOWN，随后这只手指不放开，再上去一根手指，就触发了ACTION_POINTER_DOWN，又会去遍历，并可能调用addTouchTarget方法，TouchTarget里面有一个成员遍历pointerIdBits，可以认为是绑定的这根手指的id。<br>另外，在dispatchTouchEvent最一开始是会将之前保留的touchTarget队列清空的，在ACTION_UP里面也做了</p>
+<pre><code class="java">  if (actionMasked == MotionEvent.ACTION_DOWN) {
+                // Throw away all previous state when starting a new touch gesture.
+                // The framework may have dropped the up or cancel event for the previous gesture
+                // due to an app switch, ANR, or some other state change.
+                cancelAndClearTouchTargets(ev);
+                resetTouchState();
+            }
+</code></pre>
 <h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ol>
 <li><a href="http://www.jianshu.com/p/e99b5e8bd67b">图解安卓事件分发机制</a></li>
 <li><a href="https://www.youtube.com/watch?v=usBaTHZdXSI">making sense of the touch system</a></li>
@@ -751,7 +766,7 @@ int maskAction=0x0ff&amp;0x105; //  maskAction=0x005;
 <li><a href="http://wangkuiwu.github.io/2015/01/03/TouchEvent-View/">Android触摸事件机制(三)</a></li>
 <li><a href="http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2013/0225/907.html">ViewConfiguration用法</a></li>
 <li><a href="http://glblong.blog.51cto.com/3058613/1559320">触摸事件的分析与总结</a></li>
-<li><a href="http://mouxuejie.com/blog/2016-05-01/view-touch-event-source-analysis/">View事件分发及消费源码分析</a></li>
+<li><a href="http://mouxuejie.com/blog/2016-05-01/view-touch-event-source-analysis/">View事件分发及消费源码分析</a><br><a href="https://www.jianshu.com/p/06574d8f10bf">看这篇文章就够了</a></li>
 </ol>
 
       
