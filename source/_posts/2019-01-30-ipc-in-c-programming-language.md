@@ -360,7 +360,7 @@ int main(void){
 这里添一句，cpython因为是用Ｃ语言写的，在处理信号这方面几乎是一模一样。
 [注册signal_handler](https://stackabuse.com/handling-unix-signals-in-python/)
 
-> ＝＝＝＝＝＝＝＝＝介绍进程的基础知识到此结束＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+> ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝介绍进程的基础知识到此结束
 
 
 ## 进程之间的通信

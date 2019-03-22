@@ -90,6 +90,26 @@ public void trimToSize() // 内存压力大的时候可以释放掉一部分内�
 
 > 和Vector不同，ArrayList中的操作不是线程安全的！所以，建议在单线程中才使用ArrayList，而在多线程中可以选择Vector或者CopyOnWriteArrayList。
 
+CopyOnWriteArrayList的get操作是通过将elements声明为volatile，而修改(增删改)则是通过修改(copyOf(原来的List)，完事CAS去设置object，所以修改的比较多的话会导致大量的memory copy，性能差一点)
+
+时间复杂度问题：直接看javadoc怎么说的:
+The size, isEmpty, get, set, iterator, and listIterator operations run in constant time. The add operation runs in amortized constant time, that is, adding n elements requires O(n) time. All of the other operations run in linear time (roughly speaking). The constant factor is low compared to that for the LinkedList implementation.
+
+
+
+| Operation | Array | ArrayList | Singly Linked List |
+| ------ | ------ | ------ | ------  |
+| Read (any where) | O(1) | O(1) |O(n) |
+| Add/Remove at end | O(1) | O(1) |O(n) |
+| Add/Remove in the interior | O(n) | O(n) |O(n) |
+| Resize | O(n) | N/A |N/A |
+| Find By position | O(1) | O(1) |O(n) |
+| Find By target (value) | O(n) | O(n) |O(n) |
+
+[图表参考](http://www.haobanfa.info/array-arraylist-linked-list时间复杂度对比图/)
+
+HashMapput操作的时间复杂度理论上来说当然是O(1)，但是实际上还有很多时间开销的，比如hash碰撞，另外hash的计算也要耗费CPU时间。所以一般我们认为它的时间复杂度是常数级的。
+
 
 ### 1.2 LinkedList的一些点
 LinkedList是双向链表实现的，可以想象成一帮小孩左手拉右手绕成一个圈，只不过这里面的每一个小孩并不是你放进去的 T 类型数据，而是一个Node<T> 。所以LinkedList是可以放进去一个Null的。
@@ -736,7 +756,7 @@ HashSet的源码只有三百多行，内部有一个map（HashMap）相对来说
 
     Queue是一个interface，属于两端可以出入的List，通常是(FIFO模式)，实现类有
     PriorityQueue，
-    java.util.concurrent.LinkedBlockingQueue
+    java.util.concurrent.ArrayBlockingQueue
     java.util.concurrent.LinkedBlockingQueue
     java.util.concurrent.PriorityBlockingQueue
     作者都是大名鼎鼎的Doug Lea
@@ -750,6 +770,7 @@ HashSet的源码只有三百多行，内部有一个map（HashMap）相对来说
 
 ### 5. concurrentHashMap等
 jdk1.8的concurrentHashMap不是用synchronized实现的，是Doug Lea使用CAS操作写的，非常高效。
+concurrentHashMap的原理是分段锁(jdk 1.7)
 
 ### 6. WeakHaskMap
 WeakHashMap的Key是WeakReference，但Value不是。

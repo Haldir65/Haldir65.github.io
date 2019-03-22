@@ -707,7 +707,7 @@ io.reactivex.schedulers.Schedulers
     public abstract Worker createWorker();
 ```
 
-Schedulers.io()  ---> io.reactivex.internal.schedulers.ComputationScheduler //尽量cache,忙不过来的话创建新的线程
+Schedulers.io()  ---> io.reactivex.internal.schedulers.IoScheduler //尽量cache,忙不过来的话创建新的线程
 Schedulers.computation() io.reactivex.internal.schedulers.ComputationScheduler //只是维持了cpu核心数以内的线程，有任务来的时候round-robin
 
 

@@ -211,6 +211,8 @@ public class CountDownLatchTest {
 
 }
 ```
+CountDownLatch的await方法会阻塞主线程直到N减少到0。
+
 CyclicBarrier的例子
 
 ```java
@@ -234,6 +236,10 @@ public class CyclicBarrierDemo {
   }
 }
 ```
+CyclicBarrier是等大家都调完await之后才开始各自走下一步
+
+CountDownLatch：一个或者多个线程，等待其他多个线程完成某件事情之后才能执行；
+CyclicBarrier：多个线程互相等待，直到到达同一个同步点，再继续一起执行。
 
 
 ## 10.指令重排不是说说而已
@@ -315,13 +321,19 @@ ArrayBlockingQueue的入列核心方法是enqueue，而这个方法的调用是�
 LinkedBlockingQueue是Exexutors中使用的创建线程池的静态方法中使用的参数，显然更推荐使用。主要用的是两个方法，
 put方法在队列满的时候会阻塞直到有队列成员被消费，take方法在队列空的时候会阻塞，直到有队列成员被放进来。官方文档提到了， **LinkedBlockingQueue的吞吐量通常要高于基于数组的队列，但在大多数并发应用程序中，其可预知的性能要低一些** ， 内部的lock只能是unfair的。
 
-在线程池(ThreadPoolExecutor)中，获取任务使用的是queue的**poll**方法，添加任务使用的是queue的**offer**方法。
+在线程池(ThreadPoolExecutor)中，获取任务使用的是queue的**poll**方法，添加任务使用的是queue的**offer**方法。就是说“不堵塞”
 
 
 ## 15. AtomicXXX只是将value写成volatile，这样get就安全了，set的话直接交给Unsafe了
 volatile并不是Atomic操作，例如，A线程对volatile变量进行写操作(实际上是读和写操作)，B线程可能在这两个操作之间进行了写操作；例如用volatile修饰count变量那么 count++ 操作就不是原子性的。而AtomicInteger类提供的atomic方法可以让这种操作具有原子性如getAndIncrement()方法会原子性的进行增量操作把当前值加一,因为AtomicInteger的getAndIncrement方法就是简单的调用了Unsafe的getAndAddInt。
 
+
 [CAS还是不能解决ABA问题](https://mp.weixin.qq.com/s/nRnQKhiSUrDKu3mz3vItWg) 在java中用AtomicStampedReference就可以了
+
+ABA问题简单说就是两条线程1,2同时想把100改成50，这时1用CAS改好了，2因为某些问题堵住了，恰好这个时候3线程跑进来把50改成了100，这之后2结束堵塞，用CAS比较，嗯，预期是100，没错，直接CAS变成50.（然而正常情况下结果应该是100，也就是说减法操作做了两次）
+
+java.util.concurrent.atomic下包括AtomicBoolean、AtomicInteger...还有AtomicLongFiledUpdater
+
 
 ## 16. 读多写少的场景下的同步
  CopyOnWriteArrayList和Collections.synchronizedList相比。在高并发前提下，前者读的性能更好，后者写的性能更好（前者的写性能极差）。[CopyOnWriteArrayList与Collections.synchronizedList的性能对比](http://blog.csdn.net/yangzl2008/article/details/39456817)。CopyOnWriteArrayList适合做缓存。
@@ -333,6 +345,50 @@ java 无锁状态、偏向锁、轻量级锁和重量级锁
 
 ## 17. CompletableFuture等java 8 的api
 [AtomicLongFieldUpdater](http://normanmaurer.me/blog/2013/10/28/Lesser-known-concurrent-classes-Part-1/)比AtomicLong更加省内存的方式
+
+
+## 18.ScheduledThreadPoolExecutor用于定期执行任务
+首先要知道的是早期（jdk1.5之前）可以使用TimerTask去定期执行任务，但是因为其内部实现是只有一条线程，所以难免会因为前面堵塞而达不到准时。
+ScheduledThreadPoolExecutor可以解决这个问题，主要是scheduleAtFixedRate和scheduleWithFixedDelay这两个api
+
+ScheduledThreadPoolExecutor作为线程池，内部的blockingQueue使用的是DelayedWorkQueue.
+DelayedWorkQueue为ScheduledThreadPoolExecutor中的内部类，它其实和阻塞队列DelayQueue有点儿类似。DelayQueue是可以提供延迟的阻塞队列，它只有在延迟期满时才能从中提取元素，其列头是延迟期满后保存时间最长的Delayed元素。如果延迟都还没有期满，则队列没有头部，并且 poll 将返回 null。
+DelayedWorkQueue中的任务必然是按照延迟时间从短到长来进行排序的。ScheduledFutureTask有一个compareTo，用于在队列中进行排序。其实就是看task.time，谁在前头谁上。
+
+```java
+public ScheduledFuture<?> scheduleAtFixedRate(Runnable command,
+                                                long initialDelay,
+                                                long period,
+                                                TimeUnit unit) {
+    ScheduledFutureTask<Void> sft =
+        new ScheduledFutureTask<Void>(command,
+                                        null,
+                                        triggerTime(initialDelay, unit),
+                                        unit.toNanos(period));
+}
+
+public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command,
+                                                    long initialDelay,
+                                                    long delay,
+                                                    TimeUnit unit) {
+    ScheduledFutureTask<Void> sft =
+        new ScheduledFutureTask<Void>(command,
+                                        null,
+                                        triggerTime(initialDelay, unit),
+                                        unit.toNanos(-delay));
+}
+
+
+//而在ScheduledFutureTask中定时任务是这样设置下一次执行时间的
+
+private void setNextRunTime() {
+        long p = period;
+        if (p > 0)
+            time += p;
+        else
+            time = triggerTime(-p); //当前时间+period。而走到这里，run方法已经走过了，所以如果run堵塞了很久，这个task的下一次执行时间就会不准了
+}
+```
 
 ## 参考
 - [看起来 ReentrantLock 无论在哪方面都比 synchronized 好](http://blog.csdn.net/fw0124/article/details/6672522)

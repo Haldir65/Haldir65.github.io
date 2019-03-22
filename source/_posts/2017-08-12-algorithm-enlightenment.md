@@ -289,7 +289,169 @@ java的Collections.sort的算法，
 [Comparison Method Violates Its General Contract!]((https://www.youtube.com/watch?v=bvnmbRo7a1Y))
 
 
-## 2. 其他算法
+
+
+## 2. 二叉树
+
+### 2.1 二叉查找树(BST)
+#### 定义:
+在二叉查找树中：
+(01) 若任意节点的左子树不空，则左子树上所有结点的值均小于它的根结点的值；
+(02) 任意节点的右子树不空，则右子树上所有结点的值均大于它的根结点的值；
+(03) 任意节点的左、右子树也分别为二叉查找树。
+(04) 没有键值相等的节点（no duplicate nodes）。
+
+[二叉查找树的增删改查](https://blog.csdn.net/sheepmu/article/details/38407221 )
+
+#### 求BST的最小值
+```java
+//求BST的最小值
+public TreeNode  getMin(TreeNode root)
+{
+    if(root==null)
+        return null;
+    while(root.left!=null)
+        root=root.left;	 
+    return root;
+}
+```
+
+求BST的最大值
+```java
+//求BST的最大值
+public TreeNode  getMax(TreeNode root)
+{
+    if(root==null)
+        return null;
+    while(root.right!=null)
+        root=root.right;
+    return root;
+}
+```
+
+#### 查找BST中某节点的前驱节点.即查找数据值小于该结点的最大结点。
+```java
+public TreeNode preNode(TreeNode x)
+{
+    if(x==null)
+        return null;
+    // 如果x存在左孩子，则"x的前驱结点"为 "以其左孩子为根的子树的最大结点"。
+    if(x.left!=null)
+        return getMax(x.left);//直接找左树的最大节点就好了，就是一直往左找
+    // 如果x没有左孩子。则x有以下两种可能：
+    // (01) x是"一个右孩子"，则"x的前驱结点"为 "它的父结点"。
+    // (02) x是"一个左孩子"，则 前驱节点为x的某一个祖先节点的父节点，而且该祖先节点是作为其父节点的右儿子
+    TreeNode p=x.parent;
+    while(p!=null&&p.left==x)
+    {
+        x=p;//父节点置为新的x
+        p=p.parent;  //父节点的父节点置为新的父节点
+    }
+    return p;	 
+}
+```
+
+#### 查找BST中某节点的后继节点.即查找数据值大于该结点的最小结点。
+```java
+public TreeNode postNode(TreeNode x)
+		{
+			if(x==null)
+				return null;
+			// 如果x存在右孩子，则"x的后继结点"为 "以其右孩子为根的子树的最小结点"。
+		    if(x.left!=null)
+		    	return getMin(x.right);
+		    // 如果x没有右孩子。则x有以下两种可能：
+		    //  (01) x是"一个左孩子"，则"x的后继结点"为 "它的父结点"。
+		    // (02) x是"一个右孩子"，则 前驱节点为x的某一个祖先节点的父节点，而且该祖先节点是作为其父节点的左儿子
+		    TreeNode p=x.parent;
+		    while(p!=null&&p.right==x)
+		    {
+		    	x=p;//父节点置为新的x
+		    	p=p.parent;  //父节点的父节点置为新的父节点
+		    }
+		   return p;	 
+		}
+```
+
+#### 给出一个Int值，查找这个Int值在树中对应的节点
+```java
+//递归
+public TreeNode findNode(TreeNode head, int val){
+    if(head==null){
+        return null;
+    }
+    if(head.val==val){
+        return head;
+    }else if(head.val > val){
+        head = head.left;
+    }else {
+        head= head.right;
+    }
+    return findNode(head, val);
+}
+//非递归
+public TreeNode findNode(TreeNode head, int val){
+    if(head==null){
+        return null;
+    }
+    while(head!=null){
+        if(head.val ==val){
+            return head;
+        }else if (head.val > val){
+            head = head.left;
+        }else {
+            head = head.right;
+        }
+    }
+    return head;
+}
+```
+#### 插入值
+```java
+//BST插入节点  --递归版--
+public TreeNode insertRec(TreeNode root,TreeNode x)
+{
+    if(root==null)
+        root=x;
+    else if(x.value<root.value)
+        root.left=insertRec(root.left,  x);
+    else if(x.value>root.value)
+        root.right=insertRec(root.right,  x);
+    return root;
+}
+		//BST插入节点  --非 递归版--
+public TreeNode insert(TreeNode root,TreeNode x)
+{
+    if(root==null)
+        root=x;
+    TreeNode p=null;//需要记录父节点
+    while(root!=null)//定位插入的位置
+    {
+        p=root;//记录父节点
+        if(x.value<root.value)
+            root=root.left;
+        else
+            root=root.right;
+    }
+    x.parent=p;//定位到合适的页节点的空白处后，根据和父节点的大小比较插入合适的位置
+    if(x.value<p.value) 
+        p.left=x;
+    else if(x.value>p.value)
+        p.right=x;
+    return root;
+}
+```
+
+
+
+
+
+### 参考
+[Java关于数据结构的实现：树](https://juejin.im/post/59cc55b95188250b4007539b)
+
+
+
+## 3. 链表
 [有环链表的判断问题](https://juejin.im/post/5a224e1551882535c56cb940)。时间复杂度和空间复杂度的最优解是创建两根迭代速度不一样的指针
 
 下面的代码来自[csdn](http://blog.csdn.net/jq_ak47/article/details/52739651)
@@ -416,27 +578,27 @@ class Solution:
 首先给出计算总的可能路径的方法
 ```java
 public static int uniquePaths(int m, int n){  
- 2              if(m==0 || n==0) return 0;  
- 3              if(m ==1 || n==1) return 1;  
- 4               
- 5             int[][] dp = new int[m][n];  
- 6               
- 7             //只有一行时，到终点每个格子只有一种走法  
- 8             for (int i=0; i<n; i++)  
- 9                 dp[0][i] = 1;  
-10               
-11             // 只有一列时，到终点每个格子只有一种走法
-12             for (int i=0; i<m; i++)  
-13                 dp[i][0] = 1;  
-14               
-15             // for each body node, number of path = paths from top + paths from left  
-16             for (int i=1; i<m; i++){  
-17                 for (int j=1; j<n; j++){  
-18                     dp[i][j] = dp[i-1][j] + dp[i][j-1];  
-19                 }  
-20             }  
-21             return dp[m-1][n-1];  
-22         }
+            if(m==0 || n==0) return 0;  
+            if(m ==1 || n==1) return 1;  
+                
+              int[][] dp = new int[m][n];  
+               
+              //只有一行时，到终点每个格子只有一种走法  
+              for (int i=0; i<n; i++)  
+                  dp[0][i] = 1;  
+               
+             // 只有一列时，到终点每个格子只有一种走法
+             for (int i=0; i<m; i++)  
+                 dp[i][0] = 1;  
+               
+             // for each body node, number of path = paths from top + paths from left  
+            for (int i=1; i<m; i++){  
+                 for (int j=1; j<n; j++){  
+                     dp[i][j] = dp[i-1][j] + dp[i][j-1];  
+                 }  
+             }  
+             return dp[m-1][n-1];  
+}
 ```
 
 解法二：数学中的组合问题，因为从左上角到右下角，总共需要走n+m-2步，左上角和右下角的元素不考虑在内，我们每次都可以选择向下走，向下走总共需要m-1步，所以在n+m-2步中选择m-1步，这是典型的排列组合问题。
@@ -457,8 +619,3 @@ int uniquePaths(int m, int n)
 
 
 KMP算法
-
-
-### 参考
-[Java关于数据结构的实现：树](https://juejin.im/post/59cc55b95188250b4007539b)
-

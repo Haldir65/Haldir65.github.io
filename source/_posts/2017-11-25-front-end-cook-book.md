@@ -344,7 +344,9 @@ $(function() {
 });
 ```
 来看看xss一般的手段
-> <img src="#" onerror="alert(/xss/)" />
+```js
+<img src="#" onerror="alert(/xss/)" />
+```
 
 防范XSS攻击的手段中提到了，对于用户的输入，需要有条件的进行转换
 比如说
@@ -380,9 +382,7 @@ private static String htmlEncode(char c) {
 python flask里面类似的函数叫做escape.
 
 
-
-[cms(content management sustem)参考](https://github.com/ximolang/QuillCMS)
-
+[cms(content management system)参考](https://github.com/ximolang/QuillCMS)
 
 
 

@@ -198,3 +198,5 @@ c语言中多线程通信基础
 
 ## 参考
 [美团博客中关于java锁的一片文章](https://tech.meituan.com/2018/11/15/java-lock.html)
+[openjdk是如何读取.class文件的](https://fansunion.blog.csdn.net/article/details/13252309)
+[AQS这个java并发基础类的实现原理](https://javadoop.com/post/AbstractQueuedSynchronizer)

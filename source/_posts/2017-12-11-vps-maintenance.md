@@ -114,7 +114,7 @@ sudo ssserver -c /etc/shadowsocks.json --user username -d start - 不要总是�
 ```
 如果使用systemd来管理的话，就不要使用 -d参数，因为需要root权限，此时应该将ssserver的生命周期管理交给systemd
 
-nohup /net-speeder/net-speeder/net_speeder eth0 "tcp src port 12345" > /dev/null 2>&1 &
+<del>nohup /net-speeder/net-speeder/net_speeder eth0 "tcp src port 12345" > /dev/null 2>&1 &</del>
 
 慎用！！一不小心会把自己的ip加到iptable黑名单里面
 //防止暴力扫描ss端口
@@ -129,7 +129,9 @@ iptables -L -n ## 查看已添加的iptables规则
 
 > python server.py -p 443 -k password -m aes-256-cfb -O auth_sha1_v4 -o http_simple -d start
 
-[net-speeder](https://zhgcao.github.io/2016/05/26/ubuntu-install-net-speeder/)
+
+
+<del>[net-speeder](https://zhgcao.github.io/2016/05/26/ubuntu-install-net-speeder/)</del>
 > apt-get install libnet1-dev
 apt-get install libpcap0.8-dev
 
@@ -143,7 +145,6 @@ sh build.sh -DCOOKED
 cd net-speeder-master/
 sh build.sh
 
-
 ### 加速所有ip协议数据
 
 ./net_speeder venet0 "ip"
@@ -155,6 +156,7 @@ sh build.sh
 ./net_speeder venet0 "ip"
 ```
 [net-speeder写入开机脚本](https://blog.kuoruan.com/48.html)
+
 
 ### 2.3 升级内核开启 BBR
 
@@ -223,7 +225,7 @@ cat  shadowsocks.log | awk '{ print $5}' |grep -o '^[^:]*' | sort | uniq -c | so
 查看尝试连接本服务器的客户端
 cat shadowsocks.log | awk '{ print $NF }'| grep -o '^[^:]*' | sort | uniq -c | sort -n
 
-### 2.6 simple-obfs
+### 2.6 <del>simple-obfs</del>
 sudo apt-get install simple-obfs
 /etc/shadowsocks-libev/config.json文件中添加
 ```
@@ -234,13 +236,14 @@ sudo apt-get install simple-obfs
 ```
 
 ### 2.7 ss-local提供正向代理
-//curl使用代理，在ss-local监听1080端口的前提下，这条命令可以正常访问google
+curl使用代理，在ss-local监听1080端口的前提下，这条命令可以正常访问google
 
 > curl -4sSkL -x socks5h://127.0.0.1:1080 https://www.google.com
 > curl --socks5 127.0.0.1:1080 http://stackoverflow.com/ //这个更简单
 
 
-// 有两种方式
+有两种方式
+
 > $ export http_proxy="vivek:myPasswordHere@10.12.249.194:3128/"
 > $ curl -v -O http://dl.cyberciti.biz/pdfdownloads/b8bf71be9da19d3feeee27a0a6960cb3/569b7f08/cms/631.pdf
 
@@ -255,7 +258,7 @@ curl --socks5 192.168.1.254:3099 https://www.cyberciti.biz/
 首先安装iperf
 apt-get install iperf 
 [iperf.sh](https://gist.github.com/madeye/c046fc35e10a82154f4697fb316a7ac6)
-```shell
+```bash
 #!/bin/bash
 
 method=$1
@@ -466,7 +469,7 @@ docker images
 docker run -it ubuntu
 exit
 
-##这两条命令用于自己在本地打一个docker image
+## 这两条命令用于自己在本地打一个docker image
 docker build -t <your username>/node-web-app .
 docker build -t packsdkandroiddocker.image -f ./scripts/PackSdkDockerfile .
 ## 注意你修改了Dockerfile之后要重新跑一遍docker build -t <your username>/node-web-app .

@@ -288,24 +288,25 @@ client = new OkHttpClient.Builder()
 response = call.execute();
 
 ```java
-    public Response execute() throws IOException {
-        synchronized(this) {
-            this.executed = true;
-        }
-        Response var2;
-        try {
-            this.client.dispatcher().executed(this); //这个Dispatcher负责记录当前OkHttpClient的所有Request的状态，提供线程池
-            Response result = this.getResponseWithInterceptorChain();
-            if(result == null) {
-                throw new IOException("Canceled");
-            }
-
-            var2 = result;
-        } finally {
-            this.client.dispatcher().finished(this); //记录状态
-        }
-        return var2;
+  @Override public Response execute() throws IOException {
+    synchronized (this) {
+      if (executed) throw new IllegalStateException("Already Executed");
+      executed = true;
     }
+    captureCallStackTrace();
+    eventListener.callStart(this);
+    try {
+      client.dispatcher().executed(this);//这里只是把realCall添加到了Disptcher的RunningSyncall这个deque中，只是为了记个数，以及方便cancel
+      Response result = getResponseWithInterceptorChain();
+      if (result == null) throw new IOException("Canceled");
+      return result;
+    } catch (IOException e) {
+      eventListener.callFailed(this, e);
+      throw e;
+    } finally {
+      client.dispatcher().finished(this);//从deque中移除
+    }
+  }
 ```
 
 重点就在getResponseWithInterceptorChain里面
@@ -329,6 +330,47 @@ response = call.execute();
 注意顺序，用户手动添加的interceptor是最先添加的。在添加完ConnectInterceptor之后，又添加了networkInterceptors(用户手动添加的，一个List)。道理也很清楚，一种是在发起Socket请求之前就拦下来，一种是连上Socket之后的拦截
 
 Chain的proceed就是从List中一个个取出Inerceptor，然后执行
+
+关于异步请求的线程池问题，异步请求实际的调用是这样的
+Dispatcher.java
+```java
+synchronized void enqueue(AsyncCall call) {
+if (runningAsyncCalls.size() < maxRequests && runningCallsForHost(call) < maxRequestsPerHost) {
+    runningAsyncCalls.add(call);//当前运行的异步任务少于maxRequest，并且针对当前host发起的请求少于maxRequestsPerHost(默认是5个，也就是默认同时只能对1个域名发起5个请求，这个跟浏览器很像)
+    executorService().execute(call);// 丢给线程池
+} else {
+    readyAsyncCalls.add(call);//添加到队列中去
+}
+}
+
+/** Ready async calls in the order they'll be run. */
+private final Deque<AsyncCall> readyAsyncCalls = new ArrayDeque<>(); //排队等待被执行的异步任务
+
+/** Running asynchronous calls. Includes canceled calls that haven't finished yet. */
+private final Deque<AsyncCall> runningAsyncCalls = new ArrayDeque<>();//正在运行中的异步任务
+
+/** Running synchronous calls. Includes canceled calls that haven't finished yet. */
+private final Deque<RealCall> runningSyncCalls = new ArrayDeque<>();//同步的运行的或者已经被取消的请求
+```
+异步请求：
+和浏览器相似，okhttp client也设定了客户端同时只能对一个host发起有上限的连接数(5个)，并且，所有的请求总数加在一起不超过64个。超过的加到一个Deque中，等异步任务执行完成后，有一个finally，这里面有一个promoteCalls，就是说可以去消费刚才排队的请求了。
+同步请求：
+而RealCall的execute方法就完全是一个在当前线程中执行的方法，没有任何限制，只是将这个请求加入了Dispatcher的runningSyncCalls中去了
+
+所以，对于使用enqueue方法的应用，如果同时1s内对一个host发起的请求超过了5个，并且网络也特别差的情况下，需要等到至少timeout(connectTimeout)-1s的时间后才能轮到后续的请求执行。使用execute方法的则不受限制。
+
+用户感知到的延时是：网络请求的时间 = 队列等待时间+dns解析时间+socket连接时间+socket io时间
+```java
+OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder()
+                .readTimeout(30, TimeUnit.SECONDS)
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .addInterceptor(new HeaderInterceptor())
+```
+关于timeout，外部设置的时候可以设定的超时包括: 连接socket的超时，读超时，写超时
+连接socket超时是直接调用socket.setSoTimeout实现的，这个是指，对这个socket的read操作只会堵塞这么长时间(就是说假如这么长时间内没有数据)，之后跑出一个SocketTimeoutException。
+
+
 
 
 ## 3. 自带的五个Interceptor
@@ -419,7 +461,132 @@ interceptors.add(new BridgeInterceptor(this.client.cookieJar()));//注意带进�
 这里也是让请求接着走下去，response回来之后，只有304的时候才会去主动cache下来。
 
 ### 3.4 ConnectInterceptor
+(深入okHttp 3.9.1的connectionPool以及引用计数)
+在高并发的请求连接情况下或者同个客户端多次频繁的请求操作，无限制的创建连接会导致性能低下。所以OkHttp做到了对socket的复用和及时清理。
+从第四个intercepter开始
+ConnectInterceptor.java
+```java
+public final class ConnectInterceptor implements Interceptor{
+
+  @Override public Response intercept(Chain chain) throws IOException {
+  RealInterceptorChain realChain = (RealInterceptorChain) chain;
+  Request request = realChain.request();
+  // 第一步，获取streamAllocation
+  StreamAllocation streamAllocation = realChain.streamAllocation();
+
+  // We need the network to satisfy this request. Possibly for validating a conditional GET.
+  boolean doExtensiveHealthChecks = !request.method().equals("GET");
+  // 第二步，使用streamAllocation创建(或者复用)一个httpCodec模型（即处理header和body的读写策略，具体实现包括Http1Codec和Http2Codec）
+  HttpCodec httpCodec = streamAllocation.newStream(client, chain, doExtensiveHealthChecks);
+  // 第三部，挑选出RealConnection,streamAllocation对象中的mConnection变量是在第二步里面赋值的
+  RealConnection connection = streamAllocation.connection();
+
+  return realChain.proceed(request, streamAllocation, httpCodec, connection);
+  }
+}
+```
+
+所以socket连接复用就在这句话里面了
+> HttpCodec httpCodec = streamAllocation.newStream(client, chain, doExtensiveHealthChecks);
+
+StreamAllocation.java
+```java
+public HttpCodec newStream(
+    OkHttpClient client, Interceptor.Chain chain, boolean doExtensiveHealthChecks) {
+
+      // 省略部分，主要是这两句话
+      RealConnection resultConnection = findHealthyConnection(connectTimeout, readTimeout,
+               writeTimeout, connectionRetryEnabled, doExtensiveHealthChecks);
+      //
+      HttpCodec resultCodec = resultConnection.newCodec(client, chain, this);
+    }
+```
+
+findHealthyConnection最终走到这里
+```java
+// Attempt to get a connection from the pool.
+for (RealConnection connection : connections) {
+    if (connection.isEligible(address, route)) {
+      streamAllocation.acquire(connection, true);
+      return connection;
+    }
+  }
+
+// 判断是否isEligible的方法在RealConnection里面
+
+// If the non-host fields of the address don't overlap, we're done.
+ if (!Internal.instance.equalsNonHost(this.route.address(), address)) return false;
+// 只要DNS,port,protocols等host无关的参数中有一个不同就不能复用
+
+ // If the host exactly matches, we're done: this connection can carry the address.
+ if (address.url().host().equals(this.route().address().url().host())) {
+   return true; // This connection is a perfect match.
+ }
+ // 这里说明host是相同的，上面的DNS什么的都是一样的，只有后面的path,query或者RequestBody不同，那么直接复用
+```
+
+所以这里socket复用的方式是直接使用RealConnection持有Socket对象的引用，每一次在RealConnection的connect成功后，都会讲这个socket包装成一个BufferedSource(读取Response)和BufferedSink(往外写Request)，在timeout时长内，socket不会被关闭。既然缓存就一定会有清理
+
+在上面的findHealthyConnection中有一段
+> streamAllocation.acquire(connection, true);
+
+这里面的作用就是将这条请求（Stream）添加到当前连接承载的一个List<Reference<StreamAllocation>>中，也就是所谓的引用计数。提到这一点是要谈到清理的实现：
+ConnectionPool中有一个Executor，目的就是执行一个cleanupRunnable的Runnable，这里面的清理操作大致如下：
+```java
+long cleanup(long now) {
+   // Find either a connection to evict, or the time that the next eviction is due.
+   synchronized (this) {
+     for (Iterator<RealConnection> i = connections.iterator(); i.hasNext(); ) {
+       RealConnection connection = i.next();
+
+       // If the connection is in use, keep searching.
+       if (pruneAndGetAllocationCount(connection, now) > 0) {
+         inUseConnectionCount++; //这条连接还在用
+         continue;
+       }
+
+       idleConnectionCount++; //这条连接现在空闲下来了
+
+       // If the connection is ready to be evicted, we're done.
+       long idleDurationNs = now - connection.idleAtNanos;// 这条连接已经多久没用到了，假如超过了闲置时间(默认5纳秒)，就准备干掉这个socket
+       if (idleDurationNs > longestIdleDurationNs) {
+         longestIdleDurationNs = idleDurationNs;
+         longestIdleConnection = connection;
+       }
+     }
+       // We've found a connection to evict. Remove it from the list, then close it below (outside
+       // of the synchronized block).
+
+       // A connection will be ready to evict soon.
+
+       // All connections are in use. It'll be at least the keep alive duration 'til we run again.
+
+       // No connections, idle or in use.
+   }
+  // 在这前面如果找不到一条该被干掉的连接，直接return
+   closeQuietly(longestIdleConnection.socket());// 这里面就是socket.close了
+
+   // Cleanup again immediately.
+   return 0;
+ }
+```
+
+观察一下ConnectionPool的构造函数
+```java
+/**
+  * Create a new connection pool with tuning parameters appropriate for a single-user application.
+  * The tuning parameters in this pool are subject to change in future OkHttp releases. Currently
+  * this pool holds up to 5 idle connections which will be evicted after 5 minutes of inactivity.
+  */
+  // 最多保留5条闲置RealConnection(也就是底层5个Socket),每个连接(Socket)如果超过5分钟没有接客，直接干掉
+ public ConnectionPool() {
+   this(5, 5, TimeUnit.MINUTES);
+ }
+```
+所以，在创建Client的时候，可以把socket的缓存数量写大一点，也可以自定义一个ConnectionPool，只要实现了put,get,remove等标准的CRD操作就行了。简单来说就是自己设计一个Cache，我觉得可以根据实际的endpoint数量来设定缓存的socket的数量。
+
 这里的interceptor方法异常简短
+
 ```java
 
     public Response intercept(Chain chain) throws IOException {
@@ -445,7 +612,38 @@ public final class StreamAllocation {
     private HttpCodec codec;
 }
 ```
-从HttpCodec httpCodec = streamAllocation.newStream(this.client, doExtensiveHealthChecks); 这句话一直往下走，会走到Socket.connect()，也就是大多数人初学网络编程时被教导的如何创建Socket连接。现在想想，能够从操作系统底层的Socket封装出这么多复杂的步骤，实在是高手。
+
+
+从HttpCodec httpCodec = streamAllocation.newStream(this.client, doExtensiveHealthChecks); 这句话一直往下走，会走到Socket.connect()，也就是大多数人初学网络编程时被教导的如何创建Socket连接。
+Stream代表一个api请求过程，RealConnection持有了真正的rawSocket。
+
+StreamAllocation.findConnection中主要做了
+1.查看当前streamAllocation是否有之前已经分配过的连接，有则直接使用
+2.从连接池中查找可复用的连接，有则返回该连接
+3.配置路由，配置后再次从连接池中查找是否有可复用连接，有则直接返回
+4.新建一个连接，并修改其StreamAllocation标记计数，将其放入连接池中
+5.查看连接池是否有重复的多路复用连接，有则清除
+
+从连接池中找connection的判断是
+```java
+ if (connection.isEligible(address, route)) {
+        streamAllocation.acquire(connection, true);
+        return connection;
+      }
+
+ public boolean isEligible(Address address, @Nullable Route route) {
+    // If this connection is not accepting new streams, we're done.
+    if (allocations.size() >= allocationLimit || noNewStreams) return false; //注意啊，若不是HTTP/2的连接，则allocationLimit的值总是1
+    ///....
+    }      
+```
+多个HTTP/1.1请求是不能在同一个连接上交叉处理(multiplexing)的，http1中一个socket只能同时处理一个stream请求,acquire类似于markInUse。这样的设计主要是为了实现HTTP/2 multi stream，http2所有stream都走一条tcp连接(一个socket)。在Http1Codec的endOfInput方法里会调用streamAllocation.streamFinished()方法，也就是说，我这stream(一次接口请求读完了，http1报文的空行读到了)用完了，socket还给pool，socket在http1场景下一次只能接一个请求。connectionPool里默认是最大5个空闲连接数(就是说最多同时存在5个没关的socket,并且每个socket如果5min内没干活，就关闭掉，因为socket也是系统资源)。
+
+
+
+
+关于RouterSelector.Selection这个class，其实就是把DNS返回的多个查询record（InetSocketAddress，也就是ip地址存起来，当然存的是一个Route 对象，里头包住了InetSocketAddress)。所以可以粗略的认为一个Router对应一个ip地址吧，RouteDatabase就是一个HashSet，换ip的时候会对那些失败过的Route（ip）躲得远远的
+
 StreamAllocation.newStream  ----> StreamAllocation.findHealthyConnection  ---> StreamAallocation.findConnection ---> new RealConnection ---> RealConnection.connect
 
 RealConnection.connect()方法
@@ -629,7 +827,8 @@ public void writeRequest(Headers headers, String requestLine) throws IOException
 ## 4.结语
 这里只是针对OkHttp发起的一个最简单同步的网络请求进行了分析。
 关于异步请求再说两句：本质上不过是包装了一个回调，丢到线程池里面，相比整个Http请求，实在是不值一提。来看下这个线程池
--  new ThreadPoolExecutor(0, 2147483647, 60L, TimeUnit.SECONDS, new SynchronousQueue(), Util.threadFactory("OkHttp Dispatcher", false));
+-  new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60, TimeUnit.SECONDS,
+          new SynchronousQueue<Runnable>(), Util.threadFactory("OkHttp Dispatcher", false));
 
 照说jdk不推荐这么创建线程池，一般用jdk封装好的CachedThreadPool，FixedThreadPool等等，但想必这样做也是不为了造成过大的系统开销吧。debug的时候如果看到OkHttp Dispatcher这条线程，应该明白是为什么了吧。另外，Okio会引入一条名为Okio WatchDog的线程，这跟Okio的AsyncTimeOut有关。时间关系(已经是夜里12点了)，不打算研究了。
 
@@ -682,6 +881,29 @@ public void cancel(OkHttpClient client, Object tag) {
  }
 ```
 瞅了下call.cancel的实现，其实是对RealCall里面的成员变量RetryAndFollowUpInterceptor调用了cancel方法
+
+动态调节timeout,也就是说随时可以修改网络请求的timeout
+
+RealInterceptorChain.java中有这么三个方法，
+Interceptor.Chain withConnectTimeout(int timeout, TimeUnit unit)
+Interceptor.Chain withReadTimeout(int timeout, TimeUnit unit)
+Interceptor.Chain withWriteTimeout(int timeout, TimeUnit unit) 
+```java
+ @Test public void chainWithReadTimeout() throws Exception {
+    Interceptor interceptor1 = new Interceptor() {
+      @Override public Response intercept(Chain chainA) throws IOException {
+        assertEquals(5000, chainA.readTimeoutMillis());
+        //if 网络较差。。。
+        Chain chainB = chainA.withReadTimeout(100, TimeUnit.MILLISECONDS);
+        assertEquals(100, chainB.readTimeoutMillis());
+
+        return chainB.proceed(chainA.request());
+      }
+    };
+  }
+```
+所以完全可以在网络条件较差的时候修改后续的网络请求的timeout
+
 
 ### 设计模式
 当一个网络请求发出时,需要经过应用层->传输层->网络层->连接层->物理层

@@ -148,6 +148,7 @@ A：TinkerPatch的SDK里面包含了Tinker必要的功能，开发者只需要�
 
 Q: 如何更换Dex的
 A: 引用[Android热补丁之Tinker原理解析](http://w4lle.com/2016/12/16/tinker/index.html)中的话：“由于Tinker的方案是基于Multidex实现的修改dexElements的顺序实现的，所以最终还是要修改classLoder中dexPathList中dexElements的顺序。Android中有两种ClassLoader用于加载dex文件，BootClassLoader、PathClassLoader和DexClassLoader都是继承自BaseDexClassLoader。最终在DexPathList的findClass中遍历dexElements，谁在前面用谁。”。所以其实就是根据下发的补丁文件，把dex文件给修改了，这一点跟MultiDex很像。
+更新一下，低版本是dexpathList前置，高版本则直接创建classLoader
 
 Q: Dex文件格式
 A： [The Dex File Format](https://blog.bugsnag.com/dex-and-d8/)。值得一提的是，这篇文章提到了文件头，dex的头是
@@ -159,7 +160,7 @@ dex
 [关于dex format的更多的分析](http://blog.csdn.net/sbsujjbcy/article/details/52869361)
 
 Q: broken.apk + patch_signed_7zip = fixed apk的过程
-A: 在UpgradePatch.tryPath -> DexDiffPatchInternal.tryRecoverDexFiles -> dexOptimizeDexFiles -> TinkerDexOptimizer.optimizeAll ->OptimizeWorker.run -> DexFile.loadDex(DexFile是dalvik.system包下的)。
+A: 在UpgradePatch.tryPath -> DexDiffPatchInternal.tryRecoverDexFiles -> dexOptimizeDexFiles -> TinkerDexOptimizer.optimizeAll ->OptimizeWorker.run -> DexFile.loadDex(DexFile是dalvik.system包下的)。 这些都是在patch进程运行的
 
 Q： 把Tinker导入Intelij中
 A： <Del>Intelij中open project -> 选择 tinker-build/tinker-build.iml 即可</Del>。顺带着其他的mudule都能查看了。最好在tinker-sample-android/app/build.gradle文件中注释掉这两句话
@@ -209,7 +210,39 @@ public final class BuildConfig {
 所以QQ空间给出的方案是在所有class的构造函数中添加一行println(C.class)方法，直接引用另一个dex包中的类。这个添加的过程用javaAssist这种操作字节码的方式就可以简单实现
 [ Android热补丁动态修复技术](https://blog.csdn.net/u010386612/article/details/51192421)这一系列文章介绍了使用gradle api对编译过程进行hook，实现自动化补丁操作的过程
 
+Q: Tinker是如何使用gradle插件生成dex补丁的?
+A: [参考鸿洋这篇文章](https://blog.csdn.net/lmj623565791/article/details/72667669) 
 
+打补丁的时候执行的是tinkerPatchDebug这个任务，执行这个任务发现依次执行了这些任务
+
+:app:processDebugManifest
+:app:tinkerProcessDebugManifest（tinker）
+:app:tinkerProcessDebugResourceId (tinker)
+:app:processDebugResources
+:app:tinkerProguardConfigTask(tinker)
+:app:transformClassesAndResourcesWithProguard
+:app:tinkerProcessDebugMultidexKeep (tinker)
+:app:transformClassesWidthMultidexlistForDebug
+:app:assembleDebug
+:app:tinkerPatchDebug(tinker)
+
+1.TinkerManifestTask，用于添加TINKER_ID；
+2.TinkerResourceIdTask，使用aapt的public.xml和ids.xml接管了资源id的生成.首先在打老的apk包的时候会配置一个tinkerApplyResourcePath，对应的是生成的R.txt的路径。接下来比较res文件夹中各种资源，对比生成public.xml
+3.TinkerProguardConfigTask。因为proguard的存在，两次打出来的代码混淆差异非常大，proguard有一个-applymapping选项，用于限定两次混淆使用同一份混淆规则。还有com.tencent.tinker.loader.**这些是不能混淆的。
+4. TinkerMultidexConfigTask。这里要确保application、com.tencent.tinker.loader.**这些在主dex中
+5. TinkerPatchSchemaTask，生成patch，生成meta-file和version-file，build patch
+这里就是对两个apk进行了比较：
+old apk: build/intermediates/outputs/old apk名称/
+new apk: build/intermediates/outputs/app-debug/
+dexFile -> dexDecoder.patch 
+
+首先将两个dex读取到内存中，如果oldFile不存在，则newFile认为是新增文件，直接copy到输出目录，并记录log。如果存在，则计算两个文件的md5，如果md5不同，则认为dexChanged(hasDexChanged = true)，执行：collectAddedOrDeletedClasses(oldFile, newFile);该方法收集了addClasses和deleteClasses的相关信息。***仅将新增的文件copy到了目标目录。***发生改变的文件，后面会执行diffDexPairAndFillRelatedInfo，生成的patch文件放到了outputs/tempPatchedDexes文件夹里。patch完了之后还模拟做了一次合并，看下old dex打完patch是不是和新的dex的md5相同。
+soFile -> soDecoder.patch 完成so文件的比对,新文件的话直接复制，否则比较md5，超过80%则直接copy新文件至目标文件夹,不超过新文件的80%，则copy patch文件至目标文件夹，记录log
+resFile -> resDecoder.patch 完成res文件的比对
+
+Q: 收到下发的补丁后是如何合成的，合成好了放在哪了
+A: 首先，合成是在patch进程跑的，关键方法是DexDiffPatchInternal.patchDexExtractViaDexDiff，这里面做了两件是，一个是合成新的dex文件（extractDexDiffInternals），另一个是手动调用DexFile.loadDex去触发dexoat流程(dexOptimizeDexFiles) 文件写到了/data/data/com.example.application/tinker/patch1.1/Dex/classes1.dex //这里这个classes1.dex我不确定，patch1.1是补丁版本号。这里面就是写往一个ZipOutputStream.
+然后重启，注意这里是主进程咯，开始加载这个写好的文件，在TinkerDexLoader.loadTinkerJar中，也是去/data/data/com.example.application/tinker/patch1.1/Dex/这个文件夹下面找文件，然后加入到一个legalFiles的list中，调用SystemClassLoaderAdder.installDexes（也就是DexPathList那一套）
 
 
 

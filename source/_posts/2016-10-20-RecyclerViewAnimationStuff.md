@@ -849,3 +849,4 @@ package private的变量是否就不能访问到？
 - [ItemAnimator模板](https://github.com/wasabeef/recyclerview-animators)
 - [UI ToolKit Demo](https://github.com/google/android-ui-toolkit-demos)
 - [Yigit Boyar: Pro RecyclerView](https://www.youtube.com/watch?v=KhLVD6iiZQs)
+- [RecyclerView的源码解析](https://blog.saymagic.cn/2016/10/21/understand-recycler.html) 说的比较清楚

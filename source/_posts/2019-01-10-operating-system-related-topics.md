@@ -17,3 +17,4 @@ tags: [tbd]
 
 ## 参考
 [从内核文件系统看文件读写过程](http://www.cnblogs.com/huxiao-tee/p/4657851.html)
+[计算机底层知识拾遗](https://blog.csdn.net/ITer_ZC/column/info/computer-os-network)

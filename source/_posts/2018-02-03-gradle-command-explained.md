@@ -567,6 +567,50 @@ maven {
     }
 ```
 
+[如何debug gradle plugin](https://fucknmb.com/2017/07/05/又掌握了一项新技能-断点调试Gradle插件/) 
+在命令行里
+./gradlew clean assembleDebug -Dorg.gradle.daemon=false -Dorg.gradle.debug=true //一个是noDaemon 一个是debug=true (这段输入后命令行会卡在这里等debugger attach上来)
+然后照着在studio里面添加一个remote debug.
+然后点击这个debug按钮
+Listening for transport dt_socket at address: 5005 //这个是在等着
+To honour the JVM settings for this build a new JVM will be forked. Please consider using the daemon: https://docs.gradle.org/4.10.1/userguide/gradle_daemon.html. //这个是点了一次那个debug按钮
+Daemon will be stopped at the end of the build stopping after processing //这个是我又点了一次之后，终于开始运行了(要点两次。。。)
+效果是酱紫的
+![](https://www.haldir66.ga/static/imgs/debug_android_gradle_plugin_1.png) 
+![](https://www.haldir66.ga/static/imgs/debug_android_gradle_plugin_2.png) 
+
+
+
+```java
+public class PluginImpl implements Plugin<Project> {
+    void apply(Project project) {
+        project.task('testTask').doLast{
+            println "Hello gradle plugin" 
+        }
+
+        project.afterEvaluate {
+            project.logger.error "afterEvaluated" //这个先执行
+            if (project.plugins.hasPlugin("com.android.application")) {
+                def android = project.extensions.getByName("android")
+                android.applicationVariants.all {ApplicationVariantImpl variant -> //这里会冒出来debug和release的两种variant，似乎android gradle plugin 在3.5的时候会设定lazyTask,就是这里只会有一个debug
+                    project.logger.error "DebuggerPlugin:${variant}"
+                    ApplicationVariantData apkVariantData = variant.getProperty('variantData')
+                    ApplicationVariantData variantData = variant.getVariantData()
+                    TestVariant testVariant = variant.getTestVariant()
+                    UnitTestVariant unitTestVariant = variant.getUnitTestVariant()
+                }
+            }
+        }
+    }
+}
+```
+
+### error
+One of the classes is an explicit generated class using the class statement, the other is a class generated from the script body based on the file name. Solutions are to change the file name or to change the class name.
+
+[出现错误的原因是在class外面还写了语句](https://www.moreofless.co.uk/invalid-duplicate-class-definition-error-groovy/)
+
+
 [比较复杂的gradle knowledge](https://github.com/adwiv/android-fat-aar)
 [official gradle docs 是最好的学习资料](https://guides.gradle.org/creating-new-gradle-builds/)
 [custom_plugins](https://docs.gradle.org/current/userguide/custom_plugins.html)
@@ -574,3 +618,4 @@ maven {
 [关于Android Gradle你需要知道这些（4）](https://juejin.im/post/5a756f11f265da4e7c185bc5)
 [Gradle插件学习笔记（四)](https://juejin.im/post/5a767c7cf265da4e9c6300a1#heading-5)
 [Android Gradle Plugin  source Code](https://android.googlesource.com/platform/tools/build/+/tools_r22/gradle/src/main/groovy/com/android/build/gradle/BasePlugin.groovy)
+[gradle api](https://mvnrepository.com/artifact/com.android.tools.build/gradle-api?repo=google)挪到google()仓库了

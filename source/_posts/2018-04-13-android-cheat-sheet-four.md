@@ -858,4 +858,90 @@ ActivityThread.performLaunchActivity
 *AcitiviyB.onCreate
 ```
 
+
+### 26. SharedPreference的apply用多了有一个比较需要注意的anr隐患
+(Android中SharedPreferenceImpl中写磁盘操作有一个writtenToDiskLatch(CountDownLatch)，这个也是SharedPreference在activity onStop或者onPause中可能导致anr的原因)
+给看一下堆栈就清楚了
+```
+"main" prio=5 tid=1 WAIT
+  | group="main" sCount=1 dsCount=0 obj=0x4155cc90 self=0x41496408
+  | sysTid=13523 nice=0 sched=0/0 cgrp=apps handle=1074110804
+  | state=S schedstat=( 2098661082 1582204811 6433 ) utm=165 stm=44 core=0
+  at java.lang.Object.wait(Native Method)
+  - waiting on <0x4155cd60> (a java.lang.VMThread) held by tid=1 (main)
+  at java.lang.Thread.parkFor(Thread.java:1205)
+  at sun.misc.Unsafe.park(Unsafe.java:325)
+  at java.util.concurrent.locks.LockSupport.park(LockSupport.java:157)
+  at java.util.concurrent.locks.AbstractQueuedSynchronizer.parkAndCheckInterrupt(AbstractQueuedSynchronizer.java:813)
+  at java.util.concurrent.locks.AbstractQueuedSynchronizer.doAcquireSharedInterruptibly(AbstractQueuedSynchronizer.java:973)
+  at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(AbstractQueuedSynchronizer.java:1281)
+  at java.util.concurrent.CountDownLatch.await(CountDownLatch.java:202)
+  at android.app.SharedPreferencesImpl$EditorImpl$1.run(SharedPreferencesImpl.java:364)
+  at android.app.QueuedWork.waitToFinish(QueuedWork.java:88)
+  at android.app.ActivityThread.handleServiceArgs(ActivityThread.java:2689)
+  at android.app.ActivityThread.access$2000(ActivityThread.java:135)
+  at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1494)
+  at android.os.Handler.dispatchMessage(Handler.java:102)
+  at android.os.Looper.loop(Looper.java:137)
+  at android.app.ActivityThread.main(ActivityThread.java:4998)
+  at java.lang.reflect.Method.invokeNative(Native Method)
+  at java.lang.reflect.Method.invoke(Method.java:515)
+  at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:777)
+  at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:593)
+  at dalvik.system.NativeStart.main(Native Method)
+```
+
+看上去像是SharedPreferencesImpl$EditorImpl$1这个class堵住了主线程
+这个匿名内部类就干了这么件事，堵住了主线程。此时HandlerThread正在忙着写磁盘呢。
+```java
+ final Runnable awaitCommit = new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            mcr.writtenToDiskLatch.await();}}}
+```
+这种情况重现的方式是，在任意线程apply 1000次，然后按返回键。。。应该会把主线程给堵住
+
+
+countDownLatch的javaDoc是这么说的：
+If the current count is zero then this method returns immediately.
+If the current count is greater than zero then the current thread becomes disabled for thread scheduling purposes and lies dormant until one of two things happen:
+The count reaches zero due to invocations of the countDown method; or
+Some other thread interrupts the current thread.
+If the current thread:
+has its interrupted status set on entry to this method; or
+is interrupted while waiting,
+then InterruptedException is thrown and the current thread's interrupted status is cleared.
+
+当前数量是0的话，立刻返回；大于0 的话，就等别人调用coutDown()方法或者其他线程interrupts这条线程
+
+
+另外,The SharedPreferences implementation in Android is thread-safe but not process-safe.(线程安全)
+原因是，apply的时候有这么一段
+```java
+synchronized (SharedPreferencesImpl.this.mLock) {
+    // mMap ，顺便说一下,getXXX的时候也要  synchronized (mLock) {}，所以极端情况下，A线程写完之后去apply后马上又去put（此时获得了mLock，read这一端就看不到最新的数据了）
+//所谓线程安全就是读和写都用了一把锁。可以保证的是apply或者commit对内存中map进行写时，任何试图读的线程都会因为拿不到锁而等待
+}
+```
+
+关于sharedPreference的工作流程嘛，getXXX的时候从一个mMap里面getXXX(用一个mLock包起来了),putxxx的时候就是拿着这把锁(mLock)，往一个mModified的map里丢数据，apply的时候先去commitToMemory(就是抢到这把锁mLock，一个个去往mMap里面比较containsKey，然后clear这个mModified)。另外,mMap是创建的时候就起了一个线程，loadFromDisk之后生成这个map。
+写磁盘分为apply和commit，apply是先commitToMemory，然后enqueueDiskWrite()。commit在特定情况下直接在调用commit的线程中写磁盘，这个特定情况是指（c，mDiskWritesInFlight在每次调用commitToMemory中加一，写完磁盘后减一，所以这种特殊情况一般出现在刚调用一次commit之后，就是说等待同步到磁盘上的写次数只有一次的时候就直接写磁盘了。）否则立刻给handler发送一个消息去处理写磁盘任务队列 。
+
+在commit里面，enqueueDiskWrite之后调用了writtenToDiskLatch.await();（如果是同步写，写的里面就通过countDown把count变成0，所以这里直接返回）。如果是跑到那个handlerThread里面去写。enqueueDiskWrite还指定了一个postWriteRunnable(就是countDown，所以这里会堵住)
+
+这样看来，commit的堵塞有两种堵法，一种是直接在当前线程做io堵住(mDiskWritesInFlight == 1)v，另一种是CountDownLatch.await(等其他线程写完了之后countDown，这里的线程才能唤醒)。
+
+
+
+```java
+HandlerThread handlerThread = new HandlerThread("queued-work-looper",
+                    Process.THREAD_PRIORITY_FOREGROUND); //这个是apply里面写磁盘的后台线程
+```
+
+往这条HandlerThread上推任务时有延时(延时100ms再post)和立刻执行(立刻post，理论上应该会唤醒等待的looper，算是立刻执行吧)两种方式
+
+
+
+
 [安卓打包流程](https://www.haldir66.ga/static/imgs/android_build_detail.png)

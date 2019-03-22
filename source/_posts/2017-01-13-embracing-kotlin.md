@@ -432,12 +432,82 @@ lst.add(Noun_Class::class.java)
 
 
 [stackoverflow](https://stackoverflow.com/questions/45267041/not-enough-information-to-infer-parameter-t-with-kotlin-and-android)
-init代码块不是构造函数，同时，init的执行效果要看写在哪一行了，如果在Init中引用了一个propertity，这个属性要是在Init之前就初始化了那倒还好，要是在后面,那么在init调用的时候看到的就是null.
+init代码块不是构造函数，同时，init的执行效果要看写在哪一行了，如果在Init中引用了一个propertity，这个属性要是在Init之前就初始化了那倒还好，要是在后面,那么在init调用的时候看到的就是null.(其实编辑器这时候就会警告的)
+
+```js
+class Person {
+
+    /*主构造*/
+    constructor() {
+        println("constructor1")
+    }
+
+    /*属性*/
+    private var gender: Boolean = true
+
+    /*伴生对象*/
+    companion object {
+        val instance: Person by lazy {
+            Person("yzq", 26)
+        }
+
+        /*伴生对象中的初始化代码*/
+        init {
+            println("companion init 1")
+        }
+
+        init {
+            println("companion init 2")
+        }
+    }
+
+    /*次构造方法*/
+    constructor(name: String, age: Int) : this() {
+        println("constructor2")
+    }
+
+    /*初始化代码块*/
+    init {
+        println("Person init 2,gender:${gender}")
+    }
+
+    /*初始化代码块*/
+    init {
+        println("Person init 1")
+    }
+}
+```
+初始化的时候打印结果:
+companion init 1
+companion init 2
+Person init 2,gender:true
+Person init 1
+constructor1
+constructor2
+自己感受下这个顺序
+
 
 ```js
 @Insert
 fun insertAll(vararg users: User) //这个vararg等于java里面的...就是一个数组的意思
 ```
+
+## forEach在Android上可能会崩
+```js
+fun test1(){
+    hashMapOf("a" to "b").forEach { t, u ->
+
+    }
+}
+
+
+fun test2(){
+    hashMapOf("a" to "b").forEach { (t, u) ->
+
+    }
+}
+```
+test1使用的是java 8的BiConsumer，在低版本(api 24以下)会崩，第二种使用的是常规的Iterator方法
 
 ### 参考
 

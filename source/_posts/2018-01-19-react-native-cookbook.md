@@ -15,6 +15,7 @@ react-native init myproject ## 最好全部小写字母
 cd myproject
 react-native run-android
 注意，可能会报错
+
 ```
 FAILURE: Build failed with an exception.
 * What went wrong:
@@ -134,6 +135,10 @@ styling as seprate file在后面跟一个大括号，引用style对象的properi
 [Button组件的styling仅限于几个属性，可以用TouchableXXX来代替](https://stackoverflow.com/questions/43585297/react-native-button-style-not-work)
 
 ## Components
+
+Button是一个没什么大用处的控件，一般用TouchableOpacity包一层text去实现
+
+
 ### ScrollView
 Android平台一个ScrollView只能有一个ChildView(Node)，在react-native上似乎没有这样的限制
 

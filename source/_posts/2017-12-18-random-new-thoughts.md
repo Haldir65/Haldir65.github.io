@@ -54,6 +54,7 @@ top : 1
 - [腾讯的mmkv是shared preference的有效替代品](https://juejin.im/post/5baf8ae8f265da0ae92a7df5) mmap的使用值得学习
 - [ ] [openjdk的C语言实现可以随便调几处来看看](https://github.com/keerath/openjdk-8-source/blob/master/jdk/src/windows/native/java/net/SocketOutputStream.c)
 - [简单的组件化方案](https://www.jianshu.com/p/5f9a7bc902e1)
+- [mvc,mvp,mvvm](https://www.tianmaying.com/tutorial/AndroidMVC)这些关键术语的掌握还是必要的
 
 
 

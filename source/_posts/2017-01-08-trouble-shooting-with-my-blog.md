@@ -182,7 +182,7 @@ top: 0 # 0或者1
  > **Ctrl+Shift+Enter 在上一行插入新的一行**
  > **Shift+ 向上箭头 向上选中多行**
 
-Ctrl+Shift+D：复制粘贴当前行 Ctrl+Shift+Enter：在当前行前插入新行
+>Ctrl+Shift+D：复制粘贴当前行 Ctrl+Shift+Enter：在当前行前插入新行
 Ctrl+M：跳转到对应括号
 Ctrl+U：软撤销，撤销光标位置
 Ctrl+J：选择标签内容
@@ -205,7 +205,7 @@ Shift+右键拖动：光标多不，用来更改或插入列内容
 Alt+数字：切换打开第 N 个文件鼠标的前进后退键可切换 Tab 文件按 Ctrl，依次点击或选取，可需要编辑的多个位置按 Ctrl+Shift+上下键，可替换行
 
 
-vscode的快捷键最重要的一个是ctrl+shift+p,ctrl+p只是在全局查找文件
+vscode的快捷键最重要的一个是ctrl+shift+p(相当于sublime里面的命令模式),ctrl+p只是在全局查找文件
 
 ## 5. title 不能以[]开头
 
@@ -217,8 +217,14 @@ MarkDown 页面内部跳转
 [MarkDown 技巧：两种方式实现页内跳转](http://www.cnblogs.com/JohnTsai/p/4027229.html)
 
 > *一个星星包起来是斜体字*
- > **两个星星包起来是粗体字**
- > ***_那么三个星星呢_***
+> **两个星星包起来是粗体字**
+> ***_那么三个星星呢_***
+
+
+"---" 三根横杠是分割线
+我是分割线上面
+---
+我在分割线下面
 
 ## 7.github 提交 commit 的时候显示 Emoji
 

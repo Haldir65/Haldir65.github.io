@@ -73,6 +73,7 @@ app.use(bodyParser.json())
 
 - 获取GET请求的参数
 比如 GET /student/getById/27 这样一个get请求
+
 ```js
 app.get('/getById/:age',function(req,res){
     res.send(req.params.age);
@@ -81,7 +82,7 @@ app.get('/getById/:age',function(req,res){
 
 - 获取POST请求的参数
 在postMan发起post请求
-```
+```config
 POST /api/personal?age=10 HTTP/1.1
 Host: localhost:8080
 Content-Type: application/x-www-form-urlencoded
@@ -220,7 +221,8 @@ kitty.save().then(() => console.log('meow'));
 
 简单的session处理:
 > yarn add express cookie-parser express-session
-```js
+
+```javaScript
 router.get("/", function(req, res, next) {
   if (req.session.user) {
     var user = req.session.user;

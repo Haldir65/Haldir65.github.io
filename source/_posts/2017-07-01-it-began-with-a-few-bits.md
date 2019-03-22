@@ -480,7 +480,9 @@ CallAdapterFactory和ConverterFactory类似，也可以自定义，所以这样�
 
 
 ### 1.6 补充
-OkHttp本身没有将response挪到主线程，Retrofit这么干了，具体在
+OkHttp本身没有将response挪到主线程，OkHttp的execute方法在当前线程回调，OkHttp的enqueue方法在OkHttpDispatcher线程回调onResponse。都没有推到主线程。
+
+Retrofit这么干了，具体在
 Retrofit.Builder.build方法里面
 ```java
 public Retrofit build() {
@@ -488,22 +490,153 @@ public Retrofit build() {
   if (callbackExecutor == null) {
     callbackExecutor = platform.defaultCallbackExecutor();
     //Andriod平台默认挪到主线程，就是一个持有主线程的线程池
-    //这个线程池的excute方法就是用一个hadler推到主线程了。
+    //这个线程池的excute方法就是用一个handler推到主线程了。
   }
-  // Make a defensive copy of the adapters and add the default Call adapter.
-  List<CallAdapter.Factory> adapterFactories = new ArrayList<>(this.adapterFactories);
-  adapterFactories.add(platform.defaultCallAdapterFactory(callbackExecutor));
-  //如果不加CallAdapterFactory的话，
-  //Android平台默认直接把response丢回给callback，默认配置也是在主线程干的。
-  //如果不希望在主线程接收Response的话，自己在Builder里面添加callbackExecutor.
 
-  // Make a defensive copy of the converters.
-  List<Converter.Factory> converterFactories = new ArrayList<>(this.converterFactories);
+  //把这个defaultCallAdapterFactory默认添加到列表中第一个的位置
+  List<CallAdapter.Factory> callAdapterFactories = new ArrayList<>(this.callAdapterFactories);
+    callAdapterFactories.add(platform.defaultCallAdapterFactory(callbackExecutor));
 
-  return new Retrofit(callFactory, baseUrl, converterFactories, adapterFactories,
-      callbackExecutor, validateEagerly);
+  //这里传进去callAdapterFactories是一个list，头一个factory是defaultCallAdapterFactory
+  return new Retrofit(callFactory, baseUrl, unmodifiableList(converterFactories),
+          unmodifiableList(callAdapterFactories), callbackExecutor, validateEagerly);
 }
 ```
+
+这个callbackExecutor什么时候用的呢，还记得三个方法中最后一个serviceMethod.adapt吗， 
+调用顺序如下：
+serviceMethod.adapt -> ServiceMethod的成员变量callAdapter.adapt(call) (这个时候还没发起请求哈) -> 
+这个callAdapter是在ServiceMethod.Builder.build中调用了retrofit.callAdapter(returnType, annotations);-> 继而调用到nextCallAdapter-> callAdapterFactories.get(i).get(returnType, annotations, this); 
+就是在Retrofit对象的callAdapterFactories这个列表里找，上面不是说默认添加了第一个吗，所以这个get方法会跑到
+ExecutorCallAdapterFactory.get方法中。而对应的实现返回了
+new ExecutorCallbackCall<>(callbackExecutor, call);//callbackExecutor是那个主线程的executor
+外部执行Retrofit.call.enqueue -> serviceMethod.adapt -> ExecutorCallbackCall.enqueue -> (调用oKhttp的qnqueue，在onResponse中callbackExecutor.execute -> { callback.onResponse() })
+
+
+外部调用经历流程
+```java
+
+public interface GitHubService {
+  @GET("users/{user}/repos")
+  Call<List<Repo>> listRepos(@Path("user") String user); //可以认为这底下就是藏着一个ServiceMethod的实例
+}
+
+Retrofit retrofit = new Retrofit.Builder()
+    .baseUrl("https://api.github.com/")
+    .build();
+
+GitHubService service = retrofit.create(GitHubService.class);//在这里以动态代理的方式生产ServiceMethod
+Call<List<Contributor>> call = github.contributors("square", "retrofit");//在这里调用了serviceMethod.adapt方法
+List<Contributor> contributors = call.execute().body();//这里是Call类型，说明上面serviceMethod.adapt返回了一个
+```
+也就是说这个adapt方法会返回Call<T> ，或者Observable<T>类型的数据
+怎么做到的呢？ 它会拿着期待的返回类型(Call,Observable)去询问Retrofit的callAdapterFactories里面的每一个callAdapterFactory的
+get(returntype)方法，上面github这种，returnType就是Call.class
+
+DefaultCallAdapterFactory.java
+```java
+final class DefaultCallAdapterFactory extends CallAdapter.Factory {
+  static final CallAdapter.Factory INSTANCE = new DefaultCallAdapterFactory();
+
+  @Override
+  public CallAdapter<?, ?> get(Type returnType, Annotation[] annotations, Retrofit retrofit) {
+    if (getRawType(returnType) != Call.class) { //如果是call，那么能够handle的来，否则nextCallAdapter
+      return null;
+    }
+
+    final Type responseType = Utils.getCallResponseType(returnType);
+    return new CallAdapter<Object, Call<?>>() {
+      @Override public Type responseType() {
+        return responseType;
+      }
+
+      @Override public Call<Object> adapt(Call<Object> call) {
+        return call;
+      }
+    };
+  }
+}
+```
+
+RxJava2CallAdapterFactory 是这样回应的。其实就是看一个listRepos这个方法的返回类型
+```java
+boolean isFlowable = rawType == Flowable.class;
+boolean isSingle = rawType == Single.class;
+boolean isMaybe = rawType == Maybe.class;
+if (rawType != Observable.class && !isFlowable && !isSingle && !isMaybe) {
+  return null;
+}
+```
+
+ExecutorCallAdapterFactory
+```java
+  @Override
+  public CallAdapter<?, ?> get(Type returnType, Annotation[] annotations, Retrofit retrofit) {
+    if (getRawType(returnType) != Call.class) {
+      return null;
+    }
+    final Type responseType = Utils.getCallResponseType(returnType);
+    return new CallAdapter<Object, Call<?>>() {
+      @Override public Type responseType() {
+        return responseType;
+      }
+
+      @Override public Call<Object> adapt(Call<Object> call) {
+        return new ExecutorCallbackCall<>(callbackExecutor, call);//这个在Android平台上默认会把onResponse搞到主线程上
+      }
+    };
+  }
+```
+```java
+//DefaultCallAdapterFactory里面
+@Override public Call<Object> adapt(Call<Object> call) {
+  return call;
+}
+
+// ExecutorCallAdapterFactory
+@Override public Call<Object> adapt(Call<Object> call) {
+  return new ExecutorCallbackCall<>(callbackExecutor, call);
+}
+//RxJava2CallAdapter
+@Override public Object adapt(Call<R> call) {
+    Observable<Response<R>> responseObservable = isAsync //这个isAsync默认是false
+        ? new CallEnqueueObservable<>(call)
+        : new CallExecuteObservable<>(call);
+     ///....
+     return observable;   
+}
+```
+所以Retrofit的service里面可以返回各种类型。
+
+```java
+call.enqueue(new okhttp3.Callback() {
+     @Override public void onResponse(okhttp3.Call call, okhttp3.Response rawResponse) {
+      //..这里还是oKHttp的Dispatcher线程，所以解析数据是在子线程上的
+       response = parseResponse(rawResponse);
+
+      // 这然后才是callback，在ExecutorCallAdapterFactory中callbackExecutor.execute(），就是在这里推向主线程的
+       callback.onResponse(OkHttpCall.this, response);
+     }
+}
+```
+那么假如是Rxjava2CallAdapterFactory呢,callAdapter返回的是默认CallExecuteObservable，
+```java
+  @Override protected void subscribeActual(Observer<? super Response<T>> observer) {
+      Response<T> response = call.execute();//不要被这个call.execute.execute迷惑了
+      if (!disposable.isDisposed()) {
+        observer.onNext(response);
+      }
+  }
+
+  //OkHttpCall
+  @Override public Response<T> execute() throws IOException {
+        // ...
+      return parseResponse(call.execute());//所以还是要走ResponseBodyConverter那一套的
+  }
+```
+
+
+
 
 根据[jake Wharton在stackoverFlow上的回答](https://stackoverflow.com/questions/21652461/retrofit-callback-on-main-thread),Retrofit parse byte to Object的过程是发生在子线程的。
 

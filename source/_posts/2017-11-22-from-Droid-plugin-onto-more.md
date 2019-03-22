@@ -11,6 +11,7 @@ tags: [android,插件化]
 <!--more-->
 ## 1. 从Context的本质说起
 其实也简单，就是ContextImpl，一个各种资源的容器。
+
 ```java
 Activity extends ContextThemeWrapper
 ContextThemeWrapper extends ContextWrapper
@@ -45,15 +46,15 @@ onSaveInstance是从ActivityThread的callCallActivityOnSaveInstanceState方法di
 关于打包: 根据[Android 多渠道打包梳理](https://www.jianshu.com/p/4f2990cf53bf)
 Gradle UMeng 多渠道打包
 
--  Android.manifest文件添加
+Android.manifest文件添加
 ```xml
 <meta-data
     android:name="UMENG_CHANNEL"
     android:value="${UMENG_CHANNEL_VALUE}" />
 ```
 
--  app的build.gradle中添加
-```gradle
+### app的build.gradle中添加
+```Gradle
 android {  
     ...
     productFlavors {
@@ -86,7 +87,6 @@ android {
         flavor -> flavor.manifestPlaceholders = [UMENG_CHANNEL_VALUE: name]
     }
 }
-
 ```
 
 -  打包
@@ -169,7 +169,7 @@ signingConfigs {
 > 传统的进程间通信方式有管道，消息队列，共享内存等，其中管道，消息队列采用存储-转发方式，即数据先从发送方缓存区拷贝到内核开辟的缓存区中，然后再从内核缓存区拷贝到接收方缓存区，至少有两次拷贝过程。共享内存虽然无需拷贝，但控制复杂，难以使用。socket作为一款通用接口，其传输效率低，开销大，主要用在跨网络的进程间通信和本机上进程间的低速通信。Binder通过内存映射的方式，使数据只需要在内存进行一次读写过程。
 内存映射，简而言之就是将用户空间的一段内存区域映射到内核空间，映射成功后，用户对这段内存区域的修改可以直接反映到内核空间，相反，内核空间对这段区域的修改也直接反映用户空间。那么对于内核空间<—->用户空间两者之间需要大量数据传输等操作的话效率是非常高的。
 
-## sharedPreference其实是支持跨进程的，只是谷歌不推荐，建议使用ContentProvider这种
+## sharedPreference不支持跨进程，建议使用ContentProvider这种
 > Context.MODE_MULTI_PROCESS
 This constant was deprecated in API level 23. MODE_MULTI_PROCESS does not work reliably in some versions of Android, and furthermore does not provide any mechanism for reconciling concurrent modifications across processes. Applications should not attempt to use it. Instead, they should use an explicit cross-process data management approach such as ContentProvider.
 
@@ -197,10 +197,10 @@ Xposed的原理与Multidex及动态加载问题
 组件化的方案多为路由 + 接口下沉的方式，所有接口下沉到base中，组件中实现接口
 
 
--  多渠道的话这样的命令要跑多次
-使用walle就好了。
-> project 的 build.gradle 添加:
-```gradle
+多渠道的话这样的命令要跑多次
+使用walle就好了,在project 的 build.gradle 添加:
+
+```Gradle
 dependencies {
     classpath 'com.meituan.android.walle:plugin:1.0.3'
 }
@@ -242,7 +242,7 @@ myapp
 ```
 
 编译全部渠道
-> gradlew clean assembleReleaseChannels
+gradlew clean assembleReleaseChannels
 gradlew clean assembleReleaseChannels -PchannelList=huawei // 只编译华为的
 gradlew clean assembleReleaseChannels -PchannelList=huawei,xiaomi // 小米跟华为的
 

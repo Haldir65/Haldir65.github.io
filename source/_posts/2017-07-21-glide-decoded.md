@@ -499,14 +499,13 @@ Engine先去Cache里面查找，找到了直接调用ResourceCallback(GenericReq
     private final ResourceRecycler resourceRecycler;
     private final LazyDiskCacheProvider diskCacheProvider;
 
+    
+
 }
  ```
-
-如果在MemoryCache这个Lru里面没找到，就调用loadFromActiveResources，从activeResources里面找到。
-
-**所以这里已经出现两层缓存了，先去Lru(内存)找，再去activeResources(HashMap)里面找。缓存都是放在Engine里面的，全局只有一份**
-
-缓存里面的Value都是EngineResource。
+  
+EngineResource<?> active = loadFromActiveResources(key, isMemoryCacheable); //4.8的glide是先从这个引用计数里面找
+EngineResource<?> cached = loadFromCache(key, isMemoryCacheable); //然后再从com.bumptech.glide.util。LruCache这个类中找.
 
 
 这个MemoryCache是一个LruCache，大小是在MemorySizeCalculator中获得的，
@@ -859,10 +858,34 @@ if (dataSource != DataSource.RESOURCE_DISK_CACHE) {
 
 ### 关于DirectByteBuffer在glide中的使用
 java.nio.DirectByteBuffer这个class,从成员变量来看有MemoryBlock,以及FileChannel.MapModel
+```java
+public static ByteBuffer fromFile(@NonNull File file) throws IOException {
+    RandomAccessFile raf = null;
+    FileChannel channel = null;
+    raf = new RandomAccessFile(file, "r");
+    channel = raf.getChannel();
+    return channel.map(FileChannel.MapMode.READ_ONLY, 0, fileLength).load(); //map就是mmap，返回的是MappedByteBuffer,这是一个抽象类，实际应该是DirectByteBuffer
+  }
+```
+
+一些默认的配置如果外部没有设置的话是这样的
+```java
+if (arrayPool == null) {
+    arrayPool = new LruArrayPool(memorySizeCalculator.getArrayPoolSizeInBytes());
+}
+
+if (memoryCache == null) {
+    memoryCache = new LruResourceCache(memorySizeCalculator.getMemoryCacheSize());
+}
+
+if (diskCacheFactory == null) {
+    diskCacheFactory = new InternalCacheDiskCacheFactory(context);
+}
+```
 
 
-
-
+tbd
+是否可以在onSizeReady之后修改url，添加上七牛的宽高参数？
 
 
 

@@ -209,7 +209,7 @@ target_link_libraries( my-lib
         *将任意格式的视频在手机上进行播放，使用native进行绘制
         * env:虚拟机指针
         * inputStr：视频文件路径
-        * surface: 从java层传递过来的SurfaceView的serface对象 
+        * surface: 从java层传递过来的SurfaceView的surface对象 
         */
     void ffmpegVideoPlayer(JNIEnv *env, char *inputStr, jobject surface) {
         // 1.注册各大组件，执行ffmgpe都必须调用此函数
@@ -227,7 +227,7 @@ target_link_libraries( my-lib
             return;
         }
         //5.用来记住视频流的索引
-        int vedio_stream_idx = -1;
+        int video_stream_idx = -1;
         //从上下文中寻找找到视频流
         for (int i = 0; i < pContext->nb_streams; ++i) {
             LOGE("循环  %d", i);
@@ -235,12 +235,12 @@ target_link_libraries( my-lib
             //codec_type：流的类型
             if (pContext->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
                 //如果找到的流类型 == AVMEDIA_TYPE_VIDEO 即视频流，就将其索引保存下来
-                vedio_stream_idx = i;
+                video_stream_idx = i;
             }
         }
     
         //获取到解码器上下文
-        AVCodecContext *pCodecCtx = pContext->streams[vedio_stream_idx]->codec;
+        AVCodecContext *pCodecCtx = pContext->streams[video_stream_idx]->codec;
         //获取解码器（加密视频就是在此处无法获取）
         AVCodec *pCodex = avcodec_find_decoder(pCodecCtx->codec_id);
         LOGE("获取视频编码 %p", pCodex);
@@ -287,7 +287,7 @@ target_link_libraries( my-lib
         int length = 0;
         int got_frame;
         while (av_read_frame(pContext, packet) >= 0) {//开始读每一帧的数据
-            if (packet->stream_index == vedio_stream_idx) {//如果这是一个视频流
+            if (packet->stream_index == video_stream_idx) {//如果这是一个视频流
                 //7.解封装（将packet解压给frame，即：拿到了视频数据frame）
                 length = avcodec_decode_video2(pCodecCtx, frame, &got_frame, packet);//解封装函数
                 LOGE(" 获得长度   %d 解码%d  ", length, frameCount++);

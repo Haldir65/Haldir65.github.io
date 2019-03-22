@@ -93,7 +93,7 @@ sudo systemctl enable nginx
 ### 4.1 不想用80端口怎么办(比如跟apache冲突了)
 修改 /etc/nginx/nginx.conf文件
 config文件的大致结构就是这样,来自[stackoverflow](https://stackoverflow.com/questions/10829402/how-to-start-nginx-via-different-portother-than-80)
-```bash
+```Nginx
 user www-data;
 worker_processes  1;
 
@@ -203,7 +203,7 @@ nginx -s stop // force stop on windows
 
 ### 4.3 分享特定目录(serve static files)
 [How to serve a directory of static files at a certain location path with nginx?](https://stackoverflow.com/questions/33989060/how-to-serve-a-directory-of-static-files-at-a-certain-location-path-with-nginx)
-```
+```Nginx
 server {
   listen 80;
   server_name   something.nateeagle.com;
@@ -216,7 +216,7 @@ server {
 ```
 
 有的时候会看到两种写法
-```
+```Nginx
 location /static/ {
         root /var/www/app/static/;
         autoindex off;
@@ -233,11 +233,11 @@ location /static/ {
 
 [那alias标签和root标签到底有哪些区别呢？](http://blog.51cto.com/nolinux/1317109)
 1、alias后跟的指定目录是准确的,并且末尾必须加“/”，否则找不到文件
-```
+```Nginx
 location /c/ {
       alias /a/
 }
-```
+```Nginx
 如果访问站点http://location/c ，访问的就是/a/目录下的站点信息。
 2、root后跟的指定目录是上级目录，并且该上级目录下要含有和location后指定名称的同名目录才行，末尾“/”加不加无所谓。
 ```
@@ -264,19 +264,19 @@ location / {
 
 ###4.5 Nginx通过CORS实现跨域
 在nginx.conf里找到server项,并在里面添加如下配置
-```
+```Nginx
 location / {
-add_header 'Access-Control-Allow-Origin' 'http://example.com';
-add_header 'Access-Control-Allow-Credentials' 'true';
-add_header 'Access-Control-Allow-Headers' 'Authorization,Content-Type,Accept,Origin,User-Agent,DNT,Cache-Control,X-Mx-ReqToken,X-Requested-With';
-add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS';
-...
+    add_header 'Access-Control-Allow-Origin' 'http://example.com';
+    add_header 'Access-Control-Allow-Credentials' 'true';
+    add_header 'Access-Control-Allow-Headers' 'Authorization,Content-Type,Accept,Origin,User-Agent,DNT,Cache-Control,X-Mx-ReqToken,X-Requested-With';
+    add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS';
+    ...
 }
 ```
 
 但上述配置只能实现允许一个domain或者*实现跨域，Nginx允许多个域名跨域访问
 在location context的上层添加
-```config
+```Nginx
 map $http_origin $corsHost {
     default 0;
     "~http://www.example.com" http://www.example.com;
@@ -300,7 +300,7 @@ server
 根据[how-to-set-up-a-node-js-application-for-production-on-ubuntu-14-04](https://www.digitalocean.com/community/tutorials/how-to-set-up-a-node-js-application-for-production-on-ubuntu-14-04)
 > /etc/nginx/sites-available/default
 
-``` config
+```Nginx
 server {
     listen 80;
 
@@ -339,7 +339,7 @@ from [mitigating-ddos-attacks-with-nginx-and-nginx-plus/](https://www.nginx.com/
 ### 1. Limiting the Rate of Requests
 eg: 单ip访问login接口频率不能超过2秒每次。
 
-```config
+```Nginx
 limit_req_zone $binary_remote_addr zone=one:10m rate=30r/m;
 
 server {
@@ -353,7 +353,7 @@ server {
 
 ### 2. Limiting the Number of Connections
 eg: 单ip访问/store/不能创建超过10条connections
-```nginx
+```Nginx
 limit_conn_zone $binary_remote_addr zone=addr:10m;
 
 server {
@@ -365,9 +365,10 @@ server {
 }
 ```
 
-3. Closing Slow Connections
+### 3. Closing Slow Connections
 eg: 限定nginx一条connection写client header和写client body的时间间隔为5s，默认为60s
-```config
+
+```Nginx
 server {
     client_body_timeout 5s;
     client_header_timeout 5s;
@@ -375,8 +376,9 @@ server {
 }
 ```
 
-4. 黑名单
-```config
+### 4. 黑名单
+
+```Nginx
 // 123.123.123.1 through 123.123.123.16 拉黑
 location / {
     deny 123.123.123.0/28;
@@ -398,18 +400,18 @@ location / {
 }
 ```
 
-5.  ngx_http_proxy_module的configuration
+### 5.  ngx_http_proxy_module的configuration
 proxy_cache_use_stale
 当客户端请求一项过期的资源时，只发送一次请求，在backend server返回新的资源之前，不再发送新的请求，并只向客户端返回已有的过期资源。这有助于缓解backend server的压力。
 proxy_cache_key:包含内置三个key$scheme$proxy_host$request_uri。但不要添加$query_string，这会造成过多的caching.
 
-6. 几种情况是应该直接拉黑的
+### 6. 几种情况是应该直接拉黑的
 >Requests to a specific URL that seems to be targeted  
 Requests in which the User-Agent header is set to a value that does not correspond to normal client traffic
 Requests in which the Referer header is set to a value that can be associated with an attack
 Requests in which other headers have values that can be associated with an attack
 
-```config
+```Nginx
 location /foo.php {
     deny all; //直接让这个接口不响应
 }
@@ -436,7 +438,7 @@ http_image_filter_module（图片裁剪模块）
 首先查看是否已安装http_image_filter_module模块
 > nginx -V
 /etc/nginx/nginx.conf文件添加
-```nginx
+```Nginx
 location /image {
 		   alias "/imgdirectory/"; 
             ## 这样直接输入 yourip/image/imgname.jpg就能返回原始图片
@@ -455,7 +457,7 @@ location ~* /imgs/.*\.(jpg|jpeg|gif|png|jpeg)$ {
 亲测上述可行，python也有类似库[thumbor](https://github.com/thumbor/thumbor)
 
 关于正则匹配：
-```config
+```Nginx
 ## 比如匹配全站所有的结尾图片
 location ~* \.(jpg|gif|png)$ {
                image_filter resize 500 500;
@@ -494,7 +496,7 @@ cat access.log | sed -n '/28\/Jul\/2018:10/,/30\/Jul\/2018:13/p' | more
 
 
 ### 5.3 return rewrite and try_files
-```config
+```Nginx
 server {
     listen 80;
     listen 443 ssl;
@@ -507,7 +509,7 @@ server {
 
 rewrite就更加复杂一点，比如可以manipulate url
 Here’s a sample NGINX rewrite rule that uses the rewrite directive. It matches URLs that begin with the string /download and then include the /media/ or /audio/ directory somewhere later in the path. It replaces those elements with /mp3/ and adds the appropriate file extension, .mp3 or .ra. The $1 and $2 variables capture the path elements that aren't changing. As an example, /download/cdn-west/media/file1 becomes /download/cdn-west/mp3/file1.mp3. If there is an extension on the filename (such as .flv), the expression strips it off and replaces it with .mp3.
-```config
+```Nginx
 server {
     # ...
     rewrite ^(/download/.*)/media/(\w+)\.?.*$ $1/mp3/$2.mp3 last;
@@ -519,7 +521,7 @@ server {
 
 
 In the following example, NGINX serves a default GIF file if the file requested by the client doesn’t exist. When the client requests (for example) http://www.domain.com/images/image1.gif, NGINX first looks for image1.gif in the local directory specified by the root or alias directive that applies to the location (not shown in the snippet). If image1.gif doesn’t exist, NGINX looks for image1.gif/, and if that doesn’t exist, it redirects to /images/default.gif. That value exactly matches the second location directive, so processing stops and NGINX serves that file and marks it to be cached for 30 seconds.
-```config
+```Nginx
 try_files $uri $uri/ =404; ## 这么写的话，碰到找不到的，浏览器直接返回一个丑到爆的ngix默认404页面。
 
 location /images/ {
@@ -540,7 +542,7 @@ location ~ \.(htm|html|gif|jpg|jpeg|png|bmp|ico|css|js|txt)$ {
 
 ### 5.4 NGINX LOAD BALANCING 负载均衡
 Load balancing across multiple application instances is a commonly used technique for optimizing resource utilization, maximizing throughput, reducing latency, and ensuring fault-tolerant configurations.
-```config
+```Nginx
 http {
     upstream backend {
         server backend1.example.com weight=5;
@@ -562,7 +564,7 @@ http {
 导向策略有多种：
 1.Round-robin (默认) 1, 2 , 1, 2 ,1 ....如此反复
 2.least_conn 连接数最少的优先（如果有weight，加权选择）
-```config
+```Nginx
 upstream backend {
     least_conn;
     server backend1.example.com;
@@ -597,7 +599,7 @@ benchmark，[压力测试](https://www.digitalocean.com/community/tutorials/how-
 ### 7. 整理一下linode的文章
 [linoe关于nginx配置的文章写得特别好](https://linode.com/docs/web-servers/nginx/how-to-configure-nginx/)
 /etc/nginx/nginx.conf
-```config
+```Nginx
 http {
 
     ##
@@ -651,7 +653,7 @@ http这个directive下一层就是server了,一般来说，一个虚拟域名(vi
 
 **接下来的东西就不要写在/etc/nginx/nginx.conf文件里了,这里应该是一个domain写一个.conf文件**
 /etc/nginx/sites-available/default
-```server
+```Nginx
 server {
         listen 80 default_server;  //  default_server means this virtual host will answer requests on port 80 that don’t specifically match another virtual host’s listen statement.
         listen [::]:80 default_server ipv6only=on; // 这个是给ipv6用的
