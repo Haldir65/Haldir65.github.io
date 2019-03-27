@@ -232,29 +232,34 @@ location /static/ {
 [location里面写root还是alias](https://stackoverflow.com/questions/10631933/nginx-static-file-serving-confusion-with-root-alias)
 
 [那alias标签和root标签到底有哪些区别呢？](http://blog.51cto.com/nolinux/1317109)
-1、alias后跟的指定目录是准确的,并且末尾必须加“/”，否则找不到文件
+1. alias后跟的指定目录是准确的,并且末尾必须加“/”，否则找不到文件
+
 ```Nginx
 location /c/ {
       alias /a/
 }
-```Nginx
-如果访问站点http://location/c ，访问的就是/a/目录下的站点信息。
-2、root后跟的指定目录是上级目录，并且该上级目录下要含有和location后指定名称的同名目录才行，末尾“/”加不加无所谓。
 ```
+
+如果访问站点http://location/c ，访问的就是/a/目录下的站点信息。
+
+2、root后跟的指定目录是上级目录，并且该上级目录下要含有和location后指定名称的同名目录才行，末尾“/”加不加无所谓。
+```Nginx
 location /c/ {
       root /a/
 }
 ```
 如果访问站点http://location/c，访问的就是/a/c目录下的站点信息。
-3、一般情况下，在location /中配置root，在location /other中配置alias是一个好习惯。
 
-在windows平台下这么写
+3.一般情况下，在location /中配置root，在location /other中配置alias是一个好习惯。
+
+在windows平台下可以这么写
 ```
 location / {
            root D:/VDownload;
            index index.html index.htm;
        }
 ```
+
 > nginx -s reload 然后重启nginx
 
 
@@ -262,7 +267,7 @@ location / {
 目测不能用软链接
 
 
-###4.5 Nginx通过CORS实现跨域
+### 4.5 Nginx通过CORS实现跨域
 在nginx.conf里找到server项,并在里面添加如下配置
 ```Nginx
 location / {
@@ -367,12 +372,10 @@ server {
 
 ### 3. Closing Slow Connections
 eg: 限定nginx一条connection写client header和写client body的时间间隔为5s，默认为60s
-
 ```Nginx
 server {
     client_body_timeout 5s;
     client_header_timeout 5s;
-    # ...
 }
 ```
 
@@ -438,6 +441,7 @@ http_image_filter_module（图片裁剪模块）
 首先查看是否已安装http_image_filter_module模块
 > nginx -V
 /etc/nginx/nginx.conf文件添加
+
 ```Nginx
 location /image {
 		   alias "/imgdirectory/"; 

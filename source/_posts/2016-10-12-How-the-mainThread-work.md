@@ -406,6 +406,29 @@ Looper.cpp利用epoll机制接收events,并调用callback回调的handleEvent方
 mMessageQueue->getLooper()->addFd(fd, 0, events, this, NULL);
 ```
 
+### Choregrapher
+Choregrapher里面有一个内部类FrameDisplayEventReceiver(继承自DisplayEventReceiver，DisplayEventReceiver是一个没有抽象方法的抽象类)，主要提供两个方法nativeScheduleVsync和onVsync。
+FrameDisplayEventReceiver在onVsync的时候会post一个异步(也就是说不受syncBarrier阻拦)的消息到主线程上去调用Choregrapher的doFrame（这里面就是把之前所有通过Choregrapher.postCallback添加到队列的事件拿出来，到期了就执行）
+
+主线程的MessageQueue被syncBarrier堵住的显著特征是meg.target==null(也就是对应的handler为null).  ViewRootImpl在scheduleTraversals的时候会postSyncBarrier一次，也就是说，这个doTraversal是高优先级的，这一刻起后面的所有丢到主线程上的msg都要等到我doTraversal完成后才执行(异步消息例外，所以上面onVsync的消息得是异步的)。从时间顺序上来讲，
+ViewRootImpl.scheduleTraversal -> mChoreographer.postCallback -> Choreographer开始scheduleFrameLocked（假如时间到了，直接调用nativeScheduleVsync，否则发送的msg全都是异步的，就是为了跨过之前的barrier.）同样，在onVsync的时候，由于此时的barrier还没移除，所以发出的消息还得是异步的。doFrame里面，严格按照input -> animation -> traversal的类型去执行。也就是viewRootImpl在scheduleTraversals的时候post的callback要老老实实在第三组被执行。而在轮到这个doTraversal执行的时候，终于可以去移除barrier了。
+
+需要指明的是，每一次scheduleTraversal都要触发measure -> layout -> draw这一套，所以，耗时是很严重的。vsync信号也不是系统主动发出的，而是需要通过nativeScheduleVsync请求，才会有一次onVsync的相应的。看了一下，ViewRootImpl里面的setLayoutParams，invalidate,requestLayout,requestFitSystemWindows等方法里面都会触发scheduleTraversal。 显然在onCreate的setContentView里面会至少调用一次。然后就是熟悉的performTraversal(measure,layout,draw)。
+
+人们常说在onCreate里面获取一个View的宽高有四种方式：
+onPreDraw,onLayoutChange,view.measure.
+第四种就是直接在setContentView后面跟着post一个msg，原理就是前面有一个barrier，这个barrier解除之后执行的第一个msg大概率就是这个msg(不考虑别的线程这么巧也插进来)，这时候，performTraversals刚刚走完，draw也走完了,最后绘制数据都缓存到Surface上。但是systemServer那边，windowManagerService和surfaceFlinger那边还没来得及处理这些刚draw的数据（surfaceFlinger那边还要compose，没那么快吧）。
+
+### surfaceFlinger
+Android是通过系统级进程中的SurfaceFlinger服务来把真正需要显示的数据渲染到屏幕上。SurfaceFlinger的主要工作是：
+
+响应客户端事件，创建Layer与客户端的Surface建立连接。
+接收客户端数据及属性，修改Layer属性，如尺寸、颜色、透明度等。
+将创建的Layer内容刷新到屏幕上。
+维持Layer的序列，并对Layer最终输出做出裁剪计算。
+因应用层和系统层分别是两个不同进程，需要一个跨进程的通信机制来实现数据传输，在Android的显示系统中，使用了Android的匿名共享内存：SharedClient。每一个应用和SurfaceFlinger之间都会创建一个SharedClient，每个SharedClient中，最多可以创建31个SharedBufferStack，每个Surface都对应一个SharedBufferStack，也就是一个window。这意味着一个Android应用程序最多可以包含31个窗口，同时每个SharedBufferStack中又包含两个(<4.1)或三个(>=4.1)缓冲区。
+应用层绘制到缓冲区，SurfaceFlinger把缓存区数据渲染到屏幕，两个进程之间使用Android的匿名共享内存SharedClient缓存需要显示的数据。
+
 ### Reference
 1. [Handler.postDelayed()是如何精确延迟指定时间的](http://www.dss886.com/android/2016/08/17/17-18)
 2. [How the Main Thread works](https://www.youtube.com/watch?v=aFGbv9Ih9qQ)
