@@ -17,7 +17,7 @@
 <meta property="og:description" content="OkHttp通过ConnectionPool做到tcp连接复用（在Timeout内）,所以并不是每个http都去建立一个tcp连接自定义通讯协议，使用java socket实现客户端和服务端。需要注意的是分包问题和黏包问题">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/jpglight-and-shadow-2411321_960_720.jpg">
-<meta property="og:updated_time" content="2019-03-13T02:30:25.326Z">
+<meta property="og:updated_time" content="2019-03-27T14:13:01.248Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="网络通信手册-2">
 <meta name="twitter:description" content="OkHttp通过ConnectionPool做到tcp连接复用（在Timeout内）,所以并不是每个http都去建立一个tcp连接自定义通讯协议，使用java socket实现客户端和服务端。需要注意的是分包问题和黏包问题">
@@ -201,118 +201,7 @@ ga('send', 'pageview');
     <div class="article-entry" itemprop="articleBody">
       
         <p>OkHttp通过ConnectionPool做到tcp连接复用（在Timeout内）,所以并不是每个http都去建立一个tcp连接<br>自定义通讯协议，使用java socket实现客户端和服务端。需要注意的是分包问题和黏包问题<br><img src="https://www.haldir66.ga/static/imgs/jpglight-and-shadow-2411321_960_720.jpg" alt=""><br><a id="more"></a></p>
-<h2 id="1-http请求中tcp连接的复用-深入okHttp-3-9-1的connectionPool以及引用计数"><a href="#1-http请求中tcp连接的复用-深入okHttp-3-9-1的connectionPool以及引用计数" class="headerlink" title="1. http请求中tcp连接的复用(深入okHttp 3.9.1的connectionPool以及引用计数)"></a>1. http请求中tcp连接的复用(深入okHttp 3.9.1的connectionPool以及引用计数)</h2><p>在高并发的请求连接情况下或者同个客户端多次频繁的请求操作，无限制的创建连接会导致性能低下。所以OkHttp做到了对socket的复用和及时清理。<br>从第四个intercepter开始<br>ConnectInterceptor.java</p>
-<pre><code class="java">public final class ConnectInterceptor implements Interceptor{
-
-  @Override public Response intercept(Chain chain) throws IOException {
-  RealInterceptorChain realChain = (RealInterceptorChain) chain;
-  Request request = realChain.request();
-  // 第一步，获取streamAllocation
-  StreamAllocation streamAllocation = realChain.streamAllocation();
-
-  // We need the network to satisfy this request. Possibly for validating a conditional GET.
-  boolean doExtensiveHealthChecks = !request.method().equals(&quot;GET&quot;);
-  // 第二步，使用streamAllocation创建(或者复用)一个httpCodec模型（即处理header和body的读写策略，具体实现包括Http1Codec和Http2Codec）
-  HttpCodec httpCodec = streamAllocation.newStream(client, chain, doExtensiveHealthChecks);
-  // 第三部，挑选出RealConnection,streamAllocation对象中的mConnection变量是在第二步里面赋值的
-  RealConnection connection = streamAllocation.connection();
-
-  return realChain.proceed(request, streamAllocation, httpCodec, connection);
-  }
-}
-</code></pre>
-<p>所以socket连接复用就在这句话里面了</p>
-<blockquote>
-<p>HttpCodec httpCodec = streamAllocation.newStream(client, chain, doExtensiveHealthChecks);</p>
-</blockquote>
-<p>StreamAllocation.java</p>
-<pre><code class="java">public HttpCodec newStream(
-    OkHttpClient client, Interceptor.Chain chain, boolean doExtensiveHealthChecks) {
-
-      // 省略部分，主要是这两句话
-      RealConnection resultConnection = findHealthyConnection(connectTimeout, readTimeout,
-               writeTimeout, connectionRetryEnabled, doExtensiveHealthChecks);
-      //
-      HttpCodec resultCodec = resultConnection.newCodec(client, chain, this);
-    }
-</code></pre>
-<p>findHealthyConnection最终走到这里</p>
-<pre><code class="java">// Attempt to get a connection from the pool.
-for (RealConnection connection : connections) {
-    if (connection.isEligible(address, route)) {
-      streamAllocation.acquire(connection, true);
-      return connection;
-    }
-  }
-
-// 判断是否isEligible的方法在RealConnection里面
-
-// If the non-host fields of the address don&#39;t overlap, we&#39;re done.
- if (!Internal.instance.equalsNonHost(this.route.address(), address)) return false;
-// 只要DNS,port,protocols等host无关的参数中有一个不同就不能复用
-
- // If the host exactly matches, we&#39;re done: this connection can carry the address.
- if (address.url().host().equals(this.route().address().url().host())) {
-   return true; // This connection is a perfect match.
- }
- // 这里说明host是相同的，上面的DNS什么的都是一样的，只有后面的path,query或者RequestBody不同，那么直接复用
-</code></pre>
-<p>所以这里socket复用的方式是直接使用RealConnection持有Socket对象的引用，每一次在RealConnection的connect成功后，都会讲这个socket包装成一个BufferedSource(读取Response)和BufferedSink(往外写Request)，在timeout时长内，socket不会被关闭。既然缓存就一定会有清理</p>
-<p>在上面的findHealthyConnection中有一段</p>
-<blockquote>
-<p>streamAllocation.acquire(connection, true);</p>
-</blockquote>
-<p>这里面的作用就是将这条请求（Stream）添加到当前连接承载的一个List&lt;Reference<StreamAllocation>&gt;中，也就是所谓的引用计数。提到这一点是要谈到清理的实现：<br>ConnectionPool中有一个Executor，目的就是执行一个cleanupRunnable的Runnable，这里面的清理操作大致如下：</p>
-<pre><code class="java">long cleanup(long now) {
-   // Find either a connection to evict, or the time that the next eviction is due.
-   synchronized (this) {
-     for (Iterator&lt;RealConnection&gt; i = connections.iterator(); i.hasNext(); ) {
-       RealConnection connection = i.next();
-
-       // If the connection is in use, keep searching.
-       if (pruneAndGetAllocationCount(connection, now) &gt; 0) {
-         inUseConnectionCount++; //这条连接还在用
-         continue;
-       }
-
-       idleConnectionCount++; //这条连接现在空闲下来了
-
-       // If the connection is ready to be evicted, we&#39;re done.
-       long idleDurationNs = now - connection.idleAtNanos;// 这条连接已经多久没用到了，假如超过了闲置时间(默认5纳秒)，就准备干掉这个socket
-       if (idleDurationNs &gt; longestIdleDurationNs) {
-         longestIdleDurationNs = idleDurationNs;
-         longestIdleConnection = connection;
-       }
-     }
-       // We&#39;ve found a connection to evict. Remove it from the list, then close it below (outside
-       // of the synchronized block).
-
-       // A connection will be ready to evict soon.
-
-       // All connections are in use. It&#39;ll be at least the keep alive duration &#39;til we run again.
-
-       // No connections, idle or in use.
-   }
-  // 在这前面如果找不到一条该被干掉的连接，直接return
-   closeQuietly(longestIdleConnection.socket());// 这里面就是socket.close了
-
-   // Cleanup again immediately.
-   return 0;
- }
-</code></pre>
-<p>观察一下ConnectionPool的构造函数</p>
-<pre><code class="java">/**
-  * Create a new connection pool with tuning parameters appropriate for a single-user application.
-  * The tuning parameters in this pool are subject to change in future OkHttp releases. Currently
-  * this pool holds up to 5 idle connections which will be evicted after 5 minutes of inactivity.
-  */
-  // 最多保留5条闲置RealConnection(也就是底层5个Socket),每个连接(Socket)如果超过5分钟没有接客，直接干掉
- public ConnectionPool() {
-   this(5, 5, TimeUnit.MINUTES);
- }
-</code></pre>
-<p>所以，在创建Client的时候，可以把socket的缓存数量写大一点，也可以自定义一个ConnectionPool，只要实现了put,get,remove等标准的CRD操作就行了。简单来说就是自己设计一个Cache，我觉得可以根据实际的endpoint数量来设定缓存的socket的数量。</p>
-<h2 id="2-自定义通讯协议"><a href="#2-自定义通讯协议" class="headerlink" title="2. 自定义通讯协议"></a>2. 自定义通讯协议</h2><p>http这种属于应用层的协议定义了每个数据包的结构是怎样的。在一些场合下，比如追求通讯速度，自定义加密手段，可能需要自定义结构体。<br>自己用Socket实现一套server-clinent通讯模型其实不难。<br>server这边，先确定自己对外公布的ip,port。然后起一个serverSocket，死循环去accept，每次accept到一个就添加到一个列表中，同时用线程池去执行一个死跑从socket中read的runnable。<br>client这边，根据server的ip和port去连接上，client主动发消息(byte，int,String类型都行)，server这边读到信息，给出response，clinent再读取server的回话，就跟两个人之间你一句我一句说话一样。整个过程中 <strong>保持了长连接</strong>,只要任何一方没有手动设置socket.setSoTimeout的话，放一晚上都不会断开。</p>
+<h2 id="1-http请求中tcp连接的复用-http-keep-alive是应用层的实现，与tcp-kkepalive那个2小时没关系"><a href="#1-http请求中tcp连接的复用-http-keep-alive是应用层的实现，与tcp-kkepalive那个2小时没关系" class="headerlink" title="1. http请求中tcp连接的复用(http -keep alive是应用层的实现，与tcp kkepalive那个2小时没关系)"></a>1. http请求中tcp连接的复用(http -keep alive是应用层的实现，与tcp kkepalive那个2小时没关系)</h2><h2 id="2-自定义通讯协议"><a href="#2-自定义通讯协议" class="headerlink" title="2. 自定义通讯协议"></a>2. 自定义通讯协议</h2><p>http这种属于应用层的协议定义了每个数据包的结构是怎样的。在一些场合下，比如追求通讯速度，自定义加密手段，可能需要自定义结构体。<br>自己用Socket实现一套server-clinent通讯模型其实不难。<br>server这边，先确定自己对外公布的ip,port。然后起一个serverSocket，死循环去accept，每次accept到一个就添加到一个列表中，同时用线程池去执行一个死跑从socket中read的runnable。<br>client这边，根据server的ip和port去连接上，client主动发消息(byte，int,String类型都行)，server这边读到信息，给出response，clinent再读取server的回话，就跟两个人之间你一句我一句说话一样。整个过程中 <strong>保持了长连接</strong>,只要任何一方没有手动设置socket.setSoTimeout的话，放一晚上都不会断开。</p>
 <p>一个重点是双方发送的消息格式，即两个人交流的语言，如果全部是String的话，那就跟http很像了，当然任何数据格式从socket发出去最终都是以byte的形式发出去的(比如string会用utf-8或者gbk编码成byte数组)。<br>google的protoBuffer最重要的两个方法writeTo(object转成byte数组)和parseFrom(byte数组转成object)。</p>
 <p><a href="https://blog.csdn.net/u010818425/article/details/53448817">基于Java Socket的自定义协议，实现Android与服务器的长连接（二）</a>，基于这篇文章，可以将数据类型定义为统一的protocol，protocol的要素包括:</p>
 <blockquote>
@@ -501,6 +390,28 @@ Cookie: session=fsdaf;aaa=dfasf;......
 <p><a href="https://stackoverflow.com/questions/9334401/http-keep-alive-and-tcp-keep-alive">tcp keep-alive和http的keep-alive是两回事</a> http keep-alive是由webserver负责实现的。 关键字:http keepalive implementation<br>这篇回答里解释了http keep-alive是为了让后续的http请求复用这一条tcp连接。而tcp的keep alive则是定期发小的包。<br>另外,http server并不会主动去问client是否还连着，只需要起一个timeout(到时间就掐掉这条tcp)就行了。下次客户端再来发起请求，重新起一条tcp吧。<br>但是http keepalive在有些时候也是有问题的<br>虽说HTTP/1.1 Keep-Alive特性支持多个请求在同一个连接上排队发送，在浏览器端正常的HTML等资源请求，会带来线头阻塞弊端，后一个请求依赖于前一个请求完成，一旦出现阻塞，后续请求只能排队等待。</p>
 <p><a href="http://www.blogjava.net/yongboy/archive/2015/03/30/423963.html">移动APP后端网络处理一些问题记录</a><br>HTTP/1.1 Pipelining（建立在Keep-Alive持久化基础之上，中文译为管线化，支持连续的幂等的GET/HEAD方法请求，实际环境下，并没有被浏览器所支持。同一个连接，处理同样的三次请求-响应）</p>
 <p>arp caches</p>
+<h3 id="hash算法和加密"><a href="#hash算法和加密" class="headerlink" title="hash算法和加密"></a>hash算法和加密</h3><p>哈希算法是不可逆的，而加密算法是可逆的<br>哈希（Hash）是将目标文本转换成具有相同长度的、不可逆的杂凑字符串（或叫做消息摘要），而加密（Encrypt）是将目标文本转换成具有不同长度的、可逆的密文。</p>
+<p>具体来说，两者有如下重要区别：</p>
+<p>1、哈希算法往往被设计成生成具有相同长度的文本，而加密算法生成的文本长度与明文本身的长度有关。</p>
+<p>例如，设我们有两段文本：“Microsoft”和“Google”。两者使用某种哈希算法得到的结果分别为：“140864078AECA1C7C35B4BEB33C53C34”和“8B36E9207C24C76E6719268E49201D94”，而使用某种加密算法的到的结果分别为“Njdsptpgu”和“Hpphmf”。可以看到，哈希的结果具有相同的长度，而加密的结果则长度不同。实际上，如果使用相同的哈希算法，不论你的输入有多么长，得到的结果长度是一个常数，而加密算法往往与明文的长度成正比。</p>
+<p>2、哈希算法是不可逆的，而加密算法是可逆的。</p>
+<p>这里的不可逆有两层含义，一是“给定一个哈希结果R，没有方法将E转换成原目标文本S”，二是“给定哈希结果R，即使知道一段文本S的哈希结果为R，也不能断言当初的目标文本就是S”。其实稍微想想就知道，哈希是不可能可逆的，因为如果可逆，那么哈希就是世界上最强悍的压缩方式了——能将任意大小的文件压缩成固定大小。(这话的意思就是不同的内容可能会有相同的hashCode，所以在https加密中)</p>
+<p>加密则不同，给定加密后的密文R，存在一种方法可以将R确定的转换为加密前的明文S。</p>
+<h3 id="https流程"><a href="#https流程" class="headerlink" title="https流程"></a>https流程</h3><p>1.浏览器将自己支持的一套加密规则发送给网站。<br>2.网站从中选出一组加密算法与HASH算法，并将自己的身份信息以证书的形式发回给浏览器。证书里面包含了网站地址，加密公钥，以及证书的颁发机构等信息。<br>第 2步时服务器发送了一个SSL证书给客户端，SSL 证书中包含的具体内容有：</p>
+<p>（1）证书的发布机构CA<br>（2）证书的有效期<br>（3）公钥<br>（4）证书所有者<br>（5）签名</p>
+<blockquote>
+<p>数字签名是用来验证数据完整性的，首先将公钥与个人信息用一个Hash算法生成一个消息摘要，Hash算法是不可逆的，且只要内容发生变化，那生成的消息摘要将会截然不同。然后CA再用它的私钥对消息摘要加密，最终形成数字签名。还把原始信息和数据签名合并，形成一个全新的东西，叫做“数字证书”</p>
+</blockquote>
+<p>客户端在接受到服务端发来的SSL证书时，会对证书的真伪进行校验，以浏览器为例说明如下：</p>
+<p>（1）首先浏览器读取证书中的证书所有者、有效期等信息进行一一校验</p>
+<p>（2）浏览器开始查找操作系统中已内置的受信任的证书发布机构CA，与服务器发来的证书中的颁发者CA比对，用于校验证书是否为合法机构颁发 </p>
+<p>（3）如果找不到，浏览器就会报错，说明服务器发来的证书是不可信任的。</p>
+<p>（4）如果找到，那么浏览器就会从操作系统中取出  颁发者CA  的公钥，然后对服务器发来的证书里面的签名进行解密</p>
+<p>（5）浏览器使用相同的hash算法计算出服务器发来的证书的hash值，将这个计算的hash值与证书中签名做对比</p>
+<p>（6）对比结果一致，则证明服务器发来的证书合法，没有被冒充</p>
+<p>（7）此时浏览器就可以读取证书中的公钥，用于后续加密了</p>
+<p>4、所以通过发送SSL证书的形式，既解决了公钥获取问题，又解决了黑客冒充问题，一箭双雕，HTTPS加密过程也就此形成</p>
+<p>我是这样理解这个https是如何解决中间人攻击问题的：<br>数字证书包括：证书的发布机构CA，证书的有效期，公钥，证书所有者，签名（前面几个明文的hash值）<br>作为一个中间人：我可以伪造证书的发布机构CA，证书的有效期，证书所有者，但是公钥我必须得换成我自己的啊（百度公钥加密的东西我又解不开），好了，这下明文内容肯定要改了。这下导致签名(hash值)不对了，客户端肯定不认，用百度发过来的的？当然不行了。瞎写一个？客户端拿着操作系统内置的CA证书去解密你这段瞎写的hash，肯定不对。唯一能实现对的上的情况是。让CA用自己的私钥把（百度的证书的发布机构CA，百度证书的有效期，<strong>我的公钥</strong>，百度的证书所有者这些东西加密一遍，这样客户端用CA解密出来的hash也一样了）。但是这怎么可能？</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.dreamtobe.cn/network_basic/">常见网络协议优化与演进</a></p>
 
       
@@ -832,10 +743,6 @@ Cookie: session=fsdaf;aaa=dfasf;......
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
@@ -872,15 +779,7 @@ Cookie: session=fsdaf;aaa=dfasf;......
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -901,6 +800,18 @@ Cookie: session=fsdaf;aaa=dfasf;......
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
               </li>
              
               <li class="article-tag-list-item">

@@ -17,7 +17,7 @@
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/10013-1109230P20693.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/merge_sort.png">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/selectionsort.jpg">
-<meta property="og:updated_time" content="2019-03-13T02:30:25.322Z">
+<meta property="og:updated_time" content="2019-03-27T14:13:01.244Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="数据结构之-算法手册">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/10013-1109230P20693.jpg">
@@ -428,7 +428,133 @@ public static int partition(int[] arr,int low , int high){
    }
 </code></pre>
 <h3 id="1-7-TimSort"><a href="#1-7-TimSort" class="headerlink" title="1.7 TimSort"></a>1.7 TimSort</h3><p>java的Collections.sort的算法，<br><a href="(https://www.youtube.com/watch?v=bvnmbRo7a1Y">Comparison Method Violates Its General Contract!</a>)</p>
-<h2 id="2-其他算法"><a href="#2-其他算法" class="headerlink" title="2. 其他算法"></a>2. 其他算法</h2><p><a href="https://juejin.im/post/5a224e1551882535c56cb940">有环链表的判断问题</a>。时间复杂度和空间复杂度的最优解是创建两根迭代速度不一样的指针</p>
+<h2 id="2-二叉树"><a href="#2-二叉树" class="headerlink" title="2. 二叉树"></a>2. 二叉树</h2><h3 id="2-1-二叉查找树-BST"><a href="#2-1-二叉查找树-BST" class="headerlink" title="2.1 二叉查找树(BST)"></a>2.1 二叉查找树(BST)</h3><h4 id="定义"><a href="#定义" class="headerlink" title="定义:"></a>定义:</h4><p>在二叉查找树中：<br>(01) 若任意节点的左子树不空，则左子树上所有结点的值均小于它的根结点的值；<br>(02) 任意节点的右子树不空，则右子树上所有结点的值均大于它的根结点的值；<br>(03) 任意节点的左、右子树也分别为二叉查找树。<br>(04) 没有键值相等的节点（no duplicate nodes）。</p>
+<p><a href="https://blog.csdn.net/sheepmu/article/details/38407221">二叉查找树的增删改查</a></p>
+<h4 id="求BST的最小值"><a href="#求BST的最小值" class="headerlink" title="求BST的最小值"></a>求BST的最小值</h4><pre><code class="java">//求BST的最小值
+public TreeNode  getMin(TreeNode root)
+{
+    if(root==null)
+        return null;
+    while(root.left!=null)
+        root=root.left;     
+    return root;
+}
+</code></pre>
+<p>求BST的最大值</p>
+<pre><code class="java">//求BST的最大值
+public TreeNode  getMax(TreeNode root)
+{
+    if(root==null)
+        return null;
+    while(root.right!=null)
+        root=root.right;
+    return root;
+}
+</code></pre>
+<h4 id="查找BST中某节点的前驱节点-即查找数据值小于该结点的最大结点。"><a href="#查找BST中某节点的前驱节点-即查找数据值小于该结点的最大结点。" class="headerlink" title="查找BST中某节点的前驱节点.即查找数据值小于该结点的最大结点。"></a>查找BST中某节点的前驱节点.即查找数据值小于该结点的最大结点。</h4><pre><code class="java">public TreeNode preNode(TreeNode x)
+{
+    if(x==null)
+        return null;
+    // 如果x存在左孩子，则&quot;x的前驱结点&quot;为 &quot;以其左孩子为根的子树的最大结点&quot;。
+    if(x.left!=null)
+        return getMax(x.left);//直接找左树的最大节点就好了，就是一直往左找
+    // 如果x没有左孩子。则x有以下两种可能：
+    // (01) x是&quot;一个右孩子&quot;，则&quot;x的前驱结点&quot;为 &quot;它的父结点&quot;。
+    // (02) x是&quot;一个左孩子&quot;，则 前驱节点为x的某一个祖先节点的父节点，而且该祖先节点是作为其父节点的右儿子
+    TreeNode p=x.parent;
+    while(p!=null&amp;&amp;p.left==x)
+    {
+        x=p;//父节点置为新的x
+        p=p.parent;  //父节点的父节点置为新的父节点
+    }
+    return p;     
+}
+</code></pre>
+<h4 id="查找BST中某节点的后继节点-即查找数据值大于该结点的最小结点。"><a href="#查找BST中某节点的后继节点-即查找数据值大于该结点的最小结点。" class="headerlink" title="查找BST中某节点的后继节点.即查找数据值大于该结点的最小结点。"></a>查找BST中某节点的后继节点.即查找数据值大于该结点的最小结点。</h4><pre><code class="java">public TreeNode postNode(TreeNode x)
+        {
+            if(x==null)
+                return null;
+            // 如果x存在右孩子，则&quot;x的后继结点&quot;为 &quot;以其右孩子为根的子树的最小结点&quot;。
+            if(x.left!=null)
+                return getMin(x.right);
+            // 如果x没有右孩子。则x有以下两种可能：
+            //  (01) x是&quot;一个左孩子&quot;，则&quot;x的后继结点&quot;为 &quot;它的父结点&quot;。
+            // (02) x是&quot;一个右孩子&quot;，则 前驱节点为x的某一个祖先节点的父节点，而且该祖先节点是作为其父节点的左儿子
+            TreeNode p=x.parent;
+            while(p!=null&amp;&amp;p.right==x)
+            {
+                x=p;//父节点置为新的x
+                p=p.parent;  //父节点的父节点置为新的父节点
+            }
+           return p;     
+        }
+</code></pre>
+<h4 id="给出一个Int值，查找这个Int值在树中对应的节点"><a href="#给出一个Int值，查找这个Int值在树中对应的节点" class="headerlink" title="给出一个Int值，查找这个Int值在树中对应的节点"></a>给出一个Int值，查找这个Int值在树中对应的节点</h4><pre><code class="java">//递归
+public TreeNode findNode(TreeNode head, int val){
+    if(head==null){
+        return null;
+    }
+    if(head.val==val){
+        return head;
+    }else if(head.val &gt; val){
+        head = head.left;
+    }else {
+        head= head.right;
+    }
+    return findNode(head, val);
+}
+//非递归
+public TreeNode findNode(TreeNode head, int val){
+    if(head==null){
+        return null;
+    }
+    while(head!=null){
+        if(head.val ==val){
+            return head;
+        }else if (head.val &gt; val){
+            head = head.left;
+        }else {
+            head = head.right;
+        }
+    }
+    return head;
+}
+</code></pre>
+<h4 id="插入值"><a href="#插入值" class="headerlink" title="插入值"></a>插入值</h4><pre><code class="java">//BST插入节点  --递归版--
+public TreeNode insertRec(TreeNode root,TreeNode x)
+{
+    if(root==null)
+        root=x;
+    else if(x.value&lt;root.value)
+        root.left=insertRec(root.left,  x);
+    else if(x.value&gt;root.value)
+        root.right=insertRec(root.right,  x);
+    return root;
+}
+        //BST插入节点  --非 递归版--
+public TreeNode insert(TreeNode root,TreeNode x)
+{
+    if(root==null)
+        root=x;
+    TreeNode p=null;//需要记录父节点
+    while(root!=null)//定位插入的位置
+    {
+        p=root;//记录父节点
+        if(x.value&lt;root.value)
+            root=root.left;
+        else
+            root=root.right;
+    }
+    x.parent=p;//定位到合适的页节点的空白处后，根据和父节点的大小比较插入合适的位置
+    if(x.value&lt;p.value) 
+        p.left=x;
+    else if(x.value&gt;p.value)
+        p.right=x;
+    return root;
+}
+</code></pre>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="https://juejin.im/post/59cc55b95188250b4007539b">Java关于数据结构的实现：树</a></p>
+<h2 id="3-链表"><a href="#3-链表" class="headerlink" title="3. 链表"></a>3. 链表</h2><p><a href="https://juejin.im/post/5a224e1551882535c56cb940">有环链表的判断问题</a>。时间复杂度和空间复杂度的最优解是创建两根迭代速度不一样的指针</p>
 <p>下面的代码来自<a href="http://blog.csdn.net/jq_ak47/article/details/52739651">csdn</a></p>
 <pre><code class="java">public class LinkLoop {
 
@@ -521,27 +647,27 @@ public static int partition(int[] arr,int low , int high){
 </ol>
 <p>首先给出计算总的可能路径的方法</p>
 <pre><code class="java">public static int uniquePaths(int m, int n){  
- 2              if(m==0 || n==0) return 0;  
- 3              if(m ==1 || n==1) return 1;  
- 4               
- 5             int[][] dp = new int[m][n];  
- 6               
- 7             //只有一行时，到终点每个格子只有一种走法  
- 8             for (int i=0; i&lt;n; i++)  
- 9                 dp[0][i] = 1;  
-10               
-11             // 只有一列时，到终点每个格子只有一种走法
-12             for (int i=0; i&lt;m; i++)  
-13                 dp[i][0] = 1;  
-14               
-15             // for each body node, number of path = paths from top + paths from left  
-16             for (int i=1; i&lt;m; i++){  
-17                 for (int j=1; j&lt;n; j++){  
-18                     dp[i][j] = dp[i-1][j] + dp[i][j-1];  
-19                 }  
-20             }  
-21             return dp[m-1][n-1];  
-22         }
+            if(m==0 || n==0) return 0;  
+            if(m ==1 || n==1) return 1;  
+
+              int[][] dp = new int[m][n];  
+
+              //只有一行时，到终点每个格子只有一种走法  
+              for (int i=0; i&lt;n; i++)  
+                  dp[0][i] = 1;  
+
+             // 只有一列时，到终点每个格子只有一种走法
+             for (int i=0; i&lt;m; i++)  
+                 dp[i][0] = 1;  
+
+             // for each body node, number of path = paths from top + paths from left  
+            for (int i=1; i&lt;m; i++){  
+                 for (int j=1; j&lt;n; j++){  
+                     dp[i][j] = dp[i-1][j] + dp[i][j-1];  
+                 }  
+             }  
+             return dp[m-1][n-1];  
+}
 </code></pre>
 <p>解法二：数学中的组合问题，因为从左上角到右下角，总共需要走n+m-2步，左上角和右下角的元素不考虑在内，我们每次都可以选择向下走，向下走总共需要m-1步，所以在n+m-2步中选择m-1步，这是典型的排列组合问题。</p>
 <pre><code class="c">int uniquePaths(int m, int n)
@@ -557,7 +683,6 @@ public static int partition(int[] arr,int low , int high){
 }
 </code></pre>
 <p>KMP算法</p>
-<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="https://juejin.im/post/59cc55b95188250b4007539b">Java关于数据结构的实现：树</a></p>
 
       
 
@@ -892,10 +1017,6 @@ public static int partition(int[] arr,int low , int high){
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
@@ -932,15 +1053,7 @@ public static int partition(int[] arr,int low , int high){
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -961,6 +1074,18 @@ public static int partition(int[] arr,int low , int high){
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
               </li>
              
               <li class="article-tag-list-item">

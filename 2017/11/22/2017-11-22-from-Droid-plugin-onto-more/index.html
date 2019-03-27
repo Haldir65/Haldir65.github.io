@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery15111006999.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery2a2241cc5c1278cf7a28f15f91dbbb7f.jpg">
-<meta property="og:updated_time" content="2019-03-13T02:30:25.322Z">
+<meta property="og:updated_time" content="2019-03-27T14:13:01.244Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从DroidPlugin谈插件化开发">
 <meta name="twitter:description" content="关于360团队出开源的DroidPlugin的一些记录 过程中发现了关于插件化，Hook系统方法的操作，摘录下来。">
@@ -214,49 +214,53 @@ ContextWrapper extends Context
 <h2 id="2-Hook作为插件化的切入点给了开发者篡改系统api实现的通道"><a href="#2-Hook作为插件化的切入点给了开发者篡改系统api实现的通道" class="headerlink" title="2. Hook作为插件化的切入点给了开发者篡改系统api实现的通道"></a>2. Hook作为插件化的切入点给了开发者篡改系统api实现的通道</h2><p><a href="http://weishu.me/2016/02/16/understand-plugin-framework-binder-hook/">比如Hook掉剪切板SystemService</a>,<br><a href="http://weishu.me/2016/03/07/understand-plugin-framework-ams-pms-hook/">比如在ActivityManagerService调用IPC操作时添加私货</a></p>
 <p><img src="https://www.haldir66.ga/static/imgs/scenery2a2241cc5c1278cf7a28f15f91dbbb7f.jpg" alt=""></p>
 <h2 id="3-Android多渠道打包的实现"><a href="#3-Android多渠道打包的实现" class="headerlink" title="3. Android多渠道打包的实现"></a>3. Android多渠道打包的实现</h2><h3 id="3-1-历史上曾经有效的方式，原始方法"><a href="#3-1-历史上曾经有效的方式，原始方法" class="headerlink" title="3.1 历史上曾经有效的方式，原始方法"></a>3.1 历史上曾经有效的方式，原始方法</h3><p>关于gradlew<br>打包release之前，先Build -&gt; Generate Singed apk 创建一个新的keystore , 密码记住，keystore文件保存好。<br>关于打包: 根据<a href="https://www.jianshu.com/p/4f2990cf53bf">Android 多渠道打包梳理</a><br>Gradle UMeng 多渠道打包</p>
-<ul>
-<li><p>Android.manifest文件添加</p>
+<p>Android.manifest文件添加</p>
 <pre><code class="xml">&lt;meta-data
- android:name=&quot;UMENG_CHANNEL&quot;
- android:value=&quot;${UMENG_CHANNEL_VALUE}&quot; /&gt;
+    android:name=&quot;UMENG_CHANNEL&quot;
+    android:value=&quot;${UMENG_CHANNEL_VALUE}&quot; /&gt;
 </code></pre>
-</li>
-<li><p>app的build.gradle中添加<br>```gradle<br>android {<br> …<br> productFlavors {</p>
-<pre><code> xiaomi {
-     manifestPlaceholders = [UMENG_CHANNEL_VALUE: &quot;xiaomi&quot;]
- }
- _360 {
-     manifestPlaceholders = [UMENG_CHANNEL_VALUE: &quot;_360&quot;]
- }
- baidu {
-     manifestPlaceholders = [UMENG_CHANNEL_VALUE: &quot;baidu&quot;]
- }
- wandoujia {
-     manifestPlaceholders = [UMENG_CHANNEL_VALUE: &quot;wandoujia&quot;]
- }
- ...
-</code></pre><p> }<br> …<br>}</p>
+<h3 id="app的build-gradle中添加"><a href="#app的build-gradle中添加" class="headerlink" title="app的build.gradle中添加"></a>app的build.gradle中添加</h3><pre><code class="Gradle">android {  
+    ...
+    productFlavors {
+        xiaomi {
+            manifestPlaceholders = [UMENG_CHANNEL_VALUE: &quot;xiaomi&quot;]
+        }
+        _360 {
+            manifestPlaceholders = [UMENG_CHANNEL_VALUE: &quot;_360&quot;]
+        }
+        baidu {
+            manifestPlaceholders = [UMENG_CHANNEL_VALUE: &quot;baidu&quot;]
+        }
+        wandoujia {
+            manifestPlaceholders = [UMENG_CHANNEL_VALUE: &quot;wandoujia&quot;]
+        }
+        ...
+    }  
+    ...
+}
+
+android {  
+    productFlavors {
+        xiaomi {}
+        _360 {}
+        baidu {}
+        wandoujia {}
+    }  
+
+    productFlavors.all {
+        flavor -&gt; flavor.manifestPlaceholders = [UMENG_CHANNEL_VALUE: name]
+    }
+}
+</code></pre>
+<ul>
+<li>打包<br>除此之外 assemble 还能和 Product Flavor 结合创建新的任务（assemble + Build Variants），Build Variants = Build Type + Product Flavor<blockquote>
+<p>./gradlew assembleDebug # 会打包 Debug apk<br>./gradlew assembleRelease # 打包 Release apk<br>./gradlew assembleWandoujiaRelease # 打包 wandoujia Release 版本，大小写不敏感<br>./gradlew assembleWandoujia  # 此命令会生成wandoujia渠道的Release和Debug版本</p>
+</blockquote>
 </li>
 </ul>
-<p>android {<br>    productFlavors {<br>        xiaomi {}<br>        _360 {}<br>        baidu {}<br>        wandoujia {}<br>    }  </p>
-<pre><code>productFlavors.all {
-    flavor -&gt; flavor.manifestPlaceholders = [UMENG_CHANNEL_VALUE: name]
-}
-</code></pre><p>}</p>
-<pre><code>
--  打包
-除此之外 assemble 还能和 Product Flavor 结合创建新的任务（assemble + Build Variants），Build Variants = Build Type + Product Flavor
-&gt; ./gradlew assembleDebug # 会打包 Debug apk
-./gradlew assembleRelease # 打包 Release apk
-./gradlew assembleWandoujiaRelease # 打包 wandoujia Release 版本，大小写不敏感
-./gradlew assembleWandoujia  # 此命令会生成wandoujia渠道的Release和Debug版本
-
-但是，20个渠道就要编译20次，耗时冗长。
-
-### 3.2 在META-INF目录内添加空文件，可以不用重新签名应用。&lt;del&gt;已失效&lt;/del&gt;
-比较出名的有python版本的，就是写了个空文件
-```python
-for line in channels:
+<p>但是，20个渠道就要编译20次，耗时冗长。</p>
+<h3 id="3-2-在META-INF目录内添加空文件，可以不用重新签名应用。已失效"><a href="#3-2-在META-INF目录内添加空文件，可以不用重新签名应用。已失效" class="headerlink" title="3.2 在META-INF目录内添加空文件，可以不用重新签名应用。已失效"></a>3.2 在META-INF目录内添加空文件，可以不用重新签名应用。<del>已失效</del></h3><p>比较出名的有python版本的，就是写了个空文件</p>
+<pre><code class="python">for line in channels:
     target_channel = line.strip()
     target_apk = output_dir + apk_names[0] + &quot;-&quot; + target_channel+&quot;-&quot;+apk_names[2] + src_apk_extension
     shutil.copy(src_apk,  target_apk)
@@ -264,7 +268,8 @@ for line in channels:
     empty_channel_file = &quot;META-INF/uuchannel_{channel}&quot;.format(channel = target_channel) //所以渠道号简单来说就是往META-INF里写了一个&quot;uuchannel_xiaomi&quot;之类的文件
     zipped.write(src_empty_file, empty_channel_file)
     zipped.close()
-</code></pre><p><strong>亲测</strong> 关于多渠道打包，由于新的签名机制的引入，上面的这种方法是会报错的。</p>
+</code></pre>
+<p><strong>亲测</strong> 关于多渠道打包，由于新的签名机制的引入，上面的这种方法是会报错的。</p>
 <blockquote>
 <p>$ adb install app-release_channel_xiaomi.apk<br>Failed to install app-release_channel_xiaomi.apk: Failure [INSTALL_PARSE_FAILED_NO_CERTIFICATES: Failed to collect certificates from /data/app/vmdl185799136.tmp/base.apk: META-INF/CERT.SF indicates /data/app/vmdl185799136.tmp/base.apk is signed using APK Signature Scheme v2, but no such signature was found. Signature stripped?]</p>
 </blockquote>
@@ -289,7 +294,7 @@ for line in channels:
 <blockquote>
 <p>传统的进程间通信方式有管道，消息队列，共享内存等，其中管道，消息队列采用存储-转发方式，即数据先从发送方缓存区拷贝到内核开辟的缓存区中，然后再从内核缓存区拷贝到接收方缓存区，至少有两次拷贝过程。共享内存虽然无需拷贝，但控制复杂，难以使用。socket作为一款通用接口，其传输效率低，开销大，主要用在跨网络的进程间通信和本机上进程间的低速通信。Binder通过内存映射的方式，使数据只需要在内存进行一次读写过程。<br>内存映射，简而言之就是将用户空间的一段内存区域映射到内核空间，映射成功后，用户对这段内存区域的修改可以直接反映到内核空间，相反，内核空间对这段区域的修改也直接反映用户空间。那么对于内核空间&lt;—-&gt;用户空间两者之间需要大量数据传输等操作的话效率是非常高的。</p>
 </blockquote>
-<h2 id="sharedPreference其实是支持跨进程的，只是谷歌不推荐，建议使用ContentProvider这种"><a href="#sharedPreference其实是支持跨进程的，只是谷歌不推荐，建议使用ContentProvider这种" class="headerlink" title="sharedPreference其实是支持跨进程的，只是谷歌不推荐，建议使用ContentProvider这种"></a>sharedPreference其实是支持跨进程的，只是谷歌不推荐，建议使用ContentProvider这种</h2><blockquote>
+<h2 id="sharedPreference不支持跨进程，建议使用ContentProvider这种"><a href="#sharedPreference不支持跨进程，建议使用ContentProvider这种" class="headerlink" title="sharedPreference不支持跨进程，建议使用ContentProvider这种"></a>sharedPreference不支持跨进程，建议使用ContentProvider这种</h2><blockquote>
 <p>Context.MODE_MULTI_PROCESS<br>This constant was deprecated in API level 23. MODE_MULTI_PROCESS does not work reliably in some versions of Android, and furthermore does not provide any mechanism for reconciling concurrent modifications across processes. Applications should not attempt to use it. Instead, they should use an explicit cross-process data management approach such as ContentProvider.</p>
 </blockquote>
 <p><a href="https://www.jianshu.com/p/adaa1a39a274">听说你Binder机制学的不错，来面试下这几个问题</a></p>
@@ -299,17 +304,15 @@ for line in channels:
 <h3 id="组件化、插件化"><a href="#组件化、插件化" class="headerlink" title="组件化、插件化"></a>组件化、插件化</h3><p>组件化、插件化的前提就是解耦</p>
 <p><a href="https://github.com/jaredrummler/AndroidShell">在Android中执行shell指令</a><br><a href="https://github.com/didi/VirtualAPK">滴滴的virtualApp</a>。 目前看来就是用android.content.pm.PackageParse去解析一个apk文件，封装成一个LoadedPlugin对象（Cache下来），后续调用apk中描述的功能进行操作。所以应该还是在host的进程中跑的。由此联系到<a href="http://www.cnblogs.com/myitm/archive/2012/05/17/2506635.html">PackageInstaller 原理简述</a></p>
 <p>组件化的方案多为路由 + 接口下沉的方式，所有接口下沉到base中，组件中实现接口</p>
-<ul>
-<li>多渠道的话这样的命令要跑多次<br>使用walle就好了。<blockquote>
-<p>project 的 build.gradle 添加:</p>
-<pre><code class="gradle">dependencies {
- classpath &#39;com.meituan.android.walle:plugin:1.0.3&#39;
+<p>多渠道的话这样的命令要跑多次<br>使用walle就好了,在project 的 build.gradle 添加:</p>
+<pre><code class="Gradle">dependencies {
+    classpath &#39;com.meituan.android.walle:plugin:1.0.3&#39;
 }
 app/build.gradle 添加：
 apply plugin: &#39;walle&#39;
 dependencies {
- ...
- compile &#39;com.meituan.android.walle:library:1.0.3&#39;
+    ...
+    compile &#39;com.meituan.android.walle:library:1.0.3&#39;
 }
 在工程目录下创建 channel 文件：
 meituan # 美团
@@ -341,13 +344,7 @@ baidu
 # 应用宝
 myapp
 </code></pre>
-</blockquote>
-</li>
-</ul>
-<p>编译全部渠道</p>
-<blockquote>
-<p>gradlew clean assembleReleaseChannels<br>gradlew clean assembleReleaseChannels -PchannelList=huawei // 只编译华为的<br>gradlew clean assembleReleaseChannels -PchannelList=huawei,xiaomi // 小米跟华为的</p>
-</blockquote>
+<p>编译全部渠道<br>gradlew clean assembleReleaseChannels<br>gradlew clean assembleReleaseChannels -PchannelList=huawei // 只编译华为的<br>gradlew clean assembleReleaseChannels -PchannelList=huawei,xiaomi // 小米跟华为的</p>
 <p>以上亲测通过，原本装的jdk 9，一直报错。在java home里换成jdk 1.8后，就没什么问题了。有问题gradlew的时候后面跟上–stacktrace，出错了粘贴到google里就好了。</p>
 <p>在java代码中获取渠道信息</p>
 <blockquote>
@@ -725,10 +722,6 @@ class InstrumentationWrapper extends Instrumentation {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
@@ -765,15 +758,7 @@ class InstrumentationWrapper extends Instrumentation {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -794,6 +779,18 @@ class InstrumentationWrapper extends Instrumentation {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
               </li>
              
               <li class="article-tag-list-item">

@@ -24,7 +24,7 @@
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/different_response.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/delegate_converters.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/always_observe_on_mian_thread.jpg">
-<meta property="og:updated_time" content="2019-03-13T02:30:25.318Z">
+<meta property="og:updated_time" content="2019-03-27T14:13:01.240Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Retrofit源码阅读笔记">
 <meta name="twitter:description" content="This is gonna be nasty…… TL;DR">
@@ -577,27 +577,133 @@ class XmlOrJsonConverterFactroy extend Converter.Factory{
 <h4 id="1-5-7-和Rxjava配合使用"><a href="#1-5-7-和Rxjava配合使用" class="headerlink" title="1.5.7 和Rxjava配合使用"></a>1.5.7 和Rxjava配合使用</h4><p>CallAdapterFactory和ConverterFactory类似，也可以自定义，所以这样可以直接将所有的Observable返回到主线程</p>
 <p><img src="https://www.haldir66.ga/static/imgs/always_observe_on_mian_thread.jpg" alt=""></p>
 <p>所以，Retrofit就是将HttpClient、Converter和CallAdapter这三样职能结合起来，又提供了足够的定制化。</p>
-<h3 id="1-6-补充"><a href="#1-6-补充" class="headerlink" title="1.6 补充"></a>1.6 补充</h3><p>OkHttp本身没有将response挪到主线程，Retrofit这么干了，具体在<br>Retrofit.Builder.build方法里面</p>
+<h3 id="1-6-补充"><a href="#1-6-补充" class="headerlink" title="1.6 补充"></a>1.6 补充</h3><p>OkHttp本身没有将response挪到主线程，OkHttp的execute方法在当前线程回调，OkHttp的enqueue方法在OkHttpDispatcher线程回调onResponse。都没有推到主线程。</p>
+<p>Retrofit这么干了，具体在<br>Retrofit.Builder.build方法里面</p>
 <pre><code class="java">public Retrofit build() {
   Executor callbackExecutor = this.callbackExecutor;
   if (callbackExecutor == null) {
     callbackExecutor = platform.defaultCallbackExecutor();
     //Andriod平台默认挪到主线程，就是一个持有主线程的线程池
-    //这个线程池的excute方法就是用一个hadler推到主线程了。
+    //这个线程池的excute方法就是用一个handler推到主线程了。
   }
-  // Make a defensive copy of the adapters and add the default Call adapter.
-  List&lt;CallAdapter.Factory&gt; adapterFactories = new ArrayList&lt;&gt;(this.adapterFactories);
-  adapterFactories.add(platform.defaultCallAdapterFactory(callbackExecutor));
-  //如果不加CallAdapterFactory的话，
-  //Android平台默认直接把response丢回给callback，默认配置也是在主线程干的。
-  //如果不希望在主线程接收Response的话，自己在Builder里面添加callbackExecutor.
 
-  // Make a defensive copy of the converters.
-  List&lt;Converter.Factory&gt; converterFactories = new ArrayList&lt;&gt;(this.converterFactories);
+  //把这个defaultCallAdapterFactory默认添加到列表中第一个的位置
+  List&lt;CallAdapter.Factory&gt; callAdapterFactories = new ArrayList&lt;&gt;(this.callAdapterFactories);
+    callAdapterFactories.add(platform.defaultCallAdapterFactory(callbackExecutor));
 
-  return new Retrofit(callFactory, baseUrl, converterFactories, adapterFactories,
-      callbackExecutor, validateEagerly);
+  //这里传进去callAdapterFactories是一个list，头一个factory是defaultCallAdapterFactory
+  return new Retrofit(callFactory, baseUrl, unmodifiableList(converterFactories),
+          unmodifiableList(callAdapterFactories), callbackExecutor, validateEagerly);
 }
+</code></pre>
+<p>这个callbackExecutor什么时候用的呢，还记得三个方法中最后一个serviceMethod.adapt吗，<br>调用顺序如下：<br>serviceMethod.adapt -&gt; ServiceMethod的成员变量callAdapter.adapt(call) (这个时候还没发起请求哈) -&gt;<br>这个callAdapter是在ServiceMethod.Builder.build中调用了retrofit.callAdapter(returnType, annotations);-&gt; 继而调用到nextCallAdapter-&gt; callAdapterFactories.get(i).get(returnType, annotations, this);<br>就是在Retrofit对象的callAdapterFactories这个列表里找，上面不是说默认添加了第一个吗，所以这个get方法会跑到<br>ExecutorCallAdapterFactory.get方法中。而对应的实现返回了<br>new ExecutorCallbackCall&lt;&gt;(callbackExecutor, call);//callbackExecutor是那个主线程的executor<br>外部执行Retrofit.call.enqueue -&gt; serviceMethod.adapt -&gt; ExecutorCallbackCall.enqueue -&gt; (调用oKhttp的qnqueue，在onResponse中callbackExecutor.execute -&gt; { callback.onResponse() })</p>
+<p>外部调用经历流程</p>
+<pre><code class="java">
+public interface GitHubService {
+  @GET(&quot;users/{user}/repos&quot;)
+  Call&lt;List&lt;Repo&gt;&gt; listRepos(@Path(&quot;user&quot;) String user); //可以认为这底下就是藏着一个ServiceMethod的实例
+}
+
+Retrofit retrofit = new Retrofit.Builder()
+    .baseUrl(&quot;https://api.github.com/&quot;)
+    .build();
+
+GitHubService service = retrofit.create(GitHubService.class);//在这里以动态代理的方式生产ServiceMethod
+Call&lt;List&lt;Contributor&gt;&gt; call = github.contributors(&quot;square&quot;, &quot;retrofit&quot;);//在这里调用了serviceMethod.adapt方法
+List&lt;Contributor&gt; contributors = call.execute().body();//这里是Call类型，说明上面serviceMethod.adapt返回了一个
+</code></pre>
+<p>也就是说这个adapt方法会返回Call<T> ，或者Observable<T>类型的数据<br>怎么做到的呢？ 它会拿着期待的返回类型(Call,Observable)去询问Retrofit的callAdapterFactories里面的每一个callAdapterFactory的<br>get(returntype)方法，上面github这种，returnType就是Call.class</p>
+<p>DefaultCallAdapterFactory.java</p>
+<pre><code class="java">final class DefaultCallAdapterFactory extends CallAdapter.Factory {
+  static final CallAdapter.Factory INSTANCE = new DefaultCallAdapterFactory();
+
+  @Override
+  public CallAdapter&lt;?, ?&gt; get(Type returnType, Annotation[] annotations, Retrofit retrofit) {
+    if (getRawType(returnType) != Call.class) { //如果是call，那么能够handle的来，否则nextCallAdapter
+      return null;
+    }
+
+    final Type responseType = Utils.getCallResponseType(returnType);
+    return new CallAdapter&lt;Object, Call&lt;?&gt;&gt;() {
+      @Override public Type responseType() {
+        return responseType;
+      }
+
+      @Override public Call&lt;Object&gt; adapt(Call&lt;Object&gt; call) {
+        return call;
+      }
+    };
+  }
+}
+</code></pre>
+<p>RxJava2CallAdapterFactory 是这样回应的。其实就是看一个listRepos这个方法的返回类型</p>
+<pre><code class="java">boolean isFlowable = rawType == Flowable.class;
+boolean isSingle = rawType == Single.class;
+boolean isMaybe = rawType == Maybe.class;
+if (rawType != Observable.class &amp;&amp; !isFlowable &amp;&amp; !isSingle &amp;&amp; !isMaybe) {
+  return null;
+}
+</code></pre>
+<p>ExecutorCallAdapterFactory</p>
+<pre><code class="java">  @Override
+  public CallAdapter&lt;?, ?&gt; get(Type returnType, Annotation[] annotations, Retrofit retrofit) {
+    if (getRawType(returnType) != Call.class) {
+      return null;
+    }
+    final Type responseType = Utils.getCallResponseType(returnType);
+    return new CallAdapter&lt;Object, Call&lt;?&gt;&gt;() {
+      @Override public Type responseType() {
+        return responseType;
+      }
+
+      @Override public Call&lt;Object&gt; adapt(Call&lt;Object&gt; call) {
+        return new ExecutorCallbackCall&lt;&gt;(callbackExecutor, call);//这个在Android平台上默认会把onResponse搞到主线程上
+      }
+    };
+  }
+</code></pre>
+<pre><code class="java">//DefaultCallAdapterFactory里面
+@Override public Call&lt;Object&gt; adapt(Call&lt;Object&gt; call) {
+  return call;
+}
+
+// ExecutorCallAdapterFactory
+@Override public Call&lt;Object&gt; adapt(Call&lt;Object&gt; call) {
+  return new ExecutorCallbackCall&lt;&gt;(callbackExecutor, call);
+}
+//RxJava2CallAdapter
+@Override public Object adapt(Call&lt;R&gt; call) {
+    Observable&lt;Response&lt;R&gt;&gt; responseObservable = isAsync //这个isAsync默认是false
+        ? new CallEnqueueObservable&lt;&gt;(call)
+        : new CallExecuteObservable&lt;&gt;(call);
+     ///....
+     return observable;   
+}
+</code></pre>
+<p>所以Retrofit的service里面可以返回各种类型。</p>
+<pre><code class="java">call.enqueue(new okhttp3.Callback() {
+     @Override public void onResponse(okhttp3.Call call, okhttp3.Response rawResponse) {
+      //..这里还是oKHttp的Dispatcher线程，所以解析数据是在子线程上的
+       response = parseResponse(rawResponse);
+
+      // 这然后才是callback，在ExecutorCallAdapterFactory中callbackExecutor.execute(），就是在这里推向主线程的
+       callback.onResponse(OkHttpCall.this, response);
+     }
+}
+</code></pre>
+<p>那么假如是Rxjava2CallAdapterFactory呢,callAdapter返回的是默认CallExecuteObservable，</p>
+<pre><code class="java">  @Override protected void subscribeActual(Observer&lt;? super Response&lt;T&gt;&gt; observer) {
+      Response&lt;T&gt; response = call.execute();//不要被这个call.execute.execute迷惑了
+      if (!disposable.isDisposed()) {
+        observer.onNext(response);
+      }
+  }
+
+  //OkHttpCall
+  @Override public Response&lt;T&gt; execute() throws IOException {
+        // ...
+      return parseResponse(call.execute());//所以还是要走ResponseBodyConverter那一套的
+  }
 </code></pre>
 <p>根据<a href="https://stackoverflow.com/questions/21652461/retrofit-callback-on-main-thread">jake Wharton在stackoverFlow上的回答</a>,Retrofit parse byte to Object的过程是发生在子线程的。</p>
 <h2 id="update"><a href="#update" class="headerlink" title="update"></a>update</h2><p><a href="https://stackoverflow.com/questions/37016261/retrofit-optional-and-required-fields">根据stackoverFlow上的解释，对于queryParameters，一些optional的参数直接传null就可以了</a> 这段从源码上还没有来得及看清楚。</p>
@@ -945,10 +1051,6 @@ class XmlOrJsonConverterFactroy extend Converter.Factory{
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
@@ -985,15 +1087,7 @@ class XmlOrJsonConverterFactroy extend Converter.Factory{
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1014,6 +1108,18 @@ class XmlOrJsonConverterFactroy extend Converter.Factory{
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
               </li>
              
               <li class="article-tag-list-item">

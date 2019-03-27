@@ -17,7 +17,7 @@
 <meta property="og:description" content="关于Android Application集成Tinker的一次记录。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/single-yellow-beauty-flower-on-the-fence-wallpaper-56801fde208df.jpg">
-<meta property="og:updated_time" content="2019-03-13T02:30:25.322Z">
+<meta property="og:updated_time" content="2019-03-27T14:13:01.244Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="集成Tinker的一些记录">
 <meta name="twitter:description" content="关于Android Application集成Tinker的一次记录。">
@@ -298,13 +298,13 @@ Mainfest里面要改成上面那个“com.包名.SomeName”
 <h2 id="4-常见问题"><a href="#4-常见问题" class="headerlink" title="4. 常见问题"></a>4. 常见问题</h2><p>Q: 我只不过改了一个Toast的文案，为毛生成的patch_signed_7zip.apk文件这么大()？<br>A: 看下tinkerPatch文件夹下面的log.txt文件（建议用Notepad打开），里面一大堆“Found add resource: res/drawable-hdpi-v4/abc_list_pressed_holo_light.9.png”这样的类似的出现，具体原因跟aapt有关，好像可以设置detect resource change （大概就这意思）为false，这样就不会那么大了。</p>
 <p>Q: Tinker-Patch把补丁文件放在什么位置<br>A: 因为接收补丁的代码就在TinkerInstaller.onReceiveUpgradePatch这一段了。在UpgradePatchRetry.java中，有这么一段：tempPatchFile = new File(SharePatchFileUtil.getPatchTempDirectory(context), TEMP_PATCH_NAME); （/data/data/com.example.myApp/data/tinker_temp/temp.apk）。当然还有其他的，总之就是放在当前应用data文件夹下面的tinker或者tinker_temp文件夹下。</p>
 <p>Q: TinkerPatch和Tinker什么关系<br>A：TinkerPatch的SDK里面包含了Tinker必要的功能，开发者只需要添加TinkerPatch这一条依赖，也不需要去继承ApplicationLike这些东西了，开发者不用自己开一个下载服务去下发patch_signed_7zip.apk这个文件了，onReceiveUpgradePatch这些事也做好了。确实是接入成本最低的方案，搭建后台假如交由自己公司的API团队处理，起码得好几天，还得耽误产品正常的开发节奏。而TinkerPatch给出的报价是399元/月。短期来看，显然前者的成本要高出不少，还得顾虑自家团队维护的代价。算一笔经济账的话，显然企业倾向于花钱买稳定服务。对于个人来讲，目前有免费版可以使用，估计也是为了给测试Demo使用的，想玩简单版的话可以试试。</p>
-<p>Q: 如何更换Dex的<br>A: 引用<a href="http://w4lle.com/2016/12/16/tinker/index.html">Android热补丁之Tinker原理解析</a>中的话：“由于Tinker的方案是基于Multidex实现的修改dexElements的顺序实现的，所以最终还是要修改classLoder中dexPathList中dexElements的顺序。Android中有两种ClassLoader用于加载dex文件，BootClassLoader、PathClassLoader和DexClassLoader都是继承自BaseDexClassLoader。最终在DexPathList的findClass中遍历dexElements，谁在前面用谁。”。所以其实就是根据下发的补丁文件，把dex文件给修改了，这一点跟MultiDex很像。</p>
+<p>Q: 如何更换Dex的<br>A: 引用<a href="http://w4lle.com/2016/12/16/tinker/index.html">Android热补丁之Tinker原理解析</a>中的话：“由于Tinker的方案是基于Multidex实现的修改dexElements的顺序实现的，所以最终还是要修改classLoder中dexPathList中dexElements的顺序。Android中有两种ClassLoader用于加载dex文件，BootClassLoader、PathClassLoader和DexClassLoader都是继承自BaseDexClassLoader。最终在DexPathList的findClass中遍历dexElements，谁在前面用谁。”。所以其实就是根据下发的补丁文件，把dex文件给修改了，这一点跟MultiDex很像。<br>更新一下，低版本是dexpathList前置，高版本则直接创建classLoader</p>
 <p>Q: Dex文件格式<br>A： <a href="https://blog.bugsnag.com/dex-and-d8/">The Dex File Format</a>。值得一提的是，这篇文章提到了文件头，dex的头是</p>
 <blockquote>
 <p>6465780A 30333800<br>dex<br>038</p>
 </blockquote>
 <p>这个是hexoDecimal，十六进制2个数字（字母）代表一个byte(2*8bits = 2 bytes)，按照二进制0101的方式来看的话就是： 6465（0110 0100 0110 0101） 780A(0111 1000 0000 1010)。<br><a href="http://blog.csdn.net/sbsujjbcy/article/details/52869361">关于dex format的更多的分析</a></p>
-<p>Q: broken.apk + patch_signed_7zip = fixed apk的过程<br>A: 在UpgradePatch.tryPath -&gt; DexDiffPatchInternal.tryRecoverDexFiles -&gt; dexOptimizeDexFiles -&gt; TinkerDexOptimizer.optimizeAll -&gt;OptimizeWorker.run -&gt; DexFile.loadDex(DexFile是dalvik.system包下的)。</p>
+<p>Q: broken.apk + patch_signed_7zip = fixed apk的过程<br>A: 在UpgradePatch.tryPath -&gt; DexDiffPatchInternal.tryRecoverDexFiles -&gt; dexOptimizeDexFiles -&gt; TinkerDexOptimizer.optimizeAll -&gt;OptimizeWorker.run -&gt; DexFile.loadDex(DexFile是dalvik.system包下的)。 这些都是在patch进程运行的</p>
 <p>Q： 把Tinker导入Intelij中<br>A： <Del>Intelij中open project -&gt; 选择 tinker-build/tinker-build.iml 即可</Del>。顺带着其他的mudule都能查看了。最好在tinker-sample-android/app/build.gradle文件中注释掉这两句话</p>
 <blockquote>
 <p>// annotationProcessor(“com.tencent.tinker:tinker-android-anno:${TINKER_VERSION}”) { changing = true }<br>//  compileOnly(“com.tencent.tinker:tinker-android-anno:${TINKER_VERSION}”) { changing = true }</p>
@@ -328,6 +328,16 @@ Mainfest里面要改成上面那个“com.包名.SomeName”
 <p>不同的渠道包的BuildConfig这个class文件变量，所以最后的dex文件都不一样了。<br>所以更好的方式是使用美团的walle(往APK Signature Block这里添加ID-Value),能够这么做的原因仅仅是google目前还没对这块限制，也就是这里可以当做一个自定义的key-value存储block。<br>因为这种方式没有碰dex，所以就可以一个补丁修复所有渠道了（在bakApk文件夹下面不是有基准包嘛）</p>
 <p><strong>在apk安装的时候系统会将dex文件优化成odex文件，在优化的过程中会涉及一个预校验的过程<br>如果一个类的static方法，private方法，override方法以及构造函数中引用了其他类，而且这些类都属于同一个dex文件，此时该类就会被打上CLASS_ISPREVERIFIED<br>如果在运行时被打上CLASS_ISPREVERIFIED的类引用了其他dex的类，就会报错<br>所以MainActivity的onCreate()方法中引用另一个dex的类就会出现上文中的问题<br>正常的分包方案会保证相关类被打入同一个dex文件<br>想要使得patch可以被正常加载，就必须保证类不会被打上CLASS_ISPREVERIFIED标记。而要实现这个目的就必须要在分完包后的class中植入对其他dex文件中类的引用。<br>如果A类引用了C类，C类在其他Dex中，那么就可以避免A类被打上标记。只要在static方法，构造方法，private方法，Override方法中直接饮用了其他dex中的类，这个类就不会被打上CLASS_ISPREVERIFIED的标记。<br>要在已经编译完成后的类中植入对其他类的引用，就需要操作字节码，惯用的方案是插桩。常见的工具有javaassist，asm等。</strong></p>
 <p>所以QQ空间给出的方案是在所有class的构造函数中添加一行println(C.class)方法，直接引用另一个dex包中的类。这个添加的过程用javaAssist这种操作字节码的方式就可以简单实现<br><a href="https://blog.csdn.net/u010386612/article/details/51192421"> Android热补丁动态修复技术</a>这一系列文章介绍了使用gradle api对编译过程进行hook，实现自动化补丁操作的过程</p>
+<p>Q: Tinker是如何使用gradle插件生成dex补丁的?<br>A: <a href="https://blog.csdn.net/lmj623565791/article/details/72667669">参考鸿洋这篇文章</a> </p>
+<p>打补丁的时候执行的是tinkerPatchDebug这个任务，执行这个任务发现依次执行了这些任务</p>
+<p>:app:processDebugManifest<br>:app:tinkerProcessDebugManifest（tinker）<br>:app:tinkerProcessDebugResourceId (tinker)<br>:app:processDebugResources<br>:app:tinkerProguardConfigTask(tinker)<br>:app:transformClassesAndResourcesWithProguard<br>:app:tinkerProcessDebugMultidexKeep (tinker)<br>:app:transformClassesWidthMultidexlistForDebug<br>:app:assembleDebug<br>:app:tinkerPatchDebug(tinker)</p>
+<p>1.TinkerManifestTask，用于添加TINKER_ID；<br>2.TinkerResourceIdTask，使用aapt的public.xml和ids.xml接管了资源id的生成.首先在打老的apk包的时候会配置一个tinkerApplyResourcePath，对应的是生成的R.txt的路径。接下来比较res文件夹中各种资源，对比生成public.xml<br>3.TinkerProguardConfigTask。因为proguard的存在，两次打出来的代码混淆差异非常大，proguard有一个-applymapping选项，用于限定两次混淆使用同一份混淆规则。还有com.tencent.tinker.loader.**这些是不能混淆的。</p>
+<ol>
+<li>TinkerMultidexConfigTask。这里要确保application、com.tencent.tinker.loader.**这些在主dex中</li>
+<li>TinkerPatchSchemaTask，生成patch，生成meta-file和version-file，build patch<br>这里就是对两个apk进行了比较：<br>old apk: build/intermediates/outputs/old apk名称/<br>new apk: build/intermediates/outputs/app-debug/<br>dexFile -&gt; dexDecoder.patch </li>
+</ol>
+<p>首先将两个dex读取到内存中，如果oldFile不存在，则newFile认为是新增文件，直接copy到输出目录，并记录log。如果存在，则计算两个文件的md5，如果md5不同，则认为dexChanged(hasDexChanged = true)，执行：collectAddedOrDeletedClasses(oldFile, newFile);该方法收集了addClasses和deleteClasses的相关信息。<strong><em>仅将新增的文件copy到了目标目录。</em></strong>发生改变的文件，后面会执行diffDexPairAndFillRelatedInfo，生成的patch文件放到了outputs/tempPatchedDexes文件夹里。patch完了之后还模拟做了一次合并，看下old dex打完patch是不是和新的dex的md5相同。<br>soFile -&gt; soDecoder.patch 完成so文件的比对,新文件的话直接复制，否则比较md5，超过80%则直接copy新文件至目标文件夹,不超过新文件的80%，则copy patch文件至目标文件夹，记录log<br>resFile -&gt; resDecoder.patch 完成res文件的比对</p>
+<p>Q: 收到下发的补丁后是如何合成的，合成好了放在哪了<br>A: 首先，合成是在patch进程跑的，关键方法是DexDiffPatchInternal.patchDexExtractViaDexDiff，这里面做了两件是，一个是合成新的dex文件（extractDexDiffInternals），另一个是手动调用DexFile.loadDex去触发dexoat流程(dexOptimizeDexFiles) 文件写到了/data/data/com.example.application/tinker/patch1.1/Dex/classes1.dex //这里这个classes1.dex我不确定，patch1.1是补丁版本号。这里面就是写往一个ZipOutputStream.<br>然后重启，注意这里是主进程咯，开始加载这个写好的文件，在TinkerDexLoader.loadTinkerJar中，也是去/data/data/com.example.application/tinker/patch1.1/Dex/这个文件夹下面找文件，然后加入到一个legalFiles的list中，调用SystemClassLoaderAdder.installDexes（也就是DexPathList那一套）</p>
 <p>好的学习资料<br><a href="https://www.jianshu.com/p/7034c3fec6c8">Tinker学习计划(2)-Tinker的原理一</a><br><a href="https://www.jianshu.com/p/23ea8e332dcd">Android 基于gradle插件实现多渠道打包</a><br><a href="https://www.jianshu.com/p/53923d8f241c">加快apk的构建速度，如何把编译时间从130秒降到17秒</a><br><a href="https://github.com/typ0520/fastdex">fastdex</a><br><a href="https://github.com/typ0520/multiple-apk-generator">multiple-apk-generator</a></p>
 <h2 id="5-源码解析"><a href="#5-源码解析" class="headerlink" title="5. 源码解析"></a>5. 源码解析</h2><p>至少我现在看到7个包：</p>
 <blockquote>
@@ -691,10 +701,6 @@ final String url = urlBuilder.appendPath(this.appKey)
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
@@ -731,15 +737,7 @@ final String url = urlBuilder.appendPath(this.appKey)
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -760,6 +758,18 @@ final String url = urlBuilder.appendPath(this.appKey)
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
               </li>
              
               <li class="article-tag-list-item">

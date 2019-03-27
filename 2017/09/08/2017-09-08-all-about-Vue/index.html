@@ -19,7 +19,7 @@
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery1511100775410.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/1102531047-2.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/VueJsLogo.jpg">
-<meta property="og:updated_time" content="2019-03-13T02:30:25.322Z">
+<meta property="og:updated_time" content="2019-03-27T14:13:01.244Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="VueJs学习笔记">
 <meta name="twitter:description" content="Vue Js学习笔记">
@@ -335,16 +335,21 @@ data{
 </code></pre>
 <p>SelectBox会从authors数组中提供选项，选中后，blog.author对象将会被赋予相应的值。</p>
 <h3 id="1-5-HTML模板复用"><a href="#1-5-HTML模板复用" class="headerlink" title="1.5 HTML模板复用"></a>1.5 HTML模板复用</h3><p>组件的意义就在于可以复用UI元素，就像Flask的renderTemplate方法里面可以接收若干参数，vue Component也是一样</p>
-<pre><code>1. 在父Component中引入子Component
-2. 子Component中添加props:[&#39;variable1&#39;,&#39;variable2&#39;]数组
-3. 在父控件中直接在html标签上添加 :variable1 =&#39;&#39; ，注意这个冒号其实是  v-bind: 的缩写，不能省略
-4. 在子控件的html中就像引用data一样使用props
-</code></pre><h3 id="1-6各种引用"><a href="#1-6各种引用" class="headerlink" title="1.6各种引用"></a>1.6各种引用</h3><p>在vue组件中this指的是当前的VueComponent（也就是常说的vm），self指的是window对象，this.$el指的是所渲染的template</p>
+<ol>
+<li>在父Component中引入子Component</li>
+<li>子Component中添加props:[‘variable1’,’variable2’]数组</li>
+<li>在父控件中直接在html标签上添加 :variable1 =’’ ，注意这个冒号其实是  v-bind: 的缩写，不能省略</li>
+<li>在子控件的html中就像引用data一样使用props</li>
+</ol>
+<h3 id="1-6各种引用"><a href="#1-6各种引用" class="headerlink" title="1.6各种引用"></a>1.6各种引用</h3><p>在vue组件中this指的是当前的VueComponent（也就是常说的vm），self指的是window对象，this.$el指的是所渲染的template</p>
 <h3 id="1-7-嵌套路由破坏了静态资源的引用路径"><a href="#1-7-嵌套路由破坏了静态资源的引用路径" class="headerlink" title="1.7 嵌套路由破坏了静态资源的引用路径"></a>1.7 嵌套路由破坏了静态资源的引用路径</h3><p><a href="https://stackoverflow.com/questions/45133669/nested-routes-breaks-the-static-path">nested-routes-breaks-the-static-path</a><br>解决方法是在 html中置顶css或js等静态资源的location，从绝对路径，根路径开始</p>
 <h2 id="2-使用Http进行CURD操作"><a href="#2-使用Http进行CURD操作" class="headerlink" title="2.使用Http进行CURD操作"></a>2.使用Http进行CURD操作</h2><p>安装：<a href="https://github.com/pagekit/vue-resource">Repo</a><br>注意：需要在当前工作目录.<br>安装完成在package.json中看到</p>
-<ul>
-<li>“dependencies”: {<br>  “vue”: “^2.3.3”,<br>  “Vue-resource”:”^1.3.4”<br>},<br>类似这样即可。</li>
-</ul>
+<pre><code class="json"> &quot;dependencies&quot;: {
+    &quot;vue&quot;: &quot;^2.3.3&quot;,
+    &quot;Vue-resource&quot;:&quot;^1.3.4&quot;
+  },
+</code></pre>
+<p>类似这样即可。</p>
 <h3 id="2-1-进行POST操作"><a href="#2-1-进行POST操作" class="headerlink" title="2.1 进行POST操作"></a>2.1 进行POST操作</h3><p><a href="https://jsonplaceholder.typicode.com/">jsonPlaceHolder</a>是一个免费的API网站。<br>vue-resource提交表单的操作如下:</p>
 <pre><code class="javaScript">  post:function () {
       //use http here
@@ -362,8 +367,10 @@ data{
 <p>post方法返回的是一个promise，加回调即可打印出api返回结果。</p>
 <h2 id="3-Router-Eventbus-mixin，axios等"><a href="#3-Router-Eventbus-mixin，axios等" class="headerlink" title="3. Router,Eventbus,mixin，axios等"></a>3. Router,Eventbus,mixin，axios等</h2><p>安装:</p>
 <blockquote>
-<p>npm install vue-router –save</p>
-<h2 id="npm-install-vue-bus-–save"><a href="#npm-install-vue-bus-–save" class="headerlink" title="npm install vue-bus –save"></a>npm install vue-bus –save</h2><h3 id="3-1-关于Bus，-是用来在不同的Vue文件中传递事件-数据-用的，安装好后，main-js里面improt并使用"><a href="#3-1-关于Bus，-是用来在不同的Vue文件中传递事件-数据-用的，安装好后，main-js里面improt并使用" class="headerlink" title="3.1 关于Bus， 是用来在不同的Vue文件中传递事件(数据)用的，安装好后，main.js里面improt并使用"></a>3.1 关于Bus， 是用来在不同的Vue文件中传递事件(数据)用的，安装好后，main.js里面improt并使用</h3><p>import Vue from ‘vue’<br>import VueBus from ‘vue-bus’;<br>Vue.use(VueBus);</p>
+<p>npm install vue-router –save<br>npm install vue-bus –save</p>
+</blockquote>
+<h3 id="3-1-关于Bus，-是用来在不同的Vue文件中传递事件-数据-用的，安装好后，main-js里面import并使用"><a href="#3-1-关于Bus，-是用来在不同的Vue文件中传递事件-数据-用的，安装好后，main-js里面import并使用" class="headerlink" title="3.1 关于Bus， 是用来在不同的Vue文件中传递事件(数据)用的，安装好后，main.js里面import并使用"></a>3.1 关于Bus， 是用来在不同的Vue文件中传递事件(数据)用的，安装好后，main.js里面import并使用</h3><blockquote>
+<p>import Vue from ‘vue’<br>import VueBus from ‘vue-bus’;<br>Vue.use(VueBus);</p>
 </blockquote>
 <p>A.vue中</p>
 <pre><code class="javaScript">created(){
@@ -816,10 +823,6 @@ new Vue({  // eslint-disable-line no-new
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
@@ -856,15 +859,7 @@ new Vue({  // eslint-disable-line no-new
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -885,6 +880,18 @@ new Vue({  // eslint-disable-line no-new
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
               </li>
              
               <li class="article-tag-list-item">

@@ -16,7 +16,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/scenery1511100756208.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery1511100809920.jpg">
-<meta property="og:updated_time" content="2019-03-13T02:30:25.322Z">
+<meta property="og:updated_time" content="2019-03-27T14:13:01.248Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="VPS维护的日常">
 <meta name="twitter:image" content="https://haldir66.ga/static/imgs/scenery1511100756208.jpg">
@@ -272,14 +272,14 @@ ssserver -c /etc/shadowsocks.json -d stop
 sudo ssserver -c /etc/shadowsocks.json --user username -d start - 不要总是用root用户做事，adduser来做，给sudo权限即可
 </code></pre>
 <p>如果使用systemd来管理的话，就不要使用 -d参数，因为需要root权限，此时应该将ssserver的生命周期管理交给systemd</p>
-<p>nohup /net-speeder/net-speeder/net_speeder eth0 “tcp src port 12345” &gt; /dev/null 2&gt;&amp;1 &amp;</p>
+<p><del>nohup /net-speeder/net-speeder/net_speeder eth0 “tcp src port 12345” &gt; /dev/null 2&gt;&amp;1 &amp;</del></p>
 <p>慎用！！一不小心会把自己的ip加到iptable黑名单里面<br>//防止暴力扫描ss端口<br><a href="https://github.com/shadowsocks/shadowsocks/wiki/Ban-Brute-Force-Crackers">nohup tail -F /var/log/shadowsocks.log | python autoban.py &gt;log 2&gt;log &amp;</a></p>
 <p>其实就是找“can not parse header when handling connection from”这句话，超过次数的加到iptable的ban rule里面，可以看下哪些ip被拉黑了<br>iptables -L -n ## 查看已添加的iptables规则</p>
 <h3 id="2-2-SSR-以及一些衍生的软件"><a href="#2-2-SSR-以及一些衍生的软件" class="headerlink" title="2.2 SSR 以及一些衍生的软件"></a>2.2 SSR 以及一些衍生的软件</h3><p><a href="https://github.com/breakwa11/shadowsocks-rss/wiki">ShadowsocksR</a>启动后台运行命令</p>
 <blockquote>
 <p>python server.py -p 443 -k password -m aes-256-cfb -O auth_sha1_v4 -o http_simple -d start</p>
 </blockquote>
-<p><a href="https://zhgcao.github.io/2016/05/26/ubuntu-install-net-speeder/">net-speeder</a></p>
+<p><del><a href="https://zhgcao.github.io/2016/05/26/ubuntu-install-net-speeder/">net-speeder</a></del></p>
 <blockquote>
 <p>apt-get install libnet1-dev<br>apt-get install libpcap0.8-dev</p>
 <p>venetX，OpenVZ 架构</p>
@@ -290,7 +290,6 @@ sh build.sh -DCOOKED
 ###Xen，KVM，物理机
 cd net-speeder-master/
 sh build.sh
-
 
 ### 加速所有ip协议数据
 
@@ -350,23 +349,23 @@ cd .. &amp;&amp; rm -rf libsodium-${Libsodiumr_ver}.tar.gz &amp;&amp; rm -rf lib
 <p>现在就可以去config.json文件中将加密方式改成: chacha20 了，重启下ss即可</p>
 <h3 id="2-5-查看日志"><a href="#2-5-查看日志" class="headerlink" title="2.5 查看日志"></a>2.5 查看日志</h3><p>日志文件的位置在/var/log/shadowsocks.log<br>下面这条命令用于查看访问了哪些网站<br>cat  shadowsocks.log | awk ‘{ print $5}’ |grep -o ‘^[^:]*’ | sort | uniq -c | sort -n</p>
 <p>查看尝试连接本服务器的客户端<br>cat shadowsocks.log | awk ‘{ print $NF }’| grep -o ‘^[^:]*’ | sort | uniq -c | sort -n</p>
-<h3 id="2-6-simple-obfs"><a href="#2-6-simple-obfs" class="headerlink" title="2.6 simple-obfs"></a>2.6 simple-obfs</h3><p>sudo apt-get install simple-obfs<br>/etc/shadowsocks-libev/config.json文件中添加</p>
+<h3 id="2-6-simple-obfs"><a href="#2-6-simple-obfs" class="headerlink" title="2.6 simple-obfs"></a>2.6 <del>simple-obfs</del></h3><p>sudo apt-get install simple-obfs<br>/etc/shadowsocks-libev/config.json文件中添加</p>
 <pre><code>&quot;plugin&quot;:&quot;obfs-server&quot;,
 &quot;plugin_opts&quot;: &quot;obfs=tls;obfs-host=www.bing.com&quot;,
 &quot;fast_open&quot;:true,
 &quot;reuse_port&quot;:true
-</code></pre><h3 id="2-7-ss-local提供正向代理"><a href="#2-7-ss-local提供正向代理" class="headerlink" title="2.7 ss-local提供正向代理"></a>2.7 ss-local提供正向代理</h3><p>//curl使用代理，在ss-local监听1080端口的前提下，这条命令可以正常访问google</p>
+</code></pre><h3 id="2-7-ss-local提供正向代理"><a href="#2-7-ss-local提供正向代理" class="headerlink" title="2.7 ss-local提供正向代理"></a>2.7 ss-local提供正向代理</h3><p>curl使用代理，在ss-local监听1080端口的前提下，这条命令可以正常访问google</p>
 <blockquote>
 <p>curl -4sSkL -x socks5h://127.0.0.1:1080 <a href="https://www.google.com">https://www.google.com</a><br>curl –socks5 127.0.0.1:1080 <a href="http://stackoverflow.com/">http://stackoverflow.com/</a> //这个更简单</p>
 </blockquote>
-<p>// 有两种方式</p>
+<p>有两种方式</p>
 <blockquote>
 <p>$ export http_proxy=”vivek:myPasswordHere@10.12.249.194:3128/“<br>$ curl -v -O <a href="http://dl.cyberciti.biz/pdfdownloads/b8bf71be9da19d3feeee27a0a6960cb3/569b7f08/cms/631.pdf">http://dl.cyberciti.biz/pdfdownloads/b8bf71be9da19d3feeee27a0a6960cb3/569b7f08/cms/631.pdf</a></p>
 <p>curl -x ‘<a href="http://vivek:myPasswordHere@10.12.249.194:3128">http://vivek:myPasswordHere@10.12.249.194:3128</a>‘ -v -O <a href="https://dl.cyberciti.biz/pdfdownloads/b8bf71be9da19d3feeee27a0a6960cb3/569b7f08/cms/631.pdf">https://dl.cyberciti.biz/pdfdownloads/b8bf71be9da19d3feeee27a0a6960cb3/569b7f08/cms/631.pdf</a></p>
 </blockquote>
 <p><a href="https://linux.cn/article-9223-1.html">如何让 curl 命令通过代理访问</a><br>curl -x socks5://[user:password@]proxyhost[:port]/ url<br>curl –socks5 192.168.1.254:3099 <a href="https://www.cyberciti.biz/">https://www.cyberciti.biz/</a></p>
 <h3 id="ss各种加密算法跑分测试"><a href="#ss各种加密算法跑分测试" class="headerlink" title="ss各种加密算法跑分测试"></a>ss各种加密算法跑分测试</h3><p>首先安装iperf<br>apt-get install iperf<br><a href="https://gist.github.com/madeye/c046fc35e10a82154f4697fb316a7ac6">iperf.sh</a></p>
-<pre><code class="shell">#!/bin/bash
+<pre><code class="bash">#!/bin/bash
 
 method=$1
 
@@ -527,7 +526,7 @@ Softlayer, HongKong, CN         119.81.130.170          35.2MB/s
 <blockquote>
 <p>docker run hello-world<br>docker search ubuntu<br>docker pull ubuntu<br>docker run ubuntu ## 进入ubuntu这个container<br>docker images<br>docker run -it ubuntu<br>exit</p>
 </blockquote>
-<p>##这两条命令用于自己在本地打一个docker image<br>docker build -t <your username>/node-web-app .<br>docker build -t packsdkandroiddocker.image -f ./scripts/PackSdkDockerfile .</p>
+<h2 id="这两条命令用于自己在本地打一个docker-image"><a href="#这两条命令用于自己在本地打一个docker-image" class="headerlink" title="这两条命令用于自己在本地打一个docker image"></a>这两条命令用于自己在本地打一个docker image</h2><p>docker build -t <your username>/node-web-app .<br>docker build -t packsdkandroiddocker.image -f ./scripts/PackSdkDockerfile .</p>
 <h2 id="注意你修改了Dockerfile之后要重新跑一遍docker-build-t-node-web-app"><a href="#注意你修改了Dockerfile之后要重新跑一遍docker-build-t-node-web-app" class="headerlink" title="注意你修改了Dockerfile之后要重新跑一遍docker build -t /node-web-app ."></a>注意你修改了Dockerfile之后要重新跑一遍docker build -t <your username>/node-web-app .</h2><p><a href="https://stackoverflow.com/questions/18804124/docker-updating-image-along-when-dockerfile-changes">每次修改之后重新打image</a></p>
 <p>docker会在/var/lib/docker文件夹里吃掉大量空间，释放空间的话</p>
 <blockquote>
@@ -902,10 +901,6 @@ Softlayer, HongKong, CN         119.81.130.170          35.2MB/s
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
@@ -942,15 +937,7 @@ Softlayer, HongKong, CN         119.81.130.170          35.2MB/s
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -971,6 +958,18 @@ Softlayer, HongKong, CN         119.81.130.170          35.2MB/s
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
               </li>
              
               <li class="article-tag-list-item">

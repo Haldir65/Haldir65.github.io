@@ -17,7 +17,7 @@
 <meta property="og:description" content="位运算的好处至少有两点，由于是直接操作bit,没有任何包装类，速度快。另外一个就是节省内存了。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/8af185ed137a586be732d63425d8bcb8.jpg">
-<meta property="og:updated_time" content="2019-03-13T02:30:25.318Z">
+<meta property="og:updated_time" content="2019-03-27T14:13:01.244Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="位运算总结">
 <meta name="twitter:description" content="位运算的好处至少有两点，由于是直接操作bit,没有任何包装类，速度快。另外一个就是节省内存了。">
@@ -211,7 +211,17 @@ ga('send', 'pageview');
 <p>原理：<br>5的二进制表示方式是：<br>0000 0000 0000 0000 0000 0000 0000 0101<br>向左挪两位就变成了<br>0000 0000 0000 0000 0000 0000 0001 0100 //末位补零 ，也就是20</p>
 <p>可以认为 5&lt;&lt;n就代表乘以2的n次方<br>所以10KB可以这么写 ： 10&lt;&lt;10</p>
 <h2 id="2-右移-gt-gt"><a href="#2-右移-gt-gt" class="headerlink" title="2.右移(&gt;&gt;)"></a>2.右移(&gt;&gt;)</h2><p>和左移反过来，前面补0。一样的道理，不再赘述。</p>
-<h2 id="3-无符号右移-gt-gt-gt"><a href="#3-无符号右移-gt-gt-gt" class="headerlink" title="3. 无符号右移(&gt;&gt;&gt;)"></a>3. 无符号右移(&gt;&gt;&gt;)</h2><p>在java中一个int占32位，正数的首位是0，负数位-1。<br>-5 就是<br>1111 1111 1111 1111 1111 1111 1111 1011</p>
+<h2 id="3-无符号右移-gt-gt-gt"><a href="#3-无符号右移-gt-gt-gt" class="headerlink" title="3. 无符号右移(&gt;&gt;&gt;)"></a>3. 无符号右移(&gt;&gt;&gt;)</h2><p>在java中一个int占32位，正数的首位是0，负数位-1。<br>首先说一下负数怎么算出来二进制表示的(原码，补码，反码)在计算机中，负数以其正值的补码形式表达</p>
+<blockquote>
+<p>计算机对有符号数（包括浮点数）的表示有三种方法：原码、反码和补码， 补码=反码+1。在 二进制里，是用 0 和 1 来表示正负的，最高位为符号位，最高位为 1 代表负数，最高位为 0 代表正数。</p>
+</blockquote>
+<p>以-5为例</p>
+<ol>
+<li>先将-5的绝对值转成二进制： 00000000 00000000 00000000 00000101</li>
+<li>然后求该二进制的反码(~)， 也就是0变成1,1变成0，得到11111111 11111111 11111111 11111010</li>
+<li>然后把得到的反码加1 ，得到11111111 11111111 11111111 11111010 + 1 = 11111111 11111111 11111111 11111011</li>
+</ol>
+<p>因此-5 就是<br>11111111 11111111 11111111 11111011<br>0xFFFFFFFB（16进制写法）</p>
 <p>正数右移，高位用0补；负数右移，高位用1补；负数无符号右移，用0补高位。</p>
 <p>所以-5&gt;&gt;&gt;3 也就变成了<br>0001 1111 1111 1111 1111 1111 1111 1111 //十进制536870911</p>
 <p>注意，正数或者负数左移，低位都是用0补</p>
@@ -267,53 +277,88 @@ ga('send', 'pageview');
 <p>// 17. 从低位到高位,取n的第m位<br>int m = 2;<br>System.out.println((n &gt;&gt; (m-1)) &amp; 1);</p>
 <p>// 18. 从低位到高位.将n的第m位置为1<br>System.out.println(n | (1&lt;&lt;(m-1)));<br>/<em>将1左移m-1位找到第m位，得到000…1…000<br>n在和这个数做或运算</em>/</p>
 <p>// 19. 从低位到高位,将n的第m位置为0<br>System.out.println(n &amp; ~(0&lt;&lt;(m-1)));<br>/<em> 将1左移m-1位找到第m位，取反后变成111…0…1111<br>n再和这个数做与运算</em>/</p>
+<p>//不用加减乘除计算实现一个加法</p>
+<pre><code class="java">public class Solution {
+    public int Add(int num1,int num2) {
+        while (num2!=0) {
+            int temp = num1^num2;
+            num2 = (num1&amp;num2)&lt;&lt;1;
+            num1 = temp;
+        }
+        return num1;
+    }
+}
+</code></pre>
+<p><a href="https://www.nowcoder.com/questionTerminal/59ac416b4b944300b617d4f7f111b215">牛客网</a><br>首先看十进制是如何做的： 5+7=12，三步走<br>第一步：相加各位的值，不算进位，得到2。<br>第二步：计算进位值，得到10. 如果这一步的进位值为0，那么第一步得到的值就是最终结果。</p>
+<p>第三步：重复上述两步，只是相加的值变成上述两步的得到的结果2和10，得到12。</p>
+<p>同样我们可以用三步走的方式计算二进制值相加： 5-101，7-111 第一步：相加各位的值，不算进位，得到010，二进制每位相加就相当于各位做异或操作，101^111。</p>
+<p>第二步：计算进位值，得到1010，相当于各位做与操作得到101，再向左移一位得到1010，(101&amp;111)&lt;&lt;1。</p>
+<p>第三步重复上述两步， 各位相加 010^1010=1000，进位值为100=(010&amp;1010)&lt;&lt;1。<br>     继续重复上述两步：1000^100 = 1100，进位值为0，跳出循环，1100为最终结果。</p>
 <h2 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h2><ol>
-<li><p>记得Chet Haase和Romain Guy曾经在2013年的一次<a href="https://www.youtube.com/watch?v=Ho-anLsWvJo">演讲</a>中提到,Android中View内部使用了3个int来表示70多个Flags。如果换做boolean(4byte大小)的话，就需要接近300bytes。由于View在Application中被广泛（成百上千）使用，framework这样做事实上为开发者节约了相当多的内存。<br>View.java里面放了好几个flags。<br>android.view.View.java</p>
+<li>记得Chet Haase和Romain Guy曾经在2013年的一次<a href="https://www.youtube.com/watch?v=Ho-anLsWvJo">演讲</a>中提到,Android中View内部使用了3个int来表示70多个Flags。如果换做boolean(4byte大小)的话，就需要接近300bytes。由于View在Application中被广泛（成百上千）使用，framework这样做事实上为开发者节约了相当多的内存。<br>View.java里面放了好几个flags。<br>android.view.View.java</li>
+</ol>
 <pre><code class="java">/* @hide */
-public int mPrivateFlags;
-int mPrivateFlags2;
-int mPrivateFlags3;
+   public int mPrivateFlags;
+   int mPrivateFlags2;
+   int mPrivateFlags3;
 
-// The view flags hold various views states.
-int mViewFlags;
+   // The view flags hold various views states.
+   int mViewFlags;
 </code></pre>
 <p>int中的每一个bit都成为一个boolean，一共只用了12bytes(96bits)的内存.和300bytes相比，节省的内存总量还是相当可观的。<br>一个onClickListener大概500bytes<br>所以View.java中到处是这样的奇怪的Flags</p>
-<pre><code class="java">public void setDrawingCacheEnabled(boolean enabled) {
-     mCachingFailed = false;
-     setFlags(enabled ? 0x00008000 : 0, 0x00008000);
- }
+<pre><code class="java">  public void setDrawingCacheEnabled(boolean enabled) {
+        mCachingFailed = false;
+        setFlags(enabled ? 0x00008000 : 0, 0x00008000);
+    }
 
- @ViewDebug.ExportedProperty(category = &quot;drawing&quot;)
- public boolean isDrawingCacheEnabled() {
-     return (mViewFlags &amp; 0x00008000) == 0x00008000;
- }
+    @ViewDebug.ExportedProperty(category = &quot;drawing&quot;)
+    public boolean isDrawingCacheEnabled() {
+        return (mViewFlags &amp; 0x00008000) == 0x00008000;
+    }
 </code></pre>
 <p>除了省内存，位运算速度快也有一定的好处。</p>
-</li>
-<li><p>来看看Android中的ViewGroup是怎么干的<br>```java<br>// Set by default<br>static final int FLAG_CLIP_CHILDREN = 0x1;   //二进制的1</p>
-<p>private static final int FLAG_CLIP_TO_PADDING = 0x2; //二进制的10</p>
-<p>static final int FLAG_INVALIDATE_REQUIRED  = 0x4; //二进制 100</p>
-<p>private static final int FLAG_RUN_ANIMATION = 0x8; //二进制1000</p>
-<p>static final int FLAG_ANIMATION_DONE = 0x10; //二进制 10000</p>
-</li>
+<ol>
+<li>来看看Android中的ViewGroup是怎么干的</li>
 </ol>
-<p>   private static final int FLAG_PADDING_NOT_NULL = 0x20;//二进制 100000</p>
-<p>   /<em>* @deprecated - functionality removed </em>/<br>   private static final int FLAG_ANIMATION_CACHE = 0x40;//二进制 1000000</p>
-<p>   static final int FLAG_OPTIMIZE_INVALIDATE = 0x80;//二进制 10000000</p>
-<p>   static final int FLAG_CLEAR_TRANSFORMATION = 0x100;//二进制 100000000</p>
-<p>   private static final int FLAG_NOTIFY_ANIMATION_LISTENER = 0x200;//二进制 1000000000</p>
-<p>   protected static final int FLAG_USE_CHILD_DRAWING_ORDER = 0x400;//二进制 10000000000</p>
-<p>   //还有更多。</p>
-<p>   if ((flags &amp; FLAG_INVALIDATE_REQUIRED) == FLAG_INVALIDATE_REQUIRED) {<br>     //按为与 两个都为1才为1，所以只有当前flag小于FLAG_INVALIDATE_REQUIRED的时候这个表达式才成立<br>             invalidate(true);<br>         }</p>
-<pre><code>[java-integer-flag-and-bitwise-operations-for-memory-reduction](https://stackoverflow.com/questions/7415590/java-integer-flag-and-bitwise-operations-for-memory-reduction)stackoverflow上有人回答了关于用一个int的flag替代32个boolean的利弊。要点如下:
-&gt; 大多数jvm implementation都以一个int的方式存储boolean
-&gt; 如果一个class里面滥用一大堆boolean，但这个class的实例不过几百个，那么也不会有什么影响
-&gt; 位运算对于cpu来说非常快
-&gt; jdk提供了BitSet，属于一种开箱即用的bit操作工具
+<pre><code class="java">   // Set by default
+   static final int FLAG_CLIP_CHILDREN = 0x1;   //二进制的1
 
-下面是google 关键词 int flag找到的一段java代码。这是代表各种state之间互斥的。
-```java
-public static final int UPPERCASE = 1;  // 0001
+   private static final int FLAG_CLIP_TO_PADDING = 0x2; //二进制的10
+
+   static final int FLAG_INVALIDATE_REQUIRED  = 0x4; //二进制 100
+
+   private static final int FLAG_RUN_ANIMATION = 0x8; //二进制1000
+
+   static final int FLAG_ANIMATION_DONE = 0x10; //二进制 10000
+
+
+   private static final int FLAG_PADDING_NOT_NULL = 0x20;//二进制 100000
+
+   /** @deprecated - functionality removed */
+   private static final int FLAG_ANIMATION_CACHE = 0x40;//二进制 1000000
+
+   static final int FLAG_OPTIMIZE_INVALIDATE = 0x80;//二进制 10000000
+
+   static final int FLAG_CLEAR_TRANSFORMATION = 0x100;//二进制 100000000
+
+   private static final int FLAG_NOTIFY_ANIMATION_LISTENER = 0x200;//二进制 1000000000
+
+
+   protected static final int FLAG_USE_CHILD_DRAWING_ORDER = 0x400;//二进制 10000000000
+
+   //还有更多。
+
+   if ((flags &amp; FLAG_INVALIDATE_REQUIRED) == FLAG_INVALIDATE_REQUIRED) {
+     //按为与 两个都为1才为1，所以只有当前flag小于FLAG_INVALIDATE_REQUIRED的时候这个表达式才成立
+             invalidate(true);
+         }
+</code></pre>
+<p><a href="https://stackoverflow.com/questions/7415590/java-integer-flag-and-bitwise-operations-for-memory-reduction">java-integer-flag-and-bitwise-operations-for-memory-reduction</a>stackoverflow上有人回答了关于用一个int的flag替代32个boolean的利弊。要点如下:</p>
+<blockquote>
+<p>大多数jvm implementation都以一个int的方式存储boolean<br>如果一个class里面滥用一大堆boolean，但这个class的实例不过几百个，那么也不会有什么影响<br>位运算对于cpu来说非常快<br>jdk提供了BitSet，属于一种开箱即用的bit操作工具</p>
+</blockquote>
+<p>下面是google 关键词 int flag找到的一段java代码。这是代表各种state之间互斥的。</p>
+<pre><code class="java">public static final int UPPERCASE = 1;  // 0001
 public static final int REVERSE   = 2;  // 0010
 public static final int FULL_STOP = 4;  // 0100
 public static final int EMPHASISE = 8;  // 1000
@@ -331,7 +376,8 @@ public static String format(String value, int flags)
 
     return value;
 }
-</code></pre><p>可以想象的是，View中一个int，32个小槽子(bit)，每一位都能用来代表isSelected,isFocused,XXX等属性。<br>检查是否有某个flag只需要</p>
+</code></pre>
+<p>可以想象的是，View中一个int，32个小槽子(bit)，每一位都能用来代表isSelected,isFocused,XXX等属性。<br>检查是否有某个flag只需要</p>
 <pre><code class="java">public class BitFlags
 {
     public static boolean isFlagSet(byte value, byte flags)
@@ -353,44 +399,56 @@ public static String format(String value, int flags)
 <ol>
 <li><p>不要迷信位运算，对于一些简单的操作，现代编译器还是能够帮助开发者自动做好优化的。</p>
 </li>
-<li><p>从java7开始，可以在java代码里<a href="https://www.bbsmax.com/A/xl569bA1Jr/">直接写二进制，八进制，十六进制的数字了</a><br>```java<br>//16进制<br>jdk6写法：<br>public static void main(String[] args) {</p>
-<pre><code>  int res = Integer.parseInt(&quot;A&quot;, 16);
-  System.out.println(res);
-</code></pre><p>  }<br>jdk7写法：<br>public static void main(String[] args) {</p>
-<pre><code>  int res = 0xA;
-  System.out.println(res);
-</code></pre><p>  }</p>
+<li><p>从java7开始，可以在java代码里<a href="https://www.bbsmax.com/A/xl569bA1Jr/">直接写二进制，八进制，十六进制的数字了</a></p>
 </li>
 </ol>
-<p>// 8进制<br>jdk6写法:<br> public static void main(String[] args) {</p>
-<pre><code>     int res = Integer.parseInt(&quot;11&quot;,8);
-     System.out.println(res);
- }
-</code></pre><p>jdk7写法:<br>public static void main(String[] args) {</p>
-<pre><code>     int res = 011;
-     System.out.println(res);
- }
-</code></pre><p>//二进制<br>jdk6写法:<br>public static void main(String[] args) {</p>
-<pre><code>     int res = Integer.parseInt(&quot;1100110&quot;, 2);
-     System.out.println(res);
- }
-</code></pre><p>jdk7写法:<br>public static void main(String[] args) {</p>
-<pre><code>     int res = 0b1100110;
-     System.out.println(res);
- }
-</code></pre><pre><code>即：
-二进制： int res = 0b110; 六（0B也行，0b01_10010_0这种加下划线也行）
-八进制： int res = 0110; 七十二
-十六进制： int res = 0xA;  十
+<pre><code class="java">//16进制
+jdk6写法：
+public static void main(String[] args) {
 
-5. View.MeasureSpec就是32位的int
-前2位是mode(能表示四种，够了),后30位是size
-文档的定义是：
-MeasureSpecs are implemented as ints to reduce object allocation. This class
-is provided to pack and unpack the size, mode tuple into the int
-就是为了节省内存，才用的位运算
-```java
-public static class MeasureSpec {
+         int res = Integer.parseInt(&quot;A&quot;, 16);
+         System.out.println(res);
+     }
+jdk7写法：
+public static void main(String[] args) {
+
+         int res = 0xA;
+         System.out.println(res);
+     }
+
+// 8进制
+jdk6写法:
+ public static void main(String[] args) {
+
+         int res = Integer.parseInt(&quot;11&quot;,8);
+         System.out.println(res);
+     }
+jdk7写法:
+public static void main(String[] args) {
+
+         int res = 011;
+         System.out.println(res);
+     }
+
+//二进制
+jdk6写法:
+public static void main(String[] args) {
+
+         int res = Integer.parseInt(&quot;1100110&quot;, 2);
+         System.out.println(res);
+     }
+jdk7写法:
+public static void main(String[] args) {
+
+         int res = 0b1100110;
+         System.out.println(res);
+     }
+</code></pre>
+<p>即：<br>二进制： int res = 0b110; 六（0B也行，0b01_10010_0这种加下划线也行）<br>八进制： int res = 0110; 七十二<br>十六进制： int res = 0xA;  十</p>
+<ol>
+<li>View.MeasureSpec就是32位的int<br>前2位是mode(能表示四种，够了),后30位是size<br>文档的定义是：<br>MeasureSpecs are implemented as ints to reduce object allocation. This class<br>is provided to pack and unpack the size, mode tuple into the int<br>就是为了节省内存，才用的位运算</li>
+</ol>
+<pre><code class="java">public static class MeasureSpec {
        private static final int MODE_SHIFT = 30;
        private static final int MODE_MASK  = 0x3 &lt;&lt; MODE_SHIFT;
 
@@ -407,14 +465,45 @@ public static class MeasureSpec {
 
        public static int getMode(int measureSpec) {
                   //noinspection ResourceType
-                  return (measureSpec &amp; MODE_MASK); //按位与，都是1才能得到1，再加上前面的IndeDef
+                  return (measureSpec &amp; MODE_MASK); //按位与，都是1才能得到1，就是把一个Int的32位中前两位提取出来
               }
 
         public static int getSize(int measureSpec) {
             return (measureSpec &amp; ~MODE_MASK); //按位与加上位非，二进制取反，结果加一
         }      // ~MODE_MASK就是01后面跟30个0，所以等于直接把measureSpec后三十位拿出来转成int。
      }
-</code></pre><p>所以就是一个int存了状态以及大小两部分信息。<br>多说一句measureSpec是在ViewGroup.getChildMeasureSpec里面算出来的，是parent用来跟child交流的，一般用View.resolveSize就知道到底得多大了。</p>
+</code></pre>
+<p>所以就是一个int存了状态以及大小两部分信息。<br>多说一句measureSpec是在ViewGroup.getChildMeasureSpec里面算出来的，是parent用来跟child交流的，一般用View.resolveSize就知道到底得多大了。</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>含义</th>
+<th>数值（二进制）</th>
+<th>具体表现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UNSPECIFIED</td>
+<td>父View不对子View 施加任何约束，子View可以是它想要的任何尺寸</td>
+<td>00 …(30个0)</td>
+<td>系统内部使用</td>
+</tr>
+<tr>
+<td>EXACTLY</td>
+<td>父View已确定子View 的确切大小，子View的大小为父View测量所得的值</td>
+<td>01 …(30个0)</td>
+<td>具体数值、match_parent</td>
+</tr>
+<tr>
+<td>AT_MOST</td>
+<td>父View 指定一个子View可用的最大尺寸值，View大小 不能超过该值。</td>
+<td>10 …(30个0)</td>
+<td>wrap_content</td>
+</tr>
+</tbody>
+</table>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="https://my.oschina.net/xianggao/blog/412967">Java位运算操作全面总结</a></li>
 <li><a href="http://blog.csdn.net/xiaochunyong/article/details/7748713">Java 位运算(移位、位与、或、异或、非）</a></li>
@@ -753,10 +842,6 @@ public static class MeasureSpec {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
@@ -793,15 +878,7 @@ public static class MeasureSpec {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -822,6 +899,18 @@ public static class MeasureSpec {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
               </li>
              
               <li class="article-tag-list-item">

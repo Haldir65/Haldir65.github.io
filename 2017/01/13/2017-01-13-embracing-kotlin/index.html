@@ -16,7 +16,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="Kotlin是Jetbrain公司推出的面向jvm的语言，编译后的bytecode和java编写的代码并没有什么区别。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-03-13T02:30:25.314Z">
+<meta property="og:updated_time" content="2019-03-27T14:13:01.240Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用Kotlin进行java开发">
 <meta name="twitter:description" content="Kotlin是Jetbrain公司推出的面向jvm的语言，编译后的bytecode和java编写的代码并没有什么区别。">
@@ -507,10 +507,67 @@ retrofit.create(ApiStores::class.java) // kotlin写法
 </a>.简单来说，init函数</p>
 <h2 id="19-extends-T怎么写"><a href="#19-extends-T怎么写" class="headerlink" title="19. ? extends T怎么写"></a>19. ? extends T怎么写</h2><p>var lst = ArrayList&lt;Class<out Number>&gt;()<br>lst.add(Noun_Class::class.java)</p>
 <p><a href="https://stackoverflow.com/questions/44276277/constructors-in-kotlin">class的主构造函数中是不能包含任何code逻辑的</a></p>
-<p><a href="https://stackoverflow.com/questions/45267041/not-enough-information-to-infer-parameter-t-with-kotlin-and-android">stackoverflow</a><br>init代码块不是构造函数，同时，init的执行效果要看写在哪一行了，如果在Init中引用了一个propertity，这个属性要是在Init之前就初始化了那倒还好，要是在后面,那么在init调用的时候看到的就是null.</p>
+<p><a href="https://stackoverflow.com/questions/45267041/not-enough-information-to-infer-parameter-t-with-kotlin-and-android">stackoverflow</a><br>init代码块不是构造函数，同时，init的执行效果要看写在哪一行了，如果在Init中引用了一个propertity，这个属性要是在Init之前就初始化了那倒还好，要是在后面,那么在init调用的时候看到的就是null.(其实编辑器这时候就会警告的)</p>
+<pre><code class="js">class Person {
+
+    /*主构造*/
+    constructor() {
+        println(&quot;constructor1&quot;)
+    }
+
+    /*属性*/
+    private var gender: Boolean = true
+
+    /*伴生对象*/
+    companion object {
+        val instance: Person by lazy {
+            Person(&quot;yzq&quot;, 26)
+        }
+
+        /*伴生对象中的初始化代码*/
+        init {
+            println(&quot;companion init 1&quot;)
+        }
+
+        init {
+            println(&quot;companion init 2&quot;)
+        }
+    }
+
+    /*次构造方法*/
+    constructor(name: String, age: Int) : this() {
+        println(&quot;constructor2&quot;)
+    }
+
+    /*初始化代码块*/
+    init {
+        println(&quot;Person init 2,gender:${gender}&quot;)
+    }
+
+    /*初始化代码块*/
+    init {
+        println(&quot;Person init 1&quot;)
+    }
+}
+</code></pre>
+<p>初始化的时候打印结果:<br>companion init 1<br>companion init 2<br>Person init 2,gender:true<br>Person init 1<br>constructor1<br>constructor2<br>自己感受下这个顺序</p>
 <pre><code class="js">@Insert
 fun insertAll(vararg users: User) //这个vararg等于java里面的...就是一个数组的意思
 </code></pre>
+<h2 id="forEach在Android上可能会崩"><a href="#forEach在Android上可能会崩" class="headerlink" title="forEach在Android上可能会崩"></a>forEach在Android上可能会崩</h2><pre><code class="js">fun test1(){
+    hashMapOf(&quot;a&quot; to &quot;b&quot;).forEach { t, u -&gt;
+
+    }
+}
+
+
+fun test2(){
+    hashMapOf(&quot;a&quot; to &quot;b&quot;).forEach { (t, u) -&gt;
+
+    }
+}
+</code></pre>
+<p>test1使用的是java 8的BiConsumer，在低版本(api 24以下)会崩，第二种使用的是常规的Iterator方法</p>
 <h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ol>
 <li><a href="https://www.youtube.com/watch?v=mDpnc45WwlI&amp;index=10&amp;list=PLnVy79PaFHMXJha06t6pWfkYcATV4oPvC">Kotlin in production</a></li>
 <li><a href="https://www.youtube.com/watch?v=YKzUbeUtTak">10 Kotlin Tricks in 10 ish minutes by Jake Wharton</a>​</li>
@@ -858,10 +915,6 @@ fun insertAll(vararg users: User) //这个vararg等于java里面的...就是一�
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
@@ -898,15 +951,7 @@ fun insertAll(vararg users: User) //这个vararg等于java里面的...就是一�
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -927,6 +972,18 @@ fun insertAll(vararg users: User) //这个vararg等于java里面的...就是一�
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
               </li>
              
               <li class="article-tag-list-item">

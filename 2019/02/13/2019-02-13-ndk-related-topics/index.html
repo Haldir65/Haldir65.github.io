@@ -17,7 +17,7 @@
 <meta property="og:description" content="android中ndk及jni编写注意事项（本文主要讲CMake）">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/ShanwangpingKarst_EN-AU5360258756_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-03-13T02:30:25.330Z">
+<meta property="og:updated_time" content="2019-03-27T14:13:01.252Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ndk入门笔记">
 <meta name="twitter:description" content="android中ndk及jni编写注意事项（本文主要讲CMake）">
@@ -350,7 +350,7 @@ target_link_libraries( native-lib //这个是我们自己的lib的名字
         *将任意格式的视频在手机上进行播放，使用native进行绘制
         * env:虚拟机指针
         * inputStr：视频文件路径
-        * surface: 从java层传递过来的SurfaceView的serface对象 
+        * surface: 从java层传递过来的SurfaceView的surface对象 
         */
     void ffmpegVideoPlayer(JNIEnv *env, char *inputStr, jobject surface) {
         // 1.注册各大组件，执行ffmgpe都必须调用此函数
@@ -368,7 +368,7 @@ target_link_libraries( native-lib //这个是我们自己的lib的名字
             return;
         }
         //5.用来记住视频流的索引
-        int vedio_stream_idx = -1;
+        int video_stream_idx = -1;
         //从上下文中寻找找到视频流
         for (int i = 0; i &lt; pContext-&gt;nb_streams; ++i) {
             LOGE(&quot;循环  %d&quot;, i);
@@ -376,12 +376,12 @@ target_link_libraries( native-lib //这个是我们自己的lib的名字
             //codec_type：流的类型
             if (pContext-&gt;streams[i]-&gt;codec-&gt;codec_type == AVMEDIA_TYPE_VIDEO) {
                 //如果找到的流类型 == AVMEDIA_TYPE_VIDEO 即视频流，就将其索引保存下来
-                vedio_stream_idx = i;
+                video_stream_idx = i;
             }
         }
 
         //获取到解码器上下文
-        AVCodecContext *pCodecCtx = pContext-&gt;streams[vedio_stream_idx]-&gt;codec;
+        AVCodecContext *pCodecCtx = pContext-&gt;streams[video_stream_idx]-&gt;codec;
         //获取解码器（加密视频就是在此处无法获取）
         AVCodec *pCodex = avcodec_find_decoder(pCodecCtx-&gt;codec_id);
         LOGE(&quot;获取视频编码 %p&quot;, pCodex);
@@ -428,7 +428,7 @@ target_link_libraries( native-lib //这个是我们自己的lib的名字
         int length = 0;
         int got_frame;
         while (av_read_frame(pContext, packet) &gt;= 0) {//开始读每一帧的数据
-            if (packet-&gt;stream_index == vedio_stream_idx) {//如果这是一个视频流
+            if (packet-&gt;stream_index == video_stream_idx) {//如果这是一个视频流
                 //7.解封装（将packet解压给frame，即：拿到了视频数据frame）
                 length = avcodec_decode_video2(pCodecCtx, frame, &amp;got_frame, packet);//解封装函数
                 LOGE(&quot; 获得长度   %d 解码%d  &quot;, length, frameCount++);
@@ -907,10 +907,6 @@ echo &quot;-------- End --------&quot;
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
@@ -947,15 +943,7 @@ echo &quot;-------- End --------&quot;
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -976,6 +964,18 @@ echo &quot;-------- End --------&quot;
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
               </li>
              
               <li class="article-tag-list-item">

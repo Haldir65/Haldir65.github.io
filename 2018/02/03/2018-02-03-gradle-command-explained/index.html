@@ -14,7 +14,9 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/street lights dark night car city.jpg">
-<meta property="og:updated_time" content="2019-03-13T02:30:25.326Z">
+<meta property="og:image" content="https://www.haldir66.ga/static/imgs/debug_android_gradle_plugin_1.png">
+<meta property="og:image" content="https://www.haldir66.ga/static/imgs/debug_android_gradle_plugin_2.png">
+<meta property="og:updated_time" content="2019-03-27T14:13:01.248Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="gradle command记事本">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/street lights dark night car city.jpg">
@@ -597,7 +599,32 @@ gradle.taskGraph.afterTask { Task task, TaskState state -&gt;
         }
     }
 </code></pre>
-<p><a href="https://github.com/adwiv/android-fat-aar">比较复杂的gradle knowledge</a><br><a href="https://guides.gradle.org/creating-new-gradle-builds/">official gradle docs 是最好的学习资料</a><br><a href="https://docs.gradle.org/current/userguide/custom_plugins.html">custom_plugins</a><br><a href="https://docs.gradle.org/current/userguide/tutorial_using_tasks.html#configure-by-dag">Build Script Basics</a><br><a href="https://juejin.im/post/5a756f11f265da4e7c185bc5">关于Android Gradle你需要知道这些（4）</a><br><a href="https://juejin.im/post/5a767c7cf265da4e9c6300a1#heading-5">Gradle插件学习笔记（四)</a><br><a href="https://android.googlesource.com/platform/tools/build/+/tools_r22/gradle/src/main/groovy/com/android/build/gradle/BasePlugin.groovy">Android Gradle Plugin  source Code</a></p>
+<p><a href="https://fucknmb.com/2017/07/05/又掌握了一项新技能-断点调试Gradle插件/">如何debug gradle plugin</a><br>在命令行里<br>./gradlew clean assembleDebug -Dorg.gradle.daemon=false -Dorg.gradle.debug=true //一个是noDaemon 一个是debug=true (这段输入后命令行会卡在这里等debugger attach上来)<br>然后照着在studio里面添加一个remote debug.<br>然后点击这个debug按钮<br>Listening for transport dt_socket at address: 5005 //这个是在等着<br>To honour the JVM settings for this build a new JVM will be forked. Please consider using the daemon: <a href="https://docs.gradle.org/4.10.1/userguide/gradle_daemon.html">https://docs.gradle.org/4.10.1/userguide/gradle_daemon.html</a>. //这个是点了一次那个debug按钮<br>Daemon will be stopped at the end of the build stopping after processing //这个是我又点了一次之后，终于开始运行了(要点两次。。。)<br>效果是酱紫的<br><img src="https://www.haldir66.ga/static/imgs/debug_android_gradle_plugin_1.png" alt=""><br><img src="https://www.haldir66.ga/static/imgs/debug_android_gradle_plugin_2.png" alt=""> </p>
+<pre><code class="java">public class PluginImpl implements Plugin&lt;Project&gt; {
+    void apply(Project project) {
+        project.task(&#39;testTask&#39;).doLast{
+            println &quot;Hello gradle plugin&quot; 
+        }
+
+        project.afterEvaluate {
+            project.logger.error &quot;afterEvaluated&quot; //这个先执行
+            if (project.plugins.hasPlugin(&quot;com.android.application&quot;)) {
+                def android = project.extensions.getByName(&quot;android&quot;)
+                android.applicationVariants.all {ApplicationVariantImpl variant -&gt; //这里会冒出来debug和release的两种variant，似乎android gradle plugin 在3.5的时候会设定lazyTask,就是这里只会有一个debug
+                    project.logger.error &quot;DebuggerPlugin:${variant}&quot;
+                    ApplicationVariantData apkVariantData = variant.getProperty(&#39;variantData&#39;)
+                    ApplicationVariantData variantData = variant.getVariantData()
+                    TestVariant testVariant = variant.getTestVariant()
+                    UnitTestVariant unitTestVariant = variant.getUnitTestVariant()
+                }
+            }
+        }
+    }
+}
+</code></pre>
+<h3 id="error"><a href="#error" class="headerlink" title="error"></a>error</h3><p>One of the classes is an explicit generated class using the class statement, the other is a class generated from the script body based on the file name. Solutions are to change the file name or to change the class name.</p>
+<p><a href="https://www.moreofless.co.uk/invalid-duplicate-class-definition-error-groovy/">出现错误的原因是在class外面还写了语句</a></p>
+<p><a href="https://github.com/adwiv/android-fat-aar">比较复杂的gradle knowledge</a><br><a href="https://guides.gradle.org/creating-new-gradle-builds/">official gradle docs 是最好的学习资料</a><br><a href="https://docs.gradle.org/current/userguide/custom_plugins.html">custom_plugins</a><br><a href="https://docs.gradle.org/current/userguide/tutorial_using_tasks.html#configure-by-dag">Build Script Basics</a><br><a href="https://juejin.im/post/5a756f11f265da4e7c185bc5">关于Android Gradle你需要知道这些（4）</a><br><a href="https://juejin.im/post/5a767c7cf265da4e9c6300a1#heading-5">Gradle插件学习笔记（四)</a><br><a href="https://android.googlesource.com/platform/tools/build/+/tools_r22/gradle/src/main/groovy/com/android/build/gradle/BasePlugin.groovy">Android Gradle Plugin  source Code</a><br><a href="https://mvnrepository.com/artifact/com.android.tools.build/gradle-api?repo=google">gradle api</a>挪到google()仓库了</p>
 
       
 
@@ -917,10 +944,6 @@ gradle.taskGraph.afterTask { Task task, TaskState state -&gt;
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
@@ -957,15 +980,7 @@ gradle.taskGraph.afterTask { Task task, TaskState state -&gt;
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -986,6 +1001,18 @@ gradle.taskGraph.afterTask { Task task, TaskState state -&gt;
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
               </li>
              
               <li class="article-tag-list-item">

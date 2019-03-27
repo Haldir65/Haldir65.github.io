@@ -17,7 +17,7 @@
 <meta property="og:description" content="根据网上的大部分博客的分类，集合框架分为Collections(具有类似数组的功能)和Map(存储键值对)这两大部分。针对jdk1.8的java.util里面的一些常用的或者不常用的集合做一些分析。写这篇文章的过程中，我慢慢发现不同版本jdk的同一个class的实现是有一些差异的(LinkedList)，由于对照的是java1.8的代码，里面会多一些since 1.8的代码，这里不作论述。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg">
-<meta property="og:updated_time" content="2019-03-13T02:30:25.318Z">
+<meta property="og:updated_time" content="2019-03-27T14:13:01.240Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java集合类的一些整理">
 <meta name="twitter:description" content="根据网上的大部分博客的分类，集合框架分为Collections(具有类似数组的功能)和Map(存储键值对)这两大部分。针对jdk1.8的java.util里面的一些常用的或者不常用的集合做一些分析。写这篇文章的过程中，我慢慢发现不同版本jdk的同一个class的实现是有一些差异的(LinkedList)，由于对照的是java1.8的代码，里面会多一些since 1.8的代码，这里不作论述。">
@@ -245,6 +245,58 @@ public void trimToSize() // 内存压力大的时候可以释放掉一部分内�
 <blockquote>
 <p>和Vector不同，ArrayList中的操作不是线程安全的！所以，建议在单线程中才使用ArrayList，而在多线程中可以选择Vector或者CopyOnWriteArrayList。</p>
 </blockquote>
+<p>CopyOnWriteArrayList的get操作是通过将elements声明为volatile，而修改(增删改)则是通过修改(copyOf(原来的List)，完事CAS去设置object，所以修改的比较多的话会导致大量的memory copy，性能差一点)</p>
+<p>时间复杂度问题：直接看javadoc怎么说的:<br>The size, isEmpty, get, set, iterator, and listIterator operations run in constant time. The add operation runs in amortized constant time, that is, adding n elements requires O(n) time. All of the other operations run in linear time (roughly speaking). The constant factor is low compared to that for the LinkedList implementation.</p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Array</th>
+<th>ArrayList</th>
+<th>Singly Linked List</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Read (any where)</td>
+<td>O(1)</td>
+<td>O(1)</td>
+<td>O(n)</td>
+</tr>
+<tr>
+<td>Add/Remove at end</td>
+<td>O(1)</td>
+<td>O(1)</td>
+<td>O(n)</td>
+</tr>
+<tr>
+<td>Add/Remove in the interior</td>
+<td>O(n)</td>
+<td>O(n)</td>
+<td>O(n)</td>
+</tr>
+<tr>
+<td>Resize</td>
+<td>O(n)</td>
+<td>N/A</td>
+<td>N/A</td>
+</tr>
+<tr>
+<td>Find By position</td>
+<td>O(1)</td>
+<td>O(1)</td>
+<td>O(n)</td>
+</tr>
+<tr>
+<td>Find By target (value)</td>
+<td>O(n)</td>
+<td>O(n)</td>
+<td>O(n)</td>
+</tr>
+</tbody>
+</table>
+<p><a href="http://www.haobanfa.info/array-arraylist-linked-list时间复杂度对比图/">图表参考</a></p>
+<p>HashMapput操作的时间复杂度理论上来说当然是O(1)，但是实际上还有很多时间开销的，比如hash碰撞，另外hash的计算也要耗费CPU时间。所以一般我们认为它的时间复杂度是常数级的。</p>
 <h3 id="1-2-LinkedList的一些点"><a href="#1-2-LinkedList的一些点" class="headerlink" title="1.2 LinkedList的一些点"></a>1.2 LinkedList的一些点</h3><p>LinkedList是双向链表实现的，可以想象成一帮小孩左手拉右手绕成一个圈，只不过这里面的每一个小孩并不是你放进去的 T 类型数据，而是一个Node<T> 。所以LinkedList是可以放进去一个Null的。<br>LinkedList往往被人诟病的就是除了添加和删除快之外，get和set很慢。<br>来看下add的实现（jdk 1.8）</p>
 <pre><code class="java">   public boolean add(E e) {
         linkLast(e);
@@ -785,7 +837,7 @@ Vector属于List,线程安全，但效率低（就是简单的在所有方法前
 
 Queue是一个interface，属于两端可以出入的List，通常是(FIFO模式)，实现类有
 PriorityQueue，
-java.util.concurrent.LinkedBlockingQueue
+java.util.concurrent.ArrayBlockingQueue
 java.util.concurrent.LinkedBlockingQueue
 java.util.concurrent.PriorityBlockingQueue
 作者都是大名鼎鼎的Doug Lea
@@ -795,7 +847,7 @@ Stack是Vector的子类(属于LIFO的栈)
 The Stack class represents a last-in-first-out (LIFO) stack of object
 
 Deque(双端队列)
-</code></pre><h3 id="5-concurrentHashMap等"><a href="#5-concurrentHashMap等" class="headerlink" title="5. concurrentHashMap等"></a>5. concurrentHashMap等</h3><p>jdk1.8的concurrentHashMap不是用synchronized实现的，是Doug Lea使用CAS操作写的，非常高效。</p>
+</code></pre><h3 id="5-concurrentHashMap等"><a href="#5-concurrentHashMap等" class="headerlink" title="5. concurrentHashMap等"></a>5. concurrentHashMap等</h3><p>jdk1.8的concurrentHashMap不是用synchronized实现的，是Doug Lea使用CAS操作写的，非常高效。<br>concurrentHashMap的原理是分段锁(jdk 1.7)</p>
 <h3 id="6-WeakHaskMap"><a href="#6-WeakHaskMap" class="headerlink" title="6. WeakHaskMap"></a>6. WeakHaskMap</h3><p>WeakHashMap的Key是WeakReference，但Value不是。<br>常见用法</p>
 <pre><code class="java">String a = &quot;a&quot;;
 map.put(1,a);
@@ -1160,10 +1212,6 @@ a = null;
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
@@ -1200,15 +1248,7 @@ a = null;
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
+                <a href="javascript:void(0)" class="js-tag color5">algorithm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1229,6 +1269,18 @@ a = null;
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
               </li>
              
               <li class="article-tag-list-item">
