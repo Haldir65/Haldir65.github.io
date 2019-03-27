@@ -17,7 +17,7 @@
 <meta property="og:description" content="linode的docs里面是这么介绍的  nginx is a lightweight, high performance web server designed to deliver large amounts of static content quickly with efficient use of system resources. nginx’s strong point is its">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery151110073841.jpg">
-<meta property="og:updated_time" content="2019-03-27T14:13:01.248Z">
+<meta property="og:updated_time" content="2019-03-27T16:04:40.619Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Nginx使用记录">
 <meta name="twitter:description" content="linode的docs里面是这么介绍的  nginx is a lightweight, high performance web server designed to deliver large amounts of static content quickly with efficient use of system resources. nginx’s strong point is its">
@@ -379,38 +379,41 @@ location /static/ {
 ##这才是/var/www/app/static目录
 </code></pre>
 <p><a href="https://stackoverflow.com/questions/10631933/nginx-static-file-serving-confusion-with-root-alias">location里面写root还是alias</a></p>
-<p><a href="http://blog.51cto.com/nolinux/1317109">那alias标签和root标签到底有哪些区别呢？</a><br>1、alias后跟的指定目录是准确的,并且末尾必须加“/”，否则找不到文件</p>
+<p><a href="http://blog.51cto.com/nolinux/1317109">那alias标签和root标签到底有哪些区别呢？</a></p>
+<ol>
+<li>alias后跟的指定目录是准确的,并且末尾必须加“/”，否则找不到文件</li>
+</ol>
 <pre><code class="Nginx">location /c/ {
       alias /a/
 }
-```Nginx
-如果访问站点http://location/c ，访问的就是/a/目录下的站点信息。
-2、root后跟的指定目录是上级目录，并且该上级目录下要含有和location后指定名称的同名目录才行，末尾“/”加不加无所谓。
 </code></pre>
-<p>location /c/ {<br>      root /a/<br>}</p>
-<pre><code>如果访问站点http://location/c，访问的就是/a/c目录下的站点信息。
-3、一般情况下，在location /中配置root，在location /other中配置alias是一个好习惯。
-
-在windows平台下这么写
-</code></pre><p>location / {<br>           root D:/VDownload;<br>           index index.html index.htm;<br>       }</p>
-<pre><code>&gt; nginx -s reload 然后重启nginx
-
-
-### 4.4 Nginx软链接
-目测不能用软链接
-
-
-###4.5 Nginx通过CORS实现跨域
-在nginx.conf里找到server项,并在里面添加如下配置
-```Nginx
-location / {
+<p>如果访问站点<a href="http://location/c">http://location/c</a> ，访问的就是/a/目录下的站点信息。</p>
+<p>2、root后跟的指定目录是上级目录，并且该上级目录下要含有和location后指定名称的同名目录才行，末尾“/”加不加无所谓。</p>
+<pre><code class="Nginx">location /c/ {
+      root /a/
+}
+</code></pre>
+<p>如果访问站点<a href="http://location/c，访问的就是/a/c目录下的站点信息。">http://location/c，访问的就是/a/c目录下的站点信息。</a></p>
+<p>3.一般情况下，在location /中配置root，在location /other中配置alias是一个好习惯。</p>
+<p>在windows平台下可以这么写</p>
+<pre><code>location / {
+           root D:/VDownload;
+           index index.html index.htm;
+       }
+</code></pre><blockquote>
+<p>nginx -s reload 然后重启nginx</p>
+</blockquote>
+<h3 id="4-4-Nginx软链接"><a href="#4-4-Nginx软链接" class="headerlink" title="4.4 Nginx软链接"></a>4.4 Nginx软链接</h3><p>目测不能用软链接</p>
+<h3 id="4-5-Nginx通过CORS实现跨域"><a href="#4-5-Nginx通过CORS实现跨域" class="headerlink" title="4.5 Nginx通过CORS实现跨域"></a>4.5 Nginx通过CORS实现跨域</h3><p>在nginx.conf里找到server项,并在里面添加如下配置</p>
+<pre><code class="Nginx">location / {
     add_header &#39;Access-Control-Allow-Origin&#39; &#39;http://example.com&#39;;
     add_header &#39;Access-Control-Allow-Credentials&#39; &#39;true&#39;;
     add_header &#39;Access-Control-Allow-Headers&#39; &#39;Authorization,Content-Type,Accept,Origin,User-Agent,DNT,Cache-Control,X-Mx-ReqToken,X-Requested-With&#39;;
     add_header &#39;Access-Control-Allow-Methods&#39; &#39;GET,POST,OPTIONS&#39;;
     ...
 }
-</code></pre><p>但上述配置只能实现允许一个domain或者*实现跨域，Nginx允许多个域名跨域访问<br>在location context的上层添加</p>
+</code></pre>
+<p>但上述配置只能实现允许一个domain或者*实现跨域，Nginx允许多个域名跨域访问<br>在location context的上层添加</p>
 <pre><code class="Nginx">map $http_origin $corsHost {
     default 0;
     &quot;~http://www.example.com&quot; http://www.example.com;
@@ -486,7 +489,6 @@ server {
 <pre><code class="Nginx">server {
     client_body_timeout 5s;
     client_header_timeout 5s;
-    # ...
 }
 </code></pre>
 <h3 id="4-黑名单"><a href="#4-黑名单" class="headerlink" title="4. 黑名单"></a>4. 黑名单</h3><pre><code class="Nginx">// 123.123.123.1 through 123.123.123.16 拉黑
@@ -535,16 +537,26 @@ upstream website {
 </code></pre>
 <h3 id="5-2-Nginx模块"><a href="#5-2-Nginx模块" class="headerlink" title="5.2 Nginx模块"></a>5.2 Nginx模块</h3><p>http_image_filter_module（图片裁剪模块）<br>首先查看是否已安装http_image_filter_module模块</p>
 <blockquote>
-<p>nginx -V<br>/etc/nginx/nginx.conf文件添加<br>```Nginx<br>location /image {<br>           alias “/imgdirectory/“; </p>
-<pre><code>        ## 这样直接输入 yourip/image/imgname.jpg就能返回原始图片
-</code></pre><p>}<br>location ~<em> (.</em>.(jpg|jpeg|gif|png))!(.<em>)!(.</em>)$ {  ## 这个是匹配全站图片资源<br>                set $width      $3;<br>                set $height     $4;<br>                rewrite “(.<em>.(jpg|jpeg|gif|png))(.</em>)$” $1;  ## 这样输入 yourip/image/imgname.jpg!200!200就能返回200*200的图片<br>}  </p>
+<p>nginx -V<br>/etc/nginx/nginx.conf文件添加</p>
 </blockquote>
-<p>location ~<em> /imgs/.</em>.(jpg|jpeg|gif|png|jpeg)$ {<br>            root “/var/www/“;<br>          image_filter resize $width $height;<br>}</p>
-<pre><code>亲测上述可行，python也有类似库[thumbor](https://github.com/thumbor/thumbor)
+<pre><code class="Nginx">location /image {
+           alias &quot;/imgdirectory/&quot;; 
+            ## 这样直接输入 yourip/image/imgname.jpg就能返回原始图片
+}
+location ~* (.*\.(jpg|jpeg|gif|png))!(.*)!(.*)$ {  ## 这个是匹配全站图片资源
+                set $width      $3;  
+                set $height     $4;  
+                rewrite &quot;(.*\.(jpg|jpeg|gif|png))(.*)$&quot; $1;  ## 这样输入 yourip/image/imgname.jpg!200!200就能返回200*200的图片
+}  
 
-关于正则匹配：
-```Nginx
-## 比如匹配全站所有的结尾图片
+location ~* /imgs/.*\.(jpg|jpeg|gif|png|jpeg)$ {  
+            root &quot;/var/www/&quot;;
+          image_filter resize $width $height;  
+}
+</code></pre>
+<p>亲测上述可行，python也有类似库<a href="https://github.com/thumbor/thumbor">thumbor</a></p>
+<p>关于正则匹配：</p>
+<pre><code class="Nginx">## 比如匹配全站所有的结尾图片
 location ~* \.(jpg|gif|png)$ {
                image_filter resize 500 500;
        }
@@ -553,7 +565,8 @@ location ~* \.(jpg|gif|png)$ {
 location ~* /image/.*\.(jpg|gif|png)$ {
             image_filter resize 500 500;
     }
-</code></pre><p>更多直接google吧。<br>关于这个var/www目录，按照惯例，这个目录里面就应该放example.com,anothersite.com,myblog.com,…这种根据一个个site名来放置资源和html文件。一个文件夹里放一个site相关的资源，当然这只是惯例。</p>
+</code></pre>
+<p>更多直接google吧。<br>关于这个var/www目录，按照惯例，这个目录里面就应该放example.com,anothersite.com,myblog.com,…这种根据一个个site名来放置资源和html文件。一个文件夹里放一个site相关的资源，当然这只是惯例。</p>
 <h3 id="添加黑名单"><a href="#添加黑名单" class="headerlink" title="添加黑名单"></a>添加黑名单</h3><pre><code class="bash">##获取各个IP访问次数
 
 awk &#39;{print $1}&#39; nginx.access.log |sort |uniq -c|sort -n
@@ -1298,15 +1311,15 @@ limit_conn addr 30;
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Window</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1342,10 +1355,6 @@ limit_conn addr 30;
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
@@ -1371,6 +1380,10 @@ limit_conn addr 30;
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">sql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
               </li>
              
               <li class="article-tag-list-item">
