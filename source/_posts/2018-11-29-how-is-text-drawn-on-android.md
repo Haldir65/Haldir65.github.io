@@ -26,6 +26,20 @@ Layout有BoringLayout(一行文字),StaticLayout(多行文字)和DynamicLayout(�
 在某些版本的Android上，TextView碰到中英文夹杂的时候，会出现提前换行(普遍的看法是Layout这个类里面处理全角符号的时候算错了)
 
 
+ActivityThread里面有一个freeTextLayoutCachesIfNeeded方法
+```java
+    static void freeTextLayoutCachesIfNeeded(int configDiff) {
+        if (configDiff != 0) {
+            // Ask text layout engine to free its caches if there is a locale change
+            boolean hasLocaleConfigChange = ((configDiff & ActivityInfo.CONFIG_LOCALE) != 0);
+            if (hasLocaleConfigChange) {
+                Canvas.freeTextLayoutCaches();
+                if (DEBUG_CONFIGURATION) Slog.v(TAG, "Cleared TextLayout Caches");
+            }
+        }
+    }
+```
+
 ## 参考
 [Textview的高度ascent,descent这些的详细解说](https://stackoverflow.com/questions/27631736/meaning-of-top-ascent-baseline-descent-bottom-and-leading-in-androids-font)
 [TextView预渲染研究](http://ragnraok.github.io/textview-pre-render-research.html)

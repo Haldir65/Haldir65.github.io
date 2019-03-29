@@ -373,6 +373,11 @@ if (willScale && decodeMode != SkImageDecoder::kDecodeBounds_Mode) {
 最终的大小就是
 > scaledWidth*scaledHeight*4
 
+一张522*686的PNG 图片，我把它放到 drawable-xxhdpi 目录下，在三星s6上加载，占用内存2547360B，其中 density 对应 xxhdpi 为480，targetDensity 对应三星s6的密度为640：
+
+（实际长/xxxhdpi文件夹对应的值）* 手机dpi * (实际宽/xxxhdpi文件夹对应的值) * 4
+522/480 * 640 * 686/480 *640 * 4 = 2546432B（同样一张图片，放在xxxhdpi占用内存< 放在xxhdpi < 放在xhdpi,经验之谈，放在xxxhdpi是一种降低内存占用的方式）
+
 [一篇研究bitmap存储位置的文章，讲到cpp层](https://kotlintc.com/articles/3875?fr=sidebar)。
 
 

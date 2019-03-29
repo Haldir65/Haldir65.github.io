@@ -120,7 +120,9 @@ java代码里添加一句
 fitSystemWindows属性：
 官方描述:
 Boolean internal attribute to adjust view layout based on system windows such as the status bar. If true, adjusts the padding of this view to leave space for the system windows. Will only take effect if this view is in a non-embedded activity.
-简单来说就是如果设置为true,机会根据statusbar来添加一个padding.
+简单来说就是如果设置为true,在设置了透明状态栏或者导航栏时，此view的所有padding属性失效(透明状态栏的话，paddingTop等于状态栏高度；透明导航栏的话，paddingBootm等于NavigationBar的高度)
+
+
 假定:
 布局文件只是一个普通的LinearLayout(fitSystemWindow = false（默认情况）),顶部include一个toolbar(fitSystemWindow = true )
 就已经可以实现4.4以下，4.4-5.0，5.0以上的各种场景了,(前提，使用Appcompat 的Theme，因为它会使用colorPrimaryDark为statusBar着色)
