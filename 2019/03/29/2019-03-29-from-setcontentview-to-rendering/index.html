@@ -23,7 +23,7 @@
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/window_manager_07.png">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/window_manager_06.png">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/window_manager_03.jpeg">
-<meta property="og:updated_time" content="2019-04-02T06:51:17.571Z">
+<meta property="og:updated_time" content="2019-04-02T17:31:04.026Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从setContentView开始谈的渲染流程">
 <meta name="twitter:description" content="谈一谈View的渲染流程吧">
@@ -754,7 +754,105 @@ public void showAtLocation(View parent, int gravity, int x, int y) {
     }
 </code></pre>
 <h3 id="Toast"><a href="#Toast" class="headerlink" title="Toast"></a>Toast</h3><p>用IPC往NotificationManagerService的一个队列中添加一个runnable，系统全局所有应用的Toast请求都被添加到这里，排队，一个个来，远程再回调app进程的Toast.TN(extends ITransientNotification.Stub)的handleShow方法去添加一个type为WindowManager.LayoutPrams.TYPE_TOAST的view。<br>当然，时间到了远程还会回调cancelToast去用WMS移除View。</p>
-<h3 id="measure"><a href="#measure" class="headerlink" title="measure"></a>measure</h3><h3 id="layout"><a href="#layout" class="headerlink" title="layout"></a>layout</h3><h3 id="draw"><a href="#draw" class="headerlink" title="draw"></a>draw</h3><h3 id="Choregrapher"><a href="#Choregrapher" class="headerlink" title="Choregrapher"></a>Choregrapher</h3><p>Choregrapher里面有一个内部类FrameDisplayEventReceiver(继承自DisplayEventReceiver，DisplayEventReceiver是一个没有抽象方法的抽象类)，主要提供两个方法nativeScheduleVsync和onVsync。<br>FrameDisplayEventReceiver在onVsync的时候会post一个异步(也就是说不受syncBarrier阻拦)的消息到主线程上去调用Choregrapher的doFrame（这里面就是把之前所有通过Choregrapher.postCallback添加到队列的事件拿出来，到期了就执行）</p>
+<h2 id="doTraversal"><a href="#doTraversal" class="headerlink" title="doTraversal"></a>doTraversal</h2><p>ViewRootImpl中的doTraversal可以分成三件事</p>
+<p>mView.performMeasure<br>mView.performLayout<br>mView.performDraw</p>
+<p>这里的mView也就是DecorView了</p>
+<h3 id="measure"><a href="#measure" class="headerlink" title="measure"></a>measure</h3><pre><code class="java">//onMeasure里的两个参数witdthMeasureSpec和heightMeasureSpec是怎么来的
+  @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+
+    }
+
+//ViewGroup.java中有这么一段
+protected void measureChildWithMargins(View child,
+        int parentWidthMeasureSpec, int widthUsed,
+        int parentHeightMeasureSpec, int heightUsed) {
+    final MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
+
+    final int childWidthMeasureSpec = getChildMeasureSpec(parentWidthMeasureSpec,
+            mPaddingLeft + mPaddingRight + lp.leftMargin + lp.rightMargin
+                    + widthUsed, lp.width);
+    final int childHeightMeasureSpec = getChildMeasureSpec(parentHeightMeasureSpec,
+            mPaddingTop + mPaddingBottom + lp.topMargin + lp.bottomMargin
+                    + heightUsed, lp.height);
+
+    child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
+}
+
+//ViewGroup.java
+public static int getChildMeasureSpec(int spec, int padding, int childDimension) { //这个childDimension就是lp.width或者lp.height
+    int specMode = MeasureSpec.getMode(spec);
+    int specSize = MeasureSpec.getSize(spec);
+
+    int size = Math.max(0, specSize - padding); 
+    //所以这个size就是当前这个viewGroup的measureSpec中的size-viewgroup的padding-child.lp.margin之后的值
+
+    int resultSize = 0;
+    int resultMode = 0;
+
+    switch (specMode) {
+    // Parent has imposed an exact size on us
+    case MeasureSpec.EXACTLY:
+        if (childDimension &gt;= 0) { //如果自己是EXACTLY，child的lp.width或者lp.height&gt;0的话，生成一个size为dimension只，mode为EXACTLY的 spec
+            resultSize = childDimension;
+            resultMode = MeasureSpec.EXACTLY;
+        } else if (childDimension == LayoutParams.MATCH_PARENT) {
+            // Child wants to be our size. So be it.
+            resultSize = size;
+            resultMode = MeasureSpec.EXACTLY;
+        } else if (childDimension == LayoutParams.WRAP_CONTENT) {
+            // Child wants to determine its own size. It can&#39;t be
+            // bigger than us.
+            resultSize = size;
+            resultMode = MeasureSpec.AT_MOST;
+        }
+        break;
+
+    // Parent has imposed a maximum size on us
+    case MeasureSpec.AT_MOST:
+        if (childDimension &gt;= 0) {
+            // Child wants a specific size... so be it
+            resultSize = childDimension;
+            resultMode = MeasureSpec.EXACTLY;
+        } else if (childDimension == LayoutParams.MATCH_PARENT) {
+            // Child wants to be our size, but our size is not fixed.
+            // Constrain child to not be bigger than us.
+            resultSize = size;
+            resultMode = MeasureSpec.AT_MOST;
+        } else if (childDimension == LayoutParams.WRAP_CONTENT) {
+            // Child wants to determine its own size. It can&#39;t be
+            // bigger than us.
+            resultSize = size;
+            resultMode = MeasureSpec.AT_MOST;
+        }
+        break;
+    return MeasureSpec.makeMeasureSpec(resultSize, resultMode);
+}
+</code></pre>
+<h3 id="layout"><a href="#layout" class="headerlink" title="layout"></a>layout</h3><p>这里就是调用onLayout方法了，FrameLayout会根据child的Gravity横向或者纵向摆放。LinearLayout会根据自己的orientation，从上到下或者从左到右进行摆放。</p>
+<h3 id="draw"><a href="#draw" class="headerlink" title="draw"></a>draw</h3><pre><code class="java">public void draw(Canvas canvas) {
+  . . . 
+  // 绘制背景，只有dirtyOpaque为false时才进行绘制，下同
+  int saveCount;
+  if (!dirtyOpaque) {
+    drawBackground(canvas);
+  }
+
+  . . . 
+
+  // 绘制自身内容
+  if (!dirtyOpaque) onDraw(canvas);
+
+  // 绘制子View
+  dispatchDraw(canvas);
+
+   . . .
+  // 绘制滚动条等
+  onDrawForeground(canvas);
+
+}
+</code></pre>
+<h3 id="Choregrapher"><a href="#Choregrapher" class="headerlink" title="Choregrapher"></a>Choregrapher</h3><p>Choregrapher里面有一个内部类FrameDisplayEventReceiver(继承自DisplayEventReceiver，DisplayEventReceiver是一个没有抽象方法的抽象类)，主要提供两个方法nativeScheduleVsync和onVsync。<br>FrameDisplayEventReceiver在onVsync的时候会post一个异步(也就是说不受syncBarrier阻拦)的消息到主线程上去调用Choregrapher的doFrame（这里面就是把之前所有通过Choregrapher.postCallback添加到队列的事件拿出来，到期了就执行）</p>
 <p>主线程的MessageQueue被syncBarrier堵住的显著特征是meg.target==null(也就是对应的handler为null).  ViewRootImpl在scheduleTraversals的时候会postSyncBarrier一次，也就是说，这个doTraversal是高优先级的，这一刻起后面的所有丢到主线程上的msg都要等到我doTraversal完成后才执行(异步消息例外，所以上面onVsync的消息得是异步的)。从时间顺序上来讲，<br>ViewRootImpl.scheduleTraversal -&gt; mChoreographer.postCallback -&gt; Choreographer开始scheduleFrameLocked（假如时间到了，直接调用nativeScheduleVsync，否则发送的msg全都是异步的，就是为了跨过之前的barrier.）同样，在onVsync的时候，由于此时的barrier还没移除，所以发出的消息还得是异步的。doFrame里面，严格按照input -&gt; animation -&gt; traversal的类型去执行。也就是viewRootImpl在scheduleTraversals的时候post的callback要老老实实在第三组被执行。而在轮到这个doTraversal执行的时候，终于可以去移除barrier了。</p>
 <p>需要指明的是，每一次scheduleTraversal都要触发measure -&gt; layout -&gt; draw这一套，所以，耗时是很严重的。vsync信号也不是系统主动发出的，而是需要通过nativeScheduleVsync请求，才会有一次onVsync的相应的。看了一下，ViewRootImpl里面的setLayoutParams，invalidate,requestLayout,requestFitSystemWindows等方法里面都会触发scheduleTraversal。 显然在onCreate的setContentView里面会至少调用一次。然后就是熟悉的performTraversal(measure,layout,draw)。</p>
 <p>人们常说在onCreate里面获取一个View的宽高有四种方式：<br>onPreDraw,onLayoutChange,view.measure.<br>第四种就是直接在setContentView后面跟着post一个msg，原理就是前面有一个barrier，这个barrier解除之后执行的第一个msg大概率就是这个msg(不考虑别的线程这么巧也插进来)，这时候，performTraversals刚刚走完，draw也走完了,最后绘制数据都缓存到Surface上。但是systemServer那边，windowManagerService和surfaceFlinger那边还没来得及处理这些刚draw的数据（surfaceFlinger那边还要compose，没那么快吧）。</p>
@@ -1010,6 +1108,10 @@ public void showAtLocation(View parent, int gravity, int x, int y) {
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
@@ -1019,10 +1121,6 @@ public void showAtLocation(View parent, int gravity, int x, int y) {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1070,14 +1168,6 @@ public void showAtLocation(View parent, int gravity, int x, int y) {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Window</a>
               </li>
              
@@ -1086,11 +1176,19 @@ public void showAtLocation(View parent, int gravity, int x, int y) {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Vue</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">

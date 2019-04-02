@@ -17,7 +17,7 @@
 <meta property="og:description" content="关于Android Application集成Tinker的一次记录。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/single-yellow-beauty-flower-on-the-fence-wallpaper-56801fde208df.jpg">
-<meta property="og:updated_time" content="2019-04-02T06:51:17.563Z">
+<meta property="og:updated_time" content="2019-04-02T17:31:04.018Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="集成Tinker的一些记录">
 <meta name="twitter:description" content="关于Android Application集成Tinker的一次记录。">
@@ -314,7 +314,7 @@ Mainfest里面要改成上面那个“com.包名.SomeName”
 <p>bsdiff old.apk new.apk old-to-new.patch<br>bspatch old.apk new2.apk old-to-new.patch</p>
 </blockquote>
 <p>Q: patch进程是如何和业务进程交互的<br>A： tinker-android/tinker-android-lib/src/main/AndroidManifest.xml中明确指明了打补丁是在一个youpackagename:patch的进程中去操作的。这样做也是为了减少对于主业务的影响。跨进程交互并没有写aidl，其实只是起了一个IntentService通知主业务进程。</p>
-<p>Q: 关于CLASS_ISPREVERIFIED这个关键词<br>A：dexElements数组更换之后就完事了？其实还差一个类的校验。这里不是说classLaoder的校验（这个好像有五个步骤），<a href="https://yq.aliyun.com/articles/70321">这篇文章</a>提到了</p>
+<p>Q: 关于CLASS_ISPREVERIFIED这个关键词<br>A：dexElements数组更换之后就完事了？其实还差一个类的校验。这里不是说classLoader的校验（这个好像有五个步骤），<a href="https://yq.aliyun.com/articles/70321">这篇文章</a>提到了</p>
 <p>Q: 多渠道要不要打多个包啊<br>A: 如果是使用productFlavor这种官方方式打出来的多渠道包，确实需要打多个补丁，这个gradle task的名字叫做<br>buildAllFlavorsTinkerPatchRelease(相当长)<br><a href="https://buglydevteam.github.io/2017/05/15/solution-of-multiple-channel-hotpatch/">bugly团队的解释</a>，因为</p>
 <pre><code class="java">public final class BuildConfig {
   public static final boolean DEBUG = Boolean.parseBoolean(&quot;true&quot;);
@@ -325,13 +325,15 @@ Mainfest里面要改成上面那个“com.包名.SomeName”
   public static final String VERSION_NAME = &quot;1.0&quot;;
 }
 </code></pre>
-<p>不同的渠道包的BuildConfig这个class文件变量，所以最后的dex文件都不一样了。<br>所以更好的方式是使用美团的walle(往APK Signature Block这里添加ID-Value),能够这么做的原因仅仅是google目前还没对这块限制，也就是这里可以当做一个自定义的key-value存储block。<br>因为这种方式没有碰dex，所以就可以一个补丁修复所有渠道了（在bakApk文件夹下面不是有基准包嘛）</p>
+<p>不同的渠道包的BuildConfig这个class文件的flavor这个值就不一样了，所以最后的dex文件都不一样了。<br>所以更好的方式是使用美团的walle(往APK Signature Block这里添加ID-Value),能够这么做的原因仅仅是google目前还没对这块限制，也就是这里可以当做一个自定义的key-value存储block。<br>因为这种方式没有碰dex，所以就可以一个补丁修复所有渠道了（在bakApk文件夹下面不是有基准包嘛）</p>
 <p><strong>在apk安装的时候系统会将dex文件优化成odex文件，在优化的过程中会涉及一个预校验的过程<br>如果一个类的static方法，private方法，override方法以及构造函数中引用了其他类，而且这些类都属于同一个dex文件，此时该类就会被打上CLASS_ISPREVERIFIED<br>如果在运行时被打上CLASS_ISPREVERIFIED的类引用了其他dex的类，就会报错<br>所以MainActivity的onCreate()方法中引用另一个dex的类就会出现上文中的问题<br>正常的分包方案会保证相关类被打入同一个dex文件<br>想要使得patch可以被正常加载，就必须保证类不会被打上CLASS_ISPREVERIFIED标记。而要实现这个目的就必须要在分完包后的class中植入对其他dex文件中类的引用。<br>如果A类引用了C类，C类在其他Dex中，那么就可以避免A类被打上标记。只要在static方法，构造方法，private方法，Override方法中直接饮用了其他dex中的类，这个类就不会被打上CLASS_ISPREVERIFIED的标记。<br>要在已经编译完成后的类中植入对其他类的引用，就需要操作字节码，惯用的方案是插桩。常见的工具有javaassist，asm等。</strong></p>
 <p>所以QQ空间给出的方案是在所有class的构造函数中添加一行println(C.class)方法，直接引用另一个dex包中的类。这个添加的过程用javaAssist这种操作字节码的方式就可以简单实现<br><a href="https://blog.csdn.net/u010386612/article/details/51192421"> Android热补丁动态修复技术</a>这一系列文章介绍了使用gradle api对编译过程进行hook，实现自动化补丁操作的过程</p>
 <p>Q: Tinker是如何使用gradle插件生成dex补丁的?<br>A: <a href="https://blog.csdn.net/lmj623565791/article/details/72667669">参考鸿洋这篇文章</a> </p>
 <p>打补丁的时候执行的是tinkerPatchDebug这个任务，执行这个任务发现依次执行了这些任务</p>
+<blockquote>
 <p>:app:processDebugManifest<br>:app:tinkerProcessDebugManifest（tinker）<br>:app:tinkerProcessDebugResourceId (tinker)<br>:app:processDebugResources<br>:app:tinkerProguardConfigTask(tinker)<br>:app:transformClassesAndResourcesWithProguard<br>:app:tinkerProcessDebugMultidexKeep (tinker)<br>:app:transformClassesWidthMultidexlistForDebug<br>:app:assembleDebug<br>:app:tinkerPatchDebug(tinker)</p>
-<p>1.TinkerManifestTask，用于添加TINKER_ID；<br>2.TinkerResourceIdTask，使用aapt的public.xml和ids.xml接管了资源id的生成.首先在打老的apk包的时候会配置一个tinkerApplyResourcePath，对应的是生成的R.txt的路径。接下来比较res文件夹中各种资源，对比生成public.xml<br>3.TinkerProguardConfigTask。因为proguard的存在，两次打出来的代码混淆差异非常大，proguard有一个-applymapping选项，用于限定两次混淆使用同一份混淆规则。还有com.tencent.tinker.loader.**这些是不能混淆的。</p>
+</blockquote>
+<p>1.TinkerManifestTask，用于添加TINKER_ID；<br>2.TinkerResourceIdTask，使用aapt的public.xml和ids.xml接管了资源id的生成.首先在打老的apk包的时候会配置一个tinkerApplyResourcePath，对应的是生成的R.txt的路径。接下来比较res文件夹中各种资源，对比生成public.xml<br>3.TinkerProguardConfigTask。因为proguard的存在，两次打出来的代码混淆差异非常大，proguard有一个-applymapping选项，用于限定两次混淆使用同一份混淆规则。还有<code>com.tencent.tinker.loader.**</code>这些是不能混淆的。</p>
 <ol>
 <li>TinkerMultidexConfigTask。这里要确保application、com.tencent.tinker.loader.**这些在主dex中</li>
 <li>TinkerPatchSchemaTask，生成patch，生成meta-file和version-file，build patch<br>这里就是对两个apk进行了比较：<br>old apk: build/intermediates/outputs/old apk名称/<br>new apk: build/intermediates/outputs/app-debug/<br>dexFile -&gt; dexDecoder.patch </li>
@@ -344,7 +346,7 @@ Mainfest里面要改成上面那个“com.包名.SomeName”
 <p>com.tencent.tinker:aosp-dexutils:1.91.@jar<br>com.tencent.tinker:bsdiff-util:1.91.@jar<br>com.tencent.tinker:tinker-android-anno:1.91.@jar<br>com.tencent.tinker:tinker-android-lib:1.91.@jar<br>com.tencent.tinker:tinker-android-loader:1.91.@jar<br>com.tencent.tinker:tinker-commons:1.91.@jar<br>com.tencent.tinker:tinker-ziputils:1.91.@jar</p>
 </blockquote>
 <h1 id="分的这么散估计也是希望能够好扩展吧。"><a href="#分的这么散估计也是希望能够好扩展吧。" class="headerlink" title="分的这么散估计也是希望能够好扩展吧。"></a>分的这么散估计也是希望能够好扩展吧。</h1><p>换dex文件的关键方法在<a href="http://androidxref.com/5.0.0_r2/xref/libcore/dalvik/src/main/java/dalvik/system/DexPathList.java#316">DexPathList.findClass这个方法里面</a>。<a href="https://juejin.im/post/5a42f29ef265da43333eaba0">参考</a></p>
-<p>网上关于源码解析的文章已经很多，有时间看看，应该不难。</p>
+<p>网上关于源码解析的文章已经很多，就是要考虑的点特别多。</p>
 <p>看一下官方Tinker项目中的文件夹，有一个tinker-build，里面有两个python文件，这就很有意思了。再看看tinker-patch-gradle-plugin，里面一大堆groovy文件，所以看懂这个对于gradle插件开发是有好处的。</p>
 <h1 id="目前在1-9-1版本里面好像看到了一个tinkerFastCrashProtect，看来也是跟风天猫快速修复启动保护那一套。"><a href="#目前在1-9-1版本里面好像看到了一个tinkerFastCrashProtect，看来也是跟风天猫快速修复启动保护那一套。" class="headerlink" title="目前在1.9.1版本里面好像看到了一个tinkerFastCrashProtect，看来也是跟风天猫快速修复启动保护那一套。"></a>目前在1.9.1版本里面好像看到了一个<em>tinkerFastCrashProtect</em>，看来也是跟风天猫快速修复启动保护那一套。</h1><p>关于Tinker-Patch这个外包给第三方的服务，纯属好奇就去看了下url到底长什么样。在<a href="https://github.com/TinkerPatch/tinkerpatch-sdk/blob/master/tinkerpatch-sdk/src/main/java/com/tencent/tinker/server/client/TinkerClientAPI.java">TinkerClientAPI</a>里面有这么一段，其实跟Tinker本身庞大的架构比起来，已经算不上什么了。</p>
 <pre><code class="java">Uri.Builder urlBuilder = Uri.parse(this.host).buildUpon(); // &quot;http://q.tinkerpatch.com&quot;
@@ -629,6 +631,10 @@ final String url = urlBuilder.appendPath(this.appKey)
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
@@ -638,10 +644,6 @@ final String url = urlBuilder.appendPath(this.appKey)
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -689,14 +691,6 @@ final String url = urlBuilder.appendPath(this.appKey)
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Window</a>
               </li>
              
@@ -705,11 +699,19 @@ final String url = urlBuilder.appendPath(this.appKey)
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Vue</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
