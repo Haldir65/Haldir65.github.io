@@ -1,5 +1,5 @@
 ---
-title: 高并发实践手册
+title: java多线程中需要注意的一些点
 date: 2017-08-03 21:04:28
 tags: [java,tools,concurrency]
 ---

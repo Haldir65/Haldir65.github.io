@@ -610,7 +610,7 @@ MediaCodec应该就是硬解，ffmpeg是软解(后面好像支持了硬解)
 [nginx搭建rtmp推流服务](https://www.jianshu.com/p/fc64102d6162)
 [ijkplayer如何使用FFmpeg 4.0内核？](https://zhuanlan.zhihu.com/p/51010662)
 [微信Android视频编码爬过的那些坑](https://github.com/WeMobileDev/article/blob/master/微信Android视频编码爬过的那些坑.md) 使用Neon指令
-
+[B站有一个AndroidVideoCache通过本地ServerSocket的形式实现了边看边缓存](https://www.jianshu.com/p/4745de02dcdc) 具体实现是读的时候读所在的线程每隔一秒wait(1000)(这一秒中其实读取远程server数据的线程一直在跑)然后去读，很好的框架。
 
 
 tbd

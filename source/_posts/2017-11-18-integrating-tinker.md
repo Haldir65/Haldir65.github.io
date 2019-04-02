@@ -176,7 +176,7 @@ Q: patch进程是如何和业务进程交互的
 A： tinker-android/tinker-android-lib/src/main/AndroidManifest.xml中明确指明了打补丁是在一个youpackagename:patch的进程中去操作的。这样做也是为了减少对于主业务的影响。跨进程交互并没有写aidl，其实只是起了一个IntentService通知主业务进程。
 
 Q: 关于CLASS_ISPREVERIFIED这个关键词
-A：dexElements数组更换之后就完事了？其实还差一个类的校验。这里不是说classLaoder的校验（这个好像有五个步骤），[这篇文章](https://yq.aliyun.com/articles/70321)提到了
+A：dexElements数组更换之后就完事了？其实还差一个类的校验。这里不是说classLoader的校验（这个好像有五个步骤），[这篇文章](https://yq.aliyun.com/articles/70321)提到了
 
 Q: 多渠道要不要打多个包啊
 A: 如果是使用productFlavor这种官方方式打出来的多渠道包，确实需要打多个补丁，这个gradle task的名字叫做
@@ -192,7 +192,7 @@ public final class BuildConfig {
   public static final String VERSION_NAME = "1.0";
 }
 ```
-不同的渠道包的BuildConfig这个class文件变量，所以最后的dex文件都不一样了。
+不同的渠道包的BuildConfig这个class文件的flavor这个值就不一样了，所以最后的dex文件都不一样了。
 所以更好的方式是使用美团的walle(往APK Signature Block这里添加ID-Value),能够这么做的原因仅仅是google目前还没对这块限制，也就是这里可以当做一个自定义的key-value存储block。
 因为这种方式没有碰dex，所以就可以一个补丁修复所有渠道了（在bakApk文件夹下面不是有基准包嘛）
 
@@ -215,7 +215,7 @@ A: [参考鸿洋这篇文章](https://blog.csdn.net/lmj623565791/article/details
 
 打补丁的时候执行的是tinkerPatchDebug这个任务，执行这个任务发现依次执行了这些任务
 
-:app:processDebugManifest
+>:app:processDebugManifest
 :app:tinkerProcessDebugManifest（tinker）
 :app:tinkerProcessDebugResourceId (tinker)
 :app:processDebugResources
@@ -228,7 +228,7 @@ A: [参考鸿洋这篇文章](https://blog.csdn.net/lmj623565791/article/details
 
 1.TinkerManifestTask，用于添加TINKER_ID；
 2.TinkerResourceIdTask，使用aapt的public.xml和ids.xml接管了资源id的生成.首先在打老的apk包的时候会配置一个tinkerApplyResourcePath，对应的是生成的R.txt的路径。接下来比较res文件夹中各种资源，对比生成public.xml
-3.TinkerProguardConfigTask。因为proguard的存在，两次打出来的代码混淆差异非常大，proguard有一个-applymapping选项，用于限定两次混淆使用同一份混淆规则。还有com.tencent.tinker.loader.**这些是不能混淆的。
+3.TinkerProguardConfigTask。因为proguard的存在，两次打出来的代码混淆差异非常大，proguard有一个-applymapping选项，用于限定两次混淆使用同一份混淆规则。还有`com.tencent.tinker.loader.**`这些是不能混淆的。
 4. TinkerMultidexConfigTask。这里要确保application、com.tencent.tinker.loader.**这些在主dex中
 5. TinkerPatchSchemaTask，生成patch，生成meta-file和version-file，build patch
 这里就是对两个apk进行了比较：
@@ -269,7 +269,7 @@ A: 首先，合成是在patch进程跑的，关键方法是DexDiffPatchInternal.
 
 换dex文件的关键方法在[DexPathList.findClass这个方法里面](http://androidxref.com/5.0.0_r2/xref/libcore/dalvik/src/main/java/dalvik/system/DexPathList.java#316)。[参考](https://juejin.im/post/5a42f29ef265da43333eaba0)
 
-网上关于源码解析的文章已经很多，有时间看看，应该不难。
+网上关于源码解析的文章已经很多，就是要考虑的点特别多。
 
 看一下官方Tinker项目中的文件夹，有一个tinker-build，里面有两个python文件，这就很有意思了。再看看tinker-patch-gradle-plugin，里面一大堆groovy文件，所以看懂这个对于gradle插件开发是有好处的。
 目前在1.9.1版本里面好像看到了一个*tinkerFastCrashProtect*，看来也是跟风天猫快速修复启动保护那一套。

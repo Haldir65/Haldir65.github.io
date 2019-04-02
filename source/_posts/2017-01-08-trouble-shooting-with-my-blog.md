@@ -222,9 +222,15 @@ MarkDown 页面内部跳转
 
 
 "---" 三根横杠是分割线
+
 我是分割线上面
 ---
 我在分割线下面
+
+`键盘ESC下面那个键按两下是code的意思` 和<code>一个html code tag</code> 同样的效果
+
+彩色的字
+<font color="red">0</font>、<font color="orange">10</font>、<font color="green">20</font>、<font color="blue">30</font>、<font color="Purple">40</font>
 
 ## 7.github 提交 commit 的时候显示 Emoji
 

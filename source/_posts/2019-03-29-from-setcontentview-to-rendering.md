@@ -11,6 +11,7 @@ tags:
 
 
 ### Activity
+
 不负责控制视图，它主要控制生命周期和处理事件。Activity中通过持有PhoneWindow来控制视图,而事件则是通过WindowCallback来传达给Activity的
 Window（唯一实现类是PhoneWindow）。PhoneWindow是在activity的attach中new出来的，并且设置了PhoneWindow.setCallback(this)。大致代码如下
 
@@ -620,12 +621,117 @@ public void showAtLocation(View parent, int gravity, int x, int y) {
 用IPC往NotificationManagerService的一个队列中添加一个runnable，系统全局所有应用的Toast请求都被添加到这里，排队，一个个来，远程再回调app进程的Toast.TN(extends ITransientNotification.Stub)的handleShow方法去添加一个type为WindowManager.LayoutPrams.TYPE_TOAST的view。
 当然，时间到了远程还会回调cancelToast去用WMS移除View。
 
+## doTraversal
+ViewRootImpl中的doTraversal可以分成三件事
+
+mView.performMeasure
+mView.performLayout
+mView.performDraw
+
+这里的mView也就是DecorView了
+
 ### measure
+```java
+//onMeasure里的两个参数witdthMeasureSpec和heightMeasureSpec是怎么来的
+  @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+
+    }
+
+//ViewGroup.java中有这么一段
+protected void measureChildWithMargins(View child,
+        int parentWidthMeasureSpec, int widthUsed,
+        int parentHeightMeasureSpec, int heightUsed) {
+    final MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
+
+    final int childWidthMeasureSpec = getChildMeasureSpec(parentWidthMeasureSpec,
+            mPaddingLeft + mPaddingRight + lp.leftMargin + lp.rightMargin
+                    + widthUsed, lp.width);
+    final int childHeightMeasureSpec = getChildMeasureSpec(parentHeightMeasureSpec,
+            mPaddingTop + mPaddingBottom + lp.topMargin + lp.bottomMargin
+                    + heightUsed, lp.height);
+
+    child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
+}
+
+//ViewGroup.java
+public static int getChildMeasureSpec(int spec, int padding, int childDimension) { //这个childDimension就是lp.width或者lp.height
+    int specMode = MeasureSpec.getMode(spec);
+    int specSize = MeasureSpec.getSize(spec);
+
+    int size = Math.max(0, specSize - padding); 
+    //所以这个size就是当前这个viewGroup的measureSpec中的size-viewgroup的padding-child.lp.margin之后的值
+
+    int resultSize = 0;
+    int resultMode = 0;
+
+    switch (specMode) {
+    // Parent has imposed an exact size on us
+    case MeasureSpec.EXACTLY:
+        if (childDimension >= 0) { //如果自己是EXACTLY，child的lp.width或者lp.height>0的话，生成一个size为dimension只，mode为EXACTLY的 spec
+            resultSize = childDimension;
+            resultMode = MeasureSpec.EXACTLY;
+        } else if (childDimension == LayoutParams.MATCH_PARENT) {
+            // Child wants to be our size. So be it.
+            resultSize = size;
+            resultMode = MeasureSpec.EXACTLY;
+        } else if (childDimension == LayoutParams.WRAP_CONTENT) {
+            // Child wants to determine its own size. It can't be
+            // bigger than us.
+            resultSize = size;
+            resultMode = MeasureSpec.AT_MOST;
+        }
+        break;
+
+    // Parent has imposed a maximum size on us
+    case MeasureSpec.AT_MOST:
+        if (childDimension >= 0) {
+            // Child wants a specific size... so be it
+            resultSize = childDimension;
+            resultMode = MeasureSpec.EXACTLY;
+        } else if (childDimension == LayoutParams.MATCH_PARENT) {
+            // Child wants to be our size, but our size is not fixed.
+            // Constrain child to not be bigger than us.
+            resultSize = size;
+            resultMode = MeasureSpec.AT_MOST;
+        } else if (childDimension == LayoutParams.WRAP_CONTENT) {
+            // Child wants to determine its own size. It can't be
+            // bigger than us.
+            resultSize = size;
+            resultMode = MeasureSpec.AT_MOST;
+        }
+        break;
+    return MeasureSpec.makeMeasureSpec(resultSize, resultMode);
+}
+```
 
 ### layout
+这里就是调用onLayout方法了，FrameLayout会根据child的Gravity横向或者纵向摆放。LinearLayout会根据自己的orientation，从上到下或者从左到右进行摆放。
 
 ### draw
+```java
+public void draw(Canvas canvas) {
+  . . . 
+  // 绘制背景，只有dirtyOpaque为false时才进行绘制，下同
+  int saveCount;
+  if (!dirtyOpaque) {
+    drawBackground(canvas);
+  }
 
+  . . . 
+
+  // 绘制自身内容
+  if (!dirtyOpaque) onDraw(canvas);
+
+  // 绘制子View
+  dispatchDraw(canvas);
+
+   . . .
+  // 绘制滚动条等
+  onDrawForeground(canvas);
+
+}
+```
 
 ### Choregrapher
 Choregrapher里面有一个内部类FrameDisplayEventReceiver(继承自DisplayEventReceiver，DisplayEventReceiver是一个没有抽象方法的抽象类)，主要提供两个方法nativeScheduleVsync和onVsync。
