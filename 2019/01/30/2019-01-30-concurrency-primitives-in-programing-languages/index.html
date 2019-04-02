@@ -17,7 +17,7 @@
 <meta property="og:description" content="主要讲讲java中的notify,wait,synchronized ，unsafe等多线程基础工具的使用方式。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/HongKongFireworks_ZH-CN13422096721_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-03-30T15:16:39.544Z">
+<meta property="og:updated_time" content="2019-04-02T06:44:50.510Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="编程语言中使用到的多线程基础数据结构">
 <meta name="twitter:description" content="主要讲讲java中的notify,wait,synchronized ，unsafe等多线程基础工具的使用方式。">
@@ -257,14 +257,112 @@ public class com.me.harris.concurrent.SynchronizedSample {
 <pre><code class="java">// The standard idiom for calling the wait method in Java 
 synchronized (sharedObject) { 
     while (condition) { 
-    sharedObject.wait(); 
+      sharedObject.wait(); //当前线程释放锁，此时
         // (Releases lock, and reacquires on wakeup) 
     } 
     // do action based upon condition e.g. take or put into queue 
 }
 </code></pre>
-<p>基本的思路就是生产者和消费者共同持有一个锁（随便new一个Object出来就是了），生产者和消费者都extends Thread。<br>生产者的run方法里while(true)，再加上synchronized，往queue里面丢东西，塞满了就notify一下（让消费者去消费）。<br>消费者的run方法里面while(true)，再加上synchronized，从queue里面取东西，发现没东西了。notify一下其他人（让生产者去生产）。</p>
-<h2 id="Sleep和wait的区别"><a href="#Sleep和wait的区别" class="headerlink" title="Sleep和wait的区别"></a>Sleep和wait的区别</h2><p>不要搞混淆了，sleep是不会让出cpu的执行权的，而wait则会让出cpu执行权，也就是释放锁。</p>
+<p>基本的思路就是生产者和消费者共同持有一个锁（随便new一个Object出来就是了），生产者和消费者都extends Thread。<br>生产者每次生产一个都会notifyAll，消费者每次消费一个都会notifyAll</p>
+<p><a href="http://cmsblogs.com/?p=2915">在Java中，每个对象都有两个池，锁(monitor)池和等待池</a><br>锁池 :假设线程A已经拥有了某个对象(注意:不是类)的锁，而其它的线程想要调用这个对象的某个synchronized方法(或者synchronized块)，由于这些线程在进入对象的synchronized方法之前必须先获得该对象的锁的拥有权，但是该对象的锁目前正被线程A拥有，所以这些线程就进入了该对象的锁池中。<br>等待池 :假设一个线程A调用了某个对象的wait()方法，线程A就会释放该对象的锁(因为wait()方法必须出现在synchronized中，这样自然在执行wait()方法之前线程A就已经拥有了该对象的锁)，同时线程A就进入到了该对象的等待池中。如果另外的一个线程调用了相同对象的notifyAll()方法，那么处于该对象的等待池中的线程就会全部进入该对象的锁池中，准备争夺锁的拥有权。如果另外的一个线程调用了相同对象的notify()方法，那么仅仅有一个处于该对象的等待池中的线程(随机)会进入该对象的锁池.</p>
+<p>也即是被notify的线程都在锁池里(有权竞争cpu)，自己调用wait的线程都在等待池里(无权竞争cpu)。 那么什么时候竞争呢，持有锁的线程自己wait(释放锁)了，那么有权竞争的线程就开始竞争，获得锁的进入同步代码块或者同步方法。</p>
+<p>以下代码验证通过</p>
+<pre><code class="java">public class Test1 {
+
+    private static int count = 0;
+    private static final int FULL = 5;
+    private static final String LOCK = &quot;lock&quot;;
+
+
+    public static void main(String[] args) {
+        Test1 instance = new Test1();
+        new Thread(instance.new Producer()).start();
+        new Thread(instance.new Consumer()).start();
+    }
+
+    class Producer implements Runnable{
+
+        @Override
+        public void run() {
+            for (int i = 0; i &lt; 10; i++) {
+                synchronized (LOCK){
+                    while (count==FULL){
+                        try{
+                            System.out.println(&quot;PRODUCER WILL WAITING&quot;);
+                            LOCK.wait();
+                            System.out.println(&quot;PRODUCER END WAITING&quot;);
+                            // 进入 wait()方法后，当前线程释放锁。在从 wait()返回前，线程与其他线程竞争重新获得锁
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                    count++;
+                    System.out.println(Thread.currentThread().getName() + &quot;生产者生产，目前总共有&quot; + count);
+                    LOCK.notifyAll();//当前处在wait状态的线程不会马上获得锁
+                }
+                //退出synchronize代码块之后，程序退出 synchronized 代码块后，当前线程才会释放锁，wait所在的线程也才可以获取该对象锁
+            }
+        }
+    }
+
+    class Consumer implements Runnable {
+
+        @Override
+        public void run() {
+            for (int i = 0; i &lt; 10; i++) {
+                synchronized (LOCK){
+                    while (count==0){
+                        try {
+                            System.out.println(&quot;CONSUMER WILL WAITING&quot;);
+                            LOCK.wait();
+                            System.out.println(&quot;CONSUMER END WAITING&quot;);
+                            // 进入 wait()方法后，当前线程释放锁。在从 wait()返回前，线程与其他线程竞争重新获得锁
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    count--;
+                    System.out.println(Thread.currentThread().getName()+&quot;消费者消费，当前还剩下&quot;+count+&quot;个&quot;);
+                    LOCK.notifyAll();
+                }
+            }
+        }
+    }
+}
+</code></pre>
+<p>对应输出如下（输出结果不确定）</p>
+<pre><code>Thread-0生产者生产，目前总共有1
+Thread-0生产者生产，目前总共有2
+Thread-0生产者生产，目前总共有3
+Thread-0生产者生产，目前总共有4
+Thread-0生产者生产，目前总共有5
+PRODUCER WILL WAITING        //producer线程开始wait，阻塞在这里
+Thread-1消费者消费，当前还剩下4个 // 消费者线程进入Synchronized代码块
+PRODUCER END WAITING //消费者每次在执行完synchronized代码块都会notifyAll，所以生产者又开始竞争锁，这一次居然抢到了，于是之前的wait返回
+Thread-0生产者生产，目前总共有5 //发现满了，重复上面的wait步骤
+PRODUCER WILL WAITING  //释放锁
+Thread-1消费者消费，当前还剩下4个 //锁被别人抢到
+PRODUCER END WAITING //别人notify导致我抢到了锁
+Thread-0生产者生产，目前总共有5
+PRODUCER WILL WAITING
+Thread-1消费者消费，当前还剩下4个
+PRODUCER END WAITING
+Thread-0生产者生产，目前总共有5
+PRODUCER WILL WAITING
+Thread-1消费者消费，当前还剩下4个
+PRODUCER END WAITING
+Thread-0生产者生产，目前总共有5
+PRODUCER WILL WAITING
+Thread-1消费者消费，当前还剩下4个
+PRODUCER END WAITING
+Thread-0生产者生产，目前总共有5 //生产者最后一次生产
+Thread-1消费者消费，当前还剩下4个
+Thread-1消费者消费，当前还剩下3个
+Thread-1消费者消费，当前还剩下2个
+Thread-1消费者消费，当前还剩下1个
+Thread-1消费者消费，当前还剩下0个
+</code></pre><p>从代码执行顺序来看，wait方法调用后，当前线程阻塞住(虽然还在一个同步代码块中，直到别的线程notify，这个wait方法才会返回)，此时另一个线程竞争获取锁开始执行同步代码块。</p>
+<h2 id="Thread-sleep并不释放锁，只是让出cpu执行时间"><a href="#Thread-sleep并不释放锁，只是让出cpu执行时间" class="headerlink" title="Thread.sleep并不释放锁，只是让出cpu执行时间"></a>Thread.sleep并不释放锁，只是让出cpu执行时间</h2><p>Thread.sleep和Object.wait都会暂停当前的线程，对于CPU资源来说，不管是哪种方式暂停的线程，都表示它暂时不再需要CPU的执行时间。OS会将执行时间分配给其它线程。区别是，调用wait后，需要别的线程执行notify/notifyAll才能够重新获得CPU执行时间。<br>所以在同步代码块里执行sleep是一个很糟糕的做法</p>
 <h2 id="yield的用法"><a href="#yield的用法" class="headerlink" title="yield的用法"></a>yield的用法</h2><p>yield是让当前线程从running的状态变成runnable的状态（不过这个方法很少用到）</p>
 <h2 id="join的用法"><a href="#join的用法" class="headerlink" title="join的用法"></a>join的用法</h2><p>和python一样，主线程调用childThread.join()就是让主线程等子线程执行完了之后再去执行后面的语句。不过从源码来看,join调用了wait。</p>
 <pre><code class="java">public final void join() throws InterruptedException {
@@ -689,6 +787,10 @@ static void ensure_join(JavaThread* thread) {
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
@@ -733,15 +835,11 @@ static void ensure_join(JavaThread* thread) {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">nginx</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
               </li>
             
             <div class="clearfix"></div>

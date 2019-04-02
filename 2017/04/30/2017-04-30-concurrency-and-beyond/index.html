@@ -17,7 +17,7 @@
 <meta property="og:description" content="原本只打算写一点关于线程池的实现原理，后来发现坑越挖越大。不得不写到一半停下来，所以，这算是一篇不那么完善的关于原理的解析吧。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg">
-<meta property="og:updated_time" content="2019-03-30T15:16:39.532Z">
+<meta property="og:updated_time" content="2019-04-02T06:44:50.497Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java线程池的实现原理">
 <meta name="twitter:description" content="原本只打算写一点关于线程池的实现原理，后来发现坑越挖越大。不得不写到一半停下来，所以，这算是一篇不那么完善的关于原理的解析吧。">
@@ -240,16 +240,20 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
     }
 </code></pre>
 <p>但实际上，java不建议这样直接弄一个线程池出来，而是使用java.util.concurrent.Executors中的一些现成的工厂方法来创建一个线程池实例，具体的方法名很好理解，newFixedThreadPool，newSingleThreadExecutor，newCachedThreadPool等等。关于线程池构造函数各个参数的意义以及Executors提供的各种线程方法的适用场合，网上有很多详尽的文章。</p>
-<pre><code class="java">Thread有这些状态
-    */
-    public enum State {
-        NEW,
-        RUNNABLE,
-        BLOCKED,
-        WAITING,
-        TIMED_WAITING,
-        TERMINATED;
-    }
+<pre><code class="java">//Thread有六种状态
+public enum State {
+    NEW,
+    RUNNABLE,
+    BLOCKED,
+    WAITING,
+    TIMED_WAITING,
+    TERMINATED;
+}
+
+//ThreadPoolExecutor中用一个AtomicInteger的前三位表示当前state，后29位表示worker的数量。通过AtomicInteger的CAS操作保证多线程之间看到的worker数和当前state是一致的；
+private final AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
+//用一个ReentrantLock来锁住对workers这个HashSet的添加，删除操作
+private final HashSet&lt;Worker&gt; workers = new HashSet&lt;Worker&gt;();
 </code></pre>
 <p>这里针对execute方法具体的实现来展开，即，如何做到自动扩容，如何做到线程缓存，如何实现终止，以及资源同步问题。</p>
 <pre><code class="java"> public void execute(Runnable command) {
@@ -298,33 +302,78 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
     }
 </code></pre>
 <p>来看addWorker的实现</p>
-<pre><code class="java">private boolean addWorker(Runnable firstTask, boolean core) {
+<pre><code class="java">//ThreadPoolExecutor.java
+  private boolean addWorker(Runnable firstTask, boolean core) {
+      //下面是一个循环，假设线程池不关闭的话，循环去cas实现workerCount自增。但如果workerCount已经大于最大数量的话，则会失败
         retry:
-        、、、省略代码
+        for (;;) {
+            int c = ctl.get();
+            int rs = runStateOf(c);
+
+            // Check if queue empty only if necessary.
+            if (rs &gt;= SHUTDOWN &amp;&amp;
+                ! (rs == SHUTDOWN &amp;&amp;
+                   firstTask == null &amp;&amp;
+                   ! workQueue.isEmpty()))
+                return false; //每一次尝试设置workerCount之前都会检查一下当前是否关闭
+
+            for (;;) {
+                int wc = workerCountOf(c);
+                if (wc &gt;= CAPACITY ||
+                    wc &gt;= (core ? corePoolSize : maximumPoolSize))
+                    return false;
+                if (compareAndIncrementWorkerCount(c)) 
+                    break retry;// 只有自增成功才会跳出循环，否则一直尝试；如果没有自增成功，继续
+                c = ctl.get();  // Re-read ctl
+                if (runStateOf(c) != rs)//看下当前状态是否发生了变化，一旦变化就要检查当前是否关闭，所以跳到外部循环
+                    continue retry;
+                // else CAS failed due to workerCount change; retry inner loop
+            }
+        }
+        //走到这里说明自增成功了，在worker数量小于limit的时候，几乎一定能够添加worker成功
+
+        boolean workerStarted = false;
+        boolean workerAdded = false;
+        Worker w = null;
         try {
             w = new Worker(firstTask);
-            //每一个不为null的command都会创建一个新的worker
             final Thread t = w.thread;
             if (t != null) {
                 final ReentrantLock mainLock = this.mainLock;
-                mainLock.lock();//加锁
+                mainLock.lock();
                 try {
-                        workers.add(w); //workers就是一个普通的HashSet,同步的问题通过ReentrantLock解决
+                    // Recheck while holding lock.
+                    // Back out on ThreadFactory failure or if
+                    // shut down before lock acquired.
+                    int rs = runStateOf(ctl.get());
+
+                    if (rs &lt; SHUTDOWN ||
+                        (rs == SHUTDOWN &amp;&amp; firstTask == null)) {
+                        if (t.isAlive()) // precheck that t is startable
+                            throw new IllegalThreadStateException();
+                        workers.add(w);
+                        int s = workers.size();
+                        if (s &gt; largestPoolSize)
+                            largestPoolSize = s;
+                        workerAdded = true;
                     }
                 } finally {
                     mainLock.unlock();
                 }
                 if (workerAdded) {
-                    t.start(); //这里就是真正执行command的方法了
+                    t.start(); //这个Thread的构造函数里传入了一个Runnable，也就是Worker自身
                     workerStarted = true;
                 }
             }
-        } 
-        return workerStarted; //这里可以看出来,addWorker返回值表示这个command有没有被执行
+        } finally {
+            if (! workerStarted)
+                addWorkerFailed(w);
+        }
+        return workerStarted;
     }
 
 
-
+// 上面在addWorker中，workerCount自增成功后就会
  final void runWorker(Worker w) { //每一条线程运行起来的时候都会走这个方法
         try {
             while (task != null || (task = getTask()) != null) {
@@ -352,7 +401,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
             }
             completedAbruptly = false;
         } finally {
-            processWorkerExit(w, completedAbruptly);
+            processWorkerExit(w, completedAbruptly); //在这里从workers的HashSet中移除当前worker
         }
     }
 </code></pre>
@@ -361,10 +410,12 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
         boolean timedOut = false; // Did the last poll() time out?
 
         for (;;) { //轮询
+            boolean timed = allowCoreThreadTimeOut || wc &gt; corePoolSize; //如果当前worker数量超出了corePoolSize，就要允许我这条线程挂掉
+
             try {
                 Runnable r = timed ?
-                    workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS) : //从queue中提取任务
-                    workQueue.take();
+                    workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS) : //queue的poll是立刻返回的,poll(time,unit)是等待超时返回，take则是阻塞
+                    workQueue.take(); // 如果当前没有超过核心线程数，就用take，否则，超过keepAlive时间就设置timedOut为true，重新走一遍循环的时候会cas把当前worker数量自减
                 if (r != null)
                     return r;
 
@@ -385,6 +436,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 </li>
 </ol>
 <p>最后，今天下午看到很多jdk里源码的注释，作者都是 Doug Lea ，实在佩服前人的功力。之前也看过一些自定义线程池的实现，现在看起来确实差很多，不要重复造轮子不意味着不需要去了解轮子是怎么造出来的。</p>
+<h2 id="自定义线程池的话，有一些经验公式"><a href="#自定义线程池的话，有一些经验公式" class="headerlink" title="自定义线程池的话，有一些经验公式"></a>自定义线程池的话，有一些经验公式</h2><p>简单来说，就是如果你是CPU密集型运算，那么线程数量和CPU核心数相同就好，避免了大量无用的切换线程上下文。<br>如果你是IO密集型的话，需要大量等待，那么线程数可以设置的多一些，比如CPU核心乘以2.</p>
 <p>Reference </p>
 <ol>
 <li><a href="https://github.com/pzxwhc/MineKnowContainer/issues/9">Java 多线程：线程池实现原理</a></li>
@@ -747,6 +799,10 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
@@ -791,15 +847,11 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">nginx</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
               </li>
             
             <div class="clearfix"></div>
