@@ -55,17 +55,23 @@ public ThreadPoolExecutor(int corePoolSize,
 
 
 ```java
-Thread有这些状态
-    */
-    public enum State {
-        NEW,
-        RUNNABLE,
-        BLOCKED,
-        WAITING,
-        TIMED_WAITING,
-        TERMINATED;
-    }
+//Thread有六种状态
+public enum State {
+    NEW,
+    RUNNABLE,
+    BLOCKED,
+    WAITING,
+    TIMED_WAITING,
+    TERMINATED;
+}
+
+//ThreadPoolExecutor中用一个AtomicInteger的前三位表示当前state，后29位表示worker的数量。通过AtomicInteger的CAS操作保证多线程之间看到的worker数和当前state是一致的；
+private final AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
+//用一个ReentrantLock来锁住对workers这个HashSet的添加，删除操作
+private final HashSet<Worker> workers = new HashSet<Worker>();    
 ```
+
+
 
 这里针对execute方法具体的实现来展开，即，如何做到自动扩容，如何做到线程缓存，如何实现终止，以及资源同步问题。
 ```java
@@ -117,33 +123,78 @@ Thread有这些状态
 来看addWorker的实现
 
 ```java
-private boolean addWorker(Runnable firstTask, boolean core) {
+//ThreadPoolExecutor.java
+  private boolean addWorker(Runnable firstTask, boolean core) {
+      //下面是一个循环，假设线程池不关闭的话，循环去cas实现workerCount自增。但如果workerCount已经大于最大数量的话，则会失败
         retry:
-        、、、省略代码
+        for (;;) {
+            int c = ctl.get();
+            int rs = runStateOf(c);
+
+            // Check if queue empty only if necessary.
+            if (rs >= SHUTDOWN &&
+                ! (rs == SHUTDOWN &&
+                   firstTask == null &&
+                   ! workQueue.isEmpty()))
+                return false; //每一次尝试设置workerCount之前都会检查一下当前是否关闭
+
+            for (;;) {
+                int wc = workerCountOf(c);
+                if (wc >= CAPACITY ||
+                    wc >= (core ? corePoolSize : maximumPoolSize))
+                    return false;
+                if (compareAndIncrementWorkerCount(c)) 
+                    break retry;// 只有自增成功才会跳出循环，否则一直尝试；如果没有自增成功，继续
+                c = ctl.get();  // Re-read ctl
+                if (runStateOf(c) != rs)//看下当前状态是否发生了变化，一旦变化就要检查当前是否关闭，所以跳到外部循环
+                    continue retry;
+                // else CAS failed due to workerCount change; retry inner loop
+            }
+        }
+        //走到这里说明自增成功了，在worker数量小于limit的时候，几乎一定能够添加worker成功
+
+        boolean workerStarted = false;
+        boolean workerAdded = false;
+        Worker w = null;
         try {
             w = new Worker(firstTask);
-            //每一个不为null的command都会创建一个新的worker
             final Thread t = w.thread;
             if (t != null) {
                 final ReentrantLock mainLock = this.mainLock;
-                mainLock.lock();//加锁
+                mainLock.lock();
                 try {
-                        workers.add(w); //workers就是一个普通的HashSet,同步的问题通过ReentrantLock解决
+                    // Recheck while holding lock.
+                    // Back out on ThreadFactory failure or if
+                    // shut down before lock acquired.
+                    int rs = runStateOf(ctl.get());
+
+                    if (rs < SHUTDOWN ||
+                        (rs == SHUTDOWN && firstTask == null)) {
+                        if (t.isAlive()) // precheck that t is startable
+                            throw new IllegalThreadStateException();
+                        workers.add(w);
+                        int s = workers.size();
+                        if (s > largestPoolSize)
+                            largestPoolSize = s;
+                        workerAdded = true;
                     }
                 } finally {
                     mainLock.unlock();
                 }
                 if (workerAdded) {
-                    t.start(); //这里就是真正执行command的方法了
+                    t.start(); //这个Thread的构造函数里传入了一个Runnable，也就是Worker自身
                     workerStarted = true;
                 }
             }
-        } 
-        return workerStarted; //这里可以看出来,addWorker返回值表示这个command有没有被执行
+        } finally {
+            if (! workerStarted)
+                addWorkerFailed(w);
+        }
+        return workerStarted;
     }
 
 
-
+// 上面在addWorker中，workerCount自增成功后就会
  final void runWorker(Worker w) { //每一条线程运行起来的时候都会走这个方法
         try {
             while (task != null || (task = getTask()) != null) {
@@ -171,7 +222,7 @@ private boolean addWorker(Runnable firstTask, boolean core) {
             }
             completedAbruptly = false;
         } finally {
-            processWorkerExit(w, completedAbruptly);
+            processWorkerExit(w, completedAbruptly); //在这里从workers的HashSet中移除当前worker
         }
     }    
 ```
@@ -181,10 +232,12 @@ private Runnable getTask() {
         boolean timedOut = false; // Did the last poll() time out?
 
         for (;;) { //轮询
+            boolean timed = allowCoreThreadTimeOut || wc > corePoolSize; //如果当前worker数量超出了corePoolSize，就要允许我这条线程挂掉
+
             try {
                 Runnable r = timed ?
-                    workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS) : //从queue中提取任务
-                    workQueue.take();
+                    workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS) : //queue的poll是立刻返回的,poll(time,unit)是等待超时返回，take则是阻塞
+                    workQueue.take(); // 如果当前没有超过核心线程数，就用take，否则，超过keepAlive时间就设置timedOut为true，重新走一遍循环的时候会cas把当前worker数量自减
                 if (r != null)
                     return r;
                 
@@ -194,6 +247,7 @@ private Runnable getTask() {
         }
     }
 ```
+
 整体来说，executor.execute方法就是通过new出Woker，而Worker则会在run方法中不停的从queue中获取新的任务，从而确保线程不会挂掉。也就是所谓的线程池缓存了线程，避免了频繁创建线程的开销。
 
 
@@ -208,6 +262,11 @@ AbstractQueuedSynchronizer即大名鼎鼎的AQS。
 4. Future,Callable,FutureTask等等
 
 最后，今天下午看到很多jdk里源码的注释，作者都是 Doug Lea ，实在佩服前人的功力。之前也看过一些自定义线程池的实现，现在看起来确实差很多，不要重复造轮子不意味着不需要去了解轮子是怎么造出来的。
+
+
+## 自定义线程池的话，有一些经验公式
+简单来说，就是如果你是CPU密集型运算，那么线程数量和CPU核心数相同就好，避免了大量无用的切换线程上下文。
+如果你是IO密集型的话，需要大量等待，那么线程数可以设置的多一些，比如CPU核心乘以2.
 
 Reference 
 1. [Java 多线程：线程池实现原理](https://github.com/pzxwhc/MineKnowContainer/issues/9)

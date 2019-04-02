@@ -389,6 +389,7 @@ private void setNextRunTime() {
             time = triggerTime(-p); //当前时间+period。而走到这里，run方法已经走过了，所以如果run堵塞了很久，这个task的下一次执行时间就会不准了
 }
 ```
+结论就是scheduleWithFixedDelay可能会因为前面的任务堵塞造成不是那么准
 
 ## 参考
 - [看起来 ReentrantLock 无论在哪方面都比 synchronized 好](http://blog.csdn.net/fw0124/article/details/6672522)

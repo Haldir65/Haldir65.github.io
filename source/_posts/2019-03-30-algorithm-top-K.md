@@ -70,7 +70,7 @@ public static int partition(int[] array, int left, int right) {
 堆排序在处理海量数据的时候十分有效
 查找最大的K个数，其实就是建立一个大小为K的小顶堆，每次出现比顶部大的元素时，替换，并重新调整堆
 代码实现如下
-下面这个是找出最小的K个元素，并且是构建小顶堆
+下面这个是找出最小的K个元素，并且是构建大顶堆
 
 ```java
 public static int[] findTopK(int[] array, int k) {

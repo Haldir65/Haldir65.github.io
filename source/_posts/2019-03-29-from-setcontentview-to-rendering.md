@@ -247,7 +247,7 @@ mSessions:ArraySet<Session> //All currently active sessions with clients.一个a
 mWindowMap:HashMap<IBinder,WindowState> // Mapping from an IWindow IBinder to the server's Window object.Key是IWindow
 mTokenMap:HashMap<IBinder,WindowToken> //Mapping from a token IBinder to a WindowToken object.key应该是IApplicationToken，是从WindowManager.LayoutParams.token跨ipc传入的，value是windowToken。一个windowToken(背后对应唯一activity)，下面包含多个windowState(一个activity可以有多个窗口，比如Dialog)
 ```
-一个windowToken中存有多个WindowState(token.windows),而一般的，一个WindowState就赌赢一个window.
+一个windowToken中存有多个WindowState(token.windows),而一般的，一个WindowState就对应一个window.
 就像WMS要管理多个app(WindowToken)，每个app有多个窗口(WindowState，在app端就是ViewRootImpl.W)，
 
 
@@ -366,7 +366,10 @@ ViewRootImpl中有针对远程返回的res判断的逻辑,结合这WindowManager
     }
 }
 ```
+<code>添加View到WMS的流程</code>
 ![](https://www.haldir66.ga/static/imgs/window_manager_05.png)
+
+<code>从WMS中RemoveView的流程</code>
 ![](https://www.haldir66.ga/static/imgs/window_manager_04.png)
 
 ### 回到ViewRootImpl的setView方法,session.addToDisplay
@@ -617,6 +620,11 @@ public void showAtLocation(View parent, int gravity, int x, int y) {
 用IPC往NotificationManagerService的一个队列中添加一个runnable，系统全局所有应用的Toast请求都被添加到这里，排队，一个个来，远程再回调app进程的Toast.TN(extends ITransientNotification.Stub)的handleShow方法去添加一个type为WindowManager.LayoutPrams.TYPE_TOAST的view。
 当然，时间到了远程还会回调cancelToast去用WMS移除View。
 
+### measure
+
+### layout
+
+### draw
 
 
 ### Choregrapher
@@ -654,3 +662,4 @@ APP可以没有Activty,PhoneWindow,DecorView，例如带悬浮窗的service。
 
 ### 参考
 [图片出自Bugly](https://cloud.tencent.com/developer/article/1070984)
+[深入理解Android之View的绘制流程](https://www.jianshu.com/p/060b5f68da79)
