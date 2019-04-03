@@ -732,6 +732,7 @@ public void draw(Canvas canvas) {
 
 }
 ```
+draw的基本流程是这样，这个canvas是ViewRootImpl中的canvas = mSurface.lockCanvas(dirty);获得的。个人理解Canvas是存储了一系列的指令，再交给surface
 
 ### Choregrapher
 Choregrapher里面有一个内部类FrameDisplayEventReceiver(继承自DisplayEventReceiver，DisplayEventReceiver是一个没有抽象方法的抽象类)，主要提供两个方法nativeScheduleVsync和onVsync。

@@ -5,7 +5,6 @@ tags: [算法]
 ---
 
 10亿个数中找出最大的10000个数（top K问题）
-![](https://www.haldir66.ga/static/imgs/WolfeCreekCrater_ZH-CN10953577427_1920x1080.jpg)
 
 <!--more-->
 
