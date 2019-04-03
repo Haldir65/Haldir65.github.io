@@ -23,7 +23,7 @@
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/window_manager_07.png">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/window_manager_06.png">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/window_manager_03.jpeg">
-<meta property="og:updated_time" content="2019-04-02T17:31:04.026Z">
+<meta property="og:updated_time" content="2019-04-03T14:16:56.388Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从setContentView开始谈的渲染流程">
 <meta name="twitter:description" content="谈一谈View的渲染流程吧">
@@ -852,6 +852,7 @@ public static int getChildMeasureSpec(int spec, int padding, int childDimension)
 
 }
 </code></pre>
+<p>draw的基本流程是这样，这个canvas是ViewRootImpl中的canvas = mSurface.lockCanvas(dirty);获得的。个人理解Canvas是存储了一系列的指令，再交给surface</p>
 <h3 id="Choregrapher"><a href="#Choregrapher" class="headerlink" title="Choregrapher"></a>Choregrapher</h3><p>Choregrapher里面有一个内部类FrameDisplayEventReceiver(继承自DisplayEventReceiver，DisplayEventReceiver是一个没有抽象方法的抽象类)，主要提供两个方法nativeScheduleVsync和onVsync。<br>FrameDisplayEventReceiver在onVsync的时候会post一个异步(也就是说不受syncBarrier阻拦)的消息到主线程上去调用Choregrapher的doFrame（这里面就是把之前所有通过Choregrapher.postCallback添加到队列的事件拿出来，到期了就执行）</p>
 <p>主线程的MessageQueue被syncBarrier堵住的显著特征是meg.target==null(也就是对应的handler为null).  ViewRootImpl在scheduleTraversals的时候会postSyncBarrier一次，也就是说，这个doTraversal是高优先级的，这一刻起后面的所有丢到主线程上的msg都要等到我doTraversal完成后才执行(异步消息例外，所以上面onVsync的消息得是异步的)。从时间顺序上来讲，<br>ViewRootImpl.scheduleTraversal -&gt; mChoreographer.postCallback -&gt; Choreographer开始scheduleFrameLocked（假如时间到了，直接调用nativeScheduleVsync，否则发送的msg全都是异步的，就是为了跨过之前的barrier.）同样，在onVsync的时候，由于此时的barrier还没移除，所以发出的消息还得是异步的。doFrame里面，严格按照input -&gt; animation -&gt; traversal的类型去执行。也就是viewRootImpl在scheduleTraversals的时候post的callback要老老实实在第三组被执行。而在轮到这个doTraversal执行的时候，终于可以去移除barrier了。</p>
 <p>需要指明的是，每一次scheduleTraversal都要触发measure -&gt; layout -&gt; draw这一套，所以，耗时是很严重的。vsync信号也不是系统主动发出的，而是需要通过nativeScheduleVsync请求，才会有一次onVsync的相应的。看了一下，ViewRootImpl里面的setLayoutParams，invalidate,requestLayout,requestFitSystemWindows等方法里面都会触发scheduleTraversal。 显然在onCreate的setContentView里面会至少调用一次。然后就是熟悉的performTraversal(measure,layout,draw)。</p>
@@ -1108,10 +1109,6 @@ public static int getChildMeasureSpec(int spec, int padding, int childDimension)
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
@@ -1121,6 +1118,30 @@ public static int getChildMeasureSpec(int spec, int padding, int childDimension)
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">tools</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Window</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1164,23 +1185,15 @@ public static int getChildMeasureSpec(int spec, int padding, int childDimension)
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Window</a>
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1208,15 +1221,19 @@ public static int getChildMeasureSpec(int spec, int padding, int childDimension)
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1233,22 +1250,6 @@ public static int getChildMeasureSpec(int spec, int padding, int childDimension)
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">sql</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
               </li>
              
               <li class="article-tag-list-item">
