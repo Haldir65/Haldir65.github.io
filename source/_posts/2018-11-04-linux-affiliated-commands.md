@@ -193,6 +193,14 @@ $ ./command file1 file2 file3 2> log-file
 stdout file1
 stdout file3
 
+比方说这个命令
+/tmp/test.sh > /tmp/test.log 2>&1
+执行sh脚本，输出到log文件中，把错误信息也写进文件
+所以经常看到的
+nohup /mnt/Nand3/H2000G >/dev/null 2>&1 &
+就是把输出丢进垃圾桶，跟着把错误也丢进垃圾桶，后面那个是后台运行的意思
+
+
 使用 dmesg 来查看一些硬件或驱动程序的信息或问题。感觉像是查看系统启动日志
 
 文件夹/sys/devices/system/cpu就是对cpu的文件映射。进入以后，随便进一个cpu核，可以看到cache文件夹，tree以后：
@@ -227,7 +235,6 @@ stdout file3
 ...同上一个文件夹
     └── ways_of_associativity
 ```
-
 
 
 

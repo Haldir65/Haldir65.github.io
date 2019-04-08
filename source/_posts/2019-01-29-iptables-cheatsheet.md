@@ -23,12 +23,22 @@ which may be a jump to a user-defined chain in the same table.
 **iptables命令需要root权限执行**
 每个表包含有若干个不同的链，比如 filter 表默认包含有 INPUT，FORWARD，OUTPUT 三个链。iptables有四个表，分别是：raw，nat，mangle和filter，每个表都有自己专门的用处，比如最常用filter表就是专门用来做包过滤的，而 nat 表是专门用来做NAT的。
 
-**iptables中有3个chain**
+## Chain
+默认的Chain包括
 - INPUT ---> 所有进入这台主机的连接
 - FORWARD  ---> 借由这台主机发出的（路由器）
 - OUTPUT ---> 所有从这台主机发出去的连接
+- PREROUTING / POSTROUTING
 
 每一条Chain上都有一个rules的列表(用A去append,用I去Insert)
+
+## table（table是一系列针对packet的同一类决策的集合）
+Mangle is to change packets (Type Of Service, Time To Live etc) on traversal.
+Nat is to put in NAT rules.
+Raw is to be used for marking and connection tracking.
+Filter is for filtering packets.
+
+
 ```
 #~ iptables -L INPUT -n -v --line-numbers
 
@@ -39,7 +49,7 @@ num  target     prot opt source               destination
 3    ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0           state NEW,ESTABLISHED
 ```
 执行顺序(这个比较麻烦):
-> 每一个chain是从上往下读取的。
+
 iptables执行规则时，是从从规则表中从上至下顺序执行的，如果没遇到匹配的规则，就一条一条往下执行，如果遇到匹配的规则后，那么就执行本规则，执行后根据本规则的动作(accept, reject, log等)，决定下一步执行的情况。
 比如说上面这个，拉黑了202.54.1.2虽然第三条规则说全部接受，其实202.54.1.2的包是进不来的。
 这也是很多教程建议把自己的iptables写在后面的原因，不要把系统现有规则覆盖掉。
@@ -111,7 +121,11 @@ iptabels -D INPUT 4 //把这个第四行的规则删掉
 iptables -D INPUT -s 202.54.1.1 -j DROP //这个也是一样的
 ```
 
-上面说了，iptables的顺序是从上往下读取的，后面的会依据前面的规则作出决定。所以假如第2条规则说全部接受，我想拉黑某个ip，就得用-I，把拉黑的规则插入到最前面（-I 1 就是插入到第一位）: 
+只允许特定ip访问某个端口
+> sudo iptables -I INPUT -p tcp ! -s 200.200.200.0/24 --destination-port 1080 -j DROP
+
+
+上面说了，iptables的顺序是从上往下match，前面的如果匹配上了，后面的就不会有机会被匹配。所以假如第2条规则说全部接受，我想拉黑某个ip，就得用-I，把拉黑的规则插入到最前面（-I 1 就是插入到第一位）: 
 iptables -I 1 INPUT -s xxx.xxx.xxx.xxx -j DROP
 
 
@@ -179,8 +193,12 @@ ping: sendmsg: Operation not permitted(就是被发出去的包被iptables拦下
 iptables -A OUTPUT -p tcp -d www.facebook.com -j DROP //直接搞定,但是不推荐这么干
 ```
 
-### 拉黑某个mac地址
+### 根据某个mac地址指定
 ```
+# iptables -I INPUT -m mac --mac-source 3E:D7:88:A6:66:8E -j ACCEPT
+# iptables -I INPUT -p tcp --dport 22 -m mac --mac-source 3E:D7:88:A6:66:8E -j ACCEPT
+# iptables -I INPUT -p tcp --dport 22 -m mac --mac-source 3E:D7:88:A6:66:8E -j REJECT
+# iptables -I INPUT -p tcp --port 22 -m mac ! --mac-source 3E:D7:88:A6:66:8E -j REJECT //除了特定mac以外都不允许访问
 # iptables -A INPUT -m mac --mac-source 00:0F:EA:91:04:08 -j DROP
 ```
 
@@ -204,10 +222,19 @@ iptables -A INPUT -p icmp --icmp-type echo-request -j ACCEPT
 iptables -A OUTPUT -p tcp -d 69.171.224.0/19 -j LOG --log-prefix "IP_SPOOF A: "
 iptables -A OUTPUT -p tcp -d 69.171.224.0/19 -j DROP 
 
-//默认情况下所有信息都被log到/var/log/messgaes文件中了，我试了下，并没有，不过这并不重要吧
-tail -f /var/log/messages
-grep --color 'IP SPOOF' /var/log/messages
+我们可以简单地使用下面的命令启用iptables的日志记录。
+$ iptables -A INPUT -j LOG
+我们还可以定义哪些日志将被创建的源IP或范围。
+$ iptables -A INPUT -s 192.168.10.0/24 -j LOG
+定义我们的iptables -log 生成的日志级别。
+$ iptables -A INPUT -s 192.168.10.0/24 -j LOG --log-level 4
+我们还可以添加一些前缀生成的日志，所以它会很容易在一个巨大的文件中搜索日志。
+$ iptables -A INPUT -s 192.168.10.0/24 -j LOG --log-prefix '** SUSPECT **'
 ```
+在Ubuntu和Debian
+iptables的日志由内核生成的。因此，检查以下内核日志文件。
+查看iptables的日志
+$ tailf /var/log/kern.log
 
 ### 只开7000-7010端口,只允许某个网段的ip发请求
 ```
@@ -291,7 +318,7 @@ iptables -I INPUT -j syn-flood
 iptables -L INPUT -s xxx.xxx.xxx.xxx -p tcp --dport 80 -j DROP
 iptables -L INPUT -s xxx.xxx.xxx.xxx -p tcp --dport 443 -j DROP
 
-而事实上就是创建了一个chain
+而事实上就是创建了一个action
 ~ cat /etc/fail2ban/action.d/iptables.conf
 # Option:  actionban
 # Notes.:  command executed when banning an IP. Take care that the
@@ -302,7 +329,7 @@ iptables -L INPUT -s xxx.xxx.xxx.xxx -p tcp --dport 443 -j DROP
 actionban = <iptables> -I f2b-<name> 1 -s <ip> -j <blocktype>
 ```
 
-## REDIRECT (Transparent proxy related)
+## REDIRECT (透明代理)
 首先来看一个把所有走网卡eth0的数据包都转发到redSocks的规则
 ```
 // 新建路由转发表中的一个链 REDSOCKS
@@ -361,7 +388,7 @@ iptables -t mangle -A V2RAY_MASK -p udp -j TPROXY --on-port 1080 --tproxy-mark 1
 iptables -t mangle -A PREROUTING -p udp -j V2RAY_MASK
 ```
 
-***亲测，透明代理的效果是可以的。只是比不上在windows上的速度,cpu占用达到50%以上，没什么意思。***
+**亲测，透明代理的效果是可以的。只是比不上在windows上的速度,cpu占用达到50%以上，没什么意思。**
 
 
 相比起来,shadowsocks-libev给出了这样一份transparent proxy的代码，更加清楚
@@ -433,7 +460,9 @@ iptables -t nat -L -n -v //在路由器上这个会有
 一般路由器就是干这个的（使用iptables配置nat）
 POSTROUTING 和 PREROUTING的概念
 
-还有一个ipset 可以认为是一次性执行多个iptables命令,openwrt上经常用
+### ipset的概念
+就是一大堆ip的一个集合，但是存的是hash，所以性能很好
+
 
 netfilter是kernel的实现
 > Iptables is a standard firewall included in most Linux distributions by default (a modern variant called nftables will begin to replace it). It is actually a front end to the kernel-level netfilter hooks that can manipulate the Linux network stack.

@@ -189,6 +189,8 @@ awk '/[a-z]/ { print }' test.txt  //包含a-z任一字母的
 awk '/[0-8]/ { print }' test.txt // 包含0-8任一数字的
 awk '/^[0-8]/ { print }' test.txt // 以0-8任一数字开头的
 awk '/[0-8]$/ { print }' test.txt //以0-8任一数字结尾的
+awk 'NR==5 || NR==9' "file" //NR是行号
+awk 'NR>=5&&NR<=9' "file" //NR还可以指定行号范围
 
 
 sudo last | awk '{ print $(NF-7)}' //我想看倒数第7列的数据

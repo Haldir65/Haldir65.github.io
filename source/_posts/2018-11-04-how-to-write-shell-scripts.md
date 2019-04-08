@@ -23,6 +23,8 @@ Linux 的 Shell 种类众多，常见的有：
 - Shell for Root（/sbin/sh）
 ……
 
+这里说的并不是严格的`posix complaint shell`，就是那种在各种unix系统中都能运行的shell。因为bash用的最广，所以这里主要针对bash语法进行讲解
+
 ## Shebang
 脚本以[Shebang](https://en.wikipedia.org/wiki/Shebang_(Unix))开始
 ```
@@ -71,42 +73,169 @@ echo \$myvar ## $myvar
 ```
 单引号里面的变量是不能输出变量的值的，所以尽量用双引号
 
-## if else这种逻辑判断怎么写
+## bash的变量是无类型的
+bash中是没有变量类型的说法的，例如`a=1` 这句话，你不能认为a是integer类型的。**本质上来说，Bash变量是字符串，但是根据环境的不同，Bash允许变量有整数计算和比较。其中的决定因素是变量的值是不是只含有数字.**
 ```bash
-#!/bin/sh
-myPath="/var/log/httpd/"
-myFile="/var /log/httpd/access.log"
-#这里的-x 参数判断$myPath是否存在并且是否具有可执行权限
-if [ ! -x "$myPath"]; then
-mkdir "$myPath"
+$ a=2
+$ echo "$a + 1"
+2 + 1 //被当成字符串了
+$ echo "$(($a + 1))"
+3 //被当成整数了
+```
+
+
+
+## if else这种逻辑判断怎么写
+
+`两个数字比较是否相等，大小关系`
+```bash
+ #!/bin/bash
+a=10
+b=6
+
+if [ $a -eq 10  ]; then
+    echo "a == 10"
+else
+    echo "not equal"
 fi
-#这里的-d 参数判断$myPath是否存在
-if [ ! -d "$myPath"]; then
-mkdir "$myPath"
+
+if (( $a > $b  )); then
+    echo "a greater than b "
 fi
-#这里的-f参数判断$myFile是否存在
-if [ ! -f "$myFile" ]; then
-touch "$myFile"
-fi
-#其他参数还有-n,-n是判断一个变量是否是否有值
-if [ ! -n "$myVar" ]; then
-echo "$myVar is empty"
-exit 0
-fi
-#两个变量判断是否相等
+```
+
+`类似的数字之间的比较还有很多`
+```
+-eq 等于,如:if [ "$a" -eq "$b" ] 
+-ne 不等于,如:if [ "$a" -ne "$b" ] 
+-gt 大于,如:if [ "$a" -gt "$b" ] 
+-ge 大于等于,如:if [ "$a" -ge "$b" ] 
+-lt 小于,如:if [ "$a" -lt "$b" ] 
+-le 小于等于,如:if [ "$a" -le "$b" ] 
+<   小于(需要双括号),如:(("$a" < "$b")) 
+<=  小于等于(需要双括号),如:(("$a" <= "$b")) 
+>   大于(需要双括号),如:(("$a" > "$b")) 
+>=  大于等于(需要双括号),如:(("$a" >= "$b"))
+```
+
+`判断两个字符串是否相等`
+
+```bash
 if [ "$var1" == "$var2" ]; then  ##if 后面必须加then
 echo '$var1 eq $var2'
 else
 echo '$var1 not eq $var2'
-fi //else后面必须加fi
-if list then
-    do something here
-elif list then
-    do another thing here
-else
-    do something else here
-fi  
+fi
 ```
+
+`判断两个字符串是否不相等`
+```bash
+if [ "$a"x != "$b"x ]; then
+echo "$a not equals $b"
+else
+echo "$a equals $b"
+fi
+```
+
+`判断字符串是否为空`
+```bash
+if [ -z "$d" ]
+then
+	echo "d is empty"
+fi
+```
+str1 = str2　　　　　　当两个串有相同内容、长度时为真 
+str1 != str2　　　　　 当串str1和str2不等时为真 
+-n str1　　　　　　　 当串的长度大于0时为真(串非空) 
+-z str1　　　　　　　 当串的长度为0时为真(空串) 
+str1　　　　　　　　   当串str1为非空时为真
+
+
+`文件或者目录相关操作`
+```bash
+## 文件不存在
+if [ ! -f /etc/nonexisitfile ]; then
+     echo "file not exists"
+fi
+## 文件存在
+if [ -f /etc/rc.local ]; then //-f是被测文件是一个regular文件（正常文件，非目录或设备）
+    echo "file exists"
+fi    
+
+if [ -d /usr/bin ]; then
+    echo "folder exists"
+fi
+
+if [ ! -f /usr/bin ]; then
+    echo "folder cannot use -f" // 文件不存在
+fi
+
+if [ -s /usr/bin ]; then
+    echo "folder can use -s" //文件存在
+fi
+
+if [ -r /usr/bin/watch ]; then
+    echo "i can read this file" //可读权限
+fi
+
+if [ ! -w /usr/bin/watch ]; then
+    echo "i can not write this file" //可写权限
+fi
+```
+-r file　　　　　用户可读为真 
+-w file　　　　　用户可写为真 
+-x file　　　　　用户可执行为真 
+-f file　　　　　文件为正规文件为真 
+-d file　　　　　文件为目录为真 
+-c file　　　　　文件为字符特殊文件为真 
+-b file　　　　　文件为块特殊文件为真 
+-s file　　　　　文件大小非0时为真 
+-t file　　　　　当文件描述符(默认为1)指定的设备为终端时为真
+
+
+`判断nginx是否在运行，没有运行的话拉起来`
+```bash
+#!/bin/sh
+set -e
+SERVICE="nginx"
+if pgrep -x "$SERVICE" >/dev/null
+then
+    echo "$SERVICE is running"
+else
+    echo "$SERVICE stopped"
+    # uncomment to start nginx if stopped
+    systemctl start nginx
+    # mail
+fi
+```
+
+`检查下当前是否安装了git`
+```bash
+if ! [ -x "$(command -v git)" ]; then   ## command这个关键字是posix compatible的
+  echo 'Error: git is not installed.' >&2
+  exit 1
+fi
+```
+
+
+`在一个文件中查找是否存在某一个单词，如果存在的话执行某项task`
+```bash
+if grep -q keyword /var/somefile ; then ##这个-q只是避免grep输出找出来的string，我们只需要知道它的返回值是成功还是失败
+    echo "file contain that word"
+fi
+```
+
+## 与，或，非操作
+```shell
+if [ ${OUT_FILE}a != ${OUT_FILE%/*}a ] && [ ! -d ${OUT_FILE%/*} ]; then ## 用&& 就可以了
+    _red 'Error: Folder do not exist: '${OUT_FILE%/*}'\n'
+    exit 1
+fi
+```
+-a 　 　　　　　 与 
+-o　　　　　　　 或 
+!　　　　　　　　非
+
 
 ## 字符串拼接是很重要的
 ```bash
@@ -132,18 +261,171 @@ echo "$(which java)"/something
 >> /usr/bin/java/something
 
 #!/bin/bash
-java_stuff="$(which java)"
-${java_stuff} --version
+java="$(which java)"
+${java} --version
 ```
 
 
-## 还有for循环
-```bash
+## 流程控制(for循环和while循环)
+```shell
 for file in `ls /etc`
 ##或
 for file in $(ls /etc)
+
+for str in "a b c"  //用空格分割
 ```
 
+
+## 数组遍历，下标，长度等等
+写成一行也是可以的
+```shell
+distro=("redhat" "debian" "gentoo")
+len=<code>${</code>#distro[@]}
+for (( i=0; i<$len; i++ )); do echo "${distro[$i]}" ; done
+```
+
+
+## 简单的循环（for each循环）
+```shell
+#!/bin/bash
+i=0;
+while [ $i -lt 4 ];
+do
+   echo $i;
+   i=`expr $i + 1`;
+   # let i+=1; //这些都是让i自增的方式
+   # ((i++));
+   # i=$[$i+1];
+   # i=$(( $i + 1 ))
+done
+
+#!/bin/bash
+for j in $(seq 1 5)
+do
+  echo $j
+done
+
+## 还可以写成一行
+for f in *.txt; do grep "tasks:" $f
+```
+
+### switch case的例子找了一个现成的
+```bash
+get_args(){
+    OUT_TYPE='DNSMASQ_RULES'
+    DNS_IP='127.0.0.1'
+    DNS_PORT='5353'
+    IPSET_NAME=''
+    FILE_FULLPATH=''
+    CURL_EXTARG=''
+    WGET_EXTARG=''
+    WITH_IPSET=0
+    EXTRA_DOMAIN_FILE=''
+    EXCLUDE_DOMAIN_FILE=''
+    IPV4_PATTERN='^((2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?)\.){3}(2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?)$'
+    IPV6_PATTERN='^((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:)))(%.+)?$'
+
+    while [ ${#} -gt 0 ]; do
+        case "${1}" in
+            --help | -h)
+                usage 0
+                ;;
+            --domain-list | -l)
+                OUT_TYPE='DOMAIN_LIST'
+                ;;
+            --insecure | -i)
+                CURL_EXTARG='--insecure'
+                WGET_EXTARG='--no-check-certificate'
+                ;;
+            --dns | -d)
+                DNS_IP="$2"
+                shift
+                ;;
+            --port | -p)
+                DNS_PORT="$2"
+                shift
+                ;;
+            --ipset | -s)
+                IPSET_NAME="$2"
+                shift
+                ;;
+            --output | -o)
+                OUT_FILE="$2"
+                shift
+                ;;
+            --extra-domain-file)
+                EXTRA_DOMAIN_FILE="$2"
+                shift
+                ;;
+           --exclude-domain-file)
+                EXCLUDE_DOMAIN_FILE="$2"
+                shift
+                ;;
+            *)
+                _red "Invalid argument: $1"
+                usage 1
+                ;;
+        esac
+        shift 1
+    done
+
+    # Check path & file name
+    if [ -z $OUT_FILE ]; then
+        _red 'Error: Please specify the path to the output file(using -o/--output argument).\n'
+        exit 1
+    else
+        if [ -z ${OUT_FILE##*/} ]; then  ## -z表示字符串的长度为0,-n为大于0
+            _red 'Error: '$OUT_FILE' is a path, not a file.\n'
+            exit 1
+        else
+            if [ ${OUT_FILE}a != ${OUT_FILE%/*}a ] && [ ! -d ${OUT_FILE%/*} ]; then
+                _red 'Error: Folder do not exist: '${OUT_FILE%/*}'\n'
+                exit 1
+            fi
+        fi
+    fi
+
+    if [ $OUT_TYPE = 'DNSMASQ_RULES' ]; then
+        # Check DNS IP
+        IPV4_TEST=$(echo $DNS_IP | grep -E $IPV4_PATTERN)
+        IPV6_TEST=$(echo $DNS_IP | grep -E $IPV6_PATTERN)
+        if [ "$IPV4_TEST" != "$DNS_IP" -a "$IPV6_TEST" != "$DNS_IP" ]; then
+            _red 'Error: Please enter a valid DNS server IP address.\n'
+            exit 1
+        fi
+
+        # Check DNS port
+        if [ $DNS_PORT -lt 1 -o $DNS_PORT -gt 65535 ]; then
+            _red 'Error: Please enter a valid DNS server port.\n'
+            exit 1
+        fi
+
+        # Check ipset name
+        if [ -z $IPSET_NAME ]; then
+            WITH_IPSET=0
+        else
+            IPSET_TEST=$(echo $IPSET_NAME | grep -E '^\w+$')
+            if [ "$IPSET_TEST" != "$IPSET_NAME" ]; then
+                _red 'Error: Please enter a valid IP set name.\n'
+                exit 1
+            else
+                WITH_IPSET=1
+            fi
+        fi
+    fi
+
+    if [ ! -z $EXTRA_DOMAIN_FILE ] && [ ! -f $EXTRA_DOMAIN_FILE ]; then
+        _yellow 'WARNING:\nExtra domain file does not exist, ignored.\n\n'
+        EXTRA_DOMAIN_FILE=''
+    fi
+
+    if [ ! -z $EXCLUDE_DOMAIN_FILE ] && [ ! -f $EXCLUDE_DOMAIN_FILE ]; then
+        _yellow 'WARNING:\nExclude domain file does not exist, ignored.\n\n'
+        EXCLUDE_DOMAIN_FILE=''
+    fi
+}
+```
+懒得解释了，就是一个switch case和各种if else
 
 
 ### 变量($其实就是美元符号了)
@@ -235,6 +517,8 @@ fi
 ```
 
 [原因是sh不支持这种用法，bash支持。所以改成bash xxx.sh就可以了](https://superuser.com/questions/374406/why-do-i-get-not-found-when-running-a-script)
+
+`ununtu默认的sh不是bash而是一个叫做dash的东西`
 sh只是一个符号链接，最终指向是一个叫做dash的程序，自Ubuntu 6.10以后，系统的默认shell /bin/sh被改成了dash。dash(the Debian Almquist shell) 是一个比bash小很多但仍兼容POSIX标准的shell，它占用的磁盘空间更少，执行shell脚本比bash更快，依赖的库文件更少，当然，在功能上无法与bash相比。dash来自于NetBSD版本的Almquist Shell(ash)。
 Ubuntu中将默认shell改为dash的主要原因是效率。由于Ubuntu启动过程中需要启动大量的shell脚本，为了优化启动速度和资源使用情况，Ubuntu做了这样的改动。
 
@@ -316,6 +600,32 @@ EOF
 shell脚本里面经常会看到mktemp函数，作用就是确保生成一个随机命名的文件
 
 
+### 一行行的读取一个文件
+```bash
+#!/bin/bash
+file="/home/vivek/data.txt"
+while IFS= read -r line
+do
+        # display $line or do somthing with $line
+	printf '%s\n' "$line"
+done <"$file"
+```
+
+`awk有一个比较坑的地方是在执行命令的语句中只能写print,printf这种awk自带的函数`
+```bash
+echo "A B C" | awk '{split($0,a," ");for(i in a){ if(i == NF){ print a[1] } else { print a[i+1] }}}' //NF是最后一行的意思
+```
+得到输出
+B
+C
+A
+
+`awk的命令里面要想调用一个系统函数，比方说ls，或者自己的一个shell function，得这么写`
+```bash
+awk '{printf("%s ",$1); system("d2h " $2)}' file
+```
+
+
 ### 直接挑选几个可以用的脚本开始看吧
 
 1. 一个把文件夹（/public/imgs）下所有文件重命名为img-x.jpg的shell脚本
@@ -349,8 +659,8 @@ grep -E aaa\|bbb
 
 
 2. [一个直接把gfwlist的bs64文本转换成dnsmasq配置文件的脚本](https://github.com/cokebar/gfwlist2dnsmasq/blob/master/gfwlist2dnsmasq.sh) 注意，base64在linux上是预装的
-这个脚本分开几段来看:
-### 首先是检查当前系统中依赖的软件是否都装了
+
+### 检查当前系统中依赖的软件是否都装了
 
 ```bash
 check_depends(){
@@ -372,7 +682,7 @@ check_depends(){
     fi
 
     SYS_KERNEL=`uname -s`
-    if [ $SYS_KERNEL = "Darwin"  -o $SYS_KERNEL = "FreeBSD" ]; then ## if 语句里面or是这么写的
+    if [ $SYS_KERNEL = "Darwin"  -o $SYS_KERNEL = "FreeBSD" ]; then ## if 语句里面or是就是-o，短路与是-a 
         BASE64_DECODE='base64 -D'
         SED_ERES='sed -E'
     else
@@ -382,123 +692,7 @@ check_depends(){
 }
 ```
 
-### 接下来是从获取传进来的参数
-```bash
-get_args(){
-    OUT_TYPE='DNSMASQ_RULES'
-    DNS_IP='127.0.0.1'
-    DNS_PORT='5353'
-    IPSET_NAME=''
-    FILE_FULLPATH=''
-    CURL_EXTARG=''
-    WGET_EXTARG=''
-    WITH_IPSET=0
-    EXTRA_DOMAIN_FILE=''
-    EXCLUDE_DOMAIN_FILE=''
-    IPV4_PATTERN='^((2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?)\.){3}(2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?)$'
-    IPV6_PATTERN='^((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:)))(%.+)?$'
 
-    while [ ${#} -gt 0 ]; do
-        case "${1}" in
-            --help | -h)
-                usage 0
-                ;;
-            --domain-list | -l)
-                OUT_TYPE='DOMAIN_LIST'
-                ;;
-            --insecure | -i)
-                CURL_EXTARG='--insecure'
-                WGET_EXTARG='--no-check-certificate'
-                ;;
-            --dns | -d)
-                DNS_IP="$2"
-                shift
-                ;;
-            --port | -p)
-                DNS_PORT="$2"
-                shift
-                ;;
-            --ipset | -s)
-                IPSET_NAME="$2"
-                shift
-                ;;
-            --output | -o)
-                OUT_FILE="$2"
-                shift
-                ;;
-            --extra-domain-file)
-                EXTRA_DOMAIN_FILE="$2"
-                shift
-                ;;
-           --exclude-domain-file)
-                EXCLUDE_DOMAIN_FILE="$2"
-                shift
-                ;;
-            *)
-                _red "Invalid argument: $1"
-                usage 1
-                ;;
-        esac
-        shift 1
-    done
-
-    # Check path & file name
-    if [ -z $OUT_FILE ]; then
-        _red 'Error: Please specify the path to the output file(using -o/--output argument).\n'
-        exit 1
-    else
-        if [ -z ${OUT_FILE##*/} ]; then
-            _red 'Error: '$OUT_FILE' is a path, not a file.\n'
-            exit 1
-        else
-            if [ ${OUT_FILE}a != ${OUT_FILE%/*}a ] && [ ! -d ${OUT_FILE%/*} ]; then
-                _red 'Error: Folder do not exist: '${OUT_FILE%/*}'\n'
-                exit 1
-            fi
-        fi
-    fi
-
-    if [ $OUT_TYPE = 'DNSMASQ_RULES' ]; then
-        # Check DNS IP
-        IPV4_TEST=$(echo $DNS_IP | grep -E $IPV4_PATTERN)
-        IPV6_TEST=$(echo $DNS_IP | grep -E $IPV6_PATTERN)
-        if [ "$IPV4_TEST" != "$DNS_IP" -a "$IPV6_TEST" != "$DNS_IP" ]; then
-            _red 'Error: Please enter a valid DNS server IP address.\n'
-            exit 1
-        fi
-
-        # Check DNS port
-        if [ $DNS_PORT -lt 1 -o $DNS_PORT -gt 65535 ]; then
-            _red 'Error: Please enter a valid DNS server port.\n'
-            exit 1
-        fi
-
-        # Check ipset name
-        if [ -z $IPSET_NAME ]; then
-            WITH_IPSET=0
-        else
-            IPSET_TEST=$(echo $IPSET_NAME | grep -E '^\w+$')
-            if [ "$IPSET_TEST" != "$IPSET_NAME" ]; then
-                _red 'Error: Please enter a valid IP set name.\n'
-                exit 1
-            else
-                WITH_IPSET=1
-            fi
-        fi
-    fi
-
-    if [ ! -z $EXTRA_DOMAIN_FILE ] && [ ! -f $EXTRA_DOMAIN_FILE ]; then
-        _yellow 'WARNING:\nExtra domain file does not exist, ignored.\n\n'
-        EXTRA_DOMAIN_FILE=''
-    fi
-
-    if [ ! -z $EXCLUDE_DOMAIN_FILE ] && [ ! -f $EXCLUDE_DOMAIN_FILE ]; then
-        _yellow 'WARNING:\nExclude domain file does not exist, ignored.\n\n'
-        EXCLUDE_DOMAIN_FILE=''
-    fi
-}
-```
-懒得解释了，就是一个switch case和各种if else
 
 ![](https://www.haldir66.ga/static/imgs/PuffinWales_EN-AU12757555133_1920x1080.jpg)
 
@@ -507,4 +701,4 @@ get_args(){
 [shell script tutorial](https://www.youtube.com/watch?v=hwrnmQumtPw)
 [LINUX下的21个特殊符号](http://blog.51cto.com/litaotao/1187983)
 [Shell学习笔记](https://notes.wanghao.work/2015-06-02-Shell%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html)
-[how to use variables in shell scripts](https://www.youtube.com/watch?v=Lu-xzWajbFo)
+[非常好的shell介绍网站](https://www.cyberciti.biz/faq/linux-unix-shell-check-if-directory-empty/)
