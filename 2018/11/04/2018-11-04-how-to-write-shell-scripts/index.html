@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/timg.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/PuffinWales_EN-AU12757555133_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-04-03T14:16:56.384Z">
+<meta property="og:updated_time" content="2019-04-08T01:41:03.508Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="如何写shell脚本">
 <meta name="twitter:description" content="总结linux下shell脚本语句的语法Shell 是一个用 C 语言编写的程序，它是用户使用 Linux 的桥梁。Shell 既是一种命令语言，又是一种程序设计语言。Shell 是指一种应用程序，这个应用程序提供了一个界面，用户通过这个界面访问操作系统内核的服务。Ken Thompson 的 sh 是第一种 Unix Shell，Windows Explorer 是一个典型的图形界面 Shell">
@@ -212,6 +212,7 @@ ga('send', 'pageview');
 <li>K Shell（/usr/bin/ksh）</li>
 <li>Shell for Root（/sbin/sh）<br>……</li>
 </ul>
+<p>这里说的并不是严格的<code>posix complaint shell</code>，就是那种在各种unix系统中都能运行的shell。因为bash用的最广，所以这里主要针对bash语法进行讲解</p>
 <h2 id="Shebang"><a href="#Shebang" class="headerlink" title="Shebang"></a>Shebang</h2><p>脚本以<a href="https://en.wikipedia.org/wiki/Shebang_(Unix">Shebang</a>)开始</p>
 <pre><code>&gt; #!/bin/sh
 #! 是一个约定的标记，它告诉系统这个脚本需要什么解释器来执行，即使用哪一种 Shell。
@@ -241,40 +242,122 @@ echo &#39; $myvar&#39; ## $myvar
 echo \$myvar ## $myvar
 </code></pre>
 <p>单引号里面的变量是不能输出变量的值的，所以尽量用双引号</p>
-<h2 id="if-else这种逻辑判断怎么写"><a href="#if-else这种逻辑判断怎么写" class="headerlink" title="if else这种逻辑判断怎么写"></a>if else这种逻辑判断怎么写</h2><pre><code class="bash">#!/bin/sh
-myPath=&quot;/var/log/httpd/&quot;
-myFile=&quot;/var /log/httpd/access.log&quot;
-#这里的-x 参数判断$myPath是否存在并且是否具有可执行权限
-if [ ! -x &quot;$myPath&quot;]; then
-mkdir &quot;$myPath&quot;
+<h2 id="bash的变量是无类型的"><a href="#bash的变量是无类型的" class="headerlink" title="bash的变量是无类型的"></a>bash的变量是无类型的</h2><p>bash中是没有变量类型的说法的，例如<code>a=1</code> 这句话，你不能认为a是integer类型的。<strong>本质上来说，Bash变量是字符串，但是根据环境的不同，Bash允许变量有整数计算和比较。其中的决定因素是变量的值是不是只含有数字.</strong></p>
+<pre><code class="bash">$ a=2
+$ echo &quot;$a + 1&quot;
+2 + 1 //被当成字符串了
+$ echo &quot;$(($a + 1))&quot;
+3 //被当成整数了
+</code></pre>
+<h2 id="if-else这种逻辑判断怎么写"><a href="#if-else这种逻辑判断怎么写" class="headerlink" title="if else这种逻辑判断怎么写"></a>if else这种逻辑判断怎么写</h2><p><code>两个数字比较是否相等，大小关系</code></p>
+<pre><code class="bash"> #!/bin/bash
+a=10
+b=6
+
+if [ $a -eq 10  ]; then
+    echo &quot;a == 10&quot;
+else
+    echo &quot;not equal&quot;
 fi
-#这里的-d 参数判断$myPath是否存在
-if [ ! -d &quot;$myPath&quot;]; then
-mkdir &quot;$myPath&quot;
+
+if (( $a &gt; $b  )); then
+    echo &quot;a greater than b &quot;
 fi
-#这里的-f参数判断$myFile是否存在
-if [ ! -f &quot;$myFile&quot; ]; then
-touch &quot;$myFile&quot;
-fi
-#其他参数还有-n,-n是判断一个变量是否是否有值
-if [ ! -n &quot;$myVar&quot; ]; then
-echo &quot;$myVar is empty&quot;
-exit 0
-fi
-#两个变量判断是否相等
-if [ &quot;$var1&quot; == &quot;$var2&quot; ]; then  ##if 后面必须加then
+</code></pre>
+<p><code>类似的数字之间的比较还有很多</code></p>
+<pre><code>-eq 等于,如:if [ &quot;$a&quot; -eq &quot;$b&quot; ] 
+-ne 不等于,如:if [ &quot;$a&quot; -ne &quot;$b&quot; ] 
+-gt 大于,如:if [ &quot;$a&quot; -gt &quot;$b&quot; ] 
+-ge 大于等于,如:if [ &quot;$a&quot; -ge &quot;$b&quot; ] 
+-lt 小于,如:if [ &quot;$a&quot; -lt &quot;$b&quot; ] 
+-le 小于等于,如:if [ &quot;$a&quot; -le &quot;$b&quot; ] 
+&lt;   小于(需要双括号),如:((&quot;$a&quot; &lt; &quot;$b&quot;)) 
+&lt;=  小于等于(需要双括号),如:((&quot;$a&quot; &lt;= &quot;$b&quot;)) 
+&gt;   大于(需要双括号),如:((&quot;$a&quot; &gt; &quot;$b&quot;)) 
+&gt;=  大于等于(需要双括号),如:((&quot;$a&quot; &gt;= &quot;$b&quot;))
+</code></pre><p><code>判断两个字符串是否相等</code></p>
+<pre><code class="bash">if [ &quot;$var1&quot; == &quot;$var2&quot; ]; then  ##if 后面必须加then
 echo &#39;$var1 eq $var2&#39;
 else
 echo &#39;$var1 not eq $var2&#39;
-fi //else后面必须加fi
-if list then
-    do something here
-elif list then
-    do another thing here
-else
-    do something else here
 fi
 </code></pre>
+<p><code>判断两个字符串是否不相等</code></p>
+<pre><code class="bash">if [ &quot;$a&quot;x != &quot;$b&quot;x ]; then
+echo &quot;$a not equals $b&quot;
+else
+echo &quot;$a equals $b&quot;
+fi
+</code></pre>
+<p><code>判断字符串是否为空</code></p>
+<pre><code class="bash">if [ -z &quot;$d&quot; ]
+then
+    echo &quot;d is empty&quot;
+fi
+</code></pre>
+<p>str1 = str2　　　　　　当两个串有相同内容、长度时为真<br>str1 != str2　　　　　 当串str1和str2不等时为真<br>-n str1　　　　　　　 当串的长度大于0时为真(串非空)<br>-z str1　　　　　　　 当串的长度为0时为真(空串)<br>str1　　　　　　　　   当串str1为非空时为真</p>
+<p><code>文件或者目录相关操作</code></p>
+<pre><code class="bash">## 文件不存在
+if [ ! -f /etc/nonexisitfile ]; then
+     echo &quot;file not exists&quot;
+fi
+## 文件存在
+if [ -f /etc/rc.local ]; then //-f是被测文件是一个regular文件（正常文件，非目录或设备）
+    echo &quot;file exists&quot;
+fi    
+
+if [ -d /usr/bin ]; then
+    echo &quot;folder exists&quot;
+fi
+
+if [ ! -f /usr/bin ]; then
+    echo &quot;folder cannot use -f&quot; // 文件不存在
+fi
+
+if [ -s /usr/bin ]; then
+    echo &quot;folder can use -s&quot; //文件存在
+fi
+
+if [ -r /usr/bin/watch ]; then
+    echo &quot;i can read this file&quot; //可读权限
+fi
+
+if [ ! -w /usr/bin/watch ]; then
+    echo &quot;i can not write this file&quot; //可写权限
+fi
+</code></pre>
+<p>-r file　　　　　用户可读为真<br>-w file　　　　　用户可写为真<br>-x file　　　　　用户可执行为真<br>-f file　　　　　文件为正规文件为真<br>-d file　　　　　文件为目录为真<br>-c file　　　　　文件为字符特殊文件为真<br>-b file　　　　　文件为块特殊文件为真<br>-s file　　　　　文件大小非0时为真<br>-t file　　　　　当文件描述符(默认为1)指定的设备为终端时为真</p>
+<p><code>判断nginx是否在运行，没有运行的话拉起来</code></p>
+<pre><code class="bash">#!/bin/sh
+set -e
+SERVICE=&quot;nginx&quot;
+if pgrep -x &quot;$SERVICE&quot; &gt;/dev/null
+then
+    echo &quot;$SERVICE is running&quot;
+else
+    echo &quot;$SERVICE stopped&quot;
+    # uncomment to start nginx if stopped
+    systemctl start nginx
+    # mail
+fi
+</code></pre>
+<p><code>检查下当前是否安装了git</code></p>
+<pre><code class="bash">if ! [ -x &quot;$(command -v git)&quot; ]; then   ## command这个关键字是posix compatible的
+  echo &#39;Error: git is not installed.&#39; &gt;&amp;2
+  exit 1
+fi
+</code></pre>
+<p><code>在一个文件中查找是否存在某一个单词，如果存在的话执行某项task</code></p>
+<pre><code class="bash">if grep -q keyword /var/somefile ; then ##这个-q只是避免grep输出找出来的string，我们只需要知道它的返回值是成功还是失败
+    echo &quot;file contain that word&quot;
+fi
+</code></pre>
+<h2 id="与，或，非操作"><a href="#与，或，非操作" class="headerlink" title="与，或，非操作"></a>与，或，非操作</h2><pre><code class="shell">if [ ${OUT_FILE}a != ${OUT_FILE%/*}a ] &amp;&amp; [ ! -d ${OUT_FILE%/*} ]; then ## 用&amp;&amp; 就可以了
+    _red &#39;Error: Folder do not exist: &#39;${OUT_FILE%/*}&#39;\n&#39;
+    exit 1
+fi
+</code></pre>
+<p>-a 　 　　　　　 与<br>-o　　　　　　　 或<br>!　　　　　　　　非</p>
 <h2 id="字符串拼接是很重要的"><a href="#字符串拼接是很重要的" class="headerlink" title="字符串拼接是很重要的"></a>字符串拼接是很重要的</h2><pre><code class="bash">#!/bin/bashbash
 echo &quot;hello there&quot;
 foo=&quot;Hello&quot;
@@ -296,13 +379,156 @@ echo &quot;$(which java)&quot;/something
 &gt;&gt; /usr/bin/java/something
 
 #!/bin/bash
-java_stuff=&quot;$(which java)&quot;
-${java_stuff} --version
+java=&quot;$(which java)&quot;
+${java} --version
 </code></pre>
-<h2 id="还有for循环"><a href="#还有for循环" class="headerlink" title="还有for循环"></a>还有for循环</h2><pre><code class="bash">for file in `ls /etc`
+<h2 id="流程控制-for循环和while循环"><a href="#流程控制-for循环和while循环" class="headerlink" title="流程控制(for循环和while循环)"></a>流程控制(for循环和while循环)</h2><pre><code class="shell">for file in `ls /etc`
 ##或
 for file in $(ls /etc)
+
+for str in &quot;a b c&quot;  //用空格分割
 </code></pre>
+<h2 id="数组遍历，下标，长度等等"><a href="#数组遍历，下标，长度等等" class="headerlink" title="数组遍历，下标，长度等等"></a>数组遍历，下标，长度等等</h2><p>写成一行也是可以的</p>
+<pre><code class="shell">distro=(&quot;redhat&quot; &quot;debian&quot; &quot;gentoo&quot;)
+len=&lt;code&gt;${&lt;/code&gt;#distro[@]}
+for (( i=0; i&lt;$len; i++ )); do echo &quot;${distro[$i]}&quot; ; done
+</code></pre>
+<h2 id="简单的循环（for-each循环）"><a href="#简单的循环（for-each循环）" class="headerlink" title="简单的循环（for each循环）"></a>简单的循环（for each循环）</h2><pre><code class="shell">#!/bin/bash
+i=0;
+while [ $i -lt 4 ];
+do
+   echo $i;
+   i=`expr $i + 1`;
+   # let i+=1; //这些都是让i自增的方式
+   # ((i++));
+   # i=$[$i+1];
+   # i=$(( $i + 1 ))
+done
+
+#!/bin/bash
+for j in $(seq 1 5)
+do
+  echo $j
+done
+
+## 还可以写成一行
+for f in *.txt; do grep &quot;tasks:&quot; $f
+</code></pre>
+<h3 id="switch-case的例子找了一个现成的"><a href="#switch-case的例子找了一个现成的" class="headerlink" title="switch case的例子找了一个现成的"></a>switch case的例子找了一个现成的</h3><pre><code class="bash">get_args(){
+    OUT_TYPE=&#39;DNSMASQ_RULES&#39;
+    DNS_IP=&#39;127.0.0.1&#39;
+    DNS_PORT=&#39;5353&#39;
+    IPSET_NAME=&#39;&#39;
+    FILE_FULLPATH=&#39;&#39;
+    CURL_EXTARG=&#39;&#39;
+    WGET_EXTARG=&#39;&#39;
+    WITH_IPSET=0
+    EXTRA_DOMAIN_FILE=&#39;&#39;
+    EXCLUDE_DOMAIN_FILE=&#39;&#39;
+    IPV4_PATTERN=&#39;^((2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?)\.){3}(2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?)$&#39;
+    IPV6_PATTERN=&#39;^((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:)))(%.+)?$&#39;
+
+    while [ ${#} -gt 0 ]; do
+        case &quot;${1}&quot; in
+            --help | -h)
+                usage 0
+                ;;
+            --domain-list | -l)
+                OUT_TYPE=&#39;DOMAIN_LIST&#39;
+                ;;
+            --insecure | -i)
+                CURL_EXTARG=&#39;--insecure&#39;
+                WGET_EXTARG=&#39;--no-check-certificate&#39;
+                ;;
+            --dns | -d)
+                DNS_IP=&quot;$2&quot;
+                shift
+                ;;
+            --port | -p)
+                DNS_PORT=&quot;$2&quot;
+                shift
+                ;;
+            --ipset | -s)
+                IPSET_NAME=&quot;$2&quot;
+                shift
+                ;;
+            --output | -o)
+                OUT_FILE=&quot;$2&quot;
+                shift
+                ;;
+            --extra-domain-file)
+                EXTRA_DOMAIN_FILE=&quot;$2&quot;
+                shift
+                ;;
+           --exclude-domain-file)
+                EXCLUDE_DOMAIN_FILE=&quot;$2&quot;
+                shift
+                ;;
+            *)
+                _red &quot;Invalid argument: $1&quot;
+                usage 1
+                ;;
+        esac
+        shift 1
+    done
+
+    # Check path &amp; file name
+    if [ -z $OUT_FILE ]; then
+        _red &#39;Error: Please specify the path to the output file(using -o/--output argument).\n&#39;
+        exit 1
+    else
+        if [ -z ${OUT_FILE##*/} ]; then  ## -z表示字符串的长度为0,-n为大于0
+            _red &#39;Error: &#39;$OUT_FILE&#39; is a path, not a file.\n&#39;
+            exit 1
+        else
+            if [ ${OUT_FILE}a != ${OUT_FILE%/*}a ] &amp;&amp; [ ! -d ${OUT_FILE%/*} ]; then
+                _red &#39;Error: Folder do not exist: &#39;${OUT_FILE%/*}&#39;\n&#39;
+                exit 1
+            fi
+        fi
+    fi
+
+    if [ $OUT_TYPE = &#39;DNSMASQ_RULES&#39; ]; then
+        # Check DNS IP
+        IPV4_TEST=$(echo $DNS_IP | grep -E $IPV4_PATTERN)
+        IPV6_TEST=$(echo $DNS_IP | grep -E $IPV6_PATTERN)
+        if [ &quot;$IPV4_TEST&quot; != &quot;$DNS_IP&quot; -a &quot;$IPV6_TEST&quot; != &quot;$DNS_IP&quot; ]; then
+            _red &#39;Error: Please enter a valid DNS server IP address.\n&#39;
+            exit 1
+        fi
+
+        # Check DNS port
+        if [ $DNS_PORT -lt 1 -o $DNS_PORT -gt 65535 ]; then
+            _red &#39;Error: Please enter a valid DNS server port.\n&#39;
+            exit 1
+        fi
+
+        # Check ipset name
+        if [ -z $IPSET_NAME ]; then
+            WITH_IPSET=0
+        else
+            IPSET_TEST=$(echo $IPSET_NAME | grep -E &#39;^\w+$&#39;)
+            if [ &quot;$IPSET_TEST&quot; != &quot;$IPSET_NAME&quot; ]; then
+                _red &#39;Error: Please enter a valid IP set name.\n&#39;
+                exit 1
+            else
+                WITH_IPSET=1
+            fi
+        fi
+    fi
+
+    if [ ! -z $EXTRA_DOMAIN_FILE ] &amp;&amp; [ ! -f $EXTRA_DOMAIN_FILE ]; then
+        _yellow &#39;WARNING:\nExtra domain file does not exist, ignored.\n\n&#39;
+        EXTRA_DOMAIN_FILE=&#39;&#39;
+    fi
+
+    if [ ! -z $EXCLUDE_DOMAIN_FILE ] &amp;&amp; [ ! -f $EXCLUDE_DOMAIN_FILE ]; then
+        _yellow &#39;WARNING:\nExclude domain file does not exist, ignored.\n\n&#39;
+        EXCLUDE_DOMAIN_FILE=&#39;&#39;
+    fi
+}
+</code></pre>
+<p>懒得解释了，就是一个switch case和各种if else</p>
 <h3 id="变量-其实就是美元符号了"><a href="#变量-其实就是美元符号了" class="headerlink" title="变量($其实就是美元符号了)"></a>变量($其实就是美元符号了)</h3><p>变量调用符号($)</p>
 <pre><code class="bash">LI=date
 $LI ##
@@ -368,7 +594,8 @@ else
 fi
 </code></pre>
 <h2 id="sh-xxx-sh出现下面这个错误"><a href="#sh-xxx-sh出现下面这个错误" class="headerlink" title="sh xxx.sh出现下面这个错误"></a>sh xxx.sh出现下面这个错误</h2><pre><code>&gt; [[: not found…………………..
-</code></pre><p><a href="https://superuser.com/questions/374406/why-do-i-get-not-found-when-running-a-script">原因是sh不支持这种用法，bash支持。所以改成bash xxx.sh就可以了</a><br>sh只是一个符号链接，最终指向是一个叫做dash的程序，自Ubuntu 6.10以后，系统的默认shell /bin/sh被改成了dash。dash(the Debian Almquist shell) 是一个比bash小很多但仍兼容POSIX标准的shell，它占用的磁盘空间更少，执行shell脚本比bash更快，依赖的库文件更少，当然，在功能上无法与bash相比。dash来自于NetBSD版本的Almquist Shell(ash)。<br>Ubuntu中将默认shell改为dash的主要原因是效率。由于Ubuntu启动过程中需要启动大量的shell脚本，为了优化启动速度和资源使用情况，Ubuntu做了这样的改动。</p>
+</code></pre><p><a href="https://superuser.com/questions/374406/why-do-i-get-not-found-when-running-a-script">原因是sh不支持这种用法，bash支持。所以改成bash xxx.sh就可以了</a></p>
+<p><code>ununtu默认的sh不是bash而是一个叫做dash的东西</code><br>sh只是一个符号链接，最终指向是一个叫做dash的程序，自Ubuntu 6.10以后，系统的默认shell /bin/sh被改成了dash。dash(the Debian Almquist shell) 是一个比bash小很多但仍兼容POSIX标准的shell，它占用的磁盘空间更少，执行shell脚本比bash更快，依赖的库文件更少，当然，在功能上无法与bash相比。dash来自于NetBSD版本的Almquist Shell(ash)。<br>Ubuntu中将默认shell改为dash的主要原因是效率。由于Ubuntu启动过程中需要启动大量的shell脚本，为了优化启动速度和资源使用情况，Ubuntu做了这样的改动。</p>
 <h2 id="shell脚本执行的时候不是可以带参数-0-1什么的嘛"><a href="#shell脚本执行的时候不是可以带参数-0-1什么的嘛" class="headerlink" title="shell脚本执行的时候不是可以带参数$0, $1什么的嘛"></a>shell脚本执行的时候不是可以带参数$0, $1什么的嘛</h2><p>这实质上就是一个数组</p>
 <pre><code class="sh">#!/bin/bash
 echo &quot;The script you are running has basename `basename &quot;$0&quot;`, dirname `dirname &quot;$0&quot;`&quot;
@@ -415,6 +642,21 @@ EOF
 <p>time bash -c ‘echo “hey”‘<br>time somescript.sh</p>
 </blockquote>
 <p>shell脚本里面经常会看到mktemp函数，作用就是确保生成一个随机命名的文件</p>
+<h3 id="一行行的读取一个文件"><a href="#一行行的读取一个文件" class="headerlink" title="一行行的读取一个文件"></a>一行行的读取一个文件</h3><pre><code class="bash">#!/bin/bash
+file=&quot;/home/vivek/data.txt&quot;
+while IFS= read -r line
+do
+        # display $line or do somthing with $line
+    printf &#39;%s\n&#39; &quot;$line&quot;
+done &lt;&quot;$file&quot;
+</code></pre>
+<p><code>awk有一个比较坑的地方是在执行命令的语句中只能写print,printf这种awk自带的函数</code></p>
+<pre><code class="bash">echo &quot;A B C&quot; | awk &#39;{split($0,a,&quot; &quot;);for(i in a){ if(i == NF){ print a[1] } else { print a[i+1] }}}&#39; //NF是最后一行的意思
+</code></pre>
+<p>得到输出<br>B<br>C<br>A</p>
+<p><code>awk的命令里面要想调用一个系统函数，比方说ls，或者自己的一个shell function，得这么写</code></p>
+<pre><code class="bash">awk &#39;{printf(&quot;%s &quot;,$1); system(&quot;d2h &quot; $2)}&#39; file
+</code></pre>
 <h3 id="直接挑选几个可以用的脚本开始看吧"><a href="#直接挑选几个可以用的脚本开始看吧" class="headerlink" title="直接挑选几个可以用的脚本开始看吧"></a>直接挑选几个可以用的脚本开始看吧</h3><ol>
 <li>一个把文件夹（/public/imgs）下所有文件重命名为img-x.jpg的shell脚本</li>
 </ol>
@@ -442,9 +684,9 @@ grep -E aaa\|bbb
 </code></pre>
 <p><a href="https://www.cyberciti.biz/faq/howto-use-grep-command-in-linux-unix/">how to grep</a></p>
 <ol>
-<li><a href="https://github.com/cokebar/gfwlist2dnsmasq/blob/master/gfwlist2dnsmasq.sh">一个直接把gfwlist的bs64文本转换成dnsmasq配置文件的脚本</a> 注意，base64在linux上是预装的<br>这个脚本分开几段来看:<h3 id="首先是检查当前系统中依赖的软件是否都装了"><a href="#首先是检查当前系统中依赖的软件是否都装了" class="headerlink" title="首先是检查当前系统中依赖的软件是否都装了"></a>首先是检查当前系统中依赖的软件是否都装了</h3></li>
+<li><a href="https://github.com/cokebar/gfwlist2dnsmasq/blob/master/gfwlist2dnsmasq.sh">一个直接把gfwlist的bs64文本转换成dnsmasq配置文件的脚本</a> 注意，base64在linux上是预装的</li>
 </ol>
-<pre><code class="bash">check_depends(){
+<h3 id="检查当前系统中依赖的软件是否都装了"><a href="#检查当前系统中依赖的软件是否都装了" class="headerlink" title="检查当前系统中依赖的软件是否都装了"></a>检查当前系统中依赖的软件是否都装了</h3><pre><code class="bash">check_depends(){
     which sed base64 mktemp &gt;/dev/null
     if [ $? != 0 ]; then ## 美元加问号就是上一个命令的返回值
         _red &#39;Error: Missing Dependency.\nPlease check whether you have the following binaries on you system:\nwhich, sed, base64, mktemp.\n&#39;
@@ -463,7 +705,7 @@ grep -E aaa\|bbb
     fi
 
     SYS_KERNEL=`uname -s`
-    if [ $SYS_KERNEL = &quot;Darwin&quot;  -o $SYS_KERNEL = &quot;FreeBSD&quot; ]; then ## if 语句里面or是这么写的
+    if [ $SYS_KERNEL = &quot;Darwin&quot;  -o $SYS_KERNEL = &quot;FreeBSD&quot; ]; then ## if 语句里面or是就是-o，短路与是-a 
         BASE64_DECODE=&#39;base64 -D&#39;
         SED_ERES=&#39;sed -E&#39;
     else
@@ -472,123 +714,8 @@ grep -E aaa\|bbb
     fi
 }
 </code></pre>
-<h3 id="接下来是从获取传进来的参数"><a href="#接下来是从获取传进来的参数" class="headerlink" title="接下来是从获取传进来的参数"></a>接下来是从获取传进来的参数</h3><pre><code class="bash">get_args(){
-    OUT_TYPE=&#39;DNSMASQ_RULES&#39;
-    DNS_IP=&#39;127.0.0.1&#39;
-    DNS_PORT=&#39;5353&#39;
-    IPSET_NAME=&#39;&#39;
-    FILE_FULLPATH=&#39;&#39;
-    CURL_EXTARG=&#39;&#39;
-    WGET_EXTARG=&#39;&#39;
-    WITH_IPSET=0
-    EXTRA_DOMAIN_FILE=&#39;&#39;
-    EXCLUDE_DOMAIN_FILE=&#39;&#39;
-    IPV4_PATTERN=&#39;^((2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?)\.){3}(2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?)$&#39;
-    IPV6_PATTERN=&#39;^((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:)))(%.+)?$&#39;
-
-    while [ ${#} -gt 0 ]; do
-        case &quot;${1}&quot; in
-            --help | -h)
-                usage 0
-                ;;
-            --domain-list | -l)
-                OUT_TYPE=&#39;DOMAIN_LIST&#39;
-                ;;
-            --insecure | -i)
-                CURL_EXTARG=&#39;--insecure&#39;
-                WGET_EXTARG=&#39;--no-check-certificate&#39;
-                ;;
-            --dns | -d)
-                DNS_IP=&quot;$2&quot;
-                shift
-                ;;
-            --port | -p)
-                DNS_PORT=&quot;$2&quot;
-                shift
-                ;;
-            --ipset | -s)
-                IPSET_NAME=&quot;$2&quot;
-                shift
-                ;;
-            --output | -o)
-                OUT_FILE=&quot;$2&quot;
-                shift
-                ;;
-            --extra-domain-file)
-                EXTRA_DOMAIN_FILE=&quot;$2&quot;
-                shift
-                ;;
-           --exclude-domain-file)
-                EXCLUDE_DOMAIN_FILE=&quot;$2&quot;
-                shift
-                ;;
-            *)
-                _red &quot;Invalid argument: $1&quot;
-                usage 1
-                ;;
-        esac
-        shift 1
-    done
-
-    # Check path &amp; file name
-    if [ -z $OUT_FILE ]; then
-        _red &#39;Error: Please specify the path to the output file(using -o/--output argument).\n&#39;
-        exit 1
-    else
-        if [ -z ${OUT_FILE##*/} ]; then
-            _red &#39;Error: &#39;$OUT_FILE&#39; is a path, not a file.\n&#39;
-            exit 1
-        else
-            if [ ${OUT_FILE}a != ${OUT_FILE%/*}a ] &amp;&amp; [ ! -d ${OUT_FILE%/*} ]; then
-                _red &#39;Error: Folder do not exist: &#39;${OUT_FILE%/*}&#39;\n&#39;
-                exit 1
-            fi
-        fi
-    fi
-
-    if [ $OUT_TYPE = &#39;DNSMASQ_RULES&#39; ]; then
-        # Check DNS IP
-        IPV4_TEST=$(echo $DNS_IP | grep -E $IPV4_PATTERN)
-        IPV6_TEST=$(echo $DNS_IP | grep -E $IPV6_PATTERN)
-        if [ &quot;$IPV4_TEST&quot; != &quot;$DNS_IP&quot; -a &quot;$IPV6_TEST&quot; != &quot;$DNS_IP&quot; ]; then
-            _red &#39;Error: Please enter a valid DNS server IP address.\n&#39;
-            exit 1
-        fi
-
-        # Check DNS port
-        if [ $DNS_PORT -lt 1 -o $DNS_PORT -gt 65535 ]; then
-            _red &#39;Error: Please enter a valid DNS server port.\n&#39;
-            exit 1
-        fi
-
-        # Check ipset name
-        if [ -z $IPSET_NAME ]; then
-            WITH_IPSET=0
-        else
-            IPSET_TEST=$(echo $IPSET_NAME | grep -E &#39;^\w+$&#39;)
-            if [ &quot;$IPSET_TEST&quot; != &quot;$IPSET_NAME&quot; ]; then
-                _red &#39;Error: Please enter a valid IP set name.\n&#39;
-                exit 1
-            else
-                WITH_IPSET=1
-            fi
-        fi
-    fi
-
-    if [ ! -z $EXTRA_DOMAIN_FILE ] &amp;&amp; [ ! -f $EXTRA_DOMAIN_FILE ]; then
-        _yellow &#39;WARNING:\nExtra domain file does not exist, ignored.\n\n&#39;
-        EXTRA_DOMAIN_FILE=&#39;&#39;
-    fi
-
-    if [ ! -z $EXCLUDE_DOMAIN_FILE ] &amp;&amp; [ ! -f $EXCLUDE_DOMAIN_FILE ]; then
-        _yellow &#39;WARNING:\nExclude domain file does not exist, ignored.\n\n&#39;
-        EXCLUDE_DOMAIN_FILE=&#39;&#39;
-    fi
-}
-</code></pre>
-<p>懒得解释了，就是一个switch case和各种if else</p>
 <p><img src="https://www.haldir66.ga/static/imgs/PuffinWales_EN-AU12757555133_1920x1080.jpg" alt=""></p>
-<p><a href="https://github.com/hiboyhiboy/opt-script">opt-script</a><br><a href="https://www.youtube.com/watch?v=hwrnmQumtPw">shell script tutorial</a><br><a href="http://blog.51cto.com/litaotao/1187983">LINUX下的21个特殊符号</a><br><a href="https://notes.wanghao.work/2015-06-02-Shell%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html">Shell学习笔记</a><br><a href="https://www.youtube.com/watch?v=Lu-xzWajbFo">how to use variables in shell scripts</a></p>
+<p><a href="https://github.com/hiboyhiboy/opt-script">opt-script</a><br><a href="https://www.youtube.com/watch?v=hwrnmQumtPw">shell script tutorial</a><br><a href="http://blog.51cto.com/litaotao/1187983">LINUX下的21个特殊符号</a><br><a href="https://notes.wanghao.work/2015-06-02-Shell%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html">Shell学习笔记</a><br><a href="https://www.cyberciti.biz/faq/linux-unix-shell-check-if-directory-empty/">非常好的shell介绍网站</a></p>
 
       
 
@@ -867,30 +994,6 @@ grep -E aaa\|bbb
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Window</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
@@ -931,15 +1034,27 @@ grep -E aaa\|bbb
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+                <a href="javascript:void(0)" class="js-tag color2">Window</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -967,19 +1082,15 @@ grep -E aaa\|bbb
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -996,6 +1107,22 @@ grep -E aaa\|bbb
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">sql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
               </li>
              
               <li class="article-tag-list-item">

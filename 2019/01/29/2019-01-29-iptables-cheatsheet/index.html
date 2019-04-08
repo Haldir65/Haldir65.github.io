@@ -17,7 +17,7 @@
 <meta property="og:description" content="iptables是控制linux 内核netfilter的command line frontend tool，只存在于linux平台，是system admin常用的防火墙。(虽然已经被nftables取代了，学习点网络知识还是很有必要)">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/lidongjieya_ZH-CN9263684179_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-04-03T14:16:56.388Z">
+<meta property="og:updated_time" content="2019-04-08T01:41:03.508Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iptables速查手册">
 <meta name="twitter:description" content="iptables是控制linux 内核netfilter的command line frontend tool，只存在于linux平台，是system admin常用的防火墙。(虽然已经被nftables取代了，学习点网络知识还是很有必要)">
@@ -206,13 +206,15 @@ ga('send', 'pageview');
 <p>DESCRIPTION<br>Iptables and ip6tables are used to set up, maintain, and inspect  the  tables<br>of  IPv4 and IPv6 packet filter rules in the Linux kernel.  Several different<br>tables may be defined.  Each table contains a number of built-in  chains  and<br>may also contain user-defined chains.<br>Each  chain  is  a list of rules which can match a set of packets.  Each rule<br>specifies what to do with a packet that matches.  This is called a  `target’,<br>which may be a jump to a user-defined chain in the same table.</p>
 </blockquote>
 <h2 id="概念"><a href="#概念" class="headerlink" title="概念:"></a>概念:</h2><p><strong>iptables命令需要root权限执行</strong><br>每个表包含有若干个不同的链，比如 filter 表默认包含有 INPUT，FORWARD，OUTPUT 三个链。iptables有四个表，分别是：raw，nat，mangle和filter，每个表都有自己专门的用处，比如最常用filter表就是专门用来做包过滤的，而 nat 表是专门用来做NAT的。</p>
-<p><strong>iptables中有3个chain</strong></p>
+<h2 id="Chain"><a href="#Chain" class="headerlink" title="Chain"></a>Chain</h2><p>默认的Chain包括</p>
 <ul>
 <li>INPUT —&gt; 所有进入这台主机的连接</li>
 <li>FORWARD  —&gt; 借由这台主机发出的（路由器）</li>
 <li>OUTPUT —&gt; 所有从这台主机发出去的连接</li>
+<li>PREROUTING / POSTROUTING</li>
 </ul>
 <p>每一条Chain上都有一个rules的列表(用A去append,用I去Insert)</p>
+<h2 id="table（table是一系列针对packet的同一类决策的集合）"><a href="#table（table是一系列针对packet的同一类决策的集合）" class="headerlink" title="table（table是一系列针对packet的同一类决策的集合）"></a>table（table是一系列针对packet的同一类决策的集合）</h2><p>Mangle is to change packets (Type Of Service, Time To Live etc) on traversal.<br>Nat is to put in NAT rules.<br>Raw is to be used for marking and connection tracking.<br>Filter is for filtering packets.</p>
 <pre><code>#~ iptables -L INPUT -n -v --line-numbers
 
 Chain INPUT (policy DROP)
@@ -221,8 +223,8 @@ num  target     prot opt source               destination
 2    DROP       all  --  202.54.1.2           0.0.0.0/0
 3    ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0           state NEW,ESTABLISHED
 </code></pre><p>执行顺序(这个比较麻烦):</p>
+<p>iptables执行规则时，是从从规则表中从上至下顺序执行的，如果没遇到匹配的规则，就一条一条往下执行，如果遇到匹配的规则后，那么就执行本规则，执行后根据本规则的动作(accept, reject, log等)，决定下一步执行的情况。<br>比如说上面这个，拉黑了202.54.1.2虽然第三条规则说全部接受，其实202.54.1.2的包是进不来的。<br>这也是很多教程建议把自己的iptables写在后面的原因，不要把系统现有规则覆盖掉。</p>
 <blockquote>
-<p>每一个chain是从上往下读取的。<br>iptables执行规则时，是从从规则表中从上至下顺序执行的，如果没遇到匹配的规则，就一条一条往下执行，如果遇到匹配的规则后，那么就执行本规则，执行后根据本规则的动作(accept, reject, log等)，决定下一步执行的情况。<br>比如说上面这个，拉黑了202.54.1.2虽然第三条规则说全部接受，其实202.54.1.2的包是进不来的。<br>这也是很多教程建议把自己的iptables写在后面的原因，不要把系统现有规则覆盖掉。</p>
 <p>iptables -L -n -v //查看已添加的iptables规则</p>
 </blockquote>
 <p>默认是全部接受的</p>
@@ -271,7 +273,11 @@ LOG --log-prefix &quot;IP_SPOOF A: &quot; //加日志,这个LOG关键词和DROP,
 <pre><code>iptables -L OUTPUT -n --line-numbers | grep 202.54.1.1 //发现在条规则第四行
 iptabels -D INPUT 4 //把这个第四行的规则删掉
 iptables -D INPUT -s 202.54.1.1 -j DROP //这个也是一样的
-</code></pre><p>上面说了，iptables的顺序是从上往下读取的，后面的会依据前面的规则作出决定。所以假如第2条规则说全部接受，我想拉黑某个ip，就得用-I，把拉黑的规则插入到最前面（-I 1 就是插入到第一位）:<br>iptables -I 1 INPUT -s xxx.xxx.xxx.xxx -j DROP</p>
+</code></pre><p>只允许特定ip访问某个端口</p>
+<blockquote>
+<p>sudo iptables -I INPUT -p tcp ! -s 200.200.200.0/24 –destination-port 1080 -j DROP</p>
+</blockquote>
+<p>上面说了，iptables的顺序是从上往下match，前面的如果匹配上了，后面的就不会有机会被匹配。所以假如第2条规则说全部接受，我想拉黑某个ip，就得用-I，把拉黑的规则插入到最前面（-I 1 就是插入到第一位）:<br>iptables -I 1 INPUT -s xxx.xxx.xxx.xxx -j DROP</p>
 <pre><code class="bash">iptables -P FORWARD DROP ## 把forward 一律改为drop（走本机代理的包全部丢掉）
 iptables -A INPUT -s  192.168.1.3  ## A是append s是source，拒绝接受192.168.1.3的访问，就是黑名单了
 iptables -A INPUT -s  192.168.0.0/24 -p tcp --destination-port 25 -j DROP  ## block all devices on this network ,  p是protocol,SMTP一般是25端口
@@ -322,7 +328,11 @@ ping: sendmsg: Operation not permitted(就是被发出去的包被iptables拦下
 
 //上面这堆看起来挺麻烦的
 iptables -A OUTPUT -p tcp -d www.facebook.com -j DROP //直接搞定,但是不推荐这么干
-</code></pre><h3 id="拉黑某个mac地址"><a href="#拉黑某个mac地址" class="headerlink" title="拉黑某个mac地址"></a>拉黑某个mac地址</h3><pre><code># iptables -A INPUT -m mac --mac-source 00:0F:EA:91:04:08 -j DROP
+</code></pre><h3 id="根据某个mac地址指定"><a href="#根据某个mac地址指定" class="headerlink" title="根据某个mac地址指定"></a>根据某个mac地址指定</h3><pre><code># iptables -I INPUT -m mac --mac-source 3E:D7:88:A6:66:8E -j ACCEPT
+# iptables -I INPUT -p tcp --dport 22 -m mac --mac-source 3E:D7:88:A6:66:8E -j ACCEPT
+# iptables -I INPUT -p tcp --dport 22 -m mac --mac-source 3E:D7:88:A6:66:8E -j REJECT
+# iptables -I INPUT -p tcp --port 22 -m mac ! --mac-source 3E:D7:88:A6:66:8E -j REJECT //除了特定mac以外都不允许访问
+# iptables -A INPUT -m mac --mac-source 00:0F:EA:91:04:08 -j DROP
 </code></pre><h3 id="不允许别人ping我"><a href="#不允许别人ping我" class="headerlink" title="不允许别人ping我"></a>不允许别人ping我</h3><pre><code># iptables -A INPUT -p icmp --icmp-type echo-request -j DROP
 # iptables -A INPUT -i eth1 -p icmp --icmp-type echo-request -j DROP
 
@@ -337,10 +347,16 @@ iptables -A INPUT -p icmp --icmp-type echo-request -j ACCEPT
 <pre><code>iptables -A OUTPUT -p tcp -d 69.171.224.0/19 -j LOG --log-prefix &quot;IP_SPOOF A: &quot;
 iptables -A OUTPUT -p tcp -d 69.171.224.0/19 -j DROP 
 
-//默认情况下所有信息都被log到/var/log/messgaes文件中了，我试了下，并没有，不过这并不重要吧
-tail -f /var/log/messages
-grep --color &#39;IP SPOOF&#39; /var/log/messages
-</code></pre><h3 id="只开7000-7010端口-只允许某个网段的ip发请求"><a href="#只开7000-7010端口-只允许某个网段的ip发请求" class="headerlink" title="只开7000-7010端口,只允许某个网段的ip发请求"></a>只开7000-7010端口,只允许某个网段的ip发请求</h3><pre><code>iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 7000:7010 -j ACCEPT
+我们可以简单地使用下面的命令启用iptables的日志记录。
+$ iptables -A INPUT -j LOG
+我们还可以定义哪些日志将被创建的源IP或范围。
+$ iptables -A INPUT -s 192.168.10.0/24 -j LOG
+定义我们的iptables -log 生成的日志级别。
+$ iptables -A INPUT -s 192.168.10.0/24 -j LOG --log-level 4
+我们还可以添加一些前缀生成的日志，所以它会很容易在一个巨大的文件中搜索日志。
+$ iptables -A INPUT -s 192.168.10.0/24 -j LOG --log-prefix &#39;** SUSPECT **&#39;
+</code></pre><p>在Ubuntu和Debian<br>iptables的日志由内核生成的。因此，检查以下内核日志文件。<br>查看iptables的日志<br>$ tailf /var/log/kern.log</p>
+<h3 id="只开7000-7010端口-只允许某个网段的ip发请求"><a href="#只开7000-7010端口-只允许某个网段的ip发请求" class="headerlink" title="只开7000-7010端口,只允许某个网段的ip发请求"></a>只开7000-7010端口,只允许某个网段的ip发请求</h3><pre><code>iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 7000:7010 -j ACCEPT
 
 ## only accept connection to tcp port 80 (Apache) if ip is between 192.168.1.100 and 192.168.1.200 ##
 iptables -A INPUT -p tcp --destination-port 80 -m iprange --src-range 192.168.1.100-192.168.1.200 -j ACCEPT
@@ -406,7 +422,7 @@ iptables -I INPUT -j syn-flood
 <pre><code>iptables -L INPUT -s xxx.xxx.xxx.xxx -p tcp --dport 80 -j DROP
 iptables -L INPUT -s xxx.xxx.xxx.xxx -p tcp --dport 443 -j DROP
 
-而事实上就是创建了一个chain
+而事实上就是创建了一个action
 ~ cat /etc/fail2ban/action.d/iptables.conf
 # Option:  actionban
 # Notes.:  command executed when banning an IP. Take care that the
@@ -415,7 +431,7 @@ iptables -L INPUT -s xxx.xxx.xxx.xxx -p tcp --dport 443 -j DROP
 # Values:  CMD
 #
 actionban = &lt;iptables&gt; -I f2b-&lt;name&gt; 1 -s &lt;ip&gt; -j &lt;blocktype&gt;
-</code></pre><h2 id="REDIRECT-Transparent-proxy-related"><a href="#REDIRECT-Transparent-proxy-related" class="headerlink" title="REDIRECT (Transparent proxy related)"></a>REDIRECT (Transparent proxy related)</h2><p>首先来看一个把所有走网卡eth0的数据包都转发到redSocks的规则</p>
+</code></pre><h2 id="REDIRECT-透明代理"><a href="#REDIRECT-透明代理" class="headerlink" title="REDIRECT (透明代理)"></a>REDIRECT (透明代理)</h2><p>首先来看一个把所有走网卡eth0的数据包都转发到redSocks的规则</p>
 <pre><code>// 新建路由转发表中的一个链 REDSOCKS
 sudo iptables -t nat -N REDSOCKS
 // 设置不需要代理转发的网段
@@ -456,7 +472,7 @@ iptables -t mangle -N V2RAY_MASK
 iptables -t mangle -A V2RAY_MASK -d 192.168.0.0/16 -j RETURN
 iptables -t mangle -A V2RAY_MASK -p udp -j TPROXY --on-port 1080 --tproxy-mark 1
 iptables -t mangle -A PREROUTING -p udp -j V2RAY_MASK
-</code></pre><p><strong><em>亲测，透明代理的效果是可以的。只是比不上在windows上的速度,cpu占用达到50%以上，没什么意思。</em></strong></p>
+</code></pre><p><strong>亲测，透明代理的效果是可以的。只是比不上在windows上的速度,cpu占用达到50%以上，没什么意思。</strong></p>
 <p>相比起来,shadowsocks-libev给出了这样一份transparent proxy的代码，更加清楚</p>
 <pre><code># Create new chain
 iptables -t nat -N SHADOWSOCKS
@@ -508,7 +524,7 @@ export http_proxy=socks5://127.0.0.1:8118; export https_proxy=$http_proxy
 <p><strong>注意还需要将上述规则添加到开机启动中，想要持久化的话好像有一个iptables-persistent</strong>，还有使用iptables屏蔽来自<a href="https://www.vpser.net/security/iptables-block-countries-ip.html">某个国家的IP</a>的教程</p>
 <h2 id="tbd"><a href="#tbd" class="headerlink" title="tbd"></a>tbd</h2><h3 id="nat相关"><a href="#nat相关" class="headerlink" title="nat相关"></a>nat相关</h3><pre><code>iptables -t nat -L -n -v //在路由器上这个会有
 </code></pre><p>一般路由器就是干这个的（使用iptables配置nat）<br>POSTROUTING 和 PREROUTING的概念</p>
-<p>还有一个ipset 可以认为是一次性执行多个iptables命令,openwrt上经常用</p>
+<h3 id="ipset的概念"><a href="#ipset的概念" class="headerlink" title="ipset的概念"></a>ipset的概念</h3><p>就是一大堆ip的一个集合，但是存的是hash，所以性能很好</p>
 <p>netfilter是kernel的实现</p>
 <blockquote>
 <p>Iptables is a standard firewall included in most Linux distributions by default (a modern variant called nftables will begin to replace it). It is actually a front end to the kernel-level netfilter hooks that can manipulate the Linux network stack.</p>
@@ -797,30 +813,6 @@ export http_proxy=socks5://127.0.0.1:8118; export https_proxy=$http_proxy
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Window</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
@@ -861,15 +853,27 @@ export http_proxy=socks5://127.0.0.1:8118; export https_proxy=$http_proxy
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+                <a href="javascript:void(0)" class="js-tag color2">Window</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -897,19 +901,15 @@ export http_proxy=socks5://127.0.0.1:8118; export https_proxy=$http_proxy
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -926,6 +926,22 @@ export http_proxy=socks5://127.0.0.1:8118; export https_proxy=$http_proxy
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">sql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">OkHttp</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Okio</a>
               </li>
              
               <li class="article-tag-list-item">
