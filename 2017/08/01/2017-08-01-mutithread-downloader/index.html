@@ -8,19 +8,19 @@
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>多线程断点续传原理及实现 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="主要讲一下在java中实现多线程断点续传的原理,主要讲断点下载的原理。">
+  <meta name="description" content="主要讲一下在java中(平台并不限于android)实现多线程断点续传的原理,主要讲断点下载的原理。">
 <meta name="keywords" content="java">
 <meta property="og:type" content="article">
 <meta property="og:title" content="多线程断点续传原理及实现">
 <meta property="og:url" content="https://haldir65.github.io/2017/08/01/2017-08-01-mutithread-downloader/index.html">
 <meta property="og:site_name" content="Haldir的博客">
-<meta property="og:description" content="主要讲一下在java中实现多线程断点续传的原理,主要讲断点下载的原理。">
+<meta property="og:description" content="主要讲一下在java中(平台并不限于android)实现多线程断点续传的原理,主要讲断点下载的原理。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/4b52d8db2e9d86b95c730af1db127a81.jpg">
-<meta property="og:updated_time" content="2019-04-08T01:41:03.500Z">
+<meta property="og:updated_time" content="2019-04-11T09:53:36.206Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="多线程断点续传原理及实现">
-<meta name="twitter:description" content="主要讲一下在java中实现多线程断点续传的原理,主要讲断点下载的原理。">
+<meta name="twitter:description" content="主要讲一下在java中(平台并不限于android)实现多线程断点续传的原理,主要讲断点下载的原理。">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/4b52d8db2e9d86b95c730af1db127a81.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
@@ -200,14 +200,12 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>主要讲一下在java中实现多线程断点续传的原理,主要讲断点下载的原理。<br><img src="https://www.haldir66.ga/static/imgs/4b52d8db2e9d86b95c730af1db127a81.jpg" alt=""><br><a id="more"></a></p>
+        <p>主要讲一下在java中(平台并不限于android)实现多线程断点续传的原理,主要讲断点下载的原理。<br><img src="https://www.haldir66.ga/static/imgs/4b52d8db2e9d86b95c730af1db127a81.jpg" alt=""><br><a id="more"></a></p>
 <p>其实就是在Http请求里面加上一个”range”的header，HttpUrlConnection可以这么干：</p>
-<ul>
-<li>conn.setRequestProperty(“Range”, “bytes=” + 500 + “-“ + 1000);</li>
-</ul>
+<p><code>conn.setRequestProperty(&quot;Range&quot;, &quot;bytes=&quot; + 500 + &quot;-&quot; + 1000);</code></p>
 <p>也就是告诉服务器上次下载到的位置，本地写文件可以使用RandomAccessFile。本地需要记录下上次中断后停下来的位置。可以用db记录，也可以用sp记录。<br>实践中肯定要发两次请求，第一次是为了读content-Length，确定每一份下载任务需要下载多少bytes。<br>第二步，就是根据线程数量，总数除以线程数，用一个线程池(或者直接开多条线程)去执行这么多份任务。每一份任务的请求都要带上上面那个Range的Header。</p>
 <p>nginx里面可能要设置一下,当然前提是下载服务本身支持range请求</p>
-<pre><code class="conf">proxy_cache_key $host&amp;uri&amp;is_args&amp;args$http_range;
+<pre><code class="nginx">proxy_cache_key $host&amp;uri&amp;is_args&amp;args$http_range;
 proxy_set_header Range $http_range;
 proxy_set_header If-Range $http_if_range;
 proxy_cache_valid 200 206;
@@ -238,6 +236,7 @@ at com.android.okhttp.internal.http.DelegatingHttpsURLConnection.getResponseCode
 </code></pre>
 <p><a href="http://blog.sina.com.cn/s/blog_bfdb961b0101mkbo.html">参考</a> con.setChunkedStreamingMode(1024);//内部缓冲区—分段上传防止oom<br><a href="http://www.cnblogs.com/begin1949/p/5060802.html">HttpURLConnection教程</a><br><a href="http://blog.csdn.net/lmj623565791/article/details/23781773">上传的时候不走HttpUrlConnection，直接创建Socket模拟POST避免大文件OOM</a></p>
 <h2 id="3-现有的实现方案"><a href="#3-现有的实现方案" class="headerlink" title="3. 现有的实现方案"></a>3. 现有的实现方案</h2><p>非常优秀的library，英语流利说喜欢搞多进程。<br><a href="https://github.com/Aspsine/MultiThreadDownload">Aspsine</a><br><a href="https://github.com/lingochamp/FileDownloader">英语流利说</a><br>下载文件的本质是inputstream.read</p>
+<h2 id="4-简单的实现"><a href="#4-简单的实现" class="headerlink" title="4.简单的实现"></a>4.简单的实现</h2><p>一种朴素的想法是，判断当前系统有多少可用cpu，启动对应数量的线程。比方说cpu4核心，需要下载61MB的文件，那么三条线程分别下载15MB文件，第四条线程下载16MB文件。每条线程在读取一次后，通过锁通知外部监听。每条线程下载完成后通知外部检查是否已经完成。<br>暂停，恢复下载。这俩是相对应的，每个tasK在运行的时候监测全局的状态，在发现状态变为暂停的时候，本地持久化当前进度(sql或者文件)</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="http://www.jianshu.com/p/2b82db0a5181">简书</a></li>
 <li><a href="https://github.com/AriaLyy/Aria">Demo</a></li>
@@ -631,10 +630,6 @@ at com.android.okhttp.internal.http.DelegatingHttpsURLConnection.getResponseCode
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
               </li>
              
@@ -644,6 +639,10 @@ at com.android.okhttp.internal.http.DelegatingHttpsURLConnection.getResponseCode
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">Okio</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">

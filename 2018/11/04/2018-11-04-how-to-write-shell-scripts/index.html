@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/timg.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/PuffinWales_EN-AU12757555133_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-04-08T01:41:03.508Z">
+<meta property="og:updated_time" content="2019-04-11T09:53:36.214Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="如何写shell脚本">
 <meta name="twitter:description" content="总结linux下shell脚本语句的语法Shell 是一个用 C 语言编写的程序，它是用户使用 Linux 的桥梁。Shell 既是一种命令语言，又是一种程序设计语言。Shell 是指一种应用程序，这个应用程序提供了一个界面，用户通过这个界面访问操作系统内核的服务。Ken Thompson 的 sh 是第一种 Unix Shell，Windows Explorer 是一个典型的图形界面 Shell">
@@ -240,6 +240,14 @@ echo &quot;$myvar&quot;  ## Hi there!
 echo &#39; $myvar&#39; ## $myvar
 
 echo \$myvar ## $myvar
+
+## shell中的大括号有点像js的es6中的spread operator
+# ls {ex1,ex2}.sh  
+ex1.sh  ex2.sh  
+# ls {ex{1..3},ex4}.sh  
+ex1.sh  ex2.sh  ex3.sh  ex4.sh  
+# ls {ex[1-3],ex4}.sh  
+ex1.sh  ex2.sh  ex3.sh  ex4.sh
 </code></pre>
 <p>单引号里面的变量是不能输出变量的值的，所以尽量用双引号</p>
 <h2 id="bash的变量是无类型的"><a href="#bash的变量是无类型的" class="headerlink" title="bash的变量是无类型的"></a>bash的变量是无类型的</h2><p>bash中是没有变量类型的说法的，例如<code>a=1</code> 这句话，你不能认为a是integer类型的。<strong>本质上来说，Bash变量是字符串，但是根据环境的不同，Bash允许变量有整数计算和比较。其中的决定因素是变量的值是不是只含有数字.</strong></p>
@@ -263,7 +271,14 @@ fi
 if (( $a &gt; $b  )); then
     echo &quot;a greater than b &quot;
 fi
+
+if ($i&lt;5)  ## 小括号里的直接执行命令
+if [ $i -lt 5 ]  
+if [ $a -ne 1 -a $a != 2 ]  ## -a表示&amp;&amp;
+if [ $a -ne 1] &amp;&amp; [ $a != 2 ]  
+if [[ $a != 1 &amp;&amp; $a != 2 ]] ##&amp;&amp; || 这些东西都能存在于两个中括号里面
 </code></pre>
+<p>上面这个例子就是两个小括号的体现了，两个小括号$((exp))中，双括号中的变量可以不使用$符号引用,exp被作为一个算术表达式判断，<br>比如 a=5; ((a++)) 可将 $a 重定义为6</p>
 <p><code>类似的数字之间的比较还有很多</code></p>
 <pre><code>-eq 等于,如:if [ &quot;$a&quot; -eq &quot;$b&quot; ] 
 -ne 不等于,如:if [ &quot;$a&quot; -ne &quot;$b&quot; ] 
@@ -340,6 +355,8 @@ else
     systemctl start nginx
     # mail
 fi
+
+#if [ $(ps -ef | grep -c &quot;ssh&quot;) -gt 1 ]; then echo &quot;true&quot;; fi
 </code></pre>
 <p><code>检查下当前是否安装了git</code></p>
 <pre><code class="bash">if ! [ -x &quot;$(command -v git)&quot; ]; then   ## command这个关键字是posix compatible的
@@ -352,13 +369,19 @@ fi
     echo &quot;file contain that word&quot;
 fi
 </code></pre>
+<p><code>查看某个命令的输出中有没有某个关键字，有的话执行操作</code></p>
+<pre><code class="bash">OUTPUT=&#39;blah blah (Status: 200)&#39;
+if echo &quot;$OUTPUT&quot; | grep -q &quot;(Status:\s200)&quot;; then
+    echo &quot;MATCH&quot;
+fi
+</code></pre>
 <h2 id="与，或，非操作"><a href="#与，或，非操作" class="headerlink" title="与，或，非操作"></a>与，或，非操作</h2><pre><code class="shell">if [ ${OUT_FILE}a != ${OUT_FILE%/*}a ] &amp;&amp; [ ! -d ${OUT_FILE%/*} ]; then ## 用&amp;&amp; 就可以了
     _red &#39;Error: Folder do not exist: &#39;${OUT_FILE%/*}&#39;\n&#39;
     exit 1
 fi
 </code></pre>
 <p>-a 　 　　　　　 与<br>-o　　　　　　　 或<br>!　　　　　　　　非</p>
-<h2 id="字符串拼接是很重要的"><a href="#字符串拼接是很重要的" class="headerlink" title="字符串拼接是很重要的"></a>字符串拼接是很重要的</h2><pre><code class="bash">#!/bin/bashbash
+<h2 id="字符串相关函数"><a href="#字符串相关函数" class="headerlink" title="字符串相关函数"></a>字符串相关函数</h2><pre><code class="bash">#!/bin/bashbash
 echo &quot;hello there&quot;
 foo=&quot;Hello&quot;
 foo=&quot;$foo World&quot;  ## 拼接一个现成的string到另一个string的尾部，用冒号跟美元符号就好了
@@ -378,57 +401,12 @@ echo &quot;$(ls -al | wc)&quot;
 echo &quot;$(which java)&quot;/something
 &gt;&gt; /usr/bin/java/something
 
-#!/bin/bash
 java=&quot;$(which java)&quot;
 ${java} --version
-</code></pre>
-<h2 id="流程控制-for循环和while循环"><a href="#流程控制-for循环和while循环" class="headerlink" title="流程控制(for循环和while循环)"></a>流程控制(for循环和while循环)</h2><pre><code class="shell">for file in `ls /etc`
-##或
-for file in $(ls /etc)
 
-for str in &quot;a b c&quot;  //用空格分割
-</code></pre>
-<h2 id="数组遍历，下标，长度等等"><a href="#数组遍历，下标，长度等等" class="headerlink" title="数组遍历，下标，长度等等"></a>数组遍历，下标，长度等等</h2><p>写成一行也是可以的</p>
-<pre><code class="shell">distro=(&quot;redhat&quot; &quot;debian&quot; &quot;gentoo&quot;)
-len=&lt;code&gt;${&lt;/code&gt;#distro[@]}
-for (( i=0; i&lt;$len; i++ )); do echo &quot;${distro[$i]}&quot; ; done
-</code></pre>
-<h2 id="简单的循环（for-each循环）"><a href="#简单的循环（for-each循环）" class="headerlink" title="简单的循环（for each循环）"></a>简单的循环（for each循环）</h2><pre><code class="shell">#!/bin/bash
-i=0;
-while [ $i -lt 4 ];
-do
-   echo $i;
-   i=`expr $i + 1`;
-   # let i+=1; //这些都是让i自增的方式
-   # ((i++));
-   # i=$[$i+1];
-   # i=$(( $i + 1 ))
-done
-
-#!/bin/bash
-for j in $(seq 1 5)
-do
-  echo $j
-done
-
-## 还可以写成一行
-for f in *.txt; do grep &quot;tasks:&quot; $f
-</code></pre>
-<h3 id="switch-case的例子找了一个现成的"><a href="#switch-case的例子找了一个现成的" class="headerlink" title="switch case的例子找了一个现成的"></a>switch case的例子找了一个现成的</h3><pre><code class="bash">get_args(){
-    OUT_TYPE=&#39;DNSMASQ_RULES&#39;
-    DNS_IP=&#39;127.0.0.1&#39;
-    DNS_PORT=&#39;5353&#39;
-    IPSET_NAME=&#39;&#39;
-    FILE_FULLPATH=&#39;&#39;
-    CURL_EXTARG=&#39;&#39;
-    WGET_EXTARG=&#39;&#39;
-    WITH_IPSET=0
-    EXTRA_DOMAIN_FILE=&#39;&#39;
-    EXCLUDE_DOMAIN_FILE=&#39;&#39;
-    IPV4_PATTERN=&#39;^((2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?)\.){3}(2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?)$&#39;
-    IPV6_PATTERN=&#39;^((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:)))(%.+)?$&#39;
-
-    while [ ${#} -gt 0 ]; do
+## 字符串长度
+string=&quot;abcd&quot;
+echo $ -gt 0 ]; do
         case &quot;${1}&quot; in
             --help | -h)
                 usage 0
@@ -549,6 +527,9 @@ else
     echo &quot;非root用户！&quot;  
 fi
 </code></pre>
+<blockquote>
+<p>${a} 变量a的值, 在不引起歧义的情况下可以省略大括号。<br>$(cmd) 命令替换，和<code>cmd</code>效果相同，结果为shell命令cmd的输出<br>$((expression)) 和<code>exprexpression</code>效果相同, 计算数学表达式exp的数值, 其中exp只要符合C语言的运算规则即可, 甚至三目运算符和逻辑表达式都可以计算。</p>
+</blockquote>
 <p>变量分为用户自定义的和环境变量（其实就是系统预设的）,有些区别</p>
 <blockquote>
 <p>用户自定义变量只在当前的shell中生效，环境变量在当前shell和这个shell的所有子shell中生效。<br>环境变量是全局变量，用户自定义变量是局部变量。<br>对系统生效的环境变量名和变量作用是固定的。</p>
@@ -715,7 +696,7 @@ grep -E aaa\|bbb
 }
 </code></pre>
 <p><img src="https://www.haldir66.ga/static/imgs/PuffinWales_EN-AU12757555133_1920x1080.jpg" alt=""></p>
-<p><a href="https://github.com/hiboyhiboy/opt-script">opt-script</a><br><a href="https://www.youtube.com/watch?v=hwrnmQumtPw">shell script tutorial</a><br><a href="http://blog.51cto.com/litaotao/1187983">LINUX下的21个特殊符号</a><br><a href="https://notes.wanghao.work/2015-06-02-Shell%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html">Shell学习笔记</a><br><a href="https://www.cyberciti.biz/faq/linux-unix-shell-check-if-directory-empty/">非常好的shell介绍网站</a></p>
+<p><a href="https://github.com/hiboyhiboy/opt-script">opt-script</a><br><a href="https://www.youtube.com/watch?v=hwrnmQumtPw">shell script tutorial</a><br><a href="http://blog.51cto.com/litaotao/1187983">LINUX下的21个特殊符号</a><br><a href="https://notes.wanghao.work/2015-06-02-Shell%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html">Shell学习笔记</a><br><a href="https://www.cyberciti.biz/faq/linux-unix-shell-check-if-directory-empty/">非常好的shell介绍网站</a><br><a href="https://blog.csdn.net/taiyang1987912/article/details/39551385">shell中各种括号的作用()、(())、[]、[[]]、{}</a></p>
 
       
 
@@ -1110,10 +1091,6 @@ grep -E aaa\|bbb
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
               </li>
              
@@ -1123,6 +1100,10 @@ grep -E aaa\|bbb
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">Okio</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">

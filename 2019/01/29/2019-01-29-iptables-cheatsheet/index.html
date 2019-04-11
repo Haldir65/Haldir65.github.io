@@ -17,7 +17,7 @@
 <meta property="og:description" content="iptables是控制linux 内核netfilter的command line frontend tool，只存在于linux平台，是system admin常用的防火墙。(虽然已经被nftables取代了，学习点网络知识还是很有必要)">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/lidongjieya_ZH-CN9263684179_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-04-08T01:41:03.508Z">
+<meta property="og:updated_time" content="2019-04-11T09:53:36.214Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iptables速查手册">
 <meta name="twitter:description" content="iptables是控制linux 内核netfilter的command line frontend tool，只存在于linux平台，是system admin常用的防火墙。(虽然已经被nftables取代了，学习点网络知识还是很有必要)">
@@ -522,9 +522,26 @@ export http_proxy=socks5://127.0.0.1:8118; export https_proxy=$http_proxy
 <p>Often, services on the computer communicate with each other by sending network packets to each other. They do this by utilizing a pseudo network interface called the loopback device, which directs traffic back to itself rather than to other computers.<br>同一台机器的不同进程之间有时候是通过一个虚拟的网络(loopback device)进行通信的，所以，必须要让iptables允许这些通信<br>$ sudo iptables -I INPUT 1 -i lo -j ACCEPT // -I的意思是插入，就是插入到INPUT这个规则里面。 1是说插到第一位，因为iptables排在前面的优先级高。 -i是interface的意思，lo就是loopback的简称。（也就是说，所有使用本地loopback这个interface发过来的包，放行）</p>
 </blockquote>
 <p><strong>注意还需要将上述规则添加到开机启动中，想要持久化的话好像有一个iptables-persistent</strong>，还有使用iptables屏蔽来自<a href="https://www.vpser.net/security/iptables-block-countries-ip.html">某个国家的IP</a>的教程</p>
-<h2 id="tbd"><a href="#tbd" class="headerlink" title="tbd"></a>tbd</h2><h3 id="nat相关"><a href="#nat相关" class="headerlink" title="nat相关"></a>nat相关</h3><pre><code>iptables -t nat -L -n -v //在路由器上这个会有
-</code></pre><p>一般路由器就是干这个的（使用iptables配置nat）<br>POSTROUTING 和 PREROUTING的概念</p>
-<h3 id="ipset的概念"><a href="#ipset的概念" class="headerlink" title="ipset的概念"></a>ipset的概念</h3><p>就是一大堆ip的一个集合，但是存的是hash，所以性能很好</p>
+<h3 id="透明代理的实现"><a href="#透明代理的实现" class="headerlink" title="透明代理的实现"></a>透明代理的实现</h3><p><a href="https://github.com/shadowsocks/luci-app-shadowsocks">ss-liibev的openwrt移植就是这么干的</a><br>在ss-rules(其实就是一个shell脚本)中</p>
+<pre><code class="bash">ipset -! restore create ss_spec_src_fw hash:ip hashsize 64
+iptables-restore -n &lt;&lt;-EOF
+nat
+-A SS_SPEC_LAN_AC -m set --match-set ss_spec_src_fw src -j SS_SPEC_WAN_FW
+-A SS_SPEC_WAN_AC -m set --match-set ss_spec_dst_fw dst -j SS_SPEC_WAN_FW
+EOF
+## 这个EOF主要为了方便换行，match src是gfwlist的转到SS_SPEC_WAN_FW这个chain上(外面的流量进来)，dst是gfwlist的也转到这个chain上。
+## 而这个chain 只干了一件事 REDIRECT   tcp  --  anywhere             anywhere             redir ports 1080(比方说local ss-redir监听在这个端口的话)
+iptables -t nat -A SS_SPEC_WAN_FW -p tcp \
+        -j REDIRECT --to-ports $local_port //tcp流量导向ss-redir本地监听端口
+iptables -t mangle -A SS_SPEC_WAN_FW -p udp \
+        -j TPROXY --on-port $LOCAL_PORT --tproxy-mark 0x01/0x01   //udp转发
+</code></pre>
+<p><a href="https://vvl.me/2018/06/09/from-ss-redir-to-linux-nat/">UDP 透明代理是通过 TPROXY 方式实现的</a> TPROXY是LINUX内核为支持透明代理而提供的一项新技术。<br>所以在部署了ss-libev-luci的路由器上iptables -t nat -L 都能看到这些东西。事实上在iptables没有看到udp的影子，使用的是TPROXY。<br>ss-redir的原理很简单：使用iptables对PREROUTING与OUTPUT的TCP/UDP流量进行REDIRECT（REDIRECT是DNAT的特例），ss—redir在捕获网络流量后，通过一些技术手段获取REDIRECT之前的目的地址（dst）与端口（port），连同网络流量一起转发至远程服务器。<br>为了在redirect UDP后还能够获取原本的dst和port，ss-redir采用了TPROXY。Linux系统有关TPROXY的设置是以下三条命令：</p>
+<pre><code>ip rule add fwmark 0x2333/0x2333 pref 100 table 100
+ip route add local default dev lo table 100
+iptables -t mangle -A PREROUTING -p udp -j TPROXY --tproxy-mark 0x2333/0x2333 --on-ip 127.0.0.1 --on-port 1080
+</code></pre><p>大意就是在mangle表的PREROUTING中为每个UDP数据包打上0x2333/0x2333标志，之后在路由选择中将具有0x2333/0x2333标志的数据包投递到本地环回设备上的1080端口；对监听0.0.0.0地址的1080端口的socket启用IP_TRANSPARENT标志，使IPv4路由能够将非本机的数据报投递到传输层，传递给监听1080端口的ss-redir。</p>
+<h3 id="ipset的语法"><a href="#ipset的语法" class="headerlink" title="ipset的语法"></a>ipset的语法</h3><p>就是一大堆ip的一个集合，但是存的是hash。 iptables的参数可以传 -m –match-set</p>
 <p>netfilter是kernel的实现</p>
 <blockquote>
 <p>Iptables is a standard firewall included in most Linux distributions by default (a modern variant called nftables will begin to replace it). It is actually a front end to the kernel-level netfilter hooks that can manipulate the Linux network stack.</p>
@@ -536,7 +553,7 @@ export http_proxy=socks5://127.0.0.1:8118; export https_proxy=$http_proxy
 <p><a href="https://www.digitalocean.com/community/tutorials/a-deep-dive-into-iptables-and-netfilter-architecture">a-deep-dive-into-iptables-and-netfilter-architecture</a></p>
 <p><a href="https://unix.stackexchange.com/questions/413545/what-does-iptables-j-redirect-actually-do-to-packet-headers">iptable在透明代理中的原理就是修改了packet的destination address，同时还记住了原来的address</a></p>
 <blockquote>
-<p>iptables overrites the original destination address but it remembers the old one. The application code can then fetch it by asking for a special socket option, SO_ORIGINAL_DST<br><a href="https://github.com/darkk/redsocks">著名tcp代理redsocks就是用SO_ORIGINAL_DST的</a></p>
+<p>iptables overwrites the original destination address but it remembers the old one. The application code can then fetch it by asking for a special socket option, SO_ORIGINAL_DST<br><a href="https://github.com/darkk/redsocks">著名tcp代理redsocks就是用SO_ORIGINAL_DST的</a></p>
 </blockquote>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.cyberciti.biz/tips/linux-iptables-examples.html">linux-iptables-examples</a><br><a href="https://blog.dreamtobe.cn/r7800-openwrt-v2ray/">网件R7800 OpenWrt使用V2Ray+mKcp+透明代理完美翻墙</a></p>
 
@@ -929,10 +946,6 @@ export http_proxy=socks5://127.0.0.1:8118; export https_proxy=$http_proxy
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
               </li>
              
@@ -942,6 +955,10 @@ export http_proxy=socks5://127.0.0.1:8118; export https_proxy=$http_proxy
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">Okio</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
