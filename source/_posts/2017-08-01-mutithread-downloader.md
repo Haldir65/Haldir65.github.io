@@ -4,14 +4,14 @@ date: 2017-08-01 22:19:31
 tags: [java]
 ---
 
-主要讲一下在java中实现多线程断点续传的原理,主要讲断点下载的原理。
+主要讲一下在java中(平台并不限于android)实现多线程断点续传的原理,主要讲断点下载的原理。
 ![](https://www.haldir66.ga/static/imgs/4b52d8db2e9d86b95c730af1db127a81.jpg)
 <!--more-->
 
 
 其实就是在Http请求里面加上一个"range"的header，HttpUrlConnection可以这么干：
 
-- conn.setRequestProperty("Range", "bytes=" + 500 + "-" + 1000);
+`conn.setRequestProperty("Range", "bytes=" + 500 + "-" + 1000);`
 
 也就是告诉服务器上次下载到的位置，本地写文件可以使用RandomAccessFile。本地需要记录下上次中断后停下来的位置。可以用db记录，也可以用sp记录。
 实践中肯定要发两次请求，第一次是为了读content-Length，确定每一份下载任务需要下载多少bytes。
@@ -19,7 +19,7 @@ tags: [java]
 
 
 nginx里面可能要设置一下,当然前提是下载服务本身支持range请求
-```conf
+```nginx
 proxy_cache_key $host&uri&is_args&args$http_range;
 proxy_set_header Range $http_range;
 proxy_set_header If-Range $http_if_range;
@@ -72,6 +72,11 @@ at com.android.okhttp.internal.http.DelegatingHttpsURLConnection.getResponseCode
 [Aspsine](https://github.com/Aspsine/MultiThreadDownload)
 [英语流利说](https://github.com/lingochamp/FileDownloader)
 下载文件的本质是inputstream.read
+
+## 4.简单的实现
+一种朴素的想法是，判断当前系统有多少可用cpu，启动对应数量的线程。比方说cpu4核心，需要下载61MB的文件，那么三条线程分别下载15MB文件，第四条线程下载16MB文件。每条线程在读取一次后，通过锁通知外部监听。每条线程下载完成后通知外部检查是否已经完成。
+暂停，恢复下载。这俩是相对应的，每个tasK在运行的时候监测全局的状态，在发现状态变为暂停的时候，本地持久化当前进度(sql或者文件)
+
 
 ## 参考
 - [简书](http://www.jianshu.com/p/2b82db0a5181)

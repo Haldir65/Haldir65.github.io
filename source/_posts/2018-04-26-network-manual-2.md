@@ -109,6 +109,7 @@ html里面上传文件一般是ajax对象send一个FormData出去，
 [域名解析之dig,host,nslookup命令](http://luodw.cc/2015/12/27/dns03/)
 好用的命令
 > dig +trace baidu.com
+nslookup www.youtube.com 1.1.1.1 //指定server，国内因为dns污染，返回的结果是错误的
 nslookup -vc google.com 8.8.8.8 // -vc是指强制走tcp查询dns
 nslookup -d www.163.com //显示ttl
 nslookup -> set debug -> www.163.com //这三条走完是一样的，类似于交互模式

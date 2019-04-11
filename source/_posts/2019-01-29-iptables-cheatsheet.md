@@ -433,6 +433,7 @@ ss-redir -u -c /etc/config/shadowsocks.json -f /var/run/shadowsocks.pid
 代理的原理:参考[ss/ssr/v2ray/socks5 透明代理](https://paper.tuisec.win/detail/4f9d95db284d609)里面的解释
 > ss-redir 是 ss-libev、ssr-libev 中的一个工具，配合 iptables 可以在 Linux 上实现 ss、ssr 透明代理，ss-redir 的透明代理是通过 DNAT 实现的，但是 udp 包在经过 DNAT 后会无法获取原目的地址，所以 ss-redir 无法代理经过 DNAT 的 udp 包；但是 ss-redir 提供了另一种 udp 透明代理方式：xt_TPROXY 内核模块（不涉及 NAT 操作），配合 iproute2 即可实现 udp 的透明代理，但缺点是只能代理来自内网主机的 udp 流量。强调一点，利用 ss-redir 实现透明代理必须使用 ss-libev 或 ssr-libev，python、go 等实现版本没有 ss-redir、ss-tunnel 程序。当然，ss、ssr 透明代理并不是只能用 ss-redir 来实现，使用 ss-local + redsocks/tun2socks 同样可以实现 socks5（ss-local 是 socks5 服务器）全局透明代理，ss-local + redsocks 实际上是 ss-redir 的分体实现，都是通过 NAT 进行代理的，因此也不能代理本机的 udp，当然内网的 udp 也不能代理，因为 redsocks 不支持 xt_TPROXY 方式（redsocks2 支持 TPROXY 模块，但是依旧无法代理本机 udp，不考虑）。所以这里只讨论 ss-local + tun2socks，这个组合方式其实和 Android 上的 VPN 模式差不多（ss-redir 或 ss-local + redsocks 则是 NAT 模式），因为不涉及 NAT 操作，所以能够代理所有 tcp、udp 流量（包括本机、内网的 udp）。很显然，利用 tun2socks 可以实现任意 socks5 透明代理（不只是 ss/ssr，ssh、v2ray 都可以，只要能提供 socks5 本地代理）。最后再说一下 v2ray 的透明代理，其实原理和 ss/ssr-libev 一样，v2ray 可以看作是 ss-local、ss-redir、ss-tunnel 三者的合体，因为一个 v2ray 客户端可以同时充当这三个角色（当然端口要不一样）；所以 v2ray 的透明代理也有两种实现方式，一是利用对应的 ss-redir/ss-tunnel + iptables，二是利用对应的 ss-local + tun2socks（这其实就是前面说的 socks5 代理）。
 
+
 shell中全局的http代理可以这么设置
 ```
 export http_proxy=http://127.0.0.1:8118; export https_proxy=$http_proxy
@@ -450,18 +451,36 @@ $ sudo iptables -I INPUT 1 -i lo -j ACCEPT // -I的意思是插入，就是插�
 **注意还需要将上述规则添加到开机启动中，想要持久化的话好像有一个iptables-persistent**，还有使用iptables屏蔽来自[某个国家的IP](https://www.vpser.net/security/iptables-block-countries-ip.html)的教程
 
 
-## tbd
-
-### nat相关
+### 透明代理的实现
+[ss-liibev的openwrt移植就是这么干的](https://github.com/shadowsocks/luci-app-shadowsocks)
+在ss-rules(其实就是一个shell脚本)中
+```bash
+ipset -! restore create ss_spec_src_fw hash:ip hashsize 64
+iptables-restore -n <<-EOF
+nat
+-A SS_SPEC_LAN_AC -m set --match-set ss_spec_src_fw src -j SS_SPEC_WAN_FW
+-A SS_SPEC_WAN_AC -m set --match-set ss_spec_dst_fw dst -j SS_SPEC_WAN_FW
+EOF
+## 这个EOF主要为了方便换行，match src是gfwlist的转到SS_SPEC_WAN_FW这个chain上(外面的流量进来)，dst是gfwlist的也转到这个chain上。
+## 而这个chain 只干了一件事 REDIRECT   tcp  --  anywhere             anywhere             redir ports 1080(比方说local ss-redir监听在这个端口的话)
+iptables -t nat -A SS_SPEC_WAN_FW -p tcp \
+		-j REDIRECT --to-ports $local_port //tcp流量导向ss-redir本地监听端口
+iptables -t mangle -A SS_SPEC_WAN_FW -p udp \
+		-j TPROXY --on-port $LOCAL_PORT --tproxy-mark 0x01/0x01   //udp转发    
 ```
-iptables -t nat -L -n -v //在路由器上这个会有
+[UDP 透明代理是通过 TPROXY 方式实现的](https://vvl.me/2018/06/09/from-ss-redir-to-linux-nat/) TPROXY是LINUX内核为支持透明代理而提供的一项新技术。
+所以在部署了ss-libev-luci的路由器上iptables -t nat -L 都能看到这些东西。事实上在iptables没有看到udp的影子，使用的是TPROXY。
+ss-redir的原理很简单：使用iptables对PREROUTING与OUTPUT的TCP/UDP流量进行REDIRECT（REDIRECT是DNAT的特例），ss—redir在捕获网络流量后，通过一些技术手段获取REDIRECT之前的目的地址（dst）与端口（port），连同网络流量一起转发至远程服务器。
+为了在redirect UDP后还能够获取原本的dst和port，ss-redir采用了TPROXY。Linux系统有关TPROXY的设置是以下三条命令：
 ```
+ip rule add fwmark 0x2333/0x2333 pref 100 table 100
+ip route add local default dev lo table 100
+iptables -t mangle -A PREROUTING -p udp -j TPROXY --tproxy-mark 0x2333/0x2333 --on-ip 127.0.0.1 --on-port 1080
+```
+大意就是在mangle表的PREROUTING中为每个UDP数据包打上0x2333/0x2333标志，之后在路由选择中将具有0x2333/0x2333标志的数据包投递到本地环回设备上的1080端口；对监听0.0.0.0地址的1080端口的socket启用IP_TRANSPARENT标志，使IPv4路由能够将非本机的数据报投递到传输层，传递给监听1080端口的ss-redir。
 
-一般路由器就是干这个的（使用iptables配置nat）
-POSTROUTING 和 PREROUTING的概念
-
-### ipset的概念
-就是一大堆ip的一个集合，但是存的是hash，所以性能很好
+### ipset的语法
+就是一大堆ip的一个集合，但是存的是hash。 iptables的参数可以传 -m --match-set
 
 
 netfilter是kernel的实现
@@ -473,7 +492,7 @@ iptables的工作流程
 [a-deep-dive-into-iptables-and-netfilter-architecture](https://www.digitalocean.com/community/tutorials/a-deep-dive-into-iptables-and-netfilter-architecture)
 
 [iptable在透明代理中的原理就是修改了packet的destination address，同时还记住了原来的address](https://unix.stackexchange.com/questions/413545/what-does-iptables-j-redirect-actually-do-to-packet-headers)
-> iptables overrites the original destination address but it remembers the old one. The application code can then fetch it by asking for a special socket option, SO_ORIGINAL_DST
+> iptables overwrites the original destination address but it remembers the old one. The application code can then fetch it by asking for a special socket option, SO_ORIGINAL_DST
 [著名tcp代理redsocks就是用SO_ORIGINAL_DST的](https://github.com/darkk/redsocks)
 
 ## 参考
