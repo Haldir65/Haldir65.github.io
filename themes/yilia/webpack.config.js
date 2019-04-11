@@ -1,11 +1,22 @@
-var webpack = require("webpack");
-var autoprefixer = require('autoprefixer');
+const webpack = require("webpack");
+const path = require("path");
+const fs = require("fs");
+const autoprefixer = require('autoprefixer');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
+const scssLoader = new ExtractTextPlugin('[name].[chunkhash:6].css');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var CleanPlugin = require('clean-webpack-plugin');
 
-// 模板压缩
-// 详见：https://github.com/kangax/html-minifier#options-quick-reference
+const THEME_NAME = "yilia";
+const OUTPUT_DIR = 'source';
+
+// init `yilia_config.yml` in root dir,
+if (!fs.existsSync(path.resolve(__dirname, '..', 'yilia_config.yml'))) {
+  let theme_config = fs.readFileSync(path.resolve(__dirname, '_config.yml'));
+  fs.writeFileSync(path.resolve(__dirname, '..', 'yilia_config.yml'), theme_config);
+  // node v8.5+ fs.copyFileSync(path.resolve(__dirname, '_config.yml'), path.resolve(__dirname, '..', 'yilia_config.yml'));
+}
+let target_dir = path.resolve(__dirname, '../../', 'themes', THEME_NAME);
 
 var minifyHTML = {
   collapseInlineTagWhitespace: true,
@@ -20,40 +31,57 @@ module.exports = {
     mobile: ["babel-polyfill", "./source-src/js/mobile.js"]
   },
   output: {
-    path: "./source",
+    path: path.resolve(target_dir, OUTPUT_DIR),
     publicPath: "./",
     filename: "[name].[chunkhash:6].js"
   },
   module: {
-    loaders: [{
-      test: /\.js$/,
-      loader: 'babel-loader?cacheDirectory',
-      exclude: /node_modules/
-    }, {
+    rules: [
+    {
+      test: /\.js$/, //es6 => es5
+      include: [
+        path.resolve(__dirname, 'source-src')
+      ],
+      exclude: /node_modules/,
+      use: 'babel-loader'
+    },
+    {
       test: /\.html$/,
-      loader: 'html'
-    }, {
+      use: 'html-loader'
+    }, 
+    {
       test: /\.(scss|sass|css)$/,
-      loader: ExtractTextPlugin.extract('style-loader', ['css-loader?-autoprefixer', 'postcss-loader', 'sass-loader'])
+      use: ['style-loader'].concat(scssLoader.extract([{
+        loader: 'css-loader',
+        options: {
+          importLoaders: 2
+        }
+      }, {
+        loader: 'postcss-loader',
+        options: {
+          ident: 'postcss',
+          plugins: (loader) => [require('autoprefixer')()]
+        }
+      }, 'sass-loader']))
+     
     }, {
       test: /\.(gif|jpg|png)\??.*$/,
-      loader: 'url-loader?limit=500&name=img/[name].[ext]'
+      use: [{
+        loader: 'url-loader',
+        options: {
+          limit: 500,
+          name: 'img/[name].[ext]'
+        }
+      }]
     }, {
       test: /\.(woff|svg|eot|ttf)\??.*$/,
-      loader: "file-loader?name=fonts/[name].[hash:6].[ext]"
+      use: [{
+        loader: 'file-loader',
+        options: {
+          name: 'fonts/[name].[hash:6].[ext]'
+        }
+      }]
     }]
-  },
-  alias: {
-    'vue$': 'vue/dist/vue.js'
-  },
-  resolve: {
-    alias: {
-      'vue$': 'vue/dist/vue.common.js'
-    }
-  },
-  // devtool: '#eval-source-map',
-  postcss: function() {
-    return [autoprefixer];
   },
   plugins: [
     new ExtractTextPlugin('[name].[chunkhash:6].css'),
@@ -64,15 +92,15 @@ module.exports = {
       inject: false,
       cache: false,
       minify: minifyHTML,
-      template: './source-src/script.ejs',
-      filename: '../layout/_partial/script.ejs'
+      template: path.resolve(__dirname, 'source-src', 'script.ejs'),
+      filename: path.resolve(target_dir, 'layout', '_partial', 'script.ejs')
     }),
     new HtmlWebpackPlugin({
       inject: false,
       cache: false,
       minify: minifyHTML,
-      template: './source-src/css.ejs',
-      filename: '../layout/_partial/css.ejs'
+      template: path.resolve(__dirname, 'source-src', 'css.ejs'),
+      filename: path.resolve(target_dir, 'layout', '_partial', 'css.ejs')
     })
   ],
   watch: true
