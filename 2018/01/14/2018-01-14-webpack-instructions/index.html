@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/hot%20coffee%20city%20life%20winter.jpg">
-<meta property="og:updated_time" content="2019-04-11T10:03:04.959Z">
+<meta property="og:updated_time" content="2019-04-14T13:23:15.852Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Webpack资源汇总">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/hot%20coffee%20city%20life%20winter.jpg">
@@ -198,9 +198,9 @@ ga('send', 'pageview');
     <div class="article-entry" itemprop="articleBody">
       
         <p><img src="https://www.haldir66.ga/static/imgs/hot%20coffee%20city%20life%20winter.jpg" alt=""><br><a id="more"></a></p>
-<p>使用webpack的一个好处是，浏览器的并发请求资源数是有一个上限的，把所有资源打成一个包，能够减少请求数量。webpack更新的速度是真快，目前(2018年9月最新版本已经到4.19)</p>
+<p>使用webpack的一个好处是，浏览器的并发请求资源数是有一个上限的，把所有资源打成一个包，能够减少请求数量。webpack更新的速度是真快，目前(2019年4月最新版本已经到4.30.0)</p>
 <h2 id="1-安装"><a href="#1-安装" class="headerlink" title="1.安装"></a>1.安装</h2><blockquote>
-<p>yarn add webpack</p>
+<p>yarn add webpack –dev</p>
 </blockquote>
 <h2 id="2-使用"><a href="#2-使用" class="headerlink" title="2.使用"></a>2.使用</h2><blockquote>
 <p>webpack is basically pulling  all external js files into on build.js file that we can bundle into our html.<br>这样做的好处很多，能够有效减少浏览器发出的请求数量。</p>
@@ -208,35 +208,47 @@ ga('send', 'pageview');
 <p>webpack -p即可</p>
 <h2 id="3-webpack-config-js"><a href="#3-webpack-config-js" class="headerlink" title="3. webpack.config.js"></a>3. webpack.config.js</h2><p>从<a href="https://github.com/WsmDyj/webpack">webpack-example</a>copy一个webpack.config.js过来，基本可以搞定es6,less,hot-reload,css-plugin还有asset文件copy这些常见的需求。<br>首先是package.json</p>
 <pre><code class="json">{
-  &quot;name&quot;: &quot;try-webpack&quot;,
+  &quot;name&quot;: &quot;Web&quot;,
   &quot;version&quot;: &quot;1.0.0&quot;,
-  &quot;description&quot;: &quot;&quot;,
+  &quot;description&quot;: &quot;[webpack4, babel7,react 16](https://medium.freecodecamp.org/how-to-use-reactjs-with-webpack-4-babel-7-and-material-design-ff754586f618)&quot;,
   &quot;main&quot;: &quot;index.js&quot;,
   &quot;scripts&quot;: {
-    &quot;build&quot;: &quot;webpack --mode production&quot;,
-    &quot;start&quot;: &quot;webpack-dev-server --mode development&quot;
+    &quot;test&quot;: &quot;echo \&quot;Error: no test specified\&quot; &amp;&amp; exit 1&quot;,
+    &quot;webpack&quot;: &quot;babel-node ./node_modules/webpack/bin/webpack&quot;,
+    &quot;start&quot;: &quot;babel-node ./node_modules/webpack-dev-server/bin/webpack-dev-server --open&quot;
+  },
+  &quot;repository&quot;: {
+    &quot;type&quot;: &quot;git&quot;,
+    &quot;url&quot;: &quot;git+https://github.com/Haldir65/Web.git&quot;
   },
   &quot;keywords&quot;: [],
   &quot;author&quot;: &quot;&quot;,
   &quot;license&quot;: &quot;ISC&quot;,
+  &quot;bugs&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Haldir65/Web/issues&quot;
+  },
+  &quot;homepage&quot;: &quot;https://github.com/Haldir65/Web#readme&quot;,
   &quot;devDependencies&quot;: {
-    &quot;babel-core&quot;: &quot;^6.26.3&quot;,
-    &quot;babel-loader&quot;: &quot;^7.1.5&quot;,
-    &quot;babel-preset-env&quot;: &quot;^1.7.0&quot;,
-    &quot;copy-webpack-plugin&quot;: &quot;^4.5.2&quot;,
-    &quot;css-loader&quot;: &quot;^1.0.0&quot;,
-    &quot;extract-text-webpack-plugin&quot;: &quot;^4.0.0-beta.0&quot;,
-    &quot;file-loader&quot;: &quot;^1.1.11&quot;,
+    &quot;@babel/core&quot;: &quot;^7.4.3&quot;,
+    &quot;@babel/node&quot;: &quot;^7.2.2&quot;,
+    &quot;@babel/plugin-proposal-class-properties&quot;: &quot;^7.4.0&quot;,
+    &quot;@babel/preset-env&quot;: &quot;^7.4.3&quot;,
+    &quot;@babel/preset-react&quot;: &quot;^7.0.0&quot;,
+    &quot;babel-loader&quot;: &quot;^8.0.5&quot;,
+    &quot;css-loader&quot;: &quot;^2.1.1&quot;,
+    &quot;file-loader&quot;: &quot;^3.0.1&quot;,
     &quot;html-webpack-plugin&quot;: &quot;^3.2.0&quot;,
-    &quot;less&quot;: &quot;^3.7.0&quot;,
-    &quot;webpack&quot;: &quot;^4.15.1&quot;,
-    &quot;webpack-cli&quot;: &quot;^3.0.8&quot;,
-    &quot;webpack-dev-server&quot;: &quot;^3.1.4&quot;
+    &quot;node-sass&quot;: &quot;^4.11.0&quot;,
+    &quot;path&quot;: &quot;^0.12.7&quot;,
+    &quot;sass-loader&quot;: &quot;^7.1.0&quot;,
+    &quot;style-loader&quot;: &quot;^0.23.1&quot;,
+    &quot;webpack&quot;: &quot;^4.30.0&quot;,
+    &quot;webpack-cli&quot;: &quot;^3.3.0&quot;,
+    &quot;webpack-dev-server&quot;: &quot;^3.3.1&quot;
   },
   &quot;dependencies&quot;: {
-    &quot;less-loader&quot;: &quot;^4.1.0&quot;,
-    &quot;lodash&quot;: &quot;^4.17.10&quot;,
-    &quot;style-loader&quot;: &quot;^0.21.0&quot;
+    &quot;react&quot;: &quot;^16.8.6&quot;,
+    &quot;react-dom&quot;: &quot;^16.8.6&quot;
   }
 }
 </code></pre>
@@ -338,19 +350,39 @@ module.exports = {
 <p>yarn add browsersync browser-sync-webpack-plugin</p>
 </blockquote>
 <p>HtmlWebpackPlugin目前已经可以做到和webpack-dev-server搭配实现html hot reload<br>有了HtmlWebpackPlugin,html文件里面已经不需要写script或者css的tag了。<br>直接在index.js里面去require(“./styles/index”)就行</p>
-<h2 id="4-babel-es-2015-gt-es5"><a href="#4-babel-es-2015-gt-es5" class="headerlink" title="4. babel(es 2015 -&gt; es5)"></a>4. babel(es 2015 -&gt; es5)</h2><p>首先需要知道的是mudule.exports那一套在浏览器里是不支持的。会出现”require is undefined…”。解决办法也有，安装babel就行了。<br>babel的作用是把es2015的代码编译成es5的代码, 安装方式</p>
+<h2 id="4-babel-loader-es6-gt-es5"><a href="#4-babel-loader-es6-gt-es5" class="headerlink" title="4. babel-loader(es6 -&gt; es5)"></a>4. babel-loader(es6 -&gt; es5)</h2><p>babel-loader是webpack的一个loader，可以转换ES6以上的代码到ES5<br>babel的作用是把es2015的代码编译成es5的代码, 为了使用babel-loader我们需要安装一系列的依赖</p>
 <blockquote>
-<p>yarn add babel-cli babel-preset-env</p>
+<p>yarn add babel-core babel-loader babel-preset-env –dev</p>
 </blockquote>
-<p>然后创建一个.babelrc文件</p>
+<p>然后创建一个.babelrc文件,在.babelrc配置文件中，主要是对预设（presets）和插件（plugins）进行配置</p>
 <pre><code class="json">{
-  &quot;presets&quot;: [&quot;env&quot;]
+  &quot;presets&quot;: [&quot;@babel/preset-env&quot;, &quot;@babel/preset-react&quot;]
 }
 </code></pre>
-<p>package.json中添加script:<br>babel : “babel”<br>命令行 ： npm run babel – index.js -o bundle.js -w</p>
-<p>==================trash ========================================================================</p>
-<h2 id="7-react-cli-and-vue-cli原理"><a href="#7-react-cli-and-vue-cli原理" class="headerlink" title="7. react cli and vue cli原理"></a>7. react cli and vue cli原理</h2><h2 id="8-common-front-end-javaScript-libraries"><a href="#8-common-front-end-javaScript-libraries" class="headerlink" title="8. common front end javaScript libraries"></a>8. common front end javaScript libraries</h2><p>minify js(删掉所有的空行)<br>underscore javaScript library<br>handlebars(模板)</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://web.jobbole.com/94944/">请手写一个webpack4.0配置</a></p>
+<p>要使用babel-loader的话，就在webpack.config.js文件中添加</p>
+<pre><code class="js">module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: &quot;babel-loader&quot;
+        }
+      }
+    ]
+  }
+};
+</code></pre>
+<p>package.json中修改script:</p>
+<pre><code class="json">&quot;scripts&quot;: {
+    &quot;webpack&quot;: &quot;babel-node ./node_modules/webpack/bin/webpack&quot;,
+    &quot;start&quot;: &quot;babel-node ./node_modules/webpack-dev-server/bin/webpack-dev-server --open&quot;
+}
+</code></pre>
+<p>首先生成对应的bundle，后续再用devServer将build文件夹中的内容渲染到浏览器</p>
+<h2 id="Deprecated"><a href="#Deprecated" class="headerlink" title="Deprecated"></a>Deprecated</h2><p>react cli and vue cli原理<br>common front end javaScript libraries<br>minify js(删掉所有的空行)<br>underscore javaScript library<br>handlebars(模板)</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.valentinog.com/blog/webpack-tutorial/">Webpack 4 Tutorial: from 0 Conf to Production Mode</a></p>
 
       
 
@@ -677,11 +709,11 @@ module.exports = {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -737,6 +769,10 @@ module.exports = {
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
               </li>
              
@@ -746,10 +782,6 @@ module.exports = {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">Okio</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
