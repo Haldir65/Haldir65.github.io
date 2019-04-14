@@ -8,10 +8,10 @@ tags: [前端]
 <!--more-->
 
 
-使用webpack的一个好处是，浏览器的并发请求资源数是有一个上限的，把所有资源打成一个包，能够减少请求数量。webpack更新的速度是真快，目前(2018年9月最新版本已经到4.19)
+使用webpack的一个好处是，浏览器的并发请求资源数是有一个上限的，把所有资源打成一个包，能够减少请求数量。webpack更新的速度是真快，目前(2019年4月最新版本已经到4.30.0)
 
 ## 1.安装
-> yarn add webpack
+> yarn add webpack --dev
 
 ## 2.使用
 
@@ -25,35 +25,47 @@ webpack -p即可
 首先是package.json
 ```json
 {
-  "name": "try-webpack",
+  "name": "Web",
   "version": "1.0.0",
-  "description": "",
+  "description": "[webpack4, babel7,react 16](https://medium.freecodecamp.org/how-to-use-reactjs-with-webpack-4-babel-7-and-material-design-ff754586f618)",
   "main": "index.js",
   "scripts": {
-    "build": "webpack --mode production",
-    "start": "webpack-dev-server --mode development"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "webpack": "babel-node ./node_modules/webpack/bin/webpack",
+    "start": "babel-node ./node_modules/webpack-dev-server/bin/webpack-dev-server --open"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Haldir65/Web.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Haldir65/Web/issues"
+  },
+  "homepage": "https://github.com/Haldir65/Web#readme",
   "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-loader": "^7.1.5",
-    "babel-preset-env": "^1.7.0",
-    "copy-webpack-plugin": "^4.5.2",
-    "css-loader": "^1.0.0",
-    "extract-text-webpack-plugin": "^4.0.0-beta.0",
-    "file-loader": "^1.1.11",
+    "@babel/core": "^7.4.3",
+    "@babel/node": "^7.2.2",
+    "@babel/plugin-proposal-class-properties": "^7.4.0",
+    "@babel/preset-env": "^7.4.3",
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.5",
+    "css-loader": "^2.1.1",
+    "file-loader": "^3.0.1",
     "html-webpack-plugin": "^3.2.0",
-    "less": "^3.7.0",
-    "webpack": "^4.15.1",
-    "webpack-cli": "^3.0.8",
-    "webpack-dev-server": "^3.1.4"
+    "node-sass": "^4.11.0",
+    "path": "^0.12.7",
+    "sass-loader": "^7.1.0",
+    "style-loader": "^0.23.1",
+    "webpack": "^4.30.0",
+    "webpack-cli": "^3.3.0",
+    "webpack-dev-server": "^3.3.1"
   },
   "dependencies": {
-    "less-loader": "^4.1.0",
-    "lodash": "^4.17.10",
-    "style-loader": "^0.21.0"
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6"
   }
 }
 ```
@@ -161,31 +173,56 @@ HtmlWebpackPlugin目前已经可以做到和webpack-dev-server搭配实现html h
 直接在index.js里面去require("./styles/index")就行
 
 
-## 4. babel(es 2015 -> es5)
-首先需要知道的是mudule.exports那一套在浏览器里是不支持的。会出现"require is undefined..."。解决办法也有，安装babel就行了。
-babel的作用是把es2015的代码编译成es5的代码, 安装方式
-> yarn add babel-cli babel-preset-env
+## 4. babel-loader(es6 -> es5)
+babel-loader是webpack的一个loader，可以转换ES6以上的代码到ES5
+babel的作用是把es2015的代码编译成es5的代码, 为了使用babel-loader我们需要安装一系列的依赖
+> yarn add babel-core babel-loader babel-preset-env --dev
 
-然后创建一个.babelrc文件
+然后创建一个.babelrc文件,在.babelrc配置文件中，主要是对预设（presets）和插件（plugins）进行配置
 ```json
 {
-  "presets": ["env"]
+  "presets": ["@babel/preset-env", "@babel/preset-react"]
 }
 ```
 
-package.json中添加script:
-babel : "babel"
-命令行 ： npm run babel -- index.js -o bundle.js -w
+要使用babel-loader的话，就在webpack.config.js文件中添加
+```js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: "babel-loader"
+        }
+      }
+    ]
+  }
+};
+```
+
+package.json中修改script:
+```json
+"scripts": {
+    "webpack": "babel-node ./node_modules/webpack/bin/webpack",
+    "start": "babel-node ./node_modules/webpack-dev-server/bin/webpack-dev-server --open"
+}
+```
+首先生成对应的bundle，后续再用devServer将build文件夹中的内容渲染到浏览器
 
 
-==================trash ========================================================================
 
-## 7. react cli and vue cli原理
 
-## 8. common front end javaScript libraries
+
+
+
+## Deprecated
+react cli and vue cli原理
+common front end javaScript libraries
 minify js(删掉所有的空行) 
 underscore javaScript library
 handlebars(模板)
 
 ## 参考
-[请手写一个webpack4.0配置](http://web.jobbole.com/94944/)
+[Webpack 4 Tutorial: from 0 Conf to Production Mode](https://www.valentinog.com/blog/webpack-tutorial/)
