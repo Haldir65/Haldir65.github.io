@@ -13,6 +13,7 @@ tags: [android]
 
 - GridLayoutManager可以设置某个Item在某一行占据的Column num（VERTICAL的情况下）
 代码如下:
+
 ```java
 GridLayoutManager manager = new GridLayoutManager(
    this,2 ,GridLayoutManager.VERTICAL,false)
@@ -24,7 +25,8 @@ manager.setSpanSizeLookup(){
                 return (position % 3 == 0 ? 2 : 1)
             }
         }
-    }   
+    } 
+    );  
 ```
 所以，一开始可以把这个2设置大一点，后面可以动态设置，看上去就会造成一种多种格子的错觉。
 
@@ -41,11 +43,13 @@ Recycler内部有两个集合:
 ### 4.FillGaps,最重要的方法
 1. Discover firstVisible position/location
 2. 找到layout Gaps
+
 ```java
 findFirstVisiblePosition
 ```
 
 3. Scrap everything(丢到ScrapHeap)
+
 ```java
  /**
          * Temporarily detach and scrap all currently attached child views. Views will be scrapped
@@ -75,7 +79,9 @@ for(...){
     layoutDecorated(view,....)
     }
 ```
+
 5. Recycle remaining views
+
 ```java
 final List<RecyclerView.ViewHolder> scrapList =
     recycler.getScrapList();
@@ -111,6 +117,8 @@ SmoothScroller是一个接口，在里面实现computeScrollVectorForPosition返
 
 ### 7. supportPredictiveItemAnimation主要用于ItemChange Animation
 主要在发生变化时展示动画。如果想要在滑动过程中展示动画的话，可以考虑在onViewAttachedToWindow或者onBindViewHolder里面给View添加TranslationX（从左边出来），Alpha(透明度从0变成1)，或者ScaleX等等
+
+这篇文章最初是打算翻译Dave Smith的一次演讲的，后面决定加上StaggeredGridLayoutManger的原理解析
 
 
 
