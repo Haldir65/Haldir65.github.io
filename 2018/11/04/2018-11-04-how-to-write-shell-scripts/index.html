@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/timg.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/PuffinWales_EN-AU12757555133_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-04-14T13:23:15.856Z">
+<meta property="og:updated_time" content="2019-04-21T15:09:22.461Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="如何写shell脚本">
 <meta name="twitter:description" content="总结linux下shell脚本语句的语法Shell 是一个用 C 语言编写的程序，它是用户使用 Linux 的桥梁。Shell 既是一种命令语言，又是一种程序设计语言。Shell 是指一种应用程序，这个应用程序提供了一个界面，用户通过这个界面访问操作系统内核的服务。Ken Thompson 的 sh 是第一种 Unix Shell，Windows Explorer 是一个典型的图形界面 Shell">
@@ -279,7 +279,7 @@ if [ $a -ne 1] &amp;&amp; [ $a != 2 ]
 if [[ $a != 1 &amp;&amp; $a != 2 ]] ##&amp;&amp; || 这些东西都能存在于两个中括号里面
 </code></pre>
 <p>上面这个例子就是两个小括号的体现了，两个小括号$((exp))中，双括号中的变量可以不使用$符号引用,exp被作为一个算术表达式判断，<br>比如 a=5; ((a++)) 可将 $a 重定义为6</p>
-<p><code>类似的数字之间的比较还有很多</code></p>
+<p><code>以下只适用于数值之间的比较</code></p>
 <pre><code>-eq 等于,如:if [ &quot;$a&quot; -eq &quot;$b&quot; ] 
 -ne 不等于,如:if [ &quot;$a&quot; -ne &quot;$b&quot; ] 
 -gt 大于,如:if [ &quot;$a&quot; -gt &quot;$b&quot; ] 
@@ -290,7 +290,8 @@ if [[ $a != 1 &amp;&amp; $a != 2 ]] ##&amp;&amp; || 这些东西都能存在于�
 &lt;=  小于等于(需要双括号),如:((&quot;$a&quot; &lt;= &quot;$b&quot;)) 
 &gt;   大于(需要双括号),如:((&quot;$a&quot; &gt; &quot;$b&quot;)) 
 &gt;=  大于等于(需要双括号),如:((&quot;$a&quot; &gt;= &quot;$b&quot;))
-</code></pre><p><code>判断两个字符串是否相等</code></p>
+</code></pre><p><code>以下适用于字符串之间的比较，也可用于数值比较</code><br>= 相等则为真<br>!= 不相等则为真</p>
+<p><code>判断两个字符串是否相等</code></p>
 <pre><code class="bash">if [ &quot;$var1&quot; == &quot;$var2&quot; ]; then  ##if 后面必须加then
 echo &#39;$var1 eq $var2&#39;
 else
@@ -549,6 +550,24 @@ unix下查看环境变量命令：
 windows下查看环境变量:
 &gt; set
 </code></pre>
+<h3 id="自定义函数的返回值"><a href="#自定义函数的返回值" class="headerlink" title="自定义函数的返回值"></a>自定义函数的返回值</h3><p>在自己写的函数中返回一个字符串是不行的</p>
+<pre><code class="bash">function my_function(){
+    procss=`lsof -i:80`
+    return $process
+}
+</code></pre>
+<p>函数中可以有返回值，但只能返回数字，字符串是会爆”numeric argument required”的错误的<br>所以想要通过函数给某个变量赋值的话，可以这么干</p>
+<pre><code class="bash">#定义函数
+function func(){
+    a=99
+}
+#调用函数
+func
+#外部就可以调用这个
+echo $a
+</code></pre>
+<p>写在函数体中的变量默认是全局变量，但是要是用local修饰的话就不能被外部引用。</p>
+<p>另一种方式是在调用一个函数之后跟着使用$? 立马获取上一个函数的返回值</p>
 <h2 id="shell里面判断一个命令是否执行成功"><a href="#shell里面判断一个命令是否执行成功" class="headerlink" title="shell里面判断一个命令是否执行成功"></a>shell里面判断一个命令是否执行成功</h2><p>其实在terminal中执行命令的话，有一个小细节：注意看最左下方的符号。上一个命令如果成功的话，是绿色的，不成功的话是红色的。<br>c语言中有一个errornum,shell 里面有差不多的东西，用于判断上一个命令是否返回非0的return value。</p>
 <pre><code class="bash"># iptables -C INPUT -p tcp --dport 8080 --jump ACCEPT
 iptables: Bad rule (does a matching rule exist in that chain?).
@@ -696,7 +715,7 @@ grep -E aaa\|bbb
 }
 </code></pre>
 <p><img src="https://www.haldir66.ga/static/imgs/PuffinWales_EN-AU12757555133_1920x1080.jpg" alt=""></p>
-<p><a href="https://github.com/hiboyhiboy/opt-script">opt-script</a><br><a href="https://www.youtube.com/watch?v=hwrnmQumtPw">shell script tutorial</a><br><a href="http://blog.51cto.com/litaotao/1187983">LINUX下的21个特殊符号</a><br><a href="https://notes.wanghao.work/2015-06-02-Shell%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html">Shell学习笔记</a><br><a href="https://www.cyberciti.biz/faq/linux-unix-shell-check-if-directory-empty/">非常好的shell介绍网站</a><br><a href="https://blog.csdn.net/taiyang1987912/article/details/39551385">shell中各种括号的作用()、(())、[]、[[]]、{}</a></p>
+<p><a href="https://github.com/hiboyhiboy/opt-script">opt-script</a><br><a href="https://www.youtube.com/watch?v=hwrnmQumtPw">shell script tutorial</a><br><a href="http://blog.51cto.com/litaotao/1187983">LINUX下的21个特殊符号</a><br><a href="https://notes.wanghao.work/2015-06-02-Shell%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html">Shell学习笔记</a><br><a href="https://www.cyberciti.biz/faq/linux-unix-shell-check-if-directory-empty/">非常好的shell介绍网站</a><br><a href="https://blog.csdn.net/taiyang1987912/article/details/39551385">shell中各种括号的作用()、(())、[]、[[]]、{}</a><br><a href="http://c.biancheng.net/view/773.html">非常好的教程</a></p>
 
       
 
