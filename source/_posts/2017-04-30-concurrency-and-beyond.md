@@ -270,3 +270,4 @@ AbstractQueuedSynchronizer即大名鼎鼎的AQS。
 
 Reference 
 1. [Java 多线程：线程池实现原理](https://github.com/pzxwhc/MineKnowContainer/issues/9)
+2. [深入分析 java 8 编程语言规范：Threads and Locks](https://javadoop.com/post/Threads-And-Locks-md)

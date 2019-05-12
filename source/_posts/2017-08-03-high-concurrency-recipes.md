@@ -238,8 +238,9 @@ public class CyclicBarrierDemo {
 ```
 CyclicBarrier是等大家都调完await之后才开始各自走下一步
 
-CountDownLatch：一个或者多个线程，等待其他多个线程完成某件事情之后才能执行；
-CyclicBarrier：多个线程互相等待，直到到达同一个同步点，再继续一起执行。
+[CyclicBarrier和CountDownLatch的原理简述](https://javadoop.com/post/phaser-tutorial)
+CountDownLatch：一个或者多个线程，等待其他多个线程完成某件事情之后才能执行；CountDownLatch 的原理：AQS 共享模式的典型使用，构造函数中的 1 是设置给 AQS 的 state 的。latch.await() 方法会阻塞，而 latch.countDown() 方法就是用来将 state-- 的，减到 0 以后，唤醒所有的阻塞在 await() 方法上的线程。
+CyclicBarrier：多个线程互相等待，直到到达同一个同步点，再继续一起执行。CyclicBarrier 的原理不是 AQS 的共享模式，是 AQS Condition 和 ReentrantLock 的结合使用
 
 
 ## 10.指令重排不是说说而已
