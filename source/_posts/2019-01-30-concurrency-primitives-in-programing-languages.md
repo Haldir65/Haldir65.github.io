@@ -16,6 +16,9 @@ tags: [java, tbd]
 java Object中是有一个monitor对象的，wait和notify就是基于这个属性去实现的。只要在同一对象上去调用notify/notifyAll方法，就可以唤醒对应对象monitor上等待的线程了。
 为什么jvm需要对象的头部信息呢，一是给GC，锁做标记，二是hash数据和分代年龄，三是为了从对象指针就可以会的其数据类型及动态分派的能力，四是数组类型需要有数量信息。
 
+[抛出异常也需要获得锁](https://javadoop.com/post/Threads-And-Locks-md)
+wait方法抛出了InterruptedException异常，即使是异常，也是要获取到监视器锁了才会抛出
+
 ### synchronized关键字
 从语法上讲，synchronized可以用在
 instance　method(锁在这个instance上), static method (锁在这个class )以及method block(锁这一块代码逻辑)。
@@ -73,9 +76,40 @@ java doc是这么解释的
 • If the thread already owns the monitor associated with objectref, it reenters the monitor, incrementing its entry count.
 • If another thread already owns the monitor associated with objectref, the thread blocks until the monitor's entry count is zero, then tries again to gain ownership.
 看上去很像c语言里面的semctl嘛。
-Synchronized是通过对象内部的一个叫做监视器锁（monitor）来实现的。但是监视器锁本质又是依赖于底层的操作系统的Mutex Lock来实现的。而操作系统实现线程之间的切换这就需要从用户态转换到核心态，这个成本非常高，状态之间的转换需要相对比较长的时间，这就是为什么Synchronized效率低的原因。因此，这种依赖于操作系统Mutex Lock所实现的锁我们称之为“重量级锁”。JDK中对Synchronized做的种种优化，其核心都是为了减少这种重量级锁的使用。JDK1.6以后，为了减少获得锁和释放锁所带来的性能消耗，提高性能，引入了“轻量级锁”和“偏向锁”。
+Synchronized是通过对象内部的一个叫做监视器锁（monitor）来实现的，monitor对象存在于每一个java对象的对象头中(具体点是存的是指针)。但是监视器锁本质又是依赖于底层的操作系统的Mutex Lock来实现的。而操作系统实现线程之间的切换这就需要从用户态转换到核心态，这个成本非常高，状态之间的转换需要相对比较长的时间，这就是为什么Synchronized效率低的原因。因此，这种依赖于操作系统Mutex Lock所实现的锁我们称之为“重量级锁”。JDK中对Synchronized做的种种优化，其核心都是为了减少这种重量级锁的使用。JDK1.6以后，为了减少获得锁和释放锁所带来的性能消耗，提高性能，引入了“轻量级锁”和“偏向锁”。
 
-[轻量级锁和偏向锁](http://www.cnblogs.com/paddix/p/5405678.html)
+## Java虚拟机对synchronized的优化
+锁的状态总共有四种，无锁状态、偏向锁、轻量级锁和重量级锁。随着锁的竞争，锁可以从偏向锁升级到轻量级锁，再升级的重量级锁，但是锁的升级是单向的，也就是说只能从低到高升级，不会出现锁的降级
+
+[锁的实现](https://www.jianshu.com/p/acf667ccec40)
+java中的锁一共有4种状态，级别从低到高分别是：
+- 无锁状态
+- 偏向锁
+- 轻量级锁
+- 重量级锁
+
+### 偏向锁：
+顾名思义，为了让线程获得锁的代价更低，引入了偏向锁。
+**加锁**
+当一个线程访问同步块并且获取锁时，会在对象头和栈帧中的锁记录里存储锁偏向的线程id，这样，这个线程便获取了这个对象的偏向锁，之后这个线程进入和退出就不需要通过CAS操作，也就是原子操作，来进行加锁和解锁，只需要简单的测试下对象头存储的偏向锁的线程id是否和自身的id一致，如果一致，那么已经获取锁，直接进入。否则，判断对象中是否已经存储了偏向锁，如果没有锁，那么使用CAS竞争锁，如果设置了，那么尝试使用CAS将对象头的偏向锁指向当前线程。
+**解锁**
+偏向锁的解锁时机是在竞争时才会释放锁,撤销时需要等待全局安全点，这个时间点没有正在执行的字节码，首先会暂停拥有偏向锁的线程，然后检查偏向锁的线程是否存活，如果不活动，那么直接设置为无锁状态。否则要么偏向其他锁，要么恢复到无锁或者标记对象不适合偏向锁。
+
+### 轻量锁
+会自旋尝试获取锁，消耗cpu资源
+**加锁**
+一旦多线程发起了锁竞争，并且释放了偏向锁之后，线程通过CAS修改Mark Word，如果当前没有对象持有同步体的锁，那么直接将同步体的锁修改的轻量锁，否则，该线程将自旋获取锁，直到膨胀为重量级锁，修改同步体的Mark Word为重量级锁，然后阻塞
+**解锁**
+一旦有其他线程因想获取当前锁而膨胀为重量级锁，那么这个线程将会通过CAS替换Mark Word，然后失败，解锁，并且唤醒其他等待线程。
+
+### 重量级锁
+会阻塞，不消耗cpu资源，但是响应时间较慢
+synchronized
+内部也是利用了锁。
+每一个对象都有一个自己的monitor，必须先获取这个monitor对象才能够进入同步块或同步方法，而这个monitor对象的获取是排他的，也就是同一时刻只能有一个线程获取到这个monitor
+
+
+[轻量级锁和偏向锁](https://blog.csdn.net/javazejian/article/details/72828483)
 
 类似的，synchronized修饰的instance method在编译后添加了一个ACC_SYNCHRONIZED的flag，同步是通过这个标志实现的。
 
@@ -101,6 +135,8 @@ synchronized (sharedObject) {
 
 也即是被notify的线程都在锁池里(有权竞争cpu)，自己调用wait的线程都在等待池里(无权竞争cpu)。 那么什么时候竞争呢，持有锁的线程自己wait(释放锁)了，那么有权竞争的线程就开始竞争，获得锁的进入同步代码块或者同步方法。
 
+需要注意的是
+***notify/notifyAll方法调用后，并不会马上释放监视器锁，而是在相应的synchronized(){}/synchronized方法执行结束后才自动释放锁。***
 
 
 
@@ -206,12 +242,68 @@ Thread-1消费者消费，当前还剩下0个
 
 从代码执行顺序来看，wait方法调用后，当前线程阻塞住(虽然还在一个同步代码块中，直到别的线程notify，这个wait方法才会返回)，此时另一个线程竞争获取锁开始执行同步代码块。
 
-
+synchronized对于内存可见性的影响[java内存模型](https://javadoop.com/post/java-memory-model)
+一个线程在获取到监视器锁以后才能进入 synchronized 控制的代码块，一旦进入代码块，首先，该线程对于共享变量的缓存就会失效，因此 synchronized 代码块中对于共享变量的读取需要从主内存中重新获取，也就能获取到最新的值。
+退出代码块的时候的，会将该线程写缓冲区中的数据刷到主内存中，所以在 synchronized 代码块之前或 synchronized 代码块中对于共享变量的操作随着该线程退出 synchronized 块，会立即对其他线程可见（这句话的前提是其他读取共享变量的线程会从主内存读取最新值）。
 
 ## Thread.sleep并不释放锁，只是让出cpu执行时间
 Thread.sleep和Object.wait都会暂停当前的线程，对于CPU资源来说，不管是哪种方式暂停的线程，都表示它暂时不再需要CPU的执行时间。OS会将执行时间分配给其它线程。区别是，调用wait后，需要别的线程执行notify/notifyAll才能够重新获得CPU执行时间。
 所以在同步代码块里执行sleep是一个很糟糕的做法
 
+
+## interrupt与线程中断
+```java
+//中断线程（实例方法）
+public void Thread.interrupt();
+
+//判断线程是否被中断（实例方法）
+public boolean Thread.isInterrupted();
+
+//判断是否被中断并清除当前中断状态（静态方法）
+public static boolean Thread.interrupted();
+```
+
+这个要背下来javadoc的描述，因为不同操作系统上的实现细节可能有差异:
+>  /**
+     * Interrupts this thread.
+     *
+     * <p> Unless the current thread is interrupting itself, which is
+     * always permitted, the {@link #checkAccess() checkAccess} method
+     * of this thread is invoked, which may cause a {@link
+     * SecurityException} to be thrown.
+     *
+     * <p> If this thread is blocked in an invocation of the {@link
+     * Object#wait() wait()}, {@link Object#wait(long) wait(long)}, or {@link
+     * Object#wait(long, int) wait(long, int)} methods of the {@link Object}
+     * class, or of the {@link #join()}, {@link #join(long)}, {@link
+     * #join(long, int)}, {@link #sleep(long)}, or {@link #sleep(long, int)},
+     * methods of this class, then its interrupt status will be cleared and it
+     * will receive an {@link InterruptedException}.
+     *
+     * <p> If this thread is blocked in an I/O operation upon an {@link
+     * java.nio.channels.InterruptibleChannel InterruptibleChannel}
+     * then the channel will be closed, the thread's interrupt
+     * status will be set, and the thread will receive a {@link
+     * java.nio.channels.ClosedByInterruptException}.
+     *
+     * <p> If this thread is blocked in a {@link java.nio.channels.Selector}
+     * then the thread's interrupt status will be set and it will return
+     * immediately from the selection operation, possibly with a non-zero
+     * value, just as if the selector's {@link
+     * java.nio.channels.Selector#wakeup wakeup} method were invoked.
+     *
+     * <p> If none of the previous conditions hold then this thread's interrupt
+     * status will be set. </p>
+     *
+     * <p> Interrupting a thread that is not alive need not have any effect.
+     *
+     * @throws  SecurityException
+     *          if the current thread cannot modify this thread
+     *
+     * @revised 6.0
+     * @spec JSR-51
+     */
+概括下来就是在wait,i/o操作，或者selector操作的中间调用线程对象的interrupt方法会抛出InterruptedException，如果不是上述三种情况之一，则将重置isInterrupted的标志位。也就意味着对于这种非阻塞的线程是不会因为interrupt方法而停下来的
 
 ## yield的用法
 yield是让当前线程从running的状态变成runnable的状态（不过这个方法很少用到）
@@ -268,33 +360,6 @@ static void ensure_join(JavaThread* thread) {
 ```
 答案就在
 lock.notify_all(thread);这里
-
-[锁的实现](https://www.jianshu.com/p/acf667ccec40)
-java中的锁一共有4种状态，级别从低到高分别是：
-- 无锁状态
-- 偏向锁
-- 轻量级锁
-- 重量级锁
-
-### 偏向锁：
-顾名思义，为了让线程获得锁的代价更低，引入了偏向锁。
-**加锁**
-当一个线程访问同步块并且获取锁时，会在对象头和栈帧中的锁记录里存储锁偏向的线程id，这样，这个线程便获取了这个对象的偏向锁，之后这个线程进入和退出就不需要通过CAS操作，也就是原子操作，来进行加锁和解锁，只需要简单的测试下对象头存储的偏向锁的线程id是否和自身的id一致，如果一致，那么已经获取锁，直接进入。否则，判断对象中是否已经存储了偏向锁，如果没有锁，那么使用CAS竞争锁，如果设置了，那么尝试使用CAS将对象头的偏向锁指向当前线程。
-**解锁**
-偏向锁的解锁时机是在竞争时才会释放锁,撤销时需要等待全局安全点，这个时间点没有正在执行的字节码，首先会暂停拥有偏向锁的线程，然后检查偏向锁的线程是否存活，如果不活动，那么直接设置为无锁状态。否则要么偏向其他锁，要么恢复到无锁或者标记对象不适合偏向锁。
-
-### 轻量锁
-会自旋尝试获取锁，消耗cpu资源
-**加锁**
-一旦多线程发起了锁竞争，并且释放了偏向锁之后，线程通过CAS修改Mark Word，如果当前没有对象持有同步体的锁，那么直接将同步体的锁修改的轻量锁，否则，该线程将自旋获取锁，直到膨胀为重量级锁，修改同步体的Mark Word为重量级锁，然后阻塞
-**解锁**
-一旦有其他线程因想获取当前锁而膨胀为重量级锁，那么这个线程将会通过CAS替换Mark Word，然后失败，解锁，并且唤醒其他等待线程。
-
-### 重量级锁
-会阻塞，不消耗cpu资源，但是响应时间较慢
-synchronized
-内部也是利用了锁。
-每一个对象都有一个自己的monitor，必须先获取这个monitor对象才能够进入同步块或同步方法，而这个monitor对象的获取是排他的，也就是同一时刻只能有一个线程获取到这个monitor
 
 
 

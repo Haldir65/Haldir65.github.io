@@ -1,5 +1,5 @@
 ---
-title: jvm架构概述
+title: jmm(java memory model)概述
 date: 2017-05-24 22:48:58
 categories: blog
 tags: [jvm]
@@ -138,3 +138,4 @@ b = b +1 ;
 [JVM ( java virtual machine) architecture - tutorial](https://www.youtube.com/watch?v=ZBJ0u9MaKtM)
 [Java系列笔记(3) - Java 内存区域和GC机制](http://www.cnblogs.com/zhguang/p/3257367.html)
 [Java内存区域——堆，栈，方法区等](https://blog.csdn.net/qian520ao/article/details/78952895)
+[理解Java内存区域与Java内存模型](https://blog.csdn.net/javazejian/article/details/72772461)

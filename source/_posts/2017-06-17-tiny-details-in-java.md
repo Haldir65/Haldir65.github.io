@@ -1718,7 +1718,23 @@ public class ReadFileWithMappedByteBuffer
 }
 ```
 
-### 51. Class.forName...
+### 51. 严防Math.abs返回负数
+Math.abs会返回负数是一个很有名的坑，这个只有在Integer.MIN_VALUE或者Long.MIN_VALUE的时候会发生
+```java
+System.out.println("Integer is " + Math.abs(Integer.MIN_VALUE));
+System.out.println("Long is " + Math.abs(Long.MIN_VALUE));
+System.out.println("Byte is " + Math.abs(Byte.MIN_VALUE));
+```
+Integer is -2147483648
+Long is -9223372036854775808
+Byte is 128
+原因是Integer.MIN_VALUE = -2^31
+Integer.MAX_VALUE = 2^31-1
+所以MIN_VALUE找不到对应的正数
+
+
+
+### 52. Class.forName...
 在App启动的时候在另外一个线程里面提前去加载这个class，能够加快速度吗？
 
 todo a pratical cheetsheet on java reflection
