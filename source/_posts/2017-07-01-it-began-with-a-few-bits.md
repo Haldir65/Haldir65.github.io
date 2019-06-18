@@ -651,6 +651,11 @@ call.enqueue(new okhttp3.Callback() {
 
 ### 3. A few 'ok' libraries
 why moshi ? why Retrofit call can be clone cheap？
+[moshi避免了不必要的String Allocation主要是在于避免了key的allocate](https://vimeo.com/334067631#t=47m03s)
+
+在将一大串byte array转为java object的过程中，json parser要为所遇见的每一个key创建json object（moshi则不是，它只关心对应的java bean中的field的name，并且只要获取对应的index。） 具体在JsonUTF8Reader的selectName方法中。
+
+
 why SinkedSource?
 why protolBuffer cost less ?
 

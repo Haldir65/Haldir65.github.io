@@ -134,8 +134,13 @@ b = b +1 ;
 
 方法区又被称为静态区，是程序中永远唯一的元素存储区域。和堆一样，是各个线程共享的内存区域。它用于存储已被虚拟机加载的类信息、常量、静态变量、即时编译器编译后的代码等数据。
 
+### updates
+
+jmm(java memory model)
+
 ### 参考
 [JVM ( java virtual machine) architecture - tutorial](https://www.youtube.com/watch?v=ZBJ0u9MaKtM)
 [Java系列笔记(3) - Java 内存区域和GC机制](http://www.cnblogs.com/zhguang/p/3257367.html)
 [Java内存区域——堆，栈，方法区等](https://blog.csdn.net/qian520ao/article/details/78952895)
 [理解Java内存区域与Java内存模型](https://blog.csdn.net/javazejian/article/details/72772461)
+[Java 并发基础之内存模型](https://javadoop.com/post/java-memory-model)

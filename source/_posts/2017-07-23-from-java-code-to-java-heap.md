@@ -38,6 +38,16 @@ public class ObjectSizeFetcher {
 JVM为了malloc与gc方便，指定分配的每个对象都需要是8字节的整数倍[参考](http://github.thinkingbar.com/alignment/)
 简单来说，一个Object占用的内存大小是8 Byte的倍数
 
+在DirectByteBuffer的构造函数中有这么一段内存对齐的函数
+```java
+if (pa && (base % ps != 0)) {
+        // Round up to page boundary
+        address = base + ps - (base & (ps - 1));
+} else {
+    address = base;
+}
+```
+
 
 ## 3. java进程的内存占用情况
 

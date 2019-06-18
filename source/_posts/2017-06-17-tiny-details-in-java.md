@@ -786,6 +786,26 @@ System.out.println( 0.999999999f==1f ); // 9个9
 // true
 ```
 
+```java
+public class FloatNumberAccuracy {
+    public static void main(String[] args) {
+        System.out.println(0.05+0.01);
+        System.out.println(1.0-0.42);
+        System.out.println(4.015*100);
+        System.out.println(123.3/100);
+    }
+}
+```
+
+```
+0.060000000000000005
+0.5800000000000001
+401.49999999999994
+1.2329999999999999
+```
+显然双精度浮点数是无法精确表达数学上的有些数字的
+
+
 [Java 浮点数 float和double类型的表示范围和精度](http://blog.csdn.net/zq602316498/article/details/41148063)
 和整数型是signed的不一样,float和double是unsigned。
 这32位是怎么分的：
@@ -908,11 +928,19 @@ String currentLat2 = "2.455675";
 BigDecimal b = new BigDecimal(currentLat2);   
 System.out.println(b.setScale(5,BigDecimal.ROUND_HALF_UP).doubleValue());
 ```
-所以建议用String初始化BigDecimal.
+
+用String初始化BigDecimal.在《Effective   Java》这本书中也提到这个原则，float和double只能用来做科学计算或者是工程计算，在商业计算中我们要用java.math.BigDecimal。使用BigDecimal并且一定要用String来够造。
+Note: the results of this constructor can be somewhat unpredictable. One might assume that new BigDecimal(.1) is exactly equal to .1, but it is actually equal to .1000000000000000055511151231257827021181583404541015625. This is so because .1 cannot be represented exactly as a double (or, for that matter, as a binary fraction of any finite length). Thus, the long value that is being passed in to the constructor is not exactly equal to .1, appearances nonwithstanding. 
+The (String) constructor, on the other hand, is perfectly predictable: new BigDecimal(".1") is exactly equal to .1, as one would expect. Therefore, it is generally recommended that the (String) constructor be used in preference to this one.
+
 
 [Floating point precision error](https://www.quora.com/In-Python-why-does-8-5-8-4-give-0-099999999999999964)这种事几乎所有语言都有
 
+
+
+
 type -casting java中从double强转float，从long强转int是怎么实现的
+
 
 
 ### 36.调jvm参数

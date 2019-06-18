@@ -299,6 +299,7 @@ print '10 // 3 =', 10 // 3
 
 
 ### 参考
+- [real python](https://realpython.com/python-encodings-guide/)
 - [廖雪峰的官方网站](http://www.liaoxuefeng.com/)
 - [静觅](http://cuiqingcai.com/category/technique/python)
 - [unicodeencodeerror-ascii-codec-cant-encode-character](https://stackoverflow.com/questions/9942594/unicodeencodeerror-ascii-codec-cant-encode-character-u-xa0-in-position-20?rq=1)

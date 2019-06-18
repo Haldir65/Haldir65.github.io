@@ -248,6 +248,119 @@ Java_sun_nio_ch_FileChannelImpl_map0(JNIEnv *env, jobject this,
 其实就是通过jni调用了c语言api.
 
 
+jni可以做一些很有意思的事情
+标准输入，标准输出，标准错误输出是所有操作系统都支持的，对于一个进程来说，文件描述符0,1,2固定是标准输入，标准输出，标准错误输出。
+
+java语法中有一条是final的成员变量要么在声明的时候就初始化，要么在构造函数中就得初始化。在System这个class中，我们看到了使用jni强行修改final变量的做法
+[JDK 源码阅读 : FileDescriptor](http://www.importnew.com/28981.html)文中提到:
+> System作为一个特殊的类，类构造时无法实例化in/out/err，构造发生在initializeSystemClass被调用时，但是in/out/err是被声明为final的，如果声明时和类构造时没有赋值，是会报错的，所以System在实现时，先设置为null，然后通过native方法来在运行时修改（学到了不少奇技淫巧。。），通过setIn0/setOut0/setErr0的注释也可以说明这一点：
+
+```java
+public final class System {
+    public final static InputStream in = null;
+    public final static PrintStream out = null;
+    public final static PrintStream err = null;
+    /**
+    * Initialize the system class.  Called after thread initialization.
+    */
+    private static void initializeSystemClass() {
+        FileInputStream fdIn = new FileInputStream(FileDescriptor.in);
+        FileOutputStream fdOut = new FileOutputStream(FileDescriptor.out);
+        FileOutputStream fdErr = new FileOutputStream(FileDescriptor.err);
+        setIn0(new BufferedInputStream(fdIn));
+        setOut0(newPrintStream(fdOut, props.getProperty("sun.stdout.encoding")));
+        setErr0(newPrintStream(fdErr, props.getProperty("sun.stderr.encoding")));
+    }
+    private static native void setIn0(InputStream in);
+    private static native void setOut0(PrintStream out);
+    private static native void setErr0(PrintStream err);
+}
+```
+
+```c
+/*
+ * The following three functions implement setter methods for
+ * java.lang.System.{in, out, err}. They are natively implemented
+ * because they violate the semantics of the language (i.e. set final
+ * variable).
+ */
+JNIEXPORT void JNICALL
+Java_java_lang_System_setIn0(JNIEnv *env, jclass cla, jobject stream)
+{
+    jfieldID fid =
+        (*env)->GetStaticFieldID(env,cla,"in","Ljava/io/InputStream;");
+    if (fid == 0)
+        return;
+    (*env)->SetStaticObjectField(env,cla,fid,stream);
+}
+JNIEXPORT void JNICALL
+Java_java_lang_System_setOut0(JNIEnv *env, jclass cla, jobject stream)
+{
+    jfieldID fid =
+        (*env)->GetStaticFieldID(env,cla,"out","Ljava/io/PrintStream;");
+    if (fid == 0)
+        return;
+    (*env)->SetStaticObjectField(env,cla,fid,stream);
+}
+JNIEXPORT void JNICALL
+Java_java_lang_System_setErr0(JNIEnv *env, jclass cla, jobject stream)
+{
+    jfieldID fid =
+        (*env)->GetStaticFieldID(env,cla,"err","Ljava/io/PrintStream;");
+    if (fid == 0)
+        return;
+    (*env)->SetStaticObjectField(env,cla,fid,stream);
+}
+```
+
+这篇文章还指出了:
+>尝试关闭0，1，2文件描述符，需要特殊的操作。首先这三个是不能关闭的，
+如果关闭了，后续打开的文件就会占用这三个描述符，
+
+```c
+// /jdk/src/solaris/native/java/io/FileInputStream_md.c
+JNIEXPORT void JNICALL
+Java_java_io_FileInputStream_close0(JNIEnv *env, jobject this) {
+    fileClose(env, this, fis_fd);
+}
+// /jdk/src/solaris/native/java/io/io_util_md.c
+void fileClose(JNIEnv *env, jobject this, jfieldID fid)
+{
+    FD fd = GET_FD(this, fid);
+    if (fd == -1) {
+        return;
+    }
+    /* Set the fd to -1 before closing it so that the timing window
+     * of other threads using the wrong fd (closed but recycled fd,
+     * that gets re-opened with some other filename) is reduced.
+     * Practically the chance of its occurance is low, however, we are
+     * taking extra precaution over here.
+     */
+    SET_FD(this, -1, fid);
+    // 尝试关闭0，1，2文件描述符，需要特殊的操作。首先这三个是不能关闭的，
+    // 如果关闭的，后续打开的文件就会占用这三个描述符，
+    // 所以合理的做法是把要关闭的描述符指向/dev/null，实现关闭的效果
+    // 不过Java代码中，正常是没办法关闭0，1，2文件描述符的
+    if (fd >= STDIN_FILENO && fd <= STDERR_FILENO) {
+        int devnull = open("/dev/null", O_WRONLY);
+        if (devnull < 0) {
+            SET_FD(this, fd, fid); // restore fd
+            JNU_ThrowIOExceptionWithLastError(env, "open /dev/null failed");
+        } else {
+            dup2(devnull, fd);
+            close(devnull);
+        }
+    } else if (close(fd) == -1) { // 关闭非0，1，2的文件描述符只是调用close系统调用
+        JNU_ThrowIOExceptionWithLastError(env, "close failed");
+    }
+}
+```
+
+[知乎上关于DirectByteBuffer的讨论](https://www.zhihu.com/question/60892134/answer/191781461)
+>整个JVM都是运行在用户空间上的，不存在内核空间的分配。Java NIO 的IO读写如果不是directbuffer就把数据copy的临时的directbuffer中再做IO读写。所以直接使用directbuffer会节省内存copy次数，这是JavaNIO框架具体实现方式的限制，不好称之为“优势”。JavaNIO使用directbuffer进行IO读写的原因主要是在GC优化上。jvm并不是不能直接用java heapbuffer或java byte[]直接做IO读写，但会mark此段内存不能移动，从而影响GC效率。但是JavaNIO框架里的IO操作都是非阻塞模式的快速操作，究竟能影响多少GC效率还不能轻易下结论。JavaNIO的高效主要体现在相对java bio在管理大量连接时少使用了很多线程而节省的线程资源和线程切换，但其编程模型比BIO要复杂得多，只能说NIO高效，不好说它“高级”。对于客户端使用少量连接时，BIO比NIO更有优势，不但编程模型简单，IO效率也不比NIO差。directbuffer本身也是一个内存隐患，使用directbuffer并不能像heapbuffer或byte[]一样任意使用可以被GC及时的回收。所以使用directbuffer最好是分配好缓存起来重复使用，否则很容易出现OOM错误。
+
+DirectByteBuffer这个对象占用的内存是放在java heap上的，这部分没多少，但是其分配的native内存(也就是放在C语言的heap上的)是占主要大小的。这部分的释放使用了PhantomReference追踪DirectByteBuffer被加入到ReferenceQueue的时候就会开始运行一个runnbale，这里面去调用jni方法释放内存。
+
 ## 总结
 netty的作者在演讲中提到java官方的nio并不特别好，所以，生产环境用的都是netty这种。
 
