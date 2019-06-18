@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/9b157a7acab582078ac1fabada5c8009.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/official_java_primitive_type_size_table.jpg">
-<meta property="og:updated_time" content="2019-05-19T14:41:32.167Z">
+<meta property="og:updated_time" content="2019-06-18T00:52:49.455Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java对象内存占用分析">
 <meta name="twitter:description" content="面向对象语言就意味着对象要占用内存空间，那么，java中随便new 出来的东西到底多大？还有，new出来的东西全都都放在heap上吗(有些真不是)？">
@@ -219,6 +219,14 @@ ga('send', 'pageview');
 <p>这样通常在IDE里面跑不起来。</p>
 <p>据说dump memory也行，没试过。</p>
 <h2 id="2-内存对齐"><a href="#2-内存对齐" class="headerlink" title="2. 内存对齐"></a>2. 内存对齐</h2><p>JVM为了malloc与gc方便，指定分配的每个对象都需要是8字节的整数倍<a href="http://github.thinkingbar.com/alignment/">参考</a><br>简单来说，一个Object占用的内存大小是8 Byte的倍数</p>
+<p>在DirectByteBuffer的构造函数中有这么一段内存对齐的函数</p>
+<pre><code class="java">if (pa &amp;&amp; (base % ps != 0)) {
+        // Round up to page boundary
+        address = base + ps - (base &amp; (ps - 1));
+} else {
+    address = base;
+}
+</code></pre>
 <h2 id="3-java进程的内存占用情况"><a href="#3-java进程的内存占用情况" class="headerlink" title="3. java进程的内存占用情况"></a>3. java进程的内存占用情况</h2><h3 id="3-1-操作系统和runtime占用的内存"><a href="#3-1-操作系统和runtime占用的内存" class="headerlink" title="3.1 操作系统和runtime占用的内存"></a>3.1 操作系统和runtime占用的内存</h3><p>操作系统的内存中，一部分被操作系统和kernel所占用。对于用c或者c++写的jvm，还需要分配一部分给c runtime。操作系统和c<br>runtime占用的内存比较大，不同的操作系统上不一样，windows上默认是2GB。剩下的内存(即user space)，就是进程可以使用的内存。</p>
 <h3 id="3-2-剩下的内存-user-space"><a href="#3-2-剩下的内存-user-space" class="headerlink" title="3.2 剩下的内存(user space)"></a>3.2 剩下的内存(user space)</h3><p>对于Java进程来讲，这剩下的部分分为两块:</p>
 <ul>
