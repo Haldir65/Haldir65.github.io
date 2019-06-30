@@ -171,7 +171,6 @@ wrk是一种http 跑分工具，tcp和udp测速需要iperf
 
 [.well-known的意思](https://serverfault.com/questions/795467/for-what-is-the-well-known-folder)，其实就跟robot.txt差不多。一种为了能够在客户端发起请求(但此时并不清楚url空间的允许策略，贸然访问万一侵权了呢)获得一些有用的信息。于是RFC就提出来搞一个专门的.well-known的path，这下面的位置都是广而周知的，大家都知道是特定的用途的。
 
-[已经有人对shadowsocks的源码进行了分析](https://www.jianshu.com/p/a7ccaef0f465)
 
 nc其实就是netcat了，功能比较强大
 nc -vz 192.168.0.181 20060 //测试TCP端口可用性的方法
