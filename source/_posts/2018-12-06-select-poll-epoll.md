@@ -48,6 +48,8 @@ IO多路复用，I/O复用(I/O multiplexing). IO多路复用是nio的核心和�
 
 IOCP基于非阻塞异步模型，而epoll基于非阻塞同步模型。
 
+[IO模型详解](http://cmsblogs.com/?p=4812) blocking io, nonblocking io, io multiplexing, asynchronous io,etc
+
 
 [Windows IOCP vs Linux EPOLL Performance Comparison](https://www.slideshare.net/sm9kr/iocp-vs-epoll-perfor)
 [IO多路复用之epoll总结](https://www.cnblogs.com/Anker/p/3263780.html)

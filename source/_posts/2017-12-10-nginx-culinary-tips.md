@@ -990,6 +990,11 @@ sudo ls /etc/letsencrypt/live ##一切顺利的话，生成的证书都在这里
 sudo -H ./letsencrypt-auto certonly --standalone --renew-by-default -d example.com -d www.example.com ##就是多了renew-by-default这个参数，因为这个免费证书默认是三个月的有效期。
 ```
 
+上面的方式需要安装python2，不是很推荐了。[certbot的方式更简单](https://www.digitalocean.com/community/tutorials/how-to-use-certbot-standalone-mode-to-retrieve-let-s-encrypt-ssl-certificates-on-ubuntu-1804)
+基本上的语法都是一样的
+> sudo certbot certonly --standalone --preferred-challenges http -d example.com -d exmaple2.com
+
+
 强制http导向https的方法也很多
 ```
 server {

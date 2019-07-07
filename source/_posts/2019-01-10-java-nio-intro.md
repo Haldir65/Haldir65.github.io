@@ -94,7 +94,7 @@ mark方法类似于打一个标记，待会儿通过reset回到这个position。
 
 
 ### java的byte数组在内存层面不一定是连续的，C语言里面是连续的
-原因是GC会挪动内存
+原因是GC会挪动内存，所以DirectByteBuffer存在的主要意义是为了给c语言层调用提供连续的内存。
 
 ## nio的channel
 在Java IO中，基本上可以分为文件类和Stream类两大类。Channel 也相应地分为了FileChannel 和 Socket Channel，其中 socket channel 又分为三大类，一个是用于监听端口的ServerSocketChannel，第二类是用于TCP通信的SocketChannel，第三类是用于UDP通信的DatagramChannel。channel 最主要的作用还是用于非阻塞式读写。可以使用Channel结合ByteBuffer进行读写。
@@ -145,6 +145,150 @@ public class WebClient {
     }
 }
 ```
+
+
+### Selector
+java.nio.channels.Selector是一个抽象类，因为在不同的操作系统上的实现不一样。但基本原理是一样的，所有的Channel都由selector管理，用户层向selector注册感兴趣的IO动作，并通过selctor.select方法轮询IO事件。
+java nio中主要的Channel的实现包括:
+- FileChannel (处理文件io)
+- DatagramChannel (处理udp通信)
+- SocketChannel （通过tcp读取网络数据）
+- ServerSocketChannel(服务端接收传入的tcp数据)
+
+
+改进一下上面的WebClient和WebServer。
+```java
+public class EpollServer {
+    public static void main(String[] args) {
+        try {
+            ServerSocketChannel ssc = ServerSocketChannel.open();
+            ssc.socket().bind(new InetSocketAddress("127.0.0.1", 8001));
+            ssc.configureBlocking(false);
+
+            Selector selector = Selector.open();
+            // 注册 channel，并且指定感兴趣的事件是 Accept
+            ssc.register(selector, SelectionKey.OP_ACCEPT);
+
+            ByteBuffer readBuff = ByteBuffer.allocate(1024);
+            ByteBuffer writeBuff = ByteBuffer.allocate(128);
+            writeBuff.put("received".getBytes());
+            writeBuff.flip();
+
+            while (true) {
+                int nReady = selector.select();
+                Set<SelectionKey> keys = selector.selectedKeys();
+                Iterator<SelectionKey> it = keys.iterator();
+
+                while (it.hasNext()) {
+                    SelectionKey key = it.next();
+                    it.remove();
+
+                    if (key.isAcceptable()) {
+                        // 创建新的连接，并且把连接注册到selector上，而且，
+                        // 声明这个channel只对读操作感兴趣。
+                        SocketChannel socketChannel = ssc.accept();
+                        socketChannel.configureBlocking(false);
+                        socketChannel.register(selector, SelectionKey.OP_READ);
+                    }
+                    else if (key.isReadable()) {
+                        SocketChannel socketChannel = (SocketChannel) key.channel();
+                        readBuff.clear();
+                        socketChannel.read(readBuff);
+
+                        readBuff.flip();
+                        System.out.println("received : " + new String(readBuff.array())+" at "+ System.currentTimeMillis());
+                        key.interestOps(SelectionKey.OP_WRITE);
+                    }
+                    else if (key.isWritable()) {
+                        writeBuff.rewind();
+                        SocketChannel socketChannel = (SocketChannel) key.channel();
+                        socketChannel.write(writeBuff);
+                        System.out.println("dispatched msg to client  : " + new String(writeBuff.array())+" at "+ System.currentTimeMillis());
+                        key.interestOps(SelectionKey.OP_READ);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+public class EpollClient {
+    public static void main(String[] args) {
+        try {
+            SocketChannel socketChannel = SocketChannel.open();
+            socketChannel.connect(new InetSocketAddress("127.0.0.1", 8001));
+
+            ByteBuffer writeBuffer = ByteBuffer.allocate(32);
+            ByteBuffer readBuffer = ByteBuffer.allocate(32);
+
+            writeBuffer.put("hello".getBytes());
+            writeBuffer.flip();
+
+            while (true) {
+                writeBuffer.rewind();
+                socketChannel.write(writeBuffer);
+                readBuffer.clear();
+                socketChannel.read(readBuffer);
+                System.out.println("received  from server :" + new String(readBuffer.array()));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}    
+```
+
+这套处理io事件的程序模型在python中也有对应的selector模块，使用方式也是相近的。因为无论是java还是python，都是对操作系统上的c语言api的select,poll,epoll系统调用进行了封装。
+
+selctor在openjdk的实现是:
+selctor.select -> PollSelectorImpl.doSelect ->  pollWrapper.poll -> poll0
+
+sun.nio.ch.PollArrayWrapper 
+```java
+private native int poll0(long pollAddress, int numfds, long timeout);
+```
+对应的c语言实现在:
+jdk8u-jdk/src/solaris/native/sun/nio/ch/PollArrayWrapper.c
+```c
+
+#include "jni.h"
+#include "jni_util.h"
+#include "jvm.h"
+#include "jlong.h"
+#include "sun_nio_ch_PollArrayWrapper.h"
+#include <poll.h>
+#include <unistd.h>
+#include <sys/time.h>
+
+JNIEXPORT jint JNICALL
+Java_sun_nio_ch_PollArrayWrapper_poll0(JNIEnv *env, jobject this,
+                                       jlong address, jint numfds,
+                                       jlong timeout)
+{
+    struct pollfd *a;
+    int err = 0;
+
+    a = (struct pollfd *) jlong_to_ptr(address);
+
+    if (timeout <= 0) {           /* Indefinite or no wait */
+        RESTARTABLE (poll(a, numfds, timeout), err); ## 就是调用了poll
+    } else {                     /* Bounded wait; bounded restarts */
+        err = ipoll(a, numfds, timeout);
+    }
+
+    if (err < 0) {
+        JNU_ThrowIOExceptionWithLastError(env, "Poll failed");
+    }
+    return (jint)err;
+}
+```
+
+windows平台的实现是sun.nio.ch.WindowsSelectorImpl.java
+
+
 
 ### MMAP(memory mapped file)
 将文件映射到内存空间的操作，懒得看原理的话，背下这段话就够了
@@ -361,7 +505,39 @@ void fileClose(JNIEnv *env, jobject this, jfieldID fid)
 
 DirectByteBuffer这个对象占用的内存是放在java heap上的，这部分没多少，但是其分配的native内存(也就是放在C语言的heap上的)是占主要大小的。这部分的释放使用了PhantomReference追踪DirectByteBuffer被加入到ReferenceQueue的时候就会开始运行一个runnbale，这里面去调用jni方法释放内存。
 
-## 总结
+
+### FileChannel的几个重要方法
+
+直接上一个用FileChannel读取文件的代码
+```java
+RandomAccessFile aFile = new RandomAccessFile("/tmp/sample.txt", "rw");
+FileChannel inChannel = aFile.getChannel();
+ByteBuffer buf = ByteBuffer.allocate(48);
+int bytesRead = inChannel.read(buf);
+while (bytesRead != -1) {
+  System.out.println("Read " + bytesRead);
+  buf.flip();
+  while(buf.hasRemaining()){
+    System.out.print((char) buf.get());
+  }
+
+  buf.clear();
+  bytesRead = inChannel.read(buf);
+}
+aFile.close();
+```
+
+
+## 3. 从opnjdk的C语言实现来看jvm对system call的选择
+[Java File I/O大混战](https://www.youtube.com/watch?v=MSYbEQLm8ww) 这篇youtube上的演讲从jdk对system call调用的选择来看分析了各自的效率
+FileChannel.transferTo方法会根据host machine的操作系统选择文件操作的system call方案:
+速度和效率也是依次降低
+1. sendFile（linux kernel 2.4+支持，data copy使用磁盘DMA engine，不消耗cpu，即所谓zero copy）
+2. mmap
+3. read(最慢)
+
+
+
 netty的作者在演讲中提到java官方的nio并不特别好，所以，生产环境用的都是netty这种。
 
 ## 参考

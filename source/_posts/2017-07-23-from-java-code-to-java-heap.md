@@ -34,6 +34,38 @@ public class ObjectSizeFetcher {
 
 据说dump memory也行，没试过。
 
+openjdk提供了一种command line interface可以方便的查看一个object到底占用多少内存
+```
+curl -O -L https://repo1.maven.org/maven2/org/openjdk/jol/jol-cli/0.9/jol-cli-0.9-full.jar 
+java -cp jol-cli-0.9-full.jar org.openjdk.jol.Main internals java.lang.String ##比方说要看String的内存分布
+```
+
+输出：
+```
+java -cp jol-cli-0.9-full.jar org.openjdk.jol.Main internals java.lang.String
+# Running 64-bit HotSpot VM.
+# Using compressed oop with 3-bit shift.
+# Using compressed klass with 3-bit shift.
+# Objects are 8 bytes aligned.
+# Field sizes by type: 4, 1, 1, 2, 2, 4, 4, 8, 8 [bytes]
+# Array element sizes: 4, 1, 1, 2, 2, 4, 4, 8, 8 [bytes]
+
+Instantiated the sample instance via default constructor.
+
+java.lang.String object internals:
+ OFFSET  SIZE     TYPE DESCRIPTION                               VALUE
+      0     4          (object header)                           01 00 00 00 (00000001 00000000 00000000 00000000) (1)
+      4     4          (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4          (object header)                           da 02 00 f8 (11011010 00000010 00000000 11111000) (-134216998)
+     12     4   char[] String.value                              []
+     16     4      int String.hash                               0
+     20     4          (loss due to the next object alignment)
+Instance size: 24 bytes
+Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
+```
+
+我们熟知的String就一个int(hashcode)和一个char[]数组，从上面的结果来看，开启压缩指针后,对象头占12字节，字符数组4个字节，int占用4字节，一共20字节，由于要内存对齐，最终得到24字节（这还是什么都没放的时候的内存占用）
+
 ## 2. 内存对齐
 JVM为了malloc与gc方便，指定分配的每个对象都需要是8字节的整数倍[参考](http://github.thinkingbar.com/alignment/)
 简单来说，一个Object占用的内存大小是8 Byte的倍数

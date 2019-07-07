@@ -55,9 +55,9 @@ top : 1
 - [简单的组件化方案](https://www.jianshu.com/p/5f9a7bc902e1)
 - [mvc,mvp,mvvm](https://www.tianmaying.com/tutorial/AndroidMVC)这些关键术语的掌握还是必要的
 - Parcelable 是怎么实现跨进程的? ipc并不仅限于后台，客户端不同进程间也会有类似的概念。
-- jdk8 standard Library implementation detail(java code --> hotspot)
+- jdk8 standard Library implementation detail(java代码的实现 --> hotspot代码的c语言实现)
 - [ ] [openjdk的C语言实现可以随便调几处来看看](https://github.com/keerath/openjdk-8-source/blob/master/jdk/src/windows/native/java/net/SocketOutputStream.c)
-
+- jdk7开始提供fork join pool方法，将任务分配到多个线程上处理
 
 
 ### 已完成

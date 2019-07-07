@@ -162,6 +162,10 @@ net.ipv4.ip_forward = 1
 [内核文档对于这些参数的定义](https://www.cyberciti.biz/files/linux-kernel/Documentation/networking/ip-sysctl.txt)
 注意，这些参数修改了会影响所有的进程，修改还是慎重一些
 
+```
+/proc/sys/kernel/pid_max  ## 全局对pid数量的限制
+/proc/sys/kernel/threads-max ## 可以创建的最大线程数，这个跟ram有关
+```
 
 ### tcp buffer
 关键字： tcp read buffer and write buffer
