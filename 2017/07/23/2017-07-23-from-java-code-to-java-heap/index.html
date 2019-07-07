@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/9b157a7acab582078ac1fabada5c8009.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/official_java_primitive_type_size_table.jpg">
-<meta property="og:updated_time" content="2019-06-30T09:34:05.172Z">
+<meta property="og:updated_time" content="2019-07-07T13:42:31.360Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java对象内存占用分析">
 <meta name="twitter:description" content="面向对象语言就意味着对象要占用内存空间，那么，java中随便new 出来的东西到底多大？还有，new出来的东西全都都放在heap上吗(有些真不是)？">
@@ -218,6 +218,31 @@ ga('send', 'pageview');
 </code></pre>
 <p>这样通常在IDE里面跑不起来。</p>
 <p>据说dump memory也行，没试过。</p>
+<p>openjdk提供了一种command line interface可以方便的查看一个object到底占用多少内存</p>
+<pre><code>curl -O -L https://repo1.maven.org/maven2/org/openjdk/jol/jol-cli/0.9/jol-cli-0.9-full.jar 
+java -cp jol-cli-0.9-full.jar org.openjdk.jol.Main internals java.lang.String ##比方说要看String的内存分布
+</code></pre><p>输出：</p>
+<pre><code>java -cp jol-cli-0.9-full.jar org.openjdk.jol.Main internals java.lang.String
+# Running 64-bit HotSpot VM.
+# Using compressed oop with 3-bit shift.
+# Using compressed klass with 3-bit shift.
+# Objects are 8 bytes aligned.
+# Field sizes by type: 4, 1, 1, 2, 2, 4, 4, 8, 8 [bytes]
+# Array element sizes: 4, 1, 1, 2, 2, 4, 4, 8, 8 [bytes]
+
+Instantiated the sample instance via default constructor.
+
+java.lang.String object internals:
+ OFFSET  SIZE     TYPE DESCRIPTION                               VALUE
+      0     4          (object header)                           01 00 00 00 (00000001 00000000 00000000 00000000) (1)
+      4     4          (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4          (object header)                           da 02 00 f8 (11011010 00000010 00000000 11111000) (-134216998)
+     12     4   char[] String.value                              []
+     16     4      int String.hash                               0
+     20     4          (loss due to the next object alignment)
+Instance size: 24 bytes
+Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
+</code></pre><p>我们熟知的String就一个int(hashcode)和一个char[]数组，从上面的结果来看，开启压缩指针后,对象头占12字节，字符数组4个字节，int占用4字节，一共20字节，由于要内存对齐，最终得到24字节（这还是什么都没放的时候的内存占用）</p>
 <h2 id="2-内存对齐"><a href="#2-内存对齐" class="headerlink" title="2. 内存对齐"></a>2. 内存对齐</h2><p>JVM为了malloc与gc方便，指定分配的每个对象都需要是8字节的整数倍<a href="http://github.thinkingbar.com/alignment/">参考</a><br>简单来说，一个Object占用的内存大小是8 Byte的倍数</p>
 <p>在DirectByteBuffer的构造函数中有这么一段内存对齐的函数</p>
 <pre><code class="java">if (pa &amp;&amp; (base % ps != 0)) {
@@ -619,19 +644,19 @@ JDK6字符串内存占用的计算方式：
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -675,14 +700,6 @@ JDK6字符串内存占用的计算方式：
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
@@ -691,11 +708,19 @@ JDK6字符串内存占用的计算方式：
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">nginx</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">sql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
              
               <li class="article-tag-list-item">

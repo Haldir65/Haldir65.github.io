@@ -17,7 +17,7 @@
 <meta property="og:description" content="关于java nio的一些点">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/UmbriaCastelluccio_EN-AU8834990889_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-06-30T09:34:05.184Z">
+<meta property="og:updated_time" content="2019-07-07T13:42:31.368Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java nio使用指南">
 <meta name="twitter:description" content="关于java nio的一些点">
@@ -257,7 +257,7 @@ public final Buffer flip() {
     }
 </code></pre>
 <p>显然连续调用flip会导致limit变成0，不能读也不能写了。<br>mark方法类似于打一个标记，待会儿通过reset回到这个position。</p>
-<h3 id="java的byte数组在内存层面不一定是连续的，C语言里面是连续的"><a href="#java的byte数组在内存层面不一定是连续的，C语言里面是连续的" class="headerlink" title="java的byte数组在内存层面不一定是连续的，C语言里面是连续的"></a>java的byte数组在内存层面不一定是连续的，C语言里面是连续的</h3><p>原因是GC会挪动内存</p>
+<h3 id="java的byte数组在内存层面不一定是连续的，C语言里面是连续的"><a href="#java的byte数组在内存层面不一定是连续的，C语言里面是连续的" class="headerlink" title="java的byte数组在内存层面不一定是连续的，C语言里面是连续的"></a>java的byte数组在内存层面不一定是连续的，C语言里面是连续的</h3><p>原因是GC会挪动内存，所以DirectByteBuffer存在的主要意义是为了给c语言层调用提供连续的内存。</p>
 <h2 id="nio的channel"><a href="#nio的channel" class="headerlink" title="nio的channel"></a>nio的channel</h2><p>在Java IO中，基本上可以分为文件类和Stream类两大类。Channel 也相应地分为了FileChannel 和 Socket Channel，其中 socket channel 又分为三大类，一个是用于监听端口的ServerSocketChannel，第二类是用于TCP通信的SocketChannel，第三类是用于UDP通信的DatagramChannel。channel 最主要的作用还是用于非阻塞式读写。可以使用Channel结合ByteBuffer进行读写。<br>一个简单的client server echo程序可以这样写</p>
 <pre><code class="java">// server
 
@@ -304,6 +304,135 @@ public class WebClient {
     }
 }
 </code></pre>
+<h3 id="Selector"><a href="#Selector" class="headerlink" title="Selector"></a>Selector</h3><p>java.nio.channels.Selector是一个抽象类，因为在不同的操作系统上的实现不一样。但基本原理是一样的，所有的Channel都由selector管理，用户层向selector注册感兴趣的IO动作，并通过selctor.select方法轮询IO事件。<br>java nio中主要的Channel的实现包括:</p>
+<ul>
+<li>FileChannel (处理文件io)</li>
+<li>DatagramChannel (处理udp通信)</li>
+<li>SocketChannel （通过tcp读取网络数据）</li>
+<li>ServerSocketChannel(服务端接收传入的tcp数据)</li>
+</ul>
+<p>改进一下上面的WebClient和WebServer。</p>
+<pre><code class="java">public class EpollServer {
+    public static void main(String[] args) {
+        try {
+            ServerSocketChannel ssc = ServerSocketChannel.open();
+            ssc.socket().bind(new InetSocketAddress(&quot;127.0.0.1&quot;, 8001));
+            ssc.configureBlocking(false);
+
+            Selector selector = Selector.open();
+            // 注册 channel，并且指定感兴趣的事件是 Accept
+            ssc.register(selector, SelectionKey.OP_ACCEPT);
+
+            ByteBuffer readBuff = ByteBuffer.allocate(1024);
+            ByteBuffer writeBuff = ByteBuffer.allocate(128);
+            writeBuff.put(&quot;received&quot;.getBytes());
+            writeBuff.flip();
+
+            while (true) {
+                int nReady = selector.select();
+                Set&lt;SelectionKey&gt; keys = selector.selectedKeys();
+                Iterator&lt;SelectionKey&gt; it = keys.iterator();
+
+                while (it.hasNext()) {
+                    SelectionKey key = it.next();
+                    it.remove();
+
+                    if (key.isAcceptable()) {
+                        // 创建新的连接，并且把连接注册到selector上，而且，
+                        // 声明这个channel只对读操作感兴趣。
+                        SocketChannel socketChannel = ssc.accept();
+                        socketChannel.configureBlocking(false);
+                        socketChannel.register(selector, SelectionKey.OP_READ);
+                    }
+                    else if (key.isReadable()) {
+                        SocketChannel socketChannel = (SocketChannel) key.channel();
+                        readBuff.clear();
+                        socketChannel.read(readBuff);
+
+                        readBuff.flip();
+                        System.out.println(&quot;received : &quot; + new String(readBuff.array())+&quot; at &quot;+ System.currentTimeMillis());
+                        key.interestOps(SelectionKey.OP_WRITE);
+                    }
+                    else if (key.isWritable()) {
+                        writeBuff.rewind();
+                        SocketChannel socketChannel = (SocketChannel) key.channel();
+                        socketChannel.write(writeBuff);
+                        System.out.println(&quot;dispatched msg to client  : &quot; + new String(writeBuff.array())+&quot; at &quot;+ System.currentTimeMillis());
+                        key.interestOps(SelectionKey.OP_READ);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+public class EpollClient {
+    public static void main(String[] args) {
+        try {
+            SocketChannel socketChannel = SocketChannel.open();
+            socketChannel.connect(new InetSocketAddress(&quot;127.0.0.1&quot;, 8001));
+
+            ByteBuffer writeBuffer = ByteBuffer.allocate(32);
+            ByteBuffer readBuffer = ByteBuffer.allocate(32);
+
+            writeBuffer.put(&quot;hello&quot;.getBytes());
+            writeBuffer.flip();
+
+            while (true) {
+                writeBuffer.rewind();
+                socketChannel.write(writeBuffer);
+                readBuffer.clear();
+                socketChannel.read(readBuffer);
+                System.out.println(&quot;received  from server :&quot; + new String(readBuffer.array()));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+<p>这套处理io事件的程序模型在python中也有对应的selector模块，使用方式也是相近的。因为无论是java还是python，都是对操作系统上的c语言api的select,poll,epoll系统调用进行了封装。</p>
+<p>selctor在openjdk的实现是:<br>selctor.select -&gt; PollSelectorImpl.doSelect -&gt;  pollWrapper.poll -&gt; poll0</p>
+<p>sun.nio.ch.PollArrayWrapper </p>
+<pre><code class="java">private native int poll0(long pollAddress, int numfds, long timeout);
+</code></pre>
+<p>对应的c语言实现在:<br>jdk8u-jdk/src/solaris/native/sun/nio/ch/PollArrayWrapper.c</p>
+<pre><code class="c">
+#include &quot;jni.h&quot;
+#include &quot;jni_util.h&quot;
+#include &quot;jvm.h&quot;
+#include &quot;jlong.h&quot;
+#include &quot;sun_nio_ch_PollArrayWrapper.h&quot;
+#include &lt;poll.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;sys/time.h&gt;
+
+JNIEXPORT jint JNICALL
+Java_sun_nio_ch_PollArrayWrapper_poll0(JNIEnv *env, jobject this,
+                                       jlong address, jint numfds,
+                                       jlong timeout)
+{
+    struct pollfd *a;
+    int err = 0;
+
+    a = (struct pollfd *) jlong_to_ptr(address);
+
+    if (timeout &lt;= 0) {           /* Indefinite or no wait */
+        RESTARTABLE (poll(a, numfds, timeout), err); ## 就是调用了poll
+    } else {                     /* Bounded wait; bounded restarts */
+        err = ipoll(a, numfds, timeout);
+    }
+
+    if (err &lt; 0) {
+        JNU_ThrowIOExceptionWithLastError(env, &quot;Poll failed&quot;);
+    }
+    return (jint)err;
+}
+</code></pre>
+<p>windows平台的实现是sun.nio.ch.WindowsSelectorImpl.java</p>
 <h3 id="MMAP-memory-mapped-file"><a href="#MMAP-memory-mapped-file" class="headerlink" title="MMAP(memory mapped file)"></a>MMAP(memory mapped file)</h3><p>将文件映射到内存空间的操作，懒得看原理的话，背下这段话就够了</p>
 <blockquote>
 <p><strong>常规文件操作需要从磁盘到页缓存再到用户主存的两次数据拷贝。而mmap操控文件，只需要从磁盘到用户主存的一次数据拷贝过程。说白了，mmap的关键点是实现了用户空间和内核空间的数据直接交互而省去了空间不同数据不通的繁琐过程。因此mmap效率更高</strong></p>
@@ -500,7 +629,30 @@ void fileClose(JNIEnv *env, jobject this, jfieldID fid)
 <p>整个JVM都是运行在用户空间上的，不存在内核空间的分配。Java NIO 的IO读写如果不是directbuffer就把数据copy的临时的directbuffer中再做IO读写。所以直接使用directbuffer会节省内存copy次数，这是JavaNIO框架具体实现方式的限制，不好称之为“优势”。JavaNIO使用directbuffer进行IO读写的原因主要是在GC优化上。jvm并不是不能直接用java heapbuffer或java byte[]直接做IO读写，但会mark此段内存不能移动，从而影响GC效率。但是JavaNIO框架里的IO操作都是非阻塞模式的快速操作，究竟能影响多少GC效率还不能轻易下结论。JavaNIO的高效主要体现在相对java bio在管理大量连接时少使用了很多线程而节省的线程资源和线程切换，但其编程模型比BIO要复杂得多，只能说NIO高效，不好说它“高级”。对于客户端使用少量连接时，BIO比NIO更有优势，不但编程模型简单，IO效率也不比NIO差。directbuffer本身也是一个内存隐患，使用directbuffer并不能像heapbuffer或byte[]一样任意使用可以被GC及时的回收。所以使用directbuffer最好是分配好缓存起来重复使用，否则很容易出现OOM错误。</p>
 </blockquote>
 <p>DirectByteBuffer这个对象占用的内存是放在java heap上的，这部分没多少，但是其分配的native内存(也就是放在C语言的heap上的)是占主要大小的。这部分的释放使用了PhantomReference追踪DirectByteBuffer被加入到ReferenceQueue的时候就会开始运行一个runnbale，这里面去调用jni方法释放内存。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>netty的作者在演讲中提到java官方的nio并不特别好，所以，生产环境用的都是netty这种。</p>
+<h3 id="FileChannel的几个重要方法"><a href="#FileChannel的几个重要方法" class="headerlink" title="FileChannel的几个重要方法"></a>FileChannel的几个重要方法</h3><p>直接上一个用FileChannel读取文件的代码</p>
+<pre><code class="java">RandomAccessFile aFile = new RandomAccessFile(&quot;/tmp/sample.txt&quot;, &quot;rw&quot;);
+FileChannel inChannel = aFile.getChannel();
+ByteBuffer buf = ByteBuffer.allocate(48);
+int bytesRead = inChannel.read(buf);
+while (bytesRead != -1) {
+  System.out.println(&quot;Read &quot; + bytesRead);
+  buf.flip();
+  while(buf.hasRemaining()){
+    System.out.print((char) buf.get());
+  }
+
+  buf.clear();
+  bytesRead = inChannel.read(buf);
+}
+aFile.close();
+</code></pre>
+<h2 id="3-从opnjdk的C语言实现来看jvm对system-call的选择"><a href="#3-从opnjdk的C语言实现来看jvm对system-call的选择" class="headerlink" title="3. 从opnjdk的C语言实现来看jvm对system call的选择"></a>3. 从opnjdk的C语言实现来看jvm对system call的选择</h2><p><a href="https://www.youtube.com/watch?v=MSYbEQLm8ww">Java File I/O大混战</a> 这篇youtube上的演讲从jdk对system call调用的选择来看分析了各自的效率<br>FileChannel.transferTo方法会根据host machine的操作系统选择文件操作的system call方案:<br>速度和效率也是依次降低</p>
+<ol>
+<li>sendFile（linux kernel 2.4+支持，data copy使用磁盘DMA engine，不消耗cpu，即所谓zero copy）</li>
+<li>mmap</li>
+<li>read(最慢)</li>
+</ol>
+<p>netty的作者在演讲中提到java官方的nio并不特别好，所以，生产环境用的都是netty这种。</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://zhuanlan.zhihu.com/p/23488863">美团团队出的关于nio的解说</a><br>这里面有一句原话摘抄下来：</p>
 <blockquote>
 <p>线程的创建和销毁成本很高，在Linux这样的操作系统中，线程本质上就是一个进程。创建和销毁都是重量级的系统函数。像Java的线程栈，一般至少分配512K～1M的空间，</p>
@@ -791,19 +943,19 @@ void fileClose(JNIEnv *env, jobject this, jfieldID fid)
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -847,14 +999,6 @@ void fileClose(JNIEnv *env, jobject this, jfieldID fid)
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
@@ -863,11 +1007,19 @@ void fileClose(JNIEnv *env, jobject this, jfieldID fid)
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">nginx</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">sql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
              
               <li class="article-tag-list-item">
