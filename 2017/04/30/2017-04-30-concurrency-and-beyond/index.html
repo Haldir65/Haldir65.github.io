@@ -17,7 +17,7 @@
 <meta property="og:description" content="原本只打算写一点关于线程池的实现原理，后来发现坑越挖越大。不得不写到一半停下来，所以，这算是一篇不那么完善的关于原理的解析吧。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg">
-<meta property="og:updated_time" content="2019-07-14T07:15:51.348Z">
+<meta property="og:updated_time" content="2019-07-14T13:47:39.317Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java线程池的实现原理">
 <meta name="twitter:description" content="原本只打算写一点关于线程池的实现原理，后来发现坑越挖越大。不得不写到一半停下来，所以，这算是一篇不那么完善的关于原理的解析吧。">
@@ -201,9 +201,7 @@ ga('send', 'pageview');
     <div class="article-entry" itemprop="articleBody">
       
         <p>原本只打算写一点关于线程池的实现原理，后来发现坑越挖越大。不得不写到一半停下来，所以，这算是一篇不那么完善的关于原理的解析吧。<br><img src="https://www.haldir66.ga/static/imgs/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg" alt=""><br><a id="more"></a></p>
-<ol>
-<li>线程池的常规使用方式<br>通常说的线程池对外表现为具有一系列操作功能的接口，Executor提供了execute一个runnable的功能，而其子类ExecutorService则对外提供了更多的实用功能，所以平时用的都是ExecutorService的实现类。</li>
-</ol>
+<h2 id="1-线程池的常规使用方式"><a href="#1-线程池的常规使用方式" class="headerlink" title="1. 线程池的常规使用方式"></a>1. 线程池的常规使用方式</h2><p>通常说的线程池对外表现为具有一系列操作功能的接口，Executor提供了execute一个runnable的功能，而其子类ExecutorService则对外提供了更多的实用功能，所以平时用的都是ExecutorService的实现类。</p>
 <pre><code class="java">public interface Executor {
 
     /**
@@ -425,22 +423,60 @@ private final HashSet&lt;Worker&gt; workers = new HashSet&lt;Worker&gt;();
         }
     }
 </code></pre>
-<p>整体来说，executor.execute方法就是通过new出Woker，而Worker则会在run方法中不停的从queue中获取新的任务，从而确保线程不会挂掉。也就是所谓的线程池缓存了线程，避免了频繁创建线程的开销。</p>
+<p>整体来说，executor.execute方法会获取Woker，而Worker则会在run方法中不停的从queue中获取新的任务，从而确保线程不会挂掉。也就是所谓的线程池缓存了线程，避免了频繁创建线程的开销。<br>在ThreadPoolExecutor的execute方法中有一段注释写的很清楚，分为三步：</p>
 <ol>
-<li>Worker这个类继承自AbstractQueuedSynchronizer<br>AbstractQueuedSynchronizer即大名鼎鼎的AQS。</li>
+<li>如果当前的线程数量小于corePoolSize,直接创建一个新的线程干活</li>
+<li>否则加入到队列，成功的话还要重新检查一下，因为可能线程池关闭了</li>
+<li>加入队列失败的话，尝试创建一个新的线程(如果size超过maximumPoolSize的话是会失败的)，再次失败的话就调用RejectPolicy</li>
 </ol>
+<p>在javadoc中也写的很清楚</p>
 <ol>
-<li><p>Reetranlock的使用<br>这其中有<br>注意上面使用了重入锁 ReentrantLock，后来发现ThreadPoolExecutor中多处使用了这个类。</p>
-</li>
-<li><p>Future,Callable,FutureTask等等</p>
-</li>
+<li>If fewer than corePoolSize threads are running, the Executor always prefers adding a new thread rather than queuing.</li>
+<li>If corePoolSize or more threads are running, the Executor always prefers queuing a request rather than adding a new thread.</li>
+<li>If a request cannot be queued, a new thread is created unless this would exceed maximumPoolSize, in which case, the task will be rejected.</li>
 </ol>
-<p>最后，今天下午看到很多jdk里源码的注释，作者都是 Doug Lea ，实在佩服前人的功力。之前也看过一些自定义线程池的实现，现在看起来确实差很多，不要重复造轮子不意味着不需要去了解轮子是怎么造出来的。</p>
+<h2 id="2-Queue的选择"><a href="#2-Queue的选择" class="headerlink" title="2. Queue的选择"></a>2. Queue的选择</h2><p>BlockingQueue是一个接口<br>BlockingQueue提供了四种应对策略来处理这种资源不能被立即满足的场景</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">空值</th>
+<th style="text-align:left">抛出异常</th>
+<th style="text-align:left">返回一个特殊值</th>
+<th style="text-align:left">阻塞</th>
+<th style="text-align:left">调用者提供一个超时</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">插入</td>
+<td style="text-align:left">add(e)</td>
+<td style="text-align:left">offer(e)</td>
+<td style="text-align:left">put(e)</td>
+<td style="text-align:left">put(e, time ,timeUnit)</td>
+</tr>
+<tr>
+<td style="text-align:left">移除</td>
+<td style="text-align:left">remove()</td>
+<td style="text-align:left">poll()</td>
+<td style="text-align:left">take()</td>
+<td style="text-align:left">poll(time,timeUnit)</td>
+</tr>
+<tr>
+<td style="text-align:left">检查</td>
+<td style="text-align:left">element()</td>
+<td style="text-align:left">peek()</td>
+<td style="text-align:left">不可用</td>
+<td style="text-align:left">不可用</td>
+</tr>
+</tbody>
+</table>
+<p>ThreadPoolExecutor的构造函数中需要传入一个BlockingQueue<Runnable> workQueue，一个阻塞式的队列 。也就是说，添加任务和获取任务的过程都是阻塞的。<br>jdk中提供的线程池选择的队列：<br>newCachedThreadPool使用了SynchronousQueue(每一个插入操作必须等待另一个线程的对应移除操作)<br>newFixedThreadPool使用了LinkedBlockingQueue(这个队列是无界的)，干活的线程就那么多，任务多了就加入队列好了</p>
 <h2 id="自定义线程池的话，有一些经验公式"><a href="#自定义线程池的话，有一些经验公式" class="headerlink" title="自定义线程池的话，有一些经验公式"></a>自定义线程池的话，有一些经验公式</h2><p>简单来说，就是如果你是CPU密集型运算，那么线程数量和CPU核心数相同就好，避免了大量无用的切换线程上下文。<br>如果你是IO密集型的话，需要大量等待，那么线程数可以设置的多一些，比如CPU核心乘以2.</p>
-<p>Reference </p>
-<ol>
-<li><a href="https://github.com/pzxwhc/MineKnowContainer/issues/9">Java 多线程：线程池实现原理</a></li>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
+<li><a href="https://www.oschina.net/question/565065_86540">java自带线程池和队列详解</a></li>
 <li><a href="https://javadoop.com/post/Threads-And-Locks-md">深入分析 java 8 编程语言规范：Threads and Locks</a></li>
+<li><a href="https://javadoop.com/post/java-concurrent-queue">解读 java 并发队列 BlockingQueue</a></li>
+<li><a href="https://www.infoq.cn/article/java-blocking-queue">聊聊并发（七）——Java 中的阻塞队列</a></li>
 </ol>
 
       
@@ -792,10 +828,6 @@ private final HashSet&lt;Worker&gt; workers = new HashSet&lt;Worker&gt;();
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
@@ -804,7 +836,15 @@ private final HashSet&lt;Worker&gt; workers = new HashSet&lt;Worker&gt;();
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">sql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">django</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -817,10 +857,6 @@ private final HashSet&lt;Worker&gt; workers = new HashSet&lt;Worker&gt;();
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">tbd</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">django</a>
               </li>
              
               <li class="article-tag-list-item">

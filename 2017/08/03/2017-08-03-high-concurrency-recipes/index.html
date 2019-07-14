@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/be3c80a11edfd0fdb75d098550ed2c8e.jpg">
-<meta property="og:updated_time" content="2019-07-14T07:15:51.352Z">
+<meta property="og:updated_time" content="2019-07-14T13:47:39.325Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java多线程中需要注意的一些点">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/be3c80a11edfd0fdb75d098550ed2c8e.jpg">
@@ -407,7 +407,7 @@ private byte[] lock = new byte[0]; // 特殊的instance变量
 <p>Thread.yield方法是让当前线程从执行状态变成就绪状态（就是和大家一起抢）</p>
 <p>synchronized关键字一般有三种用法</p>
 <p><strong>一、实例同步方法</strong><br>synchronized用于修饰实例方法（非静态方法）时，执行该方法需要获得的是该类实例对象的内置锁（同一个类的不同实例拥有不同的内置锁）。如果多个实例方法都被synchronized修饰，则当多个线程调用同一实例的不同同步方法（或者同一方法）时，需要竞争锁。但当调用的是不同实例的方法时，并不需要竞争锁。<br>也正是如此，一个同步方法被调用时，就等于独占了当前实例的锁，其他线程无法调用当前实例的其他同步方法。所以不是很推荐使用同步方法。<br><strong>二、静态同步方法</strong><br>synchronized用于修饰静态方法时，执行该方法需要获得的是该类的class对象的内置锁（一个类只有唯一一个class对象）。调用同一个类的不同静态同步方法时会产生锁竞争。<br><strong>三、同步代码块</strong><br>synchronized用于修饰代码块时，进入同步代码块需要获得synchronized关键字后面括号内的对象（可以是实例对象也可以是class对象）的内置锁。</p>
-<p>java io为什么慢，有一个原因是InputStream的read方法和OutputStream的write方法都是加了synchronized的。而Okio里面synchronized方法我没找到，另外，真的想要io性能的话，用nio。</p>
+<p>java io中的InputStream的read方法和OutputStream的write方法都是加了synchronized的。而Okio里面synchronized方法我没找到，另外，真的想要io性能的话，用nio。</p>
 <p>同步一个对象的前提是各方都同意使用同一把锁作为调用方法的前提，单方面加锁并不限制不尊重锁机制的使用者。两条线程分别去取两个互不相干的锁，这里面当然不存在阻塞问题。</p>
 <h2 id="13-CAS操作是有操作系统提供了硬件级别的原子操作的。"><a href="#13-CAS操作是有操作系统提供了硬件级别的原子操作的。" class="headerlink" title="13. CAS操作是有操作系统提供了硬件级别的原子操作的。"></a>13. CAS操作是有操作系统提供了硬件级别的原子操作的。</h2><p>CAS属于乐观的一种，假如比较之后发现OK那最好，假如不成功还允许继续尝试。jdk中使用的是UnSafe这个类，这个类属于“后门”，开发者可以使用这个类直接操控HotSpot jvm内存和线程。被广泛应用于juc包中。</p>
 <p>比如说直接操纵内存</p>
@@ -415,7 +415,7 @@ private byte[] lock = new byte[0]; // 特殊的instance变量
 Class aClass = A.class;
 A a = (A) unsafe.allocateInstance(aClass);
 </code></pre>
-<p>最好不要在工程中使用。</p>
+<p>最好不要在工程中使用，这样的做法在json库中往往被作为一种保底的方法，注意这种方式创建的对象是没有初始化的（没有调用构造函数）</p>
 <h2 id="14-ArrayBlockingQueue和LinkedBlockingQueue"><a href="#14-ArrayBlockingQueue和LinkedBlockingQueue" class="headerlink" title="14.ArrayBlockingQueue和LinkedBlockingQueue"></a>14.ArrayBlockingQueue和LinkedBlockingQueue</h2><p>线程池的构造方法最后一个参数是一个BlockingQueue，BlockingQueue是一个接口，就像一个典型的生产者消费者模型问题一样。如果从queue中取element的时候发现size为0，或者往queue中添加element的时候发现queue满了。应对这种资源不能被 <strong><em>立即满足</em></strong> 的策略就定义了BlockingQueue。<br>BlockingQueue提供了四种应对策略来处理这种资源不能被立即satisfy的场景</p>
 <table>
 <thead>
@@ -453,9 +453,10 @@ A a = (A) unsafe.allocateInstance(aClass);
 </table>
 <p>文档上说： Usage example, based on a typical producer-consumer scenario. Note that a BlockingQueue can safely be used with multiple producers and multiple consumers.（BlockingQueue能够安全的用于多个生产者消费者的场景，就是说这个容器已经帮外部处理好了生产和消费并发的同步问题，其实就是加锁）</p>
 <p>BlockingQueue的常用的实现类包括ArrayBlockingQueue(FIFO)和LinkedBlockingQueue(FIFO)。</p>
-<p>ArrayBlockingQueue是一个由数组实现的 <strong>有界阻塞队列</strong>。该队列采用 <strong><em>FIFO</em></strong> 的原则对元素进行排序添加。<br>ArrayBlockingQueue的入列核心方法是enqueue，而这个方法的调用是被包在一个lock.lock和lock.unlock中的，所以是同步的。出列的核心方法是dequeue，也是包在同步lock里面的。构造函数可以传一个fair进来。</p>
+<p>ArrayBlockingQueue是一个由数组实现的 <strong>有界阻塞队列</strong>。该队列采用 <strong><em>FIFO</em></strong> 的原则对元素进行排序添加。<br>ArrayBlockingQueue的入列核心方法是一个private方法enqueue(put ,offer都代理给了这个方法)，而这个方法的调用是被包在一个lock.lock和lock.unlock中的，所以是线程安全的的。出列的核心方法是dequeue，也是包在同步lock里面的。构造函数可以传一个fair进来。enqueue方法里面还有一个notEmpty.signal() ， 其实就是典型的通知消费者。</p>
 <p>LinkedBlockingQueue是Exexutors中使用的创建线程池的静态方法中使用的参数，显然更推荐使用。主要用的是两个方法，<br>put方法在队列满的时候会阻塞直到有队列成员被消费，take方法在队列空的时候会阻塞，直到有队列成员被放进来。官方文档提到了， <strong>LinkedBlockingQueue的吞吐量通常要高于基于数组的队列，但在大多数并发应用程序中，其可预知的性能要低一些</strong> ， 内部的lock只能是unfair的。</p>
-<p>在线程池(ThreadPoolExecutor)中，获取任务使用的是queue的<strong>poll</strong>方法，添加任务使用的是queue的<strong>offer</strong>方法。就是说“不堵塞”</p>
+<p>在线程池(ThreadPoolExecutor)中，获取任务使用的是queue的<strong>poll</strong>方法，添加任务使用的是queue的<strong>offer</strong>方法。<br>从ArrayBlockingQueue的实现来看，poll和offer都被一个lock的上锁和解锁包住了，所以和上面的表格中的poll、offer不阻塞有一定差异(大概这也是叫做BlockingQueue的原因吧)</p>
+<p>从原理来看</p>
 <h2 id="15-AtomicXXX只是将value写成volatile，这样get就安全了，set的话直接交给Unsafe了"><a href="#15-AtomicXXX只是将value写成volatile，这样get就安全了，set的话直接交给Unsafe了" class="headerlink" title="15. AtomicXXX只是将value写成volatile，这样get就安全了，set的话直接交给Unsafe了"></a>15. AtomicXXX只是将value写成volatile，这样get就安全了，set的话直接交给Unsafe了</h2><p>volatile并不是Atomic操作，例如，A线程对volatile变量进行写操作(实际上是读和写操作)，B线程可能在这两个操作之间进行了写操作；例如用volatile修饰count变量那么 count++ 操作就不是原子性的。而AtomicInteger类提供的atomic方法可以让这种操作具有原子性如getAndIncrement()方法会原子性的进行增量操作把当前值加一,因为AtomicInteger的getAndIncrement方法就是简单的调用了Unsafe的getAndAddInt。</p>
 <p><a href="https://mp.weixin.qq.com/s/nRnQKhiSUrDKu3mz3vItWg">CAS还是不能解决ABA问题</a> 在java中用AtomicStampedReference就可以了</p>
 <p>ABA问题简单说就是两条线程1,2同时想把100改成50，这时1用CAS改好了，2因为某些问题堵住了，恰好这个时候3线程跑进来把50改成了100，这之后2结束堵塞，用CAS比较，嗯，预期是100，没错，直接CAS变成50.（然而正常情况下结果应该是100，也就是说减法操作做了两次）</p>
@@ -865,10 +866,6 @@ private void setNextRunTime() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
@@ -877,7 +874,15 @@ private void setNextRunTime() {
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">sql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">django</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -890,10 +895,6 @@ private void setNextRunTime() {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">tbd</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">django</a>
               </li>
              
               <li class="article-tag-list-item">
