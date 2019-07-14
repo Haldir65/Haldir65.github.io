@@ -13,15 +13,6 @@ SPA(Single Page Application)单页应用（没有SEO,首屏时间比较长，因
 
 Common js是node js的库遵守的,export import是es2015的东西,AMD(Asynchronous Module Definition)在common js的基础上加了一个带回调的require(用于浏览器)
 
-# 常用网站
-[cssmatic](https://www.cssmatic.com/box-shadow),一个可以用拖拽的方式生成css代码的神奇的网站
-[不仅仅是font,还有很好的icon](http://fontawesome.io/)
-
-
-[TBS]腾讯浏览服务(Tencent Browsing Service, TBS)。网上很多人喷的微信浏览器慢就是这个
-[handlebars](https://github.com/wycats/handlebars.js)
-[一个html里面有两个id一样的元素没问题](http://blog.csdn.net/lnn2007/article/details/8869057)
-[awesome css UI Design](https://github.com/CodeFrogShow/UI-Design-Music-Player),[Video link here](https://www.youtube.com/watch?v=ExnD_KV5q5g)
 
 ***Index***
 ## html Related
@@ -41,7 +32,6 @@ p tag 里面能够放一个小的Strong tag
 
 [什么在阻塞DOM？](https://juejin.im/post/587f4afb61ff4b00651b3c18)
 
-## css Related
 
 ## Vanilla javaScript Related
 Ajax(Asynchronous javaScript & xml)，从命名上来看就是异步的
@@ -54,9 +44,9 @@ object["Property"];
 
 
 对于POST请求，如果Request中明确设置了:
->
+```js
 xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-
+```
 后台会认为这是一个提交表单的请求，body就应该设置为''
 [What is the difference between form data and request payload?](https://stackoverflow.com/questions/10494574/what-is-the-difference-between-form-data-and-request-payload)
 
@@ -130,28 +120,13 @@ json【JavaScript Object Notation】
 
 [jsonp的解释](http://schock.net/articles/2013/02/05/how-jsonp-really-works-examples/)
 
-亲测，Flask里面给response添加Header:
+Flask里面给response添加Header的方式是:
 >  response.headers['Access-Control-Allow-Origin'] = 'http://localhost:8080'
 
 在8080端口的web页面发起请求就能成功
 
 
-
-### 2.2 ajax跨域操作
-[XMLHttpRequest cannot load http://localhost:5000/hello.
-No 'Access-Control-Allow-Origin' header is present on the requested resource.](https://stackoverflow.com/questions/25860304/how-do-i-set-response-headers-in-flask)
-用Flask做后台，大概的代码这样
-<!--
-```python
-@app.route("/posts", methods=['GET'])
-def create_post()
-    resp = Response(json.dumps(post_lists), mimetype='application/json')
-    resp.headers['Access-Control-Allow-Origin'] = '*'
-    return resp    
-``` -->
-
-
-## Webpack configuration
+## Webpack 相关
 > 安装
 yarn add webpack //官网不推荐global安装
 // 初始化项目
@@ -219,7 +194,7 @@ loaders {
 ***Third Party Library***
 
 ## Vue Related
-[better-scroll](https://github.com/ustbhuangyi/better-scroll) 滴滴的员工写的
+
 
 ## handlebars,ejs,jade
 模板（和python那边的jinja模板一个意思）
@@ -232,6 +207,10 @@ jQuery是一个Dom Manipulate Library
 
 ## Twitter BootStrap
 [BootStrap速查手册](https://getbootstrap.com/docs/4.0/layout/grid/#stacked-to-horizontal)
+
+
+## css Related
+![](https://www.haldir66.ga/static/imgs/Cute_and_sexy_asian_girl_in_purple_strapless_gown.jpg)
 
 ## 工具
 ### vsCode插件推荐
@@ -248,45 +227,21 @@ VSCode快捷键(其实可以自己配置的，vs的设置文件就是一个很�
 vs code 调整锁进的命令叫做reindent
 
 
-
-在<del>不会自己搭服务</dev>的情况下只好拿一些免费的api凑合了
-[posts](http://jsonplaceholder.typicode.com/posts)
-[cnodejs](https://cnodejs.org/api/v1/topics)
-
-
-## 使用nginx搭建本地服务器
-官方说nginx的windows版本只供测试使用，性能不怎么样，但用于前端部署还是够用的。去[nginx网站](http://nginx.org/en/docs/windows.html)下载windows版本的nginx，解压缩，双击可执行文件nginx.exe。在这之前，最好先打开conf文件夹，编辑nginx.conf。设置一下端口，因为默认的80说不定就给谁占用了。其实用命令行也能启动：
-> start nginx
-tasklist /fi "imagename eq nginx.exe" //这个是windows下查看当前在运行的nginx的命令
-nginx -s stop // 立即关闭
-nginx -s quit // graceful shutdown
-这些东西官网上都写得很明白。
-
-生产环境部署前端静态资源可以这么设置，参考知乎的[回答](https://www.zhihu.com/question/46630687)
->
-用vue-cli搭建的做法:
-1、npm run build
-2、把dist里的文件打包上传至服务器 例 /data/www/，我一般把index.html放在static里
-所以我的文件路径为：
-/data/www/static    
-|-----index.html   
-|-----js    
-|-----css    
-|-----images   
- ....
-3、配置nginx监听80端口，
-location /static alias 到 /data/www/static，
-重启nginx   
-location /static {       
-  alias  /data/www/static/;   
-  }
-4、浏览器访问http://ip/static/index.html即可
+# 网站
+[cssmatic](https://www.cssmatic.com/box-shadow),一个可以用拖拽的方式生成css代码的神奇的网站
+[不仅仅是font,还有很好的icon](http://fontawesome.io/)
+[TBS]腾讯浏览服务(Tencent Browsing Service, TBS)。网上很多人喷的微信浏览器慢就是这个
+[一个html里面有两个id一样的元素没问题](http://blog.csdn.net/lnn2007/article/details/8869057)
+[awesome css UI Design](https://github.com/CodeFrogShow/UI-Design-Music-Player),[Video link here](https://www.youtube.com/watch?v=ExnD_KV5q5g)
 
 
-
+## Library
 Babel是一个可以把ES6代码打包成ES5代码的插件，毕竟要兼容老的浏览器。
 [ua-parser-js](https://github.com/faisalman/ua-parser-js)是一个很好用的检测ua的library。
 [Backbone](http://www.css88.com/doc/backbone/)是一个mvc框架
+[handlebars](https://github.com/wycats/handlebars.js)
+
+
 [移动开发中的一些有用meta标签](http://www.html-js.com/article/The-front-end-of-mobile-terminal-meta-tag-set-of-notes-the-role-of)
 
 - [X]如何使用js显示一个Dialog
@@ -294,25 +249,8 @@ Babel是一个可以把ES6代码打包成ES5代码的插件，毕竟要兼容老
 - [ ] css3 属性大全
 
 
-vscode disable eslint，在workspace setting中添加
-> "jshint.enable" : false
 
 
-atom的emmet插件很好用
-比如想要创建一个
-```html
-<div class='test'></div>
-```
-只需要输入div.test或者.test然后按tab键
-[好玩的Atom插件](https://www.youtube.com/watch?v=aiXNKHKWlmY)
-minimap,emmet,file icons，atom liveserver,atom beautify
-
-=======================================================================================
-atom中输入vue,会自动提示生成vue模板,输入re会生成react Boilplate。前提是在js,vue,html文件中。
-![](https://www.haldir66.ga/static/imgs/Cute_and_sexy_asian_girl_in_purple_strapless_gown.jpg)
-![](https://www.haldir66.ga/static/imgs/IMG_0766.jpg)
-
-把vscode 加入command line，将'C:\\Program Files (x86)\\Microsoft VS Code\\bin'添加到windows的环境变量中即可。cmd里输入code即可打开当前目录。
 
 handlebars渲染template的过程就是把写在模板里面的大括号包着的变量换成String。所以，在hbs文件里内嵌的js是[没有办法轻易拿到data的](https://stackoverflow.com/questions/19247150/is-it-possible-to-access-the-data-that-is-sent-to-handlebars-through-js-inside-t)。这跟flask很像。
 这里顺便提到iffe的概念[Immediately-invoked_function_expression](https://stackoverflow.com/questions/8228281/what-is-the-function-construct-in-javascript)
@@ -347,6 +285,9 @@ $(function() {
 ```js
 <img src="#" onerror="alert(/xss/)" />
 ```
+
+![](https://www.haldir66.ga/static/imgs/IMG_0766.jpg)
+
 
 防范XSS攻击的手段中提到了，对于用户的输入，需要有条件的进行转换
 比如说
@@ -384,7 +325,9 @@ python flask里面类似的函数叫做escape.
 
 [cms(content management system)参考](https://github.com/ximolang/QuillCMS)
 
-
+在<del>不会自己搭服务</dev>的情况下只好拿一些免费的api凑合了
+[posts](http://jsonplaceholder.typicode.com/posts)
+[cnodejs](https://cnodejs.org/api/v1/topics)
 
 ## 参考
 - [一个腾讯前端的博客](https://www.xuanfengge.com/page-back-does-not-cache.html)

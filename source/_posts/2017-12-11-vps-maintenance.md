@@ -455,6 +455,7 @@ sudo apt install openjdk-8-source //这样就能在linux desktop的intelij里面
 
 ### 5. 关于 docker
 
+首先的首先，docker命令用sudo权限运行，会少很多麻烦
 docker image 是snapshot, 而container是docker image的运行实例
 
 youtube 上有人在 Digital Ocean 的 vps 上安装 docker，主要作用就是将一个复杂的操作系统打包成一个下载即用的容器。进入容器中，可以像在实际的操作系统中一样运行指令。所以虚拟化的机器随时可以使用其他操作系统。[how-to-install-and-use-docker-on-ubuntu-16-04](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-16-04)

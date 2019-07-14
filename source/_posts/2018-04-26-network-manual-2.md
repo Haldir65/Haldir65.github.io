@@ -187,7 +187,6 @@ wget --spider www.baidu.com //wget还有一个spider模式
 “ping -l 1472 -f www.baidu.com"
 [udp的MTU参数](http://yangtai.xunlei.com/?p=1326&cpage=6)
 
-美团的技术博客还不错
 [前端安全系列之二：如何防止CSRF攻击？](https://tech.meituan.com/fe_security_csrf.html)
 
 [https的url是加密的吗？](https://stackoverflow.com/questions/499591/are-https-urls-encrypted)是的，
