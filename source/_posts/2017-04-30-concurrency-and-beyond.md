@@ -8,7 +8,7 @@ tags: [concurrency]
 ![](https://www.haldir66.ga/static/imgs/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg)
 <!--more-->
 
-1. 线程池的常规使用方式
+## 1. 线程池的常规使用方式
 通常说的线程池对外表现为具有一系列操作功能的接口，Executor提供了execute一个runnable的功能，而其子类ExecutorService则对外提供了更多的实用功能，所以平时用的都是ExecutorService的实现类。
 
 ```java
@@ -248,26 +248,41 @@ private Runnable getTask() {
     }
 ```
 
-整体来说，executor.execute方法就是通过new出Woker，而Worker则会在run方法中不停的从queue中获取新的任务，从而确保线程不会挂掉。也就是所谓的线程池缓存了线程，避免了频繁创建线程的开销。
+整体来说，executor.execute方法会获取Woker，而Worker则会在run方法中不停的从queue中获取新的任务，从而确保线程不会挂掉。也就是所谓的线程池缓存了线程，避免了频繁创建线程的开销。
+在ThreadPoolExecutor的execute方法中有一段注释写的很清楚，分为三步：
+1. 如果当前的线程数量小于corePoolSize,直接创建一个新的线程干活
+2. 否则加入到队列，成功的话还要重新检查一下，因为可能线程池关闭了
+3.  加入队列失败的话，尝试创建一个新的线程(如果size超过maximumPoolSize的话是会失败的)，再次失败的话就调用RejectPolicy
+
+在javadoc中也写的很清楚
+1. If fewer than corePoolSize threads are running, the Executor always prefers adding a new thread rather than queuing.
+2. If corePoolSize or more threads are running, the Executor always prefers queuing a request rather than adding a new thread.
+3. If a request cannot be queued, a new thread is created unless this would exceed maximumPoolSize, in which case, the task will be rejected.
+
+## 2. Queue的选择
+BlockingQueue是一个接口
+BlockingQueue提供了四种应对策略来处理这种资源不能被立即满足的场景
+
+| 空值     | 抛出异常     |   返回一个特殊值 | 阻塞 | 调用者提供一个超时 |
+| :------------- | :------------- |:------------- |:------------- |:------------- |
+| 插入     | add(e)      | offer(e) | put(e)  | put(e, time ,timeUnit) |
+| 移除     | remove()     | poll() | take()  | poll(time,timeUnit) |
+| 检查     | element()  | peek()  | 不可用 | 不可用 |
 
 
-2. Worker这个类继承自AbstractQueuedSynchronizer
-AbstractQueuedSynchronizer即大名鼎鼎的AQS。
-
-
-3. Reetranlock的使用
-这其中有
-注意上面使用了重入锁 ReentrantLock，后来发现ThreadPoolExecutor中多处使用了这个类。
-
-4. Future,Callable,FutureTask等等
-
-最后，今天下午看到很多jdk里源码的注释，作者都是 Doug Lea ，实在佩服前人的功力。之前也看过一些自定义线程池的实现，现在看起来确实差很多，不要重复造轮子不意味着不需要去了解轮子是怎么造出来的。
+ThreadPoolExecutor的构造函数中需要传入一个BlockingQueue<Runnable> workQueue，一个阻塞式的队列 。也就是说，添加任务和获取任务的过程都是阻塞的。
+jdk中提供的线程池选择的队列：
+newCachedThreadPool使用了SynchronousQueue(每一个插入操作必须等待另一个线程的对应移除操作)
+newFixedThreadPool使用了LinkedBlockingQueue(这个队列是无界的)，干活的线程就那么多，任务多了就加入队列好了
 
 
 ## 自定义线程池的话，有一些经验公式
 简单来说，就是如果你是CPU密集型运算，那么线程数量和CPU核心数相同就好，避免了大量无用的切换线程上下文。
 如果你是IO密集型的话，需要大量等待，那么线程数可以设置的多一些，比如CPU核心乘以2.
 
-Reference 
-1. [Java 多线程：线程池实现原理](https://github.com/pzxwhc/MineKnowContainer/issues/9)
+
+## 参考
+1. [java自带线程池和队列详解](https://www.oschina.net/question/565065_86540)
 2. [深入分析 java 8 编程语言规范：Threads and Locks](https://javadoop.com/post/Threads-And-Locks-md)
+3. [解读 java 并发队列 BlockingQueue](https://javadoop.com/post/java-concurrent-queue)
+4. [聊聊并发（七）——Java 中的阻塞队列](https://www.infoq.cn/article/java-blocking-queue)

@@ -201,6 +201,14 @@ fi
 if [ ! -w /usr/bin/watch ]; then
     echo "i can not write this file" //可写权限
 fi
+
+//文件夹为空
+if [ "$(ls -A /usr/bin)" ]; then
+        echo "this directory  is not empty "
+else
+        echo "this directory is mepty"
+fi
+
 ```
 -r file　　　　　用户可读为真 
 -w file　　　　　用户可写为真 

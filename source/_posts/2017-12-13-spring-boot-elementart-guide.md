@@ -37,6 +37,11 @@ server
 
 
 
+## Tomcat教程
+[Create a Maven Project with Servlet in IntelliJ IDEA](https://medium.com/@backslash112/create-maven-project-with-servlet-in-intellij-idea-2018-be0d673bd9af) 需要使用intelij idea ultimate version，过程中可能需要联网，会比较慢。
+
+Tomcat可以host static file，做法是在webapp文件夹下创建一个MyApp（名字其实随意）文件夹，在这个文件夹里新建一个index.html（文件也随意）,接下来访问localhost:8080/MyApp/index.html 就能看到内容了
+
 补充一些tomcat和servlet的知识
 tomcat是web container,servlet是处理业务逻辑的。
 servlet继承自HttpServlet,里面有doGet和doPost方法。

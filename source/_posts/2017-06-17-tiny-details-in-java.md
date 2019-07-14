@@ -1775,11 +1775,8 @@ windos平台下，想在idea中看jdk源码的话，下载openjdk源码(一个zi
 ### 53. Class.forName...
 在App启动的时候在另外一个线程里面提前去加载这个class，能够加快速度吗？
 
-todo a pratical cheetsheet on java reflection
-
-=========================================
-[反射为什么慢，慢成什么样了](https://github.com/hehonghui/android-tech-frontier/blob/master/issue-45/%E4%BD%BF%E7%94%A8%E5%8F%8D%E5%B0%84%E5%88%B0%E5%BA%95%E4%BC%9A%E5%AF%B9%E6%80%A7%E8%83%BD%E9%80%A0%E6%88%90%E5%A4%9A%E5%A4%A7%E5%BD%B1%E5%93%8D%EF%BC%9F.md)
 class的生命周期
+
 
 
 
@@ -1787,4 +1784,4 @@ class的生命周期
 - [Jake Wharton and Jesse Wilson - Death, Taxes, and HTTP](https://www.youtube.com/watch?v=6uroXz5l7Gk)
 - [Android Tech Talk: HTTP In A Hostile World](https://www.youtube.com/watch?v=tfD2uYjzXFo)
 - [netty里面使用jvm inline提升运行效率的一个issue](http://normanmaurer.me/blog/2014/05/15/Inline-all-the-Things/) 博客内容非常深入
-
+[反射为什么慢，慢成什么样了](https://github.com/hehonghui/android-tech-frontier/blob/master/issue-45/%E4%BD%BF%E7%94%A8%E5%8F%8D%E5%B0%84%E5%88%B0%E5%BA%95%E4%BC%9A%E5%AF%B9%E6%80%A7%E8%83%BD%E9%80%A0%E6%88%90%E5%A4%9A%E5%A4%A7%E5%BD%B1%E5%93%8D%EF%BC%9F.md)

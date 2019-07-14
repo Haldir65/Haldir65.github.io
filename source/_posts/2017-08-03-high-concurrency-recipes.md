@@ -286,7 +286,7 @@ synchronized用于修饰静态方法时，执行该方法需要获得的是该�
 **三、同步代码块**
 synchronized用于修饰代码块时，进入同步代码块需要获得synchronized关键字后面括号内的对象（可以是实例对象也可以是class对象）的内置锁。
 
-java io为什么慢，有一个原因是InputStream的read方法和OutputStream的write方法都是加了synchronized的。而Okio里面synchronized方法我没找到，另外，真的想要io性能的话，用nio。
+java io中的InputStream的read方法和OutputStream的write方法都是加了synchronized的。而Okio里面synchronized方法我没找到，另外，真的想要io性能的话，用nio。
 
 同步一个对象的前提是各方都同意使用同一把锁作为调用方法的前提，单方面加锁并不限制不尊重锁机制的使用者。两条线程分别去取两个互不相干的锁，这里面当然不存在阻塞问题。
 
@@ -299,7 +299,7 @@ Unsafe unsafe = getUnsafe();
 Class aClass = A.class;
 A a = (A) unsafe.allocateInstance(aClass);
 ```
-最好不要在工程中使用。
+最好不要在工程中使用，这样的做法在json库中往往被作为一种保底的方法，注意这种方式创建的对象是没有初始化的（没有调用构造函数）
 
 ## 14.ArrayBlockingQueue和LinkedBlockingQueue
 
@@ -317,12 +317,15 @@ BlockingQueue提供了四种应对策略来处理这种资源不能被立即sati
 BlockingQueue的常用的实现类包括ArrayBlockingQueue(FIFO)和LinkedBlockingQueue(FIFO)。
 
 ArrayBlockingQueue是一个由数组实现的 **有界阻塞队列**。该队列采用 ***FIFO*** 的原则对元素进行排序添加。
-ArrayBlockingQueue的入列核心方法是enqueue，而这个方法的调用是被包在一个lock.lock和lock.unlock中的，所以是同步的。出列的核心方法是dequeue，也是包在同步lock里面的。构造函数可以传一个fair进来。
+ArrayBlockingQueue的入列核心方法是一个private方法enqueue(put ,offer都代理给了这个方法)，而这个方法的调用是被包在一个lock.lock和lock.unlock中的，所以是线程安全的的。出列的核心方法是dequeue，也是包在同步lock里面的。构造函数可以传一个fair进来。enqueue方法里面还有一个notEmpty.signal() ， 其实就是典型的通知消费者。
 
 LinkedBlockingQueue是Exexutors中使用的创建线程池的静态方法中使用的参数，显然更推荐使用。主要用的是两个方法，
 put方法在队列满的时候会阻塞直到有队列成员被消费，take方法在队列空的时候会阻塞，直到有队列成员被放进来。官方文档提到了， **LinkedBlockingQueue的吞吐量通常要高于基于数组的队列，但在大多数并发应用程序中，其可预知的性能要低一些** ， 内部的lock只能是unfair的。
 
-在线程池(ThreadPoolExecutor)中，获取任务使用的是queue的**poll**方法，添加任务使用的是queue的**offer**方法。就是说“不堵塞”
+在线程池(ThreadPoolExecutor)中，获取任务使用的是queue的**poll**方法，添加任务使用的是queue的**offer**方法。
+从ArrayBlockingQueue的实现来看，poll和offer都被一个lock的上锁和解锁包住了，所以和上面的表格中的poll、offer不阻塞有一定差异(大概这也是叫做BlockingQueue的原因吧)
+
+从原理来看
 
 
 ## 15. AtomicXXX只是将value写成volatile，这样get就安全了，set的话直接交给Unsafe了

@@ -362,13 +362,14 @@ static void ensure_join(JavaThread* thread) {
 lock.notify_all(thread);这里
 
 
-
-
+### unsafe
+这个类的源码在sun.misc这个package下，看源码的话需要导入openjdk源码
+和多线程相关的类是LockSupport,让一个线程休眠的方法使用的是LockSupport.park（AQS中挂起线程的就是在parkAndCheckInterrupt中使用了这个方法）调用了Unsafe.park方法（这是个native方法，c++的实现似乎是使用了pthread_mutex）
 
 
 
 [图解java并发](http://ifeve.com/图解java并发上/)
-unSafe
+
 
 hacknoon中有关于python中多线程primitives的文章
 c语言中多线程通信基础
@@ -376,6 +377,6 @@ c语言中多线程通信基础
 
 
 ## 参考
-[美团博客中关于java锁的一片文章](https://tech.meituan.com/2018/11/15/java-lock.html)
-[openjdk是如何读取.class文件的](https://fansunion.blog.csdn.net/article/details/13252309)
+[美团博客中关于java锁的一篇文章](https://tech.meituan.com/2018/11/15/java-lock.html)
+
 [AQS这个java并发基础类的实现原理](https://javadoop.com/post/AbstractQueuedSynchronizer)
