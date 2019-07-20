@@ -57,7 +57,6 @@ top : 1
 - Parcelable 是怎么实现跨进程的? ipc并不仅限于后台，客户端不同进程间也会有类似的概念。
 - jdk8 standard Library implementation detail(java代码的实现 --> hotspot代码的c语言实现)
 - [ ] [openjdk的C语言实现可以随便调几处来看看](https://github.com/keerath/openjdk-8-source/blob/master/jdk/src/windows/native/java/net/SocketOutputStream.c)
-- jdk7开始提供fork join pool方法，将任务分配到多个线程上处理
 
 
 ### 已完成
@@ -111,6 +110,7 @@ top : 1
 - [X]C语言fork进程以及进程之间通信的套路
 - [X] flex,grid. css的box-size真是坑人
 - [X] rxjava是如何切换线程的以及源码解析，ObserveOnObserver和ObservableSubscribeOn实例是桥梁
+- [X] jdk7开始提供fork join pool方法，将任务分配到多个线程上处理(不适合io密集型操作)
 
 
 

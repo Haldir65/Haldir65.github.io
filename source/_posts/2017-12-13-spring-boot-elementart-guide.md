@@ -13,6 +13,7 @@ tags: [tools]
 ## 1. 创建一个Spring Boot app 非常简单
 [Creating a Spring Application in Intelij is darn Simple](https://medium.com/@ahmetkapusuz/spring-boot-hello-world-application-with-intellij-idea-1524c68ddaae)
 
+[脚手架这种东西也是有的](https://start.spring.io/)
 
 ## 2. 组件及用法
 
