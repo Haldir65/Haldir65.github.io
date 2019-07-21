@@ -5,7 +5,7 @@ tags:
 ---
 
 
-openjdk部分源码解析(文件IO),java层以及c语言层的分析
+[openjdk](https://github.com/keerath/openjdk-8-source/blob/master/jdk/src/windows/native/java/net/SocketOutputStream.c)部分源码解析(文件IO),java层以及c语言层的分析
 ![](https://www.haldir66.ga/static/imgs/BlueShark_EN-AU12265881842_1920x1080.jpg)
 
 <!--more-->

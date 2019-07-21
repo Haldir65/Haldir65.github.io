@@ -1386,6 +1386,8 @@ If --classpath is explicitly set as a command line parameter, it overrides all o
 
 运行的时候需要带上bin这个classpath的原因是设定了classpath就会覆盖掉其他设定，所以要把我们自己的java文件打出来的class文件也加到classpath。还有要注意的是，unix系统上classpath之间是用:分割的，windows上是用;分割的
 
+上述只是编译运行一个java文件，实际项目有多个java文件的话，需要准备一个MANIFEST.MF文件（提供入口函数）
+[写一个shell脚本好了](https://zhuanlan.zhihu.com/p/29345229) 。实际上生产中使用的都是mvn这种了，这里只是解释下原理。
 
 ### 43 . java读文件也要注意编码问题(FileReader读取文件里文乱码问题)
 ```java
