@@ -29,7 +29,7 @@ exit
 ## docker-compose 
 使用docker-compose.yml的方式要比输入docker命令来的简单的多。就是将参数写入docker-compose.yml这个文件，然后运行docker-compose up -d命令的方式。
 
-
+docker run -p 3000:3000 -ti dummy-app ## 每次都需要输入一大段命令行参数很烦人的，所以把配置写在一个docker-compose.yml文件里面，每次只需要docker-compose up就可以了。
 
 ## 这两条命令用于自己在本地打一个docker image
 docker build -t <your username>/node-web-app .
@@ -49,7 +49,7 @@ docker会在/var/lib/docker文件夹里吃掉大量空间，释放空间的话
 [用docker运行一个node mongodb应用](https://medium.com/@kahana.hagai/docker-compose-with-node-js-and-mongodb-dbdadab5ce0a) 亲测有效
 [node的官方image太大了，alpine-node占用的磁盘空间更小](https://hub.docker.com/r/mhart/alpine-node/)
 
-docker run -p 3000:3000 -ti dummy-app ## 每次都需要输入一大段命令行参数很烦人的，所以把配置写在一个docker-compose.yml文件里面，每次只需要docker-compose up就可以了。
+
 
 
 ## 参考

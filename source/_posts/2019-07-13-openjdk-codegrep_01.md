@@ -5,7 +5,7 @@ tags:
 ---
 
 
-[openjdk](https://github.com/keerath/openjdk-8-source/blob/master/jdk/src/windows/native/java/net/SocketOutputStream.c)部分源码解析(文件IO),java层以及c语言层的分析
+[openjdk](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/windows/native/java/net/SocketOutputStream.c)部分源码解析(文件IO),java层以及c语言层的分析
 ![](https://www.haldir66.ga/static/imgs/BlueShark_EN-AU12265881842_1920x1080.jpg)
 
 <!--more-->
@@ -81,7 +81,7 @@ Java_java_io_UnixFileSystem_getBooleanAttributes0(JNIEnv *env, jobject this,
 
 文件读写以及FileDescriptor
 文件描述符在unix系统上是非负的int，用于代表一个文件。java层的FileDescriptor中包裹了一个int fd。
-读写文件都需要通过FileInputStream进行，构造函数中有一个open方法，对应c语言的方法子啊
+读写文件都需要通过FileInputStream进行，构造函数中有一个open方法，对应c语言的方法在
 [FileInputStream.c](https://github.com/openjdk-mirror/jdk7u-jdk/blob/master/src/share/native/java/io/FileInputStream.c)中
 ```c
 JNIEXPORT void JNICALL
@@ -116,6 +116,54 @@ JVM_OPEN是jvm的方法，不属于jdk了，要去hotSpot里面查看对应的�
 //  在/hotspot/src/share/vm/prims/jvm.cpp （cpp我不熟，据说这里面最终走的是 open64方法）
 
 **这里要提一句，jvm不止oracle一家**，还包括OpenJDK，SUN JVM，IBM JVM，都是对java specification的implementation。
+
+
+### 文件读写
+java这边读取文件用的是FileInputStream，下面方法表示读取一个Byte
+```java
+private native int read0() throws IOException; 
+```
+
+对应openjdk的实现在[FileInputStream.c](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/native/java/io/FileInputStream.c)文件中
+```c
+JNIEXPORT jint JNICALL
+Java_java_io_FileInputStream_read0(JNIEnv *env, jobject this) {
+    return readSingle(env, this, fis_fd);
+}
+```
+
+[readSingle在io_util.c中](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/native/java/io/io_util.c)
+
+```c
+jint
+readSingle(JNIEnv *env, jobject this, jfieldID fid) {
+    jint nread;
+    char ret;
+    FD fd = GET_FD(this, fid);
+    if (fd == -1) {
+        JNU_ThrowIOException(env, "Stream Closed");
+        return -1;
+    }
+    nread = IO_Read(fd, &ret, 1);
+    if (nread == 0) { /* EOF */
+        return -1;
+    } else if (nread == -1) { /* error */
+        JNU_ThrowIOExceptionWithLastError(env, "Read error");
+    }
+    return ret & 0xFF;
+}
+
+// IO_Read指向io_util_md.c中的handleRead方法
+ssize_t
+handleRead(FD fd, void *buf, jint len)
+{
+    ssize_t result;
+    RESTARTABLE(read(fd, buf, len), result);
+    return result;
+}
+```
+
+
 
 ## 参考
 [openjdk是如何读取.class文件的](https://fansunion.blog.csdn.net/article/details/13252309)
