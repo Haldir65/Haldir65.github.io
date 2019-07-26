@@ -16,7 +16,7 @@
 <meta property="og:description" content="openjdk部分源码解析(文件IO),java层以及c语言层的分析">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/BlueShark_EN-AU12265881842_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-07-26T10:04:13.312Z">
+<meta property="og:updated_time" content="2019-07-26T13:41:48.401Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="openjdk源码解析[一]">
 <meta name="twitter:description" content="openjdk部分源码解析(文件IO),java层以及c语言层的分析">
@@ -199,7 +199,7 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p><a href="https://github.com/keerath/openjdk-8-source/blob/master/jdk/src/windows/native/java/net/SocketOutputStream.c">openjdk</a>部分源码解析(文件IO),java层以及c语言层的分析<br><img src="https://www.haldir66.ga/static/imgs/BlueShark_EN-AU12265881842_1920x1080.jpg" alt=""></p>
+        <p><a href="https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/windows/native/java/net/SocketOutputStream.c">openjdk</a>部分源码解析(文件IO),java层以及c语言层的分析<br><img src="https://www.haldir66.ga/static/imgs/BlueShark_EN-AU12265881842_1920x1080.jpg" alt=""></p>
 <a id="more"></a>
 <h2 id="File-IO"><a href="#File-IO" class="headerlink" title="File IO"></a>File IO</h2><p>IOUtils<br>FileChannel</p>
 <h2 id="回顾一下C语言提供的操作文件的api"><a href="#回顾一下C语言提供的操作文件的api" class="headerlink" title="回顾一下C语言提供的操作文件的api"></a>回顾一下C语言提供的操作文件的api</h2><p>1 .读写(创建)文件</p>
@@ -278,7 +278,7 @@ Java_java_io_UnixFileSystem_getBooleanAttributes0(JNIEnv *env, jobject this,
 
 // S_IFMT是一个掩码， S_IFREG表示是一个普通文件， S_IFDIR表示是一个目录。返回值是一个int（其中4位被分别用于存储BA_HIDDEN，BA_DIRECTORY，BA_REGULAR，BA_EXISTS），足以表达文件的这几种常用属性。java层获取对应的属性后，进行位运算就能知道这个文件的属性了。
 </code></pre>
-<p>文件读写以及FileDescriptor<br>文件描述符在unix系统上是非负的int，用于代表一个文件。java层的FileDescriptor中包裹了一个int fd。<br>读写文件都需要通过FileInputStream进行，构造函数中有一个open方法，对应c语言的方法子啊<br><a href="https://github.com/openjdk-mirror/jdk7u-jdk/blob/master/src/share/native/java/io/FileInputStream.c">FileInputStream.c</a>中</p>
+<p>文件读写以及FileDescriptor<br>文件描述符在unix系统上是非负的int，用于代表一个文件。java层的FileDescriptor中包裹了一个int fd。<br>读写文件都需要通过FileInputStream进行，构造函数中有一个open方法，对应c语言的方法在<br><a href="https://github.com/openjdk-mirror/jdk7u-jdk/blob/master/src/share/native/java/io/FileInputStream.c">FileInputStream.c</a>中</p>
 <pre><code class="c">JNIEXPORT void JNICALL
 Java_java_io_FileInputStream_open(JNIEnv *env, jobject this, jstring path) {
     fileOpen(env, this, path, fis_fd, O_RDONLY);
@@ -308,6 +308,43 @@ fileOpen(JNIEnv *env, jobject this, jstring path, jfieldID fid, int flags)
 </code></pre>
 <p>JVM_OPEN是jvm的方法，不属于jdk了，要去hotSpot里面查看对应的实现：<br>//  在/hotspot/src/share/vm/prims/jvm.cpp （cpp我不熟，据说这里面最终走的是 open64方法）</p>
 <p><strong>这里要提一句，jvm不止oracle一家</strong>，还包括OpenJDK，SUN JVM，IBM JVM，都是对java specification的implementation。</p>
+<h3 id="文件读写"><a href="#文件读写" class="headerlink" title="文件读写"></a>文件读写</h3><p>java这边读取文件用的是FileInputStream，下面方法表示读取一个Byte</p>
+<pre><code class="java">private native int read0() throws IOException;
+</code></pre>
+<p>对应openjdk的实现在<a href="https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/native/java/io/FileInputStream.c">FileInputStream.c</a>文件中</p>
+<pre><code class="c">JNIEXPORT jint JNICALL
+Java_java_io_FileInputStream_read0(JNIEnv *env, jobject this) {
+    return readSingle(env, this, fis_fd);
+}
+</code></pre>
+<p><a href="https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/native/java/io/io_util.c">readSingle在io_util.c中</a></p>
+<pre><code class="c">jint
+readSingle(JNIEnv *env, jobject this, jfieldID fid) {
+    jint nread;
+    char ret;
+    FD fd = GET_FD(this, fid);
+    if (fd == -1) {
+        JNU_ThrowIOException(env, &quot;Stream Closed&quot;);
+        return -1;
+    }
+    nread = IO_Read(fd, &amp;ret, 1);
+    if (nread == 0) { /* EOF */
+        return -1;
+    } else if (nread == -1) { /* error */
+        JNU_ThrowIOExceptionWithLastError(env, &quot;Read error&quot;);
+    }
+    return ret &amp; 0xFF;
+}
+
+// IO_Read指向io_util_md.c中的handleRead方法
+ssize_t
+handleRead(FD fd, void *buf, jint len)
+{
+    ssize_t result;
+    RESTARTABLE(read(fd, buf, len), result);
+    return result;
+}
+</code></pre>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://fansunion.blog.csdn.net/article/details/13252309">openjdk是如何读取.class文件的</a><br><a href="https://hunterzhao.io/">openjdk源码分析</a><br><a href="https://github.com/openjdk-mirror/jdk7u-hotspot">hotspot源码</a></p>
 
       
