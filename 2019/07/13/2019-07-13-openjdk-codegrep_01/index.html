@@ -16,7 +16,7 @@
 <meta property="og:description" content="openjdk部分源码解析(文件IO),java层以及c语言层的分析">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/BlueShark_EN-AU12265881842_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-07-26T13:41:48.401Z">
+<meta property="og:updated_time" content="2019-07-28T02:57:14.188Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="openjdk源码解析[一]">
 <meta name="twitter:description" content="openjdk部分源码解析(文件IO),java层以及c语言层的分析">
@@ -203,7 +203,8 @@ ga('send', 'pageview');
 <a id="more"></a>
 <h2 id="File-IO"><a href="#File-IO" class="headerlink" title="File IO"></a>File IO</h2><p>IOUtils<br>FileChannel</p>
 <h2 id="回顾一下C语言提供的操作文件的api"><a href="#回顾一下C语言提供的操作文件的api" class="headerlink" title="回顾一下C语言提供的操作文件的api"></a>回顾一下C语言提供的操作文件的api</h2><p>1 .读写(创建)文件</p>
-<pre><code class="c">FILE *fopen( const char * filename, const char * mode );
+<pre><code class="c">#include &lt;stdio.h&gt; 
+FILE *fopen( const char * filename, const char * mode ); //定义在标准中的，所以是跨平台的
 
 int fclose( FILE *fp ); //关闭文件
 </code></pre>
@@ -345,6 +346,12 @@ handleRead(FD fd, void *buf, jint len)
     return result;
 }
 </code></pre>
+<blockquote>
+<p>c语言的read方法:</p>
+<pre><code>头文件：#include &lt;unistd.h&gt;
+定义函数：ssize_t read(int fd, void * buf, size_t count);
+函数说明：read()会把参数fd 所指的文件传送count 个字节到buf 指针所指的内存中. 若参数count 为0, 则read()不会有作用并返回0. 返回值为实际读取到的字节数, 如果返回0, 表示已到达文件尾或是无可读取的数据,此外文件读写位置会随读取到的字节移动.
+</code></pre></blockquote>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://fansunion.blog.csdn.net/article/details/13252309">openjdk是如何读取.class文件的</a><br><a href="https://hunterzhao.io/">openjdk源码分析</a><br><a href="https://github.com/openjdk-mirror/jdk7u-hotspot">hotspot源码</a></p>
 
       
@@ -661,15 +668,15 @@ handleRead(FD fd, void *buf, jint len)
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">前端</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -689,19 +696,15 @@ handleRead(FD fd, void *buf, jint len)
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">nginx</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">sql</a>
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">django</a>
+                <a href="javascript:void(0)" class="js-tag color4">sql</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -718,6 +721,10 @@ handleRead(FD fd, void *buf, jint len)
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">opengl</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">django</a>
               </li>
              
               <li class="article-tag-list-item">
