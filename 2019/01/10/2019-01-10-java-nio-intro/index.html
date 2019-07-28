@@ -17,7 +17,7 @@
 <meta property="og:description" content="关于java nio的一些点">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/UmbriaCastelluccio_EN-AU8834990889_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-07-28T02:57:14.184Z">
+<meta property="og:updated_time" content="2019-07-28T15:21:20.970Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java nio使用指南">
 <meta name="twitter:description" content="关于java nio的一些点">
@@ -675,18 +675,200 @@ aFile.close();
 <ul>
 <li>对于<strong>同步阻塞IO</strong>来说，这两个阶段都是阻塞的</li>
 <li>对于<strong>同步非阻塞IO</strong>来说，当socket接收缓冲区没有数据时，recv会立刻返回一个特定的状态值，表示现在没有数据，待会再来吧。当socket接收缓冲区有数据的时候，recv将数据拷贝到进程空间的这个过程，也是阻塞的。通常采用轮训polling的方式，循环往复的主动询问内核有没有数据可以读取。实际上，这样的轮询其实还不阻塞IO的性能好。只有第一步是非阻塞的，第二步还是阻塞的</li>
-<li>对于<strong>多路复用IO</strong>来说，它的优势是可以调用select、poll、epoll这些操作系统级别的系统调用，同时轮训多个socket连接。当调用select、poll、epoll的时候，如果所监控的socket中有部分socket可读，可写或者连接上的时候，就会返回，将其返回给用户进程来处理，这个过程是阻塞的。只不过是因为select、poll、epoll系统调用而阻塞的；<br>当系统调用返回后，用户进程再调用recv，将数据从内核拷贝到进程空间中，这个过程也是阻塞的。事实上这个方式比第二种还差些，因为这里包含了两个系统调用(select/poll/epoll、recv)，而第二种只有一个系统调用recv。但是这种方式的优势是可以处理更多的连接。连接数大的时候，缺点就被有点给掩盖了。<br>IO多路复用相比多进程/多线程+ 阻塞IO的系统开销小，因为系统不需要创建新的进程或者线程，也不需要维护多个进程，线程的执行。对于多路复用IO来说，第一个阶段是因为select、poll、epoll而阻塞的，第二个阶段(recv)依旧是阻塞的。</li>
+<li>对于<strong>多路复用IO</strong>来说，它的优势是可以调用select、poll、epoll这些操作系统级别的系统调用，同时轮训多个socket连接。当调用select、poll、epoll的时候，如果所监控的socket中有部分socket可读，可写或者连接上的时候，就会返回，将其返回给用户进程来处理，这个过程是阻塞的。只不过是因为select、poll、epoll系统调用而阻塞的；<br>当系统调用返回后，用户进程再调用recv，将数据从内核拷贝到进程空间中，这个过程也是阻塞的。事实上这个方式比第二种还差些，因为这里包含了两个系统调用(select/poll/epoll、recv)，而第二种只有一个系统调用recv。但是这种方式的优势是可以处理更多的连接。连接数大的时候，缺点就被优点给掩盖了。<br>IO多路复用相比多进程/多线程+ 阻塞IO的系统开销小，因为系统不需要创建新的进程或者线程，也不需要维护多个进程，线程的执行。对于多路复用IO来说，第一个阶段是因为select、poll、epoll而阻塞的，第二个阶段(recv)依旧是阻塞的。</li>
 <li>对于<strong>异步IO</strong>来说，两个阶段都没有被阻塞，因为只需要发起rec、send请求，系统会帮忙完成数据的copy，完事之后通知用户进程一声。</li>
 </ul>
 <p>异步操作(asynchronous IO)的本质<br>所有的程序最终都会由计算机硬件来执行，所以为了更好的理解异步操作的本质，我们有必要了解一下它的硬件基础。<br>熟悉电脑硬件的朋友肯定对 DMA 这个词不陌生，硬盘、光驱的技术规格中都有明确 DMA 的模式指标，其实网卡、声卡、显卡也是有 DMA 功能的。<br>DMA 就是直接内存访问的意思，也就是说，拥有 DMA 功能的硬件在和内存进行数据交换的时候可以不消耗 CPU 资源。只要 CPU 在发起数据传输时发送一个指令，硬件就开始自己和内存交换数据，在传输完成之后硬件会触发一个中断来通知操作完成。<br>这些无须消耗 CPU 时间的 I/O 操作正是异步操作的硬件基础。所以即使在 DOS 这样的单进程（而且无线程概念）系统中也同样可以发起异步的 DMA 操作。</p>
 <p>线程的本质<br>线程不是一个计算机硬件的功能，而是操作系统提供的一种逻辑功能，线程本质上是进程中一段并发运行的代码，所以线程需要操作系统投入 CPU 资源来运行和调度。</p>
-<p>nio中的几个主要概念<br><strong>channel</strong> 和jdk1.4之前的bio的”将io抽象为流”的概念是差不多的，只不过流是单向的，channel是双向的<br><strong>Buffer</strong> 就是数组的<br><strong>Selector</strong> 对select、poll、epoll系统调用的包装，用于Socket channel，因为它要求channel必须是非阻塞的</p>
+<p>nio中的几个主要概念<br><strong>channel</strong> 和jdk1.4之前的bio的”将io抽象为流”的概念是差不多的，只不过流是单向的，channel是双向的<br><strong>Buffer</strong> 就是对数组的封装<br><strong>Selector</strong> 对select、poll、epoll系统调用的包装，用于Socket channel，因为它要求channel必须是非阻塞的</p>
 <p>bio是没有缓冲区的（BufferedInputStream,BufferedReader这种除外），包括RandomAccessFile也没有缓冲区<br>Nio都是有缓冲区的，必须和Buffer对象一起使用，Buffer对象就是缓冲区。</p>
 <p>ByteBuffer是唯一直接与channel交互的缓冲，因为所有的数据都是以二进制形式存在的<br>在 BIO 中，与文件 IO 相关联的三个类是：<br>1) java.io.FileInputStream，从文件流中读取字节数据，只读；<br>2) java.io.FileOutputStream，向文件流中写入字节数据，只写；<br>3) java.io.RandomAccessFile，独立的IO流类，支持r只读、rw读写、rws读写 + metadata/data自动同步、rwd读写 + data自动同步四种模式；</p>
 <p>为了迎合 NIO，这几个类都进行修改，加入了getChannel()方法，获取对应的FileChannel对象，提供高效率的 I/O 操作；<br>但是 NIO 并未给 FileChannel 提供非阻塞支持，FileChannel 只能运行在阻塞模式下，但是效率依旧比 BIO 高，因为有 Buffer 啊；</p>
 <p>而java.net包中的三个 Socket 类：<br>1) java.net.ServerSocket：TCP Socket，Server端；<br>2) java.net.Socket：TCP Socket；<br>3) java.net.DatagramSocket：UDP Socket；</p>
 <p>这几个类其实也定义了一个getChannel()方法，但是默认只能返回null，需要显式的 open() 对应的 SocketChannel 通道。</p>
-<p>netty的作者在演讲中提到java官方的nio并不特别好，所以，生产环境用的都是netty这种。</p>
+<p>Channel通道,java.nio.channels包，主要有：FileChannel、ServerSocketChannel、SocketChannel、DatagramChannel</p>
+<h3 id="FileChannel"><a href="#FileChannel" class="headerlink" title="FileChannel"></a>FileChannel</h3><pre><code class="java">import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.RandomAccessFile;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+
+public class FileChannelDemo {
+    public static void main(String[] args) throws IOException {
+        FileChannel fc = null;
+
+        fc = new FileOutputStream(&quot;data.txt&quot;).getChannel();
+        fc.write(ByteBuffer.wrap(&quot;www.baidu.com\n&quot;.getBytes()));
+        fc.close();
+
+        fc = new RandomAccessFile(&quot;data.txt&quot;, &quot;rw&quot;).getChannel();
+        fc.position(fc.size());
+        fc.write(ByteBuffer.wrap(&quot;www.google.com\n&quot;.getBytes()));
+        fc.close();
+
+        fc = new FileInputStream(&quot;data.txt&quot;).getChannel();
+        ByteBuffer buf = ByteBuffer.allocate(1024 * 4);
+        fc.read(buf);
+        buf.flip();
+        while (buf.hasRemaining()) {
+            System.out.print((char)buf.get());
+        }
+        // or
+        System.out.println();
+        buf.rewind();
+        System.out.print(new String(buf.array(), 0, buf.remaining()));
+        fc.close();
+    }
+}
+</code></pre>
+<p>或者</p>
+<pre><code class="java">import java.nio.channels.FileChannel;
+import java.nio.ByteBuffer;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.io.IOException;
+
+public class FileChannelOpen {
+    private static Path path = Paths.get(&quot;test.txt&quot;);
+    private static final int BUF_SIZE = 1024 * 4;
+
+    public static void main(String[] args)
+        throws IOException
+    {
+        FileChannel fc = FileChannel.open(path, // 文件路径
+                                          StandardOpenOption.READ, // r
+                                          StandardOpenOption.WRITE, // w
+                                          StandardOpenOption.CREATE, // 不存在时新建
+                                          StandardOpenOption.TRUNCATE_EXISTING); // 清空原有内容
+        ByteBuffer buf = ByteBuffer.allocate(BUF_SIZE);
+        buf.put(args.length == 0 ?
+                &quot;default-file-content\n&quot;.getBytes() :
+                args[0].getBytes());
+
+        fc.write((ByteBuffer)buf.flip());
+        fc.position(0).read((ByteBuffer)buf.clear());
+        System.out.print(new String(buf.array(), 0, buf.flip().remaining()));
+
+        fc.close();
+    }
+}
+</code></pre>
+<p>transferTo，最快速的文件复制的方法</p>
+<pre><code>import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
+
+public class FileCopy2 {
+    public static void main(String[] args) throws IOException {
+        if (args.length &lt; 2) {
+            System.err.println(&quot;Usage: FileCopy2 &lt;src_file&gt; &lt;dst_file&gt;&quot;);
+            System.exit(1);
+        }
+
+        FileChannel
+            in = new FileInputStream(args[0]).getChannel(),
+            out = new FileOutputStream(args[1]).getChannel();
+
+        in.transferTo(0, in.size(), out);
+        // or:
+        // out.transferFrom(in, 0, in.size());
+
+        in.close();
+        out.close();
+    }
+}
+</code></pre><p>接下来介绍，SelectableChannel，主要包括ServerSocketChannel，SocketChannel以及DatagramChannel</p>
+<h3 id="SocketChannel和-ServerSocketChannel"><a href="#SocketChannel和-ServerSocketChannel" class="headerlink" title="SocketChannel和 ServerSocketChannel"></a>SocketChannel和 ServerSocketChannel</h3><pre><code class="java">import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
+import java.net.StandardSocketOptions;
+import java.net.InetSocketAddress;
+import java.io.IOException;
+
+public class Server {
+    private static ServerSocketChannel servChannel;
+
+    private static final InetSocketAddress BIND_ADDR = new InetSocketAddress(&quot;0.0.0.0&quot;, 8080);
+    private static final int BACKLOG = 128;
+    private static final int BUF_SIZE = 1024;
+
+    public static void main(String[] args) throws IOException {
+        // 注册 shutdown hook 钩子, 关闭 servChannel
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    servChannel.close();
+                } catch (IOException e) {}
+            }
+        }));
+
+        servChannel = ServerSocketChannel.open();
+        servChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
+        servChannel.bind(BIND_ADDR, BACKLOG);
+
+        System.out.printf(&quot;----- listen: %s:%d -----\n&quot;,
+                          BIND_ADDR.getAddress().getHostAddress(),
+                          BIND_ADDR.getPort());
+
+        SocketChannel connChannel = null;
+        while (true) {
+            connChannel = servChannel.accept();
+            service(connChannel);
+        }
+    }
+
+    private static void service(SocketChannel connChannel) throws IOException {
+        InetSocketAddress remoteAddr = (InetSocketAddress) connChannel.getRemoteAddress();
+        System.out.printf(&quot;new Connect: %s:%d\n&quot;,
+                          remoteAddr.getAddress().getHostAddress(),
+                          remoteAddr.getPort());
+
+        ByteBuffer buf = ByteBuffer.allocate(BUF_SIZE);
+        while (connChannel.read((ByteBuffer)buf.clear()) != -1) {
+            System.out.printf(&quot;msg: %s\n&quot;, Charset.forName(&quot;UTF-8&quot;).decode((ByteBuffer)buf.flip()));
+            connChannel.write((ByteBuffer)buf.rewind());
+        }
+        System.out.printf(&quot;close Connect: %s:%d\n&quot;,
+                          remoteAddr.getAddress().getHostAddress(),
+                          remoteAddr.getPort());
+        connChannel.close();
+    }
+}
+
+
+
+public class Client2 {
+    private static final InetSocketAddress SERV_ADDR = new InetSocketAddress(&quot;127.0.0.1&quot;, 8081);
+    private static final int BUF_SIZE = 1024;
+
+    public static void main(String[] args) throws IOException {
+        SocketChannel sockChannel = SocketChannel.open();
+        sockChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
+        sockChannel.connect(SERV_ADDR);
+
+        ByteBuffer buf = ByteBuffer.allocate(BUF_SIZE);
+        if (args.length == 0) {
+            buf.put(&quot;default-message&quot;.getBytes(&quot;UTF-8&quot;));
+            sockChannel.write((ByteBuffer)buf.flip());
+            sockChannel.read((ByteBuffer)buf.clear());
+            System.out.printf(&quot;msg: %s\n&quot;, Charset.forName(&quot;UTF-8&quot;).decode((ByteBuffer)buf.flip()));
+        }
+        for (String s : args) {
+            ((ByteBuffer)buf.clear()).put(s.getBytes(&quot;UTF-8&quot;));
+            sockChannel.write((ByteBuffer)buf.flip());
+            sockChannel.read((ByteBuffer)buf.clear());
+            System.out.printf(&quot;msg: %s\n&quot;, Charset.forName(&quot;UTF-8&quot;).decode((ByteBuffer)buf.flip()));
+        }
+        sockChannel.close();
+    }
+}
+</code></pre>
+<h3 id="DatagramChannel"><a href="#DatagramChannel" class="headerlink" title="DatagramChannel"></a>DatagramChannel</h3><p>这个主要是udp了</p>
 <h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>不要迷信nio：</p>
 <ol>
 <li>DirectByteBuffer的本意并不是为了减少内存拷贝(而是为了固定内存地址)，DirectByteBuffer的回收机制比较重要，因为万一发生堆外内存泄露是比较严重的。</li>
@@ -1026,15 +1208,15 @@ aFile.close();
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">前端</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1054,15 +1236,19 @@ aFile.close();
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">sql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">django</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1079,10 +1265,6 @@ aFile.close();
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">opengl</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">django</a>
               </li>
              
               <li class="article-tag-list-item">
