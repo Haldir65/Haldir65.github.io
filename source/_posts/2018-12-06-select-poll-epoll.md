@@ -8,6 +8,16 @@ select，poll，epoll都是IO多路复用的机制。I/O多路复用就通过一
 ![](https://www.haldir66.ga/static/imgs/OrionNebula_EN-AU10620917199_1920x1080.jpg)
 <!--more-->
 
+linux下提供五种io model
+同步IO(synchronous IO)
+阻塞IO(bloking IO)
+非阻塞IO(non-blocking IO)
+多路复用IO(multiplexing IO)
+信号驱动式IO(signal-driven IO) 这种用的不多
+异步IO(asynchronous IO)
+具体的介绍看这篇文章:[五种io模式的介绍](http://cmsblogs.com/?p=4812)
+
+
 
 用户态到内核态的内存copy的开销
 
@@ -62,3 +72,4 @@ IOCP基于非阻塞异步模型，而epoll基于非阻塞同步模型。
 [IO 多路复用 — SELECT 和 POLL](https://void-shana.moe/linux/io-%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8-select-%E5%92%8C-poll.html)
 
 [linux kernel aio是另一个内核提供的异步框架，但是不如epoll成熟](https://www.zhihu.com/question/26943558)
+[如何使用 epoll? 一个 C 语言实例](https://www.oschina.net/translate/how-to-use-epoll-a-complete-example-in-c)

@@ -57,6 +57,8 @@ sed 's/^.*at/(&)/' annoying.txt ## 把那些会匹配上的文字用括号包起
 
 [intermediate training](https://www.digitalocean.com/community/tutorials/intermediate-sed-manipulating-streams-of-text-in-a-linux-environment)
 
+[colshell的教程](https://coolshell.cn/articles/9104.html)
+
 linux下查看一个文件的时间戳
 > stat test
 

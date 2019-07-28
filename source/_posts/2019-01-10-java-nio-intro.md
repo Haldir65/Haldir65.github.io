@@ -101,7 +101,6 @@ mark方法类似于打一个标记，待会儿通过reset回到这个position。
 一个简单的client server echo程序可以这样写
 ```java
 // server
-
 public class WebServer {
     public static void main(String args[]) {
         try {
@@ -241,7 +240,7 @@ public class EpollClient {
 }    
 ```
 
-这套处理io事件的程序模型在python中也有对应的selector模块，使用方式也是相近的。因为无论是java还是python，都是对操作系统上的c语言api的select,poll,epoll系统调用进行了封装。
+这套处理io事件的程序模型在python中也有对应的selector模块，使用方式也是相近的。因为无论是java还是python，都是对操作系统上的c语言api的select,poll,epoll系统调用进行了封装。SelectionKey类似于epoll中的一个事件，包括OP_READ，OP_WRITE，OP_ACCEPT和OP_CONNECT。事实上从openjdk源码来看，确实是对poll的封装
 
 selctor在openjdk的实现是:
 selctor.select -> PollSelectorImpl.doSelect ->  pollWrapper.poll -> poll0
@@ -536,11 +535,94 @@ FileChannel.transferTo方法会根据host machine的操作系统选择文件操�
 2. mmap
 3. read(最慢)
 
+## 4. java nio介绍
+[java nio介绍](https://www.zfl9.com/java-nio.html#more) 文章写的非常好
+java io的发展经历了三个阶段
+1. io/bio 即java.io.*，面向流，阻塞io，逐个字节的读写，没有相应的缓冲（除了bufferd），效率较低
+2. nio ，java.nio.* 面向缓冲区，阻塞/非阻塞，包含Buffer,Channel,Selector
+3 .aio/nio.2,  java.nio.channels.Asynchronous*,异步IO、阻塞IO、由ThreadPool线程池实现，每个异步IO Channel都属于某个AsynchronousChannelGroup，而每个AsynchronousChannelGroup都与一个ThreadPool相关联。
+
+BIO、NIO、AIO 适用场景分析：
+1) BIO方式适用于连接数目比较小且固定的架构，这种方式对服务器资源要求比较高，并发局限于应用中，JDK1.4 以前的唯一选择，但程序直观简单易理解。
+2) NIO方式适用于连接数目多且连接比较短（轻操作）的架构，比如聊天服务器，并发局限于应用中，编程比较复杂，JDK1.4 开始支持。
+3) AIO方式适用于连接数目多且连接比较长（重操作）的架构，比如相册服务器，充分调用 OS 参与并发操作，编程比较复杂，JDK1.7 开始支持。
+
+linux下提供五种io model（这个主要是针对socket来讲的，本地File读取都是阻塞的，不要想太多）
+1. 同步IO(synchronous IO)
+2. 阻塞IO(bloking IO)
+3. 非阻塞IO(non-blocking IO)
+4. 多路复用IO(multiplexing IO)
+5. 信号驱动式IO(signal-driven IO) 这种用的不多
+异步IO(asynchronous IO)
+具体的介绍看这篇文章:[五种io模式的介绍](http://cmsblogs.com/?p=4812)
+
+这里要声明，io操作可以简单的分为三类：
+1. 内存io，直接对byte[]数组进行操作，效率非常高，也不存在什么阻塞的问题
+2. 文件io，FileInputStream,RamdomAccessFile这些东西，**这个跟上面5种model没有太大关系**，并且只能运行在阻塞模式。java的FileChannel只能是阻塞式的。
+3. socket io ,比如说ServerSocket，DatagramSocket这种，这也是Java NIO 的主要研究对象，有阻塞模式、非阻塞模式，默认为阻塞模式。
+
+对于Socket的读(recv)和写(send)操作来说,主要有两个阶段，以recv()为例：
+(1) 等待数据准备，通常涉及等待网络上的数据分组到达，然后被复制到内核的某个缓冲区(tcp buffer之类的)
+(2) 将数据从内核空间来拷贝到进程空间，将接收到的数据从内核缓冲区复制到应用进程的缓冲区（调用者提供的字节数组）
+分别对上面四种（信号驱动式IO用的不多，不介绍了）
+
+- 对于**同步阻塞IO**来说，这两个阶段都是阻塞的
+- 对于**同步非阻塞IO**来说，当socket接收缓冲区没有数据时，recv会立刻返回一个特定的状态值，表示现在没有数据，待会再来吧。当socket接收缓冲区有数据的时候，recv将数据拷贝到进程空间的这个过程，也是阻塞的。通常采用轮训polling的方式，循环往复的主动询问内核有没有数据可以读取。实际上，这样的轮询其实还不阻塞IO的性能好。只有第一步是非阻塞的，第二步还是阻塞的
+- 对于**多路复用IO**来说，它的优势是可以调用select、poll、epoll这些操作系统级别的系统调用，同时轮训多个socket连接。当调用select、poll、epoll的时候，如果所监控的socket中有部分socket可读，可写或者连接上的时候，就会返回，将其返回给用户进程来处理，这个过程是阻塞的。只不过是因为select、poll、epoll系统调用而阻塞的；
+当系统调用返回后，用户进程再调用recv，将数据从内核拷贝到进程空间中，这个过程也是阻塞的。事实上这个方式比第二种还差些，因为这里包含了两个系统调用(select/poll/epoll、recv)，而第二种只有一个系统调用recv。但是这种方式的优势是可以处理更多的连接。连接数大的时候，缺点就被有点给掩盖了。
+IO多路复用相比多进程/多线程+ 阻塞IO的系统开销小，因为系统不需要创建新的进程或者线程，也不需要维护多个进程，线程的执行。对于多路复用IO来说，第一个阶段是因为select、poll、epoll而阻塞的，第二个阶段(recv)依旧是阻塞的。
+- 对于**异步IO**来说，两个阶段都没有被阻塞，因为只需要发起rec、send请求，系统会帮忙完成数据的copy，完事之后通知用户进程一声。
+
+异步操作(asynchronous IO)的本质
+所有的程序最终都会由计算机硬件来执行，所以为了更好的理解异步操作的本质，我们有必要了解一下它的硬件基础。
+熟悉电脑硬件的朋友肯定对 DMA 这个词不陌生，硬盘、光驱的技术规格中都有明确 DMA 的模式指标，其实网卡、声卡、显卡也是有 DMA 功能的。
+DMA 就是直接内存访问的意思，也就是说，拥有 DMA 功能的硬件在和内存进行数据交换的时候可以不消耗 CPU 资源。只要 CPU 在发起数据传输时发送一个指令，硬件就开始自己和内存交换数据，在传输完成之后硬件会触发一个中断来通知操作完成。
+这些无须消耗 CPU 时间的 I/O 操作正是异步操作的硬件基础。所以即使在 DOS 这样的单进程（而且无线程概念）系统中也同样可以发起异步的 DMA 操作。
+
+线程的本质
+线程不是一个计算机硬件的功能，而是操作系统提供的一种逻辑功能，线程本质上是进程中一段并发运行的代码，所以线程需要操作系统投入 CPU 资源来运行和调度。
+
+nio中的几个主要概念
+**channel** 和jdk1.4之前的bio的"将io抽象为流"的概念是差不多的，只不过流是单向的，channel是双向的
+**Buffer** 就是数组的
+**Selector** 对select、poll、epoll系统调用的包装，用于Socket channel，因为它要求channel必须是非阻塞的
+
+bio是没有缓冲区的（BufferedInputStream,BufferedReader这种除外），包括RandomAccessFile也没有缓冲区
+Nio都是有缓冲区的，必须和Buffer对象一起使用，Buffer对象就是缓冲区。
+
+ByteBuffer是唯一直接与channel交互的缓冲，因为所有的数据都是以二进制形式存在的
+在 BIO 中，与文件 IO 相关联的三个类是：
+1) java.io.FileInputStream，从文件流中读取字节数据，只读；
+2) java.io.FileOutputStream，向文件流中写入字节数据，只写；
+3) java.io.RandomAccessFile，独立的IO流类，支持r只读、rw读写、rws读写 + metadata/data自动同步、rwd读写 + data自动同步四种模式；
+
+为了迎合 NIO，这几个类都进行修改，加入了getChannel()方法，获取对应的FileChannel对象，提供高效率的 I/O 操作；
+但是 NIO 并未给 FileChannel 提供非阻塞支持，FileChannel 只能运行在阻塞模式下，但是效率依旧比 BIO 高，因为有 Buffer 啊；
+
+而java.net包中的三个 Socket 类：
+1) java.net.ServerSocket：TCP Socket，Server端；
+2) java.net.Socket：TCP Socket；
+3) java.net.DatagramSocket：UDP Socket；
+
+这几个类其实也定义了一个getChannel()方法，但是默认只能返回null，需要显式的 open() 对应的 SocketChannel 通道。
+
+
 
 
 netty的作者在演讲中提到java官方的nio并不特别好，所以，生产环境用的都是netty这种。
 
+## 最后
+不要迷信nio：
+1. DirectByteBuffer的本意并不是为了减少内存拷贝(而是为了固定内存地址)，DirectByteBuffer的回收机制比较重要，因为万一发生堆外内存泄露是比较严重的。
+2. 不要动不动就mmap，mmap在读写大文件的时候才体现出明显的优势
+3. 使用transferTo和transferFrom（会按照sendfile,mmap,bio的顺序查看当前系统支持哪个）
+4. nio是直接和byte打交道，java的内码是utf-16BE（为毛c语言只要1个byte，java一个char却要2个byte,因为方便啊，虽然浪费点内存，但是所有的字符，不管是英文，拉丁文，中文，阿拉伯文，2个字节，2^16,unicode也没有这么多吧。相应的,1个字符的c语言的char就不能那么方便的存储中文了。）
+5. java的很多api是直接对c语言的api的包装，java.io.RandomAccessFile，独立的IO流类，支持r只读、rw读写、rws读写 + metadata/data自动同步、rwd读写 + data自动同步四种模式。猜测和fsync和fsyncdata有关。
+6. ByteOrder，字节序。
+
+
 ## 参考
 [美团团队出的关于nio的解说](https://zhuanlan.zhihu.com/p/23488863) 
+[java nio](https://www.zfl9.com/java-nio.html#more) 作者的文章条理很清晰。
 这里面有一句原话摘抄下来：
 > 线程的创建和销毁成本很高，在Linux这样的操作系统中，线程本质上就是一个进程。创建和销毁都是重量级的系统函数。像Java的线程栈，一般至少分配512K～1M的空间，

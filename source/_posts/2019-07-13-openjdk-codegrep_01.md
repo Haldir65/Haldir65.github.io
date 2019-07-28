@@ -20,7 +20,8 @@ FileChannel
 
 1 .读写(创建)文件
 ```c
-FILE *fopen( const char * filename, const char * mode );
+#include <stdio.h> 
+FILE *fopen( const char * filename, const char * mode ); //定义在标准中的，所以是跨平台的
 
 int fclose( FILE *fp ); //关闭文件
 ```
@@ -163,6 +164,12 @@ handleRead(FD fd, void *buf, jint len)
 }
 ```
 
+> c语言的read方法:
+```
+头文件：#include <unistd.h>
+定义函数：ssize_t read(int fd, void * buf, size_t count);
+函数说明：read()会把参数fd 所指的文件传送count 个字节到buf 指针所指的内存中. 若参数count 为0, 则read()不会有作用并返回0. 返回值为实际读取到的字节数, 如果返回0, 表示已到达文件尾或是无可读取的数据,此外文件读写位置会随读取到的字节移动.
+```
 
 
 ## 参考

@@ -386,6 +386,66 @@ awesomeFunction.h
 至于操作系统，先用汇编语言写一个操作系统。Ken Thompson 干过这样的事，他用汇编语言以及他自创的一种解释性语言——B 语言写出来 unix 第一版，是在一台内存只有 8KB 的废弃的计算机上写出来的。然后 Dennis Ritchie 发明了 C 语言，然后 Ken 与 Dennis 又用 C 语言在一台更好的计算机——16 位机器上将 unix 重写了一遍。
 至于 Windows 系统，MS 先是买了 QDOS，然后又在 QDOS 里引入了一些 Unix 的元素，然后比尔·盖茨靠着这个买来的系统赚了一大笔钱，然后就在 DOS 系统上开发了 windows 3.1，windows 95 ……
 
+
+## syscall（系统调用）
+很多高级语言是用c语言写的，那么c语言是用什么写的呢。研究了下历史，
+首先一门高级语言(c语言算是高级语言)一般都会有standard或者specification，比如java 的叫做jsrXXX,python的叫做pepxxx。
+C语言的诞生(1960年)其实早于标准(1989年)，因为一开始没有标准，所以各种各样的library都有，但是并没有像c++的stl那样的官方标准库。
+根据[wiki](https://en.wikipedia.org/wiki/C_standard_library)的介绍，[ANSI C，几乎被所有广泛使用的C语言编译器支持的标准直到1989年才形成](https://en.wikipedia.org/wiki/ANSI_C)（也就是C89），后面又出现了C90,C99等，现行的标准是C11。标准出来了(其实就是stdio.h这种头文件)。
+C语言这边还不太一样，头文件的实现是由编译器提供的，所以stdio.h对应的stdio.c文件其实不好找，就算找到了，各家编译器的实现并不一致（当然非要找的话，去glibc官网下载源码自己看也是有的）
+
+
+支持ANSI C的编译器包括GCC, Xcode, Microsoft visual c++等。
+这里又要扯到glibc和libc的关系，粗略的认为libc是标准，glibc是被最广泛采用的实现（在Linux上就是lib/x86_64-linux-gnu/libc.so.6 这个文件）。除了glibc以外，还有uclibc,dietlibc,BSD libc，apple也有自己的实现
+当然随着标准的进步，头文件的数量也是越来越多，比如一开始的C89只有15个头文件
+```
+<assert.h>  <locale.h>  <stddef.h>  <ctype.h>  <math.h>
+<stdio.h>  <errno.h>  <setjmp.h>  <stdlib.h>  <float.h>
+<signal.h>  <string.h>  <limits.h>  <stdarg.h>  <time.h>    
+```
+
+c99加了几个
+```
+<complex.h>  <inttypes.h>  <stdint.h>  <tgmath.h>
+<fenv.h>     <stdbool.h>
+```
+
+c11又加了几个
+```
+<stdalign.h>  <stdatomic.h>  <stdnoreturn.h>  <threads.h>  <uchar.h>
+```
+注意，Three of the header files (complex.h, stdatomic.h, and threads.h) are conditional features that implementations are not required to support. 所以，比方说多线程这种特性，编译器并没有义务去支持。
+
+
+当然，在linux环境下，还有unistd.h（包含一大堆系统调用的wrapper），signal.h等头文件，这是因为posix也搞了一套[C POSIX library](https://en.wikipedia.org/wiki/C_POSIX_library),这些是posix标准添加的头文件，当然也只在unix平台上存在，这些不是标准，但是会用到。所以在unix上写程序，除了可以使用标准库的头文件，还要使用posix标准的头文件。在linux上，这些文件一般在/usr/include文件夹里。
+
+C语言是系统调用的一层wrapper,而系统调用完全是platform dependent的。
+从[syccall以及glibc的系统调用原理](https://jameshfisher.com/2018/02/19/how-to-syscall-in-c/)可以看出，一句简单的printf的实现是assembly code。[glibc源码分析](https://zhuanlan.zhihu.com/p/28984642)中介绍到，
+> glibc实现了许多系统调用的封装。它们的封装方式大致可以分为两种：一 脚本生成汇编文件，汇编文件中汇编代码封装了系统调用。这种方式，简称脚本封装。二 .c文件中调用嵌入式汇编代码封装系统调用。一般使用.c文件封装系统调用，代码中除了嵌入式汇编封装代码外，还有一些C代码做其他处理。这种方式，简称.c封装。
+
+举个例子，[从open与fopen的区别来看](https://stackoverflow.com/questions/1658476/c-fopen-vs-open)，c语言标准实现了在不同平台上提供统一的fopen接口，而open是UNIX系统调用函数（包括LINUX等），返回的是文件描述符（File Descriptor），它是文件在文件描述符表里的索引。fopen是ANSI C标准中的C语言库函数，在不同的系统中应该调用不同的内核api。返回的是一个指向文件结构的指针。在unix平台上，fopen的内部实现调用了open。要是在windows上，使用的是CreateFile的系统api。
+
+[glibc](https://github.com/bminor/glibc)的源码在这里
+
+
+
+### 最后
+C语言就是这样，好多功能都得自己实现。一些高级语言都有自己的简单高性能的标准库，比如集合,多线程等等。C语言就没有，用C语言写的项目，需要用到任何类的功能的时候，出于性能的考虑，直接当场造轮子。
+
+>c 语言有它的设计哲学，就是那著名的“Keep It Simple, Stupid”，语言本身仅仅实现最为基本的功能，然后标准库也仅仅带有最为基本的内存管理（更高效一点的内存池都必须要自己实现）、IO、断言等基本功能。 
+
+社区提供了一些比较优秀的通用功能库
+[1] http://developer.gnome.org/glib/stable/ 
+[2] http://www.gnu.org/software/gnulib/ 
+[3] http://apr.apache.org/
+- [common opensource c libraries](https://en.cppreference.com/w/c/links/libs)
+
+[gets在c11中被gets_s替代](https://zh.cppreference.com/w/c/io/gets)
+
+## 参考
+[automatic directory creation in make](http://ismail.badawi.io/blog/2017/03/28/automatic-directory-creation-in-make/)
+[本文的参考](https://www.zfl9.com/)
+
 ==========================================
 tbd 
 ## 3. gcc ,clang,llvm的历史
@@ -393,20 +453,5 @@ tbd
 ### c语言中的未定义行为(比如说数组越界)
 
 c语言的goto fail
-
-
-### 最后
-c语言就是这样，好多功能都得自己实现
->c 语言有它的设计哲学，就是那著名的“Keep It Simple, Stupid”，语言本身仅仅实现最为基本的功能，然后标准库也仅仅带有最为基本的内存管理（更高效一点的内存池都必须要自己实现）、IO、断言等基本功能。 
-
-社区提供了一些比较优秀的通用功能库
-[1] http://developer.gnome.org/glib/stable/ 
-[2] http://www.gnu.org/software/gnulib/ 
-[3] http://apr.apache.org/
-
-[gets在c11中被gets_s替代](https://zh.cppreference.com/w/c/io/gets)
-
-## 参考
-[automatic directory creation in make](http://ismail.badawi.io/blog/2017/03/28/automatic-directory-creation-in-make/)
-[本文的参考](https://www.zfl9.com/)
+- [深入select多路复用内核源码加驱动实现](https://my.oschina.net/fileoptions/blog/911091)
 

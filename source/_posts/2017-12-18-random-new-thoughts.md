@@ -58,11 +58,6 @@ top : 1
 - jdk8 standard Library implementation detail(java代码的实现 --> hotspot代码的c语言实现)
 - [] 安装并使用MAT 分析java应用内存。
 
-- [syccall以及glibc的系统调用原理](https://jameshfisher.com/2018/02/19/how-to-syscall-in-c/)
-- [glibc源码分析](https://zhuanlan.zhihu.com/p/28984642) [glibc](https://github.com/bminor/glibc)
-- [深入select多路复用内核源码加驱动实现](https://my.oschina.net/fileoptions/blog/911091)
-- [common opensource c libraries](https://en.cppreference.com/w/c/links/libs)
-Where-is-the-source-code-for-the-C-and-C++-standard-libraries
 
 ### 已完成
 * 用 express 转接一个知乎 Api，添加 Access-control-allow-origin,或许还可以用 redis 缓存数据结果（一个就好）由此想到一篇文章"How to use Python to build a restful Web Service".只不过用的是 Tornado

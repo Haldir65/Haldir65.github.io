@@ -219,6 +219,8 @@ awk '$1 !~ /J/' inventory-shipped  ##排除所有包含J的内容
 
 [阮一峰的awk教程](http://www.ruanyifeng.com/blog/2018/11/awk.html)
 
+[coolshell的教程](https://coolshell.cn/articles/9070.html)
+
 
 ### 7.tar命令
 主要是跟压缩和解压文件有关的,[参考](http://man.linuxde.net/tar)
