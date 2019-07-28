@@ -569,7 +569,7 @@ linux下提供五种io model（这个主要是针对socket来讲的，本地File
 - 对于**同步阻塞IO**来说，这两个阶段都是阻塞的
 - 对于**同步非阻塞IO**来说，当socket接收缓冲区没有数据时，recv会立刻返回一个特定的状态值，表示现在没有数据，待会再来吧。当socket接收缓冲区有数据的时候，recv将数据拷贝到进程空间的这个过程，也是阻塞的。通常采用轮训polling的方式，循环往复的主动询问内核有没有数据可以读取。实际上，这样的轮询其实还不阻塞IO的性能好。只有第一步是非阻塞的，第二步还是阻塞的
 - 对于**多路复用IO**来说，它的优势是可以调用select、poll、epoll这些操作系统级别的系统调用，同时轮训多个socket连接。当调用select、poll、epoll的时候，如果所监控的socket中有部分socket可读，可写或者连接上的时候，就会返回，将其返回给用户进程来处理，这个过程是阻塞的。只不过是因为select、poll、epoll系统调用而阻塞的；
-当系统调用返回后，用户进程再调用recv，将数据从内核拷贝到进程空间中，这个过程也是阻塞的。事实上这个方式比第二种还差些，因为这里包含了两个系统调用(select/poll/epoll、recv)，而第二种只有一个系统调用recv。但是这种方式的优势是可以处理更多的连接。连接数大的时候，缺点就被有点给掩盖了。
+当系统调用返回后，用户进程再调用recv，将数据从内核拷贝到进程空间中，这个过程也是阻塞的。事实上这个方式比第二种还差些，因为这里包含了两个系统调用(select/poll/epoll、recv)，而第二种只有一个系统调用recv。但是这种方式的优势是可以处理更多的连接。连接数大的时候，缺点就被优点给掩盖了。
 IO多路复用相比多进程/多线程+ 阻塞IO的系统开销小，因为系统不需要创建新的进程或者线程，也不需要维护多个进程，线程的执行。对于多路复用IO来说，第一个阶段是因为select、poll、epoll而阻塞的，第二个阶段(recv)依旧是阻塞的。
 - 对于**异步IO**来说，两个阶段都没有被阻塞，因为只需要发起rec、send请求，系统会帮忙完成数据的copy，完事之后通知用户进程一声。
 
@@ -584,7 +584,7 @@ DMA 就是直接内存访问的意思，也就是说，拥有 DMA 功能的硬�
 
 nio中的几个主要概念
 **channel** 和jdk1.4之前的bio的"将io抽象为流"的概念是差不多的，只不过流是单向的，channel是双向的
-**Buffer** 就是数组的
+**Buffer** 就是对数组的封装
 **Selector** 对select、poll、epoll系统调用的包装，用于Socket channel，因为它要求channel必须是非阻塞的
 
 bio是没有缓冲区的（BufferedInputStream,BufferedReader这种除外），包括RandomAccessFile也没有缓冲区
@@ -606,10 +606,204 @@ ByteBuffer是唯一直接与channel交互的缓冲，因为所有的数据都是
 
 这几个类其实也定义了一个getChannel()方法，但是默认只能返回null，需要显式的 open() 对应的 SocketChannel 通道。
 
+Channel通道,java.nio.channels包，主要有：FileChannel、ServerSocketChannel、SocketChannel、DatagramChannel
+
+### FileChannel
+```java
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.RandomAccessFile;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+
+public class FileChannelDemo {
+    public static void main(String[] args) throws IOException {
+        FileChannel fc = null;
+
+        fc = new FileOutputStream("data.txt").getChannel();
+        fc.write(ByteBuffer.wrap("www.baidu.com\n".getBytes()));
+        fc.close();
+
+        fc = new RandomAccessFile("data.txt", "rw").getChannel();
+        fc.position(fc.size());
+        fc.write(ByteBuffer.wrap("www.google.com\n".getBytes()));
+        fc.close();
+
+        fc = new FileInputStream("data.txt").getChannel();
+        ByteBuffer buf = ByteBuffer.allocate(1024 * 4);
+        fc.read(buf);
+        buf.flip();
+        while (buf.hasRemaining()) {
+            System.out.print((char)buf.get());
+        }
+        // or
+        System.out.println();
+        buf.rewind();
+        System.out.print(new String(buf.array(), 0, buf.remaining()));
+        fc.close();
+    }
+}
+```
+或者
+```java
+import java.nio.channels.FileChannel;
+import java.nio.ByteBuffer;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.io.IOException;
+
+public class FileChannelOpen {
+    private static Path path = Paths.get("test.txt");
+    private static final int BUF_SIZE = 1024 * 4;
+
+    public static void main(String[] args)
+        throws IOException
+    {
+        FileChannel fc = FileChannel.open(path, // 文件路径
+                                          StandardOpenOption.READ, // r
+                                          StandardOpenOption.WRITE, // w
+                                          StandardOpenOption.CREATE, // 不存在时新建
+                                          StandardOpenOption.TRUNCATE_EXISTING); // 清空原有内容
+        ByteBuffer buf = ByteBuffer.allocate(BUF_SIZE);
+        buf.put(args.length == 0 ?
+                "default-file-content\n".getBytes() :
+                args[0].getBytes());
+
+        fc.write((ByteBuffer)buf.flip());
+        fc.position(0).read((ByteBuffer)buf.clear());
+        System.out.print(new String(buf.array(), 0, buf.flip().remaining()));
+
+        fc.close();
+    }
+}
+```
+
+transferTo，最快速的文件复制的方法
+```
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
+
+public class FileCopy2 {
+    public static void main(String[] args) throws IOException {
+        if (args.length < 2) {
+            System.err.println("Usage: FileCopy2 <src_file> <dst_file>");
+            System.exit(1);
+        }
+
+        FileChannel
+            in = new FileInputStream(args[0]).getChannel(),
+            out = new FileOutputStream(args[1]).getChannel();
+
+        in.transferTo(0, in.size(), out);
+        // or:
+        // out.transferFrom(in, 0, in.size());
+
+        in.close();
+        out.close();
+    }
+}
+```
+
+接下来介绍，SelectableChannel，主要包括ServerSocketChannel，SocketChannel以及DatagramChannel
+ 
+### SocketChannel和 ServerSocketChannel 
+```java
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
+import java.net.StandardSocketOptions;
+import java.net.InetSocketAddress;
+import java.io.IOException;
+
+public class Server {
+    private static ServerSocketChannel servChannel;
+
+    private static final InetSocketAddress BIND_ADDR = new InetSocketAddress("0.0.0.0", 8080);
+    private static final int BACKLOG = 128;
+    private static final int BUF_SIZE = 1024;
+
+    public static void main(String[] args) throws IOException {
+        // 注册 shutdown hook 钩子, 关闭 servChannel
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    servChannel.close();
+                } catch (IOException e) {}
+            }
+        }));
+
+        servChannel = ServerSocketChannel.open();
+        servChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
+        servChannel.bind(BIND_ADDR, BACKLOG);
+
+        System.out.printf("----- listen: %s:%d -----\n",
+                          BIND_ADDR.getAddress().getHostAddress(),
+                          BIND_ADDR.getPort());
+
+        SocketChannel connChannel = null;
+        while (true) {
+            connChannel = servChannel.accept();
+            service(connChannel);
+        }
+    }
+
+    private static void service(SocketChannel connChannel) throws IOException {
+        InetSocketAddress remoteAddr = (InetSocketAddress) connChannel.getRemoteAddress();
+        System.out.printf("new Connect: %s:%d\n",
+                          remoteAddr.getAddress().getHostAddress(),
+                          remoteAddr.getPort());
+
+        ByteBuffer buf = ByteBuffer.allocate(BUF_SIZE);
+        while (connChannel.read((ByteBuffer)buf.clear()) != -1) {
+            System.out.printf("msg: %s\n", Charset.forName("UTF-8").decode((ByteBuffer)buf.flip()));
+            connChannel.write((ByteBuffer)buf.rewind());
+        }
+        System.out.printf("close Connect: %s:%d\n",
+                          remoteAddr.getAddress().getHostAddress(),
+                          remoteAddr.getPort());
+        connChannel.close();
+    }
+}
 
 
 
-netty的作者在演讲中提到java官方的nio并不特别好，所以，生产环境用的都是netty这种。
+public class Client2 {
+    private static final InetSocketAddress SERV_ADDR = new InetSocketAddress("127.0.0.1", 8081);
+    private static final int BUF_SIZE = 1024;
+
+    public static void main(String[] args) throws IOException {
+        SocketChannel sockChannel = SocketChannel.open();
+        sockChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
+        sockChannel.connect(SERV_ADDR);
+
+        ByteBuffer buf = ByteBuffer.allocate(BUF_SIZE);
+        if (args.length == 0) {
+            buf.put("default-message".getBytes("UTF-8"));
+            sockChannel.write((ByteBuffer)buf.flip());
+            sockChannel.read((ByteBuffer)buf.clear());
+            System.out.printf("msg: %s\n", Charset.forName("UTF-8").decode((ByteBuffer)buf.flip()));
+        }
+        for (String s : args) {
+            ((ByteBuffer)buf.clear()).put(s.getBytes("UTF-8"));
+            sockChannel.write((ByteBuffer)buf.flip());
+            sockChannel.read((ByteBuffer)buf.clear());
+            System.out.printf("msg: %s\n", Charset.forName("UTF-8").decode((ByteBuffer)buf.flip()));
+        }
+        sockChannel.close();
+    }
+}
+```
+
+
+### DatagramChannel
+这个主要是udp了
+
 
 ## 最后
 不要迷信nio：

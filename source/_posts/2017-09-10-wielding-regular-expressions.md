@@ -115,8 +115,7 @@ e的意思是extended regular expressions（Extended regular expressions include
 ![](https://www.haldir66.ga/static/imgs/HuaynaPicchu_EN-AU9938663347_1920x1080.jpg)
 ![](https://www.haldir66.ga/static/imgs/HubbleSaturn_EN-AU12572317531_1920x1080.jpg)
 ![](https://www.haldir66.ga/static/imgs/JeanLafitte_EN-AU11428973003_1920x1080.jpg)
-![](https://www.haldir66.ga/static/imgs/JovianCloudscape_EN-AU11726040455_1920x1080.jpg)
-![](https://www.haldir66.ga/static/imgs/LetchworthSP_EN-AU14482052774_1920x1080.jpg)
+
 
 
 ![](https://www.haldir66.ga/static/imgs/OtterChillin_EN-AU10154811440_1920x1080.jpg)
@@ -157,10 +156,39 @@ e的意思是extended regular expressions（Extended regular expressions include
 ![](https://www.haldir66.ga/static/imgs/OsoyoosExpressway_EN-AU12955968650_1920x1080.jpg)
 
 
+![](https://www.haldir66.ga/static/imgs/BailysBeads_ZH-CN5728297739_1920x1080.jpg)
+![](https://www.haldir66.ga/static/imgs/ElkFallsBridge_ZH-CN3921681387_1920x1080.jpg)
+![](https://www.haldir66.ga/static/imgs/HawksbillCrag_ZH-CN4429681235_1920x1080.jpg)
+![](https://www.haldir66.ga/static/imgs/HKreuni_ZH-CN5683726370_1920x1080.jpg)
+![](https://www.haldir66.ga/static/imgs/ManausBasin_ZH-CN4303809335_1920x1080.jpg)
+![](https://www.haldir66.ga/static/imgs/RootBridge_ZH-CN5173953292_1920x1080.jpg)
+![](https://www.haldir66.ga/static/imgs/SalcombeDevon_ZH-CN5806331292_1920x1080.jpg)
+![](https://www.haldir66.ga/static/imgs/SutherlandFalls_ZH-CN4602884079_1920x1080.jpg)
+
+
+
+![](https://www.haldir66.ga/static/imgs/RainierMilkyWay_ZH-CN9404321904_1920x1080.jpg)
+![](https://www.haldir66.ga/static/imgs/RioGrande_ZH-CN8091224199_1920x1080.jpg)
+![](https://www.haldir66.ga/static/imgs/PeruvianRainforest_ZH-CN4066508593_1920x1080.jpg)
+![](https://www.haldir66.ga/static/imgs/Ghyakar_ZH-CN4631836915_1920x1080.jpg)
+![](https://www.haldir66.ga/static/imgs/LuciolaCruciata_ZH-CN9063767400_1920x1080.jpg)
+![](https://www.haldir66.ga/static/imgs/HallstattAustria_PT-BR9407016733_1920x1080.jpg)
+![](https://www.haldir66.ga/static/imgs/SainteVictoireCezanneBirthday_ZH-CN8216109812_1920x1080.jpg)
+![](https://www.haldir66.ga/static/imgs/PingganVillage_ZH-CN10035092925_1920x1080.jpg)
+![](https://www.haldir66.ga/static/imgs/RainforestMoss_ZH-CN2878951870_1920x1080.jpg)
+![](https://www.haldir66.ga/static/imgs/BlumenwieseNRW_ZH-CN4774429225_1920x1080.jpg)
+![](https://www.haldir66.ga/static/imgs/HopeValley_ZH-CN2208363231_1920x1080.jpg)
+![](https://www.haldir66.ga/static/imgs/may1_ZH-CN8582006115_1920x1080.jpg)
+![](https://www.haldir66.ga/static/imgs/NFLDfog_ZH-CN4846953507_1920x1080.jpg)
+![](https://www.haldir66.ga/static/imgs/dragonboat_ZH-CN0697680986_1920x1080.jpg)
+![](https://www.haldir66.ga/static/imgs/Manhattanhenge_ZH-CN4659585143_1920x1080.jpg)
+![](https://www.haldir66.ga/static/imgs/QingMingHuangShan_ZH-CN12993895964_1920x1080.jpg)
+![](https://www.haldir66.ga/static/imgs/SeaCliffBridge_ZH-CN5362667487_1920x1080.jpg)
+![](https://www.haldir66.ga/static/imgs/FreshSalt_ZH-CN12818759319_1920x1080.jpg)
 
 
 ![](https://haldir66.ga/static/imgs/starry-night-van-gogh.jpg)
 ### 参考
 - [DFA和NFA](http://www.importnew.com/26560.html)
 - [Learn regex the easy way](https://github.com/ziishaned/learn-regex)
-- [必应壁纸](https://bing.ioliu.cn/)
+- [大部分图片来自必应壁纸](https://bing.ioliu.cn/)

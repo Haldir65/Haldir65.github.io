@@ -1,7 +1,7 @@
 ---
 title: Python中的集合类
 date: 2019-07-26 22:21:38
-tags:
+tags: [python]
 ---
 
 

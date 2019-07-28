@@ -1,7 +1,7 @@
 ---
 title: 从setContentView开始谈的渲染流程
 date: 2019-03-29 09:25:01
-tags:
+tags: [android]
 ---
 
 谈一谈View的渲染流程吧

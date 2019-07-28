@@ -1,7 +1,7 @@
 ---
 title: docker学习笔记
 date: 2019-07-21 20:18:17
-tags:
+tags: [tools]
 ---
 
 docker相关的知识点
