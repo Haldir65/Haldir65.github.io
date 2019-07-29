@@ -14,6 +14,9 @@ tags: [tbd]
 
 ## 内存中段和分页的语义是什么
 
+[为什么用户态和内核态的切换耗费时间](https://www.cnblogs.com/gtarcoder/articles/5278074.html)
+[用户态与内核态](https://www.cnblogs.com/bakari/p/5520860.html)
+
 
 ## 参考
 [从内核文件系统看文件读写过程](http://www.cnblogs.com/huxiao-tee/p/4657851.html)

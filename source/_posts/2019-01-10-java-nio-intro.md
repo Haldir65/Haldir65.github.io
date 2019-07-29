@@ -535,6 +535,28 @@ FileChannel.transferTo方法会根据host machine的操作系统选择文件操�
 2. mmap
 3. read(最慢)
 
+[上面这段话的代码实例在FileChannelImpl.java这个文件中](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/sun/nio/ch/FileChannelImpl.java)
+```java
+public long transferTo(long position, long count,
+                           WritableByteChannel target)
+        throws IOException
+{
+            // Attempt a direct transfer, if the kernel supports it
+    if ((n = transferToDirectly(position, icount, target)) >= 0)
+        return n;
+
+    // Attempt a mapped transfer, but only to trusted channel types
+    if ((n = transferToTrustedChannel(position, icount, target)) >= 0)
+        return n;
+
+    // Slow path for untrusted targets
+    return transferToArbitraryChannel(position, icount, target);
+}
+```
+
+
+[zero copy技术](https://xunnanxu.github.io/2016/09/10/It-s-all-about-buffers-zero-copy-mmap-and-Java-NIO/)
+
 ## 4. java nio介绍
 [java nio介绍](https://www.zfl9.com/java-nio.html#more) 文章写的非常好
 java io的发展经历了三个阶段
