@@ -17,7 +17,7 @@
 <meta property="og:description" content="DiectByteBuffer（堆外内存）是分配在jvm以外的内存，这个java对象本身是受jvm gc控制的，但是其指向的堆外内存是如何回收的">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/JovianCloudscape_EN-AU11726040455_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-07-28T15:21:20.970Z">
+<meta property="og:updated_time" content="2019-07-29T11:26:31.498Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="堆外内存，weakHashMap以及四种引用类型的研究">
 <meta name="twitter:description" content="DiectByteBuffer（堆外内存）是分配在jvm以外的内存，这个java对象本身是受jvm gc控制的，但是其指向的堆外内存是如何回收的">
@@ -201,7 +201,52 @@ ga('send', 'pageview');
     <div class="article-entry" itemprop="articleBody">
       
         <p>DiectByteBuffer（堆外内存）是分配在jvm以外的内存，这个java对象本身是受jvm gc控制的，但是其指向的堆外内存是如何回收的<br><img src="https://www.haldir66.ga/static/imgs/JovianCloudscape_EN-AU11726040455_1920x1080.jpg" alt=""><br><a id="more"></a></p>
-<h2 id="weapHashMap-有一个ReferenceQueue的使用"><a href="#weapHashMap-有一个ReferenceQueue的使用" class="headerlink" title="weapHashMap 有一个ReferenceQueue的使用"></a>weapHashMap 有一个ReferenceQueue的使用</h2>
+<h2 id="weakHashMap-有一个ReferenceQueue的使用"><a href="#weakHashMap-有一个ReferenceQueue的使用" class="headerlink" title="weakHashMap 有一个ReferenceQueue的使用"></a>weakHashMap 有一个ReferenceQueue的使用</h2><p>WeakHashMap的核心定义是： 一旦key不再被外部持有，这个Entry将在未来的某一时刻被干掉<br><a href="https://docs.oracle.com/javase/8/docs/api/java/util/WeakHashMap.html">oracle java doc for weakHashMap</a>中提到，WeakHashMap的key最好是那种equals是直接使用==的，当然使用String这种比较实质内容的也可以。但会带来一些confusing的现象。<br>&gt;<br>This class is intended primarily for use with key objects whose equals methods test for object identity using the == operator. Once such a key is discarded it can never be recreated, so it is impossible to do a lookup of that key in a WeakHashMap at some later time and be surprised that its entry has been removed. This class will work perfectly well with key objects whose equals methods are not based upon object identity, such as String instances. With such recreatable key objects, however, the automatic removal of WeakHashMap entries whose keys have been discarded may prove to be confusing.</p>
+<pre><code class="java">public class TestWeakHashMap
+{
+    private String str1 = new String(&quot;newString1&quot;); //this entry will be removed soon
+    private String str2 = &quot;literalString2&quot;;
+    private String str3 = &quot;literalString3&quot;;
+    private String str4 = new String(&quot;newString4&quot;); //this entry will be removed soon
+    private Map map = new WeakHashMap();
+
+     void testGC() throws IOException
+    {
+        map.put(str1, new Object());
+        map.put(str2, new Object());
+        map.put(str3, new Object());
+        map.put(str4, new Object());
+
+        /**
+         * Discard the strong reference to all the keys
+         */
+        str1 = null;
+        str2 = null;
+        str3 = null;
+        str4 = null;
+
+        while (true) {
+            System.gc();
+            /**
+             * Verify Full GC with the -verbose:gc option
+             * We expect the map to be emptied as the strong references to
+             * all the keys are discarded.
+             */
+            System.out.println(&quot;map.size(); = &quot; + map.size() + &quot;  &quot; + map);
+            // map.size(); = 2  {literalString3=java.lang.Object@266474c2, literalString2=java.lang.Object@6f94fa3e}
+        }
+    }
+
+    public static void main(String[] args) {
+        try {
+            new TestWeakHashMap().testGC();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+
       
 
       

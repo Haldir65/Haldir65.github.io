@@ -17,7 +17,7 @@
 <meta property="og:description" content="关于java nio的一些点">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/UmbriaCastelluccio_EN-AU8834990889_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-07-28T15:21:20.970Z">
+<meta property="og:updated_time" content="2019-07-29T11:26:31.494Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java nio使用指南">
 <meta name="twitter:description" content="关于java nio的一些点">
@@ -651,6 +651,24 @@ aFile.close();
 <li>mmap</li>
 <li>read(最慢)</li>
 </ol>
+<p><a href="https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/sun/nio/ch/FileChannelImpl.java">上面这段话的代码实例在FileChannelImpl.java这个文件中</a></p>
+<pre><code class="java">public long transferTo(long position, long count,
+                           WritableByteChannel target)
+        throws IOException
+{
+            // Attempt a direct transfer, if the kernel supports it
+    if ((n = transferToDirectly(position, icount, target)) &gt;= 0)
+        return n;
+
+    // Attempt a mapped transfer, but only to trusted channel types
+    if ((n = transferToTrustedChannel(position, icount, target)) &gt;= 0)
+        return n;
+
+    // Slow path for untrusted targets
+    return transferToArbitraryChannel(position, icount, target);
+}
+</code></pre>
+<p><a href="https://xunnanxu.github.io/2016/09/10/It-s-all-about-buffers-zero-copy-mmap-and-Java-NIO/">zero copy技术</a></p>
 <h2 id="4-java-nio介绍"><a href="#4-java-nio介绍" class="headerlink" title="4. java nio介绍"></a>4. java nio介绍</h2><p><a href="https://www.zfl9.com/java-nio.html#more">java nio介绍</a> 文章写的非常好<br>java io的发展经历了三个阶段</p>
 <ol>
 <li>io/bio 即java.io.*，面向流，阻塞io，逐个字节的读写，没有相应的缓冲（除了bufferd），效率较低</li>
