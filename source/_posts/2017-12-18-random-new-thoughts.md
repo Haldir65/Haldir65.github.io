@@ -58,7 +58,9 @@ top : 1
 - jdk8 standard Library implementation detail(java代码的实现 --> hotspot代码的c语言实现)
 - [] 安装并使用MAT 分析java应用内存。
 - [后端面试题](https://segmentfault.com/a/1190000017864721)
-
+- thrift 源码解析，rpc框架（比方说人脸识别应用就可以用java调用python服务）这种rpc过程肯定要考虑字节序的问题。
+- Perl被称为脚本语言中的瑞士军刀，正则多一点
+- seamphore 这个java class以及phaser
 
 ### 已完成
 * 用 express 转接一个知乎 Api，添加 Access-control-allow-origin,或许还可以用 redis 缓存数据结果（一个就好）由此想到一篇文章"How to use Python to build a restful Web Service".只不过用的是 Tornado
