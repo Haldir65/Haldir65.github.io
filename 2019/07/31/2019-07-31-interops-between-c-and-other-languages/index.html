@@ -6,20 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://haldir65.github.io">
-  <title>activity transition pre and post lollipop | Haldir的博客</title>
+  <title>各种编程语言与c、c++的交互 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="Lollipop开始引入了新的Activity Transition动画效果，比起常用的overridePendingTransaction() 效果要强大许多 测试环境supportLibVersion = “24.2.1”gradle plugin version : “classpath ‘com.android.tools.build:gradle:2.2.0’”gradle versio">
-<meta name="keywords" content="android,transition">
-<meta property="og:type" content="article">
-<meta property="og:title" content="activity transition pre and post lollipop">
-<meta property="og:url" content="https://haldir65.github.io/2016/09/27/activity-transition-pre-and-post-lollipop/index.html">
+  <meta property="og:type" content="article">
+<meta property="og:title" content="各种编程语言与c、c++的交互">
+<meta property="og:url" content="https://haldir65.github.io/2019/07/31/2019-07-31-interops-between-c-and-other-languages/index.html">
 <meta property="og:site_name" content="Haldir的博客">
-<meta property="og:description" content="Lollipop开始引入了新的Activity Transition动画效果，比起常用的overridePendingTransaction() 效果要强大许多 测试环境supportLibVersion = “24.2.1”gradle plugin version : “classpath ‘com.android.tools.build:gradle:2.2.0’”gradle versio">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://www.haldir66.ga/static/imgs/SutherlandFalls_ZH-CN4602884079_1920x1080.jpg">
 <meta property="og:updated_time" content="2019-08-02T14:23:09.313Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="activity transition pre and post lollipop">
-<meta name="twitter:description" content="Lollipop开始引入了新的Activity Transition动画效果，比起常用的overridePendingTransaction() 效果要强大许多 测试环境supportLibVersion = “24.2.1”gradle plugin version : “classpath ‘com.android.tools.build:gradle:2.2.0’”gradle versio">
+<meta name="twitter:title" content="各种编程语言与c、c++的交互">
+<meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/SutherlandFalls_ZH-CN4602884079_1920x1080.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -178,72 +176,30 @@ ga('send', 'pageview');
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-activity-transition-pre-and-post-lollipop" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-2019-07-31-interops-between-c-and-other-languages" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      activity transition pre and post lollipop
+      各种编程语言与c、c++的交互
     </h1>
   
 
         
-        <a href="/2016/09/27/activity-transition-pre-and-post-lollipop/" class="archive-article-date">
-  	<time datetime="2016-09-27T14:53:25.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-09-27</time>
+        <a href="/2019/07/31/2019-07-31-interops-between-c-and-other-languages/" class="archive-article-date">
+  	<time datetime="2019-07-31T22:11:55.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-31</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>Lollipop开始引入了新的Activity Transition动画效果，比起常用的overridePendingTransaction() 效果要强大许多</p>
-<p>测试环境<br>supportLibVersion = “24.2.1”<br>gradle plugin version : “classpath ‘com.android.tools.build:gradle:2.2.0’”<br>gradle version : 3.1<br>compileSdkVersion 24<br>buildToolsVersion “24.0.2”</p>
-<a id="more"></a>
-<ul>
-<li>常规用法:</li>
-</ul>
-<p>A activity &gt;&gt;&gt;&gt; B activity</p>
-<p>A activity中:</p>
-<pre><code class="java"> intent = new Intent(getActivity(), PictureDetailSubActivity2.class);
-                intent.putExtra(EXTRA_IMAGE_URL, R.drawable.b2);
-                intent.putExtra(EXTRA_IMAGE_TITLE, &quot;使用ActivityCompat动画&quot;);
-                ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.
-                        makeSceneTransitionAnimation(getActivity(), view, TRANSIT_PIC);
-                try {
-                    ActivityCompat.startActivity(getActivity(), intent, optionsCompat.toBundle()); //据说部分三星手机上会失效
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    ToastUtils.showTextShort(getActivity(), &quot;ActivityCompat出错！！&quot;);
-                    startActivity(intent);
-                }
-</code></pre>
-<p>Pair这个class是v4包里的一个Util类，用来装载一组(pair)对象，支持泛型，很好用。由于都是v4包里的方法，省去了做API版本判断，在API 16以下，就只会调用普通的startActivity方法。上面加了try catch是避免部分手机上出现问题</p>
-<p>B activity中onCreate调用</p>
-<pre><code class="java"> ViewCompat.setTransitionName(binding.imageDetail, TRANSIT_PIC);
-</code></pre>
-<p>就可实现普通的转场动画。</p>
-<ul>
-<li><p>兼容方式(将连续的Transition带到API16以下)</p>
-<p>主要的原理: 在A activity中记录要带到B activity中的View的当前位置，在B activity中添加onPredrawListener(measure完毕，layout完毕，即将开始Draw的时候)，此时开始进行动画，将SharedView从原位置animate到B Activty中的位置</p>
-<p>原理及详细代码在这里:</p>
-<p> <a href="https://www.youtube.com/watch?v=CPxkoe2MraA">Dev Bytes Activity Animations Youtube</a> 我照着写了一些关于Activity Transition的模板，<a href="https://github.com/Haldir65/CustomActivityTransition">gitHub</a> 基本能实现兼容到API 16以下的效果</p>
-</li>
-<li><p>最后是这几天遇到的天坑</p>
-</li>
-</ul>
-<pre><code class="java">@Override
-public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
-    super.onCreate(savedInstanceState, persistentState);
-}
-</code></pre>
-<p>这样的Activity绝对会出ClassNotFoundException , 而且并不会主动出现在logcat中</p>
-<ul>
-<li>overridePendingTransaction要在startActivity以及finish之后才能调用</li>
-</ul>
-<p>gitHub上有一个比较好的<a href="https://github.com/takahirom/PreLollipopTransition">兼容库</a>，大致原理也是使用onPreDrawListener</p>
-
+        <p><img src="https://www.haldir66.ga/static/imgs/SutherlandFalls_ZH-CN4602884079_1920x1080.jpg" alt=""><br><a id="more"></a></p>
+<h2 id="1-cpython"><a href="#1-cpython" class="headerlink" title="1. cpython"></a>1. cpython</h2><h3 id="1-1-pythont调用C、C-代码"><a href="#1-1-pythont调用C、C-代码" class="headerlink" title="1.1 pythont调用C、C++代码"></a>1.1 pythont调用C、C++代码</h3><p>c python extension</p>
+<h3 id="1-2-C、C-调用python代码"><a href="#1-2-C、C-调用python代码" class="headerlink" title="1.2 C、C++调用python代码"></a>1.2 C、C++调用python代码</h3><h3 id="1-3-python调用系统方法"><a href="#1-3-python调用系统方法" class="headerlink" title="1.3 python调用系统方法"></a>1.3 python调用系统方法</h3><p>好像是process module</p>
+<h2 id="2-javascript"><a href="#2-javascript" class="headerlink" title="2. javascript"></a>2. javascript</h2><h3 id="2-1-javascript调用C、C-代码"><a href="#2-1-javascript调用C、C-代码" class="headerlink" title="2.1 javascript调用C、C++代码"></a>2.1 javascript调用C、C++代码</h3><h3 id="2-2-C、C-调用javascript代码"><a href="#2-2-C、C-调用javascript代码" class="headerlink" title="2.2 C、C++调用javascript代码"></a>2.2 C、C++调用javascript代码</h3><h3 id="2-3-javascript调用系统方法"><a href="#2-3-javascript调用系统方法" class="headerlink" title="2.3 javascript调用系统方法"></a>2.3 javascript调用系统方法</h3><h2 id="3-java"><a href="#3-java" class="headerlink" title="3. java"></a>3. java</h2><h3 id="3-1-java调用C、C-代码"><a href="#3-1-java调用C、C-代码" class="headerlink" title="3.1 java调用C、C++代码"></a>3.1 java调用C、C++代码</h3><h3 id="3-2-C、C-调用java代码"><a href="#3-2-C、C-调用java代码" class="headerlink" title="3.2 C、C++调用java代码"></a>3.2 C、C++调用java代码</h3><h3 id="3-3-java调用系统方法"><a href="#3-3-java调用系统方法" class="headerlink" title="3.3 java调用系统方法"></a>3.3 java调用系统方法</h3>
       
 
       
@@ -272,33 +228,7 @@ public void onCreate(Bundle savedInstanceState, PersistableBundle persistentStat
     <div class="article-info article-info-index">
       
       
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">android</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">transition</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
       
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/blog//" class="article-tag-list-link color5">blog</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
 
       
 
@@ -348,7 +278,7 @@ public void onCreate(Bundle savedInstanceState, PersistableBundle persistentStat
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=https://haldir65.github.io/2016/09/27/activity-transition-pre-and-post-lollipop/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=https://haldir65.github.io/2019/07/31/2019-07-31-interops-between-c-and-other-languages/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -362,18 +292,18 @@ public void onCreate(Bundle savedInstanceState, PersistableBundle persistentStat
   
 <nav id="article-nav">
   
-    <a href="/2016/09/27/git-manual/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2046/12/18/2017-12-18-random-new-thoughts/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          git常用操作手册
+          即刻备忘录
         
       </div>
     </a>
   
   
-    <a href="/2016/09/23/selectableItemBackground-foreground/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">android使用selectableItemBackground的一些坑</div>
+    <a href="/2019/07/28/2019-07-28-from-directByteBuffer-to-PhantomReference/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">堆外内存，weakHashMap以及四种引用类型的研究</div>
       <i class="icon-circle-right"></i>
     </a>
   
