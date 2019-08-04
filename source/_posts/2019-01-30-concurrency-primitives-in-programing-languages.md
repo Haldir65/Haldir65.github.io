@@ -371,9 +371,8 @@ lock.notify_all(thread);这里
 [图解java并发](http://ifeve.com/图解java并发上/)
 
 
-hacknoon中有关于python中多线程primitives的文章
-c语言中多线程通信基础
-基本的思想都是相通的
+[pv操作](https://liujiacai.net/blog/2018/12/29/how-java-synchronizer-work/)
+
 
 
 ## 参考

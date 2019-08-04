@@ -84,6 +84,7 @@ Tomcat可以host static file，做法是在webapp文件夹下创建一个MyApp�
 tomcat是web container,servlet是处理业务逻辑的。
 servlet继承自HttpServlet,里面有doGet和doPost方法。
 servlet和请求的url的对应关系写在web.xml中。
+servlet不是线程安全的，解决方式(ThreadLocal)
 
 [下面是从一片关于如何使用命令行生成并运行jar的文章中摘抄的](https://medium.com/nycdev/java-get-started-with-apache-maven-a71f4f907cb3)
 ```

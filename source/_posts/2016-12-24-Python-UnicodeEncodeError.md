@@ -280,10 +280,7 @@ virtualenv的好处是不会干扰机器上已安装的package，有些包现在
 [推荐使用os.subprocess模块调用shell](http://blog.csdn.net/pipisorry/article/details/46972171)
 
 
-grep log in command console
-basic grammars
-network, disk ,database, io , dic, list ,etc
-class object orientated  
+
 
 ### 9.  __future__模块是为了在2.7中使用3的功能
 ```python

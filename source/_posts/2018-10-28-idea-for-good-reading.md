@@ -32,3 +32,5 @@ tags: [tbd]
 [脚本语言的中变量作用域问题](https://liujiacai.net/blog/2016/05/28/scope-closure/)
 [Andriod系统的文章写得很深](https://fucknmb.com/2017/05/24/CURL-NDK交叉编译/)
 
+[各种技术话题的blog](https://jameshfisher.com/)
+

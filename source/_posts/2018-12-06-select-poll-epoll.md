@@ -17,6 +17,7 @@ linux下提供五种io model
 异步IO(asynchronous IO)
 具体的介绍看这篇文章:[五种io模式的介绍](http://cmsblogs.com/?p=4812)
 
+> select(readfds, writefds, errorfds)
 
 
 用户态到内核态的内存copy的开销
