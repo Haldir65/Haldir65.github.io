@@ -29,6 +29,6 @@ tags: [tbd]
 [关于linux的任何事](https://www.cyberciti.biz/)
 [jvm,java技术相关的](https://leokongwq.github.io/)
 [tcp进阶](https://halfrost.com/advance_tcp/)
-
+[脚本语言的中变量作用域问题](https://liujiacai.net/blog/2016/05/28/scope-closure/)
 [Andriod系统的文章写得很深](https://fucknmb.com/2017/05/24/CURL-NDK交叉编译/)
 

@@ -213,7 +213,6 @@ code :
 print(string)  
 print(string.encode('utf-8'))
 print(bstring2string)
-print(bstring2string)
 
 print(which_instance_is_this(string))
 print(which_instance_is_this(bstring))
@@ -223,7 +222,6 @@ print(which_instance_is_this(bstring2string))
 outputs:
 你好啊
 b'\xe4\xbd\xa0\xe5\xa5\xbd\xe5\x95\x8a'
-你好啊
 你好啊
 
 is str

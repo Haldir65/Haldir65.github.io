@@ -29,7 +29,7 @@ top : 1
 - [ ] nodejs ,go ,protobuf rpc(proto更多的是作为一种协议来进行rpc数据传输)
 - [ ]一致性哈希原理
 - [ ] [使用redis实现低粒度的分布式锁](http://afghl.github.io/2018/06/17/distributed-lock-and-granarity.html)
-- [ ] Coordinator behavior以及scroll原理，完善blog
+- [ ] Coordinator behavior以及scroll原理
 - [ ] instagram好像通过注解的方式自己写了一个json解析器[ig-json-parser](https://github.com/Instagram/ig-json-parser)
 - [ ] when it comes to design , how do we translate px, pt, em  into sp,dp and others(设计方面的，各种单位之间的转换)?
 - [ ] learning how textView works is painful yet necessary
@@ -56,7 +56,6 @@ top : 1
 - [mvc,mvp,mvvm](https://www.tianmaying.com/tutorial/AndroidMVC)这些关键术语的掌握还是必要的
 - Parcelable 是怎么实现跨进程的? ipc并不仅限于后台，客户端不同进程间也会有类似的概念。
 - jdk8 standard Library implementation detail(java代码的实现 --> hotspot代码的c语言实现)
-- [] 安装并使用MAT 分析java应用内存。
 - [后端面试题](https://segmentfault.com/a/1190000017864721)
 - thrift 源码解析，rpc框架（比方说人脸识别应用就可以用java调用python服务）这种rpc过程肯定要考虑字节序的问题。
 - Perl被称为脚本语言中的瑞士军刀，正则多一点
@@ -115,6 +114,8 @@ top : 1
 - [X] rxjava是如何切换线程的以及源码解析，ObserveOnObserver和ObservableSubscribeOn实例是桥梁
 - [X] jdk7开始提供fork join pool方法，将任务分配到多个线程上处理(不适合io密集型操作)
 - [X] [openjdk的C语言实现可以随便调几处来看看](https://github.com/keerath/openjdk-8-source/blob/master/jdk/src/windows/native/java/net/SocketOutputStream.c)
+- [X] 安装并使用MAT 分析java应用内存。
+
 
 
  

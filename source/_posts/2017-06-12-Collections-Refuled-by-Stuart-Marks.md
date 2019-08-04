@@ -749,23 +749,23 @@ Set的重要特点就是**不能放进去重复**的元素，Set中不会存在e
 HashSet的源码只有三百多行，内部有一个map（HashMap）相对来说是比较简单的。其实Set平时用的也不是那么多。。。
 
 ### 4. 一些不常用的类
+Vetor(不要用)，Stack，ArrayDeque,Queue, HashTable（oracle专家建议使用HashMap）
 
-    Vetor，Stack，ArrayDeque,Queue
+Vector属于List,线程安全，但效率低（就是简单的在所有方法前面加上了synchronized）。而事实上这种同步不能保证大批量操作的时候(putAll)的线程安全性，外部调用者还得专门搞一把锁。
 
-    Vector属于List,线程安全，但效率低（就是简单的在所有方法前面加上了synchronized）
 
-    Queue是一个interface，属于两端可以出入的List，通常是(FIFO模式)，实现类有
-    PriorityQueue，
-    java.util.concurrent.ArrayBlockingQueue
-    java.util.concurrent.LinkedBlockingQueue
-    java.util.concurrent.PriorityBlockingQueue
-    作者都是大名鼎鼎的Doug Lea
-    另外，LinkedList也能直接拿来当做queue使用
+Queue是一个interface，属于两端可以出入的List，通常是(FIFO模式)，实现类有
+PriorityQueue，
+java.util.concurrent.ArrayBlockingQueue
+java.util.concurrent.LinkedBlockingQueue
+java.util.concurrent.PriorityBlockingQueue
+作者都是大名鼎鼎的Doug Lea
+另外，LinkedList也能直接拿来当做queue使用
 
-    Stack是Vector的子类(属于LIFO的栈)
-    The Stack class represents a last-in-first-out (LIFO) stack of object
+Stack是Vector的子类(属于LIFO的栈)
+The Stack class represents a last-in-first-out (LIFO) stack of object
 
-    Deque(双端队列)
+Deque(双端队列)
 
 
 ### 5. concurrentHashMap等
@@ -809,7 +809,7 @@ putIfAbsent是Atmmic的[Is putIfAbsent an atomic operation](http://forums.terrac
 jdk 1.8对于长度超过8的链表改用红黑树。
 
 
-### Reference
+### 参考
 1. [Collections Refuled by Stuart Marks](https://www.youtube.com/watch?v=q6zF3vf114M)
 2. [From Java Code to Java Heap: Understanding the Memory Usage of Your Application](https://www.youtube.com/watch?v=FLcXf9pO27w)
 3. [Java集合干货系列](http://www.jianshu.com/p/2cd7be850540)
@@ -817,3 +817,4 @@ jdk 1.8对于长度超过8的链表改用红黑树。
 5. [WeakHashMap和HashMap的区别](http://blog.csdn.net/yangzl2008/article/details/6980709)
 6. [Hashmap的死锁问题](https://zhuanlan.zhihu.com/p/31614195)
 7. [Young Pups: New Collections APIs for Java 9 by Stuart Marks](https://www.youtube.com/watch?v=OJrIMv4dAek)
+8. [CON6891 20 Years of APIs A Retrospective](https://www.youtube.com/watch?v=X7y-0FDSRoc) 【Stuart Marks, Principal Member of Technical Staff, Oracle】反思了java发展的历程，java的api也并非完美，早期有些class就是匆匆忙忙设计出来的，但为了不破坏binary compatability，java从来没有移除过这些不那么完善的api。实际生产中要避免使用这些不推荐使用的api，Data,Calendar,HashTable,Vector。。。
