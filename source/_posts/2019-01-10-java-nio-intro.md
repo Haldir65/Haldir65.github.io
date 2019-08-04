@@ -603,6 +603,9 @@ DMA 就是直接内存访问的意思，也就是说，拥有 DMA 功能的硬�
 
 线程的本质
 线程不是一个计算机硬件的功能，而是操作系统提供的一种逻辑功能，线程本质上是进程中一段并发运行的代码，所以线程需要操作系统投入 CPU 资源来运行和调度。
+linux下有一条命令可以查看当前进程下有多少个线程：
+ps –o nlwp pid ## nlwp含义是number of light-weight process。
+ps -eLo pid ,stat | grep pid | grep running | wc -l
 
 nio中的几个主要概念
 **channel** 和jdk1.4之前的bio的"将io抽象为流"的概念是差不多的，只不过流是单向的，channel是双向的

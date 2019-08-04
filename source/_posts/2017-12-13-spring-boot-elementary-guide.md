@@ -36,6 +36,8 @@ intelij内置了maven, 由于网速的原因，不想浪费时间的话还是给
 
 ### 2.1 Service
 ### 2.2 Dao
+h2 database的web console中，用户名是user， 密码自己在console中搜索。使用h2 database的好处是memory db，速度快，不用装mysql，如果需要持久化的话，dburl制定一个本地文件就可以了
+
 ### 2.3 Entity
 ### 2.4 Controller
 

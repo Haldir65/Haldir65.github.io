@@ -8,7 +8,7 @@ tags:
 <!--more-->
 
 ## 1. cpython
-### 1.1 pythont调用C、C++代码
+### 1.1 python中调用C、C++代码
 
 方法一：
 Python中的ctypes模块可能是调用C方法最简单的一种。ctypes模块提供了和C语言兼容的数据类型了函数来加载dll或者so文件。
@@ -146,7 +146,7 @@ cython(python c extension)和cpython(c语言实现的python）是两件事
 ## 2. javascript
 ### 2.1 javascript调用C、C++代码
 首先，在浏览器中运行c语言的代码，似乎可以将C编成webassembly在浏览器中运行。
-在Node js中，可以使用[n-api](https://nodejs.org/api/n-api.html)这个module。
+而在Node js中，可以使用[n-api](https://nodejs.org/api/n-api.html)这个module。
 > N-API (pronounced N as in the letter, followed by API) is an API for building native Addons. It is independent from the underlying JavaScript runtime (for example, V8) and is maintained as part of Node.js itself. This API will be Application Binary Interface (ABI) stable across versions of Node.js. It is intended to insulate Addons from changes in the underlying JavaScript engine and allow modules compiled for one major version to run on later major versions of Node.js without recompilation. 
 
 就是说保持了binary compatibility，比如说在node6上编译通过之后，假如后面出了node10，不需要重新编译也能继续运行。
@@ -156,11 +156,6 @@ cython(python c extension)和cpython(c语言实现的python）是两件事
 很多大型js项目都有一个binging.gyp文件（一定是这个名字）
 
 gyp其实是一个用来生成项目文件的工具，一开始是设计给chromium项目使用的，后来大家发现比较好用就用到了其他地方。生成项目文件后就可以调用GCC, vsbuild, xcode等编译平台来编译。至于为什么要有node-gyp，是由于node程序中需要调用一些其他语言编写的工具甚至是dll，需要先编译一下，否则就会有跨平台的问题，例如在windows上运行的软件copy到mac上就不能用了，但是如果源码支持，编译一下，在mac上还是可以用的。
-
-
-
-
-
 
 
 ### 2.2 C、C++调用javascript代码
@@ -189,5 +184,7 @@ exec("./myProgram", (error, stdout, stderr) => console.log(stdout));
 就是jni了
 
 ### 3.2 C、C++调用java代码
+c、c++层调用java也是可以的
 
 ### 3.3 java调用系统方法
+java有一个Process api
