@@ -17,7 +17,7 @@
 <meta property="og:description" content="Tomcat源码解析">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/LetchworthSP_EN-AU14482052774_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-08-04T07:34:52.433Z">
+<meta property="og:updated_time" content="2019-08-04T15:20:46.435Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Tomcat部分源码解析">
 <meta name="twitter:description" content="Tomcat源码解析">
@@ -200,11 +200,182 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>Tomcat源码解析</p>
+        <p><a href="https://github.com/apache/tomcat">Tomcat</a>源码解析</p>
 <p><img src="https://www.haldir66.ga/static/imgs/LetchworthSP_EN-AU14482052774_1920x1080.jpg" alt=""><br><a id="more"></a></p>
 <p>tomcat的使用很简单，windows下双击那个startup.bat或者cd 到bin目录，运行catlina run就可以了。配置的话，用xml文件就可以了，静态文件放在webapp/目录下。。</p>
 <p>从Spring-boot支持的embedded servlet container就能看出来，tomcat的替代品有不少<br>spring-boot-starter-undertow,<br>spring-boot-starter-jetty,<br>spring-boot-starter-tomcat </p>
-<p><a href="https://httpd.apache.org/docs/2.4/mod/core.html#enablesendfile">apache支持zero-copy</a></p>
+<p><strong><font color="red">源码版本tomcat 9.0.21</font></strong></p>
+<h2 id="从main函数开始吧"><a href="#从main函数开始吧" class="headerlink" title="从main函数开始吧"></a>从main函数开始吧</h2><p>tomcat的主函数在org.apache.catalina.startup.Bootstrap这个文件中</p>
+<pre><code class="java">public final class Bootstrap {
+
+    public static void main(String args[]) {
+        Bootstrap bootstrap = new Bootstrap();
+        try {
+            bootstrap.init();
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return;
+        }
+        //接下来就是根据不同的command执行对应的start,stop等命令
+          try {
+            String command = &quot;start&quot;;
+            if (args.length &gt; 0) {
+                command = args[args.length - 1];
+            }
+
+            if (command.equals(&quot;startd&quot;)) {
+                args[args.length - 1] = &quot;start&quot;;
+                daemon.load(args);
+                daemon.start();
+            } else if (command.equals(&quot;stopd&quot;)) {
+                args[args.length - 1] = &quot;stop&quot;;
+                daemon.stop();
+            } else if (command.equals(&quot;start&quot;)) {
+                daemon.setAwait(true);
+                daemon.load(args);
+                daemon.start();
+                if (null == daemon.getServer()) {
+                    System.exit(1);
+                }
+            } else if (command.equals(&quot;stop&quot;)) {
+                daemon.stopServer(args);
+            } else if (command.equals(&quot;configtest&quot;)) {
+                daemon.load(args);
+                if (null == daemon.getServer()) {
+                    System.exit(1);
+                }
+                System.exit(0);
+            } else {
+                log.warn(&quot;Bootstrap: command \&quot;&quot; + command + &quot;\&quot; does not exist.&quot;);
+            }
+        }
+    }
+}
+</code></pre>
+<h2 id="init的调用栈"><a href="#init的调用栈" class="headerlink" title="init的调用栈"></a>init的调用栈</h2><p>Tomcat能够处理ajp(不常用，无视)和http协议。<br>默认情况下，Server只有一个Service组件，Service组件先后对Engine、Connector进行初始化。而Engine组件并不会在初始化阶段对子容器进行初始化，Host、Context、Wrapper容器的初始化是在start阶段完成的。tomcat默认会启用HTTP1.1和AJP的Connector连接器，这两种协议默认使用Http11NioProtocol、AJPNioProtocol进行处理</p>
+<blockquote>
+<p>Connector的主要功能，是接收连接请求，创建Request和Response对象用于和请求端交换数据；然后分配线程让Engine（也就是Servlet容器）来处理这个请求，并把产生的Request和Response对象传给Engine。当Engine处理完请求后，也会通过Connector将响应返回给客户端。</p>
+</blockquote>
+<p>ProtocolHandler是处理HTTP1.1协议的类(实际上是一个接口)，实现的子类有两个，AbstractProtocol和Http11NioProtocol（继承于AbstractProtocol）<br>AbstractProtocol是基本的实现，可以认为这个类把主要的活都干了，而NIO默认使用的是Http11NioProtocol。</p>
+<p>在AbstractProtocol的init方法中，调用了endpoint.init();endPoint是抽象类，实现类包括NioEndpoint和Nio2Endpoint。Endpoint的主要工作是完成端口和地址的绑定监听。</p>
+<pre><code class="java">// NioEndPoint.java
+private volatile ServerSocketChannel serverSock = null;
+// ServerSocketChannel是nio的一个类，用于监听外来请求的
+
+protected void initServerSocket() throws Exception {
+
+serverSock = ServerSocketChannel.open();
+        socketProperties.setProperties(serverSock.socket()); // 这里面设了是否要setReuseAddress，设置setSoTimeout为多少
+        InetSocketAddress addr = new InetSocketAddress(getAddress(), getPortWithOffset());
+        serverSock.socket().bind(addr,getAcceptCount()); //这里就是socket.bind的地方了
+}
+
+// Nio2Endpoint.java
+@Override
+public void bind() throws Exception {
+    serverSock = AsynchronousServerSocketChannel.open(threadGroup);
+    socketProperties.setProperties(serverSock);
+    InetSocketAddress addr = new InetSocketAddress(getAddress(), getPortWithOffset());
+    serverSock.bind(addr, getAcceptCount());
+}
+</code></pre>
+<p>可以看出来NioEndPoint和Nio2EndPoint在绑定socket的时候的区别是后者用的是jdk1.7的AsynchronousServerSocketChannel，而ServerSocketChannel是jdk1.4就有的。java的io操作分为bio,nio,nio2，tomcat8.5开始去掉了bio（就是那种阻塞式io）的支持。</p>
+<p>在 socketProperties.setProperties里面，设置了socket的超时时间，很好奇到底是多少<br>在Constants.java中</p>
+<pre><code class="java">public static final int DEFAULT_CONNECTION_TIMEOUT = 60000;
+</code></pre>
+<p><strong>所以是1分钟?</strong></p>
+<p>接着NioEndPoint.java的Bind方法来看，走到了selectorPool.open(getName());<br>这里面就是启动了一条线程,NioBlockingSelector.BlockPoller继承自Thread。对应的run方法中使用的是selector那一套(selector.selectedKeys()获得一个Iterator<SelectionKey> ，根据是read,write还是connect的形式去判断)。注意，此刻已经开始select了。select自身是阻塞的，但是一旦有io事件到来，就会将事件交给线程池去处理，所以并发性能是可以的。</p>
+<p><a href="https://www.cnblogs.com/kismetv/p/7806063.html">参考</a></p>
+<font color="red">Tomcat处理请求的过程：在accept队列中接收连接（当客户端向服务器发送请求时，如果客户端与OS完成三次握手建立了连接，则OS将该连接放入accept队列）；在连接中获取请求的数据，生成request；调用servlet容器处理请求；返回response。</font>
+
+<p>线程池的配置是可以通过server.xml配置的</p>
+<pre><code class="xml">&lt;Executor name=&quot;tomcatThreadPool&quot; namePrefix =&quot;catalina-exec-&quot; maxThreads=&quot;150&quot; minSpareThreads=&quot;4&quot; /&gt;
+&lt;Connector executor=&quot;tomcatThreadPool&quot; port=&quot;8080&quot; protocol=&quot;HTTP/1.1&quot; connectionTimeout=&quot;20000&quot; redirectPort=&quot;8443&quot; acceptCount=&quot;1000&quot; /&gt;
+</code></pre>
+<p><font color="red">Connector中的几个参数功能如下：</font></p>
+<ul>
+<li><p>acceptCount<br>accept队列的长度；当accept队列中连接的个数达到acceptCount时，队列满，进来的请求一律被拒绝。默认值是100。<br>关于这个100，我记得2017年的时候，公司后端老大在一次内部技术分享的点评环节提问一帮后端这个参数是多少，其当时还提到这个Executor“就是接客”的(原话如此)。两年后回过头来再来看这段，挺有趣的。</p>
+</li>
+<li><p>maxConnections<br>Tomcat在任意时刻接收和处理的最大连接数。当Tomcat接收的连接数达到maxConnections时，Acceptor线程不会读取accept队列中的连接；这时accept队列中的线程会一直阻塞着，直到Tomcat接收的连接数小于maxConnections。如果设置为-1，则连接数不受限制。</p>
+</li>
+<li><p>maxThreads<br>请求处理线程的最大数量。默认值是200（Tomcat7和8都是的）。如果该Connector绑定了Executor，这个值会被忽略，因为该Connector将使用绑定的Executor，而不是内置的线程池来执行任务。<br>maxThreads规定的是最大的线程数目，并不是实际running的CPU数量；实际上，maxThreads的大小比CPU核心数量要大得多。这是因为，处理请求的线程真正用于计算的时间可能很少，大多数时间可能在阻塞，如等待数据库返回数据、等待硬盘读写数据等。因此，在某一时刻，只有少数的线程真正的在使用物理CPU，大多数线程都在等待；因此线程数远大于物理核心数才是合理的。<br>换句话说，Tomcat通过使用比CPU核心数量多得多的线程数，可以使CPU忙碌起来，大大提高CPU的利用率。<br>默认值与连接器使用的协议有关：NIO的默认值是10000，APR/native的默认值是8192，而BIO的默认值为maxThreads（如果配置了Executor，则默认值是Executor的maxThreads）。<br>在windows下，APR/native的maxConnections值会自动调整为设置值以下最大的1024的整数倍；如设置为2000，则最大值实际是1024。</p>
+</li>
+</ul>
+<hr>
+<p><font color="red">Executor的主要属性包括：</font></p>
+<ul>
+<li>name：该线程池的标记</li>
+<li>maxThreads：线程池中最大活跃线程数，默认值200（Tomcat7和8都是）</li>
+<li>minSpareThreads：线程池中保持的最小线程数，最小值是25</li>
+<li>maxIdleTime：线程空闲的最大时间，当空闲超过该值时关闭线程（除非线程数小于minSpareThreads），单位是ms，默认值60000（1分钟）</li>
+<li>daemon：是否后台线程，默认值true</li>
+<li>threadPriority：线程优先级，默认值5</li>
+<li>namePrefix：线程名字的前缀，线程池中线程名字为：namePrefix+线程编号</li>
+</ul>
+<hr>
+<p>这些参数的调优有一些经验:<br>（1）maxThreads的设置既与应用的特点有关，也与服务器的CPU核心数量有关。通过前面介绍可以知道，maxThreads数量应该远大于CPU核心数量；而且CPU核心数越大，maxThreads应该越大；应用中CPU越不密集（IO越密集），maxThreads应该越大，以便能够充分利用CPU。当然，maxThreads的值并不是越大越好，如果maxThreads过大，那么CPU会花费大量的时间用于线程的切换，整体效率会降低。<br>（2）maxConnections的设置与Tomcat的运行模式有关。<del/>如果tomcat使用的是BIO，那么maxConnections的值应该与maxThreads一致</del>；如果tomcat使用的是NIO，maxConnections值应该远大于maxThreads。<br>（3）通过前面的介绍可以知道，虽然tomcat同时可以处理的连接数目是maxConnections，但服务器中可以同时接收的连接数为maxConnections+acceptCount 。acceptCount的设置，与应用在连接过高情况下希望做出什么反应有关系。如果设置过大，后面进入的请求等待时间会很长；如果设置过小，后面进入的请求立马返回connection refused。</p>
+<p>走到这里，是从BootStrap.init -&gt; Catalina.init-&gt; …总之中间封了很多层组件… -&gt; 方法的调用栈</p>
+<h2 id="start方法的调用栈"><a href="#start方法的调用栈" class="headerlink" title="start方法的调用栈"></a>start方法的调用栈</h2><p>和init一样,bootStrap的start方法被代理给了catalina的start方法<br>Catalina.java</p>
+<pre><code class="java">public void start() {
+    try {
+        getServer().start();
+    } catch (LifecycleException e) {
+        //....
+        return;
+    }
+
+    if (shutdownHook == null) {
+        shutdownHook = new CatalinaShutdownHook();
+    }
+    //用于安全的关闭服务
+    Runtime.getRuntime().addShutdownHook(shutdownHook);
+
+     if (await) { //这个是true
+            await(); //其目的在于让tomcat在shutdown端口阻塞监听关闭命令
+            stop();
+    }
+}
+</code></pre>
+<p>上面的getServer返回的是server的默认实现StandardServer，后者的startInternal中又会走到StandardService，的startInternal，这里面会</p>
+<ol>
+<li>调用Engine.start</li>
+<li>启动线程池</li>
+<li>启动Connector</li>
+</ol>
+<p>一个个来看<br>Engine<br>StandardEngine、StandardHost、StandardContext、StandardWrapper各个容器存在父子关系，一个父容器包含多个子容器，并且一个子容器对应一个父容器。Engine是顶层父容器，它不存在父容器。默认情况下，StandardEngine只有一个子容器StandardHost，一个StandardContext对应一个webapp应用，而一个StandardWrapper对应一个webapp里面的一个 Servlet。<br><a href="https://blog.csdn.net/Dwade_mia/article/details/79244157">参考</a><br>StandardEngine的startInternal调用到父类ContainerBase的startInternal方法。具体实现就是给一个线程池去跑所有child的启动任务。当前线程通过Future.get方法阻塞等待所有child初始化完毕。<br>一个child(StandardHost)就是一个webapp，可以添加多个，初始化的时候，有一个线程池，并发去初始化各个webapp<br><strong>server.xml</strong></p>
+<pre><code class="xml">&lt;Host name=&quot;localhost&quot;  appBase=&quot;webapps&quot;
+            unpackWARs=&quot;true&quot; autoDeploy=&quot;true&quot; startStopThreads=&quot;4&quot;&gt;
+  &lt;Valve className=&quot;org.apache.catalina.valves.AccessLogValve&quot; directory=&quot;logs&quot;
+         prefix=&quot;localhost_access_log&quot; suffix=&quot;.txt&quot;
+         pattern=&quot;%h %l %u %t &amp;quot;%r&amp;quot; %s %b&quot; /&gt;
+&lt;/Host&gt;
+</code></pre>
+<p>然后启动PipeLine（Pipeline是管道组件，用于封装了一组有序的Valve，便于Valve顺序地传递或者处理请求，就是处理请求的前后拦截器）。<br>Valve包括</p>
+<ul>
+<li>AccessLogValve(默认开启，用于记录请求日志)，</li>
+<li>RemoteAddrValve，可以做访问控制，比如限制IP黑白名单 </li>
+<li>RemoteIpValve，主要用于处理 X-Forwarded-For 请求头，用来识别通过HTTP代理或负载均衡方式连接到Web服务器的客户端最原始的IP地址的HTTP请求头字段</li>
+</ul>
+<p>加载子容器的方法是在HostConfig(实现了LifecycleListener，在start中启动Context容器)处理的。<br>HostConfig.java</p>
+<pre><code class="java">    protected void deployApps() {
+
+        File appBase = host.getAppBaseFile();
+        File configBase = host.getConfigBaseFile();
+        String[] filteredAppPaths = filterAppPaths(appBase.list());
+        // Deploy XML descriptors from configBase
+        deployDescriptors(configBase, configBase.list());
+        // Deploy WARs
+        deployWARs(appBase, filteredAppPaths);
+        // Deploy expanded folders
+        deployDirectories(appBase, filteredAppPaths);
+    }
+</code></pre>
+<p>deployWARs也是丢(submit)N个任务到线程池中，然后调用future.get使得当前线程阻塞直到拿到结果。这个任务其实就是解压war文件(war就是zip文件改了个后缀),这个任务包括，调用java处理压缩文件的API(JarEntry)去获取文件内容，还有一些其他的<br>deployDirectories方法的注释是（Deploy exploded webapps.），就是说解压完成之后做的事情。这里面又是executor.submit，然后future.get那一套东西(tomcat里似乎很多用这种方式等待多个任务完成)。<br>deployWars和deployDirectories中都出现了</p>
+<blockquote>
+<p>context = (Context) digester.parse(xml); //所以Context是对xml文件的描述？</p>
+</blockquote>
+<p>tbd</p>
+<h2 id="tomcat类加载器-重点"><a href="#tomcat类加载器-重点" class="headerlink" title="tomcat类加载器(重点)"></a>tomcat类加载器(重点)</h2><p><a href="https://httpd.apache.org/docs/2.4/mod/core.html#enablesendfile">apache支持zero-copy</a></p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/Dwade_mia/column/info/18882">tomcat源码解析</a></p>
 
       
@@ -536,10 +707,6 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
@@ -548,7 +715,7 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -556,11 +723,19 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -569,10 +744,6 @@ ga('send', 'pageview');
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">sql</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
               <li class="article-tag-list-item">

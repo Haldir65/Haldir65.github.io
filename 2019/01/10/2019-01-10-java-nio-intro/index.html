@@ -17,7 +17,7 @@
 <meta property="og:description" content="关于java nio的一些点">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/UmbriaCastelluccio_EN-AU8834990889_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-08-04T07:34:52.429Z">
+<meta property="og:updated_time" content="2019-08-04T15:20:46.435Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java nio使用指南">
 <meta name="twitter:description" content="关于java nio的一些点">
@@ -697,7 +697,7 @@ aFile.close();
 <li>对于<strong>异步IO</strong>来说，两个阶段都没有被阻塞，因为只需要发起rec、send请求，系统会帮忙完成数据的copy，完事之后通知用户进程一声。</li>
 </ul>
 <p>异步操作(asynchronous IO)的本质<br>所有的程序最终都会由计算机硬件来执行，所以为了更好的理解异步操作的本质，我们有必要了解一下它的硬件基础。<br>熟悉电脑硬件的朋友肯定对 DMA 这个词不陌生，硬盘、光驱的技术规格中都有明确 DMA 的模式指标，其实网卡、声卡、显卡也是有 DMA 功能的。<br>DMA 就是直接内存访问的意思，也就是说，拥有 DMA 功能的硬件在和内存进行数据交换的时候可以不消耗 CPU 资源。只要 CPU 在发起数据传输时发送一个指令，硬件就开始自己和内存交换数据，在传输完成之后硬件会触发一个中断来通知操作完成。<br>这些无须消耗 CPU 时间的 I/O 操作正是异步操作的硬件基础。所以即使在 DOS 这样的单进程（而且无线程概念）系统中也同样可以发起异步的 DMA 操作。</p>
-<p>线程的本质<br>线程不是一个计算机硬件的功能，而是操作系统提供的一种逻辑功能，线程本质上是进程中一段并发运行的代码，所以线程需要操作系统投入 CPU 资源来运行和调度。</p>
+<p>线程的本质<br>线程不是一个计算机硬件的功能，而是操作系统提供的一种逻辑功能，线程本质上是进程中一段并发运行的代码，所以线程需要操作系统投入 CPU 资源来运行和调度。<br>linux下有一条命令可以查看当前进程下有多少个线程：<br>ps –o nlwp pid ## nlwp含义是number of light-weight process。<br>ps -eLo pid ,stat | grep pid | grep running | wc -l</p>
 <p>nio中的几个主要概念<br><strong>channel</strong> 和jdk1.4之前的bio的”将io抽象为流”的概念是差不多的，只不过流是单向的，channel是双向的<br><strong>Buffer</strong> 就是对数组的封装<br><strong>Selector</strong> 对select、poll、epoll系统调用的包装，用于Socket channel，因为它要求channel必须是非阻塞的</p>
 <p>bio是没有缓冲区的（BufferedInputStream,BufferedReader这种除外），包括RandomAccessFile也没有缓冲区<br>Nio都是有缓冲区的，必须和Buffer对象一起使用，Buffer对象就是缓冲区。</p>
 <p>ByteBuffer是唯一直接与channel交互的缓冲，因为所有的数据都是以二进制形式存在的<br>在 BIO 中，与文件 IO 相关联的三个类是：<br>1) java.io.FileInputStream，从文件流中读取字节数据，只读；<br>2) java.io.FileOutputStream，向文件流中写入字节数据，只写；<br>3) java.io.RandomAccessFile，独立的IO流类，支持r只读、rw读写、rws读写 + metadata/data自动同步、rwd读写 + data自动同步四种模式；</p>
@@ -1226,10 +1226,6 @@ public class Client2 {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
@@ -1238,7 +1234,7 @@ public class Client2 {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1246,11 +1242,19 @@ public class Client2 {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1259,10 +1263,6 @@ public class Client2 {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">sql</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
               <li class="article-tag-list-item">
