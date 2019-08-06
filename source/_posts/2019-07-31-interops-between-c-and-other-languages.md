@@ -188,3 +188,61 @@ c、c++层调用java也是可以的
 
 ### 3.3 java调用系统方法
 java有一个Process api
+### 38. java中Process的Api
+关键词：ProcessBuilder , java9提供了新的Api。另外还有Runtime.exec这个方法
+亲测，下面的命令可以在mac上执行uname -a 命令
+```java
+//用ProcessBuilder是一种做法
+ try {
+            Runtime r = Runtime.getRuntime();
+            Process p = r.exec("uname -a");
+            p.waitFor();
+            BufferedReader b = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            String line = "";
+
+            while ((line = b.readLine()) != null) {
+                System.out.println(line);
+            }
+
+            b.close();
+        }catch (IOException | InterruptedException e){
+            
+        }
+
+//  下面这个也行
+String s = null;
+
+        try {
+
+            // run the Unix "ps -ef" command
+            // using the Runtime exec method:
+            Process p = Runtime.getRuntime().exec("ps -ef");
+
+            BufferedReader stdInput = new BufferedReader(new
+                    InputStreamReader(p.getInputStream()));
+
+            BufferedReader stdError = new BufferedReader(new
+                    InputStreamReader(p.getErrorStream()));
+
+            // read the output from the command
+            System.out.println("Here is the standard output of the command:\n");
+            while ((s = stdInput.readLine()) != null) {
+                System.out.println(s);
+            }
+
+            // read any errors from the attempted command
+            System.out.println("Here is the standard error of the command (if any):\n");
+            while ((s = stdError.readLine()) != null) {
+                System.out.println(s);
+            }
+
+            System.exit(0);
+        }
+        catch (IOException e) {
+            System.out.println("exception happened - here's what I know: ");
+            e.printStackTrace();
+            System.exit(-1);
+        }
+
+```
+只不过很少见过用java去调用系统接口的

@@ -26,3 +26,51 @@ invoke dynamic是第五种，jdk7加入的
 [JVM Bytecode for Dummies (and the Rest of Us Too)](https://www.youtube.com/watch?v=rPyqB1l4gko)
 [实例分析JAVA CLASS的文件结构](https://coolshell.cn/articles/9229.html)
 [从字节码层面看“HelloWorld”](https://www.cnblogs.com/paddix/p/5282004.html)
+
+
+### 39. javap一般用来反编译class文件
+> javap Animal.class
+> javap -c Animal.class  //直接看字节码
+> javap -help 可以看更多命令行参数的含义
+
+不过一般不这么直接看字节码，因为都是有规则的，已经有人做出了gui的工具，比如[jad](http://www.javadecompilers.com/jad)
+> ./jad -sjava Animal.class
+
+```java
+public enum Animal {
+    DOG,CAT
+}
+
+// 通过jad翻译过后的字节码其实长这样
+public final class Animal extends Enum
+{
+
+    public static Animal[] values()
+    {
+        return (Animal[])$VALUES.clone();
+    }
+
+    public static Animal valueOf(String s)
+    {
+        return (Animal)Enum.valueOf(Animal, s);
+    }
+
+    private Animal(String s, int i)
+    {
+        super(s, i);
+    }
+
+    public static final Animal DOG;
+    public static final Animal CAT;
+    private static final Animal $VALUES[];
+
+    static
+    {
+        DOG = new Animal("DOG", 0);
+        CAT = new Animal("CAT", 1);
+        $VALUES = (new Animal[] {
+            DOG, CAT
+        });
+    }
+}
+```

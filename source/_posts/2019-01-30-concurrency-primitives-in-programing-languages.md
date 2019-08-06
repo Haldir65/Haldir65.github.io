@@ -138,6 +138,18 @@ synchronized (sharedObject) {
 需要注意的是
 ***notify/notifyAll方法调用后，并不会马上释放监视器锁，而是在相应的synchronized(){}/synchronized方法执行结束后才自动释放锁。***
 
+wait方法就是将当前线程加入object的waitSet同时释放锁（理解成一个hashset也行），notifyAll则是把waitset里面的内容全部挪到blocked队列中，在notifyAll的线程执行完毕释放锁之后，挑选一个获得锁。[JVM源码分析之Object.wait/notify实现](https://www.jianshu.com/p/f4454164c017)
+
+[oracle的文档上说明了,wait有一个spurious wakeup](https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html#wait()) 是出于performance考虑，表现为wait的线程不需要notify也能自己醒过来。(文档中也指出了，这也就是为什么每一个wait都要包在一个while loop里面的原因)。这一现象在某些os上，包括linux上就有。
+```java
+ synchronized (obj) {
+         while (<condition does not hold>) // 就是为了防止spurious wakeup
+             obj.wait(timeout);
+         ... // Perform action appropriate to condition
+     }
+```
+
+[how not to do java concurrency](https://www.youtube.com/watch?v=Oi6-pXX11qw)
 
 
 
