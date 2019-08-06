@@ -17,7 +17,7 @@
 <meta property="og:description" content="python中可以使用diss module 轻易的查看byte code。那么在java中呢">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/BadlandsBday_EN-AU10299777329_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-08-04T15:20:46.431Z">
+<meta property="og:updated_time" content="2019-08-06T14:56:13.401Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="bytecode基本解读">
 <meta name="twitter:description" content="python中可以使用diss module 轻易的查看byte code。那么在java中呢">
@@ -207,6 +207,50 @@ ga('send', 'pageview');
 <p><a href="https://www.cnblogs.com/paddix/p/5326863.html">从反编译角度来看string常量池的问题</a></p>
 <p>invoke dynamic是第五种，jdk7加入的</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.youtube.com/watch?v=lP4ED_dN16g">JVM bytecode engineering 101</a><br><a href="https://www.youtube.com/watch?v=rPyqB1l4gko">JVM Bytecode for Dummies (and the Rest of Us Too)</a><br><a href="https://coolshell.cn/articles/9229.html">实例分析JAVA CLASS的文件结构</a><br><a href="https://www.cnblogs.com/paddix/p/5282004.html">从字节码层面看“HelloWorld”</a></p>
+<h3 id="39-javap一般用来反编译class文件"><a href="#39-javap一般用来反编译class文件" class="headerlink" title="39. javap一般用来反编译class文件"></a>39. javap一般用来反编译class文件</h3><blockquote>
+<p>javap Animal.class<br>javap -c Animal.class  //直接看字节码<br>javap -help 可以看更多命令行参数的含义</p>
+</blockquote>
+<p>不过一般不这么直接看字节码，因为都是有规则的，已经有人做出了gui的工具，比如<a href="http://www.javadecompilers.com/jad">jad</a></p>
+<blockquote>
+<p>./jad -sjava Animal.class</p>
+</blockquote>
+<pre><code class="java">public enum Animal {
+    DOG,CAT
+}
+
+// 通过jad翻译过后的字节码其实长这样
+public final class Animal extends Enum
+{
+
+    public static Animal[] values()
+    {
+        return (Animal[])$VALUES.clone();
+    }
+
+    public static Animal valueOf(String s)
+    {
+        return (Animal)Enum.valueOf(Animal, s);
+    }
+
+    private Animal(String s, int i)
+    {
+        super(s, i);
+    }
+
+    public static final Animal DOG;
+    public static final Animal CAT;
+    private static final Animal $VALUES[];
+
+    static
+    {
+        DOG = new Animal(&quot;DOG&quot;, 0);
+        CAT = new Animal(&quot;CAT&quot;, 1);
+        $VALUES = (new Animal[] {
+            DOG, CAT
+        });
+    }
+}
+</code></pre>
 
       
 
@@ -537,15 +581,15 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">前端</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -561,11 +605,11 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">

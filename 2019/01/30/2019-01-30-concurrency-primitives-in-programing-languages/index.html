@@ -17,7 +17,7 @@
 <meta property="og:description" content="主要讲讲java中的notify,wait,synchronized ，unsafe等多线程基础工具的使用方式。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/HongKongFireworks_ZH-CN13422096721_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-08-04T15:20:46.435Z">
+<meta property="og:updated_time" content="2019-08-06T14:56:13.405Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="编程语言中使用到的多线程基础数据结构">
 <meta name="twitter:description" content="主要讲讲java中的notify,wait,synchronized ，unsafe等多线程基础工具的使用方式。">
@@ -279,6 +279,15 @@ synchronized (sharedObject) {
 <p><a href="http://cmsblogs.com/?p=2915">在Java中，每个对象都有两个池，锁(monitor)池和等待池</a><br>锁池 :假设线程A已经拥有了某个对象(注意:不是类)的锁，而其它的线程想要调用这个对象的某个synchronized方法(或者synchronized块)，由于这些线程在进入对象的synchronized方法之前必须先获得该对象的锁的拥有权，但是该对象的锁目前正被线程A拥有，所以这些线程就进入了该对象的锁池中。<br>等待池 :假设一个线程A调用了某个对象的wait()方法，线程A就会释放该对象的锁(因为wait()方法必须出现在synchronized中，这样自然在执行wait()方法之前线程A就已经拥有了该对象的锁)，同时线程A就进入到了该对象的等待池中。如果另外的一个线程调用了相同对象的notifyAll()方法，那么处于该对象的等待池中的线程就会全部进入该对象的锁池中，准备争夺锁的拥有权。如果另外的一个线程调用了相同对象的notify()方法，那么仅仅有一个处于该对象的等待池中的线程(随机)会进入该对象的锁池.</p>
 <p>也即是被notify的线程都在锁池里(有权竞争cpu)，自己调用wait的线程都在等待池里(无权竞争cpu)。 那么什么时候竞争呢，持有锁的线程自己wait(释放锁)了，那么有权竞争的线程就开始竞争，获得锁的进入同步代码块或者同步方法。</p>
 <p>需要注意的是<br><strong><em>notify/notifyAll方法调用后，并不会马上释放监视器锁，而是在相应的synchronized(){}/synchronized方法执行结束后才自动释放锁。</em></strong></p>
+<p>wait方法就是将当前线程加入object的waitSet同时释放锁（理解成一个hashset也行），notifyAll则是把waitset里面的内容全部挪到blocked队列中，在notifyAll的线程执行完毕释放锁之后，挑选一个获得锁。<a href="https://www.jianshu.com/p/f4454164c017">JVM源码分析之Object.wait/notify实现</a></p>
+<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html#wait(">oracle的文档上说明了,wait有一个spurious wakeup</a>) 是出于performance考虑，表现为wait的线程不需要notify也能自己醒过来。(文档中也指出了，这也就是为什么每一个wait都要包在一个while loop里面的原因)。这一现象在某些os上，包括linux上就有。</p>
+<pre><code class="java"> synchronized (obj) {
+         while (&lt;condition does not hold&gt;) // 就是为了防止spurious wakeup
+             obj.wait(timeout);
+         ... // Perform action appropriate to condition
+     }
+</code></pre>
+<p><a href="https://www.youtube.com/watch?v=Oi6-pXX11qw">how not to do java concurrency</a></p>
 <p>以下代码验证通过</p>
 <pre><code class="java">public class Test1 {
 
@@ -813,15 +822,15 @@ static void ensure_join(JavaThread* thread) {
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">前端</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -837,11 +846,11 @@ static void ensure_join(JavaThread* thread) {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">

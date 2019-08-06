@@ -17,7 +17,7 @@
 <meta property="og:description" content="interesting stuff in java that don’t seem to get enough pubilicity">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/34a7d57ccabb18c69d085247cf009b22.jpg">
-<meta property="og:updated_time" content="2019-08-04T15:20:46.419Z">
+<meta property="og:updated_time" content="2019-08-06T14:56:13.389Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="For those tiny details in Java">
 <meta name="twitter:description" content="interesting stuff in java that don’t seem to get enough pubilicity">
@@ -1040,105 +1040,7 @@ private void writeObject0(Object obj, boolean unshared)
 
 <p>所以还是得老老实实写，而且一次写了之后就不用<strong>也不要</strong>改了<br>现在可以不用瞎写了，在Intelij里面有小工具：</p>
 <pre><code>&quot;File-&gt;Setting-&gt;Editor-&gt;Inspections-&gt;Serialization issues-&gt;Serializable class without ’serialVersionUID’ -&gt;勾选操作&quot;
-</code></pre><h3 id="38-java中Process的Api"><a href="#38-java中Process的Api" class="headerlink" title="38. java中Process的Api"></a>38. java中Process的Api</h3><p>关键词：ProcessBuilder , java9提供了新的Api。另外还有Runtime.exec这个方法<br>亲测，下面的命令可以在mac上执行uname -a 命令</p>
-<pre><code class="java">//用ProcessBuilder是一种做法
- try {
-            Runtime r = Runtime.getRuntime();
-            Process p = r.exec(&quot;uname -a&quot;);
-            p.waitFor();
-            BufferedReader b = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line = &quot;&quot;;
-
-            while ((line = b.readLine()) != null) {
-                System.out.println(line);
-            }
-
-            b.close();
-        }catch (IOException | InterruptedException e){
-
-        }
-
-//  下面这个也行
-String s = null;
-
-        try {
-
-            // run the Unix &quot;ps -ef&quot; command
-            // using the Runtime exec method:
-            Process p = Runtime.getRuntime().exec(&quot;ps -ef&quot;);
-
-            BufferedReader stdInput = new BufferedReader(new
-                    InputStreamReader(p.getInputStream()));
-
-            BufferedReader stdError = new BufferedReader(new
-                    InputStreamReader(p.getErrorStream()));
-
-            // read the output from the command
-            System.out.println(&quot;Here is the standard output of the command:\n&quot;);
-            while ((s = stdInput.readLine()) != null) {
-                System.out.println(s);
-            }
-
-            // read any errors from the attempted command
-            System.out.println(&quot;Here is the standard error of the command (if any):\n&quot;);
-            while ((s = stdError.readLine()) != null) {
-                System.out.println(s);
-            }
-
-            System.exit(0);
-        }
-        catch (IOException e) {
-            System.out.println(&quot;exception happened - here&#39;s what I know: &quot;);
-            e.printStackTrace();
-            System.exit(-1);
-        }
-</code></pre>
-<p>只不过很少见过用java去调用系统接口的</p>
-<h3 id="39-javap一般用来反编译class文件"><a href="#39-javap一般用来反编译class文件" class="headerlink" title="39. javap一般用来反编译class文件"></a>39. javap一般用来反编译class文件</h3><blockquote>
-<p>javap Animal.class<br>javap -c Animal.class  //直接看字节码<br>javap -help 可以看更多命令行参数的含义</p>
-</blockquote>
-<p>不过一般不这么直接看字节码，因为都是有规则的，已经有人做出了gui的工具，比如<a href="http://www.javadecompilers.com/jad">jad</a></p>
-<blockquote>
-<p>./jad -sjava Animal.class</p>
-</blockquote>
-<pre><code class="java">public enum Animal {
-    DOG,CAT
-}
-
-// 通过jad翻译过后的字节码其实长这样
-public final class Animal extends Enum
-{
-
-    public static Animal[] values()
-    {
-        return (Animal[])$VALUES.clone();
-    }
-
-    public static Animal valueOf(String s)
-    {
-        return (Animal)Enum.valueOf(Animal, s);
-    }
-
-    private Animal(String s, int i)
-    {
-        super(s, i);
-    }
-
-    public static final Animal DOG;
-    public static final Animal CAT;
-    private static final Animal $VALUES[];
-
-    static
-    {
-        DOG = new Animal(&quot;DOG&quot;, 0);
-        CAT = new Animal(&quot;CAT&quot;, 1);
-        $VALUES = (new Animal[] {
-            DOG, CAT
-        });
-    }
-}
-</code></pre>
-<h3 id="40-关于动态代理-InvocationHandler这一套"><a href="#40-关于动态代理-InvocationHandler这一套" class="headerlink" title="40. 关于动态代理(InvocationHandler这一套)"></a>40. 关于动态代理(InvocationHandler这一套)</h3><p><a href="http://www.wanandroid.com/blog/show/2038">动态代理</a>。</p>
+</code></pre><h3 id="40-关于动态代理-InvocationHandler这一套"><a href="#40-关于动态代理-InvocationHandler这一套" class="headerlink" title="40. 关于动态代理(InvocationHandler这一套)"></a>40. 关于动态代理(InvocationHandler这一套)</h3><p><a href="http://www.wanandroid.com/blog/show/2038">动态代理</a>。</p>
 <blockquote>
 <p>System.getProperties().put(“sun.misc.ProxyGenerator.saveGeneratedFiles”, “true”);  </p>
 </blockquote>
@@ -1888,15 +1790,15 @@ System.out.println(&quot;Byte is &quot; + Math.abs(Byte.MIN_VALUE));
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">前端</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1912,11 +1814,11 @@ System.out.println(&quot;Byte is &quot; + Math.abs(Byte.MIN_VALUE));
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
