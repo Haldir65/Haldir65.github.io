@@ -172,6 +172,20 @@ phaser.arriveAndAwaitAdvance();
 ## ThreadPoolExecutor.Worker
 
 
+## Semaphere
+Semaphere的构造函数中可以传一个int参数,用于标识同时最多有几条线程可以获得permit（也就是同时最多有几条线程进入acquire和release之间的代码块中）
+```java
+semaphere.acquire();
+// 操作数据
+semaphere.release();
+```
+假如构造函数中传入了1，那么这个semaphore实际上是一个lock或者说mutex，如果大于一，那么同时进入这段代码块里的线程就有多个了，就需要实现自己的同步逻辑。（race condition，往往要加一段sleep就能快速重现，比如两条线程同时对一个int 0 自增，那么极有可能得到的结果是1而不是预期的2，因为各自看到的都是0）
+
+
+## Exchanger
+
+juc里面没有c语言那样的mutex，不过reentrantlock这种实际上就发挥了mutex的作用。
+
 
 
 

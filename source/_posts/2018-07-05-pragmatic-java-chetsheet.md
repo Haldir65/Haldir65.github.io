@@ -592,6 +592,31 @@ try {
     e.printStackTrace();
 }
 ```
+classLoader在loadClass（无论是隐式的new XXX还是显式的classLoader.loadClass..）都会走缓存
+缓存机制会将已经加载的class缓存起来，当程序中需要使用某个Class时，类加载器先从缓存区中搜寻该Class，只有当缓存中不存在该Class时，系统才会读取该类的二进制数据，并将其转换为Class对象，存入缓存中。这就是为什么更改了class后，需要重启JVM才生效的原因。
+
+[能不能自己写个类叫java.lang.System？](https://blog.csdn.net/tang9140/article/details/42738433) 看了很多博客的摘抄，意思是不可能。进一步说,java.lang.xxx，甚至是java.xxx.xxx都不可能。
+原因在java.lang.ClassLoader这个文件中有一个preDefineClass方法，
+```java
+// Note:  Checking logic in java.lang.invoke.MemberName.checkForTypeAlias
+// relies on the fact that spoofing is impossible if a class has a name
+// of the form "java.*"
+if ((name != null) && name.startsWith("java.")) {
+    throw new SecurityException
+        ("Prohibited package name: " +
+            name.substring(0, name.lastIndexOf('.')));
+}
+```
+这个方法在defineClass前调用。实际上根据byte[]生成class对象的方法叫做defineClass0，defineClass1，defineClass2。BootStrapClassLoader(C++写的)负责加载rt.jar中的所有class(java.xxx.xxx,sun.xxx.xxx....等等都是)，所以这些由BootStrapClassLoader加载的class的getClassLoader方法返回的都是null.
+BootStrapClassLoader(C++写的，负责加载rt.jar下面的所有class,就是包名以java.开头的)
+sun.misc.ExtClassLoader(负责java.ext.dirs这个位置，也就是jre/lib/ext文件夹下面的东西)
+```
+/c/Program Files/Java/jre1.8.0_201/lib/ext
+λ ls
+access-bridge-64.jar  dnsns.jar    jfxrt.jar       meta-index   sunec.jar            sunmscapi.jar  zipfs.jar
+cldrdata.jar          jaccess.jar  localedata.jar  nashorn.jar  sunjce_provider.jar  sunpkcs11.jar
+```
+sun.misc.AppClassLoader(负责java.class.path这个位置，就是/c/Program Files/Java/jre1.8.0_201/lib/文件夹下面的所有jar包,以及/c/Program Files/Java/jre1.8.0_201/lib/ext中的所有jar包，这个其实是委托上去了)。
 
 
 

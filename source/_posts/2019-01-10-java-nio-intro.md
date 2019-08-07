@@ -394,7 +394,7 @@ Java_sun_nio_ch_FileChannelImpl_map0(JNIEnv *env, jobject this,
 jni可以做一些很有意思的事情
 标准输入，标准输出，标准错误输出是所有操作系统都支持的，对于一个进程来说，文件描述符0,1,2固定是标准输入，标准输出，标准错误输出。
 
-java语法中有一条是final的成员变量要么在声明的时候就初始化，要么在构造函数中就得初始化。在System这个class中，我们看到了使用jni强行修改final变量的做法
+java语法中有一条是final的成员变量要么在声明的时候就初始化，要么在构造函数中就得初始化。在System这个class中，我们看到了使用jni强行修改final变量的做法（类似的情况在sun.nio.ch.IOUtil中也有，在static代码块中初始化一个final的int值）
 [JDK 源码阅读 : FileDescriptor](http://www.importnew.com/28981.html)文中提到:
 > System作为一个特殊的类，类构造时无法实例化in/out/err，构造发生在initializeSystemClass被调用时，但是in/out/err是被声明为final的，如果声明时和类构造时没有赋值，是会报错的，所以System在实现时，先设置为null，然后通过native方法来在运行时修改（学到了不少奇技淫巧。。），通过setIn0/setOut0/setErr0的注释也可以说明这一点：
 

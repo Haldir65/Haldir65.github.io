@@ -17,6 +17,9 @@ java 有一个关键字叫做goto，在java代码中好像不能用，但是其�
 javap -c someclass
 jmap等jdk的bin文件下面的功能
 
+jps
+jstack 12345 > thread.txt
+
 [从反编译角度来看string常量池的问题](https://www.cnblogs.com/paddix/p/5326863.html)
 
 invoke dynamic是第五种，jdk7加入的

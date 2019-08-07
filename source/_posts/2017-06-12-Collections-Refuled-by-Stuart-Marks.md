@@ -771,6 +771,7 @@ Deque(双端队列)
 ### 5. concurrentHashMap等
 jdk1.8的concurrentHashMap不是用synchronized实现的，是Doug Lea使用CAS操作写的，非常高效。
 concurrentHashMap的原理是分段锁(jdk 1.7)
+concurrentHashMap早在1.7的时候就加入了putIfAbsent方法，因为确实需要这种atomic action。
 
 ### 6. WeakHaskMap
 WeakHashMap的Key是WeakReference，但Value不是。
@@ -817,4 +818,4 @@ jdk 1.8对于长度超过8的链表改用红黑树。
 5. [WeakHashMap和HashMap的区别](http://blog.csdn.net/yangzl2008/article/details/6980709)
 6. [Hashmap的死锁问题](https://zhuanlan.zhihu.com/p/31614195)
 7. [Young Pups: New Collections APIs for Java 9 by Stuart Marks](https://www.youtube.com/watch?v=OJrIMv4dAek)
-8. [CON6891 20 Years of APIs A Retrospective](https://www.youtube.com/watch?v=X7y-0FDSRoc) 【Stuart Marks, Principal Member of Technical Staff, Oracle】反思了java发展的历程，java的api也并非完美，早期有些class就是匆匆忙忙设计出来的，但为了不破坏binary compatability，java从来没有移除过这些不那么完善的api。实际生产中要避免使用这些不推荐使用的api，Data,Calendar,HashTable,Vector。。。
+8. [CON6891 20 Years of APIs A Retrospective](https://www.youtube.com/watch?v=X7y-0FDSRoc) 【Stuart Marks, Principal Member of Technical Staff, Oracle】反思了java发展的历程，java的api也并非完美，早期有些class就是匆匆忙忙设计出来的，但为了不破坏binary compatability，java从来没有移除过这些不那么完善的api。实际生产中要避免使用这些不推荐使用的api,Data,Calendar,HashTable,Vector。。。

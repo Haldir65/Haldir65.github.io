@@ -115,17 +115,7 @@ synchronized
 
 
 ## 回顾一下用notify,wait,synchronized实现的生产者-消费者模型
-Effective java里面说要把wait写在一个while检查里面
-```java
-// The standard idiom for calling the wait method in Java 
-synchronized (sharedObject) { 
-    while (condition) { 
-      sharedObject.wait(); //当前线程释放锁，此时
-        // (Releases lock, and reacquires on wakeup) 
-    } 
-    // do action based upon condition e.g. take or put into queue 
-}
-```
+
 基本的思路就是生产者和消费者共同持有一个锁（随便new一个Object出来就是了），生产者和消费者都extends Thread。
 生产者每次生产一个都会notifyAll，消费者每次消费一个都会notifyAll
 
@@ -141,14 +131,16 @@ synchronized (sharedObject) {
 wait方法就是将当前线程加入object的waitSet同时释放锁（理解成一个hashset也行），notifyAll则是把waitset里面的内容全部挪到blocked队列中，在notifyAll的线程执行完毕释放锁之后，挑选一个获得锁。[JVM源码分析之Object.wait/notify实现](https://www.jianshu.com/p/f4454164c017)
 
 [oracle的文档上说明了,wait有一个spurious wakeup](https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html#wait()) 是出于performance考虑，表现为wait的线程不需要notify也能自己醒过来。(文档中也指出了，这也就是为什么每一个wait都要包在一个while loop里面的原因)。这一现象在某些os上，包括linux上就有。
+Effective java里面说要把wait写在一个while检查里面
 ```java
- synchronized (obj) {
-         while (<condition does not hold>) // 就是为了防止spurious wakeup
-             obj.wait(timeout);
-         ... // Perform action appropriate to condition
-     }
+// The standard idiom for calling the wait method in Java 
+synchronized (sharedObject) { 
+    while (condition) { 
+      sharedObject.wait(); // 就是为了防止spurious wakeup
+    } 
+    // do action based upon condition e.g. take or put into queue 
+}
 ```
-
 [how not to do java concurrency](https://www.youtube.com/watch?v=Oi6-pXX11qw)
 
 
