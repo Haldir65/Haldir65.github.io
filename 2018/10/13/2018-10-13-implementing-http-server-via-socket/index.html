@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head><meta name="generator" content="Hexo 3.9.0">
   <meta charset="utf-8">
   
   <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>从Socket入手实现http协议 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -17,7 +17,7 @@
 <meta property="og:description" content="收集几种语言中使用socket实现httpServer和httpClient的主要步骤">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/sun_rise_dim_grass.jpg">
-<meta property="og:updated_time" content="2019-08-06T14:56:13.401Z">
+<meta property="og:updated_time" content="2019-08-08T02:58:31.377Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从Socket入手实现http协议">
 <meta name="twitter:description" content="收集几种语言中使用socket实现httpServer和httpClient的主要步骤">
@@ -53,7 +53,7 @@ ga('send', 'pageview');
   
 
 </head>
-
+</html>
 <body>
   <div id="container" q-class="show:isCtnShow">
     <canvas id="anm-canvas" class="anm-canvas"></canvas>
@@ -534,7 +534,7 @@ char* joinString(char *s1, char *s2)
 </code></pre>
 <p>使用方式:</p>
 <blockquote>
-<p>curl -X GET -d  –header “Content-Type:application/json” –header “Authorization:JWT somerandomjwtstringandstuffs” “<a href="http://127.0.0.1:8888/user">http://127.0.0.1:8888/user</a>“</p>
+<p>curl -X GET -d  –header “Content-Type:application/json” –header “Authorization:JWT somerandomjwtstringandstuffs” “<a href="http://127.0.0.1:8888/user&quot;">http://127.0.0.1:8888/user&quot;</a></p>
 </blockquote>
 <p>一个类似于简易的curl的c语言httpClient可能长这样</p>
 <pre><code class="C">#include &lt;stdio.h&gt;
@@ -624,7 +624,7 @@ int get_ip_by_domain(const char *domain, char *ip)
 </code></pre>
 <p>使用方式:</p>
 <blockquote>
-<p>./bin/client www.baidu.com ##这时候，在百度服务器看来，这个程序和普通的浏览器没有区别。试了下主流的网站，都没有什么问题。优酷返回了一大串奇怪的字符串，看了下，应该是content-encoding: gzip了，所以在终端里面看上去乱七八糟的。</p>
+<p>./bin/client <a href="http://www.baidu.com">www.baidu.com</a> ##这时候，在百度服务器看来，这个程序和普通的浏览器没有区别。试了下主流的网站，都没有什么问题。优酷返回了一大串奇怪的字符串，看了下，应该是content-encoding: gzip了，所以在终端里面看上去乱七八糟的。</p>
 </blockquote>
 <p>上面这段会卡在read里面，因为读到最后一个字节的时候，客户端并不知道是没有更多数据还是网络不好堵住了。需要在每一次读完之后去找那个”\r\n\r\n”的结束标志。</p>
 <p>一个使用libevent的版本的客户端可以这样写</p>
@@ -766,7 +766,7 @@ ssize_t write(int fd, const void *buf, size_t count);
 <p>要注意send函数把buf中的数据成功copy到s的发送缓冲的剩余空间里后它就返回了，但是此时这些数据并不一定马上被传到连接的另一端。如果协议在后续的传送过程中出现网络错误的话，那么下一个Socket函数就会返回SOCKET_ERROR。（每一个除send外的Socket函数在执 行的最开始总要先等待套接字的发送缓冲中的数据被协议传送完毕才能继续，如果在等待时出现网络错误，那么该Socket函数就返回 SOCKET_ERROR）</p>
 <p>注意：在Unix系统下，如果send在等待协议传送数据时网络断开的话，调用send的进程会接收到一个SIGPIPE信号，进程对该信号的默认处理是进程终止。</p>
 <p>通过测试发现，异步socket的send函数在网络刚刚断开时还能发送返回相应的字节数，同时使用select检测也是可写的，但是过几秒钟之后，再send就会出错了，返回-1。select也不能检测出可写了。</p>
-<ol>
+<ol start="2">
 <li>recv函数</li>
 </ol>
 <p>int recv( SOCKET s, char FAR *buf, int len, int flags);   </p>
@@ -841,7 +841,7 @@ print(data);
 <p>//在python的socket client这边接收到了<br>11100100<br>10111101<br>10100000<br>11100101<br>10100101<br>10111101<br>11100101<br>10010101<br>10001010</p>
 <p> b’\xe4’<br> b’\xbd’<br> b’\xa0’<br> b’\xe5’<br> b’\xa5’<br> b’\xbd’<br> b’\xe5’<br> b’\x95’<br> b’\x8a’<br> ‘\r’<br> ‘\n’<br> 因为tcp是有序的，所以发送端的字节以什么顺序排列的，接受端就是受到完全一样顺序排列的字节。这里因为网络传输是以字节为单位的。而sizeof(char) = 1 ，但是sizeof(int) = 4, 以上都还只是text-based content，字节序这回事只跟多字节类型的数据有关的比如int,short,long这类数字类型有关，所以基于文本传输的协议当然不存在字节序问题(当然content-length这种数字还是要注意一下的)。</p>
 <p> //在console里面还能够正常的打印出“你好啊”这三个字（包括换行也做了）</p>
-<p>ut-8是变长的<br>Unicode符号范围        | UTF-8编码方式<br>(十六进制)             | （二进制）<br>———————-+———————————————<br>      0 &lt;–&gt; 0x7f     | 0xxxxxxx<br>   0x80 &lt;–&gt; 0x7FF    | 110xxxxx 10xxxxxx<br>  0x800 &lt;–&gt; 0xFFFF   | 1110xxxx 10xxxxxx 10xxxxxx<br>0x10000 &lt;–&gt; 0x10FFFF | 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx</p>
+<p>ut-8是变长的<br>Unicode符号范围        | UTF-8编码方式<br>(十六进制)             | （二进制）<br>———————-+———————————————<br>      0 <--> 0x7f     | 0xxxxxxx<br>   0x80 <--> 0x7FF    | 110xxxxx 10xxxxxx<br>  0x800 <--> 0xFFFF   | 1110xxxx 10xxxxxx 10xxxxxx<br>0x10000 <--> 0x10FFFF | 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx</p>
 <p>//来看这三个字的unicode码<br>你 -&gt; u4f60 —–&gt; 转换成二进制就是 0100 1111 0110 0000(位于上表的第三行，也就是三个字节) 把0100 1111 0110 0000塞进1110xxxx 10xxxxxx 10xxxxxx的xxx里面<br>得到11100100 10111101 10100000（E4 BD A0）<br>好 -&gt; u597d —–&gt; 同上，不再赘述<br>啊 -&gt; u554a —–&gt; 同上，不再赘述</p>
 <p>在浏览器console里面输入<br>encodeURI(‘你好啊’)<br>“%E4%BD%A0%E5%A5%BD%E5%95%8A” //是不是和python那边收到的东西很像</p>
 <p>所以，c语言这边关键函数<br>send(sock_client,”你好啊”,len,0);<br>看上去是发送了6个字节(每个汉字unicode两个字节)，实际上send调用下层在发送出去的时候回把这个6个字节的数据分散在9个字节长度的utf-8 byte array上。<br>可以认为发送6个字节，耗费9个字节的流量(如果发送的全部是ascii字符就不会这么浪费了，但其实utf-8已经很节省了)</p>
@@ -1127,19 +1127,19 @@ int main(void)
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1243,11 +1243,11 @@ int main(void)
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">nio</a>
+                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+                <a href="javascript:void(0)" class="js-tag color4">nio</a>
               </li>
              
               <li class="article-tag-list-item">

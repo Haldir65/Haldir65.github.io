@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head><meta name="generator" content="Hexo 3.9.0">
   <meta charset="utf-8">
   
   <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>wrap_content到底多大 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/480617.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/timelineView.png">
-<meta property="og:updated_time" content="2019-08-06T14:56:13.385Z">
+<meta property="og:updated_time" content="2019-08-08T02:58:31.361Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="wrap_content到底多大">
 <meta name="twitter:description" content="转眼就十一月了，java的分析越来越少，虽然常常在业务上碰到不少坑。。。">
@@ -54,7 +54,7 @@ ga('send', 'pageview');
   
 
 </head>
-
+</html>
 <body>
   <div id="container" q-class="show:isCtnShow">
     <canvas id="anm-canvas" class="anm-canvas"></canvas>
@@ -217,13 +217,16 @@ ga('send', 'pageview');
         final int widthSize = MeasureSpec.getSize(widthMeasureSpec);
         final int heightSize = MeasureSpec.getSize(heightMeasureSpec); // 居然等于0
     }
+
 </code></pre>
 <p>回顾这个Item的实现，Item继承自RelativeLayout，左边的View是调用addView(view,RelativeLayout.Layoutparams)加进去的,params设置了一些rules，像是AlignParentLeft这种，记得给左边的View和右边的TextView都设置一个id就好。TextView也是这样addView进去的。后来查到了秋百万对于MeasureSpec的介绍，我想到RelativeLayout的onMeasure会调用两次，在第一次测量的时候，左边的View和右边的TextView都把高度设置为wrap_content了。要命的是这个Item本身添加到UI的方式也是类似的addView(view,RelativeLayout.Layoutparams)方式，这里的height也是wrap_content。即Item本身高度需要由其child决定，左边的child决定不了，只有右边的TextView才能决定。所以第一轮测量下来，左边的View的高度只能是0，右边的TextView高度倒是确定了。这时候Item本身的高度也就能确定了。在第二遍测量的时候，就能顺利拿到高度了。</p>
 <blockquote>
-<ol>
+<ol start="2">
 <li>左侧的每个节点上的drawable不画出来<br>后来查了下，原因在于我对传进来的drawable检查了大小，太大的话用一个ScaleDrawable转一下。但是，scaleDrawable需要调用setLevel方法才会draw，我这里偷懒直接设置为1了。</li>
 </ol>
-<ol>
+</blockquote>
+<blockquote>
+<ol start="3">
 <li>Item本身是继承自RelativeLayout，想要使onDraw方法被调用需要在构造函数里设置<br>setWillNotDraw(false)<br>这个boolean值默认是true，主要是顾及到性能的原因。</li>
 </ol>
 </blockquote>
@@ -499,19 +502,19 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -615,11 +618,11 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">nio</a>
+                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+                <a href="javascript:void(0)" class="js-tag color4">nio</a>
               </li>
              
               <li class="article-tag-list-item">

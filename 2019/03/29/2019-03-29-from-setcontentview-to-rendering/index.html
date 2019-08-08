@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head><meta name="generator" content="Hexo 3.9.0">
   <meta charset="utf-8">
   
   <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>从setContentView开始谈的渲染流程 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -24,7 +24,7 @@
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/window_manager_07.png">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/window_manager_06.png">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/window_manager_03.jpeg">
-<meta property="og:updated_time" content="2019-08-06T14:56:13.405Z">
+<meta property="og:updated_time" content="2019-08-08T02:58:31.381Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从setContentView开始谈的渲染流程">
 <meta name="twitter:description" content="谈一谈View的渲染流程吧">
@@ -60,7 +60,7 @@ ga('send', 'pageview');
   
 
 </head>
-
+</html>
 <body>
   <div id="container" q-class="show:isCtnShow">
     <canvas id="anm-canvas" class="anm-canvas"></canvas>
@@ -476,7 +476,7 @@ void windowAddedLocked() {
             win.mService.removeWindowLocked(win);
         }
         windows.clear();
-    }
+    }      
 </code></pre>
 <p><img src="https://www.haldir66.ga/static/imgs/window_manager_01.jpeg" alt=""><br>一般的，每一个window都对应一个WindowState对象，<br>该对象的成员中mClient(final IWindow mClient;)用于跟应用端交互<br>成员变量mToken(WindowToken mToken;)用于跟AMS交互</p>
 <p>ViewRootImpl中有针对远程返回的res判断的逻辑,结合这WindowManagerService的addView方法查看更加清楚</p>
@@ -547,7 +547,7 @@ final W mWindow;
 static class W extends IWindow.Stub{
     //运行在app进程，是app端的ViewRootImpl.W服务的binder代理对象
     //这个W的构造函数把ViewRootImpl用weakReference包起来了，远程有消息到达的时候就去调用viewRootImpl的对应方法
-}
+}                    
 </code></pre>
 <p>app端通过IWindowSession调用WMS端的方法，WMS端通过IWindow(WindowState.mClient)调用app端的方法<br><img src="https://www.haldir66.ga/static/imgs/window_manager_07.png" alt=""></p>
 <h3 id="Window调用过程中涉及到的IPC服务"><a href="#Window调用过程中涉及到的IPC服务" class="headerlink" title="Window调用过程中涉及到的IPC服务"></a>Window调用过程中涉及到的IPC服务</h3><table>
@@ -858,7 +858,7 @@ public static int getChildMeasureSpec(int spec, int padding, int childDimension)
 <p>主线程的MessageQueue被syncBarrier堵住的显著特征是msg.target==null(也就是对应的handler为null).  ViewRootImpl在scheduleTraversals的时候会postSyncBarrier一次，也就是说，这个doTraversal是高优先级的，这一刻起后面的所有丢到主线程上的msg都要等到我doTraversal完成后才执行(异步消息例外，所以上面onVsync的消息得是异步的)。从时间顺序上来讲，<br>ViewRootImpl.scheduleTraversal -&gt; mChoreographer.postCallback -&gt; Choreographer开始scheduleFrameLocked（假如时间到了，直接调用nativeScheduleVsync，否则发送的msg全都是异步的，就是为了跨过之前的barrier.）同样，在onVsync的时候，由于此时的barrier还没移除，所以发出的消息还得是异步的。doFrame里面，严格按照input -&gt; animation -&gt; traversal的类型去执行。也就是viewRootImpl在scheduleTraversals的时候post的callback要老老实实在第三组被执行。而在轮到这个doTraversal执行的时候，终于可以去移除barrier了。</p>
 <p>需要指明的是，每一次scheduleTraversal都要触发measure -&gt; layout -&gt; draw这一套，所以，耗时是很严重的。vsync信号也不是系统主动发出的，而是需要通过nativeScheduleVsync请求，才会有一次onVsync的相应的。看了一下，ViewRootImpl里面的setLayoutParams，invalidate,requestLayout,requestFitSystemWindows等方法里面都会触发scheduleTraversal。 显然在onCreate的setContentView里面会至少调用一次。然后就是熟悉的performTraversal(measure,layout,draw)。</p>
 <p>人们常说在onCreate里面获取一个View的宽高有四种方式：<br>onPreDraw,onLayoutChange,view.measure.<br>第四种就是直接在setContentView后面跟着post一个msg，原理就是前面有一个barrier，这个barrier解除之后执行的第一个msg大概率就是这个msg(不考虑别的线程这么巧也插进来)，这时候，performTraversals刚刚走完，draw也走完了,最后绘制数据都缓存到Surface上。但是systemServer那边，windowManagerService和surfaceFlinger那边还没来得及处理这些刚draw的数据（surfaceFlinger那边还要compose，没那么快吧）。</p>
-<h3 id="surfaceFlinger"><a href="#surfaceFlinger" class="headerlink" title="surfaceFlinger"></a>surfaceFlinger</h3><p>Android是通过系统级进程中的SurfaceFlinger服务来把真正需要显示的数据渲染到屏幕上。SurfaceFlinger的主要工作是：<br><img src="https://www.haldir66.ga/static/imgs/window_manager_06.png" alt=""><br>响应客户端事件，创建Layer与客户端的Surface建立连接。<br>接收客户端数据及属性，修改Layer属性，如尺寸、颜色、透明度等。<br>将创建的Layer内容刷新到屏幕上。<br>维持Layer的序列，并对Layer最终输出做出裁剪计算。<br>因应用层和系统层分别是两个不同进程，需要一个跨进程的通信机制来实现数据传输，在Android的显示系统中，使用了Android的匿名共享内存：SharedClient。每一个应用和SurfaceFlinger之间都会创建一个SharedClient，每个SharedClient中，最多可以创建31个SharedBufferStack，每个Surface都对应一个SharedBufferStack，也就是一个window。这意味着一个Android应用程序最多可以包含31个窗口，同时每个SharedBufferStack中又包含两个(<4.1)或三个(>=4.1)缓冲区。<br>应用层绘制到缓冲区，SurfaceFlinger把缓存区数据渲染到屏幕，两个进程之间使用Android的匿名共享内存SharedClient缓存需要显示的数据。</p>
+<h3 id="surfaceFlinger"><a href="#surfaceFlinger" class="headerlink" title="surfaceFlinger"></a>surfaceFlinger</h3><p>Android是通过系统级进程中的SurfaceFlinger服务来把真正需要显示的数据渲染到屏幕上。SurfaceFlinger的主要工作是：<br><img src="https://www.haldir66.ga/static/imgs/window_manager_06.png" alt=""><br>响应客户端事件，创建Layer与客户端的Surface建立连接。<br>接收客户端数据及属性，修改Layer属性，如尺寸、颜色、透明度等。<br>将创建的Layer内容刷新到屏幕上。<br>维持Layer的序列，并对Layer最终输出做出裁剪计算。<br>因应用层和系统层分别是两个不同进程，需要一个跨进程的通信机制来实现数据传输，在Android的显示系统中，使用了Android的匿名共享内存：SharedClient。每一个应用和SurfaceFlinger之间都会创建一个SharedClient，每个SharedClient中，最多可以创建31个SharedBufferStack，每个Surface都对应一个SharedBufferStack，也就是一个window。这意味着一个Android应用程序最多可以包含31个窗口，同时每个SharedBufferStack中又包含两个(&lt;4.1)或三个(&gt;=4.1)缓冲区。<br>应用层绘制到缓冲区，SurfaceFlinger把缓存区数据渲染到屏幕，两个进程之间使用Android的匿名共享内存SharedClient缓存需要显示的数据。</p>
 <p>WMS跟surfaceFlinger交互的过程是，WMS建立SurfaceComposerClient，然后会在SF中创建Client与之对应，后续通过ISurfaceComposerClient与SF通信</p>
 <p>APP可以没有Activty,PhoneWindow,DecorView，例如带悬浮窗的service。</p>
 <p><img src="https://www.haldir66.ga/static/imgs/window_manager_03.jpeg" alt=""></p>
@@ -1121,19 +1121,19 @@ public static int getChildMeasureSpec(int spec, int padding, int childDimension)
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1237,11 +1237,11 @@ public static int getChildMeasureSpec(int spec, int padding, int childDimension)
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">nio</a>
+                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+                <a href="javascript:void(0)" class="js-tag color4">nio</a>
               </li>
              
               <li class="article-tag-list-item">

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head><meta name="generator" content="Hexo 3.9.0">
   <meta charset="utf-8">
   
   <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>Android知识集合[四] | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -16,7 +16,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/street%20lights%20dark%20night%20car%20city%20bw.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/toast_transact.jpg">
-<meta property="og:updated_time" content="2019-08-06T14:56:13.397Z">
+<meta property="og:updated_time" content="2019-08-08T02:58:31.373Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android知识集合[四]">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/street%20lights%20dark%20night%20car%20city%20bw.jpg">
@@ -51,7 +51,7 @@ ga('send', 'pageview');
   
 
 </head>
-
+</html>
 <body>
   <div id="container" q-class="show:isCtnShow">
     <canvas id="anm-canvas" class="anm-canvas"></canvas>
@@ -230,7 +230,7 @@ ga('send', 'pageview');
 <h2 id="2-ContentProvider的onCreate要早于Application的onCreate发生"><a href="#2-ContentProvider的onCreate要早于Application的onCreate发生" class="headerlink" title="2.ContentProvider的onCreate要早于Application的onCreate发生"></a>2.ContentProvider的onCreate要早于Application的onCreate发生</h2><p>比如ArchitectureComponent中的lifeCycle就是这么干的，写了个dummpy的contentProvider，在provider的onCreate中去loadLibrary.</p>
 <h2 id="3-看到一个关于apk反编译和重新打包的帖子，非常好用"><a href="#3-看到一个关于apk反编译和重新打包的帖子，非常好用" class="headerlink" title="3. 看到一个关于apk反编译和重新打包的帖子，非常好用"></a>3. 看到一个关于apk反编译和重新打包的帖子，非常好用</h2><p><a href="https://www.jianshu.com/p/792a08d5452c">Android apk反编译及重新打包流程</a>，关键词apktool。<br>但是，360加固之后的apk是不能用dex2jar查看java代码的。</p>
 <h3 id="4-从base-apk谈到apk安装的过程"><a href="#4-从base-apk谈到apk安装的过程" class="headerlink" title="4.从base.apk谈到apk安装的过程"></a>4.从base.apk谈到apk安装的过程</h3><p><a href="https://www.jianshu.com/p/ae45af3c3098">APK安装过程</a>。<br>之前无意间在FileExplorer中看到了base.apk这个文件，由此展开apk安装过程的研究。</p>
-<h2 id="5-关于模块化和项目重构"><a href="#5-关于模块化和项目重构" class="headerlink" title="5.关于模块化和项目重构"></a>5.关于模块化和项目重构</h2><p>很多关于Android甚至java项目的重构的文章都会最终提到两条：<br>面向接口编程 -&gt; 依赖注入(IOC)<br>然后跟上一大堆专业分析和没什么用的废话。<br>这俩在java的领域翻译过来就是：<br>在A模块中用Dagger2生成B模块中定义的interface的impl实例。<br><del>其实不用Dagger2也行，就是每次在B模块的生命周期开始时准备一个HashMap<interfaceClass,ImplClass>这样的一大堆键值对，然后在A模块中根据想要的interface class去找impl class，用反射去创建，生产环境肯定不能这么干。</del><br>在Dagger2中大致是这么干的：</p>
+<h2 id="5-关于模块化和项目重构"><a href="#5-关于模块化和项目重构" class="headerlink" title="5.关于模块化和项目重构"></a>5.关于模块化和项目重构</h2><p>很多关于Android甚至java项目的重构的文章都会最终提到两条：<br>面向接口编程 -&gt; 依赖注入(IOC)<br>然后跟上一大堆专业分析和没什么用的废话。<br>这俩在java的领域翻译过来就是：<br>在A模块中用Dagger2生成B模块中定义的interface的impl实例。<br><del>其实不用Dagger2也行，就是每次在B模块的生命周期开始时准备一个HashMap&lt;interfaceClass,ImplClass&gt;这样的一大堆键值对，然后在A模块中根据想要的interface class去找impl class，用反射去创建，生产环境肯定不能这么干。</del><br>在Dagger2中大致是这么干的：</p>
 <p>先声明好B模块对外提供的接口，以下这俩都在另一个module中，A module通过gradle引用了B模块</p>
 <pre><code class="java">public interface Store {
     String sell();
@@ -490,6 +490,7 @@ void Java_com_honjane_ndkdemo_JNIUtils_accessPublicMethod( JNIEnv* env, jobject 
     }
 
     public native int accessStaticMethod();
+
 </code></pre>
 <pre><code class="c++">
 //访问java中static方法
@@ -544,7 +545,7 @@ jint Java_com_honjane_ndkdemo_JNIUtils_addNum( JNIEnv* env, jobject jobj){
 <p>1、当调用一个JNI函数后，必须先检查、处理、清除异常后再做其它 JNI 函数调用，否则会产生不可预知的结果。<br>2、一旦发生异常，立即返回，让调用者处理这个异常。或 调用 ExceptionClear 清除异常，然后执行自己的异常处理代码。<br>3、异常处理的相关JNI函数总结：<br>1&gt; ExceptionCheck：检查是否发生了异常，若有异常返回JNI_TRUE，否则返回JNI_FALSE<br>2&gt; ExceptionOccurred：检查是否发生了异常，若用异常返回该异常的引用，否则返回NULL<br>3&gt; ExceptionDescribe：打印异常的堆栈信息<br>4&gt; ExceptionClear：清除异常堆栈信息<br>5&gt; ThrowNew：在当前线程触发一个异常，并自定义输出异常信息<br>jint (JNICALL <em>ThrowNew) (JNIEnv </em>env, jclass clazz, const char <em>msg);<br>6&gt; Throw：丢弃一个现有的异常对象，在当前线程触发一个新的异常<br>jint (JNICALL </em>Throw) (JNIEnv <em>env, jthrowable obj);<br>7&gt; FatalError：致命异常，用于输出一个异常信息，并终止当前VM实例（即退出程序）<br>void (JNICALL </em>FatalError) (JNIEnv <em>env, const char </em>msg);</p>
 </blockquote>
 <p>jni是一套规范,oracle有一个<a href="https://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/functions.html">文档</a>，不同的vm照着这个规范实现就是了</p>
-<ol>
+<ol start="15">
 <li>关于Spannable String的问题<br>Medium上有关于使用span的文章 <a href="https://medium.com/google-developers/spantastic-text-styling-with-spans-17b0c16b4568">Spantastic text styling with Spans</a> 其实有SpannableString(mutable),SpannableStringBuilder还有SpannedString(immutable)。<br>Just reading and not setting the text nor the spans? -&gt; SpannedString(文字和style都改不了)<br>Setting the text and the spans? -&gt; SpannableStringBuilder(文字和Style都能改)<br>Setting a small number of spans (&lt;~10)? -&gt; SpannableString(文字不能改，Style能改)<br>Setting a larger number of spans (&gt;~10) -&gt; SpannableStringBuilder</li>
 </ol>
 <p><a href="https://stackoverflow.com/questions/17546955/android-spanned-spannedstring-spannable-spannablestring-and-charsequence">stackoverflow上甚至有Glide作者的讨论</a><br>从源码来看,SpannedString和SpannableString几乎是一样的，后者继承了一个Spannable的接口，由此对外暴露了父类(SpannableStringInternal)的setSpan和removeSpan方法。</p>
@@ -727,9 +728,12 @@ public Bitmap blurBitmap(Bitmap bitmap){
      */
  val configRoot = (if (Build.VERSION.SDK_INT &lt; 24 || app.getSystemService&lt;UserManager&gt;()
                             ?.isUserUnlocked != false) app else Core.deviceStorage).noBackupFilesDir
- val configFile =  File(configRoot, &quot;shadowsocks.conf&quot;)
+ val configFile =  File(configRoot, &quot;shadowsocks.conf&quot;)                            
 </code></pre>
-<p><strong>isUserUnlocked（added in api 24）</strong><br>&gt;<br>Return whether the calling user is running in an “unlocked” state.<br>On devices with direct boot, a user is unlocked only after they’ve entered their credentials (such as a lock pattern or PIN). On devices without direct boot, a user is unlocked as soon as it starts.<br>When a user is locked, only device-protected data storage is available. When a user is unlocked, both device-protected and credential-protected private app data storage is available.</p>
+<p><strong>isUserUnlocked（added in api 24）</strong></p>
+<blockquote>
+</blockquote>
+<p>Return whether the calling user is running in an “unlocked” state.<br>On devices with direct boot, a user is unlocked only after they’ve entered their credentials (such as a lock pattern or PIN). On devices without direct boot, a user is unlocked as soon as it starts.<br>When a user is locked, only device-protected data storage is available. When a user is unlocked, both device-protected and credential-protected private app data storage is available.</p>
 <p>所以上面的文件路径在api 24或者userUnlocked（已经解锁）的情况下，用的是Application.noBackupFilesDir,否则用的是context.createDeviceProtectedStorageContext()创建出来的一个context(也就是在24以上)。noBackupFilesDir的意思只是不会被自动同步，这种敏感信息当然不应该被同步。</p>
 <p>至于安全性，getFilesDir()这种返回的属于internal Storage。根据<a href="https://stackoverflow.com/questions/43710317/is-storing-data-using-file-input-output-stream-method-secure">Commonsware的解释</a>的解释，这个位置的文件只有当前app（或者有root权限的app）能够读或者写，其他的app一律deny。所以如果不考虑root的情况下，这个位置其实是很安全的。</p>
 <p>android:sharedUserId这个属性可以让两个app共享getFilesDir()下面的文件（前提是signing key相同），事实上这些文件的owner都是同一个linux user。<br>最后提一下这个目录的位置</p>
@@ -1156,19 +1160,19 @@ ActivityThread.performLaunchActivity
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1272,11 +1276,11 @@ ActivityThread.performLaunchActivity
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">nio</a>
+                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+                <a href="javascript:void(0)" class="js-tag color4">nio</a>
               </li>
              
               <li class="article-tag-list-item">

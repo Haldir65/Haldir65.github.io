@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head><meta name="generator" content="Hexo 3.9.0">
   <meta charset="utf-8">
   
   <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>java线程池的实现原理 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -17,7 +17,7 @@
 <meta property="og:description" content="原本只打算写一点关于线程池的实现原理，后来发现坑越挖越大。不得不写到一半停下来，所以，这算是一篇不那么完善的关于原理的解析吧。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg">
-<meta property="og:updated_time" content="2019-08-06T14:56:13.389Z">
+<meta property="og:updated_time" content="2019-08-08T02:58:31.365Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java线程池的实现原理">
 <meta name="twitter:description" content="原本只打算写一点关于线程池的实现原理，后来发现坑越挖越大。不得不写到一半停下来，所以，这算是一篇不那么完善的关于原理的解析吧。">
@@ -53,7 +53,7 @@ ga('send', 'pageview');
   
 
 </head>
-
+</html>
 <body>
   <div id="container" q-class="show:isCtnShow">
     <canvas id="anm-canvas" class="anm-canvas"></canvas>
@@ -251,7 +251,7 @@ public enum State {
 //ThreadPoolExecutor中用一个AtomicInteger的前三位表示当前state，后29位表示worker的数量。通过AtomicInteger的CAS操作保证多线程之间看到的worker数和当前state是一致的；
 private final AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
 //用一个ReentrantLock来锁住对workers这个HashSet的添加，删除操作
-private final HashSet&lt;Worker&gt; workers = new HashSet&lt;Worker&gt;();
+private final HashSet&lt;Worker&gt; workers = new HashSet&lt;Worker&gt;();    
 </code></pre>
 <p>这里针对execute方法具体的实现来展开，即，如何做到自动扩容，如何做到线程缓存，如何实现终止，以及资源同步问题。</p>
 <pre><code class="java"> public void execute(Runnable command) {
@@ -401,7 +401,7 @@ private final HashSet&lt;Worker&gt; workers = new HashSet&lt;Worker&gt;();
         } finally {
             processWorkerExit(w, completedAbruptly); //在这里从workers的HashSet中移除当前worker
         }
-    }
+    }    
 </code></pre>
 <p>addWorker会创建一个新的Worker(线程)，并将command作为这个线程要执行的第一个任务，而Worker的run方法是线程跑起来执行的方法。至于如何实现从queue中获取任务交给线程去完成，看getTask方法</p>
 <pre><code class="java">private Runnable getTask() {
@@ -736,19 +736,19 @@ private final HashSet&lt;Worker&gt; workers = new HashSet&lt;Worker&gt;();
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -852,11 +852,11 @@ private final HashSet&lt;Worker&gt; workers = new HashSet&lt;Worker&gt;();
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">nio</a>
+                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+                <a href="javascript:void(0)" class="js-tag color4">nio</a>
               </li>
              
               <li class="article-tag-list-item">

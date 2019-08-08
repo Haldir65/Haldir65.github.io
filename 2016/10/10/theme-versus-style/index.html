@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head><meta name="generator" content="Hexo 3.9.0">
   <meta charset="utf-8">
   
   <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>Theme和Style的区别 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -16,7 +16,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="认识Theme和Styles 重新看一遍Using Themes and styles without going crazy，大部分属于直接翻译 1. Styles1.1 首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来&amp;lt;View android:background= &amp;quot;#ff0000&amp;quot; /&amp;gt;  变成 &amp;lt;View style=">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-08-06T14:56:13.405Z">
+<meta property="og:updated_time" content="2019-08-08T02:58:31.381Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Theme和Style的区别">
 <meta name="twitter:description" content="认识Theme和Styles 重新看一遍Using Themes and styles without going crazy，大部分属于直接翻译 1. Styles1.1 首先，在layout文件中，Style可以将一些重复的，具有共性的属性提取出来&amp;lt;View android:background= &amp;quot;#ff0000&amp;quot; /&amp;gt;  变成 &amp;lt;View style=">
@@ -51,7 +51,7 @@ ga('send', 'pageview');
   
 
 </head>
-
+</html>
 <body>
   <div id="container" q-class="show:isCtnShow">
     <canvas id="anm-canvas" class="anm-canvas"></canvas>
@@ -233,6 +233,8 @@ ga('send', 'pageview');
 <p>如上所示，TextView中可以定义TextAppearance，后者包含了常见的textColor，textSize等attributes，而在一个View中可以同时定义两个Style。如果出现冲突，styles之间相同attributes的应用优先级为：</p>
 <blockquote>
 <p>android:textColor &gt;&gt; SomeStyle中的android:textColor&gt;&gt;MyText中的android:textColor</p>
+</blockquote>
+<blockquote>
 <p>使用TextAppearance 时一定要有一个parent</p>
 </blockquote>
 <pre><code class="xml">&lt;style name = &quot;MyText&quot; parent=&quot;TextAppearance.Appcompat&quot;&gt;
@@ -270,14 +272,14 @@ ga('send', 'pageview');
     android:theme=&quot;@style/Theme.AppCompat.Light&quot;        /&gt;
 </code></pre>
 <p>  activty中Theme override Application的Theme</p>
-<ol>
+<ol start="2">
 <li><p>应用于View</p>
 <p>Lollipop开始引入View Theming的概念</p>
 </li>
 </ol>
 <pre><code class="xml">  &lt;Toolbar
      android:theme=&quot;@style/ThemeOverlay.AppCompat.Dark.ActionBar&quot;
-     app:popupTheme=&quot;@style/ThemeOverlay.AppCompa.Light&quot;/&gt;
+     app:popupTheme=&quot;@style/ThemeOverlay.AppCompa.Light&quot;/&gt;      
 </code></pre>
 <p>  应用在View上的Theme将能够作用在该View及其所有的Children，这样做的好处在于没有必要专门为了一个View而去选择其他的Theme。</p>
 <p>  例如在Holo中有Holo.Light.DarkActionBar，为了专门适配ActionBar需要一个专门的Theme。目前看来主要应用在Toolbar上。</p>
@@ -354,7 +356,7 @@ ga('send', 'pageview');
   TypedArray a = context.obtainStyledAttributes(attrs,com.android.internal.R.styleable.ImageView,defStyleAttr,defStyleRes)
 
 int alpha = a.getInt(
-  com.android.internal.R.styleable.ImageView_drawableAlpha,255)
+  com.android.internal.R.styleable.ImageView_drawableAlpha,255)   
 </code></pre>
 <p>Activity有一个setTheme(int themeResId)方法，注意，这个方法并不是取代原先的Theme,只是在原有的Theme上apply了。所以这个命名不算太好。Activity内部会在onCreate()前调用setTheme(你写在manifest里面的Theme)</p>
 <h2 id="6-v21的问题"><a href="#6-v21的问题" class="headerlink" title="6. v21的问题"></a>6. v21的问题</h2><pre><code class="xml">在values/styles.xml中
@@ -372,7 +374,7 @@ lint就不会飙黄了，直接引用Toolbar即可
 <p>通过这种继承的方式能够在自己的Theme中使用统一的theme，针对不同的运行时版本确定最终运行的Theme。</p>
 <h2 id="7-ThemeOverlay"><a href="#7-ThemeOverlay" class="headerlink" title="7 . ThemeOverlay"></a>7 . ThemeOverlay</h2><pre><code class="JAVA">ThemeOverlay.Material.Light
 ThemeOverlay.Material.Dark
-//etc ...
+//etc ...   
 </code></pre>
 <p>用于添加到现有的Theme上，例如Theme.Material.Light只包含color relevant to a light Theme，不会改变原有Theme的window Attributes。查看源码，只是完整的Theme中的一小部分attribute。</p>
 <h2 id="8-常见错误"><a href="#8-常见错误" class="headerlink" title="8. 常见错误"></a>8. 常见错误</h2><ol>
@@ -389,7 +391,7 @@ ThemeOverlay.Material.Dark
 &lt;/style&gt;
 </code></pre>
 <p>这样做的结果将是所有的EditText都会失去基本的属性</p>
-<ol>
+<ol start="2">
 <li>defStyleAttr vs defStyleRes</li>
 </ol>
 <p>常见于</p>
@@ -408,7 +410,7 @@ ThemeOverlay.Material.Dark
 2. Value in the explicit style
 3. Default style specified in defStyleRes
 4. Default style specified in defStyleAttr
-5. Base value in this theme
+5. Base value in this theme     
 </code></pre>
 <p>注意最后一条，万一在manifests文件中出现这种东西</p>
 <pre><code class="xml">&lt;Style name = &quot;AppTheme&quot; parent = &quot;Theme.AppCompat&quot;&gt;
@@ -708,19 +710,19 @@ View view = new View(themedContext);
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -824,11 +826,11 @@ View view = new View(themedContext);
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">nio</a>
+                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+                <a href="javascript:void(0)" class="js-tag color4">nio</a>
               </li>
              
               <li class="article-tag-list-item">

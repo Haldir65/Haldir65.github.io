@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head><meta name="generator" content="Hexo 3.9.0">
   <meta charset="utf-8">
   
   <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>pragmatic-java-chetsheet | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -16,7 +16,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/20160720094529840.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/1279081126453.jpg">
-<meta property="og:updated_time" content="2019-08-06T14:56:13.401Z">
+<meta property="og:updated_time" content="2019-08-08T02:58:31.377Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="pragmatic-java-chetsheet">
 <meta name="twitter:image" content="https://haldir66.ga/static/imgs/20160720094529840.jpg">
@@ -51,7 +51,7 @@ ga('send', 'pageview');
   
 
 </head>
-
+</html>
 <body>
   <div id="container" q-class="show:isCtnShow">
     <canvas id="anm-canvas" class="anm-canvas"></canvas>
@@ -260,6 +260,8 @@ public class MyObject {
 <p>输出(我怀疑这个顺序是按照字母顺序来的)</p>
 <blockquote>
 <p>cons[0] ()<br>cons[1] (int)<br>cons[2] (java.lang.String, int)<br>cons[3] (java.lang.String)</p>
+</blockquote>
+<blockquote>
 <p>实例化一个object，假设有很多个构造函数的话</p>
 </blockquote>
 <pre><code class="java">    public void createViaReflection(){
@@ -284,6 +286,8 @@ public class MyObject {
 </code></pre>
 <blockquote>
 <p>MyObject{name=’passing value via constructor is ok -ish’, age=0}</p>
+</blockquote>
+<blockquote>
 <p>获取一个class中所有的Fileds（private的也能拿到）</p>
 </blockquote>
 <pre><code class="java">    public void getAllFields(){
@@ -310,6 +314,8 @@ public class MyObject {
 <p>输出：</p>
 <blockquote>
 <p>name<br>mo: 1<br>public java.lang.String name<br>age<br>mo: 2<br>private int age</p>
+</blockquote>
+<blockquote>
 <p>获得一个class中所有的方法(拿不到private的和构造函数，父类的wait,notfy这些反而能够拿到),getMethod只能拿到public的方法，getDeclaredMethod基本上是什么类型的都能拿到(getDeclaredMethods，有个s)</p>
 </blockquote>
 <pre><code class="java">    public void getAllMethods(){
@@ -725,6 +731,23 @@ public class Test {
     e.printStackTrace();
 }
 </code></pre>
+<p>classLoader在loadClass（无论是隐式的new XXX还是显式的classLoader.loadClass..）都会走缓存<br>缓存机制会将已经加载的class缓存起来，当程序中需要使用某个Class时，类加载器先从缓存区中搜寻该Class，只有当缓存中不存在该Class时，系统才会读取该类的二进制数据，并将其转换为Class对象，存入缓存中。这就是为什么更改了class后，需要重启JVM才生效的原因。</p>
+<p><a href="https://blog.csdn.net/tang9140/article/details/42738433">能不能自己写个类叫java.lang.System？</a> 看了很多博客的摘抄，意思是不可能。进一步说,java.lang.xxx，甚至是java.xxx.xxx都不可能。<br>原因在java.lang.ClassLoader这个文件中有一个preDefineClass方法，</p>
+<pre><code class="java">// Note:  Checking logic in java.lang.invoke.MemberName.checkForTypeAlias
+// relies on the fact that spoofing is impossible if a class has a name
+// of the form &quot;java.*&quot;
+if ((name != null) &amp;&amp; name.startsWith(&quot;java.&quot;)) {
+    throw new SecurityException
+        (&quot;Prohibited package name: &quot; +
+            name.substring(0, name.lastIndexOf(&#39;.&#39;)));
+}
+</code></pre>
+<p>这个方法在defineClass前调用。实际上根据byte[]生成class对象的方法叫做defineClass0，defineClass1，defineClass2。BootStrapClassLoader(C++写的)负责加载rt.jar中的所有class(java.xxx.xxx,sun.xxx.xxx….等等都是)，所以这些由BootStrapClassLoader加载的class的getClassLoader方法返回的都是null.<br>BootStrapClassLoader(C++写的，负责加载rt.jar下面的所有class,就是包名以java.开头的)<br>sun.misc.ExtClassLoader(负责java.ext.dirs这个位置，也就是jre/lib/ext文件夹下面的东西)</p>
+<pre><code>/c/Program Files/Java/jre1.8.0_201/lib/ext
+λ ls
+access-bridge-64.jar  dnsns.jar    jfxrt.jar       meta-index   sunec.jar            sunmscapi.jar  zipfs.jar
+cldrdata.jar          jaccess.jar  localedata.jar  nashorn.jar  sunjce_provider.jar  sunpkcs11.jar
+</code></pre><p>sun.misc.AppClassLoader(负责java.class.path这个位置，就是/c/Program Files/Java/jre1.8.0_201/lib/文件夹下面的所有jar包,以及/c/Program Files/Java/jre1.8.0_201/lib/ext中的所有jar包，这个其实是委托上去了)。</p>
 <p>todo<br>反编译java代码的基本套路<br><a href="https://www.zhihu.com/question/60892134">有直接去看hotspot源码来分析的</a><br><a href="https://zhuanlan.zhihu.com/p/51374915">classLoader related topics</a></p>
 <p><img src="https://www.haldir66.ga/static/imgs/1279081126453.jpg" alt=""></p>
 
@@ -985,19 +1008,19 @@ public class Test {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1101,11 +1124,11 @@ public class Test {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">nio</a>
+                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+                <a href="javascript:void(0)" class="js-tag color4">nio</a>
               </li>
              
               <li class="article-tag-list-item">

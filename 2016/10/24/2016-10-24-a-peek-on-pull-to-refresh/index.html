@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head><meta name="generator" content="Hexo 3.9.0">
   <meta charset="utf-8">
   
   <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>android-Ultra-pull-to-refresh分析 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -17,7 +17,7 @@
 <meta property="og:description" content="最早开始接触安卓的时候就知道有Chris Banes的Pull-To-Refresh，当时这个库已经被标记被Deprecated了，后来出于寻找替代品的目的找到了秋百万的android-Ultra-pull-toRefresh，直接    当时甚至没有能力把一个Demo跑起来。之后的项目中，直接使用swipeRefreshLayout了。现在回头看，终于觉得可以尝试着分析一遍整个下拉刷新的过程。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/687474703a2f2f692e696d6775722e636f6d2f4766746846417a2e706e67.png">
-<meta property="og:updated_time" content="2019-08-06T14:56:13.385Z">
+<meta property="og:updated_time" content="2019-08-08T02:58:31.361Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="android-Ultra-pull-to-refresh分析">
 <meta name="twitter:description" content="最早开始接触安卓的时候就知道有Chris Banes的Pull-To-Refresh，当时这个库已经被标记被Deprecated了，后来出于寻找替代品的目的找到了秋百万的android-Ultra-pull-toRefresh，直接    当时甚至没有能力把一个Demo跑起来。之后的项目中，直接使用swipeRefreshLayout了。现在回头看，终于觉得可以尝试着分析一遍整个下拉刷新的过程。">
@@ -53,7 +53,7 @@ ga('send', 'pageview');
   
 
 </head>
-
+</html>
 <body>
   <div id="container" q-class="show:isCtnShow">
     <canvas id="anm-canvas" class="anm-canvas"></canvas>
@@ -270,7 +270,7 @@ ga('send', 'pageview');
 }
 </code></pre>
 <p>构造函数里面主要就是获得在xml中设定的一些自定义属性的值并保存为成员变量，实际用途后面再看。</p>
-<ol>
+<ol start="2">
 <li><strong>onFinishInflate</strong><br>这个方法在inflate xml文件结束，所有的childView都已经添加之后调用<br>PtrFrameLayout复写了这个方法，</li>
 </ol>
 <ul>
@@ -284,7 +284,7 @@ if (child1 instanceof PtrUIHandler) {
                   mHeaderView = child2;
                   mContent = child1;
               } 
-//省略若干
+//省略若干                
 </code></pre>
 <p>来看一下这个ptrUIHandler</p>
 <pre><code class="java">public interface PtrUIHandler {
@@ -319,8 +319,8 @@ if (child1 instanceof PtrUIHandler) {
 <p>大概可以猜到这货是用来指定下拉过程中的刷新开始，刷新结束，刷新结束后复位等过程的实现者，具体的下拉过程中的动画，位移等特效都应该由这接口的实例(View)来完成。</p>
 </li>
 </ul>
-<ol>
-<li><strong>onMeasure</strong><br>```java<br>@Override<br> protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {<pre><code> super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+<ol start="3">
+<li><strong>onMeasure</strong><br><code>`</code>java<br>@Override<br> protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {<pre><code> super.onMeasure(widthMeasureSpec, heightMeasureSpec);
  //省略...
   measureContentView(mContent, widthMeasureSpec, heightMeasureSpec);
 </code></pre> }</li>
@@ -400,6 +400,7 @@ if (child1 instanceof PtrUIHandler) {
         }
         return dispatchTouchEventSupper(e);
     }
+
 </code></pre><p>用户手指按下。。。。。手指滑动。。。。。手指抬起</p>
 <p><strong>ACTION_DOWN</strong> : 手指按下后将TouchEvent交给mPtrIndicator处理，后者保留了当前ptr的位置，高度等信息。在执行ACTION_DOWN时，并没有简单地使用Event.getY，而是保留了当前position的一个备份(这是必要的，因为对于下拉刷新来说，最终需要回到的位置是0，而用户按下的位置可能在contentView比较靠下面的位置。ACTION_DOWN的getY并没有太大意义)。随后调用Scroller的 mScroller.forceFinished(true)方法停止滑动，如果定义了页面自动刷新(就是进来会下拉刷新一次)，还会调用onRelease(true)方法，onRelease方法与ACTION_UP相关。</p>
 <p><strong>ACTION_MOVE</strong> : 手指开始在屏幕上滑动，首先将滑动距离的改变保留到mPtrIndicator中，这里作者将很多坐标计算的方法都拆出来放到这个mPtrIndicator中，暴露出get方法，也使得代码更清晰。在开始滑动之前，先检查下是否是横向滑动，以及是否在(mDisableWhenHorizontalMove，ViewPager需要消费横向手势，这个标志符是为了return super)。<br>往下走，来看这一段</p>
@@ -770,19 +771,19 @@ if (child1 instanceof PtrUIHandler) {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -886,11 +887,11 @@ if (child1 instanceof PtrUIHandler) {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">nio</a>
+                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+                <a href="javascript:void(0)" class="js-tag color4">nio</a>
               </li>
              
               <li class="article-tag-list-item">

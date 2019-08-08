@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head><meta name="generator" content="Hexo 3.9.0">
   <meta charset="utf-8">
   
   <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>page-size and block size | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -17,7 +17,7 @@
 <meta property="og:description" content="page size（内存相关）和block size(文件系统相关)的一些点">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery1511100718415.jpg">
-<meta property="og:updated_time" content="2019-08-06T14:56:13.401Z">
+<meta property="og:updated_time" content="2019-08-08T02:58:31.377Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="page-size and block size">
 <meta name="twitter:description" content="page size（内存相关）和block size(文件系统相关)的一些点">
@@ -53,7 +53,7 @@ ga('send', 'pageview');
   
 
 </head>
-
+</html>
 <body>
   <div id="container" q-class="show:isCtnShow">
     <canvas id="anm-canvas" class="anm-canvas"></canvas>
@@ -246,8 +246,14 @@ int main(){
 <p>简单的来说，fsize获取的大小和du的结果不一致。但du -b 就一样了。这事主要是因为block size的缘故,文件系统分配磁盘存储的时候是以block为单位的。所以经常看到windows里面显示一个文件的大小和“占用的磁盘空间”。就是因为block的原因。<a href="https://unix.stackexchange.com/questions/120311/why-are-there-so-many-different-ways-to-measure-disk-usage">更详细的解释在这里</a></p>
 <blockquote>
 <p>For files, ls -l file shows (among other things) the size of file in bytes, while du -k file shows the space occupied by file on disk (in units of 1 kB = 1204 bytes). Since disk space is allocated in blocks, the size indicated by du -k is always slightly larger than the space indicated by  ls -kl (which is the same as ls -l, but in 1 kB units).</p>
+</blockquote>
+<blockquote>
 <p>For directories, ls -ld dir shows (among other things) the size of the list of filenames (together with a number of attributes) of the files and subdirectories in dir. This is just the list of filenames, not the files’ or subdirectories’ contents. So this size increases when you add files to dir (even when files are empty), but it stays unchanged when one of the files in dir grows.</p>
+</blockquote>
+<blockquote>
 <p>However, when you delete files from dir the space from the list is not reclaimed immediately, but rather the entries for deleted files are marked as unused, and are later recycled (this is actually implementation-dependent, but what I described is pretty much the universal behavior these days). That’s why you may not see any changes in ls -ld output when you delete files until much later, if ever.</p>
+</blockquote>
+<blockquote>
 <p>Finally, du -ks dir shows (an estimate of) the space occupied on disk by all files in dir, together with all files in all of dir’s subdirectories, in 1 kB = 1024 bytes units. Taking into account the description above, this has no relation whatsoever with the output of ls -kld dir.</p>
 </blockquote>
 <p>linux上是ext4文件系统<br>应用程序调用read()方法，系统会通过中断从用户空间进入内核处理流程，然后经过VFS(Virtual File System，虚拟文件系统)、具体文件系统、页缓存Page Cache。VFS主要是用于实现屏蔽具体的文件系统，为应用程序的操作提供一个统一的接口。<br>Page Cache(页缓存)，读文件的时候，会先看一下它是不是已经在Page Cache里面，如果命中了的话，就不会去读取磁盘。通过/proc/meminfo文件可以查看缓存的内存占用情况，当系统内存不足的时候，系统会回收这部分内存，I/O的性能就会降低。</p>
@@ -524,19 +530,19 @@ int main(){
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -640,11 +646,11 @@ int main(){
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">nio</a>
+                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+                <a href="javascript:void(0)" class="js-tag color4">nio</a>
               </li>
              
               <li class="article-tag-list-item">

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head><meta name="generator" content="Hexo 3.9.0">
   <meta charset="utf-8">
   
   <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>使用RecyclerView的Animation | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -23,7 +23,7 @@
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/snapshot20161020124442.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/snapshot20161020124836.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/snapshot20161020143554.jpg">
-<meta property="og:updated_time" content="2019-08-06T14:56:13.385Z">
+<meta property="og:updated_time" content="2019-08-08T02:58:31.361Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用RecyclerView的Animation">
 <meta name="twitter:description" content="From the talkRecyclerView Animations and Behind the ScenesYigit Biyar &amp;amp; Chet Haaseon Anroid Dev Summit 2015 1. RecyclerView架构RecyclerView is Flexible , Pluggable and Customizeable内部很多功能都交给了各个组件去完成">
@@ -59,7 +59,7 @@ ga('send', 'pageview');
   
 
 </head>
-
+</html>
 <body>
   <div id="container" q-class="show:isCtnShow">
     <canvas id="anm-canvas" class="anm-canvas"></canvas>
@@ -211,7 +211,7 @@ ga('send', 'pageview');
 <ul>
 <li>ViewHolder的创建<br><img src="https://www.haldir66.ga/static/imgs/viewHolder_step_1.jpg" alt=""><br>1 .LayoutManager首先检查getViewForPosition，RecyclerView查找Cache(getViewForPosition)，如果找到了。直接交给LayoutManager,这一过程甚至不需要与Adapter接触。</li>
 </ul>
-<ol>
+<ol start="2">
 <li>如果Cache中未找到，RecyclerView调用Adpter的getViewType，并去Recycled Pool中getViewHolderByType。</li>
 <li>如果在Pool中未找到，RecyclerView将调用Adapter的createViewHolder。</li>
 <li>如果在Pool中这种Type的ViewHolder已经有了，或者步骤3中创建了一个新的viewHolder，bindViewHolder并交给LayoutManager。<br><img src="https://www.haldir66.ga/static/imgs/viewHolder_step_2.jpg" alt=""></li>
@@ -318,6 +318,7 @@ animateChange()//实际的动画添加位置
         public ItemHolderInfo obtainHolderInfo() {
             return new ColorTextInfo();
         }
+
 </code></pre>
 <ul>
 <li>canReuseViewHolder的作用:<br>例如notifyItemChanged(position)后，只是某个位置的viewHolder发生了信息改变，那就没有必要创建一个新的ViewHolder，直接提供原有的ViewHolder，提升性能。</li>
@@ -341,7 +342,7 @@ animateChange()//实际的动画添加位置
 <ul>
 <li><p>view:: requestLayout的效果，requestLayout会一直地向上请求直到根视图，next Frame开始时，所有的子View都将调用自身的measure(onMeasure)和layout(onLayout)方法<br>如果子View不曾requestLayout,之前的measure结果会被cache下来，节省measure和layout的时间。</p>
 </li>
-<li><p>在RecyclerView中，在itemView的onBIndView方法中调用ImageLoader的加载图片方法，由于图片加载是异步操作，最终会调用ImageView的setImageBitmap方法。而在ImageView的实现中，setImageBitmap方法最终会调用requestLayout方法，最终会一层层向上传递到recyclerView中，就像这样<br>```java<br>imageView setImageBitmap</p>
+<li><p>在RecyclerView中，在itemView的onBIndView方法中调用ImageLoader的加载图片方法，由于图片加载是异步操作，最终会调用ImageView的setImageBitmap方法。而在ImageView的实现中，setImageBitmap方法最终会调用requestLayout方法，最终会一层层向上传递到recyclerView中，就像这样<br><code>`</code>java<br>imageView setImageBitmap</p>
 </li>
 </ul>
 <p>imageView requestLayout</p>
@@ -360,9 +361,10 @@ void setImageDrawable(Drawable drawable){
         invalidate();
     }
 }
+
 </code></pre><p>简单来说就是判断下前后图像的宽度或高度是否发生了变化，如果无变化则不需调用requestLayout方法，只需要reDraw。也就避免了这种性能的损耗。但是，TextView的implementation则复杂的多，并没有这种优化。实际操作中，API应该能够告诉客户端图片的width和Height,使用AspectRationImageView加载图片。在图片加载完成之前优先使用PlaceHolder，并设定好加载完成应有的尺寸，这样就避免了后期图片加载完成后的requestLayout。</p>
 <ul>
-<li>使用SortedList用于进行List变更<br>```java<br>SortedList<Item> mSortedList = new SortedList<Item>(Item.class,<br>  new SortedListAdapterCallback<Item>(mAdapter)){<br>  //override三个方法，懒得抄了</li>
+<li>使用SortedList用于进行List变更<br><code>`</code>java<br>SortedList<Item> mSortedList = new SortedList<Item>(Item.class,<br>  new SortedListAdapterCallback<Item>(mAdapter)){<br>  //override三个方法，懒得抄了</li>
 </ul>
 <p>}<br>使用方式十分简单，后面的数据更新操作包括notifyDataChange都被处理好了。<br>onNetwokCallback(List<News> news){<br>    mSortedList.addAll(news);<br>}</p>
 <pre><code>对于未发生变化的Item，将直接跳过，实现了最优化的列表数据更新。
@@ -418,7 +420,7 @@ result.dispatchTo(mAdapter);
 </ul>
 <p>onCreate<br>onBindViewHolder(获取video资源)<br>onViewAttachedToWindow(可以在这里开始播放视频)<br>onViewDetachedFromWindow(可以在这里停止播放视频，随时有可能重新被直接attach，这过程中不会调用onBind方法)<br>onRecycled(可以在这里释放Video资源或者释放Bitmap引用，这之后再使用该ViewHolder需要调用onBind方法)</p>
 <ul>
-<li>recyclerView的一些defer操作对于日常开发的帮助<br>recyclerView会将一些pending操作defer到next frame。eg:<br>```java<br>recyclerView.scrollToPosition(15);<br>int x = layoutManager.getFirstVisiblePosition();//此时x并不等于15，因为下一帧并未开始。真正的执行scroll操作需要等到nextFrame执行后才能生效，具体一点的话，就是下一个执行layout的message的callback还未被执行。<br>// 又例如，在onCreate中调用<br>recyclerView.scrollToPosition(15);<br>//在netWorkCallback中调用setAdapter，这时recyclerView会利用pending的15 position。原因在于recyclerView会判断如果layoutManager和adapter是否为null，如果都为null。skip layout。</li>
+<li>recyclerView的一些defer操作对于日常开发的帮助<br>recyclerView会将一些pending操作defer到next frame。eg:<br><code>`</code>java<br>recyclerView.scrollToPosition(15);<br>int x = layoutManager.getFirstVisiblePosition();//此时x并不等于15，因为下一帧并未开始。真正的执行scroll操作需要等到nextFrame执行后才能生效，具体一点的话，就是下一个执行layout的message的callback还未被执行。<br>// 又例如，在onCreate中调用<br>recyclerView.scrollToPosition(15);<br>//在netWorkCallback中调用setAdapter，这时recyclerView会利用pending的15 position。原因在于recyclerView会判断如果layoutManager和adapter是否为null，如果都为null。skip layout。</li>
 </ul>
 <p>// - 在getItemViewType中返回R.layout.itemLayout的好处。<br>onCreateViewHolder(ViewGroup viewParent,int ViewType) {<br>    View itemView = inflate.inflate(ViewType,parent,false);<br>    return XXXHolder(itemView);//aapt可以确保R.layout.xxxx是unique的。<br>}</p>
 <pre><code>
@@ -861,7 +863,7 @@ void addViewHolderToRecycledViewPool(ViewHolder holder, boolean dispatchRecycled
 <p>GapWorker.run  -&gt; GapWorker.prefetch  -&gt; GapWorker.flushTasksWithDeadLine -&gt; GapWorker.flushTaskWithDeadLine -&gt; GapWorker.prefetchPositionWithDeadLine -&gt; Recycler.tryGetViewHolderForPositionByDeadline</p>
 <p>打断点发现，在scrollBy的过程中通过layoutChunk方法一直走到Recycler.tryGetViewHolderForPositionByDeadline</p>
 <ol>
-<li>tryGetViewHolderForPositionByDeadline方法用于获取一个viewHolder<br>```java<br>// 0) If there is a changed scrap, try to find from there<br>holder = getChangedScrapViewForPosition(position);<br>// 1) Find by position from scrap/hidden list/cache<br>holder = getScrapOrHiddenOrCachedHolderForPosition(position, dryRun);<br>// 2) Find from scrap/cache via stable ids, if exists<br>if (mAdapter.hasStableIds()) {<br> holder = getScrapOrCachedViewForId(mAdapter.getItemId(offsetPosition), type, dryRun);<br>}<br>//这中间还有一个<br>final View view = mViewCacheExtension.getViewForPositionAndType(this, position, type);</li>
+<li>tryGetViewHolderForPositionByDeadline方法用于获取一个viewHolder<br><code>`</code>java<br>// 0) If there is a changed scrap, try to find from there<br>holder = getChangedScrapViewForPosition(position);<br>// 1) Find by position from scrap/hidden list/cache<br>holder = getScrapOrHiddenOrCachedHolderForPosition(position, dryRun);<br>// 2) Find from scrap/cache via stable ids, if exists<br>if (mAdapter.hasStableIds()) {<br> holder = getScrapOrCachedViewForId(mAdapter.getItemId(offsetPosition), type, dryRun);<br>}<br>//这中间还有一个<br>final View view = mViewCacheExtension.getViewForPositionAndType(this, position, type);</li>
 </ol>
 <p>// fallback to pool<br>holder = getRecycledViewPool().getRecycledView(type);</p>
 <p>//last resort<br>holder = mAdapter.createViewHolder(RecyclerView.this, type);</p>
@@ -1194,19 +1196,19 @@ if (mState.isPreLayout() &amp;&amp; holder.isBound()) {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1310,11 +1312,11 @@ if (mState.isPreLayout() &amp;&amp; holder.isBound()) {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">nio</a>
+                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+                <a href="javascript:void(0)" class="js-tag color4">nio</a>
               </li>
              
               <li class="article-tag-list-item">

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head><meta name="generator" content="Hexo 3.9.0">
   <meta charset="utf-8">
   
   <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>tcp和udp包结构分析 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -28,7 +28,7 @@
 <meta property="og:image" content="https://haldir66.ga/static/imgs/tcp_and_udp_size_limit.png">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/https_hand_shake.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/tcp_packet_structure.jpg">
-<meta property="og:updated_time" content="2019-08-06T14:56:13.401Z">
+<meta property="og:updated_time" content="2019-08-08T02:58:31.377Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="tcp和udp包结构分析">
 <meta name="twitter:description" content="本文只针对ipv4网络进行分析">
@@ -64,7 +64,7 @@ ga('send', 'pageview');
   
 
 </head>
-
+</html>
 <body>
   <div id="container" q-class="show:isCtnShow">
     <canvas id="anm-canvas" class="anm-canvas"></canvas>
@@ -314,7 +314,7 @@ net.ipv4.ip_forward = 1
 <h3 id="可靠性交付的实现到这里也就清楚了"><a href="#可靠性交付的实现到这里也就清楚了" class="headerlink" title="可靠性交付的实现到这里也就清楚了"></a>可靠性交付的实现到这里也就清楚了</h3><p>滑动窗口(sliding window)<br>超时重传<br>流量控制 (flow control)<br>拥塞控制（congestion control）</p>
 <h2 id="一个tcp-udp或者ip包最大多大，最小多大"><a href="#一个tcp-udp或者ip包最大多大，最小多大" class="headerlink" title="一个tcp,udp或者ip包最大多大，最小多大"></a>一个tcp,udp或者ip包最大多大，最小多大</h2><p>最小我们知道<br>传送TCP数据包的時候，TCP header 占 20 bytes， IPv4 header 占 20 bytes，所以最小40byte。<br>那么最大呢<a href="https://blog.csdn.net/caoshangpa/article/details/51530685">TCP、UDP数据包大小的限制</a><br>应用层udp最大1500-20-8 = 1472 字节(多了会被分片重组，万一分片丢失导致重组失败，就会被丢包)，1500是硬件决定的,20是ip头，8是udp的头<br>结论<br>UDP 包的大小就应该是 1500 - IP头(20) - UDP头(8) = 1472(Bytes)<br>TCP 包的大小就应该是 1500 - IP头(20) - TCP头(20) = 1460 (Bytes)<br>UDP数据报的长度是指包括报头和数据部分在内的总字节数，其中报头长度固定，数据部分可变。数据报的最大长度根据操作环境的不同而各异。从理论上说，包含报头在内的数据报的最大长度为65535字节(64K)。<br>用UDP协议发送时，用sendto函数最大能发送数据的长度为：65535- IP头(20) - UDP头(8)＝65507字节。用sendto函数发送数据时，如果发送数据长度大于该值，则函数会返回错误。<br>MTU 最大传输单元（英语：Maximum Transmission Unit，缩写MTU）是指一种通信协议的某一层上面所能通过的最大数据包大小（以字节为单位），怎么看</p>
 <blockquote>
-<p>ping -l 1472 -f www.baidu.com ##根据提示去调小这个数就是了，一般1350以上是有的</p>
+<p>ping -l 1472 -f <a href="http://www.baidu.com">www.baidu.com</a> ##根据提示去调小这个数就是了，一般1350以上是有的</p>
 </blockquote>
 <p>从csdn搞来的图<br><img src="https://haldir66.ga/static/imgs/tcp_and_udp_size_limit.png" alt=""><br>传输层：<br>对于UDP协议来说，整个包的最大长度为65535，其中包头长度是65535-20=65515；<br>对于TCP协议来说，整个包的最大长度是由最大传输大小（MSS，Maxitum Segment Size）决定，MSS就是TCP数据包每次能够传<br>输的最大数据分段。为了达到最佳的传输效能TCP协议在建立连接的时候通常要协商双方的MSS值，这个值TCP协议在实现的时候往往用MTU值代替（需<br>要减去IP数据包包头的大小20Bytes和TCP数据段的包头20Bytes）所以往往MSS为1460。通讯双方会根据双方提供的MSS值得最小值<br>确定为这次连接的最大MSS值。<br>IP层：<br>对于IP协议来说，IP包的大小由MTU决定（IP数据包长度就是MTU-28（包头长度）。 MTU值越大，封包就越大，理论上可增加传送速率，但<br>MTU值又不能设得太大，因为封包太大，传送时出现错误的机会大增。一般默认的设置，PPPoE连接的最高MTU值是1492, 而以太网<br>（Ethernet）的最高MTU值则是1500,而在Internet上，默认的MTU大小是576字节</p>
 <h3 id="协议数据单元-Protocol-Data-Unit-PDU"><a href="#协议数据单元-Protocol-Data-Unit-PDU" class="headerlink" title="协议数据单元(Protocol Data Unit, PDU)"></a>协议数据单元(Protocol Data Unit, PDU)</h3><p>应用层数据在传输过程中沿着协议栈传递，每一层协议都会往其中添加信息，这就是封装的过程。在封装过程中，每一个阶段的PDU都有不同的名字来反映它的功能。</p>
@@ -592,19 +592,19 @@ net.ipv4.ip_forward = 1
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -708,11 +708,11 @@ net.ipv4.ip_forward = 1
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">nio</a>
+                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+                <a href="javascript:void(0)" class="js-tag color4">nio</a>
               </li>
              
               <li class="article-tag-list-item">

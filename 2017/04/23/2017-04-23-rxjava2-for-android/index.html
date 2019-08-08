@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head><meta name="generator" content="Hexo 3.9.0">
   <meta charset="utf-8">
   
   <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>Rxjava2 的一些点 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -23,7 +23,7 @@
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/4dab298b9f7ce29c43f9d8eaf686e02f.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/reading_network_response_on_main_thread.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/observing_on_ui_thread.jpg">
-<meta property="og:updated_time" content="2019-08-06T14:56:13.389Z">
+<meta property="og:updated_time" content="2019-08-08T02:58:31.365Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Rxjava2 的一些点">
 <meta name="twitter:description" content="本文多数内容来自Jake Wharton的演讲，配合一些个人的感受，作为今后使用Rxjava2的一些参考。">
@@ -59,7 +59,7 @@ ga('send', 'pageview');
   
 
 </head>
-
+</html>
 <body>
   <div id="container" q-class="show:isCtnShow">
     <canvas id="anm-canvas" class="anm-canvas"></canvas>
@@ -402,7 +402,7 @@ interface Subscription{
   // Observable、Single、Completeable、Maybe以及Flowable都支持subscribewith。
 </code></pre>
 <h2 id="4-数据源和接受者建立联系"><a href="#4-数据源和接受者建立联系" class="headerlink" title="4. 数据源和接受者建立联系"></a>4. 数据源和接受者建立联系</h2><blockquote>
-<p>Observable.subscribe<br>或者<br>Flowable.subscribe<br>或者使用之前提到的sbscribeWith<br>我尝试写了一个比较复杂的调用顺序<br>```java<br>Observable.fromCallable(new Callable&lt;List<String>&gt;() {<br>            @Override<br>            public List<String> call() throws Exception {<br>                LogUtil.p(“call do on thread any”);<br>                blockThread(2000); // block 2s<br>                return Arrays.asList(array);<br>            }<br>        }).subscribeOn(Schedulers.computation())<br>                .observeOn(AndroidSchedulers.mainThread())<br>                .doOnSubscribe(new Consumer<Disposable>() {<br>                    @Override<br>                    public void accept(Disposable disposable) throws Exception {<br>                        LogUtil.p(“”);<br>                    }<br>                }).doOnComplete(new Action() {<br>            @Override<br>            public void run() throws Exception {<br>                LogUtil.p(“”);<br>            }<br>        }).doOnNext(new Consumer&lt;List<String>&gt;() {<br>            @Override<br>            public void accept(List<String> strings) throws Exception {<br>                LogUtil.p(“” + strings.get(0));<br>            }<br>        }).doAfterNext(new Consumer&lt;List<String>&gt;() {<br>            @Override<br>            public void accept(List<String> strings) throws Exception {<br>                LogUtil.p(“”+strings.get(0));<br>            }<br>        }).subscribe(new Observer&lt;List<String>&gt;() {<br>            @Override<br>            public void onSubscribe(Disposable d) {<br>                LogUtil.p(“onSubscribe “ + d.isDisposed());<br>            }</p>
+<p>Observable.subscribe<br>或者<br>Flowable.subscribe<br>或者使用之前提到的sbscribeWith<br>我尝试写了一个比较复杂的调用顺序<br><code>`</code>java<br>Observable.fromCallable(new Callable&lt;List<String>&gt;() {<br>            @Override<br>            public List<String> call() throws Exception {<br>                LogUtil.p(“call do on thread any”);<br>                blockThread(2000); // block 2s<br>                return Arrays.asList(array);<br>            }<br>        }).subscribeOn(Schedulers.computation())<br>                .observeOn(AndroidSchedulers.mainThread())<br>                .doOnSubscribe(new Consumer<Disposable>() {<br>                    @Override<br>                    public void accept(Disposable disposable) throws Exception {<br>                        LogUtil.p(“”);<br>                    }<br>                }).doOnComplete(new Action() {<br>            @Override<br>            public void run() throws Exception {<br>                LogUtil.p(“”);<br>            }<br>        }).doOnNext(new Consumer&lt;List<String>&gt;() {<br>            @Override<br>            public void accept(List<String> strings) throws Exception {<br>                LogUtil.p(“” + strings.get(0));<br>            }<br>        }).doAfterNext(new Consumer&lt;List<String>&gt;() {<br>            @Override<br>            public void accept(List<String> strings) throws Exception {<br>                LogUtil.p(“”+strings.get(0));<br>            }<br>        }).subscribe(new Observer&lt;List<String>&gt;() {<br>            @Override<br>            public void onSubscribe(Disposable d) {<br>                LogUtil.p(“onSubscribe “ + d.isDisposed());<br>            }</p>
 </blockquote>
 <pre><code>        @Override
         public void onNext(List&lt;String&gt; value) {
@@ -435,6 +435,8 @@ Observable.subscribeOn(Schedulers.io()) //
 <p>流之间的转换</p>
 <blockquote>
 <p>Observable -&gt; first() -&gt; single<br>Observable -&gt; firsetElement -&gt; Maybe<br>Observable -&gt; ignoreElements() -&gt;Completable</p>
+</blockquote>
+<blockquote>
 <p>Flowable -&gt; first() -&gt; single<br>Flowable -&gt; firsetElement -&gt; Maybe<br>Flowable -&gt; ignoreElements() -&gt;Completable</p>
 </blockquote>
 <ul>
@@ -1101,19 +1103,19 @@ public class NewThreadWorker extends Scheduler.Worker implements Disposable {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1217,11 +1219,11 @@ public class NewThreadWorker extends Scheduler.Worker implements Disposable {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">nio</a>
+                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+                <a href="javascript:void(0)" class="js-tag color4">nio</a>
               </li>
              
               <li class="article-tag-list-item">

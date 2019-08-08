@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head><meta name="generator" content="Hexo 3.9.0">
   <meta charset="utf-8">
   
   <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>编程语言中使用到的多线程基础数据结构 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -17,7 +17,7 @@
 <meta property="og:description" content="主要讲讲java中的notify,wait,synchronized ，unsafe等多线程基础工具的使用方式。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/HongKongFireworks_ZH-CN13422096721_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-08-06T14:56:13.405Z">
+<meta property="og:updated_time" content="2019-08-08T02:58:31.377Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="编程语言中使用到的多线程基础数据结构">
 <meta name="twitter:description" content="主要讲讲java中的notify,wait,synchronized ，unsafe等多线程基础工具的使用方式。">
@@ -53,7 +53,7 @@ ga('send', 'pageview');
   
 
 </head>
-
+</html>
 <body>
   <div id="container" q-class="show:isCtnShow">
     <canvas id="anm-canvas" class="anm-canvas"></canvas>
@@ -265,27 +265,19 @@ public class com.me.harris.concurrent.SynchronizedSample {
 <h3 id="重量级锁"><a href="#重量级锁" class="headerlink" title="重量级锁"></a>重量级锁</h3><p>会阻塞，不消耗cpu资源，但是响应时间较慢<br>synchronized<br>内部也是利用了锁。<br>每一个对象都有一个自己的monitor，必须先获取这个monitor对象才能够进入同步块或同步方法，而这个monitor对象的获取是排他的，也就是同一时刻只能有一个线程获取到这个monitor</p>
 <p><a href="https://blog.csdn.net/javazejian/article/details/72828483">轻量级锁和偏向锁</a></p>
 <p>类似的，synchronized修饰的instance method在编译后添加了一个ACC_SYNCHRONIZED的flag，同步是通过这个标志实现的。</p>
-<h2 id="回顾一下用notify-wait-synchronized实现的生产者-消费者模型"><a href="#回顾一下用notify-wait-synchronized实现的生产者-消费者模型" class="headerlink" title="回顾一下用notify,wait,synchronized实现的生产者-消费者模型"></a>回顾一下用notify,wait,synchronized实现的生产者-消费者模型</h2><p>Effective java里面说要把wait写在一个while检查里面</p>
-<pre><code class="java">// The standard idiom for calling the wait method in Java 
-synchronized (sharedObject) { 
-    while (condition) { 
-      sharedObject.wait(); //当前线程释放锁，此时
-        // (Releases lock, and reacquires on wakeup) 
-    } 
-    // do action based upon condition e.g. take or put into queue 
-}
-</code></pre>
-<p>基本的思路就是生产者和消费者共同持有一个锁（随便new一个Object出来就是了），生产者和消费者都extends Thread。<br>生产者每次生产一个都会notifyAll，消费者每次消费一个都会notifyAll</p>
+<h2 id="回顾一下用notify-wait-synchronized实现的生产者-消费者模型"><a href="#回顾一下用notify-wait-synchronized实现的生产者-消费者模型" class="headerlink" title="回顾一下用notify,wait,synchronized实现的生产者-消费者模型"></a>回顾一下用notify,wait,synchronized实现的生产者-消费者模型</h2><p>基本的思路就是生产者和消费者共同持有一个锁（随便new一个Object出来就是了），生产者和消费者都extends Thread。<br>生产者每次生产一个都会notifyAll，消费者每次消费一个都会notifyAll</p>
 <p><a href="http://cmsblogs.com/?p=2915">在Java中，每个对象都有两个池，锁(monitor)池和等待池</a><br>锁池 :假设线程A已经拥有了某个对象(注意:不是类)的锁，而其它的线程想要调用这个对象的某个synchronized方法(或者synchronized块)，由于这些线程在进入对象的synchronized方法之前必须先获得该对象的锁的拥有权，但是该对象的锁目前正被线程A拥有，所以这些线程就进入了该对象的锁池中。<br>等待池 :假设一个线程A调用了某个对象的wait()方法，线程A就会释放该对象的锁(因为wait()方法必须出现在synchronized中，这样自然在执行wait()方法之前线程A就已经拥有了该对象的锁)，同时线程A就进入到了该对象的等待池中。如果另外的一个线程调用了相同对象的notifyAll()方法，那么处于该对象的等待池中的线程就会全部进入该对象的锁池中，准备争夺锁的拥有权。如果另外的一个线程调用了相同对象的notify()方法，那么仅仅有一个处于该对象的等待池中的线程(随机)会进入该对象的锁池.</p>
 <p>也即是被notify的线程都在锁池里(有权竞争cpu)，自己调用wait的线程都在等待池里(无权竞争cpu)。 那么什么时候竞争呢，持有锁的线程自己wait(释放锁)了，那么有权竞争的线程就开始竞争，获得锁的进入同步代码块或者同步方法。</p>
 <p>需要注意的是<br><strong><em>notify/notifyAll方法调用后，并不会马上释放监视器锁，而是在相应的synchronized(){}/synchronized方法执行结束后才自动释放锁。</em></strong></p>
 <p>wait方法就是将当前线程加入object的waitSet同时释放锁（理解成一个hashset也行），notifyAll则是把waitset里面的内容全部挪到blocked队列中，在notifyAll的线程执行完毕释放锁之后，挑选一个获得锁。<a href="https://www.jianshu.com/p/f4454164c017">JVM源码分析之Object.wait/notify实现</a></p>
-<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html#wait(">oracle的文档上说明了,wait有一个spurious wakeup</a>) 是出于performance考虑，表现为wait的线程不需要notify也能自己醒过来。(文档中也指出了，这也就是为什么每一个wait都要包在一个while loop里面的原因)。这一现象在某些os上，包括linux上就有。</p>
-<pre><code class="java"> synchronized (obj) {
-         while (&lt;condition does not hold&gt;) // 就是为了防止spurious wakeup
-             obj.wait(timeout);
-         ... // Perform action appropriate to condition
-     }
+<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html#wait(">oracle的文档上说明了,wait有一个spurious wakeup</a>) 是出于performance考虑，表现为wait的线程不需要notify也能自己醒过来。(文档中也指出了，这也就是为什么每一个wait都要包在一个while loop里面的原因)。这一现象在某些os上，包括linux上就有。<br>Effective java里面说要把wait写在一个while检查里面</p>
+<pre><code class="java">// The standard idiom for calling the wait method in Java 
+synchronized (sharedObject) { 
+    while (condition) { 
+      sharedObject.wait(); // 就是为了防止spurious wakeup
+    } 
+    // do action based upon condition e.g. take or put into queue 
+}
 </code></pre>
 <p><a href="https://www.youtube.com/watch?v=Oi6-pXX11qw">how not to do java concurrency</a></p>
 <p>以下代码验证通过</p>
@@ -754,19 +746,19 @@ static void ensure_join(JavaThread* thread) {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -870,11 +862,11 @@ static void ensure_join(JavaThread* thread) {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">nio</a>
+                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+                <a href="javascript:void(0)" class="js-tag color4">nio</a>
               </li>
              
               <li class="article-tag-list-item">

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head><meta name="generator" content="Hexo 3.9.0">
   <meta charset="utf-8">
   
   <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>主线程的工作原理 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -17,7 +17,7 @@
 <meta property="og:description" content="​    今天突然找到这样一个问题: “Handler的postDelayed会阻塞线程吗？”。基于自己之前对于Handler的线程间通讯机制的理解，还是不能给出明确的答案。正好打算把一篇关于主线程的工作原理的文章写出来，顺带看下能否把这个问题从源码的角度解释清楚。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/writing_code_that_nobody_else_can_read.jpg">
-<meta property="og:updated_time" content="2019-08-06T14:56:13.385Z">
+<meta property="og:updated_time" content="2019-08-08T02:58:31.361Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="主线程的工作原理">
 <meta name="twitter:description" content="​    今天突然找到这样一个问题: “Handler的postDelayed会阻塞线程吗？”。基于自己之前对于Handler的线程间通讯机制的理解，还是不能给出明确的答案。正好打算把一篇关于主线程的工作原理的文章写出来，顺带看下能否把这个问题从源码的角度解释清楚。">
@@ -53,7 +53,7 @@ ga('send', 'pageview');
   
 
 </head>
-
+</html>
 <body>
   <div id="container" q-class="show:isCtnShow">
     <canvas id="anm-canvas" class="anm-canvas"></canvas>
@@ -315,7 +315,7 @@ ga('send', 'pageview');
 <li>postDelayed()/postAtTime() //一个相对时间，一个绝对时间</li>
 <li>postAtFrontOfQueue() // @piwai 插队行为，不要用</li>
 </ul>
-<ol>
+<ol start="2">
 <li>Handle message when this message doesn’t have callback<br>Handler的构造方法有7个,初始化时需要获得一个Looper<br>常用的Handler handler = new Handler() 会创建一个基于当前线程的Looper的Handler,如果当前线程没有调用Looper.Prepare，会抛出一个异常，这些在源代码里都能看到。<br>一些好用的构造函数<blockquote>
 <p>Handler (Looper.getMainLooper()) //往主线程的Looper的消息队列里发消息<br>Hanlder(Looper.myLooper()) //往当前线程Looper的消息队列里添加消息</p>
 </blockquote>
@@ -519,7 +519,7 @@ public static void prepareMainLooper() {
       at android.view.InputEventReceiver.dispatchInputEvent(InputEventReceiver.java:185)
       at android.os.MessageQueue.nativePollOnce(MessageQueue.java:-1)
       at android.os.MessageQueue.next(MessageQueue.java:323)
-      at android.os.Looper.loop(Looper.java:136)
+      at android.os.Looper.loop(Looper.java:136)      
 </code></pre>
 <p>AndroidPerformanceMonitor(BlockCanary)的缺陷,不能检测触控事件处理的block<br><a href="https://www.jianshu.com/p/9849026e7232">nativePollOnce直接调用了android.view.InputEventReceiver.dispatchInputEvent。</a><br>原因在这一段代码</p>
 <pre><code class="java">    // Called from native code. //直接由native端调用
@@ -811,19 +811,19 @@ public static void prepareMainLooper() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -927,11 +927,11 @@ public static void prepareMainLooper() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">nio</a>
+                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+                <a href="javascript:void(0)" class="js-tag color4">nio</a>
               </li>
              
               <li class="article-tag-list-item">

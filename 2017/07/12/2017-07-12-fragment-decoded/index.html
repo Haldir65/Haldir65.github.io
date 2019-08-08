@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head><meta name="generator" content="Hexo 3.9.0">
   <meta charset="utf-8">
   
   <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>Fragment源码解析记录(supportLibrary 25.3.0) | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -17,7 +17,7 @@
 <meta property="og:description" content="We been told Fragment itself should only trust official docs, the implementation detail are prone to any change any time, don’t count on it!">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/2009528111321773591934.jpg">
-<meta property="og:updated_time" content="2019-08-06T14:56:13.389Z">
+<meta property="og:updated_time" content="2019-08-08T02:58:31.365Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Fragment源码解析记录(supportLibrary 25.3.0)">
 <meta name="twitter:description" content="We been told Fragment itself should only trust official docs, the implementation detail are prone to any change any time, don’t count on it!">
@@ -53,7 +53,7 @@ ga('send', 'pageview');
   
 
 </head>
-
+</html>
 <body>
   <div id="container" q-class="show:isCtnShow">
     <canvas id="anm-canvas" class="anm-canvas"></canvas>
@@ -274,6 +274,7 @@ ga('send', 'pageview');
         op.popEnterAnim = mPopEnterAnim;
         op.popExitAnim = mPopExitAnim;
     }
+
 </code></pre>
 <h2 id="3-通过FragmentTransaction-commit执行操作"><a href="#3-通过FragmentTransaction-commit执行操作" class="headerlink" title="3.通过FragmentTransaction.commit执行操作"></a>3.通过FragmentTransaction.commit执行操作</h2><p>FragmentFransaction只是将所有操作保留到一次Transaction的一个任务队列(ArrayList)中了。真正的执行需要提交事务，这和数据库的事务很像。</p>
 <pre><code class="java">    @Override
@@ -396,7 +397,8 @@ ga('send', 'pageview');
             // Added fragments are added at the end to comply with prior behavior.
             mManager.moveToState(mManager.mCurState, true);
         }
-    }
+    }        
+
 </code></pre>
 <p>通常我们都是在主线程往Manager添加Transaction，不过从这里看来，添加Transaction只是添加了一份BackStackRecord，最终执行还是在主线程上做的。<br>很直观的看到这里 调用了manager的removeFragment、showFragment等方法.随便挑两个</p>
 <pre><code class="java">// FragmentManagerImpl.java
@@ -439,6 +441,7 @@ ga('send', 'pageview');
             fragment.mHiddenChanged = !fragment.mHiddenChanged;
         }
     }
+
 </code></pre>
 <p>接下里就是FragmentManager的MoveToState方法了，非常长<br>先记住Fragment的几个状态，这些都是Adam powell说过的，这是线性的，moveToState方法也是这样走的，不会跳过中间某个state</p>
 <blockquote>
@@ -585,6 +588,7 @@ ga('send', 'pageview');
             }
         }
     }
+
 </code></pre>
 <p>moveToState的方法很长，基本上可以分为state升高和state降低来看：</p>
 <ol>
@@ -677,7 +681,7 @@ public void onBackPressed() {
  }
 }
 </code></pre>
-特意查了下aosp的git log，<br>George Mount <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#x6d;&#x6f;&#x75;&#110;&#x74;&#64;&#x67;&#x6f;&#x6f;&#x67;&#108;&#101;&#46;&#99;&#x6f;&#109;">&#x6d;&#x6f;&#x75;&#110;&#x74;&#64;&#x67;&#x6f;&#x6f;&#x67;&#108;&#101;&#46;&#99;&#x6f;&#109;</a>    Tue Feb 21 11:04:14 2017 -0800。<br>```java<br>@Override<br>public void onBackPressed() {</li>
+特意查了下aosp的git log，<br>George Mount <a href="mailto:&#109;&#111;&#117;&#110;&#116;&#x40;&#103;&#111;&#111;&#x67;&#x6c;&#101;&#46;&#99;&#111;&#x6d;">&#109;&#111;&#117;&#110;&#116;&#x40;&#103;&#111;&#111;&#x67;&#x6c;&#101;&#46;&#99;&#111;&#x6d;</a>    Tue Feb 21 11:04:14 2017 -0800。<br><code>`</code>java<br>@Override<br>public void onBackPressed() {</li>
 </ol>
 <ul>
 <li>if (!mFragments.getSupportFragmentManager().popBackStackImmediate()) {</li>
@@ -692,9 +696,9 @@ public void onBackPressed() {
 <li>// since the fragmentManager has already been saved.</li>
 <li>return;</li>
 <li>}</li>
-<li>if (isStateSaved || !fragmentManager.popBackStackImmediate()) {<br>super.onBackPressed();<br>}<br>}<br>```<br>怎么说呢，fragmentManager.isStateSaved()对外暴露mStateSaved还是挺开明的。</li>
+<li>if (isStateSaved || !fragmentManager.popBackStackImmediate()) {<br>super.onBackPressed();<br>}<br>}<br><code>`</code><br>怎么说呢，fragmentManager.isStateSaved()对外暴露mStateSaved还是挺开明的。</li>
 </ul>
-<ol>
+<ol start="3">
 <li><p><a href="https://www.reddit.com/r/androiddev/comments/7hq00q/why_does_jake_wharton_recommend_one_activity_for/">Jake Wharton建议不要用fragment的addtoBackStack</a>，这是Reddit上的讨论，最后Jake本人出来选择了最佳解读(Nailed it)</p>
 </li>
 <li><p>这种在Activity中持有mFragment,或者在Adapter中持有mFragments的做法是<strong>有可能</strong>出错的<br>亲身遇到过这种事，在Activity中持有了mFragments[]，在特定的时段（可能stateSave已经调用过了），再去debug查看，发现mFragments中的所有fragment都处于一种被detach的状态(所有的boolean被设置为false，所有的field被设置为null)。<br>这件事的原因是在onSaveInstance和onRestoreInstance之间发生的。复现前提条件是viewPager.setOffScreenLimit设置的比较大,比如mDatas.size()-1<br>具体来说就是：<br>Fragment在onRestoreInstance之后都是通过反射重新恢复的，而在FragmentStatePagerAdapter中有这么一段，</p>
@@ -989,19 +993,19 @@ public void onBackPressed() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1105,11 +1109,11 @@ public void onBackPressed() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">nio</a>
+                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+                <a href="javascript:void(0)" class="js-tag color4">nio</a>
               </li>
              
               <li class="article-tag-list-item">
