@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/01f691dea62d22e138481a353fbb6228.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/ascii-Table.jpg">
-<meta property="og:updated_time" content="2019-08-08T02:58:31.369Z">
+<meta property="og:updated_time" content="2019-08-09T10:42:43.410Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="二进制编码总结">
 <meta name="twitter:description" content="OkHttp作者Jesse Wilson在2016 Droidcon NYC上作了一篇关于编码的演讲，十分有趣。对于了解计算机基础非常有用，结合着写一些关于这方面的笔记。">
@@ -347,13 +347,23 @@ for(int i =0 ,size = s.length();i&lt;size;i++){
     print(myre.findall(sss))         # 找出字符串中的Emoji
 </code></pre>
 <p>正确的做法是:</p>
-<pre><code>String s = &quot;一些包含Emoji的文字&quot;
-for(int i =0 ,size = s.length();i&lt;size;){
-    int c = s.codePointAt(i);
-    System.out.println(&quot;The Caharacter at %d is &#39;%c&#39;%n&quot;,i,c);
+<pre><code class="java">String emoji = &quot;嘿嘿\uD83D\uDC37咦丶恸&quot;;
+System.out.println(emoji);
+for(int i =0 ,size = emoji.length();i&lt;size;){
+    int c = emoji.codePointAt(i);
+    System.out.println(String.format(&quot;The Character at %d is &#39;%c&#39;%n&quot;, i,c));
     i+=Character.charCount(c);//正确识别char数量
 }
-</code></pre><p>汉字用UTF-8编码的话，有些还是会超出两个字节的，比如“𠮷”，<a href="https://zh.wiktionary.org/zh-hans/%F0%A0%AE%B7">wiki</a>给这货的解释。十进制是134071，已经超出两个字节(65536)了。<br>转成十六进制的话就是“F0 A0 AE B7”，utf-8本身就是可变长度的编码format，所以这货占了4个字节也正常。</p>
+</code></pre>
+<p>输出:<br>嘿嘿🐷咦丶恸<br>The Character at 0 is ‘嘿’</p>
+<p>The Character at 1 is ‘嘿’</p>
+<p>The Character at 2 is ‘🐷’</p>
+<p>The Character at 4 is ‘咦’</p>
+<p>The Character at 5 is ‘丶’</p>
+<p>The Character at 6 is ‘恸’</p>
+<p>emoji有一个特点，两个char(4个byte的第二个是3D,第三个是DC，这俩叫做surrogate pairs，当然第二个不一定是3D，而是一个范围内，具体在isHighSurrogate中)</p>
+<p>codePointAt(int index)的实现在codePointAtImpl中，事实上就是判断位于index的这个char是否isHighSurrogate（第二个是不是3D），如果是，跟着判断isLowSurrogate(++index)（第三个是不是DC）.</p>
+<p>汉字用UTF-8编码的话，有些还是会超出两个字节的，比如“𠮷”，<a href="https://zh.wiktionary.org/zh-hans/%F0%A0%AE%B7">wiki</a>给这货的解释。十进制是134071，已经超出两个字节(65536)了。<br>转成十六进制的话就是“F0 A0 AE B7”，utf-8本身就是可变长度的编码format，所以这货占了4个字节也正常。</p>
 <pre><code class="java">String w = &quot;\uD842\uDFB7&quot;; //这个“\u”是ide自己加上去的，注意和上面的十六进制不一样，是因为utf-8前面要加一些0,1什么的
       System.out.println(String.valueOf(hex));  // 134071
       for (int i = 0,size = w.length(); i &lt;size;) {
@@ -732,7 +742,21 @@ for(int i = 0; i&lt; size; i++){
 <li>hexadecimal简化了写无数个01的过程，日常开发尽量写0xffffff这种形式。两个十六进制数字的组合通常代表一个byte的范围。</li>
 <li>根据阮一峰的<a href="http://www.ruanyifeng.com/blog/2014/12/unicode.html">介绍</a>，目前，Unicode的最新版本是7.0版，一共收入了109449个符号，其中的中日韩文字为74500个。可以近似认为，全世界现有的符号当中，三分之二以上来自东亚文字。</li>
 </ol>
-<p>java内存中字符的存储方式是utf-16，因为简单啊，不用像utf-8那样麻烦<br>UTF-16 表示字符非常方便，每两个字节表示一个字符，这个在字符串操作时就大大简化了操作，这也是 Java 以 UTF-16 作为内存的字符存储格式的一个很重要的原因。 这也是为什么 java字符占用两个字节的原因。</p>
+<p>oracle文档上就这么写的</p>
+<blockquote>
+<p>The Java programming language represents text in sequences of 16-bit code units, using the UTF-16 encoding.</p>
+</blockquote>
+<p>java内存中字符的存储方式是utf-16，因为简单啊，不用像utf-8那样麻烦( random access cannot be done efficiently with UTF-8) <a href="https://stackoverflow.com/questions/36236364/why-java-char-uses-utf-16">为什么java用utf-16</a><br>java最早用的是UCS-2(以为16个bit足以表达所有字符集，随着unicode的发展，发现16个也不够了)，但历史上utf-16一开始是固定长度两个字节的，后面发现不够表示unicode了就改成变长的，16或者32bit.<br>Since 16 bits can only contain the range of characters from 0x0 to 0xFFFF, some additional complexity is used to store values above this range (0x10000 to 0x10FFFF). This is done using pairs of code units known as surrogates.<br>UTF-8 requires either 8, 16, 24 or 32 bits (one to four octets) to encode a Unicode character, UTF-16 requires either 16 or 32 bits to encode a character, and UTF-32 always requires 32 bits to encode a character.<br>Java的String内存储的字符串使用的是Unicode编码（默认使用UTF16编码），Unicode是可扩展的，不过目前大部分情况下UTF16只用到了2个字节（大多数非生僻汉字还是可以用两个byte搞定的）</p>
+<pre><code class="java">   public static String getRandomChar(){
+        char[] arr = {&#39;一&#39;,&#39;二&#39;,&#39;三&#39;,&#39;四&#39;,&#39;五&#39;};
+        return &quot;&quot; + arr[1] + arr[2] +arr[4];
+    }
+
+    public static void main(String[] args) {
+        String cc = getRandomChar();
+        System.out.println(&quot;输出的文字是&quot; + cc);// 输出的文字是二三五
+    }
+</code></pre>
 <p>而在c语言中，一个字符(char)只需要1个字节</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="https://www.youtube.com/watch?v=T_p22jMZSrk">Jesse Wilson | Decoding the Secrets of Binary Data </a></li>
@@ -1001,19 +1025,19 @@ for(int i = 0; i&lt; size; i++){
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">adb</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1097,10 +1121,6 @@ for(int i = 0; i&lt; size; i++){
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">nginx</a>
               </li>
              
@@ -1113,11 +1133,7 @@ for(int i = 0; i&lt; size; i++){
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1125,7 +1141,15 @@ for(int i = 0; i&lt; size; i++){
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">opengl</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">

@@ -17,7 +17,7 @@
 <meta property="og:description" content="记录一下常用git的命令，作为日常使用的参考手册">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/f787b2e8d757dc83b782bcd6d4c9f523.jpg">
-<meta property="og:updated_time" content="2019-08-08T02:58:31.381Z">
+<meta property="og:updated_time" content="2019-08-09T10:42:43.422Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="git常用操作手册">
 <meta name="twitter:description" content="记录一下常用git的命令，作为日常使用的参考手册">
@@ -422,7 +422,25 @@ Host work
 <blockquote>
 <p>git log –pretty=format:”%cn committed %h on %cd”<br>git log –oneline<br>git log –stat ## 显示出每一次commit的，以及每一次commit都改了哪些文件<br>git log -v ##这个更啰嗦 ## 比stat多出了每次更改之后修改的文件内容<br>git log –graph –oneline –decorate<br>git log –pretty=format:”%cn committed %h on %cd” | awk ‘{ print $8}’ | sort -n ##结合awk可以看到最晚几点commit，比如凌晨1点还在commit的.<a href="https://mirrors.edge.kernel.org/pub/software/scm/git/docs/git-log.html#_pretty_formats">format里面的参数在man git log page可以找到</a><br>git log –after=”2014-7-1” –before=”2014-7-4” ## 还可以查看某个日期之间提交的东西<br>git log –author=”John”<br>git log –author=”John|Mary” ## John或者Mary的<br>git log –grep=”JRA-224:” ## 从commit message里面查找<br>git log – foo.py bar.py ## 查看跟这几个文件相关的操作记录<br>git log -S”Hello, World!” ##这个等于查找git log -p里面哪一次提交添加了“Hello, World！”这句话<br>git log –no-merges<br>git log –merges<br>git log –pretty=format:”%h%x09%an%x09%ad%x09%s” //非常简明的一行显示</p>
 </blockquote>
-<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
+<h3 id="18-autocrlf的概念"><a href="#18-autocrlf的概念" class="headerlink" title="18. autocrlf的概念"></a>18. autocrlf的概念</h3><p><a href="https://stackoverflow.com/questions/1967370/git-replacing-lf-with-crlf">warning: LF will be replaced by CRLF in XXXXX.</a> 这个主要是针对windows用户来讲的。</p>
+<blockquote>
+<p>git config settings can be overridden by gitattributes settings.</p>
+</blockquote>
+<p>所以在当前项目中创建一个gitattributes文件就是为了覆盖系统预设git 配置</p>
+<blockquote>
+<p>Moral (for Windows):</p>
+<ul>
+<li>use core.autocrlf = true if you plan to use this project under Unix as well (and unwilling to configure your editor/IDE to use unix line endings),</li>
+<li>use core.autocrlf = false if you plan to use this project under Windows only (or you have configured your editor/IDE to use unix line endings),</li>
+<li>never use core.autocrlf = input unless you have a good reason to (eg if you’re using unix utilities under windows or if you run into makefiles issues)</li>
+</ul>
+</blockquote>
+<p>autocrlf就是对于一个可能同时在unix(换行符是lf)和windows(换行符是crlf)上被修改的文本文件，如果是在windows上创建； 一个新的文件(那么换行符肯定是crlf，在commit的时候git会将所有crlf的换行符换成lf,但是对于所有的已有文件，不会有影响，远程git仓库中的crlf还是crlf)。</p>
+<p>The warning “LF will be replaced by CRLF” says that you (having autocrlf=true) will lose your unix-style LF after commit-checkout cycle (it will be replaced by windows-style CRLF). Git doesn’t expect you to use unix-style LF under windows.</p>
+<p>The warning “CRLF will be replaced by LF” says that you (having autocrlf=input) will lose your windows-style CRLF after a commit-checkout cycle (it will be replaced by unix-style LF). Don’t use input under windows.</p>
+<p>对于windows用户来讲：<br>git config –global core.autocrlf true  //全局设置(希望使用windows的换行符)<br>git config –local core.autocrlf input  //单个项目设置(希望使用unix的换行符)</p>
+<p>所以这事要看自己到底希望使用哪种换行符<br>对于已经出现这种错误的项目，git rm -r –cached . &amp;&amp; git  add . &amp;&amp; git commit -m “fix crlf”</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="http://yijiebuyi.com/blog/8f985d539566d0bf3b804df6be4e0c90.html">git reset和revert</a></li>
 <li><a href="https://github.com/geeeeeeeeek/git-recipes">git recipes</a></li>
 <li><a href="http://hungyuhei.github.io/2012/08/07/better-git-commit-graph-using-pull---rebase-and-merge---no-ff.html">git merge –no-ff</a></li>
@@ -701,19 +719,19 @@ Host work
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">adb</a>
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">adb</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -797,10 +815,6 @@ Host work
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">nginx</a>
               </li>
              
@@ -813,11 +827,7 @@ Host work
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -825,7 +835,15 @@ Host work
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">opengl</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">
