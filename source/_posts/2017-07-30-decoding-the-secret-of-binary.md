@@ -218,14 +218,33 @@ def test_emoji():
 ```
 
 正确的做法是:
-```
-String s = "一些包含Emoji的文字"
-for(int i =0 ,size = s.length();i<size;){
-    int c = s.codePointAt(i);
-    System.out.println("The Caharacter at %d is '%c'%n",i,c);
+```java
+String emoji = "嘿嘿\uD83D\uDC37咦丶恸";
+System.out.println(emoji);
+for(int i =0 ,size = emoji.length();i<size;){
+    int c = emoji.codePointAt(i);
+    System.out.println(String.format("The Character at %d is '%c'%n", i,c));
     i+=Character.charCount(c);//正确识别char数量
 }
 ```
+输出: 
+嘿嘿🐷咦丶恸
+The Character at 0 is '嘿'
+
+The Character at 1 is '嘿'
+
+The Character at 2 is '🐷'
+
+The Character at 4 is '咦'
+
+The Character at 5 is '丶'
+
+The Character at 6 is '恸'
+
+emoji有一个特点，两个char(4个byte的第二个是3D,第三个是DC，这俩叫做surrogate pairs，当然第二个不一定是3D，而是一个范围内，具体在isHighSurrogate中)
+
+codePointAt(int index)的实现在codePointAtImpl中，事实上就是判断位于index的这个char是否isHighSurrogate（第二个是不是3D），如果是，跟着判断isLowSurrogate(++index)（第三个是不是DC）.
+
 汉字用UTF-8编码的话，有些还是会超出两个字节的，比如“𠮷”，[wiki](https://zh.wiktionary.org/zh-hans/%F0%A0%AE%B7)给这货的解释。十进制是134071，已经超出两个字节(65536)了。
 转成十六进制的话就是“F0 A0 AE B7”，utf-8本身就是可变长度的编码format，所以这货占了4个字节也正常。
 ```java
@@ -725,9 +744,26 @@ for(int i = 0; i< size; i++){
 4. hexadecimal简化了写无数个01的过程，日常开发尽量写0xffffff这种形式。两个十六进制数字的组合通常代表一个byte的范围。
 5. 根据阮一峰的[介绍](http://www.ruanyifeng.com/blog/2014/12/unicode.html)，目前，Unicode的最新版本是7.0版，一共收入了109449个符号，其中的中日韩文字为74500个。可以近似认为，全世界现有的符号当中，三分之二以上来自东亚文字。
 
-java内存中字符的存储方式是utf-16，因为简单啊，不用像utf-8那样麻烦
-UTF-16 表示字符非常方便，每两个字节表示一个字符，这个在字符串操作时就大大简化了操作，这也是 Java 以 UTF-16 作为内存的字符存储格式的一个很重要的原因。 这也是为什么 java字符占用两个字节的原因。
+oracle文档上就这么写的
+> The Java programming language represents text in sequences of 16-bit code units, using the UTF-16 encoding.
 
+java内存中字符的存储方式是utf-16，因为简单啊，不用像utf-8那样麻烦( random access cannot be done efficiently with UTF-8) [为什么java用utf-16](https://stackoverflow.com/questions/36236364/why-java-char-uses-utf-16)
+java最早用的是UCS-2(以为16个bit足以表达所有字符集，随着unicode的发展，发现16个也不够了)，但历史上utf-16一开始是固定长度两个字节的，后面发现不够表示unicode了就改成变长的，16或者32bit.
+Since 16 bits can only contain the range of characters from 0x0 to 0xFFFF, some additional complexity is used to store values above this range (0x10000 to 0x10FFFF). This is done using pairs of code units known as surrogates.
+UTF-8 requires either 8, 16, 24 or 32 bits (one to four octets) to encode a Unicode character, UTF-16 requires either 16 or 32 bits to encode a character, and UTF-32 always requires 32 bits to encode a character.
+Java的String内存储的字符串使用的是Unicode编码（默认使用UTF16编码），Unicode是可扩展的，不过目前大部分情况下UTF16只用到了2个字节（大多数非生僻汉字还是可以用两个byte搞定的）
+
+```java
+   public static String getRandomChar(){
+        char[] arr = {'一','二','三','四','五'};
+        return "" + arr[1] + arr[2] +arr[4];
+    }
+
+    public static void main(String[] args) {
+        String cc = getRandomChar();
+        System.out.println("输出的文字是" + cc);// 输出的文字是二三五
+    }
+```
 而在c语言中，一个字符(char)只需要1个字节
 
 ## 参考

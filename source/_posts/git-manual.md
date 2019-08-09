@@ -356,7 +356,31 @@ git log --no-merges
 git log --merges
 git log --pretty=format:"%h%x09%an%x09%ad%x09%s" //非常简明的一行显示
 
-## Reference
+### 18. autocrlf的概念
+[warning: LF will be replaced by CRLF in XXXXX.](https://stackoverflow.com/questions/1967370/git-replacing-lf-with-crlf) 这个主要是针对windows用户来讲的。
+
+> git config settings can be overridden by gitattributes settings.
+
+所以在当前项目中创建一个gitattributes文件就是为了覆盖系统预设git 配置
+>Moral (for Windows):
+- use core.autocrlf = true if you plan to use this project under Unix as well (and unwilling to configure your editor/IDE to use unix line endings),
+- use core.autocrlf = false if you plan to use this project under Windows only (or you have configured your editor/IDE to use unix line endings),
+- never use core.autocrlf = input unless you have a good reason to (eg if you're using unix utilities under windows or if you run into makefiles issues)
+
+autocrlf就是对于一个可能同时在unix(换行符是lf)和windows(换行符是crlf)上被修改的文本文件，如果是在windows上创建； 一个新的文件(那么换行符肯定是crlf，在commit的时候git会将所有crlf的换行符换成lf,但是对于所有的已有文件，不会有影响，远程git仓库中的crlf还是crlf)。
+
+The warning "LF will be replaced by CRLF" says that you (having autocrlf=true) will lose your unix-style LF after commit-checkout cycle (it will be replaced by windows-style CRLF). Git doesn't expect you to use unix-style LF under windows.
+
+The warning "CRLF will be replaced by LF" says that you (having autocrlf=input) will lose your windows-style CRLF after a commit-checkout cycle (it will be replaced by unix-style LF). Don't use input under windows.
+
+对于windows用户来讲：
+git config --global core.autocrlf true  //全局设置(希望使用windows的换行符)
+git config --local core.autocrlf input  //单个项目设置(希望使用unix的换行符)
+
+所以这事要看自己到底希望使用哪种换行符
+对于已经出现这种错误的项目，git rm -r --cached . && git  add . && git commit -m "fix crlf"
+
+## 参考
 - [git reset和revert](http://yijiebuyi.com/blog/8f985d539566d0bf3b804df6be4e0c90.html)
 - [git recipes](https://github.com/geeeeeeeeek/git-recipes)
 - [git merge --no-ff](http://hungyuhei.github.io/2012/08/07/better-git-commit-graph-using-pull---rebase-and-merge---no-ff.html)

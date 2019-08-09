@@ -301,3 +301,18 @@ a = 1 , b= 1
 
 Little endian platform!
 ```
+
+```c
+struct Test{
+    int flag;
+    char str[10];
+};
+struct Test a;
+a.flag = 4096;       // 未转换字节序
+strcpy(a.str,"hello");
+```
+如果通过c语言发送这样一个struct，在wireShark里面抓包，得到的data是这样的(16进制，理解成两个数字代表一个byte就行了):
+00 10 00 00 68 65 6c 6c 6f 00 00 00 00 00 00 00 
+前四个byte（一个int就4byte嘛）就是4096(十六进制是00 00 10 00)，实际传的是按照小端传的
+后面的字符串，因为每一个char就占用一个byte，所以不存在一份数据实体跨越多个Byte的问题。注意实际发送的byte大小是16 bytes而不是 4 + 10 （因为struct的sizeof是所有成员加在一起的大小再加上padding，就是内存对齐，直接8的倍数。union则是所有变量中最大的那一个加上padding）
+
