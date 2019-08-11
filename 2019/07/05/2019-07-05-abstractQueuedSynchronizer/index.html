@@ -17,7 +17,7 @@
 <meta property="og:description" content="关于java.util.concurrent.locks.AbstractQueuedSynchronizer,这个类是juc的基础。ReentrantLock中，ThreadPoolExecutor中，CountDownLatch中都有用到。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/CapeBretonSunset_EN-AU10231293487_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-08-09T10:42:43.422Z">
+<meta property="og:updated_time" content="2019-08-11T13:05:11.320Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="AbstractQueuedSynchronizer源码分析">
 <meta name="twitter:description" content="关于java.util.concurrent.locks.AbstractQueuedSynchronizer,这个类是juc的基础。ReentrantLock中，ThreadPoolExecutor中，CountDownLatch中都有用到。">
@@ -337,7 +337,9 @@ phaser.arriveAndAwaitAdvance();
 semaphere.release();
 </code></pre>
 <p>假如构造函数中传入了1，那么这个semaphore实际上是一个lock或者说mutex，如果大于一，那么同时进入这段代码块里的线程就有多个了，就需要实现自己的同步逻辑。（race condition，往往要加一段sleep就能快速重现，比如两条线程同时对一个int 0 自增，那么极有可能得到的结果是1而不是预期的2，因为各自看到的都是0）</p>
-<h2 id="Exchanger"><a href="#Exchanger" class="headerlink" title="Exchanger"></a>Exchanger</h2><p>juc里面没有c语言那样的mutex，不过reentrantlock这种实际上就发挥了mutex的作用。</p>
+<h2 id="Exchanger"><a href="#Exchanger" class="headerlink" title="Exchanger"></a>Exchanger</h2><p>Exchanger是成双成对使用的，支持泛型，两条线程同时开跑，先到的会等着，两个都到了之后，互相交换泛型的数据</p>
+<h2 id="Mutex"><a href="#Mutex" class="headerlink" title="Mutex"></a>Mutex</h2><p>juc里面没有c语言那样的mutex，不过Reentrantlock这种实际上就发挥了mutex的作用。</p>
+<h2 id="tbd"><a href="#tbd" class="headerlink" title="tbd"></a>tbd</h2><p>使用AQS的普遍方式是自己继承实现一个Sync（写一个试试看？,Tomcat里面就有）</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://javadoop.com/post/AbstractQueuedSynchronizer-2">一行一行源码分析清楚 AbstractQueuedSynchronizer</a></p>
 
       
@@ -665,10 +667,6 @@ semaphere.release();
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
@@ -685,11 +683,19 @@ semaphere.release();
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -705,7 +711,7 @@ semaphere.release();
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -718,10 +724,6 @@ semaphere.release();
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">opengl</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">

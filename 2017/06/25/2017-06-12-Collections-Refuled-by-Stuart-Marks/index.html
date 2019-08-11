@@ -17,7 +17,7 @@
 <meta property="og:description" content="根据网上的大部分博客的分类，集合框架分为Collections(具有类似数组的功能)和Map(存储键值对)这两大部分。针对jdk1.8的java.util里面的一些常用的或者不常用的集合做一些分析。写这篇文章的过程中，我慢慢发现不同版本jdk的同一个class的实现是有一些差异的(LinkedList)，由于对照的是java1.8的代码，里面会多一些since 1.8的代码，这里不作论述。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg">
-<meta property="og:updated_time" content="2019-08-09T10:42:43.406Z">
+<meta property="og:updated_time" content="2019-08-11T13:05:11.308Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java集合类的一些整理">
 <meta name="twitter:description" content="根据网上的大部分博客的分类，集合框架分为Collections(具有类似数组的功能)和Map(存储键值对)这两大部分。针对jdk1.8的java.util里面的一些常用的或者不常用的集合做一些分析。写这篇文章的过程中，我慢慢发现不同版本jdk的同一个class的实现是有一些差异的(LinkedList)，由于对照的是java1.8的代码，里面会多一些since 1.8的代码，这里不作论述。">
@@ -839,12 +839,13 @@ public void put(int key, int value) {
 </ol>
 <h3 id="2-4-ArrayMap"><a href="#2-4-ArrayMap" class="headerlink" title="2.4 ArrayMap"></a>2.4 ArrayMap</h3><h2 id="3-Set的介绍"><a href="#3-Set的介绍" class="headerlink" title="3. Set的介绍"></a>3. Set的介绍</h2><p>Set用比较少，HashSet、TreeSet和LinkedHashSet是jdk的实现类</p>
 <p>public class HashSet<E><br>    extends AbstractSet<E><br>    implements Set<E>, Cloneable, java.io.Serializable<br>Set的重要特点就是<strong>不能放进去重复</strong>的元素，Set中不会存在e1和e2，e1.equals(e2)的情况<br>HashSet的源码只有三百多行，内部有一个map（HashMap）相对来说是比较简单的。其实Set平时用的也不是那么多。。。</p>
-<h3 id="4-一些不常用的类"><a href="#4-一些不常用的类" class="headerlink" title="4. 一些不常用的类"></a>4. 一些不常用的类</h3><p>Vetor(不要用)，Stack，ArrayDeque,Queue, HashTable（oracle专家建议使用HashMap）</p>
+<h3 id="4-一些不常用的类"><a href="#4-一些不常用的类" class="headerlink" title="4. 一些不常用的类"></a>4. 一些不常用的类</h3><p>Vetor(不要用)，Stack，ArrayDeque,Queue, HashTable（oracle专家建议使用HashMap）,IdentityHashMap</p>
 <p>Vector属于List,线程安全，但效率低（就是简单的在所有方法前面加上了synchronized）。而事实上这种同步不能保证大批量操作的时候(putAll)的线程安全性，外部调用者还得专门搞一把锁。</p>
 <p>Queue是一个interface，属于两端可以出入的List，通常是(FIFO模式)，实现类有<br>PriorityQueue，<br>java.util.concurrent.ArrayBlockingQueue<br>java.util.concurrent.LinkedBlockingQueue<br>java.util.concurrent.PriorityBlockingQueue<br>作者都是大名鼎鼎的Doug Lea<br>另外，LinkedList也能直接拿来当做queue使用</p>
 <p>Stack是Vector的子类(属于LIFO的栈)<br>The Stack class represents a last-in-first-out (LIFO) stack of object</p>
 <p>Deque(双端队列)</p>
 <h3 id="5-concurrentHashMap等"><a href="#5-concurrentHashMap等" class="headerlink" title="5. concurrentHashMap等"></a>5. concurrentHashMap等</h3><p>jdk1.8的concurrentHashMap不是用synchronized实现的，是Doug Lea使用CAS操作写的，非常高效。<br>concurrentHashMap的原理是分段锁(jdk 1.7)<br>concurrentHashMap早在1.7的时候就加入了putIfAbsent方法，因为确实需要这种atomic action。</p>
+<p>ConcurrentLinkedQueue(tbd)</p>
 <h3 id="6-WeakHaskMap"><a href="#6-WeakHaskMap" class="headerlink" title="6. WeakHaskMap"></a>6. WeakHaskMap</h3><p>WeakHashMap的Key是WeakReference，但Value不是。<br>常见用法</p>
 <pre><code class="java">String a = &quot;a&quot;;
 map.put(1,a);
@@ -1206,10 +1207,6 @@ a = null;
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
@@ -1226,11 +1223,19 @@ a = null;
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1246,7 +1251,7 @@ a = null;
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1259,10 +1264,6 @@ a = null;
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">opengl</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">
