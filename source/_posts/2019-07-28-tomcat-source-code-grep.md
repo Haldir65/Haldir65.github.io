@@ -235,9 +235,229 @@ deployWars和deployDirectories中都出现了
 > context = (Context) digester.parse(xml); //所以Context是对xml文件的描述？
 
 
+## NioEndPoint和NioEndPoint2这俩是如何实现从socket接受请求并将其转化为http请求的？
+### NioEndPoint
+来看NioEndPoint的注释
+NIO tailored thread pool, providing the following services:
+- Socket acceptor thread
+- Socket poller thread
+- Worker threads pool
+When switching to Java 5, there's an opportunity to use the virtual machine's thread pool.（这段似乎是使用了System.inheritedChannel这个方法，关于这个方法的介绍非常少）
+
+```java
+public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> {
+
+}
+// SocketChannel,ByteChannel,ScatteringByteChannel,GatheringByteChannel是nio的class
+public class NioChannel implements ByteChannel, ScatteringByteChannel, GatheringByteChannel {
+
+}
+```
+从注释来看,NioEndPoint的功能包括(监听socket的线程，poll的线程，以及一个工作分发的线程池)
+监听是这一段:
+```java
+serverSock = ServerSocketChannel.open();
+serverSock.socket().bind(addr,getAcceptCount()); //bind方法的第二个参数是requested maximum length of the queue of incoming connections.就是连接等待队列的最大长度
+```
+
+poll在这里，只有一条线程
+```java
+protected static class BlockPoller extends Thread {
+
+    //线程名字叫做 “”
+    poller.setName(name + "-BlockPoller");
+    // 结果一般是 NioBlockingSelector.BlockPoller
+
+    public void run() {
+
+
+        while (run && iterator != null && iterator.hasNext()) {
+                    SelectionKey sk = iterator.next();
+                    NioSocketWrapper socketWrapper = (NioSocketWrapper) sk.attachment();
+                    try {
+                        iterator.remove();
+                        sk.interestOps(sk.interestOps() & (~sk.readyOps()));
+                        if (sk.isReadable()) {
+                            countDown(socketWrapper.getReadLatch()); //这里就是通知在等待的Poller线程，可以开始读了
+                        }
+                        if (sk.isWritable()) { //这里是通知在等待的Poller线程，可以开始写了
+                            countDown(socketWrapper.getWriteLatch());
+                        }
+                    } catch (CancelledKeyException ckx) {
+                        sk.cancel();
+                        countDown(socketWrapper.getReadLatch());
+                        countDown(socketWrapper.getWriteLatch());
+                    }
+                }
+    }
+}
+```
+所以BlockPoller（线程名NioBlockingSelector.BlockPoller）这条线程的作用主要就是循环监听是否有事情发生，有事情发生之后使用CountDownLatch.countDown，让正在等待的线程开始读。
+那么是哪条线程在等待？线程是什么时候开始等待的？
+在Http11InputBuffer.fill方法中
+```java
+nRead = socketWrapper.read(block, byteBuffer); // 此时运行在线程池中，也就是工作线程
+//这个方法调用到了NioBlockingSelector.read方法
+
+ while (!timedout) {
+        if (keycount > 0) { //only read if we were registered for a read
+            read = socket.read(buf);
+            if (read != 0) {
+                break; //如果读取到了一些东西，那么直接跳出循环，不走下面那一套
+            }
+        }
+
+        try {
+            if (att.getReadLatch()==null || att.getReadLatch().getCount()==0) {
+            att.startReadLatch(1); //创建一个CountDownLatch(1)
+            }
+            poller.add(att,SelectionKey.OP_READ, reference); //注册一下感兴趣的事件
+            att.awaitReadLatch(AbstractEndpoint.toTimeout(readTimeout), TimeUnit.MILLISECONDS); 
+            //在这里开始等待
+        } catch (InterruptedException ignore) {
+            // Ignore
+        }
+}
+//至于这里为什么要这么写，作为一个读方法，那么如果没有读取到东西，是不是就需要写一个while循环，这会浪费很多cpu cycle，还不如注册一下事件，把轮询的任务交给os。
+```
+所以等待的是线程池中的线程，创建了一个CountDownLatch(1)，等在那里。于此同时BlockPoller线程一直在跑，发现新的Read事件，从attachMent(SocketWrapper中获取这个CountDownLatch，countDown一下，这里就能够恢复继续执行)
+
+
+processKey -> AbstractEndPoint.processSocket -> Executor.execute(SocketProcessorBase)(在这里开始分发到工作线程池) -> NioEndPoint.SocketProcessor.doRun -> AbstractProtocol.ConnectionHandler.process -> Processor.process -> AbstractProcessorLight.process -> Http11Processor.service(SocketWrapperBase<?> socketWrapper) -> Http11InputBuffer.parseRequestLine(这里就开始读取Http1.1请求，比较复杂)
+
+走到Http11InputBuffer说明一定是http1.1的请求格式了(但这有可能是webSocket或者http2的upgrade请求)，在哪里判断是交给http1.1还是http2.0还是ajp协议？在AbstractProcessorLight.process中判断了如果socket.status == SocketEvent.OPEN_READ(就是说这是一个连接上的，刚刚准备好可以读的连接，所以默认直接交给http1.1去处理了，就算是http2后面还是可以upgrade的)
+
+上面提到NioSocketWrapper是一个attachMent，这个类的实例的创建是在Acceptor中发生的。
+在NioEndPoint.java的startInternal方法中，有这么一段
+```java
+ // Start poller thread
+poller = new Poller(); //这个Poller和上面的BlockingPoller不一样
+Thread pollerThread = new Thread(poller, getName() + "-ClientPoller");
+pollerThread.setPriority(threadPriority);
+pollerThread.setDaemon(true);
+pollerThread.start();
+startAcceptorThread();
+```
+
+```java
+protected void startAcceptorThread() {
+    acceptor = new Acceptor<>(this); 
+    String threadName = getName() + "-Acceptor";
+    acceptor.setThreadName(threadName);
+    Thread t = new Thread(acceptor, threadName);
+    t.setPriority(getAcceptorThreadPriority());
+    t.setDaemon(getDaemon());
+    t.start();
+}
+```
+所以至少又拉起了两条线程。先来看Acceptor这个线程,在run中做的事情：
+```java
+socket = endpoint.serverSocketAccept();
+endpoint.setSocketOptions() 
+
+//NioEndpoint.setSocketOptions
+NioSocketWrapper socketWrapper = new NioSocketWrapper(channel, this);
+channel.setSocketWrapper(socketWrapper);
+socketWrapper.setReadTimeout(getConnectionTimeout());
+socketWrapper.setWriteTimeout(getConnectionTimeout());
+socketWrapper.setKeepAliveLeft(NioEndpoint.this.getMaxKeepAliveRequests());
+socketWrapper.setSecure(isSSLEnabled());
+poller.register(channel, socketWrapper); //这里面设定了NioSockertWrapper的interestOps为SelectionKey.OP_READ
+
+//NioEndpoint.Poller.register
+PollerEvent r = null;
+r = new PollerEvent(socket, OP_REGISTER); // PollerEvent实现了runnable，在run里面
+addEvent(r); //往一个SynchronizedQueue里面offer事件
+```
+总结一下，Acceptor这条线程就是不断地接受新的Socket，并创建NioSockertWrapper对象，注册NioSockertWrapper的interestOps为SelectionKey.OP_REGISTER（但这里还没有调用系统api去注册，注意这里是OP_REGISTER）
+
+
+再来看ClientPoller这条线程:
+ClientPoller是先于Acceptor线程跑起来的，看一下run方法的实现
+NioEndPoint.Poller.run
+```java
+ public void run() {
+   while (true) {
+    hasEvents = events(); 
+
+    int keyCount = selector.select(selectorTimeout);
+
+     while (iterator != null && iterator.hasNext()) {
+                    SelectionKey sk = iterator.next();
+                    NioSocketWrapper socketWrapper = (NioSocketWrapper) sk.attachment();
+                    // Attachment may be null if another thread has called
+                    // cancelledKey()
+                    if (socketWrapper == null) {
+                        iterator.remove();
+                    } else {
+                        iterator.remove();
+                        processKey(sk, socketWrapper); //这里是处理具体的事件的，会将业务逻辑分发给线程池
+                    }
+                }
+
+    // Process timeouts
+    timeout(keyCount,hasEvents);
+   }
+ }   
+
+//从SynchronizedQueue里面取出PollEvent，一个个执行
+public boolean events() {
+            boolean result = false;
+            PollerEvent pe = null;
+            for (int i = 0, size = events.size(); i < size && (pe = events.poll()) != null; i++ ) {
+                try {
+                    pe.run();
+                    pe.reset();
+                } catch ( Throwable x ) {
+                    log.error(sm.getString("endpoint.nio.pollerEventError"), x);
+                }
+            }
+            return result;
+}
+
+//PollEvent的run方法里面就有调用java nio系统api了
+PollEvent.run
+```java
+ @Override
+public void run() {
+    if (interestOps == OP_REGISTER) {
+        try {
+            socket.getIOChannel().register(socket.getSocketWrapper().getPoller().getSelector(), SelectionKey.OP_READ, socket.getSocketWrapper()); //这里就是调用了nio的api
+        } catch (Exception x) {
+            log.error(sm.getString("endpoint.nio.registerFail"), x);
+        }
+    }else {
+        // 。。
+    }
+    }
+// 具体调用的系统方法是:
+AbstractSelectableChannel.register(Selector sel, int ops,
+                                       Object att)    //三个参数，最后一个是attachMent，也就是上面BlockPoller在run方法中提取出来的attachment
+
+
+//回到timeout方法里，注释说该方法在Poller的每一个loop中都会被调用。
+protected void timeout(int keyCount, boolean hasEvents) {
+        long now = System.currentTimeMillis();
+    // This method is called on every loop of the Poller. Don't process
+    // timeouts on every loop of the Poller since that would create too
+    // much load and timeouts can afford to wait a few seconds.
+    // However, do process timeouts if any of the following are true:
+    // - the selector simply timed out (suggests there isn't much load)
+    // - the nextExpiration time has passed
+    // - the server socket is being closed
+    //这里面主要的判断是否是读超时或者写超时了，如果是的话，CancelKey
+}
+```
+ClientPoller线程就是负责执行Selector那一套，出现事件之后就分发给工作线程（SocketProcessor），工作线程的名字是这么起的:
+> TaskThreadFactory tf = new TaskThreadFactory(getName() + "-exec-", daemon, getThreadPriority());
+
+所以在断点里面能够看到http-nio-8080-exec-1 ,http-nio-8080-exec-2...这个线程池就是主要的处理业务逻辑的线程。
+
+
 tbd
 
 ## tomcat类加载器(重点)
+## tomcat支持开启sendFile
 
 
 

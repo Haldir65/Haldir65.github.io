@@ -183,11 +183,15 @@ semaphere.release();
 
 
 ## Exchanger
-
-juc里面没有c语言那样的mutex，不过reentrantlock这种实际上就发挥了mutex的作用。
-
+Exchanger是成双成对使用的，支持泛型，两条线程同时开跑，先到的会等着，两个都到了之后，互相交换泛型的数据
 
 
+## Mutex
+juc里面没有c语言那样的mutex，不过Reentrantlock这种实际上就发挥了mutex的作用。
+
+
+## tbd 
+使用AQS的普遍方式是自己继承实现一个Sync（写一个试试看？,Tomcat里面就有）
 
 
 ## 参考

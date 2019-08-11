@@ -749,7 +749,7 @@ Set的重要特点就是**不能放进去重复**的元素，Set中不会存在e
 HashSet的源码只有三百多行，内部有一个map（HashMap）相对来说是比较简单的。其实Set平时用的也不是那么多。。。
 
 ### 4. 一些不常用的类
-Vetor(不要用)，Stack，ArrayDeque,Queue, HashTable（oracle专家建议使用HashMap）
+Vetor(不要用)，Stack，ArrayDeque,Queue, HashTable（oracle专家建议使用HashMap）,IdentityHashMap
 
 Vector属于List,线程安全，但效率低（就是简单的在所有方法前面加上了synchronized）。而事实上这种同步不能保证大批量操作的时候(putAll)的线程安全性，外部调用者还得专门搞一把锁。
 
@@ -772,6 +772,9 @@ Deque(双端队列)
 jdk1.8的concurrentHashMap不是用synchronized实现的，是Doug Lea使用CAS操作写的，非常高效。
 concurrentHashMap的原理是分段锁(jdk 1.7)
 concurrentHashMap早在1.7的时候就加入了putIfAbsent方法，因为确实需要这种atomic action。
+
+ConcurrentLinkedQueue(tbd)
+
 
 ### 6. WeakHaskMap
 WeakHashMap的Key是WeakReference，但Value不是。

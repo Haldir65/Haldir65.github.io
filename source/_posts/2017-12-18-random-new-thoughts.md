@@ -41,7 +41,6 @@ top : 1
 - [ ] 宇宙第一ide熟悉使用
 - [ ] js的闭包等面试常谈
 - [ ] java的aspectJ教程，Spring AOP 与AspectJ 实现原理上并不完全一致，但功能上是相似的
-- [ ] autoWired, autovalue这些java 的library
 - [ ] code generator(代码生成器)
 - [ ][content-disposition](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)
 - [ ] 用正则检测或者解析json(jQuery源码里有) 在线正则检测网站
@@ -59,7 +58,6 @@ top : 1
 - [后端面试题](https://segmentfault.com/a/1190000017864721)
 - thrift 源码解析，rpc框架（比方说人脸识别应用就可以用java调用python服务）这种rpc过程肯定要考虑字节序的问题。
 - Perl被称为脚本语言中的瑞士军刀，正则多一点
-- seamphore 这个java class以及phaser
 
 ### 已完成
 * 用 express 转接一个知乎 Api，添加 Access-control-allow-origin,或许还可以用 redis 缓存数据结果（一个就好）由此想到一篇文章"How to use Python to build a restful Web Service".只不过用的是 Tornado
@@ -78,8 +76,7 @@ top : 1
 * [如何调试 Android 打包流程？](http://www.wangyuwei.me/)，一个remote的事
 * [一个用于优化 png 图片的 gradle 插件](https://github.com/chenenyu/img-optimizer-gradle-plugin)，用来看 groovy 语法挺好的。以及 [How to write gradle plugin](http://yuanfentiank789.github.io/2017/09/20/%E5%9C%A8AndroidStudio%E4%B8%AD%E8%87%AA%E5%AE%9A%E4%B9%89Gradle%E6%8F%92%E4%BB%B6/)
 * XSS 攻击,DOM based和Stored XSS,基本上就是不要相信用户的输入，除了合法输入以外一律过滤掉
-- websocket nodejs，局限性就是前后台都得用socket.io的库。前端是浏览器的话还好，app的话java,Android都有对应的实现.[其实就是socket io] 
-- [X]一直不会maven是在是太丢人了[看文档就行了](https://maven.apache.org/guides/getting-started/index.html#How_do_I_make_my_first_Maven_project)，其他的[教程](https://www.tutorialspoint.com/maven/maven_build_life_cycle.htm)也不错
+- Websocket nodejs，局限性就是前后台都得用socket.io的库。前端是浏览器的话还好，app的话java,Android都有对应的实现.[其实就是socket io] 
 - [使用Spring boot后台提供protobuf接口实现客户端通信] 不要使用protobf-gradle-plugin了。直接写脚本用protoc去生成文件，指定生成文件的路径要和proto里面写的包名对的上。另外就是客户端和server端依赖的protobuf版本以及protoc工具的版本得一致，比如都是3.5。还有就是protoc的语法，什么import的比较烦。
 - [X] 使用jinja2生成文件。[一个比较好玩的代码生成器](https://github.com/guokr/swagger-py-codegen)
 - [X] URL Encoding,就是那个在网址里把字符转成百分号加上UTF-8的[找到了阮一峰老师的解释](http://www.ruanyifeng.com/blog/2010/02/url_encoding.html)
