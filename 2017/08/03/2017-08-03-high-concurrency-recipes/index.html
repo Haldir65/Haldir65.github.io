@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/be3c80a11edfd0fdb75d098550ed2c8e.jpg">
-<meta property="og:updated_time" content="2019-08-11T13:05:11.312Z">
+<meta property="og:updated_time" content="2019-08-12T11:39:32.318Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java多线程中需要注意的一些点">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/be3c80a11edfd0fdb75d098550ed2c8e.jpg">
@@ -285,7 +285,78 @@ public class TestLock {
 <p>一个比较好的关于ThreadlLocal为什么容易leak的<a href="http://blog.xiaohansong.com/2016/08/06/ThreadLocal-memory-leak/">解释</a>，ThreadLocal是作为ThreadLocalMap中的Entry的key存在的，也就是Thread-&gt; ThreadLocalMap -&gt; Entry -&gt; WeakReference of ThreadLocal 。想想一下，假如外部调用者释放了ThreadLocal的引用，这个Entry中的key就成为null了，但是这个Entry中的Value还在，一直被Thread持有着。所以这事还是在于Thread的生命周期可能很长。fix的方案： 外部确定不用的时候记得调用下remove就好了。</p>
 <p>所以避免leak的话，记得调用ThreadLocal.remove<br>每一条线程调用ThreadLocal的set方法时都只能改变属于自己（线程）的值，调用get的时候也只能读到自己曾经设置的值。在多条线程面前，一个ThreadLocal本身并不是容器，因为数据实际上放在了Thread的一个map里面，每条线程只能保存或者更改读取自己的保险柜里的东西，保险柜钥匙即ThreadLocal自身。</p>
 <h2 id="3-Fork-join-since-java-7"><a href="#3-Fork-join-since-java-7" class="headerlink" title="3. Fork/join since java 7"></a>3. Fork/join since java 7</h2><p>有些任务是可以分块的。<a href="http://ifeve.com/java7-fork-join-and-closure/">work-stealing的实现</a></p>
-<h2 id="4-ArrayBlockingQueue-Thread-Safe"><a href="#4-ArrayBlockingQueue-Thread-Safe" class="headerlink" title="4. ArrayBlockingQueue Thread Safe"></a>4. ArrayBlockingQueue<E> Thread Safe</h2><p>构造函数里面就加了锁，是为了避免指令重排，保证可见性</p>
+<h2 id="4-ArrayBlockingQueue-Thread-Safe"><a href="#4-ArrayBlockingQueue-Thread-Safe" class="headerlink" title="4. ArrayBlockingQueue Thread Safe"></a>4. ArrayBlockingQueue<E> Thread Safe</h2><p>构造函数里面就加了锁，是为了避免指令重排，保证可见性<br><a href="http://cmsblogs.com/?p=2458">ArrayBlockingQueue的构造函数加锁问题</a>是体现指令重排的一个非常好的例子：<br>ArrayBlockingQueue</p>
+<pre><code class="java">
+/** Main lock guarding all access */
+final ReentrantLock lock;
+
+/** Condition for waiting takes */
+private final Condition notEmpty;
+
+/** Condition for waiting puts */
+private final Condition notFull;
+
+public ArrayBlockingQueue(int capacity) {
+    this(capacity, false);
+}
+
+public ArrayBlockingQueue(int capacity, boolean fair) {
+    if (capacity &lt;= 0)
+        throw new IllegalArgumentException();
+    this.items = new Object[capacity];
+    lock = new ReentrantLock(fair); //
+    notEmpty = lock.newCondition(); //
+    notFull =  lock.newCondition(); //
+    //这些成员变量都是final的
+}
+
+public ArrayBlockingQueue(int capacity, boolean fair,
+                            Collection&lt;? extends E&gt; c) {
+    this(capacity, fair);
+
+    final ReentrantLock lock = this.lock;
+    lock.lock(); // Lock only for visibility, not mutual exclusion
+    //锁是为了内存可见性，而不是互斥
+    try {
+        int i = 0;
+        try {
+            for (E e : c) {
+                checkNotNull(e);
+                items[i++] = e;
+            }
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            throw new IllegalArgumentException();
+        }
+        count = i;
+        putIndex = (i == capacity) ? 0 : i;
+    } finally {
+        lock.unlock();
+    }
+}
+</code></pre>
+<p>jvm创建一个对象应该分三步，malloc内存(把所有值设为0,false或者null)，执行对象的构造函数，将该对象的引用赋值给filed。后两部是有可能顺序颠倒的，这就导致多线程场景下读取到一个“没有完全初始化的”对象<br><a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-17.html">java language specification</a> 中（17.5. final Field Semantics）部分指出，对于final的成员变量，vm保证并发场景下不会发生构造函数指令重排</p>
+<pre><code class="java">class FinalFieldExample { 
+    final int x;
+    int y; 
+    static FinalFieldExample f;
+
+    public FinalFieldExample() {
+        x = 3; 
+        y = 4; 
+    } 
+
+    static void writer() {
+        f = new FinalFieldExample();
+    } 
+
+    static void reader() {
+        if (f != null) {
+            int i = f.x;  // guaranteed to see 3  //final变量保证会被初始化
+            int j = f.y;  // could see 0 //普通变量不保证
+        } 
+    } 
+}
+</code></pre>
 <h2 id="5-ReentrantLock-不公平锁"><a href="#5-ReentrantLock-不公平锁" class="headerlink" title="5.ReentrantLock 不公平锁"></a>5.ReentrantLock 不公平锁</h2><p>在jdk1.5里面，ReentrantLock的性能是明显优于synchronized的，但是在jdk1.6里面，synchronized做了优化，他们之间的性能差别已经不明显了。</p>
 <h2 id="6-StampedLocks-java-8"><a href="#6-StampedLocks-java-8" class="headerlink" title="6. StampedLocks(java 8)"></a>6. StampedLocks(java 8)</h2><p>java 1.5 就有了ReentrantReadWriteLock，用于实现专门针对读或者写的lock<br>java 8提供了StampedLocks,lock方法返回一个long的时间戳，可以用这个时间戳release lock，或者检测lock是否有效。例如，tryConvertToOptimisticRead,假如在这个读的时间段内未发生其他线程的写操作，可以认为数据是有效的。像这样</p>
 <ul>
@@ -823,10 +894,6 @@ private void setNextRunTime() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
               </li>
              
@@ -839,7 +906,15 @@ private void setNextRunTime() {
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -859,19 +934,11 @@ private void setNextRunTime() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -883,7 +950,7 @@ private void setNextRunTime() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">django</a>
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -896,6 +963,10 @@ private void setNextRunTime() {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">django</a>
               </li>
              
               <li class="article-tag-list-item">
