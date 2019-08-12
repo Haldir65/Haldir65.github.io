@@ -845,3 +845,5 @@ public class Client2 {
 [java nio](https://www.zfl9.com/java-nio.html#more) 作者的文章条理很清晰。
 这里面有一句原话摘抄下来：
 > 线程的创建和销毁成本很高，在Linux这样的操作系统中，线程本质上就是一个进程。创建和销毁都是重量级的系统函数。像Java的线程栈，一般至少分配512K～1M的空间，
+
+这个值(jvm创建一条线程时为其分配的call stack size)其实是可配置的，-XX:ThreadStackSize(默认是1M，也就是创建一条线程至少要占用1M的内存)

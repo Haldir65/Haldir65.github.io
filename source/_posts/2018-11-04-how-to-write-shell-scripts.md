@@ -813,6 +813,27 @@ check_depends(){
 }
 ```
 
+### http的get和post方法包装一下
+[类似于import的语法叫做source](https://github.com/vcheckzen/FamilyCloudSpeederInShell/blob/master/shell/CloudDisk/speedup_router.sh)
+```shell
+get() {
+    HEADER="$1"
+    URL="$2"
+    eval curl -s --connect-timeout "${CONNECTION_TIME}"  -m "${TRANSMISSION_TIME}" "${HEADER}" "${URL}"
+}
+
+post() {
+    HEADER="$1"
+    URL="$2"
+    PAYLOAD="$3"
+    eval curl -s --connect-timeout "${CONNECTION_TIME}" -m "${TRANSMISSION_TIME}" -X POST "${URL}" "${HEADER}" -w %{http_code} -d "'$PAYLOAD'"
+}
+
+## 使用方式
+result=`get "$HOST$ACCESS_URL?qosClientSn=$qosClientSn" "$headers"`
+result=`post "$headers" "$HOST$ACCESS_URL" "$send_data"`
+```
+
 
 
 ![](https://www.haldir66.ga/static/imgs/PuffinWales_EN-AU12757555133_1920x1080.jpg)

@@ -117,6 +117,84 @@ private static void prepare(boolean quitAllowed) {
 
 ## 4. ArrayBlockingQueue<E> Thread Safe
 构造函数里面就加了锁，是为了避免指令重排，保证可见性
+[ArrayBlockingQueue的构造函数加锁问题](http://cmsblogs.com/?p=2458)是体现指令重排的一个非常好的例子：
+ArrayBlockingQueue
+```java
+
+/** Main lock guarding all access */
+final ReentrantLock lock;
+
+/** Condition for waiting takes */
+private final Condition notEmpty;
+
+/** Condition for waiting puts */
+private final Condition notFull;
+
+public ArrayBlockingQueue(int capacity) {
+    this(capacity, false);
+}
+
+public ArrayBlockingQueue(int capacity, boolean fair) {
+    if (capacity <= 0)
+        throw new IllegalArgumentException();
+    this.items = new Object[capacity];
+    lock = new ReentrantLock(fair); //
+    notEmpty = lock.newCondition(); //
+    notFull =  lock.newCondition(); //
+    //这些成员变量都是final的
+}
+
+public ArrayBlockingQueue(int capacity, boolean fair,
+                            Collection<? extends E> c) {
+    this(capacity, fair);
+
+    final ReentrantLock lock = this.lock;
+    lock.lock(); // Lock only for visibility, not mutual exclusion
+    //锁是为了内存可见性，而不是互斥
+    try {
+        int i = 0;
+        try {
+            for (E e : c) {
+                checkNotNull(e);
+                items[i++] = e;
+            }
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            throw new IllegalArgumentException();
+        }
+        count = i;
+        putIndex = (i == capacity) ? 0 : i;
+    } finally {
+        lock.unlock();
+    }
+}
+```
+
+jvm创建一个对象应该分三步，malloc内存(把所有值设为0,false或者null)，执行对象的构造函数，将该对象的引用赋值给filed。后两部是有可能顺序颠倒的，这就导致多线程场景下读取到一个“没有完全初始化的”对象
+[java language specification](https://docs.oracle.com/javase/specs/jls/se8/html/jls-17.html) 中（17.5. final Field Semantics）部分指出，对于final的成员变量，vm保证并发场景下不会发生构造函数指令重排
+```java
+class FinalFieldExample { 
+    final int x;
+    int y; 
+    static FinalFieldExample f;
+
+    public FinalFieldExample() {
+        x = 3; 
+        y = 4; 
+    } 
+
+    static void writer() {
+        f = new FinalFieldExample();
+    } 
+
+    static void reader() {
+        if (f != null) {
+            int i = f.x;  // guaranteed to see 3  //final变量保证会被初始化
+            int j = f.y;  // could see 0 //普通变量不保证
+        } 
+    } 
+}
+```
+
 
 ## 5.ReentrantLock 不公平锁
 在jdk1.5里面，ReentrantLock的性能是明显优于synchronized的，但是在jdk1.6里面，synchronized做了优化，他们之间的性能差别已经不明显了。

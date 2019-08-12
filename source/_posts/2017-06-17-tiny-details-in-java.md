@@ -1642,11 +1642,14 @@ javac -source 1.7 -bootclasspath /usr/lib/jvm/java-7-oracle/jre/lib/rt.jar Main.
 sun被oracle收购后，rt.jar属于oracle公司，并未开源。有时候需要看jdk源码的话，可以参考[社区维护的openjdk的源码](https://github.com/ojdkbuild/ojdkbuild),但是千万不要乱改。
 windos平台下，想在idea中看jdk源码的话，下载openjdk源码(一个zip文件)，下载下来解压到任意一个文件夹。在idea里，File - Project structure - sdk - source path，点击加号，选择添加刚才解压的文件夹里头的java-1.8.0-openjdk-1.8.0.212-1.b04.ojdkbuild.windows.x86_64/src.zip。接下来，随便查找一个sun package下面的文件，比方说sun.nio.ch.WindowsSelectorImpl，自然会跳转到对应的文件中。
 
-
 ### 53. Class.forName...
 在App启动的时候在另外一个线程里面提前去加载这个class，能够加快速度吗？
 
 class的生命周期
+
+circular dependencies in java , how to ?
+[理论上可以用Makefile来编译运行java项目](https://stackoverflow.com/questions/2209827/why-is-no-one-using-make-for-java) 只是很少有人这么干
+[RedisClient lettuce这么干了](https://github.com/lettuce-io/lettuce-core/blob/master/Makefile)
 
 
 
