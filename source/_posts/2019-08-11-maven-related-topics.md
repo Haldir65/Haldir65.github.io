@@ -8,6 +8,7 @@ tags:
 ![](https://www.haldir66.ga/static/imgs/FreshSalt_ZH-CN12818759319_1920x1080.jpg)
 
 maven的一些东西
+<!--more-->
 
 
 maven官网提供的通过命令行创建一个maven项目的方法

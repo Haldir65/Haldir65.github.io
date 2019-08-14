@@ -40,7 +40,7 @@ SparseArray(Android平台用)
 
 ### 1.1 ArrayList源码解析
 
-- 先上一段崩溃代码
+先上一段崩溃代码
 ```java
  public static void main(String[] args) {
     String[] array = new String[]{"a", "b", "c", "d"};
@@ -57,7 +57,7 @@ Exception in thread "main" java.lang.UnsupportedOperationException
 正确的用法是new 一个ArrayList，把这个有限的list的元素(的指针)copy进去，即addAll()方法
 ArrayList.toArray(T[] a)是把所有的elements通过System.arraycopy(elementData, 0, a, 0, size);复制到a数组中。
 
-- System.arraycopy可以从自己的数组复制到自己的数组
+System.arraycopy可以从自己的数组复制到自己的数组
 ```java
   public void add(int index, E element) {
         rangeCheckForAdd(index);

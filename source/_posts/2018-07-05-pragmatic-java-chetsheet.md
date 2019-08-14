@@ -532,7 +532,7 @@ public class Test {
 }
 ```
 
-反射替换final成员变量的时候要小心[一种全局拦截并监控 DNS 的方式](https://fucknmb.com/2018/04/16/一种全局拦截并监控DNS的方式/) 文中提到
+反射替换final成员变量的时候要小心[一种全局拦截并监控 DNS 的方式](https://fucknmb.com/2018/04/16/一种全局拦截并监控DNS的方式/) 文中提到,要改一下Modifier的flag
 ```java
 try {
     //获取InetAddress中的impl
@@ -592,6 +592,8 @@ try {
     e.printStackTrace();
 }
 ```
+
+
 classLoader在loadClass（无论是隐式的new XXX还是显式的classLoader.loadClass..）都会走缓存
 缓存机制会将已经加载的class缓存起来，当程序中需要使用某个Class时，类加载器先从缓存区中搜寻该Class，只有当缓存中不存在该Class时，系统才会读取该类的二进制数据，并将其转换为Class对象，存入缓存中。这就是为什么更改了class后，需要重启JVM才生效的原因。
 
@@ -617,6 +619,50 @@ access-bridge-64.jar  dnsns.jar    jfxrt.jar       meta-index   sunec.jar       
 cldrdata.jar          jaccess.jar  localedata.jar  nashorn.jar  sunjce_provider.jar  sunpkcs11.jar
 ```
 sun.misc.AppClassLoader(负责java.class.path这个位置，就是/c/Program Files/Java/jre1.8.0_201/lib/文件夹下面的所有jar包,以及/c/Program Files/Java/jre1.8.0_201/lib/ext中的所有jar包，这个其实是委托上去了)。
+
+
+## java 的CLASSPATH
+首先来看一下一台windows上的classPath长什么样
+```shell
+echo "${CLASSPATH}"
+.;C:\Program Files\Java\jdk1.8.0_201\bin;C:\Program Files\Java\jdk1.8.0_201\lib\dt.jar;C:\Program Files\Java\jdk1.8.0_201\lib\tools.jar
+```
+
+分别是"."当前文件夹，bin文件夹，lib文件夹下面的dt.jar，以及lib下面的tools.jar
+bin文件夹里放的都是些可执行文件(windows上是.exe文件),它们实际上仅仅相当于是一层代码的包装，这些工具的实现所要用到的类库都在tools.jar中(这些跟运行期没什么关系)
+dt.jar 主要是Swing包,用解压缩软件看下就知道了
+
+上述这些位置(".", "bin/"."lib/dt.jar", "lib/tools.jar")都是由Application ClassLoader加载的
+
+"%JAVA_HOME%\jre\lib"，这个文件夹下面包括了rt.jar,resource.jar,该文件夹下所有class是由BootStrapClassLoader加载的
+扩展类库在%JAVA_HOME%\jre\lib\ext目录下，该目录下的类是由Extension ClassLoader来加载的
+代码为证
+```java
+public static void main(String[] args) {
+        String property = System.getProperty("sun.boot.class.path");//BoostrapClassLoader
+        String[] split = property.split(";");
+        Arrays.asList(split).forEach(s -> System.out.println(s)); // jre/lib 文件夹下面的所有类
+    } 
+
+public static void main(String[] args) {
+        String property = System.getProperty("java.ext.dirs");//ExtClassLoader
+        String[] split = property.split(";");
+        Arrays.asList(split).forEach(s -> System.out.println(s)); //jre/lib以及jre/lib/ext文件夹下面的所有类。这里面已经看出来委派了
+    }
+
+public static void main(String[] args) {
+        String property = System.getProperty("java.class.path");//AppClassLoader
+        String[] split = property.split(";");
+        Arrays.asList(split).forEach(s -> System.out.println(s));// 这个打印出来的是上面的外加其他（.） 也是双亲委派
+    }    
+```
+
+现实生活中，跑一个java应用都是java -cp xxx非常长甚至几百个jar的classpathxxx (好在ide帮开发者完成了这种处理)
+[java这个可执行文件接收的参数](https://docs.oracle.com/javase/8/docs/technotes/tools/windows/java.html) 这里面介绍了，有些是标准的(所有vm implementaion都支持)，有些是非标准的(只在hotspot vm上支持)
+
+
+[jdk bin 文件夹中的可执行文件的介绍](https://docs.oracle.com/javase/8/docs/technotes/tools/index.html) java的命令行参数
+
 
 
 
