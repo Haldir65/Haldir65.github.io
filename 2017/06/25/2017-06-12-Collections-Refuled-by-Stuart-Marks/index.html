@@ -17,7 +17,7 @@
 <meta property="og:description" content="根据网上的大部分博客的分类，集合框架分为Collections(具有类似数组的功能)和Map(存储键值对)这两大部分。针对jdk1.8的java.util里面的一些常用的或者不常用的集合做一些分析。写这篇文章的过程中，我慢慢发现不同版本jdk的同一个class的实现是有一些差异的(LinkedList)，由于对照的是java1.8的代码，里面会多一些since 1.8的代码，这里不作论述。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg">
-<meta property="og:updated_time" content="2019-08-12T11:39:32.314Z">
+<meta property="og:updated_time" content="2019-08-14T10:59:21.348Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java集合类的一些整理">
 <meta name="twitter:description" content="根据网上的大部分博客的分类，集合框架分为Collections(具有类似数组的功能)和Map(存储键值对)这两大部分。针对jdk1.8的java.util里面的一些常用的或者不常用的集合做一些分析。写这篇文章的过程中，我慢慢发现不同版本jdk的同一个class的实现是有一些差异的(LinkedList)，由于对照的是java1.8的代码，里面会多一些since 1.8的代码，这里不作论述。">
@@ -208,17 +208,21 @@ ga('send', 'pageview');
 <h2 id="Queue"><a href="#Queue" class="headerlink" title="Queue"></a>Queue</h2><p>Stack ArrayDeque(不常用)</p>
 <h2 id="Map"><a href="#Map" class="headerlink" title="Map"></a>Map</h2><p>HashMap （键值都可以为null,底层是哈希表）<br>TreeMap(底层二叉树)<br>HashTable(线程安全，键值都不允许为null)<br>SparseArray(Android平台用)</p>
 <p>关于集合，不得不提到泛型，Java 1.5引入了泛型，关于泛型，找到一篇很好的文章<br><a href="http://blog.csdn.net/lonelyroamer/article/details/7868820">类型擦除原理</a>。本质上只是提供了编译期类型检查。编译通过后都是Object，所以叫做<a href="https://zh.wikipedia.org/wiki/%E7%B1%BB%E5%9E%8B%E6%93%A6%E9%99%A4">类型擦除</a>。</p>
-<h2 id="1-List的解析"><a href="#1-List的解析" class="headerlink" title="1. List的解析"></a>1. List的解析</h2><h3 id="1-1-ArrayList源码解析"><a href="#1-1-ArrayList源码解析" class="headerlink" title="1.1 ArrayList源码解析"></a>1.1 ArrayList源码解析</h3><ul>
-<li>先上一段崩溃代码<br><code>`</code>java<br>public static void main(String[] args) {<br>  String[] array = new String[]{“a”, “b”, “c”, “d”};<br>  List<String> l = Arrays.asList(array);<br>  l.add(“d”);<br>}</li>
-</ul>
-<p>Exception in thread “main” java.lang.UnsupportedOperationException<br>    at java.util.AbstractList.add(AbstractList.java:148)<br>    at java.util.AbstractList.add(AbstractList.java:108)<br>    at com.example.demo.main(ConcurrentModificationListDemo.java:13)</p>
-<pre><code>问题出在Arrays.asList返回了一个**java.util.Arrays.ArrayList**，而不是**java.util.ArrayList**。前者只实现了List接口的有限的几个方法，并且是Arrays内部的一个private class。
-正确的用法是new 一个ArrayList，把这个有限的list的元素(的指针)copy进去，即addAll()方法
-ArrayList.toArray(T[] a)是把所有的elements通过System.arraycopy(elementData, 0, a, 0, size);复制到a数组中。
+<h2 id="1-List的解析"><a href="#1-List的解析" class="headerlink" title="1. List的解析"></a>1. List的解析</h2><h3 id="1-1-ArrayList源码解析"><a href="#1-1-ArrayList源码解析" class="headerlink" title="1.1 ArrayList源码解析"></a>1.1 ArrayList源码解析</h3><p>先上一段崩溃代码</p>
+<pre><code class="java"> public static void main(String[] args) {
+    String[] array = new String[]{&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;};
+    List&lt;String&gt; l = Arrays.asList(array);
+    l.add(&quot;d&quot;);
+}
 
-- System.arraycopy可以从自己的数组复制到自己的数组
-```java
-  public void add(int index, E element) {
+Exception in thread &quot;main&quot; java.lang.UnsupportedOperationException
+    at java.util.AbstractList.add(AbstractList.java:148)
+    at java.util.AbstractList.add(AbstractList.java:108)
+    at com.example.demo.main(ConcurrentModificationListDemo.java:13)
+</code></pre>
+<p>问题出在Arrays.asList返回了一个<strong>java.util.Arrays.ArrayList</strong>，而不是<strong>java.util.ArrayList</strong>。前者只实现了List接口的有限的几个方法，并且是Arrays内部的一个private class。<br>正确的用法是new 一个ArrayList，把这个有限的list的元素(的指针)copy进去，即addAll()方法<br>ArrayList.toArray(T[] a)是把所有的elements通过System.arraycopy(elementData, 0, a, 0, size);复制到a数组中。</p>
+<p>System.arraycopy可以从自己的数组复制到自己的数组</p>
+<pre><code class="java">  public void add(int index, E element) {
         rangeCheckForAdd(index);
         ensureCapacityInternal(size + 1);  // Increments modCount!!
         System.arraycopy(elementData, index, elementData, index + 1,
@@ -226,7 +230,8 @@ ArrayList.toArray(T[] a)是把所有的elements通过System.arraycopy(elementDat
         elementData[index] = element;
         size++;
     }
-</code></pre><p>添加到指定位置，System.arrayCopy可以从同一个数组复制到同一个数组，几乎就是挪动指针了。</p>
+</code></pre>
+<p>添加到指定位置，System.arrayCopy可以从同一个数组复制到同一个数组，几乎就是挪动指针了。</p>
 <ul>
 <li>不常见的方法</li>
 </ul>
@@ -1187,6 +1192,10 @@ a = null;
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
               </li>
              
@@ -1196,10 +1205,6 @@ a = null;
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">Okio</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1219,15 +1224,11 @@ a = null;
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1239,11 +1240,15 @@ a = null;
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">sql</a>
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
+                <a href="javascript:void(0)" class="js-tag color2">django</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">sql</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1259,7 +1264,7 @@ a = null;
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">django</a>
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1272,10 +1277,6 @@ a = null;
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1292,6 +1293,10 @@ a = null;
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">service</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
             
             <div class="clearfix"></div>
