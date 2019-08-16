@@ -108,7 +108,7 @@ The size, isEmpty, get, set, iterator, and listIterator operations run in consta
 
 [图表参考](http://www.haobanfa.info/array-arraylist-linked-list时间复杂度对比图/)
 
-HashMapput操作的时间复杂度理论上来说当然是O(1)，但是实际上还有很多时间开销的，比如hash碰撞，另外hash的计算也要耗费CPU时间。所以一般我们认为它的时间复杂度是常数级的。
+HashMap put操作的时间复杂度理论上来说当然是O(1)，但是实际上还有很多时间开销的，比如hash碰撞，另外hash的计算也要耗费CPU时间。所以一般我们认为它的时间复杂度是常数级的。
 
 
 ### 1.2 LinkedList的一些点
@@ -735,6 +735,48 @@ vauleAt和keyAt接收一个index参数(数组下标)，这个参数应该是key�
 ### 2.4 ArrayMap
 
 
+### 2.5 HashTable的一些点(虽然已经不推荐使用了)
+HashTable的key,value都不允许为null
+```java
+/**
+    * The maximum size of array to allocate.
+    * Some VMs reserve some header words in an array.
+    * Attempts to allocate larger arrays may result in
+    * OutOfMemoryError: Requested array size exceeds VM limit
+    */
+private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
+
+int index = (hash & 0x7FFFFFFF) % tab.length;
+
+if (count >= threshold) { 
+        // Rehash the table if the threshold is exceeded
+        rehash();
+}
+threshold = (int)Math.min(newCapacity * loadFactor, MAX_ARRAY_SIZE + 1); 
+//所以这个loadFactor的意思就是，如果size(count其实就是size)超过了数组长度*0.75 ,就会扩容。
+//所以哪怕所有的元素都挂在第一个Entry的尾巴上，size到了这个程度，也得resize。这也是hashMap后面改成树结构的一部分原因
+```
+因为int 是signed的，所以最大的容量是2的32次方，20亿左右，2147483647。上面的注释也说明了，部分vm可能不允许allocate超过20亿这个数字，所以减掉8。
+
+生成数组下标的方法是用(0x7FFFFFFF，其实就是2的31次方)这个数对hashCode进行按位与运算，再对当前数组取模。
+这里强调一点，[hashCode可以为负数](https://stackoverflow.com/questions/9249983/hashcode-giving-negative-values)。负数是怎么来的，overflow。
+java中的overflow大概是这样的
+```java
+int dd1 = Integer.MAX_VALUE+1;
+int dd2 = Integer.MAX_VALUE+2;
+System.out.println(Integer.toBinaryString(Integer.MAX_VALUE));
+// 1111111111111111111111111111111  //31个1（其实前面还有一个0）
+System.out.println(Integer.toBinaryString(dd1));
+// 10000000000000000000000000000000 // 31个0加上尾部一个1
+System.out.println(Integer.toBinaryString(dd2));
+// 10000000000000000000000000000001 // 1个1 + 中间30个0 + 尾部1个1
+System.out.println(dd1>Integer.MAX_VALUE); // false
+System.out.println(dd2>dd1); // true
+```
+所以在Int(32个槽子，最多40多亿可能，0-20多亿是正数，30亿，40亿是负数)，long也是类似。
+回到0x7FFFFFFF 这个数，& 操作的作用就是把哪些超过20亿的（负数），抹掉第一位的0，也就成了正数。对于不超过那个20多亿的数，原样返还。
+
+一个有趣的现象是hashTable的rehash会把每个Entry上的元素顺序颠倒过来，例如(a->b->c->d)变成(d->c->b->a)。不过这个属于vm实现的细节。
 
 
 

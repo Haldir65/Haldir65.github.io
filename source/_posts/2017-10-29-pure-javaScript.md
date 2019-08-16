@@ -1300,3 +1300,4 @@ JS的解析是由浏览器中的JS解析引擎完成的。JS是单线程运行�
 ## tbd
 
 [ES6 Proxy]
+[手动实现promise](https://jameshfisher.com/2017/11/07/promise-implementation/)

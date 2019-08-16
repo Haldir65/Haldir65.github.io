@@ -378,8 +378,13 @@ find /etc -name "passwd*" -exec grep "root" {} \;
 exec是和find一起使用的，分号是要执行的命令的终止标志，前面得加上斜杠。
 简单来说，就是把exec前面的结果执行某项操作，语法上，大括号不能少，反斜杠不能少，分号不能少
 感觉exec和find 命令的xargs差不多
-find命令要结合着exec和xargs命令一起来看
+<del>find命令要结合着exec和xargs命令一起来看</del>
+xargs命令的作用，是将标准输入转为命令行参数。
 [xargs命令](http://www.cnblogs.com/peida/archive/2012/11/15/2770888.html)
+[阮一峰的xargs教程](http://www.ruanyifeng.com/blog/2019/08/xargs-tutorial.html) 例如可以针对文本文件的每一行命令进行操作
+
+> echo {0..9} | xargs -n 2 echo
+
 [exec命令](http://www.cnblogs.com/peida/archive/2012/11/14/2769248.html)
 可以认为就是把find出来的所有结果填充到exec的大括号里面,因为平时实际从一个文件中查找字符的方式就是
 grep "SQLALCHEMY_DATABASE_URI" somefilename
