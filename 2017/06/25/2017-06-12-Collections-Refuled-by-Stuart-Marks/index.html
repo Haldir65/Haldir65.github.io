@@ -17,7 +17,7 @@
 <meta property="og:description" content="根据网上的大部分博客的分类，集合框架分为Collections(具有类似数组的功能)和Map(存储键值对)这两大部分。针对jdk1.8的java.util里面的一些常用的或者不常用的集合做一些分析。写这篇文章的过程中，我慢慢发现不同版本jdk的同一个class的实现是有一些差异的(LinkedList)，由于对照的是java1.8的代码，里面会多一些since 1.8的代码，这里不作论述。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg">
-<meta property="og:updated_time" content="2019-08-14T10:59:21.348Z">
+<meta property="og:updated_time" content="2019-08-16T10:27:58.109Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java集合类的一些整理">
 <meta name="twitter:description" content="根据网上的大部分博客的分类，集合框架分为Collections(具有类似数组的功能)和Map(存储键值对)这两大部分。针对jdk1.8的java.util里面的一些常用的或者不常用的集合做一些分析。写这篇文章的过程中，我慢慢发现不同版本jdk的同一个class的实现是有一些差异的(LinkedList)，由于对照的是java1.8的代码，里面会多一些since 1.8的代码，这里不作论述。">
@@ -301,7 +301,7 @@ public void trimToSize() // 内存压力大的时候可以释放掉一部分内�
 </tbody>
 </table>
 <p><a href="http://www.haobanfa.info/array-arraylist-linked-list时间复杂度对比图/">图表参考</a></p>
-<p>HashMapput操作的时间复杂度理论上来说当然是O(1)，但是实际上还有很多时间开销的，比如hash碰撞，另外hash的计算也要耗费CPU时间。所以一般我们认为它的时间复杂度是常数级的。</p>
+<p>HashMap put操作的时间复杂度理论上来说当然是O(1)，但是实际上还有很多时间开销的，比如hash碰撞，另外hash的计算也要耗费CPU时间。所以一般我们认为它的时间复杂度是常数级的。</p>
 <h3 id="1-2-LinkedList的一些点"><a href="#1-2-LinkedList的一些点" class="headerlink" title="1.2 LinkedList的一些点"></a>1.2 LinkedList的一些点</h3><p>LinkedList是双向链表实现的，可以想象成一帮小孩左手拉右手绕成一个圈，只不过这里面的每一个小孩并不是你放进去的 T 类型数据，而是一个Node<T> 。所以LinkedList是可以放进去一个Null的。<br>LinkedList往往被人诟病的就是除了添加和删除快之外，get和set很慢。<br>来看下add的实现（jdk 1.8）</p>
 <pre><code class="java">   public boolean add(E e) {
         linkLast(e);
@@ -842,7 +842,41 @@ public void put(int key, int value) {
 <li>SparseArray 是针对HashMap做的优化。<br> 1.HashMap 内部的存储结构，导致一些内存的浪费。<br> 2.在刚扩容完，SparseArray 和 HashMap 都会存在一些没被利用的内存。</li>
 <li>SparseArray 并不是任何时候都会更快，有时反而会更慢<br>vauleAt和keyAt接收一个index参数(数组下标)，这个参数应该是key对应的BinarySearch得到的值。</li>
 </ol>
-<h3 id="2-4-ArrayMap"><a href="#2-4-ArrayMap" class="headerlink" title="2.4 ArrayMap"></a>2.4 ArrayMap</h3><h2 id="3-Set的介绍"><a href="#3-Set的介绍" class="headerlink" title="3. Set的介绍"></a>3. Set的介绍</h2><p>Set用比较少，HashSet、TreeSet和LinkedHashSet是jdk的实现类</p>
+<h3 id="2-4-ArrayMap"><a href="#2-4-ArrayMap" class="headerlink" title="2.4 ArrayMap"></a>2.4 ArrayMap</h3><h3 id="2-5-HashTable的一些点-虽然已经不推荐使用了"><a href="#2-5-HashTable的一些点-虽然已经不推荐使用了" class="headerlink" title="2.5 HashTable的一些点(虽然已经不推荐使用了)"></a>2.5 HashTable的一些点(虽然已经不推荐使用了)</h3><p>HashTable的key,value都不允许为null</p>
+<pre><code class="java">/**
+    * The maximum size of array to allocate.
+    * Some VMs reserve some header words in an array.
+    * Attempts to allocate larger arrays may result in
+    * OutOfMemoryError: Requested array size exceeds VM limit
+    */
+private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
+
+int index = (hash &amp; 0x7FFFFFFF) % tab.length;
+
+if (count &gt;= threshold) { 
+        // Rehash the table if the threshold is exceeded
+        rehash();
+}
+threshold = (int)Math.min(newCapacity * loadFactor, MAX_ARRAY_SIZE + 1); 
+//所以这个loadFactor的意思就是，如果size(count其实就是size)超过了数组长度*0.75 ,就会扩容。
+//所以哪怕所有的元素都挂在第一个Entry的尾巴上，size到了这个程度，也得resize。这也是hashMap后面改成树结构的一部分原因
+</code></pre>
+<p>因为int 是signed的，所以最大的容量是2的32次方，20亿左右，2147483647。上面的注释也说明了，部分vm可能不允许allocate超过20亿这个数字，所以减掉8。</p>
+<p>生成数组下标的方法是用(0x7FFFFFFF，其实就是2的31次方)这个数对hashCode进行按位与运算，再对当前数组取模。<br>这里强调一点，<a href="https://stackoverflow.com/questions/9249983/hashcode-giving-negative-values">hashCode可以为负数</a>。负数是怎么来的，overflow。<br>java中的overflow大概是这样的</p>
+<pre><code class="java">int dd1 = Integer.MAX_VALUE+1;
+int dd2 = Integer.MAX_VALUE+2;
+System.out.println(Integer.toBinaryString(Integer.MAX_VALUE));
+// 1111111111111111111111111111111  //31个1（其实前面还有一个0）
+System.out.println(Integer.toBinaryString(dd1));
+// 10000000000000000000000000000000 // 31个0加上尾部一个1
+System.out.println(Integer.toBinaryString(dd2));
+// 10000000000000000000000000000001 // 1个1 + 中间30个0 + 尾部1个1
+System.out.println(dd1&gt;Integer.MAX_VALUE); // false
+System.out.println(dd2&gt;dd1); // true
+</code></pre>
+<p>所以在Int(32个槽子，最多40多亿可能，0-20多亿是正数，30亿，40亿是负数)，long也是类似。<br>回到0x7FFFFFFF 这个数，&amp; 操作的作用就是把哪些超过20亿的（负数），抹掉第一位的0，也就成了正数。对于不超过那个20多亿的数，原样返还。</p>
+<p>一个有趣的现象是hashTable的rehash会把每个Entry上的元素顺序颠倒过来，例如(a-&gt;b-&gt;c-&gt;d)变成(d-&gt;c-&gt;b-&gt;a)。不过这个属于vm实现的细节。</p>
+<h2 id="3-Set的介绍"><a href="#3-Set的介绍" class="headerlink" title="3. Set的介绍"></a>3. Set的介绍</h2><p>Set用比较少，HashSet、TreeSet和LinkedHashSet是jdk的实现类</p>
 <p>public class HashSet<E><br>    extends AbstractSet<E><br>    implements Set<E>, Cloneable, java.io.Serializable<br>Set的重要特点就是<strong>不能放进去重复</strong>的元素，Set中不会存在e1和e2，e1.equals(e2)的情况<br>HashSet的源码只有三百多行，内部有一个map（HashMap）相对来说是比较简单的。其实Set平时用的也不是那么多。。。</p>
 <h3 id="4-一些不常用的类"><a href="#4-一些不常用的类" class="headerlink" title="4. 一些不常用的类"></a>4. 一些不常用的类</h3><p>Vetor(不要用)，Stack，ArrayDeque,Queue, HashTable（oracle专家建议使用HashMap）,IdentityHashMap</p>
 <p>Vector属于List,线程安全，但效率低（就是简单的在所有方法前面加上了synchronized）。而事实上这种同步不能保证大批量操作的时候(putAll)的线程安全性，外部调用者还得专门搞一把锁。</p>
@@ -1144,10 +1178,6 @@ a = null;
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
@@ -1157,6 +1187,10 @@ a = null;
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">adb</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1224,11 +1258,11 @@ a = null;
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
+                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1236,19 +1270,19 @@ a = null;
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">django</a>
+                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">sql</a>
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">django</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1264,7 +1298,7 @@ a = null;
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
+                <a href="javascript:void(0)" class="js-tag color4">sql</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1277,6 +1311,10 @@ a = null;
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1293,10 +1331,6 @@ a = null;
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">service</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
             
             <div class="clearfix"></div>
