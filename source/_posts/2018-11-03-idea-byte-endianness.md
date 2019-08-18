@@ -316,3 +316,33 @@ strcpy(a.str,"hello");
 前四个byte（一个int就4byte嘛）就是4096(十六进制是00 00 10 00)，实际传的是按照小端传的
 后面的字符串，因为每一个char就占用一个byte，所以不存在一份数据实体跨越多个Byte的问题。注意实际发送的byte大小是16 bytes而不是 4 + 10 （因为struct的sizeof是所有成员加在一起的大小再加上padding，就是内存对齐，直接8的倍数。union则是所有变量中最大的那一个加上padding）
 
+
+```c
+#include <stdio.h>
+
+union Data{
+    char ch;
+    short sh;
+    int n;
+} data;
+
+int main(){
+    data.ch = 0x65;
+    printf("%#x, %#x, %#x\n", data.ch, data.sh, data.n);
+    data.ch = 0x12345678;
+    printf("%#x, %#x, %#x\n", data.ch, data.sh, data.n);
+    data.sh = 0x87654321;
+    printf("%#x, %#x, %#x\n", data.ch, data.sh, data.n);
+    data.n = 0x87654321;
+    printf("%#x, %#x, %#x\n", data.ch, data.sh, data.n);
+    return 0;
+}
+```
+
+>0x65, 0x65, 0x65
+0x78, 0x78, 0x78
+0x21, 0x4321, 0x4321
+0x21, 0x4321, 0x87654
+
+高位的数据被抹掉了，所以0x12345678 在内存中的存储方式其实是 78 56 34 12
+

@@ -108,3 +108,5 @@ Page Cache(页缓存)，读文件的时候，会先看一下它是不是已经�
 
 https://zhuanlan.zhihu.com/p/52054044
 https://zhuanlan.zhihu.com/p/35879028
+
+[what a c programmer should know about memory](https://marek.vavrusa.com/memory/)

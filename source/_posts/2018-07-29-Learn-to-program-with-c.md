@@ -120,7 +120,7 @@ int main(void)
 ```
 
 - gcc -E hello_world.c | tail -10
-需要tail以下，因为预处理阶段会把stdio.h中所有代码复制粘贴进来
+需要tail一下，因为预处理阶段会把stdio.h中所有代码复制粘贴进来
 
 ```c
 # 499 "/usr/include/stdio.h" 2 3 4
@@ -255,7 +255,7 @@ wacky_math.o: wacky_math.c wacky_math.h
         clang -c -fPIC wacky_math.c -o $@
 
 -fPIC使得生成的object file是relocateable的
-同时还得告诉run time linke如何去找这个so文件
+同时还得告诉run time linker如何去找这个so文件
 
 man ldpath ##  so文件查找目录
 export LD_LIBRARY_PATH=. ## 添加当前目录为查找路径
@@ -354,7 +354,7 @@ printf("content %s\n",s1);##改成这样就好了
 
 ### static关键字
 c语言中不同头文件中的方法名或者外部变量是不能重名的（所以给方法起名字的时候要注意下），除非使用static关键字（只在该源文件内可以使用）  静态变量存放在全局数据区，不是在堆栈上，所以不存在堆栈溢出的问题。生命周期是整个程序的运行期。（static变量只在当前文件中可以使用，一旦退出当前文件的调用，就不可用，但如果运行期间又调用了该文件，那么static变量的值就会是刚才退出的时候的值，而不是default值）
-设计和调用访问动态全局变量、静态全局变量、静态局部变量的函数时，需要考虑重入问题。
+设计和调用访问动态全局变量、静态全局变量、静态局部变量的函数时，需要考虑重名问题。
 [函数名冲突的问题也可以用一个struct封起来](https://segmentfault.com/q/1010000002512553/a-1020000002512728)
 [c语言const关键字](https://www.jianshu.com/p/46926f2ffef0)有的时候是说指针指向的对象不能动，有的时候说的是指针指向的值不能动
 
@@ -426,6 +426,37 @@ C语言是系统调用的一层wrapper,而系统调用完全是platform dependen
 举个例子，[从open与fopen的区别来看](https://stackoverflow.com/questions/1658476/c-fopen-vs-open)，c语言标准实现了在不同平台上提供统一的fopen接口，而open是UNIX系统调用函数（包括LINUX等），返回的是文件描述符（File Descriptor），它是文件在文件描述符表里的索引。fopen是ANSI C标准中的C语言库函数，在不同的系统中应该调用不同的内核api。返回的是一个指向文件结构的指针。在unix平台上，fopen的内部实现调用了open。要是在windows上，使用的是CreateFile的系统api。
 
 [glibc](https://github.com/bminor/glibc)的源码在这里
+
+
+### const关键字
+const和指针一起用时
+
+const int *ptr：表示指针指向的数据是只读的，但是指针本身可以改变指向
+int const *ptr：同上
+int *const ptr：表示指针本身是只读的，但是指针指向的数据是可以读写的
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+void strnchr(const char *str, char chr){
+    int count = 0;
+    int len = strlen(str);
+    for(int i=0; i<len; i++){
+        if(str[i] == chr){
+            count++;
+        }
+    }
+    printf("%d\n", count);
+}
+
+int main(){
+    char str[] = "abcdefg", chr = 'w';
+    strnchr(str, chr);
+    return 0;
+}
+```
+用const修饰形参指针的一个重要的点就是向外部保证，指针指向的内容是只读的。例如上面的strnchr函数，使用const修饰一个指针，指针的指向可以修改，但是这个字符串的内容就不会被修改。但是这里只是说指针A指向的内容不能改了，假如将指针A的地址赋给B,通过B还是可能修改这部分内容的。
 
 
 
