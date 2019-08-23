@@ -12,11 +12,17 @@ maven的一些东西
 
 
 maven官网提供的通过命令行创建一个maven项目的方法
-```
+```shell
 mvn -B archetype:generate -DarchetypeGroupId=org.apache.maven.archetypes -DgroupId=com.mycompany.app -DartifactId=my-app
-
+//上述命令生成的文件夹就足够了，连pom.xml也帮忙生成好了，接下来就是去复制粘贴pom里面的内容
 mvn compile ##开始编译
+
+// 或者这两条直接收工
+mvn archetype:generate -DgroupId=com.websystique.maven -DartifactId=SampleMavenJavaProject -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
+mvn -q clean compile exec:java  -Dexec.mainClass="com.websystique.maven.App"
 ```
+
+
 [maven getting started是很友好的教程](https://maven.apache.org/guides/getting-started/index.html#How_do_I_make_my_first_Maven_project)
 
 看完这俩再不会就是蠢

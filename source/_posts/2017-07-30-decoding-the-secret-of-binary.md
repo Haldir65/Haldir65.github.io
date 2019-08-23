@@ -257,6 +257,8 @@ String w = "\uD842\uDFB7"; //这个“\u”是ide自己加上去的，注意和�
       }
 ```
 
+[jni中的GetStringUTFChars返回的并不是utf8 array](https://stackoverflow.com/questions/32205446/getting-true-utf-8-characters-in-java-jni) 而是Modified UTF-8
+
 
 ### 3.3 UTF-8出现
 8-bit Unicode Transformation Format于1998年出现，之前提到了2个byte表示一个字符实在太浪费了，utf-8的做法是将每个字符所需要的长度变成可变的。[WIKI上UTF-8的描述](https://zh.wikipedia.org/wiki/UTF-8)

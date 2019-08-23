@@ -95,6 +95,9 @@ js能够操作cookie的前提是cookie中没有HttpOnly=true 字段
 document.cookie = "key1=value1;key2=value2;expires=date";
 ```
 
+[js里面没有deleteCookieByNameOrDomain这种方法](https://jameshfisher.com/2018/12/22/what-is-document-cookie/) 都是用设置expire的方法删掉cookie，还有一些坑
+
+
 ### 浏览器信息一般在Navigator对象里面拿
 ```js
 var browsername=navigator.appName;

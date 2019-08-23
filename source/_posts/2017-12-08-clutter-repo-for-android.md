@@ -1364,6 +1364,17 @@ Parcelable的底层使用了 **Parcel** 机制， Parcel机制会将序列化的
 > cat /proc/pid/stat ## 如果系统分配的cpu时间不够，那么卡顿也是难免的
 
 
+## 41. RelativeLayout的居中
+centerVertical = true 并不是我所想象的那样。
+亲测，例如一个RelativeLayout的高度写死100dp，所有的child都是centerVertical = true ，child的高度都是50dp。
+运行时修改RelativeLayout的layoutParmas.height = 130dp ，同时relativeLayout.paddingTop = 30dp。
+那么最终的结果并不是我所想象的，每一个child的top= 55dp，实际结果是每一个child的top = 40dp (是的,centerVertical将padding也算进来了) 
+另外，100dp高的parent,parent.paddingTop= 25dp, parent.paddindBottom = 25dp。里头放一个60dp的child（child的marginTop = 10dp,marginBottom= 10dp），最终的效果是child的高度被压成30dp(100 - 25-25-10 -10)。
+这些在onMeasure的源码里面都能看到
+
+RelativeLayout的源码中使用了拓扑排序的方式，在onMeasure中预先理清楚各个child之间的依赖树（存储在dependencyGraph中），具体的measure中根据理清楚的依赖给那些不依赖其他的view预先排好座次，那些需要依赖其他view的位置信息的view，会找到对应的在各个方向上的anchorParams(锚点)，确定其在该方向上的坐标（applyHorizontalSizeRules）。apply了这些constraint之后，根据RelativeLayout自身的width和height给child计算出一个measureSpec(以宽度为例，分给child的maxAvailable是自身的宽度减掉自身左右padding，减掉child的marginLeft和marginRight,mode方面，一般给child分配的都是MeasureSpec.EXACTLY(child写了个match_parent)或者MeasureSpec.AT_MOST(child写了个wrap_content)),跟着是positionChildHorizontal(根据前述的收集的信息，补全一些mleft和mRight)。
+
+RelativeLayout的代码比较复杂，重点在于：一：梳理依赖树(这个难一点)。 二：从依赖树的顶端开始给每一个child赋值上下左右。
 
 =============================================================================
 
@@ -1379,3 +1390,4 @@ Parcelable的底层使用了 **Parcel** 机制， Parcel机制会将序列化的
 [偏向native层面的内存占用分析](http://wetest.qq.com/lab/view/359.html)
 [Android进程框架：进程的启动创建、启动与调度流程](https://juejin.im/post/5a646211f265da3e3f4cc997)
 [Android进程框架：进程的启动创建、启动与调度流程](https://juejin.im/post/59fafa3351882529642107d2)
+[Android 中的 Hardware Layer 详解 | 开发者说·DTalk](https://wemp.app/posts/6036929c-5712-441b-b6bc-533a66f0a6f6)

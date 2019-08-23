@@ -139,6 +139,10 @@ Java中的对象一定在堆上分配内存吗？(随着逃逸分析技术的成
 
 jmm(java memory model)
 
+如果看android sdk的源码的话，很多方法内部都有读取一个成员变量-> 赋值给一个final局部变量，后续只读取这个成员变量的操作。 原因的话，读取局部变量的成本要小得多，final则是为了避免后续代码瞎改这个值(从javap来看生成的class file中加不加final都是一样的)，因为一旦改了编译器会报错的。
+
+
+
 ### 参考
 [JVM ( java virtual machine) architecture - tutorial](https://www.youtube.com/watch?v=ZBJ0u9MaKtM)
 [Java系列笔记(3) - Java 内存区域和GC机制](http://www.cnblogs.com/zhguang/p/3257367.html)
