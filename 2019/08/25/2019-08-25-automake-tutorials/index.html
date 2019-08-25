@@ -6,15 +6,22 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="https://haldir65.github.io">
-  <title>Haldir的博客</title>
+  <title>automake教程 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Haldir的博客">
-<meta property="og:url" content="https://haldir65.github.io/page/3/index.html">
+  <meta name="description" content="多数unix软件的安装方式都是下载一个tarball,configure，make,make install，就这么简单。背后使用的是autotools.">
+<meta name="keywords" content="tools">
+<meta property="og:type" content="article">
+<meta property="og:title" content="automake教程">
+<meta property="og:url" content="https://haldir65.github.io/2019/08/25/2019-08-25-automake-tutorials/index.html">
 <meta property="og:site_name" content="Haldir的博客">
+<meta property="og:description" content="多数unix软件的安装方式都是下载一个tarball,configure，make,make install，就这么简单。背后使用的是autotools.">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://www.haldir66.ga/static/imgs/SeaCliffBridge_ZH-CN5362667487_1920x1080.jpg">
+<meta property="og:updated_time" content="2019-08-25T13:43:13.355Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Haldir的博客">
+<meta name="twitter:title" content="automake教程">
+<meta name="twitter:description" content="多数unix软件的安装方式都是下载一个tarball,configure，make,make install，就这么简单。背后使用的是autotools.">
+<meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/SeaCliffBridge_ZH-CN5362667487_1920x1080.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -173,267 +180,159 @@ ga('send', 'pageview');
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-    <article id="post-2019-01-10-java-nio-intro" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+            <article id="post-2019-08-25-automake-tutorials" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/01/10/2019-01-10-java-nio-intro/">java nio使用指南</a>
+    <h1 class="article-title" itemprop="name">
+      automake教程
     </h1>
   
 
         
-        <a href="/2019/01/10/2019-01-10-java-nio-intro/" class="archive-article-date">
-  	<time datetime="2019-01-10T22:25:50.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-10</time>
+        <a href="/2019/08/25/2019-08-25-automake-tutorials/" class="archive-article-date">
+  	<time datetime="2019-08-25T08:46:19.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-25</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>关于java nio的一些点<br><img src="https://www.haldir66.ga/static/imgs/UmbriaCastelluccio_EN-AU8834990889_1920x1080.jpg" alt=""><br>
-        
-          <a class="article-more-a" href="/2019/01/10/2019-01-10-java-nio-intro/#more">more >></a>
-        
+        <p>多数unix软件的安装方式都是下载一个tarball,configure，make,make install，就这么简单。背后使用的是autotools.<br><img src="https://www.haldir66.ga/static/imgs/SeaCliffBridge_ZH-CN5362667487_1920x1080.jpg" alt=""><br><a id="more"></a></p>
+<h2 id="从最简单的helloworld开始说起吧"><a href="#从最简单的helloworld开始说起吧" class="headerlink" title="从最简单的helloworld开始说起吧"></a>从最简单的helloworld开始说起吧</h2><p>创建三份文件:</p>
+<blockquote>
+<p>cat main.c</p>
+</blockquote>
+<pre><code class="c">#include &lt;stdio.h&gt;
+
+int
+main(int argc, char* argv[])
+{
+    printf(&quot;Hello world\n&quot;);
+    return 0;
+}
+</code></pre>
+<blockquote>
+<p>cat Makefile.am</p>
+</blockquote>
+<pre><code>AUTOMAKE_OPTIONS = foreign
+bin_PROGRAMS = helloworld
+helloworld_SOURCES = main.c
+</code></pre><blockquote>
+<p>cat configure.ac</p>
+</blockquote>
+<pre><code>AC_INIT([helloworld], [0.1], [myemail@example.com])
+AM_INIT_AUTOMAKE
+AC_PROG_CC
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT
+</code></pre><p>依次执行下面的命令：<br>aclocal # Set up an m4 environment<br>autoconf # Generate configure from configure.ac<br>automake –add-missing # Generate Makefile.in from Makefile.am<br>./configure # Generate Makefile from Makefile.in<br>make dist # 会生成一个.tar.gz文件<br>make distcheck # Use Makefile to build and test a tarball to distribute</p>
+<p>想要使用生成的可执行文件的话, sudo make install(会复制可执行文件到 /usr/bin/local文件夹中) ，放心 make uninstall  也有，就是把这个可执行文件给删除掉</p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>GNU Autotools 一般指的是3个 GNU 工具包：Autoconf，Automake 和 Libtool<br>它们能解决什么问题，要先从 GNU 开源软件的 Build 系统说起。一般来说。GNU 软件的安装过程都是：</p>
+<p>解压源代码包<br>./configure<br>make<br>make install（可能要切root用户）<br>这个过程中， 需要有一个 configure 脚本，同时也需要一个 Makefile 文件。</p>
+<p>而 Autoconf 和 Automake 就是一套自动生成 configure 脚本和 Makefile 文件的工具。</p>
+<p>在ubuntu上安装autoconf,automake,libtool:</p>
+<blockquote>
+<p>sudo apt install build-essential autoconf automake libtool libtool-bin autotools-dev</p>
+</blockquote>
+<p>configure文件是用autoconf根据configure.ac创建出来的，而configure.ac能用autoscan自动创建出来</p>
+<p>随便创建一个文件夹</p>
+<p>$ ls<br>epoch.c Makefile</p>
+<p>$ cat epoch.c</p>
+<pre><code class="c">#include &lt;stdio.h&gt;
+#include &lt;sys/time.h&gt;
+#include &lt;time.h&gt;
+#include &quot;config.h&quot;
+
+double get_epoch()
+{
+  double sec;
+  #ifdef HAVE_GETTIMEOFDAY
+     struct timeval tv;
+     gettimeofday(&amp;tv, NULL);
+     sec = tv.tv_sec;
+     sec += tv.tv_usec / 1000000.0;
+  #else
+     sec = time(NULL);
+  #endif
+  return sec;
+}
+
+int main(int argc, char* argv[])
+{
+   printf(&quot;%f\n&quot;, get_epoch());
+   return 0;
+}
+</code></pre>
+<p>这么写的原因是gettimeofday()这个函数不是在所有的平台上都有，这种时候就要用time()函数了。</p>
+<p>$ cat Makefile</p>
+<pre><code># Makefile: A standard Makefile for epoch.c
+all: epoch
+
+clean:
+    rm ­f epoch
+</code></pre><p>这样其实已经可以直接make生成可执行文件了。但是我们用autoconf来生成试一下</p>
+<ol>
+<li>生成config.h文件<br>config.h文件是configure命令根据config.h.in文件生成的，config.h.in文件是由autoheader（C的source code）中生成的（总之也是自动的）<br>$ ls<br>epoch.c Makefile<br>$ autoscan<br>$ ls<br>autoscan.log  configure.scan  epoch.c  Makefile<br>$  mv configure.scan configure.ac<br>$ ls<br>autoscan.log  configure.ac  epoch.c  Makefile<br>$ autoheader<br>$ ls<br>autom4te.cache  autoscan.log  config.h.in  configure.ac  epoch.c  Makefile<br>$  mv Makefile Makefile.in<br>$ autoconf<br>$ ls<br>autom4te.cache  autoscan.log  config.h.in  configure  configure.ac  epoch.c  Makefile.in<br>$ ./configure<br>checking for gcc… gcc<br>checking whether the C compiler works… yes<br>checking for C compiler default output file name… a.out<br>checking for suffix of executables…<br>checking whether we are cross compiling… no<br>checking for suffix of object files… o<br>checking whether we are using the GNU C compiler… yes<br>checking whether gcc accepts -g… yes<br>checking for gcc option to accept ISO C89… none needed<br>checking how to run the C preprocessor… gcc -E<br>checking for grep that handles long lines and -e… /bin/grep<br>checking for egrep… /bin/grep -E<br>checking for ANSI C header files… yes<br>checking for sys/types.h… yes<br>checking for sys/stat.h… yes<br>checking for stdlib.h… yes<br>checking for string.h… yes<br>checking for memory.h… yes<br>checking for strings.h… yes<br>checking for inttypes.h… yes<br>checking for stdint.h… yes<br>checking for unistd.h… yes<br>checking sys/time.h usability… yes<br>checking sys/time.h presence… yes<br>checking for sys/time.h… yes<br>checking for gettimeofday… yes<br>configure: creating ./config.status<br>config.status: creating Makefile<br>config.status: creating config.h<br>$  ls<br>autom4te.cache  autoscan.log  config.h  config.h.in  config.log  config.status  configure  configure.ac  epoch.c  Makefile  Makefile.in<br>$ make<br>$ ls<br>autom4te.cache  config.h     config.log     configure     epoch    Makefile<br>autoscan.log    config.h.in  config.status  configure.ac  epoch.c  Makefile.in<br>$  ./epoch<br>1544345416.704451</li>
+</ol>
+<p>//到此结束（这样做的意义在于一份代码就能够拥有多平台兼容性）</p>
+<p>另一种方式<br>手动创造“Makefile.am”文件<br>$ cat Makefile.am</p>
+<h1 id="Makefile-am-for-epoch-c"><a href="#Makefile-am-for-epoch-c" class="headerlink" title="Makefile.am for epoch.c"></a>Makefile.am for epoch.c</h1><p>bin_PROGRAMS=epoch<br>epoch_SOURCES=epoch.c</p>
+<p>$ ls<br>epoch.c  Makefile.am</p>
+<p>$ autoscan<br>$  mv configure.scan configure.ac<br>$ autoheader<br>$ ls<br>autom4te.cache  autoscan.log  config.h.in  configure.ac  epoch.c  Makefile.am<br>$ vim configure.ac<br>改成这样</p>
+<pre><code>#                                               -*- Autoconf -*-
+# Process this file with autoconf to produce a configure script.
+
+AC_PREREQ([2.69])
+AC_INIT([FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS])
+AM_INIT_AUTOMAKE
+AC_CONFIG_SRCDIR([epoch.c])
+AC_CONFIG_HEADERS([config.h])
+
+# Checks for programs.
+AC_PROG_CC
+
+# Checks for libraries.
+
+# Checks for header files.
+AC_CHECK_HEADERS([sys/time.h])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_HEADER_TIME
+
+# Checks for library functions.
+AC_CHECK_FUNCS([gettimeofday])
+
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT
+</code></pre><p>其实就是加了AM_INIT_AUTOMAKE这一行还有AC_HEADER_TIME<br>$ aclocal<br>$ automake ­­add­missing ­­copy<br>$ autoconf<br>$ ./configure 在这一步因为没有生成Makefile.in所以停下来了</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://thoughtbot.com/blog/the-magic-behind-configure-make-make-install">helloworld</a><br><a href="https://www.gnu.org/software/automake/manual/automake.html">autotools教程</a></p>
+
       
 
       
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">tbd</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/01/10/2019-01-10-java-nio-intro/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
         </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-2018-12-31-tcp-proxy-and-socks-server-related" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/31/2018-12-31-tcp-proxy-and-socks-server-related/">tcp-proxy简单实现及socks协议相关</a>
-    </h1>
-  
-
-        
-        <a href="/2018/12/31/2018-12-31-tcp-proxy-and-socks-server-related/" class="archive-article-date">
-  	<time datetime="2018-12-31T18:45:38.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-31</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>python实现简易的tcp-proxy server及socks代理学习笔记</p>
-<p><img src="https://www.haldir66.ga/static/imgs/MountainDayJapan_EN-AU8690491173_1920x1080.jpg" alt=""><br>
-        
-          <a class="article-more-a" href="/2018/12/31/2018-12-31-tcp-proxy-and-socks-server-related/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">python</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2018/12/31/2018-12-31-tcp-proxy-and-socks-server-related/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-2018-12-12-sinking-your-teeth-into-ByteCode" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/12/2018-12-12-sinking-your-teeth-into-ByteCode/">bytecode基本解读</a>
-    </h1>
-  
-
-        
-        <a href="/2018/12/12/2018-12-12-sinking-your-teeth-into-ByteCode/" class="archive-article-date">
-  	<time datetime="2018-12-12T11:11:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-12</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>python中可以使用diss module 轻易的查看byte code。那么在java中呢<br><img src="https://www.haldir66.ga/static/imgs/BadlandsBday_EN-AU10299777329_1920x1080.jpg" alt=""><br>
-        
-          <a class="article-more-a" href="/2018/12/12/2018-12-12-sinking-your-teeth-into-ByteCode/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">java</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">tbd</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2018/12/12/2018-12-12-sinking-your-teeth-into-ByteCode/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-2018-12-06-select-poll-epoll" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/06/2018-12-06-select-poll-epoll/">select、poll、epoll学习笔记</a>
-    </h1>
-  
-
-        
-        <a href="/2018/12/06/2018-12-06-select-poll-epoll/" class="archive-article-date">
-  	<time datetime="2018-12-06T08:38:54.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-06</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>select，poll，epoll都是IO多路复用的机制。I/O多路复用就通过一种机制，可以监视多个描述符，一旦某个描述符就绪（一般是读就绪或者写就绪），能够通知程序进行相应的读写操作。但select，poll，epoll本质上都是同步I/O，因为他们都需要在读写事件就绪后自己负责进行读写，也就是说这个读写过程是阻塞的，而异步I/O则无需自己负责进行读写，异步I/O的实现会负责把数据从内核拷贝到用户空间。<br><img src="https://www.haldir66.ga/static/imgs/OrionNebula_EN-AU10620917199_1920x1080.jpg" alt=""><br>
-        
-          <a class="article-more-a" href="/2018/12/06/2018-12-06-select-poll-epoll/#more">more >></a>
-        
-      
-
       
     </div>
     <div class="article-info article-info-index">
@@ -446,14 +345,6 @@ ga('send', 'pageview');
         		<li class="article-tag-list-item">
         			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">tools</a>
         		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">linux</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">tbd</a>
-        		</li>
       		
 		</ul>
 	</div>
@@ -461,16 +352,84 @@ ga('send', 'pageview');
       
 
       
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2018/12/06/2018-12-06-select-poll-epoll/">展开全文 >></a>
-        </p>
-      
 
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
+        </div>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=https://haldir65.github.io/2019/08/25/2019-08-25-automake-tutorials/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
       
       <div class="clearfix"></div>
     </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
+  
+    <a href="/2046/12/18/2017-12-18-random-new-thoughts/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          即刻备忘录
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/08/11/2019-08-11-maven-related-topics/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">maven的一些东西</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
 
 <aside class="wrap-side-operation">
     <div class="mod-side-operation">
@@ -490,494 +449,14 @@ ga('send', 'pageview');
 
 
 
-
-  
-    <article id="post-2018-12-03-packet-structure-of-tcp-and-udp" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/03/2018-12-03-packet-structure-of-tcp-and-udp/">tcp和udp包结构分析</a>
-    </h1>
-  
-
-        
-        <a href="/2018/12/03/2018-12-03-packet-structure-of-tcp-and-udp/" class="archive-article-date">
-  	<time datetime="2018-12-03T13:42:25.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-03</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文只针对ipv4网络进行分析<br><img src="https://www.haldir66.ga/static/imgs/AlanTuringNotebook_EN-AU7743633207_1920x1080.jpg" alt=""><br>
-        
-          <a class="article-more-a" href="/2018/12/03/2018-12-03-packet-structure-of-tcp-and-udp/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">tools</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">linux</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2018/12/03/2018-12-03-packet-structure-of-tcp-and-udp/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-2018-12-02-page-size-and-block-size" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/02/2018-12-02-page-size-and-block-size/">page-size and block size</a>
-    </h1>
-  
-
-        
-        <a href="/2018/12/02/2018-12-02-page-size-and-block-size/" class="archive-article-date">
-  	<time datetime="2018-12-02T21:42:24.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-02</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>page size（内存相关）和block size(文件系统相关)的一些点<br><img src="https://www.haldir66.ga/static/imgs/scenery1511100718415.jpg" alt=""><br>
-        
-          <a class="article-more-a" href="/2018/12/02/2018-12-02-page-size-and-block-size/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">tools</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">linux</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">tbd</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2018/12/02/2018-12-02-page-size-and-block-size/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-2018-11-29-how-is-text-drawn-on-android" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/11/29/2018-11-29-how-is-text-drawn-on-android/">TextView测量及渲染原理</a>
-    </h1>
-  
-
-        
-        <a href="/2018/11/29/2018-11-29-how-is-text-drawn-on-android/" class="archive-article-date">
-  	<time datetime="2018-11-29T16:11:54.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-11-29</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Android上的TextView分为java层和native层，java层包括<br>Layout,Paint,Canvas<br>native层包括各种开源库，Minikin,ICU,HarfBuzz,FreeType<br>关于文字的形体,排版等信息是native层计算出来的。</p>
-<p><img src="https://www.haldir66.ga/static/imgs/textview_architecture.png" alt=""></p>
-        
-          <a class="article-more-a" href="/2018/11/29/2018-11-29-how-is-text-drawn-on-android/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">android</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">tbd</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2018/11/29/2018-11-29-how-is-text-drawn-on-android/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-2018-11-27-indexed-db-tutorial" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/11/27/2018-11-27-indexed-db-tutorial/">浏览器indexedDb使用示例</a>
-    </h1>
-  
-
-        
-        <a href="/2018/11/27/2018-11-27-indexed-db-tutorial/" class="archive-article-date">
-  	<time datetime="2018-11-27T10:33:01.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-11-27</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>浏览器indexedDb使用方式及注意的点<br><img src="https://www.haldir66.ga/static/imgs/black-mountains.jpg" alt=""><br>
-        
-          <a class="article-more-a" href="/2018/11/27/2018-11-27-indexed-db-tutorial/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">前端</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">javaScript</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2018/11/27/2018-11-27-indexed-db-tutorial/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-2018-11-26-cmake-intro" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/11/26/2018-11-26-cmake-intro/">cmake实用手册</a>
-    </h1>
-  
-
-        
-        <a href="/2018/11/26/2018-11-26-cmake-intro/" class="archive-article-date">
-  	<time datetime="2018-11-26T13:42:16.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-11-26</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>当我们敲下cmake命令的时候，cmake会在当前目录下找CMakeLists.txt这个文件</p>
-<p><img src="https://www.haldir66.ga/static/imgs/fresh-sparkle-dew-drops-on-red-flower-wallpaper-53861cf580909.jpg" alt=""><br>
-        
-          <a class="article-more-a" href="/2018/11/26/2018-11-26-cmake-intro/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">linux</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">C</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2018/11/26/2018-11-26-cmake-intro/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-2018-11-15-opengl-related-topics" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/11/15/2018-11-15-opengl-related-topics/">opengl学习笔记</a>
-    </h1>
-  
-
-        
-        <a href="/2018/11/15/2018-11-15-opengl-related-topics/" class="archive-article-date">
-  	<time datetime="2018-11-15T22:53:55.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-11-15</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>topics relating opengl stuff<br><img src="https://www.haldir66.ga/static/imgs/scenery151110074347.jpg" alt=""></p>
-        
-          <a class="article-more-a" href="/2018/11/15/2018-11-15-opengl-related-topics/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">opengl</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2018/11/15/2018-11-15-opengl-related-topics/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
   
   
-    <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/page/2/">&laquo; Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/13/">13</a><a class="extend next" rel="next" href="/page/4/">Next &raquo;</a>
-    </nav>
+  
+
+  
+
+  
+
   
 
 
@@ -1000,8 +479,8 @@ ga('send', 'pageview');
     <script>
 	var yiliaConfig = {
 		mathjax: false,
-		isHome: true,
-		isPost: false,
+		isHome: false,
+		isPost: true,
 		isArchive: false,
 		isTag: false,
 		isCategory: false,

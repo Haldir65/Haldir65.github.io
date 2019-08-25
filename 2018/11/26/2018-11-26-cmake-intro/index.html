@@ -17,7 +17,7 @@
 <meta property="og:description" content="当我们敲下cmake命令的时候，cmake会在当前目录下找CMakeLists.txt这个文件">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/fresh-sparkle-dew-drops-on-red-flower-wallpaper-53861cf580909.jpg">
-<meta property="og:updated_time" content="2019-08-23T10:34:19.592Z">
+<meta property="og:updated_time" content="2019-08-25T13:43:13.355Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="cmake实用手册">
 <meta name="twitter:description" content="当我们敲下cmake命令的时候，cmake会在当前目录下找CMakeLists.txt这个文件">
@@ -345,85 +345,7 @@ install (TARGETS cmake_examples_inst
 <blockquote>
 <p>$ LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib cmake_examples_inst_bin<br>Hello Install! //把生成的bin文件复制到/sur/local/bin目录下，再修改LDPATH,就能去/usr/locallib这个目录去找生成的library了</p>
 </blockquote>
-<h2 id="Autoconf-Automake教程"><a href="#Autoconf-Automake教程" class="headerlink" title="Autoconf/Automake教程"></a>Autoconf/Automake教程</h2><p>GNU Autotools 一般指的是3个 GNU 工具包：Autoconf，Automake 和 Libtool (本文先介绍前两个工具，Libtool留到今后介绍)<br>它们能解决什么问题，要先从 GNU 开源软件的 Build 系统说起。一般来说。GNU 软件的安装过程都是：</p>
-<p>解压源代码包<br>./configure<br>make<br>make install（可能要切root用户）<br>这个过程中， 需要有一个 configure 脚本，同时也需要一个 Makefile 文件。</p>
-<p>而 Autoconf 和 Automake 就是一套自动生成 configure 脚本和 Makefile 文件的工具。</p>
-<p>在ubuntu上安装autoconf,automake,libtool:</p>
-<blockquote>
-<p>sudo apt install build-essential autoconf automake libtool libtool-bin autotools-dev</p>
-</blockquote>
-<p>configure文件是用autoconf根据configure.ac创建出来的，而configure.ac能用autoscan自动创建出来</p>
-<p>随便创建一个文件夹</p>
-<p>$ ls<br>epoch.c Makefile</p>
-<p>$ cat epoch.c</p>
-<pre><code class="c">#include &lt;stdio.h&gt;
-#include &lt;sys/time.h&gt;
-#include &lt;time.h&gt;
-#include &quot;config.h&quot;
-
-double get_epoch()
-{
-  double sec;
-  #ifdef HAVE_GETTIMEOFDAY
-     struct timeval tv;
-     gettimeofday(&amp;tv, NULL);
-     sec = tv.tv_sec;
-     sec += tv.tv_usec / 1000000.0;
-  #else
-     sec = time(NULL);
-  #endif
-  return sec;
-}
-
-int main(int argc, char* argv[])
-{
-   printf(&quot;%f\n&quot;, get_epoch());
-   return 0;
-}
-</code></pre>
-<p>这么写的原因是gettimeofday()这个函数不是在所有的平台上都有，这种时候就要用time()函数了。</p>
-<p>$ cat Makefile</p>
-<pre><code># Makefile: A standard Makefile for epoch.c
-all: epoch
-
-clean:
-    rm ­f epoch
-</code></pre><p>这样其实已经可以直接make生成可执行文件了。但是我们用autoconf来生成试一下</p>
-<ol>
-<li>生成config.h文件<br>config.h文件是configure命令根据config.h.in文件生成的，config.h.in文件是由autoheader（C的source code）中生成的（总之也是自动的）<br>$ ls<br>epoch.c Makefile<br>$ autoscan<br>$ ls<br>autoscan.log  configure.scan  epoch.c  Makefile<br>$  mv configure.scan configure.ac<br>$ ls<br>autoscan.log  configure.ac  epoch.c  Makefile<br>$ autoheader<br>$ ls<br>autom4te.cache  autoscan.log  config.h.in  configure.ac  epoch.c  Makefile<br>$  mv Makefile Makefile.in<br>$ autoconf<br>$ ls<br>autom4te.cache  autoscan.log  config.h.in  configure  configure.ac  epoch.c  Makefile.in<br>$ ./configure<br>checking for gcc… gcc<br>checking whether the C compiler works… yes<br>checking for C compiler default output file name… a.out<br>checking for suffix of executables…<br>checking whether we are cross compiling… no<br>checking for suffix of object files… o<br>checking whether we are using the GNU C compiler… yes<br>checking whether gcc accepts -g… yes<br>checking for gcc option to accept ISO C89… none needed<br>checking how to run the C preprocessor… gcc -E<br>checking for grep that handles long lines and -e… /bin/grep<br>checking for egrep… /bin/grep -E<br>checking for ANSI C header files… yes<br>checking for sys/types.h… yes<br>checking for sys/stat.h… yes<br>checking for stdlib.h… yes<br>checking for string.h… yes<br>checking for memory.h… yes<br>checking for strings.h… yes<br>checking for inttypes.h… yes<br>checking for stdint.h… yes<br>checking for unistd.h… yes<br>checking sys/time.h usability… yes<br>checking sys/time.h presence… yes<br>checking for sys/time.h… yes<br>checking for gettimeofday… yes<br>configure: creating ./config.status<br>config.status: creating Makefile<br>config.status: creating config.h<br>$  ls<br>autom4te.cache  autoscan.log  config.h  config.h.in  config.log  config.status  configure  configure.ac  epoch.c  Makefile  Makefile.in<br>$ make<br>$ ls<br>autom4te.cache  config.h     config.log     configure     epoch    Makefile<br>autoscan.log    config.h.in  config.status  configure.ac  epoch.c  Makefile.in<br>$  ./epoch<br>1544345416.704451</li>
-</ol>
-<p>//到此结束（这样做的意义在于一份代码就能够拥有多平台兼容性）</p>
-<p>另一种方式<br>手动创造“Makefile.am”文件<br>$ cat Makefile.am</p>
-<h1 id="Makefile-am-for-epoch-c"><a href="#Makefile-am-for-epoch-c" class="headerlink" title="Makefile.am for epoch.c"></a>Makefile.am for epoch.c</h1><p>bin_PROGRAMS=epoch<br>epoch_SOURCES=epoch.c</p>
-<p>$ ls<br>epoch.c  Makefile.am</p>
-<p>$ autoscan<br>$  mv configure.scan configure.ac<br>$ autoheader<br>$ ls<br>autom4te.cache  autoscan.log  config.h.in  configure.ac  epoch.c  Makefile.am<br>$ vim configure.ac<br>改成这样</p>
-<pre><code>#                                               -*- Autoconf -*-
-# Process this file with autoconf to produce a configure script.
-
-AC_PREREQ([2.69])
-AC_INIT([FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS])
-AM_INIT_AUTOMAKE
-AC_CONFIG_SRCDIR([epoch.c])
-AC_CONFIG_HEADERS([config.h])
-
-# Checks for programs.
-AC_PROG_CC
-
-# Checks for libraries.
-
-# Checks for header files.
-AC_CHECK_HEADERS([sys/time.h])
-
-# Checks for typedefs, structures, and compiler characteristics.
-AC_HEADER_TIME
-
-# Checks for library functions.
-AC_CHECK_FUNCS([gettimeofday])
-
-AC_CONFIG_FILES([Makefile])
-AC_OUTPUT
-</code></pre><p>其实就是加了AM_INIT_AUTOMAKE这一行还有AC_HEADER_TIME<br>$ aclocal<br>$ automake ­­add­missing ­­copy<br>$ autoconf<br>$ ./configure 在这一步因为没有生成Makefile.in所以停下来了</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://mirkokiefer.com/cmake-by-example-f95eb47d45b1">cmake的教程，非常好</a><br><a href="https://github.com/ttroy50/cmake-examples">Useful CMake Examples</a>本文来自这里的实例<br><a href="http://www.lugod.org/presentations/autotools/presentation/autotools.pdf">autotools教程</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://mirkokiefer.com/cmake-by-example-f95eb47d45b1">cmake的教程，非常好</a><br><a href="https://github.com/ttroy50/cmake-examples">Useful CMake Examples</a>本文来自这里的实例</p>
 
       
 
@@ -754,6 +676,10 @@ AC_OUTPUT
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
@@ -782,7 +708,7 @@ AC_OUTPUT
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -791,10 +717,6 @@ AC_OUTPUT
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">django</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
               </li>
              
               <li class="article-tag-list-item">
