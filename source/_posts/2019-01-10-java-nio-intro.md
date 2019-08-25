@@ -625,7 +625,7 @@ ByteBuffer是唯一直接与channel交互的缓冲，因为所有的数据都是
 但是 NIO 并未给 FileChannel 提供非阻塞支持，FileChannel 只能运行在阻塞模式下，但是效率依旧比 BIO 高，因为有 Buffer 啊；
 
 而java.net包中的三个 Socket 类：
-1) java.net.ServerSocket：TCP Socket，Server端；
+1) java.net.ServerSocket：TCP Socket，Server端；(从源码来看，ServerSocket里面有一个socket对象，也就是包装了一层)
 2) java.net.Socket：TCP Socket；
 3) java.net.DatagramSocket：UDP Socket；
 
