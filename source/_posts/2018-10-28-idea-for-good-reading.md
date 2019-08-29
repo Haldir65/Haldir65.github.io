@@ -34,3 +34,7 @@ tags: [tbd]
 
 [各种技术话题的blog](https://jameshfisher.com/)
 
+[来测试下你的Java编程能力](http://hellojava.info/?p=549)
+
+[guava](https://github.com/google/guava/wiki/cachesexplained) ,apache common pool
+
