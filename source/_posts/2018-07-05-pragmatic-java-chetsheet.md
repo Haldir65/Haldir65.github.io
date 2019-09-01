@@ -531,6 +531,7 @@ public class Test {
    }
 }
 ```
+spi打破了双亲委派机制（如何在父加载器加载的类中，去调用子加载器去加载类？） 使用TThread.currentThread().getContextClassLoader()就可以实现在核心包里的基础类调用用户代码
 
 反射替换final成员变量的时候要小心[一种全局拦截并监控 DNS 的方式](https://fucknmb.com/2018/04/16/一种全局拦截并监控DNS的方式/) 文中提到,要改一下Modifier的flag
 ```java
@@ -662,6 +663,55 @@ public static void main(String[] args) {
 
 
 [jdk bin 文件夹中的可执行文件的介绍](https://docs.oracle.com/javase/8/docs/technotes/tools/index.html) java的命令行参数
+
+
+[fastjson等json序列化反序列化库对于key的大小写处理。](https://segmentfault.com/a/1190000015634321)（fastjson的大小写的坑）
+具体来讲就是一个Age的field在被序列化之后变成了age的string，而一个age的string倒是可以反过来在反序列化得到Age。似乎fastjson默认策略是field首字母小写，序列化反序列化都是。结论就是，跟后台商量好，所有字段小写开头(听闻c#是大写开头)。后台不改的话，加JSONField注解。
+要想让Age序列化为Age，一般是在get和set上面加JSONField，加在field的定义上没有用。
+
+还做了一个好玩的小实验
+```java
+private static class Customer implements Serializable {
+        private int age;
+        private int Age;
+        private boolean IsRegistered;
+        public int getage() {
+            return age;
+        }
+
+        public void setage(int age) {
+            this.age= age;
+        }
+          public int getAge() {
+            return Age;
+        }
+
+        public void setAge(int age) {
+            Age = age;
+        }
+
+        public boolean isRegistered() {
+            return IsRegistered;
+        }
+
+        public void setRegistered(boolean registered) {
+            IsRegistered = registered;
+        }
+
+}
+
+//给一这么串json， c2string = "{\"age\":21,\"Age\":22,\"registered\":true}"; 解析出来的结果是
+c2string = "{\"age\":21,\"Age\":22,\"registered\":true}";
+Customer c3 = JSON.parseObject(c2string,Customer.class);
+System.out.println(c3.Age); // 21 似乎是fastjson根据setXXX后面的xxx找到了Age这个field
+System.out.println(c3.age); // 0
+System.out.println(c3.IsRegistered);
+```
+其他的json库，gson是没有这个现象的
+
+
+
+
 
 
 

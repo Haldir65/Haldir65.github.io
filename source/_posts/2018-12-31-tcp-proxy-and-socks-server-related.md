@@ -204,3 +204,4 @@ try:
 [python小工具：tcp proxy和tcp hub](http://ichuan.net/post/22/tcp-proxy-and-tcp-hub-in-python/)
 [Writing a simple SOCKS server in Python](https://rushter.com/blog/python-socks-server/)
 [SOCKS 5协议简析](https://geesun.github.io/posts/2015/09/socks5_protocol.html)
+[shadowsocks-netty](https://github.com/TongxiJi/shadowsocks-java)

@@ -180,15 +180,58 @@ exec("./myProgram", (error, stdout, stderr) => console.log(stdout));
 
 
 ## 3. java
+其实就是jni了，[To be honest, if you have any other choice besides using JNI, do that other thing.](https://medium.com/@bschlining/a-simple-java-native-interface-jni-example-in-java-and-scala-68fdafe76f5f)
+如果不是没有java的解决方法，不要使用jni，一个是麻烦，另一个是我们彻底失去了跨平台兼容性
+
+JNI的流程网上有一大堆，注意的是不同的平台gcc的参数是不一样的，三步直接搞定,在linux上亲测这样是可以的
+```shell
+## 生成头文件其实也很简单
+javac -h . HelloJNI2.java 
+## 先是生成.o文件
+gcc -c -I /usr/lib/jvm/java-8-openjdk-amd64/include -I /usr/lib/jvm/java-8-openjdk-amd64/include/linux jni/hellojni.c  
+## 然后打成sharedLibrary
+gcc -rdynamic -shared -o libhellojni.so hellojni.o
+
+## 在intelij里面class文件都放在target/classes目录下，这么一句话就能把代码跑起来
+java -cp .:target/classes com.me.harris.jupiter.channel.HelloJNI
+```
+
+这两步走完，就在当前目录下生成了libhellojni.so文件，接下来看java代码这边
+使用System.loadLibrary的前提是把这个so文件扔到/usr/lib这一类的文件夹里面，或者使用-Djava.library.path指定
+具体点的话：
+
+```java
+System.out.println(System.getProperty("java.library.path"));
+// 打印出来 /usr/java/packages/lib/amd64:/usr/lib/x86_64-linux-gnu/jni:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib/jni:/lib:/usr/lib
+// loadLibrary("hello")就是去上述目录里面找一个叫做libhello.so的文件，没有的话就报错
+//java -cp . -Djava.library.path=/NATIVE_SHARED_LIB_FOLDER com.xxx.xxx
+
+String currentDir = System.getProperty("user.dir"); //这个就是pwd
+System.load(currentDir+"/"+"libhellojni.so"); //load则是给出文件的绝对路径,这里面的斜线照说也要依据平台区分的
+```
+
+[详细教程](https://www.baeldung.com/jni)
 ### 3.1 java调用C、C++代码
-就是jni了
+
 
 ### 3.2 C、C++调用java代码
-c、c++层调用java也是可以的
+c、c++层调用java也是可以的,甚至可以在native层创建一个java实例返回给java层，所以创建一个java对象的方法至少包括new,unsafe,以及jni。
+
+比方说入口文件叫做com.me.harris.jupiter.channel.HelloJNI2.java
+生成的头文件就叫做
+com_me_harris_jupiter_channel_HelloJNI2.h
+g++的参数有一点点区别
+```shell
+g++ -c -fPIC -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux com_me_harris_jupiter_channel_HelloJNI2.cpp -o com_me_harris_jupiter_channel_HelloJNI2.o
+g++ -shared -fPIC -o libnative.so com_me_harris_jupiter_channel_HelloJNI2.o -lc
+mv libnative.so  jni
+java -cp .:target/classes -Djava.library.path=jni com.me.harris.jupiter.channel.HelloJNI2 ## java命令行参数一个比较烦人的地方就是com.example.Main这个class非得要去一个com/example文件夹下面有这个class文件
+```
+
 
 ### 3.3 java调用系统方法
 java有一个Process api
-### 38. java中Process的Api
+java中Process的Api
 关键词：ProcessBuilder , java9提供了新的Api。另外还有Runtime.exec这个方法
 亲测，下面的命令可以在mac上执行uname -a 命令
 ```java

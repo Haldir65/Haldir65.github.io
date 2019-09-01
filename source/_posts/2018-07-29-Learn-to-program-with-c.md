@@ -482,6 +482,25 @@ tbd
 ## 3. gcc ,clang,llvm的历史
 
 ### c语言中的未定义行为(比如说数组越界)
+[c语言的一些问题](https://coolshell.cn/articles/945.html)
+```c
+#include <stdio.h>
+int main()  
+{
+    float a = 12.5;
+    printf("%d\n", a);
+    printf("%d\n", (int)a);
+    printf("%d\n", *(int *)&a);
+    return 0;  
+}
+```
+上述代码的输出，在linux上亲测
+1615312664 // 这个变来变去的，1973997256
+12
+1095237632
+
+后两个值都是确定的，第一个变来变去的，具体为什么出现这个数，要考虑到字节序
+
 
 c语言的goto fail
 - [深入select多路复用内核源码加驱动实现](https://my.oschina.net/fileoptions/blog/911091)
