@@ -207,7 +207,7 @@ System.out.println(System.getProperty("java.library.path"));
 //java -cp . -Djava.library.path=/NATIVE_SHARED_LIB_FOLDER com.xxx.xxx
 
 String currentDir = System.getProperty("user.dir"); //这个就是pwd
-System.load(currentDir+"/"+"libhellojni.so"); //load则是给出文件的绝对路径,这里面的斜线照说也要依据平台区分的
+System.load(currentDir+"/"+"libhellojni.so"); //load则是给出文件的绝对路径,这里面的斜线照说也要依据平台区分的,System.getProperty("line.separator")
 ```
 
 [详细教程](https://www.baeldung.com/jni)
@@ -237,55 +237,55 @@ java中Process的Api
 ```java
 //用ProcessBuilder是一种做法
  try {
-            Runtime r = Runtime.getRuntime();
-            Process p = r.exec("uname -a");
-            p.waitFor();
-            BufferedReader b = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line = "";
+        Runtime r = Runtime.getRuntime();
+        Process p = r.exec("uname -a");
+        p.waitFor();
+        BufferedReader b = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String line = "";
 
-            while ((line = b.readLine()) != null) {
-                System.out.println(line);
-            }
-
-            b.close();
-        }catch (IOException | InterruptedException e){
-            
+        while ((line = b.readLine()) != null) {
+            System.out.println(line);
         }
+
+        b.close();
+    }catch (IOException | InterruptedException e){
+        
+    }
 
 //  下面这个也行
 String s = null;
 
-        try {
+try {
 
-            // run the Unix "ps -ef" command
-            // using the Runtime exec method:
-            Process p = Runtime.getRuntime().exec("ps -ef");
+    // run the Unix "ps -ef" command
+    // using the Runtime exec method:
+    Process p = Runtime.getRuntime().exec("ps -ef");
 
-            BufferedReader stdInput = new BufferedReader(new
-                    InputStreamReader(p.getInputStream()));
+    BufferedReader stdInput = new BufferedReader(new
+            InputStreamReader(p.getInputStream()));
 
-            BufferedReader stdError = new BufferedReader(new
-                    InputStreamReader(p.getErrorStream()));
+    BufferedReader stdError = new BufferedReader(new
+            InputStreamReader(p.getErrorStream()));
 
-            // read the output from the command
-            System.out.println("Here is the standard output of the command:\n");
-            while ((s = stdInput.readLine()) != null) {
-                System.out.println(s);
-            }
+    // read the output from the command
+    System.out.println("Here is the standard output of the command:\n");
+    while ((s = stdInput.readLine()) != null) {
+        System.out.println(s);
+    }
 
-            // read any errors from the attempted command
-            System.out.println("Here is the standard error of the command (if any):\n");
-            while ((s = stdError.readLine()) != null) {
-                System.out.println(s);
-            }
+    // read any errors from the attempted command
+    System.out.println("Here is the standard error of the command (if any):\n");
+    while ((s = stdError.readLine()) != null) {
+        System.out.println(s);
+    }
 
-            System.exit(0);
-        }
-        catch (IOException e) {
-            System.out.println("exception happened - here's what I know: ");
-            e.printStackTrace();
-            System.exit(-1);
-        }
+    System.exit(0);
+}
+catch (IOException e) {
+    System.out.println("exception happened - here's what I know: ");
+    e.printStackTrace();
+    System.exit(-1);
+}
 
 ```
 只不过很少见过用java去调用系统接口的

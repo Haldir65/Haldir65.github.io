@@ -203,6 +203,8 @@ sudo tcpdump -A -i 2 | egrep -i 'pass=|pwd=|password=|username=' --color=auto --
 //比方说抓到了md5过的密码，随便找个解密网站，就能解出来了
 
 
+## tbd
+抓包，json和protoBuf的payload区别，为什么同样的数据，后者更省流量？
 
 
 

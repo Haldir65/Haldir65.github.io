@@ -20,6 +20,8 @@ jmap等jdk的bin文件下面的功能
 jps
 jstack 12345 > thread.txt
 
+JDK 中的 jps，jstat，jstack，jmap 很有用
+
 [从反编译角度来看string常量池的问题](https://www.cnblogs.com/paddix/p/5326863.html)
 
 invoke dynamic是第五种，jdk7加入的
@@ -77,3 +79,6 @@ public final class Animal extends Enum
     }
 }
 ```
+
+## 参考
+[美团技术博客关于java byte code 的介绍](https://tech.meituan.com/2019/09/05/java-bytecode-enhancement.html)

@@ -38,3 +38,5 @@ tags: [tbd]
 
 [guava](https://github.com/google/guava/wiki/cachesexplained) ,apache common pool
 
+[blog of jake Wharton](https://jakewharton.com/blog/)
+

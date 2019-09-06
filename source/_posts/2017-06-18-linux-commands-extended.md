@@ -75,6 +75,9 @@ $ source ~/.bash_profile ## 立刻生效
 ```
 顺便说下widnows下怎么看环境变量： echo %path%
 
+怎么查看本机环境变量
+printenv
+
 
 ### 3. alias设置
 查看已经设置过的alias：  alias或者 alias -p

@@ -834,6 +834,9 @@ result=`get "$HOST$ACCESS_URL?qosClientSn=$qosClientSn" "$headers"`
 result=`post "$headers" "$HOST$ACCESS_URL" "$send_data"`
 ```
 
+比较两个文件内容是否一致直接用diff
+>diff -q $TMP_FILE $IPSET_DATA >/dev/null
+if [[ $? -ne 0 ]]; then
 
 
 ![](https://www.haldir66.ga/static/imgs/PuffinWales_EN-AU12757555133_1920x1080.jpg)
@@ -846,3 +849,5 @@ result=`post "$headers" "$HOST$ACCESS_URL" "$send_data"`
 [非常好的shell介绍网站](https://www.cyberciti.biz/faq/linux-unix-shell-check-if-directory-empty/)
 [shell中各种括号的作用()、(())、[]、[[]]、{}](https://blog.csdn.net/taiyang1987912/article/details/39551385)
 [非常好的教程](http://c.biancheng.net/view/773.html)
+
+[awesome shell](https://github.com/alebcay/awesome-shell)

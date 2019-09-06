@@ -191,7 +191,7 @@ juc里面没有c语言那样的mutex，不过Reentrantlock这种实际上就发�
 
 
 ## tbd 
-使用AQS的普遍方式是自己继承实现一个Sync（写一个试试看？,Tomcat里面就有）
+使用AQS的普遍方式是自己继承实现一个Sync（写一个试试看？Tomcat里面就有）
 
 
 ## 参考
