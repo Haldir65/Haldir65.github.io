@@ -6,22 +6,15 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="https://haldir65.github.io">
-  <title>cmake实用手册 | Haldir的博客</title>
+  <title>Archives: 2019/9 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="当我们敲下cmake命令的时候，cmake会在当前目录下找CMakeLists.txt这个文件">
-<meta name="keywords" content="linux,C">
-<meta property="og:type" content="article">
-<meta property="og:title" content="cmake实用手册">
-<meta property="og:url" content="https://haldir65.github.io/2018/11/26/2018-11-26-cmake-intro/index.html">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Haldir的博客">
+<meta property="og:url" content="https://haldir65.github.io/archives/2019/09/index.html">
 <meta property="og:site_name" content="Haldir的博客">
-<meta property="og:description" content="当我们敲下cmake命令的时候，cmake会在当前目录下找CMakeLists.txt这个文件">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://www.haldir66.ga/static/imgs/fresh-sparkle-dew-drops-on-red-flower-wallpaper-53861cf580909.jpg">
-<meta property="og:updated_time" content="2019-09-06T11:03:42.406Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="cmake实用手册">
-<meta name="twitter:description" content="当我们敲下cmake命令的时候，cmake会在当前目录下找CMakeLists.txt这个文件">
-<meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/fresh-sparkle-dew-drops-on-red-flower-wallpaper-53861cf580909.jpg">
+<meta name="twitter:title" content="Haldir的博客">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -180,325 +173,60 @@ ga('send', 'pageview');
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-2018-11-26-cmake-intro" class="article article-type-post " itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
+            
   
-    <h1 class="article-title" itemprop="name">
-      cmake实用手册
+  
+    
+    
+      
+      
+      <section class="archives-wrap">
+        <div class="archive-year-wrap">
+          <a href="/archives/2019" class="archive-year">2019</a>
+        </div>
+        <div class="archives">
+    
+    <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      	<div class="article-meta">
+	      	<a href="/2019/09/06/2019-09-06-openjdk-codegrep_02/" class="archive-article-date">
+  	<time datetime="2019-09-06T21:06:23.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-06</time>
+</a>
+        </div>
+    	 
+  
+    <h1 itemprop="name">
+      <a class="archive-article-title" href="/2019/09/06/2019-09-06-openjdk-codegrep_02/">openjdk源码解析[二]</a>
     </h1>
   
 
-        
-        <a href="/2018/11/26/2018-11-26-cmake-intro/" class="archive-article-date">
-  	<time datetime="2018-11-26T13:42:16.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-11-26</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>当我们敲下cmake命令的时候，cmake会在当前目录下找CMakeLists.txt这个文件</p>
-<p><img src="https://www.haldir66.ga/static/imgs/fresh-sparkle-dew-drops-on-red-flower-wallpaper-53861cf580909.jpg" alt=""><br><a id="more"></a></p>
-<p><a href="https://hulinhong.com/2018/04/21/cmake_tutorial/">CMake好在跨平台</a></p>
-<blockquote>
-<p>你或许听过好几种 Make 工具，例如 GNU Make ，QT 的 qmake ，微软的 MS nmake，BSD Make（pmake），Makepp，等等。这些 Make 工具遵循着不同的规范和标准，所执行的 Makefile 格式也千差万别。这样就带来了一个严峻的问题：如果软件想跨平台，必须要保证能够在不同平台编译。而如果使用上面的 Make 工具，就得为每一种标准写一次 Makefile ，这将是一件让人抓狂的工作。<br>就是针对上面问题所设计的工具：它首先允许开发者编写一种平台无关的 CMakeList.txt 文件来定制整个编译流程，然后再根据目标用户的平台进一步生成所需的本地化 Makefile 和工程文件，如 Unix 的 Makefile 或 Windows 的 Visual Studio 工程。从而做到“Write once, run everywhere”。</p>
-</blockquote>
-<p>下面就是最简单的一个CMakeLists.txt的例子，project(hello_cmake)是一个函数，该函数生成了PROJECT_NAME这个变量，所以下面直接用了。add_executable（）第一个参数是要生成的可执行文件的名字，第二个参数(其实可以包括所有编译需要的源文件)</p>
-<blockquote>
-<p>cmake_minimum_required(VERSION 3.5)<br>project (hello_cmake)<br>add_executable(${PROJECT_NAME} main.cpp)</p>
-</blockquote>
-<p>这个更简单</p>
-<blockquote>
-<p>cmake_minimum_required(VERSION 2.8)<br>project(app_project)<br>add_executable(myapp main.c)<br>install(TARGETS myapp DESTINATION bin)</p>
-</blockquote>
-<p>生成Makefile<br>mkdir _build &amp;&amp; cd _build &amp;&amp; cmake .. -DCMAKE_INSTALL_PREFIX=../_install<br>生成的Makefile拿来用:<br>make &amp;&amp; make install<br>省的手写Makefile了</p>
-<p>cmake支持In-Place Build和Out-of-Source Build。前者是直接在当前文件夹（CMAKE_BINARY_DIR）中生成一大堆文件（太乱了），后者则是在一个指定的文件夹中生成文件。<br>Out-of-source build其实很简单<br>mkdir build &amp;&amp; cd build/ &amp;&amp; cmake .. (在build文件夹中会生成一个Makefile)<br>make &amp;&amp; ./hello_cmake </p>
-<p>一堆内置的变量供参考</p>
-<table>
-<thead>
-<tr>
-<th>Variable</th>
-<th>Info</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>CMAKE_SOURCE_DIR</td>
-<td>The root source directory</td>
-</tr>
-<tr>
-<td>CMAKE_CURRENT_SOURCE_DIR</td>
-<td>The current source directory if using sub-projects and directories.</td>
-</tr>
-<tr>
-<td>PROJECT_SOURCE_DIR</td>
-<td>The source directory of the current cmake project.</td>
-</tr>
-<tr>
-<td>CMAKE_BINARY_DIR</td>
-<td>The root binary / build directory. This is the directory where you ran the cmake command.</td>
-</tr>
-<tr>
-<td>CMAKE_CURRENT_BINARY_DIR</td>
-<td>The build directory you are currently in.</td>
-</tr>
-<tr>
-<td>PROJECT_BINARY_DIR</td>
-<td>The build directory for the current project.</td>
-</tr>
-</tbody>
-</table>
-<h3 id="header文件的处理"><a href="#header文件的处理" class="headerlink" title="header文件的处理"></a>header文件的处理</h3><p>可以指定多个源文件</p>
-<blockquote>
-<p>set(SOURCES<br>    src/Hello.cpp<br>    src/main.cpp<br>)<br>add_executable(${PROJECT_NAME} ${SOURCES})<br>//或者直接把src文件夹下面的所有.cpp文件加入进来<br>file(GLOB SOURCES “src/*.cpp”)</p>
-</blockquote>
-<h3 id="对于include文件夹"><a href="#对于include文件夹" class="headerlink" title="对于include文件夹"></a>对于include文件夹</h3><blockquote>
-<p>target_include_directories(target<br>    PRIVATE<br>        ${PROJECT_SOURCE_DIR}/include<br>)<br>这样编译器就会在编译参数上加上-I/directory/path这种东西</p>
-</blockquote>
-<h3 id="static-library的处理"><a href="#static-library的处理" class="headerlink" title="static library的处理"></a>static library的处理</h3><pre><code>cmake_minimum_required(VERSION 3.5)
-
-project(hello_library)
-
-############################################################
-# Create a library
-############################################################
-
-#Generate the static library from the library sources
-add_library(hello_library STATIC 
-    src/Hello.cpp //创建一个libhello_library.a 的static library
-)
-
-target_include_directories(hello_library
-    PUBLIC 
-        ${PROJECT_SOURCE_DIR}/include
-)
-
-
-############################################################
-# Create an executable
-############################################################
-
-# Add an executable with the above sources
-add_executable(hello_binary 
-    src/main.cpp
-)
-
-# link the new hello_library target with the hello_binary target
-target_link_libraries( hello_binary
-    PRIVATE 
-        hello_library
-)
-</code></pre><h3 id="shared-library的处理"><a href="#shared-library的处理" class="headerlink" title="shared library的处理"></a>shared library的处理</h3><pre><code>cmake_minimum_required(VERSION 3.5)
-
-project(hello_library)
-
-############################################################
-# Create a library
-############################################################
-
-#Generate the shared library from the library sources
-add_library(hello_library SHARED 
-    src/Hello.cpp  // 用传入该函数的文件创建一个 libhello_library.so Library
-)
-add_library(hello::library ALIAS hello_library)
-
-target_include_directories(hello_library //hello_library需要这个include directory
-    PUBLIC 
-        ${PROJECT_SOURCE_DIR}/include  
-)
-
-############################################################
-# Create an executable
-############################################################
-
-# Add an executable with the above sources
-add_executable(hello_binary
-    src/main.cpp
-)
-
-# link the new hello_library target with the hello_binary target
-target_link_libraries( hello_binary // 接下来就是Link了，这里使用了上面的一个alias
-    PRIVATE 
-        hello::library
-)
-</code></pre><h3 id="接下来是make-install-将生成的可执行文件安装到系统中，似乎就是复制到-usr-bin里面"><a href="#接下来是make-install-将生成的可执行文件安装到系统中，似乎就是复制到-usr-bin里面" class="headerlink" title="接下来是make install (将生成的可执行文件安装到系统中，似乎就是复制到/usr/bin里面)"></a>接下来是make install (将生成的可执行文件安装到系统中，似乎就是复制到/usr/bin里面)</h3><p>默认情况下cmake会把生成的可执行文件安装到系统中，我们可以指定安装到特定的位置<br>cmake .. -DCMAKE_INSTALL_PREFIX=/install/location</p>
-<pre><code>install (TARGETS cmake_examples_inst_bin
-    DESTINATION bin)
-// target cmake_examples_inst_bin target to the destination ${CMAKE_INSTALL_PREFIX}/bin
-
-
-install (TARGETS cmake_examples_inst
-    LIBRARY DESTINATION lib) 
-//install the shared library generated from the target cmake_examples_inst target to the destination ${CMAKE_INSTALL_PREFIX}/lib       
-</code></pre><blockquote>
-<p>$ ls /usr/local/bin/<br>cmake_examples_inst_bin</p>
-</blockquote>
-<blockquote>
-<p>$ ls /usr/local/lib<br>libcmake_examples_inst.so</p>
-</blockquote>
-<blockquote>
-<p>$ ls /usr/local/etc/<br>cmake-examples.conf</p>
-</blockquote>
-<blockquote>
-<p>$ LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib cmake_examples_inst_bin<br>Hello Install! //把生成的bin文件复制到/sur/local/bin目录下，再修改LDPATH,就能去/usr/locallib这个目录去找生成的library了</p>
-</blockquote>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://mirkokiefer.com/cmake-by-example-f95eb47d45b1">cmake的教程，非常好</a><br><a href="https://github.com/ttroy50/cmake-examples">Useful CMake Examples</a>本文来自这里的实例</p>
-
-      
-
-      
-        <div class="page-reward">
-          <a href="javascript:;" class="page-reward-btn tooltip-top">
-            <div class="tooltip tooltip-east">
-            <span class="tooltip-item">
-              赏
-            </span>
-            <span class="tooltip-content">
-              <span class="tooltip-text">
-                <span class="tooltip-inner">
-                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
-                  <div class="reward-box">
-                    
-                    
-                  </div>
-                </span>
-              </span>
-            </span>
-          </div>
-          </a>
-        </div>
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
+        <div class="article-info info-on-right">
+          
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">linux</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">C</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">java</a>
         		</li>
       		
 		</ul>
 	</div>
 
-      
+          
 
-      
-
-      
-        
-<div class="share-btn share-icons tooltip-left">
-  <div class="tooltip tooltip-east">
-    <span class="tooltip-item">
-      <a href="javascript:;" class="share-sns share-outer">
-        <i class="icon icon-share"></i>
-      </a>
-    </span>
-    <span class="tooltip-content">
-      <div class="share-wrap">
-        <div class="share-icons">
-          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
-            <i class="icon icon-weibo"></i>
-          </a>
-          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
-            <i class="icon icon-weixin"></i>
-          </a>
-          <a class="qq share-sns" href="javascript:;" data-type="qq">
-            <i class="icon icon-qq"></i>
-          </a>
-          <a class="douban share-sns" href="javascript:;" data-type="douban">
-            <i class="icon icon-douban"></i>
-          </a>
-          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
-            <i class="icon icon-qzone"></i>
-          </a>
-          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
-            <i class="icon icon-facebook"></i>
-          </a>
-          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
-            <i class="icon icon-twitter"></i>
-          </a>
-          <a class="google share-sns" href="javascript:;" data-type="google">
-            <i class="icon icon-google"></i>
-          </a>
         </div>
-      </div>
-    </span>
-  </div>
-</div>
-
-<div class="page-modal wx-share js-wx-box">
-    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
-    <p>扫一扫，分享到微信</p>
-    <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=https://haldir65.github.io/2018/11/26/2018-11-26-cmake-intro/" alt="微信分享二维码">
-    </div>
-</div>
-
-<div class="mask js-mask"></div>
-      
-      <div class="clearfix"></div>
-    </div>
+        <div class="clearfix"></div>
+    </header>
   </div>
 </article>
-
-  
-<nav id="article-nav">
-  
-    <a href="/2018/11/27/2018-11-27-indexed-db-tutorial/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          浏览器indexedDb使用示例
-        
-      </div>
-    </a>
   
   
-    <a href="/2018/11/15/2018-11-15-opengl-related-topics/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">opengl学习笔记</div>
-      <i class="icon-circle-right"></i>
-    </a>
-  
-</nav>
-
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-  
-  
+    </div></section>
   
 
-  
-
-  
-
-  
+    
 
 
           </div>
@@ -521,8 +249,8 @@ install (TARGETS cmake_examples_inst
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: true,
-		isArchive: false,
+		isPost: false,
+		isArchive: true,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,

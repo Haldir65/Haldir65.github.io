@@ -14,7 +14,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/SutherlandFalls_ZH-CN4602884079_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-09-01T13:48:00.408Z">
+<meta property="og:updated_time" content="2019-09-06T11:03:42.410Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="各种编程语言与c、c++的交互">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/SutherlandFalls_ZH-CN4602884079_1920x1080.jpg">
@@ -346,7 +346,7 @@ java -cp .:target/classes com.me.harris.jupiter.channel.HelloJNI
 //java -cp . -Djava.library.path=/NATIVE_SHARED_LIB_FOLDER com.xxx.xxx
 
 String currentDir = System.getProperty(&quot;user.dir&quot;); //这个就是pwd
-System.load(currentDir+&quot;/&quot;+&quot;libhellojni.so&quot;); //load则是给出文件的绝对路径,这里面的斜线照说也要依据平台区分的
+System.load(currentDir+&quot;/&quot;+&quot;libhellojni.so&quot;); //load则是给出文件的绝对路径,这里面的斜线照说也要依据平台区分的,System.getProperty(&quot;line.separator&quot;)
 </code></pre>
 <p><a href="https://www.baeldung.com/jni">详细教程</a></p>
 <h3 id="3-1-java调用C、C-代码"><a href="#3-1-java调用C、C-代码" class="headerlink" title="3.1 java调用C、C++代码"></a>3.1 java调用C、C++代码</h3><h3 id="3-2-C、C-调用java代码"><a href="#3-2-C、C-调用java代码" class="headerlink" title="3.2 C、C++调用java代码"></a>3.2 C、C++调用java代码</h3><p>c、c++层调用java也是可以的,甚至可以在native层创建一个java实例返回给java层，所以创建一个java对象的方法至少包括new,unsafe,以及jni。</p>
@@ -359,55 +359,55 @@ java -cp .:target/classes -Djava.library.path=jni com.me.harris.jupiter.channel.
 <h3 id="3-3-java调用系统方法"><a href="#3-3-java调用系统方法" class="headerlink" title="3.3 java调用系统方法"></a>3.3 java调用系统方法</h3><p>java有一个Process api<br>java中Process的Api<br>关键词：ProcessBuilder , java9提供了新的Api。另外还有Runtime.exec这个方法<br>亲测，下面的命令可以在mac上执行uname -a 命令</p>
 <pre><code class="java">//用ProcessBuilder是一种做法
  try {
-            Runtime r = Runtime.getRuntime();
-            Process p = r.exec(&quot;uname -a&quot;);
-            p.waitFor();
-            BufferedReader b = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line = &quot;&quot;;
+        Runtime r = Runtime.getRuntime();
+        Process p = r.exec(&quot;uname -a&quot;);
+        p.waitFor();
+        BufferedReader b = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String line = &quot;&quot;;
 
-            while ((line = b.readLine()) != null) {
-                System.out.println(line);
-            }
-
-            b.close();
-        }catch (IOException | InterruptedException e){
-
+        while ((line = b.readLine()) != null) {
+            System.out.println(line);
         }
+
+        b.close();
+    }catch (IOException | InterruptedException e){
+
+    }
 
 //  下面这个也行
 String s = null;
 
-        try {
+try {
 
-            // run the Unix &quot;ps -ef&quot; command
-            // using the Runtime exec method:
-            Process p = Runtime.getRuntime().exec(&quot;ps -ef&quot;);
+    // run the Unix &quot;ps -ef&quot; command
+    // using the Runtime exec method:
+    Process p = Runtime.getRuntime().exec(&quot;ps -ef&quot;);
 
-            BufferedReader stdInput = new BufferedReader(new
-                    InputStreamReader(p.getInputStream()));
+    BufferedReader stdInput = new BufferedReader(new
+            InputStreamReader(p.getInputStream()));
 
-            BufferedReader stdError = new BufferedReader(new
-                    InputStreamReader(p.getErrorStream()));
+    BufferedReader stdError = new BufferedReader(new
+            InputStreamReader(p.getErrorStream()));
 
-            // read the output from the command
-            System.out.println(&quot;Here is the standard output of the command:\n&quot;);
-            while ((s = stdInput.readLine()) != null) {
-                System.out.println(s);
-            }
+    // read the output from the command
+    System.out.println(&quot;Here is the standard output of the command:\n&quot;);
+    while ((s = stdInput.readLine()) != null) {
+        System.out.println(s);
+    }
 
-            // read any errors from the attempted command
-            System.out.println(&quot;Here is the standard error of the command (if any):\n&quot;);
-            while ((s = stdError.readLine()) != null) {
-                System.out.println(s);
-            }
+    // read any errors from the attempted command
+    System.out.println(&quot;Here is the standard error of the command (if any):\n&quot;);
+    while ((s = stdError.readLine()) != null) {
+        System.out.println(s);
+    }
 
-            System.exit(0);
-        }
-        catch (IOException e) {
-            System.out.println(&quot;exception happened - here&#39;s what I know: &quot;);
-            e.printStackTrace();
-            System.exit(-1);
-        }
+    System.exit(0);
+}
+catch (IOException e) {
+    System.out.println(&quot;exception happened - here&#39;s what I know: &quot;);
+    e.printStackTrace();
+    System.exit(-1);
+}
 
 </code></pre>
 <p>只不过很少见过用java去调用系统接口的</p>
