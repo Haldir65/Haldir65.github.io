@@ -17,7 +17,7 @@
 <meta property="og:description" content="Tomcat源码解析">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/LetchworthSP_EN-AU14482052774_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-09-06T11:03:42.410Z">
+<meta property="og:updated_time" content="2019-09-08T12:13:00.641Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Tomcat部分源码解析">
 <meta name="twitter:description" content="Tomcat源码解析">
@@ -567,9 +567,29 @@ protected void timeout(int keyCount, boolean hasEvents) {
 <p>TaskThreadFactory tf = new TaskThreadFactory(getName() + “-exec-“, daemon, getThreadPriority());</p>
 </blockquote>
 <p>所以在断点里面能够看到http-nio-8080-exec-1 ,http-nio-8080-exec-2…这个线程池就是主要的处理业务逻辑的线程。</p>
+<h2 id="tomcat类加载器-重点"><a href="#tomcat类加载器-重点" class="headerlink" title="tomcat类加载器(重点)"></a>tomcat类加载器(重点)</h2><p>首先，Tomcat的类加载机制是违背了双亲委派模型的（webappClassLoader加载自己的目录下的class文件，不会传递给父类加载器。）</p>
+<p>Tomcat里面主要的classLoader包括：<br>CommonClassLoader  /common/<em> 下面的class<br>CatalinaClassLoader   /server/</em> 下面的class归它<br>SharedClassLoader  /shared/<em> 下面的归它<br>WebappClassLoader  /WebApp/WEB-INF/</em> 下面的归它 每一个Web应用程序对应一个WebApp类加载器，每一个jsp文件对应一个jsp类加载器。</p>
+<p>在org.apache.catalina.startup.BootStrap.java中，有初始化classLoader的方法</p>
+<pre><code class="java">initClassLoaders();
+
+Thread.currentThread().setContextClassLoader(catalinaLoader);
+
+SecurityClassLoad.securityClassLoad(catalinaLoader);
+</code></pre>
+<p>当一个应用启动的时候，会为其创建对应的WebappClassLoader<br>StandardContext.startInternal</p>
+<pre><code class="java">if (getLoader() == null) {
+        WebappLoader webappLoader = new WebappLoader(getParentClassLoader());
+        webappLoader.setDelegate(getDelegate()); 
+        setLoader(webappLoader);
+    }
+</code></pre>
+<p>classLoader最终是用来loadClass的，这个方法在WebAppClassLoaderBase.loadClass方法中。使用了一个</p>
+<blockquote>
+<p>clazz = Class.forName(name, false, parent); // class.forName还有一个三个参数的方法。。。。</p>
+</blockquote>
 <p>tbd</p>
-<h2 id="tomcat类加载器-重点"><a href="#tomcat类加载器-重点" class="headerlink" title="tomcat类加载器(重点)"></a>tomcat类加载器(重点)</h2><h2 id="tomcat支持开启sendFile"><a href="#tomcat支持开启sendFile" class="headerlink" title="tomcat支持开启sendFile"></a>tomcat支持开启sendFile</h2><p><a href="https://httpd.apache.org/docs/2.4/mod/core.html#enablesendfile">apache支持zero-copy</a></p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/Dwade_mia/column/info/18882">tomcat源码解析</a></p>
+<h2 id="tomcat支持开启sendFile"><a href="#tomcat支持开启sendFile" class="headerlink" title="tomcat支持开启sendFile"></a>tomcat支持开启sendFile</h2><p><a href="https://httpd.apache.org/docs/2.4/mod/core.html#enablesendfile">apache支持zero-copy</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/Dwade_mia/column/info/18882">tomcat源码解析</a><br><a href="https://tomcat.apache.org/tomcat-9.0-doc/class-loader-howto.html">tomcat官方文档关于classloader的解释 </a></p>
 
       
 
@@ -920,10 +940,6 @@ protected void timeout(int keyCount, boolean hasEvents) {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
@@ -944,7 +960,7 @@ protected void timeout(int keyCount, boolean hasEvents) {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -957,6 +973,10 @@ protected void timeout(int keyCount, boolean hasEvents) {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">opengl</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">
