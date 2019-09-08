@@ -57,6 +57,8 @@ void main(){
     else
         printf("Boolean doesn't work in 'C'. \n");
 }
+
+
 ```
 
 
@@ -89,7 +91,14 @@ name[4] = 'a';
 string.h 标准库中定义了空指针，NULL(数值0)
 在C/C++中，当要给一个字符串添加结束标志时，都应该用‘\0’而不是NULL或0
 
+
 ‘\0’是一个“空字符”常量，它表示一个字符串的结束，它的ASCII码值为0。注意它与空格' '（ASCII码值为32）及'0'（ASCII码值为48）不一样的。
+
+```c
+printf("%s\n", '\0'== NULL ? "true" : "false"); // 输出是true
+```
+
+所以'\0' 就是 NULL ?
 
 编译过程中有时候可能会出现一些警告
 "Implicit declaration of function 'sleep' is invalid in C99"

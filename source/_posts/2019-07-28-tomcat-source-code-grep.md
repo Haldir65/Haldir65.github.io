@@ -454,9 +454,52 @@ ClientPoller线程就是负责执行Selector那一套，出现事件之后就分
 所以在断点里面能够看到http-nio-8080-exec-1 ,http-nio-8080-exec-2...这个线程池就是主要的处理业务逻辑的线程。
 
 
-tbd
 
 ## tomcat类加载器(重点)
+首先，Tomcat的类加载机制是违背了双亲委派模型的（webappClassLoader加载自己的目录下的class文件，不会传递给父类加载器。）
+
+Tomcat里面主要的classLoader包括：
+CommonClassLoader  /common/* 下面的class
+CatalinaClassLoader   /server/* 下面的class归它
+SharedClassLoader  /shared/* 下面的归它
+WebappClassLoader  /WebApp/WEB-INF/* 下面的归它 每一个Web应用程序对应一个WebApp类加载器，每一个jsp文件对应一个jsp类加载器。
+
+在org.apache.catalina.startup.BootStrap.java中，有初始化classLoader的方法
+```java
+initClassLoaders();
+
+Thread.currentThread().setContextClassLoader(catalinaLoader);
+
+SecurityClassLoad.securityClassLoad(catalinaLoader);
+```
+
+当一个应用启动的时候，会为其创建对应的WebappClassLoader
+StandardContext.startInternal
+```java
+if (getLoader() == null) {
+        WebappLoader webappLoader = new WebappLoader(getParentClassLoader());
+        webappLoader.setDelegate(getDelegate()); 
+        setLoader(webappLoader);
+    }
+```
+
+classLoader最终是用来loadClass的，这个方法在WebAppClassLoaderBase.loadClass方法中。使用了一个
+> clazz = Class.forName(name, false, parent); // class.forName还有一个三个参数的方法。。。。
+
+
+
+
+
+
+
+
+
+
+
+
+
+tbd
+
 ## tomcat支持开启sendFile
 
 
@@ -465,3 +508,4 @@ tbd
 
 ## 参考
 [tomcat源码解析](https://blog.csdn.net/Dwade_mia/column/info/18882)
+[tomcat官方文档关于classloader的解释 ](https://tomcat.apache.org/tomcat-9.0-doc/class-loader-howto.html)

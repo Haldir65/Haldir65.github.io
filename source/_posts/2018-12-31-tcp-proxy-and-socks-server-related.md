@@ -200,6 +200,9 @@ try:
 主动探测方法
 [协议与结构](https://loggerhead.me/posts/shadowsocks-yuan-ma-fen-xi-xie-yi-yu-jie-gou.html)
 
+
+## tbd java里面有一个proxy类，事实上jdk本身对于sock代理是支持的
+
 ## 参考
 [python小工具：tcp proxy和tcp hub](http://ichuan.net/post/22/tcp-proxy-and-tcp-hub-in-python/)
 [Writing a simple SOCKS server in Python](https://rushter.com/blog/python-socks-server/)
