@@ -189,7 +189,7 @@ activity.startActivity(intent);
 ```
 
 ### 13. Canvas.clipPath会出现锯齿的问题以及可能的解决方案
-a Navive implementation of CircleImageView would look something like this:
+a Naive implementation of CircleImageView would look something like this:
 xml里面宽高都写成200dp，方便一点。
 ```java
 import android.content.Context;

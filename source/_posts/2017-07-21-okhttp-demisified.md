@@ -176,9 +176,98 @@ BufferedInputStream要求外部调用者带着一个固定大小的byte数组来
 java io中各种decorater流之间的包装带来了System.arrayCopy
 ```java
 new DataInputStream(new BufferedInputStream(new FileInputStream("")));
+````
+
+>上面DataInputStream通常用于方便的读取基本数据类型，比如readChar,readLong，readByte等等.
+例如 dataInputstream.readByte ->  BufferedInputStream.read ->  FileInputStream.read
+
+> 在BufferedInputStream中有一层byte[] buf. BufferedInputStream的read有两种，一是一次读一个byte，一种是外部传一个byte，指定offset和len。第一种要经历fill方法，第二种则是先填满自己的buf，然后System.arraycopy到外部传入的dst数组中。当然如果外界要求的len超出buff.length，那么直接跳过buf这一层。
+
+
+调用fill方法的前提是发现pos >= count ，也就是是说提前预读取的数据不够了，fill方法主要是从0开始重新从底层读取数据，期望从底层读取buf.length - pos 个数据
+```java
+pos = 0;            /* no mark: throw away the buffer */
+count = pos;
+int n = getInIfOpen().read(buffer, pos, buffer.length - pos);
+if (n > 0)
+    count = n + pos; //所以理想情况下，每次fill方法的调用都会往buf里面塞8192个byte， count = 8192 , pos = 0.下一个read从0开始，同时已经预读取了一部分数据，从pos到count的数据都是下一次read可以直接读的。这里面并不涉及arrayCopy.
 ```
-比如这样的代码，DataInputStream的read方法实际上传了一个byte[]，调用了BufferedInputStream的read方法，后者再将数据从自身arrayCopy到byte[]中。在Okio中，不存在这样的copy,
-Buffer的定义是"A collection of bytes in memory."，与数组不同，Buffer之间传递数据的方式是挪指针。
+xxxOutputSream中常常看到这样一句话
+/* If the request length exceeds the size of the output buffer,
+                flush the buffer and then write the data directly.  In this
+                way buffered streams will cascade harmlessly. */
+回顾BufferedInputStream和BufferedOutputSream存在的主要意义是预防那种数据很少的读写，如果是一次性的大批量读取，则直接跳过buff一层。
+
+在[jake wharton的forcing-bytes-downward-in-okio](https://jakewharton.com/forcing-bytes-downward-in-okio/) 中有这么一段话
+
+> With java.io.* streams, however, multiple levels of buffering require each level to allocate and manage its own byte[]. This means that a flush operation will result in each level doing an arraycopy() of its data down to the next level (which also might have required buffer expansion).
+
+
+查了下BufferdOutputStream.flush
+```java
+// 1. 
+public synchronized void flush() throws IOException {
+    flushBuffer();
+    out.flush();
+}
+
+// 2
+private void flushBuffer() throws IOException {
+    if (count > 0) {
+        out.write(buf, 0, count);
+        count = 0;
+    }
+}
+
+// 3.1 BuuferdOutputStream的write方法
+public synchronized void write(byte b[], int off, int len) throws IOException {
+    if (len >= buf.length) {
+        /* If the request length exceeds the size of the output buffer,
+            flush the output buffer and then write the data directly.
+            In this way buffered streams will cascade harmlessly. 
+            超过大小直接跳过缓存            
+            */
+        flushBuffer();
+        out.write(b, off, len);
+        return;
+    }
+    if (len > buf.length - count) {
+        flushBuffer();
+    }
+    System.arraycopy(b, off, buf, count, len); //这里一定会走到arrayCopy
+    //假设
+    count += len;
+}
+
+// 3.2 ByteArrayOutputStream的write方法
+public synchronized void write(byte b[], int off, int len) {
+    if ((off < 0) || (off > b.length) || (len < 0) ||
+        ((off + len) - b.length > 0)) {
+        throw new IndexOutOfBoundsException();
+    }
+    ensureCapacity(count + len);
+    System.arraycopy(b, off, buf, count, len);
+    count += len;
+}
+
+// 3.3 BufferedWriter（虽然已经不算stream了）
+public void write(char cbuf[], int off, int len) throws IOException {
+    synchronized (lock) {
+        while (b < t) {
+            int d = min(nChars - nextChar, t - b);
+            System.arraycopy(cbuf, b, cb, nextChar, d);
+            b += d;
+            nextChar += d;
+            if (nextChar >= nChars)
+                flushBuffer();
+        }
+    }
+}
+```
+都是arrayCopy，可以想象，一层层的flush调用传递下来，每一层的buffer都会被通过arrayCopy的方式传递到下一层。比方说，包了3层BufferdOutputStream就要arrayCopy三次，极其费事。
+
+//在Okio中，不存在这样的copy,
+//Buffer的定义是"A collection of bytes in memory."，与数组不同，Buffer之间传递数据的方式是挪指针。
 
 
 BufferedSource在读取Socket数据时，一边从socket里面拿一个Segment大小的数据，然后调用readInt,readLong等方法返回int,long(同时从segment头部清空数据)。如果读到segment最后发现剩下的byte不能组成一个int，就会从segment pool中借一个segment，并从socket中读取数据塞满，把第一个segment剩下的一点byte和第二个segment的头部一点拼成一个int。以BufferSource的readInt为例:

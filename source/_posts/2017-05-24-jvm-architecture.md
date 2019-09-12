@@ -27,21 +27,26 @@ classloader将class 文件加载进内存中的一部分（Runtime data areas）
 
 
 ## 4.从classloader开始执行（class loading subsystem）
-	- load 将byte code 加载进内存，来源可以是.java文件，可以是.jar文件，甚至可以是network Socket（这要看具体class loader的implementation）。load阶段包含三种不同的class loader，这也是面试时的重点。
+- load 将byte code 加载进内存，来源可以是.java文件，可以是.jar文件，甚至可以是network Socket（这要看具体class loader的implementation）。load阶段包含三种不同的class loader，这也是面试时的重点。
 
-	> 1. Bootstrap class loader (jre文件夹中有一个rt.jar文件，里面装的就是java的internal class) //
+> 1. Bootstrap class loader (jre文件夹中有一个rt.jar文件，里面装的就是java的internal class) //
 
-	> 2. extension class loader (jre/lib/ext) //负责加载这个文件夹中的class文件
+> 2. extension class loader (jre/lib/ext) //负责加载这个文件夹中的class文件
 
-	> 3. Application class loader (CLASSPATH, -cp)//加载CLASSPATH变量中描述的位置
+> 3. Application class loader (CLASSPATH, -cp)//加载CLASSPATH变量中描述的位置
 
-	- load完成后是link
-	verify(检查是否是符合jvm标准的byte code) -> prepare(为class中的static variable分配内存，variable被赋默认值) -> Resolve(when all the symbolic reference inside currentclass are resolved，例如引用了其他的class，例如引用了常量池里面的东西，classDefNotFoundException也是在这个时候抛出的)
+- load完成后是link
+verify(检查是否是符合jvm标准的byte code) -> prepare(为class中的static variable分配内存，variable被赋默认值) -> Resolve(when all the symbolic reference inside currentclass are resolved，例如引用了其他的class，例如引用了常量池里面的东西，classDefNotFoundException也是在这个时候抛出的)
 
-	注意，以上步骤都是java specification所规定的，但不同的jvm实现可能有微小的差异
+
+注意，以上步骤都是java specification所规定的，但不同的jvm实现可能有微小的差异
 
 class loading subsystem的最后一步是initialize
 class vars to initiazed Value in code(比如静态代码块就是在这时执行的)
+
+[The Java Virtual Machine dynamically loads, links and initializes classes and interfaces. ](https://stackoverflow.com/questions/26246875/is-linking-in-java-runtime-always-done-dynamically) 
+以servcieLoader为例，完全可以面向接口编译，并且编译成功。只要在运行时将implementation丢到classpath就ok，所以是运行时连接的。
+
 
 ## 5. Runtime data area五个部分的划分
 Runtime data area 即java virtural machine的内存，可以划分成五部分

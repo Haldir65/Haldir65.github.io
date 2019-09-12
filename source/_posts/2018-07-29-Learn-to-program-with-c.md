@@ -206,9 +206,9 @@ example
 默认生成的文件名叫做a.out,可以使用-o参数指定生成的文件名。然后./a.out就可以执行了
 
 
-
-
 .so文件其实是shared object的缩写
+
+
 
 ## 4. Makefile怎么写
 [几个简单的makefile实例](http://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/)
@@ -357,7 +357,7 @@ char *s1 = "hello"; ##获得了一个指向字符串常量的指针
 ##这段也会core dump
 char* s1 = "hello";
 s1 += 1;
-printf("content %s\n",*s1);##崩在这里
+printf("content %s\n",*s1);##崩在这里，因为s1其实是常量了，这里读取了未知位置的内存，当然崩
 printf("content %s\n",s1);##改成这样就好了
 ```
 

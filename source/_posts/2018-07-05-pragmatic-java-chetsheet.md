@@ -709,20 +709,19 @@ System.out.println(c3.IsRegistered);
 ```
 其他的json库，gson是没有这个现象的
 
+### autoValue这个library的使用
+autoValue主要是为了在java 1.6 以上生成immutable object的，原理是annotaion processor。在idea中使用的话，需要为当前project enable annotation processor。能够避免手动写java bean的时候写toString, equals犯错。当然如果使用的是kotlin的话，直接使用data class就可以了。还提供了builder模式。
 
 
 
 
+![](https://www.haldir66.ga/static/imgs/1279081126453.jpg)
 
 
 
-
-
-todo
-反编译java代码的基本套路
+## 参考
 [有直接去看hotspot源码来分析的](https://www.zhihu.com/question/60892134)
 [classLoader related topics](https://zhuanlan.zhihu.com/p/51374915)
 
 
-![](https://www.haldir66.ga/static/imgs/1279081126453.jpg)
 

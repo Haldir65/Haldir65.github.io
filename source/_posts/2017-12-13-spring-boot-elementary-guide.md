@@ -112,7 +112,7 @@ nohup ./start.sh > foo.out 2> foo.err < /dev/null &
 非嵌入式产品的Web应用，应使用预编译语句PreparedStatement代替直接的语句执行Statement，以防止SQL注入。
 
 
-- [ ] autoWired, autovalue这些java 的library(Spring boot的autoWired注解)
+Spring boot的autoWired注解
 
 =================================================================
 在windows里面查看内网ip，从控制面板进去看是不准的，DHCP有效期过了自动换掉，得自己敲ipconfig，这样才是最及时的。

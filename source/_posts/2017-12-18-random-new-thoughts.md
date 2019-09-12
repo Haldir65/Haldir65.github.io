@@ -62,6 +62,8 @@ top : 1
 - 微服务框架 <del>dubbo</del> kubernetes, Spring Cloud....
 - how does jvm parse class file and the code structure of .class file(how do we manipulate .class file like in asm)
 - [] java BitSet这个class的使用及效率
+- [] jconf taiwan上有一个关于kotlin实现细节的演讲
+- [] 关于textView源码的解析要补上
 
 ### 已完成
 * 用 express 转接一个知乎 Api，添加 Access-control-allow-origin,或许还可以用 redis 缓存数据结果（一个就好）由此想到一篇文章"How to use Python to build a restful Web Service".只不过用的是 Tornado

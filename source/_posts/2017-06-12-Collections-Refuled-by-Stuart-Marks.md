@@ -838,12 +838,12 @@ WeakHashMap的value不要持有key的强引用，否则，key永远不会被清�
 
 ## 7. java 8的一些新的方法
 list.replaceAll(String::toUpperCase) //method reference
-can not change the elemeet type, for that you need an stream
+can not change the element type, for that you need an stream
 [Collections Refuled by Stuart Marks](https://www.youtube.com/watch?v=q6zF3vf114M)
-putIfAbsent是Atmmic的[Is putIfAbsent an atomic operation](http://forums.terracotta.org/forums/posts/list/7968.page)
+putIfAbsent是Atomic的[Is putIfAbsent an atomic operation](http://forums.terracotta.org/forums/posts/list/7968.page)
 
 ## 8.结束语
-8.1 [Doug Lea](https://en.wikipedia.org/wiki/Doug_Lea) 是非常聪明的人，估计并发经常会牵涉到集合，所以jdk里面很多集合都有他的作品
+8.1 [Doug Lea](https://en.wikipedia.org/wiki/Doug_Lea) 是非常聪明的人，并发经常会牵涉到集合，所以jdk里面很多集合都有他的作品
 8.2 jdk只是定义了这些框架，像List，Map这些全都是接口，完全可以自己去实现。Apache就有一大堆适合特定场景的集合实现类。jdk只是帮助我们实现了一些常见的类。如果有现成的满足需求的框架，不要重复造轮子。
 8.3 平时只要记住ArrayList和HashMap的**大致内部实现**就可以了，至于别的，除非面试，平时没必要记录。
 8.4 [Stuart Mark](https://blogs.oracle.com/java/collections-refueled)特别喜欢把一个class搞成**@deprecated**

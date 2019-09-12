@@ -610,7 +610,9 @@ One of the classes is an explicit generated class using the class statement, the
 
 [出现错误的原因是在class外面还写了语句](https://www.moreofless.co.uk/invalid-duplicate-class-definition-error-groovy/)
 
+[gradle的transitive 是指依赖是否会传递](https://stackoverflow.com/a/43202597) 默认transitive = true ，就是说会去一直下载上游依赖的库，否则就是自己去添加这些上游依赖。
 
+## 参考
 [比较复杂的gradle knowledge](https://github.com/adwiv/android-fat-aar)
 [official gradle docs 是最好的学习资料](https://guides.gradle.org/creating-new-gradle-builds/)
 [custom_plugins](https://docs.gradle.org/current/userguide/custom_plugins.html)

@@ -32,12 +32,20 @@ which may be a jump to a user-defined chain in the same table.
 
 每一条Chain上都有一个rules的列表(用A去append,用I去Insert)
 
+
 ## table（table是一系列针对packet的同一类决策的集合）
 Mangle is to change packets (Type Of Service, Time To Live etc) on traversal.
 Nat is to put in NAT rules.
 Raw is to be used for marking and connection tracking.
 Filter is for filtering packets.
 
+ 一般来讲table是kernel的事情，外部无需关心。一般都是创建一个新的chain,然后在input或者output这种现有的chain后面append上去，比如这样：
+
+iptables -N Services
+iptables -A INPUT -j Services
+iptables -A Services -m tcp -p tcp --dport 80 -j ACCEPT
+
+意思就是说，默认的input chain走完了发现还没有匹配上，就全部丢给新创建的chain。
 
 ```
 #~ iptables -L INPUT -n -v --line-numbers
@@ -115,11 +123,18 @@ REJECT differs to DROP that it does send a packet back, but the answer is as if 
 >iptables -D INPUT -s xxx.xxx.xxx.xxx -j DROP
 
 比方说我不小心把202.54.1.1拉黑了，怎么挽回
+简单来说
+> iptables -A ...
+
+都可以用这一句撤销掉
+> iptables -D ...
+
 ```
 iptables -L OUTPUT -n --line-numbers | grep 202.54.1.1 //发现在条规则第四行
 iptabels -D INPUT 4 //把这个第四行的规则删掉
 iptables -D INPUT -s 202.54.1.1 -j DROP //这个也是一样的
 ```
+
 
 只允许特定ip访问某个端口
 > sudo iptables -I INPUT -p tcp ! -s 200.200.200.0/24 --destination-port 1080 -j DROP
@@ -498,3 +513,5 @@ iptables的工作流程
 ## 参考
 [linux-iptables-examples](https://www.cyberciti.biz/tips/linux-iptables-examples.html)
 [网件R7800 OpenWrt使用V2Ray+mKcp+透明代理完美翻墙](https://blog.dreamtobe.cn/r7800-openwrt-v2ray/)
+[list and delete iptables rules](https://www.digitalocean.com/community/tutorials/how-to-list-and-delete-iptables-firewall-rules)
+[如何创建并管理自定义的iptables的chain](https://blog.sleeplessbeastie.eu/2018/06/21/how-to-create-iptables-firewall-using-custom-chains/)

@@ -1665,7 +1665,48 @@ javac -source 1.7 -bootclasspath /usr/lib/jvm/java-7-oracle/jre/lib/rt.jar Main.
 sun被oracle收购后，rt.jar属于oracle公司，并未开源。有时候需要看jdk源码的话，可以参考[社区维护的openjdk的源码](https://github.com/ojdkbuild/ojdkbuild),但是千万不要乱改。
 windos平台下，想在idea中看jdk源码的话，下载openjdk源码(一个zip文件)，下载下来解压到任意一个文件夹。在idea里，File - Project structure - sdk - source path，点击加号，选择添加刚才解压的文件夹里头的java-1.8.0-openjdk-1.8.0.212-1.b04.ojdkbuild.windows.x86_64/src.zip。接下来，随便查找一个sun package下面的文件，比方说sun.nio.ch.WindowsSelectorImpl，自然会跳转到对应的文件中。
 
-### 53. Class.forName...
+
+### 53. 为什么一个内部类的private field能够被包裹它的外部类访问到
+[为什么一个内部类的private field能够被包裹它的外部类访问到](https://stackoverflow.com/questions/19747812/why-can-the-private-member-of-an-nested-class-be-accessed-by-the-methods-of-the?lq=1)
+因为java标准这么规定的。不管这个inner class是不是static的。
+
+### 54. classLoader还能读取文件
+[如何读取一个放在classpath上的文件](https://stackoverflow.com/a/1464366)
+假如目录结构是这样的
+code
+    dummy
+          Test.class
+txt
+    SomeTextFile.txt
+
+```java
+package dummy;
+
+import java.io.*;
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        InputStream stream = Test.class.getResourceAsStream("/SomeTextFile.txt");
+        System.out.println(stream != null);
+        stream = Test.class.getClassLoader().getResourceAsStream("SomeTextFile.txt");
+        System.out.println(stream != null);
+    }
+}
+```
+
+java -classpath code:txt dummy.Test
+
+输出：
+true
+true
+
+所以结论就是getResourceAsStream可以用来读取文件，所以tomcat的src文件夹中除了java文件还有一大堆其他的.xml、.properity文件等等。
+
+
+
+### 54. Class.forName...
 在App启动的时候在另外一个线程里面提前去加载这个class，能够加快速度吗？
 
 class的生命周期

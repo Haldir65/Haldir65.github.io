@@ -337,9 +337,8 @@ pollerThread.setPriority(threadPriority);
 pollerThread.setDaemon(true);
 pollerThread.start();
 startAcceptorThread();
-```
 
-```java
+
 protected void startAcceptorThread() {
     acceptor = new Acceptor<>(this); 
     String threadName = getName() + "-Acceptor";
@@ -485,7 +484,6 @@ if (getLoader() == null) {
 
 classLoader最终是用来loadClass的，这个方法在WebAppClassLoaderBase.loadClass方法中。使用了一个
 > clazz = Class.forName(name, false, parent); // class.forName还有一个三个参数的方法。。。。
-
 
 
 
