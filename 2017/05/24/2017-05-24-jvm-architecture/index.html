@@ -19,7 +19,7 @@
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/high_way_scene.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/starry_sky.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/WolfeCreekCrater_ZH-CN10953577427_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-09-08T12:13:00.625Z">
+<meta property="og:updated_time" content="2019-09-12T10:36:01.164Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="jmm(java memory model)概述">
 <meta name="twitter:description" content="关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下">
@@ -210,19 +210,30 @@ java MyApp
 <p><strong> 实际上后一句话就创建了一个jvm instance.</strong></p>
 <h2 id="2-从class-loader进入Execution-Engine-再到Host-Operating-System"><a href="#2-从class-loader进入Execution-Engine-再到Host-Operating-System" class="headerlink" title="2. 从class loader进入Execution Engine 再到Host Operating System"></a>2. 从class loader进入Execution Engine 再到Host Operating System</h2><p>java MyApp会调用class loader，后者不仅要负责加载MyApp.class文件，还需要加载java API中的class文件（String,Object,Collection….）。加载的class文件（byte code）被传递给Execution Engine,后者则负责执行byte code（其实也是调用宿主操作系统的方法执行操作）</p>
 <h2 id="3-where-did-class-loader-load-class-into"><a href="#3-where-did-class-loader-load-class-into" class="headerlink" title="3. where did class loader load class into ?"></a>3. where did class loader load class into ?</h2><p>classloader将class 文件加载进内存中的一部分（Runtime data areas）。到此，jvm architecture的三个主要组件：class loader subsystem,Runtime data areas 以及execution Enigne的主要功能都说清楚了。<br>所以，这篇文章主要就按照class loader subsystem -&gt; Runtime data areas -&gt; Execution Engine的顺序来讲。</p>
-<h2 id="4-从classloader开始执行（class-loading-subsystem）"><a href="#4-从classloader开始执行（class-loading-subsystem）" class="headerlink" title="4.从classloader开始执行（class loading subsystem）"></a>4.从classloader开始执行（class loading subsystem）</h2><pre><code>- load 将byte code 加载进内存，来源可以是.java文件，可以是.jar文件，甚至可以是network Socket（这要看具体class loader的implementation）。load阶段包含三种不同的class loader，这也是面试时的重点。
-
-&gt; 1. Bootstrap class loader (jre文件夹中有一个rt.jar文件，里面装的就是java的internal class) //
-
-&gt; 2. extension class loader (jre/lib/ext) //负责加载这个文件夹中的class文件
-
-&gt; 3. Application class loader (CLASSPATH, -cp)//加载CLASSPATH变量中描述的位置
-
-- load完成后是link
-verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的static variable分配内存，variable被赋默认值) -&gt; Resolve(when all the symbolic reference inside currentclass are resolved，例如引用了其他的class，例如引用了常量池里面的东西，classDefNotFoundException也是在这个时候抛出的)
-
-注意，以上步骤都是java specification所规定的，但不同的jvm实现可能有微小的差异
-</code></pre><p>class loading subsystem的最后一步是initialize<br>class vars to initiazed Value in code(比如静态代码块就是在这时执行的)</p>
+<h2 id="4-从classloader开始执行（class-loading-subsystem）"><a href="#4-从classloader开始执行（class-loading-subsystem）" class="headerlink" title="4.从classloader开始执行（class loading subsystem）"></a>4.从classloader开始执行（class loading subsystem）</h2><ul>
+<li>load 将byte code 加载进内存，来源可以是.java文件，可以是.jar文件，甚至可以是network Socket（这要看具体class loader的implementation）。load阶段包含三种不同的class loader，这也是面试时的重点。</li>
+</ul>
+<blockquote>
+<ol>
+<li>Bootstrap class loader (jre文件夹中有一个rt.jar文件，里面装的就是java的internal class) //</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="2">
+<li>extension class loader (jre/lib/ext) //负责加载这个文件夹中的class文件</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="3">
+<li>Application class loader (CLASSPATH, -cp)//加载CLASSPATH变量中描述的位置</li>
+</ol>
+</blockquote>
+<ul>
+<li>load完成后是link<br>verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的static variable分配内存，variable被赋默认值) -&gt; Resolve(when all the symbolic reference inside currentclass are resolved，例如引用了其他的class，例如引用了常量池里面的东西，classDefNotFoundException也是在这个时候抛出的)</li>
+</ul>
+<p>注意，以上步骤都是java specification所规定的，但不同的jvm实现可能有微小的差异</p>
+<p>class loading subsystem的最后一步是initialize<br>class vars to initiazed Value in code(比如静态代码块就是在这时执行的)</p>
+<p><a href="https://stackoverflow.com/questions/26246875/is-linking-in-java-runtime-always-done-dynamically">The Java Virtual Machine dynamically loads, links and initializes classes and interfaces. </a><br>以servcieLoader为例，完全可以面向接口编译，并且编译成功。只要在运行时将implementation丢到classpath就ok，所以是运行时连接的。</p>
 <h2 id="5-Runtime-data-area五个部分的划分"><a href="#5-Runtime-data-area五个部分的划分" class="headerlink" title="5. Runtime data area五个部分的划分"></a>5. Runtime data area五个部分的划分</h2><p>Runtime data area 即java virtural machine的内存，可以划分成五部分<br>    //per jvm ,shared by all threads</p>
 <pre><code>- Method Area
 - Heap
@@ -613,6 +624,10 @@ verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的s
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
@@ -633,7 +648,7 @@ verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的s
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -646,10 +661,6 @@ verify(检查是否是符合jvm标准的byte code) -&gt; prepare(为class中的s
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">opengl</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">

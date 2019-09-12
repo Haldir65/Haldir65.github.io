@@ -17,7 +17,7 @@
 <meta property="og:description" content="iptables是控制linux 内核netfilter的command line frontend tool，只存在于linux平台，是system admin常用的防火墙。(虽然已经被nftables取代了，学习点网络知识还是很有必要)">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/lidongjieya_ZH-CN9263684179_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-09-08T12:13:00.637Z">
+<meta property="og:updated_time" content="2019-09-12T10:36:01.176Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iptables速查手册">
 <meta name="twitter:description" content="iptables是控制linux 内核netfilter的command line frontend tool，只存在于linux平台，是system admin常用的防火墙。(虽然已经被nftables取代了，学习点网络知识还是很有必要)">
@@ -215,6 +215,9 @@ ga('send', 'pageview');
 </ul>
 <p>每一条Chain上都有一个rules的列表(用A去append,用I去Insert)</p>
 <h2 id="table（table是一系列针对packet的同一类决策的集合）"><a href="#table（table是一系列针对packet的同一类决策的集合）" class="headerlink" title="table（table是一系列针对packet的同一类决策的集合）"></a>table（table是一系列针对packet的同一类决策的集合）</h2><p>Mangle is to change packets (Type Of Service, Time To Live etc) on traversal.<br>Nat is to put in NAT rules.<br>Raw is to be used for marking and connection tracking.<br>Filter is for filtering packets.</p>
+<p> 一般来讲table是kernel的事情，外部无需关心。一般都是创建一个新的chain,然后在input或者output这种现有的chain后面append上去，比如这样：</p>
+<p>iptables -N Services<br>iptables -A INPUT -j Services<br>iptables -A Services -m tcp -p tcp –dport 80 -j ACCEPT</p>
+<p>意思就是说，默认的input chain走完了发现还没有匹配上，就全部丢给新创建的chain。</p>
 <pre><code>#~ iptables -L INPUT -n -v --line-numbers
 
 Chain INPUT (policy DROP)
@@ -269,7 +272,14 @@ LOG --log-prefix &quot;IP_SPOOF A: &quot; //加日志,这个LOG关键词和DROP,
 <blockquote>
 <p>iptables -D INPUT -s xxx.xxx.xxx.xxx -j DROP</p>
 </blockquote>
-<p>比方说我不小心把202.54.1.1拉黑了，怎么挽回</p>
+<p>比方说我不小心把202.54.1.1拉黑了，怎么挽回<br>简单来说</p>
+<blockquote>
+<p>iptables -A …</p>
+</blockquote>
+<p>都可以用这一句撤销掉</p>
+<blockquote>
+<p>iptables -D …</p>
+</blockquote>
 <pre><code>iptables -L OUTPUT -n --line-numbers | grep 202.54.1.1 //发现在条规则第四行
 iptabels -D INPUT 4 //把这个第四行的规则删掉
 iptables -D INPUT -s 202.54.1.1 -j DROP //这个也是一样的
@@ -555,7 +565,7 @@ iptables -t mangle -A PREROUTING -p udp -j TPROXY --tproxy-mark 0x2333/0x2333 --
 <blockquote>
 <p>iptables overwrites the original destination address but it remembers the old one. The application code can then fetch it by asking for a special socket option, SO_ORIGINAL_DST<br><a href="https://github.com/darkk/redsocks">著名tcp代理redsocks就是用SO_ORIGINAL_DST的</a></p>
 </blockquote>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.cyberciti.biz/tips/linux-iptables-examples.html">linux-iptables-examples</a><br><a href="https://blog.dreamtobe.cn/r7800-openwrt-v2ray/">网件R7800 OpenWrt使用V2Ray+mKcp+透明代理完美翻墙</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.cyberciti.biz/tips/linux-iptables-examples.html">linux-iptables-examples</a><br><a href="https://blog.dreamtobe.cn/r7800-openwrt-v2ray/">网件R7800 OpenWrt使用V2Ray+mKcp+透明代理完美翻墙</a><br><a href="https://www.digitalocean.com/community/tutorials/how-to-list-and-delete-iptables-firewall-rules">list and delete iptables rules</a><br><a href="https://blog.sleeplessbeastie.eu/2018/06/21/how-to-create-iptables-firewall-using-custom-chains/">如何创建并管理自定义的iptables的chain</a></p>
 
       
 
@@ -906,6 +916,10 @@ iptables -t mangle -A PREROUTING -p udp -j TPROXY --tproxy-mark 0x2333/0x2333 --
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
@@ -926,7 +940,7 @@ iptables -t mangle -A PREROUTING -p udp -j TPROXY --tproxy-mark 0x2333/0x2333 --
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -939,10 +953,6 @@ iptables -t mangle -A PREROUTING -p udp -j TPROXY --tproxy-mark 0x2333/0x2333 --
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">opengl</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">

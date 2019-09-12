@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/6da83b3b20094b044a320d1e89dfcd00.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/okHttp_chain.jpg">
-<meta property="og:updated_time" content="2019-09-08T12:13:00.629Z">
+<meta property="og:updated_time" content="2019-09-12T10:36:01.168Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="OkHttp和Okio阅读笔记">
 <meta name="twitter:description" content="很早的时候就知道，OkHttp在io层面上的操作是由Okio代为完成的，所以实际意义上和Socket打交道的应该是Okio。而Okio又比传统的java io要高效。所以，在分析OkHttp之前，有必要针对Okio的一些方法进行展开，作为后面读写操作的铺垫。 Okio -&amp;gt; OkHttp -&amp;gt; Picaso  -&amp;gt; RetrofitOkio版本 1.13.0OkHttp版本 3.">
@@ -333,8 +333,88 @@ public BufferedInputStream(InputStream in, int size) {
 <p>BufferedInputStream要求外部调用者带着一个固定大小的byte数组来取数据，难免会有人传进来一个特别小的数组，这样永远不可能读取超过这个数组大小长度的某一行。</p>
 <p>读写这种事情操作起来总是从一个近似无限大的数据源  一点一点地取出来 存在一个内存中一个临时的地方， 然后再讲这部分数据交给其他接收方。 这就要求所有的读写都要准备进行多次读写，每次读到一个中转站中。在java io中这个中转站的大小是固定的，okio中这个中转站是一个个的Segment连接起来的。<br>java io中各种decorater流之间的包装带来了System.arrayCopy</p>
 <pre><code class="java">new DataInputStream(new BufferedInputStream(new FileInputStream(&quot;&quot;)));
+`
 </code></pre>
-<p>比如这样的代码，DataInputStream的read方法实际上传了一个byte[]，调用了BufferedInputStream的read方法，后者再将数据从自身arrayCopy到byte[]中。在Okio中，不存在这样的copy,<br>Buffer的定义是”A collection of bytes in memory.”，与数组不同，Buffer之间传递数据的方式是挪指针。</p>
+<blockquote>
+<p>上面DataInputStream通常用于方便的读取基本数据类型，比如readChar,readLong，readByte等等.<br>例如 dataInputstream.readByte -&gt;  BufferedInputStream.read -&gt;  FileInputStream.read</p>
+</blockquote>
+<blockquote>
+<p>在BufferedInputStream中有一层byte[] buf. BufferedInputStream的read有两种，一是一次读一个byte，一种是外部传一个byte，指定offset和len。第一种要经历fill方法，第二种则是先填满自己的buf，然后System.arraycopy到外部传入的dst数组中。当然如果外界要求的len超出buff.length，那么直接跳过buf这一层。</p>
+</blockquote>
+<p>调用fill方法的前提是发现pos &gt;= count ，也就是是说提前预读取的数据不够了，fill方法主要是从0开始重新从底层读取数据，期望从底层读取buf.length - pos 个数据</p>
+<pre><code class="java">pos = 0;            /* no mark: throw away the buffer */
+count = pos;
+int n = getInIfOpen().read(buffer, pos, buffer.length - pos);
+if (n &gt; 0)
+    count = n + pos; //所以理想情况下，每次fill方法的调用都会往buf里面塞8192个byte， count = 8192 , pos = 0.下一个read从0开始，同时已经预读取了一部分数据，从pos到count的数据都是下一次read可以直接读的。这里面并不涉及arrayCopy.
+</code></pre>
+<p>xxxOutputSream中常常看到这样一句话<br>/<em> If the request length exceeds the size of the output buffer,<br>                flush the buffer and then write the data directly.  In this<br>                way buffered streams will cascade harmlessly. </em>/<br>回顾BufferedInputStream和BufferedOutputSream存在的主要意义是预防那种数据很少的读写，如果是一次性的大批量读取，则直接跳过buff一层。</p>
+<p>在<a href="https://jakewharton.com/forcing-bytes-downward-in-okio/">jake wharton的forcing-bytes-downward-in-okio</a> 中有这么一段话</p>
+<blockquote>
+<p>With java.io.* streams, however, multiple levels of buffering require each level to allocate and manage its own byte[]. This means that a flush operation will result in each level doing an arraycopy() of its data down to the next level (which also might have required buffer expansion).</p>
+</blockquote>
+<p>查了下BufferdOutputStream.flush</p>
+<pre><code class="java">// 1. 
+public synchronized void flush() throws IOException {
+    flushBuffer();
+    out.flush();
+}
+
+// 2
+private void flushBuffer() throws IOException {
+    if (count &gt; 0) {
+        out.write(buf, 0, count);
+        count = 0;
+    }
+}
+
+// 3.1 BuuferdOutputStream的write方法
+public synchronized void write(byte b[], int off, int len) throws IOException {
+    if (len &gt;= buf.length) {
+        /* If the request length exceeds the size of the output buffer,
+            flush the output buffer and then write the data directly.
+            In this way buffered streams will cascade harmlessly. 
+            超过大小直接跳过缓存            
+            */
+        flushBuffer();
+        out.write(b, off, len);
+        return;
+    }
+    if (len &gt; buf.length - count) {
+        flushBuffer();
+    }
+    System.arraycopy(b, off, buf, count, len); //这里一定会走到arrayCopy
+    //假设
+    count += len;
+}
+
+// 3.2 ByteArrayOutputStream的write方法
+public synchronized void write(byte b[], int off, int len) {
+    if ((off &lt; 0) || (off &gt; b.length) || (len &lt; 0) ||
+        ((off + len) - b.length &gt; 0)) {
+        throw new IndexOutOfBoundsException();
+    }
+    ensureCapacity(count + len);
+    System.arraycopy(b, off, buf, count, len);
+    count += len;
+}
+
+// 3.3 BufferedWriter（虽然已经不算stream了）
+public void write(char cbuf[], int off, int len) throws IOException {
+    synchronized (lock) {
+        while (b &lt; t) {
+            int d = min(nChars - nextChar, t - b);
+            System.arraycopy(cbuf, b, cb, nextChar, d);
+            b += d;
+            nextChar += d;
+            if (nextChar &gt;= nChars)
+                flushBuffer();
+        }
+    }
+}
+</code></pre>
+<p>都是arrayCopy，可以想象，一层层的flush调用传递下来，每一层的buffer都会被通过arrayCopy的方式传递到下一层。比方说，包了3层BufferdOutputStream就要arrayCopy三次，极其费事。</p>
+<p>//在Okio中，不存在这样的copy,<br>//Buffer的定义是”A collection of bytes in memory.”，与数组不同，Buffer之间传递数据的方式是挪指针。</p>
 <p>BufferedSource在读取Socket数据时，一边从socket里面拿一个Segment大小的数据，然后调用readInt,readLong等方法返回int,long(同时从segment头部清空数据)。如果读到segment最后发现剩下的byte不能组成一个int，就会从segment pool中借一个segment，并从socket中读取数据塞满，把第一个segment剩下的一点byte和第二个segment的头部一点拼成一个int。以BufferSource的readInt为例:</p>
 <pre><code class="java">    public int readInt() {
         if(this.size &lt; 4L) {
@@ -1287,6 +1367,10 @@ Cookie: PSTM=122178321; BIDUPSID=CF3243290400VSDG52B3859AD4AEC2; BAIDUID=5176CC0
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
@@ -1307,7 +1391,7 @@ Cookie: PSTM=122178321; BIDUPSID=CF3243290400VSDG52B3859AD4AEC2; BAIDUID=5176CC0
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1320,10 +1404,6 @@ Cookie: PSTM=122178321; BIDUPSID=CF3243290400VSDG52B3859AD4AEC2; BAIDUID=5176CC0
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">opengl</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">
