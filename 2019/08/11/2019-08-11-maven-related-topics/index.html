@@ -16,7 +16,7 @@
 <meta property="og:description" content="maven的一些东西">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/FreshSalt_ZH-CN12818759319_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-09-12T10:36:01.180Z">
+<meta property="og:updated_time" content="2019-09-14T13:28:07.555Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="maven的一些东西">
 <meta name="twitter:description" content="maven的一些东西">
@@ -213,8 +213,7 @@ mvn -q clean compile exec:java  -Dexec.mainClass=&quot;com.websystique.maven.App
 <p><a href="https://maven.apache.org/guides/getting-started/index.html#How_do_I_make_my_first_Maven_project">maven getting started是很友好的教程</a></p>
 <p>看完这俩再不会就是蠢<br><a href="https://www.youtube.com/watch?v=pt3uB0sd5kY">jetbrain在youtube上的教程</a><br><a href="https://www.packtpub.com/mapt/book/application_development/9781785286124/2/ch02lvl1sec24/creating-a-new-maven-project-in-intellij-idea">Creating a new Maven project in IntelliJ IDEA</a></p>
 <p>create from archetype可以选择org.apache.maven.archetypes:maven-archetype-quickstart(真的只有一个hello world)<br><a href="https://start.spring.io/">如果是spring的话，直接用这个网站更加方便</a></p>
-<p>intelij idea里面默认的maven源有<br><code>https://repo.maven.apache.org/maven2</code><br>和<code>http://download.java.net/maven/1</code><br>这俩网站国内似乎被墙，最好<a href="https://stackoverflow.com/questions/1784132/intellij-community-cant-use-http-proxy-for-maven/26483623#26483623">加代理</a> 就是在.m2/settings.xml中指定本地proxy。如果你的代理够快的话，修改pom.xml的同时，应该能够很快的开始下载新的依赖</p>
-<h3 id="给maven加代理"><a href="#给maven加代理" class="headerlink" title="给maven加代理"></a>给maven加代理</h3><p>intelij内置了maven, 由于网速的原因，不想浪费时间的话还是给Maven加代理:<br>在~/.m2/settings.xml中找到这一段，这一段原本是被注释掉的，端口和host根据代理设置。~/.m2/settings.xml这个文件如果不存在，就去intelij的安装目录里面copy一个出来</p>
+<p>intelij idea里面默认的maven源有<br><code>https://repo.maven.apache.org/maven2</code><br>和<code>http://download.java.net/maven/1</code><br>这俩网站国内似乎被墙，最好<a href="https://stackoverflow.com/questions/1784132/intellij-community-cant-use-http-proxy-for-maven/26483623#26483623">加代理</a> 就是在.m2/settings.xml中指定本地proxy。如果你的代理够快的话，修改pom.xml的同时，应该能够很快的开始下载新的依赖<br>intelij内置了maven, 由于网速的原因，不想浪费时间的话还是给Maven加代理:<br>在~/.m2/settings.xml中找到这一段，这一段原本是被注释掉的，端口和host根据代理设置。~/.m2/settings.xml这个文件如果不存在，就去intelij的安装目录里面copy一个出来<br>比如这样：</p>
 <pre><code class="xml"> &lt;proxies&gt;
     &lt;proxy&gt;
       &lt;id&gt;optional&lt;/id&gt;
@@ -224,25 +223,34 @@ mvn -q clean compile exec:java  -Dexec.mainClass=&quot;com.websystique.maven.App
       &lt;port&gt;1080&lt;/port&gt;
       &lt;nonProxyHosts&gt;local.net|some.host.com&lt;/nonProxyHosts&gt;
     &lt;/proxy&gt;
-
   &lt;/proxies&gt;
 </code></pre>
-<p>实际操作中，使用阿里云的maven镜像似乎更快</p>
+<h3 id="或者直接用阿里云的源"><a href="#或者直接用阿里云的源" class="headerlink" title="或者直接用阿里云的源"></a>或者直接用阿里云的源</h3><p>实际操作中，使用阿里云的maven镜像似乎更快</p>
+<pre><code class="xml"> &lt;mirrors&gt;
+   &lt;mirror&gt;
+         &lt;id&gt;alimaven&lt;/id&gt;
+         &lt;name&gt;aliyun maven&lt;/name&gt;
+         &lt;url&gt;http://maven.aliyun.com/nexus/content/groups/public/&lt;/url&gt;
+         &lt;mirrorOf&gt;central&lt;/mirrorOf&gt;
+   &lt;/mirror&gt;
+
+ &lt;/mirrors&gt;
+</code></pre>
 <p>打开项目后，在Intellij 右侧有个Maven projects，点开后，有个Lifecycle，再点开，可以看到clean , validate, compile, ….，右击clean，选中Run ‘project[clean]’，这里的project是我们的项目实际的名字。<br>如果下载失败了的话，可以选择clean，然后就会开始自己重新下载</p>
 <p>GroupId类似于你的包名，ArtifictId类似于你的applicationName</p>
 <h2 id="maven是如何解决版本冲突的-同一个package，不同版本同时存在"><a href="#maven是如何解决版本冲突的-同一个package，不同版本同时存在" class="headerlink" title="maven是如何解决版本冲突的(同一个package，不同版本同时存在)"></a>maven是如何解决版本冲突的(同一个package，不同版本同时存在)</h2><p>tbd<br>gradle也有一套解决方案，ivy也有<br>java 9 的module系统没有</p>
 <p>maven 中使用jar包的多个版本容易造成依赖问题，解决问题的方式可以将使用jar包的版本排除掉，比如dubbo使用netty 4.0.33版本可以将dubbo排除掉netty依赖，这样其他jar包就不会引用到netty4.0.33版本了。</p>
 <pre><code class="xml">&lt;dependency&gt;
-            &lt;groupId&gt;com.jd&lt;/groupId&gt;
-            &lt;artifactId&gt;jsf&lt;/artifactId&gt;
-            &lt;version&gt;1.6.0&lt;/version&gt;
-            &lt;exclusions&gt;
-                &lt;exclusion&gt;
-                    &lt;groupId&gt;io.netty&lt;/groupId&gt;
-                    &lt;artifactId&gt;netty-all&lt;/artifactId&gt;
-                &lt;/exclusion&gt;
-            &lt;/exclusions&gt;
-        &lt;/dependency&gt;
+    &lt;groupId&gt;com.jd&lt;/groupId&gt;
+    &lt;artifactId&gt;jsf&lt;/artifactId&gt;
+    &lt;version&gt;1.6.0&lt;/version&gt;
+    &lt;exclusions&gt;
+        &lt;exclusion&gt;
+            &lt;groupId&gt;io.netty&lt;/groupId&gt;
+            &lt;artifactId&gt;netty-all&lt;/artifactId&gt;
+        &lt;/exclusion&gt;
+    &lt;/exclusions&gt;
+&lt;/dependency&gt;
 </code></pre>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2>
       

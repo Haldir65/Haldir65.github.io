@@ -17,7 +17,7 @@
 <meta property="og:description" content="涉及socket的一些class,java.net.xxx">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/may1_ZH-CN8582006115_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-09-12T10:36:01.180Z">
+<meta property="og:updated_time" content="2019-09-14T13:28:07.555Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="openjdk源码解析[二]">
 <meta name="twitter:description" content="涉及socket的一些class,java.net.xxx">
@@ -202,7 +202,165 @@ ga('send', 'pageview');
       
         <p>涉及socket的一些class,java.net.xxx<br><img src="https://www.haldir66.ga/static/imgs/may1_ZH-CN8582006115_1920x1080.jpg" alt=""></p>
 <a id="more"></a>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2>
+<p>java socket编程主要是tcp和udp编程，涉及到的class包括socket(tcp client)和ServerSocket(tcp server)以及DatagramSocket(udp)，主要的类都在java.net这个package下面。<br>常用的包括：处理http请求的HttpURLConnection，代表资源地址的URL(不是URI)，SocketInputStream和SocketOutputStream。</p>
+<h2 id="URL是对一份资源地址的表示"><a href="#URL是对一份资源地址的表示" class="headerlink" title="URL是对一份资源地址的表示"></a>URL是对一份资源地址的表示</h2><pre><code class="java">public class URLDemo {
+    public static void main(String[] args) {
+        try {
+            URL url = new URL(&quot;https://www.baidu.com/abced.html?language=zh_CN#ssss-libev&quot;);
+            System.out.println(url);
+            System.out.println(url.getProtocol()); // https
+            System.out.println(url.getHost()); // www.zfl9.com
+            System.out.println(url.getPort()); // -1
+            System.out.println(url.getDefaultPort()); // 443
+            System.out.println(url.getFile()); // /abced.html?language=zh_CN
+            System.out.println(url.getPath()); // /abced.html
+            System.out.println(url.getQuery()); // language=zh_CN
+            System.out.println(url.getRef()); // ssss-libev
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+<h2 id="tcp-socket"><a href="#tcp-socket" class="headerlink" title="tcp socket"></a>tcp socket</h2><p>Socket和ServerSocket，这俩一个代表tcp通信的客户端，一个代表服务端。从源码来看,ServerSocket和socket内部分别持有一个SocketImpl对象，用于将对应的方法代理给native方法。</p>
+<h3 id="ServerSocket"><a href="#ServerSocket" class="headerlink" title="ServerSocket"></a>ServerSocket</h3><p>主要的方法包括</p>
+<pre><code class="java">//几个构造函数
+public ServerSocket() throws IOException;
+public ServerSocket(int port) throws IOException;
+public ServerSocket(int port, int backlog, InetAddress bindAddr) throws IOException ;
+
+
+//绑定端口
+public void bind(SocketAddress endpoint) throws IOException
+public void bind(SocketAddress endpoint, int backlog) throws IOException
+
+
+//开始接受client的请求
+public Socket accept() throws IOException 
+
+//还有一些设置超时什么的
+public synchronized void setSoTimeout(int timeout) throws SocketException
+public void setReuseAddress(boolean on) throws SocketException 
+public synchronized void setReceiveBufferSize (int size) throws SocketException
+</code></pre>
+<p>分别来看：<br>构造函数中默认创建了一个SocksSocketImpl（这是一个SOCKS (V4 &amp; V5) TCP socket implementation，就是一个支持socks协议的socket实现）。<br>SocksSocketImpl继承自PlainSocketImpl继承自AbstractPlainSocketImpl。<br>注意这些父类中都有一段static 代码块，所以创建了子类的时候这些父类的代码块都会被执行：</p>
+<pre><code class="java">class PlainSocketImpl extends AbstractPlainSocketImpl
+{
+    static {
+        initProto();
+    }
+
+    static native void initProto();
+
+}
+
+abstract class AbstractPlainSocketImpl extends SocketImpl
+{
+    static {
+        java.security.AccessController.doPrivileged(
+            new java.security.PrivilegedAction&lt;Void&gt;() {
+                public Void run() {
+                    System.loadLibrary(&quot;net&quot;); 
+                    return null;
+                }
+            });
+    }
+}
+</code></pre>
+<p><a href="https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/solaris/native/java/net/PlainSocketImpl.c">initProto主要是为了cache filed id</a></p>
+<p>接下来是bind方法,serverSocket中的实现是</p>
+<pre><code class="java">getImpl().bind(epoint.getAddress(), epoint.getPort());
+getImpl().listen(backlog); //这个backlog默认是50
+</code></pre>
+<p>所以是同时做了两件事，bind和listen。分别调用到了:</p>
+<pre><code class="java">native void socketBind(InetAddress address, int port)
+    throws IOException;
+native void socketListen(int count) throws IOException;
+</code></pre>
+<p>对应的c语言实现是:<br><a href="https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/solaris/native/java/net/PlainSocketImpl.c#L618">socketListen</a></p>
+<pre><code class="c">JNIEXPORT void JNICALL
+Java_java_net_PlainSocketImpl_socketListen (JNIEnv *env, jobject this,
+                                            jint count)
+{
+    /* this FileDescriptor fd field */
+    jobject fdObj = (*env)-&gt;GetObjectField(env, this, psi_fdID);
+    /* fdObj&#39;s int fd field */
+    int fd;
+
+    if (IS_NULL(fdObj)) {
+        JNU_ThrowByName(env, JNU_JAVANETPKG &quot;SocketException&quot;,
+                        &quot;Socket closed&quot;);
+        return;
+    } else {
+        fd = (*env)-&gt;GetIntField(env, fdObj, IO_fd_fdID);
+    }
+
+    /*
+     * Workaround for bugid 4101691 in Solaris 2.6. See 4106600.
+     * If listen backlog is Integer.MAX_VALUE then subtract 1.
+     */
+    if (count == 0x7fffffff)
+        count -= 1;
+
+    if (JVM_Listen(fd, count) == JVM_IO_ERR) {
+        NET_ThrowByNameWithLastError(env, JNU_JAVANETPKG &quot;SocketException&quot;,
+                       &quot;Listen failed&quot;);
+    }
+}
+</code></pre>
+<p>所以是调用了JVM_Listen这个方法,再往下就是cpp了，在/hotspot/src/share/vm/prims/jvm.cpp这个文件中，调用的是os:listen函数，这里应该是虚拟机的实现了。<br>不出意外的，JVM_Bind这个方法也出现在jvm.cpp这个方法中。</p>
+<blockquote>
+<p>在hostspot中，os是一个封装特定操作系统行为的静态类，其实现多在hotspot/src/os中。</p>
+</blockquote>
+<p>以linux为例，实现在<a href="https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/hotspot/src/os/linux/vm/os_linux.inline.hpp">os_linux.inline.hpp</a></p>
+<pre><code class="c++">inline int os::bind(int fd, struct sockaddr* him, socklen_t len) {
+  return ::bind(fd, him, len);
+}
+</code></pre>
+<p>应该是调用了<a href="https://linux.die.net/man/2/bind">bind</a>这个linux函数。</p>
+<h3 id="udp-socket"><a href="#udp-socket" class="headerlink" title="udp socket"></a>udp socket</h3><p>tbd, 实在太多了</p>
+<h3 id="socketXXXStream"><a href="#socketXXXStream" class="headerlink" title="socketXXXStream"></a>socketXXXStream</h3><p>大部分的native方法都在plainSocketImpl.java中</p>
+<pre><code class="java">native void socketCreate(boolean isServer) throws IOException;
+
+native void socketConnect(InetAddress address, int port, int timeout)
+    throws IOException;
+
+native void socketBind(InetAddress address, int port)
+    throws IOException;
+
+native void socketListen(int count) throws IOException;
+
+native void socketAccept(SocketImpl s) throws IOException;
+
+native int socketAvailable() throws IOException; 
+
+native void socketClose0(boolean useDeferredClose) throws IOException;
+
+native void socketShutdown(int howto) throws IOException;
+
+static native void initProto();
+
+native void socketSetOption0(int cmd, boolean on, Object value)
+    throws SocketException;
+
+native int socketGetOption(int opt, Object iaContainerObj) throws SocketException;
+
+native void socketSendUrgentData(int data) throws IOException;
+</code></pre>
+<p>上面的方法基本上看名字就能跟对应的java方法对上号，这里说一个socketAvailable,这个应该是对应socketInputStream的available(这个方法是inputStream要求的)。<br>那么它的对应的c++方法是JVM_SocketAvailable</p>
+<pre><code class="c++">int os::socket_available(int fd, jint *pbytes) {
+  // Linux doc says EINTR not returned, unlike Solaris
+  int ret = ::ioctl(fd, FIONREAD, pbytes);
+
+  //%% note ioctl can return 0 when successful, JVM_SocketAvailable
+  // is expected to return 0 on failure and 1 on success to the jdk.
+  return (ret &lt; 0) ? 0 : 1;
+}
+</code></pre>
+<p>所以这个方法返回的要么是0要么是1？</p>
+<h3 id="tbd"><a href="#tbd" class="headerlink" title="tbd"></a>tbd</h3><p>这么写下去，虚拟机的东西太多了。。。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.zfl9.com/java-socket.html">java socket编程</a></p>
+
       
 
       
@@ -306,11 +464,11 @@ ga('send', 'pageview');
   
 <nav id="article-nav">
   
-    <a href="/2046/12/18/2017-12-18-random-new-thoughts/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2019/09/14/2019-09-14-collections-Refuled-01/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          即刻备忘录
+          jdk集合类源码分析[List]
         
       </div>
     </a>
