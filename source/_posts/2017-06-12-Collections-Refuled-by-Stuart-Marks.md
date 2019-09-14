@@ -773,11 +773,10 @@ System.out.println(Integer.toBinaryString(dd2));
 System.out.println(dd1>Integer.MAX_VALUE); // false
 System.out.println(dd2>dd1); // true
 ```
-所以在Int(32个槽子，最多40多亿可能，0-20多亿是正数，30亿，40亿是负数)，long也是类似。
+所以在Int(32个槽子，最多40多亿的样子，0-20多亿是正数，30亿，40亿是负数)，long也是类似。
 回到0x7FFFFFFF 这个数，& 操作的作用就是把哪些超过20亿的（负数），抹掉第一位的0，也就成了正数。对于不超过那个20多亿的数，原样返还。
 
 一个有趣的现象是hashTable的rehash会把每个Entry上的元素顺序颠倒过来，例如(a->b->c->d)变成(d->c->b->a)。不过这个属于vm实现的细节。
-
 
 
 
@@ -844,16 +843,15 @@ putIfAbsent是Atomic的[Is putIfAbsent an atomic operation](http://forums.terrac
 
 ## 8.结束语
 8.1 [Doug Lea](https://en.wikipedia.org/wiki/Doug_Lea) 是非常聪明的人，并发经常会牵涉到集合，所以jdk里面很多集合都有他的作品
-8.2 jdk只是定义了这些框架，像List，Map这些全都是接口，完全可以自己去实现。Apache就有一大堆适合特定场景的集合实现类。jdk只是帮助我们实现了一些常见的类。如果有现成的满足需求的框架，不要重复造轮子。
-8.3 平时只要记住ArrayList和HashMap的**大致内部实现**就可以了，至于别的，除非面试，平时没必要记录。
-8.4 [Stuart Mark](https://blogs.oracle.com/java/collections-refueled)特别喜欢把一个class搞成**@deprecated**
-8.5 就连[Joshua Bloch](https://www.youtube.com/watch?v=V1vQf4qyMXg) 都承认，除非性能真的很重要的，平时没必要过度优化。By the way , he said Doug Lea is very smart .
+8.2 jdk定义了map,List这样的接口，同时提供了搞高效实现，保持了可扩展性。
+8.3 ArrayList和HashMap是使用频率最高的集合，具体内部实现非常重要。
 8.6 [Stack这种东西有点过时了](https://stackoverflow.com/questions/1386275/why-is-java-vector-class-considered-obsolete-or-deprecated) 一个原因是Stack extends Vector（每个方法都加synchronized，多数场景下不需要，另外Vector是1.1还是1.0就有了）
 
 
 ### update
 jdk 1.8对于长度超过8的链表改用红黑树。
-
+jdk 1.8的一个优化点是ArrayList和HashMap改成lazy initialized的了，就是底层的array只有在第一次put的时候才去allocate
+IdentityHashMap采用的是probing策略，内存消耗小(没有Entry包装，直接存的key数组和value数组)，速度快，适用于identity based key comparison的情况
 
 ### 参考
 1. [Collections Refuled by Stuart Marks](https://www.youtube.com/watch?v=q6zF3vf114M)

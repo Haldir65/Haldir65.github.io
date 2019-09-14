@@ -59,6 +59,23 @@ IO多路复用，I/O复用(I/O multiplexing). IO多路复用是nio的核心和�
 
 IOCP基于非阻塞异步模型，而epoll基于非阻塞同步模型。
 
+[参考](https://javadoop.com/post/nio-and-aio)
+```
+NIO 中 Selector 是对底层操作系统实现的一个抽象，管理通道状态其实都是底层系统实现的，这里简单介绍下在不同系统下的实现。
+
+select：上世纪 80 年代就实现了，它支持注册 FD_SETSIZE(1024) 个 socket，在那个年代肯定是够用的，不过现在嘛，肯定是不行了。
+
+poll：1997 年，出现了 poll 作为 select 的替代者，最大的区别就是，poll 不再限制 socket 数量。
+
+select 和 poll 都有一个共同的问题，那就是它们都只会告诉你有几个通道准备好了，但是不会告诉你具体是哪几个通道。所以，一旦知道有通道准备好以后，自己还是需要进行一次扫描，显然这个不太好，通道少的时候还行，一旦通道的数量是几十万个以上的时候，扫描一次的时间都很可观了，时间复杂度 O(n)。所以，后来才催生了以下实现。
+
+epoll：2002 年随 Linux 内核 2.5.44 发布，epoll 能直接返回具体的准备好的通道，时间复杂度 O(1)。
+
+除了 Linux 中的 epoll，2000 年 FreeBSD 出现了 Kqueue，还有就是，Solaris 中有 /dev/poll。
+
+前面说了那么多实现，但是没有出现 Windows，Windows 平台的非阻塞 IO 使用 select，我们也不必觉得 Windows 很落后，在 Windows 中 IOCP 提供的异步 IO 是比较强大的。
+```
+
 [IO模型详解](http://cmsblogs.com/?p=4812) blocking io, nonblocking io, io multiplexing, asynchronous io,etc
 
 

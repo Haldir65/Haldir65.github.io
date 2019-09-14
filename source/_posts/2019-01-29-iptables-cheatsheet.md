@@ -249,9 +249,9 @@ $ iptables -A INPUT -s 192.168.10.0/24 -j LOG --log-prefix '** SUSPECT **'
 在Ubuntu和Debian
 iptables的日志由内核生成的。因此，检查以下内核日志文件。
 查看iptables的日志
-$ tailf /var/log/kern.log
+$ tail /var/log/kern.log
 
-### 只开7000-7010端口,只允许某个网段的ip发请求
+### 只开7000-7010端口,只允许某个网段的ip发请求以及其他
 ```
 iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 7000:7010 -j ACCEPT
 
@@ -467,7 +467,7 @@ $ sudo iptables -I INPUT 1 -i lo -j ACCEPT // -I的意思是插入，就是插�
 
 
 ### 透明代理的实现
-[ss-liibev的openwrt移植就是这么干的](https://github.com/shadowsocks/luci-app-shadowsocks)
+[ss-libev的openwrt移植就是这么干的](https://github.com/shadowsocks/luci-app-shadowsocks)
 在ss-rules(其实就是一个shell脚本)中
 ```bash
 ipset -! restore create ss_spec_src_fw hash:ip hashsize 64

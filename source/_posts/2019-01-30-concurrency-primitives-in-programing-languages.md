@@ -267,7 +267,7 @@ public boolean Thread.isInterrupted();
 public static boolean Thread.interrupted();
 ```
 
-这个要背下来javadoc的描述，因为不同操作系统上的实现细节可能有差异:
+这个要背下来,javadoc的描述，因为不同操作系统上的实现细节可能有差异:
 >  /**
      * Interrupts this thread.
      *

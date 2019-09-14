@@ -83,7 +83,7 @@ if (pa && (base % ps != 0)) {
 
 ## 3. java进程的内存占用情况
 
-### 3.1 操作系统和runtime占用的内存
+### 3.1 操作系统和Runtime占用的内存
 操作系统的内存中，一部分被操作系统和kernel所占用。对于用c或者c++写的jvm，还需要分配一部分给c runtime。操作系统和c
 runtime占用的内存比较大，不同的操作系统上不一样，windows上默认是2GB。剩下的内存(即user space)，就是进程可以使用的内存。
 

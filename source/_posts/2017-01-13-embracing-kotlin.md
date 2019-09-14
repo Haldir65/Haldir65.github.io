@@ -509,6 +509,11 @@ fun test2(){
 ```
 test1使用的是java 8的BiConsumer，在低版本(api 24以下)会崩，第二种使用的是常规的Iterator方法
 
+
+
+- [jconf taiwan上有一个关于kotlin实现细节的演讲](https://www.youtube.com/watch?v=jQFyQSTbZ_Q) 
+
+
 ### 参考
 
 1. [Kotlin in production](https://www.youtube.com/watch?v=mDpnc45WwlI&index=10&list=PLnVy79PaFHMXJha06t6pWfkYcATV4oPvC)
