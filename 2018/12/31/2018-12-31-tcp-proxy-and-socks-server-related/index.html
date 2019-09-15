@@ -17,7 +17,7 @@
 <meta property="og:description" content="python实现简易的tcp-proxy server及socks代理学习笔记">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/MountainDayJapan_EN-AU8690491173_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-09-14T13:28:07.555Z">
+<meta property="og:updated_time" content="2019-09-15T08:26:35.183Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="tcp-proxy简单实现及socks协议相关">
 <meta name="twitter:description" content="python实现简易的tcp-proxy server及socks代理学习笔记">
@@ -332,7 +332,38 @@ while True:
                 service_connection(key, mask) ## key.fileobj是socket, key,data是register的时候自定义的数据
 </code></pre>
 <p><a href="https://blessing.studio/why-do-shadowsocks-deprecate-ota/">ss的tcp包结构</a><br>主动探测方法<br><a href="https://loggerhead.me/posts/shadowsocks-yuan-ma-fen-xi-xie-yi-yu-jie-gou.html">协议与结构</a></p>
-<h2 id="tbd-java里面有一个proxy类，事实上jdk本身对于sock代理是支持的"><a href="#tbd-java里面有一个proxy类，事实上jdk本身对于sock代理是支持的" class="headerlink" title="tbd java里面有一个proxy类，事实上jdk本身对于sock代理是支持的"></a>tbd java里面有一个proxy类，事实上jdk本身对于sock代理是支持的</h2><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://ichuan.net/post/22/tcp-proxy-and-tcp-hub-in-python/">python小工具：tcp proxy和tcp hub</a><br><a href="https://rushter.com/blog/python-socks-server/">Writing a simple SOCKS server in Python</a><br><a href="https://geesun.github.io/posts/2015/09/socks5_protocol.html">SOCKS 5协议简析</a><br><a href="https://github.com/TongxiJi/shadowsocks-java">shadowsocks-netty</a></p>
+<h2 id="java里面有一个proxy类，事实上jdk本身对于sock代理是支持的"><a href="#java里面有一个proxy类，事实上jdk本身对于sock代理是支持的" class="headerlink" title="java里面有一个proxy类，事实上jdk本身对于sock代理是支持的"></a>java里面有一个proxy类，事实上jdk本身对于sock代理是支持的</h2><p>只不过java自带的proxy类会全局代理，鉴权是对整个jvm生效的。</p>
+<pre><code class="java"> Authenticator.setDefault(new Authenticator(){
+  protected  PasswordAuthentication  getPasswordAuthentication(){
+   PasswordAuthentication p=new PasswordAuthentication(&quot;xxx&quot;, &quot;xxx&quot;.toCharArray());
+   return p;
+  }
+ });
+Proxy proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(&quot;xxx.xx.xxx.xxx&quot;, xxx));
+
+Socket sock = new Socket(proxy);
+
+sock.connect(new InetSocketAddress(server,xx));
+</code></pre>
+<p>The side effect of the SOCKS support in JDK is that your whole JVM will go through the same SOCKS proxy.<br>The Authenticator affects all authentication in your JVM (HTTP auth, Proxy Auth).</p>
+<p>所以等于说接管了整个jvm的请求<br>okHttp有一个比较友好的方式</p>
+<pre><code class="java">Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(&quot;127.0.0.1&quot;, 1086));
+Authenticator proxyAuthenticator = new Authenticator() {
+            @Override
+            public Request authenticate(Route route, Response response) throws IOException {
+                String credential = Credentials.basic(username, password);
+                return response.request().newBuilder()
+                        .header(&quot;Proxy-Authorization&quot;, credential)
+                        .build();
+            }
+        };    
+OkHttpClient client = new OkHttpClient().newBuilder().
+                connectTimeout(120, TimeUnit.SECONDS).readTimeout(120, TimeUnit.SECONDS).proxy(proxy)
+                .proxyAuthenticator(proxyAuthenticator)
+                .build()        
+</code></pre>
+<p>感觉上像是通过将账户密码放到header里面去做的</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://ichuan.net/post/22/tcp-proxy-and-tcp-hub-in-python/">python小工具：tcp proxy和tcp hub</a><br><a href="https://rushter.com/blog/python-socks-server/">Writing a simple SOCKS server in Python</a><br><a href="https://geesun.github.io/posts/2015/09/socks5_protocol.html">SOCKS 5协议简析</a><br><a href="https://github.com/TongxiJi/shadowsocks-java">shadowsocks-netty</a></p>
 
       
 
