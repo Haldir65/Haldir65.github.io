@@ -91,3 +91,5 @@ epoll：2002 年随 Linux 内核 2.5.44 发布，epoll 能直接返回具体的�
 
 [linux kernel aio是另一个内核提供的异步框架，但是不如epoll成熟](https://www.zhihu.com/question/26943558)
 [如何使用 epoll? 一个 C 语言实例](https://www.oschina.net/translate/how-to-use-epoll-a-complete-example-in-c)
+
+[用c语言实现select的client-server模型](https://gist.github.com/Alexey-N-Chernyshov/4634731)

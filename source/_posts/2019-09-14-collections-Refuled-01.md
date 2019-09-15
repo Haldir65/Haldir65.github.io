@@ -1,5 +1,5 @@
 ---
-title: jdk集合类源码分析[List]
+title: jdk集合类源码分析[list]
 date: 2019-09-14 15:44:09
 tags: [java]
 ---

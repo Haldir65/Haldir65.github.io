@@ -426,6 +426,24 @@ java.util.concurrent.atomic下包括AtomicBoolean、AtomicInteger...还有Atomic
 java 无锁状态、偏向锁、轻量级锁和重量级锁
 
 ## 17. CompletableFuture等java 8 的api
+CompletableFuture的一个好处是可以将事件处理串起来，写起来跟rxjava那一套有点像。
+thenApply()和thenCompose（）的区别：
+thenApply（）转换的是泛型中的类型，是同一个CompletableFuture；
+thenCompose（）用来连接两个CompletableFuture，是生成一个新的CompletableFuture。
+协调多个事件同步
+```java
+CompletableFuture<String> future1  
+  = CompletableFuture.supplyAsync(() -> "Hello");
+CompletableFuture<String> future2  
+  = CompletableFuture.supplyAsync(() -> "Beautiful");
+CompletableFuture<String> future3  
+  = CompletableFuture.supplyAsync(() -> "World");
+ 
+CompletableFuture<Void> combinedFuture 
+  = CompletableFuture.allOf(future1, future2, future3);
+
+combinedFuture.get();  
+```
 [AtomicLongFieldUpdater](http://normanmaurer.me/blog/2013/10/28/Lesser-known-concurrent-classes-Part-1/)比AtomicLong更加省内存的方式
 
 

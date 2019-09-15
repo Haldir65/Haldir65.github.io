@@ -201,7 +201,47 @@ try:
 [协议与结构](https://loggerhead.me/posts/shadowsocks-yuan-ma-fen-xi-xie-yi-yu-jie-gou.html)
 
 
-## tbd java里面有一个proxy类，事实上jdk本身对于sock代理是支持的
+## java里面有一个proxy类，事实上jdk本身对于sock代理是支持的
+只不过java自带的proxy类会全局代理，鉴权是对整个jvm生效的。
+```java
+ Authenticator.setDefault(new Authenticator(){
+  protected  PasswordAuthentication  getPasswordAuthentication(){
+   PasswordAuthentication p=new PasswordAuthentication("xxx", "xxx".toCharArray());
+   return p;
+  }
+ });
+Proxy proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress("xxx.xx.xxx.xxx", xxx));
+
+Socket sock = new Socket(proxy);
+
+sock.connect(new InetSocketAddress(server,xx));
+```
+
+The side effect of the SOCKS support in JDK is that your whole JVM will go through the same SOCKS proxy.
+The Authenticator affects all authentication in your JVM (HTTP auth, Proxy Auth).
+
+所以等于说接管了整个jvm的请求
+okHttp有一个比较友好的方式
+```java
+Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 1086));
+Authenticator proxyAuthenticator = new Authenticator() {
+            @Override
+            public Request authenticate(Route route, Response response) throws IOException {
+                String credential = Credentials.basic(username, password);
+                return response.request().newBuilder()
+                        .header("Proxy-Authorization", credential)
+                        .build();
+            }
+        };	
+OkHttpClient client = new OkHttpClient().newBuilder().
+                connectTimeout(120, TimeUnit.SECONDS).readTimeout(120, TimeUnit.SECONDS).proxy(proxy)
+                .proxyAuthenticator(proxyAuthenticator)
+				.build()		
+```
+感觉上像是通过将账户密码放到header里面去做的
+
+
+
 
 ## 参考
 [python小工具：tcp proxy和tcp hub](http://ichuan.net/post/22/tcp-proxy-and-tcp-hub-in-python/)
