@@ -108,6 +108,7 @@ LOG --log-prefix "IP_SPOOF A: " //加日志,这个LOG关键词和DROP,ACCEPT都�
 -m mac --mac-source //-m 我猜是metrics ，就是说根据哪种评判标准，这里是mac地址
 -m state --state NEW,ESTABLISHED -j ACCEPT
 -p tcp protocol之类的，比方说tcp,udp,icmp(ping)等等
+-m owner --uid-owner youruserid //所有由这个uid对应的进程创建的包
 ```
 
 

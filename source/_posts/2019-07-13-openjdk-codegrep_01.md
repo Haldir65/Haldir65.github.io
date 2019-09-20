@@ -171,6 +171,7 @@ handleRead(FD fd, void *buf, jint len)
 函数说明：read()会把参数fd 所指的文件传送count 个字节到buf 指针所指的内存中. 若参数count 为0, 则read()不会有作用并返回0. 返回值为实际读取到的字节数, 如果返回0, 表示已到达文件尾或是无可读取的数据,此外文件读写位置会随读取到的字节移动.
 ```
 
+[super.clone方法在openjdk中的实现](https://stackoverflow.com/questions/12032292/is-it-possible-to-find-the-source-for-a-java-native-method)
 
 ## 参考
 [openjdk是如何读取.class文件的](https://fansunion.blog.csdn.net/article/details/13252309)
