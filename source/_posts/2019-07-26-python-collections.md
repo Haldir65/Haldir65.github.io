@@ -84,6 +84,8 @@ for k,v in d.items():
 ```
 
 
+[python3.6开始dictionary是有序的](https://stackoverflow.com/questions/327311/how-are-pythons-built-in-dictionaries-implemented) 以及其实现细节（主要是为了节省内存）
+
 
 ## 参考
 [python collections](https://towardsdatascience.com/pythons-collections-module-high-performance-container-data-types-cb4187afb5fc)

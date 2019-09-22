@@ -235,7 +235,8 @@ unsigned short int ntohs(unsigned short int netshort);
 [抓包看ip地址字节序转换](https://blog.csdn.net/XiyouLinux_Kangyijie/article/details/72991235)
 utf-8还有一个byte-order-mark(bom)的问题
 
-C语言下可以把一个byte按照binary的方式打印出来(就是把一个byte的每一个bit输出来),int也可以。
+C语言下可以把一个byte按照binary的方式打印出来(就是把一个byte的每一个bit输出来),int也可以。这个其实跟java的Integer.toBinaryString是一样的。
+
 ```c
 #include <stdio.h>
 #include <limits.h>

@@ -89,6 +89,15 @@ Accept: */*
 > nc 127.0.0.1 1090 
 GET / HTTP 1.1 \r\n\r\n 这个可以直接打换行，更方便
 
+
+直接用nc发起http请求
+```
+printf "GET /status/200 HTTP/1.1\r\nHost: httpbin.org\r\n\r\n" | nc httpbin.org 80
+
+cat <(printf "GET /status/200 HTTP/1.1\r\nHost: httpbin.org\r\nConnection: close\r\n\r\n") | nc httpbin.org 80
+```
+第一输出报文后，不会断开，第二段直接断开，原因是远程直接断开连接了。
+
 ### 接下来就是看如何处理多个client的session(sock5协议实现)
 以上实现的只是一个tcp proxy，就是完全不检查通信内容的代理，是直接站在tcp层的。
 现实中还有http proxy,sock proxy，彼此之间有一些差别。
@@ -122,8 +131,6 @@ sock5协议其实在命令行里就能用上:
 服务器对Connect的响应
 客户端发送被代理的数据
 服务器响应被代理的数据
-
-
 
 
 ### 所以最终实现的效果是实现使用代理访问知乎

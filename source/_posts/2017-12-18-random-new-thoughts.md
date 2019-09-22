@@ -32,7 +32,6 @@ top : 1
 - [ ] Coordinator behavior以及scroll原理
 - [ ] instagram好像通过注解的方式自己写了一个json解析器[ig-json-parser](https://github.com/Instagram/ig-json-parser)
 - [ ] when it comes to design , how do we translate px, pt, em  into sp,dp and others(设计方面的，各种单位之间的转换)?
-- [ ] learning how textView works is painful yet necessary
 - [ ] linux环境下多进程通讯方式(管道，共享内存，信号,unix domian socket)
 - [ ] mqtt接入实践[mqtt是建立在tcp基础上的应用层协议](https://github.com/mcxiaoke/mqtt)，[netty](https://github.com/netty/netty)也做了实现
 - [ ] play around with xposed
@@ -54,7 +53,7 @@ top : 1
 - [简单的组件化方案](https://www.jianshu.com/p/5f9a7bc902e1)
 - [mvc,mvp,mvvm](https://www.tianmaying.com/tutorial/AndroidMVC)这些关键术语的掌握还是必要的
 - Parcelable 是怎么实现跨进程的? ipc并不仅限于后台，客户端不同进程间也会有类似的概念。
-- jdk8 standard Library implementation detail(java代码的实现 --> hotspot代码的c语言实现)
+- jdk8 standard Library implementatison detail(java代码的实现 --> hotspot代码的c语言实现)
 - [后端面试题](https://segmentfault.com/a/1190000017864721)
 - thrift 源码解析，rpc框架（比方说人脸识别应用就可以用java调用python服务）这种rpc过程肯定要考虑字节序的问题。
 - Perl被称为脚本语言中的瑞士军刀，正则多一点

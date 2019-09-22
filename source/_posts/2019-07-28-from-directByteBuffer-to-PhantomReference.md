@@ -220,7 +220,7 @@ DirectByteBuffer是这样创建Cleaner的：
 
 > cleaner = Cleaner.create(this, new Deallocator(base, size, cap));
 
-Deallocator的run方法里面就是调用unSafe的方法根据address去free内存
+Deallocator的run方法里面就是调用Unsafe的方法根据address去free内存
 ，这就是nio的DirectByteBuffer是如何管理堆外内存的原理了。
 
 ### 经验

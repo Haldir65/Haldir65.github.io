@@ -1705,8 +1705,11 @@ true
 所以结论就是getResourceAsStream可以用来读取文件，所以tomcat的src文件夹中除了java文件还有一大堆其他的.xml、.properity文件等等。
 
 
+### 55. java的array的长度是用int表示的，这也就意味着最多20亿多一点
+所以在jdk代码中到处是这种防着overflow的代码：
+至于为什么不能创建一个long作为长度的array，这个属于jvm的问题了。
 
-### 54. Class.forName...
+### . Class.forName...
 在App启动的时候在另外一个线程里面提前去加载这个class，能够加快速度吗？
 
 class的生命周期

@@ -14,7 +14,13 @@ java给人一种不需要清理garbage的illusion
 allocating stuff is no big deal , garbage collecting it is.
 
 
+### tcp粘包的处理方式
 
+### zero copy与CompositeBytebuf
+
+### netty处理udp也是可以的
+
+### netty通过jni扩展了一些jdk中不存在的功能用于调用系统方法
 
 netty的作者在演讲中提到java官方的nio并不特别好，所以，生产环境用的都是netty这种。
 
@@ -25,3 +31,4 @@ Vertx，是一个基于JVM、轻量级、高性能的应用平台，非常适用
 
 [Netty - One Framework to rule them all by Norman Maurer](https://www.youtube.com/watch?v=DKJ0w30M0vg)
 [netty best practices with norman maurer](https://www.youtube.com/watch?v=_GRIyCMNGGI)
+[netty规避了java nio的一个bug](https://www.zhihu.com/question/291370310),关于这个jdk导致cpu100%的bug的讨论很多
