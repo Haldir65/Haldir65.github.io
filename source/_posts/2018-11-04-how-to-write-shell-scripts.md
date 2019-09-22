@@ -299,15 +299,24 @@ echo "$(which java)"/something
 
 java="$(which java)"
 ${java} --version
+```
+
+
 
 ## 字符串长度
+```shell
 string="abcd"
-echo ${#string} #输出 4
+
 
 ## 查找字符 i 或 o 的位置(哪个字母先出现就计算哪个)：
 string="home is a great site"
 echo `expr index "$string" io`  # 输出 2
 ```
+
+```js
+echo ${井号string} ##输出 4, 这么写的原因完全是hexo碰到美元+大括号+井号渲染不出来
+```
+
 
 
 ### 字符串截取(除了awk以外)
