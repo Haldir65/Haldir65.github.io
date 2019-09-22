@@ -17,7 +17,7 @@
 <meta property="og:description" content="python实现简易的tcp-proxy server及socks代理学习笔记">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/MountainDayJapan_EN-AU8690491173_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-09-20T11:11:11.650Z">
+<meta property="og:updated_time" content="2019-09-22T12:54:53.967Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="tcp-proxy简单实现及socks协议相关">
 <meta name="twitter:description" content="python实现简易的tcp-proxy server及socks代理学习笔记">
@@ -261,6 +261,11 @@ Accept: */*
 <blockquote>
 <p>nc 127.0.0.1 1090<br>GET / HTTP 1.1 \r\n\r\n 这个可以直接打换行，更方便</p>
 </blockquote>
+<p>直接用nc发起http请求</p>
+<pre><code>printf &quot;GET /status/200 HTTP/1.1\r\nHost: httpbin.org\r\n\r\n&quot; | nc httpbin.org 80
+
+cat &lt;(printf &quot;GET /status/200 HTTP/1.1\r\nHost: httpbin.org\r\nConnection: close\r\n\r\n&quot;) | nc httpbin.org 80
+</code></pre><p>第一输出报文后，不会断开，第二段直接断开，原因是远程直接断开连接了。</p>
 <h3 id="接下来就是看如何处理多个client的session-sock5协议实现"><a href="#接下来就是看如何处理多个client的session-sock5协议实现" class="headerlink" title="接下来就是看如何处理多个client的session(sock5协议实现)"></a>接下来就是看如何处理多个client的session(sock5协议实现)</h3><p>以上实现的只是一个tcp proxy，就是完全不检查通信内容的代理，是直接站在tcp层的。<br>现实中还有http proxy,sock proxy，彼此之间有一些差别。</p>
 <p>多个client或者一个client的多个port同时走这个代理去访问远程时，代理服务器不可避免要记录下client和sever之间的连线，适当的还要在packet里面塞一些标记。业内成熟的方案当然是sock5协议,对应的标准是RFC 1928和RFC 1929。</p>
 <p>从wiki上来看sock5是在sock4版本的基础上加了鉴定、IPv6、UDP支持。</p>
