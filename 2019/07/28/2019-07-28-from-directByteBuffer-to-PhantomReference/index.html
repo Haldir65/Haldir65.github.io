@@ -8,19 +8,19 @@
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>堆外内存，weakHashMap以及四种引用类型的研究 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="DiectByteBuffer（堆外内存）是分配在jvm以外的内存，这个java对象本身是受jvm gc控制的，但是其指向的堆外内存是如何回收的">
+  <meta name="description" content="DirectByteBuffer（堆外内存）是分配在jvm以外的内存，这个java对象本身是受jvm gc控制的，但是其指向的堆外内存是如何回收的">
 <meta name="keywords" content="java,tbd">
 <meta property="og:type" content="article">
 <meta property="og:title" content="堆外内存，weakHashMap以及四种引用类型的研究">
 <meta property="og:url" content="https://haldir65.github.io/2019/07/28/2019-07-28-from-directByteBuffer-to-PhantomReference/index.html">
 <meta property="og:site_name" content="Haldir的博客">
-<meta property="og:description" content="DiectByteBuffer（堆外内存）是分配在jvm以外的内存，这个java对象本身是受jvm gc控制的，但是其指向的堆外内存是如何回收的">
+<meta property="og:description" content="DirectByteBuffer（堆外内存）是分配在jvm以外的内存，这个java对象本身是受jvm gc控制的，但是其指向的堆外内存是如何回收的">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/JovianCloudscape_EN-AU11726040455_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-09-22T12:54:53.967Z">
+<meta property="og:updated_time" content="2019-09-22T14:57:24.158Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="堆外内存，weakHashMap以及四种引用类型的研究">
-<meta name="twitter:description" content="DiectByteBuffer（堆外内存）是分配在jvm以外的内存，这个java对象本身是受jvm gc控制的，但是其指向的堆外内存是如何回收的">
+<meta name="twitter:description" content="DirectByteBuffer（堆外内存）是分配在jvm以外的内存，这个java对象本身是受jvm gc控制的，但是其指向的堆外内存是如何回收的">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/JovianCloudscape_EN-AU11726040455_1920x1080.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
@@ -200,7 +200,7 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>DiectByteBuffer（堆外内存）是分配在jvm以外的内存，这个java对象本身是受jvm gc控制的，但是其指向的堆外内存是如何回收的<br><img src="https://www.haldir66.ga/static/imgs/JovianCloudscape_EN-AU11726040455_1920x1080.jpg" alt=""><br><a id="more"></a></p>
+        <p>DirectByteBuffer（堆外内存）是分配在jvm以外的内存，这个java对象本身是受jvm gc控制的，但是其指向的堆外内存是如何回收的<br><img src="https://www.haldir66.ga/static/imgs/JovianCloudscape_EN-AU11726040455_1920x1080.jpg" alt=""><br><a id="more"></a></p>
 <p>java中有四种引用</p>
 <p>Strong Reference<br>Soft Reference （软引用）<br>Weak Reference （弱引用）<br>PhantomReference Reference（虚引用）</p>
 <p>除了强引用，另外三个class都继承自Reference这个父类，其构造函数有两个</p>

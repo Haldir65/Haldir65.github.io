@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/timg.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/PuffinWales_EN-AU12757555133_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-09-22T12:54:53.963Z">
+<meta property="og:updated_time" content="2019-09-22T14:57:24.154Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="如何写shell脚本">
 <meta name="twitter:description" content="总结linux下shell脚本语句的语法Shell 是一个用 C 语言编写的程序，它是用户使用 Linux 的桥梁。Shell 既是一种命令语言，又是一种程序设计语言。Shell 是指一种应用程序，这个应用程序提供了一个界面，用户通过这个界面访问操作系统内核的服务。Ken Thompson 的 sh 是第一种 Unix Shell，Windows Explorer 是一个典型的图形界面 Shell">
@@ -412,10 +412,103 @@ echo &quot;$(which java)&quot;/something
 
 java=&quot;$(which java)&quot;
 ${java} --version
+</code></pre>
+<h2 id="字符串长度"><a href="#字符串长度" class="headerlink" title="字符串长度"></a>字符串长度</h2><pre><code class="shell">string=&quot;abcd&quot;
 
-## 字符串长度
-string=&quot;abcd&quot;
-echo $ -gt 0 ]; do
+
+## 查找字符 i 或 o 的位置(哪个字母先出现就计算哪个)：
+string=&quot;home is a great site&quot;
+echo `expr index &quot;$string&quot; io`  # 输出 2
+</code></pre>
+<pre><code class="js">echo ${井号string} ##输出 4, 这么写的原因完全是hexo碰到美元+大括号+井号渲染不出来
+</code></pre>
+<h3 id="字符串截取-除了awk以外"><a href="#字符串截取-除了awk以外" class="headerlink" title="字符串截取(除了awk以外)"></a>字符串截取(除了awk以外)</h3><pre><code class="shell">var=/home/centos
+echo $var
+
+echo ${var:5} ## 提取从从零开始第5个字符到末尾的全部字符， 输出： /centos
+
+echo ${var: -6} ##注意-6前面需要有一个空格。提取从倒数第6个字符(含第六个)开始到末尾的全部字符 ， 输出: centos
+
+echo ${var:(-6)} ## 和上面一样，只是不需要空格了。输出 :centos
+
+echo ${var:1:4} ## 截取第一个到第四个字符之间所有字符,输出: home
+
+echo ${var/o/h} ##  把第一个匹配到的o换成h，输出: /hhme/centos 
+
+echo ${var//o/h} ## 把所有匹配到的o换成h，这个和sed非常像 输出 /hhme/cenths
+
+</code></pre>
+<h3 id="eval的用法"><a href="#eval的用法" class="headerlink" title="eval的用法"></a>eval的用法</h3><p>eval 相当于一个参数替换器，它会把所有 $开头的变量 进行求值替换，然后把替换后的结果当作一条命令来执行。js和python中也有类似的命令</p>
+<pre><code class="bash">#!/bin/bash
+CD=&quot;cd Desktop&quot;
+eval $CD ##相当于执行了上面字符串对应的命令
+</code></pre>
+<h2 id="流程控制-for循环和while循环"><a href="#流程控制-for循环和while循环" class="headerlink" title="流程控制(for循环和while循环)"></a>流程控制(for循环和while循环)</h2><pre><code class="shell">for file in `ls /etc`
+##或
+for file in $(ls /etc)
+
+for str in &quot;a b c&quot;  //用空格分割
+</code></pre>
+<h2 id="数组遍历，下标，长度等等"><a href="#数组遍历，下标，长度等等" class="headerlink" title="数组遍历，下标，长度等等"></a>数组遍历，下标，长度等等</h2><p>写成一行也是可以的</p>
+<pre><code class="shell">distro=(&quot;redhat&quot; &quot;debian&quot; &quot;gentoo&quot;)
+len=&lt;code&gt;${&lt;/code&gt;#distro[@]}
+for (( i=0; i&lt;$len; i++ )); do echo &quot;${distro[$i]}&quot; ; done
+
+
+array_name=(value0 value1 value2 value3)
+echo ${array_name[@]} ## 使用@可以获得数组的全部元素
+value0 value1 value2 value3
+</code></pre>
+<h2 id="简单的循环（for-each循环）"><a href="#简单的循环（for-each循环）" class="headerlink" title="简单的循环（for each循环）"></a>简单的循环（for each循环）</h2><pre><code class="shell">#!/bin/bash
+i=0;
+while [ $i -lt 4 ];
+do
+   echo $i;
+   i=`expr $i + 1`;
+   # let i+=1; //这些都是让i自增的方式
+   # ((i++));
+   # i=$[$i+1];
+   # i=$(( $i + 1 ))
+done
+
+##for循环有很多种写法，看到的时候注意就是了
+for j in $(seq 1 5)
+do
+  echo $j
+done
+
+for((i=0;i&lt;10;i++)); do
+    echo &quot;current num is$i\n\n&quot;
+done
+
+for j in $(seq 1 5)
+do
+echo $j
+done
+
+for j in {0..10}
+do
+echo &quot;j = $j&quot;
+done
+
+## 还可以写成一行
+for f in *.txt; do grep &quot;tasks:&quot; $f
+</code></pre>
+<h3 id="switch-case的例子找了一个现成的"><a href="#switch-case的例子找了一个现成的" class="headerlink" title="switch case的例子找了一个现成的"></a>switch case的例子找了一个现成的</h3><pre><code class="bash">get_args(){
+    OUT_TYPE=&#39;DNSMASQ_RULES&#39;
+    DNS_IP=&#39;127.0.0.1&#39;
+    DNS_PORT=&#39;5353&#39;
+    IPSET_NAME=&#39;&#39;
+    FILE_FULLPATH=&#39;&#39;
+    CURL_EXTARG=&#39;&#39;
+    WGET_EXTARG=&#39;&#39;
+    WITH_IPSET=0
+    EXTRA_DOMAIN_FILE=&#39;&#39;
+    EXCLUDE_DOMAIN_FILE=&#39;&#39;
+    IPV4_PATTERN=&#39;^((2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?)\.){3}(2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?)$&#39;
+    IPV6_PATTERN=&#39;^((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:)))(%.+)?$&#39;
+
+    while [ ${#} -gt 0 ]; do
         case &quot;${1}&quot; in
             --help | -h)
                 usage 0
