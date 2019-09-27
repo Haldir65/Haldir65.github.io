@@ -17,7 +17,7 @@
 <meta property="og:description" content="DirectByteBuffer（堆外内存）是分配在jvm以外的内存，这个java对象本身是受jvm gc控制的，但是其指向的堆外内存是如何回收的">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/JovianCloudscape_EN-AU11726040455_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-09-22T14:57:24.158Z">
+<meta property="og:updated_time" content="2019-09-27T09:56:06.679Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="堆外内存，weakHashMap以及四种引用类型的研究">
 <meta name="twitter:description" content="DirectByteBuffer（堆外内存）是分配在jvm以外的内存，这个java对象本身是受jvm gc控制的，但是其指向的堆外内存是如何回收的">
@@ -374,6 +374,30 @@ private static class ReferenceHandler extends Thread {
 <p>cleaner = Cleaner.create(this, new Deallocator(base, size, cap));</p>
 </blockquote>
 <p>Deallocator的run方法里面就是调用Unsafe的方法根据address去free内存<br>，这就是nio的DirectByteBuffer是如何管理堆外内存的原理了。</p>
+<p>于是stackoverflow上就出现了”如何释放DirectByteBuffer的native memory”的方案</p>
+<pre><code class="java">import sun.misc.Cleaner;
+import sun.nio.ch.DirectBuffer;
+
+public static void clean(ByteBuffer bb) {
+    if(bb == null) return;
+    Cleaner cleaner = ((DirectBuffer) bb).cleaner();
+    if (cleaner != null) cleaner.clean();
+}
+</code></pre>
+<pre><code class="java">import sun.misc.Cleaner;
+import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
+...
+
+public static void main(String[] args) throws Exception {
+    ByteBuffer direct = ByteBuffer.allocateDirect(1024);
+    Field cleanerField = direct.getClass().getDeclaredField(&quot;cleaner&quot;);
+    cleanerField.setAccessible(true);
+    Cleaner cleaner = (Cleaner) cleanerField.get(direct);
+    cleaner.clean();
+}
+</code></pre>
+<p>不注意就用到了sun的package了，因为sun.xxx这些package下面的class都是在rt.jar里面，由bootStrapClassLaoder加载，所以可以使用这个package。</p>
 <h3 id="经验"><a href="#经验" class="headerlink" title="经验"></a>经验</h3><ol>
 <li>WeakHashMap的key倾向于使用那种equals是直接比较==的，而不是自己实现hashCode的那一套</li>
 <li>debug的时候有时候会看见“Reference Handler”这么一条线程，就是负责迭代引用链表的</li>
@@ -626,11 +650,39 @@ private static class ReferenceHandler extends Thread {
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+                <a href="javascript:void(0)" class="js-tag color3">android</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">android</a>
+                <a href="javascript:void(0)" class="js-tag color2">databinding</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">transition</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">tools</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">service</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -663,10 +715,6 @@ private static class ReferenceHandler extends Thread {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">annotation</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">tools</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -775,30 +823,6 @@ private static class ReferenceHandler extends Thread {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">c</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">transition</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">databinding</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Butterknife</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">service</a>
               </li>
             
             <div class="clearfix"></div>
