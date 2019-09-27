@@ -317,6 +317,14 @@ referenced by <name>, but are still locally available in "remotes/<name>".
 
 prune的[解释](https://stackoverflow.com/questions/4040717/git-remote-prune-didnt-show-as-many-pruned-branches-as-i-expected)
 
+
+## 18. git clean -fd
+If you just clean untracked files, run git clean -f.
+If you want to also remove directories, run git clean -f -d.
+If you just want to remove ignored files, run git clean -f -X.
+If you want to remove ignored as well as non-ignored files, run git clean -f -x.
+
+
 ### 一些看上去很神奇的操作
 git clone --depth=50 --branch=branchName https://github.com/XXX/XXX.git myFolder/theNameIwantItToBe
 

@@ -128,7 +128,7 @@ TCP segment 被送往网络层，网络层会在其中再加入一个 IP 头部�
 - [HTTP1.1中的一些优化策略失效](https://www.youtube.com/watch?v=yURLTwZ3ehk)
 - [ O'Reilly HTTP/2](https://hpbn.co/http2/)
 - [Flow control](https://juejin.im/post/598ba1d06fb9a03c4d6464ab)
-
+- [http3 based on quic](https://blog.cloudflare.com/http3-the-past-present-and-future/)
 
 浏览器对同一ip进行请求的最大并发连接数是不一样的：IE11 、IE10 、chrome、Firefox 的并发连接数是 6个，IE9是10个。。
 

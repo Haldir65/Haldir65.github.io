@@ -223,6 +223,36 @@ DirectByteBuffer是这样创建Cleaner的：
 Deallocator的run方法里面就是调用Unsafe的方法根据address去free内存
 ，这就是nio的DirectByteBuffer是如何管理堆外内存的原理了。
 
+于是stackoverflow上就出现了"如何释放DirectByteBuffer的native memory"的方案
+
+```java
+import sun.misc.Cleaner;
+import sun.nio.ch.DirectBuffer;
+
+public static void clean(ByteBuffer bb) {
+    if(bb == null) return;
+    Cleaner cleaner = ((DirectBuffer) bb).cleaner();
+    if (cleaner != null) cleaner.clean();
+}
+```
+
+```java
+import sun.misc.Cleaner;
+import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
+...
+
+public static void main(String[] args) throws Exception {
+    ByteBuffer direct = ByteBuffer.allocateDirect(1024);
+    Field cleanerField = direct.getClass().getDeclaredField("cleaner");
+    cleanerField.setAccessible(true);
+    Cleaner cleaner = (Cleaner) cleanerField.get(direct);
+    cleaner.clean();
+}
+```
+不注意就用到了sun的package了，因为sun.xxx这些package下面的class都是在rt.jar里面，由bootStrapClassLaoder加载，所以可以使用这个package。
+
+
 ### 经验
 1. WeakHashMap的key倾向于使用那种equals是直接比较==的，而不是自己实现hashCode的那一套
 2. debug的时候有时候会看见“Reference Handler”这么一条线程，就是负责迭代引用链表的
