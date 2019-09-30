@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/cute_cat_sleepy.jpg">
-<meta property="og:updated_time" content="2019-09-27T09:56:06.675Z">
+<meta property="og:updated_time" content="2019-09-30T08:08:49.097Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="netty知识手册">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/cute_cat_sleepy.jpg">
@@ -200,7 +200,25 @@ ga('send', 'pageview');
         <p><img src="https://www.haldir66.ga/static/imgs/cute_cat_sleepy.jpg" alt=""><br><a id="more"></a></p>
 <p>都说netty要比nio好用，先从官方的intro page看起。</p>
 <p>ByteBuff是reference counted的，netty的作者说：<br>java给人一种不需要清理garbage的illusion<br>allocating stuff is no big deal , garbage collecting it is.</p>
-<h3 id="tcp粘包的处理方式"><a href="#tcp粘包的处理方式" class="headerlink" title="tcp粘包的处理方式"></a>tcp粘包的处理方式</h3><h3 id="zero-copy与CompositeBytebuf"><a href="#zero-copy与CompositeBytebuf" class="headerlink" title="zero copy与CompositeBytebuf"></a>zero copy与CompositeBytebuf</h3><h3 id="netty处理udp也是可以的"><a href="#netty处理udp也是可以的" class="headerlink" title="netty处理udp也是可以的"></a>netty处理udp也是可以的</h3><h3 id="netty通过jni扩展了一些jdk中不存在的功能用于调用系统方法"><a href="#netty通过jni扩展了一些jdk中不存在的功能用于调用系统方法" class="headerlink" title="netty通过jni扩展了一些jdk中不存在的功能用于调用系统方法"></a>netty通过jni扩展了一些jdk中不存在的功能用于调用系统方法</h3><p>netty的作者在演讲中提到java官方的nio并不特别好，所以，生产环境用的都是netty这种。</p>
+<p><a href="https://github.com/netty/netty/issues/8540#issue-380245481">netty 5要求最低jdk11</a> ，所以暂时用netty 4.1来学习还是ok的。</p>
+<h3 id="tcp粘包的处理方式"><a href="#tcp粘包的处理方式" class="headerlink" title="tcp粘包的处理方式"></a>tcp粘包的处理方式</h3><h3 id="zero-copy与CompositeBytebuf"><a href="#zero-copy与CompositeBytebuf" class="headerlink" title="zero copy与CompositeBytebuf"></a>zero copy与CompositeBytebuf</h3><h3 id="netty处理udp也是可以的"><a href="#netty处理udp也是可以的" class="headerlink" title="netty处理udp也是可以的"></a>netty处理udp也是可以的</h3><h3 id="netty通过jni扩展了一些jdk中不存在的功能用于调用系统方法"><a href="#netty通过jni扩展了一些jdk中不存在的功能用于调用系统方法" class="headerlink" title="netty通过jni扩展了一些jdk中不存在的功能用于调用系统方法"></a>netty通过jni扩展了一些jdk中不存在的功能用于调用系统方法</h3><p><a href="https://netty.io/4.1/api/io/netty/channel/ChannelPipeline.html">ChannelPipeline</a> 是一连串处理events的handler的集合，通常会有包括decoder(将Bytes转换成java object)，业务逻辑处理， encoder(将java object转成bytes)。如果业务处理耗时比较多的话，可以将业务逻辑代码挪到io线程以外</p>
+<pre><code class="java"> static final EventExecutorGroup group = new DefaultEventExecutorGroup(16);
+ ...
+
+ ChannelPipeline pipeline = ch.pipeline();
+
+ pipeline.addLast(&quot;decoder&quot;, new MyProtocolDecoder());
+ pipeline.addLast(&quot;encoder&quot;, new MyProtocolEncoder());
+
+ // Tell the pipeline to run MyBusinessLogicHandler&#39;s event handler methods
+ // in a different thread than an I/O thread so that the I/O thread is not blocked by
+ // a time-consuming task.
+ // If your business logic is fully asynchronous or finished very quickly, you don&#39;t
+ // need to specify a group.
+ pipeline.addLast(group, &quot;handler&quot;, new MyBusinessLogicHandler()); //这样在businessHandler里面就能处理blocking业务，比如操作sql, 或者。。。调用一个rpc?
+</code></pre>
+<h3 id="ChannelHandler-Sharable这个注解"><a href="#ChannelHandler-Sharable这个注解" class="headerlink" title="@ChannelHandler.Sharable这个注解"></a>@ChannelHandler.Sharable这个注解</h3><p>每一个Channel都需要创建一个新的businessHandler，因为这里牵涉到了state相关的东西<br>而有些Decoder和Encoder是不具备state的，这种就被添加了@Sharable的注解。最常用的http相关的decoder和encoder并没有添加这个注解，原因在 io.netty.handler.codec.http.HttpObjectDecoder这个class里面，是有一个currentState的。假如遇到了chunked这种，decoder不可能一次读完，那么每一个http请求(背后的channel，connection)都应该保留一个之前曾经读过的部分。自然这个handler就变成了stateful的了。</p>
+<p>netty的作者在演讲中提到java官方的nio并不特别好，所以，生产环境用的都是netty这种。</p>
 <p>Vertx，是一个基于JVM、轻量级、高性能的应用平台，非常适用于移动端后台、互联网、企业应用架构。<a href="https://vertx.io/">vertx框架底层基于netty</a>，也是异步io，selector那一套(vertx基于netty)</p>
 <p><a href="https://netty.io/4.1/xref/overview-summary.html">netty的example非常多，http2,cors,upload等等都有</a></p>
 <p><a href="https://www.youtube.com/watch?v=DKJ0w30M0vg">Netty - One Framework to rule them all by Norman Maurer</a><br><a href="https://www.youtube.com/watch?v=_GRIyCMNGGI">netty best practices with norman maurer</a><br><a href="https://www.zhihu.com/question/291370310">netty规避了java nio的一个bug</a>,关于这个jdk导致cpu100%的bug的讨论很多</p>
@@ -538,10 +556,6 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
               </li>
              
@@ -551,6 +565,10 @@ ga('send', 'pageview');
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">Okio</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -582,10 +600,6 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
@@ -594,11 +608,11 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">sql</a>
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">django</a>
+                <a href="javascript:void(0)" class="js-tag color4">sql</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -614,11 +628,15 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">opengl</a>
+                <a href="javascript:void(0)" class="js-tag color2">django</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">c</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">opengl</a>
               </li>
             
             <div class="clearfix"></div>

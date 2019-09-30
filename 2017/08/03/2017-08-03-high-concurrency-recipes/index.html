@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/be3c80a11edfd0fdb75d098550ed2c8e.jpg">
-<meta property="og:updated_time" content="2019-09-27T09:56:06.667Z">
+<meta property="og:updated_time" content="2019-09-30T08:08:49.089Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java多线程中需要注意的一些点">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/be3c80a11edfd0fdb75d098550ed2c8e.jpg">
@@ -487,6 +487,14 @@ private byte[] lock = new byte[0]; // 特殊的instance变量
 Class aClass = A.class;
 A a = (A) unsafe.allocateInstance(aClass);
 </code></pre>
+<p>需要注意的是，想要获得一个UnSafe的实例不是这么干的</p>
+<pre><code class="java">Unsafe unsafe = Unsafe.getUnsafe(); // this will crash
+</code></pre>
+<p>想要获得一个unsafe的实例可以这么干</p>
+<pre><code class="java">Field f = Unsafe.class.getDeclaredField(&quot;theUnsafe&quot;);
+f.setAccessible(true);
+Unsafe unsafe = (Unsafe) f.get(null);
+</code></pre>
 <p>最好不要在工程中使用，这样的做法在json库中往往被作为一种保底的方法，注意这种方式创建的对象是没有初始化的（没有调用构造函数）</p>
 <h2 id="14-ArrayBlockingQueue和LinkedBlockingQueue"><a href="#14-ArrayBlockingQueue和LinkedBlockingQueue" class="headerlink" title="14.ArrayBlockingQueue和LinkedBlockingQueue"></a>14.ArrayBlockingQueue和LinkedBlockingQueue</h2><p>线程池的构造方法最后一个参数是一个BlockingQueue，BlockingQueue是一个接口，就像一个典型的生产者消费者模型问题一样。如果从queue中取element的时候发现size为0，或者往queue中添加element的时候发现queue满了。应对这种资源不能被 <strong><em>立即满足</em></strong> 的策略就定义了BlockingQueue。<br>BlockingQueue提供了四种应对策略来处理这种资源不能被立即satisfy的场景</p>
 <table>
@@ -931,10 +939,6 @@ private void setNextRunTime() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Retrofit</a>
               </li>
              
@@ -944,6 +948,10 @@ private void setNextRunTime() {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">Okio</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -975,10 +983,6 @@ private void setNextRunTime() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
@@ -987,11 +991,11 @@ private void setNextRunTime() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">sql</a>
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">django</a>
+                <a href="javascript:void(0)" class="js-tag color4">sql</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1007,11 +1011,15 @@ private void setNextRunTime() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">opengl</a>
+                <a href="javascript:void(0)" class="js-tag color2">django</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">c</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">opengl</a>
               </li>
             
             <div class="clearfix"></div>
