@@ -377,6 +377,19 @@ Unsafe unsafe = getUnsafe();
 Class aClass = A.class;
 A a = (A) unsafe.allocateInstance(aClass);
 ```
+
+需要注意的是，想要获得一个UnSafe的实例不是这么干的
+```java
+Unsafe unsafe = Unsafe.getUnsafe(); // this will crash
+```
+
+想要获得一个unsafe的实例可以这么干
+```java
+Field f = Unsafe.class.getDeclaredField("theUnsafe");
+f.setAccessible(true);
+Unsafe unsafe = (Unsafe) f.get(null);
+```
+
 最好不要在工程中使用，这样的做法在json库中往往被作为一种保底的方法，注意这种方式创建的对象是没有初始化的（没有调用构造函数）
 
 ## 14.ArrayBlockingQueue和LinkedBlockingQueue

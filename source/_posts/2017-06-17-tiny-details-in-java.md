@@ -941,6 +941,9 @@ The (String) constructor, on the other hand, is perfectly predictable:�
 
 type -casting java中从double强转float，从long强转int是怎么实现的
 
+int 1000 强转 byte 变成24
+
+
 
 
 ### 36.调jvm参数

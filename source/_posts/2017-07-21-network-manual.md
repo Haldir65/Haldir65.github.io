@@ -13,10 +13,17 @@ tags:
 
 ## 1. URI和URL是两件事
 根据[wiki的解释](https://zh.wikipedia.org/wiki/%E7%BB%9F%E4%B8%80%E8%B5%84%E6%BA%90%E6%A0%87%E5%BF%97%E7%AC%A6)
-URL是URI的子集，URL的一般格式包括三部分：资源类型、存放资源的主机域名，资源文件名。语法格式上,根据[百度百科](https://baike.baidu.com/item/URL%E6%A0%BC%E5%BC%8F/10056474?fr=aladdin)找到一个能用的：
+[URL是URI的子集](https://www.baeldung.com/java-url-vs-uri)，URL的一般格式包括三部分：资源类型、存放资源的主机域名，资源文件名。
+> - Uniform Resource Identifier (URI) − a sequence of characters that allows the complete identification of any abstract or physical resource
+> - Uniform Resource Locator (URL) − a subset of URI that, in addition to identifying where a resource is available, describes the primary mechanism to access it
+> We can conclude that every URL is a URI, but the opposite is not true
+
 ```
 protocol :// hostname[:port] / path / [;parameters][?query]#fragment
 ```
+
+<font color="red">Every URL has to start with any of these schemes: ftp, http, https, gopher, mailto, news, nntp, telnet, wais, file, or prospero. If it doesn't start with it, then it's not a URL.</font>
+
 
 - protocol 指使用的传输协议(http、file、https、mailto、ed2k、thunder等)
 hostname 是指存放资源的服务器的域名系统(DNS) 主机名或 IP 地址。有时，在主机名前也可以包含连接到服务器所需的用户名和密码（格式：username:password@hostname）。有时候是ip,有时候前面还带账号密码
