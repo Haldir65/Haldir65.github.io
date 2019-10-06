@@ -80,5 +80,13 @@ public final class Animal extends Enum
 }
 ```
 
+## asm使用
+ASM 是一个 Java 字节码操控框架。它能被用来动态生成类或者增强既有类的功能。ASM 可以直接产生二进制 class 文件，也可以在类被加载入 Java 虚拟机之前动态改变类行为。Java class 被存储在严格格式定义的 .class 文件里，这些类文件拥有足够的元数据来解析类中的所有元素：类名称、方法、属性以及 Java 字节码（指令）。ASM 从类文件中读入信息后，能够改变类行为，分析类信息，甚至能够根据用户要求生成新类。
+[创建出一个class](https://blog.csdn.net/mn960mn/article/details/51418236)
+fastjson在获取java bean的属性值的时候，为了避免反射，才使用的asm。fastjson中的asm是照着 org.objectweb的asm改造的。
+fastjson中还有一段ThreadLocalCache，缓存了char数组，所以可以一定程度上避免大量的内存分配
+[class文件结构以及使用asm教程](https://www.ibm.com/developerworks/cn/java/j-lo-asm30/)
+
+
 ## 参考
 [美团技术博客关于java byte code 的介绍](https://tech.meituan.com/2019/09/05/java-bytecode-enhancement.html)

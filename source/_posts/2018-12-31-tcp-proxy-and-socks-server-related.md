@@ -249,6 +249,8 @@ OkHttpClient client = new OkHttpClient().newBuilder().
 
 
 
+SO_REUSEPORT选项支持多个进程同时监听一个port，在内核层面实现流量的负载均衡。（这是socket的一个选项，since linux 3.9）， java从jdk9才添加了支持，[也有hack的方式通过反射调用native方法去设置这个值的](https://colobu.com/2015/06/11/Socket-sharding-implemented-by-netty/)。 例如nginx的master进程和worker进程，例如多个ss-redir[同时监听一个端口](https://github.com/shadowsocks/shadowsocks-libev/issues/493)。
+
 
 ## 参考
 [python小工具：tcp proxy和tcp hub](http://ichuan.net/post/22/tcp-proxy-and-tcp-hub-in-python/)

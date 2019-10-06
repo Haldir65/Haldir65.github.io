@@ -40,3 +40,5 @@ tags: [tbd]
 
 [blog of jake Wharton](https://jakewharton.com/blog/)
 
+[关于go语言以及linux kernel的参数](https://colobu.com/2019/02/23/1m-go-tcp-connection/)
+
