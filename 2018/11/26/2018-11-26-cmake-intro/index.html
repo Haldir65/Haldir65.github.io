@@ -17,7 +17,7 @@
 <meta property="og:description" content="当我们敲下cmake命令的时候，cmake会在当前目录下找CMakeLists.txt这个文件">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/fresh-sparkle-dew-drops-on-red-flower-wallpaper-53861cf580909.jpg">
-<meta property="og:updated_time" content="2019-10-06T07:25:21.764Z">
+<meta property="og:updated_time" content="2019-10-06T14:35:17.396Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="cmake实用手册">
 <meta name="twitter:description" content="当我们敲下cmake命令的时候，cmake会在当前目录下找CMakeLists.txt这个文件">
@@ -251,6 +251,52 @@ ga('send', 'pageview');
 </tr>
 </tbody>
 </table>
+<p>内置的一些变量能够帮助判断当前运行在哪种系统中</p>
+<pre><code class="shell">cmake_minimum_required(VERSION 3.9.1)
+project(CMakeHello)
+set(CMAKE_CXX_STANDARD 14)
+# UNIX, WIN32, WINRT, CYGWIN, APPLE are environment variables as flags set by default system
+if(UNIX)
+    message(&quot;This is a ${CMAKE_SYSTEM_NAME} system&quot;)
+elseif(WIN32)
+    message(&quot;This is a Windows System&quot;)
+endif()
+# or use MATCHES to see if actual system name 
+# Darwin is Apple&#39;s system name
+if(${CMAKE_SYSTEM_NAME} MATCHES Darwin)
+    message(&quot;This is a ${CMAKE_SYSTEM_NAME} system&quot;)
+elseif(${CMAKE_SYSTEM_NAME} MATCHES Windows)
+    message(&quot;This is a Windows System&quot;)
+endif()
+add_executable(cmake_hello main.cpp)
+</code></pre>
+<p>还可以在cmake中定义变量，在c++代码中引用<br>CMakeLists.txt </p>
+<pre><code class="shell">cmake_minimum_required(VERSION 3.9.1)
+project(CMakeHello)
+set(CMAKE_CXX_STANDARD 14)
+# or use MATCHES to see if actual system name 
+# Darwin is Apple&#39;s system name
+if(${CMAKE_SYSTEM_NAME} MATCHES Darwin)
+    add_definitions(-DCMAKEMACROSAMPLE=&quot;Apple MacOS&quot;)
+elseif(${CMAKE_SYSTEM_NAME} MATCHES Windows)
+    add_definitions(-DCMAKEMACROSAMPLE=&quot;Windows PC&quot;)
+endif()
+add_executable(cmake_hello main.cpp)
+</code></pre>
+<pre><code class="c++">#include &lt;iostream&gt;
+#ifndef CMAKEMACROSAMPLE
+    #define CMAKEMACROSAMPLE &quot;NO SYSTEM NAME&quot;
+#endif
+auto sum(int a, int b){
+        return a + b;
+}
+int main() {
+        std::cout&lt;&lt;&quot;Hello CMake!&quot;&lt;&lt;std::endl;
+        std::cout&lt;&lt;CMAKEMACROSAMPLE&lt;&lt;std::endl;
+        std::cout&lt;&lt;&quot;Sum of 3 + 4 :&quot;&lt;&lt;sum(3, 4)&lt;&lt;std::endl;
+        return 0;
+}
+</code></pre>
 <h3 id="header文件的处理"><a href="#header文件的处理" class="headerlink" title="header文件的处理"></a>header文件的处理</h3><p>可以指定多个源文件</p>
 <blockquote>
 <p>set(SOURCES<br>    src/Hello.cpp<br>    src/main.cpp<br>)<br>add_executable(${PROJECT_NAME} ${SOURCES})<br>//或者直接把src文件夹下面的所有.cpp文件加入进来<br>file(GLOB SOURCES “src/*.cpp”)</p>
@@ -324,7 +370,7 @@ target_link_libraries( hello_binary // 接下来就是Link了，这里使用了�
     PRIVATE 
         hello::library
 )
-</code></pre><h3 id="接下来是make-install-将生成的可执行文件安装到系统中，似乎就是复制到-usr-bin里面"><a href="#接下来是make-install-将生成的可执行文件安装到系统中，似乎就是复制到-usr-bin里面" class="headerlink" title="接下来是make install (将生成的可执行文件安装到系统中，似乎就是复制到/usr/bin里面)"></a>接下来是make install (将生成的可执行文件安装到系统中，似乎就是复制到/usr/bin里面)</h3><p>默认情况下cmake会把生成的可执行文件安装到系统中，我们可以指定安装到特定的位置<br>cmake .. -DCMAKE_INSTALL_PREFIX=/install/location</p>
+</code></pre><h3 id="接下来是make-install-将生成的可执行文件安装到系统中，就是复制到CMAKE-INSTALL-PREFIX里面"><a href="#接下来是make-install-将生成的可执行文件安装到系统中，就是复制到CMAKE-INSTALL-PREFIX里面" class="headerlink" title="接下来是make install (将生成的可执行文件安装到系统中，就是复制到CMAKE_INSTALL_PREFIX里面)"></a>接下来是make install (将生成的可执行文件安装到系统中，就是复制到CMAKE_INSTALL_PREFIX里面)</h3><p>CMAKE_INSTALL_PREFIX默认值是 usr/locals<br>默认情况下cmake会把生成的可执行文件安装到系统中，我们可以指定安装到特定的位置<br>cmake .. -DCMAKE_INSTALL_PREFIX=/install/location</p>
 <pre><code>install (TARGETS cmake_examples_inst_bin
     DESTINATION bin)
 // target cmake_examples_inst_bin target to the destination ${CMAKE_INSTALL_PREFIX}/bin
@@ -345,7 +391,18 @@ install (TARGETS cmake_examples_inst
 <blockquote>
 <p>$ LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib cmake_examples_inst_bin<br>Hello Install! //把生成的bin文件复制到/sur/local/bin目录下，再修改LDPATH,就能去/usr/locallib这个目录去找生成的library了</p>
 </blockquote>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://mirkokiefer.com/cmake-by-example-f95eb47d45b1">cmake的教程，非常好</a><br><a href="https://github.com/ttroy50/cmake-examples">Useful CMake Examples</a>本文来自这里的实例</p>
+<h2 id="查找系统中已安装的library"><a href="#查找系统中已安装的library" class="headerlink" title="查找系统中已安装的library"></a>查找系统中已安装的library</h2><p>如果没有找到，停止编译过程</p>
+<pre><code class="shell">find_package(Boost 1.66)
+# Check for libray, if found print message, include dirs and link libraries.
+if(Boost_FOUND)  ## 直接判断是否找到
+    message(&quot;Boost Found&quot;)
+    include_directories(${Boost_INCLUDE_DIRS})
+    target_link_libraries(cmake_hello ${Boost_LIBRARIES})
+elseif(NOT Boost_FOUND)
+    error(&quot;Boost Not Found&quot;)
+endif()
+</code></pre>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://mirkokiefer.com/cmake-by-example-f95eb47d45b1">cmake的教程，非常好</a><br><a href="https://github.com/ttroy50/cmake-examples">Useful CMake Examples</a>本文来自这里的实例<br><a href="https://medium.com/@onur.dundar1/cmake-tutorial-585dd180109b">完整教程</a></p>
 
       
 

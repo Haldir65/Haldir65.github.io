@@ -17,7 +17,7 @@
 <meta property="og:description" content="interesting stuff in java that don’t seem to get enough pubilicity">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/34a7d57ccabb18c69d085247cf009b22.jpg">
-<meta property="og:updated_time" content="2019-10-06T07:25:21.756Z">
+<meta property="og:updated_time" content="2019-10-06T14:35:17.388Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="For those tiny details in Java">
 <meta name="twitter:description" content="interesting stuff in java that don’t seem to get enough pubilicity">
@@ -896,6 +896,28 @@ System.out.println(b.setScale(5,BigDecimal.ROUND_HALF_UP).doubleValue());
 <p><a href="https://www.quora.com/In-Python-why-does-8-5-8-4-give-0-099999999999999964">Floating point precision error</a>这种事几乎所有语言都有</p>
 <p>type -casting java中从double强转float，从long强转int是怎么实现的</p>
 <p>int 1000 强转 byte 变成24</p>
+<p><a href="https://blog.csdn.net/qqhjqs/article/details/100997400">字节序和精度溢出的问题</a></p>
+<p><a href="https://www.cnblogs.com/chenbenbuyi/p/11407158.html">从强转 byte 说起</a></p>
+<ul>
+<li>计算机中整数以补码的形式存储，原码进行显示。3会存成0011，-3会存成1100。<br>使用补码的目的：为了简化计算机基本运算电路，使加减法都只需要通过加法电路实现，也就是让减去一个正数或加上一个负数这样的运算可以用加上一个正数来代替。于是改变负数存储的形式，存储成一种可以直接当成正数来相加的形式，这种形式就是补码。</li>
+</ul>
+<p>正数的反码补码都是原码，如：<br>10<br>原码: 1010<br>反码: 1010<br>补码：1010</p>
+<p>负数 -10<br>原码 10000000 00000000 00000000 00001010<br>反码(符号位不变，其余位取反) 01111111 11111111 11111111 11110101<br>补码(反码+1)： 01111111 11111111 11111111 11110110</p>
+<ul>
+<li>正数的反码补码都是其本身</li>
+<li>负数的反码是原码符号位不变其他取反，补码是反码+1</li>
+</ul>
+<pre><code class="java">System.out.println((byte) 129);
+System.out.println((byte) -129);
+System.out.println(&quot;~b2: &quot; + ~10);
+</code></pre>
+<p>输出结果</p>
+<pre><code>-127
+127
+~b2: -11
+</code></pre><p>对于129，二进制为<br>00000000 00000000 00000000 10000001<br>其补码：00000000 00000000 00000000 10000001<br>由于byte只占1字节即8位，由于字节序的原因，在内存中应该是颠倒过来的。所以，上面截取后8位后如下：10000001<br>此时最高位为1即负数，该二进制减1即是反码<br>反码：10000000<br>原码：11111111<br>即-127，所以(byte)129的结果就是-127</p>
+<p>-129 二进制为<br>10000000 00000000 00000000 10000001<br>对应的补码为(反码+1)<br>11111111 11111111 11111111 01111111<br>截取8为后为：01111111（因为这个就在低地址的位置）<br>为正数，其原码反码补码均为01111111即127<br>所以(byte)-129的结果就是127</p>
+<p>10的二进制为<br>00000000 00000000 00000000 00001010<br>补码是本身，取反之后为<br>11111111 11111111 11111111 11110101<br>此时最高位为1，负数，即是负数的补码<br>该反码(补码-1)<br>11111111 11111111 11111111 11110100<br>对应的原码：<br>10000000 00000000 00000000 00001011 即-11<br>所以~b2的结果是-11</p>
 <h3 id="36-调jvm参数"><a href="#36-调jvm参数" class="headerlink" title="36.调jvm参数"></a>36.调jvm参数</h3><p>先看怎么get:<br>在Intelij里面，写一个helloworld程序，看下console的输出，然后复制出来。中间加上这么一行：</p>
 <blockquote>
 <p>-XX:+PrintFlagsFinal and -XX:+PrintFlagsInitial</p>
