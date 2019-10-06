@@ -231,6 +231,16 @@ rm -f * .o ##中间多一个空格
 ## 5. 静态库和动态库的区别及使用
 [static and dynamic libraries](https://www.geeksforgeeks.org/static-vs-dynamic-libraries/)
 
+**Shared Library File Extensions:**
+Windows: .dll
+Mac OS X: .dylib
+Linux: .so
+
+**Static Library File Extensions:**
+Windows: .lib
+Mac OS X: .a
+Linux: .a
+
 static library把依赖的library都打包进去了，体积更大
 dynamic libvrary只是写了依赖的library的名称，运行时需要去操作系统中去找，会慢一些
 

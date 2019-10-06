@@ -248,3 +248,4 @@ setsockopt (packet_send_sd, IPPROTO_IP, IP_HDRINCL, val, sizeof (one)) // IP_HDR
 [some_kcptun_tools](https://github.com/linhua55/some_kcptun_tools)
 [kcptun-raw](https://github.com/Chion82/kcptun-raw)
 [tcp那些事](https://coolshell.cn/articles/11609.html) tcp协议为了对外实现可靠交付，内部实现有很多非常复杂的算法。
+[java并不支持raw socket，最多用jni包装一下](https://stackoverflow.com/questions/14873243/raw-socket-in-java)

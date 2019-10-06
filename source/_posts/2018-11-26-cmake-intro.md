@@ -51,6 +51,60 @@ make && ./hello_cmake
 | PROJECT_BINARY_DIR | The build directory for the current project. |
 
 
+内置的一些变量能够帮助判断当前运行在哪种系统中
+```shell
+cmake_minimum_required(VERSION 3.9.1)
+project(CMakeHello)
+set(CMAKE_CXX_STANDARD 14)
+# UNIX, WIN32, WINRT, CYGWIN, APPLE are environment variables as flags set by default system
+if(UNIX)
+    message("This is a ${CMAKE_SYSTEM_NAME} system")
+elseif(WIN32)
+    message("This is a Windows System")
+endif()
+# or use MATCHES to see if actual system name 
+# Darwin is Apple's system name
+if(${CMAKE_SYSTEM_NAME} MATCHES Darwin)
+    message("This is a ${CMAKE_SYSTEM_NAME} system")
+elseif(${CMAKE_SYSTEM_NAME} MATCHES Windows)
+    message("This is a Windows System")
+endif()
+add_executable(cmake_hello main.cpp)
+```
+
+还可以在cmake中定义变量，在c++代码中引用
+CMakeLists.txt 
+```shell
+cmake_minimum_required(VERSION 3.9.1)
+project(CMakeHello)
+set(CMAKE_CXX_STANDARD 14)
+# or use MATCHES to see if actual system name 
+# Darwin is Apple's system name
+if(${CMAKE_SYSTEM_NAME} MATCHES Darwin)
+    add_definitions(-DCMAKEMACROSAMPLE="Apple MacOS")
+elseif(${CMAKE_SYSTEM_NAME} MATCHES Windows)
+    add_definitions(-DCMAKEMACROSAMPLE="Windows PC")
+endif()
+add_executable(cmake_hello main.cpp)
+```
+
+```c++
+#include <iostream>
+#ifndef CMAKEMACROSAMPLE
+    #define CMAKEMACROSAMPLE "NO SYSTEM NAME"
+#endif
+auto sum(int a, int b){
+        return a + b;
+}
+int main() {
+        std::cout<<"Hello CMake!"<<std::endl;
+		std::cout<<CMAKEMACROSAMPLE<<std::endl;
+        std::cout<<"Sum of 3 + 4 :"<<sum(3, 4)<<std::endl;
+        return 0;
+}
+```
+
+
 ### header文件的处理
 可以指定多个源文件
 > set(SOURCES
@@ -145,7 +199,8 @@ target_link_libraries( hello_binary // 接下来就是Link了，这里使用了�
 )
 ```
 
-### 接下来是make install (将生成的可执行文件安装到系统中，似乎就是复制到/usr/bin里面)
+### 接下来是make install (将生成的可执行文件安装到系统中，就是复制到CMAKE_INSTALL_PREFIX里面)
+CMAKE_INSTALL_PREFIX默认值是 usr/locals
 默认情况下cmake会把生成的可执行文件安装到系统中，我们可以指定安装到特定的位置
 cmake .. -DCMAKE_INSTALL_PREFIX=/install/location
 
@@ -173,6 +228,19 @@ cmake-examples.conf
 Hello Install! //把生成的bin文件复制到/sur/local/bin目录下，再修改LDPATH,就能去/usr/locallib这个目录去找生成的library了
 
 
+## 查找系统中已安装的library
+如果没有找到，停止编译过程
+```shell
+find_package(Boost 1.66)
+# Check for libray, if found print message, include dirs and link libraries.
+if(Boost_FOUND)  ## 直接判断是否找到
+    message("Boost Found")
+    include_directories(${Boost_INCLUDE_DIRS})
+    target_link_libraries(cmake_hello ${Boost_LIBRARIES})
+elseif(NOT Boost_FOUND)
+    error("Boost Not Found")
+endif()
+```
 
 
 
@@ -180,4 +248,4 @@ Hello Install! //把生成的bin文件复制到/sur/local/bin目录下，再修�
 ## 参考
 [cmake的教程，非常好](https://mirkokiefer.com/cmake-by-example-f95eb47d45b1)
 [Useful CMake Examples](https://github.com/ttroy50/cmake-examples)本文来自这里的实例
-
+[完整教程](https://medium.com/@onur.dundar1/cmake-tutorial-585dd180109b)

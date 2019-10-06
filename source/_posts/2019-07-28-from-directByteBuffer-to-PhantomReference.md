@@ -250,7 +250,7 @@ public static void main(String[] args) throws Exception {
     cleaner.clean();
 }
 ```
-不注意就用到了sun的package了，因为sun.xxx这些package下面的class都是在rt.jar里面，由bootStrapClassLaoder加载，所以可以使用这个package。
+不注意就用到了sun的package了，因为sun.xxx这些package下面的class都是在rt.jar里面，由BootStrapClassLaoder加载，所以可以使用这个package。不过好像java9开始sun这个包下面的东西默认不能用了。
 
 
 ### 经验

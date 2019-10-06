@@ -227,3 +227,4 @@ $ ./configure 在这一步因为没有生成Makefile.in所以停下来了
 ## 参考
 [helloworld](https://thoughtbot.com/blog/the-magic-behind-configure-make-make-install)
 [autotools教程](https://www.gnu.org/software/automake/manual/automake.html)
+[Autoconf Tutorial Part-1](http://www.idryman.org/blog/2016/03/10/autoconf-tutorial-1/)

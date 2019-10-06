@@ -119,6 +119,9 @@ print(data)
 s.close()
 ```
 
+**在recv、send、recvfrom、sendto函数中，已经自动帮我们进行了相应的字节序的转换；
+而在处理sockaddr的时候就要注意了，需要我们自己手动的转换相应的字节序**
+
 在局域网内的两台电脑,server跑在mac上,client跑在win10
 client这边打印出了
 ```
