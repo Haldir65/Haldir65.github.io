@@ -593,7 +593,7 @@ inet_ntoa();//将long类型的网络字节序转换成IP地址字符串
 
 读函数read
 ssize_t read(int fd,void *buf,size_t nbyte)
-read函数是负责从fd中读取内容.当读成功 时,read返回实际所读的字节数,如果返回的值是0 表示已经读到文件的结束了,小于0表示出现了错误.如果错误为EINTR说明读是由中断引起 的, 如果是ECONNREST表示网络连接出了问题. 
+read函数是负责从fd中读取内容.当读成功 时,read返回实际所读的字节数,如果返回的值是0 表示已经读到文件的结束了,小于0表示出现了错误.如果错误为EINTR说明读是由中断引起的, 如果是ECONNREST表示网络连接出了问题. 
 
 写函数write
 ```c

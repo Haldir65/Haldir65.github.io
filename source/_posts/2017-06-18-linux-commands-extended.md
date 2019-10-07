@@ -611,6 +611,7 @@ bash和sh的区别
 /bin/sh: symbolic link to dash
 
 Because sh is a specification, not an implementation, /bin/sh is a symlink (or a hard link) to an actual implementation on most POSIX systems.(sh是POSIX标准规定的一套协议，并非实现.sh的实现有很多种，zsh,dash,bash等等。但在很多系统上，sh是bash的symbolic link).相比起来,bash的功能要比sh强大不少。Plain sh is a very minimalistic programming language.
+Posix表示可移植操作系统接口（Portable Operating System Interface，缩写为POSIX），POSIX标准定义了操作系统应该为应用程序提供的接口标准，是IEEE为要在各种UNIX操作系统上运行的软件而定义的一系列API标准的总称，其正式称呼为IEEE 1003，而国际标准名称为ISO/IEC 9945；
 
 
 
