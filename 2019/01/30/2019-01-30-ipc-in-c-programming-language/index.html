@@ -17,7 +17,7 @@
 <meta property="og:description" content="进程是资源分配的最小单位，线程是CPU调度的最小单位 本文多数来自c语言多进程编程 当Linux启动的时候，init是系统创建的第一个进程，这一进程会一直存在，直到我们关闭计算机；虽然后面systemd取代了init进程。后面的所有进程都是init进程fork出来的,linux下使用pstree可以看到所有的进程都是以systemd为根节点的当进程调用fork的时候，Linux在内存中开辟出一片新">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/Prayercard_ZH-CN13472871640_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-10-06T14:35:17.400Z">
+<meta property="og:updated_time" content="2019-10-07T12:14:48.254Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="C语言中多进程之间通信的方式">
 <meta name="twitter:description" content="进程是资源分配的最小单位，线程是CPU调度的最小单位 本文多数来自c语言多进程编程 当Linux启动的时候，init是系统创建的第一个进程，这一进程会一直存在，直到我们关闭计算机；虽然后面systemd取代了init进程。后面的所有进程都是init进程fork出来的,linux下使用pstree可以看到所有的进程都是以systemd为根节点的当进程调用fork的时候，Linux在内存中开辟出一片新">
@@ -613,7 +613,6 @@ int main(int argc, char *argv[]){
 <p>什么是共享内存<br>顾名思义，共享内存就是允许两个不相关的进程访问同一个逻辑内存；共享内存是在两个正在运行的进程之间共享和传递数据的一种非常有效的方式；<br>不同进程之间共享的内存通常安排为同一段物理内存，进程可以将同一段共享内存连接到它们自己的地址空间中，所有进程都可以访问共享内存中的地址；<br>而如果某个进程向共享内存写入数据，所做的改动将立即影响到可以访问同一段共享内存的任何其他进程；<br>特别提醒：共享内存并未提供同步机制，也就是说，在第一个进程结束对共享内存的写操作之前，并无自动机制可以阻止第二个进程开始对它进行读取；所以我们通常需要用其他的机制来同步对共享内存的访问，例如信号量、互斥锁；</p>
 </blockquote>
 <p><strong><em>共享内存的函数接口</em></strong><br><strong><br>头文件：sys/types.h、sys/ipc.h、sys/shm.h<br>int shmget(key_t shm_key, size_t shm_size, int shm_flg);：创建共享内存<br>shm_key用来标识一块共享内存：<br>shm_size：输入参数，共享内存的大小（单位：byte）：注意内存分配的单位是页（一般为4kb，可通过getpagesize()获取）；也就是说如果shm_size为1，那么也会分配4096字节的内存；只获取共享内存时，shm_size可指定为0；</strong></p>
-<p>程序对信号量的操作都是<code>原子操作</code>，并且只能对它进行等待和发送操作</p>
 <h2 id="Unix-domain-socket"><a href="#Unix-domain-socket" class="headerlink" title="Unix domain socket"></a>Unix domain socket</h2><p>socket原本是为了网络通讯设计的，但是后来在socket的框架上发展出一种IPC机制，就是UNIX Domain Socket；<br>虽然网络socket也可用于同一台主机的进程间通讯（通过loopback地址127.0.0.1），但是UNIX Domain Socket用于IPC更有效率：</p>
 <ol>
 <li>不需要经过网络协议栈；</li>
@@ -767,6 +766,7 @@ int main(int argc, char *argv[]){
 }
 </code></pre>
 <p>上述程序实现了通过uninx domain socket的client-server 数据传输，就像是通过/var/echo.sock这个文件传输数据。印象中uwsi也是这样实现nginx和django进程的通信。</p>
+<h3 id="信号量"><a href="#信号量" class="headerlink" title="信号量"></a>信号量</h3><p>信号量是用来调协进程对共享资源的访问的，程序对信号量的操作都是<code>原子操作</code>，并且只能对它进行等待和发送操作。<br>当请求一个使用信号量来表示的资源时，进程需要先读取信号量的值来判断资源是否可用。大于0，资源可以请求，等于0，无资源可用，进程会进入睡眠状态直至资源可用。<br>当进程不再使用一个信号量控制的共享资源时，信号量的值+1，对信号量的值进行的增减<br>操作均为原子操作，这是由于信号量主要的作用是维护资源的互斥或多进程的同步访问。而在信号量的创建及初始化上，不能保证操作均为原子性。</p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p><strong>现在把进程之间传递信息的各种途径（包括各种IPC机制）总结如下：<br>父进程通过fork可以将打开文件的描述符传递给子进程<br>子进程结束时，父进程调用wait可以得到子进程的终止信息<br>几个进程可以在文件系统中读写某个共享文件，也可以通过给文件加锁来实现进程间同步<br>进程之间互发信号，一般使用SIGUSR1和SIGUSR2实现用户自定义功能<br>管道<br>FIFO<br>mmap函数，几个进程可以映射同一内存区<br>SYS V IPC，以前的SYS V UNIX系统实现的IPC机制，包括消息队列、信号量和共享内存，现在已经基本废弃<br>Linux内核继承和兼容了丰富的Unix系统进程间通信（IPC）机制。有传统的管道（Pipe）、信号（Signal）和跟踪（Trace），这三项通信手段只能用于父进程与子进程之间，或者兄弟进程之间；后来又增加了命令管道（Named Pipe），使得进程间通信不再局限于父子进程或者兄弟进程之间；为了更好地支持商业应用中的事务处理，在AT&amp;T的Unix系统V中，又增加了三种称为“System V IPC”的进程间通信机制，分别是报文队列（Message）、共享内存（Share Memory）和信号量（Semaphore）；后来BSD Unix对“System V IPC”机制进行了重要的扩充，提供了一种称为插口（Socket）的进程间通信机制。<br>UNIX Domain Socket是目前最广泛使用的IPC机制</strong></p>
 <p><a href="https://www.zhihu.com/question/39440766/answer/89210950">Linux现有的所有进程间IPC方式</a></p>
 <ol>
