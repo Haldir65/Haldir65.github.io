@@ -279,3 +279,17 @@ UDP的首部只有8个字节，12 字节的伪首部是为了计算检验和临�
 HTTP幂等性(用CAS)避免下单两次
 
 [TCP端口状态说明ESTABLISHED、TIME_WAIT](http://www.cnblogs.com/jiunadianshi/articles/2981068.html)FIN_WAIT2
+
+
+
+
+[tweak kernel parameters](https://medium.com/@pawilon/tuning-your-linux-kernel-and-haproxy-instance-for-high-loads-1a2105ea553e)
+net.ipv4.tcp_max_syn_backlog = 100000
+> how many half-open connections for which the client has not yet sent an ACK response can be kept in the queue. The default net.ipv4.tcp_max_syn_backlog is set to 128
+
+net.core.somaxconn = 100000
+ > the maximum value that net.ipv4.tcp_max_syn_backlog can take. Higher values are silently truncated to the value indicated by somaxconn
+
+net.core.netdev_max_backlog = 100000
+> the maximum number of packets in the receive queue that passed through the network interface and are waiting to be processed by the kernel. The default is set to 1000 on Ubuntu 16.04 
+

@@ -88,5 +88,10 @@ fastjson中还有一段ThreadLocalCache，缓存了char数组，所以可以一�
 [class文件结构以及使用asm教程](https://www.ibm.com/developerworks/cn/java/j-lo-asm30/)
 
 
+
+
 ## 参考
 [美团技术博客关于java byte code 的介绍](https://tech.meituan.com/2019/09/05/java-bytecode-enhancement.html)
+
+
+[Java-Class-Viewer](https://www.codeproject.com/Articles/35915/Java-Class-Viewer)

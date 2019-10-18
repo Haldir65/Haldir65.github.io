@@ -362,6 +362,8 @@ sudo iptables -t nat -A REDSOCKS -p tcp -j REDIRECT --to-ports 12345
 sudo iptables -t nat -A OUTPUT -p tcp -o eth0 -j REDSOCKS
 ```
 
+[redirect不只局限于转发到本地特定端口，还支持转到局域网内另一台设备上](https://serverfault.com/questions/586486/how-to-do-the-port-forwarding-from-one-ip-to-another-ip-in-same-network)
+
 
 经常会看到教程如何把一台局域网linux nas或者虚拟机变成软路由的教程，首先需要设备开启ip转发
 ```

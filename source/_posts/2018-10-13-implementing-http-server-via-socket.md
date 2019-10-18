@@ -384,53 +384,53 @@ char* joinString(char *s1, char *s2)
 int get_ip_by_domain(const char *domain, char *ip); // 根据域名获取ip
 
 int main(int argc, char *argv[]){
-if(argc!=2){
-    printf("please input host name %s ipn",argv[0]); 
-    return 1;
-}
-char * host = argv[1];
-int sockfd;
-int len; 
-struct sockaddr_in address; 
-int result; 
-char httpstring[1000]; 
+    if(argc!=2){
+        printf("please input host name %s ipn",argv[0]); 
+        return 1;
+    }
+    char * host = argv[1];
+    int sockfd;
+    int len; 
+    struct sockaddr_in address; 
+    int result; 
+    char httpstring[1000]; 
 
-char * server_ip[100];
-get_ip_by_domain(host,server_ip);
-strcat(httpstring,"GET / HTTP/1.1\r\n");
-strcat(httpstring,"Host: ");
-strcat(httpstring,host);
-strcat(httpstring,"\r\n");
-strcat(httpstring,
-"Connection: keep-alive\r\n"
-"Cache-Control: max-age=0\r\n"
-"Upgrade-Insecure-Requests: 1\r\n"
-"User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.67 Safari/537.36\r\n"
-"DNT: 1\r\n"
-"Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8\r\n"
-"Accept-Encoding: gzip, deflate, br\r\n"
-"Accept-Language: zh-CN,zh;q=0.9\r\n\r\n"); 
-char ch;
-sockfd = socket(AF_INET, SOCK_STREAM, 0); 
-address.sin_family = AF_INET; 
-printf("the server host is %s and the ip is %s\n",argv[1],server_ip);
-address.sin_addr.s_addr = inet_addr(server_ip); 
-address.sin_port = htons(80); 
-len = sizeof(address);
-result = connect(sockfd,(struct sockaddr *)&address,len); 
-if(result == -1){ 
-    perror("oops: client connect error"); 
-    return 1; 
-}
-printf("befor connect!!");
-write(sockfd,httpstring,strlen(httpstring)); 
-printf("after write!!\n");
-while(read(sockfd,&ch,1)){ 
-    printf("%c", ch); 
-} 
-close(sockfd); 
-printf("n"); 
-return 0;
+    char * server_ip[100];
+    get_ip_by_domain(host,server_ip);
+    strcat(httpstring,"GET / HTTP/1.1\r\n");
+    strcat(httpstring,"Host: ");
+    strcat(httpstring,host);
+    strcat(httpstring,"\r\n");
+    strcat(httpstring,
+    "Connection: keep-alive\r\n"
+    "Cache-Control: max-age=0\r\n"
+    "Upgrade-Insecure-Requests: 1\r\n"
+    "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.67 Safari/537.36\r\n"
+    "DNT: 1\r\n"
+    "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8\r\n"
+    "Accept-Encoding: gzip, deflate, br\r\n"
+    "Accept-Language: zh-CN,zh;q=0.9\r\n\r\n"); 
+    char ch;
+    sockfd = socket(AF_INET, SOCK_STREAM, 0); 
+    address.sin_family = AF_INET; 
+    printf("the server host is %s and the ip is %s\n",argv[1],server_ip);
+    address.sin_addr.s_addr = inet_addr(server_ip); 
+    address.sin_port = htons(80); 
+    len = sizeof(address);
+    result = connect(sockfd,(struct sockaddr *)&address,len); 
+    if(result == -1){ 
+        perror("oops: client connect error"); 
+        return 1; 
+    }
+    printf("befor connect!!");
+    write(sockfd,httpstring,strlen(httpstring)); 
+    printf("after write!!\n");
+    while(read(sockfd,&ch,1)){ 
+        printf("%c", ch); 
+    } 
+    close(sockfd); 
+    printf("n"); 
+    return 0;
 } 
 
 #define IP_SIZE		16
@@ -704,12 +704,28 @@ Connection: upgrade
 Upgrade: websocket
 Sec-WebSocket-Accept: sasasasaD/tA=
 
-这样也就完成了protocol upgrade的过程
+这样也就完成了protocol upgrade的过程,webSocket是建立在http协议上的
 
 
+- <del>js并不支持对操作系统socket的直接控制</del>，可能是安全因素(websocket倒是有，不过那是另外一回事了)。
+node js是有[socket支持](https://www.runoob.com/nodejs/nodejs-net-module.html)的
+```js
+var net = require('net');       // 这个是tcp             
+var client = new net.Socket();                         
+client.connect(6000, "127.0.0.1");                     
 
+client.on('data', function (data) {                   
+    console.log('!!!!!!!!:' + data);
+});
 
-- js并不支持对操作系统socket的直接控制，可能是安全因素(websocket倒是有，不过那是另外一回事了)。
+client.on('error', function (exception) {            
+    console.log('socket error:' + exception);
+//    client.end();
+});
+```
+
+想要用udp的话有require('dgram');
+
 
 ```c
 #include <unistd.h>
