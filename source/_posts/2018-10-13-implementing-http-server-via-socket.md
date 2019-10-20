@@ -607,9 +607,9 @@ write函数将buf中的nbytes字节内容写入文件描述符fd.成功时返回
 如果为EPIPE表示网络连接出现了问题(对方已经关闭了连接).
 
 [recv和send都是跟buffer打交道的](https://www.cnblogs.com/jianqiang2010/archive/2010/08/20/1804598.html)
-Socket send函数和recv函数详解
+socket send函数和recv函数详解
 1.send 函数
-int send( SOCKET s, const char FAR *buf, int len, int flags );  
+int send( socket s, const char FAR *buf, int len, int flags );  
 不论是客户还是服务器应用程序都用send函数来向TCP连接的另一端发送数据。客户程序一般用send函数向服务器发送请求，而服务器则通常用send函数来向客户程序发送应答。
 
 该函数的第一个参数指定发送端套接字描述符；
@@ -620,7 +620,7 @@ int send( SOCKET s, const char FAR *buf, int len, int flags );
 
 第四个参数一般置0。 
 
-这里只描述同步Socket的send函数的执行流程。当调用该函数时，
+这里只描述同步socket的send函数的执行流程。当调用该函数时，
 
 （1）send先比较待发送数据的长度len和套接字s的发送缓冲的长度， 如果len大于s的发送缓冲区的长度，该函数返回SOCKET_ERROR；
 

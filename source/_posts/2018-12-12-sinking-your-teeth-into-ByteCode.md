@@ -92,6 +92,4 @@ fastjson中还有一段ThreadLocalCache，缓存了char数组，所以可以一�
 
 ## 参考
 [美团技术博客关于java byte code 的介绍](https://tech.meituan.com/2019/09/05/java-bytecode-enhancement.html)
-
-
-[Java-Class-Viewer](https://www.codeproject.com/Articles/35915/Java-Class-Viewer)
+[jav-class-viewer](https://www.codeproject.com/Articles/35915/Java-Class-Viewer) 一个gui工具，能够非常直观地展示class文件的结构

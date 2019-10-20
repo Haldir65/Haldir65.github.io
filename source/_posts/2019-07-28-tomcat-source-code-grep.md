@@ -322,7 +322,7 @@ nRead = socketWrapper.read(block, byteBuffer); // 此时运行在线程池中，
 ```
 所以等待的是线程池中的线程，创建了一个CountDownLatch(1)，等在那里。于此同时BlockPoller线程一直在跑，发现新的Read事件，从attachMent(SocketWrapper中获取这个CountDownLatch，countDown一下，这里就能够恢复继续执行)
 
-
+从系统的ready keys中获取事件:
 processKey -> AbstractEndPoint.processSocket -> Executor.execute(SocketProcessorBase)(在这里开始分发到工作线程池) -> NioEndPoint.SocketProcessor.doRun -> AbstractProtocol.ConnectionHandler.process -> Processor.process -> AbstractProcessorLight.process -> Http11Processor.service(SocketWrapperBase<?> socketWrapper) -> Http11InputBuffer.parseRequestLine(这里就开始读取Http1.1请求，比较复杂)
 
 走到Http11InputBuffer说明一定是http1.1的请求格式了(但这有可能是webSocket或者http2的upgrade请求)，在哪里判断是交给http1.1还是http2.0还是ajp协议？在AbstractProcessorLight.process中判断了如果socket.status == SocketEvent.OPEN_READ(就是说这是一个连接上的，刚刚准备好可以读的连接，所以默认直接交给http1.1去处理了，就算是http2后面还是可以upgrade的)

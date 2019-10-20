@@ -48,7 +48,7 @@ top : 1
 - [ ] [chromium提供了如何在windows上编译chromium的教程](https://chromium.googlesource.com/chromium/src/+/master/docs/windows_build_instructions.md#System-requirements)
 - [ ][How the JVM compiles bytecode into machine code](https://www.youtube.com/watch?v=M8LiOANu3Nk)
 - [ ] WebSocket协议及数据帧
-- [ ]Lua脚本是一个很轻量级的脚本，也是号称性能最高的脚本。路由器上都有运行环境，语法和c语言差不多。在nginx配置文件中也可使用
+- [ ]Lua脚本是一个很轻量级的脚本，也是号称性能最高的脚本。路由器上都有运行环境，语法和c语言差不多。在<del>nginx</del>openresty配置文件中也可使用。lua还可以和java代码互相调用，还找到了一个[将lua移植到android平台](https://github.com/sanyouyugan/Mas)的项目
 - [腾讯的mmkv是shared preference的有效替代品](https://juejin.im/post/5baf8ae8f265da0ae92a7df5) mmap的使用值得学习
 - [简单的组件化方案](https://www.jianshu.com/p/5f9a7bc902e1)
 - [mvc,mvp,mvvm](https://www.tianmaying.com/tutorial/AndroidMVC)这些关键术语的掌握还是必要的
@@ -56,10 +56,9 @@ top : 1
 - jdk8 standard Library implementatison detail(java代码的实现 --> hotspot代码的c语言实现)
 - [后端面试题](https://segmentfault.com/a/1190000017864721)
 - thrift 源码解析，rpc框架（比方说人脸识别应用就可以用java调用python服务）这种rpc过程肯定要考虑字节序的问题。
-- Perl被称为脚本语言中的瑞士军刀，正则多一点
+- Perl被称为脚本语言中的瑞士军刀，处理文本和正则的能力比较强。学习perl5就可以了。
 - [Spring Boot application.yml](https://docs.spring.io/spring-boot/docs/current/reference/html/howto-properties-and-configuration.html) 写法
 - 微服务框架 <del>dubbo</del> kubernetes, Spring Cloud....
-- how does jvm parse class file and the code structure of .class file(how do we manipulate .class file like in asm)
 - [] java BitSet这个class的使用及效率
 - [] 关于textView源码的解析要补上
 - [] 熟练掌握java8的stream,lambda,optional等语法
@@ -117,6 +116,7 @@ top : 1
 - [X] jdk7开始提供fork join pool方法，将任务分配到多个线程上处理(不适合io密集型操作)
 - [X] [openjdk的C语言实现可以随便调几处来看看](https://github.com/keerath/openjdk-8-source/blob/master/jdk/src/windows/native/java/net/SocketOutputStream.c)
 - [X] 安装并使用MAT 分析java应用内存。
+- [X]how does jvm parse class file and the code structure of .class file(how do we manipulate .class file like in asm) 照着一个java classfile viewer看结构就可以了，如果不是打算深入虚拟机的话，没必要。
 
 
 

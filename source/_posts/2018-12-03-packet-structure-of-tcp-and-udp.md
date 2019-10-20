@@ -167,6 +167,33 @@ net.ipv4.ip_forward = 1
 /proc/sys/kernel/threads-max ## 可以创建的最大线程数，这个跟ram有关
 ```
 
+tcp还有一个半连接队列和全连接队列
+半连接就是三步握手的第二步完成后server等client回复
+全连接就是三步握手完成了，状态为established的
+
+
+全连接队列的大小取决于：min(backlog, somaxconn) . backlog是在socket创建的时候传入的，somaxconn是一个os级别的系统参数。 somaxconn的位置在：
+cat /proc/sys/net/core/somaxconn  
+128
+（默认是128，就是说一个port同时最多维持128条established的连接，当然可以调大一点了，网上有很多关于server端内核调优的文章）。java的serverSocket一个构造函数里写死了50，当然也可以调大点。
+
+
+半连接队列的大小取决于：max(64, /proc/sys/net/ipv4/tcp_max_syn_backlog)。 
+cat /proc/sys/net/ipv4/tcp_max_syn_backlog
+512
+不同版本的os会有些差异
+
+
+注意：比如syn floods 攻击就是针对半连接队列的，攻击方不停地建连接，但是建连接的时候只做第一步，第二步中攻击方收到server的syn+ack后故意扔掉什么也不做，导致server上这个半连接队列满其它正常请求无法进来
+
+参考[阿里中间件团队博客的这篇文章](http://jm.taobao.org/2017/05/25/525-1/)，
+cat /proc/sys/net/ipv4/tcp_abort_on_overflow
+0
+这个参数默认为0，0的时候表示如果三次握手第三步的时候全连接队列满了那么server扔掉client 发过来的ack。
+把tcp_abort_on_overflow修改成 1，1表示第三步的时候如果全连接队列满了，server发送一个reset包给client，表示废掉这个握手过程和这个连接
+这个时候客户端就能观察到connection reset by peer
+
+
 ### tcp buffer
 关键字： tcp read buffer and write buffer
 这里要分congestion window（发送方的window，对应congestion control）和receive window(接收方的window，对应flow control)
@@ -279,6 +306,10 @@ UDP的首部只有8个字节，12 字节的伪首部是为了计算检验和临�
 HTTP幂等性(用CAS)避免下单两次
 
 [TCP端口状态说明ESTABLISHED、TIME_WAIT](http://www.cnblogs.com/jiunadianshi/articles/2981068.html)FIN_WAIT2
+
+[tcp滑动窗口]](https://akaedu.github.io/book/ch36s07.html)
+
+IPv4和IPv6的地址格式定义在netinet/in.h中，IPv4地址用sockaddr_in结构体表示，包括16位端口号和32位IP地址，IPv6地址用sockaddr_in6结构体表示，包括16位端口号、128位IP地址和一些控制字段。所以ipv6的ip数量要大得多。
 
 
 

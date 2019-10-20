@@ -286,6 +286,7 @@ cahe也就意味着后续，所有对于themes文件夹中的_config.yml文件�
 
 
 vscode的返回上一个文件快捷键是ctrl + -
+multiple cursor的快捷键是ctrl + d
 
 
 ## 13 . travis ci自动部署的一些问题

@@ -155,6 +155,8 @@ cython(python c extension)和cpython(c语言实现的python）是两件事
 [how-to-call-c-c-code-from-node-js](https://medium.com/@tarkus/how-to-call-c-c-code-from-node-js-86a773033892)
 很多大型js项目都有一个binging.gyp文件（一定是这个名字）
 
+[node js addon](https://jameshfisher.com/2019/04/20/nodejs-addon-hello-world/) 在js代码中还是import的方式
+
 gyp其实是一个用来生成项目文件的工具，一开始是设计给chromium项目使用的，后来大家发现比较好用就用到了其他地方。生成项目文件后就可以调用GCC, vsbuild, xcode等编译平台来编译。至于为什么要有node-gyp，是由于node程序中需要调用一些其他语言编写的工具甚至是dll，需要先编译一下，否则就会有跨平台的问题，例如在windows上运行的软件copy到mac上就不能用了，但是如果源码支持，编译一下，在mac上还是可以用的。
 
 

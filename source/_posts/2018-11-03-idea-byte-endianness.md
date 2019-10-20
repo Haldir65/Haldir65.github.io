@@ -350,3 +350,6 @@ int main(){
 
 高位的数据被抹掉了，所以0x12345678 在内存中的存储方式其实是 78 56 34 12
 
+
+## 参考
+[linux一站式学习](https://akaedu.github.io/book/ch37s01.html)
