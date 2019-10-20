@@ -17,7 +17,7 @@
 <meta property="og:description" content="Tomcat源码解析">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/LetchworthSP_EN-AU14482052774_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-10-18T10:21:58.117Z">
+<meta property="og:updated_time" content="2019-10-20T13:23:51.761Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Tomcat部分源码解析">
 <meta name="twitter:description" content="Tomcat源码解析">
@@ -449,7 +449,7 @@ serverSock.socket().bind(addr,getAcceptCount()); //bind方法的第二个参数�
 //至于这里为什么要这么写，作为一个读方法，那么如果没有读取到东西，是不是就需要写一个while循环，这会浪费很多cpu cycle，还不如注册一下事件，把轮询的任务交给os。
 </code></pre>
 <p>所以等待的是线程池中的线程，创建了一个CountDownLatch(1)，等在那里。于此同时BlockPoller线程一直在跑，发现新的Read事件，从attachMent(SocketWrapper中获取这个CountDownLatch，countDown一下，这里就能够恢复继续执行)</p>
-<p>processKey -&gt; AbstractEndPoint.processSocket -&gt; Executor.execute(SocketProcessorBase)(在这里开始分发到工作线程池) -&gt; NioEndPoint.SocketProcessor.doRun -&gt; AbstractProtocol.ConnectionHandler.process -&gt; Processor.process -&gt; AbstractProcessorLight.process -&gt; Http11Processor.service(SocketWrapperBase&lt;?&gt; socketWrapper) -&gt; Http11InputBuffer.parseRequestLine(这里就开始读取Http1.1请求，比较复杂)</p>
+<p>从系统的ready keys中获取事件:<br>processKey -&gt; AbstractEndPoint.processSocket -&gt; Executor.execute(SocketProcessorBase)(在这里开始分发到工作线程池) -&gt; NioEndPoint.SocketProcessor.doRun -&gt; AbstractProtocol.ConnectionHandler.process -&gt; Processor.process -&gt; AbstractProcessorLight.process -&gt; Http11Processor.service(SocketWrapperBase&lt;?&gt; socketWrapper) -&gt; Http11InputBuffer.parseRequestLine(这里就开始读取Http1.1请求，比较复杂)</p>
 <p>走到Http11InputBuffer说明一定是http1.1的请求格式了(但这有可能是webSocket或者http2的upgrade请求)，在哪里判断是交给http1.1还是http2.0还是ajp协议？在AbstractProcessorLight.process中判断了如果socket.status == SocketEvent.OPEN_READ(就是说这是一个连接上的，刚刚准备好可以读的连接，所以默认直接交给http1.1去处理了，就算是http2后面还是可以upgrade的)</p>
 <p>上面提到NioSocketWrapper是一个attachMent，这个类的实例的创建是在Acceptor中发生的。<br>在NioEndPoint.java的startInternal方法中，有这么一段</p>
 <pre><code class="java"> // Start poller thread

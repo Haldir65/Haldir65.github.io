@@ -17,7 +17,7 @@
 <meta property="og:description" content="收集几种语言中使用socket实现httpServer和httpClient的主要步骤">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/sun_rise_dim_grass.jpg">
-<meta property="og:updated_time" content="2019-10-18T10:21:58.113Z">
+<meta property="og:updated_time" content="2019-10-20T13:23:51.757Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从Socket入手实现http协议">
 <meta name="twitter:description" content="收集几种语言中使用socket实现httpServer和httpClient的主要步骤">
@@ -752,12 +752,12 @@ int main(int argc, char **argv){
 ssize_t write(int fd, const void *buf, size_t count);
 </code></pre>
 <p>write函数将buf中的nbytes字节内容写入文件描述符fd.成功时返回写的字节数.失败时返回-1. 并设置errno变量. 在网络程序中,当我们向套接字文件描述符写时有两可能.<br>1)write的返回值大于0,表示写了部分或者是全部的数据. 这样我们用一个while循环来不停的写入，但是循环过程中的buf参数和nbyte参数得由我们来更新。也就是说，网络写函数是不负责将全部数据写完之后在返回的。<br>2)返回的值小于0,此时出现了错误.我们要根据错误类型来处理.<br>如果错误为EINTR表示在写的时候出现了中断错误.<br>如果为EPIPE表示网络连接出现了问题(对方已经关闭了连接).</p>
-<p><a href="https://www.cnblogs.com/jianqiang2010/archive/2010/08/20/1804598.html">recv和send都是跟buffer打交道的</a><br>Socket send函数和recv函数详解<br>1.send 函数<br>int send( SOCKET s, const char FAR *buf, int len, int flags );<br>不论是客户还是服务器应用程序都用send函数来向TCP连接的另一端发送数据。客户程序一般用send函数向服务器发送请求，而服务器则通常用send函数来向客户程序发送应答。</p>
+<p><a href="https://www.cnblogs.com/jianqiang2010/archive/2010/08/20/1804598.html">recv和send都是跟buffer打交道的</a><br>socket send函数和recv函数详解<br>1.send 函数<br>int send( socket s, const char FAR *buf, int len, int flags );<br>不论是客户还是服务器应用程序都用send函数来向TCP连接的另一端发送数据。客户程序一般用send函数向服务器发送请求，而服务器则通常用send函数来向客户程序发送应答。</p>
 <p>该函数的第一个参数指定发送端套接字描述符；</p>
 <p>第二个参数指明一个存放应用程序要发送数据的缓冲区；</p>
 <p>第三个参数指明实际要发送的数据的字节数；</p>
 <p>第四个参数一般置0。 </p>
-<p>这里只描述同步Socket的send函数的执行流程。当调用该函数时，</p>
+<p>这里只描述同步socket的send函数的执行流程。当调用该函数时，</p>
 <p>（1）send先比较待发送数据的长度len和套接字s的发送缓冲的长度， 如果len大于s的发送缓冲区的长度，该函数返回SOCKET_ERROR；</p>
 <p>（2）如果len小于或者等于s的发送缓冲区的长度，那么send先检查协议是否正在发送s的发送缓冲中的数据，如果是就等待协议把数据发送完，如果协议还没有开始发送s的发送缓冲中的数据或者s的发送缓冲中没有数据，那么send就比较s的发送缓冲区的剩余空间和len</p>
 <p>（3）如果len大于剩余空间大小，send就一直等待协议把s的发送缓冲中的数据发送完</p>
