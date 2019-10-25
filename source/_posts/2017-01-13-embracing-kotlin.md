@@ -511,7 +511,10 @@ test1使用的是java 8的BiConsumer，在低版本(api 24以下)会崩，第二
 
 
 
+tbd
 - [jconf taiwan上有一个关于kotlin实现细节的演讲](https://www.youtube.com/watch?v=jQFyQSTbZ_Q) 
+
+kotlin 委托属性
 
 
 ### 参考

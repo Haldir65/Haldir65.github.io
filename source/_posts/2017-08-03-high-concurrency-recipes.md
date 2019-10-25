@@ -407,18 +407,6 @@ BlockingQueue提供了四种应对策略来处理这种资源不能被立即sati
 
 BlockingQueue的常用的实现类包括ArrayBlockingQueue(FIFO)和LinkedBlockingQueue(FIFO)。
 
-ArrayBlockingQueue是一个由数组实现的 **有界阻塞队列**。该队列采用 ***FIFO*** 的原则对元素进行排序添加。
-ArrayBlockingQueue的入列核心方法是一个private方法enqueue(put ,offer都代理给了这个方法)，而这个方法的调用是被包在一个lock.lock和lock.unlock中的，所以是线程安全的的。出列的核心方法是dequeue，也是包在同步lock里面的。构造函数可以传一个fair进来。enqueue方法里面还有一个notEmpty.signal() ， 其实就是典型的通知消费者。
-
-LinkedBlockingQueue是Exexutors中使用的创建线程池的静态方法中使用的参数，显然更推荐使用。主要用的是两个方法，
-put方法在队列满的时候会阻塞直到有队列成员被消费，take方法在队列空的时候会阻塞，直到有队列成员被放进来。官方文档提到了， **LinkedBlockingQueue的吞吐量通常要高于基于数组的队列，但在大多数并发应用程序中，其可预知的性能要低一些** ， 内部的lock只能是unfair的。
-
-在线程池(ThreadPoolExecutor)中，获取任务使用的是queue的**poll**方法，添加任务使用的是queue的**offer**方法。
-从ArrayBlockingQueue的实现来看，poll和offer都被一个lock的上锁和解锁包住了，所以和上面的表格中的poll、offer不阻塞有一定差异(大概这也是叫做BlockingQueue的原因吧)
-
-从原理来看
-
-
 ## 15. AtomicXXX只是将value写成volatile，这样get就安全了，set的话直接交给Unsafe了
 volatile并不是Atomic操作，例如，A线程对volatile变量进行写操作(实际上是读和写操作)，B线程可能在这两个操作之间进行了写操作；例如用volatile修饰count变量那么 count++ 操作就不是原子性的。而AtomicInteger类提供的atomic方法可以让这种操作具有原子性如getAndIncrement()方法会原子性的进行增量操作把当前值加一,因为AtomicInteger的getAndIncrement方法就是简单的调用了Unsafe的getAndAddInt。
 

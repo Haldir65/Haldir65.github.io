@@ -11,7 +11,17 @@ queue的一些实现类及使用场景分析
 
 
 ## Queue在线程池中的应用
-BlockingQueue是一个接口
+BlockingQueue是一个接口，jdk中实现了该接口的class包括
+
+ArrayBlockingQueue
+DelayQueue
+LinkedBlockingQueue
+LinkedBlockingDeque
+LinkedTransferQueue
+PriorityBlockingQueue
+SynchronousQueue
+
+
 BlockingQueue提供了四种应对策略来处理这种资源不能被立即满足的场景
 
 | 空值     | 抛出异常     |   返回一个特殊值 | 阻塞 | 调用者提供一个超时 |
@@ -21,10 +31,25 @@ BlockingQueue提供了四种应对策略来处理这种资源不能被立即满�
 | 检查     | element()  | peek()  | 不可用 | 不可用 |
 
 
+
+queue的重要性在于，在线程池(ThreadPoolExecutor)中，获取任务使用的是queue的**poll**方法，添加任务使用的是queue的**offer**方法。
+从ArrayBlockingQueue的实现来看，poll和offer都被一个lock的上锁和解锁包住了，所以和上面的表格中的poll、offer不阻塞有一定差异(大概这也是叫做BlockingQueue的原因吧)
+
 ThreadPoolExecutor的构造函数中需要传入一个BlockingQueue<Runnable> workQueue，一个阻塞式的队列 。也就是说，添加任务和获取任务的过程都是阻塞的。
 jdk中提供的线程池选择的队列：
 newCachedThreadPool使用了SynchronousQueue(每一个插入操作必须等待另一个线程的对应移除操作)
 newFixedThreadPool使用了LinkedBlockingQueue(这个队列是无界的)，干活的线程就那么多，任务多了就加入队列好了
+
+
+
+ArrayBlockingQueue是一个由数组实现的 **有界阻塞队列**。该队列采用 ***FIFO*** 的原则对元素进行排序添加。
+ArrayBlockingQueue的入列核心方法是一个private方法enqueue(put ,offer都代理给了这个方法)，而这个方法的调用是被包在一个lock.lock和lock.unlock中的，所以是线程安全的的。出列的核心方法是dequeue，也是包在同步lock里面的。构造函数可以传一个fair进来。enqueue方法里面还有一个notEmpty.signal() ， 其实就是典型的通知消费者。
+
+LinkedBlockingQueue是Executors中使用的创建线程池的静态方法中使用的参数，显然更推荐使用。主要用的是两个方法，
+put方法在队列满的时候会阻塞直到有队列成员被消费，take方法在队列空的时候会阻塞，直到有队列成员被放进来。官方文档提到了， **LinkedBlockingQueue的吞吐量通常要高于基于数组的队列，但在大多数并发应用程序中，其可预知的性能要低一些** ， 内部的lock只能是unfair的。
+
+
+
 
 
 ## DelayQueue

@@ -263,7 +263,7 @@ public void Thread.interrupt();
 //判断线程是否被中断（实例方法）
 public boolean Thread.isInterrupted();
 
-//判断是否被中断并清除当前中断状态（静态方法）
+//判断是否被中断并清除当前中断状态（静态方法），该方法会clear掉interrupt标志
 public static boolean Thread.interrupted();
 ```
 

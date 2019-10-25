@@ -461,7 +461,7 @@ root = new ViewRootImpl(view.getContext(), display);
 view.setLayoutParams(wparams);//这里面直接一个requestLayout
 
 //ViewRootImpl.java
-/ Schedule the first layout -before- adding to the window
+// Schedule the first layout -before- adding to the window
 public void setView(View view, WindowManager.LayoutParams attrs, View panelParentView) {
        // Schedule the first layout -before- adding to the window
     // manager, to make sure we do the relayout before receiving
