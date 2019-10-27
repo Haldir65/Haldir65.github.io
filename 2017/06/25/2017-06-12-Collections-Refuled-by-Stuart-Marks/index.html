@@ -17,7 +17,7 @@
 <meta property="og:description" content="根据网上的大部分博客的分类，集合框架分为Collections(具有类似数组的功能)和Map(存储键值对)这两大部分。针对jdk1.8的java.util里面的一些常用的或者不常用的集合做一些分析。写这篇文章的过程中，我慢慢发现不同版本jdk的同一个class的实现是有一些差异的(LinkedList)，由于对照的是java1.8的代码，里面会多一些since 1.8的代码，这里不作论述。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg">
-<meta property="og:updated_time" content="2019-10-25T10:27:32.131Z">
+<meta property="og:updated_time" content="2019-10-27T13:11:15.641Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java集合类的一些整理">
 <meta name="twitter:description" content="根据网上的大部分博客的分类，集合框架分为Collections(具有类似数组的功能)和Map(存储键值对)这两大部分。针对jdk1.8的java.util里面的一些常用的或者不常用的集合做一些分析。写这篇文章的过程中，我慢慢发现不同版本jdk的同一个class的实现是有一些差异的(LinkedList)，由于对照的是java1.8的代码，里面会多一些since 1.8的代码，这里不作论述。">
@@ -862,7 +862,7 @@ threshold = (int)Math.min(newCapacity * loadFactor, MAX_ARRAY_SIZE + 1);
 //所以哪怕所有的元素都挂在第一个Entry的尾巴上，size到了这个程度，也得resize。这也是hashMap后面改成树结构的一部分原因
 </code></pre>
 <p>因为int 是signed的，所以最大的容量是2的32次方，20亿左右，2147483647。上面的注释也说明了，部分vm可能不允许allocate超过20亿这个数字，所以减掉8。</p>
-<p>生成数组下标的方法是用(0x7FFFFFFF，其实就是2的31次方)这个数对hashCode进行按位与运算，再对当前数组取模。<br>这里强调一点，<a href="https://stackoverflow.com/questions/9249983/hashcode-giving-negative-values">hashCode可以为负数</a>。负数是怎么来的，overflow。<br>java中的overflow大概是这样的</p>
+<p>生成数组下标的方法是用(0x7FFFFFFF，其实就是2的31次方)这个数对hashCode进行按位与运算，再对当前数组取模。<br>这里强调一点，<a href="https://stackoverflow.com/questions/9249983/hashcode-giving-negative-values">hashCode可以为负数</a>。负数是怎么来的，integer overflow。<br>java中的overflow大概是这样的</p>
 <pre><code class="java">int dd1 = Integer.MAX_VALUE+1;
 int dd2 = Integer.MAX_VALUE+2;
 System.out.println(Integer.toBinaryString(Integer.MAX_VALUE));
@@ -875,6 +875,21 @@ System.out.println(dd1&gt;Integer.MAX_VALUE); // false
 System.out.println(dd2&gt;dd1); // true
 </code></pre>
 <p>所以在Int(32个槽子，最多40多亿的样子，0-20多亿是正数，30亿，40亿是负数)，long也是类似。<br>回到0x7FFFFFFF 这个数，&amp; 操作的作用就是把哪些超过20亿的（负数），抹掉第一位的0，也就成了正数。对于不超过那个20多亿的数，原样返还。</p>
+<p>所以检测两个Int 相加会不会overflow的办法是转成long之后再相加</p>
+<pre><code class="java"> public static void main(String[] args) {
+      int val1 = 9898989;
+      int val2 = 6789054;
+      System.out.println(&quot;Value1: &quot;+val1);
+      System.out.println(&quot;Value2: &quot;+val2);
+      long sum = (long)val1 + (long)val2;
+      if (sum &gt; Integer.MAX_VALUE) {
+         throw new ArithmeticException(&quot;Overflow!&quot;);
+      }
+      // displaying sum
+      System.out.println(&quot;Sum: &quot;+(int)sum);
+   }
+</code></pre>
+<p>所以ArrayList里面就有这种防止扩容扩地太大，超出了Integer.MAX_VALUE的情况，具体来说，就是如果ArrayList的构造函数如果传入了超出20亿左右的一个int(比如说30亿，其实此时已经是一个负数了)，直接抛出一个OutOfMemoryError。</p>
 <p>一个有趣的现象是hashTable的rehash会把每个Entry上的元素顺序颠倒过来，例如(a-&gt;b-&gt;c-&gt;d)变成(d-&gt;c-&gt;b-&gt;a)。不过这个属于vm实现的细节。</p>
 <h2 id="3-Set的介绍"><a href="#3-Set的介绍" class="headerlink" title="3. Set的介绍"></a>3. Set的介绍</h2><p>Set用比较少，HashSet、TreeSet和LinkedHashSet是jdk的实现类</p>
 <p>public class HashSet<E><br>    extends AbstractSet<E><br>    implements Set<E>, Cloneable, java.io.Serializable<br>Set的重要特点就是<strong>不能放进去重复</strong>的元素，Set中不会存在e1和e2，e1.equals(e2)的情况<br>HashSet的源码只有三百多行，内部有一个map（HashMap）相对来说是比较简单的。其实Set平时用的也不是那么多。。。</p>
@@ -1290,6 +1305,10 @@ a = null;
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
@@ -1298,15 +1317,15 @@ a = null;
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">nginx</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">sql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">django</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1323,10 +1342,6 @@ a = null;
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">opengl</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">django</a>
               </li>
              
               <li class="article-tag-list-item">
