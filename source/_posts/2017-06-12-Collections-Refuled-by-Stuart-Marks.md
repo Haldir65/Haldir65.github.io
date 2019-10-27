@@ -759,7 +759,7 @@ threshold = (int)Math.min(newCapacity * loadFactor, MAX_ARRAY_SIZE + 1);
 因为int 是signed的，所以最大的容量是2的32次方，20亿左右，2147483647。上面的注释也说明了，部分vm可能不允许allocate超过20亿这个数字，所以减掉8。
 
 生成数组下标的方法是用(0x7FFFFFFF，其实就是2的31次方)这个数对hashCode进行按位与运算，再对当前数组取模。
-这里强调一点，[hashCode可以为负数](https://stackoverflow.com/questions/9249983/hashcode-giving-negative-values)。负数是怎么来的，overflow。
+这里强调一点，[hashCode可以为负数](https://stackoverflow.com/questions/9249983/hashcode-giving-negative-values)。负数是怎么来的，integer overflow。
 java中的overflow大概是这样的
 ```java
 int dd1 = Integer.MAX_VALUE+1;
@@ -775,6 +775,23 @@ System.out.println(dd2>dd1); // true
 ```
 所以在Int(32个槽子，最多40多亿的样子，0-20多亿是正数，30亿，40亿是负数)，long也是类似。
 回到0x7FFFFFFF 这个数，& 操作的作用就是把哪些超过20亿的（负数），抹掉第一位的0，也就成了正数。对于不超过那个20多亿的数，原样返还。
+
+所以检测两个Int 相加会不会overflow的办法是转成long之后再相加
+```java
+ public static void main(String[] args) {
+      int val1 = 9898989;
+      int val2 = 6789054;
+      System.out.println("Value1: "+val1);
+      System.out.println("Value2: "+val2);
+      long sum = (long)val1 + (long)val2;
+      if (sum > Integer.MAX_VALUE) {
+         throw new ArithmeticException("Overflow!");
+      }
+      // displaying sum
+      System.out.println("Sum: "+(int)sum);
+   }
+```
+所以ArrayList里面就有这种防止扩容扩地太大，超出了Integer.MAX_VALUE的情况，具体来说，就是如果ArrayList的构造函数如果传入了超出20亿左右的一个int(比如说30亿，其实此时已经是一个负数了)，直接抛出一个OutOfMemoryError。
 
 一个有趣的现象是hashTable的rehash会把每个Entry上的元素顺序颠倒过来，例如(a->b->c->d)变成(d->c->b->a)。不过这个属于vm实现的细节。
 

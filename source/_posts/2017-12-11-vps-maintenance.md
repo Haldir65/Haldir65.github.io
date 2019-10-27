@@ -528,7 +528,22 @@ sudo fail2ban-regex /var/log/nginx/access.log /etc/fail2ban/filter.d/nginx-x00.c
 |  139.162.184.185 - - [29/Oct/2018:20:02:19 -0400] "\x15\x03\x03\x00\x02\x01\x00" 400 166 "-" "-"
 
 
-[iperf是linux下的一个tcp测速软件](https://github.com/shadowsocks/shadowsocks-libev/blob/master/scripts/iperf.sh)
+[iperf是linux下的一个测速软件](https://github.com/shadowsocks/shadowsocks-libev/blob/master/scripts/iperf.sh)
+
+tcp和udp都能ce
+tcp:
+服务端:
+iperf -s
+
+客户端
+iperf -c your_server_ip 
+
+udp:
+iperf -us
+
+客户端
+iperf -uc your_server_ip -b 100M //b是bandwidth的意思
+
 
 [vps挂下载](http://frankchen.xyz/2018/04/08/private-BT-server/)。注意transmission每次修改设置文件
 sudo vim /etc/transmission-daemon/settings.json之前要先把transmission这个进程关掉，不然设置文件会被修改。
