@@ -16,7 +16,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="Kotlin是Jetbrain公司推出的面向jvm的语言，编译后的bytecode和java编写的代码并没有什么区别。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-10-27T13:11:15.641Z">
+<meta property="og:updated_time" content="2019-11-01T10:16:42.688Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用Kotlin进行java开发">
 <meta name="twitter:description" content="Kotlin是Jetbrain公司推出的面向jvm的语言，编译后的bytecode和java编写的代码并没有什么区别。">
@@ -509,6 +509,31 @@ retrofit.create(ApiStores::class.java) // kotlin写法
 <p>init函数和constructor是有区别的<br><a href="https://stackoverflow.com/questions/33688821/what-are-the-kotlin-class-initialisation-semantics">What are the Kotlin class initialisation semantics?
 </a>.简单来说，init函数</p>
 <h2 id="19-extends-T怎么写"><a href="#19-extends-T怎么写" class="headerlink" title="19. ? extends T怎么写"></a>19. ? extends T怎么写</h2><p>var lst = ArrayList&lt;Class<out Number>&gt;()<br>lst.add(Noun_Class::class.java)</p>
+<h2 id="20-map-和flatMap的区别"><a href="#20-map-和flatMap的区别" class="headerlink" title="20.map 和flatMap的区别"></a>20.map 和flatMap的区别</h2><pre><code class="js">// 这个是map
+/**
+ * Applies the given [transform] function to each element of the original collection
+ * and appends the results to the given [destination].
+ */
+public inline fun &lt;T, R, C : MutableCollection&lt;in R&gt;&gt; Iterable&lt;T&gt;.mapTo(destination: C, transform: (T) -&gt; R): C {
+    for (item in this)
+        destination.add(transform(item))
+    return destination
+}
+
+
+//这个是flatMap
+/**
+ * Appends all elements yielded from results of [transform] function being invoked on each element of original collection, to the given [destination].
+ */
+public inline fun &lt;T, R, C : MutableCollection&lt;in R&gt;&gt; Iterable&lt;T&gt;.flatMapTo(destination: C, transform: (T) -&gt; Iterable&lt;R&gt;): C {
+    for (element in this) {
+        val list = transform(element)
+        destination.addAll(list)
+    }
+    return destination
+}
+</code></pre>
+<p><a href="https://stackoverflow.com/a/26684710">The difference is that the map operation produces one output value for each input value, whereas the flatMap operation produces an arbitrary number (zero or more) values for each input value.</a> 就是说map丢进去一个返回一个，flatMap丢进去一个可能返回多个</p>
 <p><a href="https://stackoverflow.com/questions/44276277/constructors-in-kotlin">class的主构造函数中是不能包含任何code逻辑的</a></p>
 <p><a href="https://stackoverflow.com/questions/45267041/not-enough-information-to-infer-parameter-t-with-kotlin-and-android">stackoverflow</a><br>init代码块不是构造函数，同时，init的执行效果要看写在哪一行了，如果在Init中引用了一个propertity，这个属性要是在Init之前就初始化了那倒还好，要是在后面,那么在init调用的时候看到的就是null.(其实编辑器这时候就会警告的)</p>
 <pre><code class="js">class Person {
@@ -919,10 +944,6 @@ fun test2(){
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
@@ -975,15 +996,15 @@ fun test2(){
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">nginx</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">sql</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">django</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1000,6 +1021,10 @@ fun test2(){
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">opengl</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">django</a>
               </li>
              
               <li class="article-tag-list-item">
