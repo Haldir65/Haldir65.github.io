@@ -14,12 +14,13 @@ queue的一些实现类及使用场景分析
 BlockingQueue是一个接口，jdk中实现了该接口的class包括
 
 ArrayBlockingQueue
-DelayQueue
 LinkedBlockingQueue
 LinkedBlockingDeque
 LinkedTransferQueue
-PriorityBlockingQueue
 SynchronousQueue
+PriorityBlockingQueue
+DelayQueue
+
 
 
 BlockingQueue提供了四种应对策略来处理这种资源不能被立即满足的场景
@@ -70,13 +71,89 @@ private final Condition notFull;
 2. 这两个方法的调用是被包在一个lock.lock和lock.unlock中的，所以是线程安全的的。
 3. 构造函数可以传一个fair进来。enqueue方法里面还有一个notEmpty.signal()， 其实就是典型的通知消费者。同理，dequeue里面有个notFull.signal()，就是通知生产者
 4. 底层的数组是不会自动扩容的，但是如果一直添加元素，超出了底层数组的长度的话。offer会return false, put会block当前线程，add会throw new IllegalStateException("Queue full");
-5. takeIndex可以看做是fifo队列的head, putIndex可以看做是fifo队列的tail，因为数组本身没有队列的概念，所以需要人为去维护两根指针。可以认为任何时候，底层的数组中是有一个区间是存放元素的。其余位置都是空的。比如遍历所有元素的方式是从取一个int i, 从takeIndex开始一直到putIndex(中途加入碰到了i= items.length，i变为0)。takeIndex和putIndex谁大谁小不一定，都是从0开始的，并且都会往后自增，一旦触碰到items.length，从0再来。所以遍历所有元素的过程就像是takeIndex去追赶putIndex。
+5. takeIndex可以看做是fifo队列的head, putIndex可以看做是fifo队列的tail，因为数组本身没有队列的概念，所以需要人为去维护两根指针。可以认为任何时候，底层的数组中是有一个区间是存放元素的。其余位置都是空的。比如遍历所有元素的方式是从取一个int i, 从takeIndex开始一直到putIndex(中途假如碰到了i= items.length，i变为0)。takeIndex和putIndex谁大谁小不一定，都是从0开始的，并且都会往后自增，一旦触碰到items.length，从0再来。所以遍历所有元素的过程就像是takeIndex去追赶putIndex。
 这种做法应该叫做两根指针循环从数组中取元素。
 
 ## LinkedBlockingQueue的实现
 LinkedBlockingQueue是Executors中使用的创建线程池的静态方法中使用的参数，显然更推荐使用。主要用的是两个方法，
 put方法在队列满的时候会阻塞直到有队列成员被消费，take方法在队列空的时候会阻塞，直到有队列成员被放进来。官方文档提到了， **LinkedBlockingQueue的吞吐量通常要高于基于数组的队列，但在大多数并发应用程序中，其可预知的性能要低一些** ， 内部的lock只能是unfair的。
 
+LinkedBlockingQueue是用单向链表实现的，主要的成员变量包括:
+```java
+    /** The capacity bound, or Integer.MAX_VALUE if none */
+    private final int capacity;
+
+    /** Current number of elements */
+    private final AtomicInteger count = new AtomicInteger();
+
+    /**
+     * Head of linked list.
+     * Invariant: head.item == null
+     */
+    transient Node<E> head;
+
+    /**
+     * Tail of linked list.
+     * Invariant: last.next == null
+     */
+    private transient Node<E> last;
+
+    /** Lock held by take, poll, etc */
+    private final ReentrantLock takeLock = new ReentrantLock();
+
+    /** Wait queue for waiting takes */
+    private final Condition notEmpty = takeLock.newCondition();
+
+    /** Lock held by put, offer, etc */
+    private final ReentrantLock putLock = new ReentrantLock();
+
+    /** Wait queue for waiting puts */
+    private final Condition notFull = putLock.newCondition();
+```
+主要就是head和last两根指针，外加一个AtomicInteger记录size，take锁和put锁以及对应的用于唤醒等待的线程们的condition。head和last的特征是其item = null
+
+核心方法是enqueue和dequeue
+```java
+    /**
+     * Links node at end of queue.
+     *
+     * @param node the node
+     */
+    private void enqueue(Node<E> node) {
+        // assert putLock.isHeldByCurrentThread();
+        // assert last.next == null;
+        last = last.next = node;
+    }
+    //这里应该是先执行右边那个=，再执行左边那个= ， 也就是所有的入列元素都是以next的方式被添加到当前的last的next位置上
+
+
+    /**
+     * Removes a node from head of queue.
+     *
+     * @return the node
+     */
+    private E dequeue() {
+        // assert takeLock.isHeldByCurrentThread();
+        // assert head.item == null;
+        Node<E> h = head;
+        Node<E> first = h.next;
+        h.next = h; // help GC  //head自己指向自己？
+        head = first;
+        E x = first.item;
+        first.item = null; //head后面的元素就是要被移除的元素
+        return x;
+    }
+```
+1. 入列的前提是putLock.isHeldByCurrentThread()，出列的前提是takeLock.isHeldByCurrentThread()
+2. 如果要获取（take）一个元素，需要获取 takeLock 锁，但是获取了锁还不够，如果队列此时为空，还需要队列不为空（notEmpty）这个条件（Condition）。
+3. 如果要插入（put）一个元素，需要获取 putLock 锁，但是获取了锁还不够，如果队列此时已满，还需要队列不是满的（notFull）这个条件（Condition）。
+
+---
+以上的ArrayBlockingQueue和LinkedBlockingQueue都还算简单，SynchronousQueue的实现则较为复杂
+
+
+## PriorityBlockingQueue
+Priority queue represented as a balanced binary heap，The element with the lowest value is in queue[0]（所以是一个平衡小顶堆）
 
 
 

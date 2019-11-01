@@ -377,9 +377,6 @@ val name =  "myName".apply {
 print(name) //出来的还是myName，也就是说apply里面的东西不会对值产生影响
 
 
-
-
-
 ### 17. with关键字用于同时调用一个Instance 的多个method
 ```
 class Turtle {
@@ -426,6 +423,35 @@ init函数和constructor是有区别的
 var lst = ArrayList<Class<out Number>>()
 lst.add(Noun_Class::class.java)
 
+
+
+## 20.map 和flatMap的区别
+```js
+// 这个是map
+/**
+ * Applies the given [transform] function to each element of the original collection
+ * and appends the results to the given [destination].
+ */
+public inline fun <T, R, C : MutableCollection<in R>> Iterable<T>.mapTo(destination: C, transform: (T) -> R): C {
+    for (item in this)
+        destination.add(transform(item))
+    return destination
+}
+
+
+//这个是flatMap
+/**
+ * Appends all elements yielded from results of [transform] function being invoked on each element of original collection, to the given [destination].
+ */
+public inline fun <T, R, C : MutableCollection<in R>> Iterable<T>.flatMapTo(destination: C, transform: (T) -> Iterable<R>): C {
+    for (element in this) {
+        val list = transform(element)
+        destination.addAll(list)
+    }
+    return destination
+}
+```
+[The difference is that the map operation produces one output value for each input value, whereas the flatMap operation produces an arbitrary number (zero or more) values for each input value.](https://stackoverflow.com/a/26684710) 就是说map丢进去一个返回一个，flatMap丢进去一个可能返回多个
 
 
 [class的主构造函数中是不能包含任何code逻辑的](https://stackoverflow.com/questions/44276277/constructors-in-kotlin)
@@ -508,6 +534,7 @@ fun test2(){
 }
 ```
 test1使用的是java 8的BiConsumer，在低版本(api 24以下)会崩，第二种使用的是常规的Iterator方法
+
 
 
 

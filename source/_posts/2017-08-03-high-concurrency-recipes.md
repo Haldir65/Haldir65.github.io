@@ -380,7 +380,7 @@ A a = (A) unsafe.allocateInstance(aClass);
 
 需要注意的是，想要获得一个UnSafe的实例不是这么干的
 ```java
-Unsafe unsafe = Unsafe.getUnsafe(); // this will crash
+Unsafe unsafe = Unsafe.getUnsafe(); // this will crash, jdk内部的一些class可以这么干
 ```
 
 想要获得一个unsafe的实例可以这么干

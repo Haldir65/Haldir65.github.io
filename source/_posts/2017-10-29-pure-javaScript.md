@@ -878,9 +878,11 @@ js中是存在一些全局属性和全局函数的
 这两个函数都接受String作为参数
 
 ```js
-parseInt("10");  //返回 10，官方文档说返回的是integer(也就是Number了)
+parseInt("10");  //返回 10
 parseFloat("10.33") // 返回10.33
 ```
+
+[There is only the Number data type in JS that represents numbers.Internally it is implemented as IEEE 754 double precision floating point number.](https://stackoverflow.com/questions/33773296/is-there-or-isnt-there-an-integer-type-in-javascript) 严格意义上讲，javaScript中不存在int类型，全部存储为double精确度的floating point。
 
 ## 9. 交互事件的捕获，拦截，消费（冒泡）
 

@@ -95,7 +95,7 @@ sudo systemctl enable nginx
 config文件的大致结构就是这样,来自[stackoverflow](https://stackoverflow.com/questions/10829402/how-to-start-nginx-via-different-portother-than-80)
 ```Nginx
 user www-data;
-worker_processes  1;
+worker_processes  1;   
 
 error_log  /var/log/nginx/error.log;
 pid        /var/run/nginx.pid;
@@ -995,6 +995,7 @@ sudo -H ./letsencrypt-auto certonly --standalone --renew-by-default -d example.c
 > sudo certbot certonly --standalone --preferred-challenges http -d example.com -d exmaple2.com
 
 
+
 强制http导向https的方法也很多
 ```
 server {
@@ -1041,6 +1042,9 @@ server {
 有时候会在error.log里面看到这样的话：
 accept4() failed (24: Too many open files)
 cat /proc/sys/fs/file-max ##这个值是跟系统内存相关的
+
+
+多核cpu可以试着调整worker_processes和worker_cpu_affinity参数提高性能
 
 
 [用failtoban降低被攻击概率](https://www.digitalocean.com/community/tutorials/how-to-protect-an-nginx-server-with-fail2ban-on-ubuntu-14-04)
