@@ -415,7 +415,7 @@ zip –q –r -v video.zip . #加上一个-v主要是为了能够实时查看输
 
 看下跑在哪个端口
 然后
-> pscp -P 12345-r root@202.123.123.123:"/root/fileonServer.mp4" d:/whateveriwantonmyPc.mp4  ## -p要大写
+> scp -P 12345-r root@202.123.123.123:"/root/fileonServer.mp4" d:/whateveriwantonmyPc.mp4  ## -p要大写
 
 ### 8. 软件的安装，卸载(dpkg命令，不要只会apt-get)
  在debian下，你可以使用dpkg(Debian package system)来安装和卸载软件包。
