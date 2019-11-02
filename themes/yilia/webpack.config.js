@@ -1,11 +1,11 @@
 const webpack = require("webpack");
 const path = require("path");
 const fs = require("fs");
-const autoprefixer = require('autoprefixer');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 const scssLoader = new ExtractTextPlugin('[name].[chunkhash:6].css');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var CleanPlugin = require('clean-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const THEME_NAME = "yilia";
 const OUTPUT_DIR = 'source';
@@ -18,10 +18,10 @@ if (!fs.existsSync(path.resolve(__dirname, '..', 'yilia_config.yml'))) {
 }
 let target_dir = path.resolve(__dirname, '../../', 'themes', THEME_NAME);
 
-var minifyHTML = {
+let minifyHTML = {
   collapseInlineTagWhitespace: true,
   collapseWhitespace: true,
-  minifyJS:true
+  minifyJS: true
 }
 
 module.exports = {
@@ -35,56 +35,89 @@ module.exports = {
     publicPath: "./",
     filename: "[name].[chunkhash:6].js"
   },
+  resolve: {
+    extensions: [
+      '.js', '.json'
+    ],
+    modules: [path.resolve(__dirname, 'node_modules')]
+  },
+  watch: process.env.NODE_ENV == "development",
   module: {
     rules: [
-    {
-      test: /\.js$/, //es6 => es5
-      include: [
-        path.resolve(__dirname, 'source-src')
-      ],
-      exclude: /node_modules/,
-      use: 'babel-loader'
-    },
-    {
-      test: /\.html$/,
-      use: 'html-loader'
-    }, 
-    {
-      test: /\.(scss|sass|css)$/,
-      use: ['style-loader'].concat(scssLoader.extract([{
-        loader: 'css-loader',
-        options: {
-          importLoaders: 2
+      {
+        test: /\.js$/, //es6 => es5
+        include: [
+          path.resolve(__dirname, 'source-src')
+        ],
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['babel-preset-env']
+          }
         }
+      },
+      {
+        test: /\.html$/,
+        use: 'html-loader'
+      },
+      {
+        test: /\.(scss|sass|css)$/,
+        use: ['style-loader'].concat(scssLoader.extract([{
+          loader: 'css-loader',
+          options: {
+            importLoaders: 2
+          }
+        }, {
+          loader: 'postcss-loader',
+          options: {
+            ident: 'postcss',
+            plugins: (loader) => [require('autoprefixer')()]
+          }
+        }, 'sass-loader']))
+
       }, {
-        loader: 'postcss-loader',
-        options: {
-          ident: 'postcss',
-          plugins: (loader) => [require('autoprefixer')()]
-        }
-      }, 'sass-loader']))
-     
-    }, {
-      test: /\.(gif|jpg|png)\??.*$/,
-      use: [{
-        loader: 'url-loader',
-        options: {
-          limit: 500,
-          name: 'img/[name].[ext]'
-        }
+        test: /\.(gif|jpg|png)\??.*$/,
+        use: [{
+          loader: 'url-loader',
+          options: {
+            limit: 500,
+            name: 'img/[name].[ext]'
+          }
+        }]
+      }, {
+        test: /\.(woff|svg|eot|ttf)\??.*$/,
+        use: [{
+          loader: 'file-loader',
+          options: {
+            name: 'fonts/[name].[hash:6].[ext]'
+          }
+        }]
       }]
-    }, {
-      test: /\.(woff|svg|eot|ttf)\??.*$/,
-      use: [{
-        loader: 'file-loader',
-        options: {
-          name: 'fonts/[name].[hash:6].[ext]'
-        }
-      }]
-    }]
   },
   plugins: [
-    new ExtractTextPlugin('[name].[chunkhash:6].css'),
+    scssLoader,
+    new CleanWebpackPlugin(path.resolve(target_dir), {
+      root: path.resolve(target_dir, '..')
+    }),
+    new CopyWebpackPlugin([{
+      from: 'languages/**/*',
+      to: path.join(target_dir)
+    },
+    {
+      from: 'layout/**/*',
+      to: path.join(target_dir)
+    }
+    ]),
+    new CopyWebpackPlugin([{
+      from: path.join(__dirname, '..', 'yilia_config.yml'),
+      to: path.join(target_dir, '_config.yml')
+    },
+    {
+      from: 'layout/**/*',
+      to: path.join(target_dir)
+    }
+    ]),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"'
     }),
@@ -120,6 +153,6 @@ if (process.env.NODE_ENV === 'production') {
       }
     }),
     new webpack.optimize.OccurenceOrderPlugin(),
-    new CleanPlugin('builds')
+    new CleanWebpackPlugin('builds')
   ])
 }
