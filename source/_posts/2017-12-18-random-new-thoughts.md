@@ -72,7 +72,7 @@ top : 1
 * 随便放一个文件到/usr/bin/就可以直接调用这个文件名来起这个命令了吗？（实际操作只需要建立一个symbolic link就好了）
 * 单个网卡最多65535个端口，c10K。[65536其实不是操作系统限制的，而是tcp协议就只给port留了2个bytes给source port，只留了2个bytes给destination port](https://www.zhihu.com/question/66553828)端口号写在tcp包里，ip地址不是，ip地址是ip层的事情
 * oAuth2原理，其实流程上和很多客户端的微信登陆，新浪微博登陆很像的
-* 在Android手机上尝试用一个unix domain socket用于localhost进程间ipc(其实就是保证端口号一致，给网络权限就好了)
+* 在Android手机上尝试用一个unix domain socket用于localhost进程间ipc(其实就是保证端口号一致，给网络权限就好了)。有一个[jnr](https://github.com/jnr/jnr-unixsocket)项目，用jni的方式提供了各个平台上的unix domain socket的java调用实现。
 * 写 groovy 用intelij全家桶就可以了，groovy的[语法](https://www.tutorialspoint.com/groovy/groovy_closures.htm)其实没什么，主要是了解编译的流程和基本原理，这个需要看[official doc](https://docs.gradle.org/current/userguide/build_lifecycle.html#sec:build_phases)
 * [开发gradle plugin优化MultiDex](https://github.com/JLLK/gradle-android-maindexlist-plugin)。长远来看，5.0以后的手机越来越多，MultiDex也不值得过于关注。
 * intelij 点击run 实际调用的command line是两个，一个是javac，编译出来的class文件放到了target文件夹，紧接着用java命令带上一大串classpath去调用主函数

@@ -20,5 +20,5 @@ List的实现类包括ArrayList,LinkedList,CopyOnWriteArrayList,以及两个不�
 
 ## 参考
 [【死磕 Java 集合】— 总结篇](http://cmsblogs.com/?p=4781)
-[Java集合框架常见面试题.md](https://github.com/Snailclimb/JavaGuide/blob/master/docs/java/collection/Java集合框架常见面试题.md）
+[Java集合框架常见面试题](https://github.com/Snailclimb/JavaGuide/blob/master/docs/java/collection/Java集合框架常见面试题.md）
 

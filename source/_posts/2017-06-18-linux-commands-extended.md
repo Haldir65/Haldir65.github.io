@@ -682,7 +682,6 @@ sudo rm -f /var/lib/dpkg/info/format
 sudo dpkg --configure -a
 ```
 
-unix domain socket用于ipc
 
 有时候cd进一个权限不够的目录会出现Permission Denied
 >sudo su
@@ -692,7 +691,8 @@ cd directory
 nano直接跳到文本最后一行的方法是：
 > Ctrl + _ 然后Ctrl +V
 
-[装java](https://www.digitalocean.com/community/tutorials/how-to-install-java-with-apt-get-on-ubuntu-16-04)
+
+how-to-install-java-with-apt-get-on-ubuntu-16-04)
 [装Jenkins](https://www.digitalocean.com/community/tutorials/how-to-install-jenkins-on-ubuntu-16-04)
 <del>Could not find or load main class的问题</del>
 
