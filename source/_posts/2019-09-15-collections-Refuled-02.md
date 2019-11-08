@@ -183,13 +183,16 @@ Deque是一个接口,定义了addFirst,addLast, removeFirst, removeLast等操作
 3. add操作等同于addLast。
 4. head和tail都是从0开始的。addLast操作使得tail+1，head不变。第一次addFirst操作使得head从0变为length-1（比如说7），随后的addFirst操作使得head递减。当head==tail的时候，doubleCapacity。
 5. getFirst的做法
-```java
+
+~~~java
 (E) elements[head];
-```
+~~~
+
 getLast用的是这样的
-```java
+~~~java
 (E) elements[(tail - 1) & (elements.length - 1)];
-```
+~~~
+
 通过取模的方式让头尾指针在数组范围内循环，x & (len – 1) = x % len，使用&的方式更快；这也是数组长度必须为2的指数幂的原因。
 6.doubleCapacity(扩容的方式有点绕)，扩容时,head==tail。以head为边界，右边的挪到x2之后数组的最开头，左边的跟着挪到上述数据的后面，这样填满x2数组的左半部分，同时保证了head=0，tail在最尾部。
 7. 通过取模的方式让头尾指针在数组范围内循环（head往左走，tail往右走，两者相遇后扩容）

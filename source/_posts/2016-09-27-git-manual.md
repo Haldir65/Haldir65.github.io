@@ -172,7 +172,7 @@ git ls-remote --tags origin //查看远程仓库所有的tags
 ```
 
 ## 9. pull和rebase的区别
-pull = fetch +merge ，会生成新的提交
+pull = fetch +merge，会生成新的提交
 
 > Merge好在它是一个安全的操作。现有的分支不会被更改，避免了rebase潜在的缺点
 
@@ -180,7 +180,27 @@ git pull --rebase = git pull -r
 
 
 git merge --no-ff //能够 fast forward的merge，但是我还是希望能够保留历史
-git merge --squash //要合过来的分之上的提交乱七八糟，统一做成一个commit，这里需要做一次提交
+git merge --squash //要合过来的分支上的提交乱七八糟，统一做成一个commit，这里需要做一次提交。这里其实是舍弃了其他分支上的commit history，直接将对方的改动记录拿过来了，所以需要做一次提交。
+
+把多个本地未push的commit合并成一个:
+
+git rebase -i //进入vi模式，按照提示编辑文本即可。完成后会自动进入vi模式，要求对这一个合并的commit的message进行修改。这个vi模式里面有针对每一次commit的操作选项:
+# Commands:
+#  p, pick = use commit
+#  e, edit = use commit, but stop for amending
+#  s, squash = use commit, but meld into previous commit
+#
+# If you remove a line here THAT COMMIT WILL BE LOST.
+# However, if you remove everything, the rebase will be aborted.
+
+所以如果想要把本地这四次都合并到最后一次，最后一个修改成pick ，其余修改成squash
+edit可以拆分，把一次commit拆成两个
+甚至可以删除这几次comimt中的某一次提交
+
+
+git rebase -i HEAD~4 //还可以带上一些参数，比如往前数4次commit作为base， i是interactive的意思。
+
+
 
 ## 10. rebase和cherry-pick
 rebase不会生成新的提交，而且会使得项目提交历史呈现出完美的线性。但注意[不要在公共的分支上使用](https://github.com/geeeeeeeeek/git-recipes/wiki/5.1-%E4%BB%A3%E7%A0%81%E5%90%88%E5%B9%B6%EF%BC%9AMerge%E3%80%81Rebase%E7%9A%84%E9%80%89%E6%8B%A9)

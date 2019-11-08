@@ -274,6 +274,7 @@ String w = "\uD842\uDFB7"; //这个“\u”是ide自己加上去的，注意和�
 00000800 -- 0000FFFF: 	1110xxxx 10xxxxxx 10xxxxxx
 00010000 -- 001FFFFF: 	11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
 
+[UTF-8编码最长6个字节](http://docs.linuxtone.org/ebooks/C&CPP/c/apas02.html)
 
 现在来看看网上那些常用的中文转UTF-8工具怎么用，随便找一个找一个站长之家
 输入“美” ，对应的utf-8编码是"&#x7F8E"，转Unicode是"\u7f8e"

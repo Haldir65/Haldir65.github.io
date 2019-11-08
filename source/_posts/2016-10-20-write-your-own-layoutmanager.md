@@ -32,6 +32,54 @@ manager.setSpanSizeLookup(){
 
 - GridLayoutManger的同一行的ItemView的itemHeight必须一致，否则同一行的ItemView底部会出现空隙。这种情况请使用StaggeredGridLayoutManager
 
+
+## 坑
+### 坑1
+场景: 
+一个column为4的gridLayoutManager，position为0和position为3的item的左右边距是20dp。其余每一个item之间的间隔为10dp，手机屏幕宽度为720px
+
+于是尝试着这样写
+```js
+val offset = 10
+when (position%4) {
+                0 -> outRect?.set(offset*2, 0, 0, 0)
+                1 -> outRect?.set(offset, 0, 0, 0)
+                2 -> outRect?.set(offset, 0, 0, 0)
+                3 -> outRect?.set(offset, 0, offset*2, 0)
+}
+```
+没有用，
+1. 强制在onCreateViewHodler中修改宽度为 (screenWidth- 20*2 - 10*3)/4f  依旧没有用
+2. 将itemView的宽度设置为Match_Parent之后，到最后的一个View的宽度要小于实际的宽度 依旧没有用
+
+结论似乎是GridLayoutManager不应该手动指定itemView的宽度，如果想要宽度一致，但是之间的gap又不相等。那么最好也是最简单的方法是在RecyclerView上下手，让getItemItemOffset中返回一个一致的rect宽度
+
+GridLayoutManager 在指定了Column count之后，系统会自动根据当前宽度(比方说屏幕宽度)去除以columnCount计算实际item的宽度。添加了itemDecoration,并且在getItemOffset中设置了outRect的宽度之后，child的宽度计算结果就变得奇怪了。似乎是每一个child在getItemOffset中设置的左右宽度被被加权到最终宽度的计算中了。
+我尝试手动精确计算每一个child在扣除了所有中间的gap之后的宽度，强制设置宽度为一致。最终得到的view的宽度是对的，但是left和right总是偏移了。
+
+最终改成了这样才达到预期的效果
+```js
+recyclerView.layoutParms?.run {
+    leftMargin = 15dp
+    rightMargin = 15dp 
+}
+val offset = 10dp
+when (position%4) {
+                0 -> outRect?.set(offset/2, 0, offset/2, 0)
+                1 -> outRect?.set(offset/2, 0, offset/2, 0)
+                2 -> outRect?.set(offset/2, 0, offset/2, 0)
+                3 -> outRect?.set(offset/2, 0, offset/2, 0)
+}
+```
+RecyclerView的左右各使用15dp的边距，这样剩下的每一个横排的itemView，outRect的左右都需要设置为5dp。从而实现itemView宽度一致，gap大小不一致的效果。
+
+### 坑2
+Recylerview会在某一个child requestFocus之后莫名其妙的滑动一段距离
+[onRequestChildFocus](https://developer.android.com/reference/android/support/v7/widget/RecyclerView.LayoutManager.html#onrequestchildfocus_1) 我理解这样的本意是用于chat这样的场景，自动focus到新的itemView上，解决方案是在onRequestChildFocus中返回true，这样就不会莫名其妙的滑动了
+[recyclerView奇怪的滑动](https://stackoverflow.com/questions/45458054/why-does-recyclerview-scroll-to-top-of-view-when-view-is-focused)
+我也是把断点打在canScrollVertically上才发现的
+
+
 ### 2. LayoutManager <-------> Recycler <--------> Adapter
 LayoutManager永远永远永远不要碰Adapter!!!
 

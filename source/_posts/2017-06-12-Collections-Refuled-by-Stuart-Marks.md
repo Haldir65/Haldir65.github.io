@@ -240,7 +240,7 @@ HashMap中有几个默认值常量
  public HashMap() //直接把初始容量设置成16
  public HashMap(Map<? extends K, ? extends V> m)
 ```
-[注意这个初始容量必须是2的n次方](https://stackoverflow.com/questions/8352378/why-does-hashmap-require-that-the-initial-capacity-be-a-power-of-two)
+[注意这个初始容量必须是2的n次方](https://stackoverflow.com/questions/8352378/why-does-hashmap-require-that-the-initial-capacity-be-a-power-of-two) 主要是为了让indexFor(i)这个函数能够直接用位运算，效率高一点
 
 来看常见的CURD操作(jdk 1.8源码，和我在网上找到的jdk1.6源码有一些变化了)
 ```java

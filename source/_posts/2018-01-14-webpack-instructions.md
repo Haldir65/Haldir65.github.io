@@ -16,7 +16,7 @@ tags: [前端]
 ## 2.使用
 
 >webpack is basically pulling  all external js files into on build.js file that we can bundle into our html.
-这样做的好处很多，能够有效减少浏览器发出的请求数量。
+这样做的好处是，能够有效减少浏览器发出的请求数量。
 
 webpack -p即可
 
@@ -212,7 +212,37 @@ package.json中修改script:
 首先生成对应的bundle，后续再用devServer将build文件夹中的内容渲染到浏览器
 
 
+## 5. style-loader和css-loader
+以react app为例， webpack.config.js中的loader要这么写
+```js
+const HtmlWebPackPlugin = require("html-webpack-plugin");
 
+const htmlWebpackPlugin = new HtmlWebPackPlugin({
+  template: "./src/index.html",
+  filename: "./index.html"
+});
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: "babel-loader"
+        }
+      },
+      {
+        test: /\.css$/,
+        use: ["style-loader", "css-loader"]
+      }
+    ]
+  },
+  plugins: [htmlWebpackPlugin]
+};
+```
+首先要知道的是webpack是从右往左apply loader的， css-loader的作用是resolve 那些被import到React Component中的css文件，一旦resolve完成，style-loader就会在生成的html文件头部添加一个 style 的tag。
+[react app from scratch](https://www.freecodecamp.org/news/part-1-react-app-from-scratch-using-webpack-4-562b1d231e75/)
 
 
 
@@ -225,4 +255,5 @@ underscore javaScript library
 handlebars(模板)
 
 ## 参考
+[simple webpack4 boilerplate](https://github.com/pinglinh/simple_webpack_boilerplate) webpack4好用的template
 [Webpack 4 Tutorial: from 0 Conf to Production Mode](https://www.valentinog.com/blog/webpack-tutorial/)

@@ -12,7 +12,7 @@ npm run start
 ## 安装
 windows上的安装十分方便，就跟安装普通软件一样，一路下一步点下去即可。
 
-> npm install -g grunt --save-dev # 安装，成为全局(-g)module，保存为dev-dependencies(--save-dev) 简写 -D 一个意思
+> npm install -g grunt  # 安装，成为全局(-g)module，保存为dev-dependencies(--save-dev) 简写 -D 一个意思
 > npm install -g grunt --save # 安装，保存为dependencies
 
 > npm run dev # 打开发环境包

@@ -1772,7 +1772,21 @@ true
 
 ### 55. java的array的长度是用int表示的，这也就意味着最多20亿多一点
 所以在jdk代码中到处是这种防着overflow的代码：
+比如ArrayList中的容量的
+```java
+ private static int hugeCapacity(int minCapacity) {
+        if (minCapacity < 0) // overflow
+            throw new OutOfMemoryError();  // 这里就是防着那种20亿多一点的情况的
+        return (minCapacity > MAX_ARRAY_SIZE) ?
+            Integer.MAX_VALUE :
+            MAX_ARRAY_SIZE;
+    }
+```
 至于为什么不能创建一个long作为长度的array，这个属于jvm的问题了。
+
+## 56. try , catch, finally的一些点
+[finally一定会执行，但对返回值有影响吗](https://zhooker.github.io/2019/01/12/Java中finally关键字的几个坑/)  原理是从查看字节码得到的最终结论
+
 
 ### . Class.forName...
 在App启动的时候在另外一个线程里面提前去加载这个class，能够加快速度吗？

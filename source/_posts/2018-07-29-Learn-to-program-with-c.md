@@ -109,6 +109,10 @@ On UNIX, you shall include <unistd.h>.
 On MS-Windows, Sleep is rather from <windows.h>.
 ```
 
+C并不检查数组越界, 数组越界属于[undefined behavior](https://stackoverflow.com/questions/9137157/no-out-of-bounds-error)。
+```
+C doesn't check array boundaries. A segmentation fault will only occur if you try to dereference a pointer to memory that your program doesn't have permission to access. Simply going past the end of an array is unlikely to cause that behaviour. Undefined behaviour is just that - undefined. It may appear to work just fine, but you shouldn't be relying on its safety.
+```
 ## 2. 编译过程的一些解释
 C语言程序编译的顺序是
 source code -> preprocessing -> compilating -> assembling -> linking -> executable file

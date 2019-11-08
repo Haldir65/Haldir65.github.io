@@ -536,6 +536,8 @@ fun test2(){
 test1使用的是java 8的BiConsumer，在低版本(api 24以下)会崩，第二种使用的是常规的Iterator方法
 
 
+### 21 .inline , crossinline和noinline
+[inline等涉及高阶函数关键字](https://zhooker.github.io/2018/10/15//Kotlin中inline-noinline-crossinline的区别/)
 
 
 tbd
