@@ -17,7 +17,7 @@
 <meta property="og:description" content="interesting stuff in java that don’t seem to get enough pubilicity">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/34a7d57ccabb18c69d085247cf009b22.jpg">
-<meta property="og:updated_time" content="2019-11-03T14:22:44.704Z">
+<meta property="og:updated_time" content="2019-11-08T10:17:52.972Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="For those tiny details in Java">
 <meta name="twitter:description" content="interesting stuff in java that don’t seem to get enough pubilicity">
@@ -1522,7 +1522,17 @@ public class Test
 <p>java -classpath code:txt dummy.Test</p>
 <p>输出：<br>true<br>true</p>
 <p>所以结论就是getResourceAsStream可以用来读取文件，所以tomcat的src文件夹中除了java文件还有一大堆其他的.xml、.properity文件等等。</p>
-<h3 id="55-java的array的长度是用int表示的，这也就意味着最多20亿多一点"><a href="#55-java的array的长度是用int表示的，这也就意味着最多20亿多一点" class="headerlink" title="55. java的array的长度是用int表示的，这也就意味着最多20亿多一点"></a>55. java的array的长度是用int表示的，这也就意味着最多20亿多一点</h3><p>所以在jdk代码中到处是这种防着overflow的代码：<br>至于为什么不能创建一个long作为长度的array，这个属于jvm的问题了。</p>
+<h3 id="55-java的array的长度是用int表示的，这也就意味着最多20亿多一点"><a href="#55-java的array的长度是用int表示的，这也就意味着最多20亿多一点" class="headerlink" title="55. java的array的长度是用int表示的，这也就意味着最多20亿多一点"></a>55. java的array的长度是用int表示的，这也就意味着最多20亿多一点</h3><p>所以在jdk代码中到处是这种防着overflow的代码：<br>比如ArrayList中的容量的</p>
+<pre><code class="java"> private static int hugeCapacity(int minCapacity) {
+        if (minCapacity &lt; 0) // overflow
+            throw new OutOfMemoryError();  // 这里就是防着那种20亿多一点的情况的
+        return (minCapacity &gt; MAX_ARRAY_SIZE) ?
+            Integer.MAX_VALUE :
+            MAX_ARRAY_SIZE;
+    }
+</code></pre>
+<p>至于为什么不能创建一个long作为长度的array，这个属于jvm的问题了。</p>
+<h2 id="56-try-catch-finally的一些点"><a href="#56-try-catch-finally的一些点" class="headerlink" title="56. try , catch, finally的一些点"></a>56. try , catch, finally的一些点</h2><p><a href="https://zhooker.github.io/2019/01/12/Java中finally关键字的几个坑/">finally一定会执行，但对返回值有影响吗</a>  原理是从查看字节码得到的最终结论</p>
 <h3 id="Class-forName…"><a href="#Class-forName…" class="headerlink" title=". Class.forName…"></a>. Class.forName…</h3><p>在App启动的时候在另外一个线程里面提前去加载这个class，能够加快速度吗？</p>
 <p>class的生命周期</p>
 <p>circular dependencies in java , how to ?<br><a href="https://stackoverflow.com/questions/2209827/why-is-no-one-using-make-for-java">理论上可以用Makefile来编译运行java项目</a> 只是很少有人这么干<br><a href="https://github.com/lettuce-io/lettuce-core/blob/master/Makefile">RedisClient lettuce这么干了</a></p>
@@ -1905,15 +1915,7 @@ public class Test
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">sql</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1921,7 +1923,19 @@ public class Test
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">sql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">django</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1930,10 +1944,6 @@ public class Test
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">tbd</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">

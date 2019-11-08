@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/hot%20coffee%20city%20life%20winter.jpg">
-<meta property="og:updated_time" content="2019-11-03T14:22:44.712Z">
+<meta property="og:updated_time" content="2019-11-08T10:17:52.980Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Webpack资源汇总">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/hot%20coffee%20city%20life%20winter.jpg">
@@ -203,7 +203,7 @@ ga('send', 'pageview');
 <p>yarn add webpack –dev</p>
 </blockquote>
 <h2 id="2-使用"><a href="#2-使用" class="headerlink" title="2.使用"></a>2.使用</h2><blockquote>
-<p>webpack is basically pulling  all external js files into on build.js file that we can bundle into our html.<br>这样做的好处很多，能够有效减少浏览器发出的请求数量。</p>
+<p>webpack is basically pulling  all external js files into on build.js file that we can bundle into our html.<br>这样做的好处是，能够有效减少浏览器发出的请求数量。</p>
 </blockquote>
 <p>webpack -p即可</p>
 <h2 id="3-webpack-config-js"><a href="#3-webpack-config-js" class="headerlink" title="3. webpack.config.js"></a>3. webpack.config.js</h2><p>从<a href="https://github.com/WsmDyj/webpack">webpack-example</a>copy一个webpack.config.js过来，基本可以搞定es6,less,hot-reload,css-plugin还有asset文件copy这些常见的需求。<br>首先是package.json</p>
@@ -381,8 +381,36 @@ module.exports = {
 }
 </code></pre>
 <p>首先生成对应的bundle，后续再用devServer将build文件夹中的内容渲染到浏览器</p>
+<h2 id="5-style-loader和css-loader"><a href="#5-style-loader和css-loader" class="headerlink" title="5. style-loader和css-loader"></a>5. style-loader和css-loader</h2><p>以react app为例， webpack.config.js中的loader要这么写</p>
+<pre><code class="js">const HtmlWebPackPlugin = require(&quot;html-webpack-plugin&quot;);
+
+const htmlWebpackPlugin = new HtmlWebPackPlugin({
+  template: &quot;./src/index.html&quot;,
+  filename: &quot;./index.html&quot;
+});
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: &quot;babel-loader&quot;
+        }
+      },
+      {
+        test: /\.css$/,
+        use: [&quot;style-loader&quot;, &quot;css-loader&quot;]
+      }
+    ]
+  },
+  plugins: [htmlWebpackPlugin]
+};
+</code></pre>
+<p>首先要知道的是webpack是从右往左apply loader的， css-loader的作用是resolve 那些被import到React Component中的css文件，一旦resolve完成，style-loader就会在生成的html文件头部添加一个 style 的tag。<br><a href="https://www.freecodecamp.org/news/part-1-react-app-from-scratch-using-webpack-4-562b1d231e75/">react app from scratch</a></p>
 <h2 id="Deprecated"><a href="#Deprecated" class="headerlink" title="Deprecated"></a>Deprecated</h2><p>react cli and vue cli原理<br>common front end javaScript libraries<br>minify js(删掉所有的空行)<br>underscore javaScript library<br>handlebars(模板)</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.valentinog.com/blog/webpack-tutorial/">Webpack 4 Tutorial: from 0 Conf to Production Mode</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://github.com/pinglinh/simple_webpack_boilerplate">simple webpack4 boilerplate</a> webpack4好用的template<br><a href="https://www.valentinog.com/blog/webpack-tutorial/">Webpack 4 Tutorial: from 0 Conf to Production Mode</a></p>
 
       
 
@@ -757,15 +785,7 @@ module.exports = {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">sql</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -773,7 +793,19 @@ module.exports = {
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">sql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">django</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -782,10 +814,6 @@ module.exports = {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">tbd</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">

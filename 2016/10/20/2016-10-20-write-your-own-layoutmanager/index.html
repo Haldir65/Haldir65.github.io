@@ -17,7 +17,7 @@
 <meta property="og:description" content="1. 系统为我们提供了LinearLayoutManager、GridLayoutManager和StaggeredGridLayoutManager。基本用法都很简单，这里记录一些重要的用法">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/Googling-the-Error-Message.jpg">
-<meta property="og:updated_time" content="2019-11-03T14:22:44.704Z">
+<meta property="og:updated_time" content="2019-11-08T10:17:52.968Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="自定义LayoutManager">
 <meta name="twitter:description" content="1. 系统为我们提供了LinearLayoutManager、GridLayoutManager和StaggeredGridLayoutManager。基本用法都很简单，这里记录一些重要的用法">
@@ -222,6 +222,38 @@ manager.setSpanSizeLookup(){
 <ul>
 <li>GridLayoutManger的同一行的ItemView的itemHeight必须一致，否则同一行的ItemView底部会出现空隙。这种情况请使用StaggeredGridLayoutManager</li>
 </ul>
+<h2 id="坑"><a href="#坑" class="headerlink" title="坑"></a>坑</h2><h3 id="坑1"><a href="#坑1" class="headerlink" title="坑1"></a>坑1</h3><p>场景:<br>一个column为4的gridLayoutManager，position为0和position为3的item的左右边距是20dp。其余每一个item之间的间隔为10dp，手机屏幕宽度为720px</p>
+<p>于是尝试着这样写</p>
+<pre><code class="js">val offset = 10
+when (position%4) {
+                0 -&gt; outRect?.set(offset*2, 0, 0, 0)
+                1 -&gt; outRect?.set(offset, 0, 0, 0)
+                2 -&gt; outRect?.set(offset, 0, 0, 0)
+                3 -&gt; outRect?.set(offset, 0, offset*2, 0)
+}
+</code></pre>
+<p>没有用，</p>
+<ol>
+<li>强制在onCreateViewHodler中修改宽度为 (screenWidth- 20<em>2 - 10</em>3)/4f  依旧没有用</li>
+<li>将itemView的宽度设置为Match_Parent之后，到最后的一个View的宽度要小于实际的宽度 依旧没有用</li>
+</ol>
+<p>结论似乎是GridLayoutManager不应该手动指定itemView的宽度，如果想要宽度一致，但是之间的gap又不相等。那么最好也是最简单的方法是在RecyclerView上下手，让getItemItemOffset中返回一个一致的rect宽度</p>
+<p>GridLayoutManager 在指定了Column count之后，系统会自动根据当前宽度(比方说屏幕宽度)去除以columnCount计算实际item的宽度。添加了itemDecoration,并且在getItemOffset中设置了outRect的宽度之后，child的宽度计算结果就变得奇怪了。似乎是每一个child在getItemOffset中设置的左右宽度被被加权到最终宽度的计算中了。<br>我尝试手动精确计算每一个child在扣除了所有中间的gap之后的宽度，强制设置宽度为一致。最终得到的view的宽度是对的，但是left和right总是偏移了。</p>
+<p>最终改成了这样才达到预期的效果</p>
+<pre><code class="js">recyclerView.layoutParms?.run {
+    leftMargin = 15dp
+    rightMargin = 15dp 
+}
+val offset = 10dp
+when (position%4) {
+                0 -&gt; outRect?.set(offset/2, 0, offset/2, 0)
+                1 -&gt; outRect?.set(offset/2, 0, offset/2, 0)
+                2 -&gt; outRect?.set(offset/2, 0, offset/2, 0)
+                3 -&gt; outRect?.set(offset/2, 0, offset/2, 0)
+}
+</code></pre>
+<p>RecyclerView的左右各使用15dp的边距，这样剩下的每一个横排的itemView，outRect的左右都需要设置为5dp。从而实现itemView宽度一致，gap大小不一致的效果。</p>
+<h3 id="坑2"><a href="#坑2" class="headerlink" title="坑2"></a>坑2</h3><p>Recylerview会在某一个child requestFocus之后莫名其妙的滑动一段距离<br><a href="https://developer.android.com/reference/android/support/v7/widget/RecyclerView.LayoutManager.html#onrequestchildfocus_1">onRequestChildFocus</a> 我理解这样的本意是用于chat这样的场景，自动focus到新的itemView上，解决方案是在onRequestChildFocus中返回true，这样就不会莫名其妙的滑动了<br><a href="https://stackoverflow.com/questions/45458054/why-does-recyclerview-scroll-to-top-of-view-when-view-is-focused">recyclerView奇怪的滑动</a><br>我也是把断点打在canScrollVertically上才发现的</p>
 <h3 id="2-LayoutManager-Recycler-Adapter"><a href="#2-LayoutManager-Recycler-Adapter" class="headerlink" title="2. LayoutManager  Recycler  Adapter"></a>2. LayoutManager <-------> Recycler <--------> Adapter</h3><p>LayoutManager永远永远永远不要碰Adapter!!!</p>
 <h3 id="3-Recycler构造"><a href="#3-Recycler构造" class="headerlink" title="3.Recycler构造"></a>3.Recycler构造</h3><p>Recycler内部有两个集合:</p>
 <ol>
@@ -679,15 +711,7 @@ for(int i=0;i&lt;scrapList.size;i++){
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">sql</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -695,7 +719,19 @@ for(int i=0;i&lt;scrapList.size;i++){
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">sql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">django</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -704,10 +740,6 @@ for(int i=0;i&lt;scrapList.size;i++){
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">tbd</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">

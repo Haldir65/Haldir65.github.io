@@ -17,7 +17,7 @@
 <meta property="og:description" content="记录一下常用git的命令，作为日常使用的参考手册">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/f787b2e8d757dc83b782bcd6d4c9f523.jpg">
-<meta property="og:updated_time" content="2019-11-03T14:22:44.700Z">
+<meta property="og:updated_time" content="2019-11-08T10:17:52.968Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="git常用操作手册">
 <meta name="twitter:description" content="记录一下常用git的命令，作为日常使用的参考手册">
@@ -305,12 +305,17 @@ git tag -a myTag adjksdas31231//假如当前head不在想打的位置，找到�
 git push origin -tags //将本地所有标签一次性提交到git服务器
 git ls-remote --tags origin //查看远程仓库所有的tags
 </code></pre>
-<h2 id="9-pull和rebase的区别"><a href="#9-pull和rebase的区别" class="headerlink" title="9. pull和rebase的区别"></a>9. pull和rebase的区别</h2><p>pull = fetch +merge ，会生成新的提交</p>
+<h2 id="9-pull和rebase的区别"><a href="#9-pull和rebase的区别" class="headerlink" title="9. pull和rebase的区别"></a>9. pull和rebase的区别</h2><p>pull = fetch +merge，会生成新的提交</p>
 <blockquote>
 <p>Merge好在它是一个安全的操作。现有的分支不会被更改，避免了rebase潜在的缺点</p>
 </blockquote>
 <p>git pull –rebase = git pull -r</p>
-<p>git merge –no-ff //能够 fast forward的merge，但是我还是希望能够保留历史<br>git merge –squash //要合过来的分之上的提交乱七八糟，统一做成一个commit，这里需要做一次提交</p>
+<p>git merge –no-ff //能够 fast forward的merge，但是我还是希望能够保留历史<br>git merge –squash //要合过来的分支上的提交乱七八糟，统一做成一个commit，这里需要做一次提交。这里其实是舍弃了其他分支上的commit history，直接将对方的改动记录拿过来了，所以需要做一次提交。</p>
+<p>把多个本地未push的commit合并成一个:</p>
+<p>git rebase -i //进入vi模式，按照提示编辑文本即可。完成后会自动进入vi模式，要求对这一个合并的commit的message进行修改。这个vi模式里面有针对每一次commit的操作选项:</p>
+<h1 id="Commands"><a href="#Commands" class="headerlink" title="Commands:"></a>Commands:</h1><h1 id="p-pick-use-commit"><a href="#p-pick-use-commit" class="headerlink" title="p, pick = use commit"></a>p, pick = use commit</h1><h1 id="e-edit-use-commit-but-stop-for-amending"><a href="#e-edit-use-commit-but-stop-for-amending" class="headerlink" title="e, edit = use commit, but stop for amending"></a>e, edit = use commit, but stop for amending</h1><h1 id="s-squash-use-commit-but-meld-into-previous-commit"><a href="#s-squash-use-commit-but-meld-into-previous-commit" class="headerlink" title="s, squash = use commit, but meld into previous commit"></a>s, squash = use commit, but meld into previous commit</h1><p>#</p>
+<h1 id="If-you-remove-a-line-here-THAT-COMMIT-WILL-BE-LOST"><a href="#If-you-remove-a-line-here-THAT-COMMIT-WILL-BE-LOST" class="headerlink" title="If you remove a line here THAT COMMIT WILL BE LOST."></a>If you remove a line here THAT COMMIT WILL BE LOST.</h1><h1 id="However-if-you-remove-everything-the-rebase-will-be-aborted"><a href="#However-if-you-remove-everything-the-rebase-will-be-aborted" class="headerlink" title="However, if you remove everything, the rebase will be aborted."></a>However, if you remove everything, the rebase will be aborted.</h1><p>所以如果想要把本地这四次都合并到最后一次，最后一个修改成pick ，其余修改成squash<br>edit可以拆分，把一次commit拆成两个<br>甚至可以删除这几次comimt中的某一次提交</p>
+<p>git rebase -i HEAD~4 //还可以带上一些参数，比如往前数4次commit作为base， i是interactive的意思。</p>
 <h2 id="10-rebase和cherry-pick"><a href="#10-rebase和cherry-pick" class="headerlink" title="10. rebase和cherry-pick"></a>10. rebase和cherry-pick</h2><p>rebase不会生成新的提交，而且会使得项目提交历史呈现出完美的线性。但注意<a href="https://github.com/geeeeeeeeek/git-recipes/wiki/5.1-%E4%BB%A3%E7%A0%81%E5%90%88%E5%B9%B6%EF%BC%9AMerge%E3%80%81Rebase%E7%9A%84%E9%80%89%E6%8B%A9">不要在公共的分支上使用</a></p>
 <h2 id="11-gitignore文件写法"><a href="#11-gitignore文件写法" class="headerlink" title="11. gitignore文件写法"></a>11. gitignore文件写法</h2><p>参考<a href="https://github.com/suzeyu1992/repo/tree/master/project/git">repo</a></p>
 <pre><code class="git"># 忽略所有以 .c结尾的文件
@@ -836,15 +841,7 @@ Host work
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">sql</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -852,7 +849,19 @@ Host work
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">sql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">django</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -861,10 +870,6 @@ Host work
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">tbd</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
               </li>
              
               <li class="article-tag-list-item">
