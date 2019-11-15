@@ -420,6 +420,8 @@ ctime = changetime(文件状态改变时间，比如被chmod就算)
 mtime = modify time，指的是文件内容被修改的时间
 这些时间都能通过sta命令查看  
 
+//在一个目录下查找 包含“printf”关键字的txt文件
+find . -name "*.txt" | xargs grep "printf"
 
 ### 19. sort命令
 sort命令排序什么的

@@ -626,6 +626,8 @@ private fun screenShotLong(){
 ```
 还有,js调java的时候，走的是java的一个叫做JavaBridge的线程，操作UI的话post就好了。
 
+api 26之后官方提供了一个PixelCopy的class，是推荐的截屏方式
+
 ### 28. 分析一点ViewPager的源码
 
 首先是快速滑动的时候为了性能只是挪了bitmap，这比调用layout要快得多。
