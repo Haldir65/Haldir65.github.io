@@ -194,5 +194,15 @@ juc里面没有c语言那样的mutex，不过Reentrantlock这种实际上就发�
 使用AQS的普遍方式是自己继承实现一个Sync（写一个试试看？Tomcat里面就有）
 
 
+[简明概括](https://juejin.im/post/5dd4bc97f265da0bc53c7d41)
+
+1. AQS有个临界变量state,当一个线程获取到state==0时, 表示这个线程进入了临界代码(获取到锁), 并原子地把这个变量值+1
+2. 没能进入临界区(获取锁失败)的线程, 会利用CAS的方式添加到到CLH队列尾去, 并被LockSupport.park挂起.
+3. 当线程释放锁的时候, 会唤醒head节点的下一个需要唤醒的线程(有些线程cancel了就不需要唤醒了)
+4. 被唤醒的线程检查一下自己的前置节点是不是head节点(CLH队列的head节点就是之前拿到锁的线程节点)的下一个节点,
+如果不是则继续挂起, 如果是的话, 与其他线程重新争夺临界变量,即重复第1步
+
+
+
 ## 参考
 [一行一行源码分析清楚 AbstractQueuedSynchronizer](https://javadoop.com/post/AbstractQueuedSynchronizer-2)

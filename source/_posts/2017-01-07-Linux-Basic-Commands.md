@@ -490,6 +490,7 @@ install snap package(通常通过apt-get install软件时候会顺带将该软�
 ### 9. 网络监控
 tcpdump结合wireshark可实现完整的网络抓包，这个放在下面写。
 
+[netstat被废弃了，用ss就可以了](https://www.cyberciti.biz/faq/linux-ip-command-examples-usage-syntax/)
 ```bash
 netstat
 netstat -i ## 查看某个网络接口发出和接收了多少byte的数据
@@ -592,9 +593,9 @@ sudo lsof -iTCP -sTCP:LISTEN ## 查看所有处于listen状态的
 sudo lsof -iTCP -sTCP:ESTABLISHED ## ESTABLISHED状态的
 
 
-[lsof命令还是很强大的](http://www.cnblogs.com/peida/archive/2013/02/26/2932972.html)
+[查看某一进程使用的port](https://unix.stackexchange.com/questions/157823/list-ports-a-process-pid-is-listening-on-preferably-using-iproute2-tools)
 
-
+ss -l -p -n | grep "pid=1234,"
 
 ## 杀进程（如果进程不属于当前用户，要sudo）
 ## 杀进程，慎用。

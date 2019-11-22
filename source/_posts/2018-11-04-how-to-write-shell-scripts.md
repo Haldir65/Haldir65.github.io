@@ -158,18 +158,31 @@ fi
 ```
 
 `判断字符串是否为空`
+方法一：
 ```bash
 if [ -z "$d" ]
 then
 	echo "d is empty"
 fi
 ```
-str1 = str2　　　　　　当两个串有相同内容、长度时为真 
-str1 != str2　　　　　 当串str1和str2不等时为真 
--n str1　　　　　　　 当串的长度大于0时为真(串非空) 
--z str1　　　　　　　 当串的长度为0时为真(空串) 
-str1　　　　　　　　   当串str1为非空时为真
+方法二：
+-n str1　　　　　　　 当字符串的长度大于0时为真(串非空) 
 
+
+str1 = str2　　　　　　当两个字符串有相同内容、长度时为真 
+str1 != str2　　　　　 当字符串str1和str2不等时为真 
+
+-z str1　　　　　　　 当字符串的长度为0时为真(空串) 
+str1　　　　　　　　   当字符串str1为非空时为真
+
+`字符串myString是否包含字符串my`
+
+```bash
+string='My long string'
+if [[ $string == *"My long"* ]]; then
+  echo "It's there!"
+fi
+```
 
 `文件或者目录相关操作`
 ```bash
@@ -324,6 +337,7 @@ echo ${井号string} ##输出 4, 这么写的原因完全是hexo碰到美元+大
 var=/home/centos
 echo $var
 
+
 echo ${var:5} ## 提取从从零开始第5个字符到末尾的全部字符， 输出： /centos
 
 echo ${var: -6} ##注意-6前面需要有一个空格。提取从倒数第6个字符(含第六个)开始到末尾的全部字符 ， 输出: centos
@@ -335,6 +349,10 @@ echo ${var:1:4} ## 截取第一个到第四个字符之间所有字符,输出: h
 echo ${var/o/h} ##  把第一个匹配到的o换成h，输出: /hhme/centos 
 
 echo ${var//o/h} ## 把所有匹配到的o换成h，这个和sed非常像 输出 /hhme/cenths
+
+
+var="pid: 1234"
+var=${var:5} ## 输出1234，切掉前5个字符
 
 ```
 
@@ -366,7 +384,7 @@ for (( i=0; i<$len; i++ )); do echo "${distro[$i]}" ; done
 
 
 array_name=(value0 value1 value2 value3)
-echo ${array_name[@]} ## 使用@可以获得数组的全部元素
+echo ${array_name[@]} ## 使用@才能获得数组的全部元素 
 value0 value1 value2 value3
 ```
 
@@ -860,3 +878,4 @@ if [[ $? -ne 0 ]]; then
 [非常好的教程](http://c.biancheng.net/view/773.html)
 
 [awesome shell](https://github.com/alebcay/awesome-shell)
+[让printf和echo输出彩色](https://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux)

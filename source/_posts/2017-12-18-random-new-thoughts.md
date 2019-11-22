@@ -62,6 +62,7 @@ top : 1
 - [] 关于textView源码的解析要补上
 - [] 熟练掌握java8的stream,lambda,optional等语法
 - [] build a program that use libcurl , a http client wrapper
+- [] [Replacing JNI Crashes by Exceptions on Android](http://blog.httrack.com/blog/2013/08/23/catching-posix-signals-on-android/)
 
 ### 已完成
 * 用 express 转接一个知乎 Api，添加 Access-control-allow-origin,或许还可以用 redis 缓存数据结果（一个就好）由此想到一篇文章"How to use Python to build a restful Web Service".只不过用的是 Tornado

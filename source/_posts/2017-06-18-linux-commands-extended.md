@@ -445,8 +445,7 @@ history 10 ##列出最近执行的10条命令
 首先在windows上安装putty，默认会装上puttyGen。
 在开始菜单里面总归能找到。
 点击那个generate按钮，按照提示鼠标不停挪动，进度条走完。会生成公钥，点击Save private key生成私钥。提示保存在一个文件中，这个要保存好。暂时不要关闭puttygen,需要直接去复制粘贴那个public key(因为要是生成了一个public key，由于windows的原因，中间可能存在换行，就得在文本编辑器里面删掉所有的换行符，非常麻烦)
-密码登录到服务器端，cd到~/.ssh/文件夹下，没有就mkdir一个，创建一个authorized_keys的文件，要是本来就有，echo > authorized_keys，把内容清除干净。
-把自己刚才生成的public key粘贴进去，保存文件。
+密码登录到服务器端，cd到~/.ssh/文件夹下，没有就mkdir一个，创建一个authorized_keys的文件，要是本来就有，把puttygen生成的public-key的内容追加到文件尾部。
 看下/etc/ssh/sshd_config中是否符合如下描述如下条件
 ```
 RSAAuthentication yes
@@ -649,6 +648,8 @@ sudo bash -c "echo 'vm.swappiness =15' >> /etc/sysctl.conf" ## -c表示让bash�
 
 nmap可以用来扫描某台远程主机上open的port[直接看nmap cheetsheet好了](https://hackertarget.com/nmap-cheatsheet-a-quick-reference-guide/)
 > nmap -p 1-100 192.168.1.1 ## 扫描1-100的port，非常慢
+
+Skip the port scan (-sn) when you only need to determine what hosts are online.
 
 linux的swap文件需要经常读写，这对于ssd来说是一个需要注意的地方
 [digital ocean在添加swap教程的最前面就写了不建议ssd用户添加swap,因为会费ssd](https://www.digitalocean.com/community/tutorials/how-to-add-swap-space-on-ubuntu-16-04)

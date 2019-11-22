@@ -115,6 +115,10 @@ nslookup -d www.163.com //显示ttl
 nslookup -> set debug -> www.163.com //这三条走完是一样的，类似于交互模式
 [dig挖出DNS的秘密](http://blogread.cn/it/article.php?id=5711)
 
+[dns查询也可以使用tcp](https://serverfault.com/questions/404840/when-do-dns-queries-use-tcp-instead-of-udp)
+The Transmission Control Protocol (TCP) is used when the response data size exceeds 512 bytes, or for tasks such as zone transfers.
+
+
 [详细的http-content-type表格](http://www.runoob.com/http/http-content-type.html)
 关于content-type,找到一篇[介绍](http://homeway.me/2015/07/19/understand-http-about-content-type/)
 关于Http header常用字段[理解Http Header](http://zq210wl.github.io/2014/12/30/html-http-header-analysis/)

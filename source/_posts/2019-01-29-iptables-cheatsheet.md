@@ -37,7 +37,16 @@ which may be a jump to a user-defined chain in the same table.
 Mangle is to change packets (Type Of Service, Time To Live etc) on traversal.
 Nat is to put in NAT rules.
 Raw is to be used for marking and connection tracking.
-Filter is for filtering packets.
+Filter is for filtering packets.(默认的，如果不加-t的话默认都是对这个表操作)
+
+[表的优先级](https://www.zfl9.com/iptables.html)
+所谓优先级就是处理的顺序，从左到右优先级依次降低：raw -> mangle -> nat -> filter；
+
+raw，优先级最高，通常与NOTRACK一起使用，用于跳过连接跟踪（conntrack）和 nat 表的处理；
+mangle，修改包头部的某些特殊条目，如 TOS、TTL、打上特殊标记 MARK 等，以影响后面的路由决策；
+nat，用于进行网络地址转换，如 SNAT（修改源地址）、DNAT（修改目的地址）、REDIRECT 重定向等；
+filter，用于过滤数据包，比如 ACCEPT（允许），DROP（丢弃）、REJECT（拒绝）、LOG（记录日志）；
+raw 表除了 -j NOTRACK 外，还有一个常用的动作，那就是 -j TRACE，用于跟踪数据包，进行规则的调试，使用 dmesg 查看。
 
  一般来讲table是kernel的事情，外部无需关心。一般都是创建一个新的chain,然后在input或者output这种现有的chain后面append上去，比如这样：
 
@@ -496,6 +505,13 @@ ip route add local default dev lo table 100
 iptables -t mangle -A PREROUTING -p udp -j TPROXY --tproxy-mark 0x2333/0x2333 --on-ip 127.0.0.1 --on-port 1080
 ```
 大意就是在mangle表的PREROUTING中为每个UDP数据包打上0x2333/0x2333标志，之后在路由选择中将具有0x2333/0x2333标志的数据包投递到本地环回设备上的1080端口；对监听0.0.0.0地址的1080端口的socket启用IP_TRANSPARENT标志，使IPv4路由能够将非本机的数据报投递到传输层，传递给监听1080端口的ss-redir。
+
+
+# 新建路由表 100，将所有数据包发往 loopback 网卡
+ip route add local 0/0 dev lo table 100
+
+# 添加路由策略，让所有经 TPROXY 标记的 0x2333/0x2333 udp 数据包使用路由表 100
+ip rule add fwmark 0x2333/0x2333 lookup 100
 
 ### ipset的语法
 就是一大堆ip的一个集合，但是存的是hash。 iptables的参数可以传 -m --match-set
