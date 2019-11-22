@@ -19,7 +19,7 @@
 <meta property="og:image" content="https://haldir66.ga/static/imgs/ChMkJ1gq00WIXw_GAA47r_8gjqgAAXxJAH8qOMADjvH566.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/htop-top.png">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/htop-bottom.png">
-<meta property="og:updated_time" content="2019-11-15T10:28:39.341Z">
+<meta property="og:updated_time" content="2019-11-22T11:12:40.551Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="linux常用命令扩展">
 <meta name="twitter:description" content="一些linux的常用命令，linux环境下运行server ,bash的语法">
@@ -418,7 +418,7 @@ du -hsBM ./* | sort -n  ##查看当前目录下所有文件，从小到大排序
 !99 ##执行上面列表中第99条命令
 !! ##执行上一条命令
 history 10 ##列出最近执行的10条命令
-</code></pre><h3 id="21-使用sshKeyGen免密码登录的方式"><a href="#21-使用sshKeyGen免密码登录的方式" class="headerlink" title="21. 使用sshKeyGen免密码登录的方式"></a>21. 使用sshKeyGen免密码登录的方式</h3><p>首先在windows上安装putty，默认会装上puttyGen。<br>在开始菜单里面总归能找到。<br>点击那个generate按钮，按照提示鼠标不停挪动，进度条走完。会生成公钥，点击Save private key生成私钥。提示保存在一个文件中，这个要保存好。暂时不要关闭puttygen,需要直接去复制粘贴那个public key(因为要是生成了一个public key，由于windows的原因，中间可能存在换行，就得在文本编辑器里面删掉所有的换行符，非常麻烦)<br>密码登录到服务器端，cd到~/.ssh/文件夹下，没有就mkdir一个，创建一个authorized_keys的文件，要是本来就有，echo &gt; authorized_keys，把内容清除干净。<br>把自己刚才生成的public key粘贴进去，保存文件。<br>看下/etc/ssh/sshd_config中是否符合如下描述如下条件</p>
+</code></pre><h3 id="21-使用sshKeyGen免密码登录的方式"><a href="#21-使用sshKeyGen免密码登录的方式" class="headerlink" title="21. 使用sshKeyGen免密码登录的方式"></a>21. 使用sshKeyGen免密码登录的方式</h3><p>首先在windows上安装putty，默认会装上puttyGen。<br>在开始菜单里面总归能找到。<br>点击那个generate按钮，按照提示鼠标不停挪动，进度条走完。会生成公钥，点击Save private key生成私钥。提示保存在一个文件中，这个要保存好。暂时不要关闭puttygen,需要直接去复制粘贴那个public key(因为要是生成了一个public key，由于windows的原因，中间可能存在换行，就得在文本编辑器里面删掉所有的换行符，非常麻烦)<br>密码登录到服务器端，cd到~/.ssh/文件夹下，没有就mkdir一个，创建一个authorized_keys的文件，要是本来就有，把puttygen生成的public-key的内容追加到文件尾部。<br>看下/etc/ssh/sshd_config中是否符合如下描述如下条件</p>
 <pre><code>RSAAuthentication yes
 PubkeyAuthentication yes
 PermitRootLogin yes
@@ -527,6 +527,7 @@ sudo bash -c &quot;echo &#39;vm.swappiness =15&#39; &gt;&gt; /etc/sysctl.conf&qu
 <blockquote>
 <p>nmap -p 1-100 192.168.1.1 ## 扫描1-100的port，非常慢</p>
 </blockquote>
+<p>Skip the port scan (-sn) when you only need to determine what hosts are online.</p>
 <p>linux的swap文件需要经常读写，这对于ssd来说是一个需要注意的地方<br><a href="https://www.digitalocean.com/community/tutorials/how-to-add-swap-space-on-ubuntu-16-04">digital ocean在添加swap教程的最前面就写了不建议ssd用户添加swap,因为会费ssd</a></p>
 <p><a href="https://stackoverflow.com/questions/12334526/on-bash-command-line-how-to-delete-all-letters-before-cursor">bash下的一些快捷键</a></p>
 <pre><code>Ctrl-u - Cut everything before the cursor // 清除光标之前所有文字

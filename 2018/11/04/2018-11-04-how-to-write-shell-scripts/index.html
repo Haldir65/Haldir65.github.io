@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/timg.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/PuffinWales_EN-AU12757555133_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-11-15T10:28:39.353Z">
+<meta property="og:updated_time" content="2019-11-22T11:12:40.563Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="如何写shell脚本">
 <meta name="twitter:description" content="总结linux下shell脚本语句的语法Shell 是一个用 C 语言编写的程序，它是用户使用 Linux 的桥梁。Shell 既是一种命令语言，又是一种程序设计语言。Shell 是指一种应用程序，这个应用程序提供了一个界面，用户通过这个界面访问操作系统内核的服务。Ken Thompson 的 sh 是第一种 Unix Shell，Windows Explorer 是一个典型的图形界面 Shell">
@@ -305,13 +305,21 @@ else
 echo &quot;$a equals $b&quot;
 fi
 </code></pre>
-<p><code>判断字符串是否为空</code></p>
+<p><code>判断字符串是否为空</code><br>方法一：</p>
 <pre><code class="bash">if [ -z &quot;$d&quot; ]
 then
     echo &quot;d is empty&quot;
 fi
 </code></pre>
-<p>str1 = str2　　　　　　当两个串有相同内容、长度时为真<br>str1 != str2　　　　　 当串str1和str2不等时为真<br>-n str1　　　　　　　 当串的长度大于0时为真(串非空)<br>-z str1　　　　　　　 当串的长度为0时为真(空串)<br>str1　　　　　　　　   当串str1为非空时为真</p>
+<p>方法二：<br>-n str1　　　　　　　 当字符串的长度大于0时为真(串非空) </p>
+<p>str1 = str2　　　　　　当两个字符串有相同内容、长度时为真<br>str1 != str2　　　　　 当字符串str1和str2不等时为真 </p>
+<p>-z str1　　　　　　　 当字符串的长度为0时为真(空串)<br>str1　　　　　　　　   当字符串str1为非空时为真</p>
+<p><code>字符串myString是否包含字符串my</code></p>
+<pre><code class="bash">string=&#39;My long string&#39;
+if [[ $string == *&quot;My long&quot;* ]]; then
+  echo &quot;It&#39;s there!&quot;
+fi
+</code></pre>
 <p><code>文件或者目录相关操作</code></p>
 <pre><code class="bash">## 文件不存在
 if [ ! -f /etc/nonexisitfile ]; then
@@ -425,6 +433,7 @@ echo `expr index &quot;$string&quot; io`  # 输出 2
 <h3 id="字符串截取-除了awk以外"><a href="#字符串截取-除了awk以外" class="headerlink" title="字符串截取(除了awk以外)"></a>字符串截取(除了awk以外)</h3><pre><code class="shell">var=/home/centos
 echo $var
 
+
 echo ${var:5} ## 提取从从零开始第5个字符到末尾的全部字符， 输出： /centos
 
 echo ${var: -6} ##注意-6前面需要有一个空格。提取从倒数第6个字符(含第六个)开始到末尾的全部字符 ， 输出: centos
@@ -436,6 +445,10 @@ echo ${var:1:4} ## 截取第一个到第四个字符之间所有字符,输出: h
 echo ${var/o/h} ##  把第一个匹配到的o换成h，输出: /hhme/centos 
 
 echo ${var//o/h} ## 把所有匹配到的o换成h，这个和sed非常像 输出 /hhme/cenths
+
+
+var=&quot;pid: 1234&quot;
+var=${var:5} ## 输出1234，切掉前5个字符
 
 </code></pre>
 <h3 id="eval的用法"><a href="#eval的用法" class="headerlink" title="eval的用法"></a>eval的用法</h3><p>eval 相当于一个参数替换器，它会把所有 $开头的变量 进行求值替换，然后把替换后的结果当作一条命令来执行。js和python中也有类似的命令</p>
@@ -456,7 +469,7 @@ for (( i=0; i&lt;$len; i++ )); do echo &quot;${distro[$i]}&quot; ; done
 
 
 array_name=(value0 value1 value2 value3)
-echo ${array_name[@]} ## 使用@可以获得数组的全部元素
+echo ${array_name[@]} ## 使用@才能获得数组的全部元素 
 value0 value1 value2 value3
 </code></pre>
 <h2 id="简单的循环（for-each循环）"><a href="#简单的循环（for-each循环）" class="headerlink" title="简单的循环（for each循环）"></a>简单的循环（for each循环）</h2><pre><code class="shell">#!/bin/bash
@@ -839,7 +852,7 @@ result=`post &quot;$headers&quot; &quot;$HOST$ACCESS_URL&quot; &quot;$send_data&
 </blockquote>
 <p><img src="https://www.haldir66.ga/static/imgs/PuffinWales_EN-AU12757555133_1920x1080.jpg" alt=""></p>
 <p><a href="https://github.com/hiboyhiboy/opt-script">opt-script</a><br><a href="https://www.youtube.com/watch?v=hwrnmQumtPw">shell script tutorial</a><br><a href="http://blog.51cto.com/litaotao/1187983">LINUX下的21个特殊符号</a><br><a href="https://notes.wanghao.work/2015-06-02-Shell%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html">Shell学习笔记</a><br><a href="https://www.cyberciti.biz/faq/linux-unix-shell-check-if-directory-empty/">非常好的shell介绍网站</a><br>[shell中各种括号的作用()、(())、[]、<a href="https://blog.csdn.net/taiyang1987912/article/details/39551385">[]]、{}</a><br><a href="http://c.biancheng.net/view/773.html">非常好的教程</a></p>
-<p><a href="https://github.com/alebcay/awesome-shell">awesome shell</a></p>
+<p><a href="https://github.com/alebcay/awesome-shell">awesome shell</a><br><a href="https://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux">让printf和echo输出彩色</a></p>
 
       
 

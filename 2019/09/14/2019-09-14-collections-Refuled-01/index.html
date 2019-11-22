@@ -17,7 +17,7 @@
 <meta property="og:description" content="源码，以及jdk8中的一些有用的method。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/SainteVictoireCezanneBirthday_ZH-CN8216109812_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-11-15T10:28:39.357Z">
+<meta property="og:updated_time" content="2019-11-22T11:12:40.567Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="jdk集合类源码分析[list]">
 <meta name="twitter:description" content="源码，以及jdk8中的一些有用的method。">
@@ -206,6 +206,51 @@ ga('send', 'pageview');
 }
 </code></pre>
 <p>List的实现类包括ArrayList,LinkedList,CopyOnWriteArrayList,以及两个不怎么用的类<del>stack和Vector</del></p>
+<h3 id="1-ArrayList"><a href="#1-ArrayList" class="headerlink" title="1. ArrayList"></a>1. ArrayList</h3><h3 id="2-LinkedList"><a href="#2-LinkedList" class="headerlink" title="2. LinkedList"></a>2. LinkedList</h3><h3 id="3-CopyOnWriteArrayList"><a href="#3-CopyOnWriteArrayList" class="headerlink" title="3.  CopyOnWriteArrayList"></a>3.  CopyOnWriteArrayList</h3><p>内部数组是一个volatile的。<br>所有的mutate操作都被一个ReentrantLock保护(all mutative<br> operations ({@code add}, {@code set}, and so on) are implemented by<br> making a fresh copy of the underlying array.) 此类操作都是创建一个新的array，再通过setArray方法设置这个volatile的值<br>所有的非mutate操作(get, size ,indexOf等)都是通过一个getArray方法先获取到这个<br><a href="https://stackoverflow.com/a/2950898">确认CopyOnWriteArrayList是线程安全的</a>。 任一线程对结构的修改都会直接被后续的读的线程看到。 缺点就是这种容器只适用于read 多 write少的场景。</p>
+<blockquote>
+<p>An important detail is that volatile only applies to the array reference itself, not to the content of the array. However because all changes to the array are made before its reference is published, the volatile guarantees extend to the content of the array</p>
+</blockquote>
+<p>volatile只是保证了数组的指针是volatile的，但事实上因为修改array引用的地方只有setArray方法（改方法包在锁里，同时只有一条线程可以调用）。因此array的内容事实上等同于是volatile的。<br>由于happen-before原则的存在，add(obj)一定发生在indexOf(obj)之前。<br>还是有崩的可能，具体就是CopyOnWrite容器只能保证数据的最终一致性，不能保证数据的实时一致性。所以如果你希望写入的的数据，马上能读到，请不要使用CopyOnWrite容器。<br>比如亲测下面这段代码会崩</p>
+<pre><code class="java">public class CrashOfCopyOnWriteArrayList {
+
+    void test(){
+        CopyOnWriteArrayList&lt;String&gt; list = new CopyOnWriteArrayList&lt;&gt;();
+        for(int i = 0; i&lt;10000; i++){
+            list.add(&quot;string&quot; + i);
+        }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    int size = list.size();
+                    if (size &gt; 0) {
+                        String content = list.get(size - 1); //崩在这里的数组越界
+                    }else {
+                        break;
+                    }
+                }
+            }
+        }).start();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    if(list.size() &lt;= 0){
+                        break;
+                    }
+                    list.remove(0);
+                }
+            }
+        }).start();
+    }
+
+    public static void main(String[] args) {
+        new CrashOfCopyOnWriteArrayList().test();
+    }
+}
+</code></pre>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://cmsblogs.com/?p=4781">【死磕 Java 集合】— 总结篇</a><br>[Java集合框架常见面试题](<a href="https://github.com/Snailclimb/JavaGuide/blob/master/docs/java/collection/Java集合框架常见面试题.md）">https://github.com/Snailclimb/JavaGuide/blob/master/docs/java/collection/Java集合框架常见面试题.md）</a></p>
 
       
