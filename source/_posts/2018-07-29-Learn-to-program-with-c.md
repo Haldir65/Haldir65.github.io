@@ -319,7 +319,11 @@ visual studio中debug的时候有时候会出现Cannot find or open the PDB file
 [Linux下安装、配置libevent](http://hahaya.github.io/build-libevent/)
 [使用libevent输出Hello](http://hahaya.github.io/hello-in-libevent/)
 
-unix下安装libevent的教程
+
+
+<del>unix下安装libevent的教程</del>
+直接
+sudo apt install libevent-dev一部搞定
 1. 在官网上下载对应版本的包 
 2. tar -zxvf /your path/libevent-1.4.14b-stable.tar.gz解压到当前目录 
 3. cd libevent-1.4.14b-stable 
@@ -337,7 +341,10 @@ ls -al /usr/lib | grep libevent
 ls -al /usr/local/lib | grep libevent
 试一下就行了
 
-printf("Error: %d (%s)\n", errno, strerror(errno))
+在ubuntu上，安装的位置有点不一样
+dpkg -L libevent-dev 
+
+/usr/lib/x86_64-linux-gnu/libevent.a
 
 
 ### autoconf等工具的使用教程

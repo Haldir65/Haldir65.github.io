@@ -219,7 +219,7 @@ fi
 if [ "$(ls -A /usr/bin)" ]; then
         echo "this directory  is not empty "
 else
-        echo "this directory is mepty"
+        echo "this directory is empty"
 fi
 
 ```

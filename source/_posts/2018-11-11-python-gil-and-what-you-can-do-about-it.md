@@ -151,7 +151,7 @@ print(balance)
 
 从bytecode来看，[increment这一操作并不是atomic的](https://www.youtube.com/watch?v=7SSYhuk5hmc&t=890s)
 python里面很方便
-incremnt-is-not-atomic.py
+increment-is-not-atomic.py
 ```python
 def foo():
     global n
@@ -160,7 +160,7 @@ def foo():
 import dis
 dis.dis(foo)
 ```
-python incremnt-is-not-atomic.py
+python incrememt-is-not-atomic.py
 ```
  3           0 LOAD_GLOBAL              0 (n)
               2 LOAD_CONST               1 (1)

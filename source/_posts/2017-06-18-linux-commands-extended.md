@@ -259,10 +259,14 @@ alias untar='tar -zxvf '
 ### 10.已安装的软件
 - sudo dpkg -l
 
+apt install libevent-dev
+//libevent装到哪儿去了？
+dpkg -L libevent-dev
+
 ### 11.Ping一个主机
 - ping -c 5 gmail.com #只发送5次
 
-### 12.Wget
+### 12.wget
 下载文件
 - wget url
 下载文件并以指定的文件名保存下来

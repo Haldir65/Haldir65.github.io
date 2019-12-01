@@ -134,14 +134,15 @@ module.exports = {
         new ExtractTextPlugin('[name].css'),  //[name] 默认  也可以自定义name  声明使用
         new HtmlWebpackPlugin({  //将模板的头部和尾部添加css和js模板,dist 目录发布到服务器上，项目包。可以直接上线
             file: 'index.html', //打造单页面运用 最后运行的不是这个
-            template: 'src/index.html'  //vue-cli放在跟目录下
+            template: 'src/index.html'  //vue-cli放在根目录下
         }),
         new CopyWebpackPlugin([  //src下其他的文件直接复制到dist目录下
             { from:'src/assets/favicon.ico',to: 'favicon.ico' }
         ]),
         new webpack.ProvidePlugin({  //引用框架 jquery  lodash工具库是很多组件会复用的，省去了import
             '_': 'lodash'  //引用webpack
-        })
+        })，
+        new CleanWebpackPlugin() //这个是用于删除上一次dist文件夹中生成的main.xxxx.js这些乱七八糟的文件的
     ],
     devServer: {  //服务于webpack-dev-server  内部封装了一个express 
         port: '1314',
