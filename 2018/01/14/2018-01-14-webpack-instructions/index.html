@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/hot%20coffee%20city%20life%20winter.jpg">
-<meta property="og:updated_time" content="2019-11-22T11:12:40.559Z">
+<meta property="og:updated_time" content="2019-12-01T14:43:42.059Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Webpack资源汇总">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/hot%20coffee%20city%20life%20winter.jpg">
@@ -315,14 +315,15 @@ module.exports = {
         new ExtractTextPlugin(&#39;[name].css&#39;),  //[name] 默认  也可以自定义name  声明使用
         new HtmlWebpackPlugin({  //将模板的头部和尾部添加css和js模板,dist 目录发布到服务器上，项目包。可以直接上线
             file: &#39;index.html&#39;, //打造单页面运用 最后运行的不是这个
-            template: &#39;src/index.html&#39;  //vue-cli放在跟目录下
+            template: &#39;src/index.html&#39;  //vue-cli放在根目录下
         }),
         new CopyWebpackPlugin([  //src下其他的文件直接复制到dist目录下
             { from:&#39;src/assets/favicon.ico&#39;,to: &#39;favicon.ico&#39; }
         ]),
         new webpack.ProvidePlugin({  //引用框架 jquery  lodash工具库是很多组件会复用的，省去了import
             &#39;_&#39;: &#39;lodash&#39;  //引用webpack
-        })
+        })，
+        new CleanWebpackPlugin() //这个是用于删除上一次dist文件夹中生成的main.xxxx.js这些乱七八糟的文件的
     ],
     devServer: {  //服务于webpack-dev-server  内部封装了一个express 
         port: &#39;1314&#39;,
