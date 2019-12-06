@@ -31,9 +31,11 @@ which may be a jump to a user-defined chain in the same table.
 - PREROUTING / POSTROUTING
 
 每一条Chain上都有一个rules的列表(用A去append,用I去Insert)
+当然还可以自定义Chain
 
 
-## table（table是一系列针对packet的同一类决策的集合）
+
+## table（table是一系列针对packet的同一类决策的集合，表是为了方便管理提出的逻辑概念）
 Mangle is to change packets (Type Of Service, Time To Live etc) on traversal.
 Nat is to put in NAT rules.
 Raw is to be used for marking and connection tracking.
@@ -115,9 +117,10 @@ iptables后面可以跟的参数很多
 --dport destination端口 ，比方说80
 LOG --log-prefix "IP_SPOOF A: " //加日志,这个LOG关键词和DROP,ACCEPT都差不多的，跟在-j 屁股后面
 -m mac --mac-source //-m 我猜是metrics ，就是说根据哪种评判标准，这里是mac地址
--m state --state NEW,ESTABLISHED -j ACCEPT
+-m state --state NEW,ESTABLISHED RELATED
 -p tcp protocol之类的，比方说tcp,udp,icmp(ping)等等
 -m owner --uid-owner youruserid //所有由这个uid对应的进程创建的包
+--set-mark value 设置mark ，仅限于mangle表
 ```
 
 
@@ -259,7 +262,8 @@ $ iptables -A INPUT -s 192.168.10.0/24 -j LOG --log-prefix '** SUSPECT **'
 在Ubuntu和Debian
 iptables的日志由内核生成的。因此，检查以下内核日志文件。
 查看iptables的日志
-$ tail /var/log/kern.log
+[ubuntu上默认日志是进入了/var/log/sys.log文件中](https://askubuntu.com/questions/348439/where-can-i-find-the-iptables-log-file-and-how-can-i-change-its-location)
+$ tail /var/log/sys.log 
 
 ### 只开7000-7010端口,只允许某个网段的ip发请求以及其他
 ```
@@ -528,6 +532,24 @@ iptables的工作流程
 [iptable在透明代理中的原理就是修改了packet的destination address，同时还记住了原来的address](https://unix.stackexchange.com/questions/413545/what-does-iptables-j-redirect-actually-do-to-packet-headers)
 > iptables overwrites the original destination address but it remembers the old one. The application code can then fetch it by asking for a special socket option, SO_ORIGINAL_DST
 [著名tcp代理redsocks就是用SO_ORIGINAL_DST的](https://github.com/darkk/redsocks)
+
+
+
+iptables规则生效后，不会掐断现有的tcp连接
+
+
+[DNAT是在PREROUTING链上来进行的，而SNAT是在数据包发送出去的时候才进行，因此是在POSTROUTING链上进行的](https://blog.51cto.com/dengaosky/2129665)
+
+[dnat打LOG只会走一次](https://networkengineering.stackexchange.com/questions/18461/very-simple-nat-question-how-does-a-packet-get-back-out)
+The key thing to remember with iptables NAT is that only the first packet of each connection goes through the NAT tables. Once a connection is known any further packets for that connection (in both directions) are simply handled according to the existing mapping. (DNAT只会在连接建立之初走到)
+
+保存
+iptables-save -c > iptables-backup.txt
+恢复
+iptables-restore -c < iptables-backup.txt
+
+
+
 
 ## 参考
 [linux-iptables-examples](https://www.cyberciti.biz/tips/linux-iptables-examples.html)
