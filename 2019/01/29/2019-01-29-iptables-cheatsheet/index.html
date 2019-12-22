@@ -17,7 +17,7 @@
 <meta property="og:description" content="iptables是控制linux 内核netfilter的command line frontend tool，只存在于linux平台，是system admin常用的防火墙。(虽然已经被nftables取代了，学习点网络知识还是很有必要)">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/lidongjieya_ZH-CN9263684179_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-12-06T11:46:18.049Z">
+<meta property="og:updated_time" content="2019-12-22T13:50:16.447Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iptables速查手册">
 <meta name="twitter:description" content="iptables是控制linux 内核netfilter的command line frontend tool，只存在于linux平台，是system admin常用的防火墙。(虽然已经被nftables取代了，学习点网络知识还是很有必要)">
@@ -259,14 +259,19 @@ iptables --policy FORWARD ACCEPT
 -P 设置policy(比如说DROP , REJECT, REDIRECT)
 --line-numbers //显示每条规则所在的行号
 -s source iP
+--sport 22 //源端口号22
+--sport 513:65535 // port range也是可以的
+--dport 22 //目标端口号22
+--dport 513:65535 //port range
+iptables -t nat -A POSTROUTING -j SNAT --to-source 192.168.1.100:2000-3000 //nat的时候加range也是可以的
 -i interface，就是eth0这些网卡设备什么的
---dport destination端口 ，比方说80
 LOG --log-prefix &quot;IP_SPOOF A: &quot; //加日志,这个LOG关键词和DROP,ACCEPT都差不多的，跟在-j 屁股后面
 -m mac --mac-source //-m 我猜是metrics ，就是说根据哪种评判标准，这里是mac地址
 -m state --state NEW,ESTABLISHED RELATED
 -p tcp protocol之类的，比方说tcp,udp,icmp(ping)等等
 -m owner --uid-owner youruserid //所有由这个uid对应的进程创建的包
---set-mark value 设置mark ，仅限于mangle表
+--set-mark 0x400 设置mark ，仅限于mangle表
+-m mark --mark 0x400 后面可以用这个mark来匹配被打了标的包
 </code></pre><p>拉黑一个ip</p>
 <blockquote>
 <p>iptables -I INPUT -s xxx.xxx.xxx.xxx -j DROP //这个拉黑的效果是tcp,udp,icmp全部不通。对方的curl,ping全部卡住</p>
@@ -576,6 +581,8 @@ iptables -t mangle -A PREROUTING -p udp -j TPROXY --tproxy-mark 0x2333/0x2333 --
 <p><a href="https://blog.51cto.com/dengaosky/2129665">DNAT是在PREROUTING链上来进行的，而SNAT是在数据包发送出去的时候才进行，因此是在POSTROUTING链上进行的</a></p>
 <p><a href="https://networkengineering.stackexchange.com/questions/18461/very-simple-nat-question-how-does-a-packet-get-back-out">dnat打LOG只会走一次</a><br>The key thing to remember with iptables NAT is that only the first packet of each connection goes through the NAT tables. Once a connection is known any further packets for that connection (in both directions) are simply handled according to the existing mapping. (DNAT只会在连接建立之初走到)</p>
 <p>保存<br>iptables-save -c &gt; iptables-backup.txt<br>恢复<br>iptables-restore -c &lt; iptables-backup.txt</p>
+<p>Linux 默认会为所有连接都创建连接记录项，而维护连接跟踪表是有开销的，要命的是这个表还有大小限制；</p>
+<p>cat /proc/sys/net/netfilter/nf_conntrack_max：允许的最大连接记录项的数目，超过此值后会直接拒绝新连接<br>cat /proc/sys/net/netfilter/nf_conntrack_count：查看当前已使用的连接记录项数目，如果居高不下则应考虑优化<br>cat /proc/sys/net/netfilter/nf_conntrack_buckets：查看存储记录项的哈希桶的数目，默认为 nf_conntrack_max / 4</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.cyberciti.biz/tips/linux-iptables-examples.html">linux-iptables-examples</a><br><a href="https://blog.dreamtobe.cn/r7800-openwrt-v2ray/">网件R7800 OpenWrt使用V2Ray+mKcp+透明代理完美翻墙</a><br><a href="https://www.digitalocean.com/community/tutorials/how-to-list-and-delete-iptables-firewall-rules">list and delete iptables rules</a><br><a href="https://blog.sleeplessbeastie.eu/2018/06/21/how-to-create-iptables-firewall-using-custom-chains/">如何创建并管理自定义的iptables的chain</a></p>
 
       

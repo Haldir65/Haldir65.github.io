@@ -28,7 +28,7 @@
 <meta property="og:image" content="https://haldir66.ga/static/imgs/tcp_and_udp_size_limit.png">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/https_hand_shake.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/tcp_packet_structure.jpg">
-<meta property="og:updated_time" content="2019-12-06T11:46:18.049Z">
+<meta property="og:updated_time" content="2019-12-22T13:50:16.447Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="tcp和udp包结构分析">
 <meta name="twitter:description" content="本文只针对ipv4网络进行分析">
@@ -335,6 +335,20 @@ net.ipv4.ip_forward = 1
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://jerryc8080.gitbooks.io/understand-tcp-and-udp/">TCP 报文结构</a><br><a href="https://www.google.com/search?q=tcp%E5%8C%85%E7%BB%93%E6%9E%84">tcp包结构</a><br><a href="https://accedian.com/enterprises/blog/tcp-receive-window-everything-need-know/">推广商业软件的文章，当做关于tcp协议的一整个series来看还是很好的</a> </p>
 <p>HTTP幂等性(用CAS)避免下单两次</p>
 <p><a href="http://www.cnblogs.com/jiunadianshi/articles/2981068.html">TCP端口状态说明ESTABLISHED、TIME_WAIT</a>FIN_WAIT2</p>
+<pre><code class="shell">netstat -n | awk &#39;/^tcp/ {++state[$NF]} END {for(key in state) print key,&quot;\t&quot;,state[key]}&#39;
+</code></pre>
+<p>没有安装netstat的话，使用ss可以改一下命令</p>
+<pre><code class="shell">ss -t -a | awk &#39;{++State[$1]} END {for(key in State) print key,&quot;\t&quot;,State[key]}&#39;
+</code></pre>
+<p>输出大概是这样的</p>
+<pre><code>CLOSE-WAIT       2
+LAST-ACK         2
+ESTAB    17
+TIME-WAIT        1
+LISTEN   16
+State    1
+</code></pre><p>CLOSED：无连接是活动的或正在进行<br>LISTEN：服务器在等待进入呼叫<br>SYN_RECV：一个连接请求已经到达，等待确认<br>SYN_SENT：应用已经开始，打开一个连接<br>ESTABLISHED：正常数据传输状态<br>FIN_WAIT1：应用说它已经完成<br>FIN_WAIT2：另一边已同意释放<br>ITMED_WAIT：等待所有分组死掉<br>CLOSING：两边同时尝试关闭<br>TIME_WAIT：另一边已初始化一个释放<br>LAST_ACK：等待所有分组死掉</p>
+<p><a href="https://blog.csdn.net/yusiguyuan/article/details/22923943">查看本机网络连接</a></p>
 <p><a href="https://akaedu.github.io/book/ch36s07.html">tcp滑动窗口]</a></p>
 <p>IPv4和IPv6的地址格式定义在netinet/in.h中，IPv4地址用sockaddr_in结构体表示，包括16位端口号和32位IP地址，IPv6地址用sockaddr_in6结构体表示，包括16位端口号、128位IP地址和一些控制字段。所以ipv6的ip数量要大得多。</p>
 <p><a href="https://medium.com/@pawilon/tuning-your-linux-kernel-and-haproxy-instance-for-high-loads-1a2105ea553e">tweak kernel parameters</a><br>net.ipv4.tcp_max_syn_backlog = 100000</p>
