@@ -113,14 +113,19 @@ iptables后面可以跟的参数很多
 -P 设置policy(比如说DROP , REJECT, REDIRECT)
 --line-numbers //显示每条规则所在的行号
 -s source iP
+--sport 22 //源端口号22
+--sport 513:65535 // port range也是可以的
+--dport 22 //目标端口号22
+--dport 513:65535 //port range
+iptables -t nat -A POSTROUTING -j SNAT --to-source 192.168.1.100:2000-3000 //nat的时候加range也是可以的
 -i interface，就是eth0这些网卡设备什么的
---dport destination端口 ，比方说80
 LOG --log-prefix "IP_SPOOF A: " //加日志,这个LOG关键词和DROP,ACCEPT都差不多的，跟在-j 屁股后面
 -m mac --mac-source //-m 我猜是metrics ，就是说根据哪种评判标准，这里是mac地址
 -m state --state NEW,ESTABLISHED RELATED
 -p tcp protocol之类的，比方说tcp,udp,icmp(ping)等等
 -m owner --uid-owner youruserid //所有由这个uid对应的进程创建的包
---set-mark value 设置mark ，仅限于mangle表
+--set-mark 0x400 设置mark ，仅限于mangle表
+-m mark --mark 0x400 后面可以用这个mark来匹配被打了标的包
 ```
 
 
@@ -548,7 +553,11 @@ iptables-save -c > iptables-backup.txt
 恢复
 iptables-restore -c < iptables-backup.txt
 
+Linux 默认会为所有连接都创建连接记录项，而维护连接跟踪表是有开销的，要命的是这个表还有大小限制；
 
+cat /proc/sys/net/netfilter/nf_conntrack_max：允许的最大连接记录项的数目，超过此值后会直接拒绝新连接
+cat /proc/sys/net/netfilter/nf_conntrack_count：查看当前已使用的连接记录项数目，如果居高不下则应考虑优化
+cat /proc/sys/net/netfilter/nf_conntrack_buckets：查看存储记录项的哈希桶的数目，默认为 nf_conntrack_max / 4
 
 
 ## 参考

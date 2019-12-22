@@ -224,6 +224,20 @@ awk '$1 !~ /J/' inventory-shipped  ##排除所有包含J的内容
 
 [coolshell的教程](https://coolshell.cn/articles/9070.html)
 
+awk还能写if else
+cat testfile
+```
+ProductA  30
+ProductB  76
+ProductC  55
+```
+
+$ awk '$2<75 {printf "%s\t%s\n", $0, "REORDER";} $2>=75 {print $0;}' testfile
+ProductA  30    REORDER
+ProductB  76
+ProductC  55    REORDER
+
+
 
 ### 7.tar命令
 主要是跟压缩和解压文件有关的,[参考](http://man.linuxde.net/tar)

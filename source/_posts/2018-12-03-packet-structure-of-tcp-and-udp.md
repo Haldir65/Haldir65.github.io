@@ -307,6 +307,40 @@ HTTP幂等性(用CAS)避免下单两次
 
 [TCP端口状态说明ESTABLISHED、TIME_WAIT](http://www.cnblogs.com/jiunadianshi/articles/2981068.html)FIN_WAIT2
 
+
+```shell
+netstat -n | awk '/^tcp/ {++state[$NF]} END {for(key in state) print key,"\t",state[key]}'
+```
+
+没有安装netstat的话，使用ss可以改一下命令
+```shell
+ss -t -a | awk '{++State[$1]} END {for(key in State) print key,"\t",State[key]}'
+```
+输出大概是这样的
+```
+CLOSE-WAIT       2
+LAST-ACK         2
+ESTAB    17
+TIME-WAIT        1
+LISTEN   16
+State    1
+```
+
+CLOSED：无连接是活动的或正在进行
+LISTEN：服务器在等待进入呼叫
+SYN_RECV：一个连接请求已经到达，等待确认
+SYN_SENT：应用已经开始，打开一个连接
+ESTABLISHED：正常数据传输状态
+FIN_WAIT1：应用说它已经完成
+FIN_WAIT2：另一边已同意释放
+ITMED_WAIT：等待所有分组死掉
+CLOSING：两边同时尝试关闭
+TIME_WAIT：另一边已初始化一个释放
+LAST_ACK：等待所有分组死掉
+
+[查看本机网络连接](https://blog.csdn.net/yusiguyuan/article/details/22923943)
+
+
 [tcp滑动窗口]](https://akaedu.github.io/book/ch36s07.html)
 
 IPv4和IPv6的地址格式定义在netinet/in.h中，IPv4地址用sockaddr_in结构体表示，包括16位端口号和32位IP地址，IPv6地址用sockaddr_in6结构体表示，包括16位端口号、128位IP地址和一些控制字段。所以ipv6的ip数量要大得多。

@@ -58,12 +58,13 @@ top : 1
 - Perl被称为脚本语言中的瑞士军刀，处理文本和正则的能力比较强。学习perl5就可以了。
 - [Spring Boot application.yml](https://docs.spring.io/spring-boot/docs/current/reference/html/howto-properties-and-configuration.html) 写法
 - 微服务框架 <del>dubbo</del> kubernetes, Spring Cloud....
-- [] java BitSet这个class的使用及效率
-- [] 关于textView源码的解析要补上
-- [] 熟练掌握java8的stream,lambda,optional等语法
-- [] build a program that use libcurl , a http client wrapper
-- [] [Replacing JNI Crashes by Exceptions on Android](http://blog.httrack.com/blog/2013/08/23/catching-posix-signals-on-android/)
-- [] python sendall will block? what if tcp buffer is full , like when advertised windows size is zero. [tcp flow control](https://www.brianstorti.com/tcp-flow-control/)
+- [ ] java BitSet这个class的使用及效率
+- [ ] 关于textView源码的解析要补上
+- [ ] 熟练掌握java8的stream,lambda,optional等语法
+- [ ] build a program that use libcurl , a http client wrapper
+- [ ] [Replacing JNI Crashes by Exceptions on Android](http://blog.httrack.com/blog/2013/08/23/catching-posix-signals-on-android/)
+- [ ] python sendall will block? what if tcp buffer is full , like when advertised windows size is zero. [tcp flow control](https://www.brianstorti.com/tcp-flow-control/)
+- [ ] libuv
 
 ### 已完成
 * 用 express 转接一个知乎 Api，添加 Access-control-allow-origin,或许还可以用 redis 缓存数据结果（一个就好）由此想到一篇文章"How to use Python to build a restful Web Service".只不过用的是 Tornado
@@ -97,7 +98,7 @@ top : 1
 - [X]linux的sed命令(文本替换比较常用)
 - [nio](https://juejin.im/post/59fffdb76fb9a0450a66bd58) 还是netty好。也可以看点别的[并发编程网](http://ifeve.com/java-nio%E7%B3%BB%E5%88%97%E6%95%99%E7%A8%8B%EF%BC%88%E5%8D%81%E5%85%AD%EF%BC%89-java-nio-files/)
 - [X]js 的async await,就是一个async修饰一个method，里面随便写await
-- [X] Linux下TCP延迟确认机制
+- [X] Linux下TCP延迟确认机制 以及socket timeout的部分原因（net.ipv4.tcp_syn_retries，如果 TCP 握手的 SYN 包超时重试按照 2 的幂来 backoff）
 - [X]c语言的[libevent使用教程](https://yq.aliyun.com/articles/413601) eventloop，添加回调，大致的流程就是这样
 - [X] [indexed DB](http://www.ruanyifeng.com/blog/2018/07/indexeddb.html),浏览器端数据库，还是用第三方库好
 - [X] [block size vs page size](http://forums.justlinux.com/showthread.php?3261-Block-size-vs-page-size) Page是内存相关，block是硬盘相关的
