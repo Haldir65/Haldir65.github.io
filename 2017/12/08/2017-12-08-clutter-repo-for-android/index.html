@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery1511100734648.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery1511100809920.jpg">
-<meta property="og:updated_time" content="2019-12-22T13:50:16.439Z">
+<meta property="og:updated_time" content="2019-12-27T06:37:14.663Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android知识集合[三]">
 <meta name="twitter:description" content="之前的文章快装不下了，所以另外开一篇文章专门放Android相关的杂乱的知识点。">
@@ -1318,6 +1318,43 @@ finish();
 <h2 id="41-RelativeLayout的居中"><a href="#41-RelativeLayout的居中" class="headerlink" title="41. RelativeLayout的居中"></a>41. RelativeLayout的居中</h2><p>centerVertical = true 并不是我所想象的那样。<br>亲测，例如一个RelativeLayout的高度写死100dp，所有的child都是centerVertical = true ，child的高度都是50dp。<br>运行时修改RelativeLayout的layoutParmas.height = 130dp ，同时relativeLayout.paddingTop = 30dp。<br>那么最终的结果并不是我所想象的，每一个child的top= 55dp，实际结果是每一个child的top = 40dp (是的,centerVertical将padding也算进来了)<br>另外，100dp高的parent,parent.paddingTop= 25dp, parent.paddindBottom = 25dp。里头放一个60dp的child（child的marginTop = 10dp,marginBottom= 10dp），最终的效果是child的高度被压成30dp(100 - 25-25-10 -10)。<br>这些在onMeasure的源码里面都能看到</p>
 <p>RelativeLayout的源码中使用了拓扑排序的方式，在onMeasure中预先理清楚各个child之间的依赖树（存储在dependencyGraph中），具体的measure中根据理清楚的依赖给那些不依赖其他的view预先排好座次，那些需要依赖其他view的位置信息的view，会找到对应的在各个方向上的anchorParams(锚点)，确定其在该方向上的坐标（applyHorizontalSizeRules）。apply了这些constraint之后，根据RelativeLayout自身的width和height给child计算出一个measureSpec(以宽度为例，分给child的maxAvailable是自身的宽度减掉自身左右padding，减掉child的marginLeft和marginRight,mode方面，一般给child分配的都是MeasureSpec.EXACTLY(child写了个match_parent)或者MeasureSpec.AT_MOST(child写了个wrap_content)),跟着是positionChildHorizontal(根据前述的收集的信息，补全一些mleft和mRight)。</p>
 <p>RelativeLayout的代码比较复杂，重点在于：一：梳理依赖树(这个难一点)。 二：从依赖树的顶端开始给每一个child赋值上下左右。</p>
+<h2 id="42-手机输入法的显示与隐藏"><a href="#42-手机输入法的显示与隐藏" class="headerlink" title="42. 手机输入法的显示与隐藏"></a>42. 手机输入法的显示与隐藏</h2><p><a href="https://stackoverflow.com/a/5106399">How to show soft-keyboard when edittext is focused</a><br>还有就是如何监听keyBoard打开与关闭事件:<br>看看人家reactNative是怎么做的<br><a href="https://github.com/facebook/react-native/blob/master/ReactAndroid/src/main/java/com/facebook/react/ReactRootView.java">ReactRootView.java</a></p>
+<pre><code class="java">    private void checkForKeyboardEvents() {
+      getRootView().getWindowVisibleDisplayFrame(mVisibleViewArea);
+      final int heightDiff =
+          DisplayMetricsHolder.getWindowDisplayMetrics().heightPixels - mVisibleViewArea.bottom;
+
+      boolean isKeyboardShowingOrKeyboardHeightChanged =
+          mKeyboardHeight != heightDiff &amp;&amp; heightDiff &gt; mMinKeyboardHeightDetected;
+      if (isKeyboardShowingOrKeyboardHeightChanged) {
+        mKeyboardHeight = heightDiff;
+        sendEvent(
+            &quot;keyboardDidShow&quot;,
+            createKeyboardEventPayload(
+                PixelUtil.toDIPFromPixel(mVisibleViewArea.bottom),
+                PixelUtil.toDIPFromPixel(mVisibleViewArea.left),
+                PixelUtil.toDIPFromPixel(mVisibleViewArea.width()),
+                PixelUtil.toDIPFromPixel(mKeyboardHeight)));
+        return;
+      }
+
+      boolean isKeyboardHidden = mKeyboardHeight != 0 &amp;&amp; heightDiff &lt;= mMinKeyboardHeightDetected;
+      if (isKeyboardHidden) {
+        mKeyboardHeight = 0;
+        sendEvent(
+            &quot;keyboardDidHide&quot;,
+            createKeyboardEventPayload(
+                PixelUtil.toDIPFromPixel(mVisibleViewArea.height()),
+                0,
+                PixelUtil.toDIPFromPixel(mVisibleViewArea.width()),
+                0));
+      }
+    }
+</code></pre>
+<p>也是getWindowVisibleDisplayFrame那一套</p>
+<blockquote>
+<p>mMinKeyboardHeightDetected = (int) PixelUtil.toPixelFromDIP(60);  //是的，60dp看上去差不多了</p>
+</blockquote>
 <p>=============================================================================</p>
 <p>有些地方会对Apk进行二次打包，加固就是防着这个的。</p>
 <p><img src="https://www.haldir66.ga/static/imgs/scenery1511100809920.jpg" alt=""></p>

@@ -17,7 +17,7 @@
 <meta property="og:description" content="iptables是控制linux 内核netfilter的command line frontend tool，只存在于linux平台，是system admin常用的防火墙。(虽然已经被nftables取代了，学习点网络知识还是很有必要)">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/lidongjieya_ZH-CN9263684179_1920x1080.jpg">
-<meta property="og:updated_time" content="2019-12-22T13:50:16.447Z">
+<meta property="og:updated_time" content="2019-12-27T06:37:14.667Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iptables速查手册">
 <meta name="twitter:description" content="iptables是控制linux 内核netfilter的command line frontend tool，只存在于linux平台，是system admin常用的防火墙。(虽然已经被nftables取代了，学习点网络知识还是很有必要)">
@@ -438,8 +438,8 @@ iptables -I INPUT -j syn-flood
 -I INPUT -j syn-flood  把INPUT的包交给syn-flood链处理
 这里的--limit-burst=10相当于说最开始有10个可以匹配的包去转发，然后匹配的包的个数是根据--limit=50/s进行限制的，也就是每秒限制转发50个数据包，多余的会被下面符合要求的DROP规则去处理，进行丢弃，这样就实现了对数据包的限速问题。
 </code></pre><h2 id="现在来看看fail2ban是怎么拉黑一个ip的"><a href="#现在来看看fail2ban是怎么拉黑一个ip的" class="headerlink" title="现在来看看fail2ban是怎么拉黑一个ip的"></a>现在来看看fail2ban是怎么拉黑一个ip的</h2><p>一般来说要拒绝一个ip访问http,https可以这么干</p>
-<pre><code>iptables -L INPUT -s xxx.xxx.xxx.xxx -p tcp --dport 80 -j DROP
-iptables -L INPUT -s xxx.xxx.xxx.xxx -p tcp --dport 443 -j DROP
+<pre><code>iptables -I INPUT -s xxx.xxx.xxx.xxx -p tcp --dport 80 -j DROP
+iptables -I INPUT -s xxx.xxx.xxx.xxx -p tcp --dport 443 -j DROP
 
 而事实上就是创建了一个action
 ~ cat /etc/fail2ban/action.d/iptables.conf
@@ -583,6 +583,7 @@ iptables -t mangle -A PREROUTING -p udp -j TPROXY --tproxy-mark 0x2333/0x2333 --
 <p>保存<br>iptables-save -c &gt; iptables-backup.txt<br>恢复<br>iptables-restore -c &lt; iptables-backup.txt</p>
 <p>Linux 默认会为所有连接都创建连接记录项，而维护连接跟踪表是有开销的，要命的是这个表还有大小限制；</p>
 <p>cat /proc/sys/net/netfilter/nf_conntrack_max：允许的最大连接记录项的数目，超过此值后会直接拒绝新连接<br>cat /proc/sys/net/netfilter/nf_conntrack_count：查看当前已使用的连接记录项数目，如果居高不下则应考虑优化<br>cat /proc/sys/net/netfilter/nf_conntrack_buckets：查看存储记录项的哈希桶的数目，默认为 nf_conntrack_max / 4</p>
+<p>先经过 NAT table 的 PREROUTING 链；<br>经由路由判断确定这个封包是要进入本机与否，若不进入本机，则下一步；<br>再经过 Filter table 的 FORWARD 链；<br>通过 NAT table 的 POSTROUTING 链，最后传送出去。<br>PREROUTING会修改目标IP， POSTROUTING链会修改来源 IP， 通常我们的 NAT 内网转外网是修改来源 IP（即内网 IP），成为来源 NAT（Source NAT, SNAT）。</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.cyberciti.biz/tips/linux-iptables-examples.html">linux-iptables-examples</a><br><a href="https://blog.dreamtobe.cn/r7800-openwrt-v2ray/">网件R7800 OpenWrt使用V2Ray+mKcp+透明代理完美翻墙</a><br><a href="https://www.digitalocean.com/community/tutorials/how-to-list-and-delete-iptables-firewall-rules">list and delete iptables rules</a><br><a href="https://blog.sleeplessbeastie.eu/2018/06/21/how-to-create-iptables-firewall-using-custom-chains/">如何创建并管理自定义的iptables的chain</a></p>
 
       

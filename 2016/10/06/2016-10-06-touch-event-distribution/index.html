@@ -19,7 +19,7 @@
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/dispatch_touch_event_video.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/touch_event_1.png">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/touch_event_2.png">
-<meta property="og:updated_time" content="2019-12-22T13:50:16.435Z">
+<meta property="og:updated_time" content="2019-12-27T06:37:14.651Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="安卓事件分发流程">
 <meta name="twitter:description" content="图1 默认情况下事件传递的路径  Touch事件始于ACTION_DOWN, 终止于ACTION_UP, 这其中可能会伴随着ACTION_MOVE,ACTION_CANCEL等等。">
@@ -747,7 +747,7 @@ int maskAction=0x0ff&amp;0x105; //  maskAction=0x005;
 </code></pre>
 <p>如此，触摸动作含义改变为ACTIONPOINTERDOWN。<br>三根手指同时move汇集到应用层，接收到的是ACTION_POINTER_3_MOVE.<br>结论是，getActionIndex就是获取 0x00000206 里面那个2，也就是第几根手指上去的。getActionMasked就是，我不管你是1根手指DOWN，2根手指DOWN还是3根手指DOWN上去，mask之后全部变成ACTION_DOWN。所以一般来说，ACTION_POINTER_2_DOWN这一类的东西通常用于多点触控。一个Int 4个byte，第三个byte保存index（第几根手指），第四个byte保存类型（DOWN,MOVE还是别的什么）</p>
 <p><strong><em>如果View没有消费ACTION_DOWN事件，则之后的ACTION_MOVE等事件都不会再接收。</em></strong></p>
-<p>另外,addTouchTarget方法在遍历当前child过程中只要找到一个就break当前遍历，所以正常情况下，这个链表只会有一歌个。但是，这个遍历外面还包裹了一个<code>`</code></p>
+<p>另外,addTouchTarget方法在遍历当前child过程中只要找到一个就break当前遍历，所以正常情况下，这个链表只会有一个。但是，这个遍历外面还包裹了一个</p>
 <pre><code class="java">actionMasked == MotionEvent.ACTION_DOWN
                         || (split &amp;&amp; actionMasked == MotionEvent.ACTION_POINTER_DOWN)
                         || actionMasked == MotionEvent.ACTION_HOVER_MOVE
