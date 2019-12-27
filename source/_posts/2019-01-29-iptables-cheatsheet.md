@@ -349,8 +349,8 @@ iptables -I INPUT -j syn-flood
 一般来说要拒绝一个ip访问http,https可以这么干
 
 ```
-iptables -L INPUT -s xxx.xxx.xxx.xxx -p tcp --dport 80 -j DROP
-iptables -L INPUT -s xxx.xxx.xxx.xxx -p tcp --dport 443 -j DROP
+iptables -I INPUT -s xxx.xxx.xxx.xxx -p tcp --dport 80 -j DROP
+iptables -I INPUT -s xxx.xxx.xxx.xxx -p tcp --dport 443 -j DROP
 
 而事实上就是创建了一个action
 ~ cat /etc/fail2ban/action.d/iptables.conf
@@ -558,6 +558,12 @@ Linux 默认会为所有连接都创建连接记录项，而维护连接跟踪�
 cat /proc/sys/net/netfilter/nf_conntrack_max：允许的最大连接记录项的数目，超过此值后会直接拒绝新连接
 cat /proc/sys/net/netfilter/nf_conntrack_count：查看当前已使用的连接记录项数目，如果居高不下则应考虑优化
 cat /proc/sys/net/netfilter/nf_conntrack_buckets：查看存储记录项的哈希桶的数目，默认为 nf_conntrack_max / 4
+
+先经过 NAT table 的 PREROUTING 链；
+经由路由判断确定这个封包是要进入本机与否，若不进入本机，则下一步；
+再经过 Filter table 的 FORWARD 链；
+通过 NAT table 的 POSTROUTING 链，最后传送出去。
+PREROUTING会修改目标IP， POSTROUTING链会修改来源 IP， 通常我们的 NAT 内网转外网是修改来源 IP（即内网 IP），成为来源 NAT（Source NAT, SNAT）。
 
 
 ## 参考

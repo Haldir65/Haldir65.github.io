@@ -1378,6 +1378,51 @@ RelativeLayout的源码中使用了拓扑排序的方式，在onMeasure中预先
 
 RelativeLayout的代码比较复杂，重点在于：一：梳理依赖树(这个难一点)。 二：从依赖树的顶端开始给每一个child赋值上下左右。
 
+## 42. 手机输入法的显示与隐藏
+[How to show soft-keyboard when edittext is focused](https://stackoverflow.com/a/5106399)
+还有就是如何监听keyBoard打开与关闭事件:
+看看人家reactNative是怎么做的
+[ReactRootView.java](https://github.com/facebook/react-native/blob/master/ReactAndroid/src/main/java/com/facebook/react/ReactRootView.java)
+```java
+    private void checkForKeyboardEvents() {
+      getRootView().getWindowVisibleDisplayFrame(mVisibleViewArea);
+      final int heightDiff =
+          DisplayMetricsHolder.getWindowDisplayMetrics().heightPixels - mVisibleViewArea.bottom;
+
+      boolean isKeyboardShowingOrKeyboardHeightChanged =
+          mKeyboardHeight != heightDiff && heightDiff > mMinKeyboardHeightDetected;
+      if (isKeyboardShowingOrKeyboardHeightChanged) {
+        mKeyboardHeight = heightDiff;
+        sendEvent(
+            "keyboardDidShow",
+            createKeyboardEventPayload(
+                PixelUtil.toDIPFromPixel(mVisibleViewArea.bottom),
+                PixelUtil.toDIPFromPixel(mVisibleViewArea.left),
+                PixelUtil.toDIPFromPixel(mVisibleViewArea.width()),
+                PixelUtil.toDIPFromPixel(mKeyboardHeight)));
+        return;
+      }
+
+      boolean isKeyboardHidden = mKeyboardHeight != 0 && heightDiff <= mMinKeyboardHeightDetected;
+      if (isKeyboardHidden) {
+        mKeyboardHeight = 0;
+        sendEvent(
+            "keyboardDidHide",
+            createKeyboardEventPayload(
+                PixelUtil.toDIPFromPixel(mVisibleViewArea.height()),
+                0,
+                PixelUtil.toDIPFromPixel(mVisibleViewArea.width()),
+                0));
+      }
+    }
+```
+也是getWindowVisibleDisplayFrame那一套
+
+> mMinKeyboardHeightDetected = (int) PixelUtil.toPixelFromDIP(60);  //是的，60dp看上去差不多了
+
+
+
+
 =============================================================================
 
 有些地方会对Apk进行二次打包，加固就是防着这个的。

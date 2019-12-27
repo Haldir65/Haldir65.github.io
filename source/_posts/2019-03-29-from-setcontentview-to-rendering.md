@@ -767,6 +767,8 @@ APP可以没有Activty,PhoneWindow,DecorView，例如带悬浮窗的service。
 
 ![](https://www.haldir66.ga/static/imgs/window_manager_03.jpeg)
 
+
+
 ### 参考
 [图片出自Bugly](https://cloud.tencent.com/developer/article/1070984)
 [深入理解Android之View的绘制流程](https://www.jianshu.com/p/060b5f68da79)

@@ -614,7 +614,7 @@ int maskAction=0x0ff&0x105; //  maskAction=0x005;
 
 ***如果View没有消费ACTION_DOWN事件，则之后的ACTION_MOVE等事件都不会再接收。***
 
-另外,addTouchTarget方法在遍历当前child过程中只要找到一个就break当前遍历，所以正常情况下，这个链表只会有一歌个。但是，这个遍历外面还包裹了一个```
+另外,addTouchTarget方法在遍历当前child过程中只要找到一个就break当前遍历，所以正常情况下，这个链表只会有一个。但是，这个遍历外面还包裹了一个
 ```java
 actionMasked == MotionEvent.ACTION_DOWN
                         || (split && actionMasked == MotionEvent.ACTION_POINTER_DOWN)
