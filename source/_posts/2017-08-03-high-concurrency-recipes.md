@@ -492,6 +492,11 @@ private void setNextRunTime() {
 ```
 结论就是scheduleWithFixedDelay可能会因为前面的任务堵塞造成不是那么准
 
+
+## 19 .Concurrency Concepts in java
+[Concurrency Concepts in Java by Douglas Hawkins](https://www.youtube.com/watch?v=ADxUsCkWdbE)
+unSafe里面有一个fullFence方法
+
 ## 参考
 - [看起来 ReentrantLock 无论在哪方面都比 synchronized 好](http://blog.csdn.net/fw0124/article/details/6672522)
 - [Jesse Wilson - Coordinating Space and Time](https://www.youtube.com/watch?v=yS0Nc-L1Uuk)

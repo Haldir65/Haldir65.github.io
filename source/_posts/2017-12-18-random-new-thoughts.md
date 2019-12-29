@@ -52,7 +52,7 @@ top : 1
 - [简单的组件化方案](https://www.jianshu.com/p/5f9a7bc902e1)
 - [mvc,mvp,mvvm](https://www.tianmaying.com/tutorial/AndroidMVC)这些关键术语的掌握还是必要的
 - Parcelable 是怎么实现跨进程的? ipc并不仅限于后台，客户端不同进程间也会有类似的概念。
-- jdk8 standard Library implementatison detail(java代码的实现 --> hotspot代码的c语言实现)
+- jdk8 standard Library implementation detail(java代码的实现 --> hotspot代码的c语言实现)
 - [后端面试题](https://segmentfault.com/a/1190000017864721)
 - thrift 源码解析，rpc框架（比方说人脸识别应用就可以用java调用python服务）这种rpc过程肯定要考虑字节序的问题。
 - Perl被称为脚本语言中的瑞士军刀，处理文本和正则的能力比较强。学习perl5就可以了。

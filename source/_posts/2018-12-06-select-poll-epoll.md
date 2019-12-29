@@ -76,6 +76,16 @@ epoll：2002 年随 Linux 内核 2.5.44 发布，epoll 能直接返回具体的�
 前面说了那么多实现，但是没有出现 Windows，Windows 平台的非阻塞 IO 使用 select，我们也不必觉得 Windows 很落后，在 Windows 中 IOCP 提供的异步 IO 是比较强大的。
 ```
 
+## select,poll,epoll的归纳总结区分
+[select,poll,epoll的归纳总结区分](https://johng.cn/select-poll-epoll/)
+
+select有1024的上限
+poll本质上和select没有区别，没有上限是因为使用了链表存储，大量的fd的数组被整体复制于用户态和内核地址空间之间
+epoll使用mmap解决了复制的开销
+
+
+
+## 参考
 [IO模型详解](http://cmsblogs.com/?p=4812) blocking io, nonblocking io, io multiplexing, asynchronous io,etc
 
 

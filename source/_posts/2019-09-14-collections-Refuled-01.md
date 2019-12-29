@@ -32,7 +32,9 @@ List的实现类包括ArrayList,LinkedList,CopyOnWriteArrayList,以及两个不�
 
 volatile只是保证了数组的指针是volatile的，但事实上因为修改array引用的地方只有setArray方法（改方法包在锁里，同时只有一条线程可以调用）。因此array的内容事实上等同于是volatile的。
 由于happen-before原则的存在，add(obj)一定发生在indexOf(obj)之前。
-还是有崩的可能，具体就是CopyOnWrite容器只能保证数据的最终一致性，不能保证数据的实时一致性。所以如果你希望写入的的数据，马上能读到，请不要使用CopyOnWrite容器。
+
+***还是有崩的可能***
+具体就是CopyOnWrite容器只能保证数据的最终一致性，不能保证数据的实时一致性。所以如果你希望写入的的数据，马上能读到，请不要使用CopyOnWrite容器。
 比如亲测下面这段代码会崩
 ```java
 public class CrashOfCopyOnWriteArrayList {

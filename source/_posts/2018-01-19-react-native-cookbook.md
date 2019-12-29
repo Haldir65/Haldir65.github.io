@@ -153,11 +153,22 @@ If you want to have more control over the appearance you should use one of the T
 // Adding alignItems to a component's style determines the alignment of children along the secondary axis 
 
 
-==========================
+
+
+
+
+## 参考
+[基于React Native构建的仿京东客户端](https://github.com/yuanguozheng/JdApp)
+
+
 async storage
 
 camera Roll
-[基于React Native构建的仿京东客户端](https://github.com/yuanguozheng/JdApp)
+
+## 待填坑
+[ReactNative之js与native通信流程（Android篇）](http://yangguang1029.github.io/2018/02/26/rn-android-communicate/)
+[ReactNative之VirtualDomTree的diff原理](http://yangguang1029.github.io/2018/02/25/rn-reconciliation/)
+
 
 <!-- <audio src="http://m10.music.126.net/20180121230941/8d878803b3b0542d9c5482ccf613a86b/ymusic/d95e/bab6/a7f5/864661168da79b309c3d2fac971d1698.mp3" autoplay="autoplay">
 您的浏览器不支持 audio 标签。

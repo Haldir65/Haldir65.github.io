@@ -792,3 +792,5 @@ m3u8就是很多ts文件的目录
 [Linux下TCP延迟确认(Delayed Ack)机制导致的时延问题分析](https://cloud.tencent.com/developer/article/1004356) TCP Nagle算法&&延迟确认机制(微软更新KB328890)
 
 [301和302的区别看上去不大，但平时几乎看不到301的原因就在于301的结果会被浏览器缓存，下回访问这个url浏览器都不会发出网络请求](https://realpython.com/django-redirects/)，所以本着不要做绝的原则，绝大多数人都不会返回301
+
+[tcp/ip详解](https://blog.csdn.net/yusiguyuan/category_9262349.html)
