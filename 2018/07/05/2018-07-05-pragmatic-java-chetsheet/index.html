@@ -16,7 +16,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/20160720094529840.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/1279081126453.jpg">
-<meta property="og:updated_time" content="2019-12-29T13:29:25.769Z">
+<meta property="og:updated_time" content="2020-01-10T10:35:46.459Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="pragmatic-java-chetsheet">
 <meta name="twitter:image" content="https://haldir66.ga/static/imgs/20160720094529840.jpg">
@@ -366,7 +366,7 @@ public class MyObject {
 <blockquote>
 <p>ReturnType: void<br>Modifier.toString: public final void  wait (long arg0,int arg1) throws java.lang.InterruptedException<br>ReturnType: void<br>Modifier.toString: public final native void  wait (long arg0) throws java.lang.InterruptedException<br>ReturnType: void<br>Modifier.toString: public final void  wait () throws java.lang.InterruptedException<br>ReturnType: boolean<br>Modifier.toString: public boolean  equals (java.lang.Object arg0)<br>ReturnType: class java.lang.String<br>Modifier.toString: public java.lang.String  toString ()<br>ReturnType: int<br>Modifier.toString: public native int  hashCode ()<br>ReturnType: class java.lang.Class<br>Modifier.toString: public final native java.lang.Class  getClass ()<br>ReturnType: void<br>Modifier.toString: public final native void  notify ()<br>ReturnType: void<br>Modifier.toString: public final native void  notifyAll ()</p>
 </blockquote>
-<p>拿到方法（Method对象之后就要invoke了），不管是private还是public的</p>
+<p>拿到方法(Method对象之后就要invoke了)，不管是private还是public的</p>
 <pre><code class="java">// 假设我们的class有这么两个方法,也是可以区分开来的
 public void echo(String name){
     System.out.println(name);
@@ -620,8 +620,7 @@ public static void main(String[] args) {
     }
 </code></pre>
 <p>看下来都是需要一个支持泛型的父类，然后子类继承这个父类并指定泛型中的T是哪个class，外部就可以拿着这个父类的指针(指向填充了T类型的子类的Object)调用getGenericSuperclass方法再转成ParameterizedType去调用getActualTypeArguments方法了。</p>
-<p>这里面涉及到的类和接口包括:<br>ParameterizedType,TypeVariable,GenericArrayType,WildcardType（这四个全部是接口）等<br><a href="http://loveshisong.cn/%E7%BC%96%E7%A8%8B%E6%8A%80%E6%9C%AF/2016-02-16-Type%E8%AF%A6%E8%A7%A3.html">Type详解</a><br>由于类型擦除，class对象中并不能保有编译前的类的信息，引入Type似乎是为了迎合反射的需要。</p>
-<p>Java 系统监控有一个小的技巧是，你可以使用kill -3 <pid> 发一个SIGQUIT的信号给JVM，可以把堆栈信息（包括垃圾回收的信息）dump到stderr/logs。</p>
+<p>这里面涉及到的类和接口包括:<br>ParameterizedType,TypeVariable,GenericArrayType,WildcardType（这四个全部是接口）等<br><a href="http://loveshisong.cn/编程技术/2016-02-16-Type详解.html">Type详解</a><br>由于类型擦除，class对象中并不能保有编译前的类的信息，引入Type似乎是为了迎合反射的需要。</p>
 <h3 id="ClassLoader的使用套路"><a href="#ClassLoader的使用套路" class="headerlink" title="ClassLoader的使用套路"></a>ClassLoader的使用套路</h3><p>classloader和class的生命周期,<a href="https://zhuanlan.zhihu.com/p/51374915">知乎专栏</a></p>
 <pre><code>JVM 中内置了三个重要的 ClassLoader，分别是 BootstrapClassLoader、ExtensionClassLoader 和 AppClassLoader。
 BootstrapClassLoader 负责加载 JVM 运行时核心类，这些类位于 JAVA_HOME/lib/rt.jar 文件中，我们常用内置库 java.xxx.* 都在里面，比如 java.util.*、java.io.*、java.nio.*、java.lang.* 等等。这个 ClassLoader 比较特殊，它是由 C 代码实现的，我们将它称之为「根加载器」。
@@ -672,7 +671,18 @@ public class Test {
    }
 }
 </code></pre>
-<p>spi打破了双亲委派机制（如何在父加载器加载的类中，去调用子加载器去加载类？） 使用TThread.currentThread().getContextClassLoader()就可以实现在核心包里的基础类调用用户代码</p>
+<p>上面的代码的运行结果是这样的</p>
+<pre><code>$ cd ~/source/jcl/v1
+$ javac Dep.java
+$ cd ~/source/jcl/v2
+$ javac Dep.java
+$ cd ~/source/jcl
+$ javac Test.java
+$ java Test
+v1
+v2
+false
+</code></pre><p>spi打破了双亲委派机制（如何在父加载器加载的类中，去调用子加载器去加载类？） 使用TThread.currentThread().getContextClassLoader()就可以实现在核心包里的基础类调用用户代码</p>
 <p>反射替换final成员变量的时候要小心<a href="https://fucknmb.com/2018/04/16/一种全局拦截并监控DNS的方式/">一种全局拦截并监控 DNS 的方式</a> 文中提到,要改一下Modifier的flag</p>
 <pre><code class="java">try {
     //获取InetAddress中的impl
@@ -816,6 +826,7 @@ System.out.println(c3.IsRegistered);
 </code></pre>
 <p>其他的json库，gson是没有这个现象的</p>
 <h3 id="autoValue这个library的使用"><a href="#autoValue这个library的使用" class="headerlink" title="autoValue这个library的使用"></a>autoValue这个library的使用</h3><p>autoValue主要是为了在java 1.6 以上生成immutable object的，原理是annotaion processor。在idea中使用的话，需要为当前project enable annotation processor。能够避免手动写java bean的时候写toString, equals犯错。当然如果使用的是kotlin的话，直接使用data class就可以了。还提供了builder模式。</p>
+<p>Java 系统监控有一个小的技巧是，你可以使用kill -3 <pid> 发一个SIGQUIT的信号给JVM，可以把堆栈信息（包括垃圾回收的信息）dump到stderr/logs。</p>
 <p><img src="https://www.haldir66.ga/static/imgs/1279081126453.jpg" alt=""></p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.zhihu.com/question/60892134">有直接去看hotspot源码来分析的</a><br><a href="https://zhuanlan.zhihu.com/p/51374915">classLoader related topics</a></p>
 
@@ -976,7 +987,7 @@ System.out.println(c3.IsRegistered);
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2019 Haldir
+    		&copy; 2020 Haldir
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
