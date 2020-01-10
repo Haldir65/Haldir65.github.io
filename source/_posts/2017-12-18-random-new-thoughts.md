@@ -64,7 +64,8 @@ top : 1
 - [ ] build a program that use libcurl , a http client wrapper
 - [ ] [Replacing JNI Crashes by Exceptions on Android](http://blog.httrack.com/blog/2013/08/23/catching-posix-signals-on-android/)
 - [ ] python sendall will block? what if tcp buffer is full , like when advertised windows size is zero. [tcp flow control](https://www.brianstorti.com/tcp-flow-control/)
-- [ ] libuv
+- [ ] libuv,elf文件格式解析
+- [ ] rust and WebAssembly, [ WebAssembly 并不是一门编程语言，而是一份字节码标准，需要用高级编程语言编译出字节码放到 WebAssembly 虚拟机中才能运行， 浏览器厂商需要做的就是根据 WebAssembly 规范实现虚拟机](https://www.ibm.com/developerworks/cn/web/wa-lo-webassembly-status-and-reality/index.html)
 
 ### 已完成
 * 用 express 转接一个知乎 Api，添加 Access-control-allow-origin,或许还可以用 redis 缓存数据结果（一个就好）由此想到一篇文章"How to use Python to build a restful Web Service".只不过用的是 Tornado

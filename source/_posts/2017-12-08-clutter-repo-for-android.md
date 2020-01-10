@@ -1425,6 +1425,9 @@ RelativeLayout的代码比较复杂，重点在于：一：梳理依赖树(这�
 CardView和elevation的自带阴影几乎是无法定制的
 [shadow4Android](https://inloop.github.io/shadow4android/) 可以生成合适的点9图，还是比较好用。
 
+## 44. 美团的关于分析oom以及HRPOF文件的文章
+[顺带吐槽了华为最多500条线程的问题](https://tech.meituan.com/2019/11/14/crash-oom-probe-practice.html)
+可以作为分析处理oom文件的参考
 
 =============================================================================
 

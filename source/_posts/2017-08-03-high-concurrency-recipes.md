@@ -419,7 +419,7 @@ java.util.concurrent.atomic下包括AtomicBoolean、AtomicInteger...还有Atomic
 
 
 ## 16. 读多写少的场景下的同步
- CopyOnWriteArrayList和Collections.synchronizedList相比。在高并发前提下，前者读的性能更好，后者写的性能更好（前者的写性能极差）。[CopyOnWriteArrayList与Collections.synchronizedList的性能对比](http://blog.csdn.net/yangzl2008/article/details/39456817)。CopyOnWriteArrayList适合做缓存。
+ CopyOnWriteArrayList和Collections.synchronizedList相比。在高并发前提下，前者读的性能更好，后者写的性能更好(前者的写性能极差)。[CopyOnWriteArrayList与Collections.synchronizedList的性能对比](http://blog.csdn.net/yangzl2008/article/details/39456817)。CopyOnWriteArrayList适合做缓存。
  **ReentrantReadWriteLock** 用于针对读多写少的场景进行优化。（获得读锁后，其它线程可获得读锁而不能获取写锁
  获得写锁后，其它线程既不能获得读锁也不能获得写锁）
 
@@ -428,9 +428,9 @@ java 无锁状态、偏向锁、轻量级锁和重量级锁
 
 ## 17. CompletableFuture等java 8 的api
 CompletableFuture的一个好处是可以将事件处理串起来，写起来跟rxjava那一套有点像。
-thenApply()和thenCompose（）的区别：
-thenApply（）转换的是泛型中的类型，是同一个CompletableFuture；
-thenCompose（）用来连接两个CompletableFuture，是生成一个新的CompletableFuture。
+thenApply()和thenCompose()的区别：
+thenApply()转换的是泛型中的类型，是同一个CompletableFuture；
+thenCompose()用来连接两个CompletableFuture，是生成一个新的CompletableFuture。
 协调多个事件同步
 ```java
 CompletableFuture<String> future1  
@@ -495,7 +495,7 @@ private void setNextRunTime() {
 
 ## 19 .Concurrency Concepts in java
 [Concurrency Concepts in Java by Douglas Hawkins](https://www.youtube.com/watch?v=ADxUsCkWdbE)
-unSafe里面有一个fullFence方法
+unSafe里面有一个loadFence,storeFence,fullFence方法,但UnSafe原本就不应该使用
 
 ## 参考
 - [看起来 ReentrantLock 无论在哪方面都比 synchronized 好](http://blog.csdn.net/fw0124/article/details/6672522)

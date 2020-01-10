@@ -139,6 +139,7 @@ Android相关
 - [ ] Media相关，视频播放etc，相机，滤镜等.[Demo](https://github.com/w1123440793/VideoListDemo)
 - [X] FFMpeg，[IjkPlayer](http://www.jianshu.com/p/a4eea7ea4664)，[弹幕](https://github.com/Bilibili/DanmakuFlameMaster)
 - [X] using protobuf on android
+- [ ] binder线程池被占满(默认最多15条线程)
 - [ ] UI Toolkit源码解析(android.widget包下面的)
     - [X] ViewPager的原理，作者Adam Powell
     - [ ] View的源码, View的绘制原理(往displayList那边靠)

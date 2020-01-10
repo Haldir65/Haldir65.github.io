@@ -388,11 +388,7 @@ location /static {
 ### 一些轮子
 [better-scroll](https://github.com/ustbhuangyi/better-scroll) 滴滴的员工写的
 
-### tools,tangiable takeaways
- 1. atom plugin  ide-typescript sucks , after disable the plugin ,the autocomplete feature works againself.
- 2. config atom behind a firewall :
- > apm config set https-proxy https://127.0.0.1:1080
-  apm config set strict-ssl false
+
 
 
  官方的库

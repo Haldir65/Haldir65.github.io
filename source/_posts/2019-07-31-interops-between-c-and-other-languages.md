@@ -145,7 +145,7 @@ cython(python c extension)和cpython(c语言实现的python）是两件事
 
 ## 2. javascript
 ### 2.1 javascript调用C、C++代码
-首先，在浏览器中运行c语言的代码，似乎可以将C编成webassembly在浏览器中运行。
+首先，在浏览器中运行c语言的代码，似乎可以将C编成WebAssembly在浏览器中运行。
 而在Node js中，可以使用[n-api](https://nodejs.org/api/n-api.html)这个module。
 > N-API (pronounced N as in the letter, followed by API) is an API for building native Addons. It is independent from the underlying JavaScript runtime (for example, V8) and is maintained as part of Node.js itself. This API will be Application Binary Interface (ABI) stable across versions of Node.js. It is intended to insulate Addons from changes in the underlying JavaScript engine and allow modules compiled for one major version to run on later major versions of Node.js without recompilation. 
 

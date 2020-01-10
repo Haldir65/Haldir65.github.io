@@ -22,7 +22,7 @@ public class URLDemo {
             URL url = new URL("https://www.baidu.com/abced.html?language=zh_CN#ssss-libev");
             System.out.println(url);
             System.out.println(url.getProtocol()); // https
-            System.out.println(url.getHost()); // www.zfl9.com
+            System.out.println(url.getHost()); // www.baidu.com
             System.out.println(url.getPort()); // -1
             System.out.println(url.getDefaultPort()); // 443
             System.out.println(url.getFile()); // /abced.html?language=zh_CN

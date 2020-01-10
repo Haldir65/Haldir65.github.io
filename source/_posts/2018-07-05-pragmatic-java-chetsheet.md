@@ -202,7 +202,7 @@ ReturnType: void
 Modifier.toString: public final native void  notifyAll ()
 
 
-拿到方法（Method对象之后就要invoke了），不管是private还是public的
+拿到方法(Method对象之后就要invoke了)，不管是private还是public的
 ```java
 // 假设我们的class有这么两个方法,也是可以区分开来的
 public void echo(String name){
@@ -468,10 +468,9 @@ public static void main(String[] args) {
 
 这里面涉及到的类和接口包括:
 ParameterizedType,TypeVariable,GenericArrayType,WildcardType（这四个全部是接口）等
-[Type详解](http://loveshisong.cn/%E7%BC%96%E7%A8%8B%E6%8A%80%E6%9C%AF/2016-02-16-Type%E8%AF%A6%E8%A7%A3.html)
+[Type详解](http://loveshisong.cn/编程技术/2016-02-16-Type详解.html)
 由于类型擦除，class对象中并不能保有编译前的类的信息，引入Type似乎是为了迎合反射的需要。
 
-Java 系统监控有一个小的技巧是，你可以使用kill -3 <pid> 发一个SIGQUIT的信号给JVM，可以把堆栈信息（包括垃圾回收的信息）dump到stderr/logs。
 
 ### ClassLoader的使用套路
 classloader和class的生命周期,[知乎专栏](https://zhuanlan.zhihu.com/p/51374915)
@@ -531,6 +530,23 @@ public class Test {
    }
 }
 ```
+
+上面的代码的运行结果是这样的
+```
+$ cd ~/source/jcl/v1
+$ javac Dep.java
+$ cd ~/source/jcl/v2
+$ javac Dep.java
+$ cd ~/source/jcl
+$ javac Test.java
+$ java Test
+v1
+v2
+false
+```
+
+
+
 spi打破了双亲委派机制（如何在父加载器加载的类中，去调用子加载器去加载类？） 使用TThread.currentThread().getContextClassLoader()就可以实现在核心包里的基础类调用用户代码
 
 反射替换final成员变量的时候要小心[一种全局拦截并监控 DNS 的方式](https://fucknmb.com/2018/04/16/一种全局拦截并监控DNS的方式/) 文中提到,要改一下Modifier的flag
@@ -713,6 +729,7 @@ System.out.println(c3.IsRegistered);
 autoValue主要是为了在java 1.6 以上生成immutable object的，原理是annotaion processor。在idea中使用的话，需要为当前project enable annotation processor。能够避免手动写java bean的时候写toString, equals犯错。当然如果使用的是kotlin的话，直接使用data class就可以了。还提供了builder模式。
 
 
+Java 系统监控有一个小的技巧是，你可以使用kill -3 <pid> 发一个SIGQUIT的信号给JVM，可以把堆栈信息（包括垃圾回收的信息）dump到stderr/logs。
 
 
 ![](https://www.haldir66.ga/static/imgs/1279081126453.jpg)

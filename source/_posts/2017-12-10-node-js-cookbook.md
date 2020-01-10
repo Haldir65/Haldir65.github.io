@@ -296,7 +296,7 @@ pm2 //starting an node app as a bcakground service
 mongoose
 
 
-## Howto debug
+## How to debug
 
 vscode debug node js的方式，打开调试窗口，点击那个小齿轮(打开launch.json)。直接在代码中断点即可。注意底下有一个debug console(调试控制台)，可以输入变量，查看当前值，和一些大型Ide很像。
 
@@ -350,3 +350,4 @@ node里面就不要用Ajax了，推荐axios，原生自带也有https。
 而node中的一些module也不能用于浏览器端，比如fs这种属于偏Low level的api
 
 [node js api](https://nodejs.org/api/documentation.html)
+[typeScript教程](https://ts.xcatliu.com/)

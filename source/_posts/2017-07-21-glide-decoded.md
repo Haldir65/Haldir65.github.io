@@ -867,6 +867,7 @@ public static ByteBuffer fromFile(@NonNull File file) throws IOException {
     return channel.map(FileChannel.MapMode.READ_ONLY, 0, fileLength).load(); //map就是mmap，返回的是MappedByteBuffer,这是一个抽象类，实际应该是DirectByteBuffer
   }
 ```
+其实就是使用mmap减少了内存复制的开销
 
 一些默认的配置如果外部没有设置的话是这样的
 ```java

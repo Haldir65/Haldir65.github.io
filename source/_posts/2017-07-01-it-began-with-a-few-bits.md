@@ -100,7 +100,7 @@ contentType（MimeType）
         // 1.创建callAdapter,调用retrofit对象设定的callAdapter,例如RxjavAdapter,注意这里面的实现是便利retrofit对象的adapterFactories，找到一个就返回。找不到的话会丢出来一个IllegalArgumentException
       callAdapter = createCallAdapter();
        //callAdapter的作用 就是将retrofit.Call的Call转成一个T。例如上面就是把Call<List<Contributor>>转成一个List<Contributor>，这个过程是上面提到的最重要的三个方法中的第三部 adapt（okHttpCall）。可以认为是拿着一个已经创建好的okHttp的Call去做事情，在适当的时候将网络返回结果转成用户事先定义好的respose类型。
-        //这一步返回一个java.lang.reflect.Type ，就个class的基本作用家就是根据泛型来确定response的class。
+        //这一步返回一个java.lang.reflect.Type ，这个class的基本作用就是根据泛型来确定response的class。
       responseType = callAdapter.responseType();
         //2.创建用于response和Request的converter。
       responseConverter = createResponseConverter();

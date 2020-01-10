@@ -34,7 +34,7 @@ volatile只是保证了数组的指针是volatile的，但事实上因为修改a
 由于happen-before原则的存在，add(obj)一定发生在indexOf(obj)之前。
 
 ***还是有崩的可能***
-具体就是CopyOnWrite容器只能保证数据的最终一致性，不能保证数据的实时一致性。所以如果你希望写入的的数据，马上能读到，请不要使用CopyOnWrite容器。
+具体就是CopyOnWrite容器只能保证数据的最终一致性，不能保证数据的实时一致性。所以如果你希望写入的的数据，马上能读到，请不要使用CopyOnWrite容器。(CopyOnWriteArrayList只是保证了read能够反映上一次write的结果)
 比如亲测下面这段代码会崩
 ```java
 public class CrashOfCopyOnWriteArrayList {
@@ -77,6 +77,7 @@ public class CrashOfCopyOnWriteArrayList {
     }
 }
 ```
+
 
 
 ## 参考

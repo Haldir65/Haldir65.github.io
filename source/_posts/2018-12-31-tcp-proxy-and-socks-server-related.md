@@ -257,3 +257,4 @@ SO_REUSEPORT选项支持多个进程同时监听一个port，在内核层面实�
 [Writing a simple SOCKS server in Python](https://rushter.com/blog/python-socks-server/)
 [SOCKS 5协议简析](https://geesun.github.io/posts/2015/09/socks5_protocol.html)
 [shadowsocks-netty](https://github.com/TongxiJi/shadowsocks-java)
+[lightsocks-python](https://github.com/linw1995/lightsocks-python)

@@ -566,6 +566,11 @@ cat /proc/sys/net/netfilter/nf_conntrack_buckets：查看存储记录项的哈�
 PREROUTING会修改目标IP， POSTROUTING链会修改来源 IP， 通常我们的 NAT 内网转外网是修改来源 IP（即内网 IP），成为来源 NAT（Source NAT, SNAT）。
 
 
+流量quota限额
+# iptables -A INPUT -p tcp --dport 80 -m quota --quota 52428800 -j ACCEPT
+# iptables -A INPUT -p tcp --dport 80 -j DROP
+
+
 ## 参考
 [linux-iptables-examples](https://www.cyberciti.biz/tips/linux-iptables-examples.html)
 [网件R7800 OpenWrt使用V2Ray+mKcp+透明代理完美翻墙](https://blog.dreamtobe.cn/r7800-openwrt-v2ray/)
