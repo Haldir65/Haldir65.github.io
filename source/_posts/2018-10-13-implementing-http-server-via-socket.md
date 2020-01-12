@@ -241,8 +241,15 @@ with open('sina.html', 'wb') as f:
 ## C语言版本
 C语言的应该最接近底层,C语言实现HTTP的GET和POST请求
 [似乎有很多现成的例子可以直接拿来抄](http://pminkov.github.io/blog/socket-programming-in-linux.html)
+[经典的tinyhttpd,不到500行](https://github.com/cbsheng/tinyhttpd/blob/master/httpd.c)
 
+- 简单版本的参考
+[使用Linux c语言编写简单的web服务器](http://www.cleey.com/blog/single/id/789.html)
+[socket http文件下载器c语言实现](http://www.voidcn.com/article/p-xieequox-bat.html)
 
+- 高阶版本的参考
+[高阶一点，处理并发的](https://www.geeksforgeeks.org/socket-programming-in-cc-handling-multiple-clients-on-server-without-multi-threading/)
+[多线程的server和client源码](https://github.com/pminkov/webserver)
 
 
 一个简单的httpServer.c(unix环境下运行)
@@ -369,7 +376,7 @@ char* joinString(char *s1, char *s2)
 >curl -X GET -d  --header "Content-Type:application/json" --header "Authorization:JWT somerandomjwtstringandstuffs" "http://127.0.0.1:8888/user"
 
 
-一个类似于简易的curl的c语言httpClient可能长这样
+一个简易c语言httpClient可能长这样
 ```C
 #include <stdio.h>
 #include <stdlib.h>
@@ -591,96 +598,100 @@ gethostbyname();//获得与该域名对应的IP地址
 inet_ntoa();//将long类型的网络字节序转换成IP地址字符串
 //这些转换字节序的函数是必须的，因为ip地址，端口这些东西不是应用层处理，而是由路由器这些东西去处理的，后者遵照网络标准使用的是big-endian，所以必须转换字节序。
 
-读函数read
-ssize_t read(int fd,void *buf,size_t nbyte)
-read函数是负责从fd中读取内容.当读成功 时,read返回实际所读的字节数,如果返回的值是0 表示已经读到文件的结束了,小于0表示出现了错误.如果错误为EINTR说明读是由中断引起的, 如果是ECONNREST表示网络连接出了问题. 
+## 读写函数read和write以及recv和send
 
-写函数write
+**read和write可以操作任何fd，但是recv和send只能操作socket fd，好处是可以设置一些flag**
+```
+The difference is that recv()/send() work only on socket descriptors and let you specify certain options for the actual operation. Those functions are slightly more specialized (for instance, you can set a flag to ignore SIGPIPE, or to send out-of-band messages...).
+
+Functions read()/write() are the universal file descriptor functions working on all descriptors.
+```
+header文件就不一样 unistd.h，和sys/socket.h
+
+
+### read和write
 ```c
 #include <unistd.h>
+ssize_t read(int fd,void *buf,size_t nbyte)
+// read函数是负责从fd中读取内容.当读成功 时,read返回实际所读的字节数,如果返回的值是0 表示已经读到文件的结束了,小于0表示出现了错误.如果错误为EINTR说明读是由中断引起的, 如果是ECONNREST表示网络连接出了问题. 
+
+//写函数write
+#include <unistd.h>
 ssize_t write(int fd, const void *buf, size_t count);
+// write函数将buf中的nbytes字节内容写入文件描述符fd.成功时返回写的字节数.失败时返回-1. 并设置errno变量. 在网络程序中,当我们向套接字文件描述符写时有两可能.
+// 1)write的返回值大于0,表示写了部分或者是全部的数据. 这样我们用一个while循环来不停的写入，但是循环过程中的buf参数和nbyte参数得由我们来更新。也就是说，网络写函数是不负责将全部数据写完之后在返回的。
+// 2)返回的值小于0,此时出现了错误.我们要根据错误类型来处理.
+// 如果错误为EINTR表示在写的时候出现了中断错误.
+// 如果为EPIPE表示网络连接出现了问题(对方已经关闭了连接).
 ```
-write函数将buf中的nbytes字节内容写入文件描述符fd.成功时返回写的字节数.失败时返回-1. 并设置errno变量. 在网络程序中,当我们向套接字文件描述符写时有两可能.
-1)write的返回值大于0,表示写了部分或者是全部的数据. 这样我们用一个while循环来不停的写入，但是循环过程中的buf参数和nbyte参数得由我们来更新。也就是说，网络写函数是不负责将全部数据写完之后在返回的。
-2)返回的值小于0,此时出现了错误.我们要根据错误类型来处理.
-如果错误为EINTR表示在写的时候出现了中断错误.
-如果为EPIPE表示网络连接出现了问题(对方已经关闭了连接).
 
-[recv和send都是跟buffer打交道的](https://www.cnblogs.com/jianqiang2010/archive/2010/08/20/1804598.html)
-socket send函数和recv函数详解
-1.send 函数
-int send( socket s, const char FAR *buf, int len, int flags );  
-不论是客户还是服务器应用程序都用send函数来向TCP连接的另一端发送数据。客户程序一般用send函数向服务器发送请求，而服务器则通常用send函数来向客户程序发送应答。
 
-该函数的第一个参数指定发送端套接字描述符；
+### send和recv
+简单来讲，read是从系统的缓冲区读取的,write是写到tcp buffer里面的
+[socket send函数和recv函数详解](https://www.cnblogs.com/jianqiang2010/archive/2010/08/20/1804598.html)
 
-第二个参数指明一个存放应用程序要发送数据的缓冲区；
+### 1.send 函数
+```c
+#include <sys/types.h>
+#include <sys/socket.h>
 
-第三个参数指明实际要发送的数据的字节数；
+ssize_t send(int sockfd, const void *buf, size_t len, int flags);
+// 不论是客户还是服务器应用程序都用send函数来向TCP连接的另一端发送数据。客户程序一般用send函数向服务器发送请求，而服务器则通常用send函数来向客户程序发送应答。
 
-第四个参数一般置0。 
+// 该函数的第一个参数指定发送端套接字描述符；
 
-这里只描述同步socket的send函数的执行流程。当调用该函数时，
+// 第二个参数指明一个存放应用程序要发送数据的缓冲区；
 
-（1）send先比较待发送数据的长度len和套接字s的发送缓冲的长度， 如果len大于s的发送缓冲区的长度，该函数返回SOCKET_ERROR；
+// 第三个参数指明实际要发送的数据的字节数；
 
-（2）如果len小于或者等于s的发送缓冲区的长度，那么send先检查协议是否正在发送s的发送缓冲中的数据，如果是就等待协议把数据发送完，如果协议还没有开始发送s的发送缓冲中的数据或者s的发送缓冲中没有数据，那么send就比较s的发送缓冲区的剩余空间和len
+// 第四个参数一般置0。 
 
-（3）如果len大于剩余空间大小，send就一直等待协议把s的发送缓冲中的数据发送完
+// 这里只描述同步socket的send函数的执行流程。当调用该函数时，
 
-（4）如果len小于剩余 空间大小，send就仅仅把buf中的数据copy到剩余空间里（注意并不是send把s的发送缓冲中的数据传到连接的另一端的，而是协议传的，send仅仅是把buf中的数据copy到s的发送缓冲区的剩余空间里）。
+// （1）send先比较待发送数据的长度len和套接字s的发送缓冲的长度， 如果len大于s的发送缓冲区的长度，该函数返回SOCKET_ERROR；
 
-如果send函数copy数据成功，就返回实际copy的字节数，如果send在copy数据时出现错误，那么send就返回SOCKET_ERROR；如果send在等待协议传送数据时网络断开的话，那么send函数也返回SOCKET_ERROR。
+// （2）如果len小于或者等于s的发送缓冲区的长度，那么send先检查协议是否正在发送s的发送缓冲中的数据，如果是就等待协议把数据发送完，如果协议还没有开始发送s的发送缓冲中的数据或者s的发送缓冲中没有数据，那么send就比较s的发送缓冲区的剩余空间和len
 
-要注意send函数把buf中的数据成功copy到s的发送缓冲的剩余空间里后它就返回了，但是此时这些数据并不一定马上被传到连接的另一端。如果协议在后续的传送过程中出现网络错误的话，那么下一个Socket函数就会返回SOCKET_ERROR。（每一个除send外的Socket函数在执 行的最开始总要先等待套接字的发送缓冲中的数据被协议传送完毕才能继续，如果在等待时出现网络错误，那么该Socket函数就返回 SOCKET_ERROR）
+// （3）如果len大于剩余空间大小，send就一直等待协议把s的发送缓冲中的数据发送完
 
-注意：在Unix系统下，如果send在等待协议传送数据时网络断开的话，调用send的进程会接收到一个SIGPIPE信号，进程对该信号的默认处理是进程终止。
+// （4）如果len小于剩余 空间大小，send就仅仅把buf中的数据copy到剩余空间里（注意并不是send把s的发送缓冲中的数据传到连接的另一端的，而是协议传的，send仅仅是把buf中的数据copy到s的发送缓冲区的剩余空间里）。
 
-通过测试发现，异步socket的send函数在网络刚刚断开时还能发送返回相应的字节数，同时使用select检测也是可写的，但是过几秒钟之后，再send就会出错了，返回-1。select也不能检测出可写了。
+// 如果send函数copy数据成功，就返回实际copy的字节数，如果send在copy数据时出现错误，那么send就返回SOCKET_ERROR；如果send在等待协议传送数据时网络断开的话，那么send函数也返回SOCKET_ERROR。
 
+// 要注意send函数把buf中的数据成功copy到s的发送缓冲的剩余空间里后它就返回了，但是此时这些数据并不一定马上被传到连接的另一端。如果协议在后续的传送过程中出现网络错误的话，那么下一个Socket函数就会返回SOCKET_ERROR。（每一个除send外的Socket函数在执 行的最开始总要先等待套接字的发送缓冲中的数据被协议传送完毕才能继续，如果在等待时出现网络错误，那么该Socket函数就返回 SOCKET_ERROR）
+
+// 注意：在Unix系统下，如果send在等待协议传送数据时网络断开的话，调用send的进程会接收到一个SIGPIPE信号，进程对该信号的默认处理是进程终止。
+
+// 通过测试发现，异步socket的send函数在网络刚刚断开时还能发送返回相应的字节数，同时使用select检测也是可写的，但是过几秒钟之后，再send就会出错了，返回-1。select也不能检测出可写了。
+```
  
 
-2. recv函数
+### 2. recv函数
+```c
+#include <sys/types.h>
+#include <sys/socket.h>
 
-int recv( SOCKET s, char FAR *buf, int len, int flags);   
+ssize_t recv(int sockfd, void *buf, size_t len, int flags);
+// 不论是客户还是服务器应用程序都用recv函数从TCP连接的另一端接收数据。该函数的第一个参数指定接收端套接字描述符；
 
-不论是客户还是服务器应用程序都用recv函数从TCP连接的另一端接收数据。该函数的第一个参数指定接收端套接字描述符；
+// 第二个参数指明一个缓冲区，该缓冲区用来存放recv函数接收到的数据；
 
-第二个参数指明一个缓冲区，该缓冲区用来存放recv函数接收到的数据；
+// 第三个参数指明buf的长度；
 
-第三个参数指明buf的长度；
+// 第四个参数一般置0。
 
-第四个参数一般置0。
+// 这里只描述同步Socket的recv函数的执行流程。当应用程序调用recv函数时，
 
-这里只描述同步Socket的recv函数的执行流程。当应用程序调用recv函数时，
+// （1）recv先等待s的发送缓冲中的数据被协议传送完毕，如果协议在传送s的发送缓冲中的数据时出现网络错误，那么recv函数返回SOCKET_ERROR，
 
-（1）recv先等待s的发送缓冲中的数据被协议传送完毕，如果协议在传送s的发送缓冲中的数据时出现网络错误，那么recv函数返回SOCKET_ERROR，
+// （2）如果s的发送缓冲中没有数据或者数据被协议成功发送完毕后，recv先检查套接字s的接收缓冲区，如果s接收缓冲区中没有数据或者协议正在接收数据，那么recv就一直等待，直到协议把数据接收完毕。当协议把数据接收完毕，recv函数就把s的接收缓冲中的数据copy到buf中（注意协议接收到的数据可能大于buf的长度，所以 在这种情况下要调用几次recv函数才能把s的接收缓冲中的数据copy完。recv函数仅仅是copy数据，真正的接收数据是协议来完成的），
 
-（2）如果s的发送缓冲中没有数据或者数据被协议成功发送完毕后，recv先检查套接字s的接收缓冲区，如果s接收缓冲区中没有数据或者协议正在接收数据，那么recv就一直等待，直到协议把数据接收完毕。当协议把数据接收完毕，recv函数就把s的接收缓冲中的数据copy到buf中（注意协议接收到的数据可能大于buf的长度，所以 在这种情况下要调用几次recv函数才能把s的接收缓冲中的数据copy完。recv函数仅仅是copy数据，真正的接收数据是协议来完成的），
+// recv函数返回其实际copy的字节数。如果recv在copy时出错，那么它返回SOCKET_ERROR；如果recv函数在等待协议接收数据时网络中断了，那么它返回0。
 
-recv函数返回其实际copy的字节数。如果recv在copy时出错，那么它返回SOCKET_ERROR；如果recv函数在等待协议接收数据时网络中断了，那么它返回0。
+// 注意：在Unix系统下，如果recv函数在等待协议接收数据时网络断开了，那么调用recv的进程会接收到一个SIGPIPE信号，进程对该信号的默认处理是进程终止。
+```
 
-注意：在Unix系统下，如果recv函数在等待协议接收数据时网络断开了，那么调用recv的进程会接收到一个SIGPIPE信号，进程对该信号的默认处理是进程终止。
-
-除了read和write之外
-还有
-int recv(int sockfd,void *buf,int len,int flags)
-int send(int sockfd,void *buf,int len,int flags)
-这两个函数，功能差不多，只是多了第四个参数
-
-- 简单版本的参考
-[使用Linux c语言编写简单的web服务器](http://www.cleey.com/blog/single/id/789.html)
-[socket http文件下载器c语言实现](http://www.voidcn.com/article/p-xieequox-bat.html)
-
-- 高阶版本的参考
-[高阶一点，处理并发的](https://www.geeksforgeeks.org/socket-programming-in-cc-handling-multiple-clients-on-server-without-multi-threading/)
-[多线程的server和client源码](https://github.com/pminkov/webserver)
-
-需要记住的是，read是从系统的缓冲区读取的,write是写到tcp buffer里面的
-
-
-
-**还有实现websocket协议的，实现sock5协议的**
+## 还有实现websocket协议的
 
 见过的一个websocket的请求长这样
 GET wss://nexus-websocket-b.xxx.io/pubsub/xxx?X-Nexus-New-Client=true&X-Nexus-Version=0.4.53 HTTP/1.1
@@ -865,7 +876,6 @@ $ od -tc nihao.c
 ## 不知道为什么,百度首页的response中没有content-length字段
 [这篇文章提到](https://www.cnblogs.com/skynet/archive/2010/12/11/1903347.html)，由于http keep-alive的存在，读取server的response已经读不到EOF了，所以也就不能以EOF作为读取完毕的标志。分两种情况：有Content-length的，Transfer-Encoding：chunked（复杂一点点）这两种。
 chunked简单说就是把一个大文件切分成N个小包，每个包(chunk)里面包括header和body。这个header里面也是有body的长度的。
-
 
 
 

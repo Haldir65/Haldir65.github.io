@@ -995,6 +995,10 @@ sudo -H ./letsencrypt-auto certonly --standalone --renew-by-default -d example.c
 > sudo certbot certonly --standalone --preferred-challenges http -d example.com -d exmaple2.com
 
 
+这个是最简单的
+sudo certbot --nginx -d www.yourdomain.com
+
+
 
 强制http导向https的方法也很多
 ```
