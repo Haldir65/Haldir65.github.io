@@ -19,7 +19,7 @@
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/jpglight-and-shadow-2411321_960_720.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/http_with_out_keep_alive.png">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/http_with_keep_alive.png">
-<meta property="og:updated_time" content="2020-01-12T13:24:50.751Z">
+<meta property="og:updated_time" content="2020-01-17T10:22:26.293Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="网络通信手册-2">
 <meta name="twitter:description" content="OkHttp通过ConnectionPool做到tcp连接复用（在Timeout内）,所以并不是每个http都去建立一个tcp连接自定义通讯协议，使用java socket实现客户端和服务端。需要注意的是分包问题和黏包问题">
@@ -235,6 +235,10 @@ ga('send', 'pageview');
 </code></pre>
 <p><a href="https://stackoverflow.com/questions/19562501/ajax-what-is-the-default-character-encoding-for-http-header-values">http请求是一行一行的文字，contentType only affects the body/document.you can use any ISO-8859-1 characters in the header.</a>。ISO-8859-1不支持中文，所以header里面的东西不能写中文。<br>body和path里面随意了</p>
 <p>//网页上传excel表格的header<br>Content-Disposition: form-data; name=”files[]” filename=”sample.xls”<br>Content-Type: application/vnd.ms-excel</p>
+<p>Content-Disposition的解释</p>
+<blockquote>
+<p>上传文件的话会设置Content-Type为multipart/form-data，并指定boundary的值来标识请求体中内容的分界，而在请求体中，不同的内容(如：文件A和文件B)之间使用boundary的值来标识分界，并且请求体中每部分内容都会有Content-Disposition和Content-Type来指明这部分内容的类型和信息。<br>后端的话使用ServletFileUpload来解析请求，获得FileItem的List，遍历Item，然后通过Item获得输入流，从输入流中读取上传文件的数据，再构建FileOutputStream输出到磁盘中保存。<br>如果使用Spring MVC，则可以在接收请求的方法中接收CommonsMultipartFile，并使用transferTo方法保存到磁盘中。</p>
+</blockquote>
 <p>html里面上传文件一般是ajax对象send一个FormData出去，<br>也有Base64编码一遍然后在<a href="http://www.nickdesteffen.com/blog/file-uploading-over-ajax-using-html5">服务端base64解码的</a>。主要是html5标准中添加了新的FileReader接口，可以读取客户端文件内容，所以很多开发就调用FileReader的readAsDataURL方法去将文件的内容变成<a href="https://en.wikipedia.org/wiki/Data_URI_scheme">DATA URL形式的字符串</a><br>不过这么干还是有缺点的</p>
 <blockquote>
 <ol>
