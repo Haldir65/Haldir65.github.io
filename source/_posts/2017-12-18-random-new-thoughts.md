@@ -153,7 +153,7 @@ OpenType® is a cross-platform font file format developed jointly by Adobe and M
 - [ ][LOGSTASH+ELASTICSEARCH+KIBANA处理NGINX访问日志](http://www.wklken.me/posts/2015/04/26/elk-for-nginx-log.html)ELK全家桶, logstash接管软件日志
 - [ ] [如何编写 jQuery 插件](https://gist.github.com/quexer/3619237)
 - netfilter框架(imbedded in linux server)
-- [] java实现lambda的原理[invokedynamic以及LambdaMetafactory等](https://tech.meituan.com/2019/10/17/android-java-8.html)
+- [] java实现lambda的原理[invokedynamic以及LambdaMetafactory等](https://colobu.com/2014/11/06/secrets-of-java-8-lambda/)
 - [ ] libuv,elf文件格式解析
 
 

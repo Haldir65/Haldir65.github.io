@@ -63,11 +63,12 @@ linux下查看一个文件的时间戳
 > stat test
 
 c语言下对应的函数在sys/stat.h头文件中
-```c
+```C++
 #include <stdio.h>
 #include <sys/stat.h>
 
-int main(void){
+int main(int argc, char const *argv[])
+{
     struct stat filestat;
     stat("/etc/sysctl.conf", &filestat);
     printf("size: %ld bytes, uid: %d, gid: %d, mode: %#o\n", filestat.st_size, filestat.st_uid, filestat.st_gid, filestat.st_mode);

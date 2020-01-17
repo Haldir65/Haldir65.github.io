@@ -96,6 +96,12 @@ body和path里面随意了
 Content-Disposition: form-data; name="files[]" filename="sample.xls"
 Content-Type: application/vnd.ms-excel
 
+
+Content-Disposition的解释
+> 上传文件的话会设置Content-Type为multipart/form-data，并指定boundary的值来标识请求体中内容的分界，而在请求体中，不同的内容(如：文件A和文件B)之间使用boundary的值来标识分界，并且请求体中每部分内容都会有Content-Disposition和Content-Type来指明这部分内容的类型和信息。
+后端的话使用ServletFileUpload来解析请求，获得FileItem的List，遍历Item，然后通过Item获得输入流，从输入流中读取上传文件的数据，再构建FileOutputStream输出到磁盘中保存。
+如果使用Spring MVC，则可以在接收请求的方法中接收CommonsMultipartFile，并使用transferTo方法保存到磁盘中。
+
 html里面上传文件一般是ajax对象send一个FormData出去，
 也有Base64编码一遍然后在[服务端base64解码的](http://www.nickdesteffen.com/blog/file-uploading-over-ajax-using-html5)。主要是html5标准中添加了新的FileReader接口，可以读取客户端文件内容，所以很多开发就调用FileReader的readAsDataURL方法去将文件的内容变成[DATA URL形式的字符串](https://en.wikipedia.org/wiki/Data_URI_scheme)
 不过这么干还是有缺点的

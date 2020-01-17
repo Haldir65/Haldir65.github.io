@@ -213,6 +213,14 @@ example
 .so文件其实是shared object的缩写
 
 
+[compiler frontend和 backend的概念](https://stackoverflow.com/a/9765464)
+```
+The front-end deals with the language itself: scanning, parsing, the parse-tree. The back end deals with the target system: object code formats, the machine code itself, ... The two things don't have all that much to do with each other, and for a portable compiler it is highly desirable to use the same front-end with multiple backends, one per target.
+
+You can take that further, as gcc does, and have a front/backend interface that is language-independent, so you can use different language front-ends with the same backend. In the old days this was called the MxN problem: you don't want to have to write MxN compilers where you have M languages and N target systems. The idea is to only have to write M+N compilers.
+```
+以及[在windows上安装rust为什么需要先装msvc](https://users.rust-lang.org/t/why-do-i-need-microsoft-c-build-tools/18581/5)
+
 
 ## 4. Makefile怎么写
 [几个简单的makefile实例](http://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/)
@@ -231,6 +239,8 @@ clean:
 ```
 因为手动rm可能写成
 rm -f * .o ##中间多一个空格
+
+gcc -g参数，可以通过objdump来分析汇编源码(windows上也可以)
 
 ## 5. 静态库和动态库的区别及使用
 [static and dynamic libraries](https://www.geeksforgeeks.org/static-vs-dynamic-libraries/)

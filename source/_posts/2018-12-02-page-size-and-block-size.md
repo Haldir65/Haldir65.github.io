@@ -112,3 +112,5 @@ https://zhuanlan.zhihu.com/p/35879028
 
 [虚拟内存，分页](https://www.cnblogs.com/vamei/p/9329278.html)
 [what a c programmer should know about memory](https://marek.vavrusa.com/memory/)
+[mmap避免拷贝是因为同样的内容在物理内存中只有一份](https://blog.csdn.net/ITer_ZC/article/details/44195731)
+[RocketMQ MappedFile 预热原理解析](https://cloud.tencent.com/developer/article/1381040C)
