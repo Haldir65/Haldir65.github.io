@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/iu%20kpop%20star%20music%20sony.jpg">
-<meta property="og:updated_time" content="2020-01-17T10:22:26.289Z">
+<meta property="og:updated_time" content="2020-01-29T09:28:02.284Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="react-native-cookbook">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/iu%20kpop%20star%20music%20sony.jpg">
@@ -199,7 +199,11 @@ ga('send', 'pageview');
       
         <p><img src="https://www.haldir66.ga/static/imgs/iu%20kpop%20star%20music%20sony.jpg" alt=""></p>
 <a id="more"></a>
-<p>install cli</p>
+<p>更新<br><a href="https://github.com/react-native-community/cli#using-npx-recommended">2020年不再推荐使用react native cli</a><br>在mac上使用这种命令可以直接创建一个新的react native app，自动拉起一个simulator，运行这个app。</p>
+<pre><code>npx react-native init AwesomeProject
+cd AwesomeProject
+npx react-native run-ios
+</code></pre><p><del>install cli</del></p>
 <blockquote>
 <p>npm install -g react-native-cli<br>react-native init myproject ## 最好全部小写字母<br>cd myproject<br>react-native run-android<br>注意，可能会报错</p>
 </blockquote>
@@ -288,7 +292,46 @@ class HomeScreen extends React.Component {
   /* render function, etc */
 }
 </code></pre>
-<h2 id="styling"><a href="#styling" class="headerlink" title="styling"></a>styling</h2><p>inline styling在每一个tag的后面跟上两个大括号，<br>styling as seprate file在后面跟一个大括号，引用style对象的properity<br><a href="https://stackoverflow.com/questions/43585297/react-native-button-style-not-work">Button组件的styling仅限于几个属性，可以用TouchableXXX来代替</a></p>
+<h2 id="styling"><a href="#styling" class="headerlink" title="styling"></a>styling</h2><pre><code class="js">&lt;View style={{
+              height:30,
+              backgroundColor:'purple',
+              justifyContent:'center',
+              alignItems:'center',
+              flexDirection:'row',
+              alignContent:'flex-start'
+          }}&gt;
+      &lt;Text style={{
+          color: 'white',
+          backgroundColor: 'red',
+      }}&gt;
+          This Text will be centered both horizontally and vertically
+      &lt;/Text&gt;
+&lt;/View&gt;
+</code></pre>
+<p>view的props中,true要这么写</p>
+<!-- > autoFocus={true} -->
+<p>Text文字居中的方式是设置alignSelf:center</p>
+<p><a href="https://facebook.github.io/react-native/docs/sectionlist">SectionList</a>自带stickyHeader，并且其数据结构是这样的</p>
+<pre><code class="js">const DATA = [
+  {
+    title: &#39;Main dishes&#39;,
+    data: [&#39;Pizza&#39;, &#39;Burger&#39;, &#39;Risotto&#39;],
+  },
+  {
+    title: &#39;Sides&#39;,
+    data: [&#39;French Fries&#39;, &#39;Onion Rings&#39;, &#39;Fried Shrimps&#39;],
+  },
+  {
+    title: &#39;Drinks&#39;,
+    data: [&#39;Water&#39;, &#39;Coke&#39;, &#39;Beer&#39;],
+  },
+  {
+    title: &#39;Desserts&#39;,
+    data: [&#39;Cheese Cake&#39;, &#39;Ice Cream&#39;],
+  },
+];
+</code></pre>
+<p><a href="https://stackoverflow.com/questions/43585297/react-native-button-style-not-work">Button组件的styling仅限于几个属性，可以用TouchableXXX来代替</a></p>
 <h2 id="Components"><a href="#Components" class="headerlink" title="Components"></a>Components</h2><p>Button是一个没什么大用处的控件，一般用TouchableOpacity包一层text去实现</p>
 <h3 id="ScrollView"><a href="#ScrollView" class="headerlink" title="ScrollView"></a>ScrollView</h3><p>Android平台一个ScrollView只能有一个ChildView(Node)，在react-native上似乎没有这样的限制</p>
 <pre><code>The React Native Button is very limited in what you can do, see; Button
@@ -297,9 +340,20 @@ It does not have a style prop, and you don&#39;t set text the &quot;web-way&quot
 
 If you want to have more control over the appearance you should use one of the TouchableXXXX&#39; components like TouchableOpacity They are really easy to use :-)
 </code></pre><p>// Adding alignItems to a component’s style determines the alignment of children along the secondary axis </p>
+<pre><code>As of react v16.3.2 these methods are not &quot;safe&quot; to use:
+
+componentWillMount
+componentWillReceiveProps
+componentWillUpdate
+</code></pre><p>在jsx里面写三元表达式也是可以的</p>
+<pre><code class="xml">&lt;View style={{paddingTop: Platform.OS === 'android' ? 0 : 20}}&gt;
+&lt;/View&gt;
+</code></pre>
+<p>尤其是在iphone X上，如何设置notch那一块位置的颜色<br><a href="https://stackoverflow.com/a/39300715">iOS doesn’t have a concept of a status bar bg</a></p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://github.com/yuanguozheng/JdApp">基于React Native构建的仿京东客户端</a></p>
 <p>async storage</p>
 <p>camera Roll</p>
+<p>React.FunctionComponent</p>
 <h2 id="待填坑"><a href="#待填坑" class="headerlink" title="待填坑"></a>待填坑</h2><p><a href="http://yangguang1029.github.io/2018/02/26/rn-android-communicate/">ReactNative之js与native通信流程（Android篇）</a><br><a href="http://yangguang1029.github.io/2018/02/25/rn-reconciliation/">ReactNative之VirtualDomTree的diff原理</a></p>
 <!-- <audio src="http://m10.music.126.net/20180121230941/8d878803b3b0542d9c5482ccf613a86b/ymusic/d95e/bab6/a7f5/864661168da79b309c3d2fac971d1698.mp3" autoplay="autoplay">
 您的浏览器不支持 audio 标签。

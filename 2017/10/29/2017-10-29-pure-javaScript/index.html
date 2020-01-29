@@ -20,7 +20,7 @@
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery151110078544.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/magnolia_1920x1440.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/js-event-loop.png">
-<meta property="og:updated_time" content="2020-01-17T10:22:26.289Z">
+<meta property="og:updated_time" content="2020-01-29T09:28:02.280Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Vanilla JS Tips">
 <meta name="twitter:description" content="Vanilla JS其实就是原生javascript了。论运行速度，在Vanilla JS面前，所有的js library都要慢很多。">
@@ -216,6 +216,60 @@ ga('send', 'pageview');
 <li><a href="#7-小测试">一些tricks</a></li>
 </ol>
 <h2 id="1-一些作为一门语言基本的操作都有"><a href="#1-一些作为一门语言基本的操作都有" class="headerlink" title="1. 一些作为一门语言基本的操作都有"></a>1. 一些作为一门语言基本的操作都有</h2><p><img src="https://www.haldir66.ga/static/imgs/scenery151110078544.jpg" alt=""></p>
+<p>5种基本数据类型</p>
+<pre><code>string
+number
+boolean
+object
+function
+</code></pre><p>6种object 类型</p>
+<pre><code>Object
+Date
+Array
+String
+Number
+Boolean
+</code></pre><p>两种比较特殊的，不含value的类型<br>null<br>undefined</p>
+<p>使用typeof关键字可以查看对应的类型，typeof是一个操作符，返回值一定是一个string</p>
+<pre><code class="js">typeof &quot;John&quot;                 // Returns &quot;string&quot;
+typeof 3.14                   // Returns &quot;number&quot;
+typeof NaN                    // Returns &quot;number&quot;
+typeof false                  // Returns &quot;boolean&quot;
+typeof [1,2,3,4]              // Returns &quot;object&quot;
+typeof {name:&#39;John&#39;, age:34}  // Returns &quot;object&quot;
+typeof new Date()             // Returns &quot;object&quot;
+typeof function () {}         // Returns &quot;function&quot;
+typeof myCar                  // Returns &quot;undefined&quot; *
+typeof null                   // Returns &quot;object&quot;
+</code></pre>
+<p>//但是typeof无法判断一个object是不是array或者是不是date</p>
+<pre><code class="js">function isArray(myArray) {
+  return myArray.constructor.toString().indexOf(&quot;Array&quot;) &gt; -1;
+}
+//或者
+function isArray(myArray) {
+  return myArray.constructor === Array;
+}
+//Date就得这么判断
+function isDate(myDate) {
+  return myDate.constructor === Date;
+}
+
+//string转int，居然这也行
+parseInt(&quot;10 years&quot;)
+10
+
+//一些自动的类型转换很奇怪
+&quot;5&quot; + 2 // &quot;52&quot;
+&quot;5&quot; - 2  // 3
+
+// number转string
+let n = 10.001
+n.toFixed(2) // &quot;10.00&quot;
+n.toFixed(3) // &quot;10.001&quot;
+n.toPrecision(6) // &quot;10.0030&quot;
+
+</code></pre>
 <h3 id="1-1-比如说module（就是import，export这种，虽然是ES6才补上的）"><a href="#1-1-比如说module（就是import，export这种，虽然是ES6才补上的）" class="headerlink" title="1.1 比如说module（就是import，export这种，虽然是ES6才补上的）"></a>1.1 比如说module（就是import，export这种，虽然是ES6才补上的）</h3><p> <del>js中好像没有像java中那种javaBean的特殊的数据类型的存在。</del>其实也不需要，js并不是一种用class来model real world object的语言。<br>ES6开始可以使用import和export语法，有类似的效果，<a href="https://stackoverflow.com/questions/34741111/exporting-importing-json-object-in-es6">参考</a><br>但node js目前(version 8.x)还不支持es 2015的import export语法，偏偏node对于其他es2015的特性都支持到位了。</p>
 <pre><code class="js">// states.js
 export default {
@@ -261,7 +315,7 @@ import { firstGreet } from &#39;.A.js&#39;; // this works
 </code></pre>
 <p>原因就在于第一种方式是使用匿名export的。</p>
 <h3 id="1-2-基本的操作符，dynanic-type-函数，变量，oop-class（ES6）-for循环-while这些都有"><a href="#1-2-基本的操作符，dynanic-type-函数，变量，oop-class（ES6）-for循环-while这些都有" class="headerlink" title="1.2 基本的操作符，dynanic type,函数，变量，oop,class（ES6）,for循环,while这些都有"></a>1.2 基本的操作符，dynanic type,函数，变量，oop,class（ES6）,for循环,while这些都有</h3><ul>
-<li>js里面判断两个变量相等的方式，建议一律使用三个等号（严格相等）</li>
+<li>js里面判断两个变量相等的方式，建议一律使用三个等号（严格相等）<br><a href="https://stackoverflow.com/questions/359494/which-equals-operator-vs-should-be-used-in-javascript-comparisons?rq=1">===还是==</a>简言之就是==会先做一次类型转换，===则不会</li>
 </ul>
 <pre><code class="js">var a = 3;
 var b = &quot;3&quot;;
@@ -389,8 +443,13 @@ VM621:5 speed is 40
 <li>Object definition(construcor)，class也有</li>
 <li>还有随便用的log</li>
 </ul>
-<h3 id="1-3-一些工具，时间-Math，io操作（文件系统、网络）也有"><a href="#1-3-一些工具，时间-Math，io操作（文件系统、网络）也有" class="headerlink" title="1.3 一些工具，时间,Math，io操作（文件系统、网络）也有"></a>1.3 一些工具，时间,Math，io操作（文件系统、网络）也有</h3><p>Date Object的使用</p>
-<pre><code class="javaScript">let past = new Date(2007,11,9)
+<h3 id="1-3-一些工具，时间-Math，io操作（文件系统、网络）也有"><a href="#1-3-一些工具，时间-Math，io操作（文件系统、网络）也有" class="headerlink" title="1.3 一些工具，时间,Math，io操作（文件系统、网络）也有"></a>1.3 一些工具，时间,Math，io操作（文件系统、网络）也有</h3><p>Date 的使用</p>
+<pre><code class="javaScript">Date.now() //时间戳，毫秒 1580281147599
+Date.parse(&#39;2020-02-31&#39;) // 返回时间戳 1583107200000
+Date.parse(&#39;2020-02-31&#39;) // 注意到2月31号是不存在的，因此实际上是3月1号 Sun Mar 01 2020 08:00:00 GMT+0800 (中国标准时间) {}
+//创建Date object
+let past = new Date(2007,11,9)
+let future = new Date(2020, 11, 17, 3, 24, 0)
 undefined
 past
 // Sun Dec 09 2007 00:00:00 GMT+0800 (中国标准时间)
@@ -1118,7 +1177,7 @@ console.log(arr);
 <p><a href="http://www.ruanyifeng.com/blog/2014/12/unicode.html">JavaScript使用哪一种编码？</a>,不是utf-8</p>
 <p><a href="http://blog.csdn.net/qianghaohao/article/details/52331432">atom安装插件被墙问题</a><br>Atom推荐插件<br><a href="https://atom.io/packages/atom-beautify">atom-beautify</a></p>
 <ol start="9">
-<li><p>setTimeout是schedule一个task，setInterval是设定一个周期性执行的任务。</p>
+<li><p>setTimeout是schedule一个task，setInterval是设定一个周期性执行的任务。还有setAnimationFrame什么的</p>
 </li>
 <li><p>可以检测是ES5还是ES6</p>
 </li>
@@ -1178,6 +1237,27 @@ array.map(function(item){
 array.filter(function(item){
 
 })
+
+js操作数组的方法真的不是特别方便，习惯这种函数式书写方式就好
+someArray = [{name:&quot;Kristian&quot;, lines:&quot;2,5,10&quot;},
+             {name:&quot;John&quot;, lines:&quot;1,19,26,96&quot;}];
+//1
+someArray.shift(); // first element removed
+//2
+someArray = someArray.slice(1); // first element removed
+//3
+someArray.splice(0, 1); // first element removed //第二个参数是1，第一个参数是0开始的，等同于removeByIndex
+//4
+someArray.pop(); // last element removed
+//5
+someArray = someArray.slice(0, a.length - 1); // last element removed
+//6
+someArray.length = someArray.length - 1; // last element removed
+
+//上面这些remove的方法返回的都是被remove的对象
+
+let arrayWithoutKristian = someArray.filter(item =&gt; (item.name != &quot;Kristian&quot;))            
+
 </code></pre>
 <p>基本上就这些了<a href="https://juejin.im/post/5a3a59e7518825698e72376b">参考</a></p>
 <p>异常捕获(try catch也有)</p>
@@ -1281,6 +1361,8 @@ $(document).ready(function(){
 </ol>
 <p>由于javaScript使用的是UCS-2编码（使用两个字节表示码点，只能表示Unicode基本平面内的码点），碰到emoji这类字符的时候，<a href="https://icymind.com/sizeof/">string.length就靠不住了,可以使用Array.from(str).length</a></p>
 <h2 id="tbd"><a href="#tbd" class="headerlink" title="tbd"></a>tbd</h2><p>[ES6 Proxy]<br><a href="https://jameshfisher.com/2017/11/07/promise-implementation/">手动实现promise</a></p>
+<p><a href="https://stackoverflow.com/questions/10024866/remove-object-from-array-using-javascript">array removeAtIndex</a> 还不如用underscore.js</p>
+<p>Array.prototype.reduce（The reduce() method executes a reducer function (that you provide) on each element of the array, resulting in a single output value.）就是把数组中的每一个元素参与运算，得出一个唯一的结果。</p>
 
       
 
