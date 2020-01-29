@@ -26,6 +26,77 @@ Vanilla JS其实就是原生javascript了。论运行速度，在Vanilla JS面�
 
 ![](https://www.haldir66.ga/static/imgs/scenery151110078544.jpg)
 
+5种基本数据类型
+```
+string
+number
+boolean
+object
+function
+```
+
+6种object 类型
+```
+Object
+Date
+Array
+String
+Number
+Boolean
+```
+
+两种比较特殊的，不含value的类型
+null
+undefined
+
+使用typeof关键字可以查看对应的类型，typeof是一个操作符，返回值一定是一个string
+```js
+typeof "John"                 // Returns "string"
+typeof 3.14                   // Returns "number"
+typeof NaN                    // Returns "number"
+typeof false                  // Returns "boolean"
+typeof [1,2,3,4]              // Returns "object"
+typeof {name:'John', age:34}  // Returns "object"
+typeof new Date()             // Returns "object"
+typeof function () {}         // Returns "function"
+typeof myCar                  // Returns "undefined" *
+typeof null                   // Returns "object"
+```
+
+//但是typeof无法判断一个object是不是array或者是不是date
+```js
+function isArray(myArray) {
+  return myArray.constructor.toString().indexOf("Array") > -1;
+}
+//或者
+function isArray(myArray) {
+  return myArray.constructor === Array;
+}
+//Date就得这么判断
+function isDate(myDate) {
+  return myDate.constructor === Date;
+}
+
+//string转int，居然这也行
+parseInt("10 years")
+10
+
+//一些自动的类型转换很奇怪
+"5" + 2 // "52"
+"5" - 2  // 3
+
+// number转string
+let n = 10.001
+n.toFixed(2) // "10.00"
+n.toFixed(3) // "10.001"
+n.toPrecision(6) // "10.0030"
+
+```
+
+
+
+
+
 ### 1.1 比如说module（就是import，export这种，虽然是ES6才补上的）
  <del>js中好像没有像java中那种javaBean的特殊的数据类型的存在。</del>其实也不需要，js并不是一种用class来model real world object的语言。
 ES6开始可以使用import和export语法，有类似的效果，[参考](https://stackoverflow.com/questions/34741111/exporting-importing-json-object-in-es6)
@@ -81,6 +152,7 @@ import { firstGreet } from '.A.js'; // this works
 
 ### 1.2 基本的操作符，dynanic type,函数，变量，oop,class（ES6）,for循环,while这些都有
 - js里面判断两个变量相等的方式，建议一律使用三个等号（严格相等）
+[===还是==](https://stackoverflow.com/questions/359494/which-equals-operator-vs-should-be-used-in-javascript-comparisons?rq=1)简言之就是==会先做一次类型转换，===则不会
 
 ```js
 var a = 3;
@@ -219,9 +291,14 @@ VM621:5 speed is 40
 
 
 ### 1.3 一些工具，时间,Math，io操作（文件系统、网络）也有
-Date Object的使用
+Date 的使用
 ```javaScript
+Date.now() //时间戳，毫秒 1580281147599
+Date.parse('2020-02-31') // 返回时间戳 1583107200000
+Date.parse('2020-02-31') // 注意到2月31号是不存在的，因此实际上是3月1号 Sun Mar 01 2020 08:00:00 GMT+0800 (中国标准时间) {}
+//创建Date object
 let past = new Date(2007,11,9)
+let future = new Date(2020, 11, 17, 3, 24, 0)
 undefined
 past
 // Sun Dec 09 2007 00:00:00 GMT+0800 (中国标准时间)
@@ -1091,9 +1168,7 @@ Atom推荐插件
 [atom-beautify](https://atom.io/packages/atom-beautify)
 
 
-
-
-9. setTimeout是schedule一个task，setInterval是设定一个周期性执行的任务。
+9. setTimeout是schedule一个task，setInterval是设定一个周期性执行的任务。还有setAnimationFrame什么的
 
 8. 可以检测是ES5还是ES6
 
@@ -1153,6 +1228,27 @@ array.map(function(item){
 array.filter(function(item){
 
 })
+
+js操作数组的方法真的不是特别方便，习惯这种函数式书写方式就好
+someArray = [{name:"Kristian", lines:"2,5,10"},
+             {name:"John", lines:"1,19,26,96"}];
+//1
+someArray.shift(); // first element removed
+//2
+someArray = someArray.slice(1); // first element removed
+//3
+someArray.splice(0, 1); // first element removed //第二个参数是1，第一个参数是0开始的，等同于removeByIndex
+//4
+someArray.pop(); // last element removed
+//5
+someArray = someArray.slice(0, a.length - 1); // last element removed
+//6
+someArray.length = someArray.length - 1; // last element removed
+
+//上面这些remove的方法返回的都是被remove的对象
+
+let arrayWithoutKristian = someArray.filter(item => (item.name != "Kristian"))            
+
 ```
 基本上就这些了[参考](https://juejin.im/post/5a3a59e7518825698e72376b)
 
@@ -1303,3 +1399,9 @@ JS的解析是由浏览器中的JS解析引擎完成的。JS是单线程运行�
 
 [ES6 Proxy]
 [手动实现promise](https://jameshfisher.com/2017/11/07/promise-implementation/)
+
+[array removeAtIndex](https://stackoverflow.com/questions/10024866/remove-object-from-array-using-javascript) 还不如用underscore.js
+
+
+Array.prototype.reduce（The reduce() method executes a reducer function (that you provide) on each element of the array, resulting in a single output value.）就是把数组中的每一个元素参与运算，得出一个唯一的结果。
+

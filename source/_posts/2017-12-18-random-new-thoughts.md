@@ -38,7 +38,6 @@ top : 1
 - [ ] python gui编程
 - [ ] [Kotlin Coroutines Tutorial (STABLE VERSION) ](https://www.youtube.com/watch?v=jYuK1qzFrJg)
 - [ ] 宇宙第一ide熟悉使用
-- [ ] js的闭包等面试常谈
 - [ ] code generator(代码生成器)
 - [ ][content-disposition](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)
 - [ ] 用正则检测或者解析json(jQuery源码里有) 在线正则检测网站
@@ -123,6 +122,8 @@ top : 1
 - [X] 安装并使用MAT 分析java应用内存。
 - [X]how does jvm parse class file and the code structure of .class file(how do we manipulate .class file like in asm) 照着一个java classfile viewer看结构就可以了，如果不是打算深入虚拟机的话，没必要。
 - [X] java的aspectJ教程(AspectJ 属于静态织入，是在编译期间生成代理类，性能优于动态织入)。Spring AOP与AspectJ 实现原理上并不完全一致. Spring提供了两种方式来生成代理对象: JdkProxy(基于jdk动态代理,前提是目标是有接口的)和Cglib(基于asm，用于实现对类的代理)。实际上，Spring 只是使用了与 AspectJ 一样的注解，没有使用 AspectJ 的编译器 ，转向采用动态代理技术的实现原理来构建 Spring AOP 的内部机制（动态织入），这是与 AspectJ（静态织入）最根本的区别。
+- [X] js的闭包（closure）等面试常谈 [closure under the hood](https://stackoverflow.com/questions/111102/how-do-javascript-closures-work?rq=1)
+
 
 
 

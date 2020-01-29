@@ -102,7 +102,7 @@ CORS还是比较重要的东西，[详解](http://www.ruanyifeng.com/blog/2016/0
 > http://api.douban.com/v2/movie/top250?callback=anything这个query,这个anything是我们自己网页里面script里面定义的方法，豆瓣会返回一个: anything({json})的数据回来，直接调用anything方法
 
 
-json【JavaScript Object Notation】
+json[JavaScript Object Notation]
 [MDN上的corz](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS)
 
 将网页设置为允许 XMLHttpRequest 跨域访问

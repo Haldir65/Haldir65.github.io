@@ -8,13 +8,25 @@ tags: [前端]
 
 <!--more-->
 
-install cli
+更新
+[2020年不再推荐使用react native cli](https://github.com/react-native-community/cli#using-npx-recommended)
+在mac上使用这种命令可以直接创建一个新的react native app，自动拉起一个simulator，运行这个app。
+```
+npx react-native init AwesomeProject
+cd AwesomeProject
+npx react-native run-ios
+```
+
+
+<del>install cli</del>
 
 >npm install -g react-native-cli
 react-native init myproject ## 最好全部小写字母
 cd myproject
 react-native run-android
 注意，可能会报错
+
+
 
 ```
 FAILURE: Build failed with an exception.
@@ -130,9 +142,55 @@ class HomeScreen extends React.Component {
 
 
 ## styling
-inline styling在每一个tag的后面跟上两个大括号，
-styling as seprate file在后面跟一个大括号，引用style对象的properity
+```js
+<View style={{
+              height:30,
+              backgroundColor:'purple',
+              justifyContent:'center',
+              alignItems:'center',
+              flexDirection:'row',
+              alignContent:'flex-start'
+          }}>
+      <Text style={{
+          color: 'white',
+          backgroundColor: 'red',
+      }}>
+          This Text will be centered both horizontally and vertically
+      </Text>
+</View>
+```
+view的props中,true要这么写
+
+<!-- > autoFocus={true} -->
+
+Text文字居中的方式是设置alignSelf:center
+
+[SectionList](https://facebook.github.io/react-native/docs/sectionlist)自带stickyHeader，并且其数据结构是这样的
+```js
+const DATA = [
+  {
+    title: 'Main dishes',
+    data: ['Pizza', 'Burger', 'Risotto'],
+  },
+  {
+    title: 'Sides',
+    data: ['French Fries', 'Onion Rings', 'Fried Shrimps'],
+  },
+  {
+    title: 'Drinks',
+    data: ['Water', 'Coke', 'Beer'],
+  },
+  {
+    title: 'Desserts',
+    data: ['Cheese Cake', 'Ice Cream'],
+  },
+];
+```
+
+
 [Button组件的styling仅限于几个属性，可以用TouchableXXX来代替](https://stackoverflow.com/questions/43585297/react-native-button-style-not-work)
+
+
 
 ## Components
 
@@ -153,9 +211,27 @@ If you want to have more control over the appearance you should use one of the T
 // Adding alignItems to a component's style determines the alignment of children along the secondary axis 
 
 
+```
+As of react v16.3.2 these methods are not "safe" to use:
+
+componentWillMount
+componentWillReceiveProps
+componentWillUpdate
+```
+
+
+在jsx里面写三元表达式也是可以的
+```xml
+<View style={{paddingTop: Platform.OS === 'android' ? 0 : 20}}>
+</View>
+```
 
 
 
+
+
+尤其是在iphone X上，如何设置notch那一块位置的颜色
+[iOS doesn't have a concept of a status bar bg](https://stackoverflow.com/a/39300715)
 
 ## 参考
 [基于React Native构建的仿京东客户端](https://github.com/yuanguozheng/JdApp)
@@ -164,6 +240,8 @@ If you want to have more control over the appearance you should use one of the T
 async storage
 
 camera Roll
+
+React.FunctionComponent
 
 ## 待填坑
 [ReactNative之js与native通信流程（Android篇）](http://yangguang1029.github.io/2018/02/26/rn-android-communicate/)
