@@ -10,7 +10,7 @@ Vanilla JS其实就是原生javascript了。论运行速度，在Vanilla JS面�
 <!--more-->
 
 
-关于js的历史，根据Patrick Dubroy在2014年的一次[演讲](https://www.youtube.com/watch?v=34cw-XRknWM)，ES3是1999年出来的，ES3之前的版本简直是翔。ES4设计的实在太牛逼，一直拖到2008年也没搞定，所以大家决定直接跳过ES4(历史上也从未有过ES4)，推出了ES5（只把ES4中的一部分实现了），实际上2015年6月ES6(也就是2008年那帮人所称呼的harmony)才发布。关于Patrick Dubroy，这人在2011年的Google IO上做过关于用mat检测Android Memory Leak的演讲，老外真是全才。
+关于[js的历史](https://www.w3schools.com/js/js_versions.asp)，根据Patrick Dubroy在2014年的一次[演讲](https://www.youtube.com/watch?v=34cw-XRknWM)，ES3是1999年出来的，ES3之前的版本简直是翔。ES4设计的实在太牛逼，一直拖到2008年也没搞定，所以大家决定直接跳过ES4(历史上也从未有过ES4)，推出了ES5（只把ES4中的一部分实现了），实际上2015年6月ES6(也就是2008年那帮人所称呼的harmony)才发布。关于Patrick Dubroy，这人在2011年的Google IO上做过关于用mat检测Android Memory Leak的演讲，老外真是全才。
 
 ## TakeAways
 1. [基本语法](#1-一些作为一门语言基本的操作都有)
@@ -25,77 +25,6 @@ Vanilla JS其实就是原生javascript了。论运行速度，在Vanilla JS面�
 ## 1. 一些作为一门语言基本的操作都有
 
 ![](https://www.haldir66.ga/static/imgs/scenery151110078544.jpg)
-
-5种基本数据类型
-```
-string
-number
-boolean
-object
-function
-```
-
-6种object 类型
-```
-Object
-Date
-Array
-String
-Number
-Boolean
-```
-
-两种比较特殊的，不含value的类型
-null
-undefined
-
-使用typeof关键字可以查看对应的类型，typeof是一个操作符，返回值一定是一个string
-```js
-typeof "John"                 // Returns "string"
-typeof 3.14                   // Returns "number"
-typeof NaN                    // Returns "number"
-typeof false                  // Returns "boolean"
-typeof [1,2,3,4]              // Returns "object"
-typeof {name:'John', age:34}  // Returns "object"
-typeof new Date()             // Returns "object"
-typeof function () {}         // Returns "function"
-typeof myCar                  // Returns "undefined" *
-typeof null                   // Returns "object"
-```
-
-//但是typeof无法判断一个object是不是array或者是不是date
-```js
-function isArray(myArray) {
-  return myArray.constructor.toString().indexOf("Array") > -1;
-}
-//或者
-function isArray(myArray) {
-  return myArray.constructor === Array;
-}
-//Date就得这么判断
-function isDate(myDate) {
-  return myDate.constructor === Date;
-}
-
-//string转int，居然这也行
-parseInt("10 years")
-10
-
-//一些自动的类型转换很奇怪
-"5" + 2 // "52"
-"5" - 2  // 3
-
-// number转string
-let n = 10.001
-n.toFixed(2) // "10.00"
-n.toFixed(3) // "10.001"
-n.toPrecision(6) // "10.0030"
-
-```
-
-
-
-
 
 ### 1.1 比如说module（就是import，export这种，虽然是ES6才补上的）
  <del>js中好像没有像java中那种javaBean的特殊的数据类型的存在。</del>其实也不需要，js并不是一种用class来model real world object的语言。

@@ -124,7 +124,7 @@ function WarningBanner(props) {
 
 
 ### 局部更新
-页面发生变化时，React只更新需要刷新的部分
+页面发生变化时，React只更新需要刷新的部分。从视觉上来看，state更改之后，确实是局部刷新。
 
 
 ## 生命周期钩子函数
@@ -213,19 +213,69 @@ const listItems = numbers.map((number) =>
   <li key={number.toString()}>{number}</li>
 );
 //一个List element中的list元素应当具有独一无二的key，但不同List element实例之间，元素的key没必要遵守这一规则
-
-
 ```
 
-## 常见错误
-> Super expression must either be null or a function, not undefined
+[react推荐使用组合而不是继承来实现code reuse](https://reactjs.org/docs/composition-vs-inheritance.html)
+组件的props中有一个特殊的key(children),可以理解为直接在一个组件上设置内部的内容。实际上,props可以添加其他的key以容纳多个children
+```js
+function FancyBorder(props) {
+  return (
+    <div className={'FancyBorder FancyBorder-' + props.color}>
+      {props.children}
+    </div>
+  );
+}
+
+//例如下面的例子，FancyBorder里面的内容实际上就等于上面的props.children
+function WelcomeDialog() {
+  return (
+    <FancyBorder color="blue">
+      <h1 className="Dialog-title">
+        Welcome
+      </h1>
+      <p className="Dialog-message">
+        Thank you for visiting our spacecraft!
+      </p>
+    </FancyBorder>
+  );
+}
+```
+可以这样做的原因是components可以接受任何形式的props，例如基本数据类型，react elemets，以及函数
+> Remember that components may accept arbitrary props, including primitive values, React elements, or functions.
 
 ```js
-class LoginControl extends component{
+class SignUpDialog extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleChange = this.handleChange.bind(this); //为什么这里要写一句bind(this)，因为如果不加的话，handleChange方法里的this将会是这个
+    this.handleSignUp = this.handleSignUp.bind(this);
+    this.state = {login: ''};
+  }
 
-}
-// 应该是
-class LoginControl extends React.Component{
+  render() {
+    return (
+      <Dialog title="Mars Exploration Program"
+              message="How should we refer to you?">
+        <input value={this.state.login}
+               onChange={this.handleChange} />
 
+        <button onClick={this.handleSignUp}>
+          Sign Me Up!
+        </button>
+      </Dialog>
+    );
+  }
+
+  handleChange(e) {
+    this.setState({login: e.target.value});
+  }
+
+  handleSignUp() {
+    alert(`Welcome aboard, ${this.state.login}!`);
+  }
 }
 ```
+
+
+
+

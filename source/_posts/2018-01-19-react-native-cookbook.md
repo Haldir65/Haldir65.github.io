@@ -165,6 +165,18 @@ view的props中,true要这么写
 
 Text文字居中的方式是设置alignSelf:center
 
+类似于LinearLayout horizontal ,1：3等分两个View的方式可以这么写
+```js
+<View style={{flexDirection:'row'}}>
+  <Text style={{flex:1}}>
+    occupy 25% width
+  </Text>
+  <Text style={{flex:3}}>
+    occupy 75% width
+  </Text>
+</View>
+```
+
 [SectionList](https://facebook.github.io/react-native/docs/sectionlist)自带stickyHeader，并且其数据结构是这样的
 ```js
 const DATA = [
@@ -232,8 +244,13 @@ componentWillUpdate
 
 尤其是在iphone X上，如何设置notch那一块位置的颜色
 [iOS doesn't have a concept of a status bar bg](https://stackoverflow.com/a/39300715)
+[如何处理touch event](https://facebook.github.io/react-native/docs/gesture-responder-system) react native把这个称之为gesture
 
-## 参考
+## PropTypes用于定义一个Component的props
+PropTypes.oneOfType
+
+
+## 参考项目
 [基于React Native构建的仿京东客户端](https://github.com/yuanguozheng/JdApp)
 
 
