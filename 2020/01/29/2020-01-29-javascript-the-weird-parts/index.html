@@ -17,7 +17,7 @@
 <meta property="og:description" content="javaScript中的一些容易犯错的地方">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/guoqing_ZH-CN10903461145_1920x1080.jpg">
-<meta property="og:updated_time" content="2020-01-29T09:28:30.157Z">
+<meta property="og:updated_time" content="2020-01-30T10:50:43.008Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="javaScript中的common mistakes">
 <meta name="twitter:description" content="javaScript中的一些容易犯错的地方">
@@ -203,6 +203,77 @@ ga('send', 'pageview');
         <p>javaScript中的一些容易犯错的地方<br><img src="https://www.haldir66.ga/static/imgs/guoqing_ZH-CN10903461145_1920x1080.jpg" alt=""></p>
 <a id="more"></a>
 <p><a href="https://www.w3schools.com/js/js_let.asp">从w3school学到一些新的知识</a></p>
+<p>5种基本数据类型</p>
+<pre><code>string
+number
+boolean
+object
+function
+</code></pre><p>6种object 类型</p>
+<pre><code>Object
+Date
+Array
+String
+Number
+Boolean
+</code></pre><p>两种比较特殊的，不含value的类型<br>null<br>undefined</p>
+<p>使用typeof关键字可以查看对应的类型，typeof是一个操作符，返回值一定是一个string</p>
+<pre><code class="js">typeof &quot;John&quot;                 // Returns &quot;string&quot;
+typeof 3.14                   // Returns &quot;number&quot;
+typeof NaN                    // Returns &quot;number&quot;
+typeof false                  // Returns &quot;boolean&quot;
+typeof [1,2,3,4]              // Returns &quot;object&quot;
+typeof {name:&#39;John&#39;, age:34}  // Returns &quot;object&quot;
+typeof new Date()             // Returns &quot;object&quot;
+typeof function () {}         // Returns &quot;function&quot;
+typeof myCar                  // Returns &quot;undefined&quot; *
+typeof null                   // Returns &quot;object&quot;
+typeof undefined              // Return &quot;undefined&quot;
+</code></pre>
+<p>//但是typeof无法判断一个object是不是array或者是不是date</p>
+<pre><code class="js">function isArray(myArray) {
+  return myArray.constructor.toString().indexOf(&quot;Array&quot;) &gt; -1;
+}
+//或者
+function isArray(myArray) {
+  return myArray.constructor === Array;
+}
+//Date就得这么判断
+function isDate(myDate) {
+  return myDate.constructor === Date;
+}
+
+Array.isArray() //The isArray() method checks whether an object is an array
+
+//string转int，居然这也行
+parseInt(&quot;10 years&quot;)
+10
+
+//一些自动的类型转换很奇怪
+&quot;5&quot; + 2 // &quot;52&quot;
+&quot;5&quot; - 2  // 3
+
+// number转string
+let n = 10.001
+n.toFixed(2) // &quot;10.00&quot; 可以认为toFixed就是保留小数点后几位数字了
+n.toFixed(3) // &quot;10.001&quot;
+n.toPrecision(6) // &quot;10.0030&quot; 可以认为toPrecision是连带整数位保留几位数字
+
+</code></pre>
+<h3 id="一个函数的返回值可以是多种类型"><a href="#一个函数的返回值可以是多种类型" class="headerlink" title="一个函数的返回值可以是多种类型"></a>一个函数的返回值可以是多种类型</h3><p><a href="https://stackoverflow.com/questions/5849256/javascript-different-return-types">Javascript: Different return types</a></p>
+<pre><code class="js">somefn = function(e) {
+    switch (e.type) 
+    {
+       case &#39;mousedown&#39;:
+         return false;
+       case &#39;mousemove&#39;:
+         return {x:10, y:20};
+    }
+ };
+
+somefn({type: &#39;foo&#39;});  //undefined
+</code></pre>
+<p>以上函数完全可以运行</p>
 <p><a href="https://www.w3schools.com/js/js_hoisting.asp">Hoisting is JavaScript’s default behavior of moving all declarations to the top of the current scope (to the top of the current script or the current function</a> 一个变量可以先使用再声明（使用var关键字的话），但是Variables and constants declared with let or const are not hoisted!</p>
 <h3 id="js中的this"><a href="#js中的this" class="headerlink" title="js中的this"></a>js中的this</h3><p>In HTML event handlers, this refers to the HTML element that received the event:</p>
 <pre><code class="html">&lt;button onclick=&quot;this.style.display=&#39;none&#39;&quot;&gt;
@@ -260,7 +331,7 @@ mycar = new Car(&quot;Ford&quot;);
 mycar.cnam;
 mycar.cnam();//不需要这样写
 </code></pre>
-<p>另外，get和set方法不能取和fieldName一样的，例如这里的carname()，所以很多开发者喜欢这么干<br>变量名前面加个_，例如_carname，这样就可以用getcarname了。</p>
+<p>另外，get和set方法不能取和fieldName一样的，例如这里的carname()，所以很多开发者喜欢这么干<br>变量名前面加个_，例如_carname，这样get和set方法就可以用对应的名字了。</p>
 <pre><code class="js">class Car {
   constructor(brand) {
     this._carname = brand;
@@ -292,7 +363,8 @@ Use false instead of new Boolean()
 Use [] instead of new Array()
 Use /()/ instead of new RegExp()
 Use function (){} instead of new Function()
-</code></pre><h3 id="js里面varibale的类型是可以改变的"><a href="#js里面varibale的类型是可以改变的" class="headerlink" title="js里面varibale的类型是可以改变的"></a>js里面varibale的类型是可以改变的</h3><pre><code class="js">var x = &quot;Hello&quot;;     // typeof x is a string
+</code></pre><h3 id="js的array的一些方法，都是很早就有的"><a href="#js的array的一些方法，都是很早就有的" class="headerlink" title="js的array的一些方法，都是很早就有的"></a>js的array的一些方法，都是很早就有的</h3><p><a href="https://www.w3schools.com/js/js_array_iteration.asp">js array</a><br>例如map,reduce和reduceRight不会更改原有的array。</p>
+<h3 id="js里面variable的类型是可以改变的"><a href="#js里面variable的类型是可以改变的" class="headerlink" title="js里面variable的类型是可以改变的"></a>js里面variable的类型是可以改变的</h3><pre><code class="js">var x = &quot;Hello&quot;;     // typeof x is a string
 x = 5;               // changes typeof x to a number
 </code></pre>
 <h3 id="es6里面函数的argument可以带default参数"><a href="#es6里面函数的argument可以带default参数" class="headerlink" title="es6里面函数的argument可以带default参数"></a>es6里面函数的argument可以带default参数</h3><pre><code class="js">function (a=1, b=1) { /*function code*/ }
@@ -312,12 +384,49 @@ switch(x) {
   case &quot;10&quot;: alert(&quot;Hello&quot;);
 }
 </code></pre>
-<h3 id="floating-point-number精确度问题"><a href="#floating-point-number精确度问题" class="headerlink" title="floating point number精确度问题"></a>floating point number精确度问题</h3><pre><code class="js">var x = 0.1;
+<h3 id="和所有的计算机语言一样都存在浮点数精确度问题"><a href="#和所有的计算机语言一样都存在浮点数精确度问题" class="headerlink" title="和所有的计算机语言一样都存在浮点数精确度问题"></a>和所有的计算机语言一样都存在浮点数精确度问题</h3><pre><code class="js">var x = 0.1;
 var y = 0.2;
 var z = x + y            // the result in z will not be 0.3
+
+//这是一种解决办法
+var z = (x * 10 + y * 10) / 10;       // z will be 0.3
 </code></pre>
-<p><a href="https://babeljs.io/docs/en/learn#ecmascript-2015-features">you don’t know complete es6 features</a><br><a href="https://facebook.github.io/react-native/docs/gesture-responder-system">如何处理touch event</a> react native把这个称之为gesture</p>
-<p><a href="https://stackoverflow.com/questions/208105/how-do-i-remove-a-property-from-a-javascript-object?rq=1">how-do-i-remove-a-property-from-a-javascript-object</a><br><a href="https://stackoverflow.com/questions/122102/what-is-the-most-efficient-way-to-deep-clone-an-object-in-javascript?rq=1">javascript clone ,shallow copy可以使用JSON.stringfy可以使用lodash的deepclone函数</a></p>
+<h3 id="variable的类型变化是自动的"><a href="#variable的类型变化是自动的" class="headerlink" title="variable的类型变化是自动的"></a>variable的类型变化是自动的</h3><p>下面这个例子就是object变成了array</p>
+<pre><code class="js">var person = [];
+person[&quot;firstName&quot;] = &quot;John&quot;;
+person[&quot;lastName&quot;] = &quot;Doe&quot;;
+person[&quot;age&quot;] = 46;
+var x = person.length;      // person.length will return 0
+var y = person[0];          // person[0] will return undefined
+</code></pre>
+<h3 id="Undefined-is-Not-Null-如何判断一个object存在"><a href="#Undefined-is-Not-Null-如何判断一个object存在" class="headerlink" title="Undefined is Not Null(如何判断一个object存在)"></a>Undefined is Not Null(如何判断一个object存在)</h3><pre><code class="js">if (typeof myObj === &quot;undefined&quot;) // You can test if an object exists by testing if the type is undefined:
+
+// incorrect !
+if (myObj === null) //But you cannot test if an object is null, because this will throw an error if the object is undefined:
+
+// To solve this problem, you must test if an object is not null, and not undefined.
+// incorrect !
+if (myObj !== null &amp;&amp; typeof myObj !== &quot;undefined&quot;) 
+
+// correct。 要先判断undefined再判断null
+if (typeof myObj !== &quot;undefined&quot; &amp;&amp; myObj !== null) 
+</code></pre>
+<h3 id="一种在html文件中把script-tag写在底部来加快load的方式"><a href="#一种在html文件中把script-tag写在底部来加快load的方式" class="headerlink" title="一种在html文件中把script tag写在底部来加快load的方式"></a>一种在html文件中把script tag写在底部来加快load的方式</h3><pre><code>Putting your scripts at the bottom of the page body lets the browser load the page first.
+
+While a script is downloading, the browser will not start any other downloads. In addition all parsing and rendering activity might be blocked.
+
+The HTTP specification defines that browsers should not download more than two components in parallel.
+</code></pre><p>An alternative is to use defer=”true” in the script tag. The defer attribute specifies that the script should be executed after the page has finished parsing, but it only works for external scripts.</p>
+<pre><code class="js">&lt;script&gt;
+window.onload = function() {
+  var element = document.createElement(&quot;script&quot;);
+  element.src = &quot;myScript.js&quot;;
+  document.body.appendChild(element);
+};
+&lt;/script&gt;
+</code></pre>
+<p><a href="https://babeljs.io/docs/en/learn#ecmascript-2015-features">complete es6 features</a></p>
+<p><a href="https://stackoverflow.com/questions/208105/how-do-i-remove-a-property-from-a-javascript-object?rq=1">how-do-i-remove-a-property-from-a-javascript-object</a><br><a href="https://stackoverflow.com/questions/122102/what-is-the-most-efficient-way-to-deep-clone-an-object-in-javascript?rq=1">javascript clone ,shallow copy可以使用JSON.stringfy，也可以使用lodash的deepclone函数</a></p>
 <p><a href="https://stackoverflow.com/questions/1335851/what-does-use-strict-do-in-javascript-and-what-is-the-reasoning-behind-it?rq=1">strict-mode</a><br><a href="https://stackoverflow.com/questions/111102/how-do-javascript-closures-work?rq=1"> In JavaScript, if you use the function keyword inside another function, you are creating a closure</a><br><a href="https://stackoverflow.com/a/10115970">js 的function的bind方法</a> 例如给document的一个element添加点击callback的时候，click方法中的this已经不是所预想的this了，因此，需要bind(this)，当然有了arrow function之后，不需要bind了</p>
 <pre><code class="js">Button.prototype.hookEvent(element) {
   // Use bind() to ensure &#39;this&#39; is the &#39;this&#39; inside click()
@@ -358,6 +467,111 @@ function testList() {
 
  testList() //logs &quot;item2 undefined&quot; 3 times
 </code></pre>
+<h3 id="Object-prototype"><a href="#Object-prototype" class="headerlink" title="Object.prototype"></a>Object.prototype</h3><p>这些都是ES5就有的特性<a href="https://www.w3schools.com/js/js_object_prototypes.asp">prototypes</a><br>Object.defineProperty() is a new Object method in ES5.</p>
+<p>It lets you define an object property and/or change a property’s value and/or metadata.</p>
+<pre><code class="js">// Create an Object:
+var person = {
+  firstName: &quot;John&quot;,
+  lastName : &quot;Doe&quot;,
+  language : &quot;NO&quot;,
+};
+
+// Change a Property:
+Object.defineProperty(person, &quot;language&quot;, {
+  value: &quot;EN&quot;,
+  writable : true,
+  enumerable : true,
+  configurable : true
+});
+
+// Enumerate Properties
+var txt = &quot;&quot;;
+for (var x in person) {
+  txt += person[x] + &quot;&lt;br&gt;&quot;;
+}
+document.getElementById(&quot;demo&quot;).innerHTML = txt;
+
+// Adding or changing an object property
+Object.defineProperty(object, property, descriptor)
+
+// Adding or changing many object properties
+Object.defineProperties(object, descriptors)
+
+// Accessing Properties
+Object.getOwnPropertyDescriptor(object, property)
+
+// Returns all properties as an array
+Object.getOwnPropertyNames(object)
+
+// Returns enumerable properties as an array
+Object.keys(object)
+
+// Accessing the prototype
+Object.getPrototypeOf(object)
+
+// Prevents adding properties to an object
+Object.preventExtensions(object)
+// Returns true if properties can be added to an object
+Object.isExtensible(object)
+
+// Prevents changes of object properties (not values)
+Object.seal(object)
+// Returns true if object is sealed
+Object.isSealed(object)
+
+// Prevents any changes to an object
+Object.freeze(object)
+// Returns true if object is frozen
+Object.isFrozen(object)
+</code></pre>
+<h3 id="es6的spread-syntax"><a href="#es6的spread-syntax" class="headerlink" title="es6的spread syntax"></a>es6的spread syntax</h3><p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax">Spread syntax </a></p>
+<pre><code>Spread syntax allows an iterable such as an array expression or string to be expanded in places where zero or more arguments (for function calls) or elements (for array literals) are expected, or an object expression to be expanded in places where zero or more key-value pairs (for object literals) are expected.
+</code></pre><p>syntax</p>
+<pre><code class="js">// For function calls:
+myFunction(...iterableObj);
+//For array literals or strings:
+[...iterableObj, &#39;4&#39;, &#39;five&#39;, 6]; 
+// For object literals (new in ECMAScript 2018):
+let objClone = { ...obj };
+</code></pre>
+<h3 id="但是不要跟destructuring-assignment混淆了"><a href="#但是不要跟destructuring-assignment混淆了" class="headerlink" title="但是不要跟destructuring assignment混淆了"></a>但是不要跟destructuring assignment混淆了</h3><p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment">destructuring assignment</a><br>The destructuring assignment syntax is a JavaScript expression that makes it possible to unpack values from arrays, or properties from objects, into distinct variables.</p>
+<pre><code class="js">let a, b, rest;
+[a, b] = [10, 20];
+
+console.log(a);
+// expected output: 10
+
+console.log(b);
+// expected output: 20
+
+[a, b, ...rest] = [10, 20, 30, 40, 50];
+
+console.log(rest);
+// expected output: Array [30,40,50]
+</code></pre>
+<p>像极了kotlin的triple<br>有了spread operator，array.push可以换一种写法</p>
+<pre><code class="js">const arr1 = [0, 1, 2];
+const arr2 = [3, 4, 5];
+
+//  Append all items from arr2 onto arr1
+arr1 = arr1.concat(arr2);
+
+const arr1 = [0, 1, 2];
+const arr2 = [3, 4, 5];
+
+arr1 = [...arr1, ...arr2]; 
+//  arr1 is now [0, 1, 2, 3, 4, 5]
+</code></pre>
+<p>object的shallow clone也变了</p>
+<pre><code class="js">const obj1 = { foo: &#39;bar&#39;, x: 42 };
+const obj2 = { foo: &#39;baz&#39;, y: 13 };
+
+const clonedObj = { ...obj1 };
+// Object { foo: &quot;bar&quot;, x: 42 }
+
+const mergedObj = { ...obj1, ...obj2 };// 注意这里foo被覆盖了
+// Object { foo: &quot;baz&quot;, x: 42, y: 13 }
+</code></pre>
 <p><a href="https://www.w3schools.com/js/js_conventions.asp">一些代码规范</a> 这些只是习惯，一些推荐的设置，不强求。各个语言社区都有自己的规范。</p>
 <pre><code>Underscores:
 
@@ -372,7 +586,68 @@ PascalCase is often preferred by C programmers.
 camelCase:
 
 camelCase is used by JavaScript itself, by jQuery, and other JavaScript libraries.
-</code></pre><h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="https://github.com/getify/You-Dont-Know-JS/">You-Dont-Know-JS</a></p>
+</code></pre><p><a href="https://github.com/reduxjs/redux/blob/master/examples/todos/src/reducers/todos.js">挑一个redux的reducer代码来看</a> es6或者更高的语法，习惯就好</p>
+<pre><code class="js">const todos = (state = [], action) =&gt; { // arrow function,  参数的默认值 
+  switch (action.type) {
+    case &#39;ADD_TODO&#39;:
+      return [
+        ...state, // spread 就是把一个iterable object拆散 es 2018的
+        {
+          id: action.id,
+          text: action.text,
+          completed: false
+        }
+      ]
+    case &#39;TOGGLE_TODO&#39;:
+      return state.map(todo =&gt;
+        (todo.id === action.id)
+          ? {...todo, completed: !todo.completed} // 拆开一个todo obj，返回一个新的obj,completed被覆盖？
+          : todo
+      )
+    default:
+      return state
+  }
+}
+
+export default todos
+</code></pre>
+<h3 id="arrow-function的syntax"><a href="#arrow-function的syntax" class="headerlink" title="arrow function的syntax"></a>arrow function的syntax</h3><p>Basic syntax</p>
+<pre><code class="js">(param1, param2, …, paramN) =&gt; { statements } 
+(param1, param2, …, paramN) =&gt; expression
+// equivalent to: =&gt; { return expression; }
+
+// Parentheses are optional when there&#39;s only one parameter name:
+(singleParam) =&gt; { statements }
+singleParam =&gt; { statements }
+
+// The parameter list for a function with no parameters should be written with a pair of parentheses.
+() =&gt; { statements }
+</code></pre>
+<p>// Advanced syntax</p>
+<pre><code class="js">// Parenthesize the body of a function to return an object literal expression:
+params =&gt; ({foo: bar})
+
+// Rest parameters and default parameters are supported
+(param1, param2, ...rest) =&gt; { statements } // 其他语言常见的var args也有
+(param1 = defaultValue1, param2, …, paramN = defaultValueN) =&gt; { 
+statements }
+
+// Destructuring within the parameter list is also supported
+var f = ([a, b] = [1, 2], {x: c} = {x: a + b}) =&gt; a + b + c;
+f(); // 6
+</code></pre>
+<h3 id="因为到处是undefined，所以函数的调用或者传参也有一些奇怪的语法"><a href="#因为到处是undefined，所以函数的调用或者传参也有一些奇怪的语法" class="headerlink" title="因为到处是undefined，所以函数的调用或者传参也有一些奇怪的语法"></a>因为到处是undefined，所以函数的调用或者传参也有一些奇怪的语法</h3><p>看上去照着shell的pipe去理解就是了</p>
+<pre><code class="js">obj.dispatch(someMethod(maybeUndefined || {}));
+
+method &amp;&amp; method()
+
+//例如选择性的显示某个View可以这么干
+&lt;View&gt;
+  {show &amp;&amp; &lt;Warning style={styles.warning}&gt;这一块只有在show的时候才会显示&lt;/Warning&gt;}
+&lt;/View&gt;
+
+</code></pre>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="https://github.com/getify/You-Dont-Know-JS/">You-Dont-Know-JS</a></p>
 
       
 
@@ -400,11 +675,6 @@ camelCase is used by JavaScript itself, by jQuery, and other JavaScript librarie
       
     </div>
     <div class="article-info article-info-index">
-      
-        <div class="article-pop-out tagcloud">
-          <i class="icon-tuding"></i>
-          <a class="article-tag-list-link color3">置顶</a>
-        </div>
       
       
 	<div class="article-tag tagcloud">

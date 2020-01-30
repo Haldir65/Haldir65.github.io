@@ -20,7 +20,7 @@
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/scenery151110078544.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/magnolia_1920x1440.jpg">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/js-event-loop.png">
-<meta property="og:updated_time" content="2020-01-29T09:28:30.149Z">
+<meta property="og:updated_time" content="2020-01-30T10:50:43.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Vanilla JS Tips">
 <meta name="twitter:description" content="Vanilla JS其实就是原生javascript了。论运行速度，在Vanilla JS面前，所有的js library都要慢很多。">
@@ -205,7 +205,7 @@ ga('send', 'pageview');
       
         <p>Vanilla JS其实就是原生javascript了。论运行速度，在Vanilla JS面前，所有的js library都要慢很多。<br><img src="https://www.haldir66.ga/static/imgs/scenery04e31f5513d62958957b4caa1d944ae4.jpg" alt=""></p>
 <a id="more"></a>
-<p>关于js的历史，根据Patrick Dubroy在2014年的一次<a href="https://www.youtube.com/watch?v=34cw-XRknWM">演讲</a>，ES3是1999年出来的，ES3之前的版本简直是翔。ES4设计的实在太牛逼，一直拖到2008年也没搞定，所以大家决定直接跳过ES4(历史上也从未有过ES4)，推出了ES5（只把ES4中的一部分实现了），实际上2015年6月ES6(也就是2008年那帮人所称呼的harmony)才发布。关于Patrick Dubroy，这人在2011年的Google IO上做过关于用mat检测Android Memory Leak的演讲，老外真是全才。</p>
+<p>关于<a href="https://www.w3schools.com/js/js_versions.asp">js的历史</a>，根据Patrick Dubroy在2014年的一次<a href="https://www.youtube.com/watch?v=34cw-XRknWM">演讲</a>，ES3是1999年出来的，ES3之前的版本简直是翔。ES4设计的实在太牛逼，一直拖到2008年也没搞定，所以大家决定直接跳过ES4(历史上也从未有过ES4)，推出了ES5（只把ES4中的一部分实现了），实际上2015年6月ES6(也就是2008年那帮人所称呼的harmony)才发布。关于Patrick Dubroy，这人在2011年的Google IO上做过关于用mat检测Android Memory Leak的演讲，老外真是全才。</p>
 <h2 id="TakeAways"><a href="#TakeAways" class="headerlink" title="TakeAways"></a>TakeAways</h2><ol>
 <li><a href="#1-一些作为一门语言基本的操作都有">基本语法</a></li>
 <li><a href="#2-操作HTML-DOM的一些方法">操作html的一些点</a></li>
@@ -216,60 +216,6 @@ ga('send', 'pageview');
 <li><a href="#7-小测试">一些tricks</a></li>
 </ol>
 <h2 id="1-一些作为一门语言基本的操作都有"><a href="#1-一些作为一门语言基本的操作都有" class="headerlink" title="1. 一些作为一门语言基本的操作都有"></a>1. 一些作为一门语言基本的操作都有</h2><p><img src="https://www.haldir66.ga/static/imgs/scenery151110078544.jpg" alt=""></p>
-<p>5种基本数据类型</p>
-<pre><code>string
-number
-boolean
-object
-function
-</code></pre><p>6种object 类型</p>
-<pre><code>Object
-Date
-Array
-String
-Number
-Boolean
-</code></pre><p>两种比较特殊的，不含value的类型<br>null<br>undefined</p>
-<p>使用typeof关键字可以查看对应的类型，typeof是一个操作符，返回值一定是一个string</p>
-<pre><code class="js">typeof &quot;John&quot;                 // Returns &quot;string&quot;
-typeof 3.14                   // Returns &quot;number&quot;
-typeof NaN                    // Returns &quot;number&quot;
-typeof false                  // Returns &quot;boolean&quot;
-typeof [1,2,3,4]              // Returns &quot;object&quot;
-typeof {name:&#39;John&#39;, age:34}  // Returns &quot;object&quot;
-typeof new Date()             // Returns &quot;object&quot;
-typeof function () {}         // Returns &quot;function&quot;
-typeof myCar                  // Returns &quot;undefined&quot; *
-typeof null                   // Returns &quot;object&quot;
-</code></pre>
-<p>//但是typeof无法判断一个object是不是array或者是不是date</p>
-<pre><code class="js">function isArray(myArray) {
-  return myArray.constructor.toString().indexOf(&quot;Array&quot;) &gt; -1;
-}
-//或者
-function isArray(myArray) {
-  return myArray.constructor === Array;
-}
-//Date就得这么判断
-function isDate(myDate) {
-  return myDate.constructor === Date;
-}
-
-//string转int，居然这也行
-parseInt(&quot;10 years&quot;)
-10
-
-//一些自动的类型转换很奇怪
-&quot;5&quot; + 2 // &quot;52&quot;
-&quot;5&quot; - 2  // 3
-
-// number转string
-let n = 10.001
-n.toFixed(2) // &quot;10.00&quot;
-n.toFixed(3) // &quot;10.001&quot;
-n.toPrecision(6) // &quot;10.0030&quot;
-
-</code></pre>
 <h3 id="1-1-比如说module（就是import，export这种，虽然是ES6才补上的）"><a href="#1-1-比如说module（就是import，export这种，虽然是ES6才补上的）" class="headerlink" title="1.1 比如说module（就是import，export这种，虽然是ES6才补上的）"></a>1.1 比如说module（就是import，export这种，虽然是ES6才补上的）</h3><p> <del>js中好像没有像java中那种javaBean的特殊的数据类型的存在。</del>其实也不需要，js并不是一种用class来model real world object的语言。<br>ES6开始可以使用import和export语法，有类似的效果，<a href="https://stackoverflow.com/questions/34741111/exporting-importing-json-object-in-es6">参考</a><br>但node js目前(version 8.x)还不支持es 2015的import export语法，偏偏node对于其他es2015的特性都支持到位了。</p>
 <pre><code class="js">// states.js
 export default {

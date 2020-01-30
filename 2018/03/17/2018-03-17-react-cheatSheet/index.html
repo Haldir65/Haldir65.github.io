@@ -17,7 +17,7 @@
 <meta property="og:description" content="介绍React语法及一些Redux的使用方法">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/food-knife-green-kitchen-city-life.jpg">
-<meta property="og:updated_time" content="2020-01-29T09:28:30.149Z">
+<meta property="og:updated_time" content="2020-01-30T10:50:43.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="React语法及Redux实践笔记">
 <meta name="twitter:description" content="介绍React语法及一些Redux的使用方法">
@@ -286,7 +286,7 @@ function WarningBanner(props) {
   );
 }
 </code></pre>
-<h3 id="局部更新"><a href="#局部更新" class="headerlink" title="局部更新"></a>局部更新</h3><p>页面发生变化时，React只更新需要刷新的部分</p>
+<h3 id="局部更新"><a href="#局部更新" class="headerlink" title="局部更新"></a>局部更新</h3><p>页面发生变化时，React只更新需要刷新的部分。从视觉上来看，state更改之后，确实是局部刷新。</p>
 <h2 id="生命周期钩子函数"><a href="#生命周期钩子函数" class="headerlink" title="生命周期钩子函数"></a>生命周期钩子函数</h2><pre><code class="js">componentDidMount() {
   fetchPosts().then(response =&gt; {
     this.setState({
@@ -362,18 +362,63 @@ const listItems = numbers.map((number) =&gt;
   &lt;li key={number.toString()}&gt;{number}&lt;/li&gt;
 );
 //一个List element中的list元素应当具有独一无二的key，但不同List element实例之间，元素的key没必要遵守这一规则
-
-
 </code></pre>
-<h2 id="常见错误"><a href="#常见错误" class="headerlink" title="常见错误"></a>常见错误</h2><blockquote>
-<p>Super expression must either be null or a function, not undefined</p>
-</blockquote>
-<pre><code class="js">class LoginControl extends component{
-
+<p><a href="https://reactjs.org/docs/composition-vs-inheritance.html">react推荐使用组合而不是继承来实现code reuse</a><br>组件的props中有一个特殊的key(children),可以理解为直接在一个组件上设置内部的内容。实际上,props可以添加其他的key以容纳多个children</p>
+<pre><code class="js">function FancyBorder(props) {
+  return (
+    &lt;div className={&#39;FancyBorder FancyBorder-&#39; + props.color}&gt;
+      {props.children}
+    &lt;/div&gt;
+  );
 }
-// 应该是
-class LoginControl extends React.Component{
 
+//例如下面的例子，FancyBorder里面的内容实际上就等于上面的props.children
+function WelcomeDialog() {
+  return (
+    &lt;FancyBorder color=&quot;blue&quot;&gt;
+      &lt;h1 className=&quot;Dialog-title&quot;&gt;
+        Welcome
+      &lt;/h1&gt;
+      &lt;p className=&quot;Dialog-message&quot;&gt;
+        Thank you for visiting our spacecraft!
+      &lt;/p&gt;
+    &lt;/FancyBorder&gt;
+  );
+}
+</code></pre>
+<p>可以这样做的原因是components可以接受任何形式的props，例如基本数据类型，react elemets，以及函数</p>
+<blockquote>
+<p>Remember that components may accept arbitrary props, including primitive values, React elements, or functions.</p>
+</blockquote>
+<pre><code class="js">class SignUpDialog extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleChange = this.handleChange.bind(this); //为什么这里要写一句bind(this)，因为如果不加的话，handleChange方法里的this将会是这个
+    this.handleSignUp = this.handleSignUp.bind(this);
+    this.state = {login: &#39;&#39;};
+  }
+
+  render() {
+    return (
+      &lt;Dialog title=&quot;Mars Exploration Program&quot;
+              message=&quot;How should we refer to you?&quot;&gt;
+        &lt;input value={this.state.login}
+               onChange={this.handleChange} /&gt;
+
+        &lt;button onClick={this.handleSignUp}&gt;
+          Sign Me Up!
+        &lt;/button&gt;
+      &lt;/Dialog&gt;
+    );
+  }
+
+  handleChange(e) {
+    this.setState({login: e.target.value});
+  }
+
+  handleSignUp() {
+    alert(`Welcome aboard, ${this.state.login}!`);
+  }
 }
 </code></pre>
 
