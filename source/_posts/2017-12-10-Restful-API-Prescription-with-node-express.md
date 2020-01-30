@@ -82,6 +82,8 @@ app.get('/getById/:age',function(req,res){
 
 - 获取POST请求的参数
 在postMan发起post请求
+
+
 ```config
 POST /api/personal?age=10 HTTP/1.1
 Host: localhost:8080

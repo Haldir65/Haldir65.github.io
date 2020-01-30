@@ -14,56 +14,35 @@ top : 1
 - [个人分享--web 前端学习资源分享](https://juejin.im/post/5a0c1956f265da430a501f51)
 - [PWA 所代表的 Web 开发应是未来](https://huangxuan.me/2017/02/09/nextgen-web-pwa/)据说Electron要被PWA干掉
 - [js 循环闭包的解决方法](https://segmentfault.com/a/1190000003818163)
-- 动态类型一时爽，代码重构火葬场
-- iview，elementUi
 - [ ] shadowsocks-android源码（据说是起了一个c进程守护）
 - [ ] chromium net移植到Android平台[cronet是最简单的方式](https://github.com/GoogleChromeLabs/cronet-sample) [更多下载仓库](https://console.cloud.google.com/storage/browser/chromium-cronet?pli=1)
-- [embeed video with iframe](https://css-tricks.com/NetMag/FluidWidthVideo/Article-FluidWidthVideo.php)
-- [ ] Paul Irish from google
 - [ ] [lightbox一个很好看的js图片查看库](http://lokeshdhakar.com/projects/lightbox2/)
 - [ ] [一个很好看的h5音乐播放器](https://github.com/wangpengfei15975/skPlayer/)
 - [ ] [仿门户网站js相册](https://www.js-css.cn/a/jscode/album/2014/0915/1319.html)， [js相册2](https://www.js-css.cn/a/jscode/album/2014/0914/1318.html)
 - [ ] [八大排序算法的python实现](http://python.jobbole.com/82270/)
-- [ ] Redux和Flux很像,react context api
-- [ ] [一个展示如何在宿主App中提取一个apk文件并加载代码和资源](https://www.jianshu.com/p/a4ab102fa4ac)
+- [ ] [如何在宿主App中提取一个apk文件并加载代码和资源](https://www.jianshu.com/p/a4ab102fa4ac)
 - [ ] nodejs ,go ,protobuf rpc(proto更多的是作为一种协议来进行rpc数据传输)
-- [ ]一致性哈希原理
-- [ ] [使用redis实现低粒度的分布式锁](http://afghl.github.io/2018/06/17/distributed-lock-and-granarity.html)
 - [ ] Coordinator behavior以及scroll原理
 - [ ] instagram好像通过注解的方式自己写了一个json解析器[ig-json-parser](https://github.com/Instagram/ig-json-parser)
 - [ ] when it comes to design , how do we translate px, pt, em  into sp,dp and others(设计方面的，各种单位之间的转换)?
-- [ ] linux环境下多进程通讯方式(管道，共享内存，信号,unix domian socket)
 - [ ] mqtt接入实践[mqtt是建立在tcp基础上的应用层协议](https://github.com/mcxiaoke/mqtt)，[netty](https://github.com/netty/netty)也做了实现
-- [ ] play around with xposed
-- [ ] python gui编程
 - [ ] [Kotlin Coroutines Tutorial (STABLE VERSION) ](https://www.youtube.com/watch?v=jYuK1qzFrJg)
 - [ ] 宇宙第一ide熟悉使用
-- [ ] code generator(代码生成器)
-- [ ][content-disposition](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)
-- [ ] 用正则检测或者解析json(jQuery源码里有) 在线正则检测网站
+- [ ] python code generator(代码生成器)
 - [ ] awk，正则表达式还有数据库这些也算一门编程语言
-- [ ] 来来来，[手写一个vm](https://www.youtube.com/watch?v=DUNkdl0Jhgs)
-- [ ] [chromium提供了如何在windows上编译chromium的教程](https://chromium.googlesource.com/chromium/src/+/master/docs/windows_build_instructions.md#System-requirements)
-- [ ][How the JVM compiles bytecode into machine code](https://www.youtube.com/watch?v=M8LiOANu3Nk)
-- [ ] WebSocket协议及数据帧
 - [ ]Lua脚本是一个很轻量级的脚本，也是号称性能最高的脚本。路由器上都有运行环境，语法和c语言差不多。在<del>nginx</del>openresty配置文件中也可使用。lua还可以和java代码互相调用，还找到了一个[将lua移植到android平台](https://github.com/sanyouyugan/Mas)的项目
 - [腾讯的mmkv是shared preference的有效替代品](https://juejin.im/post/5baf8ae8f265da0ae92a7df5) mmap的使用值得学习
 - [简单的组件化方案](https://www.jianshu.com/p/5f9a7bc902e1)
 - [mvc,mvp,mvvm](https://www.tianmaying.com/tutorial/AndroidMVC)这些关键术语的掌握还是必要的
 - Parcelable 是怎么实现跨进程的? ipc并不仅限于后台，客户端不同进程间也会有类似的概念。
-- jdk8 standard Library implementation detail(java代码的实现 --> hotspot代码的c语言实现)
-- [后端面试题](https://segmentfault.com/a/1190000017864721)
-- thrift 源码解析，rpc框架（比方说人脸识别应用就可以用java调用python服务）这种rpc过程肯定要考虑字节序的问题。
 - Perl被称为脚本语言中的瑞士军刀，处理文本和正则的能力比较强。学习perl5就可以了。
 - [Spring Boot application.yml](https://docs.spring.io/spring-boot/docs/current/reference/html/howto-properties-and-configuration.html) 写法
+- [后端面试题](https://segmentfault.com/a/1190000017864721)
+- thrift 源码解析，rpc框架（比方说人脸识别应用就可以用java调用python服务）这种rpc过程肯定要考虑字节序的问题。
 - 微服务框架 <del>dubbo</del> kubernetes, Spring Cloud....
 - [ ] java BitSet这个class的使用及效率
 - [ ] 关于textView源码的解析要补上
-- [ ] 熟练掌握java8的stream,lambda,optional等语法
-- [ ] build a program that use libcurl , a http client wrapper
 - [ ] [Replacing JNI Crashes by Exceptions on Android](http://blog.httrack.com/blog/2013/08/23/catching-posix-signals-on-android/)
-- [ ] python sendall will block? what if tcp buffer is full , like when advertised windows size is zero. [tcp flow control](https://www.brianstorti.com/tcp-flow-control/)
-- [ ] rust and WebAssembly, [ WebAssembly 并不是一门编程语言，而是一份字节码标准，需要用高级编程语言编译出字节码放到 WebAssembly 虚拟机中才能运行， 浏览器厂商需要做的就是根据 WebAssembly 规范实现虚拟机](https://www.ibm.com/developerworks/cn/web/wa-lo-webassembly-status-and-reality/index.html)
 
 
 
@@ -95,7 +74,7 @@ top : 1
 - [ ] [如何写makefile](https://seisman.github.io/how-to-write-makefile/introduction.html)其实[这个更加friendly](http://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/)
 - [X] [libmp3lame移植到Android](https://www.jianshu.com/p/534741f5151c),该教程针对的lame版本是3.99.5
 - [scheme 这东西算跨客户端平台的](https://sspai.com/post/31500)，比如在 App 中调起支付宝(用的是 alipayqr://)。其实就是一个系统内跨应用调用。[用法](http://blog.csdn.net/qq_23547831/article/details/51685310)
-这个主要是ios app之间通信的协议，以及快速跳转某个app某个页面的功能实现，还有x-callback-URL这样类似的协议。不过有了3d-touch之后，很多app都能长按图标进入页面，所以url scheme这个功能只能说是不复往日辉煌了
+这个主要是ios app之间通信的协议，以及快速跳转某个app某个页面的功能实现，还有x-callback-URL这样类似的协议。不过有了3d-touch（苹果后来又把3D-Touch干掉了）之后，很多app都能长按图标进入页面，所以url scheme这个功能只能说是不复往日辉煌了
 - [X]linux的sed命令(文本替换比较常用)
 - [nio](https://juejin.im/post/59fffdb76fb9a0450a66bd58) 还是netty好。也可以看点别的[并发编程网](http://ifeve.com/java-nio%E7%B3%BB%E5%88%97%E6%95%99%E7%A8%8B%EF%BC%88%E5%8D%81%E5%85%AD%EF%BC%89-java-nio-files/)
 - [X]js 的async await,就是一个async修饰一个method，里面随便写await
@@ -123,7 +102,14 @@ top : 1
 - [X]how does jvm parse class file and the code structure of .class file(how do we manipulate .class file like in asm) 照着一个java classfile viewer看结构就可以了，如果不是打算深入虚拟机的话，没必要。
 - [X] java的aspectJ教程(AspectJ 属于静态织入，是在编译期间生成代理类，性能优于动态织入)。Spring AOP与AspectJ 实现原理上并不完全一致. Spring提供了两种方式来生成代理对象: JdkProxy(基于jdk动态代理,前提是目标是有接口的)和Cglib(基于asm，用于实现对类的代理)。实际上，Spring 只是使用了与 AspectJ 一样的注解，没有使用 AspectJ 的编译器 ，转向采用动态代理技术的实现原理来构建 Spring AOP 的内部机制（动态织入），这是与 AspectJ（静态织入）最根本的区别。
 - [X] js的闭包（closure）等面试常谈 [closure under the hood](https://stackoverflow.com/questions/111102/how-do-javascript-closures-work?rq=1)
-
+- [X] build a program that use libcurl , sudo apt install liccurl4-openssl-dev
+,编译时使用gcc -lcurl,curl perform是同步的。
+- [X][content-disposition](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition)
+- [x] 用正则检测或者解析json(jQuery源码里有) 在线正则检测网站，也就是Js中的Reg对象
+- [X] Redux和Flux很像,react context api(感觉有点像观察者模式)
+- [embeed video with iframe](https://css-tricks.com/NetMag/FluidWidthVideo/Article-FluidWidthVideo.php)
+- jdk8 standard Library implementation detail(java代码的实现 --> hotspot代码的c语言实现) 很多都是c++写的
+- [X] 熟练掌握java8的stream,lambda,optional等语法。还是要多多练习
 
 
 
@@ -156,6 +142,20 @@ OpenType® is a cross-platform font file format developed jointly by Adobe and M
 - netfilter框架(imbedded in linux server)
 - [] java实现lambda的原理[invokedynamic以及LambdaMetafactory等](https://colobu.com/2014/11/06/secrets-of-java-8-lambda/)
 - [ ] libuv,elf文件格式解析
+- [X] [WebSocket协议及数据帧](https://www.infoq.cn/article/deep-in-websocket-protocol)
+- [ ] linux环境下多进程通讯方式(管道，共享内存，信号,unix domian socket)
+- [ ] play around with xposed
+- [ ] python gui编程
+- [ ] 来来来，[手写一个vm](https://www.youtube.com/watch?v=DUNkdl0Jhgs)
+- [ ][How the JVM compiles bytecode into machine code](https://www.youtube.com/watch?v=M8LiOANu3Nk)
+- [ ] [chromium提供了如何在windows上编译chromium的教程](https://chromium.googlesource.com/chromium/src/+/master/docs/windows_build_instructions.md#System-requirements)
+- iview，elementUi
+- [ ]一致性哈希原理
+- [ ] [使用redis实现低粒度的分布式锁](http://afghl.github.io/2018/06/17/distributed-lock-and-granarity.html)
+- [ ] python sendall will block? what if tcp buffer is full , like when advertised windows size is zero. [tcp flow control](https://www.brianstorti.com/tcp-flow-control/)
+- [ ] rust and WebAssembly, [ WebAssembly 并不是一门编程语言，而是一份字节码标准，需要用高级编程语言编译出字节码放到 WebAssembly 虚拟机中才能运行， 浏览器厂商需要做的就是根据 WebAssembly 规范实现虚拟机](https://www.ibm.com/developerworks/cn/web/wa-lo-webassembly-status-and-reality/index.html)
+
+
 
 
 [jsonplaceholder](https://jsonplaceholder.typicode.com/)懒得自己写api的话

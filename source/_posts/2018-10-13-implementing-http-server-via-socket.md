@@ -1,7 +1,7 @@
 ---
 title: 从Socket入手实现http协议
 date: 2018-10-13 21:30:36
-tags: [tools]
+tags: [linux,tools]
 ---
 
 ![](https://www.haldir66.ga/static/imgs/sun_rise_dim_grass.jpg)
