@@ -37,8 +37,6 @@ class LoginControl extends React.Component{
 
 
 
-
-
 ## 安装
 > yarn global add create-react-app
 create-react-app my-app
@@ -64,9 +62,9 @@ Element感觉上就像一个或者多个UI控件的集合
 const element = <h1>Hello, world</h1>; //这就算一个Element,用于描述将要展示在屏幕上的效果
 ```
 
-Component就像javaScript函数一样，它们接收任意输入，输出React element以显示在屏幕上。需要注意的是，Component的名字一定要 **首字母大写** ，因为React把小写字母开头的当做正常的html element来处理了。
+
 ```js
-//一个返回Element的函数就算作是Component了
+//支持纯函数式的Component
 function Welcome(props) {
   return <h1>Hello, {props.name}</h1>;
 }
@@ -79,7 +77,6 @@ class Welcome extends React.Component {
 }
 
 ```
-还有就是props是immutable的，想要改的话用State吧。也即Component应该表现为纯粹的function，不修改状态。
 
 ## State的更改
 State是在constructor里面初始化的，想要更改其中的值的话，不能直接赋值，需要使用setState方法
@@ -121,8 +118,6 @@ function WarningBanner(props) {
 }
 ```
 
-
-
 ### 局部更新
 页面发生变化时，React只更新需要刷新的部分。从视觉上来看，state更改之后，确实是局部刷新。
 
@@ -142,6 +137,14 @@ componentDidMount() {
     });
   });
 }
+```
+
+```js
+As of react v16.3.2 these methods are not "safe" to use:
+
+componentWillMount
+componentWillReceiveProps
+componentWillUpdate
 ```
 
 ## 事件处理
@@ -166,7 +169,7 @@ ReactDOM.render(<ActionLink/>, document.getElementById('root'));
 <button onClick={(e) => this.deleteRow(id, e)}>Delete Row</button>
 <button onClick={this.deleteRow.bind(this, id)}>Delete Row</button>
 
-//在一个Component中，时间监听最后要加上bind(this)
+//在一个Component中，事件监听最后要加上bind(this)
 class Calculator extends React.Component {
   constructor(props) {
     super(props);
@@ -198,7 +201,6 @@ class Calculator extends React.Component {
 
 ## 组件之间通信
 In React, sharing state is accomplished by moving it up to the closest common ancestor of the components that need it. 也就是说，要把state提取到最近的公用父组件中。事件发生时，子组件调用this.props.onXXX(由父组件提供)通知父组件，子组件不再维护自身state，父组件的state成为两个子组件唯一的共有的single source of truth
-
 
 
 渲染list的时候记得要加上一个key，这是规定
@@ -275,6 +277,25 @@ class SignUpDialog extends React.Component {
   }
 }
 ```
+
+### redux的一些点
+react-redux和redux的源码都很短，但是js语法写的非常6🍉
+enhancer（典型如applyMiddleWare）
+
+reducer的定义
+> Speaking of the code that uses the action to update our application state, in Redux terminology this part is called a "reducer."
+
+
+react-redux的connect方法主要就是能够让UI Component里面可以免去持有store，而是通过一个mapDispatchToProps去发起事件
+
+
+
+
+## 参考
+[redux tutorial](https://read.reduxbook.com/markdown/part1/05-middleware-and-enhancers.html)
+
+
+
 
 
 

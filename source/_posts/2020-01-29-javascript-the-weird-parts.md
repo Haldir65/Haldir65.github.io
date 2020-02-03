@@ -4,14 +4,14 @@ date: 2020-01-29 17:20:16
 tags: [前端]
 ---
 
-javaScript中的一些容易犯错的地方
+javaScript中的一些容易犯错的地方 🐂 🐈 🐅 🦁 🌶 🥒 🍑 真是一门神奇的语言
 ![](https://www.haldir66.ga/static/imgs/guoqing_ZH-CN10903461145_1920x1080.jpg)
 
 <!--more-->
 
 [从w3school学到一些新的知识](https://www.w3schools.com/js/js_let.asp)
 
-5种基本数据类型
+### 5种基本数据类型
 ```
 string
 number
@@ -20,7 +20,7 @@ object
 function
 ```
 
-6种object 类型
+#### 6种object 类型
 ```
 Object
 Date
@@ -30,9 +30,11 @@ Number
 Boolean
 ```
 
-两种比较特殊的，不含value的类型
+### 两种比较特殊的，不含value的类型
+```js
 null
 undefined
+```
 
 使用typeof关键字可以查看对应的类型，typeof是一个操作符，返回值一定是一个string
 ```js
@@ -49,7 +51,7 @@ typeof null                   // Returns "object"
 typeof undefined              // Return "undefined"
 ```
 
-//但是typeof无法判断一个object是不是array或者是不是date
+但是typeof无法判断一个object是不是array或者是不是date
 ```js
 function isArray(myArray) {
   return myArray.constructor.toString().indexOf("Array") > -1;
@@ -58,18 +60,24 @@ function isArray(myArray) {
 function isArray(myArray) {
   return myArray.constructor === Array;
 }
+
+// 再或者
+Array.isArray() //The isArray() method checks whether an object is an array
+
 //Date就得这么判断
 function isDate(myDate) {
   return myDate.constructor === Date;
 }
 
-Array.isArray() //The isArray() method checks whether an object is an array
 
 //string转int，居然这也行
 parseInt("10 years")
 10
 
-//一些自动的类型转换很奇怪
+parseFloat('20.12HAHA1')
+// 20.12
+
+//一些自动的类型转换的结果就让人看不懂了
 "5" + 2 // "52"
 "5" - 2  // 3
 
@@ -100,33 +108,67 @@ somefn({type: 'foo'});  //undefined
 以上函数完全可以运行
 
 
+## 神奇的hoist
 [Hoisting is JavaScript's default behavior of moving all declarations to the top of the current scope (to the top of the current script or the current function](https://www.w3schools.com/js/js_hoisting.asp) 一个变量可以先使用再声明（使用var关键字的话），但是Variables and constants declared with let or const are not hoisted!
 
-### js中的this
-In HTML event handlers, this refers to the HTML element that received the event:
-```html
-<button onclick="this.style.display='none'">
-  Click to Remove Me!
-</button>
-```
-但是使用apply和call也可以改变this的语义
+
+### hoisting对于函数也有影响
+[var functionName = function() {} vs function functionName() {}](https://stackoverflow.com/questions/336859/var-functionname-function-vs-function-functionname?rq=1) 这俩有什么区别
+
 ```js
-var person1 = {
-  fullName: function() {
-    return this.firstName + " " + this.lastName;
-  }
-}
-var person2 = {
-  firstName:"John",
-  lastName: "Doe",
-}
-person1.fullName.call(person2);  // Will return "John Doe"
+// functionOne 如果没有走到这一行的话是不会被执行的
+// TypeError: functionOne is not a function
+functionOne();
+
+//下面这个其实这个叫做"Anonymous" function Expression
+var functionOne = function() {
+  console.log("Hello!");
+};
 ```
 
-**With a regular function this represents the object that calls the function:**
-**With an arrow function this represents the owner of the function:**
+```js
+// 因为hoist的原因， functionTwo的定义会被挪到最上面
+// Outputs: "Hello!"
+functionTwo();
 
-### let和var的一个重要区别就是block scope
+function functionTwo() {
+  console.log("Hello!");
+}
+
+// hoist的存在也就意味着， 下面这段，无论test是true还是false ，外部都能够调用到functionThree，除非是use-strict
+if (test) {
+   // Error or misbehavior
+   function functionThree() { doSomething(); }
+}
+```
+
+This is called a Function Expression:
+```js
+var getRectArea = function(width, height) {
+    return width * height;
+};
+
+console.log("Area of Rectangle: " + getRectArea(3,4));
+// This should return the following result in the console: 
+// Area of Rectangle: 12
+```
+
+This is called a Function Declaration:
+```js
+var w = 5;
+var h = 6;
+
+function RectArea(width, height) {  //declaring the function
+  return area = width * height;
+}                                   //note you do not need ; after }
+
+RectArea(w,h);                      //calling or executing the function
+console.log("Area of Rectangle: " + area);
+// This should return the following result in the console: 
+// Area of Rectangle: 30
+```
+
+## let和var的一个重要区别就是block scope
 ```js
 {
   var x = 2;
@@ -153,9 +195,7 @@ for (let i = 0; i < 10; i++) {
 // Here i is 5
 ```
 
-### prototype的意思大概就是动态的给一个object添加instance方法或者field。不是static方法
-
-### ES6的class的可以添加get和set方法
+### ES6的class的可以自定义get和set方法
 ```js
 class Car {
   constructor(brand) {
@@ -260,6 +300,7 @@ switch(x) {
 var x = 0.1;
 var y = 0.2;
 var z = x + y            // the result in z will not be 0.3
+// 0.30000000000000004
 
 //这是一种解决办法
 var z = (x * 10 + y * 10) / 10;       // z will be 0.3
@@ -313,15 +354,37 @@ window.onload = function() {
 ```
 
 
-[complete es6 features](https://babeljs.io/docs/en/learn#ecmascript-2015-features)
 
+## bind, call, this
 
-[how-do-i-remove-a-property-from-a-javascript-object](https://stackoverflow.com/questions/208105/how-do-i-remove-a-property-from-a-javascript-object?rq=1)
-[javascript clone ,shallow copy可以使用JSON.stringfy，也可以使用lodash的deepclone函数](https://stackoverflow.com/questions/122102/what-is-the-most-efficient-way-to-deep-clone-an-object-in-javascript?rq=1)
+### js中的this
+In HTML event handlers, this refers to the HTML element that received the event:
+```html
+<button onclick="this.style.display='none'">
+  Click to Remove Me!
+</button>
+```
+但是使用apply和call也可以改变this的语义
+```js
+var person1 = {
+  fullName: function() {
+    return this.firstName + " " + this.lastName;
+  }
+}
+var person2 = {
+  firstName:"John",
+  lastName: "Doe",
+}
+person1.fullName.call(person2);  // Will return "John Doe"
+```
 
-[strict-mode](https://stackoverflow.com/questions/1335851/what-does-use-strict-do-in-javascript-and-what-is-the-reasoning-behind-it?rq=1)
-[ In JavaScript, if you use the function keyword inside another function, you are creating a closure](https://stackoverflow.com/questions/111102/how-do-javascript-closures-work?rq=1) 
-[js 的function的bind方法](https://stackoverflow.com/a/10115970) 例如给document的一个element添加点击callback的时候，click方法中的this已经不是所预想的this了，因此，需要bind(this)，当然有了arrow function之后，不需要bind了
+With call(), an object can use a method belonging to another object.
+someFunction.call就是把原本属于一个object的方法拿过来套用在另一个object上
+
+**With a regular function this represents the object that calls the function:**
+**With an arrow function this represents the owner of the function:**
+
+[js 的function的bind方法](https://stackoverflow.com/a/10115970) 例如给document的一个element添加点击callback的时候，click方法执行时的this已经不是所预想的this了，因此，需要bind(this)，当然有了arrow function之后，不需要bind了
 ```js
 Button.prototype.hookEvent(element) {
   // Use bind() to ensure 'this' is the 'this' inside click()
@@ -343,7 +406,6 @@ Button.prototype.hookEvent(element) {
 }
 ```
 
-
 let和var的区别也在这里有体现
 ```js
 function buildList(list) {
@@ -364,6 +426,47 @@ function testList() {
 }
 
  testList() //logs "item2 undefined" 3 times
+```
+
+## ProtoType
+### prototype的意思大概就是动态的给一个object添加instance方法或者field。不是static方法
+在console里面，每一个object都能看到一个__proto__field，所以就算es6出现了class，class method也不是定义在class上的，而是定义在__proto__对象上的
+[JavaScript is a prototype-based language](https://reactjs.org/docs/typechecking-with-proptypes.html)  javaScript中class似乎是syntax sugar，使用getProtoTypeOf可以看出来class的方法最终都定义到了__proto__对象上了。Constructor也只是一个定义在__proto__上的function
+
+```js
+class Person {
+    constructor(firstName, lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
+    getFullName() {
+        return this.firstName + " " + this.lastName;
+    }
+}
+
+//There are two function declarations above: One for the constructor, which gets the name Person, and one for getFullName, which is a function assigned to Person.prototype.
+
+firstName: undefined
+lastName: undefined
+__proto__:
+constructor: class Person
+arguments: (...)
+caller: (...)
+length: 2
+prototype: {constructor: ƒ, getFullName: ƒ}
+name: "Person" // 只是一个function
+__proto__: ƒ ()
+[[FunctionLocation]]: VM40:2
+[[Scopes]]: Scopes[2]
+getFullName: ƒ getFullName()
+arguments: (...)
+caller: (...)
+length: 0
+name: "getFullName"
+__proto__: ƒ ()
+[[FunctionLocation]]: VM40:7
+[[Scopes]]: Scopes[2]
 ```
 
 ### Object.prototype
@@ -582,7 +685,304 @@ method && method()
 
 ```
 
+写过redux代码之后就会碰上连续多个arrow function
+例如[redux的文档上](https://redux.js.org/advanced/middleware)就有这种奇怪的写法
+```js
+const logger = store => next => action => {
+  console.log('dispatching', action)
+  let result = next(action)
+  console.log('next state', store.getState())
+  return result
+}
+const crashReporter = store => next => action => {
+  try {
+    return next(action)
+  } catch (err) {
+    console.error('Caught an exception!', err)
+    Raven.captureException(err, {
+      extra: {
+        action,
+        state: store.getState()
+      }
+    })
+    throw err
+  }
+}
+```
+
+
+[这个叫做curried function](https://stackoverflow.com/questions/32782922/what-do-multiple-arrow-functions-mean-in-javascript）
+简单来讲，下面这俩是一样的
+```js
+const noOpMiddleware = store => next => action => {
+  return next(action)
+}
+
+const noOpMiddleware = function(store) {
+  return function(next) {
+    return function(action) {
+      return next(action)
+    }
+  }
+}
+```
+
+### 还有method(xxx)(yyy)
+[redux basic](https://redux.js.org/basics/example)
+```js
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(TodoList)
+```
+其实是connect返回了一个函数，TodoList是该函数的参数，仅此而已。因为函数里面返回函数是完全可以的
+
+### 怎样在一个函数里检查optional Arguments是否传了
+js的函数参数似乎没有一个是required的。
+内置的关键词有一个**arguments**
+[](https://stackoverflow.com/questions/411352/how-best-to-determine-if-an-argument-is-not-sent-to-the-javascript-function)
+简单粗暴的方式是
+
+> argument2 === "undefined"
+
+***cool 🍑 kids ***会用两根竖线，以此提供default值，反正是短路的
+```js
+Using the || operator has become standard practice - all the cool kids do it - but be careful: The default value will be triggered if the argument evaluates to false, which means it might actually be undefined, null, false, 0, '' (or anything else for which Boolean(...) returns false).
+```
+
+### Object.xxx
+[Object 是standard built in object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)</br>
+常用的方法其实就那么几个
+```js
+1. Object.create()
+
+2. Object.keys() // 常常用于迭代一个Object的所有key，例如：
+// Iterate through the keys
+Object.keys(employees).forEach(key => {
+    let value = employees[key];
+
+     console.log(`${key}: ${value}`);
+});
+
+3. Object.values()
+// Initialize an object
+const session = {
+    id: 1,
+    time: `26-July-2018`,
+    device: 'mobile',
+    browser: 'Chrome'
+};
+
+// Get all values of the object
+const values = Object.values(session);
+console.log(values);
+//Output
+//[1, "26-July-2018", "mobile", "Chrome"]
+
+4. Object.entries()
+// Initialize an object
+const operatingSystem = {
+    name: 'Ubuntu',
+    version: 18.04,
+    license: 'Open Source'
+};
+
+// Get the object key/value pairs
+const entries = Object.entries(operatingSystem);
+
+console.log(entries);
+
+// Output
+// [
+//     ["name", "Ubuntu"]
+//     ["version", 18.04]
+//     ["license", "Open Source"]
+// ]
+
+5.Object.Assign()
+// Initialize an object
+const name = {
+    firstName: 'Philip',
+    lastName: 'Fry'
+};
+
+// Initialize another object
+const details = {
+    job: 'Delivery Boy',
+    employer: 'Planet Express'
+};
+
+// Merge the objects
+const character = Object.assign(name, details);
+
+console.log(character);
+// Output
+// {firstName: "Philip", lastName: "Fry", job: "Delivery Boy", employer: "Planet Express"}
+
+
+Assign也可以用spread operator来代替：
+// Initialize an object
+const name = {
+    firstName: 'Philip',
+    lastName: 'Fry'
+};
+
+// Initialize another object
+const details = {
+    job: 'Delivery Boy',
+    employer: 'Planet Express'
+};
+
+// Merge the object with the spread operator
+const character = {...name, ...details} // 切记，shallow copy!!
+
+console.log(character);
+// Output
+// {firstName: "Philip", lastName: "Fry", job: "Delivery Boy", employer: "Planet Express"}
+```
+还有，例如Object.freeze（把所有的field变成unmodifiable的），Object.seal禁止再给这个object添加新的field
+
+
+### assign也可以更改部分属性，例如redux的reducer中经常这么干
+```js
+const obj = {
+  something: 'some value',
+  other: 'the original value'
+}
+
+// Object.assign copies properties from all the objects
+// onto the first object from left to right.
+const newObject = Object.assign({}, obj, { something: 'some other value' })
+```
+
+
+## Array.xxx
+[Array.prototype](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)</br>
+map,filter这些方法返回的是一个新的array可以理解，但是下面这些很诡异了
+concat返回的是一个new Array,
+push方法返回的是新的length,也就是原来的length+1 
+```js
+Array.prototype.concat //The concat() method is used to merge two or more arrays. This method does not change the existing arrays, but instead returns a new array.
+
+
+The Array.from() method creates a new, shallow-copied Array instance from an array-like or iterable object.
+
+The Array.map() method creates a new array populated with the results of calling a provided function on every element in the calling array.
+```
+
+
+```js
+Array.isArray
+Array.pop //移除最后一个
+Array.shift //移除第一个
+Array.unshift  // insertAtFirst
+Array.push  // add at tail
+```
+
+### splice
+```js
+splice(index number, number of items to remove, items to add) //可以add 也可以remove， 也可以同时add remove.
+// 注意第三个参数是optional的
+
+1. add element
+let fish = [ "piranha", "barracuda", "koi", "eel" ];
+
+// Splice a new item number into index position 1
+fish.splice(1, 0, "manta ray");
+
+// fish;
+
+//Output
+// [ 'piranha', 'manta ray', 'barracuda', 'koi', 'eel' ]
+
+2. remove element
+let fish = [ "piranha", "barracuda", "koi", "eel" ];
+
+// Remove two items, starting at index position 1
+fish.splice(1, 2);
+
+// fish;
+
+//Output
+// [ 'piranha', 'eel' ]
+
+3. add and remove
+let fish = [ "piranha", "barracuda", "koi", "eel" ];
+
+// Remove two items and add one
+fish.splice(1, 2, "manta ray");
+
+// fish;
+
+// Output
+// [ 'piranha', 'manta ray', 'eel' ]
+```
+
+### slice
+可以认为是截取array中的一部分吧
+```js
+const animals = ['ant', 'bison', 'camel', 'duck', 'elephant'];
+
+console.log(animals.slice(2));
+// expected output: Array ["camel", "duck", "elephant"]
+
+console.log(animals.slice(2, 4));
+// expected output: Array ["camel", "duck"]
+
+console.log(animals.slice(1, 5));
+// expected output: Array ["bison", "camel", "duck", "elephant"]
+```
+
+### sort
+```js
+// Function to sort numbers by size
+const sortNumerically = (a, b) => {
+  return a - b;
+}
+
+numbers.sort(sortNumerically);
+
+```
+
+### ForEach方法的arrow Fuction最多三个参数，后俩是optional的
+```js
+fruits.forEach(function(item, index, array) {
+  console.log(item, index)
+})
+```
+
+
+## string.equals方法有没有呢
+[Comparison operators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Comparison_Operators)
+```js
+// true as both operands are type String (i.e. string primitives):
+'foo' === 'foo'
+
+var a = new String('foo');
+var b = new String('foo');
+
+// false as a and b are type Object and reference different objects
+a == b 
+
+// false as a and b are type Object and reference different objects
+a === b 
+
+// true as a and 'foo' are of different type and, the Object (a) 
+// is converted to String 'foo' before comparison
+a == 'foo'
+```
+
+或者用lodash的 _.isEqual(value, other)方法，返回true 或者false
+
+
+
 
 ### 参考
 [You-Dont-Know-JS](https://github.com/getify/You-Dont-Know-JS/)
+[complete es6 features](https://babeljs.io/docs/en/learn#ecmascript-2015-features)
+[how-do-i-remove-a-property-from-a-javascript-object](https://stackoverflow.com/questions/208105/how-do-i-remove-a-property-from-a-javascript-object?rq=1)
+[javascript clone ,shallow copy可以使用JSON.stringfy，也可以使用lodash的deepclone函数](https://stackoverflow.com/questions/122102/what-is-the-most-efficient-way-to-deep-clone-an-object-in-javascript?rq=1)
+[strict-mode](https://stackoverflow.com/questions/1335851/what-does-use-strict-do-in-javascript-and-what-is-the-reasoning-behind-it?rq=1)
+[ In JavaScript, if you use the function keyword inside another function, you are creating a closure](https://stackoverflow.com/questions/111102/how-do-javascript-closures-work?rq=1) 
+
 
