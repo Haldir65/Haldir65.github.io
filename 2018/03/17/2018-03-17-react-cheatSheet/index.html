@@ -17,7 +17,7 @@
 <meta property="og:description" content="介绍React语法及一些Redux的使用方法">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/food-knife-green-kitchen-city-life.jpg">
-<meta property="og:updated_time" content="2020-01-30T13:50:03.088Z">
+<meta property="og:updated_time" content="2020-02-03T06:46:56.386Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="React语法及Redux实践笔记">
 <meta name="twitter:description" content="介绍React语法及一些Redux的使用方法">
@@ -236,8 +236,7 @@ ReactDOM.render(element, document.getElementById(&#39;root&#39;));
 <h2 id="Element和Component的概念"><a href="#Element和Component的概念" class="headerlink" title="Element和Component的概念"></a>Element和Component的概念</h2><p>Element感觉上就像一个或者多个UI控件的集合</p>
 <pre><code class="js">const element = &lt;h1&gt;Hello, world&lt;/h1&gt;; //这就算一个Element,用于描述将要展示在屏幕上的效果
 </code></pre>
-<p>Component就像javaScript函数一样，它们接收任意输入，输出React element以显示在屏幕上。需要注意的是，Component的名字一定要 <strong>首字母大写</strong> ，因为React把小写字母开头的当做正常的html element来处理了。</p>
-<pre><code class="js">//一个返回Element的函数就算作是Component了
+<pre><code class="js">//支持纯函数式的Component
 function Welcome(props) {
   return &lt;h1&gt;Hello, {props.name}&lt;/h1&gt;;
 }
@@ -250,7 +249,6 @@ class Welcome extends React.Component {
 }
 
 </code></pre>
-<p>还有就是props是immutable的，想要改的话用State吧。也即Component应该表现为纯粹的function，不修改状态。</p>
 <h2 id="State的更改"><a href="#State的更改" class="headerlink" title="State的更改"></a>State的更改</h2><p>State是在constructor里面初始化的，想要更改其中的值的话，不能直接赋值，需要使用setState方法</p>
 <blockquote>
 <p>this.setState({comment: ‘Hello’});</p>
@@ -301,6 +299,12 @@ function WarningBanner(props) {
   });
 }
 </code></pre>
+<pre><code class="js">As of react v16.3.2 these methods are not &quot;safe&quot; to use:
+
+componentWillMount
+componentWillReceiveProps
+componentWillUpdate
+</code></pre>
 <h2 id="事件处理"><a href="#事件处理" class="headerlink" title="事件处理"></a>事件处理</h2><pre><code class="js">function ActionLink() {
   function handleClick(e) {
     e.preventDefault();
@@ -321,7 +325,7 @@ ReactDOM.render(&lt;ActionLink/&gt;, document.getElementById(&#39;root&#39;));
 &lt;button onClick={(e) =&gt; this.deleteRow(id, e)}&gt;Delete Row&lt;/button&gt;
 &lt;button onClick={this.deleteRow.bind(this, id)}&gt;Delete Row&lt;/button&gt;
 
-//在一个Component中，时间监听最后要加上bind(this)
+//在一个Component中，事件监听最后要加上bind(this)
 class Calculator extends React.Component {
   constructor(props) {
     super(props);
@@ -421,6 +425,13 @@ function WelcomeDialog() {
   }
 }
 </code></pre>
+<h3 id="redux的一些点"><a href="#redux的一些点" class="headerlink" title="redux的一些点"></a>redux的一些点</h3><p>react-redux和redux的源码都很短，但是js语法写的非常6🍉<br>enhancer（典型如applyMiddleWare）</p>
+<p>reducer的定义</p>
+<blockquote>
+<p>Speaking of the code that uses the action to update our application state, in Redux terminology this part is called a “reducer.”</p>
+</blockquote>
+<p>react-redux的connect方法主要就是能够让UI Component里面可以免去持有store，而是通过一个mapDispatchToProps去发起事件</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://read.reduxbook.com/markdown/part1/05-middleware-and-enhancers.html">redux tutorial</a></p>
 
       
 

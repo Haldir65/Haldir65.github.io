@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/iu%20kpop%20star%20music%20sony.jpg">
-<meta property="og:updated_time" content="2020-01-30T13:50:03.088Z">
+<meta property="og:updated_time" content="2020-02-03T06:46:56.382Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="react-native-cookbook">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/iu%20kpop%20star%20music%20sony.jpg">
@@ -203,30 +203,13 @@ ga('send', 'pageview');
 <pre><code>npx react-native init AwesomeProject
 cd AwesomeProject
 npx react-native run-ios
-</code></pre><p><del>install cli</del></p>
-<blockquote>
-<p>npm install -g react-native-cli<br>react-native init myproject ## 最好全部小写字母<br>cd myproject<br>react-native run-android<br>注意，可能会报错</p>
-</blockquote>
-<pre><code>FAILURE: Build failed with an exception.
-* What went wrong:
-A problem occurred configuring project &#39;:app&#39;.
-&gt; SDK location not found. Define location with sdk.dir in the local.properties file or with an ANDROID_HOME environment variable.
-</code></pre><p>新建一个local.properities文件，放到android 文件夹下面就好了</p>
-<p><a href="https://stackoverflow.com/questions/44446523/unable-to-load-script-from-assets-index-android-bundle-on-windows">unable-to-load-script-from-assets-index-android-bundle-on-windows</a></p>
-<p>在android手机上打开显示布局边界，发现react-native app并不是一个webview，而是一个个实在的buttom,text。</p>
-<h3 id="tips"><a href="#tips" class="headerlink" title="tips"></a>tips</h3><p>目前暂不支持java 9<br>Double tap R on your keyboard to reload其实并不是按电脑键盘上的R，而是模拟器上的，所以需要鼠标上去，ctrl+m即可<br>如果是一台真实手机的话，需要摇一摇手机，就能显示菜单。但是每次都要摇一摇实在是太麻烦，所以点一下那个Enable LiveReload就能在每次保存文件后Reload。<br>注意，如果更改了state，那么hotReload没用，需要手动Reload</p>
+</code></pre><h3 id="tips"><a href="#tips" class="headerlink" title="tips"></a>tips</h3><p>在android手机上打开显示布局边界，发现react-native app并不是一个webview，而是一个个实在的buttom,text。</p>
+<p>目前暂不支持java 9<br>Double tap R on your keyboard to reload其实并不是按电脑键盘上的R，而是模拟器上的，所以需要鼠标上去，ctrl+m即可<br>如果是一台真实手机的话，需要摇一摇手机，就能显示菜单。但是每次都要摇一摇实在是太麻烦，所以点一下那个Enable LiveReload就能在每次保存文件后Reload。</p>
 <p>npm run start是用来起dev server的。<br>react-native run-android是用来向client端推更新的。</p>
 <p>could not connect to development server…的原因就是没有运行npm start。</p>
 <p>所以，正常的流程应该是npm start &amp;&amp; react-native run-android</p>
 <p>debug:<br>react-native run-android是把这个App安装到手机上，然后terminal就返回了，需要查看后续日志输出的话<br>react-native log-android // 这个是帮助在console中输出log</p>
-<p>jsx文件开头的import要注意</p>
-<pre><code class="js">// 这是错误的
-import React, { AppRegistry,  Component,StyleSheet,Text,View} from &#39;react-native&#39;;
-//这才是正确的
-import React from &quot;react&quot;;
-import { AppRegistry,  Component,StyleSheet,Text,View} from &#39;react-native&#39;;
-</code></pre>
-<h2 id="route"><a href="#route" class="headerlink" title="route"></a>route</h2><p>Navigator is deprecated,use <a href="https://reactnavigation.org/">stack navigator</a></p>
+<h2 id="route"><a href="#route" class="headerlink" title="route"></a>route</h2><p><strong>react-navigation</strong> 似乎是官方推荐的解决方案，下面给出的是1.x版本的写法，目前(2020年)已经出到5.X版本了。🤮<br>Navigator is deprecated,use <a href="https://reactnavigation.org/">stack navigator</a></p>
 <pre><code class="js">import React from &#39;react&#39;;
 import { View, Text } from &#39;react-native&#39;;
 import { StackNavigator } from &#39;react-navigation&#39;; // 1.0.0-beta.27
@@ -321,7 +304,22 @@ class HomeScreen extends React.Component {
   &lt;/Text&gt;
 &lt;/View&gt;
 </code></pre>
-<p><a href="https://facebook.github.io/react-native/docs/sectionlist">SectionList</a>自带stickyHeader，并且其数据结构是这样的</p>
+<p>Image支持圆角，例如 borderTopRightRadius<br><a href="https://facebook.github.io/react-native/docs/image.html">image，这个是Image控件的文档</a><br>下面这个是圆形的Image</p>
+<pre><code class="js">&lt;Image
+  style={{
+    alignSelf: 'center',
+    height: 150,
+    width: 150,
+    borderWidth: 1,
+    borderRadius: 75
+  }}
+  source={{uri:'https://facebook.github.io/react/img/logo_og.png'}}
+  resizeMode=&quot;cover&quot;
+/&gt;
+</code></pre>
+<p><a href="https://facebook.github.io/react-native/docs/images.html">images，这个是Image数据源的文档</a></br><br>大致意思是网络图片需要手动设置宽高，assets文件则不需要。因为require(./avatar.png)的返回值将会自动带上图片的尺寸信息</p>
+<pre><code> It is more work for the developer to know the dimensions (or aspect ratio) of the remote image in advance, but we believe that it leads to a better user experience. Static images loaded from the app bundle via the require(&#39;./my-icon.png&#39;) syntax can be automatically sized because their dimensions are available immediately at the time of mounting.
+</code></pre><p><a href="https://facebook.github.io/react-native/docs/sectionlist">SectionList</a>自带stickyHeader，并且其数据结构是这样的</p>
 <pre><code class="js">const DATA = [
   {
     title: &#39;Main dishes&#39;,
@@ -341,34 +339,27 @@ class HomeScreen extends React.Component {
   },
 ];
 </code></pre>
-<p><a href="https://stackoverflow.com/questions/43585297/react-native-button-style-not-work">Button组件的styling仅限于几个属性，可以用TouchableXXX来代替</a></p>
-<h2 id="Components"><a href="#Components" class="headerlink" title="Components"></a>Components</h2><p>Button是一个没什么大用处的控件，一般用TouchableOpacity包一层text去实现</p>
-<h3 id="ScrollView"><a href="#ScrollView" class="headerlink" title="ScrollView"></a>ScrollView</h3><p>Android平台一个ScrollView只能有一个ChildView(Node)，在react-native上似乎没有这样的限制</p>
+<h2 id="Components"><a href="#Components" class="headerlink" title="Components"></a>Components</h2><p>Android平台一个ScrollView只能有一个ChildView(Node)，在react-native上似乎没有这样的限制</p>
+<p>Button是一个没什么大用处的控件，一般用TouchableOpacity包一层text去实现<br><a href="https://stackoverflow.com/questions/43585297/react-native-button-style-not-work">Button组件的styling仅限于几个属性，可以用TouchableXXX来代替</a></p>
 <pre><code>The React Native Button is very limited in what you can do, see; Button
 
 It does not have a style prop, and you don&#39;t set text the &quot;web-way&quot; like &lt;Button&gt;txt&lt;/Button&gt; but via the title property &lt;Button title=&quot;txt&quot; /&gt;
 
 If you want to have more control over the appearance you should use one of the TouchableXXXX&#39; components like TouchableOpacity They are really easy to use :-)
-</code></pre><p>// Adding alignItems to a component’s style determines the alignment of children along the secondary axis </p>
-<pre><code>As of react v16.3.2 these methods are not &quot;safe&quot; to use:
-
-componentWillMount
-componentWillReceiveProps
-componentWillUpdate
 </code></pre><p>在jsx里面写三元表达式也是可以的</p>
 <pre><code class="xml">&lt;View style={{paddingTop: Platform.OS === 'android' ? 0 : 20}}&gt;
 &lt;/View&gt;
 </code></pre>
-<p>尤其是在iphone X上，如何设置notch那一块位置的颜色<br><a href="https://stackoverflow.com/a/39300715">iOS doesn’t have a concept of a status bar bg</a><br><a href="https://facebook.github.io/react-native/docs/gesture-responder-system">如何处理touch event</a> react native把这个称之为gesture</p>
-<h2 id="PropTypes用于定义一个Component的props"><a href="#PropTypes用于定义一个Component的props" class="headerlink" title="PropTypes用于定义一个Component的props"></a>PropTypes用于定义一个Component的props</h2><p>PropTypes.oneOfType</p>
-<h2 id="参考项目"><a href="#参考项目" class="headerlink" title="参考项目"></a>参考项目</h2><p><a href="https://github.com/yuanguozheng/JdApp">基于React Native构建的仿京东客户端</a></p>
-<p>async storage</p>
+<h3 id="状态栏问题"><a href="#状态栏问题" class="headerlink" title="状态栏问题"></a>状态栏问题</h3><p>尤其是在iphone X上，如何设置notch那一块位置的颜色<br><a href="https://stackoverflow.com/a/39300715">iOS doesn’t have a concept of a status bar bg</a></p>
+<h3 id="触控事件处理"><a href="#触控事件处理" class="headerlink" title="触控事件处理"></a>触控事件处理</h3><p><a href="https://facebook.github.io/react-native/docs/gesture-responder-system">如何处理touch event</a> react native把这个称之为gesture</p>
+<h2 id="PropTypes用于定义一个Component的props"><a href="#PropTypes用于定义一个Component的props" class="headerlink" title="PropTypes用于定义一个Component的props"></a>PropTypes用于定义一个Component的props</h2><blockquote>
+<p>import PropTypes from ‘prop-types’; // 主要是为了类型检查吧</p>
+</blockquote>
+<p>例如PropTypes.oneOfType</p>
+<h2 id="待填坑"><a href="#待填坑" class="headerlink" title="待填坑"></a>待填坑</h2><p>async storage</p>
 <p>camera Roll</p>
 <p>React.FunctionComponent</p>
-<h2 id="待填坑"><a href="#待填坑" class="headerlink" title="待填坑"></a>待填坑</h2><p><a href="http://yangguang1029.github.io/2018/02/26/rn-android-communicate/">ReactNative之js与native通信流程（Android篇）</a><br><a href="http://yangguang1029.github.io/2018/02/25/rn-reconciliation/">ReactNative之VirtualDomTree的diff原理</a></p>
-<!-- <audio src="http://m10.music.126.net/20180121230941/8d878803b3b0542d9c5482ccf613a86b/ymusic/d95e/bab6/a7f5/864661168da79b309c3d2fac971d1698.mp3" autoplay="autoplay">
-您的浏览器不支持 audio 标签。
-</audio> -->
+<p><a href="http://yangguang1029.github.io/2018/02/26/rn-android-communicate/">ReactNative之js与native通信流程（Android篇）</a><br><a href="http://yangguang1029.github.io/2018/02/25/rn-reconciliation/">ReactNative之VirtualDomTree的diff原理</a><br><a href="https://github.com/yuanguozheng/JdApp">基于React Native构建的仿京东客户端</a></p>
 
       
 
