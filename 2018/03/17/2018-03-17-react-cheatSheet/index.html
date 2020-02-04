@@ -17,7 +17,7 @@
 <meta property="og:description" content="介绍React语法及一些Redux的使用方法">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/food-knife-green-kitchen-city-life.jpg">
-<meta property="og:updated_time" content="2020-02-03T06:46:56.386Z">
+<meta property="og:updated_time" content="2020-02-04T07:42:46.264Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="React语法及Redux实践笔记">
 <meta name="twitter:description" content="介绍React语法及一些Redux的使用方法">
@@ -253,12 +253,13 @@ class Welcome extends React.Component {
 <blockquote>
 <p>this.setState({comment: ‘Hello’});</p>
 </blockquote>
-<p>但有时State的更新是异步的，所以要使用两个参数的setState方法</p>
-<pre><code class="js">this.setState((prevState, props) =&gt; ({
-  counter: prevState.counter + props.increment
-}));
-</code></pre>
-<h2 id="JSX语法"><a href="#JSX语法" class="headerlink" title="JSX语法"></a>JSX语法</h2><pre><code class="js">const element = (
+<p><a href="https://reactjs.org/docs/react-component.html#setstate">setState</a>方法其实有第二个optional参数，是callback.这个callback会在render完成之后执行</p>
+<pre><code>The second parameter to setState() is an optional callback function that will be executed once setState is completed and the component is re-rendered. Generally we recommend using componentDidUpdate() for such logic instead.
+</code></pre><blockquote>
+<p>React does not guarantee that the state changes are applied immediately.//可能是异步的,多次setState可能会别batch。</p>
+</blockquote>
+<pre><code>This makes reading this.state right after calling setState() a potential pitfall. Instead, use componentDidUpdate or a setState callback (setState(updater, callback)), either of which are guaranteed to fire after the update has been applied.
+</code></pre><h2 id="JSX语法"><a href="#JSX语法" class="headerlink" title="JSX语法"></a>JSX语法</h2><pre><code class="js">const element = (
   &lt;h1 className=&quot;greeting&quot;&gt;
     Hello, world!
   &lt;/h1&gt;

@@ -14,7 +14,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/SutherlandFalls_ZH-CN4602884079_1920x1080.jpg">
-<meta property="og:updated_time" content="2020-02-03T06:46:56.390Z">
+<meta property="og:updated_time" content="2020-02-04T07:42:46.268Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="各种编程语言与c、c++的交互">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/SutherlandFalls_ZH-CN4602884079_1920x1080.jpg">
@@ -313,10 +313,12 @@ subprocess.call([&quot;cmd&quot;, &quot;arg1&quot;, &quot;arg2&quot;],shell=True
 <p>N-API (pronounced N as in the letter, followed by API) is an API for building native Addons. It is independent from the underlying JavaScript runtime (for example, V8) and is maintained as part of Node.js itself. This API will be Application Binary Interface (ABI) stable across versions of Node.js. It is intended to insulate Addons from changes in the underlying JavaScript engine and allow modules compiled for one major version to run on later major versions of Node.js without recompilation. </p>
 </blockquote>
 <p>就是说保持了binary compatibility，比如说在node6上编译通过之后，假如后面出了node10，不需要重新编译也能继续运行。</p>
-<p>下面看如何使用:<br><a href="https://medium.com/@tarkus/how-to-call-c-c-code-from-node-js-86a773033892">how-to-call-c-c-code-from-node-js</a><br>很多大型js项目都有一个binging.gyp文件（一定是这个名字）</p>
+<p>node-gyp(gyp是generate your project的意思)可以编译生成node js addon，其实也就是在host机器上生成对应的机器码<br>下面看如何使用:<br><a href="https://medium.com/@tarkus/how-to-call-c-c-code-from-node-js-86a773033892">how-to-call-c-c-code-from-node-js</a><br>很多大型js项目都有一个binging.gyp文件（一定是这个名字）</p>
 <p><a href="https://jameshfisher.com/2019/04/20/nodejs-addon-hello-world/">node js addon</a> 在js代码中还是import的方式</p>
+<p><a href="https://www.youtube.com/watch?v=O4Rlq_NSkoM">youtube上有一个2019年的windows上的教程</a></p>
 <p>gyp其实是一个用来生成项目文件的工具，一开始是设计给chromium项目使用的，后来大家发现比较好用就用到了其他地方。生成项目文件后就可以调用GCC, vsbuild, xcode等编译平台来编译。至于为什么要有node-gyp，是由于node程序中需要调用一些其他语言编写的工具甚至是dll，需要先编译一下，否则就会有跨平台的问题，例如在windows上运行的软件copy到mac上就不能用了，但是如果源码支持，编译一下，在mac上还是可以用的。</p>
-<h3 id="2-2-C、C-调用javascript代码"><a href="#2-2-C、C-调用javascript代码" class="headerlink" title="2.2 C、C++调用javascript代码"></a>2.2 C、C++调用javascript代码</h3><h3 id="2-3-javascript调用系统方法"><a href="#2-3-javascript调用系统方法" class="headerlink" title="2.3 javascript调用系统方法"></a>2.3 javascript调用系统方法</h3><p>在node js 中可以使用<a href="https://nodejs.org/api/child_process.html#child_process_child_process_execfile_file_args_options_callback">child_process模块</a></p>
+<h3 id="2-2-C、C-调用javascript代码"><a href="#2-2-C、C-调用javascript代码" class="headerlink" title="2.2 C、C++调用javascript代码"></a>2.2 C、C++调用javascript代码</h3><p><a href="https://stackoverflow.com/questions/2713289/how-to-execute-javascript-function-in-c">JavaScript is not a compiled language</a> 所以这么做虽然可行，但是比较麻烦。且网上的教程多数是c++的。</p>
+<h3 id="2-3-javascript调用系统方法"><a href="#2-3-javascript调用系统方法" class="headerlink" title="2.3 javascript调用系统方法"></a>2.3 javascript调用系统方法</h3><p>在node js 中可以使用<a href="https://nodejs.org/api/child_process.html#child_process_child_process_execfile_file_args_options_callback">child_process模块</a></p>
 <pre><code class="c">// myProgram.c
 #include &lt;stdio.h&gt;
 int main(void){
@@ -349,8 +351,8 @@ java -cp .:target/classes com.me.harris.jupiter.channel.HelloJNI
 String currentDir = System.getProperty(&quot;user.dir&quot;); //这个就是pwd
 System.load(currentDir+&quot;/&quot;+&quot;libhellojni.so&quot;); //load则是给出文件的绝对路径,这里面的斜线照说也要依据平台区分的,System.getProperty(&quot;line.separator&quot;)
 </code></pre>
-<p><a href="https://www.baeldung.com/jni">详细教程</a></p>
-<h3 id="3-1-java调用C、C-代码"><a href="#3-1-java调用C、C-代码" class="headerlink" title="3.1 java调用C、C++代码"></a>3.1 java调用C、C++代码</h3><h3 id="3-2-C、C-调用java代码"><a href="#3-2-C、C-调用java代码" class="headerlink" title="3.2 C、C++调用java代码"></a>3.2 C、C++调用java代码</h3><p>c、c++层调用java也是可以的,甚至可以在native层创建一个java实例返回给java层，所以创建一个java对象的方法至少包括new,unsafe,Constructor.newInstance以及jni。 unsafe的方式只是分配内存，并不调用构造函数。</p>
+<h3 id="3-1-java调用C、C-代码"><a href="#3-1-java调用C、C-代码" class="headerlink" title="3.1 java调用C、C++代码"></a>3.1 java调用C、C++代码</h3><p><a href="https://www.baeldung.com/jni">详细教程</a><br>这个没什么好说的</p>
+<h3 id="3-2-C、C-调用java代码"><a href="#3-2-C、C-调用java代码" class="headerlink" title="3.2 C、C++调用java代码"></a>3.2 C、C++调用java代码</h3><p>c、c++层调用java也是可以的,甚至可以在native层创建一个java实例返回给java层，所以创建一个java对象的方法至少包括new,unsafe,Constructor.newInstance以及jni。 unsafe的方式只是分配内存，并不调用构造函数。</p>
 <p>比方说入口文件叫做com.me.harris.jupiter.channel.HelloJNI2.java<br>生成的头文件就叫做<br>com_me_harris_jupiter_channel_HelloJNI2.h<br>g++的参数有一点点区别</p>
 <pre><code class="shell">g++ -c -fPIC -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux com_me_harris_jupiter_channel_HelloJNI2.cpp -o com_me_harris_jupiter_channel_HelloJNI2.o
 g++ -shared -fPIC -o libnative.so com_me_harris_jupiter_channel_HelloJNI2.o -lc
