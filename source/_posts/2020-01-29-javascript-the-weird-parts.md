@@ -5,6 +5,7 @@ tags: [前端]
 ---
 
 javaScript中的一些容易犯错的地方 🐂 🐈 🐅 🦁 🌶 🥒 🍑 真是一门神奇的语言
+🎉 🌮
 ![](https://www.haldir66.ga/static/imgs/guoqing_ZH-CN10903461145_1920x1080.jpg)
 
 <!--more-->
@@ -253,12 +254,6 @@ Use /()/ instead of new RegExp()
 Use function (){} instead of new Function()
 ```
 
-### js的array的一些方法，都是很早就有的
-[js array](https://www.w3schools.com/js/js_array_iteration.asp)
-例如map,reduce和reduceRight不会更改原有的array。
-
-
-
 ### js里面variable的类型是可以改变的
 ```js
 var x = "Hello";     // typeof x is a string
@@ -425,13 +420,14 @@ function testList() {
     }
 }
 
- testList() //logs "item2 undefined" 3 times
+testList() //logs "item2 undefined" 3 times
 ```
 
 ## ProtoType
-### prototype的意思大概就是动态的给一个object添加instance方法或者field。不是static方法
-在console里面，每一个object都能看到一个__proto__field，所以就算es6出现了class，class method也不是定义在class上的，而是定义在__proto__对象上的
-[JavaScript is a prototype-based language](https://reactjs.org/docs/typechecking-with-proptypes.html)  javaScript中class似乎是syntax sugar，使用getProtoTypeOf可以看出来class的方法最终都定义到了__proto__对象上了。Constructor也只是一个定义在__proto__上的function
+
+**prototype的意思大概就是动态的给一个object添加instance方法或者field。不是static方法**
+在console里面，每一个object都能看到一个\_\_proto\_\_ field，所以就算es6出现了class，class method也不是定义在class上的，而是定义在\_\_proto\_\_对象上的
+[JavaScript is a prototype-based language](https://reactjs.org/docs/typechecking-with-proptypes.html)  javaScript中class似乎是syntax sugar，使用getProtoTypeOf可以看出来class的方法最终都定义到了\_\_proto\_\_对象上了。Constructor也只是一个定义在\_\_proto\_\_上的function
 
 ```js
 class Person {
@@ -857,6 +853,10 @@ const newObject = Object.assign({}, obj, { something: 'some other value' })
 
 
 ## Array.xxx
+js的array的一些方法，都是很早就有的
+[js array](https://www.w3schools.com/js/js_array_iteration.asp)</br>
+例如map,reduce和reduceRight不会更改原有的array。
+
 [Array.prototype](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)</br>
 map,filter这些方法返回的是一个新的array可以理解，但是下面这些很诡异了
 concat返回的是一个new Array,

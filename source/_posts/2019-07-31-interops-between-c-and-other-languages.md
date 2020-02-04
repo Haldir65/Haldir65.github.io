@@ -151,16 +151,20 @@ cython(python c extension)和cpython(c语言实现的python）是两件事
 
 就是说保持了binary compatibility，比如说在node6上编译通过之后，假如后面出了node10，不需要重新编译也能继续运行。
 
+node-gyp(gyp是generate your project的意思)可以编译生成node js addon，其实也就是在host机器上生成对应的机器码
 下面看如何使用:
 [how-to-call-c-c-code-from-node-js](https://medium.com/@tarkus/how-to-call-c-c-code-from-node-js-86a773033892)
 很多大型js项目都有一个binging.gyp文件（一定是这个名字）
 
 [node js addon](https://jameshfisher.com/2019/04/20/nodejs-addon-hello-world/) 在js代码中还是import的方式
 
+[youtube上有一个2019年的windows上的教程](https://www.youtube.com/watch?v=O4Rlq_NSkoM)
+
 gyp其实是一个用来生成项目文件的工具，一开始是设计给chromium项目使用的，后来大家发现比较好用就用到了其他地方。生成项目文件后就可以调用GCC, vsbuild, xcode等编译平台来编译。至于为什么要有node-gyp，是由于node程序中需要调用一些其他语言编写的工具甚至是dll，需要先编译一下，否则就会有跨平台的问题，例如在windows上运行的软件copy到mac上就不能用了，但是如果源码支持，编译一下，在mac上还是可以用的。
 
 
 ### 2.2 C、C++调用javascript代码
+[JavaScript is not a compiled language](https://stackoverflow.com/questions/2713289/how-to-execute-javascript-function-in-c) 所以这么做虽然可行，但是比较麻烦。且网上的教程多数是c++的。
 
 ### 2.3 javascript调用系统方法
 在node js 中可以使用[child_process模块](https://nodejs.org/api/child_process.html#child_process_child_process_execfile_file_args_options_callback)
@@ -212,9 +216,9 @@ String currentDir = System.getProperty("user.dir"); //这个就是pwd
 System.load(currentDir+"/"+"libhellojni.so"); //load则是给出文件的绝对路径,这里面的斜线照说也要依据平台区分的,System.getProperty("line.separator")
 ```
 
-[详细教程](https://www.baeldung.com/jni)
 ### 3.1 java调用C、C++代码
-
+[详细教程](https://www.baeldung.com/jni)
+这个没什么好说的
 
 ### 3.2 C、C++调用java代码
 c、c++层调用java也是可以的,甚至可以在native层创建一个java实例返回给java层，所以创建一个java对象的方法至少包括new,unsafe,Constructor.newInstance以及jni。 unsafe的方式只是分配内存，并不调用构造函数。

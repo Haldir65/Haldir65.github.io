@@ -233,7 +233,18 @@ If you want to have more control over the appearance you should use one of the T
 例如PropTypes.oneOfType
 
 
+### 直接操作某个element也不是没有
+[refs](https://reactjs.org/docs/refs-and-the-dom.html)
+可以用来获取某个element，直接操作，例如measure
 
+```js
+cloneElement()
+isValidElement()
+React.Children
+```
+
+
+### [下拉刷新可以使用refreshControl](https://facebook.github.io/react-native/docs/refreshcontrol)
 ## 待填坑
 
 async storage

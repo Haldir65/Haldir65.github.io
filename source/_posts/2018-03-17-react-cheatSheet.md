@@ -82,12 +82,17 @@ class Welcome extends React.Component {
 State是在constructor里面初始化的，想要更改其中的值的话，不能直接赋值，需要使用setState方法
 > this.setState({comment: 'Hello'});
 
-但有时State的更新是异步的，所以要使用两个参数的setState方法
-```js
-this.setState((prevState, props) => ({
-  counter: prevState.counter + props.increment
-}));
+[setState](https://reactjs.org/docs/react-component.html#setstate)方法其实有第二个optional参数，是callback.这个callback会在render完成之后执行
 ```
+The second parameter to setState() is an optional callback function that will be executed once setState is completed and the component is re-rendered. Generally we recommend using componentDidUpdate() for such logic instead.
+```
+
+> React does not guarantee that the state changes are applied immediately.//可能是异步的,多次setState可能会别batch。
+
+```
+This makes reading this.state right after calling setState() a potential pitfall. Instead, use componentDidUpdate or a setState callback (setState(updater, callback)), either of which are guaranteed to fire after the update has been applied.
+```
+
 
 ## JSX语法
 ```js

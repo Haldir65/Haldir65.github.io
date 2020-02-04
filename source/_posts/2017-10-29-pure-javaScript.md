@@ -1097,7 +1097,7 @@ Atom推荐插件
 [atom-beautify](https://atom.io/packages/atom-beautify)
 
 
-9. setTimeout是schedule一个task，setInterval是设定一个周期性执行的任务。还有setAnimationFrame什么的
+9. setTimeout是schedule一个task，setInterval是设定一个周期性执行的任务。还有requestAnimationFrame什么的
 
 8. 可以检测是ES5还是ES6
 

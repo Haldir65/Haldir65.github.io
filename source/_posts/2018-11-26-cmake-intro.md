@@ -201,7 +201,7 @@ target_link_libraries( hello_binary // 接下来就是Link了，这里使用了�
 
 ### 接下来是make install (将生成的可执行文件安装到系统中，就是复制到CMAKE_INSTALL_PREFIX里面)
 CMAKE_INSTALL_PREFIX默认值是 usr/locals
-默认情况下cmake会把生成的可执行文件安装到系统中，我们可以指定安装到特定的位置
+默认情况下cmake会把生成的可执行文件安装到系统中，我们可以指定安装到特定的位置，推荐方案是放到用户目录下的.local文件夹下面
 cmake .. -DCMAKE_INSTALL_PREFIX=/install/location
 
 ```
