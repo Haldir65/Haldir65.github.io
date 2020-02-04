@@ -8,19 +8,19 @@
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>cmake实用手册 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="当我们敲下cmake命令的时候，cmake会在当前目录下找CMakeLists.txt这个文件">
+  <meta name="description" content="CMakeLists.txt这个文件的写法以及cmake这个executable的参数">
 <meta name="keywords" content="linux,C">
 <meta property="og:type" content="article">
 <meta property="og:title" content="cmake实用手册">
 <meta property="og:url" content="https://haldir65.github.io/2018/11/26/2018-11-26-cmake-intro/index.html">
 <meta property="og:site_name" content="Haldir的博客">
-<meta property="og:description" content="当我们敲下cmake命令的时候，cmake会在当前目录下找CMakeLists.txt这个文件">
+<meta property="og:description" content="CMakeLists.txt这个文件的写法以及cmake这个executable的参数">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/fresh-sparkle-dew-drops-on-red-flower-wallpaper-53861cf580909.jpg">
-<meta property="og:updated_time" content="2020-02-04T07:42:46.268Z">
+<meta property="og:updated_time" content="2020-02-04T13:43:46.925Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="cmake实用手册">
-<meta name="twitter:description" content="当我们敲下cmake命令的时候，cmake会在当前目录下找CMakeLists.txt这个文件">
+<meta name="twitter:description" content="CMakeLists.txt这个文件的写法以及cmake这个executable的参数">
 <meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/fresh-sparkle-dew-drops-on-red-flower-wallpaper-53861cf580909.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
@@ -200,24 +200,28 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>当我们敲下cmake命令的时候，cmake会在当前目录下找CMakeLists.txt这个文件</p>
+        <p>CMakeLists.txt这个文件的写法以及cmake这个executable的参数</p>
 <p><img src="https://www.haldir66.ga/static/imgs/fresh-sparkle-dew-drops-on-red-flower-wallpaper-53861cf580909.jpg" alt=""><br><a id="more"></a></p>
 <p><a href="https://hulinhong.com/2018/04/21/cmake_tutorial/">CMake好在跨平台</a></p>
 <blockquote>
 <p>你或许听过好几种 Make 工具，例如 GNU Make ，QT 的 qmake ，微软的 MS nmake，BSD Make（pmake），Makepp，等等。这些 Make 工具遵循着不同的规范和标准，所执行的 Makefile 格式也千差万别。这样就带来了一个严峻的问题：如果软件想跨平台，必须要保证能够在不同平台编译。而如果使用上面的 Make 工具，就得为每一种标准写一次 Makefile ，这将是一件让人抓狂的工作。<br>就是针对上面问题所设计的工具：它首先允许开发者编写一种平台无关的 CMakeList.txt 文件来定制整个编译流程，然后再根据目标用户的平台进一步生成所需的本地化 Makefile 和工程文件，如 Unix 的 Makefile 或 Windows 的 Visual Studio 工程。从而做到“Write once, run everywhere”。</p>
 </blockquote>
-<p>下面就是最简单的一个CMakeLists.txt的例子，project(hello_cmake)是一个函数，该函数生成了PROJECT_NAME这个变量，所以下面直接用了。add_executable（）第一个参数是要生成的可执行文件的名字，第二个参数(其实可以包括所有编译需要的源文件)</p>
-<blockquote>
-<p>cmake_minimum_required(VERSION 3.5)<br>project (hello_cmake)<br>add_executable(${PROJECT_NAME} main.cpp)</p>
-</blockquote>
-<p>这个更简单</p>
-<blockquote>
-<p>cmake_minimum_required(VERSION 2.8)<br>project(app_project)<br>add_executable(myapp main.c)<br>install(TARGETS myapp DESTINATION bin)</p>
-</blockquote>
-<p>生成Makefile<br>mkdir _build &amp;&amp; cd _build &amp;&amp; cmake .. -DCMAKE_INSTALL_PREFIX=../_install<br>生成的Makefile拿来用:<br>make &amp;&amp; make install<br>省的手写Makefile了</p>
-<p>cmake支持In-Place Build和Out-of-Source Build。前者是直接在当前文件夹（CMAKE_BINARY_DIR）中生成一大堆文件（太乱了），后者则是在一个指定的文件夹中生成文件。<br>Out-of-source build其实很简单<br>mkdir build &amp;&amp; cd build/ &amp;&amp; cmake .. (在build文件夹中会生成一个Makefile)<br>make &amp;&amp; ./hello_cmake </p>
-<p>一堆内置的变量供参考</p>
-<table>
+<p>下面就是最简单的一个CMakeLists.txt的例子，project(app_project)是一个函数，该函数生成了PROJECT_NAME这个变量，所以下面直接用了。add_executable（）第一个参数是要生成的可执行文件的名字，第二个参数(其实可以包括所有编译需要的源文件)</p>
+<p>一个简单的CMakeLists.txt如下</p>
+<pre><code>cmake_minimum_required(VERSION 3.5)
+project(app_project)
+add_executable(myapp main.c)
+install(TARGETS myapp DESTINATION bin)
+</code></pre><p>其实就可以拿来用了，先不要急着敲cmake</p>
+<pre><code>mkdir _build &amp;&amp; cd _build &amp;&amp; cmake .. -DCMAKE_INSTALL_PREFIX=../_install
+make &amp;&amp; make install（install其实就是把可执行文件复制到/usr/bin里面，或者把.so文件复制到/usr/lib里，或者把/usr/include里面）
+</code></pre><p>之所以没有直接在当前目录下敲cmake的原因是，cmake会在当前目录下生成一大堆中间产物，还不如挪到一个专门的目录下。所以一般都是推荐自己建一个build文件夹，避免弄乱自己的source tree<br>DCMAKE_INSTALL_PREFIX这个变量用于指定install复制的目的地，否则会把生成的可执行文件复制到/usr/bin这些目录里</p>
+<p>cmake支持In-Place Build和Out-of-Source Build。前者是直接在当前文件夹（CMAKE_BINARY_DIR）中生成一大堆文件（太乱了），后者则是在一个指定的文件夹中生成文件。 (我觉得这一段知道有这么回事就行了)<br>Out-of-source build其实很简单<br>mkdir build &amp;&amp; cd build/ &amp;&amp; cmake .. (在build文件夹中会生成一个Makefile)<br>make &amp;&amp; ./hello_cmake </p>
+<h2 id="cmake-–help一类的东西吧"><a href="#cmake-–help一类的东西吧" class="headerlink" title="cmake –help一类的东西吧"></a>cmake –help一类的东西吧</h2><pre><code>$ cmake -H. -Bbuild
+$ cmake CMakeLists.txt //指定文件位置
+# H indicates source directory
+# B indicates build directory
+</code></pre><h3 id="CMakeLists-txt里面一堆内置的变量供参考"><a href="#CMakeLists-txt里面一堆内置的变量供参考" class="headerlink" title="CMakeLists.txt里面一堆内置的变量供参考"></a>CMakeLists.txt里面一堆内置的变量供参考</h3><table>
 <thead>
 <tr>
 <th>Variable</th>
@@ -249,10 +253,26 @@ ga('send', 'pageview');
 <td>PROJECT_BINARY_DIR</td>
 <td>The build directory for the current project.</td>
 </tr>
+<tr>
+<td>CMAKE_LIBRARY_OUTPUT_DIRECTORY</td>
+<td>生成的.dll或者.so文件的目录</td>
+</tr>
+<tr>
+<td>LIBRARY_OUTPUT_PATH</td>
+<td>生成的.dll或者.so文件的路径</td>
+</tr>
+<tr>
+<td>CMAKE_ARCHIVE_OUTPUT_DIRECTORY</td>
+<td>生成的.a或者.lib文件的目录</td>
+</tr>
+<tr>
+<td>ARCHIVE_OUTPUT_PATH</td>
+<td>生成的.a或者.lib文件的路径</td>
+</tr>
 </tbody>
 </table>
-<p>内置的一些变量能够帮助判断当前运行在哪种系统中</p>
-<pre><code class="shell">cmake_minimum_required(VERSION 3.9.1)
+<h3 id="还有一堆函数，比如strcmp这种-if-else也是可以写的"><a href="#还有一堆函数，比如strcmp这种-if-else也是可以写的" class="headerlink" title="还有一堆函数，比如strcmp这种,if else也是可以写的"></a>还有一堆函数，比如strcmp这种,if else也是可以写的</h3><p>这种自己查一下就行了</p>
+<h3 id="内置的一些变量结合函数能够帮助判断当前运行在哪种系统中"><a href="#内置的一些变量结合函数能够帮助判断当前运行在哪种系统中" class="headerlink" title="内置的一些变量结合函数能够帮助判断当前运行在哪种系统中"></a>内置的一些变量结合函数能够帮助判断当前运行在哪种系统中</h3><pre><code class="shell">cmake_minimum_required(VERSION 3.9.1)
 project(CMakeHello)
 set(CMAKE_CXX_STANDARD 14)
 # UNIX, WIN32, WINRT, CYGWIN, APPLE are environment variables as flags set by default system
@@ -379,19 +399,7 @@ target_link_libraries( hello_binary // 接下来就是Link了，这里使用了�
 install (TARGETS cmake_examples_inst
     LIBRARY DESTINATION lib) 
 //install the shared library generated from the target cmake_examples_inst target to the destination ${CMAKE_INSTALL_PREFIX}/lib       
-</code></pre><blockquote>
-<p>$ ls /usr/local/bin/<br>cmake_examples_inst_bin</p>
-</blockquote>
-<blockquote>
-<p>$ ls /usr/local/lib<br>libcmake_examples_inst.so</p>
-</blockquote>
-<blockquote>
-<p>$ ls /usr/local/etc/<br>cmake-examples.conf</p>
-</blockquote>
-<blockquote>
-<p>$ LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib cmake_examples_inst_bin<br>Hello Install! //把生成的bin文件复制到/sur/local/bin目录下，再修改LDPATH,就能去/usr/locallib这个目录去找生成的library了</p>
-</blockquote>
-<h2 id="查找系统中已安装的library"><a href="#查找系统中已安装的library" class="headerlink" title="查找系统中已安装的library"></a>查找系统中已安装的library</h2><p>如果没有找到，停止编译过程</p>
+</code></pre><h2 id="查找系统中已安装的library"><a href="#查找系统中已安装的library" class="headerlink" title="查找系统中已安装的library"></a>查找系统中已安装的library</h2><p>如果没有找到，停止编译过程</p>
 <pre><code class="shell">find_package(Boost 1.66)
 # Check for libray, if found print message, include dirs and link libraries.
 if(Boost_FOUND)  ## 直接判断是否找到
@@ -402,7 +410,20 @@ elseif(NOT Boost_FOUND)
     error(&quot;Boost Not Found&quot;)
 endif()
 </code></pre>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://mirkokiefer.com/cmake-by-example-f95eb47d45b1">cmake的教程，非常好</a><br><a href="https://github.com/ttroy50/cmake-examples">Useful CMake Examples</a>本文来自这里的实例<br><a href="https://medium.com/@onur.dundar1/cmake-tutorial-585dd180109b">完整教程</a></p>
+<p>不希望把source tree搞乱</p>
+<pre><code># Disable in-source builds to prevent source tree corruption.
+if(&quot; ${CMAKE_SOURCE_DIR}&quot; STREQUAL &quot; ${CMAKE_BINARY_DIR}&quot;)
+  message(FATAL_ERROR &quot;
+FATAL: In-source builds are not allowed.
+       You should create a separate directory for build files.
+&quot;)
+endif()
+</code></pre><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
+<li><a href="https://github.com/ttroy50/cmake-examples">这个repo</a>总结了各种各样的场景，例如编译单个binary，编译library，link第三方library，调整linker参数。。。。需要的时候照着这个写就是了</li>
+<li>自己参照着<a href="https://mirkokiefer.com/cmake-by-example-f95eb47d45b1">介绍了build app, build library以及link_library的基本操作</a>写了几个<a href="https://github.com/Haldir65/Channel/tree/master/tool_write_cmake">example</a>，分别是build binary，build library 和link library，分别cd到对应文件夹下面运行shell脚本就行了</li>
+<li>这只是个工具，我知道需要的时候去哪里查资料,这就足够了</li>
+</ol>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://medium.com/@onur.dundar1/cmake-tutorial-585dd180109b">介绍了很多的内置变量</a> 比较长，话说这些变量需要的时候再查也不是不行<br><a href="https://cliutils.gitlab.io/modern-cmake/chapters/basics.html">cmake 2020年更新</a> 不是很推荐，太深层次了。</p>
 
       
 
@@ -677,11 +698,11 @@ endif()
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -697,11 +718,11 @@ endif()
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -713,11 +734,11 @@ endif()
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">linux</a>
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+                <a href="javascript:void(0)" class="js-tag color1">linux</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -725,11 +746,11 @@ endif()
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -757,15 +778,15 @@ endif()
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">前端</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
               </li>
              
               <li class="article-tag-list-item">
