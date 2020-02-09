@@ -9,7 +9,7 @@
   <title>cmake实用手册 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="CMakeLists.txt这个文件的写法以及cmake这个executable的参数">
-<meta name="keywords" content="linux,C">
+<meta name="keywords" content="tools,linux,C">
 <meta property="og:type" content="article">
 <meta property="og:title" content="cmake实用手册">
 <meta property="og:url" content="https://haldir65.github.io/2018/11/26/2018-11-26-cmake-intro/index.html">
@@ -17,7 +17,7 @@
 <meta property="og:description" content="CMakeLists.txt这个文件的写法以及cmake这个executable的参数">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/fresh-sparkle-dew-drops-on-red-flower-wallpaper-53861cf580909.jpg">
-<meta property="og:updated_time" content="2020-02-04T13:43:46.925Z">
+<meta property="og:updated_time" content="2020-02-09T13:35:51.572Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="cmake实用手册">
 <meta name="twitter:description" content="CMakeLists.txt这个文件的写法以及cmake这个executable的参数">
@@ -217,6 +217,7 @@ install(TARGETS myapp DESTINATION bin)
 make &amp;&amp; make install（install其实就是把可执行文件复制到/usr/bin里面，或者把.so文件复制到/usr/lib里，或者把/usr/include里面）
 </code></pre><p>之所以没有直接在当前目录下敲cmake的原因是，cmake会在当前目录下生成一大堆中间产物，还不如挪到一个专门的目录下。所以一般都是推荐自己建一个build文件夹，避免弄乱自己的source tree<br>DCMAKE_INSTALL_PREFIX这个变量用于指定install复制的目的地，否则会把生成的可执行文件复制到/usr/bin这些目录里</p>
 <p>cmake支持In-Place Build和Out-of-Source Build。前者是直接在当前文件夹（CMAKE_BINARY_DIR）中生成一大堆文件（太乱了），后者则是在一个指定的文件夹中生成文件。 (我觉得这一段知道有这么回事就行了)<br>Out-of-source build其实很简单<br>mkdir build &amp;&amp; cd build/ &amp;&amp; cmake .. (在build文件夹中会生成一个Makefile)<br>make &amp;&amp; ./hello_cmake </p>
+<p>CMakeLists.txt文件也支持设置不允许IN_SOURCE_BUILD<br>set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)</p>
 <h2 id="cmake-–help一类的东西吧"><a href="#cmake-–help一类的东西吧" class="headerlink" title="cmake –help一类的东西吧"></a>cmake –help一类的东西吧</h2><pre><code>$ cmake -H. -Bbuild
 $ cmake CMakeLists.txt //指定文件位置
 # H indicates source directory
@@ -418,9 +419,11 @@ FATAL: In-source builds are not allowed.
        You should create a separate directory for build files.
 &quot;)
 endif()
-</code></pre><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
+</code></pre><h2 id="看看一些开源项目的CMakeLists-txt是怎么写的-看看实际项目比看文档快点"><a href="#看看一些开源项目的CMakeLists-txt是怎么写的-看看实际项目比看文档快点" class="headerlink" title="看看一些开源项目的CMakeLists.txt是怎么写的,看看实际项目比看文档快点"></a>看看一些开源项目的CMakeLists.txt是怎么写的,看看实际项目比看文档快点</h2><p><a href="https://github.com/DaveGamble/cJSON/blob/master/CMakeLists.txt">cJSON</a><br><a href="https://stackoverflow.com/questions/8304190/cmake-with-include-and-source-paths-basic-setup">多个source文件夹的问题</a> 实际工程中可能source directory或者library directory有多个，这时往往会在每一个对应的文件夹里面都看到一个CMakeLists.txt文件，这个才是工程中实际使用的。每一个CMakeLists.txt都指明了自己所在的文件夹中文件的关系，轻易不要瞎改。<br><a href="https://github.com/srdja/Collections-C/blob/master/test/CMakeLists.txt">例如这样一个生成多个Target的项目</a><br><a href="https://github.com/shadowsocks/shadowsocks-libev/blob/master/CMakeLists.txt">再例如ss的CMakeList.txt</a></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
 <li><a href="https://github.com/ttroy50/cmake-examples">这个repo</a>总结了各种各样的场景，例如编译单个binary，编译library，link第三方library，调整linker参数。。。。需要的时候照着这个写就是了</li>
 <li>自己参照着<a href="https://mirkokiefer.com/cmake-by-example-f95eb47d45b1">介绍了build app, build library以及link_library的基本操作</a>写了几个<a href="https://github.com/Haldir65/Channel/tree/master/tool_write_cmake">example</a>，分别是build binary，build library 和link library，分别cd到对应文件夹下面运行shell脚本就行了</li>
+<li>cmake .. 会导致install到/usr/lib里面， 我个人不是很喜欢这种把系统目录弄乱的方式。还是cmake -DCMAKE_INSTALL_PREFIX=../install。</li>
 <li>这只是个工具，我知道需要的时候去哪里查资料,这就足够了</li>
 </ol>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://medium.com/@onur.dundar1/cmake-tutorial-585dd180109b">介绍了很多的内置变量</a> 比较长，话说这些变量需要的时候再查也不是不行<br><a href="https://cliutils.gitlab.io/modern-cmake/chapters/basics.html">cmake 2020年更新</a> 不是很推荐，太深层次了。</p>
@@ -457,6 +460,10 @@ endif()
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">tools</a>
+        		</li>
+      		 
         		<li class="article-tag-list-item">
         			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">linux</a>
         		</li>
@@ -698,11 +705,11 @@ endif()
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -718,11 +725,11 @@ endif()
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -734,11 +741,11 @@ endif()
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+                <a href="javascript:void(0)" class="js-tag color1">linux</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">linux</a>
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -746,11 +753,11 @@ endif()
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -778,15 +785,15 @@ endif()
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">前端</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
               </li>
              
               <li class="article-tag-list-item">

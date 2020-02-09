@@ -17,7 +17,7 @@
 <meta property="og:description" content="iptables是控制linux 内核netfilter的command line frontend tool，只存在于linux平台，是system admin常用的防火墙。(虽然已经被nftables取代了，学习点网络知识还是很有必要)">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/lidongjieya_ZH-CN9263684179_1920x1080.jpg">
-<meta property="og:updated_time" content="2020-02-04T13:43:46.925Z">
+<meta property="og:updated_time" content="2020-02-09T13:35:51.576Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iptables速查手册">
 <meta name="twitter:description" content="iptables是控制linux 内核netfilter的command line frontend tool，只存在于linux平台，是system admin常用的防火墙。(虽然已经被nftables取代了，学习点网络知识还是很有必要)">
@@ -585,7 +585,16 @@ iptables -t mangle -A PREROUTING -p udp -j TPROXY --tproxy-mark 0x2333/0x2333 --
 <p>cat /proc/sys/net/netfilter/nf_conntrack_max：允许的最大连接记录项的数目，超过此值后会直接拒绝新连接<br>cat /proc/sys/net/netfilter/nf_conntrack_count：查看当前已使用的连接记录项数目，如果居高不下则应考虑优化<br>cat /proc/sys/net/netfilter/nf_conntrack_buckets：查看存储记录项的哈希桶的数目，默认为 nf_conntrack_max / 4</p>
 <p>先经过 NAT table 的 PREROUTING 链；<br>经由路由判断确定这个封包是要进入本机与否，若不进入本机，则下一步；<br>再经过 Filter table 的 FORWARD 链；<br>通过 NAT table 的 POSTROUTING 链，最后传送出去。<br>PREROUTING会修改目标IP， POSTROUTING链会修改来源 IP， 通常我们的 NAT 内网转外网是修改来源 IP（即内网 IP），成为来源 NAT（Source NAT, SNAT）。</p>
 <p>流量quota限额</p>
-<h1 id="iptables-A-INPUT-p-tcp-–dport-80-m-quota-–quota-52428800-j-ACCEPT"><a href="#iptables-A-INPUT-p-tcp-–dport-80-m-quota-–quota-52428800-j-ACCEPT" class="headerlink" title="iptables -A INPUT -p tcp –dport 80 -m quota –quota 52428800 -j ACCEPT"></a>iptables -A INPUT -p tcp –dport 80 -m quota –quota 52428800 -j ACCEPT</h1><h1 id="iptables-A-INPUT-p-tcp-–dport-80-j-DROP"><a href="#iptables-A-INPUT-p-tcp-–dport-80-j-DROP" class="headerlink" title="iptables -A INPUT -p tcp –dport 80 -j DROP"></a>iptables -A INPUT -p tcp –dport 80 -j DROP</h1><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.cyberciti.biz/tips/linux-iptables-examples.html">linux-iptables-examples</a><br><a href="https://blog.dreamtobe.cn/r7800-openwrt-v2ray/">网件R7800 OpenWrt使用V2Ray+mKcp+透明代理完美翻墙</a><br><a href="https://www.digitalocean.com/community/tutorials/how-to-list-and-delete-iptables-firewall-rules">list and delete iptables rules</a><br><a href="https://blog.sleeplessbeastie.eu/2018/06/21/how-to-create-iptables-firewall-using-custom-chains/">如何创建并管理自定义的iptables的chain</a></p>
+<h1 id="iptables-A-INPUT-p-tcp-–dport-80-m-quota-–quota-52428800-j-ACCEPT"><a href="#iptables-A-INPUT-p-tcp-–dport-80-m-quota-–quota-52428800-j-ACCEPT" class="headerlink" title="iptables -A INPUT -p tcp –dport 80 -m quota –quota 52428800 -j ACCEPT"></a>iptables -A INPUT -p tcp –dport 80 -m quota –quota 52428800 -j ACCEPT</h1><h1 id="iptables-A-INPUT-p-tcp-–dport-80-j-DROP"><a href="#iptables-A-INPUT-p-tcp-–dport-80-j-DROP" class="headerlink" title="iptables -A INPUT -p tcp –dport 80 -j DROP"></a>iptables -A INPUT -p tcp –dport 80 -j DROP</h1><h3 id="iptables从一台vps转到另外一台vps-亲测可行"><a href="#iptables从一台vps转到另外一台vps-亲测可行" class="headerlink" title="iptables从一台vps转到另外一台vps(亲测可行)"></a>iptables从一台vps转到另外一台vps(亲测可行)</h3><p>首先开启ip转发</p>
+<pre><code>echo -e &quot;net.ipv4.ip_forward=1&quot; &gt;&gt; /etc/sysctl.conf
+sysctl -p
+</code></pre><p>中转机器为1.1.1.1， 客户端填写的serverip是1.1.1.1,server port是10000，服务器2.2.2.2监听在30000端口。</p>
+<pre><code>iptables -t nat -A PREROUTING -p tcp -m tcp --dport 10000 -j DNAT --to-destination 1.1.1.1:30000
+iptables -t nat -A PREROUTING -p udp -m udp --dport 10000 -j DNAT --to-destination 1.1.1.1:30000
+iptables -t nat -A POSTROUTING -d 1.1.1.1 -p tcp -m tcp --dport 30000 -j SNAT --to-source 2.2.2.2
+iptables -t nat -A POSTROUTING -d 1.1.1.1 -p udp -m udp --dport 30000 -j SNAT --to-source 2.2.2.2
+</code></pre><p>可以把所有发往1.1.1.1:10000端口的流量转发到2.2.2.2:30000端口</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.cyberciti.biz/tips/linux-iptables-examples.html">linux-iptables-examples</a><br><a href="https://blog.dreamtobe.cn/r7800-openwrt-v2ray/">网件R7800 OpenWrt使用V2Ray+mKcp+透明代理完美翻墙</a><br><a href="https://www.digitalocean.com/community/tutorials/how-to-list-and-delete-iptables-firewall-rules">list and delete iptables rules</a><br><a href="https://blog.sleeplessbeastie.eu/2018/06/21/how-to-create-iptables-firewall-using-custom-chains/">如何创建并管理自定义的iptables的chain</a></p>
 
       
 
@@ -860,11 +869,11 @@ iptables -t mangle -A PREROUTING -p udp -j TPROXY --tproxy-mark 0x2333/0x2333 --
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -880,11 +889,11 @@ iptables -t mangle -A PREROUTING -p udp -j TPROXY --tproxy-mark 0x2333/0x2333 --
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -896,11 +905,11 @@ iptables -t mangle -A PREROUTING -p udp -j TPROXY --tproxy-mark 0x2333/0x2333 --
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+                <a href="javascript:void(0)" class="js-tag color1">linux</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">linux</a>
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -908,11 +917,11 @@ iptables -t mangle -A PREROUTING -p udp -j TPROXY --tproxy-mark 0x2333/0x2333 --
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -940,15 +949,15 @@ iptables -t mangle -A PREROUTING -p udp -j TPROXY --tproxy-mark 0x2333/0x2333 --
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">前端</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
               </li>
              
               <li class="article-tag-list-item">
