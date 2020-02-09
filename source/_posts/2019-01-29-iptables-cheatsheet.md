@@ -571,6 +571,21 @@ PREROUTING会修改目标IP， POSTROUTING链会修改来源 IP， 通常我们�
 # iptables -A INPUT -p tcp --dport 80 -j DROP
 
 
+### iptables从一台vps转到另外一台vps(亲测可行)
+首先开启ip转发
+```
+echo -e "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
+sysctl -p
+```
+中转机器为1.1.1.1， 客户端填写的serverip是1.1.1.1,server port是10000，服务器2.2.2.2监听在30000端口。
+```
+iptables -t nat -A PREROUTING -p tcp -m tcp --dport 10000 -j DNAT --to-destination 1.1.1.1:30000
+iptables -t nat -A PREROUTING -p udp -m udp --dport 10000 -j DNAT --to-destination 1.1.1.1:30000
+iptables -t nat -A POSTROUTING -d 1.1.1.1 -p tcp -m tcp --dport 30000 -j SNAT --to-source 2.2.2.2
+iptables -t nat -A POSTROUTING -d 1.1.1.1 -p udp -m udp --dport 30000 -j SNAT --to-source 2.2.2.2
+```
+可以把所有发往1.1.1.1:10000端口的流量转发到2.2.2.2:30000端口
+
 ## 参考
 [linux-iptables-examples](https://www.cyberciti.biz/tips/linux-iptables-examples.html)
 [网件R7800 OpenWrt使用V2Ray+mKcp+透明代理完美翻墙](https://blog.dreamtobe.cn/r7800-openwrt-v2ray/)

@@ -545,3 +545,12 @@ int main()
 c语言的goto fail
 - [深入select多路复用内核源码加驱动实现](https://my.oschina.net/fileoptions/blog/911091)
 
+https://github.com/srdja/Collections-C
+https://github.com/gozfree/gear-lib
+https://github.com/DaveGamble/cJSON
+https://github.com/EZLippi/WebBench
+https://github.com/wolkykim/qlibc/blob/03a8ce0353/src/containers/qstack.c
+https://github.com/larryhe
+https://github.com/banu/tinyproxy
+https://github.com/aa65535/hev-dns-forwarder
+https://github.com/shadowsocks/shadowsocks-libev/blob/master/CMakeLists.txt

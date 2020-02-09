@@ -337,8 +337,6 @@ echo 'GET / HTTP/1.1
 Host: baidu.com
 ' | openssl s_client -quiet -connect baidu.com:443 2>/dev/null
 ```
- 
-
 
 
 记得http statusCode 302是重定向什么 ：
@@ -375,7 +373,7 @@ http 302的意思也就说明qq邮箱已经把http重定向到别的地方的
 
 ### 17. tee命令
 - echo $(date) | tee -a date.log
-tee命令能够吧程序的输出输出到stdo,同时还能将输出写进文件(-a 表示append，否则就是覆盖)
+tee命令能够把程序的输出输出到stdo,同时还能将输出写进文件(-a 表示append，否则就是覆盖)
 
 ### 18.  missing argument to \`-exec'
 find和exec命令结合起来能够实现指定（或者不指定）文件中查找特定字符的效果

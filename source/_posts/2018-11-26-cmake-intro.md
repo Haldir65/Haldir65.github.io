@@ -1,7 +1,7 @@
 ---
 title: cmake实用手册
 date: 2018-11-26 13:42:16
-tags: [C,linux]
+tags: [C,linux,tools]
 ---
 
 
@@ -41,6 +41,9 @@ cmake支持In-Place Build和Out-of-Source Build。前者是直接在当前文件
 Out-of-source build其实很简单
 mkdir build && cd build/ && cmake .. (在build文件夹中会生成一个Makefile)
 make && ./hello_cmake 
+
+CMakeLists.txt文件也支持设置不允许IN_SOURCE_BUILD
+set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 
 ## cmake --help一类的东西吧
 ```
@@ -259,12 +262,20 @@ FATAL: In-source builds are not allowed.
 endif()
 ```
 
+## 看看一些开源项目的CMakeLists.txt是怎么写的,看看实际项目比看文档快点
+[cJSON](https://github.com/DaveGamble/cJSON/blob/master/CMakeLists.txt)
+[多个source文件夹的问题](https://stackoverflow.com/questions/8304190/cmake-with-include-and-source-paths-basic-setup) 实际工程中可能source directory或者library directory有多个，这时往往会在每一个对应的文件夹里面都看到一个CMakeLists.txt文件，这个才是工程中实际使用的。每一个CMakeLists.txt都指明了自己所在的文件夹中文件的关系，轻易不要瞎改。
+[例如这样一个生成多个Target的项目](https://github.com/srdja/Collections-C/blob/master/test/CMakeLists.txt)
+[再例如ss的CMakeList.txt](https://github.com/shadowsocks/shadowsocks-libev/blob/master/CMakeLists.txt)
+
 ## 总结
 1. [这个repo](https://github.com/ttroy50/cmake-examples)总结了各种各样的场景，例如编译单个binary，编译library，link第三方library，调整linker参数。。。。需要的时候照着这个写就是了
 2. 自己参照着[介绍了build app, build library以及link_library的基本操作](https://mirkokiefer.com/cmake-by-example-f95eb47d45b1)写了几个[example](https://github.com/Haldir65/Channel/tree/master/tool_write_cmake)，分别是build binary，build library 和link library，分别cd到对应文件夹下面运行shell脚本就行了
-3. 这只是个工具，我知道需要的时候去哪里查资料,这就足够了
+3. cmake .. 会导致install到/usr/lib里面， 我个人不是很喜欢这种把系统目录弄乱的方式。还是cmake -DCMAKE_INSTALL_PREFIX=../install。
+4. 这只是个工具，我知道需要的时候去哪里查资料,这就足够了
 
 
 ## 参考
 [介绍了很多的内置变量](https://medium.com/@onur.dundar1/cmake-tutorial-585dd180109b) 比较长，话说这些变量需要的时候再查也不是不行
 [cmake 2020年更新](https://cliutils.gitlab.io/modern-cmake/chapters/basics.html) 不是很推荐，太深层次了。
+

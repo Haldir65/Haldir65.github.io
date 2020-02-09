@@ -4,12 +4,19 @@ date: 2019-08-25 08:46:19
 tags: [tools]
 ---
 
-多数unix软件的安装方式都是下载一个tarball,configure，make,make install，就这么简单。背后使用的是autotools.
+autotools的使用方式
 ![](https://www.haldir66.ga/static/imgs/SeaCliffBridge_ZH-CN5362667487_1920x1080.jpg)
 <!--more-->
 
+## 1.什么是AutoTools
+The GNU build system, also known as the Autotools, is a suite of programming tools designed to assist in making source code packages portable to many Unix-like systems.——Wikipedia
+
+从使用上来讲，多数unix软件的安装方式都是下载一个tarball,configure，make,make install，就这么简单。背后使用的就是autotools。 主要就是为了生成Makefile。
 
 ## 从最简单的helloworld开始说起吧
+[参考](https://blog.csdn.net/thalo1204/article/details/49183911) 最终可以生成一个tar.gz。
+（需要手写的就只有Makefile.am文件，configure.ac文件是从configure.scan文件重命名外加修改一点点过来的）
+
 创建三份文件:
 > cat main.c
 
@@ -224,7 +231,13 @@ $ autoconf
 $ ./configure 在这一步因为没有生成Makefile.in所以停下来了
 
 
+### pkg-config
+pkg-config是能够从一个config文件中读取到一个library的相关信息的tool，该config文件由library提供，用于描述该library的include dir，binary dir等信息。
+[具体教程](https://people.freedesktop.org/~dbn/pkg-config-guide.html)
+
+
 ## 参考
 [helloworld](https://thoughtbot.com/blog/the-magic-behind-configure-make-make-install)
 [autotools教程](https://www.gnu.org/software/automake/manual/automake.html)
 [Autoconf Tutorial Part-1](http://www.idryman.org/blog/2016/03/10/autoconf-tutorial-1/)
+[another autotools tutorial](https://digitalleaves.com/blog/2017/12/build-cross-platform-c-project-autotools/)
