@@ -17,7 +17,7 @@
 <meta property="og:description" content="npm run start">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://haldir66.ga/static/imgs/scenery1511100694324.jpg">
-<meta property="og:updated_time" content="2020-02-09T13:35:51.568Z">
+<meta property="og:updated_time" content="2020-02-16T05:46:36.759Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="nodejs学习记录">
 <meta name="twitter:description" content="npm run start">
@@ -210,12 +210,13 @@ ga('send', 'pageview');
 </blockquote>
 <p>npm的configuration非常方便设置,首先是<a href="https://stackoverflow.com/questions/7559648/is-there-a-way-to-make-npm-install-the-command-to-work-behind-proxy">设置proxy</a></p>
 <blockquote>
-<p>npm config set strict-ssl false<br>npm config set registry “<a href="http://registry.npmjs.org/&quot;">http://registry.npmjs.org/&quot;</a><br>npm config set proxy <a href="http://127.0.0.1:1080">http://127.0.0.1:1080</a> ## 以上三句话设置代理<br>npm config list ##列出当前所有的设置<br>npm config get stuff ##比如说registry等等</p>
+<p>npm config set strict-ssl false<br>npm config set registry “<a href="http://registry.npmjs.org/&quot;">http://registry.npmjs.org/&quot;</a><br>npm config set proxy <a href="http://127.0.0.1:1080">http://127.0.0.1:1080</a> ## 以上三句话设置代理<br>npm config list ##列出当前所有的设置<br>npm config get stuff ##比如说registry等等，其实跟git 那一套很像的</p>
 </blockquote>
 <p>也有用淘宝cnpm的做法:</p>
 <blockquote>
 <p>$ npm install -g cnpm –registry=<a href="https://registry.npm.taobao.org">https://registry.npm.taobao.org</a><br>$ npm config set registry <a href="https://registry.npm.taobao.org">https://registry.npm.taobao.org</a><br>$ cnpm install [name]  ## 这样就能安装了</p>
 </blockquote>
+<p>npm也支持command arguments提供registry的方式，亲测，不是一般的快，😸。<br>npm –registry <a href="https://registry.npm.taobao.org">https://registry.npm.taobao.org</a> install -D babel-cli</p>
 <p><a href="https://stackoverflow.com/questions/18875674/whats-the-difference-between-dependencies-devdependencies-and-peerdependencies">whats-the-difference-between-dependencies-devdependencies-and-peerdependencies</a><br>npm有个dependencies的概念，此外还有dev-dependencies的概念，主要看package.json这个文件</p>
 <pre><code class="json">{
   &quot;name&quot;: &quot;foo&quot;,
@@ -450,10 +451,23 @@ SET MONGOLAB_URI=mongodb://username:password@ds01316.mlab.com:1316/food
 After setting the Environment variables you need to call the Environment Variable into your code. You can do it by typing this
 
 var url = process.env.MONGOLAB_URI;
-</code></pre><p>process.env.XXX只是环境变量而已</p>
+</code></pre><p>process.env.XXX只是环境变量而已 。其实只是</p>
+<blockquote>
+<p>a copy of the output env command on unix and set command on windows machine(注意是copy，也就是修改process.env.xxx不会影响当前shell的env)</p>
+</blockquote>
+<p>好像crossenv比较好的处理了这个问题</p>
 <p>=============================================================================<br>开发环境用nodemon，生产环境用pm2(PM2的优胜之处在于当你要将app需要多核处理的时候，PM2内部集成的负载均衡可以让你很容易的去指定运行多少个实例。)</p>
 <p>node里面就不要用Ajax了，推荐axios，原生自带也有https。<br>而node中的一些module也不能用于浏览器端，比如fs这种属于偏Low level的api</p>
-<p><a href="https://nodejs.org/api/documentation.html">node js api</a><br><a href="https://ts.xcatliu.com/">typeScript教程</a></p>
+<p><a href="https://ts.xcatliu.com/">typeScript教程</a><br/><br><a href="https://www.youtube.com/playlist?list=PL4IgyW_AvXtRrWE6AdSxRcF9qqfA5oJmP">node js advanced topics</a></p>
+<p>补上一句，国内很多软件都有比较好的源，换电脑后最好把一些常用的源都给换掉<br>比较出名的有清华的和中科大的源</p>
+<pre><code>maven有一个淘宝源, 修改~/.m2/settings.xml就行了
+npm 比较出名的是淘宝的源，修改~/.npmrc就可以了，据说10分钟更新一次
+homebrew也要换
+docker也是
+ubuntu的apt也是
+openwrt的opkg也是
+pip也是
+</code></pre><p><strong>不要把人生浪费在和gfw死磕上</strong></p>
 
       
 

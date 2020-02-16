@@ -17,7 +17,7 @@
 <meta property="og:description" content="CMakeLists.txt这个文件的写法以及cmake这个executable的参数">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.haldir66.ga/static/imgs/fresh-sparkle-dew-drops-on-red-flower-wallpaper-53861cf580909.jpg">
-<meta property="og:updated_time" content="2020-02-09T13:35:51.572Z">
+<meta property="og:updated_time" content="2020-02-16T05:46:36.763Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="cmake实用手册">
 <meta name="twitter:description" content="CMakeLists.txt这个文件的写法以及cmake这个executable的参数">
@@ -419,7 +419,13 @@ FATAL: In-source builds are not allowed.
        You should create a separate directory for build files.
 &quot;)
 endif()
-</code></pre><h2 id="看看一些开源项目的CMakeLists-txt是怎么写的-看看实际项目比看文档快点"><a href="#看看一些开源项目的CMakeLists-txt是怎么写的-看看实际项目比看文档快点" class="headerlink" title="看看一些开源项目的CMakeLists.txt是怎么写的,看看实际项目比看文档快点"></a>看看一些开源项目的CMakeLists.txt是怎么写的,看看实际项目比看文档快点</h2><p><a href="https://github.com/DaveGamble/cJSON/blob/master/CMakeLists.txt">cJSON</a><br><a href="https://stackoverflow.com/questions/8304190/cmake-with-include-and-source-paths-basic-setup">多个source文件夹的问题</a> 实际工程中可能source directory或者library directory有多个，这时往往会在每一个对应的文件夹里面都看到一个CMakeLists.txt文件，这个才是工程中实际使用的。每一个CMakeLists.txt都指明了自己所在的文件夹中文件的关系，轻易不要瞎改。<br><a href="https://github.com/srdja/Collections-C/blob/master/test/CMakeLists.txt">例如这样一个生成多个Target的项目</a><br><a href="https://github.com/shadowsocks/shadowsocks-libev/blob/master/CMakeLists.txt">再例如ss的CMakeList.txt</a></p>
+</code></pre><h2 id="通过cmake运行test，例如make-test"><a href="#通过cmake运行test，例如make-test" class="headerlink" title="通过cmake运行test，例如make test"></a>通过cmake运行test，例如make test</h2><p><a href="https://stackoverflow.com/questions/38436661/cmake-and-add-test-program-command">make test</a></p>
+<pre><code>project (TextMining)
+
+enable_testing() //这一句一定要放在最外面的CMakeList.txt里面
+
+set_tests_properties(TestProgram1 PROPERTIES DEPENDS TestProgram2) //甚至可以要求TestProgram2先跑，跑完再跑TestProgram1
+</code></pre><h2 id="看看一些开源项目的CMakeLists-txt是怎么写的-看看实际项目比看文档快点"><a href="#看看一些开源项目的CMakeLists-txt是怎么写的-看看实际项目比看文档快点" class="headerlink" title="看看一些开源项目的CMakeLists.txt是怎么写的,看看实际项目比看文档快点"></a>看看一些开源项目的CMakeLists.txt是怎么写的,看看实际项目比看文档快点</h2><p><a href="https://github.com/DaveGamble/cJSON/blob/master/CMakeLists.txt">cJSON</a><br><a href="https://stackoverflow.com/questions/8304190/cmake-with-include-and-source-paths-basic-setup">多个source文件夹的问题</a> 实际工程中可能source directory或者library directory有多个，这时往往会在每一个对应的文件夹里面都看到一个CMakeLists.txt文件，这个才是工程中实际使用的。每一个CMakeLists.txt都指明了自己所在的文件夹中文件的关系，轻易不要瞎改。<br><a href="https://github.com/srdja/Collections-C/blob/master/test/CMakeLists.txt">例如这样一个生成多个Target的项目</a><br><a href="https://github.com/shadowsocks/shadowsocks-libev/blob/master/CMakeLists.txt">再例如ss的CMakeList.txt</a><br><a href="https://github.com/json-c/json-c/blob/master/CMakeLists.txt">json-c的cmake</a></p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
 <li><a href="https://github.com/ttroy50/cmake-examples">这个repo</a>总结了各种各样的场景，例如编译单个binary，编译library，link第三方library，调整linker参数。。。。需要的时候照着这个写就是了</li>
 <li>自己参照着<a href="https://mirkokiefer.com/cmake-by-example-f95eb47d45b1">介绍了build app, build library以及link_library的基本操作</a>写了几个<a href="https://github.com/Haldir65/Channel/tree/master/tool_write_cmake">example</a>，分别是build binary，build library 和link library，分别cd到对应文件夹下面运行shell脚本就行了</li>
