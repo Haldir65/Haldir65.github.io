@@ -351,6 +351,7 @@ window.onload = function() {
 
 
 ## bind, call, this
+[javascript-call-apply-vs-bind](https://stackoverflow.com/a/31922712)
 
 ### js中的this
 In HTML event handlers, this refers to the HTML element that received the event:

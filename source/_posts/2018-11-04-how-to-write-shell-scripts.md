@@ -865,6 +865,25 @@ result=`post "$headers" "$HOST$ACCESS_URL" "$send_data"`
 >diff -q $TMP_FILE $IPSET_DATA >/dev/null
 if [[ $? -ne 0 ]]; then
 
+HERE DOCUMENT的写法，就是把一行写不下的一大串文字echo到一个文件中
+[参考](https://github.com/gozfree/gear-lib/blob/master/build/autogen_lib.sh)
+```shell
+autogen_test_libfoo_c()
+{
+cat ${LPWD}/${LICENSE_HEADER} > ${TEST_LIBFOO_C}
+cat >> ${TEST_LIBFOO_C} <<!
+#include "${LIBFOO_H}"
+#include <stdio.h>
+#include <stdlib.h>
+int main(int argc, char **argv)
+{
+    return 0;
+}
+!
+}
+```
+就是把下面那一大长串文字追加 到TEST_LIBFOO_C，这里cat后面是>> 而不是> ，所以是追加
+
 
 ![](https://www.haldir66.ga/static/imgs/PuffinWales_EN-AU12757555133_1920x1080.jpg)
 

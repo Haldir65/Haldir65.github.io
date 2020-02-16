@@ -262,11 +262,23 @@ FATAL: In-source builds are not allowed.
 endif()
 ```
 
+## 通过cmake运行test，例如make test
+[make test](https://stackoverflow.com/questions/38436661/cmake-and-add-test-program-command)
+```
+project (TextMining)
+
+enable_testing() //这一句一定要放在最外面的CMakeList.txt里面
+
+set_tests_properties(TestProgram1 PROPERTIES DEPENDS TestProgram2) //甚至可以要求TestProgram2先跑，跑完再跑TestProgram1
+```
+
+
 ## 看看一些开源项目的CMakeLists.txt是怎么写的,看看实际项目比看文档快点
 [cJSON](https://github.com/DaveGamble/cJSON/blob/master/CMakeLists.txt)
 [多个source文件夹的问题](https://stackoverflow.com/questions/8304190/cmake-with-include-and-source-paths-basic-setup) 实际工程中可能source directory或者library directory有多个，这时往往会在每一个对应的文件夹里面都看到一个CMakeLists.txt文件，这个才是工程中实际使用的。每一个CMakeLists.txt都指明了自己所在的文件夹中文件的关系，轻易不要瞎改。
 [例如这样一个生成多个Target的项目](https://github.com/srdja/Collections-C/blob/master/test/CMakeLists.txt)
 [再例如ss的CMakeList.txt](https://github.com/shadowsocks/shadowsocks-libev/blob/master/CMakeLists.txt)
+[json-c的cmake](https://github.com/json-c/json-c/blob/master/CMakeLists.txt)
 
 ## 总结
 1. [这个repo](https://github.com/ttroy50/cmake-examples)总结了各种各样的场景，例如编译单个binary，编译library，link第三方library，调整linker参数。。。。需要的时候照着这个写就是了

@@ -24,12 +24,16 @@ npm的configuration非常方便设置,首先是[设置proxy](https://stackoverfl
 > npm config set registry "http://registry.npmjs.org/"
 > npm config set proxy http://127.0.0.1:1080 ## 以上三句话设置代理
 > npm config list ##列出当前所有的设置
-> npm config get stuff ##比如说registry等等
+> npm config get stuff ##比如说registry等等，其实跟git 那一套很像的
 
 也有用淘宝cnpm的做法:
 > $ npm install -g cnpm --registry=https://registry.npm.taobao.org
 $ npm config set registry https://registry.npm.taobao.org
 $ cnpm install [name]  ## 这样就能安装了
+
+
+npm也支持command arguments提供registry的方式，亲测，不是一般的快，😸。
+npm --registry https://registry.npm.taobao.org install -D babel-cli
 
 
 [whats-the-difference-between-dependencies-devdependencies-and-peerdependencies](https://stackoverflow.com/questions/18875674/whats-the-difference-between-dependencies-devdependencies-and-peerdependencies)
@@ -340,7 +344,10 @@ After setting the Environment variables you need to call the Environment Variabl
 
 var url = process.env.MONGOLAB_URI;
 ```
-process.env.XXX只是环境变量而已
+process.env.XXX只是环境变量而已 。其实只是
+> a copy of the output env command on unix and set command on windows machine(注意是copy，也就是修改process.env.xxx不会影响当前shell的env)
+
+好像crossenv比较好的处理了这个问题
 
 =============================================================================
 开发环境用nodemon，生产环境用pm2(PM2的优胜之处在于当你要将app需要多核处理的时候，PM2内部集成的负载均衡可以让你很容易的去指定运行多少个实例。)
@@ -349,5 +356,19 @@ process.env.XXX只是环境变量而已
 node里面就不要用Ajax了，推荐axios，原生自带也有https。
 而node中的一些module也不能用于浏览器端，比如fs这种属于偏Low level的api
 
-[node js api](https://nodejs.org/api/documentation.html)
-[typeScript教程](https://ts.xcatliu.com/)
+[typeScript教程](https://ts.xcatliu.com/)<br/>
+[node js advanced topics](https://www.youtube.com/playlist?list=PL4IgyW_AvXtRrWE6AdSxRcF9qqfA5oJmP)
+
+
+补上一句，国内很多软件都有比较好的源，换电脑后最好把一些常用的源都给换掉
+比较出名的有清华的和中科大的源
+```
+maven有一个淘宝源, 修改~/.m2/settings.xml就行了
+npm 比较出名的是淘宝的源，修改~/.npmrc就可以了，据说10分钟更新一次
+homebrew也要换
+docker也是
+ubuntu的apt也是
+openwrt的opkg也是
+pip也是
+```
+**不要把人生浪费在和gfw死磕上**
