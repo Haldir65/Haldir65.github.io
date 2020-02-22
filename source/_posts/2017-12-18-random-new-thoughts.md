@@ -77,7 +77,7 @@ top : 1
 这个主要是ios app之间通信的协议，以及快速跳转某个app某个页面的功能实现，还有x-callback-URL这样类似的协议。不过有了3d-touch（苹果后来又把3D-Touch干掉了）之后，很多app都能长按图标进入页面，所以url scheme这个功能只能说是不复往日辉煌了
 - [X]linux的sed命令(文本替换比较常用)
 - [nio](https://juejin.im/post/59fffdb76fb9a0450a66bd58) 还是netty好。也可以看点别的[并发编程网](http://ifeve.com/java-nio%E7%B3%BB%E5%88%97%E6%95%99%E7%A8%8B%EF%BC%88%E5%8D%81%E5%85%AD%EF%BC%89-java-nio-files/)
-- [X]js 的async await,就是一个async修饰一个method，里面随便写await
+- [X]js 的async await,就是一个async修饰一个method，里面随便写await, await on 一个Promise就可以了
 - [X] Linux下TCP延迟确认机制 以及socket timeout的部分原因（net.ipv4.tcp_syn_retries，如果 TCP 握手的 SYN 包超时重试按照 2 的幂来 backoff）
 - [X]c语言的[libevent使用教程](https://yq.aliyun.com/articles/413601) eventloop，添加回调，大致的流程就是这样
 - [X] [indexed DB](http://www.ruanyifeng.com/blog/2018/07/indexeddb.html),浏览器端数据库，还是用第三方库好

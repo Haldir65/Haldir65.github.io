@@ -554,6 +554,9 @@ var myGen = gen()
 let(lexical)的用法就在一个循环里给function赋值，很常见。
 注意的是var的作用域是跨大括号的。所以大括号里面的var是能被大括号外面访问的，let就不行。
 async await 都是ES2017（比ES2015更高的版本）中出现的。
+
+async和await很简单的，随便定义一个方法，方法定义前面加一个async，这里面就能随便写await了， await Promise就可以了。
+
 default parameters： 默认参数，和python中很像
 ```js
 function myLog(name,age,id){

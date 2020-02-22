@@ -544,6 +544,7 @@ int main()
 
 c语言的goto fail
 - [深入select多路复用内核源码加驱动实现](https://my.oschina.net/fileoptions/blog/911091)
+- [gcc的command line arguments](https://www.thegeekstuff.com/2012/10/gcc-compiler-options/)
 
 https://github.com/srdja/Collections-C
 https://github.com/gozfree/gear-lib

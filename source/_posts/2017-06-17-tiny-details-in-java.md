@@ -850,7 +850,7 @@ float和double最终在内存中都是以a^n次方来表示为十进制数值的
 还剩下32-1-8 = 23个，用来表示确切的值， 2^23 = 8388608(7个数字，所以7个数字保不准，但6个是有把握的，让7位给指数位吧，把10的-38次方变成10的-45次方)。也就是说上面个a^n的a的范围是[1,8388608]，论MIN_VALUE是怎么来的。
 
 
-
+[float和double的内存示意图](https://www.runoob.com/cplusplus/cpp-variable-types.html)
 double和float都属于The IEEE 754 format has one bit reserved for the sign and the remaining bits representing the magnitude.
 
 double的范围为-2^1024 ~ +2^1023，也即-1.79E+308 ~ +1.79E+308。就这么算出来的。
