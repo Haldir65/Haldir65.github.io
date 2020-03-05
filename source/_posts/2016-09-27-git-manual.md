@@ -99,6 +99,21 @@ export http_proxy=socks5://127.0.0.1:8118; export https_proxy=$http_proxy
 然后在当前shell中就可以直接进行clone操作了，git这类软件会自动读取当前环境变量中的http_proxy和https_proxy值，并且，这个环境变量只在当前shell中有效
 
 
+unix平台下也可以设置对ssh协议走代理
+vim ~/.ssh/config
+
+```
+Host personal
+   HostName github.com
+   ProxyCommand nc -X 5 -x 127.0.0.1:1080 %h %p 
+    // 这个是在1080端口有一个sock5协议代理的前提下
+
+
+如果让所有host都走代理的话
+Host * //就可以了
+
+```
+
 ## 6. 对上一次commit进行修改(在不添加新的commit的基础上)
 ```git
 git commit --amend

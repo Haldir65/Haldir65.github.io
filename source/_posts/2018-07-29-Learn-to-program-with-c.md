@@ -330,7 +330,6 @@ visual studio中debug的时候有时候会出现Cannot find or open the PDB file
 [使用libevent输出Hello](http://hahaya.github.io/hello-in-libevent/)
 
 
-
 <del>unix下安装libevent的教程</del>
 直接
 sudo apt install libevent-dev一部搞定
@@ -499,28 +498,6 @@ int main(){
 用const修饰形参指针的一个重要的点就是向外部保证，指针指向的内容是只读的。例如上面的strnchr函数，使用const修饰一个指针，指针的指向可以修改，但是这个字符串的内容就不会被修改。但是这里只是说指针A指向的内容不能改了，假如将指针A的地址赋给B,通过B还是可能修改这部分内容的。
 
 
-
-### 最后
-C语言就是这样，好多功能都得自己实现。一些高级语言都有自己的简单高性能的标准库，比如集合,多线程等等。C语言就没有，用C语言写的项目，需要用到任何类的功能的时候，出于性能的考虑，直接当场造轮子。
-
->c 语言有它的设计哲学，就是那著名的“Keep It Simple, Stupid”，语言本身仅仅实现最为基本的功能，然后标准库也仅仅带有最为基本的内存管理（更高效一点的内存池都必须要自己实现）、IO、断言等基本功能。 
-
-社区提供了一些比较优秀的通用功能库
-[1] http://developer.gnome.org/glib/stable/ 
-[2] http://www.gnu.org/software/gnulib/ 
-[3] http://apr.apache.org/
-- [common opensource c libraries](https://en.cppreference.com/w/c/links/libs)
-
-[gets在c11中被gets_s替代](https://zh.cppreference.com/w/c/io/gets)
-
-## 参考
-[automatic directory creation in make](http://ismail.badawi.io/blog/2017/03/28/automatic-directory-creation-in-make/)
-[本文的参考](https://www.zfl9.com/)
-
-==========================================
-tbd 
-## 3. gcc ,clang,llvm的历史
-
 ### c语言中的未定义行为(比如说数组越界)
 [c语言的一些问题](https://coolshell.cn/articles/945.html)
 ```c
@@ -542,6 +519,27 @@ int main()
 后两个值都是确定的，第一个变来变去的，具体为什么出现这个数，要考虑到字节序
 
 
+### 最后
+C语言就是这样，好多功能都得自己实现。一些高级语言都有自己的简单高性能的标准库，比如集合,多线程等等。C语言就没有，用C语言写的项目，需要用到任何类的功能的时候，出于性能的考虑，直接当场造轮子。
+
+>c 语言有它的设计哲学，就是那著名的“Keep It Simple, Stupid”，语言本身仅仅实现最为基本的功能，然后标准库也仅仅带有最为基本的内存管理（更高效一点的内存池都必须要自己实现）、IO、断言等基本功能。 
+
+社区提供了一些比较优秀的通用功能库
+[1] http://developer.gnome.org/glib/stable/ 
+[2] http://www.gnu.org/software/gnulib/ 
+[3] http://apr.apache.org/
+- [common opensource c libraries](https://en.cppreference.com/w/c/links/libs)
+
+[gets在c11中被gets_s替代](https://zh.cppreference.com/w/c/io/gets)
+
+
+
+==========================================
+tbd 
+## 3. gcc ,clang,llvm的历史
+
+
+
 c语言的goto fail
 - [深入select多路复用内核源码加驱动实现](https://my.oschina.net/fileoptions/blog/911091)
 - [gcc的command line arguments](https://www.thegeekstuff.com/2012/10/gcc-compiler-options/)
@@ -555,3 +553,9 @@ https://github.com/larryhe
 https://github.com/banu/tinyproxy
 https://github.com/aa65535/hev-dns-forwarder
 https://github.com/shadowsocks/shadowsocks-libev/blob/master/CMakeLists.txt
+https://github.com/kozross/awesome-c#data-structures
+
+
+## 参考
+[automatic directory creation in make](http://ismail.badawi.io/blog/2017/03/28/automatic-directory-creation-in-make/)
+[本文的参考](https://www.zfl9.com/)

@@ -616,5 +616,6 @@ MediaCodec应该就是硬解，ffmpeg是软解(后面好像支持了硬解)
 tbd
 opencv
 play video using ffmplayer
-
+[mediaCodec的教程](http://bigflake.com/mediacodec/)
+[grafika](https://github.com/google/grafika)
 

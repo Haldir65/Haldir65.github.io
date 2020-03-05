@@ -233,6 +233,8 @@ fi
 -s file　　　　　文件大小非0时为真 
 -t file　　　　　当文件描述符(默认为1)指定的设备为终端时为真
 
+一个获取当前文件路径的方式
+HERE=$(cd "$(dirname "$0")" && pwd)
 
 `判断nginx是否在运行，没有运行的话拉起来`
 ```bash
@@ -886,6 +888,10 @@ int main(int argc, char **argv)
 
 
 ![](https://www.haldir66.ga/static/imgs/PuffinWales_EN-AU12757555133_1920x1080.jpg)
+
+
+
+[如果你将要编写的脚本会超过100行，那么你可能应该使用Python来编写，而不是Shell。请记住，当脚本行数增加，尽早使用另外一种语言重写你的脚本，以避免之后花更多的时间来重写。](https://zh-google-styleguide.readthedocs.io/en/latest/google-shell-styleguide/background/)  Google style guide
 
 
 [opt-script](https://github.com/hiboyhiboy/opt-script)
