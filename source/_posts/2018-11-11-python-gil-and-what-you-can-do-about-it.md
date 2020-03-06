@@ -4,7 +4,7 @@ date: 2018-11-11 22:21:52
 tags: [python]
 ---
 
-![](https://www.haldir66.ga/static/imgs/1102533137-5.jpg)
+![](https://api1.foster66.xyz/static/imgs/1102533137-5.jpg)
 - If your code has a lot of I/O or Network usage:
 Multithreading is your best bet because of its low overhead
 - If you have a GUI

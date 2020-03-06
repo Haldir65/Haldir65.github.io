@@ -4,7 +4,7 @@ date: 2019-01-30 07:53:33
 tags: [java, tbd]
 ---
 
-![](https://www.haldir66.ga/static/imgs/HongKongFireworks_ZH-CN13422096721_1920x1080.jpg)
+![](https://api1.foster66.xyz/static/imgs/HongKongFireworks_ZH-CN13422096721_1920x1080.jpg)
 主要讲讲java中的notify,wait,synchronized ，unsafe等多线程基础工具的使用方式。
 
 <!--more-->

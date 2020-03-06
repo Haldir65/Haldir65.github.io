@@ -732,7 +732,7 @@ autoValue主要是为了在java 1.6 以上生成immutable object的，原理是a
 Java 系统监控有一个小的技巧是，你可以使用kill -3 <pid> 发一个SIGQUIT的信号给JVM，可以把堆栈信息（包括垃圾回收的信息）dump到stderr/logs。
 
 
-![](https://www.haldir66.ga/static/imgs/1279081126453.jpg)
+![](https://api1.foster66.xyz/static/imgs/1279081126453.jpg)
 
 
 

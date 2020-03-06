@@ -7,7 +7,7 @@ tags: [java]
 >
 >
 
-![landscape](https://www.haldir66.ga/static/imgs/34a7d57ccabb18c69d085247cf009b22.jpg)
+![landscape](https://api1.foster66.xyz/static/imgs/34a7d57ccabb18c69d085247cf009b22.jpg)
 
 <!--more-->
 

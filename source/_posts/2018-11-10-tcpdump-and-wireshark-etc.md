@@ -5,7 +5,7 @@ tags: [linux,tools]
 ---
 
 
-![](https://www.haldir66.ga/static/imgs/osi-model.png)
+![](https://api1.foster66.xyz/static/imgs/osi-model.png)
 [wireshark expression cheetsheet](http://packetlife.net/media/library/13/Wireshark_Display_Filters.pdf)
 [tcpdump cheet](http://packetlife.net/media/library/12/tcpdump.pdf)
 wireshark能抓tcp,arp,http,dns,udp,icmp,dhcp...

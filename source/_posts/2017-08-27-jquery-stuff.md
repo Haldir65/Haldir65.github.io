@@ -13,7 +13,7 @@ jQuery是一个dom manipulate library，非常大。jQuery能干的事情包括�
 5. css操作
 6. html事件操作
 7. ajax异步请求方式,etc
-![](https://www.haldir66.ga/static/imgs/a13262133_01000.jpg)
+![](https://api1.foster66.xyz/static/imgs/a13262133_01000.jpg)
 
 <!--more-->
 

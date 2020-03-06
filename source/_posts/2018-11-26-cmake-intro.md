@@ -8,7 +8,7 @@ tags: [C,linux,tools]
 CMakeLists.txt这个文件的写法以及cmake这个executable的参数
 
 
-![](https://www.haldir66.ga/static/imgs/fresh-sparkle-dew-drops-on-red-flower-wallpaper-53861cf580909.jpg)
+![](https://api1.foster66.xyz/static/imgs/fresh-sparkle-dew-drops-on-red-flower-wallpaper-53861cf580909.jpg)
 <!--more-->
 
 [CMake好在跨平台](https://hulinhong.com/2018/04/21/cmake_tutorial/)

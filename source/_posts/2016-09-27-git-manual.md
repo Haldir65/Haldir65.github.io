@@ -7,7 +7,7 @@ tags: [git,tools]
 
 记录一下常用git的命令，作为日常使用的参考手册
 
-![](https://www.haldir66.ga/static/imgs/f787b2e8d757dc83b782bcd6d4c9f523.jpg)
+![](https://api1.foster66.xyz/static/imgs/f787b2e8d757dc83b782bcd6d4c9f523.jpg)
 
 <!--more-->
 

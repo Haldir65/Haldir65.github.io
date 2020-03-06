@@ -6,7 +6,7 @@ tags: [jvm]
 ---
 
 关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下
-![](https://www.haldir66.ga/static/imgs/high_way_scene.jpg)
+![](https://api1.foster66.xyz/static/imgs/high_way_scene.jpg)
 <!--more-->
 
 ## 1.从MyApp.java文件开始
@@ -88,7 +88,7 @@ Native method stacks 是由java stack中的方法调用native方法创建的，�
 
 
 ## 6. Execution Engine的任务
-![](https://www.haldir66.ga/static/imgs/starry_sky.jpg)
+![](https://api1.foster66.xyz/static/imgs/starry_sky.jpg)
 	- Interpreter 将byte code 翻译成机器指令并执行(根据指令去调用Native方法，在windows上jre/bin/文件夹中一大堆的dll就是windows平台提供的Native库，在linux上是.so文件)
 
 	- JIT Compiler  just in time compiler（如果有某项byte code instruction被多次调用，这些byte code不会每次都被inteprete，JIT will hold on to that system level target machine code for future usage,which is fast）
@@ -105,7 +105,7 @@ Native method stacks 是由java stack中的方法调用native方法创建的，�
 下面讨论该类显式继承了一个类的情况，被继承的类没有再显式的继承。JVM会先检查父类是否被加载，如果未加载，则加载该类，并会初始化静态变量并执行静态代码块。然后检查子类，若未加载则同上。当所用到的类加载完后，开始初始化父类，先初始化成员变量，然后执行构造器。子类顺序相同。
 
 总结，JVM会从被继承的最顶层类加载，依次初始化每个类的静态成员变量，执行静态代码块。再从被继承的最顶层类依次初始化成员变量，调用构造器。
-![](https://www.haldir66.ga/static/imgs/WolfeCreekCrater_ZH-CN10953577427_1920x1080.jpg)
+![](https://api1.foster66.xyz/static/imgs/WolfeCreekCrater_ZH-CN10953577427_1920x1080.jpg)
 
 
 

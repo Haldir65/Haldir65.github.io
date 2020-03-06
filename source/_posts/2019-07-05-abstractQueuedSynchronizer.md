@@ -6,7 +6,7 @@ tags: [java]
 
 
 关于java.util.concurrent.locks.AbstractQueuedSynchronizer,这个类是juc的基础。ReentrantLock中，ThreadPoolExecutor中，CountDownLatch中都有用到。
-![](https://www.haldir66.ga/static/imgs/CapeBretonSunset_EN-AU10231293487_1920x1080.jpg)
+![](https://api1.foster66.xyz/static/imgs/CapeBretonSunset_EN-AU10231293487_1920x1080.jpg)
 <!--more-->
 
 先看java doc中是怎样描述的吧:

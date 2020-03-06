@@ -6,7 +6,7 @@ tags: [tools]
 
 OkHttp通过ConnectionPool做到tcp连接复用（在Timeout内）,所以并不是每个http都去建立一个tcp连接
 自定义通讯协议，使用java socket实现客户端和服务端。需要注意的是分包问题和黏包问题
-![](https://www.haldir66.ga/static/imgs/jpglight-and-shadow-2411321_960_720.jpg)
+![](https://api1.foster66.xyz/static/imgs/jpglight-and-shadow-2411321_960_720.jpg)
 <!--more-->
 
 ## 1. http请求中tcp连接的复用(http -keep alive是应用层的实现，与tcp kkepalive那个2小时没关系)
@@ -414,10 +414,10 @@ NAPT原理
 [tcp keep-alive和http的keep-alive是两回事](https://stackoverflow.com/questions/9334401/http-keep-alive-and-tcp-keep-alive) http keep-alive是由webserver负责实现的。 关键字:http keepalive implementation
 
 http1.0中每个tcp连接用完了就关闭掉
-![](https://www.haldir66.ga/static/imgs/http_with_out_keep_alive.png)
+![](https://api1.foster66.xyz/static/imgs/http_with_out_keep_alive.png)
 
 http1.1中每个连接用完了不关闭,(保留一个keepAlive时间，在OkHttp里面默认一条连接在没有使用过的情况下保留5分钟才关闭)
-![](https://www.haldir66.ga/static/imgs/http_with_keep_alive.png)
+![](https://api1.foster66.xyz/static/imgs/http_with_keep_alive.png)
 
 这篇回答里解释了http keep-alive是为了让后续的http请求复用这一条tcp连接。而tcp的keep alive则是定期发小的包。
 

@@ -4,7 +4,7 @@ date: 2018-10-13 21:34:19
 tags: [nio,tbd]
 ---
 
-![](https://www.haldir66.ga/static/imgs/cute_cat_sleepy.jpg)
+![](https://api1.foster66.xyz/static/imgs/cute_cat_sleepy.jpg)
 <!--more-->
 
 都说netty要比nio好用，先从官方的intro page看起。

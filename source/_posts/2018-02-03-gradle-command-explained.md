@@ -4,7 +4,7 @@ date: 2018-02-03 14:46:09
 tags:
 ---
 
-![](https://www.haldir66.ga/static/imgs/street lights dark night car city.jpg)
+![](https://api1.foster66.xyz/static/imgs/street lights dark night car city.jpg)
 <!--more-->
 
 [Gradle](https://gradle.org/)插件开发，官方推荐的具备first class supprot 的IDE包括Android Studio和Intelij Idea等。
@@ -576,8 +576,8 @@ Listening for transport dt_socket at address: 5005 //这个是在等着
 To honour the JVM settings for this build a new JVM will be forked. Please consider using the daemon: https://docs.gradle.org/4.10.1/userguide/gradle_daemon.html. //这个是点了一次那个debug按钮
 Daemon will be stopped at the end of the build stopping after processing //这个是我又点了一次之后，终于开始运行了(要点两次。。。)
 效果是酱紫的
-![](https://www.haldir66.ga/static/imgs/debug_android_gradle_plugin_1.png) 
-![](https://www.haldir66.ga/static/imgs/debug_android_gradle_plugin_2.png) 
+![](https://api1.foster66.xyz/static/imgs/debug_android_gradle_plugin_1.png) 
+![](https://api1.foster66.xyz/static/imgs/debug_android_gradle_plugin_2.png) 
 
 
 

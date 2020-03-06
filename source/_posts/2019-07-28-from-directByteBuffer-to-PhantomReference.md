@@ -5,7 +5,7 @@ tags: [java,tbd]
 ---
 
 DirectByteBuffer（堆外内存）是分配在jvm以外的内存，这个java对象本身是受jvm gc控制的，但是其指向的堆外内存是如何回收的
-![](https://www.haldir66.ga/static/imgs/JovianCloudscape_EN-AU11726040455_1920x1080.jpg)
+![](https://api1.foster66.xyz/static/imgs/JovianCloudscape_EN-AU11726040455_1920x1080.jpg)
 <!--more-->
 
 

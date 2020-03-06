@@ -6,7 +6,7 @@ tags: [java,tools]
 
 位运算的好处至少有两点，由于是直接操作bit,没有任何包装类，速度快。另外一个就是节省内存了。
 
-![](https://www.haldir66.ga/static/imgs/8af185ed137a586be732d63425d8bcb8.jpg)
+![](https://api1.foster66.xyz/static/imgs/8af185ed137a586be732d63425d8bcb8.jpg)
 <!--more-->
 
 ## 1.左移（<<）

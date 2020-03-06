@@ -5,7 +5,7 @@ tags: [android]
 ---
 
 在Android平台上，掌握滑动事件是一件让人头疼的事情。
-![](https://www.haldir66.ga/static/imgs/1513521623756.jpg)
+![](https://api1.foster66.xyz/static/imgs/1513521623756.jpg)
 
 <!--more-->
 

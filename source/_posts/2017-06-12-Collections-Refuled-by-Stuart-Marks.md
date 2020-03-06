@@ -6,7 +6,7 @@ tags: [java]
 ---
 
 根据网上的大部分博客的分类，集合框架分为Collections(具有类似数组的功能)和Map(存储键值对)这两大部分。针对jdk1.8的java.util里面的一些常用的或者不常用的集合做一些分析。写这篇文章的过程中，我慢慢发现不同版本jdk的同一个class的实现是有一些差异的(LinkedList)，由于对照的是java1.8的代码，里面会多一些since 1.8的代码，这里不作论述。
-![](https://www.haldir66.ga/static/imgs/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg)
+![](https://api1.foster66.xyz/static/imgs/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg)
 
 <!--more-->
 

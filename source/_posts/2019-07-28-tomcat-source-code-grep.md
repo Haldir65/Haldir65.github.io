@@ -6,7 +6,7 @@ tags: [java,tbd]
 
 [Tomcat](https://github.com/apache/tomcat)源码解析
 
-![](https://www.haldir66.ga/static/imgs/LetchworthSP_EN-AU14482052774_1920x1080.jpg)
+![](https://api1.foster66.xyz/static/imgs/LetchworthSP_EN-AU14482052774_1920x1080.jpg)
 <!--more-->
 
 tomcat的使用很简单，windows下双击那个startup.bat或者cd 到bin目录，运行catlina run就可以了。配置的话，用xml文件就可以了，静态文件放在webapp/目录下。。

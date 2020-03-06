@@ -27,7 +27,7 @@ private void setupStatusBarView(Context context, ViewGroup decorViewGroup) {//�
 ### 2. 直到碰到了fitSystemWindow = ture
 几个月前曾经在项目里写过一个普通的Coordinatelayout内部CollapingToolbarLayout的沉浸式状态栏实现，当时为了赶进度一直试到夜里2点才尝试出在4.4和5.0以上手机都能满意的效果。现在想想有些事还是能够事先搞清楚的好，被动学习的代价实在太大。当时的方法是给Toolbar添加了一个顶部的padding，具体原理也不大清楚。
 但实际上并不总能一直</br>  
-  ![trying stuff utill it work](https://www.haldir66.ga/static/imgs/Trying-stuff-Until-it-work.jpg)
+  ![trying stuff utill it work](https://api1.foster66.xyz/static/imgs/Trying-stuff-Until-it-work.jpg)
 
 ### 3. 使用CollapsingToolbarLayout时的问题
 1. 5.0以上的手机似乎很简单
@@ -170,16 +170,16 @@ binding.toolbar.setLayoutParams(params);
 实际操作可能还要判断非空什么的，但大致意思如此
 看起来像这样
 5.1图片展开:  
-![5.1模拟器，图片展开](https://www.haldir66.ga/static/imgs/statusbar_5.0_expanded.png)  
+![5.1模拟器，图片展开](https://api1.foster66.xyz/static/imgs/statusbar_5.0_expanded.png)  
 
 5.1图片收起:  
-  ![5.1模拟器，图片收起](https://www.haldir66.ga/static/imgs/statusbar_5.0_collapsed.png)  
+  ![5.1模拟器，图片收起](https://api1.foster66.xyz/static/imgs/statusbar_5.0_collapsed.png)  
 
 4.4图片展开:  
-  ![4.4模拟器，图片展开](https://www.haldir66.ga/static/imgs/statusbar_4.4_expanded.png)  
+  ![4.4模拟器，图片展开](https://api1.foster66.xyz/static/imgs/statusbar_4.4_expanded.png)  
 
 4.4图片收起:
-  ![4.4模拟器，图片收起](https://www.haldir66.ga/static/imgs/statusbar_4.4_collapsed.png)  
+  ![4.4模拟器，图片收起](https://api1.foster66.xyz/static/imgs/statusbar_4.4_collapsed.png)  
 
 
 原理就是让整个布局占据statusBar的位置，但把Toolbar往下挪一点（其实也就是[这篇文章](http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2016/0330/4104.html)中所推荐的给contentView的给第一个childView添加marginTop的方法）

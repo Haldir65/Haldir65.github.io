@@ -443,7 +443,7 @@ Softlayer, HongKong, CN         119.81.130.170          35.2MB/s
 ----------------------------------------------------------------------
 ```
 
-![](https://www.haldir66.ga/static/imgs/scenery1511100809920.jpg)
+![](https://api1.foster66.xyz/static/imgs/scenery1511100809920.jpg)
 
 ###  跑java？
 算了吧，简单读个文本文件print出来cpu就飙到50%。

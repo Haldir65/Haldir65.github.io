@@ -4,7 +4,7 @@ date: 2019-07-31 22:11:55
 tags:
 ---
 
-![](https://www.haldir66.ga/static/imgs/SutherlandFalls_ZH-CN4602884079_1920x1080.jpg)
+![](https://api1.foster66.xyz/static/imgs/SutherlandFalls_ZH-CN4602884079_1920x1080.jpg)
 <!--more-->
 
 ## 1. cpython

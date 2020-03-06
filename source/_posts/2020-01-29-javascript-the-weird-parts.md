@@ -6,7 +6,7 @@ tags: [前端]
 
 javaScript中的一些容易犯错的地方 🐂 🐈 🐅 🦁 🌶 🥒 🍑 真是一门神奇的语言
 🎉 🌮
-![](https://www.haldir66.ga/static/imgs/guoqing_ZH-CN10903461145_1920x1080.jpg)
+![](https://api1.foster66.xyz/static/imgs/guoqing_ZH-CN10903461145_1920x1080.jpg)
 
 <!--more-->
 

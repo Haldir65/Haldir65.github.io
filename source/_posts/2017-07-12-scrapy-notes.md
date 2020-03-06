@@ -7,7 +7,7 @@ tags: [python]
 ## Scrappy框架学习
 首先建议安装virtualenv，在env中进行操作。
 
-![](https://www.haldir66.ga/static/imgs/green_forest_alogside_river.jpg)
+![](https://api1.foster66.xyz/static/imgs/green_forest_alogside_river.jpg)
 
 <!--more-->
 pip install Scrappy 报错

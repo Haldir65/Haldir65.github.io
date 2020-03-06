@@ -5,7 +5,7 @@ tags: [android,tools]
 ---
 
 之前的文章快装不下了，所以另外开一篇文章专门放Android相关的杂乱的知识点。
-![](https://www.haldir66.ga/static/imgs/scenery1511100734648.jpg)
+![](https://api1.foster66.xyz/static/imgs/scenery1511100734648.jpg)
 <!--more-->
 
 
@@ -1433,7 +1433,7 @@ CardView和elevation的自带阴影几乎是无法定制的
 
 有些地方会对Apk进行二次打包，加固就是防着这个的。
 
-![](https://www.haldir66.ga/static/imgs/scenery1511100809920.jpg)
+![](https://api1.foster66.xyz/static/imgs/scenery1511100809920.jpg)
 
 
 ### 9. Facebook出品的BUCK能够用于编译Android 项目，速度比较快。

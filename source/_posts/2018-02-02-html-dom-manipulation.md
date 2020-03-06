@@ -5,7 +5,7 @@ tags: [前端]
 ---
 
 HTML Document操作手册
-![](https://www.haldir66.ga/static/imgs/2138000245bee1e3cc14.jpg)
+![](https://api1.foster66.xyz/static/imgs/2138000245bee1e3cc14.jpg)
 
 <!--more-->
 使用javaScript操作dom的记录

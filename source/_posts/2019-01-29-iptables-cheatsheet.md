@@ -4,7 +4,7 @@ date: 2019-01-29 11:46:11
 tags: [linux,tools]
 ---
 
-![](https://www.haldir66.ga/static/imgs/lidongjieya_ZH-CN9263684179_1920x1080.jpg)
+![](https://api1.foster66.xyz/static/imgs/lidongjieya_ZH-CN9263684179_1920x1080.jpg)
 iptables是控制linux 内核netfilter的command line frontend tool，只存在于linux平台，是system admin常用的防火墙。(虽然已经被nftables取代了，学习点网络知识还是很有必要)
 <!--more-->
 

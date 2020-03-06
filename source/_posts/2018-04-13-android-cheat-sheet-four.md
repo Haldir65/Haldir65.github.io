@@ -5,7 +5,7 @@ tags: [android]
 ---
 
 
-![](https://www.haldir66.ga/static/imgs/street%20lights%20dark%20night%20car%20city%20bw.jpg)
+![](https://api1.foster66.xyz/static/imgs/street%20lights%20dark%20night%20car%20city%20bw.jpg)
 
 <!--more-->
 
@@ -31,7 +31,7 @@ static class ToastThread extends Thread {
      }
  }
 ```
-![](https://www.haldir66.ga/static/imgs/toast_transact.jpg)
+![](https://api1.foster66.xyz/static/imgs/toast_transact.jpg)
 其实Toast的原理就是通过IPC向NotificationManager请求加入队列，后者会检测权限xxxx。然后通过上面的ipc回调到客户端的onTransact中，这里也就是走到了Toast.TN这个static inner class的handler中，发送一个Message，handlerMessage中完成了WindowManager.addView的操作
 需要注意的是，这里还是子线程，所以确实可能存在多条线程同时操作UI的现象。从形式上看，主线程和子线程中的Toast对象各自通过自己的Looper维护了一个消息循环队列，这其中的消息类型包括show,hide和cancel。所以可能存在多条线程同时调用WindowManager的方法，View也是每条线程各自独有的，最坏的场景莫过于两条线程同时各自添加了一个View到window上。另外，子线程中引入looper的形式也造成了子线程实质上的阻塞，当然可以直接当成一个handlerThread来用。
 所以不是很推荐这么干，只是说可以做。
@@ -944,4 +944,4 @@ HandlerThread handlerThread = new HandlerThread("queued-work-looper",
 
 
 
-[安卓打包流程](https://www.haldir66.ga/static/imgs/android_build_detail.png)
+[安卓打包流程](https://api1.foster66.xyz/static/imgs/android_build_detail.png)

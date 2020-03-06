@@ -5,7 +5,7 @@ tags: [c, linux]
 ---
 
 ***进程是资源分配的最小单位，线程是CPU调度的最小单位***
-![](https://www.haldir66.ga/static/imgs/Prayercard_ZH-CN13472871640_1920x1080.jpg)
+![](https://api1.foster66.xyz/static/imgs/Prayercard_ZH-CN13472871640_1920x1080.jpg)
 
 本文多数来自[c语言多进程编程](https://www.zfl9.com/c-multi-proc.html)
 

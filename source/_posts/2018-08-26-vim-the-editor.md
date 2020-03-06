@@ -4,7 +4,7 @@ date: 2018-08-26 22:49:00
 tags: [linux]
 ---
 
-![](https://www.haldir66.ga/static/imgs/food_truck_hotdog_night_city.jpg)
+![](https://api1.foster66.xyz/static/imgs/food_truck_hotdog_night_city.jpg)
 <!--more-->
 
 

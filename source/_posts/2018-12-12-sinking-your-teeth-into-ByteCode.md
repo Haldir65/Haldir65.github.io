@@ -5,7 +5,7 @@ tags: [java,tbd]
 ---
 
 python中可以使用diss module 轻易的查看byte code。那么在java中呢
-![](https://www.haldir66.ga/static/imgs/BadlandsBday_EN-AU10299777329_1920x1080.jpg)
+![](https://api1.foster66.xyz/static/imgs/BadlandsBday_EN-AU10299777329_1920x1080.jpg)
 <!--more-->
 
 interpreting the talk from 

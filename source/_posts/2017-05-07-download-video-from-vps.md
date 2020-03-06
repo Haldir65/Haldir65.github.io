@@ -6,7 +6,7 @@ tags: [linux,python]
 ---
 
 几天前花几块钱买了个新的vps，试了下，速度不错。后来看到网上有关于如何使用vps下载视频并拖到Windows的，试了一下，确实酸爽。
-![](https://www.haldir66.ga/static/imgs/4667305cbdace582c667f218e38fe70a.jpg)
+![](https://api1.foster66.xyz/static/imgs/4667305cbdace582c667f218e38fe70a.jpg)
 
 <!--more-->
 

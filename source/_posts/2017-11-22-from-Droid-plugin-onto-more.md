@@ -5,7 +5,7 @@ tags: [android,插件化]
 ---
 
 关于360团队出开源的[DroidPlugin](https://github.com/DroidPluginTeam/DroidPlugin)的一些记录
-![](https://www.haldir66.ga/static/imgs/scenery15111006999.jpg)
+![](https://api1.foster66.xyz/static/imgs/scenery15111006999.jpg)
 
 过程中发现了关于插件化，Hook系统方法的操作，摘录下来。
 <!--more-->
@@ -35,7 +35,7 @@ onSaveInstance是从ActivityThread的callCallActivityOnSaveInstanceState方法di
 [比如在ActivityManagerService调用IPC操作时添加私货](http://weishu.me/2016/03/07/understand-plugin-framework-ams-pms-hook/)
 
 
-![](https://www.haldir66.ga/static/imgs/scenery2a2241cc5c1278cf7a28f15f91dbbb7f.jpg)
+![](https://api1.foster66.xyz/static/imgs/scenery2a2241cc5c1278cf7a28f15f91dbbb7f.jpg)
 
 
 

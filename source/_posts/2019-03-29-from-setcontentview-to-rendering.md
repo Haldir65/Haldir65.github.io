@@ -5,7 +5,7 @@ tags: [android]
 ---
 
 谈一谈View的渲染流程吧
-![](https://www.haldir66.ga/static/imgs/TamarackCones_EN-AU12178466392_1920x1080.jpg)
+![](https://api1.foster66.xyz/static/imgs/TamarackCones_EN-AU12178466392_1920x1080.jpg)
 
 <!--more-->
 
@@ -88,7 +88,7 @@ Activity的setContentView走到了PhoneWindow的setContentView中
     //上面说道PhoneWindow的setContentView大致两句话，installDecor()和mLayoutInflater.inflate(layoutResID, mContentParent);
     //于是mLayoutInflater.inflate(layoutResID, mContentParent);就是把开发者写的layoutRes文件对应的view创建出来并且添加到mContentParent中
 ```
-![](https://www.haldir66.ga/static/imgs/window_manager_02.png)
+![](https://api1.foster66.xyz/static/imgs/window_manager_02.png)
 
 到这里我们自己写的view也就被添加到android.R.id.content这个FrameLayout里了，这时应该在onCreate里面。根据ActivityThread在[6.0的代码](http://androidxref.com/6.0.1_r10/xref/frameworks/base/core/java/android/app/ActivityThread.java#handleLaunchActivity)
 ```java
@@ -316,7 +316,7 @@ void windowAddedLocked() {
     }      
 ```
 
-![](https://www.haldir66.ga/static/imgs/window_manager_01.jpeg)
+![](https://api1.foster66.xyz/static/imgs/window_manager_01.jpeg)
 一般的，每一个window都对应一个WindowState对象，
 该对象的成员中mClient(final IWindow mClient;)用于跟应用端交互
 成员变量mToken(WindowToken mToken;)用于跟AMS交互
@@ -368,10 +368,10 @@ ViewRootImpl中有针对远程返回的res判断的逻辑,结合这WindowManager
 }
 ```
 <code>添加View到WMS的流程</code>
-![](https://www.haldir66.ga/static/imgs/window_manager_05.png)
+![](https://api1.foster66.xyz/static/imgs/window_manager_05.png)
 
 <code>从WMS中RemoveView的流程</code>
-![](https://www.haldir66.ga/static/imgs/window_manager_04.png)
+![](https://api1.foster66.xyz/static/imgs/window_manager_04.png)
 
 ### 回到ViewRootImpl的setView方法,session.addToDisplay
 
@@ -401,7 +401,7 @@ static class W extends IWindow.Stub{
 }                    
 ```
 app端通过IWindowSession调用WMS端的方法，WMS端通过IWindow(WindowState.mClient)调用app端的方法
-![](https://www.haldir66.ga/static/imgs/window_manager_07.png)
+![](https://api1.foster66.xyz/static/imgs/window_manager_07.png)
 
 ### Window调用过程中涉及到的IPC服务
 
@@ -751,7 +751,7 @@ onPreDraw,onLayoutChange,view.measure.
 
 ### surfaceFlinger
 Android是通过系统级进程中的SurfaceFlinger服务来把真正需要显示的数据渲染到屏幕上。SurfaceFlinger的主要工作是：
-![](https://www.haldir66.ga/static/imgs/window_manager_06.png)
+![](https://api1.foster66.xyz/static/imgs/window_manager_06.png)
 响应客户端事件，创建Layer与客户端的Surface建立连接。
 接收客户端数据及属性，修改Layer属性，如尺寸、颜色、透明度等。
 将创建的Layer内容刷新到屏幕上。
@@ -765,7 +765,7 @@ WMS跟surfaceFlinger交互的过程是，WMS建立SurfaceComposerClient，然后
 APP可以没有Activty,PhoneWindow,DecorView，例如带悬浮窗的service。
 
 
-![](https://www.haldir66.ga/static/imgs/window_manager_03.jpeg)
+![](https://api1.foster66.xyz/static/imgs/window_manager_03.jpeg)
 
 
 

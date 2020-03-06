@@ -5,7 +5,7 @@ categories: blog
 tags: [linux,tools]
 ---
 
-![](https://www.haldir66.ga/static/imgs/green_forset_alongside_river_2.jpg)
+![](https://api1.foster66.xyz/static/imgs/green_forset_alongside_river_2.jpg)
 
 <!--more-->
 

@@ -6,12 +6,12 @@ tags: [android,TouchEvent]
 ---
 记录一些Android系统坐标系的常用方法，因为日常开发中难免会碰到需要单独计算View系统坐标的情况。
 
-![](https://www.haldir66.ga/static/imgs/minion.jpg)
+![](https://api1.foster66.xyz/static/imgs/minion.jpg)
 <!--more-->
 
 ScrollTo，ScrollBy，getVisibleRect这些方法平时想要用的时候总要去网上查找，这里记录下来，方便今后直接参考
 首先是一张很多人都见过的图
-![](https://www.haldir66.ga/static/imgs/android_screen_coordinate_system.png)
+![](https://api1.foster66.xyz/static/imgs/android_screen_coordinate_system.png)
 中间的蓝色的点是TouchEvent发生时，获得的MotionEvent.getX()、getY()。
 ### 1. 坐标原点和坐标轴方向
 坐标原点有两种，屏幕左上角（statusBar也包含其中）和父控件左上角
@@ -50,7 +50,7 @@ View.getGlobalVisibleRect()  // 以屏幕左上角为坐标原点
 
 为此，我在setContentView里面放了一个CoordinateLayout,使用Hierarchy View截图的到这样的结果。
 图片有点大
-![](https://www.haldir66.ga/static/imgs/view_hirearchy_1013.png)
+![](https://api1.foster66.xyz/static/imgs/view_hirearchy_1013.png)
 
 在ViewHirearchy中可以看到，Activity中View视图层级从上到下依次为：
 
@@ -171,7 +171,7 @@ View.canScrollVertically(int)
 其实很多东西前人已经帮我们整理好了。
 对了这东西在v4包里有ViewCompat.canScrollVertically，v4包除了方法数有点多(10k+好像)这点不好以外，一直都很好用
 附上supportLibrary各个包的方法数，如果对65536这个数字熟悉的话，还是会注意点的。
-![pic](https://www.haldir66.ga/static/imgs/support_lib_methods_summary.jpg)
+![pic](https://api1.foster66.xyz/static/imgs/support_lib_methods_summary.jpg)
 
 
 
