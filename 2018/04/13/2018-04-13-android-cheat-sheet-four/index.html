@@ -14,12 +14,12 @@
 <meta property="og:url" content="https://haldir65.github.io/2018/04/13/2018-04-13-android-cheat-sheet-four/index.html">
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://www.haldir66.ga/static/imgs/street%20lights%20dark%20night%20car%20city%20bw.jpg">
-<meta property="og:image" content="https://www.haldir66.ga/static/imgs/toast_transact.jpg">
-<meta property="og:updated_time" content="2020-03-05T10:54:07.084Z">
+<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/street%20lights%20dark%20night%20car%20city%20bw.jpg">
+<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/toast_transact.jpg">
+<meta property="og:updated_time" content="2020-03-06T01:06:16.779Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android知识集合[四]">
-<meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/street%20lights%20dark%20night%20car%20city%20bw.jpg">
+<meta name="twitter:image" content="https://api1.foster66.xyz/static/imgs/street%20lights%20dark%20night%20car%20city%20bw.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -198,7 +198,7 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p><img src="https://www.haldir66.ga/static/imgs/street%20lights%20dark%20night%20car%20city%20bw.jpg" alt=""></p>
+        <p><img src="https://api1.foster66.xyz/static/imgs/street%20lights%20dark%20night%20car%20city%20bw.jpg" alt=""></p>
 <a id="more"></a>
 <h2 id="1-在子线程中显示一个Toast是亲测可行的"><a href="#1-在子线程中显示一个Toast是亲测可行的" class="headerlink" title="1. 在子线程中显示一个Toast是亲测可行的"></a>1. 在子线程中显示一个Toast是亲测可行的</h2><p>不是那种post到主线程的方案<br><a href="https://www.zhihu.com/question/51099935">其实知乎上已经有了讨论</a></p>
 <pre><code class="java">static class ToastThread extends Thread {
@@ -219,7 +219,7 @@ ga('send', 'pageview');
      }
  }
 </code></pre>
-<p><img src="https://www.haldir66.ga/static/imgs/toast_transact.jpg" alt=""><br>其实Toast的原理就是通过IPC向NotificationManager请求加入队列，后者会检测权限xxxx。然后通过上面的ipc回调到客户端的onTransact中，这里也就是走到了Toast.TN这个static inner class的handler中，发送一个Message，handlerMessage中完成了WindowManager.addView的操作<br>需要注意的是，这里还是子线程，所以确实可能存在多条线程同时操作UI的现象。从形式上看，主线程和子线程中的Toast对象各自通过自己的Looper维护了一个消息循环队列，这其中的消息类型包括show,hide和cancel。所以可能存在多条线程同时调用WindowManager的方法，View也是每条线程各自独有的，最坏的场景莫过于两条线程同时各自添加了一个View到window上。另外，子线程中引入looper的形式也造成了子线程实质上的阻塞，当然可以直接当成一个handlerThread来用。<br>所以不是很推荐这么干，只是说可以做。<br><strong>Toast.TN.handleShow</strong></p>
+<p><img src="https://api1.foster66.xyz/static/imgs/toast_transact.jpg" alt=""><br>其实Toast的原理就是通过IPC向NotificationManager请求加入队列，后者会检测权限xxxx。然后通过上面的ipc回调到客户端的onTransact中，这里也就是走到了Toast.TN这个static inner class的handler中，发送一个Message，handlerMessage中完成了WindowManager.addView的操作<br>需要注意的是，这里还是子线程，所以确实可能存在多条线程同时操作UI的现象。从形式上看，主线程和子线程中的Toast对象各自通过自己的Looper维护了一个消息循环队列，这其中的消息类型包括show,hide和cancel。所以可能存在多条线程同时调用WindowManager的方法，View也是每条线程各自独有的，最坏的场景莫过于两条线程同时各自添加了一个View到window上。另外，子线程中引入looper的形式也造成了子线程实质上的阻塞，当然可以直接当成一个handlerThread来用。<br>所以不是很推荐这么干，只是说可以做。<br><strong>Toast.TN.handleShow</strong></p>
 <pre><code class="java">try {
       mWM.addView(mView, mParams);
       trySendAccessibilityEvent();
@@ -901,7 +901,7 @@ ActivityThread.performLaunchActivity
                     Process.THREAD_PRIORITY_FOREGROUND); //这个是apply里面写磁盘的后台线程
 </code></pre>
 <p>往这条HandlerThread上推任务时有延时(延时100ms再post)和立刻执行(立刻post，理论上应该会唤醒等待的looper，算是立刻执行吧)两种方式</p>
-<p><a href="https://www.haldir66.ga/static/imgs/android_build_detail.png">安卓打包流程</a></p>
+<p><a href="https://api1.foster66.xyz/static/imgs/android_build_detail.png">安卓打包流程</a></p>
 
       
 

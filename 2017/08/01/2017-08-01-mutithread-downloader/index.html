@@ -16,12 +16,12 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="主要讲一下在java中(平台并不限于android)实现多线程断点续传的原理,主要讲断点下载的原理。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://www.haldir66.ga/static/imgs/4b52d8db2e9d86b95c730af1db127a81.jpg">
-<meta property="og:updated_time" content="2020-03-05T10:54:07.076Z">
+<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/4b52d8db2e9d86b95c730af1db127a81.jpg">
+<meta property="og:updated_time" content="2020-03-06T01:06:16.775Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="多线程断点续传原理及实现">
 <meta name="twitter:description" content="主要讲一下在java中(平台并不限于android)实现多线程断点续传的原理,主要讲断点下载的原理。">
-<meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/4b52d8db2e9d86b95c730af1db127a81.jpg">
+<meta name="twitter:image" content="https://api1.foster66.xyz/static/imgs/4b52d8db2e9d86b95c730af1db127a81.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -200,7 +200,7 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>主要讲一下在java中(平台并不限于android)实现多线程断点续传的原理,主要讲断点下载的原理。<br><img src="https://www.haldir66.ga/static/imgs/4b52d8db2e9d86b95c730af1db127a81.jpg" alt=""><br><a id="more"></a></p>
+        <p>主要讲一下在java中(平台并不限于android)实现多线程断点续传的原理,主要讲断点下载的原理。<br><img src="https://api1.foster66.xyz/static/imgs/4b52d8db2e9d86b95c730af1db127a81.jpg" alt=""><br><a id="more"></a></p>
 <p>其实就是在Http请求里面加上一个”range”的header，HttpUrlConnection可以这么干：</p>
 <p><code>conn.setRequestProperty(&quot;Range&quot;, &quot;bytes=&quot; + 500 + &quot;-&quot; + 1000);</code></p>
 <p>也就是告诉服务器上次下载到的位置，本地写文件可以使用RandomAccessFile。本地需要记录下上次中断后停下来的位置。可以用db记录，也可以用sp记录。<br>实践中肯定要发两次请求，第一次是为了读content-Length，确定每一份下载任务需要下载多少bytes。<br>第二步，就是根据线程数量，总数除以线程数，用一个线程池(或者直接开多条线程)去执行这么多份任务。每一份任务的请求都要带上上面那个Range的Header。</p>

@@ -16,18 +16,18 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="本文多数内容来自Jake Wharton的演讲，配合一些个人的感受，作为今后使用Rxjava2的一些参考。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://www.haldir66.ga/static/imgs/f21a6a245edfe0b19804be5b3df24a3d.jpg">
-<meta property="og:image" content="https://www.haldir66.ga/static/imgs/stream_compose.jpg">
-<meta property="og:image" content="https://www.haldir66.ga/static/imgs/creating_source_from_iterable.jpg">
-<meta property="og:image" content="https://www.haldir66.ga/static/imgs/creating_source_from_just.jpg">
-<meta property="og:image" content="https://www.haldir66.ga/static/imgs/4dab298b9f7ce29c43f9d8eaf686e02f.jpg">
-<meta property="og:image" content="https://www.haldir66.ga/static/imgs/reading_network_response_on_main_thread.jpg">
-<meta property="og:image" content="https://www.haldir66.ga/static/imgs/observing_on_ui_thread.jpg">
-<meta property="og:updated_time" content="2020-03-05T10:54:07.076Z">
+<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/f21a6a245edfe0b19804be5b3df24a3d.jpg">
+<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/stream_compose.jpg">
+<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/creating_source_from_iterable.jpg">
+<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/creating_source_from_just.jpg">
+<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/4dab298b9f7ce29c43f9d8eaf686e02f.jpg">
+<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/reading_network_response_on_main_thread.jpg">
+<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/observing_on_ui_thread.jpg">
+<meta property="og:updated_time" content="2020-03-06T01:06:16.771Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Rxjava2 的一些点">
 <meta name="twitter:description" content="本文多数内容来自Jake Wharton的演讲，配合一些个人的感受，作为今后使用Rxjava2的一些参考。">
-<meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/f21a6a245edfe0b19804be5b3df24a3d.jpg">
+<meta name="twitter:image" content="https://api1.foster66.xyz/static/imgs/f21a6a245edfe0b19804be5b3df24a3d.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -206,13 +206,13 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>本文多数内容来自Jake Wharton的演讲，配合一些个人的感受，作为今后使用Rxjava2的一些参考。<br><img src="https://www.haldir66.ga/static/imgs/f21a6a245edfe0b19804be5b3df24a3d.jpg" alt=""><br><a id="more"></a></p>
+        <p>本文多数内容来自Jake Wharton的演讲，配合一些个人的感受，作为今后使用Rxjava2的一些参考。<br><img src="https://api1.foster66.xyz/static/imgs/f21a6a245edfe0b19804be5b3df24a3d.jpg" alt=""><br><a id="more"></a></p>
 <h2 id="1-Why-Reactive"><a href="#1-Why-Reactive" class="headerlink" title="1. Why Reactive?"></a>1. Why Reactive?</h2><p>最早使用Rxjava的初衷在于方便地实现线程切换，使用链式语法轻松地将异步任务分发到子线程并省去了主动实现回调的麻烦。<br>我们生活在一个事件异步分发的环境中，网络，文件、甚至用户输入本身也是异步事件，除此之外，安卓系统本身的许多操作也是异步的，例如startActivity，Fragment的transaction，这就要求开发者不得不考虑各种事件状态，并在各种事件之间进行协调。Rxjava将各种事件的处理、完成以及异常在事件定义之初定义好处理方式。事件的开始，进行，完成以及异常，都被抽象到Observable的载体中。值得注意的是，这种链式调用很像Builder Pattern，但本质上每一步都生成了一个新的对象。这个在Rxjava的Wiki上有所说明，即每一步都生成一个新的immutable object（GC表示压力大）。</p>
 <h2 id="2-数据源"><a href="#2-数据源" class="headerlink" title="2. 数据源"></a>2. 数据源</h2><p>Stream基本包括这三部分</p>
 <pre><code>source of data
 listener of data
 methods for modifying data
-</code></pre><p><img src="https://www.haldir66.ga/static/imgs/stream_compose.jpg" alt=""></p>
+</code></pre><p><img src="https://api1.foster66.xyz/static/imgs/stream_compose.jpg" alt=""></p>
 <h3 id="2-1-数据源的种类"><a href="#2-1-数据源的种类" class="headerlink" title="2.1 数据源的种类"></a>2.1 数据源的种类</h3><p>Observable<T> 和Flowable<T>，区别在于后者支持BackPressure，后者不支持BackPressure.<br>接收Observable和Flowable的类型分别为Observer和Subscriber</p>
 <pre><code class="java">interface Observer&lt;T&gt;{
   void onNext(T t);
@@ -253,8 +253,8 @@ Completeable writeFile(Stirng data){}
 <p><strong>Maybe</strong> (有可能返回值，有可能不返回，也有可能异常，即optional)</p>
 <pre><code class="java">public abstract class Maybe&lt;T&gt; implements MaybeSource&lt;T&gt; {}
 </code></pre>
-<p>以上三种数据源都有static方法生成：<br>例如<br><img src="https://www.haldir66.ga/static/imgs/creating_source_from_iterable.jpg" alt="from iterable"></p>
-<p><img src="https://www.haldir66.ga/static/imgs/creating_source_from_just.jpg" alt="fromjust"></p>
+<p>以上三种数据源都有static方法生成：<br>例如<br><img src="https://api1.foster66.xyz/static/imgs/creating_source_from_iterable.jpg" alt="from iterable"></p>
+<p><img src="https://api1.foster66.xyz/static/imgs/creating_source_from_just.jpg" alt="fromjust"></p>
 <p>比较推荐的方法有两种</p>
 <h3 id="一-fromCallable"><a href="#一-fromCallable" class="headerlink" title="一. fromCallable"></a>一. fromCallable</h3><pre><code class="java">Observable.fromCallable(new Callable&lt;String&gt;(){
 
@@ -365,7 +365,7 @@ interface Subscription{
 </code></pre>
 <h2 id="所以整体来看，数据的流向就这么两种，左边发送数据-可能只有一个，可能间歇性的，可能一直不停-，事件通过数据流传输到右边，右边根据协议作出相应-Reactive"><a href="#所以整体来看，数据的流向就这么两种，左边发送数据-可能只有一个，可能间歇性的，可能一直不停-，事件通过数据流传输到右边，右边根据协议作出相应-Reactive" class="headerlink" title="所以整体来看，数据的流向就这么两种，左边发送数据(可能只有一个，可能间歇性的，可能一直不停)，事件通过数据流传输到右边，右边根据协议作出相应(Reactive)"></a>所以整体来看，数据的流向就这么两种，左边发送数据(可能只有一个，可能间歇性的，可能一直不停)，事件通过数据流传输到右边，右边根据协议作出相应(Reactive)</h2><p>Observable -&gt; subscribe -&gt; Observer</p>
 <p>Flowable -&gt; subscribe -&gt; Subscription</p>
-<h3 id="3-2-onSubscribe怎么用"><a href="#3-2-onSubscribe怎么用" class="headerlink" title="3.2 onSubscribe怎么用"></a>3.2 onSubscribe怎么用</h3><p>通常不直接用这两种base class，因为第四个方法不知道怎么用嘛。<br><img src="https://www.haldir66.ga/static/imgs/4dab298b9f7ce29c43f9d8eaf686e02f.jpg" alt=""></p>
+<h3 id="3-2-onSubscribe怎么用"><a href="#3-2-onSubscribe怎么用" class="headerlink" title="3.2 onSubscribe怎么用"></a>3.2 onSubscribe怎么用</h3><p>通常不直接用这两种base class，因为第四个方法不知道怎么用嘛。<br><img src="https://api1.foster66.xyz/static/imgs/4dab298b9f7ce29c43f9d8eaf686e02f.jpg" alt=""></p>
 <pre><code class="java">Observable.just(&quot;Hello&quot;).subscribe(new DisposableObserver&lt;String&gt;() {
                     @Override
                     public void onNext(String value) {
@@ -430,8 +430,8 @@ Observable&lt;String&gt; greeting  = Observable.just(&quot;Hello&quot;);
 Observable&lt;String&gt; yelling = greeting.map(s -&gt;s.toUppercase())
 
 Observable.subscribeOn(Schedulers.io()) //
-</code></pre><p>subscribeOn决定了task在哪条线程上运行，操作符的顺序很重要<br><strong>this is wrong</strong><br><img src="https://www.haldir66.ga/static/imgs/reading_network_response_on_main_thread.jpg" alt="Wrong"></p>
-<p><strong>this is right</strong><br><img src="https://www.haldir66.ga/static/imgs/observing_on_ui_thread.jpg" alt="Ok"></p>
+</code></pre><p>subscribeOn决定了task在哪条线程上运行，操作符的顺序很重要<br><strong>this is wrong</strong><br><img src="https://api1.foster66.xyz/static/imgs/reading_network_response_on_main_thread.jpg" alt="Wrong"></p>
+<p><strong>this is right</strong><br><img src="https://api1.foster66.xyz/static/imgs/observing_on_ui_thread.jpg" alt="Ok"></p>
 <p>流之间的转换</p>
 <blockquote>
 <p>Observable -&gt; first() -&gt; single<br>Observable -&gt; firsetElement -&gt; Maybe<br>Observable -&gt; ignoreElements() -&gt;Completable</p>

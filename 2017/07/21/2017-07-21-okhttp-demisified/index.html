@@ -16,13 +16,13 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="很早的时候就知道，OkHttp在io层面上的操作是由Okio代为完成的，所以实际意义上和Socket打交道的应该是Okio。而Okio又比传统的java io要高效。所以，在分析OkHttp之前，有必要针对Okio的一些方法进行展开，作为后面读写操作的铺垫。 Okio -&amp;gt; OkHttp -&amp;gt; Picaso  -&amp;gt; RetrofitOkio版本 1.13.0OkHttp版本 3.">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://www.haldir66.ga/static/imgs/6da83b3b20094b044a320d1e89dfcd00.jpg">
-<meta property="og:image" content="https://www.haldir66.ga/static/imgs/okHttp_chain.jpg">
-<meta property="og:updated_time" content="2020-03-05T10:54:07.076Z">
+<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/6da83b3b20094b044a320d1e89dfcd00.jpg">
+<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/okHttp_chain.jpg">
+<meta property="og:updated_time" content="2020-03-06T01:06:16.775Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="OkHttp和Okio阅读笔记">
 <meta name="twitter:description" content="很早的时候就知道，OkHttp在io层面上的操作是由Okio代为完成的，所以实际意义上和Socket打交道的应该是Okio。而Okio又比传统的java io要高效。所以，在分析OkHttp之前，有必要针对Okio的一些方法进行展开，作为后面读写操作的铺垫。 Okio -&amp;gt; OkHttp -&amp;gt; Picaso  -&amp;gt; RetrofitOkio版本 1.13.0OkHttp版本 3.">
-<meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/6da83b3b20094b044a320d1e89dfcd00.jpg">
+<meta name="twitter:image" content="https://api1.foster66.xyz/static/imgs/6da83b3b20094b044a320d1e89dfcd00.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -203,7 +203,7 @@ ga('send', 'pageview');
       
         <p>很早的时候就知道，OkHttp在io层面上的操作是由Okio代为完成的，所以实际意义上和Socket打交道的应该是Okio。而Okio又比传统的java io要高效。所以，在分析OkHttp之前，有必要针对Okio的一些方法进行展开，作为后面读写操作的铺垫。</p>
 <p>Okio -&gt; OkHttp -&gt; Picaso  -&gt; Retrofit<br>Okio版本 1.13.0<br>OkHttp版本 3.8.0</p>
-<p><img src="https://www.haldir66.ga/static/imgs/6da83b3b20094b044a320d1e89dfcd00.jpg" alt=""><br><a id="more"></a></p>
+<p><img src="https://api1.foster66.xyz/static/imgs/6da83b3b20094b044a320d1e89dfcd00.jpg" alt=""><br><a id="more"></a></p>
 <h2 id="1-Okio与java-io相比的优势"><a href="#1-Okio与java-io相比的优势" class="headerlink" title="1. Okio与java io相比的优势"></a>1. Okio与java io相比的优势</h2><p>java的InputStream可以被查看成是一个数据的来源，调用read方法从中读取数据。由于有些文件特别大，我们不可能在内存中分配一个和文件大小一样大的字节数组来专门来读写文件。因此需要传入一个缓冲数组。所以一般的读写程序的代码是这么写的</p>
 <pre><code class="java">public abstract class InputStream implements Closeable{
        public int read(byte b[]) throws IOException {
@@ -441,7 +441,7 @@ public void write(char cbuf[], int off, int len) throws IOException {
     }
 </code></pre>
 <p>一个很有意思的现象是，java BufferedInputStream的默认buffer数组大小是8192，okio 的segment的默认size也是8192，这些都是以byte为单位的。找到一个合理的<a href="https://stackoverflow.com/questions/37404068/why-is-the-default-char-buffer-size-of-bufferedreader-8192">解释</a>。大致意思是8192 = 2^13, windows和linux上这个大小正好占用两个分页文件(8kB)。另外java io的类图确实让人眼花缭乱。</p>
-<h2 id="2-OkHttp的解析"><a href="#2-OkHttp的解析" class="headerlink" title="2. OkHttp的解析"></a>2. OkHttp的解析</h2><h3 id="2-1-使用介绍"><a href="#2-1-使用介绍" class="headerlink" title="2.1 使用介绍"></a>2.1 使用介绍</h3><p>先上一张图<img src="https://www.haldir66.ga/static/imgs/okHttp_chain.jpg" alt="">。这是最简单的直接用OkHttpClient请求<a href="http://www.baidu.com">百度首页</a>的堆栈调用情况。在没有做任何手动配置的情况下，至少发现了五个Interceptor:</p>
+<h2 id="2-OkHttp的解析"><a href="#2-OkHttp的解析" class="headerlink" title="2. OkHttp的解析"></a>2. OkHttp的解析</h2><h3 id="2-1-使用介绍"><a href="#2-1-使用介绍" class="headerlink" title="2.1 使用介绍"></a>2.1 使用介绍</h3><p>先上一张图<img src="https://api1.foster66.xyz/static/imgs/okHttp_chain.jpg" alt="">。这是最简单的直接用OkHttpClient请求<a href="http://www.baidu.com">百度首页</a>的堆栈调用情况。在没有做任何手动配置的情况下，至少发现了五个Interceptor:</p>
 <p> RetryAndFollowUpInterceptor<br> BridgeInterceptor<br> CacheInterceptor<br> ConnectInterceptor<br> CallServerInterceptor</p>
 <p> 走到CallServerInterceptor的时候，可以看到Response已经形成了。每一个Interceptor之间还有一个RealInterceptorChain，将各个Interceptor串联起来，</p>
 <p>首先是调用者的代码</p>

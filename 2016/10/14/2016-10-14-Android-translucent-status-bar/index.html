@@ -16,16 +16,16 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="沉浸式状态栏是api 19之后引入的，KitKat应该算是一次比较大的更新了，像是Transition，art runtime,storage access FrameWork(这个有空研究下)，另外就是这个被官方称为Full-screen immersive mode的特性了。具体来说，App可以将展示的区域拓展到statusBar的位置了。我觉得直接叫statusBar就好了，大部分人应该也能">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://www.haldir66.ga/static/imgs/Trying-stuff-Until-it-work.jpg">
-<meta property="og:image" content="https://www.haldir66.ga/static/imgs/statusbar_5.0_expanded.png">
-<meta property="og:image" content="https://www.haldir66.ga/static/imgs/statusbar_5.0_collapsed.png">
-<meta property="og:image" content="https://www.haldir66.ga/static/imgs/statusbar_4.4_expanded.png">
-<meta property="og:image" content="https://www.haldir66.ga/static/imgs/statusbar_4.4_collapsed.png">
-<meta property="og:updated_time" content="2020-03-05T10:54:07.072Z">
+<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/Trying-stuff-Until-it-work.jpg">
+<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/statusbar_5.0_expanded.png">
+<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/statusbar_5.0_collapsed.png">
+<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/statusbar_4.4_expanded.png">
+<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/statusbar_4.4_collapsed.png">
+<meta property="og:updated_time" content="2020-03-06T01:06:16.771Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="fitSystemWindow和沉浸式状态栏的一些总结">
 <meta name="twitter:description" content="沉浸式状态栏是api 19之后引入的，KitKat应该算是一次比较大的更新了，像是Transition，art runtime,storage access FrameWork(这个有空研究下)，另外就是这个被官方称为Full-screen immersive mode的特性了。具体来说，App可以将展示的区域拓展到statusBar的位置了。我觉得直接叫statusBar就好了，大部分人应该也能">
-<meta name="twitter:image" content="https://www.haldir66.ga/static/imgs/Trying-stuff-Until-it-work.jpg">
+<meta name="twitter:image" content="https://api1.foster66.xyz/static/imgs/Trying-stuff-Until-it-work.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -220,7 +220,7 @@ ga('send', 'pageview');
     }
 </code></pre>
 <p>一切看起来都很美好</p>
-<h3 id="2-直到碰到了fitSystemWindow-ture"><a href="#2-直到碰到了fitSystemWindow-ture" class="headerlink" title="2. 直到碰到了fitSystemWindow = ture"></a>2. 直到碰到了fitSystemWindow = ture</h3><p>几个月前曾经在项目里写过一个普通的Coordinatelayout内部CollapingToolbarLayout的沉浸式状态栏实现，当时为了赶进度一直试到夜里2点才尝试出在4.4和5.0以上手机都能满意的效果。现在想想有些事还是能够事先搞清楚的好，被动学习的代价实在太大。当时的方法是给Toolbar添加了一个顶部的padding，具体原理也不大清楚。<br>但实际上并不总能一直</br><br>  <img src="https://www.haldir66.ga/static/imgs/Trying-stuff-Until-it-work.jpg" alt="trying stuff utill it work"></p>
+<h3 id="2-直到碰到了fitSystemWindow-ture"><a href="#2-直到碰到了fitSystemWindow-ture" class="headerlink" title="2. 直到碰到了fitSystemWindow = ture"></a>2. 直到碰到了fitSystemWindow = ture</h3><p>几个月前曾经在项目里写过一个普通的Coordinatelayout内部CollapingToolbarLayout的沉浸式状态栏实现，当时为了赶进度一直试到夜里2点才尝试出在4.4和5.0以上手机都能满意的效果。现在想想有些事还是能够事先搞清楚的好，被动学习的代价实在太大。当时的方法是给Toolbar添加了一个顶部的padding，具体原理也不大清楚。<br>但实际上并不总能一直</br><br>  <img src="https://api1.foster66.xyz/static/imgs/Trying-stuff-Until-it-work.jpg" alt="trying stuff utill it work"></p>
 <h3 id="3-使用CollapsingToolbarLayout时的问题"><a href="#3-使用CollapsingToolbarLayout时的问题" class="headerlink" title="3. 使用CollapsingToolbarLayout时的问题"></a>3. 使用CollapsingToolbarLayout时的问题</h3><ol>
 <li><p>5.0以上的手机似乎很简单</p>
 <pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
@@ -333,10 +333,10 @@ CollapsingToolbarLayout.LayoutParams params = (CollapsingToolbarLayout.LayoutPar
 params.setMargins(0, Utils.getStatusBarHeight(), 0, 0); //顶部加个margin就好了
 binding.toolbar.setLayoutParams(params);
 </code></pre>
-<p>实际操作可能还要判断非空什么的，但大致意思如此<br>看起来像这样<br>5.1图片展开:<br><img src="https://www.haldir66.ga/static/imgs/statusbar_5.0_expanded.png" alt="5.1模拟器，图片展开">  </p>
-<p>5.1图片收起:<br>  <img src="https://www.haldir66.ga/static/imgs/statusbar_5.0_collapsed.png" alt="5.1模拟器，图片收起">  </p>
-<p>4.4图片展开:<br>  <img src="https://www.haldir66.ga/static/imgs/statusbar_4.4_expanded.png" alt="4.4模拟器，图片展开">  </p>
-<p>4.4图片收起:<br>  <img src="https://www.haldir66.ga/static/imgs/statusbar_4.4_collapsed.png" alt="4.4模拟器，图片收起">  </p>
+<p>实际操作可能还要判断非空什么的，但大致意思如此<br>看起来像这样<br>5.1图片展开:<br><img src="https://api1.foster66.xyz/static/imgs/statusbar_5.0_expanded.png" alt="5.1模拟器，图片展开">  </p>
+<p>5.1图片收起:<br>  <img src="https://api1.foster66.xyz/static/imgs/statusbar_5.0_collapsed.png" alt="5.1模拟器，图片收起">  </p>
+<p>4.4图片展开:<br>  <img src="https://api1.foster66.xyz/static/imgs/statusbar_4.4_expanded.png" alt="4.4模拟器，图片展开">  </p>
+<p>4.4图片收起:<br>  <img src="https://api1.foster66.xyz/static/imgs/statusbar_4.4_collapsed.png" alt="4.4模拟器，图片收起">  </p>
 <p>原理就是让整个布局占据statusBar的位置，但把Toolbar往下挪一点（其实也就是<a href="http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2016/0330/4104.html">这篇文章</a>中所推荐的给contentView的给第一个childView添加marginTop的方法）</p>
 <h3 id="7-在onCreate之后设置fitSystemWindows并不会把ContentView往上挪或往下挪"><a href="#7-在onCreate之后设置fitSystemWindows并不会把ContentView往上挪或往下挪" class="headerlink" title="7.在onCreate之后设置fitSystemWindows并不会把ContentView往上挪或往下挪."></a>7.在onCreate之后设置fitSystemWindows并不会把ContentView往上挪或往下挪.</h3><p>自己测试了一下，在根布局里添加fitSystemWindows = true之后，在Activity的onCreate里面是可以使用ViewCompat.setfitSystems(rootView,false)设置起作用的。但也只限于onCreate的时候。例如添加一个点击事件，在onClick里面setFitSystemWindows，是不会把RootView往下挪的。这种情况就需要一开始就确保fitSystem = false，然后需要往下挪的时候，给设置一个FrameLayout.LayoutParams的TopMargin就可以了。注意来回切换(全屏模式和着色模式之间切换)的时候要看下rootView的getTop,因为MarginTop设置了之后会导致Top!=0。<br>其实fitSystemWindows是在FitSystemWindowLinearLayout中添加Padding起效的，后期操作的Margin只是对其Child ContentFrameLayout进行操作。<br>所以，这种情况下我觉得直接全部弄成fitSystemWindows = false，先把statusBar后面的空间占据了再说，后面再通过手动设置Margin上下挪动。</p>
 <h3 id="8-一些不要犯的小错误"><a href="#8-一些不要犯的小错误" class="headerlink" title="8. 一些不要犯的小错误"></a>8. 一些不要犯的小错误</h3><ul>
