@@ -279,6 +279,9 @@ set_tests_properties(TestProgram1 PROPERTIES DEPENDS TestProgram2) //甚至可�
 [例如这样一个生成多个Target的项目](https://github.com/srdja/Collections-C/blob/master/test/CMakeLists.txt)
 [再例如ss的CMakeList.txt](https://github.com/shadowsocks/shadowsocks-libev/blob/master/CMakeLists.txt)
 [json-c的cmake](https://github.com/json-c/json-c/blob/master/CMakeLists.txt)
+[.cmake后缀的文件](https://github.com/google/glog/blob/master/toolchains/clang-cxx17.cmake) 
+cmake -H. -B_build -DCMAKE_TOOLCHAIN_FILE="${PWD}/toolchains/gcc.cmake"
+cmake /path/to/src -DCMAKE_TOOLCHAIN_FILE=/path/to/toolchain/foo-bar-baz.cmake
 
 ## 总结
 1. [这个repo](https://github.com/ttroy50/cmake-examples)总结了各种各样的场景，例如编译单个binary，编译library，link第三方library，调整linker参数。。。。需要的时候照着这个写就是了

@@ -225,6 +225,32 @@ System.load(currentDir+"/"+"libhellojni.so"); //load则是给出文件的绝对�
 ### 3.2 C、C++调用java代码
 c、c++层调用java也是可以的,甚至可以在native层创建一个java实例返回给java层，所以创建一个java对象的方法至少包括new,unsafe,Constructor.newInstance以及jni。 unsafe的方式只是分配内存，并不调用构造函数。
 
+```java
+//1. 用new关键字，这个没什么好说的
+
+//2. 用unsafe
+Unsafe#allocateInstance(Class<?>) 
+
+//3. 用java.lang.reflect.Constructor.newInstance(Object... initargs) 
+public T newInstance(Object... initargs) throws InstantiationException,
+IllegalAccessException, IllegalArgumentException, InvocationTargetException
+
+// 4.jni直接操作
+//关键就这么一句，注意这一句是不会调用到无参的构造函数的。
+env->AllocObject(userDataClass);
+```
+
+好奇看了眼unsafe的[hotspot源码](http://hg.openjdk.java.net/jdk8/jdk8/hotspot/file/tip/src/share/vm/prims/unsafe.cpp) 原来用的也是AllocObject
+```cpp
+UNSAFE_ENTRY(jobject, Unsafe_AllocateInstance(JNIEnv *env, jobject unsafe, jclass cls))
+  UnsafeWrapper("Unsafe_AllocateInstance");
+  {
+    ThreadToNativeFromVM ttnfv(thread);
+    return env->AllocObject(cls);
+  }
+UNSAFE_END
+```
+
 比方说入口文件叫做com.me.harris.jupiter.channel.HelloJNI2.java
 生成的头文件就叫做
 com_me_harris_jupiter_channel_HelloJNI2.h
@@ -234,7 +260,10 @@ g++ -c -fPIC -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux com_me_harris_j
 g++ -shared -fPIC -o libnative.so com_me_harris_jupiter_channel_HelloJNI2.o -lc
 mv libnative.so  jni
 java -cp .:target/classes -Djava.library.path=jni com.me.harris.jupiter.channel.HelloJNI2 ## java命令行参数一个比较烦人的地方就是com.example.Main这个class非得要去一个com/example文件夹下面有这个class文件
+##cp的意思就是classpath了，这个命令要能跑成功，前提是target文件夹下有个com/me/harris/jupiter/channel/这么一连串的文件夹 
 ```
+[自己参考着写了jni的一些用例，剩下的就是照着oracle的doc一个个去尝试参数和方法了](https://github.com/Haldir65/scripts/tree/master/jnistuff)
+
 
 
 ### 3.3 java调用系统方法
