@@ -14,7 +14,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://api1.foster66.xyz/static/imgs/SutherlandFalls_ZH-CN4602884079_1920x1080.jpg">
-<meta property="og:updated_time" content="2020-03-06T01:06:16.787Z">
+<meta property="og:updated_time" content="2020-03-10T12:17:48.192Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="各种编程语言与c、c++的交互">
 <meta name="twitter:image" content="https://api1.foster66.xyz/static/imgs/SutherlandFalls_ZH-CN4602884079_1920x1080.jpg">
@@ -354,12 +354,36 @@ System.load(currentDir+&quot;/&quot;+&quot;libhellojni.so&quot;); //load则是�
 </code></pre>
 <h3 id="3-1-java调用C、C-代码"><a href="#3-1-java调用C、C-代码" class="headerlink" title="3.1 java调用C、C++代码"></a>3.1 java调用C、C++代码</h3><p><a href="https://www.baeldung.com/jni">详细教程</a><br>这个没什么好说的</p>
 <h3 id="3-2-C、C-调用java代码"><a href="#3-2-C、C-调用java代码" class="headerlink" title="3.2 C、C++调用java代码"></a>3.2 C、C++调用java代码</h3><p>c、c++层调用java也是可以的,甚至可以在native层创建一个java实例返回给java层，所以创建一个java对象的方法至少包括new,unsafe,Constructor.newInstance以及jni。 unsafe的方式只是分配内存，并不调用构造函数。</p>
+<pre><code class="java">//1. 用new关键字，这个没什么好说的
+
+//2. 用unsafe
+Unsafe#allocateInstance(Class&lt;?&gt;) 
+
+//3. 用java.lang.reflect.Constructor.newInstance(Object... initargs) 
+public T newInstance(Object... initargs) throws InstantiationException,
+IllegalAccessException, IllegalArgumentException, InvocationTargetException
+
+// 4.jni直接操作
+//关键就这么一句，注意这一句是不会调用到无参的构造函数的。
+env-&gt;AllocObject(userDataClass);
+</code></pre>
+<p>好奇看了眼unsafe的<a href="http://hg.openjdk.java.net/jdk8/jdk8/hotspot/file/tip/src/share/vm/prims/unsafe.cpp">hotspot源码</a> 原来用的也是AllocObject</p>
+<pre><code class="cpp">UNSAFE_ENTRY(jobject, Unsafe_AllocateInstance(JNIEnv *env, jobject unsafe, jclass cls))
+  UnsafeWrapper(&quot;Unsafe_AllocateInstance&quot;);
+  {
+    ThreadToNativeFromVM ttnfv(thread);
+    return env-&gt;AllocObject(cls);
+  }
+UNSAFE_END
+</code></pre>
 <p>比方说入口文件叫做com.me.harris.jupiter.channel.HelloJNI2.java<br>生成的头文件就叫做<br>com_me_harris_jupiter_channel_HelloJNI2.h<br>g++的参数有一点点区别</p>
 <pre><code class="shell">g++ -c -fPIC -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux com_me_harris_jupiter_channel_HelloJNI2.cpp -o com_me_harris_jupiter_channel_HelloJNI2.o
 g++ -shared -fPIC -o libnative.so com_me_harris_jupiter_channel_HelloJNI2.o -lc
 mv libnative.so  jni
 java -cp .:target/classes -Djava.library.path=jni com.me.harris.jupiter.channel.HelloJNI2 ## java命令行参数一个比较烦人的地方就是com.example.Main这个class非得要去一个com/example文件夹下面有这个class文件
+##cp的意思就是classpath了，这个命令要能跑成功，前提是target文件夹下有个com/me/harris/jupiter/channel/这么一连串的文件夹 
 </code></pre>
+<p><a href="https://github.com/Haldir65/scripts/tree/master/jnistuff">自己参考着写了jni的一些用例，剩下的就是照着oracle的doc一个个去尝试参数和方法了</a></p>
 <h3 id="3-3-java调用系统方法"><a href="#3-3-java调用系统方法" class="headerlink" title="3.3 java调用系统方法"></a>3.3 java调用系统方法</h3><p>java有一个Process api<br>java中Process的Api<br>关键词：ProcessBuilder , java9提供了新的Api。另外还有Runtime.exec这个方法<br>亲测，下面的命令可以在mac上执行uname -a 命令</p>
 <pre><code class="java">//用ProcessBuilder是一种做法
  try {
