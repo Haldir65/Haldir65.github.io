@@ -17,7 +17,7 @@
 <meta property="og:description" content="CMakeLists.txt这个文件的写法以及cmake这个executable的参数">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://api1.foster66.xyz/static/imgs/fresh-sparkle-dew-drops-on-red-flower-wallpaper-53861cf580909.jpg">
-<meta property="og:updated_time" content="2020-03-10T12:17:48.188Z">
+<meta property="og:updated_time" content="2020-03-14T08:45:44.035Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="cmake实用手册">
 <meta name="twitter:description" content="CMakeLists.txt这个文件的写法以及cmake这个executable的参数">
@@ -425,8 +425,28 @@ endif()
 enable_testing() //这一句一定要放在最外面的CMakeList.txt里面
 
 set_tests_properties(TestProgram1 PROPERTIES DEPENDS TestProgram2) //甚至可以要求TestProgram2先跑，跑完再跑TestProgram1
-</code></pre><h2 id="看看一些开源项目的CMakeLists-txt是怎么写的-看看实际项目比看文档快点"><a href="#看看一些开源项目的CMakeLists-txt是怎么写的-看看实际项目比看文档快点" class="headerlink" title="看看一些开源项目的CMakeLists.txt是怎么写的,看看实际项目比看文档快点"></a>看看一些开源项目的CMakeLists.txt是怎么写的,看看实际项目比看文档快点</h2><p><a href="https://github.com/DaveGamble/cJSON/blob/master/CMakeLists.txt">cJSON</a><br><a href="https://stackoverflow.com/questions/8304190/cmake-with-include-and-source-paths-basic-setup">多个source文件夹的问题</a> 实际工程中可能source directory或者library directory有多个，这时往往会在每一个对应的文件夹里面都看到一个CMakeLists.txt文件，这个才是工程中实际使用的。每一个CMakeLists.txt都指明了自己所在的文件夹中文件的关系，轻易不要瞎改。<br><a href="https://github.com/srdja/Collections-C/blob/master/test/CMakeLists.txt">例如这样一个生成多个Target的项目</a><br><a href="https://github.com/shadowsocks/shadowsocks-libev/blob/master/CMakeLists.txt">再例如ss的CMakeList.txt</a><br><a href="https://github.com/json-c/json-c/blob/master/CMakeLists.txt">json-c的cmake</a><br><a href="https://github.com/google/glog/blob/master/toolchains/clang-cxx17.cmake">.cmake后缀的文件</a><br>cmake -H. -B_build -DCMAKE_TOOLCHAIN_FILE=”${PWD}/toolchains/gcc.cmake”<br>cmake /path/to/src -DCMAKE_TOOLCHAIN_FILE=/path/to/toolchain/foo-bar-baz.cmake</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
+</code></pre><h2 id="cmake-还可以加自定义command"><a href="#cmake-还可以加自定义command" class="headerlink" title="cmake 还可以加自定义command"></a>cmake 还可以加自定义command</h2><p>例如在某一个target的post build之后把生成的产物copy到某个位置</p>
+<pre><code>add_library(gmath STATIC src/gmath.c)
+# copy out the lib binary... need to leave the static lib around to pass gradle check
+set(distribution_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../distribution)
+set_target_properties(gmath
+                      PROPERTIES
+                      ARCHIVE_OUTPUT_DIRECTORY
+                      &quot;${distribution_DIR}/gmath/lib/${ANDROID_ABI}&quot;)
+
+# copy out lib header file...
+add_custom_command(TARGET gmath POST_BUILD
+                   COMMAND &quot;${CMAKE_COMMAND}&quot; -E
+                   copy &quot;${CMAKE_CURRENT_SOURCE_DIR}/src/gmath.h&quot;
+                   &quot;${distribution_DIR}/gmath/include/gmath.h&quot;
+#                   **** the following 2 lines are for potential future debug purpose ****
+#                   COMMAND &quot;${CMAKE_COMMAND}&quot; -E
+#                   remove_directory &quot;${CMAKE_CURRENT_BINARY_DIR}&quot;
+                   COMMENT &quot;Copying gmath to output directory&quot;)
+</code></pre><h2 id="看看一些开源项目的CMakeLists-txt是怎么写的-看看实际项目比看文档快点"><a href="#看看一些开源项目的CMakeLists-txt是怎么写的-看看实际项目比看文档快点" class="headerlink" title="看看一些开源项目的CMakeLists.txt是怎么写的,看看实际项目比看文档快点"></a>看看一些开源项目的CMakeLists.txt是怎么写的,看看实际项目比看文档快点</h2><p><a href="https://github.com/DaveGamble/cJSON/blob/master/CMakeLists.txt">cJSON</a></br><br><a href="https://stackoverflow.com/questions/8304190/cmake-with-include-and-source-paths-basic-setup">多个source文件夹的问题</a> 实际工程中可能source directory或者library directory有多个，这时往往会在每一个对应的文件夹里面都看到一个CMakeLists.txt文件，这个才是工程中实际使用的。每一个CMakeLists.txt都指明了自己所在的文件夹中文件的关系，轻易不要瞎改。 </br><br><a href="https://github.com/srdja/Collections-C/blob/master/test/CMakeLists.txt">例如这样一个生成多个Target的项目</a>  </br><br><a href="https://github.com/shadowsocks/shadowsocks-libev/blob/master/CMakeLists.txt">再例如ss的CMakeList.txt</a>  </br><br><a href="https://github.com/json-c/json-c/blob/master/CMakeLists.txt">json-c的cmake</a> </br><br><a href="https://github.com/google/glog/blob/master/toolchains/clang-cxx17.cmake">.cmake后缀的文件</a>一般都是这么用的： </br></p>
+<pre><code>cmake -H. -B_build -DCMAKE_TOOLCHAIN_FILE=&quot;${PWD}/toolchains/gcc.cmake&quot;
+cmake /path/to/src -DCMAKE_TOOLCHAIN_FILE=/path/to/toolchain/foo-bar-baz.cmake
+</code></pre><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
 <li><a href="https://github.com/ttroy50/cmake-examples">这个repo</a>总结了各种各样的场景，例如编译单个binary，编译library，link第三方library，调整linker参数。。。。需要的时候照着这个写就是了</li>
 <li>自己参照着<a href="https://mirkokiefer.com/cmake-by-example-f95eb47d45b1">介绍了build app, build library以及link_library的基本操作</a>写了几个<a href="https://github.com/Haldir65/Channel/tree/master/tool_write_cmake">example</a>，分别是build binary，build library 和link library，分别cd到对应文件夹下面运行shell脚本就行了</li>
 <li>cmake .. 会导致install到/usr/lib里面， 我个人不是很喜欢这种把系统目录弄乱的方式。还是cmake -DCMAKE_INSTALL_PREFIX=../install。</li>
@@ -691,11 +711,15 @@ set_tests_properties(TestProgram1 PROPERTIES DEPENDS TestProgram2) //甚至可�
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">transition</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">foreground</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">transition</a>
+                <a href="javascript:void(0)" class="js-tag color3">service</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -707,15 +731,11 @@ set_tests_properties(TestProgram1 PROPERTIES DEPENDS TestProgram2) //甚至可�
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">service</a>
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -731,11 +751,11 @@ set_tests_properties(TestProgram1 PROPERTIES DEPENDS TestProgram2) //甚至可�
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -747,15 +767,15 @@ set_tests_properties(TestProgram1 PROPERTIES DEPENDS TestProgram2) //甚至可�
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">linux</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">kotlin</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">linux</a>
               </li>
              
               <li class="article-tag-list-item">
