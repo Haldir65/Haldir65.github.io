@@ -109,6 +109,8 @@ Page Cache(页缓存)，读文件的时候，会先看一下它是不是已经�
 https://zhuanlan.zhihu.com/p/52054044
 https://zhuanlan.zhihu.com/p/35879028
 
+http://docs.linuxtone.org/ebooks/C&CPP/c/ch20s05.html
+
 
 [虚拟内存，分页](https://www.cnblogs.com/vamei/p/9329278.html)
 [what a c programmer should know about memory](https://marek.vavrusa.com/memory/)

@@ -355,7 +355,12 @@ echo ${var//o/h} ## 把所有匹配到的o换成h，这个和sed非常像 输出
 
 var="pid: 1234"
 var=${var:5} ## 输出1234，切掉前5个字符
+```
 
+用[cut](https://stackoverflow.com/questions/428109/extract-substring-in-bash)也行
+```
+echo 'someletters_12345_moreleters.ext' | cut -d'_' -f 2
+12345
 ```
 
 ### eval的用法
@@ -793,7 +798,7 @@ for file in $ALLIMGES
         echo renaming $dir/$file to  $dir/$name
         mv $dir/$file $dir/$name
         ((index++))
-        # name=$(ls $file | cut -d. -f1)
+        # name=$(ls $file | cut -d. -f1) ##去掉文件后缀
         # mv $dir/public/imgs/$file ${name}.$suffix
         done
 echo "renaming $index image files =====> x.jpg done!"

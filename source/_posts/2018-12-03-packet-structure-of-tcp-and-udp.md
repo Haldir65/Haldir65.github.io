@@ -243,7 +243,7 @@ MTU 最大传输单元（英语：Maximum Transmission Unit，缩写MTU）是指
 > ping -l 1472 -f www.baidu.com ##根据提示去调小这个数就是了，一般1350以上是有的
 
 从csdn搞来的图
-![](https://haldir66.ga/static/imgs/tcp_and_udp_size_limit.png)
+![](https://api1.foster66.xyz/static/imgs/tcp_and_udp_size_limit.png)
 传输层： 
 对于UDP协议来说，整个包的最大长度为65535，其中包头长度是65535-20=65515； 
 对于TCP协议来说，整个包的最大长度是由最大传输大小（MSS，Maxitum Segment Size）决定，MSS就是TCP数据包每次能够传 

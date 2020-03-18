@@ -941,7 +941,15 @@ HandlerThread handlerThread = new HandlerThread("queued-work-looper",
 
 往这条HandlerThread上推任务时有延时(延时100ms再post)和立刻执行(立刻post，理论上应该会唤醒等待的looper，算是立刻执行吧)两种方式
 
+### 27. 半夜看到一篇关于miui的开发者文档，顿时感觉不是所有的问题都能通过技术来解决
+[miui](https://dev.mi.com/docs/appsmarket/technical_docs/adaptation_FAQ/#1manifestandroidpermissioninternet)。这里面描述了muui上开发的一些问题：例如
+Q:如何获取某项权限是否开启？
+A:暂时没有这个查询接口
 
+Q:为什么不能在锁屏显示Activity(这个我自己看到的是网易云音乐这种也不能在miui上锁屏)
+A:MIUI引入了锁屏显示窗口权限控制，默认不能在锁屏上显示Activity
+
+早一些看到这样的文档，也不至于浪费太多时间和国产rom进行调试吧，没意思的。当然还是要看价值。
 
 
 [安卓打包流程](https://api1.foster66.xyz/static/imgs/android_build_detail.png)

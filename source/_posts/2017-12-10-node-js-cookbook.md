@@ -5,7 +5,7 @@ tags: [前端]
 ---
 
 npm run start
-![](https://haldir66.ga/static/imgs/scenery1511100694324.jpg)
+![](https://api1.foster66.xyz/static/imgs/scenery1511100694324.jpg)
 <!--more-->
 
 

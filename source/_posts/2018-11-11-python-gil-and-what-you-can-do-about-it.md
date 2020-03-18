@@ -66,7 +66,7 @@ end = time.time()
 print('Time taken in seconds -', end - start)
 ```
 多线程虽然同一时刻只能有一条线程运行，但牵涉到数据共享的时候还是要加锁
-![](https://haldir66.ga/static/imgs/lockExplanation.jpg)
+![](https://api1.foster66.xyz/static/imgs/lockExplanation.jpg)
 
 比如这个例子，照说打印出来的应该是0，但实际操作中可能打出来正数
 ```python

@@ -6,7 +6,7 @@ tags: [C,linux]
 
 
 C语言实用指南，暂时不涉及cpp内容
-![](https://haldir66.ga/static/imgs/pretty-orange-mushroom-wallpaper-5386b0c8c3459.jpg)
+![](https://api1.foster66.xyz/static/imgs/pretty-orange-mushroom-wallpaper-5386b0c8c3459.jpg)
 <!--more-->
 
 ## 1.基本数据类型
@@ -297,6 +297,7 @@ export LD_LIBRARY_PATH=. ## 添加当前目录为查找路径
 //一般so文件都在/usr/lib或者/usr/local/lib文件夹下面
 locate sodium.so
 
+
 make wacky 也是可以的，可以指定编译target
 
 还有一种动态查找第三方库的方法
@@ -309,6 +310,9 @@ make wacky 也是可以的，可以指定编译target
 如果库在 usr/include/ 目录下，那么就用 #include < *.h >。这个目录下面放的都是些头文件
 如果库在当前目录下，就用　#include "mylib.h"
 gcc -v可以查看compile gcc时预设的链接静态库的搜索路径
+gcc -print-search-dirs ##编译器默认会找的目录可以用-print-search-dirs选项查看
+
+
 默认情况下， GCC在链接时优先使用动态链接库，只有当动态链接库不存在时才考虑使用静态链接库，如果需要的话可以在编译时加上-static选项，强制使用静态链接库。
 
 从项目结构来看,curl,ffmpeg这些都是一个文件夹里面放了所有的.h和.c文件。似乎没有其他语言的package的观念。我试了下，在Makefile里面带上文件夹的相对路径还是可以的。

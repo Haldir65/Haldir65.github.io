@@ -93,7 +93,7 @@ e的意思是extended regular expressions（Extended regular expressions include
 
 
 ![](https://api1.foster66.xyz/static/imgs/1102533911-1.jpg)
-![](https://haldir66.ga/static/imgs/20120103214255_nTsVt.jpg)
+![](https://api1.foster66.xyz/static/imgs/20120103214255_nTsVt.jpg)
 ![](https://api1.foster66.xyz/static/imgs/apic5964_sc115.jpg)
 
 ![](https://api1.foster66.xyz/static/imgs/strawberry-festival.jpg)
@@ -184,7 +184,7 @@ e的意思是extended regular expressions（Extended regular expressions include
 
 
 
-![](https://haldir66.ga/static/imgs/starry-night-van-gogh.jpg)
+![](https://api1.foster66.xyz/static/imgs/starry-night-van-gogh.jpg)
 ### 参考
 - [DFA和NFA](http://www.importnew.com/26560.html)
 - [Learn regex the easy way](https://github.com/ziishaned/learn-regex)

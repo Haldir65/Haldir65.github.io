@@ -6,7 +6,7 @@ top : 1
 ---
 
 一个待办事项的仓库
-![](https://haldir66.ga/static/imgs/girlfriend lake green nature water cold.jpg)
+![](https://api1.foster66.xyz/static/imgs/girlfriend lake green nature water cold.jpg)
 
 <!--more-->
 

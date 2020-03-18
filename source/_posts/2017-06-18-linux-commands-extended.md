@@ -7,7 +7,7 @@ tags: [tools,linux]
 > 一些linux的常用命令，linux环境下运行server ,bash的语法
 >  
 
-![](https://haldir66.ga/static/imgs/ChMkJ1gq00WIXw_GAA47r_8gjqgAAXxJAH8qOMADjvH566.jpg)
+![](https://api1.foster66.xyz/static/imgs/ChMkJ1gq00WIXw_GAA47r_8gjqgAAXxJAH8qOMADjvH566.jpg)
 
 <!--more-->
 
