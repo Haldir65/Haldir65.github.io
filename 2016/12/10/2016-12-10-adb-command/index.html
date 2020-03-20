@@ -16,7 +16,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="ADB 常用命令手册平时在android studio中用command的时候还有点不熟悉，找到一篇博客，记录下来，作为日常参考。希望后期能够有时间把Google IO上添加的一些命令加上来">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-03-18T22:24:14.500Z">
+<meta property="og:updated_time" content="2020-03-20T04:48:43.128Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="adb常用命令手册">
 <meta name="twitter:description" content="ADB 常用命令手册平时在android studio中用command的时候还有点不熟悉，找到一篇博客，记录下来，作为日常参考。希望后期能够有时间把Google IO上添加的一些命令加上来">
@@ -392,6 +392,22 @@ ga('send', 'pageview');
 <p>adb su进terminal<br>找一台root了的手机<br>adb shell<br>su<br>//好了，现在可以进root模式了<br>pm list packages<br>pm clear PACKAGE //删掉/data/data/package里面的东西<br>//启用/禁用app或者组件,需要su执行<br>pm enable [–user USER_ID] PACKAGE_OR_COMPONENT<br>pm disable [–user USER_ID] PACKAGE_OR_COMPONENT<br>pm reset //重置所有应用的权限</p>
 <p>这里面就有很多可以做的了</p>
 <p>am stack list<br>am start -n com.huxiu/com.huxiu.ui.activity.SplashActivity //命令行启动某应用<br>am start -n com.android.browser/com.android.browser.BrowserActivity //命令行开浏览器</p>
+<p>adb devices -l查看设备信息；<br>通过adb shell getprop | grep product查看设备信息：<br>更详细的信息可以使用adb shell getprop查看全部信息。</p>
+<p>导入和导出文件<br>导入：adb push xxx/xxx /sdcard/xxx<br>导出：adb pull /sdcard/xxx /xxx/xxx</p>
+<p>获取当前运行的Activity<br>adb shell dumpsys activity | grep “Run #”</p>
+<p>查看cpu<br>低版本Android(Android N及之前)：adb shell top -n 1 | sed -n ‘4,17p’<br>高版本ANdroid(Android O及之后)：adb shell top -n 1 | sed -n ‘5,15p’</p>
+<p>查看内存信息<br>adb shell dumpsys meminfo com.package</p>
+<p>查看某个应用的耗电状况<br>从android 5.0开始，可以通过adb shell dumpsys batterystats com.package获取电量的相关信息。</p>
+<p>清除应用的数据和缓存<br>adb shell pm clear com.package</p>
+<p>模拟input事件<br>adb shell input keyevent key_code<br>例如：<br>adb shell input keyevnet 3 # 点击home键操作</p>
+<p>adb shell input keyevent 4 # 点击返回键操作</p>
+<p>adb shell input keyevent 8 # for key ‘1’</p>
+<p>adb shell input keyevent 29 # for key ‘A’</p>
+<p>adb shell input text “hello” # 发送文本“hello”</p>
+<h2 id="react-native-shake-emulator-will-start-debug-menu"><a href="#react-native-shake-emulator-will-start-debug-menu" class="headerlink" title="react native shake emulator , will start debug menu"></a>react native shake emulator , will start debug menu</h2><p>adb shell input keyevent 82</p>
+<p>查看系统版本：adb shell getprop ro.build.version.release</p>
+<p>查看系统api版本：adb shell getprop ro.build.version.sdk</p>
+<p>查看手机IP地址：adb shell ifconfig | grep ‘inet addr:’ | sed -n ‘2p’ | awk ‘{print $2}’ | cut -d ‘:’ -f 2</p>
 <h3 id="参考"><a href="#参考" class="headerlink" title="参考:"></a>参考:</h3><ul>
 <li><a href="http://zmywly8866.github.io/2015/01/24/all-adb-command.html">张明云的博客</a></li>
 <li><a href="http://blog.csdn.net/ykttt1/article/details/52058717">adb无线调试</a></li>
@@ -670,11 +686,11 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -690,11 +706,11 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">python</a>
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -706,11 +722,11 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+                <a href="javascript:void(0)" class="js-tag color1">linux</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">linux</a>
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -718,11 +734,11 @@ ga('send', 'pageview');
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+                <a href="javascript:void(0)" class="js-tag color2">concurrency</a>
               </li>
              
               <li class="article-tag-list-item">
