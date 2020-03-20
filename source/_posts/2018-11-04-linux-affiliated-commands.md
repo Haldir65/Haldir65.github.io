@@ -55,6 +55,8 @@ sed 's/SINGING/saying/i' annoying.txt ##希望大小写不敏感
 sed 's/^.*at/REPLACED/' annoying.txt ##从每一行的开头到"at"
 sed 's/^.*at/(&)/' annoying.txt ## 把那些会匹配上的文字用括号包起来
 
+sed -i '' "/target text/d" annoying.txt // 所有包含target text的这一行文字都会被删掉
+
 [intermediate training](https://www.digitalocean.com/community/tutorials/intermediate-sed-manipulating-streams-of-text-in-a-linux-environment)
 
 [colshell的教程](https://coolshell.cn/articles/9104.html)

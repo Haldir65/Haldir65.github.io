@@ -234,9 +234,51 @@ am start -n com.huxiu/com.huxiu.ui.activity.SplashActivity //命令行启动某�
 am start -n com.android.browser/com.android.browser.BrowserActivity //命令行开浏览器
 
 
+adb devices -l查看设备信息；
+通过adb shell getprop | grep product查看设备信息：
+更详细的信息可以使用adb shell getprop查看全部信息。
 
+导入和导出文件
+导入：adb push xxx/xxx /sdcard/xxx
+导出：adb pull /sdcard/xxx /xxx/xxx
 
+获取当前运行的Activity
+adb shell dumpsys activity | grep "Run #"
 
+查看cpu
+低版本Android(Android N及之前)：adb shell top -n 1 | sed -n '4,17p'
+高版本ANdroid(Android O及之后)：adb shell top -n 1 | sed -n '5,15p'
+
+查看内存信息
+adb shell dumpsys meminfo com.package
+
+查看某个应用的耗电状况
+从android 5.0开始，可以通过adb shell dumpsys batterystats com.package获取电量的相关信息。
+
+清除应用的数据和缓存
+adb shell pm clear com.package
+
+模拟input事件
+adb shell input keyevent key_code
+例如：
+adb shell input keyevnet 3 # 点击home键操作
+
+adb shell input keyevent 4 # 点击返回键操作
+
+adb shell input keyevent 8 # for key '1'
+
+adb shell input keyevent 29 # for key 'A'
+
+adb shell input text “hello” # 发送文本“hello”
+
+## react native shake emulator , will start debug menu
+adb shell input keyevent 82
+
+查看系统版本：adb shell getprop ro.build.version.release
+
+查看系统api版本：adb shell getprop ro.build.version.sdk
+
+查看手机IP地址：adb shell ifconfig | grep 'inet addr:' | sed -n '2p' | awk '{print $2}' | cut -d ':' -f 2
 
 
 ### 参考:

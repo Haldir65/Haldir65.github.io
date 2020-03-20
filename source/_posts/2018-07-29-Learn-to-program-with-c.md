@@ -563,3 +563,4 @@ https://github.com/kozross/awesome-c#data-structures
 ## 参考
 [automatic directory creation in make](http://ismail.badawi.io/blog/2017/03/28/automatic-directory-creation-in-make/)
 [本文的参考](https://www.zfl9.com/)
+[CPP/C++ Compiler Flags and Options](https://caiorss.github.io/C-Cpp-Notes/compiler-flags-options.html) gcc和clang的command line arguments。
