@@ -17,7 +17,7 @@
 <meta property="og:description" content="topics relating opengl stuff">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://api1.foster66.xyz/static/imgs/scenery151110074347.jpg">
-<meta property="og:updated_time" content="2020-03-20T04:48:43.140Z">
+<meta property="og:updated_time" content="2020-04-06T09:43:53.506Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="opengl学习笔记">
 <meta name="twitter:description" content="topics relating opengl stuff">
@@ -651,22 +651,22 @@ void main(){
 <p><a href="https://en.wikipedia.org/wiki/RGBA_color_space">这个RGBA的顺序不能搞错</a><br>In OpenGL and Portable Network Graphics (PNG), the RGBA (byte-order) is used, where the colors are stored in memory such that R is at the lowest address, G after it, B after that, and A last. On a little endian architecture this is equivalent to ABGR (word-order).</p>
 <p>就是说，opengl和png数据中,byte array的顺序从内存低地址到高地址依次是RGBA，在小端上会掉头</p>
 <p><a href="https://www.jianshu.com/p/12f06da0a4ec">Android 关于美颜/滤镜 从OpenGl录制视频的一种方案</a>有这样的操作byte[]的代码，需要指出的是。<br>java平台上，因为有jvm的存在，所以是大端。所以这下面的代码才成立</p>
-<pre><code class="java"> int[] pixelData = new int[width * height];
+<pre><code class="java">int[] pixelData = new int[width * height];
 
-                int offset = 0;
-                int index = 0;
-                for (int i = 0; i &lt; height; ++i) {
-                    for (int j = 0; j &lt; width; ++j) {
-                        int pixel = 0;
-                        pixel |= (data[offset] &amp; 0xff) &lt;&lt; 16;     // R
-                        pixel |= (data[offset + 1] &amp; 0xff) &lt;&lt; 8;  // G
-                        pixel |= (data[offset + 2] &amp; 0xff);       // B
-                        pixel |= (data[offset + 3] &amp; 0xff) &lt;&lt; 24; // A
-                        pixelData[index++] = pixel;
-                        offset += pixelStride;
-                    }
-                    offset += rowPadding;
-                }
+int offset = 0;
+int index = 0;
+for (int i = 0; i &lt; height; ++i) {
+    for (int j = 0; j &lt; width; ++j) {
+        int pixel = 0;
+        pixel |= (data[offset] &amp; 0xff) &lt;&lt; 16;     // R
+        pixel |= (data[offset + 1] &amp; 0xff) &lt;&lt; 8;  // G
+        pixel |= (data[offset + 2] &amp; 0xff);       // B
+        pixel |= (data[offset + 3] &amp; 0xff) &lt;&lt; 24; // A
+        pixelData[index++] = pixel;
+        offset += pixelStride;
+    }
+    offset += rowPadding;
+}
 </code></pre>
 <p>图片模糊<br>图片模糊处理相对上面的色调处理稍微复杂一点，通常图片模糊处理是采集周边多个点，然后利用这些点的色彩和这个点自身的色彩进行计算，得到一个新的色彩值作为目标色彩。模糊处理有很多算法，类似高斯模糊、径向模糊等等。</p>
 <h3 id="YUV格式解释-相机返回的是YUV格式的图像数据"><a href="#YUV格式解释-相机返回的是YUV格式的图像数据" class="headerlink" title="YUV格式解释(相机返回的是YUV格式的图像数据)"></a>YUV格式解释(相机返回的是YUV格式的图像数据)</h3><blockquote>

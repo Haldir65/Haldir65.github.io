@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://api1.foster66.xyz/static/imgs/b9ae1189145b4a4d9dfe4d0b89a21b47.jpg">
 <meta property="og:image" content="https://api1.foster66.xyz/static/imgs/ed541bc1ed61ead0bf6ea8233ef01c0a.jpg">
-<meta property="og:updated_time" content="2020-03-20T04:48:43.132Z">
+<meta property="og:updated_time" content="2020-04-06T09:43:53.498Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="网络通信手册">
 <meta name="twitter:description" content="网络相关的查找手册">
@@ -553,11 +553,10 @@ Postman-Token: ddc99b57-f703-4d05-abbe-c0123d4f5fed
 </ul>
 <p><a href="https://wsgzao.github.io/post/service-names-port-numbers/">服务器常用端口以及TCP/UDP端口列表</a></p>
 <p>tcp dump + wireShark抓包<br><a href="http://www.trinea.cn/android/tcpdump_wireshark/">详细教程</a></p>
-<p>httpOnly：浏览器里面用js去调用document.cookie这个api时就不会拿到这个被设置了httponly的cookie了</p>
-<pre><code>Set-Cookie: =[; =]
-[; expires=][; domain=]
-[; path=][; secure][; HttpOnly]
-</code></pre><p>HttpOnly就是在设置cookie时接受这样一个参数，一旦被设置，在浏览器的document对象中就看不到cookie了,主要是为了避免（cross-site scripting）XSS attack</p>
+<p>HttpOnly就是在设置cookie时接受这样一个参数，一旦被设置，在浏览器的document对象中就看不到cookie了,主要是为了避免（cross-site scripting）XSS attack</p>
+<p>说得再简单一点，就是后台下发的Response Header一般是这样的</p>
+<p>“Set-Cookie:ticketid=supersecret13;Path=/;HttpOnly=true;”<br> HttpOnly = true 的，对于Js来讲，document.cookie里面是拿不到这个key的</p>
+<p> 不让js操作也是有原因的，避免一段恶意的script脚本插到网页中，这段script就能够通过document.cookie读取到用户身份验证相关信息，那样攻击者就能拿着用户的合法验证信息冒充此用户了</p>
 <p><a href="http://wiki.jikexueyuan.com/project/node-lessons/cookie-session.html">cookie 和 session参考</a></p>
 <h3 id="签名-signedCookies"><a href="#签名-signedCookies" class="headerlink" title="签名(signedCookies)"></a>签名(signedCookies)</h3><p>server一般不会在client端cookie中保留敏感信息，所以比方说我们要存一个user_id，正常也应该存在session中（后台的redis根据请求头中的session_id自己去找）。假如非要存client端的cookie中，可以这么干：<br>sever端保留一段随机的String，server将用户的user_id(存在后台)用sha1算法加密<br>比如</p>
 <pre><code class="js">var secret = &quot;some_very_important_key&quot;; // 这段secret越长，暴力破解的难度越大

@@ -14,7 +14,7 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://api1.foster66.xyz/static/imgs/SutherlandFalls_ZH-CN4602884079_1920x1080.jpg">
-<meta property="og:updated_time" content="2020-03-20T04:48:43.144Z">
+<meta property="og:updated_time" content="2020-04-06T09:43:53.510Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="各种编程语言与c、c++的交互">
 <meta name="twitter:image" content="https://api1.foster66.xyz/static/imgs/SutherlandFalls_ZH-CN4602884079_1920x1080.jpg">
@@ -363,6 +363,12 @@ Unsafe#allocateInstance(Class&lt;?&gt;)
 public T newInstance(Object... initargs) throws InstantiationException,
 IllegalAccessException, IllegalArgumentException, InvocationTargetException
 
+public native T newInstance() throws InstantiationException, IllegalAccessException;
+
+区别:
+class.newInstance()只能反射无参的构造函数(只能public的),对于捕获的或者未捕获的异常均由构造函数抛出
+Constructor.newInstance()可以反射任何构造函数(包括私有)，通常会把抛出的异常封装成InvocationTargetException抛出。
+
 // 4.jni直接操作
 //关键就这么一句，注意这一句是不会调用到无参的构造函数的。
 env-&gt;AllocObject(userDataClass);
@@ -383,7 +389,9 @@ mv libnative.so  jni
 java -cp .:target/classes -Djava.library.path=jni com.me.harris.jupiter.channel.HelloJNI2 ## java命令行参数一个比较烦人的地方就是com.example.Main这个class非得要去一个com/example文件夹下面有这个class文件
 ##cp的意思就是classpath了，这个命令要能跑成功，前提是target文件夹下有个com/me/harris/jupiter/channel/这么一连串的文件夹 
 </code></pre>
+<p>java classpath的分隔符,在windows上是;  在unix上是: </p>
 <p><a href="https://github.com/Haldir65/scripts/tree/master/jnistuff">自己参考着写了jni的一些用例，剩下的就是照着oracle的doc一个个去尝试参数和方法了</a></p>
+<p>比如从jni层返回一个java对象<br>比如在jni层查看java native方法穿过来的参数的值<br>比如通过jni修改一个final 变量的值。其实照着doc来几乎不会出错<br>比如在jni层在一条c++线程中通过AttachCurrentThread方法回调java</p>
 <h3 id="3-3-java调用系统方法"><a href="#3-3-java调用系统方法" class="headerlink" title="3.3 java调用系统方法"></a>3.3 java调用系统方法</h3><p>java有一个Process api<br>java中Process的Api<br>关键词：ProcessBuilder , java9提供了新的Api。另外还有Runtime.exec这个方法<br>亲测，下面的命令可以在mac上执行uname -a 命令</p>
 <pre><code class="java">//用ProcessBuilder是一种做法
  try {
