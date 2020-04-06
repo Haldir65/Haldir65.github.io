@@ -253,6 +253,10 @@ camera Roll
 
 React.FunctionComponent
 
+## react hooks的出现是为了替代一些嵌套得过深的高阶组件。
+hooks里面也有一个store，推荐去看一下react-redux的源码。应该有兼容class component和functional component的写法。
+
+
 
 [ReactNative之js与native通信流程（Android篇）](http://yangguang1029.github.io/2018/02/26/rn-android-communicate/)
 [ReactNative之VirtualDomTree的diff原理](http://yangguang1029.github.io/2018/02/25/rn-reconciliation/)

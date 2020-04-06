@@ -951,5 +951,12 @@ A:MIUI引入了锁屏显示窗口权限控制，默认不能在锁屏上显示Ac
 
 早一些看到这样的文档，也不至于浪费太多时间和国产rom进行调试吧，没意思的。当然还是要看价值。
 
+## 28. 关于android中如何收集native crash的问题
+[libcorkscrew](https://www.jianshu.com/p/5f8f6d95b79c) 一种基于linux信号量的收集crash的方式
+生产环境见过用[爱奇艺的一个库](https://github.com/iqiyi/xCrash)
 
 [安卓打包流程](https://api1.foster66.xyz/static/imgs/android_build_detail.png)
+
+
+### 29. MiuiResources不能随便替换
+Resource.getClass().getName().equals("android.content.res.MiuiResources")的时候，ContextImpl的resource不能换。

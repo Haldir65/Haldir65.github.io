@@ -574,22 +574,22 @@ In OpenGL and Portable Network Graphics (PNG), the RGBA (byte-order) is used, wh
 [Android 关于美颜/滤镜 从OpenGl录制视频的一种方案](https://www.jianshu.com/p/12f06da0a4ec)有这样的操作byte[]的代码，需要指出的是。
 java平台上，因为有jvm的存在，所以是大端。所以这下面的代码才成立
 ```java
- int[] pixelData = new int[width * height];
+int[] pixelData = new int[width * height];
 
-                int offset = 0;
-                int index = 0;
-                for (int i = 0; i < height; ++i) {
-                    for (int j = 0; j < width; ++j) {
-                        int pixel = 0;
-                        pixel |= (data[offset] & 0xff) << 16;     // R
-                        pixel |= (data[offset + 1] & 0xff) << 8;  // G
-                        pixel |= (data[offset + 2] & 0xff);       // B
-                        pixel |= (data[offset + 3] & 0xff) << 24; // A
-                        pixelData[index++] = pixel;
-                        offset += pixelStride;
-                    }
-                    offset += rowPadding;
-                }
+int offset = 0;
+int index = 0;
+for (int i = 0; i < height; ++i) {
+    for (int j = 0; j < width; ++j) {
+        int pixel = 0;
+        pixel |= (data[offset] & 0xff) << 16;     // R
+        pixel |= (data[offset + 1] & 0xff) << 8;  // G
+        pixel |= (data[offset + 2] & 0xff);       // B
+        pixel |= (data[offset + 3] & 0xff) << 24; // A
+        pixelData[index++] = pixel;
+        offset += pixelStride;
+    }
+    offset += rowPadding;
+}
 ```
 
 

@@ -610,6 +610,8 @@ provider的getType方法中返回对应的String，一次IPC来回
 好像7.0之后sharedPreference的存储的位置挪到了
 “/data/data/应用程序包/shared_prefs”这里
 
+[MultiProcessSharedPreferences在此](https://github.com/Tencent/MMKV/blob/master/Android/MMKV/mmkvdemo/src/main/java/com/tencent/mmkvdemo/MultiProcessSharedPreferences.java)
+
 ### 33. Activity的生命周期一直是一个很重要的话题
 A start B forResult , B回来之后A被系统干掉了怎么办？
 回来的时候A已经不是原来的A，所以要在onSaveInstance和onRestoreInstance中维护数据

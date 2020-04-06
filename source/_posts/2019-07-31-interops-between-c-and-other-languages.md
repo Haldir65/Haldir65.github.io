@@ -235,6 +235,12 @@ Unsafe#allocateInstance(Class<?>)
 public T newInstance(Object... initargs) throws InstantiationException,
 IllegalAccessException, IllegalArgumentException, InvocationTargetException
 
+public native T newInstance() throws InstantiationException, IllegalAccessException;
+
+区别:
+class.newInstance()只能反射无参的构造函数(只能public的),对于捕获的或者未捕获的异常均由构造函数抛出
+Constructor.newInstance()可以反射任何构造函数(包括私有)，通常会把抛出的异常封装成InvocationTargetException抛出。
+
 // 4.jni直接操作
 //关键就这么一句，注意这一句是不会调用到无参的构造函数的。
 env->AllocObject(userDataClass);
@@ -262,9 +268,16 @@ mv libnative.so  jni
 java -cp .:target/classes -Djava.library.path=jni com.me.harris.jupiter.channel.HelloJNI2 ## java命令行参数一个比较烦人的地方就是com.example.Main这个class非得要去一个com/example文件夹下面有这个class文件
 ##cp的意思就是classpath了，这个命令要能跑成功，前提是target文件夹下有个com/me/harris/jupiter/channel/这么一连串的文件夹 
 ```
+
+java classpath的分隔符,在windows上是;  在unix上是: 
+
+
 [自己参考着写了jni的一些用例，剩下的就是照着oracle的doc一个个去尝试参数和方法了](https://github.com/Haldir65/scripts/tree/master/jnistuff)
 
-
+比如从jni层返回一个java对象
+比如在jni层查看java native方法穿过来的参数的值
+比如通过jni修改一个final 变量的值。其实照着doc来几乎不会出错
+比如在jni层在一条c++线程中通过AttachCurrentThread方法回调java
 
 ### 3.3 java调用系统方法
 java有一个Process api

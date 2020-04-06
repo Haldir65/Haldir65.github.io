@@ -453,6 +453,21 @@ echo "-------- End --------"
 然后才是交叉编译
 
 
+android不同于PC端，android标准输出（stdout）、标准错误（stderr）都被重定向到了/dev/null，printf ，std::cout函数根本不起作用。
+所以一般都是使用这种方式
+
+```c
+#include <android/log.h>
+
+
+#define LOG_TAG "native-glue"
+
+#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO,  LOG_TAG, __VA_ARGS__))
+#define LOGD(...) ((void)__android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__))
+#define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN,  LOG_TAG, __VA_ARGS__))
+#define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__))
+```
+
 
 ## 参考
 [configure-cmake](https://developer.android.com/studio/projects/configure-cmake)

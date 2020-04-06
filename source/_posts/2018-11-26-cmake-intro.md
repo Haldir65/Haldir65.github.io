@@ -145,6 +145,9 @@ file(GLOB SOURCES "src/*.cpp")
 这样编译器就会在编译参数上加上-I/directory/path这种东西
 
 
+include_directories和add_subdirectory的区别
+在include header这一点上，都没有区别，但是如果想要把另一个项目里面的cpp文件也拉进来的话，需要add_subdirectory
+
 ### static library的处理
 ```
 cmake_minimum_required(VERSION 3.5)

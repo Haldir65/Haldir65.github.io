@@ -650,13 +650,15 @@ tcp dump + wireShark抓包
 [详细教程](http://www.trinea.cn/android/tcpdump_wireshark/)
 
 
-httpOnly：浏览器里面用js去调用document.cookie这个api时就不会拿到这个被设置了httponly的cookie了
-```
-Set-Cookie: =[; =]
-[; expires=][; domain=]
-[; path=][; secure][; HttpOnly]
-```
 HttpOnly就是在设置cookie时接受这样一个参数，一旦被设置，在浏览器的document对象中就看不到cookie了,主要是为了避免（cross-site scripting）XSS attack
+
+说得再简单一点，就是后台下发的Response Header一般是这样的
+
+"Set-Cookie:ticketid=supersecret13;Path=/;HttpOnly=true;"
+ HttpOnly = true 的，对于Js来讲，document.cookie里面是拿不到这个key的
+
+ 不让js操作也是有原因的，避免一段恶意的script脚本插到网页中，这段script就能够通过document.cookie读取到用户身份验证相关信息，那样攻击者就能拿着用户的合法验证信息冒充此用户了
+
 
 [cookie 和 session参考](http://wiki.jikexueyuan.com/project/node-lessons/cookie-session.html)
 ### 签名(signedCookies)

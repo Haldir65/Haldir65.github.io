@@ -502,6 +502,17 @@ int main(){
 用const修饰形参指针的一个重要的点就是向外部保证，指针指向的内容是只读的。例如上面的strnchr函数，使用const修饰一个指针，指针的指向可以修改，但是这个字符串的内容就不会被修改。但是这里只是说指针A指向的内容不能改了，假如将指针A的地址赋给B,通过B还是可能修改这部分内容的。
 
 
+### 一些语法怪的很
+```c
+void test(){
+    int err = 1;
+        printf("go to first branch %d \n",err);
+    err:
+        printf("go to this branch");     // 会走到这里
+}
+```
+
+
 ### c语言中的未定义行为(比如说数组越界)
 [c语言的一些问题](https://coolshell.cn/articles/945.html)
 ```c

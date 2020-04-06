@@ -268,6 +268,9 @@ postDelayed本身就是把一条消息推迟到相对时间多久之后。关键
 nativePollOnce(ptr, nextPollTimeoutMillis);函数的调用。线程会被阻塞在这个地方。这个native方法会调用到底层的JNI函数android_os_MessageQueue_nativePollOnce()，进一步调用c/c++层的nativeMessageQueue的pollOnce()函数，在这个函数中又会通过本线程在底层的Looper的pollOnce()函数，进而调用pollInner()函数。在pollInner()函数中会调用**epoll_wait()**函数(这个函数不堵塞)
 对应nativePollOnce的还有nativeWake，就是表明pipe写端有write事件发生，从而让epoll_wait()退出等待。
 
+
+java层的MessageQueue持有的mPtr实际上是nativeInit，也就是NativeMessageQueue的指针,这样也方便后面nativeDestory
+
 主线程（UI线程）执行到这一步就进入了死循环，不断地去拿消息队列里面的消息出来处理？那么问题来了
 1、UI线程一直在这个循环里跳不出来，主线程不会因为Looper.loop()里的死循环卡死吗，那还怎么执行其他的操作呢？
 
@@ -405,6 +408,76 @@ Looper.cpp利用epoll机制接收events,并调用callback回调的handleEvent方
 ```c++
 mMessageQueue->getLooper()->addFd(fd, 0, events, this, NULL);
 ```
+
+### NativeMessageQueue的创建和destory
+java层的顺序:
+Looper.prepare -> new Looper -> new MessageQueue -> MessageQueue的构造函数里开始进入jni
+-> nativeInit方法 -> 
+c++层开始 -> 创建new NativeMessageQueue -> NativeMessageQueue的构造函数里面创建一个Looper -> Looper的构造函数里面调用了linux函数eventfd(创建mWakeEventFd)，epoll_create(创建epoll实例)和epoll_ctl(将mWakeEventFd添加到epoll实例中，关注EPOLLIN事件，也就是后面有谁往这个mWakeEventFd里面写东西了，就会唤醒休眠在epoll_wait的线程)  -> 返回NativeMessageQueue的指针(long)给java层
+
+
+### nativePollOnce(ptr, nextPollTimeoutMillis)是一个native方法
+先说结论
+```c++
+ #include <sys/epoll.h>
+// 等待时间发生或者超时，在nativeWake()方法，向管道写端写入字符，则方法会返回。
+ int eventCount = epoll_wait(mEpollFd, eventItems, EPOLL_MAX_EVENTS, timeoutMillis); //这个timeoutMillis和java的native方法传过来的预计的下一个msg的时间有关。
+```
+
+[epoll_wait](http://man7.org/linux/man-pages/man2/epoll_wait.2.html)是一个linux函数，看下文档上对这个timeout的描述:
+```
+The timeout argument specifies the number of milliseconds that
+epoll_wait() will block.  Time is measured against the
+CLOCK_MONOTONIC clock.  The call will block until either:
+
+*  a file descriptor delivers an event;
+
+*  the call is interrupted by a signal handler; or
+
+*  the timeout expires.
+```
+所以要么是java层通过nativeWake方法往管道里写了数据唤醒了该线程，要么是timeout到了。
+来看调用顺序，
+java层:
+MessageQueue.nativePollOnce(ptr, nextPollTimeoutMillis) -> 
+进入c++层
+nativeMessageQueue->pollOnce(env, obj, timeoutMillis) ->
+mLooper->pollOnce(timeoutMillis); ->
+Looper->pollInner(timeoutMillis); ->
+int eventCount = epoll_wait(mEpollFd, eventItems, EPOLL_MAX_EVENTS, timeoutMillis); //到此就是阻塞在这里等待唤醒，eventCount代表事件总数。接下来会遍历eventCount次，发现EPOLLIN的事件就awoken()，其实就是调用read函数，使得mWakeFd的可读状态被清除。
+
+**重点是epoll_wait返回，也就是java层的nativePollOnce方法不再阻塞（实现了用不耗cpu的方式等待特定milliseconds的方式）。**
+
+
+[参考](https://cloud.tencent.com/developer/article/1199423)消息处理流程是先处理NativeMessage，再处理Native Request，最后才能从pollInner方法返回，这才能从jni方法返回，这才能执行Java Message。理解了该流程也就明白了有时上层消息很少，但响应时间却比较长的真正原因。
+
+
+nativeWake方法多数是在java层的enqueMessage的时候调用的。（应该是当前被syncBarrier挡住了，新来的一个msg.isAsynchronous的时候）。
+nativeWake也是一个native方法，c++层的实现最终是在 Looper.cpp 这个文件里。
+```c++
+void Looper::wake() {
+#if DEBUG_POLL_AND_WAKE
+    ALOGD("%p ~ wake", this);
+#endif
+
+    uint64_t inc = 1;
+    // 向管道mWakeEventFd写入字符1
+    ssize_t nWrite = TEMP_FAILURE_RETRY(write(mWakeEventFd, &inc, sizeof(uint64_t))); // 看见没，就是往一个mWakeEventFd里面写了一个1
+    if (nWrite != sizeof(uint64_t)) {
+        if (errno != EAGAIN) {
+            ALOGW("Could not write wake signal, errno=%d", errno);
+        }
+    }
+}
+```
+
+[c++层的looper是实现nativePollOnce的核心](http://androidxref.com/6.0.1_r10/xref/system/core/libutils/Looper.cpp) 这里面关注pollInner方法, java层的messageQueue也是借助了C++层的looper实现了阻塞操作不阻塞cpu
+
+性能检测，例如检测activity start等生命周期时间的方法还有一个, 
+android.util.EventLog这个class有一个readEvents方法，可以从里面读取到的信息包括
+totalTime, layoutTime 以及drawTime等
+其实就是捞出来一堆日常会在logcat里面看到的日志，系统将这些信息都根据不同的事件类型分为不同的tag打印出来了，例如
+am_activity_launch_time,am_activity_fully_drawn_time,am_kill(某个进程被干掉了) [例如launcher被干掉了](https://www.androidperformance.com/2019/09/17/Android-Kill-Background-App-Debug/)
 
 ### Reference
 1. [Handler.postDelayed()是如何精确延迟指定时间的](http://www.dss886.com/android/2016/08/17/17-18)
