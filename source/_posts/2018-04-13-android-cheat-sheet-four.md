@@ -333,10 +333,11 @@ gradle.properties添加一句android.useDeprecatedNdk=true
 Android Studio中集成c或者cpp代码照着这个官方的[教程](https://developer.android.com/studio/projects/add-native-code)抄就行了。其实也就是写一个CMakeLists.txt，然后在studio里面右键app模块, Link C++ Project with Gradle。照着来就是了。
 
 先写好java的native方法，然后cd到src/main/java路径
-javah -d jni com.your.package.name.classyoujustWroteWithnativeMethod
+javah -classpath .:/Users/harris/Library/Android/sdk/platforms/android-28/android.jar  -d jni com.me.harris.ndk_graphics.JNIHelper
+
+加上classpath的原因是JNIHelper这个java文件里面引用到了Android的class
 
 把生成的header文件剪切到和main/Java文件夹平级的jni文件夹中，再去写c的实现。
-注意的一小点是： printf是不会打印到logcat里面的，需要使用android/log.h头文件里面的东西
 
 移植mp3lame到Android平台照着[这里](https://www.jianshu.com/p/065bfe6d3ec2)操作就行了。
 这篇博客使用的是lame-3.99.5，注意下载对应的版本。

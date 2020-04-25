@@ -76,6 +76,20 @@ android {
   externalNativeBuild {
        cmake {
             path 'CMakeLists.txt' //这个是说明CMakeLists.txt这个文件在哪里的，studio 里面link project with c++ program就是干这个的
+
+            //下面这些是为了说明可以通过gradle往cmake传一些command line arguments的。
+            // Passes optional arguments to CMake.
+             arguments "-DANDROID_ARM_NEON=TRUE", "-DANDROID_TOOLCHAIN=clang"
+
+             // Sets a flag to enable format macro constants for the C compiler.
+             cFlags "-D__STDC_FORMAT_MACROS"
+
+             // Sets optional flags for the C++ compiler.
+             cppFlags "-fexceptions", "-frtti"
+
+             // Specifies the library and executable targets from your CMake project
+             // that Gradle should build.
+             targets "libexample-one", "my-executible-demo"
         }
   }
 }
@@ -468,8 +482,18 @@ android不同于PC端，android标准输出（stdout）、标准错误（stderr�
 #define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__))
 ```
 
+### libjpeg移植到android上的教程不要太简单
+[参考这篇文章的做法](https://my.oschina.net/u/3863980/blog/3021025)
+```
+项目开发过程中发现Android的质量压缩算法在图片过大，色彩丰富的前提下，压缩的性能不是特别好，经过调查发现Android底层实现使用Skia引擎，封装了了libjpeg图像库。为了适配低版本的Android手机，其内部的压缩算法并没有采用普遍的哈夫曼算法，因为哈夫曼算法比较占CPU，从而选择了其他的算法B，而算法B的效果并没有达到项目预期，所以这里研究一下通过自编译libjpeg来使用哈夫曼算法进行图片压缩的操作。
+图片在内存中占用的大小为3m，同等压缩质量下, 源生花了215毫秒，而libjpeg-turbo花了1.6秒。 
+```
+[libjpeg-turbo仓库](https://github.com/libjpeg-turbo/libjpeg-turbo/)直接把所有文件粘贴到项目中，build.gradle中指定CMakeLists.txt对应的路径。会生成libjepg.so和libturbo-jpeg.so两个文件。
+
 
 ## 参考
 [configure-cmake](https://developer.android.com/studio/projects/configure-cmake)
 [googlesamples/android-ndk](https://github.com/googlesamples/android-ndk)
 [Android NDK开发扫盲及最新CMake的编译使用](https://www.jianshu.com/p/6332418b12b1)
+[ANDROID_ABI这个变量，在CMakeLists.txt里面，可以告诉我们当前打的是x86还是arm64-v8a](https://stackoverflow.com/a/47571204)
+

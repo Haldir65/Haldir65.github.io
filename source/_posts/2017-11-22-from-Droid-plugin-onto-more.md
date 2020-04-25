@@ -162,6 +162,7 @@ signingConfigs {
 
 [有人给出了Android多渠道打包的进化史，很有意思](http://www.dss886.com/2017/11/21/01/)
 
+结论就是 建议通过修改zip摘要的方式生成渠道包
 
 [为什么 Android 要采用 Binder 作为 IPC 机制？](https://www.zhihu.com/question/39440766)
 

@@ -423,6 +423,22 @@ git config --local core.autocrlf input  //单个项目设置(希望使用unix的
 所以这事要看自己到底希望使用哪种换行符
 对于已经出现这种错误的项目，git rm -r --cached . && git  add . && git commit -m "fix crlf"
 
+
+## 19. git hooks的概念
+在每一个git仓库的.git文件夹下有一个hooks文件夹，下面有一些commit-msg.sample，pre-commit.sample等文件夹。默认情况下这些.sample文件是不会执行的，去掉后面的.sample后缀。也很好理解，pre-commit代表用户本地进行git commit的时候会执行的一个脚本，就跟写shell脚本一样的。
+本地最后一次commit message实际上被写进了 .git/COMMIT_EDITMSG 这个文件。
+gerrit 的 Change-Id 机制就是修改了这个文件，往这里头塞了一行: Change-Id: Ic89d5ce6ce4de70d1dcb315ce543c86a2b3ac003 这样的文字。 Change-Id 是 gerrit (代码审核平台)的概念, 与 git (版本管理) 是没有关系的
+
+[commit-msg文件的内容](https://gist.github.com/Haldir65/966fadaeb4ecacc3069c40faac2f75de)
+
+所以代码一般是这么提交的
+```
+$ git add ......
+$ git commit -m "你的提交日志"
+$ git push origin HEAD:refs/for/master
+```
+
+
 ## 参考
 - [git reset和revert](http://yijiebuyi.com/blog/8f985d539566d0bf3b804df6be4e0c90.html)
 - [git recipes](https://github.com/geeeeeeeeek/git-recipes)

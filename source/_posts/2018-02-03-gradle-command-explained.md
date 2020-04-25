@@ -605,6 +605,14 @@ public class PluginImpl implements Plugin<Project> {
 }
 ```
 
+
+下面这俩其实是一样的，
+其实在gradle中，这是一个方法调用，它的本质是implementation()方法传入了一个map参数，因此完整的写法实际上是这样的：
+```js
+implementation 'com.android.support:appcompat-v7:28.0.0'
+implementation( group: 'com.android.support', name:'appcompat-v7', version:'28.0.0')
+```
+
 ### error
 One of the classes is an explicit generated class using the class statement, the other is a class generated from the script body based on the file name. Solutions are to change the file name or to change the class name.
 

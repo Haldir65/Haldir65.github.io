@@ -548,6 +548,8 @@ C语言就是这样，好多功能都得自己实现。一些高级语言都有�
 [gets在c11中被gets_s替代](https://zh.cppreference.com/w/c/io/gets)
 
 
+pthread_key_create, pthread_setspecific, pthread_getspecific
+这三个是c语言的api，类似于java的threadLocal，语言都是相通的
 
 ==========================================
 tbd 

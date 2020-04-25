@@ -238,7 +238,7 @@ IllegalAccessException, IllegalArgumentException, InvocationTargetException
 public native T newInstance() throws InstantiationException, IllegalAccessException;
 
 区别:
-class.newInstance()只能反射无参的构造函数(只能public的),对于捕获的或者未捕获的异常均由构造函数抛出
+class.newInstance()只能反射无参的构造函数(只能public的),对于捕获的或者未捕获的异常均由构造函数抛出(底层调用的是Constructor.newInstance((Object[])null)，所以是可以传一个null进去的)
 Constructor.newInstance()可以反射任何构造函数(包括私有)，通常会把抛出的异常封装成InvocationTargetException抛出。
 
 // 4.jni直接操作
