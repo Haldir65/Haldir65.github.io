@@ -223,7 +223,7 @@ System.load(currentDir+"/"+"libhellojni.so"); //load则是给出文件的绝对�
 这个没什么好说的
 
 ### 3.2 C、C++调用java代码
-c、c++层调用java也是可以的,甚至可以在native层创建一个java实例返回给java层，所以创建一个java对象的方法至少包括new,unsafe,Constructor.newInstance以及jni。 unsafe的方式只是分配内存，并不调用构造函数。
+c、c++层调用java也是可以的,甚至可以在native层创建一个java实例返回给java层，所以创建一个java对象的方法至少包括new,unsafe,Constructor.newInstance以及jni。(其实还包括clone， ObjectInputStream.readObject方法) unsafe的方式只是分配内存，并不调用构造函数。
 
 ```java
 //1. 用new关键字，这个没什么好说的
@@ -232,9 +232,12 @@ c、c++层调用java也是可以的,甚至可以在native层创建一个java实�
 Unsafe#allocateInstance(Class<?>) 
 
 //3. 用java.lang.reflect.Constructor.newInstance(Object... initargs) 
+Constructor.java
 public T newInstance(Object... initargs) throws InstantiationException,
 IllegalAccessException, IllegalArgumentException, InvocationTargetException
 
+
+class.java
 public native T newInstance() throws InstantiationException, IllegalAccessException;
 
 区别:

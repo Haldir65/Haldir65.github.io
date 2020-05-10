@@ -1197,6 +1197,8 @@ throw new InvalidClassException(osc.name,
 
 [动态原理的newProxyInstance最终调用到了defineClass0](https://blog.csdn.net/jiangwei0910410003/article/details/52523679),就是根据代理类的字节码生成代理类的实例（就是遍历目标类实现的接口，生成代理类的字节码byte[]）
 
+生成的class文件最终在执行该方法的时候调用的InvocationHandler的invoke方法，仅此而已  
+
 ### 41. java io主要是装饰模式，另外，调用操作系统api实现读写文件的功能在FileInputStream和FilePutputStream里面，主要的native方法都在这里面，FileDescriptor的使用也在这里面
 ```java
   // FileInputStream.java

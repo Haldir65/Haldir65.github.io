@@ -523,7 +523,7 @@ void scheduleTraversals() {
 ```
 这样看来，在第一次handleResumeActivity的时候，Choreographer会主动设定一次traversal，后续的measure,layout,draw也就顺理成章了
 
-### Dialog
+### Dialog(创建了一个window)
 
 子窗口的话,典型的例子是dialog。直接使用Activity的windowManager和WMS交互
 Dialog的构造函数中
@@ -592,7 +592,7 @@ void adjustLayoutParamsForSubWindow(WindowManager.LayoutParams wp) {
 ```
 
 
-### PopupWindow
+### PopupWindow(没有创建window)
 ```java
 //popupwindow的LayoutParams.type默认是
 private int mWindowLayoutType = WindowManager.LayoutParams.TYPE_APPLICATION_PANEL;// 1000

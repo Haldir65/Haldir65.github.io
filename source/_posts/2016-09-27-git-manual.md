@@ -43,6 +43,10 @@ Branch master set up to track remote branch master from origin.
 > git branch --track dev origin/dev && git checkout dev
 
 
+本地创建一个分支，推送到远程
+git checkout -b feature_branch_name
+git push -u origin feature_branch_name
+
 ## 3. git处理大小写字母的问题
 
 > git默认对大小写不敏感，所以，新建一个文件adapter.java，上传到github之后说不定就给变成了Adapter.java。在windows下面将已经push到远端的文件，改变其文件名的大小写时，git默认会认为文件没有发生任何改动，从而拒绝提交和推送，原因是其默认配置为大小写不敏感，故须在bash下修改配置：

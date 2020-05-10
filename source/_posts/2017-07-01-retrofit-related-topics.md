@@ -348,7 +348,9 @@ return serviceMethod.callAdapter.adapt(okHttpCall); //这个return需要的是Ob
 
 其实就是将callback丢到一个线程池callbackExecutor中，这个线程池可以通过Retrofit创建的时候配置，简单来说就是response会在这个线程池中回调。
 
- RxjavaCallAdapterFactory的做法是
+ <del>RxjavaCallAdapterFactory的做法是</del>
+ Rxjava2CallAdapterFactory的判断是直接根据returnType获取对应的class，看看是Flowable.class还是Completeable.class。也不存在混淆的问题了
+
 ```java
  @Override
   public CallAdapter<?> get(Type returnType, Annotation[] annotations, Retrofit retrofit) {
@@ -451,7 +453,7 @@ class XmlOrJsonConverterFactroy extend Converter.Factory{
     @override
     public Converter<ResponseBody,?> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit){
         // annotations就包含了刚才我们添加的注解
-        for (Annotation annotation : annotations){
+        for (Annotation annotation : annotations){ //典型的简单工厂模式，根据不同的入参返回不同的类实例
             if(annotation.getClass == Xml.class){
                 return xml.reponseBodyConverter(type,annotations,retrofit);
             }else if(annotation.getClass == Json.class){

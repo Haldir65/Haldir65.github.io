@@ -305,12 +305,12 @@ BufferedSource在读取Socket数据时，一边从socket里面拿一个Segment�
 先上一张图![](https://api1.foster66.xyz/static/imgs/okHttp_chain.jpg)。这是最简单的直接用OkHttpClient请求[百度首页](http://www.baidu.com)的堆栈调用情况。在没有做任何手动配置的情况下，至少发现了五个Interceptor:
 
  RetryAndFollowUpInterceptor
- BridgeInterceptor
+ BridgeInterceptor 
  CacheInterceptor
  ConnectInterceptor
- CallServerInterceptor
+ CallServerInterceptor // 这里面没有再调用chain.proceed，所以责任链到此返回
 
- 走到CallServerInterceptor的时候，可以看到Response已经形成了。每一个Interceptor之间还有一个RealInterceptorChain，将各个Interceptor串联起来，
+ 走到CallServerInterceptor的时候，可以看到Response已经形成了。轮到每一个Interceptor的intercept（Chain ）方法执行的时候，传入的都是一个new 的RealInterceptorChain，只不过index+1了(其实唯一变化的也就只有这个index了)（而一般写interceptor的时候直接拿着传入的chain.proceed就可以了）
 
 首先是调用者的代码
 ```java
@@ -418,7 +418,7 @@ response = call.execute();
 ```
 注意顺序，用户手动添加的interceptor是最先添加的。在添加完ConnectInterceptor之后，又添加了networkInterceptors(用户手动添加的，一个List)。道理也很清楚，一种是在发起Socket请求之前就拦下来，一种是连上Socket之后的拦截
 
-Chain的proceed就是从List中一个个取出Inerceptor，然后执行
+Chain的proceed就是从List中一个个取出Interceptor，然后执行
 
 关于异步请求的线程池问题，异步请求实际的调用是这样的
 Dispatcher.java
@@ -960,6 +960,11 @@ OkHttp拦截器里面能不能把请求取消掉? 结论几乎是否
 ### cancel ongoing request
 [Cancelling async request by tag](https://github.com/square/okhttp/issues/2205)
 ```java
+//比如说一个request发出去的时候是这样的：
+Request request = new Request.Builder().
+url(url).tag("this-tag").build;
+
+//这里面就是从dispatcher记录的当前正在运行和还没有开始执行的request中一个个去找。
 public void cancel(OkHttpClient client, Object tag) {
    for (Call call : client.dispatcher().queuedCalls()) {
      if (tag.equals(call.request().tag())) call.cancel();
@@ -969,7 +974,11 @@ public void cancel(OkHttpClient client, Object tag) {
    }
  }
 ```
-瞅了下call.cancel的实现，其实是对RealCall里面的成员变量RetryAndFollowUpInterceptor调用了cancel方法
+瞅了下call.cancel的实现，其实是对RealCall里面的成员变量RetryAndFollowUpInterceptor调用了cancel方法(再往底层就是socket.close)
+
+这种自己主动取消的错误的 java.net.SocketException: Socket closed
+超时的错误是 java.net.SocketTimeoutException
+网络出错的错误是java.net.ConnectException: Failed to connect to xxxxx
 
 动态调节timeout,也就是说随时可以修改网络请求的timeout
 
