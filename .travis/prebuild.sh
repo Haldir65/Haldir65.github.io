@@ -13,6 +13,7 @@ if [ -d $THEMES_DIR ];then
         echo "skip because js files do exist"
     else
         echo "js files do not exist,try to build"
+        yarn install
         yarn dist
         ls -al source
     fi
