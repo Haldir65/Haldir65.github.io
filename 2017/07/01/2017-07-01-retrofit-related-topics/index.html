@@ -6,15 +6,29 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="https://haldir65.github.io">
-  <title>Archives: 2017 | Haldir的博客</title>
+  <title>Retrofit源码阅读笔记 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Haldir的博客">
-<meta property="og:url" content="https://haldir65.github.io/archives/2017/page/5/index.html">
+  <meta name="description" content="This is gonna be nasty…… TL;DR">
+<meta name="keywords" content="Retrofit,OkHttp,Okio">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Retrofit源码阅读笔记">
+<meta property="og:url" content="https://haldir65.github.io/2017/07/01/2017-07-01-retrofit-related-topics/index.html">
 <meta property="og:site_name" content="Haldir的博客">
+<meta property="og:description" content="This is gonna be nasty…… TL;DR">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/d653491fb55bec754b8471aa6a3f6eed.jpg">
+<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/ParameterHandlers.jpg">
+<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/different_end_point.jpg">
+<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/different_end_point_the_right_way.jpg">
+<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/creating_two_converters.jpg">
+<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/different_response.jpg">
+<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/delegate_converters.jpg">
+<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/always_observe_on_mian_thread.jpg">
+<meta property="og:updated_time" content="2020-05-19T04:26:39.836Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Haldir的博客">
+<meta name="twitter:title" content="Retrofit源码阅读笔记">
+<meta name="twitter:description" content="This is gonna be nasty…… TL;DR">
+<meta name="twitter:image" content="https://api1.foster66.xyz/static/imgs/d653491fb55bec754b8471aa6a3f6eed.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -173,422 +187,691 @@ ga('send', 'pageview');
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-2017-07-01-retrofit-related-topics" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Retrofit源码阅读笔记
+    </h1>
+  
+
+        
+        <a href="/2017/07/01/2017-07-01-retrofit-related-topics/" class="archive-article-date">
+  	<time datetime="2017-07-01T23:03:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-07-01</time>
+</a>
+        
+      </header>
     
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="This-is-gonna-be-nasty……-TL-DR"><a href="#This-is-gonna-be-nasty……-TL-DR" class="headerlink" title="This is gonna be nasty…… TL;DR"></a>This is gonna be nasty…… TL;DR</h3><p><img src="https://api1.foster66.xyz/static/imgs/d653491fb55bec754b8471aa6a3f6eed.jpg" alt=""></p>
+<a id="more"></a>
+<h3 id="1-Retrofit"><a href="#1-Retrofit" class="headerlink" title="1. Retrofit"></a>1. Retrofit</h3><h4 id="1-1-使用方法"><a href="#1-1-使用方法" class="headerlink" title="1.1 使用方法"></a>1.1 使用方法</h4><p>Retrofit本身并不局限于Android平台，java应用也可以用来和服务器沟通。<br>Retrofit一般的用法看上去很简单</p>
+<pre><code class="java"> public interface GitHub {
+    @GET(&quot;/repos/{owner}/{repo}/contributors&quot;)
+    Call&lt;List&lt;Contributor&gt;&gt; contributors(
+        @Path(&quot;owner&quot;) String owner,
+        @Path(&quot;repo&quot;) String repo);
+  }
+
+Retrofit retrofit = new Retrofit.Builder()
+        .baseUrl(API_URL)   // end_point
+        .addConverterFactory(GsonConverterFactory.create())
+        .build();
+
+    // Create an instance of our GitHub API interface.
+    GitHub github = retrofit.create(GitHub.class);
+
+    // Create a call instance for looking up Retrofit contributors.
+    Call&lt;List&lt;Contributor&gt;&gt; call = github.contributors(&quot;square&quot;, &quot;retrofit&quot;);
+
+    // Fetch and print a list of the contributors to the library.
+    List&lt;Contributor&gt; contributors = call.execute().body();
+    for (Contributor contributor : contributors) {
+      System.out.println(contributor.login + &quot; (&quot; + contributor.contributions + &quot;)&quot;);
+    }
+
+</code></pre>
+<p>关键来看这段 retroft.create ,重点都在这里面。关键的代码就在这三行里面了</p>
+<p>大名鼎鼎的动态代理</p>
+<pre><code class="java">@SuppressWarnings(&quot;unchecked&quot;) // Single-interface proxy creation guarded by parameter safety.
+public &lt;T&gt; T create(final Class&lt;T&gt; service) {
+  Utils.validateServiceInterface(service);
+  if (validateEagerly) {
+    eagerlyValidateMethods(service);
+  }
+  return (T) Proxy.newProxyInstance(service.getClassLoader(), new Class&lt;?&gt;[] { service },
+      new InvocationHandler() {
+        private final Platform platform = Platform.get();
+
+        @Override public Object invoke(Object proxy, Method method, @Nullable Object[] args)
+            throws Throwable {
+          // If the method is a method from Object then defer to normal invocation.
+          if (method.getDeclaringClass() == Object.class) {
+            return method.invoke(this, args);
+          }
+          if (platform.isDefaultMethod(method)) {
+            return platform.invokeDefaultMethod(method, service, proxy, args);
+          }
+          ServiceMethod&lt;Object, Object&gt; serviceMethod =
+              (ServiceMethod&lt;Object, Object&gt;) loadServiceMethod(method);
+          OkHttpCall&lt;Object&gt; okHttpCall = new OkHttpCall&lt;&gt;(serviceMethod, args);
+          return serviceMethod.adapt(okHttpCall);
+        }
+      });
+}
+</code></pre>
+<p>主要就这三个方法</p>
+<blockquote>
+<p>ServiceMethod serviceMethod = loadServiceMethod(method);<br>OkHttpCall okHttpCall = new OkHttpCall&lt;&gt;(serviceMethod, args);<br>return serviceMethod.callAdapter.adapt(okHttpCall);</p>
+</blockquote>
+<h3 id="1-2-第一个方法以及ServiceMethod的创建"><a href="#1-2-第一个方法以及ServiceMethod的创建" class="headerlink" title="1.2 第一个方法以及ServiceMethod的创建"></a>1.2 第一个方法以及ServiceMethod的创建</h3><p>loadServiceMethod(Method)会查找invoke的时候会查找methodCache中有没有这个方法，没有的话调用Builder方法创建一个ServiceMethod实例并放入cahce。看一看这个Builder的构造函数 ，基本上就是把Builder中的参数引用赋值给ServiceMethod实例。</p>
+<p>result = new ServiceMethod.Builder(this, method).build();</p>
+<pre><code class="java"> public Builder(Retrofit retrofit, Method method) {
+      this.retrofit = retrofit; //client创建retrofit时可以设定一些属性
+      this.method = method;
+      this.methodAnnotations = method.getAnnotations();
+      this.parameterTypes = method.getGenericParameterTypes();
+      this.parameterAnnotationsArray = method.getParameterAnnotations();
+    }
+</code></pre>
+<pre><code class="java">根据ServiceMethod的变量名基本上能够猜到各自的用处，比如httpMethod（GET、POST）,
+contentType（MimeType）
+ public ServiceMethod build() {
+        // 1.创建callAdapter,调用retrofit对象设定的callAdapter,例如RxjavAdapter,注意这里面的实现是便利retrofit对象的adapterFactories，找到一个就返回。找不到的话会丢出来一个IllegalArgumentException
+      callAdapter = createCallAdapter();
+       //callAdapter的作用 就是将retrofit.Call的Call转成一个T。例如上面就是把Call&lt;List&lt;Contributor&gt;&gt;转成一个List&lt;Contributor&gt;，这个过程是上面提到的最重要的三个方法中的第三部 adapt（okHttpCall）。可以认为是拿着一个已经创建好的okHttp的Call去做事情，在适当的时候将网络返回结果转成用户事先定义好的respose类型。
+        //这一步返回一个java.lang.reflect.Type ，这个class的基本作用就是根据泛型来确定response的class。
+      responseType = callAdapter.responseType();
+        //2.创建用于response和Request的converter。
+      responseConverter = createResponseConverter();
+      for (Annotation annotation : methodAnnotations) {
+        parseMethodAnnotation(annotation); //这里面就是把@GET变成&quot;GET&quot;这个String，表示当前方法是一个GET请求
+      }
+      int parameterCount = parameterAnnotationsArray.length;
+      //3.创建ParameterHandler
+      parameterHandlers = new ParameterHandler&lt;?&gt;[parameterCount];
+      for (int p = 0; p &lt; parameterCount; p++) {
+        Type parameterType = parameterTypes[p];
+        Annotation[] parameterAnnotations = parameterAnnotationsArray[p];
+        if (parameterAnnotations == null) {
+          throw parameterError(p, &quot;No Retrofit annotation found.&quot;);
+        }
+        parameterHandlers[p] = parseParameter(p, parameterType, parameterAnnotations);
+        //关键看这个方法
+         private ParameterHandler&lt;?&gt; parseParameter(int p, Type parameterType, Annotation[] annotations)
+         第一个参数表示当前的数组index
+         第二个参数表示想要的Response类型
+         第三个参数表示该方法上的注解，就是@那些东西
+         接下来就是调用 private ParameterHandler&lt;?&gt; parseParameterAnnotation(
+        int p, Type type, Annotation[] annotations, Annotation annotation)方法来判断各种Http方法，这一段代码有300多行。。。。看完有助于掌握Http协议。
+      }
+      return new ServiceMethod&lt;&gt;(this);
+    }
+}
+</code></pre>
+<p>关键是这三个方法，Builder在这个过程中完成了一些变量的赋值</p>
+<ol>
+<li><p>createCallAdapter  —&gt;  retrofit.callAdapter(returnType, annotations); 从adapterFactories(显然可以有多个)中遍历，找到了一个就返回。已经实现的的有三种<strong>策略</strong>，DefaultCallAdapterFactory、ExecutorCallAdapterFactory和RxjavaCallAdapterFactory。显然用户可以在创建retrofit实例的过程中install自己的callAdapter实现。<br>再次强调这个CallAdapter的作用，就是将Retrofit的Call adapt成对应的Response class的实例。</p>
+</li>
+<li><p>createResponseConverter —&gt;  retrofit.responseBodyConverter(responseType, annotations);<br>Retrofit2.Converter&lt;F, T&gt; (from和To，我猜的)</p>
+</li>
+</ol>
+<p>Convert objects to and from their representation in HTTP. Instances are created by {@linkplain</p>
+<ul>
+<li>Factory a factory} which is {@linkplain Retrofit.Builder#addConverterFactory(Factory) installed}</li>
+<li>into the {@link Retrofit} instance.</li>
+</ul>
+<p>从retrofit对象的converterFactories（可以有多个，原因在于server有时候会返回json，有时候会返回protocolBuffer，有时候返回xml，response回来的时候会一个个问，这一点jake Wharton多次提到过）中遍历，找到一个就返回。确切的说，是找到一个能够处理的。</p>
+<ol start="3">
+<li>创建parameterHandlers<br>应该可以猜到，这一步就是把用户定义的注解转换成发起网络请求时需要带上的参数<blockquote>
+<p>private ParameterHandler&lt;?&gt; parseParameterAnnotation(int p, Type type, Annotation[] annotations, Annotation annotation)</p>
+</blockquote>
+</li>
+</ol>
+<p>这个方法随便展开一点，关注第三个参数和第四个参数</p>
+<p>例如       </p>
+<pre><code class="java"> public interface GitHub {
+    @GET(&quot;/repos/{owner}/{repo}/contributors&quot;)
+    Call&lt;List&lt;Contributor&gt;&gt; contributors(
+        @Path(&quot;owner&quot;) String owner,
+        @Path(&quot;repo&quot;) String repo);
+  }
+</code></pre>
+<p>ServiceMethod走到这一步，annotations就表示 @Path(“owner”) String owner。注意这里的@PATH是注解类，可以把它当成一个wrapper，这里面就调用了path.value()。</p>
+<pre><code class="java">else if (annotation instanceof Path) {
+        Path path = (Path) annotation;
+        String name = path.value(); // 调用该方法时传入的String
+        validatePathName(p, name);
+        Converter&lt;?, String&gt; converter = retrofit.stringConverter(type, annotations);  
+        return new ParameterHandler.Path&lt;&gt;(name, converter, path.encoded());
+      }
+</code></pre>
+<p>ParameterHandler.Path&lt;&gt;在ParameterHandler这个类里面，看一下结构<img src="https://api1.foster66.xyz/static/imgs/ParameterHandlers.jpg" alt=""><br>Path这个class中关键的方法apply:</p>
+<pre><code class="java"> @Override void apply(RequestBuilder builder, @Nullable T value) throws IOException {
+      builder.addPathParam(name, valueConverter.convert(value), encoded);
+    }
+</code></pre>
+<p>再往下走：</p>
+<pre><code class="java">relativeUrl = relativeUrl.replace(&quot;{&quot; + name + &quot;}&quot;, canonicalizeForPath(value, encoded));
+</code></pre>
+<p>apply这个方法会在构建Request时由RequestBilder调用，以上面的实例为例子，name就是”owner” ,value就是调用该方法时传进来的值，其实就只是Stirng.replace()方法。<br>到这里，Buidler已经完成了</p>
+<ul>
+<li>准备callAdapter，</li>
+<li>createResponseConverter</li>
+<li>和填充parameterHandlers数组的任务<br>直接new一个ServiceMethod出来就好了</li>
+</ul>
+<pre><code class="java">ServiceMethod(Builder&lt;T&gt; builder) {
+    this.callFactory = builder.retrofit.callFactory();  // okhttp3.Call.Factory
+    this.callAdapter = builder.callAdapter; //
+    this.baseUrl = builder.retrofit.baseUrl(); //这个就是
+    this.responseConverter = builder.responseConverter; // GsonConverter
+    this.httpMethod = builder.httpMethod; //@GET
+    this.relativeUrl = builder.relativeUrl; //@Path
+    this.headers = builder.headers; //@Header
+    this.contentType = builder.contentType;  //application/json这种
+    this.hasBody = builder.hasBody;
+    this.isFormEncoded = builder.isFormEncoded;
+    this.isMultipart = builder.isMultipart;
+    this.parameterHandlers = builder.parameterHandlers;
+  }
+</code></pre>
+<p>上面最重要的三个方法讲完了第一个。  </p>
+<h3 id="1-3-第二个方法和OkHttpCall"><a href="#1-3-第二个方法和OkHttpCall" class="headerlink" title="1.3 第二个方法和OkHttpCall"></a>1.3 第二个方法和OkHttpCall</h3><p>第二个方法:<br>OkHttpCall<Object> okHttpCall = new OkHttpCall&lt;&gt;(serviceMethod, args);</p>
+<p>OkHttpCall的成员变量：<br>okhttp3.Call rawCall //用于发起请求<br>ServiceMethod&lt;T, ?&gt; serviceMethod;  //这就是刚才实例化的serviceMethod对象<br>这个类相对简单，主要看execute方法</p>
+<pre><code class="java">@Override public Response&lt;T&gt; execute() throws IOException {
+  okhttp3.Call call;
+
+  synchronized (this) {
+    if (executed) throw new IllegalStateException(&quot;Already executed.&quot;);
+    executed = true;
+  // ...
+    call = rawCall;
+    if (call == null) {
+      try {
+        call = rawCall = createRawCall();
+      } catch (IOException | RuntimeException | Error e) {
+        //...
+        throw e;
+      }
+    }
+  }
+  return parseResponse(call.execute()); //建立连接，发起请求，解析response都在这里了（都在一条线程上）。execute是okHttp的方法。
+}
+</code></pre>
+<p>还记得最简单的Demo吗，同步执行网络请求<br>Call&lt;List<Contributor>&gt; call = github.contributors(“square”, “retrofit”);<br>List<Contributor> contributors = call.execute().body();<br>这也是Retrofit2.Call.execute方法最终就是走到了这里</p>
+<p>createRawCall方法</p>
+<pre><code class="java"> okhttp3.Request request = serviceMethod.toRequest(args);
+ okhttp3.Call call = serviceMethod.callFactory.newCall(request);
+    if (call == null) {
+      throw new NullPointerException(&quot;Call.Factory returned null.&quot;);
+    }
+    return call;
+</code></pre>
+<p>parseRespnse的实现</p>
+<pre><code class="java">  Response&lt;T&gt; parseResponse(okhttp3.Response rawResponse) throws IOException {
+    ResponseBody rawBody = rawResponse.body(); //有用的信息在这里
+    // Remove the body&#39;s source (the only stateful object) so we can pass the response along.
+    rawResponse = rawResponse.newBuilder()
+        .body(new NoContentResponseBody(rawBody.contentType(), rawBody.contentLength()))
+        .build(); //根据服务器返回的contentType和contentLength创建一个新的response用于检测200
+
+    int code = rawResponse.code();
+    if (code &lt; 200 || code &gt;= 300) {
+      try {
+        // Buffer the entire body to avoid future I/O.
+        ResponseBody bufferedBody = Utils.buffer(rawBody);
+        return Response.error(bufferedBody, rawResponse); //创建一个body为null的Retrofit2.Response
+      } finally {
+        rawBody.close();
+      }
+    }
+
+    if (code == 204 || code == 205) {
+      rawBody.close();
+      return Response.success(null, rawResponse);
+    }
+
+    ExceptionCatchingRequestBody catchingBody = new ExceptionCatchingRequestBody(rawBody);
+    try {
+      T body = serviceMethod.toResponse(catchingBody); //调用ServiceMethod的responseConverter去转换，前面说过，responseConverter是在builder初始化的时候根据策略，从Retrofit的converterFactories中遍历，找到了就返回。 就是在这里把byte转成Object的
+      return Response.success(body, rawResponse); //返回创建一个body为定义好的数据类型的Retrofit2.Response，一般情况下，调用Response.body()就能得到所要的实体数据。
+    } catch (RuntimeException e) {
+      // If the underlying source threw an exception, propagate that rather than indicating it was
+      // a runtime exception.
+      catchingBody.throwIfCaught();
+      throw e;
+    }
+  }
+</code></pre>
+<p>这里可以得知，Retrofit对于状态码的处理，1XX和3XX以上全部走到error中</p>
+<p>execute是同步方法，enqueue是异步请求的方法，底层其实就调用了OkHttp.Call.enqueue()，所以说Retrofit本身并不负责创建网络请求，线程调度。只做了parseRespnse的方法，另外，OkHttp本身并不负责把Response推到主线程上，不过Retrofit判断了Paltform，是Android的话就设置了默认的回调线程为主线程。</p>
+<pre><code class="java">public Retrofit build() {
+//....
+Executor callbackExecutor = this.callbackExecutor;
+    if (callbackExecutor == null) {
+      callbackExecutor = platform.defaultCallbackExecutor(); //这里面有一个MainThreadExecutor
+    }
+//....    
+}
+</code></pre>
+<h3 id="1-4-第三个方法和AdapterFactory"><a href="#1-4-第三个方法和AdapterFactory" class="headerlink" title="1.4 第三个方法和AdapterFactory"></a>1.4 第三个方法和AdapterFactory</h3><p>return serviceMethod.callAdapter.adapt(okHttpCall); //这个return需要的是Object,涉及到动态代理，可以无视。</p>
+<p>回头看一下serviceMethod的createCallAdapter方法，就是从retrofit对象的adapterFactories中一个个遍历：</p>
+<blockquote>
+<p>CallAdapter&lt;?, ?&gt; adapter = adapterFactories.get(i).get(returnType, annotations, this)；</p>
+</blockquote>
+<p>找到之后就返回，默认的实现有DefaultCallAdapterFactory和ExecutorCallAdapterFactory以及RxjavaCallAdapterFactory。</p>
+<pre><code class="java">// 在DefaultCallAdapterFactory中的处理方式是
+
+ return new CallAdapter&lt;Call&lt;?&gt;&gt;() {
+      @Override public Type responseType() {
+        return responseType;
+      }
+
+      @Override public &lt;R&gt; Call&lt;R&gt; adapt(Call&lt;R&gt; call) {
+        return call;
+      }
+    };
+
+
+// ExecutorCallAdapterFactory的处理方式是
+
+
+ return new CallAdapter&lt;Object, Call&lt;?&gt;&gt;() {
+      @Override public Type responseType() {
+        return responseType;
+      }
+
+      @Override public Call&lt;Object&gt; adapt(Call&lt;Object&gt; call) {
+        return new ExecutorCallbackCall&lt;&gt;(callbackExecutor, call);
+      }
+    };
+</code></pre>
+<p>其实就是将callback丢到一个线程池callbackExecutor中，这个线程池可以通过Retrofit创建的时候配置，简单来说就是response会在这个线程池中回调。</p>
+<p> <del>RxjavaCallAdapterFactory的做法是</del><br> Rxjava2CallAdapterFactory的判断是直接根据returnType获取对应的class，看看是Flowable.class还是Completeable.class。也不存在混淆的问题了</p>
+<pre><code class="java"> @Override
+  public CallAdapter&lt;?&gt; get(Type returnType, Annotation[] annotations, Retrofit retrofit) {
+    Class&lt;?&gt; rawType = getRawType(returnType);
+    String canonicalName = rawType.getCanonicalName();
+    boolean isSingle = &quot;rx.Single&quot;.equals(canonicalName); //直接看包名。。。。。
+    boolean isCompletable = &quot;rx.Completable&quot;.equals(canonicalName);
+    if (rawType != Observable.class &amp;&amp; !isSingle &amp;&amp; !isCompletable) {
+      return null;
+    }
+    if (!isCompletable &amp;&amp; !(returnType instanceof ParameterizedType)) {
+      String name = isSingle ? &quot;Single&quot; : &quot;Observable&quot;;
+      throw new IllegalStateException(name + &quot; return type must be parameterized&quot;
+          + &quot; as &quot; + name + &quot;&lt;Foo&gt; or &quot; + name + &quot;&lt;? extends Foo&gt;&quot;);
+    }
+
+    if (isCompletable) {
+      // Add Completable-converter wrapper from a separate class. This defers classloading such that
+      // regular Observable operation can be leveraged without relying on this unstable RxJava API.
+      // Note that this has to be done separately since Completable doesn&#39;t have a parametrized
+      // type.
+      return CompletableHelper.createCallAdapter(scheduler);
+    }
+
+    CallAdapter&lt;Observable&lt;?&gt;&gt; callAdapter = getCallAdapter(returnType, scheduler);
+    if (isSingle) {
+      // Add Single-converter wrapper from a separate class. This defers classloading such that
+      // regular Observable operation can be leveraged without relying on this unstable RxJava API.
+      return SingleHelper.makeSingle(callAdapter);
+    }
+    return callAdapter;
+}
+</code></pre>
+<h3 id="1-5-使用Retrofit的best-practices"><a href="#1-5-使用Retrofit的best-practices" class="headerlink" title="1.5 使用Retrofit的best practices"></a>1.5 使用Retrofit的best practices</h3><p>到这里，retrofit的工作流程就通过三个方法讲完了，接下来根据jake wharton的talk <a href="https://www.youtube.com/watch?v=t34AQlblSeE">making retrofit work for you</a>来讲几个best practice。</p>
+<h4 id="1-5-1-end-point-不一样怎么办"><a href="#1-5-1-end-point-不一样怎么办" class="headerlink" title="1.5.1 end point 不一样怎么办"></a>1.5.1 end point 不一样怎么办</h4><p>默认情况下，如果不指定client,每一次都会创建一个新的OkHttpClient，这样做就丧失了disk caching,connection pooling等优势。</p>
+<p><img src="https://api1.foster66.xyz/static/imgs/different_end_point.jpg" alt="endpoint">    </p>
+<p>所以需要提取出一个OkHttpClient,解决方式很简单<br><img src="https://api1.foster66.xyz/static/imgs/different_end_point_the_right_way.jpg" alt=""></p>
+<h4 id="1-5-2-不要创建多个HttpClient"><a href="#1-5-2-不要创建多个HttpClient" class="headerlink" title="1.5.2 不要创建多个HttpClient"></a>1.5.2 不要创建多个HttpClient</h4><p>shallow copy</p>
+<pre><code class="java">OkHttpClient client = new OkHttpClient();
+
+OkHttpClient clientFoo = client.newBuilder().addInterceptor(new FooInterceptor()).build();
+
+OkHttpClient clientBar = client.newBuilder().readTimeOut(20,SECONDS).writeTimeOut(20,SECONDS).build();
+</code></pre>
+<h4 id="1-5-3-有的接口需要认证（加Header），有的不需要（比如登录，忘记密码）"><a href="#1-5-3-有的接口需要认证（加Header），有的不需要（比如登录，忘记密码）" class="headerlink" title="1.5.3 有的接口需要认证（加Header），有的不需要（比如登录，忘记密码）"></a>1.5.3 有的接口需要认证（加Header），有的不需要（比如登录，忘记密码）</h4><p>一般可能会想到在OkHttp的Interceptor中去判断url然后手动加上header，一种更好的解决方式是，假定所有的API都需要加Header，对于登录和忘记密码的Api,这样写</p>
+<pre><code class="java">@POST(&quot;/login&quot;)
+@Headers(&quot;No-Authentication: true&quot;)
+Call&lt;User&gt; login(@Body LoginRequest request)
+</code></pre>
+<p>//这个header对于server是不可见的，现在在Interceptor中，<br>只要判断request.header(“No-Authentication”)==null 即表示该接口需要加上header。<br>所以，对于特定接口的筛选可以，采用这种方式。</p>
+<h4 id="1-5-4-Converters将byte变成java对象，底层的解析器不要创建多个"><a href="#1-5-4-Converters将byte变成java对象，底层的解析器不要创建多个" class="headerlink" title="1.5.4 Converters将byte变成java对象，底层的解析器不要创建多个"></a>1.5.4 Converters将byte变成java对象，底层的解析器不要创建多个</h4><p>addConverterFactory，和之前的创建两个httpclient一样，人们也很容易创建两个解析器。解决方法也很实在，提取出来公用即可。<br><img src="https://api1.foster66.xyz/static/imgs/creating_two_converters.jpg" alt=""></p>
+<h4 id="1-5-5-addConverterFactory可以调用多次"><a href="#1-5-5-addConverterFactory可以调用多次" class="headerlink" title="1.5.5 addConverterFactory可以调用多次"></a>1.5.5 addConverterFactory可以调用多次</h4><p>假如一个接口返回json，一个接口返回proto。不要试图创建多个retrofit实例。这样就可以了<br><img src="https://api1.foster66.xyz/static/imgs/different_response.jpg" alt=""></p>
+<p>底层的原理是这样的。<br>User是Proto,Friend是Json。 Proto都extends一个protoType class，所以只要看下是否 instanceof proto就可以了。这一切都是在serviceMethod创建过程中判断的。这里顺序很重要。由于gson基本能够序列化一切，所以gson总是会认为自己可以成功。所以要把protoConverter放在前面。<br> GsonConverterFactory, SimpleXmlConverterFactory converters , they say yes to everyThing. 所以如果出现这种情况怎么办？<br> 首先定义自己的注解</p>
+<pre><code class="java"> @interface Xml {}
+ @interface Json {}
+
+ interface Service{
+    @GET(&quot;/User&quot;) @Xml
+    Call&lt;User&gt; user(); // User是XML
+
+    @GET(&quot;/Friends&quot;) @Json
+    Call&lt;Friends&gt; friends();  //Friends是Json
+ }
+
+class XmlOrJsonConverterFactroy extend Converter.Factory{
+    final Converter.Factory xml = ///;
+    final Converter.Factory json = //....;
+
+    @override
+    public Converter&lt;ResponseBody,?&gt; responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit){
+        // annotations就包含了刚才我们添加的注解
+        for (Annotation annotation : annotations){ //典型的简单工厂模式，根据不同的入参返回不同的类实例
+            if(annotation.getClass == Xml.class){
+                return xml.reponseBodyConverter(type,annotations,retrofit);
+            }else if(annotation.getClass == Json.class){
+                // json
+            }
+            return null; 都不是。 会去找下一个Converter..
+        }
+    }
+}
+[AnnotatedConverterFactory用于自定义类型](https://github.com/square/retrofit/blob/master/samples/src/main/java/com/example/retrofit/AnnotatedConverters.java)
+</code></pre>
+<h4 id="1-5-6-服务器返回的数据中包括一些metaData"><a href="#1-5-6-服务器返回的数据中包括一些metaData" class="headerlink" title="1.5.6 服务器返回的数据中包括一些metaData"></a>1.5.6 服务器返回的数据中包括一些metaData</h4><p>使用delegate的方式去除这些metadata，只获取想要的response实体对象<br><img src="https://api1.foster66.xyz/static/imgs/delegate_converters.jpg" alt=""><br>但这些metaData是有用的。。怎么处理<br>可以在convert中集中处理自定义错误码。</p>
+<h4 id="1-5-7-和Rxjava配合使用"><a href="#1-5-7-和Rxjava配合使用" class="headerlink" title="1.5.7 和Rxjava配合使用"></a>1.5.7 和Rxjava配合使用</h4><p>CallAdapterFactory和ConverterFactory类似，也可以自定义，所以这样可以直接将所有的Observable返回到主线程</p>
+<p><img src="https://api1.foster66.xyz/static/imgs/always_observe_on_mian_thread.jpg" alt=""></p>
+<p>所以，Retrofit就是将HttpClient、Converter和CallAdapter这三样职能结合起来，又提供了足够的定制化。</p>
+<h3 id="1-6-补充"><a href="#1-6-补充" class="headerlink" title="1.6 补充"></a>1.6 补充</h3><p>OkHttp本身没有将response挪到主线程，OkHttp的execute方法在当前线程回调，OkHttp的enqueue方法在OkHttpDispatcher线程回调onResponse。都没有推到主线程。</p>
+<p>Retrofit这么干了，具体在<br>Retrofit.Builder.build方法里面</p>
+<pre><code class="java">public Retrofit build() {
+  Executor callbackExecutor = this.callbackExecutor;
+  if (callbackExecutor == null) {
+    callbackExecutor = platform.defaultCallbackExecutor();
+    //Andriod平台默认挪到主线程，就是一个持有主线程的线程池
+    //这个线程池的excute方法就是用一个handler推到主线程了。
+  }
+
+  //把这个defaultCallAdapterFactory默认添加到列表中第一个的位置
+  List&lt;CallAdapter.Factory&gt; callAdapterFactories = new ArrayList&lt;&gt;(this.callAdapterFactories);
+    callAdapterFactories.add(platform.defaultCallAdapterFactory(callbackExecutor));
+
+  //这里传进去callAdapterFactories是一个list，头一个factory是defaultCallAdapterFactory
+  return new Retrofit(callFactory, baseUrl, unmodifiableList(converterFactories),
+          unmodifiableList(callAdapterFactories), callbackExecutor, validateEagerly);
+}
+</code></pre>
+<p>这个callbackExecutor什么时候用的呢，还记得三个方法中最后一个serviceMethod.adapt吗，<br>调用顺序如下：<br>serviceMethod.adapt -&gt; ServiceMethod的成员变量callAdapter.adapt(call) (这个时候还没发起请求哈) -&gt;<br>这个callAdapter是在ServiceMethod.Builder.build中调用了retrofit.callAdapter(returnType, annotations);-&gt; 继而调用到nextCallAdapter-&gt; callAdapterFactories.get(i).get(returnType, annotations, this);<br>就是在Retrofit对象的callAdapterFactories这个列表里找，上面不是说默认添加了第一个吗，所以这个get方法会跑到<br>ExecutorCallAdapterFactory.get方法中。而对应的实现返回了<br>new ExecutorCallbackCall&lt;&gt;(callbackExecutor, call);//callbackExecutor是那个主线程的executor<br>外部执行Retrofit.call.enqueue -&gt; serviceMethod.adapt -&gt; ExecutorCallbackCall.enqueue -&gt; (调用oKhttp的qnqueue，在onResponse中callbackExecutor.execute -&gt; { callback.onResponse() })</p>
+<p>外部调用经历流程</p>
+<pre><code class="java">
+public interface GitHubService {
+  @GET(&quot;users/{user}/repos&quot;)
+  Call&lt;List&lt;Repo&gt;&gt; listRepos(@Path(&quot;user&quot;) String user); //可以认为这底下就是藏着一个ServiceMethod的实例
+}
+
+Retrofit retrofit = new Retrofit.Builder()
+    .baseUrl(&quot;https://api.github.com/&quot;)
+    .build();
+
+GitHubService service = retrofit.create(GitHubService.class);//在这里以动态代理的方式生产ServiceMethod
+Call&lt;List&lt;Contributor&gt;&gt; call = github.contributors(&quot;square&quot;, &quot;retrofit&quot;);//在这里调用了serviceMethod.adapt方法
+List&lt;Contributor&gt; contributors = call.execute().body();//这里是Call类型，说明上面serviceMethod.adapt返回了一个
+</code></pre>
+<p>也就是说这个adapt方法会返回Call<T> ，或者Observable<T>类型的数据<br>怎么做到的呢？ 它会拿着期待的返回类型(Call,Observable)去询问Retrofit的callAdapterFactories里面的每一个callAdapterFactory的<br>get(returntype)方法，上面github这种，returnType就是Call.class</p>
+<p>DefaultCallAdapterFactory.java</p>
+<pre><code class="java">final class DefaultCallAdapterFactory extends CallAdapter.Factory {
+  static final CallAdapter.Factory INSTANCE = new DefaultCallAdapterFactory();
+
+  @Override
+  public CallAdapter&lt;?, ?&gt; get(Type returnType, Annotation[] annotations, Retrofit retrofit) {
+    if (getRawType(returnType) != Call.class) { //如果是call，那么能够handle的来，否则nextCallAdapter
+      return null;
+    }
+
+    final Type responseType = Utils.getCallResponseType(returnType);
+    return new CallAdapter&lt;Object, Call&lt;?&gt;&gt;() {
+      @Override public Type responseType() {
+        return responseType;
+      }
+
+      @Override public Call&lt;Object&gt; adapt(Call&lt;Object&gt; call) {
+        return call;
+      }
+    };
+  }
+}
+</code></pre>
+<p>RxJava2CallAdapterFactory 是这样回应的。其实就是看一个listRepos这个方法的返回类型</p>
+<pre><code class="java">boolean isFlowable = rawType == Flowable.class;
+boolean isSingle = rawType == Single.class;
+boolean isMaybe = rawType == Maybe.class;
+if (rawType != Observable.class &amp;&amp; !isFlowable &amp;&amp; !isSingle &amp;&amp; !isMaybe) {
+  return null;
+}
+</code></pre>
+<p>ExecutorCallAdapterFactory</p>
+<pre><code class="java">  @Override
+  public CallAdapter&lt;?, ?&gt; get(Type returnType, Annotation[] annotations, Retrofit retrofit) {
+    if (getRawType(returnType) != Call.class) {
+      return null;
+    }
+    final Type responseType = Utils.getCallResponseType(returnType);
+    return new CallAdapter&lt;Object, Call&lt;?&gt;&gt;() {
+      @Override public Type responseType() {
+        return responseType;
+      }
+
+      @Override public Call&lt;Object&gt; adapt(Call&lt;Object&gt; call) {
+        return new ExecutorCallbackCall&lt;&gt;(callbackExecutor, call);//这个在Android平台上默认会把onResponse搞到主线程上
+      }
+    };
+  }
+</code></pre>
+<pre><code class="java">//DefaultCallAdapterFactory里面
+@Override public Call&lt;Object&gt; adapt(Call&lt;Object&gt; call) {
+  return call;
+}
+
+// ExecutorCallAdapterFactory
+@Override public Call&lt;Object&gt; adapt(Call&lt;Object&gt; call) {
+  return new ExecutorCallbackCall&lt;&gt;(callbackExecutor, call);
+}
+//RxJava2CallAdapter
+@Override public Object adapt(Call&lt;R&gt; call) {
+    Observable&lt;Response&lt;R&gt;&gt; responseObservable = isAsync //这个isAsync默认是false
+        ? new CallEnqueueObservable&lt;&gt;(call)
+        : new CallExecuteObservable&lt;&gt;(call);
+     ///....
+     return observable;   
+}
+</code></pre>
+<p>所以Retrofit的service里面可以返回各种类型。</p>
+<pre><code class="java">call.enqueue(new okhttp3.Callback() {
+     @Override public void onResponse(okhttp3.Call call, okhttp3.Response rawResponse) {
+      //..这里还是oKHttp的Dispatcher线程，所以解析数据是在子线程上的
+       response = parseResponse(rawResponse);
+
+      // 这然后才是callback，在ExecutorCallAdapterFactory中callbackExecutor.execute(），就是在这里推向主线程的
+       callback.onResponse(OkHttpCall.this, response);
+     }
+}
+</code></pre>
+<p>那么假如是Rxjava2CallAdapterFactory呢,callAdapter返回的是默认CallExecuteObservable，</p>
+<pre><code class="java">  @Override protected void subscribeActual(Observer&lt;? super Response&lt;T&gt;&gt; observer) {
+      Response&lt;T&gt; response = call.execute();//不要被这个call.execute.execute迷惑了
+      if (!disposable.isDisposed()) {
+        observer.onNext(response);
+      }
+  }
+
+  //OkHttpCall
+  @Override public Response&lt;T&gt; execute() throws IOException {
+        // ...
+      return parseResponse(call.execute());//所以还是要走ResponseBodyConverter那一套的
+  }
+</code></pre>
+<p>根据<a href="https://stackoverflow.com/questions/21652461/retrofit-callback-on-main-thread">jake Wharton在stackoverFlow上的回答</a>,Retrofit parse byte to Object的过程是发生在子线程的。</p>
+<h2 id="update"><a href="#update" class="headerlink" title="update"></a>update</h2><p><a href="https://stackoverflow.com/questions/37016261/retrofit-optional-and-required-fields">根据stackoverFlow上的解释，对于queryParameters，一些optional的参数直接传null就可以了</a> 这段从源码上还没有来得及看清楚。</p>
+<h3 id="2-OkHttp"><a href="#2-OkHttp" class="headerlink" title="2. OkHttp"></a>2. OkHttp</h3><h3 id="3-A-few-‘ok’-libraries"><a href="#3-A-few-‘ok’-libraries" class="headerlink" title="3. A few ‘ok’ libraries"></a>3. A few ‘ok’ libraries</h3><p>why moshi ? why Retrofit call can be clone cheap？<br><a href="https://vimeo.com/334067631#t=47m03s">moshi避免了不必要的String Allocation主要是在于避免了key的allocate</a></p>
+<p>在将一大串byte array转为java object的过程中，json parser要为所遇见的每一个key创建json object（moshi则不是，它只关心对应的java bean中的field的name，并且只要获取对应的index。） 具体在JsonUTF8Reader的selectName方法中。</p>
+<p>why SinkedSource?<br>why protolBuffer cost less ?</p>
+<h3 id="Ref"><a href="#Ref" class="headerlink" title="Ref"></a>Ref</h3><ol>
+<li><a href="https://blog.piasy.com/2016/06/25/Understand-Retrofit/">Paisy解析Retrofit</a></li>
+<li><a href="https://github.com/android-cn/android-open-project-analysis/tree/master/tool-lib/network/retrofit">open-sourse-projetc解析Retrofit</a></li>
+<li><a href="https://www.youtube.com/watch?v=t34AQlblSeE">Making Retrofit Work For You by Jake Wharton</a></li>
+</ol>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
       
       
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/05/07/2017-05-07-download-video-from-vps/" class="archive-article-date">
-  	<time datetime="2017-05-07T16:48:01.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-05-07</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/05/07/2017-05-07-download-video-from-vps/">VPS下载Youtube视频并同步到本地</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">python</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Retrofit</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">linux</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/blog//" class="article-tag-list-link color5">blog</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/05/01/2017-05-01-python-server-test/" class="archive-article-date">
-  	<time datetime="2017-05-01T08:57:27.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-05-01</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/05/01/2017-05-01-python-server-test/">Python localHost部署命令</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">python</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/blog//" class="article-tag-list-link color5">blog</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/04/30/2017-04-30-concurrency-and-beyond/" class="archive-article-date">
-  	<time datetime="2017-04-30T19:17:45.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-04-30</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/04/30/2017-04-30-concurrency-and-beyond/">java线程池的实现原理</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">concurrency</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/04/23/2017-04-23-rxjava2-for-android/" class="archive-article-date">
-  	<time datetime="2017-04-23T13:56:07.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-04-23</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/04/23/2017-04-23-rxjava2-for-android/">Rxjava2 的一些点</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">android</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">OkHttp</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">rxjava2</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Okio</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/blog//" class="article-tag-list-link color5">blog</a>
-        		</li>
-      		
-		</ul>
-	</div>
+      
 
+      
 
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=https://haldir65.github.io/2017/07/01/2017-07-01-retrofit-related-topics/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/04/03/2017-04-03-properties-of-view/" class="archive-article-date">
-  	<time datetime="2017-04-03T11:38:10.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-04-03</time>
-</a>
+<nav id="article-nav">
+  
+    <a href="/2017/07/12/2017-07-12-fragment-decoded/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          Fragment源码解析记录(supportLibrary 25.3.0)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/06/25/2017-06-12-Collections-Refuled-by-Stuart-Marks/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Java集合类的一些整理</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/04/03/2017-04-03-properties-of-view/">View的属性大全[转载]</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">android</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">tools</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/blog//" class="article-tag-list-link color5">blog</a>
-        		</li>
-      		
-		</ul>
-	</div>
+        
+        
+    </div>
+</aside>
 
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/03/11/2017-03-11-utilizing-the-terminal-in-android-studio/" class="archive-article-date">
-  	<time datetime="2017-03-11T22:28:51.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-11</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/03/11/2017-03-11-utilizing-the-terminal-in-android-studio/">使用IDE内置的Terminal</a>
-    </h1>
-  
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/blog//" class="article-tag-list-link color5">blog</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/01/13/2017-01-13-embracing-kotlin/" class="archive-article-date">
-  	<time datetime="2017-01-13T23:06:13.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-01-13</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/01/13/2017-01-13-embracing-kotlin/">使用Kotlin进行java开发</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">kotlin</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/blog//" class="article-tag-list-link color5">blog</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/01/07/2017-01-07-Linux-Basic-Commands/" class="archive-article-date">
-  	<time datetime="2017-01-07T15:38:43.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-01-07</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/01/07/2017-01-07-Linux-Basic-Commands/">linux基本命令介绍</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">linux</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">tools</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/blog//" class="article-tag-list-link color5">blog</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
   
-    </div></section>
   
 
-    
-    <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/archives/2017/page/4/">&laquo; Prev</a><a class="page-number" href="/archives/2017/">1</a><span class="space">&hellip;</span><a class="page-number" href="/archives/2017/page/3/">3</a><a class="page-number" href="/archives/2017/page/4/">4</a><span class="page-number current">5</span>
-    </nav>
+  
+
+  
+
   
 
 
@@ -612,8 +895,8 @@ ga('send', 'pageview');
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
