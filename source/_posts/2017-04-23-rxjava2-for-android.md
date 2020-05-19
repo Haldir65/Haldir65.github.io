@@ -346,11 +346,11 @@ subscribeOn决定了task在哪条线程上运行，操作符的顺序很重要
 流之间的转换
 
 >Observable -> first() -> single
-Observable -> firsetElement -> Maybe
+Observable -> firstElement -> Maybe
 Observable -> ignoreElements() ->Completable
 
 >Flowable -> first() -> single
-Flowable -> firsetElement -> Maybe
+Flowable -> firstElement -> Maybe
 Flowable -> ignoreElements() ->Completable
 
 - [Combining Observables](https://github.com/ReactiveX/RxJava/wiki/Combining-Observables) 多个数据来源的加工
