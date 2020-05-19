@@ -13,11 +13,11 @@ if [ -d $THEMES_DIR ];then
         echo "skip because js files do exist"
     else
         echo "js files do not exist,try to build"
-        npm dist
+        yarn dist
         ls -al source
     fi
 else
-    echo $THEMES_DIR" doest not exists"    
+    echo $THEMES_DIR" doest not exists"
 fi
 
 
