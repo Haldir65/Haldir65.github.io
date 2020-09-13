@@ -82,7 +82,7 @@ nginx上要配合一个nginx-rtmp-module来做
 ## 移动端音视频方案选择
 一般来说，音视频，摄像头这一块相关的api。Google在这方面的控制力都非常弱，导致各大厂商之间的实现存在各种差异。[吐槽MediaCodec的文章很多](http://ragnraok.github.io/android_video_record.html)
 现实中，在Android平台上音视频编码器的选择包括：
-用NediaCodec或者FFMpeg+x264/openh264。
+用MediaCodec或者FFMpeg+x264/openh264。
 MediaRecorder能录，但是不能一帧帧地去处理。
 [有人比较了mediaRecoder、ffmpeg和mediaCodec的差别](https://stackoverflow.com/questions/42737378/android-choosing-between-mediarecorder-mediacodec-and-ffmpeg)
 简单来讲,MediaCodec有硬件加成，速度快，更加接近底层(但是强烈依赖OEM的实现，不同机型表现不同，bug有不少)

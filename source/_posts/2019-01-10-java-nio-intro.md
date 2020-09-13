@@ -554,6 +554,35 @@ public long transferTo(long position, long count,
 }
 ```
 
+[分别看windows下和linux下的transferTo的c语言实现](http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/solaris/native/sun/nio/ch/FileChannelImpl.c)， 看一下sendfile的使用
+```c++
+//Windows
+JNIEXPORT jlong JNICALL
+Java_sun_nio_ch_FileChannelImpl_transferTo0(JNIEnv *env, jobject this,
+                                            jint srcFD,
+                                            jlong position, jlong count,
+                                            jint dstFD)
+{
+    return IOS_UNSUPPORTED; //Windows并不支持 sendfile 使用 mmap
+}
+//solaris..
+JNIEXPORT jlong JNICALL
+Java_sun_nio_ch_FileChannelImpl_transferTo0(JNIEnv *env, jobject this,
+                                            jint srcFD,
+                                            jlong position, jlong count,
+                                            jint dstFD){
+#if defined(__linux__)
+    off64_t offset = (off64_t)position;
+    jlong n = sendfile64(dstFD, srcFD, &offset, (size_t)count); // 这里进行了system call
+//..
+#elif defined (__solaris__)
+    result = sendfilev64(dstFD, &sfv, 1, &numBytes);
+//..
+#elif defined(__APPLE__)
+    result = sendfile(srcFD, dstFD, position, &numBytes, NULL, 0);
+#endif
+```
+
 
 [zero copy技术](https://xunnanxu.github.io/2016/09/10/It-s-all-about-buffers-zero-copy-mmap-and-Java-NIO/)
 
@@ -836,7 +865,7 @@ public class Client2 {
 2. 不要动不动就mmap，mmap在读写大文件的时候才体现出明显的优势
 3. 使用transferTo和transferFrom（会按照sendfile,mmap,bio的顺序查看当前系统支持哪个）
 4. nio是直接和byte打交道，java的内码是utf-16BE（为毛c语言只要1个byte，java一个char却要2个byte,因为方便啊，虽然浪费点内存，但是所有的字符，不管是英文，拉丁文，中文，阿拉伯文，2个字节，2^16,unicode也没有这么多吧。相应的,1个字符的c语言的char就不能那么方便的存储中文了。）
-5. java的很多api是直接对c语言的api的包装，java.io.RandomAccessFile，独立的IO流类，支持r只读、rw读写、rws读写 + metadata/data自动同步、rwd读写 + data自动同步四种模式。猜测和fsync和fsyncdata有关。
+5. java的很多api是直接对c语言的api的包装，java.io.RandomAccessFile，独立的IO流类，支持r只读、rw读写、rws读写 + metadata/data自动同步、rwd读写 + data自动同步四种模式。猜测和fsync(同步data和metadata)和fsyncdata(仅仅同步data)有关。
 6. ByteOrder，字节序。
 
 

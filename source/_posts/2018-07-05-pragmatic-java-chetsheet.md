@@ -547,7 +547,7 @@ false
 
 
 
-spi打破了双亲委派机制（如何在父加载器加载的类中，去调用子加载器去加载类？） 使用TThread.currentThread().getContextClassLoader()就可以实现在核心包里的基础类调用用户代码
+spi打破了双亲委派机制（如何在父加载器加载的类中，去调用子加载器去加载类？） 使用Thread.currentThread().getContextClassLoader()就可以实现在核心包里的基础类调用用户代码
 
 反射替换final成员变量的时候要小心[一种全局拦截并监控 DNS 的方式](https://fucknmb.com/2018/04/16/一种全局拦截并监控DNS的方式/) 文中提到,要改一下Modifier的flag
 ```java
