@@ -13,7 +13,7 @@ OkHttp通过ConnectionPool做到tcp连接复用（在Timeout内）,所以并不�
 
 ## 2. 自定义通讯协议
 http这种属于应用层的协议定义了每个数据包的结构是怎样的。在一些场合下，比如追求通讯速度，自定义加密手段，可能需要自定义结构体。
-自己用Socket实现一套server-clinent通讯模型其实不难。
+自己用Socket实现一套server-client通讯模型其实不难。
 server这边，先确定自己对外公布的ip,port。然后起一个serverSocket，死循环去accept，每次accept到一个就添加到一个列表中，同时用线程池去执行一个死跑从socket中read的runnable。
 client这边，根据server的ip和port去连接上，client主动发消息(byte，int,String类型都行)，server这边读到信息，给出response，clinent再读取server的回话，就跟两个人之间你一句我一句说话一样。整个过程中 **保持了长连接**,只要任何一方没有手动设置socket.setSoTimeout的话，放一晚上都不会断开。
 

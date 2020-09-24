@@ -123,7 +123,7 @@ public void countDown() {
 ```
 
 await中使当前线程停下来的方法在doAcquireSharedInterruptibly中，而唤醒线程的方法在releaseShared中。CountDownLatch因为有一个count的概念，所以在调用releaseShared之前总是会判断当前count是否已经到达了0。因为一旦到达了0，那么在等待的线程(调用了await的线程就可以恢复运行)。
-> CountDoownLatch的原理： **AQS 共享模式的典型使用，构造函数中的 1 是设置给 AQS 的 state 的。latch.await() 方法会阻塞，而 latch.countDown() 方法就是用来将 state-- 的，减到 0 以后，唤醒所有的阻塞在 await() 方法上的线程。**
+> CountDownLatch的原理： **AQS 共享模式的典型使用，构造函数中的 1 是设置给 AQS 的 state 的。latch.await() 方法会阻塞，而 latch.countDown() 方法就是用来将 state-- 的，减到 0 以后，唤醒所有的阻塞在 await() 方法上的线程。**
 
 
 ### CyclicBarrier 来实现这种几条线程同步的方法更简单
@@ -172,12 +172,12 @@ phaser.arriveAndAwaitAdvance();
 ## ThreadPoolExecutor.Worker
 
 
-## Semaphere
+## Semaphore
 Semaphere的构造函数中可以传一个int参数,用于标识同时最多有几条线程可以获得permit（也就是同时最多有几条线程进入acquire和release之间的代码块中）
 ```java
-semaphere.acquire();
+Semaphore.acquire();
 // 操作数据
-semaphere.release();
+Semaphore.release();
 ```
 假如构造函数中传入了1，那么这个semaphore实际上是一个lock或者说mutex，如果大于一，那么同时进入这段代码块里的线程就有多个了，就需要实现自己的同步逻辑。（race condition，往往要加一段sleep就能快速重现，比如两条线程同时对一个int 0 自增，那么极有可能得到的结果是1而不是预期的2，因为各自看到的都是0）
 
