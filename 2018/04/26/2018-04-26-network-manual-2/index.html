@@ -19,7 +19,7 @@
 <meta property="og:image" content="https://api1.foster66.xyz/static/imgs/jpglight-and-shadow-2411321_960_720.jpg">
 <meta property="og:image" content="https://api1.foster66.xyz/static/imgs/http_with_out_keep_alive.png">
 <meta property="og:image" content="https://api1.foster66.xyz/static/imgs/http_with_keep_alive.png">
-<meta property="og:updated_time" content="2020-09-13T13:40:57.651Z">
+<meta property="og:updated_time" content="2020-09-24T07:54:34.978Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="网络通信手册-2">
 <meta name="twitter:description" content="OkHttp通过ConnectionPool做到tcp连接复用（在Timeout内）,所以并不是每个http都去建立一个tcp连接自定义通讯协议，使用java socket实现客户端和服务端。需要注意的是分包问题和黏包问题">
@@ -203,7 +203,7 @@ ga('send', 'pageview');
     <div class="article-entry" itemprop="articleBody">
       
         <p>OkHttp通过ConnectionPool做到tcp连接复用（在Timeout内）,所以并不是每个http都去建立一个tcp连接<br>自定义通讯协议，使用java socket实现客户端和服务端。需要注意的是分包问题和黏包问题<br><img src="https://api1.foster66.xyz/static/imgs/jpglight-and-shadow-2411321_960_720.jpg" alt=""><br><a id="more"></a></p>
-<h2 id="1-http请求中tcp连接的复用-http-keep-alive是应用层的实现，与tcp-kkepalive那个2小时没关系"><a href="#1-http请求中tcp连接的复用-http-keep-alive是应用层的实现，与tcp-kkepalive那个2小时没关系" class="headerlink" title="1. http请求中tcp连接的复用(http -keep alive是应用层的实现，与tcp kkepalive那个2小时没关系)"></a>1. http请求中tcp连接的复用(http -keep alive是应用层的实现，与tcp kkepalive那个2小时没关系)</h2><h2 id="2-自定义通讯协议"><a href="#2-自定义通讯协议" class="headerlink" title="2. 自定义通讯协议"></a>2. 自定义通讯协议</h2><p>http这种属于应用层的协议定义了每个数据包的结构是怎样的。在一些场合下，比如追求通讯速度，自定义加密手段，可能需要自定义结构体。<br>自己用Socket实现一套server-clinent通讯模型其实不难。<br>server这边，先确定自己对外公布的ip,port。然后起一个serverSocket，死循环去accept，每次accept到一个就添加到一个列表中，同时用线程池去执行一个死跑从socket中read的runnable。<br>client这边，根据server的ip和port去连接上，client主动发消息(byte，int,String类型都行)，server这边读到信息，给出response，clinent再读取server的回话，就跟两个人之间你一句我一句说话一样。整个过程中 <strong>保持了长连接</strong>,只要任何一方没有手动设置socket.setSoTimeout的话，放一晚上都不会断开。</p>
+<h2 id="1-http请求中tcp连接的复用-http-keep-alive是应用层的实现，与tcp-kkepalive那个2小时没关系"><a href="#1-http请求中tcp连接的复用-http-keep-alive是应用层的实现，与tcp-kkepalive那个2小时没关系" class="headerlink" title="1. http请求中tcp连接的复用(http -keep alive是应用层的实现，与tcp kkepalive那个2小时没关系)"></a>1. http请求中tcp连接的复用(http -keep alive是应用层的实现，与tcp kkepalive那个2小时没关系)</h2><h2 id="2-自定义通讯协议"><a href="#2-自定义通讯协议" class="headerlink" title="2. 自定义通讯协议"></a>2. 自定义通讯协议</h2><p>http这种属于应用层的协议定义了每个数据包的结构是怎样的。在一些场合下，比如追求通讯速度，自定义加密手段，可能需要自定义结构体。<br>自己用Socket实现一套server-client通讯模型其实不难。<br>server这边，先确定自己对外公布的ip,port。然后起一个serverSocket，死循环去accept，每次accept到一个就添加到一个列表中，同时用线程池去执行一个死跑从socket中read的runnable。<br>client这边，根据server的ip和port去连接上，client主动发消息(byte，int,String类型都行)，server这边读到信息，给出response，clinent再读取server的回话，就跟两个人之间你一句我一句说话一样。整个过程中 <strong>保持了长连接</strong>,只要任何一方没有手动设置socket.setSoTimeout的话，放一晚上都不会断开。</p>
 <p>一个重点是双方发送的消息格式，即两个人交流的语言，如果全部是String的话，那就跟http很像了，当然任何数据格式从socket发出去最终都是以byte的形式发出去的(比如string会用utf-8或者gbk编码成byte数组)。<br>google的protoBuffer最重要的两个方法writeTo(object转成byte数组)和parseFrom(byte数组转成object)。</p>
 <p><a href="https://blog.csdn.net/u010818425/article/details/53448817">基于Java Socket的自定义协议，实现Android与服务器的长连接（二）</a>，基于这篇文章，可以将数据类型定义为统一的protocol，protocol的要素包括:</p>
 <blockquote>
