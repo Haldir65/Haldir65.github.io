@@ -17,7 +17,7 @@
 <meta property="og:description" content="iptables是控制linux 内核netfilter的command line frontend tool，只存在于linux平台，是system admin常用的防火墙。(虽然已经被nftables取代了，学习点网络知识还是很有必要)">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://api1.foster66.xyz/static/imgs/lidongjieya_ZH-CN9263684179_1920x1080.jpg">
-<meta property="og:updated_time" content="2020-09-24T07:54:34.982Z">
+<meta property="og:updated_time" content="2020-09-27T06:35:30.289Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iptables速查手册">
 <meta name="twitter:description" content="iptables是控制linux 内核netfilter的command line frontend tool，只存在于linux平台，是system admin常用的防火墙。(虽然已经被nftables取代了，学习点网络知识还是很有必要)">
@@ -215,7 +215,7 @@ ga('send', 'pageview');
 </ul>
 <p>每一条Chain上都有一个rules的列表(用A去append,用I去Insert)<br>当然还可以自定义Chain</p>
 <h2 id="table（table是一系列针对packet的同一类决策的集合，表是为了方便管理提出的逻辑概念）"><a href="#table（table是一系列针对packet的同一类决策的集合，表是为了方便管理提出的逻辑概念）" class="headerlink" title="table（table是一系列针对packet的同一类决策的集合，表是为了方便管理提出的逻辑概念）"></a>table（table是一系列针对packet的同一类决策的集合，表是为了方便管理提出的逻辑概念）</h2><p>Mangle is to change packets (Type Of Service, Time To Live etc) on traversal.<br>Nat is to put in NAT rules.<br>Raw is to be used for marking and connection tracking.<br>Filter is for filtering packets.(默认的，如果不加-t的话默认都是对这个表操作)</p>
-<p><a href="https://www.zfl9.com/iptables.html">表的优先级</a><br>所谓优先级就是处理的顺序，从左到右优先级依次降低：raw -&gt; mangle -&gt; nat -&gt; filter；</p>
+<p><a href="https://zfl9.github.io/iptables.html">表的优先级</a><br>所谓优先级就是处理的顺序，从左到右优先级依次降低：raw -&gt; mangle -&gt; nat -&gt; filter；</p>
 <p>raw，优先级最高，通常与NOTRACK一起使用，用于跳过连接跟踪（conntrack）和 nat 表的处理；<br>mangle，修改包头部的某些特殊条目，如 TOS、TTL、打上特殊标记 MARK 等，以影响后面的路由决策；<br>nat，用于进行网络地址转换，如 SNAT（修改源地址）、DNAT（修改目的地址）、REDIRECT 重定向等；<br>filter，用于过滤数据包，比如 ACCEPT（允许），DROP（丢弃）、REJECT（拒绝）、LOG（记录日志）；<br>raw 表除了 -j NOTRACK 外，还有一个常用的动作，那就是 -j TRACE，用于跟踪数据包，进行规则的调试，使用 dmesg 查看。</p>
 <p> 一般来讲table是kernel的事情，外部无需关心。一般都是创建一个新的chain,然后在input或者output这种现有的chain后面append上去，比如这样：</p>
 <p>iptables -N Services<br>iptables -A INPUT -j Services<br>iptables -A Services -m tcp -p tcp –dport 80 -j ACCEPT</p>
