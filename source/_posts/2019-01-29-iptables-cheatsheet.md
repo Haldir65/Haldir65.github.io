@@ -41,7 +41,7 @@ Nat is to put in NAT rules.
 Raw is to be used for marking and connection tracking.
 Filter is for filtering packets.(默认的，如果不加-t的话默认都是对这个表操作)
 
-[表的优先级](https://www.zfl9.com/iptables.html)
+[表的优先级](https://zfl9.github.io/iptables.html)
 所谓优先级就是处理的顺序，从左到右优先级依次降低：raw -> mangle -> nat -> filter；
 
 raw，优先级最高，通常与NOTRACK一起使用，用于跳过连接跟踪（conntrack）和 nat 表的处理；

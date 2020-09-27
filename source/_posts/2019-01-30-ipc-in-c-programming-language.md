@@ -7,7 +7,7 @@ tags: [c, linux]
 ***进程是资源分配的最小单位，线程是CPU调度的最小单位***
 ![](https://api1.foster66.xyz/static/imgs/Prayercard_ZH-CN13472871640_1920x1080.jpg)
 
-本文多数来自[c语言多进程编程](https://www.zfl9.com/c-multi-proc.html)
+本文多数来自[c语言多进程编程](https://zfl9.github.io/c-multi-proc.html)
 
 当Linux启动的时候，init是系统创建的第一个进程，这一进程会一直存在，直到我们关闭计算机；虽然后面systemd取代了init进程。后面的所有进程都是init进程fork出来的,linux下使用pstree可以看到所有的进程都是以systemd为根节点的
 当进程调用fork的时候，Linux在内存中开辟出一片新的内存空间给新的进程，并将老的进程空间中的内容复制到新的空间中，此后两个进程同时运行；老进程成为新进程的父进程(parent process)，而相应的，新进程就是老进程的子进程(child process)；
@@ -739,4 +739,4 @@ UNIX Domain Socket是目前最广泛使用的IPC机制**
 6. 信号: 不适用于信息交换，更适用于进程中断控制，比如非法内存访问，杀死某个进程等；
 
 ## 参考
-[c语言多进程编程](https://www.zfl9.com/c-multi-proc.html)
+[c语言多进程编程](https://zfl9.github.io/c-multi-proc.html)

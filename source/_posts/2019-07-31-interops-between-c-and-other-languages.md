@@ -189,7 +189,7 @@ exec("./myProgram", (error, stdout, stderr) => console.log(stdout));
 其实就是jni了，[To be honest, if you have any other choice besides using JNI, do that other thing.](https://medium.com/@bschlining/a-simple-java-native-interface-jni-example-in-java-and-scala-68fdafe76f5f)
 如果不是没有java的解决方法，不要使用jni，一个是麻烦，另一个是我们彻底失去了跨平台兼容性
 
-[这篇文章是我见识过的最新手友好的jni解释](https://www.zfl9.com/java-jni.html)
+[这篇文章是我见识过的最新手友好的jni解释](https://zfl9.github.io/java-jni.html)
 
 JNI的流程网上有一大堆，注意的是不同的平台gcc的参数是不一样的，三步直接搞定,在linux上亲测这样是可以的
 ```shell

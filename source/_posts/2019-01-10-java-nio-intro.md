@@ -587,7 +587,7 @@ Java_sun_nio_ch_FileChannelImpl_transferTo0(JNIEnv *env, jobject this,
 [zero copy技术](https://xunnanxu.github.io/2016/09/10/It-s-all-about-buffers-zero-copy-mmap-and-Java-NIO/)
 
 ## 4. java nio介绍
-[java nio介绍](https://www.zfl9.com/java-nio.html#more) 文章写的非常好
+[java nio介绍](https://zfl9.github.io/java-nio.html#more) 文章写的非常好
 java io的发展经历了三个阶段
 1. io/bio 即java.io.*，面向流，阻塞io，逐个字节的读写，没有相应的缓冲（除了bufferd），效率较低
 2. nio ，java.nio.* 面向缓冲区，阻塞/非阻塞，包含Buffer,Channel,Selector
@@ -871,7 +871,7 @@ public class Client2 {
 
 ## 参考
 [美团团队出的关于nio的解说](https://zhuanlan.zhihu.com/p/23488863) 
-[java nio](https://www.zfl9.com/java-nio.html#more) 作者的文章条理很清晰。
+[java nio](https://zfl9.github.io/java-nio.html#more) 作者的文章条理很清晰。
 这里面有一句原话摘抄下来：
 > 线程的创建和销毁成本很高，在Linux这样的操作系统中，线程本质上就是一个进程。创建和销毁都是重量级的系统函数。像Java的线程栈，一般至少分配512K～1M的空间，
 

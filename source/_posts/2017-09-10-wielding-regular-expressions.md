@@ -85,7 +85,7 @@ e的意思是extended regular expressions（Extended regular expressions include
 
 
 ## C语言版本的正则
-[regex.h](https://www.zfl9.com/c-regex-pcre.html)
+[regex.h](https://zfl9.github.io/c-regex-pcre.html)
 
 ![](https://api1.foster66.xyz/static/imgs/scenery151110067848.jpg)
 ![](https://api1.foster66.xyz/static/imgs/1513521515888.jpg)
