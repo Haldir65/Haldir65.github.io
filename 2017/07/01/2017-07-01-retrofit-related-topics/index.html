@@ -16,19 +16,19 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="This is gonna be nasty…… TL;DR">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/d653491fb55bec754b8471aa6a3f6eed.jpg">
-<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/ParameterHandlers.jpg">
-<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/different_end_point.jpg">
-<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/different_end_point_the_right_way.jpg">
-<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/creating_two_converters.jpg">
-<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/different_response.jpg">
-<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/delegate_converters.jpg">
-<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/always_observe_on_mian_thread.jpg">
-<meta property="og:updated_time" content="2020-09-27T06:35:30.277Z">
+<meta property="og:image" content="https://api1.foster57.tk/static/imgs/d653491fb55bec754b8471aa6a3f6eed.jpg">
+<meta property="og:image" content="https://api1.foster57.tk/static/imgs/ParameterHandlers.jpg">
+<meta property="og:image" content="https://api1.foster57.tk/static/imgs/different_end_point.jpg">
+<meta property="og:image" content="https://api1.foster57.tk/static/imgs/different_end_point_the_right_way.jpg">
+<meta property="og:image" content="https://api1.foster57.tk/static/imgs/creating_two_converters.jpg">
+<meta property="og:image" content="https://api1.foster57.tk/static/imgs/different_response.jpg">
+<meta property="og:image" content="https://api1.foster57.tk/static/imgs/delegate_converters.jpg">
+<meta property="og:image" content="https://api1.foster57.tk/static/imgs/always_observe_on_mian_thread.jpg">
+<meta property="og:updated_time" content="2021-04-04T08:46:59.935Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Retrofit源码阅读笔记">
 <meta name="twitter:description" content="This is gonna be nasty…… TL;DR">
-<meta name="twitter:image" content="https://api1.foster66.xyz/static/imgs/d653491fb55bec754b8471aa6a3f6eed.jpg">
+<meta name="twitter:image" content="https://api1.foster57.tk/static/imgs/d653491fb55bec754b8471aa6a3f6eed.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -207,7 +207,7 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="This-is-gonna-be-nasty……-TL-DR"><a href="#This-is-gonna-be-nasty……-TL-DR" class="headerlink" title="This is gonna be nasty…… TL;DR"></a>This is gonna be nasty…… TL;DR</h3><p><img src="https://api1.foster66.xyz/static/imgs/d653491fb55bec754b8471aa6a3f6eed.jpg" alt=""></p>
+        <h3 id="This-is-gonna-be-nasty……-TL-DR"><a href="#This-is-gonna-be-nasty……-TL-DR" class="headerlink" title="This is gonna be nasty…… TL;DR"></a>This is gonna be nasty…… TL;DR</h3><p><img src="https://api1.foster57.tk/static/imgs/d653491fb55bec754b8471aa6a3f6eed.jpg" alt=""></p>
 <a id="more"></a>
 <h3 id="1-Retrofit"><a href="#1-Retrofit" class="headerlink" title="1. Retrofit"></a>1. Retrofit</h3><h4 id="1-1-使用方法"><a href="#1-1-使用方法" class="headerlink" title="1.1 使用方法"></a>1.1 使用方法</h4><p>Retrofit本身并不局限于Android平台，java应用也可以用来和服务器沟通。<br>Retrofit一般的用法看上去很简单</p>
 <pre><code class="java"> public interface GitHub {
@@ -350,7 +350,7 @@ contentType（MimeType）
         return new ParameterHandler.Path&lt;&gt;(name, converter, path.encoded());
       }
 </code></pre>
-<p>ParameterHandler.Path&lt;&gt;在ParameterHandler这个类里面，看一下结构<img src="https://api1.foster66.xyz/static/imgs/ParameterHandlers.jpg" alt=""><br>Path这个class中关键的方法apply:</p>
+<p>ParameterHandler.Path&lt;&gt;在ParameterHandler这个类里面，看一下结构<img src="https://api1.foster57.tk/static/imgs/ParameterHandlers.jpg" alt=""><br>Path这个class中关键的方法apply:</p>
 <pre><code class="java"> @Override void apply(RequestBuilder builder, @Nullable T value) throws IOException {
       builder.addPathParam(name, valueConverter.convert(value), encoded);
     }
@@ -526,8 +526,8 @@ Executor callbackExecutor = this.callbackExecutor;
 </code></pre>
 <h3 id="1-5-使用Retrofit的best-practices"><a href="#1-5-使用Retrofit的best-practices" class="headerlink" title="1.5 使用Retrofit的best practices"></a>1.5 使用Retrofit的best practices</h3><p>到这里，retrofit的工作流程就通过三个方法讲完了，接下来根据jake wharton的talk <a href="https://www.youtube.com/watch?v=t34AQlblSeE">making retrofit work for you</a>来讲几个best practice。</p>
 <h4 id="1-5-1-end-point-不一样怎么办"><a href="#1-5-1-end-point-不一样怎么办" class="headerlink" title="1.5.1 end point 不一样怎么办"></a>1.5.1 end point 不一样怎么办</h4><p>默认情况下，如果不指定client,每一次都会创建一个新的OkHttpClient，这样做就丧失了disk caching,connection pooling等优势。</p>
-<p><img src="https://api1.foster66.xyz/static/imgs/different_end_point.jpg" alt="endpoint">    </p>
-<p>所以需要提取出一个OkHttpClient,解决方式很简单<br><img src="https://api1.foster66.xyz/static/imgs/different_end_point_the_right_way.jpg" alt=""></p>
+<p><img src="https://api1.foster57.tk/static/imgs/different_end_point.jpg" alt="endpoint">    </p>
+<p>所以需要提取出一个OkHttpClient,解决方式很简单<br><img src="https://api1.foster57.tk/static/imgs/different_end_point_the_right_way.jpg" alt=""></p>
 <h4 id="1-5-2-不要创建多个HttpClient"><a href="#1-5-2-不要创建多个HttpClient" class="headerlink" title="1.5.2 不要创建多个HttpClient"></a>1.5.2 不要创建多个HttpClient</h4><p>shallow copy</p>
 <pre><code class="java">OkHttpClient client = new OkHttpClient();
 
@@ -541,8 +541,8 @@ OkHttpClient clientBar = client.newBuilder().readTimeOut(20,SECONDS).writeTimeOu
 Call&lt;User&gt; login(@Body LoginRequest request)
 </code></pre>
 <p>//这个header对于server是不可见的，现在在Interceptor中，<br>只要判断request.header(“No-Authentication”)==null 即表示该接口需要加上header。<br>所以，对于特定接口的筛选可以，采用这种方式。</p>
-<h4 id="1-5-4-Converters将byte变成java对象，底层的解析器不要创建多个"><a href="#1-5-4-Converters将byte变成java对象，底层的解析器不要创建多个" class="headerlink" title="1.5.4 Converters将byte变成java对象，底层的解析器不要创建多个"></a>1.5.4 Converters将byte变成java对象，底层的解析器不要创建多个</h4><p>addConverterFactory，和之前的创建两个httpclient一样，人们也很容易创建两个解析器。解决方法也很实在，提取出来公用即可。<br><img src="https://api1.foster66.xyz/static/imgs/creating_two_converters.jpg" alt=""></p>
-<h4 id="1-5-5-addConverterFactory可以调用多次"><a href="#1-5-5-addConverterFactory可以调用多次" class="headerlink" title="1.5.5 addConverterFactory可以调用多次"></a>1.5.5 addConverterFactory可以调用多次</h4><p>假如一个接口返回json，一个接口返回proto。不要试图创建多个retrofit实例。这样就可以了<br><img src="https://api1.foster66.xyz/static/imgs/different_response.jpg" alt=""></p>
+<h4 id="1-5-4-Converters将byte变成java对象，底层的解析器不要创建多个"><a href="#1-5-4-Converters将byte变成java对象，底层的解析器不要创建多个" class="headerlink" title="1.5.4 Converters将byte变成java对象，底层的解析器不要创建多个"></a>1.5.4 Converters将byte变成java对象，底层的解析器不要创建多个</h4><p>addConverterFactory，和之前的创建两个httpclient一样，人们也很容易创建两个解析器。解决方法也很实在，提取出来公用即可。<br><img src="https://api1.foster57.tk/static/imgs/creating_two_converters.jpg" alt=""></p>
+<h4 id="1-5-5-addConverterFactory可以调用多次"><a href="#1-5-5-addConverterFactory可以调用多次" class="headerlink" title="1.5.5 addConverterFactory可以调用多次"></a>1.5.5 addConverterFactory可以调用多次</h4><p>假如一个接口返回json，一个接口返回proto。不要试图创建多个retrofit实例。这样就可以了<br><img src="https://api1.foster57.tk/static/imgs/different_response.jpg" alt=""></p>
 <p>底层的原理是这样的。<br>User是Proto,Friend是Json。 Proto都extends一个protoType class，所以只要看下是否 instanceof proto就可以了。这一切都是在serviceMethod创建过程中判断的。这里顺序很重要。由于gson基本能够序列化一切，所以gson总是会认为自己可以成功。所以要把protoConverter放在前面。<br> GsonConverterFactory, SimpleXmlConverterFactory converters , they say yes to everyThing. 所以如果出现这种情况怎么办？<br> 首先定义自己的注解</p>
 <pre><code class="java"> @interface Xml {}
  @interface Json {}
@@ -574,9 +574,9 @@ class XmlOrJsonConverterFactroy extend Converter.Factory{
 }
 [AnnotatedConverterFactory用于自定义类型](https://github.com/square/retrofit/blob/master/samples/src/main/java/com/example/retrofit/AnnotatedConverters.java)
 </code></pre>
-<h4 id="1-5-6-服务器返回的数据中包括一些metaData"><a href="#1-5-6-服务器返回的数据中包括一些metaData" class="headerlink" title="1.5.6 服务器返回的数据中包括一些metaData"></a>1.5.6 服务器返回的数据中包括一些metaData</h4><p>使用delegate的方式去除这些metadata，只获取想要的response实体对象<br><img src="https://api1.foster66.xyz/static/imgs/delegate_converters.jpg" alt=""><br>但这些metaData是有用的。。怎么处理<br>可以在convert中集中处理自定义错误码。</p>
+<h4 id="1-5-6-服务器返回的数据中包括一些metaData"><a href="#1-5-6-服务器返回的数据中包括一些metaData" class="headerlink" title="1.5.6 服务器返回的数据中包括一些metaData"></a>1.5.6 服务器返回的数据中包括一些metaData</h4><p>使用delegate的方式去除这些metadata，只获取想要的response实体对象<br><img src="https://api1.foster57.tk/static/imgs/delegate_converters.jpg" alt=""><br>但这些metaData是有用的。。怎么处理<br>可以在convert中集中处理自定义错误码。</p>
 <h4 id="1-5-7-和Rxjava配合使用"><a href="#1-5-7-和Rxjava配合使用" class="headerlink" title="1.5.7 和Rxjava配合使用"></a>1.5.7 和Rxjava配合使用</h4><p>CallAdapterFactory和ConverterFactory类似，也可以自定义，所以这样可以直接将所有的Observable返回到主线程</p>
-<p><img src="https://api1.foster66.xyz/static/imgs/always_observe_on_mian_thread.jpg" alt=""></p>
+<p><img src="https://api1.foster57.tk/static/imgs/always_observe_on_mian_thread.jpg" alt=""></p>
 <p>所以，Retrofit就是将HttpClient、Converter和CallAdapter这三样职能结合起来，又提供了足够的定制化。</p>
 <h3 id="1-6-补充"><a href="#1-6-补充" class="headerlink" title="1.6 补充"></a>1.6 补充</h3><p>OkHttp本身没有将response挪到主线程，OkHttp的execute方法在当前线程回调，OkHttp的enqueue方法在OkHttpDispatcher线程回调onResponse。都没有推到主线程。</p>
 <p>Retrofit这么干了，具体在<br>Retrofit.Builder.build方法里面</p>
@@ -882,7 +882,7 @@ if (rawType != Observable.class &amp;&amp; !isFlowable &amp;&amp; !isSingle &amp
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2020 Haldir
+    		&copy; 2021 Haldir
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten

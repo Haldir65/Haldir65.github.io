@@ -16,14 +16,14 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="OkHttp通过ConnectionPool做到tcp连接复用（在Timeout内）,所以并不是每个http都去建立一个tcp连接自定义通讯协议，使用java socket实现客户端和服务端。需要注意的是分包问题和黏包问题">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/jpglight-and-shadow-2411321_960_720.jpg">
-<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/http_with_out_keep_alive.png">
-<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/http_with_keep_alive.png">
-<meta property="og:updated_time" content="2020-09-27T06:35:30.285Z">
+<meta property="og:image" content="https://api1.foster57.tk/static/imgs/jpglight-and-shadow-2411321_960_720.jpg">
+<meta property="og:image" content="https://api1.foster57.tk/static/imgs/http_with_out_keep_alive.png">
+<meta property="og:image" content="https://api1.foster57.tk/static/imgs/http_with_keep_alive.png">
+<meta property="og:updated_time" content="2021-04-04T08:46:59.943Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="网络通信手册-2">
 <meta name="twitter:description" content="OkHttp通过ConnectionPool做到tcp连接复用（在Timeout内）,所以并不是每个http都去建立一个tcp连接自定义通讯协议，使用java socket实现客户端和服务端。需要注意的是分包问题和黏包问题">
-<meta name="twitter:image" content="https://api1.foster66.xyz/static/imgs/jpglight-and-shadow-2411321_960_720.jpg">
+<meta name="twitter:image" content="https://api1.foster57.tk/static/imgs/jpglight-and-shadow-2411321_960_720.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -202,7 +202,7 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>OkHttp通过ConnectionPool做到tcp连接复用（在Timeout内）,所以并不是每个http都去建立一个tcp连接<br>自定义通讯协议，使用java socket实现客户端和服务端。需要注意的是分包问题和黏包问题<br><img src="https://api1.foster66.xyz/static/imgs/jpglight-and-shadow-2411321_960_720.jpg" alt=""><br><a id="more"></a></p>
+        <p>OkHttp通过ConnectionPool做到tcp连接复用（在Timeout内）,所以并不是每个http都去建立一个tcp连接<br>自定义通讯协议，使用java socket实现客户端和服务端。需要注意的是分包问题和黏包问题<br><img src="https://api1.foster57.tk/static/imgs/jpglight-and-shadow-2411321_960_720.jpg" alt=""><br><a id="more"></a></p>
 <h2 id="1-http请求中tcp连接的复用-http-keep-alive是应用层的实现，与tcp-kkepalive那个2小时没关系"><a href="#1-http请求中tcp连接的复用-http-keep-alive是应用层的实现，与tcp-kkepalive那个2小时没关系" class="headerlink" title="1. http请求中tcp连接的复用(http -keep alive是应用层的实现，与tcp kkepalive那个2小时没关系)"></a>1. http请求中tcp连接的复用(http -keep alive是应用层的实现，与tcp kkepalive那个2小时没关系)</h2><h2 id="2-自定义通讯协议"><a href="#2-自定义通讯协议" class="headerlink" title="2. 自定义通讯协议"></a>2. 自定义通讯协议</h2><p>http这种属于应用层的协议定义了每个数据包的结构是怎样的。在一些场合下，比如追求通讯速度，自定义加密手段，可能需要自定义结构体。<br>自己用Socket实现一套server-client通讯模型其实不难。<br>server这边，先确定自己对外公布的ip,port。然后起一个serverSocket，死循环去accept，每次accept到一个就添加到一个列表中，同时用线程池去执行一个死跑从socket中read的runnable。<br>client这边，根据server的ip和port去连接上，client主动发消息(byte，int,String类型都行)，server这边读到信息，给出response，clinent再读取server的回话，就跟两个人之间你一句我一句说话一样。整个过程中 <strong>保持了长连接</strong>,只要任何一方没有手动设置socket.setSoTimeout的话，放一晚上都不会断开。</p>
 <p>一个重点是双方发送的消息格式，即两个人交流的语言，如果全部是String的话，那就跟http很像了，当然任何数据格式从socket发出去最终都是以byte的形式发出去的(比如string会用utf-8或者gbk编码成byte数组)。<br>google的protoBuffer最重要的两个方法writeTo(object转成byte数组)和parseFrom(byte数组转成object)。</p>
 <p><a href="https://blog.csdn.net/u010818425/article/details/53448817">基于Java Socket的自定义协议，实现Android与服务器的长连接（二）</a>，基于这篇文章，可以将数据类型定义为统一的protocol，protocol的要素包括:</p>
@@ -394,8 +394,8 @@ Cookie: session=fsdaf;aaa=dfasf;......
 <p>192.168.0.0 - 192.168.255.255 (192.168/16比特前缀)</p>
 <p>我们可以看到其中有1个A类地址块，32个B类地址块和256个C类地址块。主流的家用路由器使用C类私有地址作为路由器LAN端的IP地址较多，所以我们可以看到路由器设置页面的IP一般都为192.168开头。</p>
 <p><a href="https://stackoverflow.com/questions/9334401/http-keep-alive-and-tcp-keep-alive">tcp keep-alive和http的keep-alive是两回事</a> http keep-alive是由webserver负责实现的。 关键字:http keepalive implementation</p>
-<p>http1.0中每个tcp连接用完了就关闭掉<br><img src="https://api1.foster66.xyz/static/imgs/http_with_out_keep_alive.png" alt=""></p>
-<p>http1.1中每个连接用完了不关闭,(保留一个keepAlive时间，在OkHttp里面默认一条连接在没有使用过的情况下保留5分钟才关闭)<br><img src="https://api1.foster66.xyz/static/imgs/http_with_keep_alive.png" alt=""></p>
+<p>http1.0中每个tcp连接用完了就关闭掉<br><img src="https://api1.foster57.tk/static/imgs/http_with_out_keep_alive.png" alt=""></p>
+<p>http1.1中每个连接用完了不关闭,(保留一个keepAlive时间，在OkHttp里面默认一条连接在没有使用过的情况下保留5分钟才关闭)<br><img src="https://api1.foster57.tk/static/imgs/http_with_keep_alive.png" alt=""></p>
 <p>这篇回答里解释了http keep-alive是为了让后续的http请求复用这一条tcp连接。而tcp的keep alive则是定期发小的包。</p>
 <p>另外,http server并不会主动去问client是否还连着，只需要起一个timeout(到时间就掐掉这条tcp)就行了。下次客户端再来发起请求，重新起一条tcp吧。<br>但是http keepalive在有些时候也是有问题的(http-keepAlive的缺点，多个请求同时到达就会因为头部阻塞而延迟，这种时候还不如重新搞一个socket处理)<br>虽说HTTP/1.1 Keep-Alive特性支持多个请求在同一个连接上排队发送，在浏览器端正常的HTML等资源请求，会带来线头阻塞弊端，后一个请求依赖于前一个请求完成，一旦出现阻塞，后续请求只能排队等待。</p>
 <p><a href="http://www.blogjava.net/yongboy/archive/2015/03/30/423963.html">移动APP后端网络处理一些问题记录</a><br>HTTP/1.1 Pipelining（建立在Keep-Alive持久化基础之上，中文译为管线化，支持连续的幂等的GET/HEAD方法请求，实际环境下，并没有被浏览器所支持。同一个连接，处理同样的三次请求-响应）</p>
@@ -581,7 +581,7 @@ Cookie: session=fsdaf;aaa=dfasf;......
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2020 Haldir
+    		&copy; 2021 Haldir
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten

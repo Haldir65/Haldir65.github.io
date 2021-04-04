@@ -16,15 +16,15 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="记录一些Android系统坐标系的常用方法，因为日常开发中难免会碰到需要单独计算View系统坐标的情况。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/minion.jpg">
-<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/android_screen_coordinate_system.png">
-<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/view_hirearchy_1013.png">
-<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/support_lib_methods_summary.jpg">
-<meta property="og:updated_time" content="2020-09-27T06:35:30.273Z">
+<meta property="og:image" content="https://api1.foster57.tk/static/imgs/minion.jpg">
+<meta property="og:image" content="https://api1.foster57.tk/static/imgs/android_screen_coordinate_system.png">
+<meta property="og:image" content="https://api1.foster57.tk/static/imgs/view_hirearchy_1013.png">
+<meta property="og:image" content="https://api1.foster57.tk/static/imgs/support_lib_methods_summary.jpg">
+<meta property="og:updated_time" content="2021-04-04T08:46:59.931Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="安卓坐标系常用方法">
 <meta name="twitter:description" content="记录一些Android系统坐标系的常用方法，因为日常开发中难免会碰到需要单独计算View系统坐标的情况。">
-<meta name="twitter:image" content="https://api1.foster66.xyz/static/imgs/minion.jpg">
+<meta name="twitter:image" content="https://api1.foster57.tk/static/imgs/minion.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -204,8 +204,8 @@ ga('send', 'pageview');
     <div class="article-entry" itemprop="articleBody">
       
         <p>记录一些Android系统坐标系的常用方法，因为日常开发中难免会碰到需要单独计算View系统坐标的情况。</p>
-<p><img src="https://api1.foster66.xyz/static/imgs/minion.jpg" alt=""><br><a id="more"></a></p>
-<p>ScrollTo，ScrollBy，getVisibleRect这些方法平时想要用的时候总要去网上查找，这里记录下来，方便今后直接参考<br>首先是一张很多人都见过的图<br><img src="https://api1.foster66.xyz/static/imgs/android_screen_coordinate_system.png" alt=""><br>中间的蓝色的点是TouchEvent发生时，获得的MotionEvent.getX()、getY()。</p>
+<p><img src="https://api1.foster57.tk/static/imgs/minion.jpg" alt=""><br><a id="more"></a></p>
+<p>ScrollTo，ScrollBy，getVisibleRect这些方法平时想要用的时候总要去网上查找，这里记录下来，方便今后直接参考<br>首先是一张很多人都见过的图<br><img src="https://api1.foster57.tk/static/imgs/android_screen_coordinate_system.png" alt=""><br>中间的蓝色的点是TouchEvent发生时，获得的MotionEvent.getX()、getY()。</p>
 <h3 id="1-坐标原点和坐标轴方向"><a href="#1-坐标原点和坐标轴方向" class="headerlink" title="1. 坐标原点和坐标轴方向"></a>1. 坐标原点和坐标轴方向</h3><p>坐标原点有两种，屏幕左上角（statusBar也包含其中）和父控件左上角<br>坐标轴方向：X轴向右，Y轴向下，Z轴(5.0增加)向上。</p>
 <h3 id="2-Left-Top-Right-Bottom"><a href="#2-Left-Top-Right-Bottom" class="headerlink" title="2. Left,Top,Right,Bottom"></a>2. Left,Top,Right,Bottom</h3><p>而Top，left，bottom,down分别对应着其其相对于父控件的距离，由此可以计算得到View的宽度width = getRight()-getLeft() ,View的高度 height = getBottom()-getTop()<br>而实际上view.getHeight()方法的实现也就是mBottom-mTop.</p>
 <h3 id="3-X-Y"><a href="#3-X-Y" class="headerlink" title="3. X , Y"></a>3. X , Y</h3><p>X代表的是当前View的左上角那个点的横坐标，Y代表的是纵坐标。<br>X = left + getTranslationX<br>Y = Top + getTranslationY<br>通常在动画中使用setTranslationX来实现偏移效果，注意，这是不会改变left的。在滑动过程中，x, y会随着改变。</p>
@@ -221,7 +221,7 @@ View.getLocalVisibleRect()
 View.getGlobalVisibleRect()  // 以屏幕左上角为坐标原点
 </code></pre>
 <p>以上四个方法在onCreate里面返回的值都是0，需要在Activity的onWindowFocusChanged(true)中去获得<br>这里需要扯一点关于window的问题，根据大部分博客的介绍：DecorView是FrameLayout的子类，是View视图层级树的根节点。<br>一般会有一个LinearLayout的child</p>
-<p>为此，我在setContentView里面放了一个CoordinateLayout,使用Hierarchy View截图的到这样的结果。<br>图片有点大<br><img src="https://api1.foster66.xyz/static/imgs/view_hirearchy_1013.png" alt=""></p>
+<p>为此，我在setContentView里面放了一个CoordinateLayout,使用Hierarchy View截图的到这样的结果。<br>图片有点大<br><img src="https://api1.foster57.tk/static/imgs/view_hirearchy_1013.png" alt=""></p>
 <p>在ViewHirearchy中可以看到，Activity中View视图层级从上到下依次为：</p>
 <blockquote>
 <p>PhoneWindow$DecorView（有三个child,分别是LinearLayout，View(id/statusBarBackground)和View(id/navigationBarBackground)）<br>LinearLayout<br>FrameLayout<br>FitWindowsLinearLayout<br>ContentFrameLayout(id/android.R.id.content) //这在开发过程中有时会用到<br>setContentView设置的view</p>
@@ -305,7 +305,7 @@ set.start();
         }
     }
 </code></pre>
-<p>这段是我在秋百万的android-ultra-pulltorefresh里面找到的，想当初为了自己写下拉刷新，一遍一遍的打Log，最后甚至用上getVisibleRect才算搞定。<br>其实很多东西前人已经帮我们整理好了。<br>对了这东西在v4包里有ViewCompat.canScrollVertically，v4包除了方法数有点多(10k+好像)这点不好以外，一直都很好用<br>附上supportLibrary各个包的方法数，如果对65536这个数字熟悉的话，还是会注意点的。<br><img src="https://api1.foster66.xyz/static/imgs/support_lib_methods_summary.jpg" alt="pic"></p>
+<p>这段是我在秋百万的android-ultra-pulltorefresh里面找到的，想当初为了自己写下拉刷新，一遍一遍的打Log，最后甚至用上getVisibleRect才算搞定。<br>其实很多东西前人已经帮我们整理好了。<br>对了这东西在v4包里有ViewCompat.canScrollVertically，v4包除了方法数有点多(10k+好像)这点不好以外，一直都很好用<br>附上supportLibrary各个包的方法数，如果对65536这个数字熟悉的话，还是会注意点的。<br><img src="https://api1.foster57.tk/static/imgs/support_lib_methods_summary.jpg" alt="pic"></p>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
 <li>使用getLocalVisibleRect可以判断一个view是否完全可见</li>
 <li>scrollBy,setScrollX等内部都是调用了scrollTo方法，ScrollTo方法传参数与实际效果是相反的</li>
@@ -489,7 +489,7 @@ set.start();
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2020 Haldir
+    		&copy; 2021 Haldir
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten

@@ -14,12 +14,12 @@
 <meta property="og:url" content="https://haldir65.github.io/2018/04/13/2018-04-13-android-cheat-sheet-four/index.html">
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/street%20lights%20dark%20night%20car%20city%20bw.jpg">
-<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/toast_transact.jpg">
-<meta property="og:updated_time" content="2020-09-27T06:35:30.285Z">
+<meta property="og:image" content="https://api1.foster57.tk/static/imgs/street%20lights%20dark%20night%20car%20city%20bw.jpg">
+<meta property="og:image" content="https://api1.foster57.tk/static/imgs/toast_transact.jpg">
+<meta property="og:updated_time" content="2021-04-04T08:46:59.943Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android知识集合[四]">
-<meta name="twitter:image" content="https://api1.foster66.xyz/static/imgs/street%20lights%20dark%20night%20car%20city%20bw.jpg">
+<meta name="twitter:image" content="https://api1.foster57.tk/static/imgs/street%20lights%20dark%20night%20car%20city%20bw.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -198,7 +198,7 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p><img src="https://api1.foster66.xyz/static/imgs/street%20lights%20dark%20night%20car%20city%20bw.jpg" alt=""></p>
+        <p><img src="https://api1.foster57.tk/static/imgs/street%20lights%20dark%20night%20car%20city%20bw.jpg" alt=""></p>
 <a id="more"></a>
 <h2 id="1-在子线程中显示一个Toast是亲测可行的"><a href="#1-在子线程中显示一个Toast是亲测可行的" class="headerlink" title="1. 在子线程中显示一个Toast是亲测可行的"></a>1. 在子线程中显示一个Toast是亲测可行的</h2><p>不是那种post到主线程的方案<br><a href="https://www.zhihu.com/question/51099935">其实知乎上已经有了讨论</a></p>
 <pre><code class="java">static class ToastThread extends Thread {
@@ -219,7 +219,7 @@ ga('send', 'pageview');
      }
  }
 </code></pre>
-<p><img src="https://api1.foster66.xyz/static/imgs/toast_transact.jpg" alt=""><br>其实Toast的原理就是通过IPC向NotificationManager请求加入队列，后者会检测权限xxxx。然后通过上面的ipc回调到客户端的onTransact中，这里也就是走到了Toast.TN这个static inner class的handler中，发送一个Message，handlerMessage中完成了WindowManager.addView的操作<br>需要注意的是，这里还是子线程，所以确实可能存在多条线程同时操作UI的现象。从形式上看，主线程和子线程中的Toast对象各自通过自己的Looper维护了一个消息循环队列，这其中的消息类型包括show,hide和cancel。所以可能存在多条线程同时调用WindowManager的方法，View也是每条线程各自独有的，最坏的场景莫过于两条线程同时各自添加了一个View到window上。另外，子线程中引入looper的形式也造成了子线程实质上的阻塞，当然可以直接当成一个handlerThread来用。<br>所以不是很推荐这么干，只是说可以做。<br><strong>Toast.TN.handleShow</strong></p>
+<p><img src="https://api1.foster57.tk/static/imgs/toast_transact.jpg" alt=""><br>其实Toast的原理就是通过IPC向NotificationManager请求加入队列，后者会检测权限xxxx。然后通过上面的ipc回调到客户端的onTransact中，这里也就是走到了Toast.TN这个static inner class的handler中，发送一个Message，handlerMessage中完成了WindowManager.addView的操作<br>需要注意的是，这里还是子线程，所以确实可能存在多条线程同时操作UI的现象。从形式上看，主线程和子线程中的Toast对象各自通过自己的Looper维护了一个消息循环队列，这其中的消息类型包括show,hide和cancel。所以可能存在多条线程同时调用WindowManager的方法，View也是每条线程各自独有的，最坏的场景莫过于两条线程同时各自添加了一个View到window上。另外，子线程中引入looper的形式也造成了子线程实质上的阻塞，当然可以直接当成一个handlerThread来用。<br>所以不是很推荐这么干，只是说可以做。<br><strong>Toast.TN.handleShow</strong></p>
 <pre><code class="java">try {
       mWM.addView(mView, mParams);
       trySendAccessibilityEvent();
@@ -906,7 +906,7 @@ ActivityThread.performLaunchActivity
 <p>Q:为什么不能在锁屏显示Activity(这个我自己看到的是网易云音乐这种也不能在miui上锁屏)<br>A:MIUI引入了锁屏显示窗口权限控制，默认不能在锁屏上显示Activity</p>
 <p>早一些看到这样的文档，也不至于浪费太多时间和国产rom进行调试吧，没意思的。当然还是要看价值。</p>
 <h2 id="28-关于android中如何收集native-crash的问题"><a href="#28-关于android中如何收集native-crash的问题" class="headerlink" title="28. 关于android中如何收集native crash的问题"></a>28. 关于android中如何收集native crash的问题</h2><p><a href="https://www.jianshu.com/p/5f8f6d95b79c">libcorkscrew</a> 一种基于linux信号量的收集crash的方式<br>生产环境见过用<a href="https://github.com/iqiyi/xCrash">爱奇艺的一个库</a></p>
-<p><a href="https://api1.foster66.xyz/static/imgs/android_build_detail.png">安卓打包流程</a></p>
+<p><a href="https://api1.foster57.tk/static/imgs/android_build_detail.png">安卓打包流程</a></p>
 <h3 id="29-MiuiResources不能随便替换"><a href="#29-MiuiResources不能随便替换" class="headerlink" title="29. MiuiResources不能随便替换"></a>29. MiuiResources不能随便替换</h3><p>Resource.getClass().getName().equals(“android.content.res.MiuiResources”)的时候，ContextImpl的resource不能换。</p>
 
       
@@ -1066,7 +1066,7 @@ ActivityThread.performLaunchActivity
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2020 Haldir
+    		&copy; 2021 Haldir
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten

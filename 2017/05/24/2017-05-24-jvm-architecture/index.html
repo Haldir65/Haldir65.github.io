@@ -16,14 +16,14 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/high_way_scene.jpg">
-<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/starry_sky.jpg">
-<meta property="og:image" content="https://api1.foster66.xyz/static/imgs/WolfeCreekCrater_ZH-CN10953577427_1920x1080.jpg">
-<meta property="og:updated_time" content="2020-09-27T06:35:30.277Z">
+<meta property="og:image" content="https://api1.foster57.tk/static/imgs/high_way_scene.jpg">
+<meta property="og:image" content="https://api1.foster57.tk/static/imgs/starry_sky.jpg">
+<meta property="og:image" content="https://api1.foster57.tk/static/imgs/WolfeCreekCrater_ZH-CN10953577427_1920x1080.jpg">
+<meta property="og:updated_time" content="2021-04-04T08:46:59.935Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="jmm(java memory model)概述">
 <meta name="twitter:description" content="关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下">
-<meta name="twitter:image" content="https://api1.foster66.xyz/static/imgs/high_way_scene.jpg">
+<meta name="twitter:image" content="https://api1.foster57.tk/static/imgs/high_way_scene.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -202,7 +202,7 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下<br><img src="https://api1.foster66.xyz/static/imgs/high_way_scene.jpg" alt=""><br><a id="more"></a></p>
+        <p>关于jvm运行的大致架构，最近找到一个比较合适的视频，记录要点如下<br><img src="https://api1.foster57.tk/static/imgs/high_way_scene.jpg" alt=""><br><a id="more"></a></p>
 <h2 id="1-从MyApp-java文件开始"><a href="#1-从MyApp-java文件开始" class="headerlink" title="1.从MyApp.java文件开始"></a>1.从MyApp.java文件开始</h2><p>大家都知道最开始学习Java的时候，要用javac 来编译MyApp.java来生成一个class文件。<br>在命令行里，大致是这样的执行顺序:</p>
 <pre><code class="java">javac MyApp.java
 java MyApp
@@ -247,7 +247,7 @@ java MyApp
 <h3 id="3-Java-Stack"><a href="#3-Java-Stack" class="headerlink" title="3. Java Stack"></a>3. Java Stack</h3><p>java stacks contains stack frames of the current execution per thread.<br>eg : method a -&gt; 调用 method b -&gt; 调用method c<br>当前线程的方法栈中就会push三个stack frame(每个Frame对应一个方法的执行环境)<br>stack Frame包含当前方法中的变量，以及返回值，etc<br>这里定义了stackoverFlowError</p>
 <h3 id="4-pc-Registers"><a href="#4-pc-Registers" class="headerlink" title="4. pc Registers"></a>4. pc Registers</h3><p>这里面装的是程序计数器，后者是指向下一个将要被执行的指令的指针（每条线程都有）。</p>
 <h3 id="5-Native-method-stacks"><a href="#5-Native-method-stacks" class="headerlink" title="5. Native method stacks"></a>5. Native method stacks</h3><p>Native method stacks 是由java stack中的方法调用native方法创建的，例如windows上的dll库</p>
-<h2 id="6-Execution-Engine的任务"><a href="#6-Execution-Engine的任务" class="headerlink" title="6. Execution Engine的任务"></a>6. Execution Engine的任务</h2><p><img src="https://api1.foster66.xyz/static/imgs/starry_sky.jpg" alt=""></p>
+<h2 id="6-Execution-Engine的任务"><a href="#6-Execution-Engine的任务" class="headerlink" title="6. Execution Engine的任务"></a>6. Execution Engine的任务</h2><p><img src="https://api1.foster57.tk/static/imgs/starry_sky.jpg" alt=""></p>
 <pre><code>- Interpreter 将byte code 翻译成机器指令并执行(根据指令去调用Native方法，在windows上jre/bin/文件夹中一大堆的dll就是windows平台提供的Native库，在linux上是.so文件)
 
 - JIT Compiler  just in time compiler（如果有某项byte code instruction被多次调用，这些byte code不会每次都被inteprete，JIT will hold on to that system level target machine code for future usage,which is fast）
@@ -256,7 +256,7 @@ java MyApp
 </code></pre><p>调用Native Method Interface(JNI) -&gt; Native method libraries（.dll,.so etc）</p>
 <p><a href="https://blog.csdn.net/SudaDays/article/details/81006483">java中new一个对象的时候发生了什么</a><br>首先，讨论该类没有显式的继承任何类的情况。此时，JVM会检查是否已经加载了这个类，如果没有加载，就会加载该类，一个类只会被加载一次。加载该类的时候会按顺序初始化静态变量，并执行静态语句块，静态函数要被调用才会执行。假如静态变量或静态代码块初始化了一个类的话，会再次执行上面的过程。加载完类之后，开始生成对象，会按照顺序初始化成员变量，基本类型被初始化为0，引用类型被初始化为NULL，然后执行构造器。</p>
 <p>下面讨论该类显式继承了一个类的情况，被继承的类没有再显式的继承。JVM会先检查父类是否被加载，如果未加载，则加载该类，并会初始化静态变量并执行静态代码块。然后检查子类，若未加载则同上。当所用到的类加载完后，开始初始化父类，先初始化成员变量，然后执行构造器。子类顺序相同。</p>
-<p>总结，JVM会从被继承的最顶层类加载，依次初始化每个类的静态成员变量，执行静态代码块。再从被继承的最顶层类依次初始化成员变量，调用构造器。<br><img src="https://api1.foster66.xyz/static/imgs/WolfeCreekCrater_ZH-CN10953577427_1920x1080.jpg" alt=""></p>
+<p>总结，JVM会从被继承的最顶层类加载，依次初始化每个类的静态成员变量，执行静态代码块。再从被继承的最顶层类依次初始化成员变量，调用构造器。<br><img src="https://api1.foster57.tk/static/imgs/WolfeCreekCrater_ZH-CN10953577427_1920x1080.jpg" alt=""></p>
 <p>主流的垃圾回收主要分两大类：引用计数和可达性分析。<br>JVM没有使用引用计数法，而是使用了可达性分析来进行GC。<br>可达性分析是基于图论的分析方法，它会找一组对象作为GC Root（根结点），并从根结点进行遍历，遍历结束后如果发现某个对象是不可达的（即从GC Root到此对象没有路径），那么它就会被标记为不可达对象，等待GC。<br>能作为GC Root的对象必定为可以存活的对象，比如全局性的引用（静态变量和常量）以及某些方法的局部变量（栈帧中的本地变量表）。</p>
 <p>以下对象通常可以作为GC Root：</p>
 <p>存活的线程<br>虚拟机栈(栈桢中的本地变量表)中的引用的对象<br>方法区中的类静态属性以及常量引用的对象<br>本地方法栈中JNI引用的局部变量以及全局变量</p>
@@ -441,7 +441,7 @@ java MyApp
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2020 Haldir
+    		&copy; 2021 Haldir
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
