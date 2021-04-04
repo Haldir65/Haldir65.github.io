@@ -6,7 +6,7 @@ tags: [C,linux]
 
 
 C语言实用指南，暂时不涉及cpp内容
-![](https://api1.foster66.xyz/static/imgs/pretty-orange-mushroom-wallpaper-5386b0c8c3459.jpg)
+![](https://api1.foster57.tk/static/imgs/pretty-orange-mushroom-wallpaper-5386b0c8c3459.jpg)
 <!--more-->
 
 ## 1.基本数据类型

@@ -6,7 +6,7 @@ tags:
 
 
 queue的一些实现类及使用场景分析
-![](https://api1.foster66.xyz/static/imgs/RioGrande_ZH-CN8091224199_1920x1080.jpg)
+![](https://api1.foster57.tk/static/imgs/RioGrande_ZH-CN8091224199_1920x1080.jpg)
 <!--more-->
 
 

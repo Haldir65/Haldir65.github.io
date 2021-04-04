@@ -5,7 +5,7 @@ tags: [javaScript,前端]
 ---
 
 浏览器indexedDb使用方式及注意的点
-![](https://api1.foster66.xyz/static/imgs/black-mountains.jpg)
+![](https://api1.foster57.tk/static/imgs/black-mountains.jpg)
 <!--more-->
 
 [浏览器上可供使用的数据持久化选择就这些](https://medium.com/@filipvitas/indexeddb-with-promises-and-async-await-3d047dddd313)

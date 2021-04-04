@@ -5,7 +5,7 @@ tags: [android]
 ---
 
 We been told Fragment itself should only trust official docs, the implementation detail are prone to any change any time, don't count on it!
-![](https://api1.foster66.xyz/static/imgs/2009528111321773591934.jpg)
+![](https://api1.foster57.tk/static/imgs/2009528111321773591934.jpg)
 <!--more-->
 
 Fragment源码解析（support Library 25.3.0），不要以为看了源码就可以不鸟官方文档了，源码的内容经常变，只有官方的文档才是可靠的，谷歌保证会实现的效果。

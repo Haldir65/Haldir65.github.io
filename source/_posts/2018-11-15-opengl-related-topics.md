@@ -5,7 +5,7 @@ tags: [opengl]
 ---
 
 topics relating opengl stuff
-![](https://api1.foster66.xyz/static/imgs/scenery151110074347.jpg)
+![](https://api1.foster57.tk/static/imgs/scenery151110074347.jpg)
 
 <!--more-->
 [本文多数代码来自这个系列](https://github.com/doggycoder/AndroidOpenGLDemo)

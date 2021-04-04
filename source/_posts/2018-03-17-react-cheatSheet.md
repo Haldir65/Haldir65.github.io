@@ -4,7 +4,7 @@ date: 2018-03-17 23:56:45
 tags: [前端]
 ---
 
-![](https://api1.foster66.xyz/static/imgs/food-knife-green-kitchen-city-life.jpg)
+![](https://api1.foster57.tk/static/imgs/food-knife-green-kitchen-city-life.jpg)
 介绍React语法及一些Redux的使用方法
 <!--more-->
 

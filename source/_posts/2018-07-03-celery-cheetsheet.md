@@ -7,7 +7,7 @@ tags: [python]
 >“There are only two hard things in Computer Science: cache invalidation and naming things.”
 — Phil Karlton
 
-![](https://api1.foster66.xyz/static/imgs/Celery_picture.jpg)
+![](https://api1.foster57.tk/static/imgs/Celery_picture.jpg)
 
 <!--more-->
 

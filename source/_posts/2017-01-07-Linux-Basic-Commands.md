@@ -9,7 +9,7 @@ tags: [tools,linux]
 >  nohup node server.js > /dev/null 2>&1 &
 
 
-![](https://api1.foster66.xyz/static/imgs/bamboo-buds-wallpaper-53859567dd31a.jpg)
+![](https://api1.foster57.tk/static/imgs/bamboo-buds-wallpaper-53859567dd31a.jpg)
 
  <!--more-->
 
@@ -958,7 +958,7 @@ curl ipinfo.io/ip 用于获取本机外部ip地址
 
 ### 参考
 
-- ![](https://api1.foster66.xyz/static/imgs/fork_you_git.jpg)
+- ![](https://api1.foster57.tk/static/imgs/fork_you_git.jpg)
 - [工具参考](http://linuxtools-rst.readthedocs.io/zh_CN/latest/tool/sar.html)
 - [文件大小查看命令](https://my.oschina.net/liting/blog/392051)
 - [文件压缩命令](http://blog.sina.com.cn/s/blog_7479f7990100zwkp.html)

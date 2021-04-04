@@ -5,7 +5,7 @@ categories: blog
 tags: [python]
 ---
 
-![](https://api1.foster66.xyz/static/imgs/ChMkJ1fAMmKIIFpWAA_5Us41gQkAAUv1QE2Pp8AD_lq599.jpg)
+![](https://api1.foster57.tk/static/imgs/ChMkJ1fAMmKIIFpWAA_5Us41gQkAAUv1QE2Pp8AD_lq599.jpg)
 <!--more-->
 
 ## 1. virtualenv 好习惯

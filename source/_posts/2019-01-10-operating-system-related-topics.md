@@ -5,7 +5,7 @@ tags: [tbd]
 ---
 
 操作系统原理的一些记录
-![](https://api1.foster66.xyz/static/imgs/SouthMoravian_ZH-CN13384331455_1920x1080.jpg)
+![](https://api1.foster57.tk/static/imgs/SouthMoravian_ZH-CN13384331455_1920x1080.jpg)
 <!--more-->
 
 

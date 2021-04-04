@@ -6,7 +6,7 @@ tags: [android,annotation]
 ---
 
 
-![](https://api1.foster66.xyz/static/imgs/apt_01.jpg)
+![](https://api1.foster57.tk/static/imgs/apt_01.jpg)
 记得Romain Guy在一次DroidCon上曾说过:
 
 > As I understand, modern java development are all about wrting annaotation Processors and not wrting code anymore...
@@ -142,34 +142,34 @@ public UserBuilder username(String username){
 }
 ```
 - 生成变量
-![](https://api1.foster66.xyz/static/imgs/apt_field.jpg)
+![](https://api1.foster57.tk/static/imgs/apt_field.jpg)
 
 - 生成方法
-![](https://api1.foster66.xyz/static/imgs/apt_methods.jpg)
+![](https://api1.foster57.tk/static/imgs/apt_methods.jpg)
 
 - 生成class:
-![](https://api1.foster66.xyz/static/imgs/apt_class.jpg)
+![](https://api1.foster57.tk/static/imgs/apt_class.jpg)
 
 直接截图了
 - 主要步骤
-![](https://api1.foster66.xyz/static/imgs/apt_process_steps.jpg)
+![](https://api1.foster57.tk/static/imgs/apt_process_steps.jpg)
 
 meta_data
-![](https://api1.foster66.xyz/static/imgs/apt_process_meta_data.jpg)
+![](https://api1.foster57.tk/static/imgs/apt_process_meta_data.jpg)
 
 - 生成private field和public setter:
 > FiledSpec username = FiledSpec.builder(String.class,"username",Modifier.PRIVATE).build();
-![](https://api1.foster66.xyz/static/imgs/apt_process_fields.jpg)
+![](https://api1.foster57.tk/static/imgs/apt_process_fields.jpg)
 
 
 - 生成build method
-![](https://api1.foster66.xyz/static/imgs/apt_process_build_method.jpg)
+![](https://api1.foster57.tk/static/imgs/apt_process_build_method.jpg)
 
 - 生成builder
-![](https://api1.foster66.xyz/static/imgs/apt_process_create_builder.jpg)
+![](https://api1.foster57.tk/static/imgs/apt_process_create_builder.jpg)
 
 - 写java文件：
-![](https://api1.foster66.xyz/static/imgs/apt_process_write_java_file.jpg)
+![](https://api1.foster57.tk/static/imgs/apt_process_write_java_file.jpg)
 
 
 

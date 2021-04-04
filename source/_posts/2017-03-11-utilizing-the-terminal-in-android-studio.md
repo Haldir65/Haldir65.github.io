@@ -6,7 +6,7 @@ tags: [android]
 ---
 
 
-![io](https://api1.foster66.xyz/static/imgs/device-2017-03-11-222239.png)
+![io](https://api1.foster57.tk/static/imgs/device-2017-03-11-222239.png)
 这周终于把Google I/O 2016的Android App在Device上跑起来了，顺便尝试多多使用命令行进行编译或者安装。
 
 <!-- more -->

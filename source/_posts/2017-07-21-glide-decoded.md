@@ -8,7 +8,7 @@ glide的源码几个月前曾经拜读过，大致了解了其异步加载的实
 写这篇文章时，Glide的版本是3.8
 
 
-![](https://api1.foster66.xyz/static/imgs/a11f41e0b1df95212c71920b3959cd72.jpg)
+![](https://api1.foster57.tk/static/imgs/a11f41e0b1df95212c71920b3959cd72.jpg)
 <!--more-->
 
 ## 1. 使用入门

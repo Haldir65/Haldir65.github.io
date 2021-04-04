@@ -5,7 +5,7 @@ tags: [concurrency]
 ---
 
 原本只打算写一点关于线程池的实现原理，后来发现坑越挖越大。不得不写到一半停下来，所以，这算是一篇不那么完善的关于原理的解析吧。
-![](https://api1.foster66.xyz/static/imgs/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg)
+![](https://api1.foster57.tk/static/imgs/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg)
 <!--more-->
 
 ## 1. 线程池的常规使用方式

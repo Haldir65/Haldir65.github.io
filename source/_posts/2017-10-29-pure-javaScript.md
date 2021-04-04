@@ -5,7 +5,7 @@ tags: [javaScript,前端]
 ---
 
 Vanilla JS其实就是原生javascript了。论运行速度，在Vanilla JS面前，所有的js library都要慢很多。
-![](https://api1.foster66.xyz/static/imgs/scenery04e31f5513d62958957b4caa1d944ae4.jpg)
+![](https://api1.foster57.tk/static/imgs/scenery04e31f5513d62958957b4caa1d944ae4.jpg)
 
 <!--more-->
 
@@ -24,7 +24,7 @@ Vanilla JS其实就是原生javascript了。论运行速度，在Vanilla JS面�
 
 ## 1. 一些作为一门语言基本的操作都有
 
-![](https://api1.foster66.xyz/static/imgs/scenery151110078544.jpg)
+![](https://api1.foster57.tk/static/imgs/scenery151110078544.jpg)
 
 ### 1.1 比如说module（就是import，export这种，虽然是ES6才补上的）
  <del>js中好像没有像java中那种javaBean的特殊的数据类型的存在。</del>其实也不需要，js并不是一种用class来model real world object的语言。
@@ -242,7 +242,7 @@ past.getDate
 past.getDate()
 9
 ```
-![](https://api1.foster66.xyz/static/imgs/magnolia_1920x1440.jpg)
+![](https://api1.foster57.tk/static/imgs/magnolia_1920x1440.jpg)
 
 网络请求，Ajax(Asynchronous javaScript & xml)请求的套路也有(AJAX命名上就是异步的)
 XMLHttpRequest缩写是(XHR)
@@ -1306,7 +1306,7 @@ TextUtils.java
 
 ### Event Loop
 [前端经典面试题: 从输入URL到页面加载发生了什么？](https://segmentfault.com/a/1190000006879700)
-![](https://api1.foster66.xyz/static/imgs/js-event-loop.png)
+![](https://api1.foster57.tk/static/imgs/js-event-loop.png)
 JS的解析是由浏览器中的JS解析引擎完成的。JS是单线程运行，也就是说，在同一个时间内只能做一件事，所有的任务都需要排队，前一个任务结束，后一个任务才能开始。但是又存在某些任务比较耗时，如IO读写等，所以需要一种机制可以先执行排在后面的任务，这就是：同步任务(synchronous)和异步任务(asynchronous)。JS的执行机制就可以看做是一个主线程加上一个任务队列(task queue)。同步任务就是放在主线程上执行的任务，异步任务是放在任务队列中的任务。所有的同步任务在主线程上执行，形成一个执行栈;异步任务有了运行结果就会在任务队列中放置一个事件；脚本运行时先依次运行执行栈，然后会从任务队列里提取事件，运行任务队列中的任务，这个过程是不断重复的，所以又叫做事件循环(Event loop)。
 
 

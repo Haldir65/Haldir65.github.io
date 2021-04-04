@@ -5,7 +5,7 @@ tags: [linux,tools,tbd]
 ---
 
 page size（内存相关）和block size(文件系统相关)的一些点
-![](https://api1.foster66.xyz/static/imgs/scenery1511100718415.jpg)
+![](https://api1.foster57.tk/static/imgs/scenery1511100718415.jpg)
 <!--more-->
 wiki上说
 Page size常由processor的架构决定的，操作系统管理内存的最小单位是一个Page size(应用程序申请分配内存时，操作系统实际分配的内存是page-size的整数倍)

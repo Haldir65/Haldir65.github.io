@@ -7,7 +7,7 @@ tags:
 Nagle’s Algorithm 和 Delayed ACK 一起用在特定场景下可能会造成网速不必要的延迟
 傳送 TCP 封包的時候， TCP header 占 20 bytes， IPv4 header 占 20 bytes，若傳送的資料太小， TCP/IPv4 headers 造成的 overhead (40bytes) 並不划算。想像傳送資料只有 1 byte，卻要另外傳 40 bytes header，這是很大的浪費。若網路上有大量小封包，會占去網路頻寬，可能會造成網路擁塞 。这个是针对发送方而言的。
 
-![](https://api1.foster66.xyz/static/imgs/nature-grass-wet-plants-high-resolution-wallpaper-573f2c6413708.jpg)
+![](https://api1.foster57.tk/static/imgs/nature-grass-wet-plants-high-resolution-wallpaper-573f2c6413708.jpg)
 <!--more-->
 
 

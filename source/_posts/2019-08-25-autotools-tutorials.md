@@ -5,7 +5,7 @@ tags: [tools]
 ---
 
 autotools的使用方式
-![](https://api1.foster66.xyz/static/imgs/SeaCliffBridge_ZH-CN5362667487_1920x1080.jpg)
+![](https://api1.foster57.tk/static/imgs/SeaCliffBridge_ZH-CN5362667487_1920x1080.jpg)
 <!--more-->
 
 ## 1.什么是AutoTools

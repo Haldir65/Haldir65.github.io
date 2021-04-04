@@ -4,7 +4,7 @@ date: 2018-01-14 22:56:46
 tags: [前端]
 ---
 
-![](https://api1.foster66.xyz/static/imgs/hot%20coffee%20city%20life%20winter.jpg)
+![](https://api1.foster57.tk/static/imgs/hot%20coffee%20city%20life%20winter.jpg)
 <!--more-->
 
 

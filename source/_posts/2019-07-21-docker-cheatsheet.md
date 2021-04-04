@@ -5,7 +5,7 @@ tags: [tools]
 ---
 
 docker相关的知识点
-![](https://api1.foster66.xyz/static/imgs/ship_docking_along_side_bay.jpg)
+![](https://api1.foster57.tk/static/imgs/ship_docking_along_side_bay.jpg)
 <!--more-->
 
 > sudo apt install docker-compose

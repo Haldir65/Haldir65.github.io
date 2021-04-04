@@ -4,7 +4,7 @@ date: 2019-01-19 22:20:35
 tags: [c]
 ---
 
-![](https://api1.foster66.xyz/static/imgs/SunFlowersStorm_EN-AU8863925685_1920x1080.jpg)
+![](https://api1.foster57.tk/static/imgs/SunFlowersStorm_EN-AU8863925685_1920x1080.jpg)
 从原始套接字 SOCK_RAW学习到的知识
 <!--more-->
 
@@ -12,16 +12,16 @@ tags: [c]
 
 
 - ### 这是IP packet
-![](https://api1.foster66.xyz/static/imgs/2019-01-19-1.jpg)
+![](https://api1.foster57.tk/static/imgs/2019-01-19-1.jpg)
 
 - ### 这是TCP header
-![](https://api1.foster66.xyz/static/imgs/2019-01-19-2.jpg)
+![](https://api1.foster57.tk/static/imgs/2019-01-19-2.jpg)
 
 - ### 这是IP header
-![](https://api1.foster66.xyz/static/imgs/2019-01-19-3.jpg)
+![](https://api1.foster57.tk/static/imgs/2019-01-19-3.jpg)
 
 - ### 这是mac header
-![](https://api1.foster66.xyz/static/imgs/2019-01-19-4.jpg)
+![](https://api1.foster57.tk/static/imgs/2019-01-19-4.jpg)
 
 从内核代码来看，这些分别对应ethhdr、iphdr、tcphdr、udphdr等结构体。
 

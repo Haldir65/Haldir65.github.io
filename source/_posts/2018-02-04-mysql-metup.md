@@ -4,7 +4,7 @@ date: 2018-02-04 21:37:37
 tags: [sql]
 ---
 
-![](https://api1.foster66.xyz/static/imgs/fuchsia-973x547.jpg)
+![](https://api1.foster57.tk/static/imgs/fuchsia-973x547.jpg)
 <!--more-->
 关系型数据库很多如，MS Access, SQL Server, MySQL
 NoSQL(NoSQL = Not Only SQL )，意即"不仅仅是SQL"，NOSQL是基于键值对的，可以想象成表中的主键和值的对应关系，而且不需要经过SQL层的解析，所以性能非常高。典型的代表如MongoDb.

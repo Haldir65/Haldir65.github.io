@@ -5,7 +5,7 @@ tags: [tbd]
 ---
 
 关于java nio的一些点
-![](https://api1.foster66.xyz/static/imgs/UmbriaCastelluccio_EN-AU8834990889_1920x1080.jpg)
+![](https://api1.foster57.tk/static/imgs/UmbriaCastelluccio_EN-AU8834990889_1920x1080.jpg)
 <!--more-->
 
 [本文大多数内容来自知乎专栏](https://zhuanlan.zhihu.com/p/27625923)的复制粘贴，因为别人写的比我好

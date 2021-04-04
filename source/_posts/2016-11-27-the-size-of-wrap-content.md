@@ -7,12 +7,12 @@ tags: [android]
 
 转眼就十一月了，java的分析越来越少，虽然常常在业务上碰到不少坑。。。
 
-![](https://api1.foster66.xyz/static/imgs/480617.jpg)
+![](https://api1.foster57.tk/static/imgs/480617.jpg)
 <!-- more -->
 
 ### 问题的由来
 这周碰到一个需要画时间轴样式的自定义View的需求，大概像这样(图片来自网络)：
-![](https://api1.foster66.xyz/static/imgs/timelineView.png)
+![](https://api1.foster57.tk/static/imgs/timelineView.png)
 
 要求，左侧的圆形节点可以自定义Drawable，右侧的文字高度随文字数量变化自适应。
 

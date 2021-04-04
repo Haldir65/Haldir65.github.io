@@ -4,7 +4,7 @@ date: 2018-11-11 22:21:52
 tags: [python]
 ---
 
-![](https://api1.foster66.xyz/static/imgs/1102533137-5.jpg)
+![](https://api1.foster57.tk/static/imgs/1102533137-5.jpg)
 - If your code has a lot of I/O or Network usage:
 Multithreading is your best bet because of its low overhead
 - If you have a GUI
@@ -66,7 +66,7 @@ end = time.time()
 print('Time taken in seconds -', end - start)
 ```
 多线程虽然同一时刻只能有一条线程运行，但牵涉到数据共享的时候还是要加锁
-![](https://api1.foster66.xyz/static/imgs/lockExplanation.jpg)
+![](https://api1.foster57.tk/static/imgs/lockExplanation.jpg)
 
 比如这个例子，照说打印出来的应该是0，但实际操作中可能打出来正数
 ```python

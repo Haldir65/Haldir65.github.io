@@ -5,7 +5,7 @@ tags: [前端]
 ---
 
 每一个领域都有些不知道该放哪的零碎的点，这里开辟一个新的地方，作为前端杂乱知识的汇总。
-![](https://api1.foster66.xyz/static/imgs/coffee art life nature living drip dark bw.jpg)
+![](https://api1.foster57.tk/static/imgs/coffee art life nature living drip dark bw.jpg)
 
 <!--more-->
 
@@ -210,7 +210,7 @@ jQuery是一个Dom Manipulate Library
 
 
 ## css Related
-![](https://api1.foster66.xyz/static/imgs/Cute_and_sexy_asian_girl_in_purple_strapless_gown.jpg)
+![](https://api1.foster57.tk/static/imgs/Cute_and_sexy_asian_girl_in_purple_strapless_gown.jpg)
 
 ## 工具
 ### vsCode插件推荐
@@ -286,7 +286,7 @@ $(function() {
 <img src="#" onerror="alert(/xss/)" />
 ```
 
-![](https://api1.foster66.xyz/static/imgs/IMG_0766.jpg)
+![](https://api1.foster57.tk/static/imgs/IMG_0766.jpg)
 
 
 防范XSS攻击的手段中提到了，对于用户的输入，需要有条件的进行转换
