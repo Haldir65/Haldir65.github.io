@@ -6,7 +6,6 @@ echo "show current info"
 node --version
 npm --version
 
-apk add --update nodejs nodejs-npm
 
 rm -rf node_modules && npm install --force
 npm install -g hexo-cli@3.1.0
