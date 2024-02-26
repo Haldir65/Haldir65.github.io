@@ -1,0 +1,83 @@
+name: Build
+
+on:
+    workflow_dispatch:
+    push:
+      branches:
+        - dev_githubaction
+
+
+permissions:
+  contents: write        
+jobs:
+  build:
+    name: Build
+    container:
+      image: docker://node:12.12.0-alpine
+    strategy:
+      matrix:
+        target:
+          - id: 'linux-amd64'
+            os: 'ubuntu-latest'
+      fail-fast: true
+
+    runs-on: ${{ matrix.target.os }}
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+        with:
+            fetch-depth: 200
+            
+      - name: Install `deps` on linux
+        if: startsWith(matrix.target.id, 'linux-')
+        run: |
+          apk add --no-cache tree
+          apk add --no-cache bash xz xz-doc git
+          node --version
+          npm --version
+
+          
+      - name: Build
+        shell: bash
+        run: |
+          ./.scripts/build_project.sh
+      
+      - name: Show layouts
+        shell: bash
+        run: |
+            tree -L 6 public
+
+      - name: Zip
+        shell: bash
+        run: |
+          mkdir -p dist
+          tar --directory public --create --xz --verbose --file dist/public.tar.xz .
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target.id }}-public-assets
+          path: dist
+          if-no-files-found: error
+          retention-days: 7     
+
+      - name: Check out dist branch
+        uses: actions/checkout@v4
+        with:
+            ref: master
+            path: dist
+
+         
+      - name: Deploy 
+        run: |
+          cd dist
+          cp -r ../public/* .
+          git checkout -b build_test
+          git config --global user.name 'Haldir65'
+          git config --global user.email 'mjw090608@users.noreply.github.com'
+          git add .
+          git commit -am "Automated build"
+          git push --set-upstream origin build_test
+
+     
