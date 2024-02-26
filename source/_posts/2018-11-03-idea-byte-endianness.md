@@ -5,7 +5,7 @@ tags:
 ---
 字节序（Endianness），在计算机科学领域中，是跨越***多字节***的程序对象的存储规则。 
 
-![](https://api1.foster57.tk/static/imgs/VernalFall_ZH-CN10631212377_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/VernalFall_ZH-CN10631212377_1920x1080.jpg)
 <!--more-->
 
 ## 首先确认下c语言下基本数据类型大小

@@ -6,7 +6,7 @@ tags: [python]
 
 
 很多高级语言都有成熟的集合类，比如Java有很优秀的集合（自动扩容，快速失败，并发集合类），Python也不例外。
-![](https://api1.foster57.tk/static/imgs/WorldWaterDay_EN-AU11747740536_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/WorldWaterDay_EN-AU11747740536_1920x1080.jpg)
 <!--more-->
 
 ## 1. namedtuple()

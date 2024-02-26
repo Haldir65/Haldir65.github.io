@@ -8,7 +8,7 @@ tags: [android]
 ### 1. 系统为我们提供了LinearLayoutManager、GridLayoutManager和StaggeredGridLayoutManager。
 基本用法都很简单，这里记录一些重要的用法
 
-![](https://api1.foster57.tk/static/imgs/Googling-the-Error-Message.jpg)
+![](https://api1.reindeer36.shop/static/imgs/Googling-the-Error-Message.jpg)
 <!--more-->
 
 - GridLayoutManager可以设置某个Item在某一行占据的Column num（VERTICAL的情况下）

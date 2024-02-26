@@ -4,7 +4,7 @@ date: 2017-07-30 17:45:51
 tags: [java,tools]
 ---
 OkHttp作者Jesse Wilson在2016 Droidcon NYC上作了一篇关于编码的演讲，十分有趣。对于了解计算机基础非常有用，结合着写一些关于这方面的笔记。
-![](https://api1.foster57.tk/static/imgs/01f691dea62d22e138481a353fbb6228.jpg)
+![](https://api1.reindeer36.shop/static/imgs/01f691dea62d22e138481a353fbb6228.jpg)
 
 <!--more-->
 ## 1.重新学习Java基本数据类型
@@ -102,7 +102,7 @@ java7 开始 ，可以直接在代码里写二进制数，例如：
 
 8 bit = 1 Byte (为什么是8，据说60年代是6)，8bit能够表达的范围也就是2^8 = 0-256.
 1967年，ASCII码诞生，即American Standard Code for Information Interchange，即将Byte转成文字的一张表。ASCII只用了7个bits，原因是当时硬件很贵。所以就能够表示128个字符。随便找了下这张表
-![](https://api1.foster57.tk/static/imgs/ascii-Table.jpg)
+![](https://api1.reindeer36.shop/static/imgs/ascii-Table.jpg)
 
 例如0表示NULL, 65表示A(大写),93表示标点符号"]"。
 举例：单词Donut的每一个字母对应的ASCII分别是：

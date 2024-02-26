@@ -5,7 +5,7 @@ tags: [tools]
 ---
 
 http建立在tcp,ip基础上，tcp协议的可靠性意味着每次http请求都会分解为多次ip请求。很多出于book keeping的东西占用了实际发送数据的相当一部分，具体占用多少。由此顺便展开到http和tcp的基本关系。
-![](https://api1.foster57.tk/static/imgs/Cg-4V1Kg7NCIMLH-AAwW6gNGe9cAAOB4AFTanwADBcC664.jpg)
+![](https://api1.reindeer36.shop/static/imgs/Cg-4V1Kg7NCIMLH-AAwW6gNGe9cAAOB4AFTanwADBcC664.jpg)
 <!--more-->
 
 大部分基于Hadi在2016年的[演讲](https://www.youtube.com/watch?v=F5smqpbz2sU)
@@ -50,7 +50,7 @@ Concatenating是把所有的js文件塞在一个大的js里面返回，这也造
 Spriting是把一大堆图片放在一整张图片里面，通过复杂的css选择其中的图片。
 
 
-![http pipe line 以及multiplex](https://api1.foster57.tk/static/imgs/http_pipeline_and_multiplexing.webp) 管道和多路复用
+![http pipe line 以及multiplex](https://api1.reindeer36.shop/static/imgs/http_pipeline_and_multiplexing.webp) 管道和多路复用
 
 ## 2. http2的开始
 Http有点像一种谈话式的协议，但tcp并不是。http并没有什么错,慢就慢在tcp

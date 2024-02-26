@@ -5,7 +5,7 @@ tags: [java]
 ---
 
 涉及socket的一些class,java.net.xxx
-![](https://api1.foster57.tk/static/imgs/may1_ZH-CN8582006115_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/may1_ZH-CN8582006115_1920x1080.jpg)
 
 <!--more-->
 

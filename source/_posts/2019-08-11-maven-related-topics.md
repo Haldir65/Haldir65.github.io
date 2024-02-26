@@ -5,7 +5,7 @@ tags:
 ---
 
 
-![](https://api1.foster57.tk/static/imgs/FreshSalt_ZH-CN12818759319_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/FreshSalt_ZH-CN12818759319_1920x1080.jpg)
 
 maven的一些东西
 <!--more-->

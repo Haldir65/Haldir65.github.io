@@ -4,7 +4,7 @@ date: 2018-01-19 22:28:34
 tags: [前端]
 ---
 
-![](https://api1.foster57.tk/static/imgs/iu%20kpop%20star%20music%20sony.jpg)
+![](https://api1.reindeer36.shop/static/imgs/iu%20kpop%20star%20music%20sony.jpg)
 
 <!--more-->
 

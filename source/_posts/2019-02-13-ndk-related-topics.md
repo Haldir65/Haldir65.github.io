@@ -5,7 +5,7 @@ tags: [android]
 ---
 
 android中ndk及jni编写注意事项（本文主要讲CMake）
-![](https://api1.foster57.tk/static/imgs/ShanwangpingKarst_EN-AU5360258756_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/ShanwangpingKarst_EN-AU5360258756_1920x1080.jpg)
 <!--more-->
 一些小窍门
 > cmake最终执行的命令在这个文件里面.externalNativeBuild/cmake/debug/{abi}/cmake_build_command.txt

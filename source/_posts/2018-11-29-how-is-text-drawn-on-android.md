@@ -9,7 +9,7 @@ Layout,Paint,Canvas
 native层包括各种开源库，Minikin,ICU,HarfBuzz,FreeType
 关于文字的形体,排版等信息是native层计算出来的。
 
-![](https://api1.foster57.tk/static/imgs/textview_architecture.png)
+![](https://api1.reindeer36.shop/static/imgs/textview_architecture.png)
 
 <!--more-->
 

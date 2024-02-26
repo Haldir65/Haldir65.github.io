@@ -14,28 +14,28 @@ on Anroid Dev Summit 2015
 
 RecyclerView is Flexible , Pluggable and Customizeable
 内部很多功能都交给了各个组件去完成
-![](https://api1.foster57.tk/static/imgs/snapshot20161020135353.jpg)
+![](https://api1.reindeer36.shop/static/imgs/snapshot20161020135353.jpg)
 ChildHelper 、AdapterHelper 、Recycler对于开发者来说并不常用，但它们在内部负责了许多针对Child View的管理。<!--more-->
 
 
 - ViewHolder的创建
-![](https://api1.foster57.tk/static/imgs/viewHolder_step_1.jpg)
+![](https://api1.reindeer36.shop/static/imgs/viewHolder_step_1.jpg)
 1 .LayoutManager首先检查getViewForPosition，RecyclerView查找Cache(getViewForPosition)，如果找到了。直接交给LayoutManager,这一过程甚至不需要与Adapter接触。
 2. 如果Cache中未找到，RecyclerView调用Adpter的getViewType，并去Recycled Pool中getViewHolderByType。
 3. 如果在Pool中未找到，RecyclerView将调用Adapter的createViewHolder。
 4. 如果在Pool中这种Type的ViewHolder已经有了，或者步骤3中创建了一个新的viewHolder，bindViewHolder并交给LayoutManager。
-![](https://api1.foster57.tk/static/imgs/viewHolder_step_2.jpg)
+![](https://api1.reindeer36.shop/static/imgs/viewHolder_step_2.jpg)
 5. 最终LayoutManager将把这个View添加到UI，这时会调用RecyclerView的onViewAttachedToWindow回调（生命周期）。
 
 
 - ViewHolder的回收(Reserves)
-![](https://api1.foster57.tk/static/imgs/viewHolder_step_3.jpg)
+![](https://api1.reindeer36.shop/static/imgs/viewHolder_step_3.jpg)
 1. LayoutManager调用removeAndRecycleView，RecyclerView会在这里收到回调onViewDetachedFromWindow
 2. 检查这个View.isValid。这一点很重要，在scroll过程中，如果一个View是Valid的话，可以将View添加到Cache中，随后可以简单将其复用。Cache将会invalidate oldest one，并告诉Adapter(onViewRecycled)。
 3. 如果不是Valid的View，将会被添加到Pool中，Adapter会收到onViewRecycled回调。
 
 - ViewHolder的另一种更好的回收方式(Fancy Reserves!)
-![](https://api1.foster57.tk/static/imgs/snapshot20161020124442.jpg)
+![](https://api1.reindeer36.shop/static/imgs/snapshot20161020124442.jpg)
 1. LayoutManager调用onLayoutChildren
 2. Layout完成后，RecyclerView检查那些之前已经被layout了的但不再存在于屏幕上了。RecyclerView将这些View重新添加到ViewGroup中，这些View此时对LayoutManager不可见。重新添加的目的在于动画。
 3. RecyclerView这时候把这些本不该add的View交给ItemAnimator，后者调用动画效果，300ms(安卓中大部分默认动画时间是300ms)之后，调用onAnimationFinished，告诉RecyclerView.
@@ -43,14 +43,14 @@ ChildHelper 、AdapterHelper 、Recycler对于开发者来说并不常用，但�
 5. 最后将这些View添加到Cache或者Recycled Pool。
 
 - ViewHolder的销毁
-![](https://api1.foster57.tk/static/imgs/snapshot20161020124836.jpg)
+![](https://api1.reindeer36.shop/static/imgs/snapshot20161020124836.jpg)
 1. LayoutManager调用removeAndRecycleView，RecyclerView检查View是否valid
 2. 如果不是Valid，添加到RecycledPool中，但在这之前先检查是否 hasTransientState（例如正在运行动画）
 3. 如果这个View正好处在Animation中，一些属性被Animating， Pool会调用Adapter的onFailedToRecycle(Adapter中应该复写这个方法，取消动画)
 4. onFailedToRecycle(ViewHolder)返回true的话，Pool将无视View的TransientState并回收这个View(可能处在动画中)
 
 - 另一种可能导致ViewHolder被销毁的方式
-![](https://api1.foster57.tk/static/imgs/snapshot20161020143554.jpg)
+![](https://api1.reindeer36.shop/static/imgs/snapshot20161020143554.jpg)
 RecyclerView将View添加到Pool中(实际调用的是addViewHolderToRecycledViewPool(ViewHolder))，Pool会检查这种type的ViewHolder是否还放得下（例如type x的ViewHolder已经有5个了，实在太多了），这种情况下就会Kill这种View,这种情况是我们希望避免的。开发者可以调用pool.setMaxRecycledViews(type,count)来让Pool放更多的Holder per type。
 
 一些需要注意的，Pool是基于一个Activity Context的。

@@ -5,7 +5,7 @@ tags: [java]
 ---
 
 
-![](https://api1.foster57.tk/static/imgs/9b157a7acab582078ac1fabada5c8009.jpg)
+![](https://api1.reindeer36.shop/static/imgs/9b157a7acab582078ac1fabada5c8009.jpg)
 面向对象语言就意味着对象要占用内存空间，那么，java中随便new 出来的东西到底多大？还有，new出来的东西全都都放在heap上吗(有些真不是)？
 <!--more-->
 
@@ -98,7 +98,7 @@ Native Heap是在分配了java maximum Heap大小之后剩下的大小(jvm占用
 
 ### 3.3 数据类型大小
 基本数据类型大小很简单，其实也不简单。这张图是从ibm网站上截下来的
-![](https://api1.foster57.tk/static/imgs/official_java_primitive_type_size_table.jpg)
+![](https://api1.reindeer36.shop/static/imgs/official_java_primitive_type_size_table.jpg)
 注意一个boolean在数组中只占用一个字节，单独使用占用4个字节。
 原理[参考](http://www.jianshu.com/p/2f663dc820d0)
 

@@ -3,7 +3,7 @@ date: 2017-07-23 19:03:51
 tags: [java,designpattern,tools]
 ---
 
-![](https://api1.foster57.tk/static/imgs/509bdb071f9e7040823049e3db56e7c1.jpg)
+![](https://api1.reindeer36.shop/static/imgs/509bdb071f9e7040823049e3db56e7c1.jpg)
 一般来讲设计模式有23种，这里根据菜鸟教程上的关于设计模式的总结看下来的一些读书笔记，估计要写很久。
 <!--more-->
 
@@ -45,7 +45,7 @@ getSystemService根据传入的参数决定返回什么样的SystemService实例
 
 
 
-![](https://api1.foster57.tk/static/imgs/77a5260f0e038392414105c5bf8fdecc.jpg)
+![](https://api1.reindeer36.shop/static/imgs/77a5260f0e038392414105c5bf8fdecc.jpg)
 
 
 

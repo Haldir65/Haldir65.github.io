@@ -7,7 +7,7 @@ tag:
 categories: blog
 ---
 
-![](https://api1.foster57.tk/static/imgs/writing_code_that_nobody_else_can_read.jpg)
+![](https://api1.reindeer36.shop/static/imgs/writing_code_that_nobody_else_can_read.jpg)
 
 ​	今天突然找到这样一个问题: "Handler的postDelayed会阻塞线程吗？"。基于自己之前对于Handler的线程间通讯机制的理解，还是不能给出明确的答案。正好打算把一篇关于主线程的工作原理的文章写出来，顺带看下能否把这个问题从源码的角度解释清楚。<!--more-->
 

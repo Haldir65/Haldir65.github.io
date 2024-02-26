@@ -6,7 +6,7 @@ tags: [javaScript,Vue,前端]
 
 Vue Js学习笔记
 
-![](https://api1.foster57.tk/static/imgs/scenery1511100775410.jpg)
+![](https://api1.reindeer36.shop/static/imgs/scenery1511100775410.jpg)
 
 <!--more-->
 
@@ -395,8 +395,8 @@ location /static {
  Vuex是负责全局状态管理的，[参考](http://whutzkj.space/2017/10/24/vuex/#more)
  组件间[通信](https://juejin.im/post/59ec95006fb9a0451c398b1a)的方式
 
-![](https://api1.foster57.tk/static/imgs/1102531047-2.jpg)
-![](https://api1.foster57.tk/static/imgs/VueJsLogo.jpg)
+![](https://api1.reindeer36.shop/static/imgs/1102531047-2.jpg)
+![](https://api1.reindeer36.shop/static/imgs/VueJsLogo.jpg)
 
 ## 参考
 1. [Vue JS 2 Tutorial](https://www.youtube.com/watch?v=5LYrN_cAJoA&list=PL4cUxeGkcC9gQcYgjhBoeQH7wiAyZNrYa)

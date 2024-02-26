@@ -5,7 +5,7 @@ tags: [前端]
 ---
 
 css预处理语言简介
-![](https://api1.foster57.tk/static/imgs/bokeh%20street%20lights%20city%20art%20blue.jpg)
+![](https://api1.reindeer36.shop/static/imgs/bokeh%20street%20lights%20city%20art%20blue.jpg)
 <!--more-->
 
 

@@ -10,7 +10,7 @@ Shell 是一个用 C 语言编写的程序，它是用户使用 Linux 的桥梁�
 Shell 是指一种应用程序，这个应用程序提供了一个界面，用户通过这个界面访问操作系统内核的服务。
 Ken Thompson 的 sh 是第一种 Unix Shell，Windows Explorer 是一个典型的图形界面 Shell。
 
-![](https://api1.foster57.tk/static/imgs/timg.jpg)
+![](https://api1.reindeer36.shop/static/imgs/timg.jpg)
 
 <!--more-->
 
@@ -892,7 +892,7 @@ int main(int argc, char **argv)
 就是把下面那一大长串文字追加 到TEST_LIBFOO_C，这里cat后面是>> 而不是> ，所以是追加
 
 
-![](https://api1.foster57.tk/static/imgs/PuffinWales_EN-AU12757555133_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/PuffinWales_EN-AU12757555133_1920x1080.jpg)
 
 
 

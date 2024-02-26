@@ -4,7 +4,7 @@ date: 2018-01-20 08:19:20
 tags:
 ---
 
-![](https://api1.foster57.tk/static/imgs/apple_log_dark_bw_life_night.jpg)
+![](https://api1.reindeer36.shop/static/imgs/apple_log_dark_bw_life_night.jpg)
 <!--more-->
 
 redis速度相当快

@@ -5,7 +5,7 @@ categories: blog
 tags: [python]
 ---
 
-![](https://api1.foster57.tk/static/imgs/Carla_Ossa_in_strapless_gown.jpg)
+![](https://api1.reindeer36.shop/static/imgs/Carla_Ossa_in_strapless_gown.jpg)
  <!--more-->
 
 前几天尝试使用一个简单的微博爬虫进行操作，导包的时候遇到lxml缺失的问题，找了好久最终在百度知道上找到个能用的，(⊙﹏⊙)b。

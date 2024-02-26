@@ -31,7 +31,7 @@ nginx的config文件中也要写正则
 > ^表示开头，$表示结尾 ## django的url中是这样的
 
 一般情况下不要乱用正则
-![](https://api1.foster57.tk/static/imgs/bee-getting-the-pollen-wallpaper-538358eb5d5a3.jpg)
+![](https://api1.reindeer36.shop/static/imgs/bee-getting-the-pollen-wallpaper-538358eb5d5a3.jpg)
 
 
 ### 从digitalOcean的 grep教程中抄来一些
@@ -87,104 +87,104 @@ e的意思是extended regular expressions（Extended regular expressions include
 ## C语言版本的正则
 [regex.h](https://zfl9.github.io/c-regex-pcre.html)
 
-![](https://api1.foster57.tk/static/imgs/scenery151110067848.jpg)
-![](https://api1.foster57.tk/static/imgs/1513521515888.jpg)
-![](https://api1.foster57.tk/static/imgs/1513521557303.jpg)
+![](https://api1.reindeer36.shop/static/imgs/scenery151110067848.jpg)
+![](https://api1.reindeer36.shop/static/imgs/1513521515888.jpg)
+![](https://api1.reindeer36.shop/static/imgs/1513521557303.jpg)
 
 
-![](https://api1.foster57.tk/static/imgs/1102533911-1.jpg)
-![](https://api1.foster57.tk/static/imgs/20120103214255_nTsVt.jpg)
-![](https://api1.foster57.tk/static/imgs/apic5964_sc115.jpg)
+![](https://api1.reindeer36.shop/static/imgs/1102533911-1.jpg)
+![](https://api1.reindeer36.shop/static/imgs/20120103214255_nTsVt.jpg)
+![](https://api1.reindeer36.shop/static/imgs/apic5964_sc115.jpg)
 
-![](https://api1.foster57.tk/static/imgs/strawberry-festival.jpg)
-
-
-
-![](https://api1.foster57.tk/static/imgs/macro-of-yellow-narcisa-flower-wallpaper-53834d45b40a1.jpg)
-
-![](https://api1.foster57.tk/static/imgs/yellow-autumn-leaves-wallpaper-537f1e4672a31.jpg)
+![](https://api1.reindeer36.shop/static/imgs/strawberry-festival.jpg)
 
 
 
-![](https://api1.foster57.tk/static/imgs/rice_on_trunk.jpg)
+![](https://api1.reindeer36.shop/static/imgs/macro-of-yellow-narcisa-flower-wallpaper-53834d45b40a1.jpg)
 
-![](https://api1.foster57.tk/static/imgs/EibseeHerbst_EN-AU10470771604_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/FoxMolt_ZH-CN7917304192_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/FremontPeak_EN-AU8617183007_1920x1080.jpg)
-
-![](https://api1.foster57.tk/static/imgs/HuaynaPicchu_EN-AU9938663347_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/HubbleSaturn_EN-AU12572317531_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/JeanLafitte_EN-AU11428973003_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/yellow-autumn-leaves-wallpaper-537f1e4672a31.jpg)
 
 
 
-![](https://api1.foster57.tk/static/imgs/OtterChillin_EN-AU10154811440_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/ParkRangerIsmael_EN-AU8783805449_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/PortAntonio_EN-AU9246692740_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/rice_on_trunk.jpg)
 
-![](https://api1.foster57.tk/static/imgs/RedAntarctica_EN-AU12197122155_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/SaltApple_EN-AU13056568956_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/EibseeHerbst_EN-AU10470771604_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/FoxMolt_ZH-CN7917304192_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/FremontPeak_EN-AU8617183007_1920x1080.jpg)
 
-![](https://api1.foster57.tk/static/imgs/SuperBlueBloodMoon_JA-JP11881086623_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/TDPflamingos_EN-AU9923017546_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/WavePoppy_EN-AU9071800685_1920x1080.jpg)
-
-![](https://api1.foster57.tk/static/imgs/BlueMushroom_EN-AU9252668987_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/DCCB_EN-AU11982634575_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/DogWork_EN-AU10032511594_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/ElkValleyVideo_EN-AU7645555683_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/Forest_ZH-CN16430313748_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/HeronIslandShark_EN-AU12565902939_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/Mapleleaf_ZH-CN9491310356_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/MaryLouWilliams_EN-AU11937645356_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/Mooncake_ZH-CN10274798301_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/MooseLakeGrass_EN-AU11940305772_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/PlutoNorthPole_ZH-CN12213356975_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/Rapadalen_EN-AU11885358150_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/SweetChestnut_ZH-CN10220364928_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/TadamiTrain_ZH-CN13495442975_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/TahquamenonFalls_EN-AU8966938934_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/VallesMarineris_ZH-CN10598461085_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/WorldRefugeeDay_EN-AU5421237644_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/HuaynaPicchu_EN-AU9938663347_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/HubbleSaturn_EN-AU12572317531_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/JeanLafitte_EN-AU11428973003_1920x1080.jpg)
 
 
 
-![](https://api1.foster57.tk/static/imgs/LakePowellStorm_ZH-CN6822865622_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/OceanCurrents_ZH-CN13704695457_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/Aldabra_EN-AU10067035056_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/EborFallsVideo_EN-AU8428374700_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/OsoyoosExpressway_EN-AU12955968650_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/OtterChillin_EN-AU10154811440_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/ParkRangerIsmael_EN-AU8783805449_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/PortAntonio_EN-AU9246692740_1920x1080.jpg)
+
+![](https://api1.reindeer36.shop/static/imgs/RedAntarctica_EN-AU12197122155_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/SaltApple_EN-AU13056568956_1920x1080.jpg)
+
+![](https://api1.reindeer36.shop/static/imgs/SuperBlueBloodMoon_JA-JP11881086623_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/TDPflamingos_EN-AU9923017546_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/WavePoppy_EN-AU9071800685_1920x1080.jpg)
+
+![](https://api1.reindeer36.shop/static/imgs/BlueMushroom_EN-AU9252668987_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/DCCB_EN-AU11982634575_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/DogWork_EN-AU10032511594_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/ElkValleyVideo_EN-AU7645555683_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/Forest_ZH-CN16430313748_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/HeronIslandShark_EN-AU12565902939_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/Mapleleaf_ZH-CN9491310356_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/MaryLouWilliams_EN-AU11937645356_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/Mooncake_ZH-CN10274798301_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/MooseLakeGrass_EN-AU11940305772_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/PlutoNorthPole_ZH-CN12213356975_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/Rapadalen_EN-AU11885358150_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/SweetChestnut_ZH-CN10220364928_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/TadamiTrain_ZH-CN13495442975_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/TahquamenonFalls_EN-AU8966938934_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/VallesMarineris_ZH-CN10598461085_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/WorldRefugeeDay_EN-AU5421237644_1920x1080.jpg)
 
 
-![](https://api1.foster57.tk/static/imgs/BailysBeads_ZH-CN5728297739_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/ElkFallsBridge_ZH-CN3921681387_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/HawksbillCrag_ZH-CN4429681235_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/HKreuni_ZH-CN5683726370_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/ManausBasin_ZH-CN4303809335_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/RootBridge_ZH-CN5173953292_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/SalcombeDevon_ZH-CN5806331292_1920x1080.jpg)
+
+![](https://api1.reindeer36.shop/static/imgs/LakePowellStorm_ZH-CN6822865622_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/OceanCurrents_ZH-CN13704695457_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/Aldabra_EN-AU10067035056_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/EborFallsVideo_EN-AU8428374700_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/OsoyoosExpressway_EN-AU12955968650_1920x1080.jpg)
 
 
-
-
-![](https://api1.foster57.tk/static/imgs/RainierMilkyWay_ZH-CN9404321904_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/PeruvianRainforest_ZH-CN4066508593_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/Ghyakar_ZH-CN4631836915_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/LuciolaCruciata_ZH-CN9063767400_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/HallstattAustria_PT-BR9407016733_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/PingganVillage_ZH-CN10035092925_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/RainforestMoss_ZH-CN2878951870_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/BlumenwieseNRW_ZH-CN4774429225_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/HopeValley_ZH-CN2208363231_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/NFLDfog_ZH-CN4846953507_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/dragonboat_ZH-CN0697680986_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/Manhattanhenge_ZH-CN4659585143_1920x1080.jpg)
-![](https://api1.foster57.tk/static/imgs/QingMingHuangShan_ZH-CN12993895964_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/BailysBeads_ZH-CN5728297739_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/ElkFallsBridge_ZH-CN3921681387_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/HawksbillCrag_ZH-CN4429681235_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/HKreuni_ZH-CN5683726370_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/ManausBasin_ZH-CN4303809335_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/RootBridge_ZH-CN5173953292_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/SalcombeDevon_ZH-CN5806331292_1920x1080.jpg)
 
 
 
 
-![](https://api1.foster57.tk/static/imgs/starry-night-van-gogh.jpg)
+![](https://api1.reindeer36.shop/static/imgs/RainierMilkyWay_ZH-CN9404321904_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/PeruvianRainforest_ZH-CN4066508593_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/Ghyakar_ZH-CN4631836915_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/LuciolaCruciata_ZH-CN9063767400_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/HallstattAustria_PT-BR9407016733_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/PingganVillage_ZH-CN10035092925_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/RainforestMoss_ZH-CN2878951870_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/BlumenwieseNRW_ZH-CN4774429225_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/HopeValley_ZH-CN2208363231_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/NFLDfog_ZH-CN4846953507_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/dragonboat_ZH-CN0697680986_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/Manhattanhenge_ZH-CN4659585143_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/QingMingHuangShan_ZH-CN12993895964_1920x1080.jpg)
+
+
+
+
+![](https://api1.reindeer36.shop/static/imgs/starry-night-van-gogh.jpg)
 ### 参考
 - [DFA和NFA](http://www.importnew.com/26560.html)
 - [Learn regex the easy way](https://github.com/ziishaned/learn-regex)

@@ -6,7 +6,7 @@ tags: [python]
 
 python实现简易的tcp-proxy server及socks代理学习笔记
 
-![](https://api1.foster57.tk/static/imgs/MountainDayJapan_EN-AU8690491173_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/MountainDayJapan_EN-AU8690491173_1920x1080.jpg)
 <!--more-->
 
 

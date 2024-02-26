@@ -5,7 +5,7 @@ tags: [java]
 ---
 
 主要讲一下在java中(平台并不限于android)实现多线程断点续传的原理,主要讲断点下载的原理。
-![](https://api1.foster57.tk/static/imgs/4b52d8db2e9d86b95c730af1db127a81.jpg)
+![](https://api1.reindeer36.shop/static/imgs/4b52d8db2e9d86b95c730af1db127a81.jpg)
 <!--more-->
 
 

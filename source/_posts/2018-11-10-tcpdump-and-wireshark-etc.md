@@ -5,7 +5,7 @@ tags: [linux,tools]
 ---
 
 
-![](https://api1.foster57.tk/static/imgs/osi-model.png)
+![](https://api1.reindeer36.shop/static/imgs/osi-model.png)
 [wireshark expression cheetsheet](http://packetlife.net/media/library/13/Wireshark_Display_Filters.pdf)
 [tcpdump cheet](http://packetlife.net/media/library/12/tcpdump.pdf)
 wireshark能抓tcp,arp,http,dns,udp,icmp,dhcp...
@@ -59,7 +59,7 @@ net mask(255.255.0.0) 192.168.1/16。
 
 
 ### 选中一个tcp包，查看Internet Protocol Version4 ..(这里就是第三层,network层了)。
-![](https://api1.foster57.tk/static/imgs/wire_shark_internet_protocol_version4.png)
+![](https://api1.reindeer36.shop/static/imgs/wire_shark_internet_protocol_version4.png)
 从上到下依次是 
 version: 4
 Header length 20bytes
@@ -75,7 +75,7 @@ Fragment offset：0 (假如被切成两个了，这里就表示当前这个包�
 
 ### 再看第四层（Transport layer），也就是tcp,udp这类了。
 还是上面这个包
-![](https://api1.foster57.tk/static/imgs/wire_shark_capture_transmission_control_protocol.png)
+![](https://api1.reindeer36.shop/static/imgs/wire_shark_capture_transmission_control_protocol.png)
 从上到下依次是
 Source Port
 Destination Port :443 //https无疑
@@ -89,7 +89,7 @@ checksum(检查数据完整)
 ## 说一说handshake
 tcp packets始于一个handshake
 检查端口，发送一个sequence number(随机的),客户端会发送一个syn packet到接受方。接受方会返回一个syn ack packet,接下来客户端发送一个ack packet。上述步骤每一次sequence number都会+1
-![](https://api1.foster57.tk/static/imgs/wireshark_tcp_handshake.png)
+![](https://api1.reindeer36.shop/static/imgs/wireshark_tcp_handshake.png)
 ```
 1. Client 发送 SYN 包（seq: x），告诉 Server：我要建立连接；Client 进入SYN-SENT状态；
 2. Server 收到 SYN 包后，发送 SYN+ACK 包（seq: y; ack: x+1），告诉它：好的；Server 进入SYN-RCVD状态；
@@ -101,7 +101,7 @@ tcp packets始于一个handshake
 host发送给destination一个fin acknowledge packet
 destination发挥一个ack packet和一个fin ack packet
 host再发送一个ack(这些都可以从flags里面看到)
-![](https://api1.foster57.tk/static/imgs/wireshark_tcp_wave.png)
+![](https://api1.reindeer36.shop/static/imgs/wireshark_tcp_wave.png)
 ```
 注意，可以是连接的任意一方主动 close，这里假设 Client 主动关闭连接：
 
@@ -113,7 +113,7 @@ host再发送一个ack(这些都可以从flags里面看到)
 MSL即报文最大生存时间，RFC793 中规定 MSL 为 2 分钟，但这完全是从工程上来考虑，对于现在的网络，MSL=2分钟可能太长了一些。实际应用中常用的是 30 秒、1 分钟、2 分钟等；可以修改/etc/sysctl.conf内核参数，来缩短TIME_WAIT的时间，避免不必要的资源浪费。
 
 所以整个tcp传输的过程看起来像这样
-![](https://api1.foster57.tk/static/imgs/wireshark_tcp_handwave.jpg)
+![](https://api1.reindeer36.shop/static/imgs/wireshark_tcp_handwave.jpg)
 
 有时候会看到rest，意味着连接突然中断了（tcp会断掉这个sequence的所有packet，把flags里面的reset设置为1）
 
@@ -125,18 +125,18 @@ DNS走的是udp的53端口，发出去的请求的dst.port=53，收到的respons
 在局域网内,dst就是路由ip(192.168.1.1)
 
 访问tmall主页
-![](https://api1.foster57.tk/static/imgs/dns_query_round_trip.png)
+![](https://api1.reindeer36.shop/static/imgs/dns_query_round_trip.png)
 一来一回的
 
 先看request
-![](https://api1.foster57.tk/static/imgs/dns_query_request_detail.png)
+![](https://api1.reindeer36.shop/static/imgs/dns_query_request_detail.png)
 在Domain Name System query的
 Flags下有一个opcode(这个值可能是standard query，也可能是authoritated answers,如果response是从name server回来的话)
 Flags下面还有一个Truncated(意思就是你发出的这个包是不是太大了，太大了塞不进一个packet)
 还有Recursion desire:Do query recursively(这意味着servername支持recursive query，就是当前dns server找不到的话，会往上继续查找)
 
 再来看response
-![](https://api1.foster57.tk/static/imgs/dns_query_response_detail.png)
+![](https://api1.reindeer36.shop/static/imgs/dns_query_response_detail.png)
 结果在Answers里面
 
 

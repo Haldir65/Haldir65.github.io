@@ -5,7 +5,7 @@ tags: [算法]
 ---
 
 
-![FlamingFlowers](https://api1.foster57.tk/static/imgs/10013-1109230P20693.jpg)
+![FlamingFlowers](https://api1.reindeer36.shop/static/imgs/10013-1109230P20693.jpg)
 <!--more-->
 
 
@@ -112,7 +112,7 @@ the best case scenario : array已经排序好 Ω（n）
 
 ### 1.4 Merge Sort
 这个算法比较复杂，一图胜千言
-![](https://api1.foster57.tk/static/imgs/merge_sort.png)
+![](https://api1.reindeer36.shop/static/imgs/merge_sort.png)
 [参考](http://www.java2novice.com/java-sorting-algorithms/merge-sort/)
 其实就是把array打成一半一半，直到变成多个大小为2的数组，然后再合并起来。java代码直接复制粘贴了，保留包名是对作者的尊重：
 ```java
@@ -186,7 +186,7 @@ public class MyMergeSort {
 
 ### 1.5 Selection Sort
 每次把数组里面最小的元素挪到最左边,图片是从[这里](http://www.java2novice.com/java-sorting-algorithms/selection-sort/)抄的
-![](https://api1.foster57.tk/static/imgs/selectionsort.jpg)
+![](https://api1.reindeer36.shop/static/imgs/selectionsort.jpg)
 java代码也是抄的
 ```java
 package com.java2novice.algos;

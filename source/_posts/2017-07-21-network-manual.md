@@ -7,7 +7,7 @@ tags:
 ---
 
 网络相关的查找手册
-![](https://api1.foster57.tk/static/imgs/b9ae1189145b4a4d9dfe4d0b89a21b47.jpg)
+![](https://api1.reindeer36.shop/static/imgs/b9ae1189145b4a4d9dfe4d0b89a21b47.jpg)
 <!--more-->
 
 
@@ -443,7 +443,7 @@ TCP 连接两端好比两个人，这两个人之间保持通信往来（建立 
 ### 5.2 keep-Alive和WebSocket的区别
 
 
-![](https://api1.foster57.tk/static/imgs/ed541bc1ed61ead0bf6ea8233ef01c0a.jpg)
+![](https://api1.reindeer36.shop/static/imgs/ed541bc1ed61ead0bf6ea8233ef01c0a.jpg)
 
 
 ### 5.3 http2可以实现推送了

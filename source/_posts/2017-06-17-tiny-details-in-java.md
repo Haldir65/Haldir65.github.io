@@ -7,7 +7,7 @@ tags: [java]
 >
 >
 
-![landscape](https://api1.foster57.tk/static/imgs/34a7d57ccabb18c69d085247cf009b22.jpg)
+![landscape](https://api1.reindeer36.shop/static/imgs/34a7d57ccabb18c69d085247cf009b22.jpg)
 
 <!--more-->
 

@@ -5,7 +5,7 @@ tags: [android,java,tools]
 ---
 
 A Cookbook shall look like a collection of Recipes, or an index page from where dinner are made. And it keeps you sane.
-![](https://api1.foster57.tk/static/imgs/Cg-4zFVJ0xGITwm_AA688WRj8n8AAXZ9wGMpd0ADr0J195.jpg)
+![](https://api1.reindeer36.shop/static/imgs/Cg-4zFVJ0xGITwm_AA688WRj8n8AAXZ9wGMpd0ADr0J195.jpg)
 <!--more-->
 
 
@@ -54,7 +54,7 @@ github上已经star了四百多个项目，应该复习下了。
 //这个博主写的一系列底层分析都比较清楚
 
 图片出自[搜狐](http://www.sohu.com/a/130814934_675634)
-![](https://api1.foster57.tk/static/imgs/android-processs.jpg)
+![](https://api1.reindeer36.shop/static/imgs/android-processs.jpg)
 [Activity的生命周期](https://www.jianshu.com/p/0a4cb44ce9d1)
 [Instant Run的工作原理](https://yq.aliyun.com/articles/202918)
 [插件化加载就两件事，代码加载，资源加载](https://blog.csdn.net/watertekhqx/article/details/51303109)

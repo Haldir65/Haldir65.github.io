@@ -5,7 +5,7 @@ tags: [linux,tools]
 ---
 
 本文只针对ipv4网络进行分析
-![](https://api1.foster57.tk/static/imgs/AlanTuringNotebook_EN-AU7743633207_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/AlanTuringNotebook_EN-AU7743633207_1920x1080.jpg)
 <!--more-->
 
 > 多数内容来自[TCP 报文结构](https://jerryc8080.gitbooks.io/understand-tcp-and-udp/chapter2.html)
@@ -18,16 +18,16 @@ tcp用16位端口号来标识一个端口，也就是两个bytes(65536就这么�
 以下图片盗自[chinaunix一篇讲解raw socket的文章](http://abcdxyzk.github.io/blog/2015/04/14/kernel-net-sock-raw/)
 
 - ### 这是IP packet
-![](https://api1.foster57.tk/static/imgs/2019-01-19-1.jpg)
+![](https://api1.reindeer36.shop/static/imgs/2019-01-19-1.jpg)
 
 - ### 这是TCP header
-![](https://api1.foster57.tk/static/imgs/2019-01-19-2.jpg)
+![](https://api1.reindeer36.shop/static/imgs/2019-01-19-2.jpg)
 
 - ### 这是IP header
-![](https://api1.foster57.tk/static/imgs/2019-01-19-3.jpg)
+![](https://api1.reindeer36.shop/static/imgs/2019-01-19-3.jpg)
 
 - ### 这是mac header
-![](https://api1.foster57.tk/static/imgs/2019-01-19-4.jpg)
+![](https://api1.reindeer36.shop/static/imgs/2019-01-19-4.jpg)
 
 
 什么是报文？
@@ -203,20 +203,20 @@ To answer your question, yes. You are definitely doing a copy. A copy of a copy,
 
 用wireshark抓包的话，在tcp header里面有个"window size value"，比方说这个数是2000，也就是发来这个包的一方告诉当前接受方，你下一次最多再发2000byte的数据过来，再多就装不下了。如果接收方处理速度跟不上，buffer慢慢填满，就会在ack包里调低window size，告诉对方发慢一点。
 client处理速度够快的时候是这样的
-![](https://api1.foster57.tk/static/imgs/TCP-window-syn.png)
+![](https://api1.reindeer36.shop/static/imgs/TCP-window-syn.png)
 
 如果不够快的话,这时候就是client在ack包里告诉server自己跟不上了
-![](https://api1.foster57.tk/static/imgs/TCP-window-http.png)
+![](https://api1.reindeer36.shop/static/imgs/TCP-window-http.png)
 
 ## TCP Window Scaling
 注意，window size是在ack包里的,另外,tcp header里面为这个window size准备的空间是2 bytes（65536 bytes,所以一个包最大也就65K?）。这样对于那些大带宽高延迟的连接来说是不利的。事实当然没这么简单，[RFC 1323](https://www.ietf.org/rfc/rfc1323.txt) enable the TCP receive window to be increased exponentially(指数增长)。这个功能是在握手的时候互相商定了一个增长的倍数(在tcp握手的header里面有一个window size scaling factor,比如下图这样的，一次乘以4)
-![](https://api1.foster57.tk/static/imgs/Transmission-control-protocol-window-scaling.png)
+![](https://api1.reindeer36.shop/static/imgs/Transmission-control-protocol-window-scaling.png)
 > In the image above, the sender of this packet is advertising a TCP Window of 63,792 bytes and is using a scaling factor of four. This means that that the true window size is 63,792 x 4 (255,168 bytes). Using scaling windows allows endpoints to advertise a window size of over 1GB. To use window scaling, both sides of the connection must advertise this capability in the handshake process. If one side or the other cannot support scaling, then neither will use this function. The scale factor, or multiplier, will only be sent in the SYN packets during the handshake and will be used for the life of the connection. This is one reason why it is so important to capture the handshake process when performing TCP analysis.
 
 就是说4这个数只会出现在握手的syn包中，并且只有在双方都能支持scaling的前提下才会用，而且这个4将会在这条连接的生命周期中一直是这个数，所以要分析的话，逮这个syn包去抓。
 
 ### TCP Zero window
-![](https://api1.foster57.tk/static/imgs/TCP-Zero-Window-Performance-Vision.png)
+![](https://api1.reindeer36.shop/static/imgs/TCP-Zero-Window-Performance-Vision.png)
 意思就是说，这个window size变成0了。通常不会出现这种情况，一般是接收方的进程出问题了，这时候server会等着，随着client的应用层开始处理数据，client会慢慢发TCP Keep-Alive包，带上新的window size，告诉server说，自己正在处理数据，快了快了。
 
 > The throughput of a communication is limited by two windows: the congestion window and the receive window. The congestion window tries not to exceed the capacity of the network (congestion control); the receive window tries not to exceed the capacity of the receiver to process data (flow control). The receiver may be overwhelmed by data if for example it is very busy (such as a Web server). Each TCP segment contains the current value of the receive window. If, for example, a sender receives an ack which acknowledges byte 4000 and specifies a receive window of 10000 (bytes), the sender will not send packets after byte 14000, even if the congestion window allows it.
@@ -243,7 +243,7 @@ MTU 最大传输单元（英语：Maximum Transmission Unit，缩写MTU）是指
 > ping -l 1472 -f www.baidu.com ##根据提示去调小这个数就是了，一般1350以上是有的
 
 从csdn搞来的图
-![](https://api1.foster57.tk/static/imgs/tcp_and_udp_size_limit.png)
+![](https://api1.reindeer36.shop/static/imgs/tcp_and_udp_size_limit.png)
 传输层： 
 对于UDP协议来说，整个包的最大长度为65535，其中包头长度是65535-20=65515； 
 对于TCP协议来说，整个包的最大长度是由最大传输大小（MSS，Maxitum Segment Size）决定，MSS就是TCP数据包每次能够传 
@@ -271,7 +271,7 @@ Transport Header(port) +
 data
 
 https版本的握手，证书校验，change cipher
-![](https://api1.foster57.tk/static/imgs/https_hand_shake.jpg)
+![](https://api1.reindeer36.shop/static/imgs/https_hand_shake.jpg)
 [出处](https://mp.weixin.qq.com/s/682cugg2niNfdg_eDYHdyw)
 证书验证完毕之后，觉得这个服务端是可信的，于是客户端计算产生随机数字Pre-master，发送Client Key Exchange，用证书中的公钥加密，再发送给服务器，服务器可以通过私钥解密出来。
 接下来，无论是客户端还是服务器，都有了三个随机数，分别是：自己的、对端的，以及刚生成的Pre-Master随机数。通过这三个随机数，可以在客户端和服务器产生相同的对称密钥。
@@ -281,7 +281,7 @@ https版本的握手，证书校验，change cipher
 当双方握手结束之后，就可以通过对称密钥进行加密传输了
 
 
-![](https://api1.foster57.tk/static/imgs/tcp_packet_structure.jpg)
+![](https://api1.reindeer36.shop/static/imgs/tcp_packet_structure.jpg)
 
 下面这段摘自微信公众号"刘超的通俗云计算"
 > 出了NAT网关，就从核心网到达了互联网。在网络世界，每一个运营商的网络成为自治系统AS。每个自治系统都有边界路由器，通过它和外面的世界建立联系。

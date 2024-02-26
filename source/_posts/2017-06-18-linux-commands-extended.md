@@ -7,7 +7,7 @@ tags: [tools,linux]
 > 一些linux的常用命令，linux环境下运行server ,bash的语法
 >  
 
-![](https://api1.foster57.tk/static/imgs/ChMkJ1gq00WIXw_GAA47r_8gjqgAAXxJAH8qOMADjvH566.jpg)
+![](https://api1.reindeer36.shop/static/imgs/ChMkJ1gq00WIXw_GAA47r_8gjqgAAXxJAH8qOMADjvH566.jpg)
 
 <!--more-->
 
@@ -548,8 +548,8 @@ pbcopy < somefile.txt ## mac上一般这样复制一个文件的内容到剪切�
 ### 27.htop怎么看
 process state
 图片[出处](https://codeahoy.com/2017/01/20/hhtop-explained-visually/)
-![](https://api1.foster57.tk/static/imgs/htop-top.png)
-![](https://api1.foster57.tk/static/imgs/htop-bottom.png)
+![](https://api1.reindeer36.shop/static/imgs/htop-top.png)
+![](https://api1.reindeer36.shop/static/imgs/htop-bottom.png)
 > PROCESS STATE CODES
    R  running or runnable (on run queue)
    D  uninterruptible sleep (usually IO)

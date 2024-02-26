@@ -6,7 +6,7 @@ tags: [tools]
 
 
 关于Spring Boot的基本知识要点
-![](https://api1.foster57.tk/static/imgs/scenery1511100670897.jpg)
+![](https://api1.reindeer36.shop/static/imgs/scenery1511100670897.jpg)
 <!--more-->
 
 

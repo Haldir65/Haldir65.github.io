@@ -4,7 +4,7 @@ date: 2018-07-05 23:05:52
 tags: [java]
 ---
 
-![](https://api1.foster57.tk/static/imgs/20160720094529840.jpg)
+![](https://api1.reindeer36.shop/static/imgs/20160720094529840.jpg)
 <!--more-->
 
 ## 反射
@@ -733,7 +733,7 @@ Java 系统监控有一个小的技巧是，你可以使用kill -3 <pid> 发一�
 原理是jvm在c++这一层注册了3的信号处理handler，android也是这样的
 
 
-![](https://api1.foster57.tk/static/imgs/1279081126453.jpg)
+![](https://api1.reindeer36.shop/static/imgs/1279081126453.jpg)
 
 
 

@@ -5,7 +5,7 @@ tags: [tbd]
 ---
 
 好的博客，好的文章的收藏夹
-![](https://api1.foster57.tk/static/imgs/ripe-grapes-macro-wallpaper-1920x1080-538350f32e183.jpg)
+![](https://api1.reindeer36.shop/static/imgs/ripe-grapes-macro-wallpaper-1920x1080-538350f32e183.jpg)
 <!--more-->
 
 [Linux C编程一站式学习](http://docs.linuxtone.org/ebooks/C&CPP/c/index.html)

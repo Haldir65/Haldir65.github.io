@@ -4,7 +4,7 @@ date: 2017-12-11 16:20:16
 tags: [tools,linux]
 ---
 
-![](https://api1.foster57.tk/static/imgs/scenery1511100756208.jpg)
+![](https://api1.reindeer36.shop/static/imgs/scenery1511100756208.jpg)
 
 <!--more-->
 
@@ -443,7 +443,7 @@ Softlayer, HongKong, CN         119.81.130.170          35.2MB/s
 ----------------------------------------------------------------------
 ```
 
-![](https://api1.foster57.tk/static/imgs/scenery1511100809920.jpg)
+![](https://api1.reindeer36.shop/static/imgs/scenery1511100809920.jpg)
 
 ###  跑java？
 算了吧，简单读个文本文件print出来cpu就飙到50%。

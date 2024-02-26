@@ -6,7 +6,7 @@ tags: [java]
 
 源码，以及jdk8中的一些有用的method。
 
-![](https://api1.foster57.tk/static/imgs/SainteVictoireCezanneBirthday_ZH-CN8216109812_1920x1080.jpg)
+![](https://api1.reindeer36.shop/static/imgs/SainteVictoireCezanneBirthday_ZH-CN8216109812_1920x1080.jpg)
 <!--more-->
 
 ```java

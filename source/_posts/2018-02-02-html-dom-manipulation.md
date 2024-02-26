@@ -5,7 +5,7 @@ tags: [前端]
 ---
 
 HTML Document操作手册
-![](https://api1.foster57.tk/static/imgs/2138000245bee1e3cc14.jpg)
+![](https://api1.reindeer36.shop/static/imgs/2138000245bee1e3cc14.jpg)
 
 <!--more-->
 使用javaScript操作dom的记录
