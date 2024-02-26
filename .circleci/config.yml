@@ -23,7 +23,16 @@ jobs:
             bash .scripts/build_project.sh
       - run:
           name: show build outputs
-          command: tree -L 5 build
+          command: tree -L 5 public
+
+      - run: 
+          name: zip build outputs
+          command: |
+            tar --directory public --create --xz --verbose --file public.tar.xz .    
+
+      - store_artifacts:
+          path: public.tar.xz
+          destination: assets
 
 
 
