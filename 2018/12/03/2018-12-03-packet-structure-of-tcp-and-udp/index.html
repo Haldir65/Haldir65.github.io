@@ -1,38 +1,38 @@
 <!DOCTYPE html>
 <html>
-<head><meta name="generator" content="Hexo 3.9.0">
+<head>
   <meta charset="utf-8">
   
   <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>tcp和udp包结构分析 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="本文只针对ipv4网络进行分析">
-<meta name="keywords" content="linux,tools">
+<meta name="keywords" content="tools,linux">
 <meta property="og:type" content="article">
 <meta property="og:title" content="tcp和udp包结构分析">
 <meta property="og:url" content="https://haldir65.github.io/2018/12/03/2018-12-03-packet-structure-of-tcp-and-udp/index.html">
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="本文只针对ipv4网络进行分析">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://api1.foster57.tk/static/imgs/AlanTuringNotebook_EN-AU7743633207_1920x1080.jpg">
-<meta property="og:image" content="https://api1.foster57.tk/static/imgs/2019-01-19-1.jpg">
-<meta property="og:image" content="https://api1.foster57.tk/static/imgs/2019-01-19-2.jpg">
-<meta property="og:image" content="https://api1.foster57.tk/static/imgs/2019-01-19-3.jpg">
-<meta property="og:image" content="https://api1.foster57.tk/static/imgs/2019-01-19-4.jpg">
-<meta property="og:image" content="https://api1.foster57.tk/static/imgs/TCP-window-syn.png">
-<meta property="og:image" content="https://api1.foster57.tk/static/imgs/TCP-window-http.png">
-<meta property="og:image" content="https://api1.foster57.tk/static/imgs/Transmission-control-protocol-window-scaling.png">
-<meta property="og:image" content="https://api1.foster57.tk/static/imgs/TCP-Zero-Window-Performance-Vision.png">
-<meta property="og:image" content="https://api1.foster57.tk/static/imgs/tcp_and_udp_size_limit.png">
-<meta property="og:image" content="https://api1.foster57.tk/static/imgs/https_hand_shake.jpg">
-<meta property="og:image" content="https://api1.foster57.tk/static/imgs/tcp_packet_structure.jpg">
-<meta property="og:updated_time" content="2021-04-04T08:46:59.947Z">
+<meta property="og:image" content="https://api1.reindeer36.shop/static/imgs/AlanTuringNotebook_EN-AU7743633207_1920x1080.jpg">
+<meta property="og:image" content="https://api1.reindeer36.shop/static/imgs/2019-01-19-1.jpg">
+<meta property="og:image" content="https://api1.reindeer36.shop/static/imgs/2019-01-19-2.jpg">
+<meta property="og:image" content="https://api1.reindeer36.shop/static/imgs/2019-01-19-3.jpg">
+<meta property="og:image" content="https://api1.reindeer36.shop/static/imgs/2019-01-19-4.jpg">
+<meta property="og:image" content="https://api1.reindeer36.shop/static/imgs/TCP-window-syn.png">
+<meta property="og:image" content="https://api1.reindeer36.shop/static/imgs/TCP-window-http.png">
+<meta property="og:image" content="https://api1.reindeer36.shop/static/imgs/Transmission-control-protocol-window-scaling.png">
+<meta property="og:image" content="https://api1.reindeer36.shop/static/imgs/TCP-Zero-Window-Performance-Vision.png">
+<meta property="og:image" content="https://api1.reindeer36.shop/static/imgs/tcp_and_udp_size_limit.png">
+<meta property="og:image" content="https://api1.reindeer36.shop/static/imgs/https_hand_shake.jpg">
+<meta property="og:image" content="https://api1.reindeer36.shop/static/imgs/tcp_packet_structure.jpg">
+<meta property="og:updated_time" content="2024-02-26T02:48:35.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="tcp和udp包结构分析">
 <meta name="twitter:description" content="本文只针对ipv4网络进行分析">
-<meta name="twitter:image" content="https://api1.foster57.tk/static/imgs/AlanTuringNotebook_EN-AU7743633207_1920x1080.jpg">
+<meta name="twitter:image" content="https://api1.reindeer36.shop/static/imgs/AlanTuringNotebook_EN-AU7743633207_1920x1080.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -64,7 +64,7 @@ ga('send', 'pageview');
   
 
 </head>
-</html>
+
 <body>
   <div id="container" q-class="show:isCtnShow">
     <canvas id="anm-canvas" class="anm-canvas"></canvas>
@@ -211,20 +211,20 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>本文只针对ipv4网络进行分析<br><img src="https://api1.foster57.tk/static/imgs/AlanTuringNotebook_EN-AU7743633207_1920x1080.jpg" alt=""><br><a id="more"></a></p>
+        <p>本文只针对ipv4网络进行分析<br><img src="https://api1.reindeer36.shop/static/imgs/AlanTuringNotebook_EN-AU7743633207_1920x1080.jpg" alt=""><br><a id="more"></a></p>
 <blockquote>
 <p>多数内容来自<a href="https://jerryc8080.gitbooks.io/understand-tcp-and-udp/chapter2.html">TCP 报文结构</a><br>同一台机器上的两个进程，可以通过管道，共享内存，信号量，消息队列等方式进行通信。通信的一个基本前提是每个进程都有唯一的标识，在同一台机器上，使用pid就可以了。两台不同的计算机之间通信，可以使用<strong>ip地址 + 协议 +协议端口号</strong> 来标识网络中的唯一进程。</p>
 </blockquote>
 <h2 id="TCP"><a href="#TCP" class="headerlink" title="TCP"></a>TCP</h2><p>tcp用16位端口号来标识一个端口，也就是两个bytes(65536就这么来的)。</p>
 <p>以下图片盗自<a href="http://abcdxyzk.github.io/blog/2015/04/14/kernel-net-sock-raw/">chinaunix一篇讲解raw socket的文章</a></p>
 <ul>
-<li><h3 id="这是IP-packet"><a href="#这是IP-packet" class="headerlink" title="这是IP packet"></a>这是IP packet</h3><p><img src="https://api1.foster57.tk/static/imgs/2019-01-19-1.jpg" alt=""></p>
+<li><h3 id="这是IP-packet"><a href="#这是IP-packet" class="headerlink" title="这是IP packet"></a>这是IP packet</h3><p><img src="https://api1.reindeer36.shop/static/imgs/2019-01-19-1.jpg" alt=""></p>
 </li>
-<li><h3 id="这是TCP-header"><a href="#这是TCP-header" class="headerlink" title="这是TCP header"></a>这是TCP header</h3><p><img src="https://api1.foster57.tk/static/imgs/2019-01-19-2.jpg" alt=""></p>
+<li><h3 id="这是TCP-header"><a href="#这是TCP-header" class="headerlink" title="这是TCP header"></a>这是TCP header</h3><p><img src="https://api1.reindeer36.shop/static/imgs/2019-01-19-2.jpg" alt=""></p>
 </li>
-<li><h3 id="这是IP-header"><a href="#这是IP-header" class="headerlink" title="这是IP header"></a>这是IP header</h3><p><img src="https://api1.foster57.tk/static/imgs/2019-01-19-3.jpg" alt=""></p>
+<li><h3 id="这是IP-header"><a href="#这是IP-header" class="headerlink" title="这是IP header"></a>这是IP header</h3><p><img src="https://api1.reindeer36.shop/static/imgs/2019-01-19-3.jpg" alt=""></p>
 </li>
-<li><h3 id="这是mac-header"><a href="#这是mac-header" class="headerlink" title="这是mac header"></a>这是mac header</h3><p><img src="https://api1.foster57.tk/static/imgs/2019-01-19-4.jpg" alt=""></p>
+<li><h3 id="这是mac-header"><a href="#这是mac-header" class="headerlink" title="这是mac header"></a>这是mac header</h3><p><img src="https://api1.reindeer36.shop/static/imgs/2019-01-19-4.jpg" alt=""></p>
 </li>
 </ul>
 <p>什么是报文？<br>例如一个 100kb 的 HTML 文档需要传送到另外一台计算机，并不会整个文档直接传送过去，可能会切割成几个部分，比如四个分别为 25kb 的数据段。<br>而每个数据段再加上一个 TCP 首部，就组成了 TCP 报文。<br>一共四个 TCP 报文，发送到另外一个端。<br>另外一端收到数据包，然后再剔除 TCP 首部，组装起来。<br>等到四个数据包都收到了，就能还原出来一个完整的 HTML 文档了。<br>在 OSI 的七层协议中，第二层（数据链路层）的数据叫「Frame」，第三层（网络层）上的数据叫「Packet」，第四层（传输层）的数据叫「Segment」。<br>TCP 报文 (Segment)，包括首部和数据部分。</p>
@@ -305,28 +305,28 @@ net.ipv4.ip_forward = 1
 <blockquote>
 <p>Your Network Interface Card (NIC) is performing all of the necessary tasks of collecting packets and waiting for your OS to read them. Ultimately, when you do a stream read you’re pulling from the memory that your OS has reserved and constantly stores the incoming information copy into.<br>To answer your question, yes. You are definitely doing a copy. A copy of a copy, the bits are read into a buffer within your NIC, your OS puts them somewhere, and you copy them when you do a stream read.</p>
 </blockquote>
-<p>用wireshark抓包的话，在tcp header里面有个”window size value”，比方说这个数是2000，也就是发来这个包的一方告诉当前接受方，你下一次最多再发2000byte的数据过来，再多就装不下了。如果接收方处理速度跟不上，buffer慢慢填满，就会在ack包里调低window size，告诉对方发慢一点。<br>client处理速度够快的时候是这样的<br><img src="https://api1.foster57.tk/static/imgs/TCP-window-syn.png" alt=""></p>
-<p>如果不够快的话,这时候就是client在ack包里告诉server自己跟不上了<br><img src="https://api1.foster57.tk/static/imgs/TCP-window-http.png" alt=""></p>
-<h2 id="TCP-Window-Scaling"><a href="#TCP-Window-Scaling" class="headerlink" title="TCP Window Scaling"></a>TCP Window Scaling</h2><p>注意，window size是在ack包里的,另外,tcp header里面为这个window size准备的空间是2 bytes（65536 bytes,所以一个包最大也就65K?）。这样对于那些大带宽高延迟的连接来说是不利的。事实当然没这么简单，<a href="https://www.ietf.org/rfc/rfc1323.txt">RFC 1323</a> enable the TCP receive window to be increased exponentially(指数增长)。这个功能是在握手的时候互相商定了一个增长的倍数(在tcp握手的header里面有一个window size scaling factor,比如下图这样的，一次乘以4)<br><img src="https://api1.foster57.tk/static/imgs/Transmission-control-protocol-window-scaling.png" alt=""></p>
+<p>用wireshark抓包的话，在tcp header里面有个”window size value”，比方说这个数是2000，也就是发来这个包的一方告诉当前接受方，你下一次最多再发2000byte的数据过来，再多就装不下了。如果接收方处理速度跟不上，buffer慢慢填满，就会在ack包里调低window size，告诉对方发慢一点。<br>client处理速度够快的时候是这样的<br><img src="https://api1.reindeer36.shop/static/imgs/TCP-window-syn.png" alt=""></p>
+<p>如果不够快的话,这时候就是client在ack包里告诉server自己跟不上了<br><img src="https://api1.reindeer36.shop/static/imgs/TCP-window-http.png" alt=""></p>
+<h2 id="TCP-Window-Scaling"><a href="#TCP-Window-Scaling" class="headerlink" title="TCP Window Scaling"></a>TCP Window Scaling</h2><p>注意，window size是在ack包里的,另外,tcp header里面为这个window size准备的空间是2 bytes（65536 bytes,所以一个包最大也就65K?）。这样对于那些大带宽高延迟的连接来说是不利的。事实当然没这么简单，<a href="https://www.ietf.org/rfc/rfc1323.txt">RFC 1323</a> enable the TCP receive window to be increased exponentially(指数增长)。这个功能是在握手的时候互相商定了一个增长的倍数(在tcp握手的header里面有一个window size scaling factor,比如下图这样的，一次乘以4)<br><img src="https://api1.reindeer36.shop/static/imgs/Transmission-control-protocol-window-scaling.png" alt=""></p>
 <blockquote>
 <p>In the image above, the sender of this packet is advertising a TCP Window of 63,792 bytes and is using a scaling factor of four. This means that that the true window size is 63,792 x 4 (255,168 bytes). Using scaling windows allows endpoints to advertise a window size of over 1GB. To use window scaling, both sides of the connection must advertise this capability in the handshake process. If one side or the other cannot support scaling, then neither will use this function. The scale factor, or multiplier, will only be sent in the SYN packets during the handshake and will be used for the life of the connection. This is one reason why it is so important to capture the handshake process when performing TCP analysis.</p>
 </blockquote>
 <p>就是说4这个数只会出现在握手的syn包中，并且只有在双方都能支持scaling的前提下才会用，而且这个4将会在这条连接的生命周期中一直是这个数，所以要分析的话，逮这个syn包去抓。</p>
-<h3 id="TCP-Zero-window"><a href="#TCP-Zero-window" class="headerlink" title="TCP Zero window"></a>TCP Zero window</h3><p><img src="https://api1.foster57.tk/static/imgs/TCP-Zero-Window-Performance-Vision.png" alt=""><br>意思就是说，这个window size变成0了。通常不会出现这种情况，一般是接收方的进程出问题了，这时候server会等着，随着client的应用层开始处理数据，client会慢慢发TCP Keep-Alive包，带上新的window size，告诉server说，自己正在处理数据，快了快了。</p>
+<h3 id="TCP-Zero-window"><a href="#TCP-Zero-window" class="headerlink" title="TCP Zero window"></a>TCP Zero window</h3><p><img src="https://api1.reindeer36.shop/static/imgs/TCP-Zero-Window-Performance-Vision.png" alt=""><br>意思就是说，这个window size变成0了。通常不会出现这种情况，一般是接收方的进程出问题了，这时候server会等着，随着client的应用层开始处理数据，client会慢慢发TCP Keep-Alive包，带上新的window size，告诉server说，自己正在处理数据，快了快了。</p>
 <blockquote>
 <p>The throughput of a communication is limited by two windows: the congestion window and the receive window. The congestion window tries not to exceed the capacity of the network (congestion control); the receive window tries not to exceed the capacity of the receiver to process data (flow control). The receiver may be overwhelmed by data if for example it is very busy (such as a Web server). Each TCP segment contains the current value of the receive window. If, for example, a sender receives an ack which acknowledges byte 4000 and specifies a receive window of 10000 (bytes), the sender will not send packets after byte 14000, even if the congestion window allows it.<br>总的来说，tcp传输的速度是由congestion window and the receive window控制的，前者控制发送方的发送速度，后者限制接收方的接收速度。</p>
 </blockquote>
 <h3 id="可靠性交付的实现到这里也就清楚了"><a href="#可靠性交付的实现到这里也就清楚了" class="headerlink" title="可靠性交付的实现到这里也就清楚了"></a>可靠性交付的实现到这里也就清楚了</h3><p>滑动窗口(sliding window)<br>超时重传<br>流量控制 (flow control)<br>拥塞控制（congestion control）</p>
 <h2 id="一个tcp-udp或者ip包最大多大，最小多大"><a href="#一个tcp-udp或者ip包最大多大，最小多大" class="headerlink" title="一个tcp,udp或者ip包最大多大，最小多大"></a>一个tcp,udp或者ip包最大多大，最小多大</h2><p>最小我们知道<br>传送TCP数据包的時候，TCP header 占 20 bytes， IPv4 header 占 20 bytes，所以最小40byte。<br>那么最大呢<a href="https://blog.csdn.net/caoshangpa/article/details/51530685">TCP、UDP数据包大小的限制</a><br>应用层udp最大1500-20-8 = 1472 字节(多了会被分片重组，万一分片丢失导致重组失败，就会被丢包)，1500是硬件决定的,20是ip头，8是udp的头<br>结论<br>UDP 包的大小就应该是 1500 - IP头(20) - UDP头(8) = 1472(Bytes)<br>TCP 包的大小就应该是 1500 - IP头(20) - TCP头(20) = 1460 (Bytes)<br>UDP数据报的长度是指包括报头和数据部分在内的总字节数，其中报头长度固定，数据部分可变。数据报的最大长度根据操作环境的不同而各异。从理论上说，包含报头在内的数据报的最大长度为65535字节(64K)。<br>用UDP协议发送时，用sendto函数最大能发送数据的长度为：65535- IP头(20) - UDP头(8)＝65507字节。用sendto函数发送数据时，如果发送数据长度大于该值，则函数会返回错误。<br>MTU 最大传输单元（英语：Maximum Transmission Unit，缩写MTU）是指一种通信协议的某一层上面所能通过的最大数据包大小（以字节为单位），怎么看</p>
 <blockquote>
-<p>ping -l 1472 -f <a href="http://www.baidu.com">www.baidu.com</a> ##根据提示去调小这个数就是了，一般1350以上是有的</p>
+<p>ping -l 1472 -f www.baidu.com ##根据提示去调小这个数就是了，一般1350以上是有的</p>
 </blockquote>
-<p>从csdn搞来的图<br><img src="https://api1.foster57.tk/static/imgs/tcp_and_udp_size_limit.png" alt=""><br>传输层：<br>对于UDP协议来说，整个包的最大长度为65535，其中包头长度是65535-20=65515；<br>对于TCP协议来说，整个包的最大长度是由最大传输大小（MSS，Maxitum Segment Size）决定，MSS就是TCP数据包每次能够传<br>输的最大数据分段。为了达到最佳的传输效能TCP协议在建立连接的时候通常要协商双方的MSS值，这个值TCP协议在实现的时候往往用MTU值代替（需<br>要减去IP数据包包头的大小20Bytes和TCP数据段的包头20Bytes）所以往往MSS为1460。通讯双方会根据双方提供的MSS值得最小值<br>确定为这次连接的最大MSS值。<br>IP层：<br>对于IP协议来说，IP包的大小由MTU决定（IP数据包长度就是MTU-28（包头长度）。 MTU值越大，封包就越大，理论上可增加传送速率，但<br>MTU值又不能设得太大，因为封包太大，传送时出现错误的机会大增。一般默认的设置，PPPoE连接的最高MTU值是1492, 而以太网<br>（Ethernet）的最高MTU值则是1500,而在Internet上，默认的MTU大小是576字节</p>
+<p>从csdn搞来的图<br><img src="https://api1.reindeer36.shop/static/imgs/tcp_and_udp_size_limit.png" alt=""><br>传输层：<br>对于UDP协议来说，整个包的最大长度为65535，其中包头长度是65535-20=65515；<br>对于TCP协议来说，整个包的最大长度是由最大传输大小（MSS，Maxitum Segment Size）决定，MSS就是TCP数据包每次能够传<br>输的最大数据分段。为了达到最佳的传输效能TCP协议在建立连接的时候通常要协商双方的MSS值，这个值TCP协议在实现的时候往往用MTU值代替（需<br>要减去IP数据包包头的大小20Bytes和TCP数据段的包头20Bytes）所以往往MSS为1460。通讯双方会根据双方提供的MSS值得最小值<br>确定为这次连接的最大MSS值。<br>IP层：<br>对于IP协议来说，IP包的大小由MTU决定（IP数据包长度就是MTU-28（包头长度）。 MTU值越大，封包就越大，理论上可增加传送速率，但<br>MTU值又不能设得太大，因为封包太大，传送时出现错误的机会大增。一般默认的设置，PPPoE连接的最高MTU值是1492, 而以太网<br>（Ethernet）的最高MTU值则是1500,而在Internet上，默认的MTU大小是576字节</p>
 <h3 id="协议数据单元-Protocol-Data-Unit-PDU"><a href="#协议数据单元-Protocol-Data-Unit-PDU" class="headerlink" title="协议数据单元(Protocol Data Unit, PDU)"></a>协议数据单元(Protocol Data Unit, PDU)</h3><p>应用层数据在传输过程中沿着协议栈传递，每一层协议都会往其中添加信息，这就是封装的过程。在封装过程中，每一个阶段的PDU都有不同的名字来反映它的功能。</p>
 <p>PDU按照TCP/IP协议的命名规范：<br>数据（Data）：应用层PDU的常用术语<br>分段（Segment）：传输层PDU<br>帧（Frame）：网络层PDU<br>比特（Bits）：在介质上物理传输数据所使用的PDU。</p>
 <p>最终发出去的数据包应该是<br>Data link Ethernet Frame Header(Destination mac address + Source mac address) +<br>Network Layer IP Packet Header(Source network:host + Destination network: host) +<br>Transport Header(port) +<br>data</p>
-<p>https版本的握手，证书校验，change cipher<br><img src="https://api1.foster57.tk/static/imgs/https_hand_shake.jpg" alt=""><br><a href="https://mp.weixin.qq.com/s/682cugg2niNfdg_eDYHdyw">出处</a><br>证书验证完毕之后，觉得这个服务端是可信的，于是客户端计算产生随机数字Pre-master，发送Client Key Exchange，用证书中的公钥加密，再发送给服务器，服务器可以通过私钥解密出来。<br>接下来，无论是客户端还是服务器，都有了三个随机数，分别是：自己的、对端的，以及刚生成的Pre-Master随机数。通过这三个随机数，可以在客户端和服务器产生相同的对称密钥。<br>有了对称密钥，客户端就可以说：“Change Cipher Spec，咱们以后都采用协商的通信密钥和加密算法进行加密通信了。”<br>然后客户端发送一个Encrypted Handshake Message，将已经商定好的参数等，采用协商密钥进行加密，发送给服务器用于数据与握手验证。<br>同样，服务器也可以发送Change Cipher Spec，说：“没问题，咱们以后都采用协商的通信密钥和加密算法进行加密通信了”，并且也发送Encrypted Handshake Message的消息试试。<br>当双方握手结束之后，就可以通过对称密钥进行加密传输了</p>
-<p><img src="https://api1.foster57.tk/static/imgs/tcp_packet_structure.jpg" alt=""></p>
+<p>https版本的握手，证书校验，change cipher<br><img src="https://api1.reindeer36.shop/static/imgs/https_hand_shake.jpg" alt=""><br><a href="https://mp.weixin.qq.com/s/682cugg2niNfdg_eDYHdyw">出处</a><br>证书验证完毕之后，觉得这个服务端是可信的，于是客户端计算产生随机数字Pre-master，发送Client Key Exchange，用证书中的公钥加密，再发送给服务器，服务器可以通过私钥解密出来。<br>接下来，无论是客户端还是服务器，都有了三个随机数，分别是：自己的、对端的，以及刚生成的Pre-Master随机数。通过这三个随机数，可以在客户端和服务器产生相同的对称密钥。<br>有了对称密钥，客户端就可以说：“Change Cipher Spec，咱们以后都采用协商的通信密钥和加密算法进行加密通信了。”<br>然后客户端发送一个Encrypted Handshake Message，将已经商定好的参数等，采用协商密钥进行加密，发送给服务器用于数据与握手验证。<br>同样，服务器也可以发送Change Cipher Spec，说：“没问题，咱们以后都采用协商的通信密钥和加密算法进行加密通信了”，并且也发送Encrypted Handshake Message的消息试试。<br>当双方握手结束之后，就可以通过对称密钥进行加密传输了</p>
+<p><img src="https://api1.reindeer36.shop/static/imgs/tcp_packet_structure.jpg" alt=""></p>
 <p>下面这段摘自微信公众号”刘超的通俗云计算”</p>
 <blockquote>
 <p>出了NAT网关，就从核心网到达了互联网。在网络世界，每一个运营商的网络成为自治系统AS。每个自治系统都有边界路由器，通过它和外面的世界建立联系。<br>对于云平台来讲，它可以被称为Multihomed AS，有多个连接连到其他的AS，但是大多拒绝帮其他的AS传输包。例如一些大公司的网络。对于运营商来说，它可以被称为Transit AS，有多个连接连到其他的AS，并且可以帮助其他的AS传输包，比如主干网。<br>如何从出口的运营商到达云平台的边界路由器？在路由器之间需要通过BGP协议实现，BGP又分为两类，eBGP和iBGP。自治系统间，边界路由器之间使用eBGP广播路由。内部网络也需要访问其他的自治系统。<br>边界路由器如何将BGP学习到的路由导入到内部网络呢？通过运行iBGP，使内部的路由器能够找到到达外网目的地最好的边界路由器。<br>网站的SLB的公网IP地址早已经通过云平台的边界路由器，让全网都知道了。于是这个下单的网络包选择了下一跳是A2，也即将A2的MAC地址放在目标MAC地址中。<br>到达A2之后，从路由表中找到下一跳是路由器C1，于是将目标MAC换成C1的MAC地址。到达C1之后，找到下一跳是C2，将目标MAC地址设置为C2的MAC。到达C2后，找到下一跳是云平台的边界路由器，于是将目标MAC设置为边界路由器的MAC地址。<br><strong>你会发现，这一路，都是只换MAC，不换目标IP地址。这就是所谓下一跳的概念。</strong><br>在云平台的边界路由器，会将下单的包转发进来，经过核心交换，汇聚交换，到达外网网关节点上的SLB的公网IP地址。<br>我们可以看到，手机到SLB的公网IP，是一个端到端的连接，连接的过程发送了很多包。所有这些包，无论是TCP三次握手，还是HTTPS的密钥交换，都是要走如此复杂的过程到达SLB的，当然每个包走的路径不一定一致。</p>
@@ -406,11 +406,11 @@ State    1
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">linux</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">tools</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">tools</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">linux</a>
         		</li>
       		
 		</ul>
@@ -534,7 +534,7 @@ State    1
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2021 Haldir
+    		&copy; 2024 Haldir
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
@@ -626,11 +626,47 @@ State    1
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">tools</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">service</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Window</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -650,55 +686,7 @@ State    1
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">前端</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">nio</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Window</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -710,59 +698,15 @@ State    1
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">c</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">django</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">sql</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -778,15 +722,71 @@ State    1
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">opengl</a>
+                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">前端</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">sql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">django</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">nio</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">opengl</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">c</a>
               </li>
             
             <div class="clearfix"></div>

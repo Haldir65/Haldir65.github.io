@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head><meta name="generator" content="Hexo 3.9.0">
+<head>
   <meta charset="utf-8">
   
   <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>java对象内存占用分析 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -16,13 +16,13 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="面向对象语言就意味着对象要占用内存空间，那么，java中随便new 出来的东西到底多大？还有，new出来的东西全都都放在heap上吗(有些真不是)？">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://api1.foster57.tk/static/imgs/9b157a7acab582078ac1fabada5c8009.jpg">
-<meta property="og:image" content="https://api1.foster57.tk/static/imgs/official_java_primitive_type_size_table.jpg">
-<meta property="og:updated_time" content="2021-04-04T08:46:59.939Z">
+<meta property="og:image" content="https://api1.reindeer36.shop/static/imgs/9b157a7acab582078ac1fabada5c8009.jpg">
+<meta property="og:image" content="https://api1.reindeer36.shop/static/imgs/official_java_primitive_type_size_table.jpg">
+<meta property="og:updated_time" content="2024-02-26T02:48:35.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java对象内存占用分析">
 <meta name="twitter:description" content="面向对象语言就意味着对象要占用内存空间，那么，java中随便new 出来的东西到底多大？还有，new出来的东西全都都放在heap上吗(有些真不是)？">
-<meta name="twitter:image" content="https://api1.foster57.tk/static/imgs/9b157a7acab582078ac1fabada5c8009.jpg">
+<meta name="twitter:image" content="https://api1.reindeer36.shop/static/imgs/9b157a7acab582078ac1fabada5c8009.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -54,7 +54,7 @@ ga('send', 'pageview');
   
 
 </head>
-</html>
+
 <body>
   <div id="container" q-class="show:isCtnShow">
     <canvas id="anm-canvas" class="anm-canvas"></canvas>
@@ -201,7 +201,7 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p><img src="https://api1.foster57.tk/static/imgs/9b157a7acab582078ac1fabada5c8009.jpg" alt=""><br>面向对象语言就意味着对象要占用内存空间，那么，java中随便new 出来的东西到底多大？还有，new出来的东西全都都放在heap上吗(有些真不是)？<br><a id="more"></a></p>
+        <p><img src="https://api1.reindeer36.shop/static/imgs/9b157a7acab582078ac1fabada5c8009.jpg" alt=""><br>面向对象语言就意味着对象要占用内存空间，那么，java中随便new 出来的东西到底多大？还有，new出来的东西全都都放在heap上吗(有些真不是)？<br><a id="more"></a></p>
 <h2 id="1-首先给出精确判断Object大小的一种方法"><a href="#1-首先给出精确判断Object大小的一种方法" class="headerlink" title="1.首先给出精确判断Object大小的一种方法"></a>1.首先给出精确判断Object大小的一种方法</h2><p>一个判断Java Object大小的方法<br>比较精准的确定一个对象的大小的<a href="https://github.com/liaohuqiu/java-object-size">方法</a>:</p>
 <pre><code class="java">public class ObjectSizeFetcher {
 
@@ -259,7 +259,7 @@ Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 <li>Native (non-java) Heap</li>
 </ul>
 <p>Java Heap可以通过-Xms 和 -Xmx 来设置最小值和最大值<br>Native Heap是在分配了java maximum Heap大小之后剩下的大小(jvm占用的内存也算在这里面)</p>
-<h3 id="3-3-数据类型大小"><a href="#3-3-数据类型大小" class="headerlink" title="3.3 数据类型大小"></a>3.3 数据类型大小</h3><p>基本数据类型大小很简单，其实也不简单。这张图是从ibm网站上截下来的<br><img src="https://api1.foster57.tk/static/imgs/official_java_primitive_type_size_table.jpg" alt=""><br>注意一个boolean在数组中只占用一个字节，单独使用占用4个字节。<br>原理<a href="http://www.jianshu.com/p/2f663dc820d0">参考</a></p>
+<h3 id="3-3-数据类型大小"><a href="#3-3-数据类型大小" class="headerlink" title="3.3 数据类型大小"></a>3.3 数据类型大小</h3><p>基本数据类型大小很简单，其实也不简单。这张图是从ibm网站上截下来的<br><img src="https://api1.reindeer36.shop/static/imgs/official_java_primitive_type_size_table.jpg" alt=""><br>注意一个boolean在数组中只占用一个字节，单独使用占用4个字节。<br>原理<a href="http://www.jianshu.com/p/2f663dc820d0">参考</a></p>
 <p>引用的大小：<br>在 32 位的 JVM 上，一个对象引用占用 4 个字节；在 64 位上，占用 8 个字节。通过 java -d64 -version 可确定是否是 64 位的 JVM。<br>处理器能够处理的bit范围决定了操作系统能够使用的内存范围：<br>32位的cpu(2^32 = 4,294,967,296 bits = 4GB)<br>64位cpu (2^64 = 18,446,744,073,709,551,616 = 16 exabytes)<br>多数jvm是用c或者c++写的:</p>
 <ul>
 <li>the Java runtime creates an operating-system process — just as if you were running a C-based program. In fact, most JVMs are written largely in C or C++</li>
@@ -278,7 +278,7 @@ Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 <li>Lock 所有的Object都能lock，这部分内存用于表示当前Object是否是被synchronized(32位上4字节，64位上8字节)</li>
 </ul>
 <p>所以，对于java.lang.Integer来说，一个Integer的大小就是：<br>32(class信息)+32(Flags)+32(Lock))+32(int是基本数据类型，4字节) = 128bits（16字节）<br>事实上，一个Interger的大小是int（4个字节）的四倍，简单来说一个对象的头信息就占用了3个字节。</p>
-<ol start="2">
+<ol>
 <li><p>数组的大小<br>数组和普通的object差不多，多了一个size(32字节)。也就是说。为了存储一个int值。使用一个大小为1的int[]数组的内存消耗比一个Integer还要大。（同样，32位4字节，64位8字节）。数组因为多一个size，所以4个字节起步。</p>
 </li>
 <li><p>8个字节变成4个字节<br>IBM和Oracle的jvm都能够提供ompressed References (-Xcompressedrefs) 和Compressed OOPs (-XX:+UseCompressedOops) 选项。这样一来，原本在64位机器上要占用8个字节的指针就只要占用4个字节了。但这只对java Heap上的内存有效，对于Native Heap这部分，64位占用内存还是要比32位多。所以同样的一份代码，在64位上占用的内存一定比32位上多。jdk 1.6.x之后好像默认是打开了的。</p>
@@ -323,15 +323,15 @@ JDK6字符串内存占用的计算方式：
 8*( ( 8+12+2*n+4+12)+7 ) / 8 = 8*(int) ( ( ( (n) *2 )+43) /8 )
 
 其中，n 为字符串长度。
-</code></pre><ol start="5">
+</code></pre><ol>
 <li>小结<br>随便new一个Object就意味着12个Byte没了，数组的话16个字节没了。每添加一个成员变量（指针），4个字节没了。这些都还没算上实际存储的数据。</li>
 </ol>
 <h2 id="5-java-util框架中使用的那些集合类"><a href="#5-java-util框架中使用的那些集合类" class="headerlink" title="5. java.util框架中使用的那些集合类"></a>5. java.util框架中使用的那些集合类</h2><h3 id="5-1-HashSet"><a href="#5-1-HashSet" class="headerlink" title="5.1 HashSet"></a>5.1 HashSet</h3><p>A HashSet is an implementation of the Set interface。无重复元素，不保证迭代顺序，常规的add,contains等方法速度不会随着内部元素的增加而变慢。HashSet内部最多有一个null，底层实现是HashMap，这意味着其占用内存要比HashMap大。<br>默认容量 16个Entries<br>内部元素为空时的大小 144bytes<br>查找，添加，删除的时间复杂度为 O(1)，在没有Hash collisions发生的前提下</p>
 <h3 id="5-2-HashMap"><a href="#5-2-HashMap" class="headerlink" title="5.2 HashMap"></a>5.2 HashMap</h3><p>A HashMap is an implementation of the Map interface.<br>HashMap是一种存储Key-Value型数据的集合，一个key最多map到一个value，key和value都可以为null，可以存储重复元素。（所以）——HashMap是HashSet的一种功能上的简化。<br>底层是Entries(Entries元素是链表)，长这样。</p>
 <ul>
-<li>transient HashMapEntry&lt;K,V&gt;[] table = (HashMapEntry&lt;K,V&gt;[]) EMPTY_TABLE;<br>HashMap的成员变量包括：</li>
+<li>transient HashMapEntry<K,V>[] table = (HashMapEntry<K,V>[]) EMPTY_TABLE;<br>HashMap的成员变量包括：</li>
 </ul>
-<p>transient HashMapEntry&lt;K,V&gt;[] table（HashMapEntry的数组）<br>int size<br>int threshold<br>final float loadFactor<br>transient int modCount;</p>
+<p>transient HashMapEntry<K,V>[] table（HashMapEntry的数组）<br>int size<br>int threshold<br>final float loadFactor<br>transient int modCount;</p>
 <p>一个HashMap刚创建时(完全为空时)的大小为128bytes，jdk 1.8在初始化时没有加载Entries，在put操作时才去分配。可能会好一点。<br>内部结构一般是这样的，一个HashMapEntry的大小为32byte。<br>int KeyHash<br>Object next<br>Object key<br>Object value<br>HashMap每次put键值对时，都使用了一个HashMap$Entry这样的包装类，这意味着整个HashMap的overhead包括：<br>This means that the total overhead of a HashMap consists of the HashMap object, a HashMap$Entry array entry, and a HashMap$Entry object for each entry.<br>直接照搬结论：对于HashMap<br>Default capacities为16个 entries</p>
 <p>对于一个有10000个Entries的HashMap，光是由于HashMap，Entry数组以及每个Entry对象带来的overhead就达到了360K左右，这里还不算存储的键值对本身的大小。</p>
 <h3 id="5-3-Hashtable"><a href="#5-3-Hashtable" class="headerlink" title="5.3 Hashtable"></a>5.3 Hashtable</h3><p>HashTable和HashMap的主要区别是HashTable是线程安全的，HashTable中很多方法都加上了synchronized修饰。一般来讲，jdk1.5以上如果想要线程安全，直接用synchronizedHashMap。Hashtable继承自Dictionary，后者已经被废弃了，推荐使用map接口的实现类。<br>照搬结论：要存储10k个Entries，overhead达到360k。</p>
@@ -516,7 +516,7 @@ JDK6字符串内存占用的计算方式：
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2021 Haldir
+    		&copy; 2024 Haldir
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
@@ -608,11 +608,47 @@ JDK6字符串内存占用的计算方式：
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">tools</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">service</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Window</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -632,55 +668,7 @@ JDK6字符串内存占用的计算方式：
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">前端</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">nio</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Window</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -692,59 +680,15 @@ JDK6字符串内存占用的计算方式：
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">c</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">django</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">sql</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -760,15 +704,71 @@ JDK6字符串内存占用的计算方式：
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">opengl</a>
+                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">前端</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">sql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">django</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">nio</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">opengl</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">c</a>
               </li>
             
             <div class="clearfix"></div>

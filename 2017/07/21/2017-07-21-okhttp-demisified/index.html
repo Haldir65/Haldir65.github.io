@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head><meta name="generator" content="Hexo 3.9.0">
+<head>
   <meta charset="utf-8">
   
   <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>OkHttp和Okio阅读笔记 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -16,13 +16,13 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="很早的时候就知道，OkHttp在io层面上的操作是由Okio代为完成的，所以实际意义上和Socket打交道的应该是Okio。而Okio又比传统的java io要高效。所以，在分析OkHttp之前，有必要针对Okio的一些方法进行展开，作为后面读写操作的铺垫。 Okio -&amp;gt; OkHttp -&amp;gt; Picaso  -&amp;gt; RetrofitOkio版本 1.13.0OkHttp版本 3.">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://api1.foster57.tk/static/imgs/6da83b3b20094b044a320d1e89dfcd00.jpg">
-<meta property="og:image" content="https://api1.foster57.tk/static/imgs/okHttp_chain.jpg">
-<meta property="og:updated_time" content="2021-04-04T08:46:59.939Z">
+<meta property="og:image" content="https://api1.reindeer36.shop/static/imgs/6da83b3b20094b044a320d1e89dfcd00.jpg">
+<meta property="og:image" content="https://api1.reindeer36.shop/static/imgs/okHttp_chain.jpg">
+<meta property="og:updated_time" content="2024-02-26T02:48:35.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="OkHttp和Okio阅读笔记">
 <meta name="twitter:description" content="很早的时候就知道，OkHttp在io层面上的操作是由Okio代为完成的，所以实际意义上和Socket打交道的应该是Okio。而Okio又比传统的java io要高效。所以，在分析OkHttp之前，有必要针对Okio的一些方法进行展开，作为后面读写操作的铺垫。 Okio -&amp;gt; OkHttp -&amp;gt; Picaso  -&amp;gt; RetrofitOkio版本 1.13.0OkHttp版本 3.">
-<meta name="twitter:image" content="https://api1.foster57.tk/static/imgs/6da83b3b20094b044a320d1e89dfcd00.jpg">
+<meta name="twitter:image" content="https://api1.reindeer36.shop/static/imgs/6da83b3b20094b044a320d1e89dfcd00.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -54,7 +54,7 @@ ga('send', 'pageview');
   
 
 </head>
-</html>
+
 <body>
   <div id="container" q-class="show:isCtnShow">
     <canvas id="anm-canvas" class="anm-canvas"></canvas>
@@ -203,7 +203,7 @@ ga('send', 'pageview');
       
         <p>很早的时候就知道，OkHttp在io层面上的操作是由Okio代为完成的，所以实际意义上和Socket打交道的应该是Okio。而Okio又比传统的java io要高效。所以，在分析OkHttp之前，有必要针对Okio的一些方法进行展开，作为后面读写操作的铺垫。</p>
 <p>Okio -&gt; OkHttp -&gt; Picaso  -&gt; Retrofit<br>Okio版本 1.13.0<br>OkHttp版本 3.8.0</p>
-<p><img src="https://api1.foster57.tk/static/imgs/6da83b3b20094b044a320d1e89dfcd00.jpg" alt=""><br><a id="more"></a></p>
+<p><img src="https://api1.reindeer36.shop/static/imgs/6da83b3b20094b044a320d1e89dfcd00.jpg" alt=""><br><a id="more"></a></p>
 <h2 id="1-Okio与java-io相比的优势"><a href="#1-Okio与java-io相比的优势" class="headerlink" title="1. Okio与java io相比的优势"></a>1. Okio与java io相比的优势</h2><p>java的InputStream可以被查看成是一个数据的来源，调用read方法从中读取数据。由于有些文件特别大，我们不可能在内存中分配一个和文件大小一样大的字节数组来专门来读写文件。因此需要传入一个缓冲数组。所以一般的读写程序的代码是这么写的</p>
 <pre><code class="java">public abstract class InputStream implements Closeable{
        public int read(byte b[]) throws IOException {
@@ -327,7 +327,7 @@ public BufferedInputStream(InputStream in, int size) {
         } else {
             this.sink = sink; //只是挪一下指针
         }
-    }   
+    }
 </code></pre>
 <p>由于一个Buffer即是source也是sink，挪一下指针就行了。写的时候往链表的尾巴写，读的时候从链表的头部读，读完了segment回收。</p>
 <p>BufferedInputStream要求外部调用者带着一个固定大小的byte数组来取数据，难免会有人传进来一个特别小的数组，这样永远不可能读取超过这个数组大小长度的某一行。</p>
@@ -337,8 +337,6 @@ public BufferedInputStream(InputStream in, int size) {
 </code></pre>
 <blockquote>
 <p>上面DataInputStream通常用于方便的读取基本数据类型，比如readChar,readLong，readByte等等.<br>例如 dataInputstream.readByte -&gt;  BufferedInputStream.read -&gt;  FileInputStream.read</p>
-</blockquote>
-<blockquote>
 <p>在BufferedInputStream中有一层byte[] buf. BufferedInputStream的read有两种，一是一次读一个byte，一种是外部传一个byte，指定offset和len。第一种要经历fill方法，第二种则是先填满自己的buf，然后System.arraycopy到外部传入的dst数组中。当然如果外界要求的len超出buff.length，那么直接跳过buf这一层。</p>
 </blockquote>
 <p>调用fill方法的前提是发现pos &gt;= count ，也就是是说提前预读取的数据不够了，fill方法主要是从0开始重新从底层读取数据，期望从底层读取buf.length - pos 个数据</p>
@@ -441,7 +439,7 @@ public void write(char cbuf[], int off, int len) throws IOException {
     }
 </code></pre>
 <p>一个很有意思的现象是，java BufferedInputStream的默认buffer数组大小是8192，okio 的segment的默认size也是8192，这些都是以byte为单位的。找到一个合理的<a href="https://stackoverflow.com/questions/37404068/why-is-the-default-char-buffer-size-of-bufferedreader-8192">解释</a>。大致意思是8192 = 2^13, windows和linux上这个大小正好占用两个分页文件(8kB)。另外java io的类图确实让人眼花缭乱。</p>
-<h2 id="2-OkHttp的解析"><a href="#2-OkHttp的解析" class="headerlink" title="2. OkHttp的解析"></a>2. OkHttp的解析</h2><h3 id="2-1-使用介绍"><a href="#2-1-使用介绍" class="headerlink" title="2.1 使用介绍"></a>2.1 使用介绍</h3><p>先上一张图<img src="https://api1.foster57.tk/static/imgs/okHttp_chain.jpg" alt="">。这是最简单的直接用OkHttpClient请求<a href="http://www.baidu.com">百度首页</a>的堆栈调用情况。在没有做任何手动配置的情况下，至少发现了五个Interceptor:</p>
+<h2 id="2-OkHttp的解析"><a href="#2-OkHttp的解析" class="headerlink" title="2. OkHttp的解析"></a>2. OkHttp的解析</h2><h3 id="2-1-使用介绍"><a href="#2-1-使用介绍" class="headerlink" title="2.1 使用介绍"></a>2.1 使用介绍</h3><p>先上一张图<img src="https://api1.reindeer36.shop/static/imgs/okHttp_chain.jpg" alt="">。这是最简单的直接用OkHttpClient请求<a href="http://www.baidu.com">百度首页</a>的堆栈调用情况。在没有做任何手动配置的情况下，至少发现了五个Interceptor:</p>
 <p> RetryAndFollowUpInterceptor<br> BridgeInterceptor<br> CacheInterceptor<br> ConnectInterceptor<br> CallServerInterceptor // 这里面没有再调用chain.proceed，所以责任链到此返回</p>
 <p> 走到CallServerInterceptor的时候，可以看到Response已经形成了。轮到每一个Interceptor的intercept（Chain ）方法执行的时候，传入的都是一个new 的RealInterceptorChain，只不过index+1了(其实唯一变化的也就只有这个index了)（而一般写interceptor的时候直接拿着传入的chain.proceed就可以了）</p>
 <p>首先是调用者的代码</p>
@@ -474,7 +472,7 @@ public void write(char cbuf[], int off, int len) throws IOException {
             public void onResponse(Call call, Response response) throws IOException {
 
             }
-        });       
+        });
 </code></pre>
 <h3 id="2-2-参数配置"><a href="#2-2-参数配置" class="headerlink" title="2.2 参数配置"></a>2.2 参数配置</h3><p>首先Request.Builder().build()方法，这里面只是使用Builder模式，和Retrofit很相似，方便链式调用。最终调用了Request的构造函数</p>
 <pre><code class="java"> Request(Request.Builder builder) {
@@ -785,7 +783,7 @@ for (RealConnection connection : connections) {
     // If this connection is not accepting new streams, we&#39;re done.
     if (allocations.size() &gt;= allocationLimit || noNewStreams) return false; //注意啊，若不是HTTP/2的连接，则allocationLimit的值总是1
     ///....
-    }      
+    }
 </code></pre>
 <p>多个HTTP/1.1请求是不能在同一个连接上交叉处理(multiplexing)的，http1中一个socket只能同时处理一个stream请求,acquire类似于markInUse。这样的设计主要是为了实现HTTP/2 multi stream，http2所有stream都走一条tcp连接(一个socket)。在Http1Codec的endOfInput方法里会调用streamAllocation.streamFinished()方法，也就是说，我这stream(一次接口请求读完了，http1报文的空行读到了)用完了，socket还给pool，socket在http1场景下一次只能接一个请求。connectionPool里默认是最大5个空闲连接数(就是说最多同时存在5个没关的socket,并且每个socket如果5min内没干活，就关闭掉，因为socket也是系统资源)。</p>
 <p>关于RouterSelector.Selection这个class，其实就是把DNS返回的多个查询record（InetSocketAddress，也就是ip地址存起来，当然存的是一个Route 对象，里头包住了InetSocketAddress)。所以可以粗略的认为一个Router对应一个ip地址吧，RouteDatabase就是一个HashSet，换ip的时候会对那些失败过的Route（ip）躲得远远的</p>
@@ -1185,7 +1183,7 @@ public void cancel(OkHttpClient client, Object tag) {
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2021 Haldir
+    		&copy; 2024 Haldir
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
@@ -1277,11 +1275,47 @@ public void cancel(OkHttpClient client, Object tag) {
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">tools</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">service</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Window</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1301,55 +1335,7 @@ public void cancel(OkHttpClient client, Object tag) {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">前端</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">nio</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Window</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1361,59 +1347,15 @@ public void cancel(OkHttpClient client, Object tag) {
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">c</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">django</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">sql</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1429,15 +1371,71 @@ public void cancel(OkHttpClient client, Object tag) {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">opengl</a>
+                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">前端</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">sql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">django</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">nio</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">opengl</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">c</a>
               </li>
             
             <div class="clearfix"></div>

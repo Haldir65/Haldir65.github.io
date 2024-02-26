@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head><meta name="generator" content="Hexo 3.9.0">
+<head>
   <meta charset="utf-8">
   
   <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>使用IDE内置的Terminal | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -16,12 +16,12 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="这周终于把Google I/O 2016的Android App在Device上跑起来了，顺便尝试多多使用命令行进行编译或者安装。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://api1.foster57.tk/static/imgs/device-2017-03-11-222239.png">
-<meta property="og:updated_time" content="2021-04-04T08:46:59.935Z">
+<meta property="og:image" content="https://api1.reindeer36.shop/static/imgs/device-2017-03-11-222239.png">
+<meta property="og:updated_time" content="2024-02-26T02:48:35.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用IDE内置的Terminal">
 <meta name="twitter:description" content="这周终于把Google I/O 2016的Android App在Device上跑起来了，顺便尝试多多使用命令行进行编译或者安装。">
-<meta name="twitter:image" content="https://api1.foster57.tk/static/imgs/device-2017-03-11-222239.png">
+<meta name="twitter:image" content="https://api1.reindeer36.shop/static/imgs/device-2017-03-11-222239.png">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -53,7 +53,7 @@ ga('send', 'pageview');
   
 
 </head>
-</html>
+
 <body>
   <div id="container" q-class="show:isCtnShow">
     <canvas id="anm-canvas" class="anm-canvas"></canvas>
@@ -200,7 +200,7 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p><img src="https://api1.foster57.tk/static/imgs/device-2017-03-11-222239.png" alt="io"><br>这周终于把Google I/O 2016的Android App在Device上跑起来了，顺便尝试多多使用命令行进行编译或者安装。</p>
+        <p><img src="https://api1.reindeer36.shop/static/imgs/device-2017-03-11-222239.png" alt="io"><br>这周终于把Google I/O 2016的Android App在Device上跑起来了，顺便尝试多多使用命令行进行编译或者安装。</p>
 <a id="more"></a>
 <h3 id="1-编译Android-client并安装到本地设备"><a href="#1-编译Android-client并安装到本地设备" class="headerlink" title="1. 编译Android client并安装到本地设备"></a>1. 编译Android client并安装到本地设备</h3><p>官方提供了比较完善的Build Instructions，对于习惯于shift+F10的我来说，还是有点麻烦。</p>
 <p>clone下来<a href="https://github.com/google/iosched">iosched</a>，修改gradle.properities里面的supportLib等值，参考Build Instruction ，</p>
@@ -416,7 +416,7 @@ at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:616)
 <h3 id="17-SpringAnimation-具有弹性的动画"><a href="#17-SpringAnimation-具有弹性的动画" class="headerlink" title="17. SpringAnimation(具有弹性的动画)"></a>17. SpringAnimation(具有弹性的动画)</h3><p>Facebook早在15年就推出了具有弹性的<a href="https://github.com/facebook/rebound">动画</a>,谷歌在16年给supportLib添加了<a href="https://developer.android.com/guide/topics/graphics/spring-animation.html">Spring Animation</a>，都是相似的理念。<br>弹性动画的关键是在keyFrame处算出非线性的值，用于设定UI控件展示状态。</p>
 <h3 id="18-Choreographer可以添加callback"><a href="#18-Choreographer可以添加callback" class="headerlink" title="18. Choreographer可以添加callback"></a>18. Choreographer可以添加callback</h3><p>doFrame方法的参数是(long FrameTimeNanos)，这个时间需要除以1000 1000<br>测试了一下，Frame确实是16毫秒更新一次，也就是接收到VSYNC信号的时机。<br>其实简单的想一下，这样可以用来显示当前应用的帧率，16ms就是60FPS,20ms就是50FPS.<br>论那些跑分软件是怎么做出来的。。。。当然更专业的方式应该是这个命令</p>
 <blockquote>
-<p>adb shell dumpsys SurfaceFlinger –latency + &lt;window名&gt;<br>网上有人写了python脚本，看起来更加直观一点</p>
+<p>adb shell dumpsys SurfaceFlinger –latency + <window名><br>网上有人写了python脚本，看起来更加直观一点</p>
 </blockquote>
 <h3 id="19-网络请求的Batch"><a href="#19-网络请求的Batch" class="headerlink" title="19. 网络请求的Batch"></a>19. 网络请求的Batch</h3><p>网络较差的情况下，可以将Request cache下来，等到网络较好的时候再执行。<br>Jesse Wilson<a href="https://stackoverflow.com/questions/37529303/how-to-cache-the-request-queue-not-responses-with-okhttp">推荐</a>使用<a href="https://github.com/square/tape">TAPE</a><br>有两种实现，基于文件系统的和基于内存的。基于内存的很简单，基于文件的能够在crash发生时自动回退。</p>
 <h3 id="20-getSystemService是存在memory-leak问题的"><a href="#20-getSystemService是存在memory-leak问题的" class="headerlink" title="20.getSystemService是存在memory leak问题的"></a>20.getSystemService是存在<a href="https://segmentfault.com/a/1190000004882511">memory leak</a>问题的</h3><p>context.getSystemService源码分析到最后，是从一个Hashmap里面取出Service<br>activity.getSystemService -&gt; ContextImpl.getSystemService -&gt; SystemServiceRegistry.getSystemService(SystemServiceRegistry里面有个HashMap&lt;String, ServiceFetcher&lt;?&gt;&gt;)<br>WifiManager存在leak的<a href="https://issuetracker.google.com/issues/63244509">issue</a></p>
@@ -547,12 +547,12 @@ LogUtil.w(TAG, String.valueOf(toMB(runtime.freeMemory()))); // 5.79MB
 LogUtil.w(TAG, String.valueOf(toMB(runtime.totalMemory()))); //14.13MB
  private String toMB(long number) {
          return String.format(&quot;%.2f&quot;, number / 1024.0 / 1024.0);
-     }               
+     }
 </code></pre>
 <p>大概也就几十个MB的样子，确实不是很多。多进程下，等于平白多了几十MB的内存，对于缓解性能压力还是有好处的。</p>
 <p><a href="https://stackoverflow.com/questions/4658511/android-how-to-decide-whether-to-run-a-service-in-a-separate-process">大概什么时候就应该开一个多进程呢</a><br>子进程挂了，主进程照样能跑，亲测会出现这样的log</p>
 <blockquote>
-<p> JavaBinder: *** Uncaught remote exception!  (Exceptions are not yet supported across processes.)</p>
+<p> JavaBinder: <em>*</em> Uncaught remote exception!  (Exceptions are not yet supported across processes.)</p>
 </blockquote>
 <h3 id="28-关于Android-APK-安装过程"><a href="#28-关于Android-APK-安装过程" class="headerlink" title="28. 关于Android APK 安装过程"></a>28. 关于Android APK 安装过程</h3><p>以下内容来自<a href="http://blog.csdn.net/zhaokaiqiang1992/article/details/72863932">Android APK 安装过程详解</a><br>首先APK 的本质是一个 Zip 压缩包，只是后缀被修改为 apk，其中打包了源代码编译出的 class.dex、一些图片视频资源文件和一些 Native 库文件。APK 文件与 Zip 文件最大的一个不同是 APK 包含签名信息，用于保证安装包安全不被修改。</p>
 <blockquote>
@@ -579,7 +579,7 @@ LogUtil.w(TAG, String.valueOf(toMB(runtime.totalMemory()))); //14.13MB
         return false;  
     }  
     return true;  
-}  
+}
 </code></pre>
 <p>显然是通过socket通信的，应用程序的安装与卸载并非PackageManagerService来完成，而是通过PackageManagerService来访问installd服务来执行程序包的安装与卸载的。</p>
 <p>installd是通过init.rc在系统启动时就开始运行的服务，installd进程是用c写的，这里面也是写了一个循环在跑的server:</p>
@@ -663,7 +663,7 @@ public final boolean handleIntent(Intent var1, IWXAPIEventHandler var2) {
           // ......
         }  
       }    
-    }    
+    }
 </code></pre>
 <p>再结合xml中的exported = true ;</p>
 <pre><code class="xml">&lt;activity
@@ -925,7 +925,7 @@ cookieManager.setAcceptThirdPartyCookies(mWebView, true);
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2021 Haldir
+    		&copy; 2024 Haldir
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
@@ -1017,11 +1017,47 @@ cookieManager.setAcceptThirdPartyCookies(mWebView, true);
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">tools</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">service</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Window</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1041,55 +1077,7 @@ cookieManager.setAcceptThirdPartyCookies(mWebView, true);
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">前端</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">nio</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Window</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1101,59 +1089,15 @@ cookieManager.setAcceptThirdPartyCookies(mWebView, true);
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">c</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">django</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">sql</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1169,15 +1113,71 @@ cookieManager.setAcceptThirdPartyCookies(mWebView, true);
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">opengl</a>
+                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">前端</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">sql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">django</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">nio</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">opengl</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">c</a>
               </li>
             
             <div class="clearfix"></div>

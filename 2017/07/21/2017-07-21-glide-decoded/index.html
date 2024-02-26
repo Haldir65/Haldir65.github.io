@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head><meta name="generator" content="Hexo 3.9.0">
+<head>
   <meta charset="utf-8">
   
   <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>从glide源码到图片加载框架设计思路 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -16,12 +16,12 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&amp;gt;  CacheDispatch  —&amp;gt; NetworkDispatcher  —-&amp;gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://api1.foster57.tk/static/imgs/a11f41e0b1df95212c71920b3959cd72.jpg">
-<meta property="og:updated_time" content="2021-04-04T08:46:59.935Z">
+<meta property="og:image" content="https://api1.reindeer36.shop/static/imgs/a11f41e0b1df95212c71920b3959cd72.jpg">
+<meta property="og:updated_time" content="2024-02-26T02:48:35.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从glide源码到图片加载框架设计思路">
 <meta name="twitter:description" content="glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&amp;gt;  CacheDispatch  —&amp;gt; NetworkDispatcher  —-&amp;gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是">
-<meta name="twitter:image" content="https://api1.foster57.tk/static/imgs/a11f41e0b1df95212c71920b3959cd72.jpg">
+<meta name="twitter:image" content="https://api1.reindeer36.shop/static/imgs/a11f41e0b1df95212c71920b3959cd72.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -53,7 +53,7 @@ ga('send', 'pageview');
   
 
 </head>
-</html>
+
 <body>
   <div id="container" q-class="show:isCtnShow">
     <canvas id="anm-canvas" class="anm-canvas"></canvas>
@@ -201,12 +201,11 @@ ga('send', 'pageview');
     <div class="article-entry" itemprop="articleBody">
       
         <p>glide的源码几个月前曾经拜读过，大致了解了其异步加载的实现原理。图片加载和网络请求很类似，就像当初看Volley，从一个Request —&gt;  CacheDispatch  —&gt; NetworkDispatcher  —-&gt;  ResponseDeliver。优秀的轮子不仅执行效率高，同时具备高的扩展性。读懂源码其实只是第一步，往下应该是利用框架提供的扩展方案，再往后应该就是能够独立设计出一套类似的框架了。<br>写这篇文章时，Glide的版本是3.8</p>
-<p><img src="https://api1.foster57.tk/static/imgs/a11f41e0b1df95212c71920b3959cd72.jpg" alt=""><br><a id="more"></a></p>
+<p><img src="https://api1.reindeer36.shop/static/imgs/a11f41e0b1df95212c71920b3959cd72.jpg" alt=""><br><a id="more"></a></p>
 <h2 id="1-使用入门"><a href="#1-使用入门" class="headerlink" title="1. 使用入门"></a>1. 使用入门</h2><p>印象中最早接触Glide是在cheesequare中，顿时发现，原来加载图片可以这么简单，之后的开发过程中总会对Glide有所偏倚。接近两年之后再来过一遍源码，希望能够回答那个“如果让你来设计一个图片加载框架，你会怎么设计？”的问题。<br>使用方式很简单</p>
 <pre><code class="java">  Glide.with(activity)
                 .load(R.drawable.image_id)
                 .into(mImageView);
-
 </code></pre>
 <p>来看这里面做了什么：</p>
 <pre><code class="java">       public RequestManager get(FragmentActivity activity) {
@@ -234,7 +233,6 @@ ga('send', 'pageview');
         }
         return current;
     }
-
 </code></pre>
 <p>with方法只是返回了一个RequestManager，with方法可以接受Fragment,Activity以及Context等.以上面的activity为例，supportFragmentGet方法只是通过FragmentActivity的supportFragmentManager去findFragmentByTag，这个Tag叫做：“com.bumptech.glide.manager”，所以一般在Debug的时候，去SupportFragmentManager里面查找，有时候能够看到一个这样的Fragment。这个方法里面就是查找这样的一个Fragment，甚至我们自己也可以FindFragmentByTag去调用这个Fragment的方法(这是一个Public的class)然后从这个Fragment里面获得RequestManager成员变量（没有就new一个并set）。可以看出，一个Fragment只有一个RequestManager，Fragment主要是为了跟Activity生命周期挂钩的。这里有必要讲一下为什么要写两次current ==null，findFragmentByTag并不会在commitAllowingStateLoss之后就会返回添加的Fragment，只是往主线程的MessageQueue里面丢了一个消息，这个消息执行完毕之后才findFragmentByTag才不为空。这里用Handler丢一条消息，这条消息肯定要排在之前那条消息之后才被执行，所以才有这样一个Pendingmap的设计。当然到这里，最重要的还是Glide是通过commit了一个特殊的Fragment来实现生命周期监听。<br>具体来看：SupportRequestManagerFragment中</p>
 <pre><code class="java">  @Override
@@ -305,7 +303,6 @@ ga('send', 'pageview');
             return builder;
         }
     }
-
 </code></pre>
 <p>上面这个泛型写的非常绕，OptionApplier的意思就是，如果用户提供了一些定制(存在options里面)，就给一些定制的选择。一般这个options为null。</p>
 <h3 id="2-1-各种Type的Request"><a href="#2-1-各种Type的Request" class="headerlink" title="2.1 各种Type的Request"></a>2.1 各种Type的Request</h3><p>Glide的RequestManager可以接受各种各样的来源</p>
@@ -336,14 +333,13 @@ ga('send', 'pageview');
                 new DrawableTypeRequest&lt;T&gt;(modelClass, streamModelLoader, fileDescriptorModelLoader, context,
                         glide, requestTracker, lifecycle, optionsApplier));
     }
-
 </code></pre>
 <p>DrawableTypeRequest接受一个泛型，可以是String(网络路径)，File(本地文件),Integer（资源文件）。所以最终返回的DrawableTypeRequet里面装的可能是String.class，Integer.class也可能是File.class。<br>比较难懂的是 streamModelLoader和fileDescriptorModelLoader的创建.</p>
 <pre><code class="java">public interface ModelLoader&lt;T, Y&gt; {
     DataFetcher&lt;Y&gt; getResourceFetcher(T model, int width, int height);
 }
 </code></pre>
-<p>ModelLoader其实就是只有一个方法的接口，例如with(File)会传一个File.class进来，返回的streamModelLoader的T就是File，Y就是InputStream。<br>ModelLoader&lt;T, Y&gt;负责提供DataFetcher<Y>，T是数据源，可以是File,Resourse，url等等。Y用于描述类型，本地的就使用ParcelFileDescriptor（记得FileDescriptor属于Native的东西），网络上的就使用InputStream.<br>T和Y的组合可能有很多种，Cache在Glide(全局唯一)的loaderFactory（成员变量）的一个HashMap(没用ConcurrentHashMap是因为buildModelLoader方法加锁了)中。所以这份缓存也是全局唯一的。<br>T和Y的一一对应其实是在Glide的构造函数里面写好的：</p>
+<p>ModelLoader其实就是只有一个方法的接口，例如with(File)会传一个File.class进来，返回的streamModelLoader的T就是File，Y就是InputStream。<br>ModelLoader<T, Y>负责提供DataFetcher<Y>，T是数据源，可以是File,Resourse，url等等。Y用于描述类型，本地的就使用ParcelFileDescriptor（记得FileDescriptor属于Native的东西），网络上的就使用InputStream.<br>T和Y的组合可能有很多种，Cache在Glide(全局唯一)的loaderFactory（成员变量）的一个HashMap(没用ConcurrentHashMap是因为buildModelLoader方法加锁了)中。所以这份缓存也是全局唯一的。<br>T和Y的一一对应其实是在Glide的构造函数里面写好的：</p>
 <pre><code class="java">
         register(File.class, ParcelFileDescriptor.class, new FileDescriptorFileLoader.Factory());
         register(File.class, InputStream.class, new StreamFileLoader.Factory());
@@ -364,7 +360,7 @@ ga('send', 'pageview');
  public class DrawableRequestBuilder&lt;ModelType&gt;
         extends GenericRequestBuilder&lt;ModelType, ImageVideoWrapper, GifBitmapWrapper, GlideDrawable&gt;
         implements BitmapOptions, DrawableOptions
- public class GenericRequestBuilder&lt;ModelType, DataType, ResourceType, TranscodeType&gt; implements Cloneable        
+ public class GenericRequestBuilder&lt;ModelType, DataType, ResourceType, TranscodeType&gt; implements Cloneable
 </code></pre><p>记住这个ModelType就是Glide.with(context).load(XXX) 里面传进去的Object的Class，例如File.class，那么<br>上面其实就是创建了一个DrawableTypeRequest，泛型是File ，构造函数一层层往上调用，DrawableRequestBuilder这一层调用了crossFade方法，即默认会有一个crossFade的效果，默认用的是DrawableCrossFadeFactory。注意这里把属于RequestManager的RequestTracker也传进来了。</p>
 <ul>
 <li>Glide.with(context).load(XX)到目前为止只是返回了一个DrawableTypeRequest<ModelType> 的实例。(还在主线程)</li>
@@ -421,7 +417,6 @@ ga('send', 'pageview');
                     + &quot;, try .as*(Class).transcode(ResourceTranscoder)&quot;);
         }
     }
-
 </code></pre>
 <p>GlideDrawableImageViewTarget、BitmapImageViewTarget以及DrawableImageViewTarget全部继承自ImageViewTarget，后者继承自ViewTarget,再继承自BaseTarget，再 implements Target。一层层继承下来，GlideDrawableImageViewTarget等三个子类中都有一个Request，一个T extents View(看来不一定是ImageView)</p>
 <h3 id="3-1-以GlideDrawableImageViewTarget为例"><a href="#3-1-以GlideDrawableImageViewTarget为例" class="headerlink" title="3.1 以GlideDrawableImageViewTarget为例"></a>3.1 以GlideDrawableImageViewTarget为例</h3><pre><code class="java">public class GlideDrawableImageViewTarget extends ImageViewTarget&lt;GlideDrawable&gt; {
@@ -693,8 +688,6 @@ class EngineJob implements EngineRunnable.EngineRunnableManager {
 
     private volatile Future&lt;?&gt; future;
 }
-
-
 </code></pre>
 <p>EngineJob是通过Factory创建的，创建时会传两个线程池进来。一个管DiskCache,一个管Source获取。初始化是在Glide.createGlide里面做的：</p>
 <pre><code class="java">if (sourceService == null) {
@@ -766,7 +759,6 @@ Resource&lt;Z&gt; result = transcode(transformed); ///把一种资源转成另�
             target.onResourceReady(result, animation); //注意这句话就可以了
         }
     }
-
 </code></pre><p>最终会调到ImageViewTarget,AppWidgetTarget等Target（持有Request和View,View可能没有），这时候，直接调用ImageView.setImagBitmap等方法就可以了。<br>图片设置完毕。</p>
 <h3 id="5-Glide除了普通的加载方法，还能用什么比较有意思的玩法"><a href="#5-Glide除了普通的加载方法，还能用什么比较有意思的玩法" class="headerlink" title="5. Glide除了普通的加载方法，还能用什么比较有意思的玩法"></a>5. Glide除了普通的加载方法，还能用什么比较有意思的玩法</h3><ul>
 <li>1.Glide加载Gif的原理在GifDecoder的 public synchronized Bitmap getNextFrame()方法里，Gif本质上是一帧帧的Frame数据，Glide将这些数据包装到GifFrame这个类中，每次想要获得下一帧的时候，就从bitmapPool中obtain Bitmap,同时从Frame中提取必要信息填充bitmap.<br>Gif的显示是在GifDrawable的draw方法里面通过frameLoader.getCurrentFrame()获得当前帧的bitmap。<br><a href="https://developer.android.com/reference/android/graphics/Movie.html">android.graphics.Movie</a>也能加载gif图片。只是Movie里面都是些native方法，glide的GifHeaderParser.java中的readContents方法里面用java方法实现了对gif帧的读取。<br>从GifDecoder.read这个方法开始读就好了</li>
@@ -796,7 +788,7 @@ Resource&lt;Z&gt; result = transcode(transformed); ///把一种资源转成另�
  }
 </code></pre>
 </li>
-<li><ol start="3">
+<li><ol>
 <li><p>Glide还可以用来纯粹的解码获得Bitmap.</p>
 <pre><code class="java">Glide.with(itemView.getContext()) //不用担心leak,RequestManager只是通过这个context获得了ApplicationContext，保留下来的是Application的context
           .load(R.drawable.image_41)
@@ -833,7 +825,7 @@ Resource&lt;Z&gt; result = transcode(transformed); ///把一种资源转成另�
 </code></pre>
 <p>根据之前的分析，打印出来的应该是context.getCacheDir+”image_manager_disk_cache”+”/xxxxxx.xxx” ，我没研究过后缀，不过这个后缀没意义吧。</p>
 </li>
-<li><ol start="5">
+<li><ol>
 <li>在2017年的Droidcon2017NYC上，有一个演讲提到了关于图片尺寸大小和内存关系。大致情形就是在使用加载图片的时候，使用了一张3594pixel<em>5421pixel(1900万像素)的图片（内存占用19million pixels X 4 bytes/pixel = 78MB），填进了一个50dp</em>50dp的avatar中。而如果使用和ImageView大小一样的图片源的话(150pxX150px)，只需要90kb。这之间的内存消耗差异几乎是1000倍。这位speaker说的解决方案是请求图片是加上宽度和高度参数，或者调用Picasso的fit方法。目前看来，Glide从onSizeReady之后获取资源的每一步，读取缓存，读磁盘，解码图片这些过程都带上了width和height参数，所以应该也是不存在这种浪费内存的问题</li>
 </ol>
 </li>
@@ -1076,7 +1068,7 @@ if (diskCacheFactory == null) {
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2021 Haldir
+    		&copy; 2024 Haldir
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
@@ -1168,11 +1160,47 @@ if (diskCacheFactory == null) {
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">tools</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">service</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Window</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1192,55 +1220,7 @@ if (diskCacheFactory == null) {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">前端</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">nio</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Window</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1252,59 +1232,15 @@ if (diskCacheFactory == null) {
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">c</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">django</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">sql</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1320,15 +1256,71 @@ if (diskCacheFactory == null) {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">opengl</a>
+                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">前端</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">sql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">django</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">nio</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">opengl</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">c</a>
               </li>
             
             <div class="clearfix"></div>

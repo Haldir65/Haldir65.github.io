@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head><meta name="generator" content="Hexo 3.9.0">
+<head>
   <meta charset="utf-8">
   
   <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>网络通信手册-2 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -16,14 +16,14 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="OkHttp通过ConnectionPool做到tcp连接复用（在Timeout内）,所以并不是每个http都去建立一个tcp连接自定义通讯协议，使用java socket实现客户端和服务端。需要注意的是分包问题和黏包问题">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://api1.foster57.tk/static/imgs/jpglight-and-shadow-2411321_960_720.jpg">
-<meta property="og:image" content="https://api1.foster57.tk/static/imgs/http_with_out_keep_alive.png">
-<meta property="og:image" content="https://api1.foster57.tk/static/imgs/http_with_keep_alive.png">
-<meta property="og:updated_time" content="2021-04-04T08:46:59.943Z">
+<meta property="og:image" content="https://api1.reindeer36.shop/static/imgs/jpglight-and-shadow-2411321_960_720.jpg">
+<meta property="og:image" content="https://api1.reindeer36.shop/static/imgs/http_with_out_keep_alive.png">
+<meta property="og:image" content="https://api1.reindeer36.shop/static/imgs/http_with_keep_alive.png">
+<meta property="og:updated_time" content="2024-02-26T02:48:35.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="网络通信手册-2">
 <meta name="twitter:description" content="OkHttp通过ConnectionPool做到tcp连接复用（在Timeout内）,所以并不是每个http都去建立一个tcp连接自定义通讯协议，使用java socket实现客户端和服务端。需要注意的是分包问题和黏包问题">
-<meta name="twitter:image" content="https://api1.foster57.tk/static/imgs/jpglight-and-shadow-2411321_960_720.jpg">
+<meta name="twitter:image" content="https://api1.reindeer36.shop/static/imgs/jpglight-and-shadow-2411321_960_720.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -55,7 +55,7 @@ ga('send', 'pageview');
   
 
 </head>
-</html>
+
 <body>
   <div id="container" q-class="show:isCtnShow">
     <canvas id="anm-canvas" class="anm-canvas"></canvas>
@@ -202,7 +202,7 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>OkHttp通过ConnectionPool做到tcp连接复用（在Timeout内）,所以并不是每个http都去建立一个tcp连接<br>自定义通讯协议，使用java socket实现客户端和服务端。需要注意的是分包问题和黏包问题<br><img src="https://api1.foster57.tk/static/imgs/jpglight-and-shadow-2411321_960_720.jpg" alt=""><br><a id="more"></a></p>
+        <p>OkHttp通过ConnectionPool做到tcp连接复用（在Timeout内）,所以并不是每个http都去建立一个tcp连接<br>自定义通讯协议，使用java socket实现客户端和服务端。需要注意的是分包问题和黏包问题<br><img src="https://api1.reindeer36.shop/static/imgs/jpglight-and-shadow-2411321_960_720.jpg" alt=""><br><a id="more"></a></p>
 <h2 id="1-http请求中tcp连接的复用-http-keep-alive是应用层的实现，与tcp-kkepalive那个2小时没关系"><a href="#1-http请求中tcp连接的复用-http-keep-alive是应用层的实现，与tcp-kkepalive那个2小时没关系" class="headerlink" title="1. http请求中tcp连接的复用(http -keep alive是应用层的实现，与tcp kkepalive那个2小时没关系)"></a>1. http请求中tcp连接的复用(http -keep alive是应用层的实现，与tcp kkepalive那个2小时没关系)</h2><h2 id="2-自定义通讯协议"><a href="#2-自定义通讯协议" class="headerlink" title="2. 自定义通讯协议"></a>2. 自定义通讯协议</h2><p>http这种属于应用层的协议定义了每个数据包的结构是怎样的。在一些场合下，比如追求通讯速度，自定义加密手段，可能需要自定义结构体。<br>自己用Socket实现一套server-client通讯模型其实不难。<br>server这边，先确定自己对外公布的ip,port。然后起一个serverSocket，死循环去accept，每次accept到一个就添加到一个列表中，同时用线程池去执行一个死跑从socket中read的runnable。<br>client这边，根据server的ip和port去连接上，client主动发消息(byte，int,String类型都行)，server这边读到信息，给出response，clinent再读取server的回话，就跟两个人之间你一句我一句说话一样。整个过程中 <strong>保持了长连接</strong>,只要任何一方没有手动设置socket.setSoTimeout的话，放一晚上都不会断开。</p>
 <p>一个重点是双方发送的消息格式，即两个人交流的语言，如果全部是String的话，那就跟http很像了，当然任何数据格式从socket发出去最终都是以byte的形式发出去的(比如string会用utf-8或者gbk编码成byte数组)。<br>google的protoBuffer最重要的两个方法writeTo(object转成byte数组)和parseFrom(byte数组转成object)。</p>
 <p><a href="https://blog.csdn.net/u010818425/article/details/53448817">基于Java Socket的自定义协议，实现Android与服务器的长连接（二）</a>，基于这篇文章，可以将数据类型定义为统一的protocol，protocol的要素包括:</p>
@@ -249,7 +249,7 @@ ga('send', 'pageview');
 </blockquote>
 <p><a href="http://luodw.cc/2015/12/27/dns03/">域名解析之dig,host,nslookup命令</a><br>好用的命令</p>
 <blockquote>
-<p>dig +trace baidu.com<br>nslookup <a href="http://www.youtube.com">www.youtube.com</a> 1.1.1.1 //指定server，国内因为dns污染，返回的结果是错误的<br>nslookup -vc google.com 8.8.8.8 // -vc是指强制走tcp查询dns<br>nslookup -d <a href="http://www.163.com">www.163.com</a> //显示ttl<br>nslookup -&gt; set debug -&gt; <a href="http://www.163.com">www.163.com</a> //这三条走完是一样的，类似于交互模式<br><a href="http://blogread.cn/it/article.php?id=5711">dig挖出DNS的秘密</a></p>
+<p>dig +trace baidu.com<br>nslookup www.youtube.com 1.1.1.1 //指定server，国内因为dns污染，返回的结果是错误的<br>nslookup -vc google.com 8.8.8.8 // -vc是指强制走tcp查询dns<br>nslookup -d www.163.com //显示ttl<br>nslookup -&gt; set debug -&gt; www.163.com //这三条走完是一样的，类似于交互模式<br><a href="http://blogread.cn/it/article.php?id=5711">dig挖出DNS的秘密</a></p>
 </blockquote>
 <p><a href="https://serverfault.com/questions/404840/when-do-dns-queries-use-tcp-instead-of-udp">dns查询也可以使用tcp</a><br>The Transmission Control Protocol (TCP) is used when the response data size exceeds 512 bytes, or for tasks such as zone transfers.</p>
 <p><a href="http://www.runoob.com/http/http-content-type.html">详细的http-content-type表格</a><br>关于content-type,找到一篇<a href="http://homeway.me/2015/07/19/understand-http-about-content-type/">介绍</a><br>关于Http header常用字段<a href="http://zq210wl.github.io/2014/12/30/html-http-header-analysis/">理解Http Header</a><br>Http底层TCP ,ACK 等等需要tcpcump结合wireShark抓包</p>
@@ -264,7 +264,7 @@ ga('send', 'pageview');
 </blockquote>
 <p>ab(ApacheBench) - a simple ,single-threaded command line tool for benchemarking an HTTP server.<br>因为是单线程的，所以并不能利用多核cpu的优势对server施加充分的负载。一般这么用</p>
 <blockquote>
-<p>ab -n 1000 -c 100 <a href="http://example.com/">http://example.com/</a><br>ab -n &lt;num_requests&gt; -c <concurrency> <addr>:<port><path></p>
+<p>ab -n 1000 -c 100 <a href="http://example.com/">http://example.com/</a><br>ab -n <num_requests> -c <concurrency> <addr>:<port><path></p>
 </blockquote>
 <p><a href="https://github.com/wg/wrk">属于netty的wrk</a></p>
 <blockquote>
@@ -276,8 +276,8 @@ ga('send', 'pageview');
 <p><a href="https://serverfault.com/questions/795467/for-what-is-the-well-known-folder">.well-known的意思</a>，其实就跟robot.txt差不多。一种为了能够在客户端发起请求(但此时并不清楚url空间的允许策略，贸然访问万一侵权了呢)获得一些有用的信息。于是RFC就提出来搞一个专门的.well-known的path，这下面的位置都是广而周知的，大家都知道是特定的用途的。</p>
 <p>nc其实就是netcat了，功能比较强大<br>nc -vz 192.168.0.181 20060 //测试TCP端口可用性的方法<br>nc -vuz IP port //测试udp端口可用性的方式，但实际测下来，就算server上udp port没开，还是会返回succeeded，所以这个也不可靠</p>
 <p>netcat还可以实现udp聊天<br>服务器上<br>nc -ul 1080 // 会卡在这里，等待新的消息到达1080端口<br>//客户端这边<br>nc -u x.x.x.x 1080 //也会卡在这里，不过可以输入文字，按下回车，服务器这边就能收到消息了</p>
-<p>wget –spider <a href="http://www.baidu.com">www.baidu.com</a> //wget还有一个spider模式</p>
-<p>“ping -l 1472 -f <a href="http://www.baidu.com&quot;">www.baidu.com&quot;</a><br><a href="http://yangtai.xunlei.com/?p=1326&amp;cpage=6">udp的MTU参数</a></p>
+<p>wget –spider www.baidu.com //wget还有一个spider模式</p>
+<p>“ping -l 1472 -f www.baidu.com”<br><a href="http://yangtai.xunlei.com/?p=1326&amp;cpage=6">udp的MTU参数</a></p>
 <p><a href="https://tech.meituan.com/fe_security_csrf.html">前端安全系列之二：如何防止CSRF攻击？</a></p>
 <p><a href="https://stackoverflow.com/questions/499591/are-https-urls-encrypted">https的url是加密的吗？</a>是的，<br>所以你可以把账户密码写在url后面发出去，这样是安全的，外界无法截获你的隐私信息.<br>但着实不应该这样做，<br>在浏览器地址栏和浏览器历史记录里面都留下了账户密码。可能会在http的referer里面带上你的url和隐私信息<br>但是第一次client hello的时候host还是会明文写在包里,后面的query Parameters由于跟client hello无关，所以是加密的.<br><a href="https://en.wikipedia.org/wiki/Server_Name_Indication">Server Name Indication</a><br>SNI breaks the ‘host’ part of SSL encryption of URLs. You can test this yourself with wireshark. There is a selector for SNI</p>
 <p>// http post请求，设置content-type = Application/json，body里面放一个int或者long，实际传输的是string还是long?(猜测是string，因为要走utf-8之类的encoding过一遍，因为http是text-based协议)<br>这事是有区别的，比如要post出去一个”6”，<br>字符串6的ascii码是<br>二进制：0011 0110<br>十进制：54<br>十六进制：36<br><strong>只需要一个字节</strong></p>
@@ -386,16 +386,16 @@ Cookie: session=fsdaf;aaa=dfasf;......
 <p>比方说：在子网192.168.20.0/30中，能接收到目的地址为192.168.20.3的IP分组的最大主机数是（）<br>到这个<a href="http://tool.chinaz.com/tools/subnetmask">在线子网掩码计算器</a>中输入，结果是<br>可用ip 2<br>掩码 255 255 255 252<br>网络 192 168 20 0<br>第一可用 192 168 20 1<br>第二可用 192 168 20 2<br>广播 192 168 20 3</p>
 <p>解释下就是 30 说明前面有30个1，后面只剩下俩位，也就是四种可能，但有俩是要保留给网络和广播的，所以只剩下2个</p>
 <blockquote>
-</blockquote>
 <p>NAPT原理<br>简单来说，在NAT网关上会有一张映射表，表上记录了内网向公网哪个IP和端口发起了请求，然后如果内网有主机向公网设备发起了请求，内网主机的请求数据包传输到了NAT网关上，那么NAT网关会修改该数据包的源IP地址和源端口为NAT网关自身的IP地址和任意一个不冲突的自身未使用的端口，并且把这个修改记录到那张映射表上。最后把修改之后的数据包发送到请求的目标主机，等目标主机发回了响应包之后，再根据响应包里面的目的IP地址和目的端口去映射表里面找到该转发给哪个内网主机。这样就实现了内网主机在没有公网IP的情况下，通过NAPT技术借助路由器唯一的一个公网IP来访问公网设备。<br>在较早以前的 RFC 1918 文档中对私有地址有相关的说明。</p>
+</blockquote>
 <p>因特网域名分配组织IANA组织（Internet Assigned Numbers Authority）保留了以下三个IP地址块用于私有网络。</p>
 <p>10.0.0.0 - 10.255.255.255 (10/8比特前缀)</p>
 <p>172.16.0.0 - 172.31.255.255 (172.16/12比特前缀)</p>
 <p>192.168.0.0 - 192.168.255.255 (192.168/16比特前缀)</p>
 <p>我们可以看到其中有1个A类地址块，32个B类地址块和256个C类地址块。主流的家用路由器使用C类私有地址作为路由器LAN端的IP地址较多，所以我们可以看到路由器设置页面的IP一般都为192.168开头。</p>
 <p><a href="https://stackoverflow.com/questions/9334401/http-keep-alive-and-tcp-keep-alive">tcp keep-alive和http的keep-alive是两回事</a> http keep-alive是由webserver负责实现的。 关键字:http keepalive implementation</p>
-<p>http1.0中每个tcp连接用完了就关闭掉<br><img src="https://api1.foster57.tk/static/imgs/http_with_out_keep_alive.png" alt=""></p>
-<p>http1.1中每个连接用完了不关闭,(保留一个keepAlive时间，在OkHttp里面默认一条连接在没有使用过的情况下保留5分钟才关闭)<br><img src="https://api1.foster57.tk/static/imgs/http_with_keep_alive.png" alt=""></p>
+<p>http1.0中每个tcp连接用完了就关闭掉<br><img src="https://api1.reindeer36.shop/static/imgs/http_with_out_keep_alive.png" alt=""></p>
+<p>http1.1中每个连接用完了不关闭,(保留一个keepAlive时间，在OkHttp里面默认一条连接在没有使用过的情况下保留5分钟才关闭)<br><img src="https://api1.reindeer36.shop/static/imgs/http_with_keep_alive.png" alt=""></p>
 <p>这篇回答里解释了http keep-alive是为了让后续的http请求复用这一条tcp连接。而tcp的keep alive则是定期发小的包。</p>
 <p>另外,http server并不会主动去问client是否还连着，只需要起一个timeout(到时间就掐掉这条tcp)就行了。下次客户端再来发起请求，重新起一条tcp吧。<br>但是http keepalive在有些时候也是有问题的(http-keepAlive的缺点，多个请求同时到达就会因为头部阻塞而延迟，这种时候还不如重新搞一个socket处理)<br>虽说HTTP/1.1 Keep-Alive特性支持多个请求在同一个连接上排队发送，在浏览器端正常的HTML等资源请求，会带来线头阻塞弊端，后一个请求依赖于前一个请求完成，一旦出现阻塞，后续请求只能排队等待。</p>
 <p><a href="http://www.blogjava.net/yongboy/archive/2015/03/30/423963.html">移动APP后端网络处理一些问题记录</a><br>HTTP/1.1 Pipelining（建立在Keep-Alive持久化基础之上，中文译为管线化，支持连续的幂等的GET/HEAD方法请求，实际环境下，并没有被浏览器所支持。同一个连接，处理同样的三次请求-响应）</p>
@@ -581,7 +581,7 @@ Cookie: session=fsdaf;aaa=dfasf;......
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2021 Haldir
+    		&copy; 2024 Haldir
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
@@ -673,11 +673,47 @@ Cookie: session=fsdaf;aaa=dfasf;......
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">tools</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">service</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Window</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -697,55 +733,7 @@ Cookie: session=fsdaf;aaa=dfasf;......
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">前端</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">nio</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Window</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -757,59 +745,15 @@ Cookie: session=fsdaf;aaa=dfasf;......
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">c</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">django</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">sql</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -825,15 +769,71 @@ Cookie: session=fsdaf;aaa=dfasf;......
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">opengl</a>
+                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">前端</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">sql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">django</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">nio</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">opengl</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">c</a>
               </li>
             
             <div class="clearfix"></div>

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head><meta name="generator" content="Hexo 3.9.0">
+<head>
   <meta charset="utf-8">
   
   <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>ndk入门笔记 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -16,12 +16,12 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="android中ndk及jni编写注意事项（本文主要讲CMake）">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://api1.foster57.tk/static/imgs/ShanwangpingKarst_EN-AU5360258756_1920x1080.jpg">
-<meta property="og:updated_time" content="2021-04-04T08:46:59.947Z">
+<meta property="og:image" content="https://api1.reindeer36.shop/static/imgs/ShanwangpingKarst_EN-AU5360258756_1920x1080.jpg">
+<meta property="og:updated_time" content="2024-02-26T02:48:35.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ndk入门笔记">
 <meta name="twitter:description" content="android中ndk及jni编写注意事项（本文主要讲CMake）">
-<meta name="twitter:image" content="https://api1.foster57.tk/static/imgs/ShanwangpingKarst_EN-AU5360258756_1920x1080.jpg">
+<meta name="twitter:image" content="https://api1.reindeer36.shop/static/imgs/ShanwangpingKarst_EN-AU5360258756_1920x1080.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -53,7 +53,7 @@ ga('send', 'pageview');
   
 
 </head>
-</html>
+
 <body>
   <div id="container" q-class="show:isCtnShow">
     <canvas id="anm-canvas" class="anm-canvas"></canvas>
@@ -200,7 +200,7 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>android中ndk及jni编写注意事项（本文主要讲CMake）<br><img src="https://api1.foster57.tk/static/imgs/ShanwangpingKarst_EN-AU5360258756_1920x1080.jpg" alt=""><br><a id="more"></a><br>一些小窍门</p>
+        <p>android中ndk及jni编写注意事项（本文主要讲CMake）<br><img src="https://api1.reindeer36.shop/static/imgs/ShanwangpingKarst_EN-AU5360258756_1920x1080.jpg" alt=""><br><a id="more"></a><br>一些小窍门</p>
 <blockquote>
 <p>cmake最终执行的命令在这个文件里面.externalNativeBuild/cmake/debug/{abi}/cmake_build_command.txt<br>cmake生成的.so文件在”\app\build\intermediates\cmake\debug\obj\arm64-v8a”这个路径下。<br>CMake 一共有2种编译工具链 - clang 和 gcc，gcc 已经废弃，clang 是默认的。</p>
 </blockquote>
@@ -288,7 +288,7 @@ mips64
             abiFilters &quot;x86_64&quot;  
         }  
     }  
-}  
+}
 </code></pre><p>第二种：<br>app/build.gradle中这句话的意思是指让生成的apk中包含下面三种abi的so文件</p>
 <pre><code class="gradle">defaultConfig {
     ndk {
@@ -298,7 +298,7 @@ mips64
 </code></pre>
 <p>在apk文件中，so文件放在lib/armeabi-v7a lib/x86_64 lib/x86 lib/arm64-v8a这些文件夹下面</p>
 <h3 id="添加prebuilt-library"><a href="#添加prebuilt-library" class="headerlink" title="添加prebuilt library"></a>添加prebuilt library</h3><p>Add other prebuilt libraries<br>在CMakeLists.txt中添加<br>add_library( imported-lib<br>             SHARED<br>             IMPORTED )<br>关键词IMPORTED ，就拿ffmepg来说，首先在linux上编译出不同abi的so文件，ffmpeg有好几个so文件，比方说libavcodec.so这个文件。</p>
-<pre><code>Some libraries provide separate packages for specific CPU architectures, or Application Binary Interfaces (ABI), and organize them into separate directories. This approach helps libraries take advantage of certain CPU architectures while allowing you to use only the versions of the library you want. To add multiple ABI versions of a library to your CMake build script, without having to write multiple commands for each version of the library, you can use the ANDROID_ABI path variable. This variable uses a list of the default ABIs that the NDK supports, or a filtered list of ABIs you manually configure Gradle to use. 
+<pre><code>Some libraries provide separate packages for specific CPU architectures, or Application Binary Interfaces (ABI), and organize them into separate directories. This approach helps libraries take advantage of certain CPU architectures while allowing you to use only the versions of the library you want. To add multiple ABI versions of a library to your CMake build script, without having to write multiple commands for each version of the library, you can use the ANDROID_ABI path variable. This variable uses a list of the default ABIs that the NDK supports, or a filtered list of ABIs you manually configure Gradle to use.
 </code></pre><p>有些第三方库针对不同的cpu架构提供了不同的so文件</p>
 <pre><code># 添加库——外部引入的库
 # 库名称：avcodec（不需要包含前缀lib）
@@ -326,7 +326,7 @@ target_link_libraries( native-lib //这个是我们自己的lib的名字
         swresample
         swscale
         -landroid
-        ${log-lib} )        
+        ${log-lib} )
 </code></pre><h3 id="预先编译好的so文件放置的目录要告诉gradle"><a href="#预先编译好的so文件放置的目录要告诉gradle" class="headerlink" title="预先编译好的so文件放置的目录要告诉gradle"></a>预先编译好的so文件放置的目录要告诉gradle</h3><blockquote>
 <p>f you want Gradle to package prebuilt native libraries with your APK, modify the default source set configuration to include the directory of your prebuilt .so files, as shown below. Keep in mind, you don’t need to do this to include artifacts of CMake build scripts that you link to Gradle.</p>
 </blockquote>
@@ -603,7 +603,7 @@ echo &quot;-------- End --------&quot;
 </code></pre>
 <h3 id="libjpeg移植到android上的教程不要太简单"><a href="#libjpeg移植到android上的教程不要太简单" class="headerlink" title="libjpeg移植到android上的教程不要太简单"></a>libjpeg移植到android上的教程不要太简单</h3><p><a href="https://my.oschina.net/u/3863980/blog/3021025">参考这篇文章的做法</a></p>
 <pre><code>项目开发过程中发现Android的质量压缩算法在图片过大，色彩丰富的前提下，压缩的性能不是特别好，经过调查发现Android底层实现使用Skia引擎，封装了了libjpeg图像库。为了适配低版本的Android手机，其内部的压缩算法并没有采用普遍的哈夫曼算法，因为哈夫曼算法比较占CPU，从而选择了其他的算法B，而算法B的效果并没有达到项目预期，所以这里研究一下通过自编译libjpeg来使用哈夫曼算法进行图片压缩的操作。
-图片在内存中占用的大小为3m，同等压缩质量下, 原生花了215毫秒，而libjpeg-turbo花了1.6秒。 
+图片在内存中占用的大小为3m，同等压缩质量下, 原生花了215毫秒，而libjpeg-turbo花了1.6秒。
 </code></pre><p><a href="https://github.com/libjpeg-turbo/libjpeg-turbo/">libjpeg-turbo仓库</a>直接把所有文件粘贴到项目中，build.gradle中指定CMakeLists.txt对应的路径。会生成libjepg.so和libturbo-jpeg.so两个文件。</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://developer.android.com/studio/projects/configure-cmake">configure-cmake</a><br><a href="https://github.com/googlesamples/android-ndk">googlesamples/android-ndk</a><br><a href="https://www.jianshu.com/p/6332418b12b1">Android NDK开发扫盲及最新CMake的编译使用</a><br><a href="https://stackoverflow.com/a/47571204">ANDROID_ABI这个变量，在CMakeLists.txt里面，可以告诉我们当前打的是x86还是arm64-v8a</a></p>
 
@@ -764,7 +764,7 @@ echo &quot;-------- End --------&quot;
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2021 Haldir
+    		&copy; 2024 Haldir
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
@@ -856,11 +856,47 @@ echo &quot;-------- End --------&quot;
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">tools</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">service</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Window</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -880,55 +916,7 @@ echo &quot;-------- End --------&quot;
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">前端</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">nio</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Window</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -940,59 +928,15 @@ echo &quot;-------- End --------&quot;
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">c</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">django</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">sql</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1008,15 +952,71 @@ echo &quot;-------- End --------&quot;
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">opengl</a>
+                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">前端</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">sql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">django</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">nio</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">opengl</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">c</a>
               </li>
             
             <div class="clearfix"></div>

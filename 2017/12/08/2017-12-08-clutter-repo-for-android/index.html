@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head><meta name="generator" content="Hexo 3.9.0">
+<head>
   <meta charset="utf-8">
   
   <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>Android知识集合[三] | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -16,13 +16,13 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="之前的文章快装不下了，所以另外开一篇文章专门放Android相关的杂乱的知识点。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://api1.foster57.tk/static/imgs/scenery1511100734648.jpg">
-<meta property="og:image" content="https://api1.foster57.tk/static/imgs/scenery1511100809920.jpg">
-<meta property="og:updated_time" content="2021-04-04T08:46:59.939Z">
+<meta property="og:image" content="https://api1.reindeer36.shop/static/imgs/scenery1511100734648.jpg">
+<meta property="og:image" content="https://api1.reindeer36.shop/static/imgs/scenery1511100809920.jpg">
+<meta property="og:updated_time" content="2024-02-26T02:48:35.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android知识集合[三]">
 <meta name="twitter:description" content="之前的文章快装不下了，所以另外开一篇文章专门放Android相关的杂乱的知识点。">
-<meta name="twitter:image" content="https://api1.foster57.tk/static/imgs/scenery1511100734648.jpg">
+<meta name="twitter:image" content="https://api1.reindeer36.shop/static/imgs/scenery1511100734648.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -54,7 +54,7 @@ ga('send', 'pageview');
   
 
 </head>
-</html>
+
 <body>
   <div id="container" q-class="show:isCtnShow">
     <canvas id="anm-canvas" class="anm-canvas"></canvas>
@@ -201,7 +201,7 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>之前的文章快装不下了，所以另外开一篇文章专门放Android相关的杂乱的知识点。<br><img src="https://api1.foster57.tk/static/imgs/scenery1511100734648.jpg" alt=""><br><a id="more"></a></p>
+        <p>之前的文章快装不下了，所以另外开一篇文章专门放Android相关的杂乱的知识点。<br><img src="https://api1.reindeer36.shop/static/imgs/scenery1511100734648.jpg" alt=""><br><a id="more"></a></p>
 <p><a href="https://android-review.googlesource.com">Android Source code</a>，能够实时看到提交信息<br><a href="http://androidxref.com/7.1.2_r36/xref/frameworks/base/core/java/android/widget/">androidxref，一个比较好的查看源码的网站</a><br><a href="https://www.youtube.com/watch?v=CMzCccqE_R0">From View to Pixel</a>讲了ViewRootImpl,SurfaceFlinger这些东西<br><a href="https://juejin.im/post/5a1e8d5ef265da431280ae19">一个很长的关于显示原理的文章</a>，基本上什么都讲了</p>
 <h3 id="1-基本上所有的Android-System-Event都是从ActivityThread中发起的"><a href="#1-基本上所有的Android-System-Event都是从ActivityThread中发起的" class="headerlink" title="1.基本上所有的Android System Event都是从ActivityThread中发起的"></a>1.基本上所有的Android System Event都是从ActivityThread中发起的</h3><p>onDetachedFromWindow是从ActivityThread的handleDestoryActivity传下来的，走到windowManager.removeViewImediate,然后ViewRootImpl.doDie,然后ViewRootImpl.dispatchDetachedFromWindow，然后DecoreView.dispatchDetachedFromWindow，然后一个个child传下去。所有的View走完了之后，DecorView在onDetachedFromWindow中以Window.Callback的方式顺手通知了Activity的onDetachedFromWindow。其实打个断点看的话就快一点。</p>
 <h3 id="2-onSaveInstance对于有id的View，系统会自动帮忙存一点东西"><a href="#2-onSaveInstance对于有id的View，系统会自动帮忙存一点东西" class="headerlink" title="2. onSaveInstance对于有id的View，系统会自动帮忙存一点东西"></a>2. onSaveInstance对于有id的View，系统会自动帮忙存一点东西</h3><p>当然onSaveInstance也是从ActivityThread里面传递下来的。还有就是onCreate(Bundle)和onRestroreSaveInstanceState(Bundle)里面的bundle是同一个object。romain Guy说最初onSaveInstance和onRestroreSaveInstanceState本来叫onIcy(冻结)和onThaw（解冻），确实很形象。<br>其实这个到现在还有一些痕迹:<br>ViewGroup.java</p>
@@ -536,7 +536,7 @@ public void uploadForm(Map&lt;String, String&gt; params, String fileFormName,
             System.out.println(&quot;上传成功&quot;);  
         }  
 
-    }  
+    }
 </code></pre>
 <h3 id="26-ScrollView，RecyclerView的截屏实现"><a href="#26-ScrollView，RecyclerView的截屏实现" class="headerlink" title="26.ScrollView，RecyclerView的截屏实现"></a>26.ScrollView，RecyclerView的截屏实现</h3><p>主要是用lru包装下，<a href="https://gist.github.com/PrashamTrivedi/809d2541776c8c141d9a">参考</a></p>
 <pre><code class="java">public static Bitmap shotRecyclerView(RecyclerView view) {
@@ -714,7 +714,7 @@ private fun screenShotLong(){
              ss.adapterState = mAdapter.saveState();
          }
          return ss;
-     }   
+     }
 </code></pre>
 <p>ViewPager的 onMeasure中有这么一段话,这也就解释了为什么viewPager宽高不能设置为wrap_content。<a href="https://stackoverflow.com/questions/8394681/android-i-am-unable-to-have-viewpager-wrap-content"></a></p>
 <pre><code class="java"> @Override
@@ -728,7 +728,7 @@ private fun screenShotLong(){
                getDefaultSize(0, heightMeasureSpec));
                 // ................................
 
-             }     
+             }
 </code></pre>
 <p>ViewPager横向挪动child的方法是<br>ViewPager.java</p>
 <pre><code class="java">
@@ -858,7 +858,6 @@ mRenderNode.offsetLeftAndRight(offset);
             requestLayout();
         }
     }
-
 </code></pre>
 <p>最后是关于ViewPager的预加载问题</p>
 <pre><code class="java"> void populate(int newCurrentItem) {
@@ -960,7 +959,7 @@ public Object instantiateItem(ViewGroup container, int position) {
 <blockquote>
 <p>Android 5.0 (API level 21) and higher uses a runtime called ART which natively supports loading multiple DEX files from APK files. ART performs pre-compilation at app install time which scans for classesN.dex files and compiles them into a single .oat file for execution by the Android device. Therefore, if your minSdkVersion is 21 or higher, you do not need the multidex support library.</p>
 </blockquote>
-<p>看下MultiDex的源码，secondaryDex文件的路径是/date/date/&lt;package_name&gt;/code_cache/secondary-dexes/ 这是一个文件夹<br>MultiDex的原理基本上在<a href="https://www.jianshu.com/p/33f22b21ef1e">简书</a></p>
+<p>看下MultiDex的源码，secondaryDex文件的路径是/date/date/<package_name>/code_cache/secondary-dexes/ 这是一个文件夹<br>MultiDex的原理基本上在<a href="https://www.jianshu.com/p/33f22b21ef1e">简书</a></p>
 <pre><code class="java">private static final class V14
     {
         private static void install(final ClassLoader loader, final List&lt;File&gt; additionalClassPathEntries, final File optimizedDirectory) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, InvocationTargetException, NoSuchMethodException {
@@ -1007,7 +1006,7 @@ return apkPath;
     if (parent != null) {
         ((ViewGroup) parent).removeView(mWebView);// 这里面会调用到 view.dispatchDetachedFromWindow();
     }
-    mWebView.destroy();    
+    mWebView.destroy();
 </code></pre>
 <p><a href="https://android.googlesource.com/platform/external/chromium_org/+/lollipop-release/android_webview/java/src/org/chromium/android_webview/AwContents.java">webView的sourceCode</a></p>
 <h3 id="32-App升级或者安装之前是要做一些检查的"><a href="#32-App升级或者安装之前是要做一些检查的" class="headerlink" title="32. App升级或者安装之前是要做一些检查的"></a>32. App升级或者安装之前是要做一些检查的</h3><p><a href="http://blog.csdn.net/sk719887916/article/details/52233112">这篇文章详尽描述了需要做的一些方案</a><br>可能被劫持的地方有三处： 升级api(就是返回下载链接的接口)，下载api(就是那个cdn), 安装过程(调用packageManager之前)</p>
@@ -1170,7 +1169,7 @@ Shader shader = new BitmapShader(
   Shader.TileMode.REPEAT,
   Shader.TileMode.REPEAT);
 textView.getPaint().setShader(shader);
-)            
+)
 </code></pre>
 <p>TextView渲染html文档的时候可以自定义一个tagHandler<br>显示数学上的带有分子和分母的分数，可以使用<afrc>标签<br>TextView里面有一个Layout.Alignment的属性，然后创建一个AlignMentSpan，可以用来实现类似于聊天的文字左对齐，右对齐，只用一个TextView</p>
 <h2 id="34-ContentProvider的一些点"><a href="#34-ContentProvider的一些点" class="headerlink" title="34. ContentProvider的一些点"></a>34. ContentProvider的一些点</h2><p>可以自定义权限，在manifest里面写<br>URI有固定格式：</p>
@@ -1203,7 +1202,7 @@ android:sharedUserId=&quot;com.mythou.share&quot;
 &lt;manifest xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;  
 package=&quot;com.mythou.clientID&quot;  
 android:sharedUserId=&quot;com.mythou.share&quot;  
-&gt;  
+&gt;
 </code></pre>
 <p>读取的时候这么读</p>
 <pre><code class="java">try {  
@@ -1214,7 +1213,7 @@ android:sharedUserId=&quot;com.mythou.share&quot;
 } catch (NameNotFoundException e) {  
      // TODO Auto-generated catch block  
      e.printStackTrace();  
-}   
+}
 </code></pre>
 <h2 id="37-ActivityAlias就跟Alias一样"><a href="#37-ActivityAlias就跟Alias一样" class="headerlink" title="37. ActivityAlias就跟Alias一样"></a>37. ActivityAlias就跟Alias一样</h2><pre><code class="xml">&lt;activity android:name=&quot;com.mytest.StartupActivity&quot;  
     android:exported=&quot;true&quot;&gt;  
@@ -1229,7 +1228,7 @@ android:sharedUserId=&quot;com.mythou.share&quot;
         &lt;action android:name=&quot;android.intent.action.MAIN&quot; /&gt;  
         &lt;category android:name=&quot;android.intent.category.LAUNCHER&quot; /&gt;  
     &lt;/intent-filter&gt;  
-&lt;/activity-alias&gt;  
+&lt;/activity-alias&gt;
 </code></pre>
 <h2 id="38-自定义一个scheme也很简单"><a href="#38-自定义一个scheme也很简单" class="headerlink" title="38. 自定义一个scheme也很简单"></a>38. 自定义一个scheme也很简单</h2><p>比如说App打电话就是:</p>
 <pre><code class="java">//电话号码  
@@ -1258,7 +1257,7 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         }  
     }  
     super.onActivityResult(requestCode, resultCode, data);  
-}  
+}
 </code></pre>
 <pre><code class="xml">&lt;activity android:name=&quot;com.sarnasea.interprocess.ShareActivity&quot;&gt;  
     &lt;intent-filter&gt;  
@@ -1266,7 +1265,7 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         &lt;data android:scheme=&quot;message&quot;/&gt;  
         &lt;category android:name=&quot;android.intent.category.DEFAULT&quot;/&gt;  
     &lt;/intent-filter&gt;  
-&lt;/activity&gt;  
+&lt;/activity&gt;
 </code></pre>
 <pre><code class="java">//  在ShareActivity获得其他应用程序传递过来的数据  （完全可以多进程）
 Uri data = getIntent().getData();  
@@ -1302,7 +1301,7 @@ data.putExtra(&quot;result&quot;, &quot;关闭Activity时返回的数据&quot;);
 // 设置返回码和Intent对象  
 setResult(Activity.RESULT_OK, data);  
 // 关闭Activity  
-finish();    
+finish();
 </code></pre>
 <h2 id="39-Intent的底层实现是共享内存"><a href="#39-Intent的底层实现是共享内存" class="headerlink" title="39. Intent的底层实现是共享内存"></a>39. Intent的底层实现是共享内存</h2><p>两个Activity之间Intent传递数据的时候，Intent中的数据已经经历了两轮序列化和反序列化，当然是不同的对象<br>熟悉AIDL的同学都很清楚，AIDL跨进程通信支持的数据类型是：</p>
 <blockquote>
@@ -1359,7 +1358,7 @@ finish();
 <h2 id="44-美团的关于分析oom以及HRPOF文件的文章"><a href="#44-美团的关于分析oom以及HRPOF文件的文章" class="headerlink" title="44. 美团的关于分析oom以及HRPOF文件的文章"></a>44. 美团的关于分析oom以及HRPOF文件的文章</h2><p><a href="https://tech.meituan.com/2019/11/14/crash-oom-probe-practice.html">顺带吐槽了华为最多500条线程的问题</a><br>可以作为分析处理oom文件的参考</p>
 <p>=============================================================================</p>
 <p>有些地方会对Apk进行二次打包，加固就是防着这个的。</p>
-<p><img src="https://api1.foster57.tk/static/imgs/scenery1511100809920.jpg" alt=""></p>
+<p><img src="https://api1.reindeer36.shop/static/imgs/scenery1511100809920.jpg" alt=""></p>
 <h3 id="9-Facebook出品的BUCK能够用于编译Android-项目，速度比较快。"><a href="#9-Facebook出品的BUCK能够用于编译Android-项目，速度比较快。" class="headerlink" title="9. Facebook出品的BUCK能够用于编译Android 项目，速度比较快。"></a>9. Facebook出品的BUCK能够用于编译Android 项目，速度比较快。</h3><p><a href="https://github.com/1hakr/AnExplorer">一个具有网络传输的FileExplorer</a><br><a href="http://mouxuejie.com/blog/2016-06-11/multidex-source-analysis/">MultiDex原理</a><br><a href="http://wetest.qq.com/lab/view/359.html">偏向native层面的内存占用分析</a><br><a href="https://juejin.im/post/5a646211f265da3e3f4cc997">Android进程框架：进程的启动创建、启动与调度流程</a><br><a href="https://juejin.im/post/59fafa3351882529642107d2">Android进程框架：进程的启动创建、启动与调度流程</a><br><a href="https://wemp.app/posts/6036929c-5712-441b-b6bc-533a66f0a6f6">Android 中的 Hardware Layer 详解 | 开发者说·DTalk</a></p>
 
       
@@ -1523,7 +1522,7 @@ finish();
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2021 Haldir
+    		&copy; 2024 Haldir
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
@@ -1615,11 +1614,47 @@ finish();
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">tools</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">service</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Window</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1639,55 +1674,7 @@ finish();
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">前端</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">nio</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Window</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1699,59 +1686,15 @@ finish();
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">c</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">django</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">sql</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1767,15 +1710,71 @@ finish();
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">opengl</a>
+                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">前端</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">sql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">django</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">nio</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">opengl</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">c</a>
               </li>
             
             <div class="clearfix"></div>

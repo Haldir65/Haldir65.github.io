@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head><meta name="generator" content="Hexo 3.9.0">
+<head>
   <meta charset="utf-8">
   
   <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://haldir65.github.io">
   <title>Java集合类的一些整理 | Haldir的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -16,12 +16,12 @@
 <meta property="og:site_name" content="Haldir的博客">
 <meta property="og:description" content="根据网上的大部分博客的分类，集合框架分为Collections(具有类似数组的功能)和Map(存储键值对)这两大部分。针对jdk1.8的java.util里面的一些常用的或者不常用的集合做一些分析。写这篇文章的过程中，我慢慢发现不同版本jdk的同一个class的实现是有一些差异的(LinkedList)，由于对照的是java1.8的代码，里面会多一些since 1.8的代码，这里不作论述。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://api1.foster57.tk/static/imgs/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg">
-<meta property="og:updated_time" content="2021-04-04T08:46:59.935Z">
+<meta property="og:image" content="https://api1.reindeer36.shop/static/imgs/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg">
+<meta property="og:updated_time" content="2024-02-26T02:48:35.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java集合类的一些整理">
 <meta name="twitter:description" content="根据网上的大部分博客的分类，集合框架分为Collections(具有类似数组的功能)和Map(存储键值对)这两大部分。针对jdk1.8的java.util里面的一些常用的或者不常用的集合做一些分析。写这篇文章的过程中，我慢慢发现不同版本jdk的同一个class的实现是有一些差异的(LinkedList)，由于对照的是java1.8的代码，里面会多一些since 1.8的代码，这里不作论述。">
-<meta name="twitter:image" content="https://api1.foster57.tk/static/imgs/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg">
+<meta name="twitter:image" content="https://api1.reindeer36.shop/static/imgs/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Haldir的博客" type="application/atom+xml">
   
@@ -53,7 +53,7 @@ ga('send', 'pageview');
   
 
 </head>
-</html>
+
 <body>
   <div id="container" q-class="show:isCtnShow">
     <canvas id="anm-canvas" class="anm-canvas"></canvas>
@@ -200,7 +200,7 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>根据网上的大部分博客的分类，集合框架分为Collections(具有类似数组的功能)和Map(存储键值对)这两大部分。针对jdk1.8的java.util里面的一些常用的或者不常用的集合做一些分析。写这篇文章的过程中，我慢慢发现不同版本jdk的同一个class的实现是有一些差异的(LinkedList)，由于对照的是java1.8的代码，里面会多一些since 1.8的代码，这里不作论述。<br><img src="https://api1.foster57.tk/static/imgs/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg" alt=""></p>
+        <p>根据网上的大部分博客的分类，集合框架分为Collections(具有类似数组的功能)和Map(存储键值对)这两大部分。针对jdk1.8的java.util里面的一些常用的或者不常用的集合做一些分析。写这篇文章的过程中，我慢慢发现不同版本jdk的同一个class的实现是有一些差异的(LinkedList)，由于对照的是java1.8的代码，里面会多一些since 1.8的代码，这里不作论述。<br><img src="https://api1.reindeer36.shop/static/imgs/16d714eb6e8ecc23e4d6ba20d0be17a0.jpg" alt=""></p>
 <a id="more"></a>
 <p>java集合的大致框架建议参考网上博客的总结，<a href="http://www.jianshu.com/p/2cd7be850540">Java集合干货系列</a>写的比较好，图画的也不错，针对jdk 1.6源码讲的。我这里只是自己学习过程中的一些笔记。</p>
 <h2 id="List"><a href="#List" class="headerlink" title="List"></a>List</h2><p>ArrayList (建议new出来的时候给定一个适当的size，不然每次扩容很慢的，可以放null)<br>LinkedList(not recommended，增删元素的时候快一点)<br>Vector（线程安全,重同步，不推荐）</p>
@@ -323,7 +323,6 @@ public void trimToSize() // 内存压力大的时候可以释放掉一部分内�
         size++;
         modCount++;
     }
-
 </code></pre>
 <p>add的过程看起来很快，new一个entery，确定下前后的指针就可以了。remove也差不多，取消指针引用即可。</p>
 <p>来看比较慢的get</p>
@@ -350,7 +349,6 @@ public void trimToSize() // 内存压力大的时候可以释放掉一部分内�
             return x;
         }
     }
-
 </code></pre>
 <p>值得注意的一点小事：<br>ArrayList implement RandomAccess接口，而LinkedList并没有。RandomAccess接口的定义如下</p>
 <blockquote>
@@ -391,7 +389,7 @@ public void trimToSize() // 内存压力大的时候可以释放掉一部分内�
 <p>1、顺序插入速度ArrayList会比较快<br>2、LinkedList将比ArrayList更耗费一些内存<br>3、ArrayList的遍历效率会比LinkedList的遍历效率高一些<br>4、有些说法认为LinkedList做插入和删除更快，这种说法其实是不准确的：如果增加或者删除的元素在前半部分的时候，ArrayList会频繁调用System.arrayCopy方法，虽然native方法快，但高频率调用肯定慢，至少比不上移动指针。</p>
 </blockquote>
 <h2 id="2-Map的几个实现类"><a href="#2-Map的几个实现类" class="headerlink" title="2. Map的几个实现类"></a>2. Map的几个实现类</h2><h3 id="2-1-HashMap源码解析"><a href="#2-1-HashMap源码解析" class="headerlink" title="2.1 HashMap源码解析"></a>2.1 HashMap源码解析</h3><blockquote>
-<p>public class HashMap&lt;K,V&gt; extends AbstractMap&lt;K,V&gt;<br>    implements Map&lt;K,V&gt;, Cloneable, Serializable</p>
+<p>public class HashMap<K,V> extends AbstractMap<K,V><br>    implements Map<K,V>, Cloneable, Serializable</p>
 </blockquote>
 <p>HashMap不是线程安全的，Key和Value都有可能为null，存储数据不是有序的(get的顺序不是put的顺序)。比较专业的说法是 <strong>链表数组结构</strong>。</p>
 <p>HashMap中有几个默认值常量</p>
@@ -474,7 +472,6 @@ static final float DEFAULT_LOAD_FACTOR = 0.75f; //一般不需要改
         afterNodeInsertion(evict);//回调函数
         return null;
     }
-
 </code></pre>
 <p>get方法</p>
 <pre><code class="java">  public V get(Object key) {
@@ -541,7 +538,6 @@ static final float DEFAULT_LOAD_FACTOR = 0.75f; //一般不需要改
         }
         return null;
     }
-
 </code></pre>
 <p>回想一下平时迭代一个HashMap的方式</p>
 <pre><code class="java">long i = 0;
@@ -568,7 +564,7 @@ while (it.hasNext()) {
      *
      * @return a set view of the mappings contained in this map
 </code></pre><p>大致意思是： 返回一个能够反映该map元素组合的一个Set，对这个Set的操作都将反映到原map上，反之亦然。在通过entrySet迭代这个map的时候，除了remove和操作操作都是不被支持的。返回的Set支持删除对应的mapping组合。但不支持add操作</p>
-<p>HashMap内部保留了一个这样的成员变量：<br>transient Set&lt;Map.Entry&lt;K,V&gt;&gt; entrySet; //成员变量<br>具体实现enterySet方法的地方：</p>
+<p>HashMap内部保留了一个这样的成员变量：<br>transient Set&lt;Map.Entry<K,V>&gt; entrySet; //成员变量<br>具体实现enterySet方法的地方：</p>
 <pre><code class="java">  public Set&lt;Map.Entry&lt;K,V&gt;&gt; entrySet() {
         Set&lt;Map.Entry&lt;K,V&gt;&gt; es;
         return (es = entrySet) == null ? (entrySet = new EntrySet()) : es;
@@ -599,7 +595,6 @@ while (it.hasNext()) {
             return false;
         }
     }
-
 </code></pre>
 <p>整理的关键在于removeNode方法，和getNode和putVal很像</p>
 <pre><code class="java">   final Node&lt;K,V&gt; removeNode(int hash, Object key, Object value,
@@ -668,7 +663,7 @@ while (it.hasNext()) {
     }
 </code></pre>
 <p>和ArrayList、LinkedList比起来，HashMap的源码要麻烦许多，这里面涉及到hashCode，链表，红黑树。需要一点数据结构的知识。另外，HashMap还针对hashCode冲突（hash Collision，不同的Object居然有相同的hashCode）的情况作了<a href="https://stackoverflow.com/questions/6493605/how-does-a-java-hashmap-handle-different-objects-with-the-same-hash-code">预处理</a><br>通俗的来说，HashMap内部维护了一个数组，每一个数组元素内部不一定只有一个，有可能是一个链表。每次添加(key,value)不是盲目的往这个数组里面塞，而是算下key的hash值，放到对应的节点上。如果这个节点上还没有元素，直接放就好了。如果有的话，新加入的value将被作为原有元素的Next(外部调用get的时候，先根据传入的key的hashCode找到节点，然后根据key.equals来找)。简单如此，精致如斯。</p>
-<h3 id="2-2-LinkedHashMap"><a href="#2-2-LinkedHashMap" class="headerlink" title="2.2 LinkedHashMap"></a>2.2 LinkedHashMap</h3><p>public class LinkedHashMap&lt;K,V&gt;<br>    extends HashMap&lt;K,V&gt;<br>    implements Map&lt;K,V&gt;<br>HashMap源码我看了下有两千多行，LinkedHashMap只有七百多行，显然这是继承带来的简便之处。<br>关键的成员变量<br>final boolean accessOrder; 默认是false</p>
+<h3 id="2-2-LinkedHashMap"><a href="#2-2-LinkedHashMap" class="headerlink" title="2.2 LinkedHashMap"></a>2.2 LinkedHashMap</h3><p>public class LinkedHashMap<K,V><br>    extends HashMap<K,V><br>    implements Map<K,V><br>HashMap源码我看了下有两千多行，LinkedHashMap只有七百多行，显然这是继承带来的简便之处。<br>关键的成员变量<br>final boolean accessOrder; 默认是false</p>
 <blockquote>
 <p>The iteration ordering method for this linked hash map: <tt>true</tt><br>for access-order, false for insertion-order.</p>
 </blockquote>
@@ -715,8 +710,6 @@ while (it.hasNext()) {
 
         }
     }
-
-
 </code></pre><p>很显然这段话是因为length= -60导致崩溃，应该是mSize被设置为0(其他线程调用了clear方法，clear只是设置mSize = 0)</p>
 <p>重现了一下：</p>
 <pre><code class="java"> @Override
@@ -835,7 +828,6 @@ public void put(int key, int value) {
         System.arraycopy(array, index, newArray, index + 1, array.length - index);
         return newArray;
     }
-
 </code></pre>
 <p>SparseArray<br>廖祜秋 特地强调</p>
 <ol>
@@ -1093,7 +1085,7 @@ a = null;
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2021 Haldir
+    		&copy; 2024 Haldir
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
@@ -1185,11 +1177,47 @@ a = null;
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">transition</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">tools</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">service</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Window</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1209,55 +1237,7 @@ a = null;
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">tools</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">前端</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">nio</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">foreground</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">TouchEvent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Window</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">statusBar</a>
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1269,59 +1249,15 @@ a = null;
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">jvm</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">C</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">c</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">置顶</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">css</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">django</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">sql</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Handler Message</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">rxjava2</a>
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1337,15 +1273,71 @@ a = null;
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">opengl</a>
+                <a href="javascript:void(0)" class="js-tag color4">designpattern</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">RecyclerView</a>
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">前端</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">javaScript</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Vue</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">css</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">插件化</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">sql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">django</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">C</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">nio</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">tbd</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">opengl</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">c</a>
               </li>
             
             <div class="clearfix"></div>
