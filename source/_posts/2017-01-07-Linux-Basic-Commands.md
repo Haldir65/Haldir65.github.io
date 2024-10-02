@@ -372,7 +372,7 @@ du -hsBM /var/* | sort -n //查看/var目录下全部文件，从小到大排列
 free -h # human readable
 
 修改默认安全设置
-> vi /etc/ssh/ssd_config
+> vi /etc/ssh/sshd_config
 ```
 
 添加或修改
